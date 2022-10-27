@@ -64,7 +64,8 @@ public class ContainerMatrixHierarchicalTestExecutor<C extends EngineExecutionCo
 
         if(graylogBackend.get() instanceof NoOpBackend) {
 //            throw new JUnitException("Backend unavailable. Maybe a container startup failure?");
-            HierarchicalTestExecutorService.TestTask rootTestTask = new AlwaysFailTask(taskContext, rootTestDescriptor);
+            AlwaysFailTask rootTestTask = new AlwaysFailTask(taskContext, rootTestDescriptor);
+            rootTestTask.setParentContext(this.rootContext);
             return this.executorService.submit(rootTestTask);
         }
 

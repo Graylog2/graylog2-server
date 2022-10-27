@@ -18,12 +18,21 @@ package org.junit.platform.engine.support.hierarchical;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.platform.commons.JUnitException;
+import org.junit.platform.commons.util.UnrecoverableExceptions;
 import org.junit.platform.engine.TestDescriptor;
+import org.junit.platform.engine.TestExecutionResult;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class AlwaysFailTask<C extends EngineExecutionContext> implements HierarchicalTestExecutorService.TestTask {
     private final NodeTestTaskContext taskContext;
     private final TestDescriptor testDescriptor;
     private final Node<C> node;
+    private ThrowableCollector throwableCollector;
+    private C parentContext;
+    private C context;
 
     public AlwaysFailTask(NodeTestTaskContext taskContext, TestDescriptor testDescriptor) {
         this.taskContext = taskContext;
@@ -39,9 +48,52 @@ public class AlwaysFailTask<C extends EngineExecutionContext> implements Hierarc
         return this.taskContext.getExecutionAdvisor().getForcedExecutionMode(this.testDescriptor).orElse(this.node.getExecutionMode());
     }
 
+    public void setParentContext(C parentContext) {
+        this.parentContext = parentContext;
+    }
+
+    private void prepare() {
+        this.throwableCollector.execute(() -> {
+            this.context = this.node.prepare(this.parentContext);
+        });
+        this.parentContext = null;
+    }
+
+    private void cleanUp() {
+        this.throwableCollector.execute(() -> {
+            this.node.cleanUp(this.context);
+        });
+    }
+
+    private void reportCompletion() {
+        this.node.nodeFinished(this.context, this.testDescriptor, TestExecutionResult.failed(new JUnitException("Backend unavailable. Maybe a container startup failure?")));
+
+        this.taskContext.getListener().executionFinished(this.testDescriptor, TestExecutionResult.failed(new JUnitException("Backend unavailable. Maybe a container startup failure?")));
+        this.throwableCollector = null;
+    }
+
     @Override
     public void execute() {
-//        throw new JUnitException("Backend unavailable. Maybe a container startup failure?");
-        Assertions.fail("Backend unavailable. Maybe a container startup failure?");
+        this.throwableCollector = this.taskContext.getThrowableCollectorFactory().create();
+
+        this.prepare();
+
+        this.throwableCollector.execute(() -> {
+            List<AlwaysFailTask<C>> children = (List) this.testDescriptor.getChildren().stream().map((descriptor) -> {
+                return new AlwaysFailTask(this.taskContext, descriptor);
+            }).collect(Collectors.toCollection(ArrayList::new));
+            if (!children.isEmpty()) {
+                children.forEach((child) -> {
+                    child.setParentContext(this.context);
+                });
+                this.taskContext.getExecutorService().invokeAll(children);
+            }
+        });
+
+        if (this.context != null) {
+            this.cleanUp();
+        }
+
+        this.reportCompletion();
     }
 }
