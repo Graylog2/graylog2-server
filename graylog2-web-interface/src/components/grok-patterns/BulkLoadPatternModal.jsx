@@ -31,8 +31,17 @@ class BulkLoadPatternModal extends React.Component {
     super(props);
 
     this.state = {
+      showModal: false,
       importStrategy: 'ABORT_ON_CONFLICT',
     };
+  }
+
+  _openModal = () => {
+    this.setState({ showModal: true });
+  }
+
+  _closeModal = () => {
+    this.setState({ importStrategy: 'ABORT_ON_CONFLICT', showModal: false });
   }
 
   _onSubmit = (evt) => {
@@ -47,7 +56,7 @@ class BulkLoadPatternModal extends React.Component {
 
       GrokPatternsStore.bulkImport(request, importStrategy).then(() => {
         UserNotification.success('Grok Patterns imported successfully', 'Success!');
-        this.modal.close();
+        this._closeModal();
         onSuccess();
       });
     };
@@ -57,17 +66,15 @@ class BulkLoadPatternModal extends React.Component {
 
   _onImportStrategyChange = (event) => this.setState({ importStrategy: event.target.value });
 
-  _resetImportStrategy = () => this.setState({ importStrategy: 'ABORT_ON_CONFLICT' });
-
   render() {
     return (
       <span>
-        <Button bsStyle="info" style={{ marginRight: 5 }} onClick={() => this.modal.open()}>Import pattern file</Button>
+        <Button bsStyle="info" style={{ marginRight: 5 }} onClick={this._openModal}>Import pattern file</Button>
 
-        <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
+        <BootstrapModalForm show={this.state.showModal}
                             title="Import Grok patterns from file"
                             submitButtonText="Upload"
-                            onModalClose={this._resetImportStrategy}
+                            onCancel={this._closeModal}
                             onSubmitForm={this._onSubmit}>
           <Input id="pattern-file"
                  type="file"
