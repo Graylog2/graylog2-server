@@ -28,6 +28,7 @@ import org.graylog.testing.containermatrix.ContainerMatrixTestEngine;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.storage.SearchVersion;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestClassDescriptor;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestWithRunningESMongoTestsDescriptor;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixTestsDescriptor;
@@ -91,7 +92,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                             at this position in the code but our use of containers makes it necessary to fail for exceptions.
                          */
                         LOG.error("Error executing tests for engine " + getId(), exception);
-                        assert false;
+                        Assertions.fail();
                         // throw new JUnitException("Error executing tests for engine " + getId(), exception);
                     }
                 } else if (Lifecycle.CLASS.equals(containerMatrixTestsDescriptor.getLifecycle())) {
@@ -115,7 +116,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                                 at this position in the code but our use of containers makes it necessary to fail for exceptions.
                              */
                             LOG.error("Error executing tests for engine " + getId(), exception);
-                            assert false;
+                            Assertions.fail();
                             // throw new JUnitException("Error executing tests for engine " + getId(), exception);
                         }
                     }
