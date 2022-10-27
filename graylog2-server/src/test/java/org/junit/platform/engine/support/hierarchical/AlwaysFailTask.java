@@ -66,9 +66,9 @@ public class AlwaysFailTask<C extends EngineExecutionContext> implements Hierarc
     }
 
     private void reportCompletion() {
-        this.node.nodeFinished(this.context, this.testDescriptor, TestExecutionResult.failed(new JUnitException("Backend unavailable. Maybe a container startup failure?")));
+        this.node.nodeFinished(this.context, this.testDescriptor, TestExecutionResult.failed(new AssertionError("Backend unavailable. Maybe a container startup failure?")));
 
-        this.taskContext.getListener().executionFinished(this.testDescriptor, TestExecutionResult.failed(new JUnitException("Backend unavailable. Maybe a container startup failure?")));
+        this.taskContext.getListener().executionFinished(this.testDescriptor, TestExecutionResult.failed(new AssertionError("Backend unavailable. Maybe a container startup failure?")));
         this.throwableCollector = null;
     }
 
