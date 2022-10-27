@@ -18,7 +18,9 @@ package org.junit.platform.engine.support.hierarchical;
 
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.completebackend.NoOpBackend;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixEngineDescriptor;
+import org.junit.platform.commons.JUnitException;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.ExecutionRequest;
 import org.junit.platform.engine.TestDescriptor;
@@ -59,6 +61,13 @@ public class ContainerMatrixHierarchicalTestExecutor<C extends EngineExecutionCo
         NodeExecutionAdvisor executionAdvisor = new NodeTreeWalker().walk(rootTestDescriptor);
         NodeTestTaskContext taskContext = new NodeTestTaskContext(executionListener, this.executorService,
                 this.throwableCollectorFactory, executionAdvisor);
+
+        if(graylogBackend.get() instanceof NoOpBackend) {
+//            throw new JUnitException("Backend unavailable. Maybe a container startup failure?");
+            HierarchicalTestExecutorService.TestTask rootTestTask = new AlwaysFailTask(taskContext, rootTestDescriptor);
+            return this.executorService.submit(rootTestTask);
+        }
+
         NodeTestTask<C> rootTestTask = new NodeTestTask<>(taskContext, rootTestDescriptor);
         rootTestTask.setParentContext(this.rootContext);
         return this.executorService.submit(rootTestTask);

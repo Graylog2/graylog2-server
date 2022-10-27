@@ -22,6 +22,7 @@ import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MavenProjectDirProvider;
+import org.graylog.testing.completebackend.NoOpBackend;
 import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.completebackend.RunningGraylogBackend;
 import org.graylog.testing.containermatrix.ContainerMatrixTestEngine;
@@ -83,16 +84,11 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                         RequestSpecification specification = requestSpec(backend);
                         this.execute(request, descriptor.getChildren(), backend, specification);
                     } catch (Exception exception) {
-                        /*
-                            Log the exception and create an assertion that fails.
-                            This triggers a failure in the failsafe plugin. Otherwise it would only log the exception as a warning
-                            and all tests are ignored which leads to a false positive.
-
-                            This is included because an exception is really not something expected in the original JUnit5 TestEngine
-                            at this position in the code but our use of containers makes it necessary to fail for exceptions.
-                         */
+                        /* Log the exception and run the tests so everything fails with an error during tests. */
                         LOG.error("Error executing tests for engine " + getId(), exception);
-                        Assertions.fail();
+                        GraylogBackend backend = new NoOpBackend();
+                        RequestSpecification specification = requestSpec(backend);
+                        this.execute(request, descriptor.getChildren(), backend, specification);
                         // throw new JUnitException("Error executing tests for engine " + getId(), exception);
                     }
                 } else if (Lifecycle.CLASS.equals(containerMatrixTestsDescriptor.getLifecycle())) {
