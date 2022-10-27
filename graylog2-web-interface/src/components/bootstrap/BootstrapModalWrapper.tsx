@@ -39,12 +39,12 @@ const BootstrapModalWrapper = ({
 };
 
 BootstrapModalWrapper.propTypes = {
-  showModal: PropTypes.bool,
+  showModal: PropTypes.bool.isRequired,
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.element),
     PropTypes.element,
   ]).isRequired,
-  onHide: PropTypes.func,
+  onHide: PropTypes.func.isRequired,
   bsSize: PropTypes.oneOf([
     'large', 'lg', 'small', 'sm',
   ]),
@@ -53,8 +53,6 @@ BootstrapModalWrapper.propTypes = {
 };
 
 BootstrapModalWrapper.defaultProps = {
-  showModal: false,
-  onHide: () => {},
   bsSize: undefined,
   backdrop: 'static',
   role: 'dialog',

@@ -100,13 +100,13 @@ BootstrapModalForm.propTypes = {
     PropTypes.element,
   ]).isRequired,
   onSubmitForm: PropTypes.func,
-  onCancel: PropTypes.func,
+  onCancel: PropTypes.func.isRequired,
   /* Object with additional props to pass to the form */
   formProps: PropTypes.object,
   /* Text to use in the submit button. "Submit" is the default */
   submitButtonText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   submitButtonDisabled: PropTypes.bool,
-  show: PropTypes.bool,
+  show: PropTypes.bool.isRequired,
 };
 
 BootstrapModalForm.defaultProps = {
@@ -115,9 +115,7 @@ BootstrapModalForm.defaultProps = {
   submitButtonText: 'Submit',
   submitButtonDisabled: false,
   onSubmitForm: undefined,
-  onCancel: () => {},
   bsSize: undefined,
-  show: false,
 };
 
 export default BootstrapModalForm;
