@@ -38,11 +38,11 @@ type Props = {
 };
 
 const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
-  const configModal = useRef<BootstrapModalForm>();
   const prevNewUrlEntry = useRef<string>();
   const [config, setConfig] = useState<WhiteListConfig>({ entries: [], disabled: false });
   const [isValid, setIsValid] = useState<boolean>(false);
   const [newUrlEntryId, setNewUrlEntryId] = useState<string | undefined>();
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const { configuration } = useStore<ConfigurationsStoreState>(ConfigurationsStore);
   const urlWhiteListConfig = configuration[URL_WHITELIST_CONFIG];
@@ -83,11 +83,12 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
   }, [setDefaultWhiteListState, urlWhiteListConfig, config, newUrlEntry, urlType]);
 
   const openModal = () => {
-    configModal.current?.open();
+    setShowModal(true);
   };
 
   const closeModal = () => {
-    configModal.current?.close();
+    setShowModal(false);
+    setDefaultWhiteListState(urlWhiteListConfig);
   };
 
   const handleUpdate = (nextConfig, nextIsValid) => {
@@ -109,10 +110,6 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
     }
   };
 
-  const resetConfig = () => {
-    setDefaultWhiteListState(urlWhiteListConfig);
-  };
-
   if (urlWhiteListConfig) {
     const { entries, disabled } = config;
 
@@ -121,11 +118,11 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
         <IfPermitted permissions="urlwhitelist:write">
           <Button bsStyle="info" bsSize="xs" onClick={openModal}>Add to URL Whitelist</Button>
         </IfPermitted>
-        <BootstrapModalForm ref={configModal}
+        <BootstrapModalForm show={showModal}
                             bsSize="lg"
                             title="Update Whitelist Configuration"
+                            onCancel={closeModal}
                             onSubmitForm={saveConfig}
-                            onModalClose={resetConfig}
                             submitButtonDisabled={!isValid}
                             submitButtonText="Update configuration">
           <h3>Whitelist URLs</h3>
