@@ -21,7 +21,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
+const { ESBuildMinifyPlugin } = require('esbuild-loader');
 
 const UniqueChunkIdPlugin = require('./webpack/UniqueChunkIdPlugin');
 
@@ -91,11 +91,10 @@ const webpackConfig = {
       {
         test: /\.[jt]s(x)?$/,
         use: {
-          loader: 'babel-loader',
+          loader: 'esbuild-loader',
           options: {
-            cacheDirectory: 'target/web/cache',
-            // eslint-disable-next-line global-require
-            presets: [require('babel-preset-graylog')],
+            loader: 'tsx',
+            target: 'es2015',
           },
         },
         include: /node_modules\/graylog-web-plugin/,
@@ -261,15 +260,8 @@ if (TARGET.startsWith('build')) {
     mode: 'production',
     optimization: {
       moduleIds: 'deterministic',
-      minimizer: [new TerserPlugin({
-        terserOptions: {
-          compress: {
-            warnings: false,
-          },
-          mangle: {
-            reserved: ['$super', '$', 'exports', 'require'],
-          },
-        },
+      minimizer: [new ESBuildMinifyPlugin({
+        target: 'es2015',
       })],
     },
     plugins: [
