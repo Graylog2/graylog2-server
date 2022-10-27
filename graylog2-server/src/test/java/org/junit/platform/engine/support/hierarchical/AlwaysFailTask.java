@@ -16,6 +16,7 @@
  */
 package org.junit.platform.engine.support.hierarchical;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.platform.commons.JUnitException;
 import org.junit.platform.engine.TestDescriptor;
 
@@ -40,6 +41,7 @@ public class AlwaysFailTask<C extends EngineExecutionContext> implements Hierarc
 
     @Override
     public void execute() {
-        throw new JUnitException("Backend unavailable. Maybe a container startup failure?");
+//        throw new JUnitException("Backend unavailable. Maybe a container startup failure?");
+        Assertions.fail("Backend unavailable. Maybe a container startup failure?");
     }
 }
