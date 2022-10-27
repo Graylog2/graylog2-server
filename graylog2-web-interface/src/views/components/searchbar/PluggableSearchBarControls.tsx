@@ -54,7 +54,7 @@ const componentHasContent = ({
   hasPluggableControls,
   hasSearchFilterFeatureFlag,
   hasLeftColFallback,
-  rightColFallback,
+  hasRightColFallback,
 }:{
   hidePluggableControlsPreview: boolean,
   showLeftControls: boolean,
@@ -62,7 +62,7 @@ const componentHasContent = ({
   hasPluggableControls: boolean,
   hasSearchFilterFeatureFlag: boolean,
   hasLeftColFallback?: boolean,
-  rightColFallback?: boolean
+  hasRightColFallback?: boolean
 }) => {
   if (hasPluggableControls) {
     return true;
@@ -73,7 +73,7 @@ const componentHasContent = ({
   }
 
   const shouldShowLeftCol = showLeftControls && hasLeftColFallback && hasSearchFilterFeatureFlag;
-  const shouldShowRightCol = showRightControls && !!rightColFallback;
+  const shouldShowRightCol = showRightControls && !!hasRightColFallback;
 
   return shouldShowLeftCol || shouldShowRightCol;
 };
