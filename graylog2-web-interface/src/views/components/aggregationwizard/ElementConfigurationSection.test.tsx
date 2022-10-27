@@ -24,6 +24,7 @@ describe('ElementConfigurationSection', () => {
     render(
       <ElementConfigurationSection allowCreate
                                    onCreate={() => {}}
+                                   elementKey="element-key"
                                    elementTitle="Aggregation Element Title">
         Children of Dune
       </ElementConfigurationSection>,
@@ -36,6 +37,7 @@ describe('ElementConfigurationSection', () => {
     render(
       <ElementConfigurationSection allowCreate
                                    onCreate={() => {}}
+                                   elementKey="element-key"
                                    elementTitle="Aggregation Element Title">
         Children of Dune
       </ElementConfigurationSection>,
@@ -50,6 +52,7 @@ describe('ElementConfigurationSection', () => {
     render(
       <ElementConfigurationSection allowCreate
                                    onCreate={onCreateMock}
+                                   elementKey="element-key"
                                    elementTitle="Aggregation Element Title">
         Children of Dune
       </ElementConfigurationSection>,
@@ -66,6 +69,7 @@ describe('ElementConfigurationSection', () => {
     render(
       <ElementConfigurationSection allowCreate={false}
                                    onCreate={() => {}}
+                                   elementKey="element-key"
                                    elementTitle="Aggregation Element Title">
         Children of Dune
       </ElementConfigurationSection>,

@@ -113,8 +113,7 @@ const AggregationWizard = ({ onChange, config, children, onSubmit, onCancel }: E
       <>
         <Controls>
           <Section data-testid="configure-elements-section">
-            <ElementsConfiguration aggregationElementsByKey={aggregationElementsByKey}
-                                   config={config}
+            <ElementsConfiguration config={config}
                                    onCreate={onCreateElement}
                                    onSubmit={onSubmit}
                                    onCancel={onCancel}

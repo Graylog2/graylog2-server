@@ -16,16 +16,15 @@
  */
 import * as React from 'react';
 import { useFormikContext } from 'formik';
-import { isEmpty } from 'lodash';
 import styled from 'styled-components';
 
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import StickyBottomActions from 'views/components/widgets/StickyBottomActions';
 import SaveOrCancelButtons from 'views/components/widgets/SaveOrCancelButtons';
 
+import aggregationElements from './aggregationElementDefinitions';
 import ElementConfigurationSection from './ElementConfigurationSection';
 import ElementsConfigurationActions from './ElementsConfigurationActions';
-import type { AggregationElement } from './AggregationElementType';
 import type { WidgetConfigFormValues } from './WidgetConfigForm';
 
 const Container = styled.div`
@@ -33,19 +32,14 @@ const Container = styled.div`
   height: 100%;
 `;
 
-const _sortConfiguredElements = (
-  values: WidgetConfigFormValues,
-  aggregationElementsByKey: { [elementKey: string]: AggregationElement },
-) => Object.keys(aggregationElementsByKey)
-  .map((elementKey) => [elementKey, values[aggregationElementsByKey[elementKey].key]])
-  .sort(
-    ([elementKey1], [elementKey2]) => (
-      aggregationElementsByKey[elementKey1].order - aggregationElementsByKey[elementKey2].order
-    ),
-  );
+const aggregationElementsByKey = Object.fromEntries(aggregationElements.map((element) => ([element.key, element])));
+const sortedConfiguredElements = Object.entries(aggregationElementsByKey).sort(
+  ([elementKey1], [elementKey2]) => (
+    aggregationElementsByKey[elementKey1].order - aggregationElementsByKey[elementKey2].order
+  ),
+);
 
 type Props = {
-  aggregationElementsByKey: { [elementKey: string]: AggregationElement }
   config: AggregationWidgetConfig,
   onConfigChange: (config: AggregationWidgetConfig) => void,
   onCreate: (
@@ -57,23 +51,21 @@ type Props = {
   onCancel: () => void,
 }
 
-const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChange, onCreate, onSubmit, onCancel }: Props) => {
-  const { values, setValues } = useFormikContext<WidgetConfigFormValues>();
+const BottomActions = (onCancel, onSubmit) => (
+  <>
+    <ElementsConfigurationActions />
+    <SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />
+  </>
+);
+
+const ElementsConfiguration = ({ config, onConfigChange, onCreate, onSubmit, onCancel }: Props) => {
+  const { values } = useFormikContext<WidgetConfigFormValues>();
 
   return (
     <Container>
-      <StickyBottomActions actions={(
-        <>
-          <ElementsConfigurationActions />
-          <SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />
-        </>
-      )}>
+      <StickyBottomActions actions={<BottomActions onCancel={onCancel} onSubmit={onSubmit} />}>
         <div>
-          {_sortConfiguredElements(values, aggregationElementsByKey).map(([elementKey, elementFormValues]) => {
-            const empty = isEmpty(elementFormValues);
-
-            const aggregationElement = aggregationElementsByKey[elementKey];
-
+          {sortedConfiguredElements.map(([elementKey, aggregationElement]) => {
             if (!aggregationElement) {
               throw new Error(`Aggregation element with key ${elementKey} is missing but configured for this widget.`);
             }
@@ -82,10 +74,10 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
 
             return (
               <ElementConfigurationSection allowCreate={aggregationElement.allowCreate(values)}
-                                           isEmpty={empty}
-                                           onCreate={() => onCreate(aggregationElement.key, values, setValues)}
+                                           onCreate={onCreate}
                                            elementTitle={aggregationElement.title}
                                            sectionTitle={aggregationElement.sectionTitle}
+                                           elementKey={aggregationElement.key}
                                            key={aggregationElement.key}>
                 <ConfigurationSection config={config} onConfigChange={onConfigChange} />
               </ElementConfigurationSection>

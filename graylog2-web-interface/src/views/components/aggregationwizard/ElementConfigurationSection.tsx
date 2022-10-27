@@ -17,7 +17,11 @@
 import * as React from 'react';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
+import { isEmpty } from 'lodash';
+import { useFormikContext } from 'formik';
+import { useCallback } from 'react';
 
+import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 import IconButton from 'components/common/IconButton';
 
 const Wrapper = styled.div(({ theme }) => css`
@@ -60,7 +64,7 @@ const Wrapper = styled.div(({ theme }) => css`
   }
 `);
 
-const Header = styled.div(({ theme, $isEmpty }: { theme: DefaultTheme, $isEmpty: boolean }) => css`
+const Header = styled.div(({ theme, $hasFormValues }: { theme: DefaultTheme, $hasFormValues: boolean }) => css`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -76,14 +80,14 @@ const Header = styled.div(({ theme, $isEmpty }: { theme: DefaultTheme, $isEmpty:
     content: ' ';
     top: 50%;
     width: 100%;
-    border-bottom: 1px solid ${$isEmpty ? theme.colors.gray['70'] : theme.utils.contrastingColor(theme.colors.global.contentBackground, 'AA')};
+    border-bottom: 1px solid ${$hasFormValues ? theme.utils.contrastingColor(theme.colors.global.contentBackground, 'AA') : theme.colors.gray['70']};
     position: absolute;
   }
 `);
 
-const ElementTitle = styled.div(({ theme, $isEmpty }: { theme: DefaultTheme, $isEmpty: boolean }) => css`
+const ElementTitle = styled.div(({ theme, $hasFormValues }: { theme: DefaultTheme, $hasFormValues: boolean }) => css`
   background-color: ${theme.colors.global.contentBackground};
-  color: ${$isEmpty ? theme.colors.gray['70'] : theme.colors.global.textDefault};
+  color: ${$hasFormValues ? theme.colors.global.textDefault : theme.colors.gray['70']};
   z-index: 1;
   padding-right: 8px;
 `);
@@ -98,37 +102,65 @@ const StyledIconButton = styled(IconButton)(({ theme }) => `
   color: ${theme.colors.global.textDefault};
 `);
 
+const SectionHeader = ({ elementKey, onCreate, title, allowCreate, elementTitle }: {
+  elementTitle: string,
+  onCreate: (
+    elementKey: string,
+    values: WidgetConfigFormValues,
+    setValues: (formValues: WidgetConfigFormValues) => void,
+  ) => void,
+  title: string,
+  allowCreate: boolean,
+  elementKey: string,
+}) => {
+  const { values, setValues } = useFormikContext<WidgetConfigFormValues>();
+  const hasFormValues = !isEmpty(values[elementKey]);
+  const createNewElement = useCallback(() => onCreate(elementKey, values, setValues), [elementKey, onCreate, setValues, values]);
+
+  return (
+    <Header $hasFormValues={hasFormValues}>
+      <ElementTitle $hasFormValues={hasFormValues}>
+        {title}
+      </ElementTitle>
+      <ElementActions>
+        {allowCreate && (
+          <StyledIconButton title={`Add a ${elementTitle}`} name="plus" onClick={createNewElement} />
+        )}
+      </ElementActions>
+    </Header>
+  );
+};
+
 type Props = {
   allowCreate: boolean,
   children: React.ReactNode,
   elementTitle: string,
-  onCreate: () => void,
+  onCreate: (
+    elementKey: string,
+    values: WidgetConfigFormValues,
+    setValues: (formValues: WidgetConfigFormValues) => void,
+  ) => void,
   sectionTitle?: string,
-  isEmpty?: boolean,
+  elementKey: string,
 }
 
 const ElementConfigurationSection = ({
   allowCreate,
   children,
   elementTitle,
-  isEmpty,
   onCreate,
   sectionTitle,
+  elementKey,
 }: Props) => {
   const title = sectionTitle ?? elementTitle;
 
   return (
     <Wrapper data-testid={`${title}-section`}>
-      <Header $isEmpty={isEmpty}>
-        <ElementTitle $isEmpty={isEmpty}>
-          {title}
-        </ElementTitle>
-        <ElementActions>
-          {allowCreate && (
-            <StyledIconButton title={`Add a ${elementTitle}`} name="plus" onClick={onCreate} />
-          )}
-        </ElementActions>
-      </Header>
+      <SectionHeader elementKey={elementKey}
+                     onCreate={onCreate}
+                     elementTitle={elementTitle}
+                     title={title}
+                     allowCreate={allowCreate} />
       <div>
         {children}
       </div>
@@ -138,7 +170,6 @@ const ElementConfigurationSection = ({
 
 ElementConfigurationSection.defaultProps = {
   sectionTitle: undefined,
-  isEmpty: false,
 };
 
 export default ElementConfigurationSection;
