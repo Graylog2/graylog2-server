@@ -26,6 +26,7 @@ import type { WhiteListConfig } from 'stores/configurations/ConfigurationsStore'
 type State = {
   config: WhiteListConfig,
   isValid: boolean,
+  showModal: boolean,
 };
 
 type Props = {
@@ -34,8 +35,6 @@ type Props = {
 };
 
 class UrlWhiteListConfig extends React.Component<Props, State> {
-  private configModal: BootstrapModalForm | undefined | null;
-
   static propTypes = {
     config: PropTypes.object.isRequired,
     updateConfig: PropTypes.func.isRequired,
@@ -48,6 +47,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
     this.state = {
       config,
       isValid: false,
+      showModal: false,
     };
   }
 
@@ -68,15 +68,14 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
   };
 
   _openModal = () => {
-    if (this.configModal) {
-      this.configModal.open();
-    }
+    this.setState({ showModal: true });
   };
 
   _closeModal = () => {
-    if (this.configModal) {
-      this.configModal.close();
-    }
+    const { config } = this.props;
+    const updatedState = { ...this.state, config, showModal: false };
+
+    this.setState(updatedState);
   };
 
   _saveConfig = () => {
@@ -96,16 +95,9 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
     this.setState(updatedState);
   };
 
-  _resetConfig = () => {
-    const { config } = this.props;
-    const updatedState = { ...this.state, config };
-
-    this.setState(updatedState);
-  };
-
   render() {
     const { config: { entries, disabled } } = this.props;
-    const { isValid } = this.state;
+    const { isValid, showModal } = this.state;
 
     return (
       <div>
@@ -131,11 +123,11 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
         <IfPermitted permissions="urlwhitelist:write">
           <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
-        <BootstrapModalForm ref={(configModal) => { this.configModal = configModal; }}
+        <BootstrapModalForm show={showModal}
                             bsSize="lg"
                             title="Update Whitelist Configuration"
                             onSubmitForm={this._saveConfig}
-                            onModalClose={this._resetConfig}
+                            onCancel={this._closeModal}
                             submitButtonDisabled={!isValid}
                             submitButtonText="Update configuration">
           <h3>Whitelist URLs</h3>
