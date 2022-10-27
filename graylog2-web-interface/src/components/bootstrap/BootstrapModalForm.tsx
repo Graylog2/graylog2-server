@@ -23,6 +23,19 @@ import ModalSubmit from 'components/common/ModalSubmit';
 import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
 
+type Props = {
+  backdrop: boolean|'static'|undefined,
+  submitButtonDisabled: boolean,
+  formProps: object,
+  bsSize: 'lg'|'large'|'sm'|'small',
+  show: boolean,
+  submitButtonText: string,
+  onSubmitForm: (event) => void,
+  onCancel: () => void,
+  title: string,
+  children: React.ReactNode,
+};
+
 /**
  * Encapsulates a form element inside a bootstrap modal, hiding some custom logic that this kind of component
  * has, and providing form validation using HTML5 and our custom validation.
@@ -38,7 +51,7 @@ const BootstrapModalForm = ({
   onCancel,
   title,
   children,
-}) => {
+}: Props) => {
   const form = useRef(null);
 
   const submit = (event) => {
