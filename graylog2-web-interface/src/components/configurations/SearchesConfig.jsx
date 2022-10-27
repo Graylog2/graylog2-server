@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React, { createRef } from 'react';
+import React from 'react';
 import moment from 'moment';
 
 import { Button, Row, Col, BootstrapModalForm, Input } from 'components/bootstrap';
@@ -58,8 +58,6 @@ class SearchesConfig extends React.Component {
   constructor(props) {
     super(props);
 
-    this.searchesConfigModal = createRef();
-
     const { config } = props;
 
     const queryTimeRangeLimit = config?.query_time_range_limit;
@@ -69,6 +67,7 @@ class SearchesConfig extends React.Component {
     const analysisDisabledFields = config?.analysis_disabled_fields;
 
     this.state = {
+      showModal: false,
       config: {
         query_time_range_limit: queryTimeRangeLimit,
         relative_timerange_options: relativeTimerangeOptions,
@@ -167,17 +166,13 @@ class SearchesConfig extends React.Component {
     });
   };
 
-  _resetConfig = () => {
-    // Reset to initial state when the modal is closed without saving.
-    this.setState(this.defaultState);
-  };
-
   _openModal = () => {
-    this.searchesConfigModal.current.open();
+    this.setState({ showModal: true });
   };
 
   _closeModal = () => {
-    this.searchesConfigModal.current.close();
+    // Reset to initial state when the modal is closed without saving.
+    this.setState(this.defaultState);
   };
 
   render() {
@@ -188,6 +183,7 @@ class SearchesConfig extends React.Component {
     };
 
     const {
+      showModal,
       config,
       limitEnabled,
       surroundingTimeRangeOptionsUpdate,
@@ -254,10 +250,10 @@ class SearchesConfig extends React.Component {
           <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
 
-        <BootstrapModalForm ref={this.searchesConfigModal}
+        <BootstrapModalForm show={showModal}
                             title="Update Search Configuration"
                             onSubmitForm={this._saveConfig}
-                            onModalClose={this._resetConfig}
+                            onCancel={this._closeModal}
                             submitButtonText="Update configuration">
           <fieldset>
             <label htmlFor="query-limit-checkbox">Relative Timerange Options</label>
