@@ -47,6 +47,7 @@ class EditPatternModal extends React.Component {
     super(props);
 
     this.state = {
+      showModal: false,
       id: props.id,
       name: props.name,
       pattern: props.pattern,
@@ -59,7 +60,7 @@ class EditPatternModal extends React.Component {
   }
 
   openModal = () => {
-    this.modal.open();
+    this.setState({ showModal: true });
   };
 
   _onPatternChange = (newPattern) => {
@@ -88,7 +89,7 @@ class EditPatternModal extends React.Component {
   };
 
   _closeModal = () => {
-    this.modal.close();
+    this.setState({ showModal: false });
   };
 
   _saved = () => {
@@ -132,6 +133,7 @@ class EditPatternModal extends React.Component {
   render() {
     const { create, patterns } = this.props;
     const {
+      showModal,
       name,
       error,
       error_message: errorMessage,
@@ -156,10 +158,11 @@ class EditPatternModal extends React.Component {
                 bsSize={create ? undefined : 'xs'}>
           {triggerButtonContent}
         </Button>
-        <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
+        <BootstrapModalForm show={showModal}
                             title={`${create ? 'Create' : 'Edit'} Grok Pattern ${name}`}
                             bsSize="large"
                             onSubmitForm={this._save}
+                            onCancel={this._closeModal}
                             submitButtonText={`${create ? 'Create' : 'Update'} pattern`}>
           <fieldset>
             <Input type="text"

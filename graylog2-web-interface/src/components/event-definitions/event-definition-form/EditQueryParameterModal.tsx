@@ -50,8 +50,6 @@ class EditQueryParameterModal extends React.Component<Props, State> {
     embryonic: PropTypes.bool.isRequired,
   };
 
-  modal: BootstrapModalForm = React.createRef();
-
   constructor(props) {
     super(props);
 
@@ -68,6 +66,12 @@ class EditQueryParameterModal extends React.Component<Props, State> {
     this.setState({ showModal: true });
   };
 
+  _cleanState = () => {
+    const { queryParameter } = this.props;
+
+    this.setState({ queryParameter, showModal: false });
+  };
+
   _saved = () => {
     const { queryParameter } = this.state;
 
@@ -76,13 +80,7 @@ class EditQueryParameterModal extends React.Component<Props, State> {
     }
 
     this.propagateChanges();
-    this.modal.close();
-  };
-
-  _cleanState = () => {
-    const { queryParameter } = this.props;
-
-    this.setState({ queryParameter, showModal: false });
+    this._cleanState();
   };
 
   propagateChanges = () => {
