@@ -64,7 +64,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
             if (descriptor instanceof ContainerMatrixTestWithRunningESMongoTestsDescriptor) {
                 GraylogBackend backend = RunningGraylogBackend.createStarted();
                 RequestSpecification specification = requestSpec(backend);
-                this.execute(request, ((ContainerMatrixTestsDescriptor) descriptor).getChildren(), backend, specification);
+                this.execute(request, descriptor.getChildren(), backend, specification);
             } else if (descriptor instanceof ContainerMatrixTestsDescriptor) {
                 ContainerMatrixTestsDescriptor containerMatrixTestsDescriptor = (ContainerMatrixTestsDescriptor) descriptor;
 
@@ -80,9 +80,19 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                 if (Lifecycle.VM.equals(containerMatrixTestsDescriptor.getLifecycle())) {
                     try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(esVersion, mongoVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, ContainerMatrixTestsConfiguration.defaultImportLicenses, withEnabledMailServer)) {
                         RequestSpecification specification = requestSpec(backend);
-                        this.execute(request, ((ContainerMatrixTestsDescriptor) descriptor).getChildren(), backend, specification);
+                        this.execute(request, descriptor.getChildren(), backend, specification);
                     } catch (Exception exception) {
-                        throw new JUnitException("Error executing tests for engine " + getId(), exception);
+                        /*
+                            Log the exception and create an assertion that fails.
+                            This triggers a failure in the failsafe plugin. Otherwise it would only log the exception as a warning
+                            and all tests are ignored which leads to a false positive.
+
+                            This is included because an exception is really not something expected in the original JUnit5 TestEngine
+                            at this position in the code but our use of containers makes it necessary to fail for exceptions.
+                         */
+                        LOG.error("Error executing tests for engine " + getId(), exception);
+                        assert false;
+                        // throw new JUnitException("Error executing tests for engine " + getId(), exception);
                     }
                 } else if (Lifecycle.CLASS.equals(containerMatrixTestsDescriptor.getLifecycle())) {
                     for (TestDescriptor td : containerMatrixTestsDescriptor.getChildren()) {
@@ -96,7 +106,17 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                             RequestSpecification specification = requestSpec(backend);
                             this.execute(request, Collections.singleton(td), backend, specification);
                         } catch (Exception exception) {
-                            throw new JUnitException("Error executing tests for engine " + getId(), exception);
+                            /*
+                                Log the exception and create an assertion that fails.
+                                This triggers a failure in the failsafe plugin. Otherwise it would only log the exception as a warning
+                                and all tests are ignored which leads to a false positive.
+
+                                This is included because an exception is really not something expected in the original JUnit5 TestEngine
+                                at this position in the code but our use of containers makes it necessary to fail for exceptions.
+                             */
+                            LOG.error("Error executing tests for engine " + getId(), exception);
+                            assert false;
+                            // throw new JUnitException("Error executing tests for engine " + getId(), exception);
                         }
                     }
                 } else {
