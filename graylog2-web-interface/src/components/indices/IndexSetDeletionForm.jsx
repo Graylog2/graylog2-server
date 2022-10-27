@@ -30,6 +30,7 @@ class IndexSetDeletionForm extends React.Component {
   };
 
   state = {
+    showModal: false,
     assignedStreams: undefined,
     deleteIndices: true,
   };
@@ -54,13 +55,13 @@ class IndexSetDeletionForm extends React.Component {
     this.setState({ deleteIndices: e.target.checked });
   };
 
-  open = () => {
-    this.forms[`index-set-deletion-modal-${this.props.indexSet.id}`].open();
-  };
+  _openModal = () => {
+    this.setState({ showModal: true });
+  }
 
-  close = () => {
-    this.forms[`index-set-deletion-modal-${this.props.indexSet.id}`].close();
-  };
+  _closeModal = () => {
+    this.setState({ showModal: false });
+  }
 
   _isLoading = () => {
     return !this.state.assignedStreams;
@@ -137,9 +138,9 @@ class IndexSetDeletionForm extends React.Component {
 
   render() {
     return (
-      <BootstrapModalForm ref={(elem) => { this.forms[`index-set-deletion-modal-${this.props.indexSet.id}`] = elem; }}
+      <BootstrapModalForm show={this.state.showModal}
                           title={`Delete index set "${this.props.indexSet.title}"?`}
-                          onModalOpen={this._onModalOpen}
+                          onCancel={this._closeModal}
                           onSubmitForm={this._onDelete}
                           submitButtonText="Delete"
                           submitButtonDisabled={!this._isDeletable()}>
