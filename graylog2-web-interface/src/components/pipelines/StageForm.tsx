@@ -38,7 +38,7 @@ type Props = {
 
 const StageForm = ({ pipeline, stage, create, save }: Props) => {
   const currentUser = useCurrentUser();
-  const modalRef = useRef<BootstrapModalForm>();
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const _initialStageNumber = useMemo(() => (
     create ? Math.max(...pipeline.stages.map((s) => s.stage)) + 1 : stage.stage
@@ -48,9 +48,7 @@ const StageForm = ({ pipeline, stage, create, save }: Props) => {
   const { rules } = useStore(RulesStore);
 
   const openModal = () => {
-    if (modalRef.current) {
-      modalRef.current.open();
-    }
+    setShowModal(true);
   };
 
   const _onChange = ({ target }) => {
@@ -62,9 +60,7 @@ const StageForm = ({ pipeline, stage, create, save }: Props) => {
   };
 
   const _closeModal = () => {
-    if (modalRef.current) {
-      modalRef.current.close();
-    }
+    setShowModal(false);
   };
 
   const _onSaved = () => {
@@ -109,9 +105,10 @@ const StageForm = ({ pipeline, stage, create, save }: Props) => {
               bsStyle={create ? 'success' : 'info'}>
         {create ? 'Add new stage' : 'Edit'}
       </Button>
-      <BootstrapModalForm ref={modalRef}
+      <BootstrapModalForm show={showModal}
                           title={`${create ? 'Add new' : 'Edit'} stage ${nextStage.stage}`}
                           onSubmitForm={_handleSave}
+                          onCancel={_closeModal}
                           submitButtonText={create ? 'Add stage' : 'Update stage'}>
         <fieldset>
           <Input type="number"
