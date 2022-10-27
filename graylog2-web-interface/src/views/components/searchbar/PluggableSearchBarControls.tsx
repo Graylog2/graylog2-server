@@ -84,7 +84,7 @@ type Props = {
 }
 
 const PluggableSearchBarControls = ({ showLeftControls, showRightControls }: Props) => {
-  const [hidePluggableControlsPreview, setHidePluggableControlsPreview] = useState(!!Store.get(PLUGGABLE_CONTROLS_HIDDEN_KEY));
+  const [hidePluggableControlsPreview, setHidePluggableControlsPreview] = useState(() => !!Store.get(PLUGGABLE_CONTROLS_HIDDEN_KEY));
   const { leftControls, rightControls } = usePluggableControls();
   const hasSearchFilterFeatureFlag = useFeature('search_filter');
   const hasPluggableControls = !!(leftControls?.length || rightControls?.length);
