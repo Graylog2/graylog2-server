@@ -33,6 +33,7 @@ type Props = {
 }
 
 type State = {
+  showModal: boolean,
   queryParameter: LookupTableParameter,
   validation: {
     lookupTable?: string,
@@ -57,13 +58,14 @@ class EditQueryParameterModal extends React.Component<Props, State> {
     const { queryParameter } = this.props;
 
     this.state = {
+      showModal: false,
       queryParameter,
       validation: {},
     };
   }
 
   openModal = () => {
-    this.modal.open();
+    this.setState({ showModal: true });
   };
 
   _saved = () => {
@@ -80,7 +82,7 @@ class EditQueryParameterModal extends React.Component<Props, State> {
   _cleanState = () => {
     const { queryParameter } = this.props;
 
-    this.setState({ queryParameter });
+    this.setState({ queryParameter, showModal: false });
   };
 
   propagateChanges = () => {
@@ -122,7 +124,7 @@ class EditQueryParameterModal extends React.Component<Props, State> {
 
   render() {
     const { lookupTables, embryonic } = this.props;
-    const { queryParameter, validation } = this.state;
+    const { queryParameter, validation, showModal } = this.state;
 
     const validationState: {
       lookupTable?: [string, string],
@@ -140,10 +142,10 @@ class EditQueryParameterModal extends React.Component<Props, State> {
           {queryParameter.name}{embryonic && ': undeclared'}
         </Button>
 
-        <BootstrapModalForm ref={(ref) => { this.modal = ref; }}
+        <BootstrapModalForm show={showModal}
                             title={`Declare Query Parameter "${queryParameter.name}" from Lookup Table`}
                             onSubmitForm={this._saved}
-                            onModalClose={this._cleanState}
+                            onCancel={this._cleanState}
                             submitButtonText="Save">
           <LookupTableParameterEdit validationState={validationState}
                                     identifier={queryParameter.name}
