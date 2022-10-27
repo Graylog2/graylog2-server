@@ -51,6 +51,7 @@ const MessageProcessorsConfig = createReactClass({
       config: {
         disabled_processors: config.disabled_processors,
         processor_order: config.processor_order,
+        showModal: false,
       },
     };
   },
@@ -58,11 +59,12 @@ const MessageProcessorsConfig = createReactClass({
   inputs: {},
 
   _openModal() {
-    this.configModal.open();
+    this.setState({ showModal: true });
   },
 
   _closeModal() {
-    this.configModal.close();
+    // Reset to initial state when the modal is closed without saving.
+    this.setState(this.getInitialState());
   },
 
   _saveConfig() {
@@ -74,11 +76,6 @@ const MessageProcessorsConfig = createReactClass({
         this._closeModal();
       });
     }
-  },
-
-  _resetConfig() {
-    // Reset to initial state when the modal is closed without saving.
-    this.setState(this.getInitialState());
   },
 
   _updateSorting(newSorting) {
@@ -184,10 +181,10 @@ const MessageProcessorsConfig = createReactClass({
           <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
 
-        <BootstrapModalForm ref={(configModal) => { this.configModal = configModal; }}
+        <BootstrapModalForm show={this.state.showModal}
                             title="Update Message Processors Configuration"
                             onSubmitForm={this._saveConfig}
-                            onModalClose={this._resetConfig}
+                            onCancel={this._closeModal}
                             submitButtonText="Update configuration">
           <h3>Order</h3>
           <p>Use drag and drop to change the execution order of the message processors.</p>
