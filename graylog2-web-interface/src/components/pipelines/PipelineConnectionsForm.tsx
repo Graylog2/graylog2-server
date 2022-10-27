@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Link } from 'components/common/router';
@@ -48,7 +48,7 @@ const formatStreams = (streams: Stream[]): FormattedStream[] => {
 
 const PipelineConnectionsForm = ({ pipeline, connections, streams, save }: Props) => {
   const currentUser = useCurrentUser();
-  const modalRef = useRef<BootstrapModalForm>();
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const initialStreamConnections = useMemo(() => {
     return connections
@@ -64,9 +64,7 @@ const PipelineConnectionsForm = ({ pipeline, connections, streams, save }: Props
   }, [streams, connectedStreams]);
 
   const _openModal = () => {
-    if (modalRef.current) {
-      modalRef.current.open();
-    }
+    setShowModal(true);
   };
 
   const _onStreamsChange = (newStreams) => {
@@ -74,9 +72,7 @@ const PipelineConnectionsForm = ({ pipeline, connections, streams, save }: Props
   };
 
   const _closeModal = () => {
-    if (modalRef.current) {
-      modalRef.current.close();
-    }
+    setShowModal(false);
   };
 
   const _save = () => {
@@ -101,9 +97,10 @@ const PipelineConnectionsForm = ({ pipeline, connections, streams, save }: Props
       <Button disabled={!isPermitted(currentUser.permissions, 'pipeline_connection:edit')} onClick={_openModal} bsStyle="info">
         <span>Edit connections</span>
       </Button>
-      <BootstrapModalForm ref={modalRef}
+      <BootstrapModalForm show={showModal}
                           title={<span>Edit connections for <em>{pipeline.title}</em></span>}
                           onSubmitForm={_save}
+                          onCancel={_closeModal}
                           submitButtonText="Update connections">
         <fieldset>
           <FormGroup id="streamsConnections">
