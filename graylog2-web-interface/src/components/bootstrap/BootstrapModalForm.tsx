@@ -32,26 +32,14 @@ const BootstrapModalForm = ({
   submitButtonDisabled,
   formProps,
   bsSize,
-  onModalClose,
   show,
   submitButtonText,
-  onModalOpen,
   onSubmitForm,
   onCancel,
   title,
   children,
 }) => {
-  const modal = useRef(null);
   const form = useRef(null);
-
-  const open = () => modal.current.open();
-
-  const close = () => modal.current.close();
-
-  const onModalCancel = () => {
-    onCancel();
-    close();
-  };
 
   const submit = (event) => {
     const formDOMNode = form.current;
@@ -77,13 +65,10 @@ const BootstrapModalForm = ({
   );
 
   return (
-    <BootstrapModalWrapper ref={modal}
-                           onOpen={onModalOpen}
-                           onClose={onModalClose}
-                           bsSize={bsSize}
+    <BootstrapModalWrapper bsSize={bsSize}
                            showModal={show}
                            backdrop={backdrop}
-                           onHide={onModalCancel}>
+                           onHide={onCancel}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
@@ -96,7 +81,7 @@ const BootstrapModalForm = ({
         </Modal.Body>
         <Modal.Footer>
           <ModalSubmit disabledSubmit={submitButtonDisabled}
-                       onCancel={onModalCancel}
+                       onCancel={onCancel}
                        submitButtonText={submitButtonText} />
         </Modal.Footer>
       </form>
@@ -114,8 +99,6 @@ BootstrapModalForm.propTypes = {
     PropTypes.arrayOf(PropTypes.element),
     PropTypes.element,
   ]).isRequired,
-  onModalOpen: PropTypes.func,
-  onModalClose: PropTypes.func,
   onSubmitForm: PropTypes.func,
   onCancel: PropTypes.func,
   /* Object with additional props to pass to the form */
@@ -131,8 +114,6 @@ BootstrapModalForm.defaultProps = {
   formProps: {},
   submitButtonText: 'Submit',
   submitButtonDisabled: false,
-  onModalOpen: () => {},
-  onModalClose: () => {},
   onSubmitForm: undefined,
   onCancel: () => {},
   bsSize: undefined,
