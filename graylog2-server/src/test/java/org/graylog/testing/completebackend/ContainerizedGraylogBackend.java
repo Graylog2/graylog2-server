@@ -24,6 +24,7 @@ import org.graylog.testing.graylognode.ExecutableNotFoundException;
 import org.graylog.testing.graylognode.NodeInstance;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.storage.SearchVersion;
+import org.junit.platform.commons.JUnitException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
@@ -53,8 +54,11 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     public static ContainerizedGraylogBackend createStarted(SearchVersion esVersion, MongodbServer mongodbVersion,
                                                             int[] extraPorts, List<URL> mongoDBFixtures,
                                                             PluginJarsProvider pluginJarsProvider, MavenProjectDirProvider mavenProjectDirProvider,
-                                                            List<String> enabledFeatureFlags, boolean preImportLicense, boolean withMailServerEnabled) {
+                                                            List<String> enabledFeatureFlags, boolean preImportLicense, boolean withMailServerEnabled, boolean previousStartFailed) {
 
+        if(previousStartFailed) {
+            throw new JUnitException("Previous backend startup failed");
+        }
         final ContainerizedGraylogBackend backend = new ContainerizedGraylogBackend();
         backend.create(esVersion, mongodbVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, withMailServerEnabled);
         return backend;
