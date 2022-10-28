@@ -87,6 +87,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                     } catch (Exception exception) {
                         /* Log the exception and run the tests so everything fails with an error during tests. */
                         LOG.error("Error executing tests for engine " + getId(), exception);
+                        System.exit(1);
                         previousBackendStartFailed = true;
                         GraylogBackend backend = new NoOpBackend();
                         RequestSpecification specification = requestSpec(backend);
