@@ -38,7 +38,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = VM, searchVersions = SearchServer.ES7)
+@ContainerMatrixTestsConfiguration(serverLifecycle = VM, searchVersions = { SearchServer.ES7, SearchServer.OS2 })
 public class SuggestionResourceIT {
 
     static final int GELF_HTTP_PORT = 12201;
