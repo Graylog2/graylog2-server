@@ -114,29 +114,6 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
         ensureSystemNotificationEventsDefinition();
     }
 
-    private void ensureSystemNotificationEventsDefinition() {
-        if (dbService.getSystemEventDefinitions().isEmpty()) {
-            EventDefinitionDto eventDto =
-                    EventDefinitionDto.builder()
-                            .title("System notification events")
-                            .description("Reserved event definition for system notification events")
-                            .isSystemEvent(true)
-                            .alert(false)
-                            .priority(1)
-                            .keySpec(ImmutableList.of())
-                            .notificationSettings(EventNotificationSettings.builder()
-                                    .gracePeriodMs(0) // Defaults to 0 in the UI
-                                    .backlogSize(0) // Defaults to 0 in the UI
-                                    .build())
-                            // Empty notifications list by default. The user will specify later in the UI.
-                            .notifications(ImmutableList.<EventNotificationHandler.Config>builder().build())
-                            .config(SystemNotificationEventProcessorConfig.builder().build())
-                            .storage(ImmutableList.of(PersistToStreamsStorageHandler.Config.createWithSystemEventsStream()))
-                            .build();
-            dbService.save(eventDto);
-        }
-    }
-
     private void ensureEventsStreamAndIndexSet(String indexSetTitle,
                                                String indexSetDescription,
                                                String indexPrefix,
@@ -239,6 +216,29 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
             LOG.info("Successfully created events stream <{}/{}>", stream.getId(), stream.getTitle());
         } catch (ValidationException e) {
             LOG.error("Couldn't create events stream <{}/{}>! This is a bug!", streamId, streamTitle, e);
+        }
+    }
+
+    private void ensureSystemNotificationEventsDefinition() {
+        if (dbService.getSystemEventDefinitions().isEmpty()) {
+            EventDefinitionDto eventDto =
+                    EventDefinitionDto.builder()
+                            .title("System notification events")
+                            .description("Reserved event definition for system notification events")
+                            .isSystemEvent(true)
+                            .alert(false)
+                            .priority(1)
+                            .keySpec(ImmutableList.of())
+                            .notificationSettings(EventNotificationSettings.builder()
+                                    .gracePeriodMs(0) // Defaults to 0 in the UI
+                                    .backlogSize(0) // Defaults to 0 in the UI
+                                    .build())
+                            // Empty notifications list by default. The user will specify later in the UI.
+                            .notifications(ImmutableList.<EventNotificationHandler.Config>builder().build())
+                            .config(SystemNotificationEventProcessorConfig.builder().build())
+                            .storage(ImmutableList.of(PersistToStreamsStorageHandler.Config.createWithSystemEventsStream()))
+                            .build();
+            dbService.save(eventDto);
         }
     }
 }

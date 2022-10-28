@@ -21,31 +21,29 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableSet;
 import org.graylog.events.processor.EventProcessorParametersWithTimerange;
+import org.graylog2.notifications.Notification;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.joda.time.DateTime;
 
-import java.util.Collections;
-import java.util.Set;
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
+import static org.joda.time.DateTime.now;
 
 @AutoValue
 @JsonTypeName(SystemNotificationEventProcessorConfig.TYPE_NAME)
 @JsonDeserialize(builder = SystemNotificationEventProcessorParameters.Builder.class)
 public abstract class SystemNotificationEventProcessorParameters implements EventProcessorParametersWithTimerange {
-    private static final String FIELD_STREAMS = "streams";
-    private static final String FIELD_BATCH_SIZE = "batch_size";
+    private static final String FIELD_TIMESTAMP = "timestamp";
+    private static final String FIELD_NOTIFICATION_TYPE = "notification_type";
 
-    @JsonProperty(FIELD_STREAMS)
-    public abstract ImmutableSet<String> streams();
+    @JsonProperty(FIELD_TIMESTAMP)
+    public abstract DateTime timestamp();
 
-    @JsonProperty(FIELD_BATCH_SIZE)
-    public abstract int batchSize();
+    @JsonProperty(FIELD_NOTIFICATION_TYPE)
+    public abstract Notification.Type notificationType();
 
     @Override
     public EventProcessorParametersWithTimerange withTimerange(DateTime from, DateTime to) {
@@ -63,7 +61,7 @@ public abstract class SystemNotificationEventProcessorParameters implements Even
     }
 
     @AutoValue.Builder
-    public static abstract class Builder implements EventProcessorParametersWithTimerange.Builder<Builder> {
+    public abstract static class Builder implements EventProcessorParametersWithTimerange.Builder<Builder> {
         @JsonCreator
         public static Builder create() {
             final RelativeRange timerange;
@@ -75,17 +73,17 @@ public abstract class SystemNotificationEventProcessorParameters implements Even
             }
 
             return new AutoValue_SystemNotificationEventProcessorParameters.Builder()
-                    .type(SystemNotificationEventProcessorConfig.TYPE_NAME)
+                    .timestamp(now())
                     .timerange(timerange)
-                    .streams(Collections.emptySet())
-                    .batchSize(500);
+                    .type(SystemNotificationEventProcessorConfig.TYPE_NAME)
+                    .notificationType(Notification.Type.GENERIC);
         }
 
-        @JsonProperty(FIELD_STREAMS)
-        public abstract Builder streams(Set<String> streams);
+        @JsonProperty(FIELD_TIMESTAMP)
+        public abstract Builder timestamp(DateTime timestamp);
 
-        @JsonProperty(FIELD_BATCH_SIZE)
-        public abstract Builder batchSize(int batchSize);
+        @JsonProperty(FIELD_NOTIFICATION_TYPE)
+        public abstract Builder notificationType(Notification.Type notificationType);
 
         public abstract SystemNotificationEventProcessorParameters build();
     }

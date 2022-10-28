@@ -16,6 +16,7 @@
  */
 package org.graylog.events.processor.systemnotification;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventFactory;
@@ -42,17 +43,21 @@ public class SystemNotificationEventProcessor implements EventProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(SystemNotificationEventProcessor.class);
 
     private final EventDefinition eventDefinition;
-    private final SystemNotificationEventProcessorConfig config;
 
     @Inject
     public SystemNotificationEventProcessor(@Assisted EventDefinition eventDefinition) {
         this.eventDefinition = eventDefinition;
-        this.config = (SystemNotificationEventProcessorConfig) eventDefinition.config();
     }
 
     @Override
     public void createEvents(EventFactory eventFactory, EventProcessorParameters processorParameters, EventConsumer<List<EventWithContext>> eventsConsumer) throws EventProcessorException {
-        LOG.debug("Creating events for config={}", config);
+        SystemNotificationEventProcessorParameters eventParameters = (SystemNotificationEventProcessorParameters) processorParameters;
+        LOG.debug("Creating system event for notification: {}", eventParameters.notificationType());
+
+        final ImmutableList.Builder<EventWithContext> eventsWithContext = ImmutableList.builder();
+        final Event event = eventFactory.createEvent(eventDefinition, eventParameters.timestamp(), eventDefinition.title());
+        eventsWithContext.add(EventWithContext.create(event));
+        eventsConsumer.accept(eventsWithContext.build());
     }
 
     @Override
