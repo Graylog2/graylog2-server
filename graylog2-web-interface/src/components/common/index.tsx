@@ -61,6 +61,7 @@ export { default as IconButton } from './IconButton';
 export { default as IfPermitted } from './IfPermitted';
 export { default as InputDescription } from './InputDescription';
 export { default as InputOptionalInfo } from './InputOptionalInfo';
+export { default as InputList } from './InputList';
 export { default as InteractableModal } from './InteractableModal';
 export { default as JSONValueInput } from './JSONValueInput';
 export { default as KeyCapture } from './KeyCapture';
