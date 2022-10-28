@@ -141,7 +141,11 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
             final EventDefinitionDto systemEventDefinition =
                     dbEventDefinitionService.getSystemEventDefinitions().stream().findFirst()
                             .orElseThrow(() -> new IllegalStateException("System notification event definition not found"));
-            SystemNotificationEventProcessorParameters parameters = SystemNotificationEventProcessorParameters.builder().build();
+            SystemNotificationEventProcessorParameters parameters =
+                    SystemNotificationEventProcessorParameters.builder()
+                            .notificationType(notification.getType())
+                            .timestamp(notification.getTimestamp())
+                            .build();
             eventProcessorEngine.execute(systemEventDefinition.id(), parameters);
         } catch (ValidationException e) {
             // We have no validations, but just in case somebody adds some...

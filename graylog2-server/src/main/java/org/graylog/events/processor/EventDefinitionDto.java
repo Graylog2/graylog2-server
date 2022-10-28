@@ -224,7 +224,6 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
                         .storage(ImmutableList.<EventStorageHandler.Config>builder()
                                 .addAll(handlersWithoutPersistToStreams)
                                 .add(withDefaultEventsStream)
-                                .add(withSystemEventsStream)
                                 .build())
                         .build();
             }

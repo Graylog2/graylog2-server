@@ -24,7 +24,7 @@ public abstract class SystemNotificationEventProcessorConfig implements EventPro
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
-    public static abstract class Builder implements EventProcessorConfig.Builder<Builder> {
+    public abstract static class Builder implements EventProcessorConfig.Builder<Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_SystemNotificationEventProcessorConfig.Builder()
