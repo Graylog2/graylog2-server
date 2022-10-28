@@ -51,17 +51,17 @@ class IndexSetDeletionForm extends React.Component {
     });
   };
 
+  open = () => {
+    this.setState({ showModal: true }, this._onModalOpen);
+  };
+
+  close = () => {
+    this.setState({ showModal: false });
+  };
+
   _onRemoveClick = (e) => {
     this.setState({ deleteIndices: e.target.checked });
   };
-
-  _openModal = () => {
-    this.setState({ showModal: true });
-  }
-
-  _closeModal = () => {
-    this.setState({ showModal: false });
-  }
 
   _isLoading = () => {
     return !this.state.assignedStreams;
@@ -140,7 +140,7 @@ class IndexSetDeletionForm extends React.Component {
     return (
       <BootstrapModalForm show={this.state.showModal}
                           title={`Delete index set "${this.props.indexSet.title}"?`}
-                          onCancel={this._closeModal}
+                          onCancel={this.close}
                           onSubmitForm={this._onDelete}
                           submitButtonText="Delete"
                           submitButtonDisabled={!this._isDeletable()}>
