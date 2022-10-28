@@ -135,7 +135,7 @@
     "@types/ua-parser-js": "^0.7.36",
     "@types/urijs": "^1.19.19",
     "assets-webpack-plugin": "^7.1.1",
-    "babel-loader": "^8.2.3",
+    "babel-loader": "^9.0.0",
     "compression": "^1.7.2",
     "connect-history-api-fallback": "^2.0.0",
     "copy-webpack-plugin": "^11.0.0",
