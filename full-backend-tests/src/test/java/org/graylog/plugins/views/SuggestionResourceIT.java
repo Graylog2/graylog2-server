@@ -16,10 +16,11 @@
  */
 package org.graylog.plugins.views;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
@@ -29,16 +30,13 @@ import org.graylog.testing.utils.StreamUtils;
 import org.graylog2.plugin.streams.StreamRuleType;
 import org.junit.jupiter.api.BeforeAll;
 
-import java.util.Map;
-import java.util.Set;
-
 import static io.restassured.RestAssured.given;
 import static org.graylog.testing.completebackend.Lifecycle.VM;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = VM, searchVersions = { SearchServer.ES7, SearchServer.OS2 })
+@ContainerMatrixTestsConfiguration(serverLifecycle = VM)
 public class SuggestionResourceIT {
 
     static final int GELF_HTTP_PORT = 12201;
@@ -58,8 +56,8 @@ public class SuggestionResourceIT {
     public void init() {
         int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
         final String defaultIndexSetId = IndexSetUtils.defaultIndexSetId(requestSpec);
-        this.stream1Id = StreamUtils.createStream(requestSpec, "Stream #1", defaultIndexSetId, new StreamUtils.StreamRule(StreamRuleType.EXACT.toInteger(), "stream1", "target_stream", false));
-        this.stream2Id = StreamUtils.createStream(requestSpec, "Stream #2", defaultIndexSetId, new StreamUtils.StreamRule(StreamRuleType.EXACT.toInteger(), "stream2", "target_stream", false));
+        this.stream1Id = StreamUtils.createStream(requestSpec, "Stream #1", defaultIndexSetId, StreamUtils.StreamRule.create(StreamRuleType.EXACT.toInteger(), "stream1", "target_stream", false));
+        this.stream2Id = StreamUtils.createStream(requestSpec, "Stream #2", defaultIndexSetId, StreamUtils.StreamRule.create(StreamRuleType.EXACT.toInteger(), "stream2", "target_stream", false));
 
         GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
         GelfInputUtils.postMessage(mappedPort,
@@ -98,10 +96,10 @@ public class SuggestionResourceIT {
         final ValidatableResponse validatableResponse = given()
                 .spec(requestSpec)
                 .when()
-                .body(Map.of(
+                .body(ImmutableMap.of(
                         "field", "source",
                         "input", "",
-                        "streams", Set.of(stream1Id)
+                        "streams", ImmutableSet.of(stream1Id)
                 ))
                 .post("/search/suggest")
                 .then()
@@ -112,10 +110,10 @@ public class SuggestionResourceIT {
         final ValidatableResponse validatableResponse2 = given()
                 .spec(requestSpec)
                 .when()
-                .body(Map.of(
+                .body(ImmutableMap.of(
                         "field", "source",
                         "input", "",
-                        "streams", Set.of(stream2Id)
+                        "streams", ImmutableSet.of(stream2Id)
                 ))
                 .post("/search/suggest")
                 .then()
