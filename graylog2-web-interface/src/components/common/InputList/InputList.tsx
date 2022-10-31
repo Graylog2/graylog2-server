@@ -16,7 +16,9 @@
  */
 import * as React from 'react';
 import CreatableSelect from 'react-select/creatable';
+import type { Props as CreatableProps } from 'react-select/creatable';
 
+import useInputListStyles from './useInputListStyles';
 import { GenericChangeEvent } from './InputList.types';
 import type { GenericTarget } from './InputList.types';
 
@@ -30,14 +32,15 @@ const createOption = (value: string | number) => ({
   value,
 });
 
-type Props = {
+type Props = CreatableProps & {
   name: string,
   values: (string | number)[],
   onChange: (newValue: React.ChangeEvent<GenericTarget<(string | number)[]>>) => void,
-  [key: string]: unknown,
+  size?: 'small' | 'normal',
 };
 
-const InputList = ({ name, values, onChange, ...rest }: Props) => {
+const InputList = ({ name, values, onChange, size, ...rest }: Props) => {
+  const { inputListTheme, styles } = useInputListStyles(size);
   const inputRef = React.useRef(null);
   const [inputValue, setInputValue] = React.useState<string>('');
   const [value, setValue] = React.useState<readonly Option[]>(values.map((val: string | number) => createOption(val)));
@@ -80,8 +83,14 @@ const InputList = ({ name, values, onChange, ...rest }: Props) => {
                      onInputChange={(newValue: string) => setInputValue(newValue)}
                      onKeyDown={handleKeyDown}
                      value={value}
+                     styles={styles}
+                     theme={inputListTheme}
                      {...rest} />
   );
+};
+
+InputList.defaultProps = {
+  size: 'normal',
 };
 
 export default InputList;
