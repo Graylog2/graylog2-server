@@ -43,10 +43,11 @@ public final class StreamUtils {
                                         @JsonProperty("value") String value,
                                         @JsonProperty("field") String field,
                                         @JsonProperty("inverted") boolean inverted) {
-            return new AutoValue_StreamUtils.StreamRule(type, value, field, inverted);
+            return new AutoValue_StreamUtils_StreamRule(type, value, field, inverted);
         }
     }
 
+    @AutoValue
     public abstract static class CreateStreamRequest {
         @JsonProperty("title")
         public abstract String title();
@@ -57,7 +58,7 @@ public final class StreamUtils {
         public static CreateStreamRequest create(@JsonProperty("title") String title,
                                                  @JsonProperty("rules") Collection<StreamRule> streamRules,
                                                  @JsonProperty("index_set_id") String indexSetId) {
-            return new AutoValue_StreamUtils.CreateStreamRequest(title, streamRules, indexSetId);
+            return new AutoValue_StreamUtils_CreateStreamRequest(title, streamRules, indexSetId);
         }
     }
 
