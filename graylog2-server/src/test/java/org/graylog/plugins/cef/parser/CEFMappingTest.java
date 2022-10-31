@@ -18,9 +18,16 @@ package org.graylog.plugins.cef.parser;
 
 import org.junit.Test;
 
+import java.math.BigInteger;
+
 import static org.junit.Assert.assertEquals;
 
 public class CEFMappingTest {
+    private static final String[] BIG_INT_FIELD_KEYS = new String[]{
+            "cn1", "cn2","cn3", "cn4", "cnt", "destinationTranslatedPort", "dpid", "dpt",
+            "dvcpid", "fsize", "in", "oldFileSize", "out", "sourceTranslatedPort", "spid", "spt"
+    };
+
     @Test
     public void forKeyName() throws Exception {
         for (CEFMapping mapping : CEFMapping.values()) {
@@ -32,6 +39,17 @@ public class CEFMappingTest {
     public void forFullName() throws Exception {
         for (CEFMapping mapping : CEFMapping.values()) {
             assertEquals(mapping, CEFMapping.forFullName(mapping.getFullName()));
+        }
+    }
+
+    @Test
+    public void convertLargeValues() throws Exception {
+        String bigValueString = String.valueOf(Integer.MAX_VALUE) + 1;
+        BigInteger bigValue = new BigInteger(bigValueString);
+        for (String keyName : BIG_INT_FIELD_KEYS) {
+            CEFMapping fieldMapping = CEFMapping.forKeyName(keyName);
+            Object mapping = fieldMapping.convert(bigValueString);
+            assertEquals(bigValue, mapping);
         }
     }
 }

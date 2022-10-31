@@ -21,7 +21,6 @@ import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 import java.math.BigInteger;
-import java.util.Map;
 import java.util.function.Function;
 
 @SuppressWarnings("unused")
@@ -69,7 +68,7 @@ public enum CEFMapping {
     destinationDnsDomain("destinationDnsDomain", "destinationDnsDomain", CEFMapping::convertString),
     destinationServiceName("destinationServiceName", "destinationServiceName", CEFMapping::convertString),
     destinationTranslatedAddress("destinationTranslatedAddress", "destinationTranslatedAddress", CEFMapping::convertIPv4Address),
-    destinationTranslatedPort("destinationTranslatedPort", "destinationTranslatedPort", CEFMapping::convertInteger),
+    destinationTranslatedPort("destinationTranslatedPort", "destinationTranslatedPort", CEFMapping::convertBigInteger),
     deviceCustomDate1("deviceCustomDate1", "deviceCustomDate1", CEFMapping::convertTimestamp),
     deviceCustomDate1Label("deviceCustomDate1Label", "deviceCustomDate1Label", CEFMapping::convertString),
     deviceCustomDate2("deviceCustomDate2", "deviceCustomDate2", CEFMapping::convertTimestamp),
@@ -90,7 +89,7 @@ public enum CEFMapping {
     dpid("dpid", "destinationProcessId", CEFMapping::convertBigInteger),
     dpriv("dpriv", "destinationUserPrivileges", CEFMapping::convertString),
     dproc("dproc", "destinationProcessName", CEFMapping::convertString),
-    dpt("dpt", "destinationPort", CEFMapping::convertInteger),
+    dpt("dpt", "destinationPort", CEFMapping::convertBigInteger),
     dst("dst", "destinationAddress", CEFMapping::convertIPv4Address),
     dtz("dtz", "deviceTimeZone", CEFMapping::convertString),
     duid("duid", "destinationUserId", CEFMapping::convertString),
@@ -161,11 +160,11 @@ public enum CEFMapping {
     sourceDnsDomain("sourceDnsDomain", "sourceDnsDomain", CEFMapping::convertString),
     sourceServiceName("sourceServiceName", "sourceServiceName", CEFMapping::convertString),
     sourceTranslatedAddress("sourceTranslatedAddress", "sourceTranslatedAddress", CEFMapping::convertIPv4Address),
-    sourceTranslatedPort("sourceTranslatedPort", "sourceTranslatedPort", CEFMapping::convertInteger),
+    sourceTranslatedPort("sourceTranslatedPort", "sourceTranslatedPort", CEFMapping::convertBigInteger),
     spid("spid", "sourceProcessId", CEFMapping::convertBigInteger),
     spriv("spriv", "sourceUserPrivileges", CEFMapping::convertString),
     sproc("sproc", "sourceProcessName", CEFMapping::convertString),
-    spt("spt", "sourcePort", CEFMapping::convertInteger),
+    spt("spt", "sourcePort", CEFMapping::convertBigInteger),
     src("src", "sourceAddress", CEFMapping::convertIPv4Address),
     start("start", "startTime", CEFMapping::convertTimestamp),
     suid("suid", "sourceUserId", CEFMapping::convertString),
