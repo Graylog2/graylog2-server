@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Fixed issue 13455. Queries that have the form of `_exists_:field_name` are now validated without any wrong warning messages."
+
+issues = ["13455"]
+pulls = ["13489"]
