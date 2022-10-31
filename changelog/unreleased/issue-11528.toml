@@ -1,0 +1,5 @@
+type = "a"
+message = "New configuration flag ignore_migration_failures to skip migrations which are blocked"
+
+issues = ["11528"]
+pulls = ["3544", "12624"]
