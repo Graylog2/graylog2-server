@@ -46,9 +46,9 @@ export type IndexConfig = {
   field_type_refresh_interval: number,
   field_type_refresh_interval_unit: 'seconds' | 'minutes',
   rotation_strategy_config: RotationStrategyConfig,
-  rotation_strategy_class: string,
+  rotation_strategy: string,
   retention_strategy_config: RetentionStrategyConfig,
-  retention_strategy_class: string,
+  retention_strategy: string,
 }
 
 const TIME_UNITS = ['SECONDS', 'MINUTES'];
@@ -121,8 +121,6 @@ const IndexSetsDefaultsConfig = ({ config, updateConfig }: Props) => {
       <h2>Index Defaults</h2>
       <p>Defaults for newly created index sets.</p>
       <StyledDefList>
-        <dt>Index prefix:</dt>
-        <dd>{!config.index_prefix ? '<none>' : config.index_prefix}</dd>
         <dt>Index analyzer:</dt>
         <dd>{config.index_analyzer}</dd>
         <dt>Shards per Index:</dt>
@@ -170,10 +168,6 @@ const IndexSetsDefaultsConfig = ({ config, updateConfig }: Props) => {
                       <Col md={12}>
                         {/* TODO: Descriptions and help text <InputDescription help={<>A relevant description</>} /> */}
                         {/* TODO: Analyzer validation? Dropdown? */}
-                        <FormikInput label="Index Prefix"
-                                     name="index_prefix"
-                                     id="index_prefix"
-                                     help="The prefix." />
                         <FormikInput label="Index Analyzer"
                                      name="index_analyzer"
                                      id="index_analyzer" />
@@ -205,7 +199,7 @@ const IndexSetsDefaultsConfig = ({ config, updateConfig }: Props) => {
                                                                  selectPlaceholder="Select rotation strategy"
                                                                  pluginExports={PluginStore.exports('indexRotationConfig')}
                                                                  strategies={rotationStrategies.strategies}
-                                                                 activeConfig={retentionConfig}
+                                                                 activeConfig={rotationConfig}
                                                                  getState={getRotationConfigState} />
 
                         <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
@@ -213,7 +207,7 @@ const IndexSetsDefaultsConfig = ({ config, updateConfig }: Props) => {
                                                                  selectPlaceholder="Select rotation strategy"
                                                                  pluginExports={PluginStore.exports('indexRetentionConfig')}
                                                                  strategies={retentionStrategies.strategies}
-                                                                 activeConfig={rotationConfig}
+                                                                 activeConfig={retentionConfig}
                                                                  getState={getRetentionConfigState} />
                       </Col>
                     </Row>

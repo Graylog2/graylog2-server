@@ -31,19 +31,23 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * In-database configuration (via ClusterConfigService) for index set defaults.
+ * The values in this class are initialized from {@link ElasticsearchConfiguration} configuration properties
+ * to allow users to specify defaults for default system indices on the first boot of the Graylog server.
+ */
 @JsonAutoDetect
 @AutoValue
 @JsonDeserialize(builder = AutoValue_IndexSetsDefaultsConfiguration.Builder.class)
 public abstract class IndexSetsDefaultsConfiguration implements PluginConfigBean {
 
     // Defaults
-    public static final String DEFAULT_INDEX_PREFIX = "";
     public static final String DEFAULT_INDEX_ANALYZER = "standard";
     public static final Integer DEFAULT_SHARDS = 1;
     public static final Integer DEFAULT_REPLICAS = 0;
     public static final boolean DEFAULT_INDEX_OPTIMIZATION_DISABLED = false;
     public static final Integer DEFAULT_INDEX_OPTIMIZATION_MAX_SEGMENTS = 1;
-    public static final int DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = 5;
+    public static final long DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = 5;
     public static final TimeUnit DEFAULT_FIELD_TYPE_REFRESH_INTERVAL_UNIT = TimeUnit.SECONDS;
     public static final String DEFAULT_ROTATION_STRATEGY_CLASS = SizeBasedRotationStrategy.class.getCanonicalName();
     public static final RotationStrategyConfig DEFAULT_ROTATION_STRATEGY_CONFIG = SizeBasedRotationStrategyConfig.createDefault();
@@ -59,14 +63,10 @@ public abstract class IndexSetsDefaultsConfiguration implements PluginConfigBean
     public static final String INDEX_OPTIMIZATION_MAX_SEGMENTS = "index_optimization_max_num_segments";
     public static final String FIELD_TYPE_REFRESH_INTERVAL = "field_type_refresh_interval";
     public static final String FIELD_TYPE_REFRESH_INTERVAL_UNIT = "field_type_refresh_interval_unit";
-    public static final String ROTATION_STRATEGY_CLASS = "rotation_strategy";
+    public static final String ROTATION_STRATEGY_CLASS = "rotation_strategy_class";
     public static final String ROTATION_STRATEGY_CONFIG = "rotation_strategy_config";
-    public static final String RETENTION_STRATEGY_CLASS = "retention_strategy";
+    public static final String RETENTION_STRATEGY_CLASS = "retention_strategy_class";
     public static final String RETENTION_STRATEGY_CONFIG = "retention_strategy_config";
-
-    @Nullable
-    @JsonProperty(INDEX_PREFIX)
-    public abstract String indexPrefix();
 
     @JsonProperty(INDEX_ANALYZER)
     public abstract String indexAnalyzer();
@@ -89,6 +89,10 @@ public abstract class IndexSetsDefaultsConfiguration implements PluginConfigBean
     @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL_UNIT)
     public abstract TimeUnit fieldTypeRefreshIntervalUnit();
 
+    /**
+     * The properties of the rotation/retention settings must match those specified on
+     * {@link org.graylog2.indexer.indexset.IndexSetConfig}, since shared UI components are used.
+     */
     @JsonProperty(ROTATION_STRATEGY_CLASS)
     public abstract String rotationStrategyClass();
 
@@ -103,7 +107,6 @@ public abstract class IndexSetsDefaultsConfiguration implements PluginConfigBean
 
     public static Builder builder() {
         return new AutoValue_IndexSetsDefaultsConfiguration.Builder()
-                .indexPrefix(DEFAULT_INDEX_PREFIX)
                 .indexAnalyzer(DEFAULT_INDEX_ANALYZER)
                 .shards(DEFAULT_SHARDS)
                 .replicas(DEFAULT_REPLICAS)
@@ -123,9 +126,6 @@ public abstract class IndexSetsDefaultsConfiguration implements PluginConfigBean
 
     @AutoValue.Builder
     public abstract static class Builder {
-        @JsonProperty(INDEX_PREFIX)
-        public abstract Builder indexPrefix(String indexPrefix);
-
         @JsonProperty(INDEX_ANALYZER)
         public abstract Builder indexAnalyzer(String indexAnalyzer);
 

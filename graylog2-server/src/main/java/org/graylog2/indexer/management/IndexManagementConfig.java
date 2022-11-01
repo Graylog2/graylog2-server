@@ -20,131 +20,28 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import com.mongodb.lang.Nullable;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
-import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 
-import java.util.concurrent.TimeUnit;
-
+/**
+ * Cluster config settings class that used when initially establishing in-database/pluggable index set management.
+ * This class should no longer be referenced by new code.
+ *
+ * See {@link org.graylog2.configuration.IndexSetsDefaultsConfiguration} for current defaults.
+ */
+@Deprecated
 @JsonAutoDetect
 @AutoValue
 @WithBeanGetter
 public abstract class IndexManagementConfig {
-
-    // Fields
-    public static final String INDEX_PREFIX = "index_prefix";
-    public static final String INDEX_ANALYZER = "index_analyzer";
-    public static final String SHARDS = "shards";
-    public static final String REPLICAS = "replicas";
-    public static final String INDEX_OPTIMIZATION_DISABLED = "index_optimization_disabled";
-    public static final String INDEX_OPTIMIZATION_MAX_SEGMENTS = "index_optimization_max_num_segments";
-    public static final String FIELD_TYPE_REFRESH_INTERVAL = "field_type_refresh_Integererval";
-    public static final String FIELD_TYPE_REFRESH_INTERVAL_UNIT = "field_type_refresh_Integererval_unit";
-    public static final String ROTATION_STRATEGY = "rotation_strategy";
-    public static final String RETENTION_STRATEGY = "retention_strategy";
-    public static final String ROTATION_STRATEGY_CONFIG = "rotation_strategy_config";
-    public static final String RETENTION_STRATEGY_CONFIG = "retention_strategy_config";
-
-    @Nullable
-    @JsonProperty(INDEX_PREFIX)
-    public abstract String indexPrefix();
-
-    @Nullable
-    @JsonProperty(INDEX_ANALYZER)
-    public abstract String indexAnalyzer();
-
-    @Nullable
-    @JsonProperty(SHARDS)
-    public abstract Integer shards();
-
-    @Nullable
-    @JsonProperty(REPLICAS)
-    public abstract Integer replicas();
-
-    @Nullable
-    @JsonProperty(INDEX_OPTIMIZATION_MAX_SEGMENTS)
-    public abstract Integer indexOptimizationMaxNumSegments();
-
-    @Nullable
-    @JsonProperty(INDEX_OPTIMIZATION_DISABLED)
-    public abstract Boolean indexOptimizationDisabled();
-
-    @Nullable
-    @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL)
-    public abstract Long fieldTypeRefreshInterval();
-
-    @Nullable
-    @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL_UNIT)
-    public abstract TimeUnit fieldTypeRefreshIntervalUnit();
-
-    @Nullable
-    @JsonProperty(ROTATION_STRATEGY)
-    public abstract String retentionStrategy();
-
-    @Nullable
-    @JsonProperty(RETENTION_STRATEGY)
+    @JsonProperty("rotation_strategy")
     public abstract String rotationStrategy();
 
-    @Nullable
-    @JsonProperty(ROTATION_STRATEGY_CONFIG)
-    public abstract RotationStrategyConfig rotationStrategyConfig();
-
-    @Nullable
-    @JsonProperty(RETENTION_STRATEGY_CONFIG)
-    public abstract RetentionStrategyConfig retentionStrategyConfig();
-
-    public static IndexManagementConfig.Builder builder() {
-        return new AutoValue_IndexManagementConfig.Builder();
-    }
+    @JsonProperty("retention_strategy")
+    public abstract String retentionStrategy();
 
     @JsonCreator
-    public static IndexManagementConfig create(@JsonProperty(ROTATION_STRATEGY) String rotationStrategy,
-                                               @JsonProperty(RETENTION_STRATEGY) String retentionStrategy) {
-        return IndexManagementConfig.builder()
-                .rotationStrategy(rotationStrategy)
-                .retentionStrategy(retentionStrategy)
-                .build();
-    }
-
-    @AutoValue.Builder
-    public abstract static class Builder {
-        @JsonProperty(INDEX_PREFIX)
-        public abstract Builder indexPrefix(String indexPrefix);
-
-        @JsonProperty(INDEX_ANALYZER)
-        public abstract Builder indexAnalyzer(String indexAnalyzer);
-
-        @JsonProperty(SHARDS)
-        public abstract Builder shards(Integer shards);
-
-        @JsonProperty(REPLICAS)
-        public abstract Builder replicas(Integer replicas);
-
-        @JsonProperty(INDEX_OPTIMIZATION_MAX_SEGMENTS)
-        public abstract Builder indexOptimizationMaxNumSegments(Integer indexOptimizationMaxNumSegments);
-
-        @JsonProperty(INDEX_OPTIMIZATION_DISABLED)
-        public abstract Builder indexOptimizationDisabled(Boolean indexOptimizationDisabled);
-
-        @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL)
-        public abstract Builder fieldTypeRefreshInterval(Long fieldTypeRefreshInterval);
-
-        @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL_UNIT)
-        public abstract Builder fieldTypeRefreshIntervalUnit(TimeUnit fieldTypeRefreshIntervalUnit);
-
-        @JsonProperty(ROTATION_STRATEGY)
-        public abstract Builder rotationStrategy(String rotationStrategy);
-
-        @JsonProperty(RETENTION_STRATEGY)
-        public abstract Builder retentionStrategy(String retentionStrategy);
-
-        @JsonProperty(ROTATION_STRATEGY_CONFIG)
-        public abstract Builder rotationStrategyConfig(RotationStrategyConfig rotationStrategyConfig);
-
-        @JsonProperty(RETENTION_STRATEGY_CONFIG)
-        public abstract Builder retentionStrategyConfig(RetentionStrategyConfig retentionStrategyConfig);
-
-        public abstract IndexManagementConfig build();
+    public static IndexManagementConfig create(@JsonProperty("rotation_strategy") String rotationStrategy,
+                                               @JsonProperty("retention_strategy") String retentionStrategy) {
+        return new AutoValue_IndexManagementConfig(rotationStrategy, retentionStrategy);
     }
 }
