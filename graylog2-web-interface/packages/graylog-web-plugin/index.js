@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
+/* eslint-disable global-require */
 module.exports = {
   PluginWebpackConfig: require('./src/PluginWebpackConfig'),
   loadBuildConfig: require('./src/loadBuildConfig'),
