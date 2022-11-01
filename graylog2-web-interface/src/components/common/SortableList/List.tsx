@@ -20,6 +20,7 @@ import type { ListItemType, CustomContentRender, CustomListItemRender } from './
 import SortableListItem from './SortableListItem';
 
 export type Props<ItemType extends ListItemType> = {
+  alignItemContent?: 'flex-start' | 'center',
   customContentRender?: CustomContentRender<ItemType>,
   customListItemRender?: CustomListItemRender<ItemType>,
   disableDragging?: boolean,
@@ -28,15 +29,17 @@ export type Props<ItemType extends ListItemType> = {
 }
 
 const List = <ItemType extends ListItemType>({
+  alignItemContent,
   customContentRender,
   customListItemRender,
   disableDragging,
   displayOverlayInPortal,
-  items,
+  items = [],
 }: Props<ItemType>) => (
   <>
     {items.map((item, index) => (
-      <SortableListItem item={item}
+      <SortableListItem alignItemContent={alignItemContent}
+                        item={item}
                         index={index}
                         key={item.id}
                         customContentRender={customContentRender}
@@ -48,10 +51,11 @@ const List = <ItemType extends ListItemType>({
   );
 
 List.defaultProps = {
+  displayOverlayInPortal: true,
+  alignItemContent: undefined,
   disableDragging: false,
   customContentRender: undefined,
   customListItemRender: undefined,
-  items: [],
 };
 
 export default React.memo(List);

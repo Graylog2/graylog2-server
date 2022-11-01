@@ -41,6 +41,7 @@ const ListItemContainer = styled.div`
   display: flex;
   justify-content: space-between;
   flex: 1;
+  overflow: hidden;
 `;
 
 const ListItem = ({
@@ -150,11 +151,12 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, dashboard
         <h3>Order</h3>
         <p>
           Use drag and drop to change the execution order of the dashboard pages.
-          Click on a dashboard title to change it.
+          Double-click on a dashboard title to change it.
         </p>
         <SortableList<PageListItem> items={orderedQueriesList.toArray()}
                                     onMoveItem={updatePageSorting}
                                     displayOverlayInPortal
+                                    alignItemContent="center"
                                     customContentRender={customListItemRender} />
       </>
     </BootstrapModalConfirm>

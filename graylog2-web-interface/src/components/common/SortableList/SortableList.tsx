@@ -19,7 +19,6 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import PropTypes from 'prop-types';
 
 import type { ListItemType, CustomContentRender, CustomListItemRender } from './ListItem';
-// import SortableListItem from './SortableListItem';
 import List from './List';
 
 const reorder = <ItemType extends ListItemType>(list: Array<ItemType>, startIndex, endIndex) => {
@@ -31,6 +30,7 @@ const reorder = <ItemType extends ListItemType>(list: Array<ItemType>, startInde
 };
 
 export type Props<ItemType extends ListItemType> = {
+  alignItemContent?: 'flex-start' | 'center',
   customContentRender?: CustomContentRender<ItemType>,
   customListItemRender?: CustomListItemRender<ItemType>,
   disableDragging?: boolean,
@@ -47,6 +47,7 @@ export type Props<ItemType extends ListItemType> = {
  * This way consumers can add or remove items easily.
  */
 const SortableList = <ItemType extends ListItemType>({
+  alignItemContent,
   customContentRender,
   customListItemRender,
   disableDragging,
@@ -76,7 +77,8 @@ const SortableList = <ItemType extends ListItemType>({
         {({ droppableProps, innerRef, placeholder }) => (
           <div {...droppableProps}
                ref={innerRef}>
-            <List items={items}
+            <List alignItemContent={alignItemContent}
+                  items={items}
                   disableDragging={disableDragging}
                   displayOverlayInPortal={displayOverlayInPortal}
                   customContentRender={customContentRender}
@@ -118,8 +120,10 @@ SortableList.propTypes = {
 };
 
 SortableList.defaultProps = {
+  alignItemContent: undefined,
   items: [],
   disableDragging: false,
+  displayOverlayInPortal: true,
   customContentRender: undefined,
   customListItemRender: undefined,
 };
