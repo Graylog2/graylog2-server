@@ -49,6 +49,7 @@ import static io.restassured.http.ContentType.JSON;
 
 public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExecutionContext> implements TestEngine {
     private static final Logger LOG = LoggerFactory.getLogger(ContainerMatrixTestEngine.class);
+    private Boolean failed = false;
 
     private <T> T instantiateFactory(Class<? extends T> providerClass) {
         try {
@@ -61,13 +62,15 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
     @Override
     public void execute(ExecutionRequest request) {
         request.getRootTestDescriptor().getChildren().forEach(descriptor -> {
+            if (failed) {
+                abort(request, new JUnitException("Container failed to start, aborting subsequent tests."));
+                return;
+            }
             if (descriptor instanceof ContainerMatrixTestWithRunningESMongoTestsDescriptor) {
                 GraylogBackend backend = RunningGraylogBackend.createStarted();
                 RequestSpecification specification = requestSpec(backend);
                 this.execute(request, ((ContainerMatrixTestsDescriptor) descriptor).getChildren(), backend, specification);
-            } else if (descriptor instanceof ContainerMatrixTestsDescriptor) {
-                ContainerMatrixTestsDescriptor containerMatrixTestsDescriptor = (ContainerMatrixTestsDescriptor) descriptor;
-
+            } else if (descriptor instanceof ContainerMatrixTestsDescriptor containerMatrixTestsDescriptor) {
                 SearchVersion esVersion = containerMatrixTestsDescriptor.getEsVersion();
                 MongodbServer mongoVersion = containerMatrixTestsDescriptor.getMongoVersion();
                 int[] extraPorts = containerMatrixTestsDescriptor.getExtraPorts();
@@ -84,8 +87,9 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                     } catch (Exception exception) {
                         /* Fail hard if the containerized backend failed to start. */
                         LOG.error("Failed container startup? Error executing tests for engine " + getId(), exception);
-                        System.exit(1);
-//                        throw new JUnitException("Error executing tests for engine " + getId(), exception);
+                        failed = true;
+                        abort(request, exception);
+                        return;
                     }
                 } else if (Lifecycle.CLASS.equals(containerMatrixTestsDescriptor.getLifecycle())) {
                     for (TestDescriptor td : containerMatrixTestsDescriptor.getChildren()) {
@@ -101,8 +105,9 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                         } catch (Exception exception) {
                             /* Fail hard if the containerized backend failed to start. */
                             LOG.error("Failed container startup? Error executing tests for engine " + getId(), exception);
-                            System.exit(1);
-//                          throw new JUnitException("Error executing tests for engine " + getId(), exception);
+                            failed = true;
+                            abort(request, exception);
+                            return;
                         }
                     }
                 } else {
@@ -113,6 +118,13 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
             }
             request.getEngineExecutionListener().executionFinished(descriptor, TestExecutionResult.successful());
         });
+    }
+
+    private void abort(ExecutionRequest request, Throwable e) {
+        request.getEngineExecutionListener().executionFinished(
+                request.getRootTestDescriptor(),
+                TestExecutionResult.failed(new JUnitException("Error executing tests for engine " + getId(), e))
+        );
     }
 
     public void execute(ExecutionRequest request, Collection<? extends TestDescriptor> testDescriptors, GraylogBackend backend, RequestSpecification specification) {
