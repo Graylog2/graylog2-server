@@ -49,6 +49,12 @@ const BackgroundImage = styled.img`
   width: 100%;
 `;
 
+const NotificationsContainer = styled.div`
+  position: fixed;
+  top: 0;
+  margin-top: 5px;
+`;
+
 const LoginContainer = styled.div`
   display: flex;
   flex: 1 1 0%;
@@ -102,11 +108,13 @@ const LoginChrome = ({ children }: Props) => (
     </LoginBox>
     <Background>
       <BackgroundText>
+        <NotificationsContainer>
+          <PublicNotifications readFromConfig />
+        </NotificationsContainer>
         <TextContainer>
           <BrandName>Graylog</BrandName>
           <Claim><Highlight>Log Management</Highlight> Done Right</Claim>
         </TextContainer>
-        <PublicNotifications />
       </BackgroundText>
       <BackgroundImage alt="background" src={bgImage} />
     </Background>
