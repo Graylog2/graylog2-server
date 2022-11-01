@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.searchtypes.pivot;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -28,6 +29,7 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -92,10 +94,34 @@ public abstract class Pivot implements SearchType {
     public abstract List<UsedSearchFilter> filters();
 
     @JsonProperty(FIELD_ROW_LIMIT)
-    public abstract OptionalInt rowLimit();
+    public Optional<Integer> rowLimit() {
+        return optionalRowLimit()
+                .or(() -> rowGroups().stream()
+                        .filter(group -> group instanceof Values)
+                        .map(group -> (Values)group)
+                        .map(values -> Optional.ofNullable(values.limit()))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .max(Integer::compare));
+    }
+
+    @JsonIgnore
+    abstract Optional<Integer> optionalRowLimit();
 
     @JsonProperty(FIELD_COLUMN_LIMIT)
-    public abstract OptionalInt columnLimit();
+    public Optional<Integer> columnLimit() {
+        return optionalColumnLimit()
+                .or(() -> columnGroups().stream()
+                        .filter(group -> group instanceof Values)
+                        .map(group -> (Values)group)
+                        .map(values -> Optional.ofNullable(values.limit()))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .max(Integer::compare));
+    }
+
+    @JsonIgnore
+    abstract Optional<Integer> optionalColumnLimit();
 
     public abstract Builder toBuilder();
 
@@ -188,10 +214,10 @@ public abstract class Pivot implements SearchType {
         public abstract Builder filters(List<UsedSearchFilter> filters);
 
         @JsonProperty(FIELD_ROW_LIMIT)
-        public abstract Builder rowLimit(int limit);
+        public abstract Builder optionalRowLimit(@Nullable Integer limit);
 
         @JsonProperty(FIELD_COLUMN_LIMIT)
-        public abstract Builder columnLimit(int limit);
+        public abstract Builder optionalColumnLimit(@Nullable Integer limit);
 
         @JsonProperty
         @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = false)
@@ -238,8 +264,8 @@ public abstract class Pivot implements SearchType {
                 .rollup(rollup())
                 .series(series())
                 .type(type());
-        builder = rowLimit().isPresent() ? builder.rowLimit(rowLimit().getAsInt()) : builder;
-        builder = columnLimit().isPresent() ? builder.columnLimit(columnLimit().getAsInt()) : builder;
+        builder = rowLimit().map(builder::rowLimit).orElse(builder);
+        builder = columnLimit().map(builder::columnLimit).orElse(builder);
         return builder.build();
     }
 }

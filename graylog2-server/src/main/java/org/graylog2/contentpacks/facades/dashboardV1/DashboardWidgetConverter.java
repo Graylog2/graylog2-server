@@ -279,7 +279,7 @@ public class DashboardWidgetConverter {
             result.add(widgetEntityBuilder
                     .config(aggregationConfigBuilder
                             .rowPivots(genPivotForPie(field, stackedFields))
-                            .rowLimit(limit)
+                            .optionalRowLimit(limit)
                             .visualization("pie").build())
                     .build());
         }
@@ -287,7 +287,7 @@ public class DashboardWidgetConverter {
             result.add(widgetEntityBuilder.config(
                     aggregationConfigBuilder.visualization("table")
                             .rowPivots(genPivotForPie(field, stackedFields))
-                            .rowLimit(dataTableLimit)
+                            .optionalRowLimit(dataTableLimit)
                             .build())
                     .id(UUID.randomUUID().toString())
                     .build());
@@ -358,7 +358,7 @@ public class DashboardWidgetConverter {
                                         .build()
                         ))
                         .columnPivots(genPivotForPie(field, stackedFields))
-                        .columnLimit(limit)
+                        .optionalColumnLimit(limit)
                         .build())
                 .id(UUID.randomUUID().toString())
                 .build());

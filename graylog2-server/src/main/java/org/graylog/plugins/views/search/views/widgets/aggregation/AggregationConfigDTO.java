@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.views.widgets.aggregation;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -26,8 +27,11 @@ import org.graylog.plugins.views.search.views.WidgetConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO;
 
 import javax.annotation.Nullable;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.stream.Collectors;
 
 @AutoValue
 @JsonTypeName(AggregationConfigDTO.NAME)
@@ -76,10 +80,32 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
     public abstract boolean eventAnnotation();
 
     @JsonProperty(FIELD_ROW_LIMIT)
-    public abstract OptionalInt rowLimit();
+    public Optional<Integer> rowLimit() {
+        return optionalRowLimit()
+                .or(() -> rowPivots().stream()
+                        .filter(pivot -> pivot.config() instanceof ValueConfigDTO)
+                        .map(pivot -> ((ValueConfigDTO) pivot.config()).limit())
+                        .filter(OptionalInt::isPresent)
+                        .map(OptionalInt::getAsInt)
+                        .max(Integer::compare));
+    }
+
+    @JsonIgnore
+    abstract Optional<Integer> optionalRowLimit();
 
     @JsonProperty(FIELD_COLUMN_LIMIT)
-    public abstract OptionalInt columnLimit();
+    public Optional<Integer> columnLimit() {
+        return optionalColumnLimit()
+                .or(() -> columnPivots().stream()
+                        .filter(pivot -> pivot.config() instanceof ValueConfigDTO)
+                        .map(pivot -> ((ValueConfigDTO) pivot.config()).limit())
+                        .filter(OptionalInt::isPresent)
+                        .map(OptionalInt::getAsInt)
+                        .max(Integer::compare));
+    }
+
+    @JsonIgnore
+    abstract Optional<Integer> optionalColumnLimit();
 
     @AutoValue.Builder
     public static abstract class Builder {
@@ -110,16 +136,16 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
         public abstract Builder formattingSettings(@Nullable WidgetFormattingSettings formattingSettings);
 
         @JsonProperty(FIELD_ROLLUP)
-        public abstract Builder rollup(boolean roolup);
+        public abstract Builder rollup(boolean rollup);
 
         @JsonProperty(FIELD_EVENT_ANNOTATION)
         public abstract Builder eventAnnotation(boolean eventAnnotation);
 
         @JsonProperty(FIELD_ROW_LIMIT)
-        public abstract Builder rowLimit(int limit);
+        public abstract Builder optionalRowLimit(@Nullable Integer limit);
 
         @JsonProperty(FIELD_COLUMN_LIMIT)
-        public abstract Builder columnLimit(int limit);
+        public abstract Builder optionalColumnLimit(@Nullable Integer limit);
 
         public abstract AggregationConfigDTO build();
 

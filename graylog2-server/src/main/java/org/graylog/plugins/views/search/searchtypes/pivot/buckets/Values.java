@@ -17,6 +17,8 @@
 package org.graylog.plugins.views.search.searchtypes.pivot.buckets;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -24,6 +26,8 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.TypedBuilder;
+
+import javax.annotation.Nullable;
 
 @AutoValue
 @JsonTypeName(Values.NAME)
@@ -39,8 +43,9 @@ public abstract class Values implements BucketSpec {
     @JsonProperty
     public abstract String field();
 
-    @JsonProperty
-    public abstract int limit();
+    @JsonIgnore
+    @Nullable
+    public abstract Integer limit();
 
     public static Values.Builder builder() {
         return new AutoValue_Values.Builder()
@@ -61,7 +66,7 @@ public abstract class Values implements BucketSpec {
         public abstract Builder field(String field);
 
         @JsonProperty
-        public abstract Builder limit(int limit);
+        public abstract Builder limit(@Nullable Integer limit);
 
     }
 
