@@ -15,8 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import type { DropResult } from 'react-beautiful-dnd';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import PropTypes from 'prop-types';
+import { useCallback } from 'react';
 
 import type { ListItemType, CustomContentRender, CustomListItemRender } from './ListItem';
 import List from './List';
@@ -55,7 +57,7 @@ const SortableList = <ItemType extends ListItemType>({
   items,
   onMoveItem,
 }: Props<ItemType>) => {
-  const onDragEnd = (result) => {
+  const onDragEnd = useCallback((result: DropResult) => {
     if (!result.destination) {
       return;
     }
@@ -69,7 +71,7 @@ const SortableList = <ItemType extends ListItemType>({
 
       onMoveItem(newList, result.source.index, result.destination.index);
     }
-  };
+  }, [items, onMoveItem]);
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
