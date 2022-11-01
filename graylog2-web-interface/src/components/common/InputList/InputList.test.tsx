@@ -18,6 +18,7 @@ import * as React from 'react';
 import { components } from 'react-select';
 import type { InputProps, MultiValueRemoveProps, ClearIndicatorProps } from 'react-select';
 import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import InputList from './InputList';
 
@@ -101,22 +102,30 @@ describe('InputList Component', () => {
   });
 
   it('should clear all values when clicking the clear trigger "X"', () => {
-    renderComponent((e: React.BaseSyntheticEvent) => { console.log(e.target.value); }, ['dir5', 'dir6', 'dir7']);
+    renderComponent(() => {}, ['dir5', 'dir6', 'dir7']);
     const clearAll = screen.getByText(/clear\s*all/i);
 
     expect(screen.getByText(/dir5/i)).toBeVisible();
     expect(screen.getByText(/dir6/i)).toBeVisible();
     expect(screen.getByText(/dir7/i)).toBeVisible();
 
-    fireEvent.click(clearAll);
-    clearAll.click();
+    userEvent.click(clearAll);
 
-    screen.debug();
-
-    expect(screen.getByText(/dir5/i)).toBeVisible();
+    expect(screen.queryByText(/dir5/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/dir6/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/dir7/i)).not.toBeInTheDocument();
   });
 
-  it.skip('should return an event with a target an a list of values of the requested type', () => {
-    expect(true).toBeTruthy();
+  it('should return an event with a target an a list of values of the requested type', () => {
+    const checkOnChange = jest.fn((e: React.BaseSyntheticEvent) => {
+      expect(e.target.name).toEqual('testList');
+      expect(e.target.value).toEqual(['dir1', 'dir2', 'dir3']);
+    });
+
+    renderComponent(checkOnChange, ['dir1', 'dir2']);
+
+    const rawInput = screen.getByTitle(/testListInput/i);
+    fireEvent.change(rawInput, { target: { value: 'dir3' } });
+    fireEvent.keyDown(rawInput, { key: 'Tab' });
   });
 });
