@@ -22,18 +22,32 @@ import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AlwaysMatcherTest {
+    private static final Message message = new Message("Test", "source", new DateTime(2016, 9, 7, 0, 0, DateTimeZone.UTC));
+    private static final AlwaysMatcher matcher = new AlwaysMatcher();
+
     @Test
     public void matchAlwaysReturnsTrue() throws Exception {
-        final AlwaysMatcher matcher = new AlwaysMatcher();
-        assertThat(matcher.match(null, null)).isTrue();
         assertThat(matcher.match(
-                new Message("Test", "source", new DateTime(2016, 9, 7, 0, 0, DateTimeZone.UTC)),
-                new StreamRuleMock(Collections.singletonMap("_id", "stream-rule-id"))))
+                message,
+                new StreamRuleMock(Map.of("_id", "stream-rule-id"))))
                 .isTrue();
+        assertThat(matcher.match(
+                message,
+                new StreamRuleMock(Map.of("_id", "stream-rule-id", "inverted", false))))
+                .isTrue();
+    }
+
+    @Test
+    public void matchAlwaysReturnsFalseIfInverted() throws Exception {
+        assertThat(matcher.match(
+                message,
+                new StreamRuleMock(Map.of("_id", "stream-rule-id", "inverted", true))))
+                .isFalse();
     }
 
 }
