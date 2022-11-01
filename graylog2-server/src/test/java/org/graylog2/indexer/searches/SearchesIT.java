@@ -162,7 +162,16 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         this.searches = createSearches();
     }
 
-    public abstract Searches createSearches();
+    public Searches createSearches() {
+        return new Searches(
+                indexRangeService,
+                metricRegistry,
+                streamService,
+                indices,
+                indexSetRegistry,
+                createSearchesAdapter()
+        );
+    }
 
     protected SearchesAdapter createSearchesAdapter() {
         return searchServer().adapters().searchesAdapter();
