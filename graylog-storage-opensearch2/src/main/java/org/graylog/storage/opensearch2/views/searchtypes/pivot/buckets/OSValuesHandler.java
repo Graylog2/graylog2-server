@@ -34,7 +34,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.Filters;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.FiltersAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.ParsedFilters;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.Terms;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.support.MultiTermsValuesSourceConfig;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
@@ -51,7 +50,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class OSValuesHandler extends OSPivotBucketSpecHandler<Values, Terms> {
+public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
     private static final String KEY_SEPARATOR_CHARACTER = "\u2E31";
     private static final String KEY_SEPARATOR_PHRASE = " + \"" + KEY_SEPARATOR_CHARACTER + "\" + ";
     private static final String AGG_NAME = "agg";
@@ -66,16 +65,20 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values, Terms> {
 
     @Nonnull
     @Override
-    public Optional<CreatedAggregations<AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<Values> bucketSpecs, OSGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, List<Values> bucketSpecs, OSGeneratedQueryContext queryContext, Query query) {
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
-        final int limit = bucketSpecs.stream()
-                .map(Values::limit)
-                .max(Integer::compare)
-                .orElse(Values.DEFAULT_LIMIT);
+        final int limit = extractLimit(direction, pivot).orElse(Values.DEFAULT_LIMIT);
         final AggregationBuilder termsAggregation = createTerms(bucketSpecs, ordering, limit);
         final FiltersAggregationBuilder filterAggregation = createFilter(name, bucketSpecs)
                 .subAggregation(termsAggregation);
-        return Optional.of(CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation)));
+        return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
+    }
+
+    private Optional<Integer> extractLimit(Direction direction, Pivot pivot) {
+        return switch (direction) {
+            case Row -> pivot.rowLimit();
+            case Column -> pivot.columnLimit();
+        };
     }
 
     private FiltersAggregationBuilder createFilter(String name, List<Values> bucketSpecs) {

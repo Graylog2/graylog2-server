@@ -27,7 +27,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.BucketO
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
+import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.PivotBucket;
@@ -38,13 +39,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class OSTimeHandler extends OSPivotBucketSpecHandler<Time, ParsedDateHistogram> {
+public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
     private static final String AGG_NAME = "agg";
     private static final BucketOrder defaultOrder = BucketOrder.key(true);
 
     @Nonnull
     @Override
-    public Optional<CreatedAggregations<AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<Time> bucketSpec, OSGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, List<Time> bucketSpec, OSGeneratedQueryContext queryContext, Query query) {
         AggregationBuilder root = null;
         AggregationBuilder leaf = null;
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
@@ -67,7 +68,7 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time, ParsedDateHist
             }
         }
 
-        return Optional.of(CreatedAggregations.create(root, leaf));
+        return CreatedAggregations.create(root, leaf);
     }
 
     private void setInterval(DateHistogramAggregationBuilder builder, DateHistogramInterval interval) {

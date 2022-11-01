@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.views.widgets.aggregation;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -26,22 +27,28 @@ import org.graylog.plugins.views.search.views.WidgetConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO;
 
 import javax.annotation.Nullable;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.stream.Collectors;
 
 @AutoValue
 @JsonTypeName(AggregationConfigDTO.NAME)
 @JsonDeserialize(builder = AggregationConfigDTO.Builder.class)
 public abstract class AggregationConfigDTO implements WidgetConfigDTO {
     public static final String NAME = "aggregation";
-    static final String FIELD_ROW_PIVOTS = "row_pivots";
-    static final String FIELD_COLUMN_PIVOTS = "column_pivots";
-    static final String FIELD_SERIES = "series";
-    static final String FIELD_SORT = "sort";
-    static final String FIELD_VISUALIZATION = "visualization";
-    static final String FIELD_VISUALIZATION_CONFIG = "visualization_config";
-    static final String FIELD_ROLLUP = "rollup";
-    static final String FIELD_FORMATTING_SETTINGS = "formatting_settings";
-    static final String FIELD_EVENT_ANNOTATION = "event_annotation";
+    private static final String FIELD_ROW_PIVOTS = "row_pivots";
+    private static final String FIELD_COLUMN_PIVOTS = "column_pivots";
+    private static final String FIELD_SERIES = "series";
+    private static final String FIELD_SORT = "sort";
+    private static final String FIELD_VISUALIZATION = "visualization";
+    private static final String FIELD_VISUALIZATION_CONFIG = "visualization_config";
+    private static final String FIELD_ROLLUP = "rollup";
+    private static final String FIELD_FORMATTING_SETTINGS = "formatting_settings";
+    private static final String FIELD_EVENT_ANNOTATION = "event_annotation";
+    private static final String FIELD_ROW_LIMIT = "row_limit";
+    private static final String FIELD_COLUMN_LIMIT = "column_limit";
 
     @JsonProperty(FIELD_ROW_PIVOTS)
     public abstract List<PivotDTO> rowPivots();
@@ -72,6 +79,34 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
     @JsonProperty(FIELD_EVENT_ANNOTATION)
     public abstract boolean eventAnnotation();
 
+    @JsonProperty(FIELD_ROW_LIMIT)
+    public Optional<Integer> rowLimit() {
+        return optionalRowLimit()
+                .or(() -> rowPivots().stream()
+                        .filter(pivot -> pivot.config() instanceof ValueConfigDTO)
+                        .map(pivot -> ((ValueConfigDTO) pivot.config()).limit())
+                        .filter(OptionalInt::isPresent)
+                        .map(OptionalInt::getAsInt)
+                        .max(Integer::compare));
+    }
+
+    @JsonIgnore
+    abstract Optional<Integer> optionalRowLimit();
+
+    @JsonProperty(FIELD_COLUMN_LIMIT)
+    public Optional<Integer> columnLimit() {
+        return optionalColumnLimit()
+                .or(() -> columnPivots().stream()
+                        .filter(pivot -> pivot.config() instanceof ValueConfigDTO)
+                        .map(pivot -> ((ValueConfigDTO) pivot.config()).limit())
+                        .filter(OptionalInt::isPresent)
+                        .map(OptionalInt::getAsInt)
+                        .max(Integer::compare));
+    }
+
+    @JsonIgnore
+    abstract Optional<Integer> optionalColumnLimit();
+
     @AutoValue.Builder
     public static abstract class Builder {
         @JsonProperty(FIELD_ROW_PIVOTS)
@@ -101,10 +136,16 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
         public abstract Builder formattingSettings(@Nullable WidgetFormattingSettings formattingSettings);
 
         @JsonProperty(FIELD_ROLLUP)
-        public abstract Builder rollup(boolean roolup);
+        public abstract Builder rollup(boolean rollup);
 
         @JsonProperty(FIELD_EVENT_ANNOTATION)
         public abstract Builder eventAnnotation(boolean eventAnnotation);
+
+        @JsonProperty(FIELD_ROW_LIMIT)
+        public abstract Builder optionalRowLimit(@Nullable Integer limit);
+
+        @JsonProperty(FIELD_COLUMN_LIMIT)
+        public abstract Builder optionalColumnLimit(@Nullable Integer limit);
 
         public abstract AggregationConfigDTO build();
 

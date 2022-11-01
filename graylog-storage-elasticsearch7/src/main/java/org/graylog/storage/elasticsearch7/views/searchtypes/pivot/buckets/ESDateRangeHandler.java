@@ -33,15 +33,13 @@ import org.joda.time.base.AbstractDateTime;
 
 import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
-public class ESDateRangeHandler extends ESPivotBucketSpecHandler<DateRangeBucket, ParsedDateRange> {
+public class ESDateRangeHandler extends ESPivotBucketSpecHandler<DateRangeBucket> {
     private static final String AGG_NAME = "agg";
-
     @Nonnull
     @Override
-    public Optional<CreatedAggregations<AggregationBuilder>> doCreateAggregation(String name, Pivot pivot, List<DateRangeBucket> bucketSpecs, ESGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, List<DateRangeBucket> bucketSpecs, ESGeneratedQueryContext queryContext, Query query) {
         AggregationBuilder root = null;
         AggregationBuilder leaf = null;
         for (DateRangeBucket dateRangeBucket : bucketSpecs) {
@@ -71,7 +69,7 @@ public class ESDateRangeHandler extends ESPivotBucketSpecHandler<DateRangeBucket
             }
         }
 
-        return Optional.of(CreatedAggregations.create(root, leaf));
+        return CreatedAggregations.create(root, leaf);
     }
 
     @Override

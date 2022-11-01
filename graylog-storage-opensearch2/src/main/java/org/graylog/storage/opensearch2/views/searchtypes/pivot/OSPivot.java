@@ -46,7 +46,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -56,12 +55,12 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
     private static final Logger LOG = LoggerFactory.getLogger(OSPivot.class);
     private static final String AGG_NAME = "agg";
 
-    private final Map<String, OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers;
+    private final Map<String, OSPivotBucketSpecHandler<? extends BucketSpec>> bucketHandlers;
     private final Map<String, OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers;
     private final EffectiveTimeRangeExtractor effectiveTimeRangeExtractor;
 
     @Inject
-    public OSPivot(Map<String, OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers,
+    public OSPivot(Map<String, OSPivotBucketSpecHandler<? extends BucketSpec>> bucketHandlers,
                    Map<String, OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers,
                    EffectiveTimeRangeExtractor effectiveTimeRangeExtractor) {
         this.bucketHandlers = bucketHandlers;
@@ -84,7 +83,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                     .forEach(searchSourceBuilder::aggregation);
         }
 
-        final BucketSpecHandler.CreatedAggregations<AggregationBuilder> createdAggregations = createPivots(query, pivot, pivot.rowGroups(), queryContext);
+        final BucketSpecHandler.CreatedAggregations<AggregationBuilder> createdAggregations = createPivots(BucketSpecHandler.Direction.Row, query, pivot, pivot.rowGroups(), queryContext);
         final AggregationBuilder rootAggregation = createdAggregations.root();
         final AggregationBuilder leafAggregation = createdAggregations.leaf();
         final List<AggregationBuilder> metricsAggregations = createdAggregations.metrics();
@@ -94,7 +93,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         }
 
         if (!pivot.columnGroups().isEmpty()) {
-            final BucketSpecHandler.CreatedAggregations<AggregationBuilder> createdColumnsAggregations = createPivots(query, pivot, pivot.columnGroups(), queryContext);
+            final BucketSpecHandler.CreatedAggregations<AggregationBuilder> createdColumnsAggregations = createPivots(BucketSpecHandler.Direction.Column, query, pivot, pivot.columnGroups(), queryContext);
             final AggregationBuilder columnsRootAggregation = createdColumnsAggregations.root();
             final List<AggregationBuilder> columnMetricsAggregations = createdColumnsAggregations.metrics();
             seriesStream(pivot, queryContext, "metrics")
@@ -147,16 +146,16 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         return groups;
     }
 
-    private BucketSpecHandler.CreatedAggregations<AggregationBuilder> createPivots(Query query, Pivot pivot, List<BucketSpec> pivots, OSGeneratedQueryContext queryContext) {
+    private BucketSpecHandler.CreatedAggregations<AggregationBuilder> createPivots(BucketSpecHandler.Direction direction, Query query, Pivot pivot, List<BucketSpec> pivots, OSGeneratedQueryContext queryContext) {
         AggregationBuilder leaf = null;
         AggregationBuilder root = null;
         final List<AggregationBuilder> metrics = new ArrayList<>();
         for (Tuple2<String, List<BucketSpec>> group : groupByConsecutiveType(pivots)) {
-            final OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> bucketHandler = bucketHandlers.get(group.v1());
-            final Optional<BucketSpecHandler.CreatedAggregations<AggregationBuilder>> bucketAggregations = bucketHandler.createAggregation(AGG_NAME, pivot, group.v2(), queryContext, query);
-            final AggregationBuilder aggregationRoot = bucketAggregations.map(BucketSpecHandler.CreatedAggregations::root).orElse(null);
-            final AggregationBuilder aggregationLeaf = bucketAggregations.map(BucketSpecHandler.CreatedAggregations::leaf).orElse(null);
-            final List<AggregationBuilder> aggregationMetrics = bucketAggregations.map(BucketSpecHandler.CreatedAggregations::metrics).orElse(Collections.emptyList());
+            final OSPivotBucketSpecHandler<? extends BucketSpec> bucketHandler = bucketHandlers.get(group.v1());
+            final BucketSpecHandler.CreatedAggregations<AggregationBuilder> bucketAggregations = bucketHandler.createAggregation(direction, AGG_NAME, pivot, group.v2(), queryContext, query);
+            final AggregationBuilder aggregationRoot = bucketAggregations.root();
+            final AggregationBuilder aggregationLeaf = bucketAggregations.leaf();
+            final List<AggregationBuilder> aggregationMetrics = bucketAggregations.metrics();
 
             metrics.addAll(aggregationMetrics);
             if (root == null && leaf == null) {
@@ -235,7 +234,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
 
         for (Tuple2<String, List<BucketSpec>> group : groupByConsecutiveType(pivots)) {
             result = result.flatMap((tuple) -> {
-                final OSPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation> bucketHandler = bucketHandlers.get(group.v1());
+                final OSPivotBucketSpecHandler<? extends BucketSpec> bucketHandler = bucketHandlers.get(group.v1());
                 return bucketHandler.extractBuckets(group.v2(), tuple);
             });
         }

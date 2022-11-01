@@ -40,8 +40,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec, AGGREGATION_RESULT extends Aggregation>
-        implements BucketSpecHandler<SPEC_TYPE, AggregationBuilder, SearchResponse, AGGREGATION_RESULT, OSGeneratedQueryContext> {
+public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
+        implements BucketSpecHandler<SPEC_TYPE, AggregationBuilder, OSGeneratedQueryContext> {
 
     protected AggTypes aggTypes(OSGeneratedQueryContext queryContext, Pivot pivot) {
         return (AggTypes) queryContext.contextMap().get(pivot.id());
