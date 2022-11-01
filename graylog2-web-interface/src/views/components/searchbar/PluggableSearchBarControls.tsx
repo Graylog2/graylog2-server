@@ -47,22 +47,63 @@ const usePluggableControls = () => {
 
 const renderControls = (controls: Array<SearchBarControl>) => controls?.map(({ component: ControlComponent, id }) => <ControlComponent key={id} />);
 
+const componentHasContent = ({
+  hidePluggableControlsPreview,
+  showLeftControls,
+  showRightControls,
+  hasPluggableControls,
+  hasSearchFilterFeatureFlag,
+  hasLeftColFallback,
+  hasRightColFallback,
+}:{
+  hidePluggableControlsPreview: boolean,
+  showLeftControls: boolean,
+  showRightControls: boolean,
+  hasPluggableControls: boolean,
+  hasSearchFilterFeatureFlag: boolean,
+  hasLeftColFallback?: boolean,
+  hasRightColFallback?: boolean
+}) => {
+  if (hasPluggableControls) {
+    return true;
+  }
+
+  if (hidePluggableControlsPreview) {
+    return false;
+  }
+
+  const shouldShowLeftCol = showLeftControls && hasLeftColFallback && hasSearchFilterFeatureFlag;
+  const shouldShowRightCol = showRightControls && !!hasRightColFallback;
+
+  return shouldShowLeftCol || shouldShowRightCol;
+};
+
 type Props = {
   showLeftControls?: boolean,
   showRightControls?: boolean,
 }
 
 const PluggableSearchBarControls = ({ showLeftControls, showRightControls }: Props) => {
-  const [hidePluggableControlsPreview, setHidePluggableControlsPreview] = useState(!!Store.get(PLUGGABLE_CONTROLS_HIDDEN_KEY));
+  const [hidePluggableControlsPreview, setHidePluggableControlsPreview] = useState(() => !!Store.get(PLUGGABLE_CONTROLS_HIDDEN_KEY));
   const { leftControls, rightControls } = usePluggableControls();
   const hasSearchFilterFeatureFlag = useFeature('search_filter');
   const hasPluggableControls = !!(leftControls?.length || rightControls?.length);
-  const shouldRenderContainer = (hasPluggableControls || (!hidePluggableControlsPreview && hasSearchFilterFeatureFlag));
 
   const onHidePluggableControlsPreview = useCallback(() => {
     setHidePluggableControlsPreview(true);
     Store.set(PLUGGABLE_CONTROLS_HIDDEN_KEY, true);
   }, []);
+
+  const leftColFallback = <SearchFilterBanner onHide={onHidePluggableControlsPreview} pluggableControls={leftControls} />;
+
+  const shouldRenderContainer = componentHasContent({
+    hidePluggableControlsPreview,
+    showLeftControls,
+    showRightControls,
+    hasPluggableControls,
+    hasSearchFilterFeatureFlag,
+    hasLeftColFallback: !!leftColFallback,
+  });
 
   if (!shouldRenderContainer) return null;
 
@@ -72,7 +113,7 @@ const PluggableSearchBarControls = ({ showLeftControls, showRightControls }: Pro
         {hasSearchFilterFeatureFlag && showLeftControls && (
           <>
             {renderControls(leftControls)}
-            <SearchFilterBanner onHide={onHidePluggableControlsPreview} pluggableControls={leftControls} />
+            {leftColFallback}
           </>
         )}
       </div>
