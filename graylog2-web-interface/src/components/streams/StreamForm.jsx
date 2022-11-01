@@ -35,6 +35,7 @@ const _getValuesFromProps = (props) => {
   }
 
   return {
+    showModal: false,
     title: props.stream.title,
     description: props.stream.description,
     removeMatchesFromDefaultStream: props.stream.remove_matches_from_default_stream,
@@ -63,11 +64,22 @@ class StreamForm extends React.Component {
     super(props);
 
     this.state = _getValuesFromProps(props);
-    this.modal = undefined;
   }
 
   _resetValues = () => {
     this.setState(_getValuesFromProps(this.props));
+  };
+
+  // eslint-disable-next-line react/no-unused-class-component-methods
+  open = () => {
+    this._resetValues();
+    IndexSetsActions.list(false);
+    this.setState({ showModal: true });
+  };
+
+  // eslint-disable-next-line react/no-unused-class-component-methods
+  close = () => {
+    this.setState({ showModal: false });
   };
 
   _onSubmit = () => {
@@ -82,19 +94,7 @@ class StreamForm extends React.Component {
         index_set_id: indexSetId,
       });
 
-    this.modal.close();
-  };
-
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  open = () => {
-    this._resetValues();
-    IndexSetsActions.list(false);
-    this.modal.open();
-  };
-
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  close = () => {
-    this.modal.close();
+    this.close();
   };
 
   _formatSelectOptions = () => {
@@ -140,11 +140,12 @@ class StreamForm extends React.Component {
 
   render() {
     const { title: propTitle, submitButtonText } = this.props;
-    const { title, description, removeMatchesFromDefaultStream } = this.state;
+    const { title, description, removeMatchesFromDefaultStream, showModal } = this.state;
 
     return (
-      <BootstrapModalForm ref={(c) => { this.modal = c; }}
+      <BootstrapModalForm show={showModal}
                           title={propTitle}
+                          onCancel={this.close}
                           onSubmitForm={this._onSubmit}
                           submitButtonText={submitButtonText}>
         <Input id="Title"
