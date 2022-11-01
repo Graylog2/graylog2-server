@@ -40,6 +40,18 @@ jest.mock('views/stores/ViewStatesStore', () => ({
 const setShow = jest.fn();
 
 describe('AdaptableQueryTabsConfiguration', () => {
+  let oldConfirm;
+
+  beforeEach(() => {
+    oldConfirm = window.confirm;
+    window.confirm = jest.fn(() => true);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+    window.confirm = oldConfirm;
+  });
+
   const renderConfiguration = () => render(
     <AdaptableQueryTabsConfiguration show
                                      setShow={setShow}
@@ -79,6 +91,25 @@ describe('AdaptableQueryTabsConfiguration', () => {
     await expect(ViewStatesActions.patchQueriesTitle).toHaveBeenCalledWith(Immutable.OrderedSet([
       { queryId: 'queryId-1', titlesMap: Immutable.Map({ tab: Immutable.Map({ title: 'Query Title 1' }) }) },
       { queryId: 'queryId-2', titlesMap: Immutable.Map({ tab: Immutable.Map({ title: 'Query Title 2' }) }) },
+    ]));
+  });
+
+  it('should remove dashboard page', async () => {
+    renderConfiguration();
+    const deleteButton = await screen.findByRole('button', {
+      name: /remove page query title 2/i,
+      hidden: true,
+    });
+
+    userEvent.click(deleteButton);
+
+    const submitButton = await screen.findByTitle('Update configuration');
+    userEvent.click(submitButton);
+
+    await expect(QueriesActions.setOrder).toHaveBeenCalledWith(Immutable.OrderedSet(['queryId-1']));
+
+    await expect(ViewStatesActions.patchQueriesTitle).toHaveBeenCalledWith(Immutable.OrderedSet([
+      { queryId: 'queryId-1', titlesMap: Immutable.Map({ tab: Immutable.Map({ title: 'Query Title 1' }) }) },
     ]));
   });
 });
