@@ -17,7 +17,7 @@
 import * as React from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import { useCallback, useState, useContext } from 'react';
-import { OrderedSet, Map, Set, List } from 'immutable';
+import { OrderedSet, Map, List } from 'immutable';
 import styled from 'styled-components';
 
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
@@ -98,7 +98,7 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, dashboard
         return ({ queryId: id, titlesMap });
       });
 
-      ViewStatesActions.patchQueriesTitle(Set(newTitles));
+      ViewStatesActions.patchQueriesTitle(OrderedSet(newTitles));
       setShow(false);
     });
   }, [orderedQueriesList, queriesList, activeQueryId, setDashboardPage, setShow]);

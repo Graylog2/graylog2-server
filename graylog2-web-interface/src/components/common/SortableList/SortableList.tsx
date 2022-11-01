@@ -125,7 +125,7 @@ SortableList.defaultProps = {
   alignItemContent: undefined,
   items: [],
   disableDragging: false,
-  displayOverlayInPortal: true,
+  displayOverlayInPortal: false,
   customContentRender: undefined,
   customListItemRender: undefined,
 };

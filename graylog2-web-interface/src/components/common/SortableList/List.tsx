@@ -51,7 +51,7 @@ const List = <ItemType extends ListItemType>({
   );
 
 List.defaultProps = {
-  displayOverlayInPortal: true,
+  displayOverlayInPortal: false,
   alignItemContent: undefined,
   disableDragging: false,
   customContentRender: undefined,

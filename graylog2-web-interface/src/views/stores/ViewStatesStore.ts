@@ -17,7 +17,7 @@
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { get, isEqualWith } from 'lodash';
-import type { Set } from 'immutable';
+import type { OrderedSet } from 'immutable';
 
 import type { RefluxActions } from 'stores/StoreTypes';
 import type { QueryId } from 'views/logic/queries/Query';
@@ -32,7 +32,7 @@ type ViewStatesActionsTypes = RefluxActions<{
   duplicate: (queryId: QueryId) => Promise<ViewState>,
   remove: (queryId: QueryId) => Promise<ViewState>,
   update: (queryId: QueryId, viewState: ViewState) => Promise<ViewState>,
-  patchQueriesTitle: (newQueriesTitle: Set<{ queryId: QueryId, titlesMap: TitlesMap}>) => Promise<ViewState>,
+  patchQueriesTitle: (newQueriesTitle: OrderedSet<{ queryId: QueryId, titlesMap: TitlesMap}>) => Promise<ViewState>,
 }>;
 
 export const ViewStatesActions: ViewStatesActionsTypes = singletonActions(
