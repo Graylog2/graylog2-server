@@ -109,6 +109,6 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
     }
 
     private ImmutableSet<String> loadAllAllowedStreamsForUser(SearchUser searchUser) {
-        return permittedStreams.load(searchUser::canReadStream);
+        return permittedStreams.load(searchUser);
     }
 }

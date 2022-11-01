@@ -14,21 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-// eslint-disable-next-line no-restricted-imports
-import { NavItem as BootstrapNavItem } from 'react-bootstrap';
+package org.graylog.testing.utils;
 
-import NavItemStateIndicator from 'components/common/NavItemStateIndicator';
+import io.restassured.specification.RequestSpecification;
 
-const NavItem = ({ children, ...props }: React.ComponentProps<typeof NavItem>) => (
-  <BootstrapNavItem {...props}>
-    <NavItemStateIndicator>
-      {children}
-    </NavItemStateIndicator>
-  </BootstrapNavItem>
-);
+import java.util.Map;
 
-NavItem.displayName = 'NavItem';
+import static io.restassured.RestAssured.given;
 
-/** @component */
-export default NavItem;
+public class IndexSetUtils {
+    private IndexSetUtils() {}
+
+    public static String defaultIndexSetId(RequestSpecification requestSpec) {
+        return given()
+                .spec(requestSpec)
+                .when()
+                .get("/system/indices/index_sets")
+                .then()
+                .statusCode(200)
+                .assertThat()
+                .extract().body().jsonPath().getString("index_sets.find { it.default == true }.id");
+    }
+}

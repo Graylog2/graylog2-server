@@ -41,7 +41,7 @@ describe('Views bindings field actions', () => {
   };
   const findAction = (type: string): ActionDefinition<{ analysisDisabledFields?: Array<string> }> => fieldActions.find((binding) => binding.type === type);
 
-  describe('Aggregate', () => {
+  describe('Show top values', () => {
     const action = findAction('aggregate');
     const { isEnabled } = action;
 
@@ -70,6 +70,15 @@ describe('Views bindings field actions', () => {
         type: FieldType.create('string', [Properties.Compound]),
       }))
         .toEqual(false);
+    });
+
+    it('should be enabled for compound fields if they are enumerable', () => {
+      expect(isEnabled({
+        ...defaultArguments,
+        field: 'something',
+        type: FieldType.create('compound(int,long)', [Properties.Compound, Properties.Enumerable]),
+      }))
+        .toEqual(true);
     });
 
     it('should be disabled for decorated fields', () => {
@@ -123,7 +132,7 @@ describe('Views bindings field actions', () => {
         .toEqual(true);
     });
 
-    it('should be disabled when field analisys is disabled', () => {
+    it('should be disabled when field analysis is disabled', () => {
       expect(isEnabled({
         ...defaultArguments,
         field: 'something',
