@@ -43,13 +43,14 @@ const StyledMenuItem = styled(MenuItem)(({ theme }) => css`
   }
 `);
 
-const CloneMenuItem = ({ error, id, modalRef, name, onChange, onSave, onSelect }) => {
+const CloneMenuItem = ({ error, id, showModal, name, onChange, onClose, onSave, onSelect }) => {
   return (
     <span>
       <StyledMenuItem onSelect={onSelect}>Clone</StyledMenuItem>
-      <BootstrapModalForm ref={modalRef}
+      <BootstrapModalForm show={showModal}
                           title="Clone"
                           onSubmitForm={onSave}
+                          onCancel={onClose}
                           submitButtonDisabled={!!error}
                           submitButtonText="Done">
         <fieldset>
@@ -71,11 +72,12 @@ const CloneMenuItem = ({ error, id, modalRef, name, onChange, onSave, onSelect }
 CloneMenuItem.propTypes = {
   error: PropTypes.string,
   id: PropTypes.string.isRequired,
-  modalRef: PropTypes.shape({ current: PropTypes.any }).isRequired,
+  showModal: PropTypes.bool.isRequired,
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
 CloneMenuItem.defaultProps = {
