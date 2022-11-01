@@ -17,7 +17,7 @@
 
 import { render, screen } from 'wrappedTestingLibrary';
 import React from 'react';
-import Immutable from 'immutable';
+import Immutable, { OrderedSet } from 'immutable';
 import userEvent from '@testing-library/user-event';
 
 import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabsConfiguration';
@@ -35,12 +35,13 @@ describe('AdaptableQueryTabsConfiguration', () => {
   const renderConfiguration = () => render(
     <AdaptableQueryTabsConfiguration show
                                      setShow={setShow}
-                                     queriesList={
-        [
-          { id: 'queryId-1', title: 'Query Title 1' },
-          { id: 'queryId-2', title: 'Query Title 2' },
-        ]
-} />);
+                                     activeQueryId="queryId-1"
+                                     dashboardId="dashboard-id"
+                                     queriesList={OrderedSet(
+                                       [
+                                         { id: 'queryId-1', title: 'Query Title 1' },
+                                         { id: 'queryId-2', title: 'Query Title 2' },
+                                       ])} />);
 
   beforeEach(() => {
     QueriesActions.setOrder = mockAction(jest.fn(() => Promise.resolve(Immutable.OrderedMap())));

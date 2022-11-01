@@ -19,7 +19,7 @@ import { useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
 import type * as Immutable from 'immutable';
 import * as ImmutablePropTypes from 'react-immutable-proptypes';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+import { List } from 'immutable';
 
 import connect, { useStore } from 'stores/connect';
 import { TitlesActions } from 'views/stores/TitlesStore';
@@ -33,33 +33,26 @@ import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { ViewStatesActions, ViewStatesStore } from 'views/stores/ViewStatesStore';
 import type { QueryId } from 'views/logic/queries/Query';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
-import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
+import FindNewActiveQueryId from 'views/logic/views/FindNewActiveQuery';
+import ConfirmDeletingDashboardPage from 'views/logic/views/ConfirmDeletingDashboardPage';
 
 import QueryTabs from './QueryTabs';
 
 const onTitleChange = (_queryId: string, newTitle: string) => TitlesActions.set('tab', 'title', newTitle);
 
-// eslint-disable-next-line no-alert
-const defaultConfirm = async () => window.confirm('Do you really want to delete this dashboard page?');
-
-const onCloseTab = async (dashboardId: string, queryId: string, currentQuery: string, queries: Immutable.OrderedSet<string>, widgetIds: Immutable.Map<string, Immutable.List<string>>, setDashboardPage: (page: string) => void) => {
+const onCloseTab = async (dashboardId: string, queryId: string, activeQueryId: string, queries: Immutable.OrderedSet<string>, widgetIds: Immutable.Map<string, Immutable.List<string>>, setDashboardPage: (page: string) => void) => {
   if (queries.size === 1) {
     return Promise.resolve();
   }
 
-  const deletingDashboardPageHooks = PluginStore.exports('views.hooks.confirmDeletingDashboardPage');
-  const _widgetIds = widgetIds.map((ids) => ids.toArray()).toObject();
-  const result = await iterateConfirmationHooks([...deletingDashboardPageHooks, defaultConfirm], dashboardId, queryId, _widgetIds);
+  const result = await ConfirmDeletingDashboardPage(dashboardId, activeQueryId, widgetIds);
 
   if (result === true) {
-    if (queryId === currentQuery) {
+    if (queryId === activeQueryId) {
       const indexedQueryIds = queries.toIndexedSeq();
-      const currentQueryIdIndex = indexedQueryIds.indexOf(queryId);
-      const newQueryIdIndex = Math.min(0, currentQueryIdIndex - 1);
-      const newQuery = indexedQueryIds.filter((currentQueryId) => (currentQueryId !== queryId))
-        .get(newQueryIdIndex);
+      const newActiveQueryId = FindNewActiveQueryId(List(indexedQueryIds), activeQueryId);
 
-      setDashboardPage(newQuery);
+      setDashboardPage(newActiveQueryId);
     }
 
     return QueriesActions.remove(queryId).then(() => ViewStatesActions.remove(queryId));
@@ -77,7 +70,7 @@ type Props = {
 const useWidgetIds = () => useStore(ViewStatesStore, (states) => states.map((viewState) => viewState.widgets.map((widget) => widget.id).toList()).toMap());
 
 const QueryBar = ({ queries, queryTitles, viewMetadata }: Props) => {
-  const { activeQuery, id: dashboardId } = viewMetadata;
+  const { activeQuery: activeQueryId, id: dashboardId } = viewMetadata;
   const { setDashboardPage } = useContext(DashboardPageContext);
   const widgetIds = useWidgetIds();
 
@@ -95,13 +88,14 @@ const QueryBar = ({ queries, queryTitles, viewMetadata }: Props) => {
     return ViewActions.selectQuery(pageId);
   }, [setDashboardPage]);
 
-  const onRemove = useCallback((queryId: string) => onCloseTab(dashboardId, queryId, activeQuery, queries, widgetIds, setDashboardPage),
-    [activeQuery, dashboardId, queries, widgetIds, setDashboardPage]);
+  const onRemove = useCallback((queryId: string) => onCloseTab(dashboardId, queryId, activeQueryId, queries, widgetIds, setDashboardPage),
+    [activeQueryId, dashboardId, queries, widgetIds, setDashboardPage]);
 
   return (
     <QueryTabs queries={queries}
-               selectedQueryId={activeQuery}
+               activeQueryId={activeQueryId}
                titles={queryTitles}
+               dashboardId={dashboardId}
                onSelect={onSelectPage}
                onTitleChange={onTitleChange}
                onRemove={onRemove} />

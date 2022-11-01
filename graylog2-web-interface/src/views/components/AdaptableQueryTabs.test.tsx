@@ -37,11 +37,12 @@ const DEFAULT_PROPS = {
   maxWidth: 500,
   queries: Immutable.OrderedSet(['query-id-1', 'query-id-2', 'query-id-3', 'query-id-4']),
   titles: Immutable.Map<string, string>([['query-id-1', 'Tab 1'], ['query-id-2', 'Tab 2'], ['query-id-3', 'Tab 3'], ['query-id-4', 'Tab 4']]),
-  selectedQueryId: 'query-id-1',
   onRemove: () => Promise.resolve(),
   onTitleChange: () => Promise.resolve(Map(['tab', Map(['query-id-1', 'Tab 1'])]) as TitlesMap),
   onSelect: (id: string) => Promise.resolve(id),
   queryTitleEditModal: React.createRef<QueryTitleEditModal>(),
+  activeQueryId: 'query-id-1',
+  dashboardId: 'dashboard-id',
 };
 
 describe('AdaptableQueryTabs', () => {
@@ -149,7 +150,7 @@ describe('AdaptableQueryTabs', () => {
 
       await finishInitialRender();
 
-      rerender(<AdaptableQueryTabs {...DEFAULT_PROPS} selectedQueryId="query-id-4" />);
+      rerender(<AdaptableQueryTabs {...DEFAULT_PROPS} activeQueryId="query-id-4" />);
 
       const newActiveTab = await screen.findByRole(mainTabRole, {
         name: 'Tab 4',
@@ -179,7 +180,7 @@ describe('AdaptableQueryTabs', () => {
   });
 
   it('displays active tab', () => {
-    render(<AdaptableQueryTabs {...DEFAULT_PROPS} selectedQueryId="query-id-2" />);
+    render(<AdaptableQueryTabs {...DEFAULT_PROPS} activeQueryId="query-id-2" />);
 
     const tab2 = screen.getByRole(mainTabRole, {
       name: 'Tab 2',

@@ -16,18 +16,26 @@
  */
 import * as React from 'react';
 import type { Dispatch, SetStateAction } from 'react';
-import { useCallback, useState } from 'react';
-import { OrderedSet, Map, Set } from 'immutable';
+import { useCallback, useState, useContext } from 'react';
+import { OrderedSet, Map, Set, List } from 'immutable';
 import styled from 'styled-components';
 
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
 import { QueriesActions } from 'views/actions/QueriesActions';
 import { SortableList, IconButton } from 'components/common';
-import type { ListItemType } from 'components/common/SortableList/ListItem';
-import { ViewStatesActions } from 'views/stores/ViewStatesStore';
+import { ViewStatesActions, ViewStatesStore } from 'views/stores/ViewStatesStore';
 import type { TitleType } from 'views/stores/TitleTypes';
 import TitleTypes from 'views/stores/TitleTypes';
 import EditableTitle from 'views/components/common/EditableTitle';
+import { useStore } from 'stores/connect';
+import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
+import FindNewActiveQueryId from 'views/logic/views/FindNewActiveQuery';
+import ConfirmDeletingDashboardPage from 'views/logic/views/ConfirmDeletingDashboardPage';
+
+type PageListItem = {
+  id: string,
+  title: string
+}
 
 const ListItemContainer = styled.div`
   display: flex;
@@ -39,31 +47,48 @@ const ListItem = ({
   item: { id, title },
   onRemove,
   onUpdateTitle,
+  disableDelete,
 }: {
-  item: { id: string, title?: string },
+  item: PageListItem,
   onUpdateTitle: (id: string, title: string) => void,
   onRemove: (id: string) => void,
+  disableDelete: boolean,
 }) => {
   return (
     <ListItemContainer>
       <EditableTitle key={title} disabled={!onUpdateTitle} value={title} onChange={(newTitle) => onUpdateTitle(id, newTitle)} />
       <div>
-        {/* <IconButton title={`Edit title for page ${title}`} name="edit" onClick={() => {}} /> */}
-        <IconButton title={`Remove page ${title}`} name="trash" onClick={() => onRemove(id)} />
+        <IconButton title={`Remove page ${title}`} name="trash" onClick={() => onRemove(id)} disabled={disableDelete} />
       </div>
     </ListItemContainer>
   );
 };
 
+const useWidgetIds = () => useStore(ViewStatesStore, (states) => states.map((viewState) => viewState.widgets.map((widget) => widget.id).toList()).toMap());
+
 type Props = {
   show: boolean,
   setShow: Dispatch<SetStateAction<boolean>>,
-  queriesList: OrderedSet<ListItemType>
+  queriesList: OrderedSet<PageListItem>,
+  dashboardId: string,
+  activeQueryId: string,
 }
 
-const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList }: Props) => {
-  const [orderedQueriesList, setOrderedQueriesList] = useState<OrderedSet<ListItemType>>(queriesList);
+const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, dashboardId, activeQueryId }: Props) => {
+  const widgetIds = useWidgetIds();
+  const { setDashboardPage } = useContext(DashboardPageContext);
+  const [orderedQueriesList, setOrderedQueriesList] = useState<OrderedSet<PageListItem>>(queriesList);
+  const disablePageDelete = queriesList.size <= 1;
   const onConfirmPagesConfiguration = useCallback(() => {
+    const isActiveQueryDeleted = !orderedQueriesList.find(({ id }) => id === activeQueryId);
+
+    if (isActiveQueryDeleted) {
+      const indexedQueryIds = queriesList.map(({ id }) => id).toIndexedSeq();
+      const newActiveQueryId = FindNewActiveQueryId(List(indexedQueryIds), activeQueryId);
+
+      setDashboardPage(newActiveQueryId);
+    }
+
     QueriesActions.setOrder(OrderedSet(orderedQueriesList.map(({ id }) => id))).then(() => {
       const newTitles = orderedQueriesList.map(({ id, title }) => {
         const titleMap = Map<string, string>({ title });
@@ -75,13 +100,13 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList }: Props) 
       ViewStatesActions.patchQueriesTitle(Set(newTitles));
       setShow(false);
     });
-  }, [orderedQueriesList, setShow]);
+  }, [orderedQueriesList, queriesList, activeQueryId, setDashboardPage, setShow]);
   const onPagesConfigurationModalClose = useCallback(() => setShow(false), [setShow]);
-  const updatePageSorting = useCallback((order: Array<ListItemType>) => {
+  const updatePageSorting = useCallback((order: Array<PageListItem>) => {
     setOrderedQueriesList(OrderedSet(order));
   }, [setOrderedQueriesList]);
 
-  const updatePageTitle = (id: string, title: string) => {
+  const onUpdateTitle = useCallback((id: string, title: string) => {
     setOrderedQueriesList((currentQueries) => (
       OrderedSet(currentQueries.map((query) => {
         if (query.id === id) {
@@ -91,13 +116,29 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList }: Props) 
         return query;
       }))),
     );
-  };
+  }, []);
 
-  const removePage = (id: string) => {
-    setOrderedQueriesList((currentQueries) => (
-      OrderedSet(currentQueries.filter((query) => query.id !== id))),
-    );
-  };
+  const onRemovePage = useCallback(async (id: string) => {
+    if (disablePageDelete) {
+      return Promise.resolve();
+    }
+
+    if (await ConfirmDeletingDashboardPage(dashboardId, activeQueryId, widgetIds)) {
+      setOrderedQueriesList((currentQueries) => (
+        OrderedSet(currentQueries.filter((query) => query.id !== id))),
+      );
+    }
+
+    return Promise.resolve();
+  }, [activeQueryId, dashboardId, disablePageDelete, widgetIds]);
+
+  // eslint-disable-next-line react/no-unused-prop-types
+  const customListItemRender = useCallback(({ item }: { item: PageListItem }) => (
+    <ListItem item={item}
+              onUpdateTitle={onUpdateTitle}
+              onRemove={onRemovePage}
+              disableDelete={disablePageDelete} />
+  ), [disablePageDelete, onRemovePage, onUpdateTitle]);
 
   return (
     <BootstrapModalConfirm showModal={show}
@@ -111,10 +152,10 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList }: Props) 
           Use drag and drop to change the execution order of the dashboard pages.
           Click on a dashboard title to change it.
         </p>
-        <SortableList items={orderedQueriesList.toArray()}
-                      onMoveItem={updatePageSorting}
-                      displayOverlayInPortal
-                      customContentRender={({ item }) => <ListItem item={item} onUpdateTitle={updatePageTitle} onRemove={removePage} />} />
+        <SortableList<PageListItem> items={orderedQueriesList.toArray()}
+                                    onMoveItem={updatePageSorting}
+                                    displayOverlayInPortal
+                                    customContentRender={customListItemRender} />
       </>
     </BootstrapModalConfirm>
   );
