@@ -33,11 +33,10 @@ type Props = {
 
 type State = {
   titleDraft: string,
+  showModal: boolean,
 };
 
 class QueryTitleEditModal extends React.Component<Props, State> {
-  modal: BootstrapModalForm = React.createRef();
-
   static propTypes = {
     onTitleChange: PropTypes.func.isRequired,
   };
@@ -46,6 +45,7 @@ class QueryTitleEditModal extends React.Component<Props, State> {
     super(props);
 
     this.state = {
+      showModal: false,
       titleDraft: '',
     };
   }
@@ -54,9 +54,12 @@ class QueryTitleEditModal extends React.Component<Props, State> {
   open = (activeQueryTitle: string) => {
     this.setState({
       titleDraft: activeQueryTitle,
+      showModal: true,
     });
+  };
 
-    this.modal.open();
+  close = () => {
+    this.setState({ showModal: false });
   };
 
   _onDraftSave = () => {
@@ -64,7 +67,7 @@ class QueryTitleEditModal extends React.Component<Props, State> {
     const { onTitleChange } = this.props;
 
     onTitleChange(titleDraft);
-    this.modal.close();
+    this.close();
   };
 
   _onDraftChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,12 +75,13 @@ class QueryTitleEditModal extends React.Component<Props, State> {
   };
 
   render() {
-    const { titleDraft } = this.state;
+    const { titleDraft, showModal } = this.state;
 
     return (
-      <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
+      <BootstrapModalForm show={showModal}
                           title="Editing dashboard page title"
                           onSubmitForm={this._onDraftSave}
+                          onCancel={this.close}
                           submitButtonText="Update title"
                           bsSize="large">
         <Input autoFocus
