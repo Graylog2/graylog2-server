@@ -144,7 +144,7 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_TRANSPORT_EMAIL_FROM_EMAIL", "developers@graylog.com")
 
                 .waitingFor(new WaitAllStrategy()
-                        .withStrategy(Wait.forLogMessage(".*Graylog server up and running.*", 1))
+                        .withStrategy(new WaitForSuccessOrFailureStrategy().withSuccessAndFailure(".*Graylog server up and running.*", ".*Exception while running migrations.*"))
                         // To be able to search for data we need the index ranges to be computed. Since this is an async
                         // background job, we need to wait until they have been created.
                         .withStrategy(new HttpWaitStrategy()
