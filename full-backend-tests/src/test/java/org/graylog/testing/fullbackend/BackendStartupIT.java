@@ -18,6 +18,7 @@ package org.graylog.testing.fullbackend;
 
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.MailServerContainer;
 import org.graylog.testing.completebackend.MailServerInstance;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
@@ -30,7 +31,7 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ContainerMatrixTestsConfiguration(withMailServerEnabled = true)
+@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, withMailServerEnabled = true)
 class BackendStartupIT {
 
     private final GraylogBackend sut;

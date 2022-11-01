@@ -14,21 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
+package org.graylog.storage.opensearch2.views.searchtypes.pivot;
 
-import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
-import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog2.indexer.searches.Searches;
-import org.graylog2.indexer.searches.SearchesAdapter;
-import org.graylog2.indexer.searches.SearchesIT;
-import org.junit.Rule;
+import com.google.common.collect.ImmutableList;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
 
-public class SearchesOS2IT extends SearchesIT {
-    @Rule
-    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
-
-    @Override
-    protected SearchServerInstance searchServer() {
-        return this.openSearchInstance;
+public record PivotBucket(ImmutableList<String> keys, MultiBucketsAggregation.Bucket bucket) {
+    public static PivotBucket create(ImmutableList<String> keys, MultiBucketsAggregation.Bucket bucket) {
+        return new PivotBucket(keys, bucket);
     }
 }

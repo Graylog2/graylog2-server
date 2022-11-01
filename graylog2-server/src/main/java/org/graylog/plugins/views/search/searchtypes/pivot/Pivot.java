@@ -144,14 +144,30 @@ public abstract class Pivot implements SearchType {
         @JsonProperty("row_groups")
         public abstract Builder rowGroups(List<BucketSpec> rowGroups);
 
+        public Builder rowGroups(BucketSpec... rowGroups) {
+            return rowGroups(List.of(rowGroups));
+        }
+
         @JsonProperty("column_groups")
         public abstract Builder columnGroups(List<BucketSpec> columnGroups);
+
+        public Builder columnGroups(BucketSpec... columnGroups) {
+            return columnGroups(List.of(columnGroups));
+        }
 
         @JsonProperty
         public abstract Builder series(List<SeriesSpec> series);
 
+        public Builder series(SeriesSpec... series) {
+            return series(List.of(series));
+        }
+
         @JsonProperty
         public abstract Builder sort(List<SortSpec> sort);
+
+        public Builder sort(SortSpec... sort) {
+            return sort(List.of(sort));
+        }
 
         @JsonProperty
         public abstract Builder rollup(boolean rollup);
