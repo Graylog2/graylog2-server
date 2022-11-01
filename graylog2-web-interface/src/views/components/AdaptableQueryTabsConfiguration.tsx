@@ -79,7 +79,7 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, dashboard
   const widgetIds = useWidgetIds();
   const { setDashboardPage } = useContext(DashboardPageContext);
   const [orderedQueriesList, setOrderedQueriesList] = useState<OrderedSet<PageListItem>>(queriesList);
-  const disablePageDelete = queriesList.size <= 1;
+  const disablePageDelete = orderedQueriesList.size <= 1;
   const onConfirmPagesConfiguration = useCallback(() => {
     const isActiveQueryDeleted = !orderedQueriesList.find(({ id }) => id === activeQueryId);
 
