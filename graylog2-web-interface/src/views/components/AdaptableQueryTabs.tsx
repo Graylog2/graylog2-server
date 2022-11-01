@@ -20,6 +20,7 @@ import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import { OrderedSet } from 'immutable';
 
 import { ModifiedNavDropdown as NavDropdown } from 'components/bootstrap/NavDropdown';
 import type { QueryId } from 'views/logic/queries/Query';
@@ -27,8 +28,8 @@ import type QueryTitleEditModal from 'views/components/queries/QueryTitleEditMod
 import { Nav, NavItem, MenuItem } from 'components/bootstrap';
 import { Icon, IconButton } from 'components/common';
 import QueryTitle from 'views/components/queries/QueryTitle';
-import type { ListItemType } from 'components/common/SortableList/ListItem';
 import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabsConfiguration';
+import type { ListItemType } from 'components/common/SortableList/ListItem';
 
 import type { QueryTabsProps } from './QueryTabs';
 
@@ -38,10 +39,10 @@ interface Props extends QueryTabsProps {
 }
 
 interface TabsTypes {
-  navItems: Array<ReactNode>,
-  menuItems: Array<ReactNode>,
-  lockedItems: Array<ReactNode>,
-  queriesList: Array<ListItemType>,
+  navItems: OrderedSet<ReactNode>,
+  menuItems: OrderedSet<ReactNode>,
+  lockedItems: OrderedSet<ReactNode>,
+  queriesList: OrderedSet<ListItemType>,
 }
 
 const CLASS_HIDDEN = 'hidden';
@@ -175,10 +176,10 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
   const [lockedTab, setLockedTab] = useState<QueryId>();
   const [showConfigurationModal, setShowConfigurationModal] = useState<boolean>(false);
   const currentTabs = useMemo((): TabsTypes => {
-    const navItems = [];
-    const menuItems = [];
-    const lockedItems = [];
-    const queriesList = [];
+    let navItems = OrderedSet();
+    let menuItems = OrderedSet();
+    let lockedItems = OrderedSet();
+    let queriesList = OrderedSet<ListItemType>();
 
     queries.keySeq().forEach((id, idx) => {
       const openTitleEditModal = (activeQueryTitle: string) => {
@@ -197,7 +198,7 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
                     title={title} />
       );
 
-      navItems.push(lockedTab === id ? null : (
+      navItems = navItems.add(lockedTab === id ? null : (
         <NavItem eventKey={id}
                  key={id}
                  data-tab-id={id}
@@ -209,18 +210,19 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
         </NavItem>
       ));
 
-      menuItems.push(lockedTab === id ? null : (
+      menuItems = menuItems.add(lockedTab === id ? null : (
         <MenuItem eventKey={id}
                   key={id}
                   data-tab-id={id}
                   onClick={() => {
                     setLockedTab(id);
                     onSelect(id);
-                  }}>{tabTitle}
+                  }}>
+          {tabTitle}
         </MenuItem>
       ));
 
-      lockedItems.push(lockedTab !== id ? null : (
+      lockedItems = lockedItems.add(lockedTab !== id ? null : (
         <NavItem eventKey={id}
                  key={id}
                  data-tab-id={id}
@@ -230,10 +232,7 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
         </NavItem>
       ));
 
-      queriesList.push({
-        id,
-        title,
-      });
+      queriesList = queriesList.add({ id, title });
     });
 
     return { navItems, menuItems, lockedItems, queriesList };
@@ -273,9 +272,9 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
       </StyledQueryNav>
       <IconButton title="Open pages configuration" name="cog" onClick={() => setShowConfigurationModal(true)} />
       {showConfigurationModal && (
-      <AdaptableQueryTabsConfiguration show={showConfigurationModal}
-                                       setShow={setShowConfigurationModal}
-                                       queriesList={currentTabs.queriesList} />
+        <AdaptableQueryTabsConfiguration show={showConfigurationModal}
+                                         setShow={setShowConfigurationModal}
+                                         queriesList={currentTabs.queriesList} />
       )}
     </Container>
   );

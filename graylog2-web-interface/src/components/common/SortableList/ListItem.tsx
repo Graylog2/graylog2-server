@@ -66,7 +66,7 @@ type Props<ItemType extends ListItemType> = {
 
 const StyledListGroupItem = styled(ListGroupItem)`
   display: flex;
-  align-items: flex-start;
+  align-items: center;
 `;
 
 const DragHandle = styled.div`
