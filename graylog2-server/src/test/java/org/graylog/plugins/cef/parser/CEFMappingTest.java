@@ -23,9 +23,10 @@ import java.math.BigInteger;
 import static org.junit.Assert.assertEquals;
 
 public class CEFMappingTest {
-    private static final String[] BIG_INT_FIELD_KEYS = new String[]{
-            "cn1", "cn2","cn3", "cn4", "cnt", "destinationTranslatedPort", "dpid", "dpt",
-            "dvcpid", "fsize", "in", "oldFileSize", "out", "sourceTranslatedPort", "spid", "spt"
+    private static final CEFMapping[] BIG_INT_FIELDS = new CEFMapping[]{
+            CEFMapping.cn1, CEFMapping.cn2, CEFMapping.cn3, CEFMapping.cn4, CEFMapping.cnt, CEFMapping.destinationTranslatedPort,
+            CEFMapping.dpid, CEFMapping.dpt, CEFMapping.dvcpid, CEFMapping.fsize, CEFMapping.in, CEFMapping.oldFileSize,
+            CEFMapping.out, CEFMapping.sourceTranslatedPort, CEFMapping.spid, CEFMapping.spt
     };
 
     @Test
@@ -46,8 +47,7 @@ public class CEFMappingTest {
     public void convertLargeValues() throws Exception {
         String bigValueString = String.valueOf(Integer.MAX_VALUE) + 1;
         BigInteger bigValue = new BigInteger(bigValueString);
-        for (String keyName : BIG_INT_FIELD_KEYS) {
-            CEFMapping fieldMapping = CEFMapping.forKeyName(keyName);
+        for (CEFMapping fieldMapping : BIG_INT_FIELDS) {
             Object mapping = fieldMapping.convert(bigValueString);
             assertEquals(bigValue, mapping);
         }
