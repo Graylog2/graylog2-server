@@ -25,22 +25,35 @@ class StaticFieldForm extends React.Component {
     input: PropTypes.object.isRequired,
   };
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showModal: false,
+    };
+  }
+
   open = () => {
-    this.modal.open();
+    this.setState({ showModal: true });
+  };
+
+  close = () => {
+    this.setState({ showModal: false });
   };
 
   _addStaticField = () => {
     const fieldName = this.fieldName.getValue();
     const fieldValue = this.fieldValue.getValue();
 
-    InputStaticFieldsStore.create(this.props.input, fieldName, fieldValue).then(() => this.modal.close());
+    InputStaticFieldsStore.create(this.props.input, fieldName, fieldValue).then(() => this.close());
   };
 
   render() {
     return (
-      <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
+      <BootstrapModalForm show={this.state.showModal}
                           title="Add static field"
                           submitButtonText="Add field"
+                          onCancel={this.close}
                           onSubmitForm={this._addStaticField}>
         <p>Define a static field that is added to every message that comes in via this input. The field is not
           overwritten If the message already has that key. Key must only contain alphanumeric characters or
