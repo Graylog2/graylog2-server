@@ -45,7 +45,7 @@ const useInputListStyles = (size: 'small' | 'normal') => {
     },
   };
 
-  const styles = {
+  const styles = (isValid: boolean) => ({
     valueContainer: (provided: any) => ({
       ...provided,
       padding: size === 'small' ? '0 8px' : '2px 12px',
@@ -54,17 +54,18 @@ const useInputListStyles = (size: 'small' | 'normal') => {
       ...provided,
       borderWidth: isFocused ? 1 : provided.borderWidth,
       outline: isFocused ? 0 : provided.outline,
-      boxShadow: isFocused ? theme.colors.input.boxShadow : null,
+      boxShadow: isFocused ? inputListTheme.colors.input.boxShadow : null,
       ...(size === 'small' ? { minHeight: 29, height: 29 } : { minHeight: 34 }),
       borderRadius: INPUT_BORDER_RADIUS,
       alignItems: 'center',
+      borderColor: isValid ? provided.borderColor : inputListTheme.colors.brand.primary,
     }),
     placeHolder: (provided: any) => ({
       ...provided,
-      color: theme.colors.input.placeholder,
+      color: inputListTheme.colors.input.placeholder,
       lineHeight: '28px',
-      fontFamily: theme.fonts.family.body,
-      fontSize: theme.fonts.size.body,
+      fontFamily: inputListTheme.fonts.family.body,
+      fontSize: inputListTheme.fonts.size.body,
       fontWeight: 400,
       whiteSpace: 'nowrap',
       textOverflow: 'ellipsis',
@@ -74,21 +75,22 @@ const useInputListStyles = (size: 'small' | 'normal') => {
     }),
     multiValue: (provided: any) => ({
       ...provided,
-      border: `1px solid ${theme.colors.variant.lighter.info}`,
+      border: `1px solid ${inputListTheme.colors.variant.lighter.info}`,
     }),
     multiValueLabel: (provided: any) => ({
       ...provided,
+      color: isValid ? provided.color : inputListTheme.colors.brand.primary,
       padding: '2px 5px',
-      fontSize: theme.fonts.size.small,
+      fontSize: inputListTheme.fonts.size.small,
     }),
     multiValueRemove: (provided: any) => ({
       ...provided,
-      borderLeft: `1px solid ${theme.colors.variant.lighter.info}`,
+      borderLeft: `1px solid ${inputListTheme.colors.variant.lighter.info}`,
       paddingLeft: '5px',
       paddingRight: '5px',
       borderRadius: '0',
     }),
-  };
+  });
 
   return { inputListTheme, styles };
 };

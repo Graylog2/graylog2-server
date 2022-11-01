@@ -18,6 +18,9 @@ import * as React from 'react';
 import CreatableSelect from 'react-select/creatable';
 import type { Props as CreatableProps } from 'react-select/creatable';
 
+import { InputDescription } from 'components/common';
+import { FormGroup, ControlLabel } from 'components/bootstrap';
+
 import useInputListStyles from './useInputListStyles';
 import { GenericChangeEvent } from './InputList.types';
 import type { GenericTarget } from './InputList.types';
@@ -36,10 +39,14 @@ type Props = CreatableProps & {
   name: string,
   values: (string | number)[],
   onChange: (newValue: React.ChangeEvent<GenericTarget<(string | number)[]>>) => void,
+  label?: string | React.ReactHTMLElement<HTMLElement> | null,
   size?: 'small' | 'normal',
+  bsStyle?: 'success' | 'warning' | 'error' | null,
+  error?: string | React.ReactHTMLElement<HTMLElement> | null,
+  help?: string | React.ReactHTMLElement<HTMLElement> | null,
 };
 
-const InputList = ({ name, values, onChange, size, ...rest }: Props) => {
+const InputList = ({ name, values, onChange, label, size, bsStyle, error, help, ...rest }: Props) => {
   const { inputListTheme, styles } = useInputListStyles(size);
   const inputRef = React.useRef(null);
   const [inputValue, setInputValue] = React.useState<string>('');
@@ -74,23 +81,31 @@ const InputList = ({ name, values, onChange, size, ...rest }: Props) => {
   };
 
   return (
-    <CreatableSelect ref={inputRef}
-                     components={{ DropdownIndicator: null }}
-                     inputValue={inputValue}
-                     isMulti
-                     menuIsOpen={false}
-                     onChange={handleOnChange}
-                     onInputChange={(newValue: string) => setInputValue(newValue)}
-                     onKeyDown={handleKeyDown}
-                     value={value}
-                     styles={styles}
-                     theme={inputListTheme}
-                     {...rest} />
+    <FormGroup controlId={rest.id ? rest.id : name} validationState={error ? 'error' : bsStyle}>
+      {label && <ControlLabel>{label}</ControlLabel>}
+      <CreatableSelect ref={inputRef}
+                       components={{ DropdownIndicator: null }}
+                       inputValue={inputValue}
+                       isMulti
+                       menuIsOpen={false}
+                       onChange={handleOnChange}
+                       onInputChange={(newValue: string) => setInputValue(newValue)}
+                       onKeyDown={handleKeyDown}
+                       value={value}
+                       styles={styles(!error)}
+                       theme={inputListTheme}
+                       {...rest} />
+      <InputDescription error={error} help={help} />
+    </FormGroup>
   );
 };
 
 InputList.defaultProps = {
+  label: null,
   size: 'normal',
+  bsStyle: null,
+  error: null,
+  help: null,
 };
 
 export default InputList;
