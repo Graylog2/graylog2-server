@@ -224,7 +224,6 @@ class StreamRuleForm extends React.Component<Props, State> {
       <BootstrapModalForm title={title}
                           show
                           onCancel={onClose}
-                          onModalClose={onClose}
                           onSubmitForm={this._onSubmit}
                           submitButtonText={submitButtonText}
                           submitLoadingText={submitLoadingText}
