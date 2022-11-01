@@ -80,9 +80,12 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                 if (Lifecycle.VM.equals(containerMatrixTestsDescriptor.getLifecycle())) {
                     try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(esVersion, mongoVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, ContainerMatrixTestsConfiguration.defaultImportLicenses, withEnabledMailServer)) {
                         RequestSpecification specification = requestSpec(backend);
-                        this.execute(request, ((ContainerMatrixTestsDescriptor) descriptor).getChildren(), backend, specification);
+                        this.execute(request, descriptor.getChildren(), backend, specification);
                     } catch (Exception exception) {
-                        throw new JUnitException("Error executing tests for engine " + getId(), exception);
+                        /* Fail hard if the containerized backend failed to start. */
+                        LOG.error("Failed container startup? Error executing tests for engine " + getId(), exception);
+                        System.exit(1);
+//                        throw new JUnitException("Error executing tests for engine " + getId(), exception);
                     }
                 } else if (Lifecycle.CLASS.equals(containerMatrixTestsDescriptor.getLifecycle())) {
                     for (TestDescriptor td : containerMatrixTestsDescriptor.getChildren()) {
@@ -96,7 +99,10 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                             RequestSpecification specification = requestSpec(backend);
                             this.execute(request, Collections.singleton(td), backend, specification);
                         } catch (Exception exception) {
-                            throw new JUnitException("Error executing tests for engine " + getId(), exception);
+                            /* Fail hard if the containerized backend failed to start. */
+                            LOG.error("Failed container startup? Error executing tests for engine " + getId(), exception);
+                            System.exit(1);
+//                          throw new JUnitException("Error executing tests for engine " + getId(), exception);
                         }
                     }
                 } else {
