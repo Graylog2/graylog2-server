@@ -33,6 +33,7 @@ class SourceViewModal extends React.Component {
   };
 
   static initialState = {
+    showModal: false,
     source: undefined,
     name: undefined,
   };
@@ -54,11 +55,11 @@ class SourceViewModal extends React.Component {
 
   open = () => {
     this._loadConfiguration();
-    this.sourceModal.open();
+    this.setState({ showModal: true });
   };
 
   hide = () => {
-    this.sourceModal.close();
+    this.setState({ showModal: false });
   };
 
   _loadConfiguration = () => {
@@ -92,7 +93,8 @@ class SourceViewModal extends React.Component {
 
   render() {
     return (
-      <BootstrapModalWrapper ref={(c) => { this.sourceModal = c; }}>
+      <BootstrapModalWrapper showModal={this.state.showModal}
+                             onHide={this.hide}>
         <Modal.Header closeButton>
           <Modal.Title><span>Configuration <em>{this.state.name}</em></span></Modal.Title>
         </Modal.Header>
