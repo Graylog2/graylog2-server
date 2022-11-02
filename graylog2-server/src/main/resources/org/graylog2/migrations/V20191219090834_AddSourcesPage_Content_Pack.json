@@ -178,7 +178,10 @@
                     {
                       "field": "source",
                       "type": "values",
-                     }
+                      "config": {
+                        "limit": 15
+                      }
+                    }
                   ],
                   "series": [
                     {
