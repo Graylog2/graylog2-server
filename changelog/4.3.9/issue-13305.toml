@@ -1,0 +1,5 @@
+type = "c"
+message = "Change page sizes for the Event Definitions overview to 10, 50, and 100."
+
+issues = ["13305"]
+pulls = ["13720"]

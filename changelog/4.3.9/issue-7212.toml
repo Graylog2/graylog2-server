@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix installation of Event Definition content packs that use a default stream."
+
+issues = ["7212"]
+pulls = ["13398"]

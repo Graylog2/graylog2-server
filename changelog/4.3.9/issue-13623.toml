@@ -1,0 +1,5 @@
+type = "c"
+message = "Unify error responses for the lookup table API endpoints."
+
+issues = ["13623"]
+pulls = ["13649"]

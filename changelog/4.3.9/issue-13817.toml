@@ -1,0 +1,4 @@
+type = "s"
+message = "Fix potential disclosure of field values from other streams in query field value suggestions."
+
+issues = ["13817"]
