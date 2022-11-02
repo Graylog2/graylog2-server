@@ -57,6 +57,8 @@ class ContentPackEntitiesList extends React.Component {
     super(props);
 
     this.state = {
+      showApplyModal: false,
+      showShowModal: false,
       filteredEntities: props.contentPack.entities || [],
       filter: undefined,
     };
@@ -96,7 +98,6 @@ class ContentPackEntitiesList extends React.Component {
       readOnly,
     } = this.props;
 
-    let applyModalRef;
     const applyParamComponent = (
       <ContentPackApplyParameter parameters={contentPack.parameters}
                                  entity={entity}
@@ -106,15 +107,17 @@ class ContentPackEntitiesList extends React.Component {
     );
 
     const closeModal = () => {
-      applyModalRef.close();
+      this.setState({ showApplyModal: false });
     };
 
     const open = () => {
-      applyModalRef.open();
+      this.setState({ showApplyModal: true });
     };
 
     const applyModal = (
-      <BootstrapModalWrapper ref={(node) => { applyModalRef = node; }} bsSize="large">
+      <BootstrapModalWrapper showModal={this.state.showApplyModal}
+                             onHide={closeModal}
+                             bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>Edit</Modal.Title>
         </Modal.Header>
@@ -127,7 +130,6 @@ class ContentPackEntitiesList extends React.Component {
       </BootstrapModalWrapper>
     );
 
-    let showModalRef;
     const entityComponent = (
       <ContentPackEntityConfig appliedParameter={appliedParameter[entity.id]}
                                parameters={contentPack.parameters}
@@ -135,15 +137,17 @@ class ContentPackEntitiesList extends React.Component {
     );
 
     const closeShowModal = () => {
-      showModalRef.close();
+      this.setState({ showShowModal: false });
     };
 
     const openShowModal = () => {
-      showModalRef.open();
+      this.setState({ showShowModal: true });
     };
 
     const showModal = (
-      <BootstrapModalWrapper ref={(node) => { showModalRef = node; }} bsSize="large">
+      <BootstrapModalWrapper showModal={this.state.showShowModal}
+                             onHide={closeShowModal}
+                             bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>Entity Config</Modal.Title>
         </Modal.Header>
