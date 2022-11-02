@@ -55,7 +55,7 @@ public class SystemNotificationEventProcessor implements EventProcessor {
         LOG.debug("Creating system event for notification: {}", eventParameters.notificationType());
 
         final ImmutableList.Builder<EventWithContext> eventsWithContext = ImmutableList.builder();
-        final Event event = eventFactory.createEvent(eventDefinition, eventParameters.timestamp(), eventDefinition.title());
+        final Event event = eventFactory.createEvent(eventDefinition, eventParameters.timestamp(), eventParameters.notificationType().name());
         eventsWithContext.add(EventWithContext.create(event));
         eventsConsumer.accept(eventsWithContext.build());
     }

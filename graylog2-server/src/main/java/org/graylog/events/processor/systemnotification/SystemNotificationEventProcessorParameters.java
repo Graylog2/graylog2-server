@@ -27,10 +27,10 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
-import static org.joda.time.DateTime.now;
 
 @AutoValue
 @JsonTypeName(SystemNotificationEventProcessorConfig.TYPE_NAME)
@@ -73,7 +73,7 @@ public abstract class SystemNotificationEventProcessorParameters implements Even
             }
 
             return new AutoValue_SystemNotificationEventProcessorParameters.Builder()
-                    .timestamp(now())
+                    .timestamp(DateTime.now(DateTimeZone.UTC))
                     .timerange(timerange)
                     .type(SystemNotificationEventProcessorConfig.TYPE_NAME)
                     .notificationType(Notification.Type.GENERIC);
