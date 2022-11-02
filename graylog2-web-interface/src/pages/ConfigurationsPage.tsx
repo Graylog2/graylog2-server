@@ -44,7 +44,7 @@ const SEARCHES_CLUSTER_CONFIG = 'org.graylog2.indexer.searches.SearchesClusterCo
 const MESSAGE_PROCESSORS_CONFIG = 'org.graylog2.messageprocessors.MessageProcessorsConfig';
 const SIDECAR_CONFIG = 'org.graylog.plugins.sidecar.system.SidecarConfiguration';
 const EVENTS_CONFIG = 'org.graylog.events.configuration.EventsConfiguration';
-const INDEX_SETS_DEFAULTS_CONFIG = 'org.graylog2.configuration.IndexSetsDefaultsConfiguration';
+const INDEX_SETS_DEFAULTS_CONFIG = 'org.graylog2.configuration.IndexSetsDefaultConfiguration';
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
 const PERMISSIONS_CONFIG = 'org.graylog2.users.UserAndTeamsConfig';
 

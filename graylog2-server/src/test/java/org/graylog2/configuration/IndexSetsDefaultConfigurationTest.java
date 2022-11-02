@@ -1,0 +1,36 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog2.configuration;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+class IndexSetsDefaultConfigurationTest {
+
+    @Test
+    void testConvert() {
+        // Verify that JSON annotation in class are properly defined so that the
+        // ClusterConfigService can perform needed payload conversions on reads/writes.
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        final Map map = objectMapper.convertValue(IndexSetsDefaultConfiguration.createDefault(), HashMap.class);
+        objectMapper.convertValue(map, IndexSetsDefaultConfiguration.class);
+    }
+}

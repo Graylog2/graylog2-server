@@ -20,11 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.mongodb.lang.Nullable;
-import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
-import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
-import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
-import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategyConfig;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -38,24 +33,9 @@ import java.util.concurrent.TimeUnit;
  */
 @JsonAutoDetect
 @AutoValue
-@JsonDeserialize(builder = AutoValue_IndexSetsDefaultsConfiguration.Builder.class)
-public abstract class IndexSetsDefaultsConfiguration implements PluginConfigBean {
+@JsonDeserialize(builder = AutoValue_IndexSetsDefaultConfiguration.Builder.class)
+public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean {
 
-    // Defaults
-    public static final String DEFAULT_INDEX_ANALYZER = "standard";
-    public static final Integer DEFAULT_SHARDS = 1;
-    public static final Integer DEFAULT_REPLICAS = 0;
-    public static final boolean DEFAULT_INDEX_OPTIMIZATION_DISABLED = false;
-    public static final Integer DEFAULT_INDEX_OPTIMIZATION_MAX_SEGMENTS = 1;
-    public static final long DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = 5;
-    public static final TimeUnit DEFAULT_FIELD_TYPE_REFRESH_INTERVAL_UNIT = TimeUnit.SECONDS;
-    public static final String DEFAULT_ROTATION_STRATEGY_CLASS = SizeBasedRotationStrategy.class.getCanonicalName();
-    public static final RotationStrategyConfig DEFAULT_ROTATION_STRATEGY_CONFIG = SizeBasedRotationStrategyConfig.createDefault();
-    public static final String DEFAULT_RETENTION_STRATEGY_CLASS = DeletionRetentionStrategy.class.getCanonicalName();
-    public static final RetentionStrategyConfig DEFAULT_RETENTION_STRATEGY_CONFIG = DeletionRetentionStrategyConfig.createDefault();
-
-    // Fields
-    public static final String INDEX_PREFIX = "index_prefix";
     public static final String INDEX_ANALYZER = "index_analyzer";
     public static final String SHARDS = "shards";
     public static final String REPLICAS = "replicas";
@@ -90,7 +70,7 @@ public abstract class IndexSetsDefaultsConfiguration implements PluginConfigBean
     public abstract TimeUnit fieldTypeRefreshIntervalUnit();
 
     /**
-     * The properties of the rotation/retention settings must match those specified on
+     * The property names of rotation/retention settings must match those specified on
      * {@link org.graylog2.indexer.indexset.IndexSetConfig}, since shared UI components are used.
      */
     @JsonProperty(ROTATION_STRATEGY_CLASS)
@@ -106,21 +86,10 @@ public abstract class IndexSetsDefaultsConfiguration implements PluginConfigBean
     public abstract RetentionStrategyConfig retentionStrategyConfig();
 
     public static Builder builder() {
-        return new AutoValue_IndexSetsDefaultsConfiguration.Builder()
-                .indexAnalyzer(DEFAULT_INDEX_ANALYZER)
-                .shards(DEFAULT_SHARDS)
-                .replicas(DEFAULT_REPLICAS)
-                .indexOptimizationDisabled(DEFAULT_INDEX_OPTIMIZATION_DISABLED)
-                .indexOptimizationMaxNumSegments(DEFAULT_INDEX_OPTIMIZATION_MAX_SEGMENTS)
-                .fieldTypeRefreshInterval(DEFAULT_FIELD_TYPE_REFRESH_INTERVAL)
-                .fieldTypeRefreshIntervalUnit(DEFAULT_FIELD_TYPE_REFRESH_INTERVAL_UNIT)
-                .rotationStrategyClass(DEFAULT_ROTATION_STRATEGY_CLASS)
-                .rotationStrategyConfig(DEFAULT_ROTATION_STRATEGY_CONFIG)
-                .retentionStrategyClass(DEFAULT_RETENTION_STRATEGY_CLASS)
-                .retentionStrategyConfig(DEFAULT_RETENTION_STRATEGY_CONFIG);
+        return new AutoValue_IndexSetsDefaultConfiguration.Builder();
     }
 
-    public static IndexSetsDefaultsConfiguration createDefault() {
+    public static IndexSetsDefaultConfiguration createDefault() {
         return builder().build();
     }
 
@@ -159,6 +128,6 @@ public abstract class IndexSetsDefaultsConfiguration implements PluginConfigBean
         @JsonProperty(RETENTION_STRATEGY_CONFIG)
         public abstract Builder retentionStrategyConfig(RetentionStrategyConfig retentionStrategyConfig);
 
-        public abstract IndexSetsDefaultsConfiguration build();
+        public abstract IndexSetsDefaultConfiguration build();
     }
 }

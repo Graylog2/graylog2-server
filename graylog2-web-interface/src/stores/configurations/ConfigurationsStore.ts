@@ -181,7 +181,7 @@ export const ConfigurationsStore = singletonStore(
     },
 
     listIndexSetsDefaultsClusterConfig() {
-      const promise = fetch('GET', this._url('/org.graylog2.configuration.IndexSetsDefaultsConfiguration')).then((response) => {
+      const promise = fetch('GET', this._url('/org.graylog2.configuration.IndexSetsDefaultConfiguration')).then((response) => {
         this.indexSetsDefaultConfig = response;
         this.propagateChanges();
 
