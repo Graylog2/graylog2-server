@@ -29,6 +29,7 @@ class ImportsViewModal extends React.Component {
   };
 
   static initialState = {
+    showModal: false,
     uploads: undefined,
     totalUploads: 0,
     pagination: {
@@ -46,11 +47,11 @@ class ImportsViewModal extends React.Component {
   // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => {
     this._loadUploads(this.state.pagination.page);
-    this.uploadsModal.open();
+    this.setState({ showModal: true });
   };
 
   hide = () => {
-    this.uploadsModal.close();
+    this.setState({ showModal: false });
   };
 
   _isLoading = () => {
@@ -142,7 +143,9 @@ class ImportsViewModal extends React.Component {
 
   render() {
     return (
-      <BootstrapModalWrapper bsSize="large" ref={(c) => { this.uploadsModal = c; }}>
+      <BootstrapModalWrapper showModal={this.state.showModal}
+                             onHide={this.hide}
+                             bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title><span>Imports from the old Collector system</span></Modal.Title>
           Edit the imported configuration after pressing the Apply button by hand. Dynamic values like the node ID can be replaced with the variables system, e.g. <code>{this._buildVariableName('nodeId')}</code>
