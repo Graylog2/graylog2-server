@@ -31,6 +31,7 @@ class ConfigurationVariablesHelper extends React.Component {
   };
 
   state = {
+    showModal: false,
     configurationVariables: undefined,
     errorModalContent: {},
     variableToDelete: {},
@@ -47,8 +48,12 @@ class ConfigurationVariablesHelper extends React.Component {
       });
   };
 
+  _openErrorModal = () => {
+    this.setState({ showModal: true });
+  };
+
   _closeErrorModal = () => {
-    this.errorModal.close();
+    this.setState({ showModal: false });
   };
 
   _renderConfigList = (configurations) => {
@@ -74,7 +79,7 @@ class ConfigurationVariablesHelper extends React.Component {
         // Variable still in use: Report error
         if (response.length > 0) {
           this.setState({ errorModalContent: this._renderConfigList(response) });
-          this.errorModal.open();
+          this._openErrorModal();
           // Not in use, ask for confirmation
         } else {
           this.deleteConfirmModal.open();
@@ -142,7 +147,7 @@ class ConfigurationVariablesHelper extends React.Component {
       return <Spinner />;
     }
 
-    const { variableToDelete, errorModalContent } = this.state;
+    const { variableToDelete, errorModalContent, showModal } = this.state;
 
     return (
       <div>
@@ -164,7 +169,8 @@ class ConfigurationVariablesHelper extends React.Component {
           </Table>
         </div>
 
-        <BootstrapModalWrapper ref={(modal) => { this.errorModal = modal; }}>
+        <BootstrapModalWrapper showModal={showModal}
+                               onHide={this._closeErrorModal}>
           <Modal.Header>
             <Modal.Title>Error deleting configuration variable <strong>$&#123;user.{variableToDelete.name}&#125;</strong></Modal.Title>
           </Modal.Header>
