@@ -21,6 +21,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
+import org.apache.shiro.subject.Subject;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
@@ -93,7 +94,12 @@ public class ClusterLookupTableResourceTest {
                         new ThreadFactoryBuilder()
                                 .setNameFormat("proxied-requests-test-pool-%d")
                                 .build()
-                ));
+                )) {
+            @Override
+            protected Subject getSubject() {
+                return mock(Subject.class);
+            }
+        };
     }
 
     @Test

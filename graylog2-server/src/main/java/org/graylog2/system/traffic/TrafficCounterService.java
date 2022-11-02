@@ -59,17 +59,17 @@ public class TrafficCounterService {
         db.createIndex(new BasicDBObject(BUCKET, 1), new BasicDBObject("unique", true));
     }
 
-    private static DateTime getDayBucket(DateTime observationTime) {
+    private static DateTime getDayBucketStart(DateTime observationTime) {
         return observationTime.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
     }
 
-    private static DateTime getHourBucket(DateTime observationTime) {
+    private static DateTime getHourBucketStart(DateTime observationTime) {
         return observationTime.withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
     }
 
     public void updateTraffic(DateTime observationTime, NodeId nodeId, long inLastMinute, long outLastMinute, long decodedLastMinute) {
         // we bucket traffic data by the hour and aggregate it to a day bucket for reporting
-        final DateTime dayBucket = getHourBucket(observationTime);
+        final DateTime dayBucket = getHourBucketStart(observationTime);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Updating traffic for node {} at {}:  in/decoded/out {}/{}/{} bytes",
@@ -92,15 +92,36 @@ public class TrafficCounterService {
         }
     }
 
-    public TrafficHistogram clusterTrafficOfLastDays(Duration duration, Interval interval) {
+    /**
+     * Method included for backwards compatibility in pre-5.0 Graylog versions.
+     * {@see #clusterTrafficOfLastDays(Duration, Interval, boolean)}
+     */
+    public TrafficHistogram clusterTrafficOfLastDays(Duration daysToIncludeDuration, Interval interval) {
+        return clusterTrafficOfLastDays(daysToIncludeDuration, interval, true);
+    }
+
+    /**
+     * Queries traffic for the specified duration.
+     * <BR>
+     * The from-date is considered to be the start of the day that the duration intersects with in the past.
+     * For example, if a duration of 1.5 days is specified, then traffic starting from the beginning of two days ago
+     * will be returned.
+     * <BR>
+     * The to-date is considered to be the current date/time (now) when {@code includeToday} false, otherwise then the
+     * end of the previous day will be used.
+     */
+    public TrafficHistogram clusterTrafficOfLastDays(Duration daysToIncludeDuration, Interval interval, boolean includeToday) {
         final ImmutableMap.Builder<DateTime, Long> inputBuilder = ImmutableMap.builder();
         final ImmutableMap.Builder<DateTime, Long> outputBuilder = ImmutableMap.builder();
         final ImmutableMap.Builder<DateTime, Long> decodedBuilder = ImmutableMap.builder();
 
-        // Include traffic up until the current timestamp
-        final DateTime to = Tools.nowUTC();
+        final DateTime now = Tools.nowUTC();
+
+        // Include traffic up until the current timestamp if includeToday is true.
+        // Otherwise, default to the end of the previous day.
+        final DateTime to = includeToday ? now : getDayBucketStart(now).minusMillis(1);
         // Make sure to include the full first day
-        final DateTime from = getDayBucket(to).minus(duration);
+        final DateTime from = getDayBucketStart(now).minus(daysToIncludeDuration);
 
         final DBQuery.Query query = DBQuery.and(
                 DBQuery.lessThanEquals(BUCKET, to),

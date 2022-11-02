@@ -68,6 +68,7 @@ import org.mongojack.DBSort;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.validation.Validator;
 import javax.validation.constraints.NotEmpty;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
@@ -151,6 +152,7 @@ public class LookupTableResource extends RestResource {
     private final SearchQueryParser cacheSearchQueryParser;
     private final LookupTableService lookupTableService;
     private final LookupDataAdapterValidationContext lookupDataAdapterValidationContext;
+    private final Validator validator;
 
     @Inject
     public LookupTableResource(DBLookupTableService dbTableService, DBDataAdapterService dbDataAdapterService,
@@ -158,7 +160,8 @@ public class LookupTableResource extends RestResource {
                                Map<String, LookupDataAdapter.Factory> dataAdapterTypes,
                                Map<String, LookupDataAdapter.Factory2> dataAdapterTypes2,
                                LookupTableService lookupTableService,
-                               LookupDataAdapterValidationContext lookupDataAdapterValidationContext) {
+                               LookupDataAdapterValidationContext lookupDataAdapterValidationContext,
+                               Validator validator) {
         this.dbTableService = dbTableService;
         this.dbDataAdapterService = dbDataAdapterService;
         this.dbCacheService = dbCacheService;
@@ -167,6 +170,7 @@ public class LookupTableResource extends RestResource {
         this.dataAdapterTypes2 = dataAdapterTypes2;
         this.lookupTableService = lookupTableService;
         this.lookupDataAdapterValidationContext = lookupDataAdapterValidationContext;
+        this.validator = validator;
         this.lutSearchQueryParser = new SearchQueryParser(LookupTableDto.FIELD_TITLE, LUT_SEARCH_FIELD_MAPPING);
         this.adapterSearchQueryParser = new SearchQueryParser(DataAdapterDto.FIELD_TITLE, ADAPTER_SEARCH_FIELD_MAPPING);
         this.cacheSearchQueryParser = new SearchQueryParser(CacheDto.FIELD_TITLE, CACHE_SEARCH_FIELD_MAPPING);
@@ -369,8 +373,11 @@ public class LookupTableResource extends RestResource {
     @NoAuditEvent("Validation only")
     @ApiOperation(value = "Validate the lookup table config")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public ValidationResult validateTable(@Valid @ApiParam LookupTableApi toValidate) {
+    public ValidationResult validateTable(@ApiParam LookupTableApi toValidate) {
         final ValidationResult validation = new ValidationResult();
+
+        validator.validate(toValidate).stream().forEach(v ->
+                validation.addError(v.getPropertyPath().toString(), v.getMessage()));
 
         final Optional<LookupTableDto> dtoOptional = dbTableService.get(toValidate.name());
         if (dtoOptional.isPresent()) {
@@ -593,8 +600,11 @@ public class LookupTableResource extends RestResource {
     @NoAuditEvent("Validation only")
     @ApiOperation(value = "Validate the data adapter config")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public ValidationResult validateAdapter(@Valid @ApiParam DataAdapterApi toValidate) {
+    public ValidationResult validateAdapter(@ApiParam DataAdapterApi toValidate) {
         final ValidationResult validation = new ValidationResult();
+
+        validator.validate(toValidate).stream().forEach(v ->
+                validation.addError(v.getPropertyPath().toString(), v.getMessage()));
 
         final Optional<DataAdapterDto> dtoOptional = dbDataAdapterService.get(toValidate.name());
         if (dtoOptional.isPresent()) {
@@ -745,8 +755,11 @@ public class LookupTableResource extends RestResource {
     @NoAuditEvent("Validation only")
     @ApiOperation(value = "Validate the cache config")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public ValidationResult validateCache(@Valid @ApiParam CacheApi toValidate) {
+    public ValidationResult validateCache(@ApiParam CacheApi toValidate) {
         final ValidationResult validation = new ValidationResult();
+
+        validator.validate(toValidate).stream().forEach(v ->
+                validation.addError(v.getPropertyPath().toString(), v.getMessage()));
 
         final Optional<CacheDto> dtoOptional = dbCacheService.get(toValidate.name());
         if (dtoOptional.isPresent()) {

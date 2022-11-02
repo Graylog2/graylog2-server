@@ -61,14 +61,16 @@ pre 2.2 Graylog installations.
 
 ## Configuration File Changes
 
-| Option                                              | Action      | Description |
-| --------------------------------------------------- | ----------  | ------------ |
-| `is_master`                                         | **removed** | Replaced with `is_leader`. For backwards compatibility, `is_master` will still be evaluated, but `is_leader` takes precedence, if both are configured.|
+| Option                                              | Action      | Description                                                                                                                                                                             |
+|-----------------------------------------------------| ----------  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `is_master`                                         | **removed** | Replaced with `is_leader`. For backwards compatibility, `is_master` will still be evaluated, but `is_leader` takes precedence, if both are configured.                                  |
 | `stale_master_timeout`                              | **removed** | Replaced with `stale_leader_timeout`. For backwards compatibility, `stale_master_timeout` will still be evaluated, but `stale_leader_timeout` takes precedence, if both are configured. |
-| `index_field_type_periodical_interval`              | **removed** | To control index field type refreshing, the new `index_field_type_periodical_full_refresh_interval` may be used instead. |
-| `is_leader`                                         | *added*     | Replacement for `is_master` to promote [inclusive naming](https://inclusivenaming.org/faqs/). |
-| `stale_leader_timeout`                              | *added*     | Replacement for `stale_master_timeout` to promote [inclusive naming](https://inclusivenaming.org/faqs/). |
-| `index_field_type_periodical_full_refresh_interval` | *added*     | Allows users to tweak the default interval after which field type information will be refreshed for *all* indices. |
+| `index_field_type_periodical_interval`              | **removed** | To control index field type refreshing, the new `index_field_type_periodical_full_refresh_interval` may be used instead.                                                                |
+| `is_leader`                                         | *added*     | Replacement for `is_master` to promote [inclusive naming](https://inclusivenaming.org/faqs/).                                                                                           |
+| `stale_leader_timeout`                              | *added*     | Replacement for `stale_master_timeout` to promote [inclusive naming](https://inclusivenaming.org/faqs/).                                                                                |
+| `index_field_type_periodical_full_refresh_interval` | *added*     | Allows users to tweak the default interval after which field type information will be refreshed for *all* indices.                                                                      |
+| `max_archive_retention_time`                        | *added*     | Allows users to set max retention time for archives on new installations in days. e.g. 365d                                                                                             |
+| `default_archive_retention_time `                   | *added*     | Allows users to set default retention time for archives on new installations in days. e.g. 365d                                                                                         |
 
 ## Behaviour Changes
 

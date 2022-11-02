@@ -81,7 +81,7 @@ public class ClusterSystemJobResource extends ProxiedResource {
     @Produces(MediaType.APPLICATION_JSON)
     public SystemJobSummary getJob(@ApiParam(name = "jobId", required = true) @PathParam("jobId") String jobId) throws IOException {
         for (Map.Entry<String, Node> entry : nodeService.allActive().entrySet()) {
-            final RemoteSystemJobResource remoteSystemJobResource = remoteInterfaceProvider.get(entry.getValue(), this.authenticationToken, RemoteSystemJobResource.class);
+            final RemoteSystemJobResource remoteSystemJobResource = remoteInterfaceProvider.get(entry.getValue(), getAuthenticationToken(), RemoteSystemJobResource.class);
             try {
                 final Response<SystemJobSummary> response = remoteSystemJobResource.get(jobId).execute();
                 if (response.isSuccessful()) {
@@ -106,7 +106,7 @@ public class ClusterSystemJobResource extends ProxiedResource {
         final Optional<Response<SystemJobSummary>> summaryResponse = nodeService.allActive().entrySet().stream()
                 .map(entry -> {
                     final RemoteSystemJobResource resource = remoteInterfaceProvider.get(entry.getValue(),
-                            this.authenticationToken, RemoteSystemJobResource.class);
+                            getAuthenticationToken(), RemoteSystemJobResource.class);
                     try {
                         return resource.delete(jobId).execute();
                     } catch (IOException e) {

@@ -54,6 +54,7 @@ public class ESLatestHandler extends ESPivotSeriesSpecHandler<Latest, TopHits> {
                                         ESGeneratedQueryContext esGeneratedQueryContext) {
         final Optional<Value> latestValue = Optional.ofNullable(latestAggregation.getHits())
                 .map(SearchHits::getHits)
+                .filter(hits -> hits.length > 0)
                 .map(hits -> hits[0])
                 .map(SearchHit::getSourceAsMap)
                 .map(source -> source.get(pivotSpec.field()))

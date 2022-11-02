@@ -53,11 +53,11 @@ public class TrafficResource extends RestResource {
     public TrafficCounterService.TrafficHistogram get(@ApiParam(name = "days", value = "For how many days the traffic stats should be returned")
                                                       @QueryParam("days") @DefaultValue("30") int days,
                                                       @ApiParam(name = "daily", value = "Whether the traffic should be aggregate to daily values")
-                                                      @QueryParam("daily") @DefaultValue("false") boolean daily) {
-        final TrafficCounterService.TrafficHistogram trafficHistogram =
-                trafficCounterService.clusterTrafficOfLastDays(Duration.standardDays(days),
-                        daily ? TrafficCounterService.Interval.DAILY : TrafficCounterService.Interval.HOURLY);
-
-        return trafficHistogram;
+                                                      @QueryParam("daily") @DefaultValue("false") boolean daily,
+                                                      @ApiParam(name = "includeToday", value = "Whether the traffic should include up to the current date/time (in UTC).")
+                                                      @QueryParam("includeToday") @DefaultValue("true") boolean includeToday) {
+        return trafficCounterService.clusterTrafficOfLastDays(Duration.standardDays(days),
+                daily ? TrafficCounterService.Interval.DAILY : TrafficCounterService.Interval.HOURLY,
+                includeToday);
     }
 }

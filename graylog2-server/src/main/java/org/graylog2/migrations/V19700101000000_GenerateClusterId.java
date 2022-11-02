@@ -14,71 +14,36 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.periodical;
+package org.graylog2.migrations;
 
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.cluster.ClusterIdFactory;
-import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.time.ZonedDateTime;
 
-public class ClusterIdGeneratorPeriodical extends Periodical {
-    private static final Logger LOG = LoggerFactory.getLogger(ClusterIdGeneratorPeriodical.class);
+public class V19700101000000_GenerateClusterId extends Migration {
+    private static final Logger LOG = LoggerFactory.getLogger(V19700101000000_GenerateClusterId.class);
 
     private final ClusterConfigService clusterConfigService;
     private final ClusterIdFactory clusterIdFactory;
 
     @Inject
-    public ClusterIdGeneratorPeriodical(ClusterConfigService clusterConfigService, ClusterIdFactory clusterIdFactory) {
+    public V19700101000000_GenerateClusterId(ClusterConfigService clusterConfigService, ClusterIdFactory clusterIdFactory) {
         this.clusterConfigService = clusterConfigService;
         this.clusterIdFactory = clusterIdFactory;
     }
 
     @Override
-    public boolean runsForever() {
-        return true;
+    public ZonedDateTime createdAt() {
+        return ZonedDateTime.parse("1970-01-01T00:00:00Z");
     }
 
     @Override
-    public boolean stopOnGracefulShutdown() {
-        return false;
-    }
-
-    @Override
-    public boolean leaderOnly() {
-        return true;
-    }
-
-    @Override
-    public boolean startOnThisNode() {
-        return true;
-    }
-
-    @Override
-    public boolean isDaemon() {
-        return true;
-    }
-
-    @Override
-    public int getInitialDelaySeconds() {
-        return 0;
-    }
-
-    @Override
-    public int getPeriodSeconds() {
-        return 0;
-    }
-
-    @Override
-    protected Logger getLogger() {
-        return LOG;
-    }
-
-    @Override
-    public void doRun() {
+    public void upgrade() {
         if(clusterConfigService.get(ClusterId.class) == null) {
             ClusterId clusterId = clusterIdFactory.create();
             clusterConfigService.write(clusterId);

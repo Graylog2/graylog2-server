@@ -281,13 +281,13 @@ public class StreamFacade implements EntityFacade<Stream> {
 
     private Optional<NativeEntity<Stream>> findExisting(EntityV1 entity, Map<String, ValueReference> parameters) {
         final String streamId = entity.id().id();
-        // Always use the existing default stream
-        if (Stream.DEFAULT_STREAM_ID.equals(streamId)) {
+        // Always use the existing system stream
+        if (Stream.isSystemStreamId(streamId)) {
             try {
-                final Stream stream = streamService.load(Stream.DEFAULT_STREAM_ID);
-                return Optional.of(NativeEntity.create(entity.id(), Stream.DEFAULT_STREAM_ID, ModelTypes.STREAM_V1, stream.getTitle(), stream));
+                final Stream stream = streamService.load(streamId);
+                return Optional.of(NativeEntity.create(entity.id(), streamId, ModelTypes.STREAM_V1, stream.getTitle(), stream));
             } catch (NotFoundException e) {
-                throw new ContentPackException("Default stream <" + streamId + "> does not exist!", e);
+                throw new ContentPackException("System stream <" + streamId + "> does not exist!", e);
             }
         } else {
             return Optional.empty();
