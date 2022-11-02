@@ -32,17 +32,18 @@ class ExtractorSortModal extends React.Component {
     super(props);
 
     this.state = {
+      showModal: false,
       sortedExtractors: props.extractors,
     };
   }
 
   // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => {
-    this.modal.open();
+    this.setState({ showModal: true });
   };
 
   close = () => {
-    this.modal.close();
+    this.setState({ showModal: false });
   };
 
   _cancel = () => {
@@ -75,11 +76,12 @@ class ExtractorSortModal extends React.Component {
   };
 
   render() {
-    const { sortedExtractors } = this.state;
+    const { sortedExtractors, showModal } = this.state;
     const { input } = this.props;
 
     return (
-      <BootstrapModalWrapper ref={(modal) => { this.modal = modal; }} onHide={this._cancel}>
+      <BootstrapModalWrapper showModal={showModal} 
+                             onHide={this._cancel}>
         <Modal.Header closeButton>
           <Modal.Title>
             <span>Sort extractors for <em>{input.title}</em></span>
