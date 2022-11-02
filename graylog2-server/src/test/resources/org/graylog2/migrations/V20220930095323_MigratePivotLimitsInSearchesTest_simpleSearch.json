@@ -1,0 +1,57 @@
+{
+  "searches": [{
+    "_id" : {
+      "$oid": "63453c49c87c8c15c478fb25"
+    },
+    "queries" : [
+      {
+        "id" : "ceab5525-3298-476d-9b89-8428deebb1fe",
+        "timerange" : {
+          "from" : 300,
+          "type" : "relative"
+        },
+        "filters" : [],
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "search_types" : [
+          {
+            "timerange" : {
+              "from" : 300,
+              "type" : "relative"
+            },
+            "query" : null,
+            "streams" : [],
+            "id" : "7acb7358-3210-4d95-b5f1-163f35355e2a",
+            "name" : "chart",
+            "series" : [
+              {
+                "type" : "count",
+                "id" : "count()"
+              }
+            ],
+            "sort" : [],
+            "rollup" : true,
+            "type" : "pivot",
+            "row_groups" : [
+              {
+                "type" : "values",
+                "field" : "action",
+                "limit" : 10
+              }
+            ],
+            "column_groups" : [],
+            "filters" : []
+          }
+        ]
+      }
+    ],
+    "parameters" : [],
+    "requires" : {},
+    "owner" : "admin",
+    "created_at" : {
+      "$date": "2022-10-11T09:50:01.115Z"
+    }
+  }]
+}
