@@ -26,17 +26,27 @@ class VerboseMessageModal extends React.Component {
     collectorVerbose: PropTypes.string.isRequired,
   };
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showModal: false,
+    };
+  }
+
   open = () => {
-    this.sourceModal.open();
+    this.setState({ showModal: true });
   };
 
   hide = () => {
-    this.sourceModal.close();
+    this.setState({ showModal: false });
   };
 
   render() {
     return (
-      <BootstrapModalWrapper ref={(c) => { this.sourceModal = c; }} bsSize="large">
+      <BootstrapModalWrapper showModal={this.state.showModal}
+                             onHide={this.hide}
+                             bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title><span>Error Details for <em>{this.props.collectorName}</em></span></Modal.Title>
         </Modal.Header>
