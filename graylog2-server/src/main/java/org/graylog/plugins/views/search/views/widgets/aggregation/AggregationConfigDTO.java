@@ -27,11 +27,9 @@ import org.graylog.plugins.views.search.views.WidgetConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO;
 
 import javax.annotation.Nullable;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.stream.Collectors;
 
 @AutoValue
 @JsonTypeName(AggregationConfigDTO.NAME)

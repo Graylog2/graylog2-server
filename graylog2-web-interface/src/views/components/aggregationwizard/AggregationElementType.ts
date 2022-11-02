@@ -27,7 +27,7 @@ export type AggregationElement = {
   key: string,
   allowCreate: (formValues: WidgetConfigFormValues) => boolean,
   order: number,
-  onRemove?: (index: number, formValues) => WidgetConfigFormValues,
+  onRemove?: (index: number, formValues: WidgetConfigFormValues) => WidgetConfigFormValues,
   toConfig?: (formValues: WidgetConfigFormValues, currentConfigBuilder: AggregationWidgetConfigBuilder) => AggregationWidgetConfigBuilder,
   fromConfig?: (config: AggregationWidgetConfig) => Partial<WidgetConfigFormValues>,
   onCreate?: (formValues: WidgetConfigFormValues) => WidgetConfigFormValues,
