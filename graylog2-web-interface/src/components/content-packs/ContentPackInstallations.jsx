@@ -33,21 +33,29 @@ class ContentPackInstallations extends React.Component {
     onUninstall: () => {},
   };
 
-  rowFormatter = (item) => {
-    let showModalRef;
+  constructor(props) {
+    super(props);
 
+    this.state = {
+      showModal: false,
+    };
+  }
+
+  rowFormatter = (item) => {
     const { onUninstall } = this.props;
 
     const closeShowModal = () => {
-      showModalRef.close();
+      this.setState({ showModal: false });
     };
 
     const openShowModal = () => {
-      showModalRef.open();
+      this.setState({ showModal: true });
     };
 
     const showModal = (
-      <BootstrapModalWrapper ref={(node) => { showModalRef = node; }} bsSize="large">
+      <BootstrapModalWrapper showModal={this.state.showModal}
+                             onHide={closeShowModal} 
+                             bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>View Installation</Modal.Title>
         </Modal.Header>
