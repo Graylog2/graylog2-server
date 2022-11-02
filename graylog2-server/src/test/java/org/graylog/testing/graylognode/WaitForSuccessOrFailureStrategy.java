@@ -31,7 +31,7 @@ import java.util.function.Predicate;
 public class WaitForSuccessOrFailureStrategy extends AbstractWaitStrategy {
 
     private String success;
-    private String failure;
+    private String[] failures;
 
     @Override
     protected void waitUntilReady() {
@@ -53,24 +53,26 @@ public class WaitForSuccessOrFailureStrategy extends AbstractWaitStrategy {
 
             Predicate<OutputFrame> waitPredicate = outputFrame -> {
                 // (?s) enables line terminator matching (equivalent to Pattern.DOTALL)
-                if(outputFrame.getUtf8String().matches("(?s)" + failure)) {
-                    throw new ContainerLaunchException("Container startup failed. Was looking for: '" + failure + "'");
+                for(final String failure: failures) {
+                    if (outputFrame.getUtf8String().matches("(?s)" + failure)) {
+                        throw new ContainerLaunchException("Container startup failed. Was looking for: '" + failure + "'");
+                    }
                 }
                 return outputFrame.getUtf8String().matches("(?s)" + success);
             };
             try {
                 waitingConsumer.waitUntil(waitPredicate, startupTimeout.getSeconds(), TimeUnit.SECONDS, 1);
             } catch (TimeoutException e) {
-                throw new ContainerLaunchException("Timed out waiting for log output matching '" + success + "' or '" + failure + "'");
+                throw new ContainerLaunchException("Timed out waiting for log output matching '" + success + "'");
             }
         } catch (IOException iox) {
             throw new ContainerLaunchException("Failed with Exception: " + iox.getMessage());
         }
     }
 
-    public WaitForSuccessOrFailureStrategy withSuccessAndFailure(String success, String failure) {
+    public WaitForSuccessOrFailureStrategy withSuccessAndFailures(final String success, final String... failures) {
         this.success = success;
-        this.failure = failure;
+        this.failures = failures;
         return this;
     }
 }
