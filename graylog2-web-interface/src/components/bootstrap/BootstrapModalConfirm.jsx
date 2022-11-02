@@ -42,10 +42,6 @@ class BootstrapModalConfirm extends React.Component {
     /** Indicates whether the confirm button should be disabled or not. */
     confirmButtonDisabled: PropTypes.bool,
     /** Function to call when the modal is opened. The function does not receive any arguments. */
-    onModalOpen: PropTypes.func,
-    /** Function to call when the modal is closed. The function does not receive any arguments. */
-    onModalClose: PropTypes.func,
-    /** Function to call when the action is not confirmed. The function does not receive any arguments. */
     onCancel: PropTypes.func,
     /**
      * Function to call when the action is confirmed. The function receives a callback function to close the modal
@@ -68,8 +64,6 @@ class BootstrapModalConfirm extends React.Component {
     cancelButtonDisabled: false,
     confirmButtonDisabled: false,
     onCancel: () => {},
-    onModalOpen: () => {},
-    onModalClose: () => {},
   };
 
   onCancel = () => {
@@ -86,20 +80,9 @@ class BootstrapModalConfirm extends React.Component {
     onConfirm(this.close);
   };
 
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  open = () => {
-    this.modal.open();
-  };
-
-  close = () => {
-    this.modal.close();
-  };
-
   render() {
     const {
       showModal,
-      onModalOpen,
-      onModalClose,
       title,
       children,
       cancelButtonDisabled,
@@ -108,10 +91,7 @@ class BootstrapModalConfirm extends React.Component {
     } = this.props;
 
     return (
-      <BootstrapModalWrapper ref={(c) => { this.modal = c; }}
-                             showModal={showModal}
-                             onOpen={onModalOpen}
-                             onClose={onModalClose}
+      <BootstrapModalWrapper showModal={showModal}
                              onHide={this.onCancel}
                              role="alertdialog">
         <Modal.Header closeButton>
