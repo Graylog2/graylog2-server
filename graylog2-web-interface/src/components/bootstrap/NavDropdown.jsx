@@ -21,6 +21,8 @@ import { NavDropdown as BootstrapNavDropdown } from 'react-bootstrap';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
+import NavItemStateIndicator from 'components/common/NavItemStateIndicator';
+
 import menuItemStyles from './styles/menuItem';
 
 class ModifiedBootstrapNavDropdown extends BootstrapNavDropdown {
@@ -50,7 +52,11 @@ const StyledNavDropdown = styled(BootstrapNavDropdown)`
 const NavDropdown = ({ inactiveTitle, title, ...props }) => {
   const isActive = inactiveTitle ? inactiveTitle !== title : undefined;
 
-  return <StyledNavDropdown {...props} title={title} active={isActive} />;
+  return (
+    <StyledNavDropdown {...props}
+                       title={<NavItemStateIndicator>{title}</NavItemStateIndicator>}
+                       active={isActive} />
+  );
 };
 
 NavDropdown.propTypes = {

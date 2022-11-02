@@ -7,7 +7,7 @@
       "node_id": "abc-123",
       "node_lifecycle_status": "RUNNING",
       "updated_at": {
-        "$date": "2019-01-01T00:01:00.000Z"
+        "$date": "2019-01-01T03:00:00.000Z"
       },
       "receive_times": {
         "ingest": {
@@ -23,8 +23,7 @@
       "input_journal": {
         "uncommitted_entries": 0,
         "read_messages_1m_rate": 0,
-        "written_messages_1m_rate": 0,
-        "journal_enabled": false
+        "written_messages_1m_rate": 0
       }
     }
   ]

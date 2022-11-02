@@ -37,6 +37,7 @@ import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamMock;
 import org.graylog2.streams.StreamService;
@@ -307,7 +308,7 @@ public class AggregationEventProcessorTest {
 
     @Test
     public void createEventsWithFilter() throws Exception {
-        when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(any(DateTime.class))).thenReturn(true);
+        when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(any(TimeRange.class))).thenReturn(true);
 
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
@@ -363,7 +364,7 @@ public class AggregationEventProcessorTest {
         final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(eventDefinitionDto, searchFactory, eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages);
 
         // If the dependency check returns true, there should be no exception raised and the state service should be called
-        when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(timerange.to())).thenReturn(true);
+        when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(timerange)).thenReturn(true);
 
         assertThatCode(() -> eventProcessor.createEvents(eventFactory, parameters, (events) -> {})).doesNotThrowAnyException();
 
@@ -380,7 +381,7 @@ public class AggregationEventProcessorTest {
         reset(stateService, moreSearch, searchFactory); // Rest mocks so we can verify it again
 
         // If the dependency check returns false, a precondition exception should be raised and the state service not be called
-        when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(timerange.to())).thenReturn(false);
+        when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(timerange)).thenReturn(false);
 
         assertThatCode(() -> eventProcessor.createEvents(eventFactory, parameters, (events) -> {}))
                 .hasMessageContaining(eventDefinitionDto.title())

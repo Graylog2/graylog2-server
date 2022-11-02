@@ -7,8 +7,10 @@ Please make sure to create a MongoDB database backup before starting the upgrade
 
 ## Breaking Changes
 
-* Graylog 5 is Java 17 only. We no longer support earlier versions starting with 5.0
+* Graylog 5 is Java 17 only. We no longer support earlier Java versions.
 * Support for Elasticsearch 6.X has been removed! Please use either Elasticsearch 7.10.2 or, preferably, latest OpenSearch.
+* Graylog 5 needs at least MongoDB 5.0. Our recommended upgrade path is to first bring your MongoDB to 5.0 and then perform the Graylog upgrade.
+  Hint: Graylog 4.3.x does support MongoDB 5.0, which allows for a seamless upgrade path.
 
 ## Disallowing embedding the frontend by default
 

@@ -65,4 +65,6 @@ public interface ProcessingStatusRecorder {
     double getJournalInfoReadMessages1mRate();
 
     double getJournalInfoWrittenMessages1mRate();
+
+    long getProcessBufferUsage();
 }

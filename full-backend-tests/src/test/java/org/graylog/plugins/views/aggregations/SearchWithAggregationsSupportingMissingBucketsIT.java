@@ -18,35 +18,45 @@ package org.graylog.plugins.views.aggregations;
 
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.rest.QueryDTO;
+import org.graylog.plugins.views.search.rest.SearchDTO;
+import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.jupiter.api.BeforeAll;
 
-import java.io.InputStream;
+import java.util.Set;
 
 import static io.restassured.RestAssured.given;
+import static org.graylog.plugins.views.aggregations.AggregationTestHelpers.serialize;
 import static org.graylog.plugins.views.search.aggregations.MissingBucketConstants.MISSING_BUCKET_NAME;
 import static org.graylog.testing.containermatrix.SearchServer.ES7;
 import static org.graylog.testing.containermatrix.SearchServer.OS1;
+import static org.graylog.testing.containermatrix.SearchServer.OS2;
+import static org.graylog.testing.containermatrix.SearchServer.OS2_2;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
-@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, searchVersions = {OS1, ES7})
+@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, searchVersions = {OS1, ES7, OS2, OS2_2})
 public class SearchWithAggregationsSupportingMissingBucketsIT {
 
     @SuppressWarnings("unused")
     //use this fixtureType:474877 in all fixtures to assure this test isolation from the others
     private static final String FIXTURE_TYPE_FIELD_VALUE = "474877";
-    private static final String EXEC_PATH = "/views/search/sync";
     private static final String QUERY_ID = "q1";
     private static final String SEARCH_TYPE_ID = "st1";
-
+    private static final String PIVOT_RESULTS_PATH = "results." + QUERY_ID + ".search_types." + SEARCH_TYPE_ID;
 
     private final RequestSpecification requestSpec;
     private final GraylogBackend backend;
@@ -61,112 +71,125 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         backend.importElasticsearchFixture("messages-for-missing-aggregation-check.json", SearchWithAggregationsSupportingMissingBucketsIT.class);
     }
 
-    @ContainerMatrixTest
-    void testSingleFieldAggregationHasProperMissingBucket() {
-        final String pivotSearchTypePathInResponse = "results." + QUERY_ID + ".search_types." + SEARCH_TYPE_ID;
-        final ValidatableResponse validatableResponse = given()
+    private ValidatableResponse execute(Pivot pivot) {
+        final Pivot pivotWithId = pivot.toBuilder()
+                .id(SEARCH_TYPE_ID)
+                .build();
+
+        final SearchDTO search = SearchDTO.builder()
+                .queries(QueryDTO.builder()
+                        .timerange(RelativeRange.create(0))
+                        .id(QUERY_ID)
+                        .query(ElasticsearchQueryString.of("fixtureType:" + FIXTURE_TYPE_FIELD_VALUE))
+                        .searchTypes(Set.of(pivotWithId))
+                        .build())
+                .build();
+
+        return given()
                 .spec(requestSpec)
                 .when()
-                .body(fixture("org/graylog/plugins/views/aggregations/search_request_with_aggregation_on_single_field.json")) //aggregates on the 'firstName' field
-                .post(EXEC_PATH)
+                .body(serialize(search))
+                .post("/views/search/sync")
                 .then()
-                .log().ifStatusCodeMatches(not(200))
-                .statusCode(200);
+                .log().ifError()
+                .log().ifValidationFails()
+                .statusCode(200)
+                .body("execution.done", equalTo(true))
+                .body("execution.completed_exceptionally", equalTo(false))
+                .body(PIVOT_RESULTS_PATH + ".total", equalTo(5));
+    }
+
+    @ContainerMatrixTest
+    void testSingleFieldAggregationHasProperMissingBucket() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .series(Count.builder().build(), Average.builder().field("age").build())
+                .rowGroups(Values.builder().field("firstName").limit(8).build())
+                .build();
+        final ValidatableResponse validatableResponse = execute(pivot);
+
         //General verification
-        validatableResponse.body("execution.done", equalTo(true))
-                .body(pivotSearchTypePathInResponse + ".rows", hasSize(5))
-                .body(pivotSearchTypePathInResponse + ".total", equalTo(5))
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == 'Joe' }", notNullValue())
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == 'Jane' }", notNullValue())
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == 'Bob' }", notNullValue())
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == '" + MISSING_BUCKET_NAME + "' }", notNullValue())
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key == [] }", notNullValue());
+        validatableResponse.rootPath(PIVOT_RESULTS_PATH)
+                .body(".rows", hasSize(5))
+                .body(".total", equalTo(5))
+                .body(".rows.find{ it.key[0] == 'Joe' }", notNullValue())
+                .body(".rows.find{ it.key[0] == 'Jane' }", notNullValue())
+                .body(".rows.find{ it.key[0] == 'Bob' }", notNullValue())
+                .body(".rows.find{ it.key[0] == '" + MISSING_BUCKET_NAME + "' }", notNullValue())
+                .body(".rows.find{ it.key == [] }", notNullValue());
 
         //Empty bucket verification (should precede the last/total one - index 3)
         //The only message with "empty" first name in a fixture is {(...)"lastName": "Cooper","age": 60(...)}
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[3].key", contains("(Empty Value)"));
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[3].values[0].key", contains("count()"));
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[3].values[0].value", equalTo(1));
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[3].values[1].key", contains("avg(age)"));
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[3].values[1].value", equalTo(60.0f));
+        validatableResponse.body(".rows[3].key", contains("(Empty Value)"));
+        validatableResponse.body(".rows[3].values[0].key", contains("count()"));
+        validatableResponse.body(".rows[3].values[0].value", equalTo(1));
+        validatableResponse.body(".rows[3].values[1].key", contains("avg(age)"));
+        validatableResponse.body(".rows[3].values[1].value", equalTo(60.0f));
 
         //Top bucket verification
         //There are 2 "Joes" in a fixture: {(...)"lastName": "Smith","age": 50(...)} and {(...)"lastName": "Biden","age": 80(...)}
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[0].key", contains("Joe"));
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[0].values[0].key", contains("count()"));
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[0].values[0].value", equalTo(2));
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[0].values[1].key", contains("avg(age)"));
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[0].values[1].value", equalTo(65.0f));
+        validatableResponse.body(".rows[0].key", contains("Joe"));
+        validatableResponse.body(".rows[0].values[0].key", contains("count()"));
+        validatableResponse.body(".rows[0].values[0].value", equalTo(2));
+        validatableResponse.body(".rows[0].values[1].key", contains("avg(age)"));
+        validatableResponse.body(".rows[0].values[1].value", equalTo(65.0f));
 
     }
 
     @ContainerMatrixTest
     void testTwoFieldAggregationHasProperMissingBucket() {
-        final String pivotSearchTypePathInResponse = "results." + QUERY_ID + ".search_types." + SEARCH_TYPE_ID;
-        final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
-                .when()
-                .body(fixture("org/graylog/plugins/views/aggregations/search_request_with_aggregation_on_two_fields.json")) //aggregates on the 'firstName' and 'lastName' fields
-                .post(EXEC_PATH)
-                .then()
-                .log().ifStatusCodeMatches(not(200))
-                .statusCode(200);
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .series(Count.builder().build(), Average.builder().field("age").build())
+                .rowGroups(
+                        Values.builder().field("firstName").limit(8).build(),
+                        Values.builder().field("lastName").limit(8).build()
+                )
+                .build();
+        final ValidatableResponse validatableResponse = execute(pivot);
+
         //General verification
-        validatableResponse.body("execution.done", equalTo(true))
-                .body(pivotSearchTypePathInResponse + ".rows", hasSize(10))
-                .body(pivotSearchTypePathInResponse + ".rows.findAll{ it.key[0] == 'Joe' }", hasSize(3)) //Joe, Joe-Biden, Joe-Smith
-                .body(pivotSearchTypePathInResponse + ".rows.findAll{ it.key[0] == 'Bob' }", hasSize(2)) //Bob, Bob-empty
-                .body(pivotSearchTypePathInResponse + ".rows.findAll{ it.key[0] == 'Jane' }", hasSize(2)) //Jane, Jane-Smith
-                .body(pivotSearchTypePathInResponse + ".rows.findAll{ it.key[0] == '" + MISSING_BUCKET_NAME + "' }", hasSize(2)) //empty, empty-Cooper
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key == [] }", notNullValue()) //totals
-                .body(pivotSearchTypePathInResponse + ".total", equalTo(5));
+        validatableResponse.rootPath(PIVOT_RESULTS_PATH)
+                .body(".rows", hasSize(5))
+                .body(".rows.findAll{ it.key[0] == 'Joe' }", hasSize(2)) // Joe-Biden, Joe-Smith
+                .body(".rows.findAll{ it.key[0] == 'Jane' }", hasSize(1)) // Jane-Smith
+                .body(".rows.findAll{ it.key[0] == '" + MISSING_BUCKET_NAME + "' }", hasSize(1))
+                .body(".rows.find{ it.key == [] }", notNullValue()) //totals
+                .body(".total", equalTo(5));
 
         //Empty buckets verification
         //We have only one entry with missing first name {(...)"lastName": "Cooper","age": 60(...)}, so both empty buckets will have the same values
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == '" + MISSING_BUCKET_NAME + "' && it.key[1] == 'Cooper'}.values[0].value", equalTo(1))
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == '" + MISSING_BUCKET_NAME + "' && it.key[1] == 'Cooper'}.values[1].value", equalTo(60.0f))
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "']}.values[0].value", equalTo(1))
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "']}.values[1].value", equalTo(60.0f));
-
-
+        validatableResponse.body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "'] }.values.value", hasItems(2, 60.0f));
     }
 
     @ContainerMatrixTest
     void testMissingBucketIsNotPresentIfItHasZeroValues() {
-        final String pivotSearchTypePathInResponse = "results." + QUERY_ID + ".search_types." + SEARCH_TYPE_ID;
-        final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
-                .when()
-                .body(fixture("org/graylog/plugins/views/aggregations/search_request_with_aggregation_that_has_no_missing_buckets.json")) //aggregates on the 'age' field
-                .post(EXEC_PATH)
-                .then()
-                .log().ifStatusCodeMatches(not(200))
-                .statusCode(200);
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .series(Count.builder().build())
+                .rowGroups(Values.builder().field("age").limit(8).build())
+                .build();
+        final ValidatableResponse validatableResponse = execute(pivot);
 
         //General verification
         validatableResponse.body("execution.done", equalTo(true))
-                .body(pivotSearchTypePathInResponse + ".rows", hasSize(5))
-                .body(pivotSearchTypePathInResponse + ".total", equalTo(5))
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == '60' }", notNullValue())
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == '40' }", notNullValue())
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == '50' }", notNullValue())
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == '80' }", notNullValue())
-                .body(pivotSearchTypePathInResponse + ".rows.find{ it.key == [] }", notNullValue());
+                .rootPath(PIVOT_RESULTS_PATH)
+                .body(".rows", hasSize(5))
+                .body(".total", equalTo(5))
+                .body(".rows.find{ it.key == ['60'] }", notNullValue())
+                .body(".rows.find{ it.key == ['40'] }", notNullValue())
+                .body(".rows.find{ it.key == ['50'] }", notNullValue())
+                .body(".rows.find{ it.key == ['80'] }", notNullValue())
+                .body(".rows.find{ it.key == [] }", notNullValue());
 
         //Empty bucket is not there - in a fixture all the documents have "age" field
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows.find{ it.key[0] == '" + MISSING_BUCKET_NAME + "' }", nullValue());
-
+        validatableResponse.body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "'] }", nullValue());
 
         //Top bucket verification
         //There are 2 guys of age 60
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[0].key", contains("60"));
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[0].values[0].key", contains("count()"));
-        validatableResponse.body(pivotSearchTypePathInResponse + ".rows[0].values[0].value", equalTo(2));
+        validatableResponse.body(".rows[0].key", contains("60"));
+        validatableResponse.body(".rows[0].values[0].key", contains("count()"));
+        validatableResponse.body(".rows[0].values[0].value", equalTo(2));
 
     }
-
-    private InputStream fixture(final String filename) {
-        return getClass().getClassLoader().getResourceAsStream(filename);
-    }
-
 }

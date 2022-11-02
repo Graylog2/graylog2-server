@@ -19,7 +19,7 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivot.series;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
+import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
@@ -34,7 +34,7 @@ import java.util.stream.Stream;
 public class OSStdDevHandler extends OSPivotSeriesSpecHandler<StdDev, ExtendedStats> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, StdDev stddevSpec, OSPivot searchTypeHandler, OSGeneratedQueryContext queryContext) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, StdDev stddevSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final ExtendedStatsAggregationBuilder stddev = AggregationBuilders.extendedStats(name).field(stddevSpec.field());
         record(queryContext, pivot, stddevSpec, name, ExtendedStats.class);
         return Optional.of(stddev);
@@ -44,7 +44,7 @@ public class OSStdDevHandler extends OSPivotSeriesSpecHandler<StdDev, ExtendedSt
     public Stream<Value> doHandleResult(Pivot pivot, StdDev pivotSpec,
                                         SearchResponse searchResult,
                                         ExtendedStats stddevAggregation,
-                                        OSPivot searchTypeHandler,
+                                        OSSearchTypeHandler<Pivot> searchTypeHandler,
                                         OSGeneratedQueryContext OSGeneratedQueryContext) {
         return Stream.of(OSPivotSeriesSpecHandler.Value.create(pivotSpec.id(), StdDev.NAME, stddevAggregation.getStdDeviation()));
     }
