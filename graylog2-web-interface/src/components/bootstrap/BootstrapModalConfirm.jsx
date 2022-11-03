@@ -70,14 +70,12 @@ class BootstrapModalConfirm extends React.Component {
     const { onCancel } = this.props;
 
     onCancel();
-
-    this.close();
   };
 
   onConfirm = () => {
     const { onConfirm } = this.props;
 
-    onConfirm(this.close);
+    onConfirm(this.onCancel);
   };
 
   render() {
