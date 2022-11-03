@@ -32,7 +32,6 @@ import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpec
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.PivotBucket;
-import org.jooq.lambda.tuple.Tuple2;
 
 import javax.annotation.Nonnull;
 import java.util.List;

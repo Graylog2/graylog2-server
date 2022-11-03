@@ -14,20 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.streams.matchers;
+const parseNumber = (num: string | number | undefined) => {
+  if (num === undefined) {
+    return num as undefined;
+  }
 
-import org.graylog2.plugin.Message;
-import org.graylog2.plugin.streams.StreamRule;
+  if (typeof num === 'number') {
+    return num;
+  }
 
-import java.util.Optional;
+  const parsedNumber = Number.parseInt(num, 10);
 
-public class AlwaysMatcher implements StreamRuleMatcher {
-    @Override
-    public boolean match(Message msg, StreamRule rule) {
-        return Optional.ofNullable(rule.getInverted())
-                // When this rule is inverted, it should never match
-                .map(inverted -> !inverted)
-                // If `inverted` is `null`, we always return `true`
-                .orElse(true);
-    }
-}
+  return Number.isNaN(parsedNumber) ? undefined : parsedNumber;
+};
+
+export default parseNumber;
