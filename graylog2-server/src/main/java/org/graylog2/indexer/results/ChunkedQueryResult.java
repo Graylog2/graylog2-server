@@ -68,7 +68,7 @@ public abstract class ChunkedQueryResult<C, R> extends IndexQueryResult implemen
         this.lastSearchResponse = result;
         this.initialResult = null;
 
-        final List<ResultMessage> resultMessages = collectMessagesFromResult(result);
+        final List<ResultMessage> resultMessages = result != null ? collectMessagesFromResult(result) : List.of();
 
         if (resultMessages.size() == 0) {
             // chunking exhausted

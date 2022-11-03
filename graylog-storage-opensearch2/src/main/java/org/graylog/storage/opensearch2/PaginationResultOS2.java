@@ -44,6 +44,9 @@ public class PaginationResultOS2 extends ChunkedQueryResultOS2 {
     protected SearchResponse nextSearchResult() throws IOException {
         final SearchSourceBuilder initialQuery = initialSearchRequest.source();
         final SearchHit[] hits = lastSearchResponse.getHits().getHits();
+        if (hits == null || hits.length == 0) {
+            return null;
+        }
         initialQuery.searchAfter(hits[hits.length - 1].getSortValues());
         initialSearchRequest.source(initialQuery);
         return client.executeWithIOException((c, requestOptions) -> c.search(initialSearchRequest, requestOptions),
