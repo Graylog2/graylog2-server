@@ -128,10 +128,10 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
         <dd>{config.shards}</dd>
         <dt>Replicas per Index:</dt>
         <dd>{config.replicas}</dd>
-        <dt>Max. Number of Segments:</dt>
-        <dd>{config.index_optimization_max_num_segments}</dd>
         <dt>Index optimization disabled:</dt>
         <dd>{config.index_optimization_disabled ? 'Yes' : 'No'}</dd>
+        <dt>Max. Number of Segments:</dt>
+        <dd>{config.index_optimization_max_num_segments}</dd>
         <dt>Field type refresh interval:</dt>
         <dd>{config.field_type_refresh_interval} {lodash.capitalize(config.field_type_refresh_interval_unit)}</dd>
         <br />
@@ -165,8 +165,6 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
                   <div>
                     <Row>
                       <Col md={12}>
-                        {/* TODO: Descriptions and help text <InputDescription help={<>A relevant description</>} /> */}
-                        {/* TODO: Analyzer validation? Dropdown? */}
                         <FormikInput label="Index Analyzer"
                                      name="index_analyzer"
                                      id="index_analyzer" />
@@ -176,13 +174,13 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
                         <FormikInput label="Replicas"
                                      name="replicas"
                                      id="replicas" />
-                        <FormikInput label="Max. Number of Segments"
-                                     name="index_optimization_max_num_segments"
-                                     id="index_optimization_max_num_segments" />
                         <FormikInput label="Index Optimization Disabled"
                                      type="checkbox"
                                      name="index_optimization_disabled"
                                      id="index_optimization_disabled" />
+                        <FormikInput label="Max. Number of Segments"
+                                     name="index_optimization_max_num_segments"
+                                     id="index_optimization_max_num_segments" />
                         <TimeUnitInput label="Field type refresh interval"
                                        update={(value, unit) => {
                                          setFieldValue('field_type_refresh_interval', value);

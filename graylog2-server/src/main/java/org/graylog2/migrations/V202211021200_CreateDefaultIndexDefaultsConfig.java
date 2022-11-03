@@ -119,9 +119,9 @@ public class V202211021200_CreateDefaultIndexDefaultsConfig extends Migration {
                     builder.retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
                             .retentionStrategyConfig(DeletionRetentionStrategyConfig.create(config.getMaxNumberOfIndices()));
                 }
-                // TODO: Handle archive? Must be in Enterprise.
                 default -> {
-                    LOG.warn("Unknown retention strategy [{}]. Defaulting to [{}].", config.getRetentionStrategy());
+                    LOG.warn("Unknown retention strategy [{}]. Defaulting to [{}].", config.getRetentionStrategy(),
+                            DeletionRetentionStrategy.NAME);
                     builder.retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
                             .retentionStrategyConfig(DeletionRetentionStrategyConfig.create(config.getMaxNumberOfIndices()));
                 }

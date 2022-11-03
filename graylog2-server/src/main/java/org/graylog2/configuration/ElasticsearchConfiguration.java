@@ -61,11 +61,11 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_replicas", validator = PositiveIntegerValidator.class, required = true)
     private int replicas = 0;
 
-    @Parameter(value = "index_optimization_max_num_segments", validator = PositiveIntegerValidator.class)
-    private int indexOptimizationMaxNumSegments = 1;
-
     @Parameter(value = "disable_index_optimization")
     private boolean disableIndexOptimization = false;
+
+    @Parameter(value = "index_optimization_max_num_segments", validator = PositiveIntegerValidator.class)
+    private int indexOptimizationMaxNumSegments = 1;
 
     @Parameter(value = "index_field_type_periodical_full_refresh_interval", validators = {PositiveDurationValidator.class})
     private Duration indexFieldTypePeriodicalFullRefreshInterval = Duration.minutes(5);
@@ -74,14 +74,14 @@ public class ElasticsearchConfiguration {
     private String retentionStrategy = DeletionRetentionStrategy.NAME;
 
     @Parameter(value = "retention_strategy", required = true)
-    private String rotationStrategy = MessageCountRotationStrategy.NAME;
+    private String rotationStrategy = SizeBasedRotationStrategy.NAME;
 
     // Rotation
     @Parameter(value = "elasticsearch_max_time_per_index", required = true)
     private Period maxTimePerIndex = Period.days(1);
 
     // Rotation
-    @Parameter(value = "index_init_default_rotate_empty", required = true)
+    @Parameter(value = "index_init_default_rotate_empty_index_set", required = true)
     private boolean rotateEmptyIndex = false;
 
     // Rotation
@@ -90,7 +90,7 @@ public class ElasticsearchConfiguration {
 
     // Rotation
     @Parameter(value = "elasticsearch_max_size_per_index", validator = PositiveLongValidator.class, required = true)
-    private long maxSizePerIndex = 1L * 1024 * 1024 * 1024; // 1GB
+    private long maxSizePerIndex = 10L * 1024 * 1024 * 1024; // 10GB
 
     // Retention
     @Parameter(value = "elasticsearch_max_number_of_indices", required = true, validator = PositiveIntegerValidator.class)
