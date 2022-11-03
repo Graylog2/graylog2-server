@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import styled from 'styled-components';
@@ -49,7 +49,6 @@ const CollectorConfigurationModalContainer = ({
 }: Props) => {
   const [nextAssignedConfigurations, setNextAssignedConfigurations] = useState<string[]>([]);
   const [nextPartiallyAssignedConfigurations, setNextPartiallyAssignedConfigurations] = useState<string[]>([]);
-  const modalConfirm = useRef(null);
 
   const getSelectedLogCollector = () => {
     return (lodash.uniq<Collector>(selectedSidecarCollectorPairs.map(({ collector }) => collector)))[0];
@@ -87,7 +86,6 @@ const CollectorConfigurationModalContainer = ({
   const onSave = (fullyAssignedConfigs: string[], partiallyAssignedConfigs: string[]) => {
     setNextAssignedConfigurations(fullyAssignedConfigs);
     setNextPartiallyAssignedConfigurations(partiallyAssignedConfigs);
-    modalConfirm.current.open();
   };
 
   const confirmConfigurationChange = (doneCallback: () => void) => {
@@ -112,6 +110,7 @@ const CollectorConfigurationModalContainer = ({
 
   const cancelConfigurationChange = () => {
     setNextAssignedConfigurations([]);
+    setNextPartiallyAssignedConfigurations([]);
   };
 
   const getConfiguration = (configName: string) => {
@@ -153,9 +152,10 @@ const CollectorConfigurationModalContainer = ({
     const sidecarsSummary = selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name).join(', ');
     const numberOfSidecarsSummary = `${selectedSidecarCollectorPairs.length} sidecars`;
     const summary = selectedSidecarCollectorPairs.length <= 5 ? sidecarsSummary : numberOfSidecarsSummary;
+    const showModal = nextAssignedConfigurations.length > 0 || nextPartiallyAssignedConfigurations.length > 0;
 
     return (
-      <BootstrapModalConfirm ref={modalConfirm}
+      <BootstrapModalConfirm showModal={showModal}
                              title="Configuration summary"
                              onConfirm={confirmConfigurationChange}
                              onCancel={cancelConfigurationChange}>
