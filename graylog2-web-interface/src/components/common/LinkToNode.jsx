@@ -40,7 +40,7 @@ class LinkToNode extends React.PureComponent {
   static propTypes = {
     /** Node ID that will be used to generate the link. */
     nodeId: PropTypes.string.isRequired,
-    nodes: PropTypes.object.isRequired,
+    nodes: PropTypes.object,
   };
 
   render() {
@@ -77,6 +77,10 @@ class LinkToNode extends React.PureComponent {
     return <i>Unknown Node</i>;
   }
 }
+
+LinkToNode.defaultProps = {
+  nodes: undefined,
+};
 
 export default connect(
   LinkToNode,
