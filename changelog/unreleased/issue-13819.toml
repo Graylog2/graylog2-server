@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Take into account if \"Always match\" rule is inverted. Previously it was ignored for this rule type."
+
+issues = ["13819"]
+pulls = ["13847"]
