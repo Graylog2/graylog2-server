@@ -14,6 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { components } from 'react-select';
+import type { InputProps } from 'react-select';
+
 import InputList from './InputList';
 
+export { components };
+export type { InputProps };
 export default InputList;

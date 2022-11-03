@@ -52,6 +52,8 @@ const InputList = ({ name, values, onChange, label, size, bsStyle, error, help, 
   const [inputValue, setInputValue] = React.useState<string>('');
   const [value, setValue] = React.useState<readonly Option[]>(values.map((val: string | number) => createOption(val)));
 
+  React.useLayoutEffect(() => setValue(values.map((val: string | number) => createOption(val))), [values]);
+
   const dispatchOnChange = (newValue: Option[]) => {
     const newList = newValue.map((item: Option) => item.value);
     const event = new GenericChangeEvent<(string | number)[]>('change');
