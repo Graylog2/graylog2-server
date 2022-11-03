@@ -31,15 +31,4 @@ public class SearchesES7IT extends SearchesIT {
         return this.elasticsearch;
     }
 
-    @Override
-    public Searches createSearches() {
-        return new Searches(
-                indexRangeService,
-                metricRegistry,
-                streamService,
-                indices,
-                indexSetRegistry,
-                createSearchesAdapter()
-        );
-    }
 }

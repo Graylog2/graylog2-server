@@ -24,6 +24,7 @@ import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.ParsedStringTerms;
@@ -33,6 +34,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.suggest.SuggestBuild
 import org.graylog.shaded.opensearch2.org.opensearch.search.suggest.term.TermSuggestion;
 import org.graylog.shaded.opensearch2.org.opensearch.search.suggest.term.TermSuggestionBuilder;
 import org.graylog.storage.opensearch2.errors.ResponseError;
+import org.graylog2.plugin.Message;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -55,8 +57,11 @@ public class QuerySuggestionsOS2 implements QuerySuggestionsService {
     public SuggestionResponse suggest(SuggestionRequest req) {
         final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(req.streams(), req.timerange());
         final TermSuggestionBuilder suggestionBuilder = SuggestBuilders.termSuggestion(req.field()).text(req.input()).size(req.size());
+        final BoolQueryBuilder query = QueryBuilders.boolQuery()
+                .must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, req.streams()))
+                .must(QueryBuilders.prefixQuery(req.field(), req.input()));
         final SearchSourceBuilder search = new SearchSourceBuilder()
-                .query(QueryBuilders.prefixQuery(req.field(), req.input()))
+                .query(query)
                 .size(0)
                 .aggregation(AggregationBuilders.terms("fieldvalues").field(req.field()).size(req.size()))
                 .suggest(new SuggestBuilder().addSuggestion("corrections", suggestionBuilder));
