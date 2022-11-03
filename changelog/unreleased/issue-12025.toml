@@ -1,0 +1,7 @@
+type = "changed"
+message = "Set elasticsearch_index_optimization_jobs default to 10"
+
+details.user = "Prevents blocking of master node's ingestion during optimizing indices after index rotation."
+
+issues = ["12025"]
+pulls = ["13521"]
