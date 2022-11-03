@@ -32,6 +32,7 @@ class ConfigurationVariablesHelper extends React.Component {
 
   state = {
     showModal: false,
+    showConfirmModal: false,
     configurationVariables: undefined,
     errorModalContent: {},
     variableToDelete: {},
@@ -52,8 +53,12 @@ class ConfigurationVariablesHelper extends React.Component {
     this.setState({ showModal: true });
   };
 
+  _openErrorConfirmModal = () => {
+    this.setState({ showConfirmModal: true });
+  };
+
   _closeErrorModal = () => {
-    this.setState({ showModal: false });
+    this.setState({ showModal: false, showConfirmModal: false });
   };
 
   _renderConfigList = (configurations) => {
@@ -68,7 +73,7 @@ class ConfigurationVariablesHelper extends React.Component {
     const { variableToDelete } = this.state;
 
     ConfigurationVariableActions.delete(variableToDelete)
-      .then(() => this._onSuccessfulUpdate(() => this.deleteConfirmModal.close()));
+      .then(() => this._onSuccessfulUpdate(() => this._closeErrorModal()));
   };
 
   _handleDeleteCheck = (configVar) => {
@@ -82,7 +87,7 @@ class ConfigurationVariablesHelper extends React.Component {
           this._openErrorModal();
           // Not in use, ask for confirmation
         } else {
-          this.deleteConfirmModal.open();
+          this._openErrorConfirmModal();
         }
       });
     };
@@ -188,7 +193,7 @@ class ConfigurationVariablesHelper extends React.Component {
           </Modal.Footer>
         </BootstrapModalWrapper>
 
-        <BootstrapModalConfirm ref={(c) => { this.deleteConfirmModal = c; }}
+        <BootstrapModalConfirm showModal={showConfirmModal}
                                title="Delete Configuration Variable?"
                                onConfirm={this._handleDeleteConfirm}
                                onCancel={this._closeErrorModal}>
