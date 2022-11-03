@@ -87,14 +87,12 @@ const SidecarConfig = createReactClass({
 
   _onUpdate(field) {
     return (value) => {
+      const newValue = typeof value === 'object' ? getValueFromInput(value.target) : value;
+
       this.setState(({ config }) => {
         const update = ObjectUtils.clone(config);
 
-        if (typeof value === 'object') {
-          update[field] = getValueFromInput(value.target);
-        } else {
-          update[field] = value;
-        }
+        update[field] = newValue;
 
         return ({ config: update });
       });
