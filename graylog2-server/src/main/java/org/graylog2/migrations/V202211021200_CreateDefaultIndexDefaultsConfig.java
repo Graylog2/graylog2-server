@@ -48,16 +48,12 @@ public class V202211021200_CreateDefaultIndexDefaultsConfig extends Migration {
 
     private final ClusterConfigService clusterConfigService;
     private final ElasticsearchConfiguration config;
-    private final Map<String, Provider<RotationStrategy>> rotationStrategies;
-    private final Map<String, Provider<RetentionStrategy>> retentionStrategies;
 
     @Inject
     public V202211021200_CreateDefaultIndexDefaultsConfig(final ClusterConfigService clusterConfigService,
                                                           final ElasticsearchConfiguration config, Map<String, Provider<RotationStrategy>> rotationStrategies, Map<String, Provider<RetentionStrategy>> retentionStrategies) {
         this.clusterConfigService = clusterConfigService;
         this.config = config;
-        this.rotationStrategies = rotationStrategies;
-        this.retentionStrategies = retentionStrategies;
     }
 
     @Override
@@ -71,7 +67,6 @@ public class V202211021200_CreateDefaultIndexDefaultsConfig extends Migration {
             LOG.debug("Migration already completed.");
             return;
         }
-
 
         try {
             final IndexSetsDefaultConfiguration.Builder builder = IndexSetsDefaultConfiguration.builder()

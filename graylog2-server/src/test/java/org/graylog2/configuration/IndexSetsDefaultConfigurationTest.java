@@ -17,11 +17,16 @@
 package org.graylog2.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
+import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 class IndexSetsDefaultConfigurationTest {
 
@@ -29,8 +34,20 @@ class IndexSetsDefaultConfigurationTest {
     void testConvert() {
         // Verify that JSON annotation in class are properly defined so that the
         // ClusterConfigService can perform needed payload conversions on reads/writes.
+        final IndexSetsDefaultConfiguration indexConfig = IndexSetsDefaultConfiguration.builder()
+                .indexAnalyzer("standard")
+                .shards(1)
+                .replicas(0)
+                .indexOptimizationDisabled(false)
+                .indexOptimizationMaxNumSegments(0)
+                .fieldTypeRefreshInterval(1)
+                .fieldTypeRefreshIntervalUnit(TimeUnit.SECONDS)
+                .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
+                .rotationStrategyConfig(MessageCountRotationStrategyConfig.create(10))
+                .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
+                .retentionStrategyConfig(DeletionRetentionStrategyConfig.create(10)).build();
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        final Map map = objectMapper.convertValue(IndexSetsDefaultConfiguration.createDefault(), HashMap.class);
+        final Map map = objectMapper.convertValue(indexConfig, HashMap.class);
         objectMapper.convertValue(map, IndexSetsDefaultConfiguration.class);
     }
 }
