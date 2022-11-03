@@ -67,9 +67,11 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
     }
 
     public int deleteUnregister(String id) {
-        // Must ensure mutability before deleting, so that de-registration is only performed if entity exists
+        // Must ensure deletability and mutability before deleting, so that de-registration is only performed if entity exists
         // and is not mutable.
-        ensureMutability(get(id).orElseThrow(() -> new IllegalArgumentException("Event Definition not found.")));
+        final EventDefinitionDto dto = get(id).orElseThrow(() -> new IllegalArgumentException("Event Definition not found."));
+        ensureDeletability(dto);
+        ensureMutability(dto);
         return doDeleteUnregister(id, () -> super.delete(id));
     }
 

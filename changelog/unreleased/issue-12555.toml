@@ -1,0 +1,5 @@
+type = "a"
+message = "Generate an event in the `System Event` stream for every system notification"
+
+issues = ["12555"]
+pulls = ["13833"]

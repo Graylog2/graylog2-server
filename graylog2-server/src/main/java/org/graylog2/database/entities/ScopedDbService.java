@@ -24,7 +24,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * A base database service to handle persistence and deletion of {@link ScopedEntity} instance.  Persistence and deletion is performed by the parent class, {@link PaginatedDbService},  this service simply performs mutability checks.
+ * A base database service to handle persistence and deletion of {@link ScopedEntity} instance.
+ * Persistence and deletion is performed by the parent class, {@link PaginatedDbService},
+ * this service simply performs mutability checks.
  *
  * <p>
  * A {@link EntityScopeService} is used to perform the actual mutability checks based on the entity's <b>scope</b>.
@@ -58,6 +60,20 @@ public abstract class ScopedDbService<E extends ScopedEntity> extends PaginatedD
         return entityScopeService.isMutable(scopedEntity);
     }
 
+    public final boolean isDeletable(ScopedEntity scopedEntity) {
+
+        Objects.requireNonNull(scopedEntity, "Entity must not be null");
+
+        // First, check whether this entity has been persisted, if so, the persisted entity's scope takes precedence.
+        Optional<E> current = get(scopedEntity.id());
+        if (current.isPresent()) {
+            return entityScopeService.isDeletable(current.get());
+        }
+
+        // The entity does not exist in the database, This could be a new entity--check it
+        return entityScopeService.isDeletable(scopedEntity);
+    }
+
     @Override
     public final E save(E entity) {
 
@@ -74,16 +90,23 @@ public abstract class ScopedDbService<E extends ScopedEntity> extends PaginatedD
         }
     }
 
-
     public final void ensureMutability(E entity) {
         if (!isMutable(entity)) {
             throw new IllegalArgumentException("Immutable entity cannot be modified");
         }
     }
 
+    public final void ensureDeletability(E entity) {
+        if (!isDeletable(entity)) {
+            throw new IllegalArgumentException("Non-deletable entity cannot be deleted");
+        }
+    }
+
     @Override
     public final int delete(String id) {
-        ensureMutability(get(id).orElseThrow(() -> new IllegalArgumentException("Entity not found")));
+        final E entity = get(id).orElseThrow(() -> new IllegalArgumentException("Entity not found"));
+        ensureDeletability(entity);
+        ensureMutability(entity);
 
         return super.delete(id);
     }

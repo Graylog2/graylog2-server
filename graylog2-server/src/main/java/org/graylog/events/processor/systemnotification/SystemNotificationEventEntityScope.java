@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.database.entities;
+package org.graylog.events.processor.systemnotification;
 
-public final class DefaultEntityScope extends EntityScope {
+import org.graylog2.database.entities.EntityScope;
 
-    public static final String NAME = "DEFAULT";
+public final class SystemNotificationEventEntityScope extends EntityScope {
+    public static final String NAME = "SYSTEM_NOTIFICATION_EVENT";
 
     @Override
     public String getName() {
@@ -32,6 +33,6 @@ public final class DefaultEntityScope extends EntityScope {
 
     @Override
     public boolean isDeletable() {
-        return true;
+        return false;
     }
 }

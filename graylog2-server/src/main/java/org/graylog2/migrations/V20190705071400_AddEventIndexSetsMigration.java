@@ -25,6 +25,7 @@ import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
+import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorConfig;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
@@ -237,6 +238,7 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
                             .notifications(ImmutableList.<EventNotificationHandler.Config>builder().build())
                             .config(SystemNotificationEventProcessorConfig.builder().build())
                             .storage(ImmutableList.of(PersistToStreamsStorageHandler.Config.createWithSystemEventsStream()))
+                            .scope(SystemNotificationEventEntityScope.NAME)
                             .build();
             dbService.save(eventDto);
         }
