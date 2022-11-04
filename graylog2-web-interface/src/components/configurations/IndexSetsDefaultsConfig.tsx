@@ -14,20 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, {useState, useEffect} from 'react';
-import {Form, Formik} from 'formik';
+import React, { useState, useEffect } from 'react';
+import { Form, Formik } from 'formik';
 import lodash from 'lodash';
-import type {DefaultTheme} from 'styled-components';
-import styled, {css} from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 import 'components/indices/rotation';
 import 'components/indices/retention';
-import {PluginStore} from 'graylog-web-plugin/plugin';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import type {MaintenanceOptions, RotationStrategyConfig, RetentionStrategyConfig} from 'components/indices/Types';
-import {IndicesConfigurationActions} from 'stores/indices/IndicesConfigurationStore';
+import type { MaintenanceOptions, RotationStrategyConfig, RetentionStrategyConfig } from 'components/indices/Types';
+import { IndicesConfigurationActions } from 'stores/indices/IndicesConfigurationStore';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
-import {Button, Col, Modal, Row} from 'components/bootstrap';
-import {IfPermitted, TimeUnitInput, Spinner} from 'components/common';
+import { Button, Col, Modal, Row } from 'components/bootstrap';
+import { IfPermitted, TimeUnitInput, Spinner } from 'components/common';
 import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
 
 import FormikInput from '../common/FormikInput';
@@ -56,7 +56,7 @@ type Props = {
 
 const StyledDefList = styled.dl.attrs({
   className: 'deflist',
-})(({theme}: { theme: DefaultTheme }) => css`
+})(({ theme }: { theme: DefaultTheme }) => css`
   &&.deflist {
     dd {
       padding-left: ${theme.spacings.md};
@@ -65,7 +65,7 @@ const StyledDefList = styled.dl.attrs({
   }
 `);
 
-const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
+const IndexSetsDefaultsConfig = ({ config, updateConfig }: Props) => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [rotationStrategies, setRotationStrategies] = useState<MaintenanceOptions>();
   const [retentionStrategies, setRetentionStrategies] = useState<MaintenanceOptions>();
@@ -103,6 +103,7 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
       retention_strategy_config: data,
     };
   };
+
   useEffect(() => {
     IndicesConfigurationActions.loadRotationStrategies().then((loadedRotationStrategies) => {
       setRotationStrategies(loadedRotationStrategies);
@@ -154,7 +155,7 @@ const IndexSetsDefaultsConfig = ({config, updateConfig}: Props) => {
 
       <Modal show={showModal} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
         <Formik onSubmit={saveConfig} initialValues={config}>
-          {({values, setFieldValue, isSubmitting}) => {
+          {({ values, setFieldValue, isSubmitting }) => {
             return (
               <Form>
                 <Modal.Header closeButton>
