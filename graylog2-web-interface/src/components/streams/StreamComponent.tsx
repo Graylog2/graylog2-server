@@ -15,153 +15,128 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import { Alert } from 'components/bootstrap';
 import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';
-import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
+import useCurrentUser from 'hooks/useCurrentUser';
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 import StreamList from './StreamList';
 import CreateStreamButton from './CreateStreamButton';
 
-class StreamComponent extends React.Component {
-  static propTypes = {
-    currentUser: PropTypes.object.isRequired,
-    onStreamSave: PropTypes.func.isRequired,
-    indexSets: PropTypes.array.isRequired,
-    paginationQueryParameter: PropTypes.object.isRequired,
-  };
+const StreamComponent = ({ onStreamSave, indexSets }) => {
+  const currentUser = useCurrentUser();
+  const paginationQueryParameter = usePaginationQueryParameter();
+  const [pagination, setPagination] = useState({
+    count: 0,
+    total: 0,
+    query: '',
+  });
+  const [streamRuleTypes, setStreamRuleTypes] = useState();
+  const [streams, setStreams] = useState<Array<any>>();
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      pagination: {
-        count: 0,
-        total: 0,
-        query: '',
-      },
-    };
-  }
-
-  componentDidMount() {
-    this.loadData();
-
-    StreamRulesStore.types().then((types) => {
-      this.setState({ streamRuleTypes: types });
-    });
-
-    StreamsStore.onChange(this.loadData);
-    StreamRulesStore.onChange(this.loadData);
-  }
-
-  componentWillUnmount() {
-    StreamsStore.unregister(this.loadData);
-    StreamRulesStore.unregister(this.loadData);
-  }
-
-  loadData = (callback, page = this.props.paginationQueryParameter.page, perPage = this.props.paginationQueryParameter.pageSize) => {
-    const { query } = this.state.pagination;
-
-    StreamsStore.searchPaginated(page, perPage, query)
-      .then(({ streams, pagination }) => {
-        this.setState({
-          streams: streams,
-          pagination: pagination,
-        });
+  const loadData = useCallback((callback?: () => void, page: number = paginationQueryParameter.page, perPage: number = paginationQueryParameter.pageSize) => {
+    StreamsStore.searchPaginated(page, perPage, pagination.query)
+      .then(({ streams: newStreams, pagination: newPagination }) => {
+        setStreams(newStreams);
+        setPagination(newPagination);
       })
       .then(() => {
         if (callback) {
           callback();
         }
       });
-  };
+  }, [pagination.query, paginationQueryParameter.page, paginationQueryParameter.pageSize]);
 
-  _isLoading = () => {
-    const { state } = this;
+  useEffect(() => {
+    loadData();
 
-    return !(state.streams && state.streamRuleTypes);
-  };
+    StreamRulesStore.types().then((types) => {
+      setStreamRuleTypes(types);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  _onPageChange = (newPage, newPerPage) => {
-    this.loadData(null, newPage, newPerPage);
-  };
+  useEffect(() => {
+    StreamsStore.onChange(loadData);
+    StreamRulesStore.onChange(loadData);
 
-  _onSearch = (query, resetLoadingCallback) => {
-    const { pagination } = this.state;
+    return () => {
+      StreamsStore.unregister(loadData);
+      StreamRulesStore.unregister(loadData);
+    };
+  }, [loadData]);
+
+  const isLoading = !(streams && streamRuleTypes);
+
+  const _onPageChange = useCallback((newPage, newPerPage) => loadData(null, newPage, newPerPage), [loadData]);
+
+  const _onSearch = useCallback((query, resetLoadingCallback) => {
     const newPagination = { ...pagination, query: query };
-    this.props.paginationQueryParameter.resetPage();
-    this.setState({ pagination: newPagination }, () => this.loadData(resetLoadingCallback));
-  };
+    paginationQueryParameter.resetPage();
+    setPagination(newPagination);
+    loadData(resetLoadingCallback);
+  }, [loadData, pagination, paginationQueryParameter]);
 
-  _onReset = () => {
-    const { pagination } = this.state;
+  const _onReset = useCallback(() => {
     const newPagination = { ...pagination, query: '' };
-    this.props.paginationQueryParameter.resetPage();
-    this.setState({ pagination: newPagination }, this.loadData);
-  };
+    paginationQueryParameter.resetPage();
+    setPagination(newPagination);
+    loadData();
+  }, [loadData, pagination, paginationQueryParameter]);
 
-  render() {
-    const { streams, pagination, streamRuleTypes } = this.state;
-    const { currentUser, onStreamSave, indexSets } = this.props;
-
-    if (this._isLoading()) {
-      return (
-        <div style={{ marginLeft: 10 }}>
-          <Spinner />
-        </div>
-      );
-    }
-
-    const createStreamButton = (
-      <IfPermitted permissions="streams:create">
-        <CreateStreamButton bsSize="small"
-                            bsStyle="link"
-                            className="btn-text"
-                            buttonText="Create one now"
-                            indexSets={indexSets}
-                            onSave={onStreamSave} />
-      </IfPermitted>
-    );
-
-    const noStreams = (
-      <Alert bsStyle="warning">
-        <Icon name="info-circle" />&nbsp;No streams found. {createStreamButton}
-      </Alert>
-    );
-
-    const streamsList = (
-      <StreamList streams={streams}
-                  streamRuleTypes={streamRuleTypes}
-                  permissions={currentUser.permissions}
-                  user={currentUser}
-                  onStreamSave={onStreamSave}
-                  indexSets={indexSets} />
-    );
-
-    const streamListComp = streams.length === 0
-      ? noStreams
-      : streamsList;
-
+  if (isLoading) {
     return (
-      <div>
-        <PaginatedList onChange={this._onPageChange}
-                       totalItems={pagination.total}>
-          <div style={{ marginBottom: 15 }}>
-            <SearchForm onSearch={this._onSearch}
-                        onReset={this._onReset}
-                        queryHelpComponent={<QueryHelper entityName="stream" />}
-                        useLoadingState />
-          </div>
-          <div>{streamListComp}</div>
-        </PaginatedList>
+      <div style={{ marginLeft: 10 }}>
+        <Spinner />
       </div>
     );
   }
-}
 
-export default withPaginationQueryParameter(StreamComponent);
+  return (
+    <PaginatedList onChange={_onPageChange}
+                   totalItems={pagination.total}>
+      <div style={{ marginBottom: 15 }}>
+        <SearchForm onSearch={_onSearch}
+                    onReset={_onReset}
+                    queryHelpComponent={<QueryHelper entityName="stream" />}
+                    useLoadingState />
+      </div>
+      <div>{streams?.length === 0
+        ? (
+          <Alert bsStyle="warning">
+            <Icon name="info-circle" />&nbsp;No streams found.
+            <IfPermitted permissions="streams:create">
+              <CreateStreamButton bsSize="small"
+                                  bsStyle="link"
+                                  className="btn-text"
+                                  buttonText="Create one now"
+                                  indexSets={indexSets}
+                                  onSave={onStreamSave} />
+            </IfPermitted>
+          </Alert>
+        )
+        : (
+          <StreamList streams={streams}
+                      streamRuleTypes={streamRuleTypes}
+                      permissions={currentUser.permissions}
+                      user={currentUser}
+                      onStreamSave={onStreamSave}
+                      indexSets={indexSets} />
+        )}
+      </div>
+    </PaginatedList>
+  );
+};
+
+StreamComponent.propTypes = {
+  onStreamSave: PropTypes.func.isRequired,
+  indexSets: PropTypes.array.isRequired,
+};
+
+export default StreamComponent;

@@ -25,7 +25,6 @@ import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
-import useCurrentUser from 'hooks/useCurrentUser';
 import { useStore } from 'stores/connect';
 
 const onSave = (_, stream) => {
@@ -35,14 +34,13 @@ const onSave = (_, stream) => {
 };
 
 const StreamsPage = () => {
-  const currentUser = useCurrentUser();
   const { indexSets } = useStore(IndexSetsStore);
 
   useEffect(() => {
     IndexSetsActions.list(false);
   }, []);
 
-  const isLoading = !currentUser || !indexSets;
+  const isLoading = !indexSets;
 
   if (isLoading) {
     return <Spinner />;
@@ -50,33 +48,30 @@ const StreamsPage = () => {
 
   return (
     <DocumentTitle title="Streams">
-      <div>
-        <PageHeader title="Streams"
-                    documentationLink={{
-                      title: 'Streams documentation',
-                      path: DocsHelper.PAGES.STREAMS,
-                    }}
-                    actions={(
-                      <IfPermitted permissions="streams:create">
-                        <CreateStreamButton bsStyle="success"
-                                            onSave={onSave}
-                                            indexSets={indexSets} />
-                      </IfPermitted>
+      <PageHeader title="Streams"
+                  documentationLink={{
+                    title: 'Streams documentation',
+                    path: DocsHelper.PAGES.STREAMS,
+                  }}
+                  actions={(
+                    <IfPermitted permissions="streams:create">
+                      <CreateStreamButton bsStyle="success"
+                                          onSave={onSave}
+                                          indexSets={indexSets} />
+                    </IfPermitted>
           )}>
-          <span>
-            You can route incoming messages into streams by applying rules against them. Messages matching
-            the rules of a stream are routed into it. A message can also be routed into multiple streams.
-          </span>
-        </PageHeader>
+        <span>
+          You can route incoming messages into streams by applying rules against them. Messages matching
+          the rules of a stream are routed into it. A message can also be routed into multiple streams.
+        </span>
+      </PageHeader>
 
-        <Row className="content">
-          <Col md={12}>
-            <StreamComponent currentUser={currentUser}
-                             onStreamSave={onSave}
-                             indexSets={indexSets} />
-          </Col>
-        </Row>
-      </div>
+      <Row className="content">
+        <Col md={12}>
+          <StreamComponent onStreamSave={onSave}
+                           indexSets={indexSets} />
+        </Col>
+      </Row>
     </DocumentTitle>
   );
 };
