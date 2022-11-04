@@ -207,7 +207,7 @@ export const createEmptyGrouping = () => addRandomId<ValuesGrouping>({
   },
 });
 
-const GroupByElement: AggregationElement = {
+const GroupByElement: AggregationElement<'groupBy'> = {
   sectionTitle: 'Group By',
   title: 'Grouping',
   key: 'groupBy',
@@ -258,6 +258,7 @@ const GroupByElement: AggregationElement = {
   toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) => groupByToConfig(formValues.groupBy, configBuilder),
   component: GroupingsConfiguration,
   validate: validateGroupings,
+  isEmpty: (formValues: WidgetConfigFormValues['groupBy']) => (formValues?.groupings ?? []).length === 0,
 };
 
 export default GroupByElement;

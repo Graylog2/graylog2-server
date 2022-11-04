@@ -91,7 +91,7 @@ const seriesToMetrics = (series: Array<Series>) => series.map((s: Series) => {
   return metric;
 });
 
-const MetricElement: AggregationElement = {
+const MetricElement: AggregationElement<'metrics'> = {
   sectionTitle: 'Metrics',
   title: 'Metric',
   key: 'metrics',
@@ -108,6 +108,7 @@ const MetricElement: AggregationElement = {
   })),
   component: MetricsConfiguration,
   validate: validateMetrics,
+  isEmpty: (formValues: WidgetConfigFormValues['metrics']) => (formValues ?? []).length === 0,
 };
 
 export default MetricElement;

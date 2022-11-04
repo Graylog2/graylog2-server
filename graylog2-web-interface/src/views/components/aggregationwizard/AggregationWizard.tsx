@@ -26,7 +26,7 @@ import ElementsConfiguration from './ElementsConfiguration';
 import aggregationElements from './aggregationElementDefinitions';
 import VisualizationContainer from './VisualizationContainer';
 
-const aggregationElementsByKey = Object.fromEntries(aggregationElements.map((element) => ([element.key, element])));
+const aggregationElementsByKey = Object.fromEntries(aggregationElements.map((element) => [element.key, element]));
 
 const _initialFormValues = (config: AggregationWidgetConfig) => {
   return aggregationElements.reduce((formValues, element) => ({
