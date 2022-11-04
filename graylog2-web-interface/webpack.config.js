@@ -97,19 +97,7 @@ const webpackConfig = {
             target: 'es2015',
           },
         },
-        include: /node_modules\/graylog-web-plugin/,
-      },
-      {
-        test: /\.[jt]s(x)?$/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            cacheDirectory: 'target/web/cache',
-            // eslint-disable-next-line global-require
-            presets: [require('babel-preset-graylog')],
-          },
-        },
-        exclude: /node_modules|\.node_cache/,
+        exclude: /node_modules\/(?!graylog-web-plugin)|\.node_cache/,
       },
       {
         test: /\.(svg)(\?.+)?$/,
