@@ -39,7 +39,12 @@ const RollupColumnsLabel = styled.div`
   align-items: center;
 `;
 
-const RollupHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
+type RollupHoverForHelpProps = {
+  children: React.ReactNode,
+  title: string,
+};
+
+const RollupHoverForHelp = styled((props: RollupHoverForHelpProps) => <HoverForHelp {...props} />)`
   margin-left: 5px;
 `;
 
@@ -64,7 +69,7 @@ const GroupingsConfiguration = () => {
     setValues(GroupingElement.onRemove(index, values));
   }, [setValues, values]);
 
-  const isEmpty = !groupBy?.groupings;
+  const isEmpty = (groupBy?.groupings ?? []).length === 0;
 
   const hasValuesRowPivots = groupBy?.groupings?.find(({ direction, field }) => (direction === 'row' && field?.type === 'values')) !== undefined;
   const hasValuesColumnPivots = groupBy?.groupings?.find(({ direction, field }) => (direction === 'column' && field?.type === 'values')) !== undefined;
@@ -98,7 +103,7 @@ const GroupingsConfiguration = () => {
             <Field name="groupBy.columnRollup">
               {({ field: { name, onChange, value } }) => (
                 <RollupColumnsCheckbox onChange={() => onChange({ target: { name, value: !groupBy?.columnRollup } })}
-                                       checked={value}
+                                       checked={value ?? false}
                                        disabled={disableColumnRollup}>
                   <RollupColumnsLabel>
                     Rollup Columns
