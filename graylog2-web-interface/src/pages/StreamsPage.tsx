@@ -40,7 +40,7 @@ const StreamsPage = () => {
 
   useEffect(() => {
     IndexSetsActions.list(false);
-  });
+  }, []);
 
   const isLoading = !currentUser || !indexSets;
 
