@@ -101,7 +101,7 @@ const validate = (formValues: WidgetConfigFormValues) => {
     : {};
 };
 
-const VisualizationElement: AggregationElement = {
+const VisualizationElement: AggregationElement<'visualization'> = {
   title: 'Visualization',
   key: 'visualization',
   order: 4,
@@ -110,6 +110,7 @@ const VisualizationElement: AggregationElement = {
   fromConfig,
   toConfig,
   validate,
+  isEmpty: () => false,
 };
 
 export default VisualizationElement;
