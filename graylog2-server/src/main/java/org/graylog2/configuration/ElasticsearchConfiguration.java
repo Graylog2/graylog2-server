@@ -73,7 +73,7 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "retention_strategy", required = true)
     private String retentionStrategy = DeletionRetentionStrategy.NAME;
 
-    @Parameter(value = "retention_strategy", required = true)
+    @Parameter(value = "rotation_strategy", required = true)
     private String rotationStrategy = SizeBasedRotationStrategy.NAME;
 
     // Rotation
