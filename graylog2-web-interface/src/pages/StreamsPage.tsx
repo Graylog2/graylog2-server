@@ -28,6 +28,12 @@ import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore'
 import useCurrentUser from 'hooks/useCurrentUser';
 import { useStore } from 'stores/connect';
 
+const onSave = (_, stream) => {
+  StreamsStore.save(stream, () => {
+    UserNotification.success('Stream has been successfully created.', 'Success');
+  });
+};
+
 const StreamsPage = () => {
   const currentUser = useCurrentUser();
   const { indexSets } = useStore(IndexSetsStore);
@@ -37,12 +43,6 @@ const StreamsPage = () => {
   });
 
   const isLoading = !currentUser || !indexSets;
-
-  const onSave = (_, stream) => {
-    StreamsStore.save(stream, () => {
-      UserNotification.success('Stream has been successfully created.', 'Success');
-    });
-  };
 
   if (isLoading) {
     return <Spinner />;
