@@ -34,9 +34,9 @@ const Container = styled.div`
 
 const _sortConfiguredElements = (
   values: WidgetConfigFormValues,
-  aggregationElementsByKey: { [elementKey: string]: AggregationElement },
+  aggregationElementsByKey: { [k: string]: AggregationElement<keyof WidgetConfigFormValues> },
 ) => Object.keys(aggregationElementsByKey)
-  .map((elementKey) => [elementKey, values[aggregationElementsByKey[elementKey].key]])
+  .map((elementKey: keyof WidgetConfigFormValues) => [elementKey, values[aggregationElementsByKey[elementKey].key]] as [keyof WidgetConfigFormValues, WidgetConfigFormValues[keyof WidgetConfigFormValues]])
   .sort(
     ([elementKey1], [elementKey2]) => (
       aggregationElementsByKey[elementKey1].order - aggregationElementsByKey[elementKey2].order
@@ -44,7 +44,7 @@ const _sortConfiguredElements = (
   );
 
 type Props = {
-  aggregationElementsByKey: { [elementKey: string]: AggregationElement }
+  aggregationElementsByKey: { [k: string]: AggregationElement<keyof WidgetConfigFormValues> },
   config: AggregationWidgetConfig,
   onConfigChange: (config: AggregationWidgetConfig) => void,
   onCreate: (

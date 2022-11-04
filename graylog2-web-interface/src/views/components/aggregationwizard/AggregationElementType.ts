@@ -21,10 +21,10 @@ import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/Aggrega
 
 import type { WidgetConfigFormValues, WidgetConfigValidationErrors } from './WidgetConfigForm';
 
-export type AggregationElement = {
+export type AggregationElement<T extends keyof WidgetConfigFormValues> = {
   sectionTitle?: string,
   title: string,
-  key: string,
+  key: keyof WidgetConfigFormValues,
   allowCreate: (formValues: WidgetConfigFormValues) => boolean,
   order: number,
   onRemove?: (index: number, formValues: WidgetConfigFormValues) => WidgetConfigFormValues,
@@ -32,7 +32,7 @@ export type AggregationElement = {
   fromConfig?: (config: AggregationWidgetConfig) => Partial<WidgetConfigFormValues>,
   onCreate?: (formValues: WidgetConfigFormValues) => WidgetConfigFormValues,
   onDeleteAll?: (formValues: WidgetConfigFormValues) => WidgetConfigFormValues,
-  isEmpty: (formValues: WidgetConfigFormValues) => boolean,
+  isEmpty: (formValues: WidgetConfigFormValues[T]) => boolean,
   component: React.ComponentType<{
     config: AggregationWidgetConfig,
     onConfigChange: (newConfig: AggregationWidgetConfig) => void
