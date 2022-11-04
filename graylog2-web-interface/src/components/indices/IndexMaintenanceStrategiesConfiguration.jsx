@@ -163,6 +163,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
 
     return null;
   }
+
   return (
     <span>
       <StyledH3>{title}</StyledH3>
