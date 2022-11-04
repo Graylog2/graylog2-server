@@ -23,11 +23,11 @@ import PageHeader from 'components/common/PageHeader';
 import { DocumentTitle, IfPermitted, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
-import StreamsStore from 'stores/streams/StreamsStore';
+import StreamsStore, {Stream} from 'stores/streams/StreamsStore';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import { useStore } from 'stores/connect';
 
-const onSave = (_, stream) => {
+const onSave = (_streamId: string, stream: Stream) => {
   StreamsStore.save(stream, () => {
     UserNotification.success('Stream has been successfully created.', 'Success');
   });

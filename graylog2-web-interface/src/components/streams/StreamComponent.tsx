@@ -21,15 +21,22 @@ import { Alert } from 'components/bootstrap';
 import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';
+import type { Stream } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import useCurrentUser from 'hooks/useCurrentUser';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 import StreamList from './StreamList';
 import CreateStreamButton from './CreateStreamButton';
 
-const StreamComponent = ({ onStreamSave, indexSets }) => {
+type Props = {
+  onStreamSave: (streamId: string, stream: Stream) => void,
+  indexSets: Array<IndexSet>
+}
+
+const StreamComponent = ({ onStreamSave, indexSets }: Props) => {
   const currentUser = useCurrentUser();
   const paginationQueryParameter = usePaginationQueryParameter();
   const [pagination, setPagination] = useState({
@@ -38,7 +45,8 @@ const StreamComponent = ({ onStreamSave, indexSets }) => {
   });
   const [searchQuery, setSearchQuery] = useState('');
   const [streamRuleTypes, setStreamRuleTypes] = useState();
-  const [streams, setStreams] = useState<Array<any>>();
+  const [streams, setStreams] = useState<Array<Stream>>();
+  const isLoading = !(streams && streamRuleTypes);
 
   const loadData = useCallback((callback?: () => void, page: number = paginationQueryParameter.page, perPage: number = paginationQueryParameter.pageSize) => {
     StreamsStore.searchPaginated(page, perPage, searchQuery)
@@ -73,16 +81,14 @@ const StreamComponent = ({ onStreamSave, indexSets }) => {
     };
   }, [loadData]);
 
-  const isLoading = !(streams && streamRuleTypes);
+  const onPageChange = useCallback((newPage: number, newPerPage: number) => loadData(null, newPage, newPerPage), [loadData]);
 
-  const _onPageChange = useCallback((newPage, newPerPage) => loadData(null, newPage, newPerPage), [loadData]);
-
-  const _onSearch = useCallback((query) => {
+  const onSearch = useCallback((query: string) => {
     paginationQueryParameter.resetPage();
     setSearchQuery(query);
   }, [paginationQueryParameter]);
 
-  const _onReset = useCallback(() => {
+  const onReset = useCallback(() => {
     paginationQueryParameter.resetPage();
     setSearchQuery('');
   }, [paginationQueryParameter]);
@@ -96,11 +102,11 @@ const StreamComponent = ({ onStreamSave, indexSets }) => {
   }
 
   return (
-    <PaginatedList onChange={_onPageChange}
+    <PaginatedList onChange={onPageChange}
                    totalItems={pagination.total}>
       <div style={{ marginBottom: 15 }}>
-        <SearchForm onSearch={_onSearch}
-                    onReset={_onReset}
+        <SearchForm onSearch={onSearch}
+                    onReset={onReset}
                     queryHelpComponent={<QueryHelper entityName="stream" />} />
       </div>
       <div>
@@ -123,7 +129,6 @@ const StreamComponent = ({ onStreamSave, indexSets }) => {
                         streamRuleTypes={streamRuleTypes}
                         permissions={currentUser.permissions}
                         user={currentUser}
-                        onStreamSave={onStreamSave}
                         indexSets={indexSets} />
           )}
       </div>
