@@ -31,9 +31,7 @@ export type TimeConfigType = {
   interval: AutoTimeConfig | TimeUnitConfig,
 };
 
-export type ValuesConfigType = {
-  limit: number,
-}
+export type ValuesConfigType = {};
 
 export type PivotConfigType = TimeConfigType | ValuesConfigType;
 
@@ -55,7 +53,7 @@ type InternalState = {
 export default class Pivot {
   _value: InternalState;
 
-  constructor(field: string, type: string, config: PivotConfigType = { limit: 15 }) {
+  constructor(field: string, type: string, config: PivotConfigType = { }) {
     this._value = { field, type, config };
   }
 
@@ -71,12 +69,12 @@ export default class Pivot {
     return this._value.config;
   }
 
-  static create(field: string, type: string, config: PivotConfigType = { limit: 15 }) {
+  static create(field: string, type: string, config: PivotConfigType = {}) {
     return new Pivot(field, type, config);
   }
 
   static fromJSON(value: PivotJson) {
-    const { field, type, config = { limit: 15 } } = value;
+    const { field, type, config = { } } = value;
 
     return new Pivot(field, type, config);
   }

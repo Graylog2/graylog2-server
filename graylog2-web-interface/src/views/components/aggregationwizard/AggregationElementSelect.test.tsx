@@ -21,21 +21,23 @@ import userEvent from '@testing-library/user-event';
 import AggregationElementSelect from './AggregationElementSelect';
 import type { AggregationElement } from './AggregationElementType';
 
-const aggregationElements: Array<AggregationElement> = [
+const aggregationElements = [
   {
     title: 'Metric',
-    key: 'metric',
+    key: 'metrics',
     order: 1,
     allowCreate: () => true,
     component: () => <div />,
-  },
+    isEmpty: () => true,
+  } as AggregationElement<'metrics'>,
   {
     title: 'Sort',
     key: 'sort',
     order: 1,
     allowCreate: () => false,
     component: () => <div />,
-  },
+    isEmpty: () => true,
+  } as AggregationElement<'sort'>,
 ];
 
 describe('AggregationElementSelect', () => {
@@ -51,7 +53,7 @@ describe('AggregationElementSelect', () => {
     await userEvent.click(await screen.findByRole('menuitem', { name: 'Metric' }));
 
     expect(onSelectMock).toHaveBeenCalledTimes(1);
-    expect(onSelectMock).toHaveBeenCalledWith('metric');
+    expect(onSelectMock).toHaveBeenCalledWith('metrics');
   });
 
   it('should not list already configured aggregation elements which can not be configured multiple times', async () => {

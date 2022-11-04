@@ -258,9 +258,9 @@ export const singleRowPivot = {
 };
 
 export const noTimePivots = {
-  rowPivots: [{ field: 'http_method', type: 'values', config: { limit: 15 } }],
+  rowPivots: [{ field: 'http_method', type: 'values', config: {} }],
   columnPivots: [
-    { field: 'action', type: 'values', config: { limit: 15 } },
+    { field: 'action', type: 'values', config: {} },
     {
       field: 'controller',
       type: 'values',

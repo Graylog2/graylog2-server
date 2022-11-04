@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useFormikContext } from 'formik';
-import { isEmpty } from 'lodash';
 import styled from 'styled-components';
 
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -35,9 +34,9 @@ const Container = styled.div`
 
 const _sortConfiguredElements = (
   values: WidgetConfigFormValues,
-  aggregationElementsByKey: { [elementKey: string]: AggregationElement },
+  aggregationElementsByKey: { [k: string]: AggregationElement<keyof WidgetConfigFormValues> },
 ) => Object.keys(aggregationElementsByKey)
-  .map((elementKey) => [elementKey, values[aggregationElementsByKey[elementKey].key]])
+  .map((elementKey: keyof WidgetConfigFormValues) => [elementKey, values[aggregationElementsByKey[elementKey].key]] as [keyof WidgetConfigFormValues, WidgetConfigFormValues[keyof WidgetConfigFormValues]])
   .sort(
     ([elementKey1], [elementKey2]) => (
       aggregationElementsByKey[elementKey1].order - aggregationElementsByKey[elementKey2].order
@@ -45,7 +44,7 @@ const _sortConfiguredElements = (
   );
 
 type Props = {
-  aggregationElementsByKey: { [elementKey: string]: AggregationElement }
+  aggregationElementsByKey: { [k: string]: AggregationElement<keyof WidgetConfigFormValues> },
   config: AggregationWidgetConfig,
   onConfigChange: (config: AggregationWidgetConfig) => void,
   onCreate: (
@@ -70,15 +69,14 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
       )}>
         <div>
           {_sortConfiguredElements(values, aggregationElementsByKey).map(([elementKey, elementFormValues]) => {
-            const empty = isEmpty(elementFormValues);
-
             const aggregationElement = aggregationElementsByKey[elementKey];
 
             if (!aggregationElement) {
               throw new Error(`Aggregation element with key ${elementKey} is missing but configured for this widget.`);
             }
 
-            const ConfigurationSection = aggregationElement.component;
+            const { component: ConfigurationSection, isEmpty } = aggregationElement;
+            const empty = isEmpty(elementFormValues);
 
             return (
               <ElementConfigurationSection allowCreate={aggregationElement.allowCreate(values)}
