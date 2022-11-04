@@ -7,8 +7,24 @@ pulls = ["13018"]
 contributors = [""]
 
 details.user = """
+Adds the capability to configure in-database global index set defaults on the System > Configurations page. The new defaults apply
+to subsequent index creation everywhere in Graylog (currently Illuminate installations, and the
+System > Index Sets > Create Index set flow).
+
+On the first server boot, the index set default configuration values are initialized from the corresponding `server.conf`
+values. This allows for both the index defaults configuration, and for system indices (Default, Events, and System
+Events index sets) to be created with the specified defaults.
+
+The `server.conf` configuration properties were un-deprecated, since Graylog intends to maintain them as initialization
+defaults Going Forward.
+
+The following defaults are also now being used:
+
+Shards: 1
+Rotation Strategy: Size - 10GB
 """
 
 details.ops = """
-Detail API changes here.
+The in-database index default configuration can also be edited VIA the Graylog API.
+TODO Dan: Add instructions.
 """
