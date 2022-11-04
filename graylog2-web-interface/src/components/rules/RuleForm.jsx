@@ -27,7 +27,7 @@ import PipelinesUsingRule from './PipelinesUsingRule';
 
 const RuleForm = ({ create }) => {
   const {
-    descriptionRef,
+    description,
     handleDescription,
     handleSavePipelineRule,
     ruleSourceRef,
@@ -94,11 +94,10 @@ const RuleForm = ({ create }) => {
         <Input type="textarea"
                id="description"
                label="Description"
+               value={description}
                onChange={handleDescriptionChange}
                autoFocus
-               defaultValue={descriptionRef?.current?.value}
-               help="Rule description (optional)."
-               ref={descriptionRef} />
+               help="Rule description (optional)." />
 
         <PipelinesUsingRule create={create} />
 
