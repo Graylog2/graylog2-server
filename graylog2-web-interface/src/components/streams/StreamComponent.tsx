@@ -35,13 +35,13 @@ const StreamComponent = ({ onStreamSave, indexSets }) => {
   const [pagination, setPagination] = useState({
     count: 0,
     total: 0,
-    query: '',
   });
+  const [searchQuery, setSearchQuery] = useState('');
   const [streamRuleTypes, setStreamRuleTypes] = useState();
   const [streams, setStreams] = useState<Array<any>>();
 
   const loadData = useCallback((callback?: () => void, page: number = paginationQueryParameter.page, perPage: number = paginationQueryParameter.pageSize) => {
-    StreamsStore.searchPaginated(page, perPage, pagination.query)
+    StreamsStore.searchPaginated(page, perPage, searchQuery)
       .then(({ streams: newStreams, pagination: newPagination }) => {
         setStreams(newStreams);
         setPagination(newPagination);
@@ -51,15 +51,16 @@ const StreamComponent = ({ onStreamSave, indexSets }) => {
           callback();
         }
       });
-  }, [pagination.query, paginationQueryParameter.page, paginationQueryParameter.pageSize]);
+  }, [searchQuery, paginationQueryParameter.page, paginationQueryParameter.pageSize]);
 
   useEffect(() => {
     loadData();
+  }, [loadData, searchQuery]);
 
+  useEffect(() => {
     StreamRulesStore.types().then((types) => {
       setStreamRuleTypes(types);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -76,19 +77,15 @@ const StreamComponent = ({ onStreamSave, indexSets }) => {
 
   const _onPageChange = useCallback((newPage, newPerPage) => loadData(null, newPage, newPerPage), [loadData]);
 
-  const _onSearch = useCallback((query, resetLoadingCallback) => {
-    const newPagination = { ...pagination, query: query };
+  const _onSearch = useCallback((query) => {
     paginationQueryParameter.resetPage();
-    setPagination(newPagination);
-    loadData(resetLoadingCallback);
-  }, [loadData, pagination, paginationQueryParameter]);
+    setSearchQuery(query);
+  }, [paginationQueryParameter]);
 
   const _onReset = useCallback(() => {
-    const newPagination = { ...pagination, query: '' };
     paginationQueryParameter.resetPage();
-    setPagination(newPagination);
-    loadData();
-  }, [loadData, pagination, paginationQueryParameter]);
+    setSearchQuery('');
+  }, [paginationQueryParameter]);
 
   if (isLoading) {
     return (
@@ -104,31 +101,31 @@ const StreamComponent = ({ onStreamSave, indexSets }) => {
       <div style={{ marginBottom: 15 }}>
         <SearchForm onSearch={_onSearch}
                     onReset={_onReset}
-                    queryHelpComponent={<QueryHelper entityName="stream" />}
-                    useLoadingState />
+                    queryHelpComponent={<QueryHelper entityName="stream" />} />
       </div>
-      <div>{streams?.length === 0
-        ? (
-          <Alert bsStyle="warning">
-            <Icon name="info-circle" />&nbsp;No streams found.
-            <IfPermitted permissions="streams:create">
-              <CreateStreamButton bsSize="small"
-                                  bsStyle="link"
-                                  className="btn-text"
-                                  buttonText="Create one now"
-                                  indexSets={indexSets}
-                                  onSave={onStreamSave} />
-            </IfPermitted>
-          </Alert>
-        )
-        : (
-          <StreamList streams={streams}
-                      streamRuleTypes={streamRuleTypes}
-                      permissions={currentUser.permissions}
-                      user={currentUser}
-                      onStreamSave={onStreamSave}
-                      indexSets={indexSets} />
-        )}
+      <div>
+        {streams?.length === 0
+          ? (
+            <Alert bsStyle="warning">
+              <Icon name="info-circle" />&nbsp;No streams found.
+              <IfPermitted permissions="streams:create">
+                <CreateStreamButton bsSize="small"
+                                    bsStyle="link"
+                                    className="btn-text"
+                                    buttonText="Create one now"
+                                    indexSets={indexSets}
+                                    onSave={onStreamSave} />
+              </IfPermitted>
+            </Alert>
+          )
+          : (
+            <StreamList streams={streams}
+                        streamRuleTypes={streamRuleTypes}
+                        permissions={currentUser.permissions}
+                        user={currentUser}
+                        onStreamSave={onStreamSave}
+                        indexSets={indexSets} />
+          )}
       </div>
     </PaginatedList>
   );
