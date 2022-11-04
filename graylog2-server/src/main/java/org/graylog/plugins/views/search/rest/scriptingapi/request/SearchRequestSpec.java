@@ -30,12 +30,15 @@ public record SearchRequestSpec(@JsonProperty("query") String queryString,
                                 @JsonProperty("timerange") TimeRange timerange,
                                 @JsonProperty("aggregation") @Valid @NotNull AggregationSpec aggregationSpec) {
 
+    // TODO: what would be a good default time range? Not too short and not all available data probably.
+    public static final RelativeRange DEFAULT_TIMERANGE = RelativeRange.allTime();
+
     public SearchRequestSpec {
         if (Strings.isNullOrEmpty(queryString)) {
             queryString = "*";
         }
         if (timerange == null) {
-            timerange = RelativeRange.allTime();
+            timerange = DEFAULT_TIMERANGE;
         }
     }
 }
