@@ -23,9 +23,9 @@ import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 
-public record AggregationSpec(@JsonProperty("groupings") @Valid @NotEmpty List<Grouping> groupings,
+public record AggregationSpec(@JsonProperty("group_by") @Valid @NotEmpty List<Grouping> groupings,
                               @JsonProperty("metrics") @Valid @NotEmpty List<Metric> metrics,
-                              @JsonProperty("groupingSortHasPriority") boolean groupingSortHasPriority) {
+                              @JsonProperty("grouping_sort_has_priority") boolean groupingSortHasPriority) {
 
     public boolean hasCustomSort() {
         return groupings().stream().anyMatch(gr -> gr.sort() != null) || metrics().stream().anyMatch(m -> m.sort() != null);

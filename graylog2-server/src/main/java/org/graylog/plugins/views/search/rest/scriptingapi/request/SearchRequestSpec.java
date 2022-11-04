@@ -25,10 +25,10 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-public record SearchRequestSpec(@JsonProperty("query_string") String queryString,
+public record SearchRequestSpec(@JsonProperty("query") String queryString,
                                 @JsonProperty("streams") List<String> streams,
                                 @JsonProperty("timerange") TimeRange timerange,
-                                @JsonProperty("aggregation_spec") @Valid @NotNull AggregationSpec aggregationSpec) {
+                                @JsonProperty("aggregation") @Valid @NotNull AggregationSpec aggregationSpec) {
 
     public SearchRequestSpec {
         if (Strings.isNullOrEmpty(queryString)) {
