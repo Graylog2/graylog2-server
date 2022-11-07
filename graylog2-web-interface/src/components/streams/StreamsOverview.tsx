@@ -36,34 +36,33 @@ type Props = {
   indexSets: Array<IndexSet>
 }
 
-const StreamComponent = ({ onStreamSave, indexSets }: Props) => {
+const StreamsOverview = ({ onStreamSave, indexSets }: Props) => {
   const currentUser = useCurrentUser();
   const paginationQueryParameter = usePaginationQueryParameter();
-  const [pagination, setPagination] = useState({
-    count: 0,
-    total: 0,
+  const [searchParams, setSearchParams] = useState({
+    page: paginationQueryParameter.page,
+    perPage: paginationQueryParameter.pageSize,
+    query: '',
   });
-  const [searchQuery, setSearchQuery] = useState('');
   const [streamRuleTypes, setStreamRuleTypes] = useState();
-  const [streams, setStreams] = useState<Array<Stream>>();
+  const [listData, setListData] = useState<{
+    streams: Array<Stream>,
+    total: number
+  }>({ streams: [], total: 0 });
+  const { streams, total } = listData;
+
   const isLoading = !(streams && streamRuleTypes);
 
-  const loadData = useCallback((callback?: () => void, page: number = paginationQueryParameter.page, perPage: number = paginationQueryParameter.pageSize) => {
-    StreamsStore.searchPaginated(page, perPage, searchQuery)
-      .then(({ streams: newStreams, pagination: newPagination }) => {
-        setStreams(newStreams);
-        setPagination(newPagination);
-      })
-      .then(() => {
-        if (callback) {
-          callback();
-        }
+  const loadData = useCallback(() => {
+    StreamsStore.searchPaginated(searchParams.page, searchParams.perPage, searchParams.query)
+      .then(({ streams: newStreams, pagination: { total: newTotal } }) => {
+        setListData({ streams: newStreams, total: newTotal });
       });
-  }, [searchQuery, paginationQueryParameter.page, paginationQueryParameter.pageSize]);
+  }, [searchParams]);
 
   useEffect(() => {
     loadData();
-  }, [loadData, searchQuery]);
+  }, [loadData, searchParams]);
 
   useEffect(() => {
     StreamRulesStore.types().then((types) => {
@@ -81,17 +80,16 @@ const StreamComponent = ({ onStreamSave, indexSets }: Props) => {
     };
   }, [loadData]);
 
-  const onPageChange = useCallback((newPage: number, newPerPage: number) => loadData(null, newPage, newPerPage), [loadData]);
+  const onPageChange = useCallback((newPage: number, newPerPage: number) => setSearchParams((cur) => ({ ...cur, page: newPage, perPage: newPerPage })), []);
 
-  const onSearch = useCallback((query: string) => {
+  const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
-    setSearchQuery(query);
+    setSearchParams((cur) => ({ ...cur, query: newQuery }));
   }, [paginationQueryParameter]);
 
   const onReset = useCallback(() => {
-    paginationQueryParameter.resetPage();
-    setSearchQuery('');
-  }, [paginationQueryParameter]);
+    onSearch('');
+  }, [onSearch]);
 
   if (isLoading) {
     return (
@@ -103,7 +101,7 @@ const StreamComponent = ({ onStreamSave, indexSets }: Props) => {
 
   return (
     <PaginatedList onChange={onPageChange}
-                   totalItems={pagination.total}>
+                   totalItems={total}>
       <div style={{ marginBottom: 15 }}>
         <SearchForm onSearch={onSearch}
                     onReset={onReset}
@@ -136,9 +134,9 @@ const StreamComponent = ({ onStreamSave, indexSets }: Props) => {
   );
 };
 
-StreamComponent.propTypes = {
+StreamsOverview.propTypes = {
   onStreamSave: PropTypes.func.isRequired,
   indexSets: PropTypes.array.isRequired,
 };
 
-export default StreamComponent;
+export default StreamsOverview;

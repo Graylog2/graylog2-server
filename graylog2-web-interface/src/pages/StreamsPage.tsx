@@ -18,12 +18,13 @@ import React, { useEffect } from 'react';
 
 import { Row, Col } from 'components/bootstrap';
 import CreateStreamButton from 'components/streams/CreateStreamButton';
-import StreamComponent from 'components/streams/StreamComponent';
+import StreamsOverview from 'components/streams/StreamsOverview';
 import PageHeader from 'components/common/PageHeader';
 import { DocumentTitle, IfPermitted, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
-import StreamsStore, {Stream} from 'stores/streams/StreamsStore';
+import type { Stream } from 'stores/streams/StreamsStore';
+import StreamsStore from 'stores/streams/StreamsStore';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import { useStore } from 'stores/connect';
 
@@ -68,7 +69,7 @@ const StreamsPage = () => {
 
       <Row className="content">
         <Col md={12}>
-          <StreamComponent onStreamSave={onSave}
+          <StreamsOverview onStreamSave={onSave}
                            indexSets={indexSets} />
         </Col>
       </Row>
