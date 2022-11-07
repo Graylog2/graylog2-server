@@ -60,13 +60,12 @@ public class WaitForSuccessOrFailureStrategy extends AbstractWaitStrategy {
                 }
                 return outputFrame.getUtf8String().matches("(?s)" + success);
             };
-            try {
-                waitingConsumer.waitUntil(waitPredicate, startupTimeout.getSeconds(), TimeUnit.SECONDS, 1);
-            } catch (TimeoutException e) {
-                throw new ContainerLaunchException("Timed out waiting for log output matching '" + success + "'");
-            }
+            waitingConsumer.waitUntil(waitPredicate, startupTimeout.getSeconds(), TimeUnit.SECONDS, 1);
+
         } catch (IOException iox) {
             throw new ContainerLaunchException("Failed with Exception: " + iox.getMessage());
+        } catch (TimeoutException e) {
+            throw new ContainerLaunchException("Timed out waiting for log output matching '" + success + "'");
         }
     }
 
