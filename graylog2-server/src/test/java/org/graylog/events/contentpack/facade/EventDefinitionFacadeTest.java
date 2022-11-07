@@ -38,6 +38,7 @@ import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.DBEventProcessorStateService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
+import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationConditions;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationFunction;
@@ -86,6 +87,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -120,11 +122,15 @@ public class EventDefinitionFacadeTest {
     @Mock
     private DBEventDefinitionService eventDefinitionService;
     @Mock
+    private DBEventDefinitionService mockEventDefinitionService;
+    @Mock
     private EventDefinitionHandler eventDefinitionHandler;
     @Mock
     private UserService userService;
     @Mock
     private EntityOwnershipService entityOwnershipService;
+    @Mock
+    private EventProcessorConfig mockEventProcessorConfig;
 
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
@@ -313,6 +319,19 @@ public class EventDefinitionFacadeTest {
     }
 
     @Test
+    public void listExcerptsExcludesNonContentPackExportableEventDefinitions() {
+        EventDefinitionFacade testFacade = new EventDefinitionFacade(
+                objectMapper, eventDefinitionHandler, new HashSet<>(), jobDefinitionService, mockEventDefinitionService, userService);
+        EventDefinitionDto dto = validEventDefinitionDto(mockEventProcessorConfig);
+
+        when(mockEventProcessorConfig.isContentPackExportable()).thenReturn(false);
+        when(mockEventDefinitionService.streamAll()).thenReturn(Stream.of(dto));
+
+        final Set<EntityExcerpt> excerpts = testFacade.listEntityExcerpts();
+        assertThat(excerpts.size()).isEqualTo(0);
+    }
+
+    @Test
     @MongoDBFixtures("EventDefinitionFacadeTest.json")
     public void delete() {
         long countBefore = eventDefinitionService.streamAll().count();
@@ -368,5 +387,21 @@ public class EventDefinitionFacadeTest {
         assertThat(graph).isNotNull();
         Set<Entity> expectedNodes = ImmutableSet.of(eventEntityV1, notificationV1);
         assertThat(graph.nodes()).isEqualTo(expectedNodes);
+    }
+
+    static EventDefinitionDto validEventDefinitionDto(EventProcessorConfig config) {
+        return EventDefinitionDto.builder()
+                .title("Test")
+                .id("id")
+                .description("Test")
+                .priority(1)
+                .config(config)
+                .keySpec(ImmutableList.of())
+                .alert(false)
+                .notificationSettings(EventNotificationSettings.builder()
+                        .gracePeriodMs(60000)
+                        .backlogSize(0)
+                        .build())
+                .build();
     }
 }
