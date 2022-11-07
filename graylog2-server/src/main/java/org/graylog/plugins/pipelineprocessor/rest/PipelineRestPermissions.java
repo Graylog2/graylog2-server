@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.rest;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog.security.authzroles.BuiltinRole;
 import org.graylog2.plugin.security.Permission;
 import org.graylog2.plugin.security.PluginPermissions;
 
@@ -59,11 +60,29 @@ public class PipelineRestPermissions implements PluginPermissions {
 
                 create(PIPELINE_CONNECTION_READ, "Read a pipeline stream connection"),
                 create(PIPELINE_CONNECTION_EDIT, "Update a pipeline stream connections")
-                );
+        );
     }
 
     @Override
     public Set<Permission> readerBasePermissions() {
         return Collections.emptySet();
+    }
+
+    @Override
+    public Set<BuiltinRole> builtinRoles() {
+        return Set.of(
+                BuiltinRole.create("Pipelines Manager", "Grants full control of processing pipelines (built-in)",
+                        Set.of(
+                                PIPELINE_CREATE,
+                                PIPELINE_READ,
+                                PIPELINE_EDIT,
+                                PIPELINE_DELETE,
+                                PIPELINE_RULE_CREATE,
+                                PIPELINE_RULE_READ,
+                                PIPELINE_RULE_EDIT,
+                                PIPELINE_RULE_DELETE,
+                                PIPELINE_CONNECTION_READ,
+                                PIPELINE_CONNECTION_EDIT))
+        );
     }
 }

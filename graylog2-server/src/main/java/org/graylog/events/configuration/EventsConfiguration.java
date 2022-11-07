@@ -31,11 +31,13 @@ public abstract class EventsConfiguration {
     private static final String FIELD_NOTIFICATIONS_RETRY_PERIOD = "events_notification_retry_period";
     private static final String FIELD_NOTIFICATIONS_DEFAULT_BACKLOG = "events_notification_default_backlog";
     private static final String FIELD_CATCHUP_WINDOW = "events_catchup_window";
+    private static final String FIELD_NOTIFICATIONS_KEEP_ALIVE_PROBE = "events_notification_tcp_keepalive";
 
     private static final long DEFAULT_SEARCH_TIMEOUT_MS = 60000;
     private static final long DEFAULT_NOTIFICATIONS_RETRY_MS = 300000;
     private static final long DEFAULT_NOTIFICATIONS_BACKLOG = 50;
     public static final long DEFAULT_CATCH_UP_WINDOW_MS = Duration.standardHours(1).getMillis();
+    private static final boolean DEFAULT_NOTIFICATIONS_KEEP_ALIVE_PROBE = false;
 
     @JsonProperty(FIELD_SEARCH_TIMEOUT)
     public abstract long eventsSearchTimeout();
@@ -48,6 +50,9 @@ public abstract class EventsConfiguration {
 
     @JsonProperty(FIELD_CATCHUP_WINDOW)
     public abstract long eventCatchupWindow();
+
+    @JsonProperty(FIELD_NOTIFICATIONS_KEEP_ALIVE_PROBE)
+    public abstract boolean notificationsKeepAliveProbe();
 
     public static Builder builder() {
         return Builder.create();
@@ -63,7 +68,8 @@ public abstract class EventsConfiguration {
                     .eventsSearchTimeout(DEFAULT_SEARCH_TIMEOUT_MS)
                     .eventNotificationsRetry(DEFAULT_NOTIFICATIONS_RETRY_MS)
                     .eventNotificationsBacklog(DEFAULT_NOTIFICATIONS_BACKLOG)
-                    .eventCatchupWindow(DEFAULT_CATCH_UP_WINDOW_MS);
+                    .eventCatchupWindow(DEFAULT_CATCH_UP_WINDOW_MS)
+                    .notificationsKeepAliveProbe(DEFAULT_NOTIFICATIONS_KEEP_ALIVE_PROBE);
         }
 
         @JsonProperty(FIELD_SEARCH_TIMEOUT)
@@ -77,6 +83,9 @@ public abstract class EventsConfiguration {
 
         @JsonProperty(FIELD_CATCHUP_WINDOW)
         public abstract Builder eventCatchupWindow(long catchupWindow);
+
+        @JsonProperty(FIELD_NOTIFICATIONS_KEEP_ALIVE_PROBE)
+        public abstract Builder notificationsKeepAliveProbe(boolean enabled);
 
         public abstract EventsConfiguration build();
     }

@@ -73,6 +73,16 @@ public interface EventProcessorConfig extends ContentPackable<EventProcessorConf
         return Collections.emptySet();
     }
 
+    /**
+     * Returns whether this config type is allowed to be exported in a Content Pack.
+     *
+     * @return whether the config type can be exported in a Content Pack
+     */
+    @JsonIgnore
+    default boolean isContentPackExportable() {
+        return true;
+    }
+
     interface Builder<SELF> {
         @JsonProperty(TYPE_FIELD)
         SELF type(String type);
