@@ -1,0 +1,78 @@
+{
+  "@timestamp" : "2022-11-07T09:26:10.579Z",
+  "@metadata" : {
+    "beat" : "packetbeat",
+    "type" : "_doc",
+    "version" : "8.5.0"
+  },
+  "related" : {
+    "ip" : [ "10.0.55.1", "10.0.55.2" ]
+  },
+  "status" : "OK",
+  "method" : "msg",
+  "mongodb" : { },
+  "event" : {
+    "kind" : "event",
+    "category" : [ "network" ],
+    "type" : [ "connection", "protocol" ],
+    "dataset" : "mongodb",
+    "start" : "2022-11-07T09:26:10.579Z"
+  },
+  "host" : {
+    "architecture" : "x86_64",
+    "os" : {
+      "codename" : "focal",
+      "type" : "linux",
+      "platform" : "ubuntu",
+      "version" : "20.04.5 LTS (Focal Fossa)",
+      "family" : "debian",
+      "name" : "Ubuntu",
+      "kernel" : "5.15.0-52-generic"
+    },
+    "id" : "3d758250c1e88241a6d2037786a23bcf",
+    "name" : "example.local",
+    "containerized" : false,
+    "ip" : [ "10.0.1.1", "10.0.55.1" ],
+    "mac" : [ "02-42-11-7A-FD-80", "02-42-77-6C-EC-7E" ],
+    "hostname" : "example.local"
+  },
+  "type" : "mongodb",
+  "network" : {
+    "community_id" : "1:NlfSWdQ8jRZXj4S/I200ox1MJQc=",
+    "bytes" : 557,
+    "type" : "ipv4",
+    "transport" : "tcp",
+    "protocol" : "mongodb",
+    "direction" : "egress"
+  },
+  "query" : ".msg()",
+  "source" : {
+    "ip" : "10.0.55.1",
+    "port" : 41076,
+    "bytes" : 557
+  },
+  "resource" : "",
+  "agent" : {
+    "name" : "example.local",
+    "type" : "packetbeat",
+    "version" : "8.5.0",
+    "ephemeral_id" : "ca453a1e-e8b7-43f5-8b4a-89cc71570dc1",
+    "id" : "506b1236-0c1e-4d1e-92ea-8fc344b4aaf0"
+  },
+  "server" : {
+    "port" : 27017,
+    "ip" : "10.0.55.2"
+  },
+  "destination" : {
+    "ip" : "10.0.55.2",
+    "port" : 27017
+  },
+  "client" : {
+    "ip" : "10.0.55.1",
+    "port" : 41076,
+    "bytes" : 557
+  },
+  "ecs" : {
+    "version" : "8.0.0"
+  }
+}
