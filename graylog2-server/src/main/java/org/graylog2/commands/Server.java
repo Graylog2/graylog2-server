@@ -38,6 +38,7 @@ import org.graylog.plugins.pipelineprocessor.PipelineConfig;
 import org.graylog.plugins.sidecar.SidecarModule;
 import org.graylog.plugins.views.ViewsBindings;
 import org.graylog.plugins.views.ViewsConfig;
+import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiModule;
 import org.graylog.plugins.views.search.searchfilters.module.SearchFiltersModule;
 import org.graylog.scheduler.JobSchedulerConfiguration;
 import org.graylog.scheduler.JobSchedulerModule;
@@ -188,6 +189,9 @@ public class Server extends ServerBootstrap {
                 new SearchFiltersModule(),
                 new ScopedEntitiesModule()
         );
+        if (configuration.isScriptingApiFeaturePreviewTurnedOn()) {
+            modules.add(new ScriptingApiModule());
+        }
         return modules.build();
     }
 

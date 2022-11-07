@@ -71,7 +71,6 @@ import org.graylog.plugins.views.search.rest.contexts.SearchUserBinder;
 import org.graylog.plugins.views.search.rest.exceptionmappers.IllegalTimeRangeExceptionMapper;
 import org.graylog.plugins.views.search.rest.exceptionmappers.MissingCapabilitiesExceptionMapper;
 import org.graylog.plugins.views.search.rest.exceptionmappers.PermissionExceptionMapper;
-import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiResource;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
@@ -143,7 +142,6 @@ public class ViewsBindings extends ViewsModule {
         addSystemRestResource(QualifyingViewsResource.class);
         addSystemRestResource(SavedSearchesResource.class);
         addSystemRestResource(SearchResource.class);
-        addSystemRestResource(ScriptingApiResource.class);
         addSystemRestResource(SearchMetadataResource.class);
         addSystemRestResource(ViewsResource.class);
         addSystemRestResource(SuggestionsResource.class);
