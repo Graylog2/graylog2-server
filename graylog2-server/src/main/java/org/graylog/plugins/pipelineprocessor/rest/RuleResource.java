@@ -213,8 +213,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .collect(Collectors.toList());
         final PaginatedList<RuleSource> rules = new PaginatedList<>(ruleSourceList,
                 result.pagination().total(), result.pagination().page(), result.pagination().perPage());
-        return PaginatedResponse.create("rules", rules,
-                prepareContextForPaginatedResponse(result.delegate()));
+        return PaginatedResponse.create(rules, prepareContextForPaginatedResponse(result.delegate()));
     }
 
     @VisibleForTesting

@@ -113,7 +113,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
         final PaginatedList<NotificationDto> result = dbNotificationService.searchPaginated(searchQuery, notification -> {
             return isPermitted(RestPermissions.EVENT_NOTIFICATIONS_READ, notification.id());
         }, "title", page, perPage);
-        return PaginatedResponse.create("notifications", result, query);
+        return PaginatedResponse.create(result, query);
     }
 
     @GET

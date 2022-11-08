@@ -140,7 +140,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                     page,
                     perPage);
 
-            return PaginatedResponse.create("views", result, query);
+            return PaginatedResponse.create(result, query);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), e);
         }

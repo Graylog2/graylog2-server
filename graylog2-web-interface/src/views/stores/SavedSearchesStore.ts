@@ -20,12 +20,18 @@ import * as URLUtils from 'util/URLUtils';
 import { singletonActions, singletonStore } from 'logic/singleton';
 import fetch from 'logic/rest/FetchProvider';
 import type { RefluxActions } from 'stores/StoreTypes';
+import type { PaginatedListJSON } from 'stores/PaginationTypes';
+import type View from 'views/logic/views/View';
 
 import type { PaginatedViews, SortField, SortOrder } from './ViewManagementStore';
 
 export type SavedSearchesActionsType = RefluxActions<{
   search: (query?: string, page?: number, perPage?: number, sortBy?: SortField, order?: SortOrder) => Promise<PaginatedViews>,
 }>;
+
+type PaginatedSavedSearchesResponse = PaginatedListJSON & {
+  entities: Array<View>,
+};
 
 const SavedSearchesActions: SavedSearchesActionsType = singletonActions(
   'views.SavedSearches',
@@ -43,8 +49,8 @@ const SavedSearchesStore = singletonStore(
 
     search({ query = '', page = 1, perPage = 10, sortBy = 'title', order = 'asc' }): Promise<PaginatedViews> {
       const promise = fetch('GET', `${savedSearchesUrl}?query=${query}&page=${page}&per_page=${perPage}&sort=${sortBy}&order=${order}`)
-        .then((response) => ({
-          list: response.views,
+        .then((response: PaginatedSavedSearchesResponse) => ({
+          list: response.entities,
           pagination: {
             count: response.count,
             page: response.page,

@@ -41,7 +41,7 @@ export const RolesStore = singletonStore(
     loadRoles(): Promise<string[]> {
       return fetch('GET', qualifyUrl(ApiRoutes.RolesApiController.listRoles().url))
         .then(
-          (response) => response.roles,
+          (response) => response.entities,
           (error) => {
             if (error.additional.status !== 404) {
               UserNotification.error(`Loading role list failed with status: ${error}`,

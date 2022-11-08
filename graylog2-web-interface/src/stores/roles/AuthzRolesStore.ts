@@ -33,7 +33,7 @@ import UserOverview from 'logic/users/UserOverview';
 import type { PaginatedListJSON, Pagination } from 'stores/PaginationTypes';
 
 export type PaginatedRolesResponse = PaginatedListJSON & {
-  roles: Array<RoleJSON>,
+  entities: Array<RoleJSON>,
   context?: RoleContext,
 };
 
@@ -43,7 +43,7 @@ const _responseToPaginatedList = ({
   page,
   per_page,
   query,
-  roles = [],
+  entities: roles = [],
   context = { users: undefined },
 }: PaginatedRolesResponse) => ({
   list: Immutable.List(roles.map((r) => Role.fromJSON(r))),
@@ -57,7 +57,7 @@ const _responseToPaginatedList = ({
   context,
 });
 
-const _responseToPaginatedUserList = ({ count, total, page, per_page, query, users }: PaginatedUsersResponse) => ({
+const _responseToPaginatedUserList = ({ count, total, page, per_page, query, entities: users }: PaginatedUsersResponse) => ({
   list: Immutable.List(users.map((u) => UserOverview.fromJSON(u))),
   pagination: {
     page,

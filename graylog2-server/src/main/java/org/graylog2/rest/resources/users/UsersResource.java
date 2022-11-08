@@ -292,7 +292,7 @@ public class UsersResource extends RestResource {
 
         final PaginatedList<UserOverviewDTO> userOverviewDTOS = new PaginatedList<>(users, result.pagination().total(),
                 result.pagination().page(), result.pagination().perPage());
-        return PaginatedResponse.create("users", userOverviewDTOS, query, Collections.singletonMap("admin_user", adminUser));
+        return PaginatedResponse.create(userOverviewDTOS, query, Collections.singletonMap("admin_user", adminUser));
     }
 
     @POST

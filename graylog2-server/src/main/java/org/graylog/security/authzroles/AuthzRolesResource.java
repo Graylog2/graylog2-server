@@ -129,7 +129,7 @@ public class AuthzRolesResource extends RestResource {
                 searchQuery, page, perPage,sort, order);
         final Map<String, Set<Map<String, String>>> userRoleMap = userRoleContext(result);
 
-        return PaginatedResponse.create("roles", result, query, ImmutableMap.of("users", userRoleMap));
+        return PaginatedResponse.create(result, query, ImmutableMap.of("users", userRoleMap));
     }
 
     @GET
@@ -170,7 +170,7 @@ public class AuthzRolesResource extends RestResource {
 
         final PaginatedList<UserOverviewDTO> enrichedResult = new PaginatedList<>(users, result.pagination().total(),
                 result.pagination().page(), result.pagination().perPage());
-        return PaginatedResponse.create("users", enrichedResult, query);
+        return PaginatedResponse.create(enrichedResult, query);
     }
 
     @GET
@@ -212,7 +212,7 @@ public class AuthzRolesResource extends RestResource {
 
         final PaginatedList<AuthzRoleDTO> result = authzRolesService.findPaginatedByIds(
                 searchQuery, page, perPage,sort, order, user.getRoleIds());
-        return PaginatedResponse.create("roles", result, query);
+        return PaginatedResponse.create(result, query);
     }
 
     @PUT

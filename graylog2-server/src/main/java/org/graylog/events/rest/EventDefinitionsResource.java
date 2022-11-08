@@ -122,7 +122,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             return isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
         }, "title", page, perPage);
         final ImmutableMap<String, Object> context = contextService.contextFor(result.delegate());
-        return PaginatedResponse.create("event_definitions", result, query, context);
+        return PaginatedResponse.create(result, query, context);
     }
 
     @GET

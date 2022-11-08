@@ -35,7 +35,7 @@ type PaginatedResponse = {
   total: number,
   page: number,
   per_page: number,
-  patterns: Array<GrokPattern>,
+  entities: Array<GrokPattern>,
 };
 
 type GrokPatternTest = {
@@ -89,7 +89,7 @@ export const GrokPatternsStore = singletonStore(
           };
 
           return {
-            patterns: response.patterns,
+            patterns: response.entities,
             pagination: pagination,
           };
         })

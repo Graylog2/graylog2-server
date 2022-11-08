@@ -134,7 +134,7 @@ public class GrokResource extends RestResource {
         final PaginatedList<GrokPattern> result = paginatedGrokPatternService
                 .findPaginated(searchQuery, page, perPage, sort, order);
 
-        return PaginatedResponse.create("patterns", result);
+        return PaginatedResponse.create(result);
     }
 
     @GET

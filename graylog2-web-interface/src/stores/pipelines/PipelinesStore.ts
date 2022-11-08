@@ -65,7 +65,7 @@ export type StageType = {
 };
 
 export type PaginatedPipelineResponse = PaginatedListJSON & {
-  pipelines: Array<PipelineType>,
+  entities: Array<PipelineType>,
 };
 
 export type PaginatedPipelines = PaginatedList<PipelineType>;
@@ -118,7 +118,7 @@ export const PipelinesStore = singletonStore(
       const url = PaginationURL(ApiRoutes.PipelinesController.paginatedList().url, page, perPage, query);
 
       const promise = fetch('GET', qualifyUrl(url)).then((response: PaginatedPipelineResponse) => ({
-        list: Immutable.List(response.pipelines),
+        list: Immutable.List(response.entities),
         pagination: {
           page: response.page,
           perPage: response.per_page,
