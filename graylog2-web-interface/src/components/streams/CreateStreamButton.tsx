@@ -15,51 +15,60 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { Button } from 'components/bootstrap';
 import StreamModal from 'components/streams/StreamModal';
+import type { Stream } from 'stores/streams/StreamsStore';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
-class CreateStreamButton extends React.Component {
-  static propTypes = {
-    buttonText: PropTypes.string,
-    bsStyle: PropTypes.string,
-    bsSize: PropTypes.string,
-    className: PropTypes.string,
-    onSave: PropTypes.func.isRequired,
-    indexSets: PropTypes.array.isRequired,
-  };
-
-  static defaultProps = {
-    buttonText: 'Create stream',
-    bsSize: undefined,
-    bsStyle: undefined,
-    className: undefined,
-  };
-
-  onClick = () => {
-    this.streamForm.open();
-  };
-
-  render() {
-    const { bsSize, bsStyle, buttonText, className, indexSets, onSave } = this.props;
-
-    return (
-      <span>
-        <Button bsSize={bsSize}
-                bsStyle={bsStyle}
-                className={className}
-                onClick={this.onClick}>
-          {buttonText}
-        </Button>
-        <StreamModal ref={(streamForm) => { this.streamForm = streamForm; }}
-                     title="Create stream"
-                     submitButtonText="Create stream"
-                     indexSets={indexSets}
-                     onSubmit={onSave} />
-      </span>
-    );
-  }
+type Props = {
+  bsSize?: string
+  bsStyle?: string,
+  buttonText?: string,
+  className?: string,
+  indexSets: Array<IndexSet>
+  onCreate: (values: Partial<Stream>) => Promise<void>
 }
+
+const CreateStreamButton = ({ bsSize, bsStyle, buttonText, className, indexSets, onCreate }: Props) => {
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const toggleCreateModal = useCallback(() => setShowCreateModal((cur) => !cur), []);
+
+  return (
+    <>
+      <Button bsSize={bsSize}
+              bsStyle={bsStyle}
+              className={className}
+              onClick={toggleCreateModal}>
+        {buttonText}
+      </Button>
+      {showCreateModal && (
+        <StreamModal title="Create stream"
+                     submitButtonText="Create stream"
+                     submitLoadingText="Creating stream..."
+                     indexSets={indexSets}
+                     onSubmit={onCreate}
+                     onClose={toggleCreateModal} />
+      )}
+    </>
+  );
+};
+
+CreateStreamButton.propTypes = {
+  buttonText: PropTypes.string,
+  bsStyle: PropTypes.string,
+  bsSize: PropTypes.string,
+  className: PropTypes.string,
+  onCreate: PropTypes.func.isRequired,
+  indexSets: PropTypes.array.isRequired,
+};
+
+CreateStreamButton.defaultProps = {
+  buttonText: 'Create stream',
+  bsSize: undefined,
+  bsStyle: undefined,
+  className: undefined,
+};
 
 export default CreateStreamButton;
