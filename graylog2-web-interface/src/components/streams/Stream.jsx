@@ -22,7 +22,7 @@ import EntityShareModal from 'components/permissions/EntityShareModal';
 import { Link, LinkContainer } from 'components/common/router';
 import { Button, Tooltip, ButtonToolbar } from 'components/bootstrap';
 import { Icon, OverlayElement, ShareButton } from 'components/common';
-import StreamRuleForm from 'components/streamrules/StreamRuleForm';
+import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import { isAnyPermitted, isPermitted } from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
@@ -258,12 +258,12 @@ class Stream extends React.Component {
                           isDefaultStream={isDefaultStream} />
         </div>
         {showStreamRuleForm && (
-          <StreamRuleForm onClose={this._closeStreamRuleForm}
-                          title="New Stream Rule"
-                          submitButtonText="Create Rule"
-                          submitLoadingText="Creating Rule..."
-                          onSubmit={this._onSaveStreamRule}
-                          streamRuleTypes={streamRuleTypes} />
+          <StreamRuleModal onClose={this._closeStreamRuleForm}
+                           title="New Stream Rule"
+                           submitButtonText="Create rule"
+                           submitLoadingText="Creating rule..."
+                           onSubmit={this._onSaveStreamRule}
+                           streamRuleTypes={streamRuleTypes} />
         )}
         {showEntityShareModal && (
           <EntityShareModal entityId={stream.id}

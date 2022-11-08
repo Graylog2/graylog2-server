@@ -23,7 +23,7 @@ import { useStore } from 'stores/connect';
 import { Icon } from 'components/common';
 import { Button, ListGroupItem } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
-import StreamRuleForm from 'components/streamrules/StreamRuleForm';
+import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import HumanReadableStreamRule from 'components/streamrules/HumanReadableStreamRule';
 import UserNotification from 'util/UserNotification';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
@@ -99,13 +99,13 @@ const StreamRule = ({ matchData, permissions, stream, streamRule, streamRuleType
       {actionItems}
       <HumanReadableStreamRule streamRule={streamRule} streamRuleTypes={streamRuleTypes} inputs={inputs} />
       {showStreamRuleForm && (
-        <StreamRuleForm streamRule={streamRule}
-                        onClose={() => setShowStreamRuleForm(false)}
-                        streamRuleTypes={streamRuleTypes}
-                        title="Edit Stream Rule"
-                        submitButtonText="Update Rule"
-                        submitLoadingText="Updating Rule..."
-                        onSubmit={_onSubmit} />
+        <StreamRuleModal initialValues={streamRule}
+                         onClose={() => setShowStreamRuleForm(false)}
+                         streamRuleTypes={streamRuleTypes}
+                         title="Edit Stream Rule"
+                         submitButtonText="Update Rule"
+                         submitLoadingText="Updating Rule..."
+                         onSubmit={_onSubmit} />
       )}
       {description}
     </ListGroupItem>

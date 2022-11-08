@@ -19,7 +19,7 @@ import { cleanup, render, fireEvent } from 'wrappedTestingLibrary';
 
 import { MockStore } from 'helpers/mocking';
 
-import StreamRuleForm from './StreamRuleForm';
+import StreamRuleModal from './StreamRuleModal';
 
 jest.mock('components/common', () => ({
   TypeAheadFieldInput: ({ defaultValue }: { defaultValue: React.ReactNode }) => (<div>{defaultValue}</div>),
@@ -33,7 +33,7 @@ jest.mock('stores/inputs/InputsStore', () => ({
   InputsStore: MockStore(['getInitialState', () => ({ inputs: [] })]),
 }));
 
-describe('StreamRuleForm', () => {
+describe('StreamRuleModal', () => {
   const streamRuleTypes = [
     { id: 1, short_desc: 'match exactly', long_desc: 'match exactly', name: 'Stream rule match exactly' },
     { id: 2, short_desc: 'match regular expression', long_desc: 'match regular expression', name: 'Stream rule match regular' },
@@ -46,12 +46,12 @@ describe('StreamRuleForm', () => {
   ];
 
   const SUT = (props: Partial<React.ComponentProps<typeof StreamRuleForm>>) => (
-    <StreamRuleForm onSubmit={() => {}}
-                    streamRuleTypes={streamRuleTypes}
-                    submitButtonText="Update rule"
-                    submitLoadingText="Updating rule..."
-                    title="Bach"
-                    {...props} />
+    <StreamRuleModal onSubmit={() => {}}
+                     streamRuleTypes={streamRuleTypes}
+                     submitButtonText="Update rule"
+                     submitLoadingText="Updating rule..."
+                     title="Bach"
+                     {...props} />
   );
 
   afterEach(() => {

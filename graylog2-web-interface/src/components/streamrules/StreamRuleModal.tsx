@@ -50,7 +50,7 @@ type StreamRule = {
   description: string,
 };
 
-type StreamRuleType = {
+export type StreamRuleType = {
   id: number,
   short_desc: string,
   long_desc: string,
@@ -74,22 +74,22 @@ type State = {
 };
 
 class StreamRuleForm extends React.Component<Props, State> {
-  static defaultProps = {
-    // eslint-disable-next-line react/default-props-match-prop-types
-    streamRule: { field: '', type: 1, value: '', inverted: false, description: '' },
-    // eslint-disable-next-line react/default-props-match-prop-types
-    inputs: [],
-    onClose: () => {},
-  };
-
-  static propTypes = {
-    onSubmit: PropTypes.func.isRequired,
-    streamRuleTypes: PropTypes.array.isRequired,
-    title: PropTypes.string.isRequired,
-    onClose: PropTypes.func,
-    submitButtonText: PropTypes.string.isRequired,
-    submitLoadingText: PropTypes.string.isRequired,
-  };
+  // static defaultProps = {
+  //   // eslint-disable-next-line react/default-props-match-prop-types
+  //   streamRule: { field: '', type: 1, value: '', inverted: false, description: '' },
+  //   // eslint-disable-next-line react/default-props-match-prop-types
+  //   inputs: [],
+  //   onClose: () => {},
+  // };
+  //
+  // static propTypes = {
+  //   onSubmit: PropTypes.func.isRequired,
+  //   streamRuleTypes: PropTypes.array.isRequired,
+  //   title: PropTypes.string.isRequired,
+  //   onClose: PropTypes.func,
+  //   submitButtonText: PropTypes.string.isRequired,
+  //   submitLoadingText: PropTypes.string.isRequired,
+  // };
 
   FIELD_PRESENCE_RULE_TYPE = 5;
 
@@ -99,14 +99,14 @@ class StreamRuleForm extends React.Component<Props, State> {
 
   PLACEHOLDER_INPUT = 0;
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      streamRule: props.streamRule,
-      error: '',
-    };
-  }
+  // constructor(props) {
+  //   super(props);
+  //
+  //   this.state = {
+  //     streamRule: props.streamRule,
+  //     error: '',
+  //   };
+  // }
 
   componentDidMount() {
     InputsActions.list();
@@ -157,10 +157,10 @@ class StreamRuleForm extends React.Component<Props, State> {
     const updatedStreamRule = { ...streamRule };
 
     updatedStreamRule[event.target.name] = FormsUtils.getValueFromInput(event.target);
-
-    if (event.target.name === 'type' && String(updatedStreamRule.type) === String(this.MATCH_INPUT)) {
-      updatedStreamRule.value = String(this.PLACEHOLDER_INPUT);
-    }
+    //
+    // if (event.target.name === 'type' && String(updatedStreamRule.type) === String(this.MATCH_INPUT)) {
+    //   updatedStreamRule.value = String(this.PLACEHOLDER_INPUT);
+    // }
 
     this.setState({ streamRule: updatedStreamRule });
   };
@@ -212,7 +212,7 @@ class StreamRuleForm extends React.Component<Props, State> {
   };
 
   render() {
-    const { streamRule } = this.state;
+    // const { streamRule } = this.state;
     const { type, inverted, description } = streamRule;
     const { streamRuleTypes: ruleTypes, title, onClose, inputs, submitButtonText, submitLoadingText } = this.props;
 
