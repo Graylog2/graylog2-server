@@ -34,7 +34,7 @@ public class MessageULIDGenerator {
     private final Cache<String, Integer> sequenceNrCache;
     private final ULID ulid;
     static final long RANDOM_MSB_MASK = 0xFFFFL;
-    static final int OFFSET_GAP = 500;
+    static final int OFFSET_GAP = 1000;
 
     @Inject
     public MessageULIDGenerator(ULID ulid) {
@@ -73,6 +73,10 @@ public class MessageULIDGenerator {
         final String key = inputId + timestamp;
         final Integer subtrahend = sequenceNrCache.get(key, k -> sequenceNr);
 
+        if (sequenceNr == subtrahend) {
+            LOG.trace("Added new timestamp <{}> for input <{}> to cache. Seq <{}>", timestamp, inputId, sequenceNr);
+        }
+
         final ULID.Value nextUlid = ulid.nextValue(timestamp);
         final long leastSignificantBits = nextUlid.getLeastSignificantBits();
 
@@ -87,7 +91,7 @@ public class MessageULIDGenerator {
             messageSequenceNr = OFFSET_GAP;
             sequenceNrCache.put(key, sequenceNr);
         } else if (messageSequenceNr >= RANDOM_MSB_MASK) {
-            LOG.warn("Message sequence number does not fit into ULID ({} >= 65535). Sort order might be wrong.", messageSequenceNr);
+            LOG.warn("Message sequence number <{}> input <{}> timestamp <{}> does not fit into ULID ({} >= 65535). Sort order might be wrong.", sequenceNr, inputId, timestamp, messageSequenceNr);
             messageSequenceNr %= RANDOM_MSB_MASK;
         }
         final ULID.Value sequencedUlid = new ULID.Value(msbWithZeroedRandom + messageSequenceNr, leastSignificantBits);
