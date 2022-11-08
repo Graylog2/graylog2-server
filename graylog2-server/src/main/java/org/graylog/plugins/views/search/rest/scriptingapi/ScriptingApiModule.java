@@ -21,6 +21,7 @@ import org.graylog2.featureflag.FeatureFlags;
 
 public class ScriptingApiModule extends ViewsModule {
 
+    public static final String FEATURE_FLAG = "scripting_api_preview";
     private final FeatureFlags featureFlags;
 
     public ScriptingApiModule(final FeatureFlags featureFlags) {
@@ -29,7 +30,7 @@ public class ScriptingApiModule extends ViewsModule {
 
     @Override
     protected void configure() {
-        if (featureFlags.isOn("scripting_api_preview")) {
+        if (featureFlags.isOn(FEATURE_FLAG)) {
             addSystemRestResource(ScriptingApiResource.class);
         }
     }
