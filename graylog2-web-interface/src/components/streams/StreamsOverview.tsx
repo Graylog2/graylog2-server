@@ -32,11 +32,11 @@ import StreamList from './StreamList';
 import CreateStreamButton from './CreateStreamButton';
 
 type Props = {
-  onStreamSave: (streamId: string, stream: Stream) => void,
+  onStreamCreate: (stream: Stream) => Promise<void>,
   indexSets: Array<IndexSet>
 }
 
-const StreamsOverview = ({ onStreamSave, indexSets }: Props) => {
+const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   const currentUser = useCurrentUser();
   const paginationQueryParameter = usePaginationQueryParameter();
   const [searchParams, setSearchParams] = useState({
@@ -118,7 +118,7 @@ const StreamsOverview = ({ onStreamSave, indexSets }: Props) => {
                                     className="btn-text"
                                     buttonText="Create one now"
                                     indexSets={indexSets}
-                                    onSave={onStreamSave} />
+                                    onCreate={onStreamCreate} />
               </IfPermitted>
             </Alert>
           )
@@ -135,7 +135,7 @@ const StreamsOverview = ({ onStreamSave, indexSets }: Props) => {
 };
 
 StreamsOverview.propTypes = {
-  onStreamSave: PropTypes.func.isRequired,
+  onStreamCreate: PropTypes.func.isRequired,
   indexSets: PropTypes.array.isRequired,
 };
 
