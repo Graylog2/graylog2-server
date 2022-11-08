@@ -57,6 +57,8 @@ const _onUpdate = (configType: string) => {
         return ConfigurationsActions.updateMessageProcessorsConfig(configType, config);
       case URL_WHITELIST_CONFIG:
         return ConfigurationsActions.updateWhitelist(configType, config);
+      case INDEX_SETS_DEFAULTS_CONFIG:
+        return ConfigurationsActions.updateIndexSetDefaults(configType, config);
       default:
         return ConfigurationsActions.update(configType, config);
     }

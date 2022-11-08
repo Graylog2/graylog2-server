@@ -71,10 +71,14 @@ const IndexSetsDefaultsConfig = ({ config, updateConfig }: Props) => {
   const [retentionStrategies, setRetentionStrategies] = useState<MaintenanceOptions>();
   const handleSaveConfig = async (configToSave: IndexConfig) => updateConfig(configToSave);
 
-  const saveConfig = (values) => {
-    handleSaveConfig(values).then(() => {
-      setShowModal(false);
-    });
+  const saveConfig = (values, { setSubmitting }) => {
+    handleSaveConfig(values)
+      .then(() => {
+        setShowModal(false);
+      })
+      .catch(() => {
+        setSubmitting(false);
+      });
   };
 
   const resetConfig = () => {

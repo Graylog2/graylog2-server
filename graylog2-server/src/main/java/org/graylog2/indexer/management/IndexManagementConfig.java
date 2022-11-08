@@ -24,7 +24,8 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.configuration.IndexSetsDefaultConfiguration;
 
 /**
- * Cluster config settings class that used when initially establishing in-database/pluggable index set management.
+ * Legacy cluster config settings class that used when initially establishing in-database/pluggable index set
+ * management in Graylog 2.0.
  * This class should no longer be referenced by new code.
  *
  * See {@link IndexSetsDefaultConfiguration} for current defaults.

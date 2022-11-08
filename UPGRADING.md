@@ -159,3 +159,15 @@ pair using a colon delimiter. This will result in Teams notifications with a tem
 formatting. Existing custom templates should be updated to use HTML or Markdown in order to display properly. If using
 the old default template, it can be replaced with the one found when creating a new Teams notification. It can also be
 found in this [pull request](https://github.com/Graylog2/graylog-plugin-integrations/pull/1202).
+
+Upgrading to Graylog 5.1.x
+==========================
+
+The following Java Code API changes have been made in 5.1.
+
+| File/method                                  | Description                                                                                                 |
+|----------------------------------------------|-------------------------------------------------------------------------------------------------------------|
+| `IndexSetValidator#validateRefreshInterval`  | The method argument have changed from `IndexSetConfig` to `Duration`                                        |
+| `IndexSetValidator#validateRetentionPeriod`  | The method argument have changed from `IndexSetConfig` to `RotationStrategyConfig, RetentionStrategyConfig` |
+| `ElasticsearchConfiguration#getIndexPrefix`  | The method name has changed to `getDefaultIndexPrefix`                                                      |
+| `ElasticsearchConfiguration#getTemplateName` | The method name has changed to `getDefaultIndexTemplateName`                                                |

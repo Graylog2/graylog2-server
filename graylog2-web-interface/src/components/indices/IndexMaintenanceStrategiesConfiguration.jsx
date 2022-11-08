@@ -200,7 +200,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
 
 IndexMaintenanceStrategiesConfiguration.propTypes = {
   title: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
+  description: PropTypes.string,
   selectPlaceholder: PropTypes.string.isRequired,
   pluginExports: PropTypes.array.isRequired,
   strategies: PropTypes.array.isRequired,

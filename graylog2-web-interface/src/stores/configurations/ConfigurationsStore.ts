@@ -33,6 +33,7 @@ type ConfigurationsActionsType = {
   listPermissionsConfig: (configType: string) => Promise<unknown>,
   update: (configType: any, config: any) => Promise<void>,
   updateWhitelist: (configType: any, config: any) => Promise<void>,
+  updateIndexSetDefaults: (configType: any, config: any) => Promise<void>,
   updateMessageProcessorsConfig: (configType: any, config: any) => Promise<void>,
 }
 export const ConfigurationsActions = singletonActions(
@@ -47,6 +48,7 @@ export const ConfigurationsActions = singletonActions(
     listPermissionsConfig: { asyncResult: true },
     update: { asyncResult: true },
     updateWhitelist: { asyncResult: true },
+    updateIndexSetDefaults: { asyncResult: true },
     updateMessageProcessorsConfig: { asyncResult: true },
   }),
 );
@@ -188,6 +190,25 @@ export const ConfigurationsStore = singletonStore(
         return response;
       });
       ConfigurationsActions.listIndexSetsDefaultsClusterConfig.promise(promise);
+    },
+
+    updateIndexSetDefaults(configType, config) {
+      const promise = fetch('PUT', qualifyUrl('/system/indices/index_set_defaults'), config);
+
+      promise.then(
+        () => {
+          this.configuration = { ...this.configuration, [configType]: config };
+          this.propagateChanges();
+          UserNotification.success('Index defaults configuration updated successfully');
+
+          return config;
+        },
+        (error) => {
+          UserNotification.error(`Index defaults configuration update failed: ${error}`, `Could not update Url Whitelist: ${configType}`);
+        },
+      );
+
+      ConfigurationsActions.updateIndexSetDefaults.promise(promise);
     },
 
     update(configType, config) {
