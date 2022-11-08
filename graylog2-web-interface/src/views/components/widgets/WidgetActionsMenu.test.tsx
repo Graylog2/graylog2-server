@@ -41,6 +41,7 @@ import { loadDashboard } from 'views/logic/views/Actions';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { ViewStore } from 'views/stores/ViewStore';
+import MockAction from 'helpers/mocking/MockAction';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
 
@@ -74,6 +75,13 @@ jest.mock('views/stores/WidgetStore', () => ({
 
 jest.mock('views/stores/CurrentQueryStore', () => ({
   CurrentQueryStore: MockStore(),
+}));
+
+jest.mock('views/stores/DashboardsStore', () => ({
+  DashboardsActions: {
+    search: MockAction(),
+  },
+  DashboardsStore: MockStore(),
 }));
 
 jest.mock('views/stores/CurrentViewStateStore', () => ({ CurrentViewStateStore: MockStore(['getInitialState', () => ({})]) }));
@@ -123,7 +131,7 @@ describe('<WidgetActionsMenu />', () => {
     pagination: {
       total: 2,
       page: 1,
-      per_page: 10,
+      perPage: 10,
       count: 2,
     },
   };
@@ -239,7 +247,6 @@ describe('<WidgetActionsMenu />', () => {
 
   describe('copy widget to dashboard', () => {
     beforeEach(() => {
-      // @ts-ignore
       DashboardsStore.getInitialState = jest.fn(() => dashboardState);
       ViewManagementActions.get = mockAction(jest.fn((async () => Promise.resolve(dashboard1.toJSON()))));
       ViewManagementActions.update = mockAction(jest.fn((view) => Promise.resolve(view)));
