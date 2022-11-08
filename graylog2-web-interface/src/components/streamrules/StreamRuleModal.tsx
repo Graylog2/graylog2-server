@@ -83,7 +83,7 @@ const StreamRuleModal = ({
   }, []);
 
   const _onSubmit = useCallback((values) => {
-    onSubmit(initialValues?.id, values).then(() => onClose());
+    return onSubmit(initialValues?.id, values).then(() => onClose());
   }, [onSubmit, initialValues?.id, onClose]);
 
   const streamRuleTypesOptions = useMemo(() => streamRuleTypes.map(({ id, short_desc }) => ({
@@ -123,8 +123,7 @@ const StreamRuleModal = ({
 
                   <Field name="type">
                     {({ field: { name, value, onChange }, meta: { error, touched } }) => (
-                      <Input id="default-aws-region-select"
-                             label="Type"
+                      <Input label="Type"
                              error={(error && touched) ? error : undefined}>
                         <Select onBlur={() => setFieldTouched(name, true)}
                                 onChange={(newValue: number) => {
@@ -139,8 +138,8 @@ const StreamRuleModal = ({
                                 }}
                                 options={streamRuleTypesOptions}
                                 inputId={name}
-                                placeholder="Select time of the day"
-                                inputProps={{ 'aria-label': 'Select time of the day' }}
+                                placeholder="Select a type"
+                                inputProps={{ 'aria-label': 'Select a type' }}
                                 value={value} />
                       </Input>
                     )}
@@ -157,8 +156,8 @@ const StreamRuleModal = ({
                               <Select onChange={(newValue: string) => onChange({ target: { value: newValue, name } })}
                                       options={inputOptions}
                                       inputId={name}
-                                      placeholder="Choose Input"
-                                      inputProps={{ 'aria-label': 'Choose Input' }}
+                                      placeholder="Select an input"
+                                      inputProps={{ 'aria-label': 'Select an input' }}
                                       value={value} />
                             </Input>
                           )}

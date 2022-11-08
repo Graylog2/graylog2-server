@@ -14,166 +14,111 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
 
-import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-import { Input } from 'components/bootstrap';
-import { Select, Spinner } from 'components/common';
-import * as FormsUtils from 'util/FormsUtils';
-import { IndexSetsActions } from 'stores/indices/IndexSetsStore';
+import React, { useMemo } from 'react';
+import type { Stream } from 'src/stores/streams/StreamsStore';
+import { Formik, Form, Field } from 'formik';
 
-const _getValuesFromProps = (props) => {
-  let defaultIndexSetId = props.stream.index_set_id;
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import { FormikInput, ModalSubmit, Select } from 'components/common';
+import { Modal, Input } from 'components/bootstrap';
 
-  if (!defaultIndexSetId && props.indexSets && props.indexSets.length > 0) {
-    const defaultIndexSet = props.indexSets.find((indexSet) => indexSet.default);
+type FormValues = Partial<Stream> & { index_set_id?: string }
 
-    if (defaultIndexSet) {
-      defaultIndexSetId = defaultIndexSet.id;
-    }
-  }
-
+const prepareInitialValues = (initialValues: FormValues, indexSets: Array<IndexSet>) => {
   return {
-    title: props.stream.title,
-    description: props.stream.description,
-    removeMatchesFromDefaultStream: props.stream.remove_matches_from_default_stream,
-    indexSetId: defaultIndexSetId,
+    index_set_id: initialValues.index_set_id ?? indexSets?.find((indexSet) => indexSet.default)?.id,
+    ...initialValues,
   };
 };
 
-class StreamForm extends React.Component {
-  static propTypes = {
-    onSubmit: PropTypes.func.isRequired,
-    stream: PropTypes.object,
-    title: PropTypes.string.isRequired,
-    submitButtonText: PropTypes.string.isRequired,
-    indexSets: PropTypes.array.isRequired,
-  };
+const validate = () => {
+  const errors = {};
 
-  static defaultProps = {
-    stream: {
-      title: '',
-      description: '',
-      remove_matches_from_default_stream: false,
-    },
-  };
+  return errors;
+};
 
-  constructor(props) {
-    super(props);
-
-    this.state = _getValuesFromProps(props);
-    this.modal = undefined;
-  }
-
-  _resetValues = () => {
-    this.setState(_getValuesFromProps(this.props));
-  };
-
-  _onSubmit = () => {
-    const { title, description, removeMatchesFromDefaultStream, indexSetId } = this.state;
-    const { onSubmit, stream } = this.props;
-
-    onSubmit(stream.id,
-      {
-        title,
-        description,
-        remove_matches_from_default_stream: removeMatchesFromDefaultStream,
-        index_set_id: indexSetId,
-      });
-
-    this.modal.close();
-  };
-
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  open = () => {
-    this._resetValues();
-    IndexSetsActions.list(false);
-    this.modal.open();
-  };
-
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  close = () => {
-    this.modal.close();
-  };
-
-  _formatSelectOptions = () => {
-    const { indexSets } = this.props;
-
-    return indexSets.filter((indexSet) => indexSet.can_be_default).map((indexSet) => {
-      return { value: indexSet.id, label: indexSet.title };
-    });
-  };
-
-  _onIndexSetSelect = (selection) => {
-    this.setState({ indexSetId: selection });
-  };
-
-  handleChange = (event) => {
-    const change = {};
-
-    change[event.target.name] = FormsUtils.getValueFromInput(event.target);
-    this.setState(change);
-  };
-
-  _indexSetSelect = () => {
-    const { indexSetId } = this.state;
-    const { indexSets } = this.props;
-
-    if (indexSets) {
-      return (
-        <Input id="index-set-selector"
-               label="Index Set"
-               help="Messages that match this stream will be written to the configured index set.">
-          <Select inputId="index-set-selector"
-                  placeholder="Select index set"
-                  options={this._formatSelectOptions()}
-                  matchProp="label"
-                  onChange={this._onIndexSetSelect}
-                  value={indexSetId} />
-        </Input>
-      );
-    }
-
-    return <Spinner>Loading index sets...</Spinner>;
-  };
-
-  render() {
-    const { title: propTitle, submitButtonText } = this.props;
-    const { title, description, removeMatchesFromDefaultStream } = this.state;
-
-    return (
-      <BootstrapModalForm ref={(c) => { this.modal = c; }}
-                          title={propTitle}
-                          onSubmitForm={this._onSubmit}
-                          submitButtonText={submitButtonText}>
-        <Input id="Title"
-               type="text"
-               required
-               label="Title"
-               name="title"
-               value={title}
-               onChange={this.handleChange}
-               placeholder="A descriptive name of the new stream"
-               autoFocus />
-        <Input id="Description"
-               type="text"
-               label="Description"
-               name="description"
-               value={description}
-               onChange={this.handleChange}
-               placeholder="What kind of messages are routed into this stream?" />
-        {this._indexSetSelect()}
-        <Input id="RemoveFromDefaultStream"
-               type="checkbox"
-               label="Remove matches from &lsquo;Default Stream&rsquo;"
-               name="removeMatchesFromDefaultStream"
-               checked={removeMatchesFromDefaultStream}
-               onChange={this.handleChange}
-               help={<span>Don&apos;t assign messages that match this stream to the &lsquo;Default Stream&rsquo;.</span>} />
-      </BootstrapModalForm>
-    );
-  }
+type Props = {
+  initialValues?: FormValues
+  title: string,
+  submitButtonText: string,
+  submitLoadingText: string,
+  onClose: () => void,
+  onSubmit: (values: FormValues) => Promise<void>
+  indexSets: Array<IndexSet>,
 }
 
-export default StreamForm;
+const StreamModal = ({ initialValues, title: modalTitle, submitButtonText, submitLoadingText, onClose, onSubmit, indexSets }: Props) => {
+  const _initialValues = useMemo(() => prepareInitialValues(initialValues, indexSets), []);
+
+  const indexSetOptions = useMemo(() => indexSets
+    .filter((indexSet) => indexSet.can_be_default)
+    .map(({ id, title }) => ({
+      value: id,
+      label: title,
+    })), [indexSets]);
+
+  const _onSubmit = (values: FormValues) => {
+    return onSubmit(values).then(() => onClose());
+  };
+
+  return (
+    <Modal title={modalTitle}
+           onHide={onClose}
+           show>
+      <Formik<FormValues> initialValues={_initialValues}
+                          onSubmit={_onSubmit}
+                          validate={validate}>
+        {({ setFieldTouched, isSubmitting, isValid }) => (
+          <Form>
+            <Modal.Header closeButton>
+              <Modal.Title>{modalTitle}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <FormikInput label="Title" name="title" id="title" help="A descriptive name of the new stream" />
+              <FormikInput label="Description" name="description" id="description" help="What kind of messages are routed into this stream?" />
+
+              <Field name="index_set_id">
+                {({ field: { name, value, onChange }, meta: { error, touched } }) => (
+                  <Input label="Index Set"
+                         help="Messages that match this stream will be written to the configured index set."
+                         error={(error && touched) ? error : undefined}>
+                    <Select onBlur={() => setFieldTouched(name, true)}
+                            onChange={(newValue: number) => onChange({
+                              target: { value: newValue, name },
+                            })}
+                            options={indexSetOptions}
+                            inputId={name}
+                            placeholder="Select an index set"
+                            inputProps={{ 'aria-label': 'Select an index set' }}
+                            value={value} />
+                  </Input>
+                )}
+              </Field>
+
+              <FormikInput label={<>Remove matches from &lsquo;Default Stream&rsquo;</>}
+                           help={<span>Don&apos;t assign messages that match this stream to the &lsquo;Default Stream&rsquo;.</span>}
+                           name="description"
+                           id="description"
+                           type="checkbox" />
+
+            </Modal.Body>
+            <Modal.Footer>
+              <ModalSubmit submitButtonText={submitButtonText} submitLoadingText={submitLoadingText} onCancel={onClose} disabledSubmit={!isValid} isSubmitting={isSubmitting} />
+            </Modal.Footer>
+          </Form>
+        )}
+      </Formik>
+    </Modal>
+  );
+};
+
+StreamModal.defaultProps = {
+  initialValues: {
+    title: '',
+    description: '',
+    remove_matches_from_default_stream: false,
+  },
+};
+
+export default StreamModal;

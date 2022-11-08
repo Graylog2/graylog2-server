@@ -45,7 +45,7 @@ describe('StreamRuleModal', () => {
     { id: 8, short_desc: 'match input', long_desc: 'match input', name: 'Stream rule match input' },
   ];
 
-  const SUT = (props: Partial<React.ComponentProps<typeof StreamRuleForm>>) => (
+  const SUT = (props: Partial<React.ComponentProps<typeof StreamRuleModal>>) => (
     <StreamRuleModal onSubmit={() => {}}
                      streamRuleTypes={streamRuleTypes}
                      submitButtonText="Update rule"
@@ -69,13 +69,13 @@ describe('StreamRuleModal', () => {
     };
   };
 
-  it('should render an empty StreamRuleForm', () => {
+  it('should render an empty StreamRuleModal', () => {
     const container = render(<SUT />);
 
     expect(container).not.toBeNull();
   });
 
-  it('should render an simple StreamRuleForm', () => {
+  it('should render an simple StreamRuleModal', () => {
     const container = render(<SUT streamRule={getStreamRule()} />);
 
     expect(container).not.toBeNull();

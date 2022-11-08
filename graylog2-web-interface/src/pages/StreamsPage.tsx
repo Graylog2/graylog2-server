@@ -28,11 +28,10 @@ import StreamsStore from 'stores/streams/StreamsStore';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import { useStore } from 'stores/connect';
 
-const onSave = (_streamId: string, stream: Stream) => {
-  StreamsStore.save(stream, () => {
-    UserNotification.success('Stream has been successfully created.', 'Success');
-  });
-};
+const onSave = (stream: Stream) => StreamsStore.save(stream, () => {
+  UserNotification.success('Stream has been successfully created.', 'Success');
+});
+
 
 const StreamsPage = () => {
   const { indexSets } = useStore(IndexSetsStore);
@@ -57,7 +56,7 @@ const StreamsPage = () => {
                   actions={(
                     <IfPermitted permissions="streams:create">
                       <CreateStreamButton bsStyle="success"
-                                          onSave={onSave}
+                                          onCreate={onSave}
                                           indexSets={indexSets} />
                     </IfPermitted>
           )}>
@@ -69,7 +68,7 @@ const StreamsPage = () => {
 
       <Row className="content">
         <Col md={12}>
-          <StreamsOverview onStreamSave={onSave}
+          <StreamsOverview onStreamCreate={onSave}
                            indexSets={indexSets} />
         </Col>
       </Row>

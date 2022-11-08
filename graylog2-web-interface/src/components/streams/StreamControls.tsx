@@ -26,17 +26,18 @@ import HideOnCloud from 'util/conditional/HideOnCloud';
 import { StartpageStore } from 'stores/users/StartpageStore';
 import type { Stream } from 'stores/streams/StreamsStore';
 import { LinkContainer } from 'components/common/router';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
-import StreamForm from './StreamForm';
+import StreamModal from './StreamModal';
 
 type Props = {
   stream: Stream,
   user: { id: string, read_only: boolean },
-  indexSets: Array<{}>,
+  indexSets: Array<IndexSet>,
   onDelete: (stream: Stream) => void,
   onClone: (streamId: string, newStream: Stream) => void,
   onQuickAdd: (streamId: string) => void,
-  onUpdate: () => void,
+  onUpdate: (stream: Stream) => Promise<void>,
   isDefaultStream?: boolean,
   disabled?: boolean,
 };
@@ -115,17 +116,17 @@ const StreamControls = ({
           </MenuItem>
         </IfPermitted>
       </DropdownButton>
-      <StreamForm ref={streamForm}
-                  title="Editing Stream"
-                  onSubmit={onUpdate}
-                  submitButtonText="Update stream"
-                  stream={stream}
-                  indexSets={indexSets} />
-      <StreamForm ref={cloneForm}
-                  title="Cloning Stream"
-                  onSubmit={_onCloneSubmit}
-                  submitButtonText="Clone stream"
-                  indexSets={indexSets} />
+      <StreamModal ref={streamForm}
+                   title="Editing Stream"
+                   onSubmit={onUpdate}
+                   submitButtonText="Update stream"
+                   stream={stream}
+                   indexSets={indexSets} />
+      <StreamModal ref={cloneForm}
+                   title="Cloning Stream"
+                   onSubmit={_onCloneSubmit}
+                   submitButtonText="Clone stream"
+                   indexSets={indexSets} />
     </>
   );
 };
