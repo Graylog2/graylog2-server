@@ -100,6 +100,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -115,6 +116,8 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Api(value = "Streams", description = "Manage streams", tags = {CLOUD_VISIBLE})
 @Path("/streams")
 public class StreamResource extends RestResource {
+    private static final String DEFAULT_SORT_FIELD = StreamDTO.FIELD_TITLE;
+    private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
             EntityAttribute.builder().id("title").title("Title").build(),
             EntityAttribute.builder().id("description").title("Description").build(),
@@ -127,7 +130,7 @@ public class StreamResource extends RestResource {
 
     private static final EntitySettings settings = EntitySettings.builder()
             .attributes(List.of("title", "description", "status"))
-            .sort(Sorting.create("title", Sorting.Direction.ASC))
+            .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
             .build();
 
     protected static final Map<String, SearchQueryField> SEARCH_FIELD_MAPPING = Map.of(
@@ -204,9 +207,9 @@ public class StreamResource extends RestResource {
                 value = "The field to sort the result on",
                 required = true,
                 allowableValues = "title,description,created_at,updated_at,status")
-        @DefaultValue(StreamImpl.FIELD_TITLE) @QueryParam("sort") String sort,
+        @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
         @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-        @DefaultValue("asc") @QueryParam("order") String order) {
+        @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order) {
 
         SearchQuery searchQuery;
         try {
