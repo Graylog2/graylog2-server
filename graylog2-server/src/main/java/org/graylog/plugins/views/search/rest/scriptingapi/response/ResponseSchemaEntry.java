@@ -19,5 +19,6 @@ package org.graylog.plugins.views.search.rest.scriptingapi.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record ResponseSchemaEntry(@JsonProperty String name,
-                                  @JsonProperty String type) {
+                                  @JsonProperty String type,
+                                  @JsonProperty String field) {
 }

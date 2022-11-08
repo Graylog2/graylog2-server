@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationSpec;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseData;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
@@ -38,9 +39,9 @@ public class SearchTypeResultToTabularResponseMapper {
         final int numMetrics = aggregationSpec.metrics().size();
         final int numColumns = numGroupings + numMetrics;
         List<ResponseSchemaEntry> schema = new ArrayList<>(numColumns);
-        aggregationSpec.groupings().forEach(gr -> schema.add(new ResponseSchemaEntry("Grouping on : " + gr.fieldName(), "string")));
+        aggregationSpec.groupings().forEach(gr -> schema.add(new ResponseSchemaEntry("Grouping", "string", gr.fieldName())));
         aggregationSpec.metrics().forEach(metric -> schema.add(new ResponseSchemaEntry("Metric : " + metric.functionName(),
-                Latest.NAME.equals(metric.functionName()) ? "string" : "numeric")));
+                Latest.NAME.equals(metric.functionName()) ? "string" : "numeric", metric.fieldName())));
         return new TabularResponse(
                 schema,
                 new ResponseData(
@@ -53,8 +54,15 @@ public class SearchTypeResultToTabularResponseMapper {
                                     for (int i = 0; i < numGroupings - resultGroupings.size(); i++) {
                                         row.add("-"); //sometimes pivotRow does not have enough keys - empty value!
                                     }
-                                    final List<Object> resultMetrics = pivRow.values().stream().map(PivotResult.Value::value).toList();
-                                    row.addAll(resultMetrics);
+                                    final ImmutableList<PivotResult.Value> values = pivRow.values();
+                                    for (Metric metric : aggregationSpec.metrics()) {
+                                        row.add(values.stream()
+                                                .filter(value -> value.key().contains(metric.sortColumnName()))
+                                                .findFirst()
+                                                .map(PivotResult.Value::value)
+                                                .orElse("-")
+                                        );
+                                    }
                                     return row;
                                 })
                                 .collect(Collectors.toList())
