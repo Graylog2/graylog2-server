@@ -86,7 +86,7 @@ const StreamRuleModal = ({
     return onSubmit(initialValues?.id, values).then(() => onClose());
   }, [onSubmit, initialValues?.id, onClose]);
 
-  const streamRuleTypesOptions = useMemo(() => streamRuleTypes.map(({ id, short_desc }) => ({
+  const streamRuleTypesOptions = useMemo(() => streamRuleTypes?.map(({ id, short_desc }) => ({
     value: id,
     label: short_desc,
   })), [streamRuleTypes]);
@@ -124,6 +124,7 @@ const StreamRuleModal = ({
                   <Field name="type">
                     {({ field: { name, value, onChange }, meta: { error, touched } }) => (
                       <Input label="Type"
+                             id="type"
                              error={(error && touched) ? error : undefined}>
                         <Select onBlur={() => setFieldTouched(name, true)}
                                 onChange={(newValue: number) => {
@@ -150,7 +151,7 @@ const StreamRuleModal = ({
                       ? (
                         <Field name="value">
                           {({ field: { name, value, onChange }, meta: { error, touched } }) => (
-                            <Input id="rule-value-input-select"
+                            <Input id="value"
                                    label="Value"
                                    error={(error && touched) ? error : undefined}>
                               <Select onChange={(newValue: string) => onChange({ target: { value: newValue, name } })}

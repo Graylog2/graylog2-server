@@ -19,11 +19,11 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import EntityShareModal from 'components/permissions/EntityShareModal';
-import { Link, LinkContainer } from 'components/common/router';
-import { Button, Tooltip, ButtonToolbar } from 'components/bootstrap';
-import { Icon, OverlayElement, ShareButton } from 'components/common';
+import { Link } from 'components/common/router';
+import { Tooltip, ButtonToolbar } from 'components/bootstrap';
+import { Icon, OverlayElement } from 'components/common';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
-import { isAnyPermitted, isPermitted } from 'util/PermissionsMixin';
+import { isPermitted } from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 import StreamsStore from 'stores/streams/StreamsStore';
@@ -31,7 +31,7 @@ import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import ObjectUtils from 'util/ObjectUtils';
 
 import StreamMetaData from './StreamMetaData';
-import StreamControls from './StreamControls';
+import StreamActions from './StreamActions';
 import StreamStateBadge from './StreamStateBadge';
 
 const StreamListItem = styled.li(({ theme }) => css`
@@ -63,10 +63,6 @@ const StreamListItem = styled.li(({ theme }) => css`
 const StreamTitle = styled.h2(({ theme }) => `
   font-family: ${theme.fonts.family.body};
 `);
-
-const ToggleButton = styled(Button)`
-  min-width: 8.8em;
-`;
 
 const _onDelete = (stream) => {
   // eslint-disable-next-line no-alert
@@ -112,7 +108,6 @@ class Stream extends React.Component {
     super(props);
 
     this.state = {
-      loading: false,
       showStreamRuleForm: false,
       showEntityShareModal: false,
     };
@@ -130,31 +125,6 @@ class Stream extends React.Component {
     this.setState({ showEntityShareModal: false });
   };
 
-  _openEntityShareModal = () => {
-    this.setState({ showEntityShareModal: true });
-  };
-
-  _onResume = () => {
-    const { stream } = this.props;
-
-    this.setState({ loading: true });
-
-    StreamsStore.resume(stream.id, (response) => response)
-      .finally(() => this.setState({ loading: false }));
-  };
-
-  _onPause = () => {
-    const { stream } = this.props;
-
-    // eslint-disable-next-line no-alert
-    if (window.confirm(`Do you really want to pause stream '${stream.title}'?`)) {
-      this.setState({ loading: true });
-
-      StreamsStore.pause(stream.id, (response) => response)
-        .finally(() => this.setState({ loading: false }));
-    }
-  };
-
   _onSaveStreamRule = (streamRuleId, streamRule) => {
     const { stream } = this.props;
 
@@ -163,70 +133,15 @@ class Stream extends React.Component {
 
   render() {
     const { indexSets, stream, permissions, streamRuleTypes, user } = this.props;
-    const { loading, showStreamRuleForm, showEntityShareModal } = this.state;
+    const { showStreamRuleForm, showEntityShareModal } = this.state;
 
     const isDefaultStream = stream.is_default;
     const isNotEditable = !stream.is_editable;
     const defaultStreamTooltip = isDefaultStream
       ? <Tooltip id="default-stream-tooltip">Action not available for the default stream</Tooltip> : null;
 
-    let editRulesLink;
-
-    if (isPermitted(permissions, [`streams:edit:${stream.id}`])) {
-      editRulesLink = (
-        <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream} className="overlay-trigger">
-          <LinkContainer disabled={isDefaultStream || isNotEditable} to={Routes.stream_edit(stream.id)}>
-            <Button>
-              <Icon name="stream" /> Manage Rules
-            </Button>
-          </LinkContainer>
-        </OverlayElement>
-      );
-    }
-
-    let toggleStreamLink;
-
-    if (isAnyPermitted(permissions, [`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`])) {
-      if (stream.disabled) {
-        toggleStreamLink = (
-          <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream} className="overlay-trigger">
-            <ToggleButton bsStyle="success"
-                          onClick={this._onResume}
-                          disabled={isDefaultStream || loading || isNotEditable}>
-              <Icon name="play" /> {loading ? 'Starting...' : 'Start Stream'}
-            </ToggleButton>
-          </OverlayElement>
-        );
-      } else {
-        toggleStreamLink = (
-          <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream} className="overlay-trigger">
-            <ToggleButton bsStyle="primary"
-                          onClick={this._onPause}
-                          disabled={isDefaultStream || loading || isNotEditable}>
-              <Icon name="pause" /> {loading ? 'Pausing...' : 'Pause Stream'}
-            </ToggleButton>
-          </OverlayElement>
-        );
-      }
-    }
-
     const createdFromContentPack = (stream.content_pack
       ? <Icon name="cube" title="Created from content pack" /> : null);
-
-    const streamControls = (
-      <OverlayElement overlay={defaultStreamTooltip} placement="top" className="overlay-trigger">
-        <StreamControls stream={stream}
-                        permissions={permissions}
-                        user={user}
-                        onDelete={_onDelete}
-                        onUpdate={_onUpdate}
-                        onClone={_onClone}
-                        onQuickAdd={this._openStreamRuleForm}
-                        indexSets={indexSets}
-                        isDefaultStream={isDefaultStream}
-                        disabled={isNotEditable} />
-      </OverlayElement>
-    );
 
     const indexSet = indexSets.find((is) => is.id === stream.index_set_id) || indexSets.find((is) => is.is_default);
     const indexSetDetails = isPermitted(permissions, ['indexsets:read']) && indexSet ? <span>index set <em>{indexSet.title}</em> &nbsp;</span> : null;
@@ -234,10 +149,19 @@ class Stream extends React.Component {
     return (
       <StreamListItem>
         <ButtonToolbar className="pull-right">
-          {toggleStreamLink}{' '}
-          {editRulesLink}{' '}
-          <ShareButton entityId={stream.id} entityType="stream" onClick={this._openEntityShareModal} />
-          {streamControls}
+          <OverlayElement overlay={defaultStreamTooltip} placement="top" className="overlay-trigger">
+            <StreamActions stream={stream}
+                           permissions={permissions}
+                           user={user}
+                           streamRuleTypes={streamRuleTypes}
+                           onDelete={_onDelete}
+                           onUpdate={_onUpdate}
+                           onClone={_onClone}
+                           onQuickAdd={this._openStreamRuleForm}
+                           indexSets={indexSets}
+                           isDefaultStream={isDefaultStream}
+                           disabled={isNotEditable} />
+          </OverlayElement>
         </ButtonToolbar>
 
         <StreamTitle>

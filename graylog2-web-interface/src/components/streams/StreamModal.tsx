@@ -23,7 +23,7 @@ import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { FormikInput, ModalSubmit, Select } from 'components/common';
 import { Modal, Input } from 'components/bootstrap';
 
-type FormValues = Partial<Stream> & { index_set_id?: string }
+type FormValues = Partial<Stream>;
 
 const prepareInitialValues = (initialValues: FormValues, indexSets: Array<IndexSet>) => {
   return {
@@ -98,8 +98,8 @@ const StreamModal = ({ initialValues, title: modalTitle, submitButtonText, submi
 
               <FormikInput label={<>Remove matches from &lsquo;Default Stream&rsquo;</>}
                            help={<span>Don&apos;t assign messages that match this stream to the &lsquo;Default Stream&rsquo;.</span>}
-                           name="description"
-                           id="description"
+                           name="remove_matches_from_default_stream"
+                           id="remove_matches_from_default_stream"
                            type="checkbox" />
 
             </Modal.Body>

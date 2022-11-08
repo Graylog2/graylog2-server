@@ -51,7 +51,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   }>({ streams: [], total: 0 });
   const { streams, total } = listData;
 
-  const isLoading = !(streams && streamRuleTypes);
+  const isLoading = !streams || !streamRuleTypes;
 
   const loadData = useCallback(() => {
     StreamsStore.searchPaginated(searchParams.page, searchParams.perPage, searchParams.query)
