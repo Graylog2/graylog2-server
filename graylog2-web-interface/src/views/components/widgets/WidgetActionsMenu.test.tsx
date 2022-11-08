@@ -42,14 +42,13 @@ import type { TitlesMap } from 'views/stores/TitleTypes';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { ViewStore } from 'views/stores/ViewStore';
 import MockAction from 'helpers/mocking/MockAction';
+import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
 
 import WidgetContext from '../contexts/WidgetContext';
 import type { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
-
-jest.mock('views/components/search/IfSearch', () => jest.fn(({ children }) => children));
 
 jest.mock('views/logic/views/CopyWidgetToDashboard', () => jest.fn());
 
@@ -260,7 +259,11 @@ describe('<WidgetActionsMenu />', () => {
     });
 
     const renderAndClick = async () => {
-      render(<DummyWidget />);
+      render((
+        <ViewTypeContext.Provider value={View.Type.Search}>
+          <DummyWidget />
+        </ViewTypeContext.Provider>
+      ));
 
       await openActionDropdown();
 
