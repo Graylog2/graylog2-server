@@ -41,8 +41,8 @@ public class MessageULIDGenerator {
         this.ulid = ulid;
 
         sequenceNrCache = Caffeine.newBuilder()
-                .maximumSize(100)
-                .initialCapacity(100)
+                .maximumSize(2000)
+                .initialCapacity(2000)
                 .build();
     }
 
