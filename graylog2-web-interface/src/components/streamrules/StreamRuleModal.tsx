@@ -14,264 +14,207 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
+import { Formik, Form, Field } from 'formik';
+import { useCallback, useMemo, useEffect } from 'react';
 
-import { Icon, TypeAheadFieldInput } from 'components/common';
-import { Col, Well, BootstrapModalForm, Input } from 'components/bootstrap';
-import { DocumentationLink } from 'components/support';
-import HumanReadableStreamRule from 'components/streamrules//HumanReadableStreamRule';
-import connect from 'stores/connect';
-import DocsHelper from 'util/DocsHelper';
 import Version from 'util/Version';
-import * as FormsUtils from 'util/FormsUtils';
-import type { Store } from 'stores/StoreTypes';
-import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
+import type { StreamRule, StreamRuleType } from 'stores/streams/StreamsStore';
+import { Icon, TypeAheadFieldInput, FormikInput, Select, ModalSubmit, InputOptionalInfo } from 'components/common';
+import HumanReadableStreamRule from 'components/streamrules//HumanReadableStreamRule';
+import { Col, Well, Input, Modal, Row } from 'components/bootstrap';
+import { DocumentationLink } from 'components/support';
+import DocsHelper from 'util/DocsHelper';
+import { useStore } from 'stores/connect';
+import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
 
-const formatStreamRuleType = (streamRuleType) => (
-  <option key={`streamRuleType${streamRuleType.id}`}
-          value={streamRuleType.id}>
-    {streamRuleType.short_desc}
-  </option>
-);
-
-const formatInputOptions = (input) => (
-  <option key={`input-${input.id}`} value={input.id}>
-    {input.title} ({input.name})
-  </option>
-);
-
-type StreamRule = {
-  type: number,
-  field: string,
-  value: string,
-  id?: string,
-  inverted: boolean,
-  description: string,
+const RULE_TYPES = {
+  FIELD_PRESENCE: 5,
+  ALWAYS_MATCHES: 7,
+  MATCH_INPUT: 8,
 };
 
-export type StreamRuleType = {
-  id: number,
-  short_desc: string,
-  long_desc: string,
-  name: string,
+type FormValues = Partial<StreamRule>
+
+const shouldDisplayValueInput = (type: number) => type !== RULE_TYPES.FIELD_PRESENCE && type !== RULE_TYPES.ALWAYS_MATCHES;
+const shouldDisplayFieldInput = (type: number) => type !== RULE_TYPES.ALWAYS_MATCHES && type !== RULE_TYPES.MATCH_INPUT;
+
+const validate = (values: FormValues) => {
+  let errors = {};
+
+  if (!values.type) {
+    errors = { ...errors, type: 'Type is required' };
+  }
+
+  if (shouldDisplayValueInput(values.type) && !values.value) {
+    errors = { ...errors, value: 'Value is required' };
+  }
+
+  if (shouldDisplayFieldInput(values.type) && !values.field) {
+    errors = { ...errors, field: 'Field is required' };
+  }
+
+  return errors;
 };
 
 type Props = {
-  onSubmit: (streamRuleId: string | undefined | null, currentStreamRule: StreamRule) => void,
-  streamRule?: StreamRule,
+  onSubmit: (streamRuleId: string | undefined | null, currentStreamRule: StreamRule) => Promise<void>,
+  initialValues?: Partial<StreamRule>,
   streamRuleTypes: Array<StreamRuleType>,
   title: string,
-  inputs?: Array<unknown>,
   onClose: () => void,
   submitButtonText: string
   submitLoadingText: string
 };
 
-type State = {
-  streamRule: StreamRule,
-  error: string,
-};
+const StreamRuleModal = ({
+  streamRuleTypes,
+  title,
+  onClose,
+  submitButtonText,
+  submitLoadingText,
+  onSubmit,
+  initialValues,
+}: Props) => {
+  const { inputs } = useStore(InputsStore);
 
-class StreamRuleForm extends React.Component<Props, State> {
-  // static defaultProps = {
-  //   // eslint-disable-next-line react/default-props-match-prop-types
-  //   streamRule: { field: '', type: 1, value: '', inverted: false, description: '' },
-  //   // eslint-disable-next-line react/default-props-match-prop-types
-  //   inputs: [],
-  //   onClose: () => {},
-  // };
-  //
-  // static propTypes = {
-  //   onSubmit: PropTypes.func.isRequired,
-  //   streamRuleTypes: PropTypes.array.isRequired,
-  //   title: PropTypes.string.isRequired,
-  //   onClose: PropTypes.func,
-  //   submitButtonText: PropTypes.string.isRequired,
-  //   submitLoadingText: PropTypes.string.isRequired,
-  // };
-
-  FIELD_PRESENCE_RULE_TYPE = 5;
-
-  ALWAYS_MATCH_RULE_TYPE = 7;
-
-  MATCH_INPUT = 8;
-
-  PLACEHOLDER_INPUT = 0;
-
-  // constructor(props) {
-  //   super(props);
-  //
-  //   this.state = {
-  //     streamRule: props.streamRule,
-  //     error: '',
-  //   };
-  // }
-
-  componentDidMount() {
+  useEffect(() => {
     InputsActions.list();
-  }
+  }, []);
 
-  _validateMatchInput = () => {
-    const { streamRule: { value } } = this.state;
+  const _onSubmit = useCallback((values) => {
+    onSubmit(initialValues?.id, values).then(() => onClose());
+  }, [onSubmit, initialValues?.id, onClose]);
 
-    if (String(value) === String(this.PLACEHOLDER_INPUT)) {
-      this.setState({ error: 'Please choose an input' });
+  const streamRuleTypesOptions = useMemo(() => streamRuleTypes.map(({ id, short_desc }) => ({
+    value: id,
+    label: short_desc,
+  })), [streamRuleTypes]);
 
-      return false;
-    }
+  const inputOptions = useMemo(() => inputs.map(({ id, title: inputTitle, name }) => ({ label: `${inputTitle} (${name})`, value: id })), [inputs]);
 
-    this.setState({ error: '' });
+  return (
+    <Modal title={title}
+           onHide={onClose}
+           show>
+      <Formik<FormValues> initialValues={initialValues} onSubmit={_onSubmit} validate={validate}>
+        {({ values, setFieldTouched, setFieldValue, isSubmitting, isValid }) => (
+          <Form>
+            <Modal.Header closeButton>
+              <Modal.Title>{title}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Row>
+                <Col md={8}>
+                  {shouldDisplayFieldInput(values.type) && (
+                    <Field name="field">
+                      {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
+                        <TypeAheadFieldInput id={name}
+                                             onBlur={onBlur}
+                                             type="text"
+                                             label="Field"
+                                             name={name}
+                                             error={(error && touched) ? error : undefined}
+                                             defaultValue={value}
+                                             onChange={onChange} />
+                      )}
+                    </Field>
+                  )}
 
-    return true;
-  };
+                  <Field name="type">
+                    {({ field: { name, value, onChange }, meta: { error, touched } }) => (
+                      <Input id="default-aws-region-select"
+                             label="Type"
+                             error={(error && touched) ? error : undefined}>
+                        <Select onBlur={() => setFieldTouched(name, true)}
+                                onChange={(newValue: number) => {
+                                  if (newValue === RULE_TYPES.MATCH_INPUT || newValue === RULE_TYPES.ALWAYS_MATCHES) {
+                                    setFieldValue('value', undefined);
+                                    setFieldValue('field', undefined);
+                                  }
 
-  _onSubmit = () => {
-    const { streamRule: currentStreamRule } = this.state;
-    const { type } = currentStreamRule;
-    const { streamRule, onSubmit } = this.props;
-    const { onClose } = this.props;
+                                  return onChange({
+                                    target: { value: newValue, name },
+                                  });
+                                }}
+                                options={streamRuleTypesOptions}
+                                inputId={name}
+                                placeholder="Select time of the day"
+                                inputProps={{ 'aria-label': 'Select time of the day' }}
+                                value={value} />
+                      </Input>
+                    )}
+                  </Field>
 
-    if (type === this.ALWAYS_MATCH_RULE_TYPE) {
-      currentStreamRule.field = '';
-      this.setState({ streamRule: currentStreamRule });
-    }
+                  {shouldDisplayValueInput(values.type) && (
+                    values.type === RULE_TYPES.MATCH_INPUT
+                      ? (
+                        <Field name="value">
+                          {({ field: { name, value, onChange }, meta: { error, touched } }) => (
+                            <Input id="rule-value-input-select"
+                                   label="Value"
+                                   error={(error && touched) ? error : undefined}>
+                              <Select onChange={(newValue: string) => onChange({ target: { value: newValue, name } })}
+                                      options={inputOptions}
+                                      inputId={name}
+                                      placeholder="Choose Input"
+                                      inputProps={{ 'aria-label': 'Choose Input' }}
+                                      value={value} />
+                            </Input>
+                          )}
+                        </Field>
+                      )
+                      : <FormikInput id="value" label="Value" name="value" />
+                  )}
 
-    if (type === this.FIELD_PRESENCE_RULE_TYPE || type === this.ALWAYS_MATCH_RULE_TYPE) {
-      currentStreamRule.value = '';
-      this.setState({ streamRule: currentStreamRule });
-    }
+                  <FormikInput id="inverted" label="Inverted" name="inverted" type="checkbox" />
+                  <FormikInput id="description" label={<>Description <InputOptionalInfo /></>} name="description" type="textarea" />
 
-    if (String(type) === String(this.MATCH_INPUT)) {
-      if (!this._validateMatchInput()) {
-        return;
-      }
-    }
+                  <p>
+                    <strong>Result:</strong>
+                    {' '}
+                    <HumanReadableStreamRule streamRule={values} streamRuleTypes={streamRuleTypes} inputs={inputs} />
+                  </p>
+                </Col>
+                <Col md={4}>
+                  <Well bsSize="small" className="matcher-github">
+                    The server will try to convert to strings or numbers based on the matcher type as well as it can.
 
-    onSubmit(streamRule.id, currentStreamRule);
-    onClose();
-  };
-
-  handleChange = (event) => {
-    const { streamRule } = this.state;
-    const updatedStreamRule = { ...streamRule };
-
-    updatedStreamRule[event.target.name] = FormsUtils.getValueFromInput(event.target);
-    //
-    // if (event.target.name === 'type' && String(updatedStreamRule.type) === String(this.MATCH_INPUT)) {
-    //   updatedStreamRule.value = String(this.PLACEHOLDER_INPUT);
-    // }
-
-    this.setState({ streamRule: updatedStreamRule });
-  };
-
-  valueBox = () => {
-    const { streamRule: { value, type }, error } = this.state;
-    const { inputs } = this.props;
-
-    switch (String(type)) {
-      case String(this.FIELD_PRESENCE_RULE_TYPE):
-      case String(this.ALWAYS_MATCH_RULE_TYPE):
-        return '';
-
-      case String(this.MATCH_INPUT): {
-        const bsStyle = error && error.length > 0 ? 'error' : undefined;
-
-        return (
-          <Input bsStyle={bsStyle}
-                 help={error}
-                 id="Value"
-                 type="select"
-                 required
-                 label="Value"
-                 name="value"
-                 value={value}
-                 data-testid="input-selection"
-                 onChange={this.handleChange}>
-            <option value={this.PLACEHOLDER_INPUT}>Choose Input</option>
-            {inputs.map(formatInputOptions)}
-          </Input>
-        );
-      }
-
-      default:
-        return <Input id="Value" type="text" required label="Value" name="value" value={value} onChange={this.handleChange} />;
-    }
-  };
-
-  fieldBox = () => {
-    const { streamRule: { field, type } } = this.state;
-
-    switch (String(type)) {
-      case String(this.ALWAYS_MATCH_RULE_TYPE):
-      case String(this.MATCH_INPUT):
-        return '';
-      default:
-        return <TypeAheadFieldInput id="field-input" type="text" required label="Field" name="field" defaultValue={field} onChange={this.handleChange} autoFocus />;
-    }
-  };
-
-  render() {
-    // const { streamRule } = this.state;
-    const { type, inverted, description } = streamRule;
-    const { streamRuleTypes: ruleTypes, title, onClose, inputs, submitButtonText, submitLoadingText } = this.props;
-
-    const streamRuleTypes = ruleTypes.map(formatStreamRuleType);
-    const fieldBox = this.fieldBox();
-    const valueBox = this.valueBox();
-
-    return (
-      <BootstrapModalForm title={title}
-                          show
-                          onCancel={onClose}
-                          onModalClose={onClose}
-                          onSubmitForm={this._onSubmit}
-                          submitButtonText={submitButtonText}
-                          submitLoadingText={submitLoadingText}
-                          formProps={{ id: 'StreamRuleForm' }}>
-        <div>
-          <Col md={8}>
-            {fieldBox}
-            <Input id="Type" data-testid="rule-type-selection" type="select" required label="Type" name="type" value={type} onChange={this.handleChange}>
-              {streamRuleTypes}
-            </Input>
-            {valueBox}
-            <Input id="Inverted" type="checkbox" label="Inverted" name="inverted" checked={inverted} onChange={this.handleChange} />
-
-            <Input id="Description" type="textarea" label="Description (optional)" name="description" value={description} onChange={this.handleChange} />
-
-            <p>
-              <strong>Result:</strong>
-              {' '}
-              <HumanReadableStreamRule streamRule={streamRule} streamRuleTypes={ruleTypes} inputs={inputs} />
-            </p>
-          </Col>
-          <Col md={4}>
-            <Well bsSize="small" className="matcher-github">
-              The server will try to convert to strings or numbers based on the matcher type as well as it can.
-
-              <br /><br />
-              <Icon name="github" type="brand" />&nbsp;
-              <a href={`https://github.com/Graylog2/graylog2-server/tree/${Version.getMajorAndMinorVersion()}/graylog2-server/src/main/java/org/graylog2/streams/matchers`}
-                 target="_blank"
-                 rel="noopener noreferrer"> Take a look at the matcher code on GitHub
-              </a>
-              <br /><br />
-              Regular expressions use Java syntax. <DocumentationLink page={DocsHelper.PAGES.STREAMS}
-                                                                      title="More information"
-                                                                      text={<Icon name="lightbulb" type="regular" />} />
-            </Well>
-          </Col>
-        </div>
-      </BootstrapModalForm>
-    );
-  }
-}
-
-type InputsStoreState = {
-  inputs: Array<unknown>;
+                    <br /><br />
+                    <Icon name="github" type="brand" />&nbsp;
+                    <a href={`https://github.com/Graylog2/graylog2-server/tree/${Version.getMajorAndMinorVersion()}/graylog2-server/src/main/java/org/graylog2/streams/matchers`}
+                       target="_blank"
+                       rel="noopener noreferrer"> Take a look at the matcher code on GitHub
+                    </a>
+                    <br /><br />
+                    Regular expressions use Java syntax. <DocumentationLink page={DocsHelper.PAGES.STREAMS}
+                                                                            title="More information"
+                                                                            text={(
+                                                                              <Icon name="lightbulb"
+                                                                                    type="regular" />
+                                                                            )} />
+                  </Well>
+                </Col>
+              </Row>
+            </Modal.Body>
+            <Modal.Footer>
+              <ModalSubmit submitButtonText={submitButtonText} submitLoadingText={submitLoadingText} onCancel={onClose} disabledSubmit={!isValid} isSubmitting={isSubmitting} />
+            </Modal.Footer>
+          </Form>
+        )}
+      </Formik>
+    </Modal>
+  );
 };
 
-export default connect(StreamRuleForm,
-  { inputs: InputsStore as Store<InputsStoreState> },
-  ({ inputs }) => ({ inputs: inputs.inputs }));
+StreamRuleModal.defaultProps = {
+  initialValues: {
+    field: '',
+    type: 1,
+    value: '',
+    inverted: false,
+    description: '',
+  },
+};
+
+export default StreamRuleModal;

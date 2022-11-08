@@ -36,10 +36,18 @@ export type Stream = {
   createdAt: number,
 };
 
-type StreamRule = {
+export type StreamRuleType = {
+  id: number,
+  short_desc: string,
+  long_desc: string,
+  name: string,
+};
+
+export type StreamRule = {
   id: string,
-  type: string,
+  type: number,
   value: string,
+  field: string,
   inverted: boolean,
   stream_id: string,
   description: string,
