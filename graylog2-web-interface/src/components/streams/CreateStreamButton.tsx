@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Button } from 'components/bootstrap';
-import StreamForm from 'components/streams/StreamForm';
+import StreamModal from 'components/streams/StreamModal';
 
 class CreateStreamButton extends React.Component {
   static propTypes = {
@@ -52,11 +52,11 @@ class CreateStreamButton extends React.Component {
                 onClick={this.onClick}>
           {buttonText}
         </Button>
-        <StreamForm ref={(streamForm) => { this.streamForm = streamForm; }}
-                    title="Create stream"
-                    submitButtonText="Create stream"
-                    indexSets={indexSets}
-                    onSubmit={onSave} />
+        <StreamModal ref={(streamForm) => { this.streamForm = streamForm; }}
+                     title="Create stream"
+                     submitButtonText="Create stream"
+                     indexSets={indexSets}
+                     onSubmit={onSave} />
       </span>
     );
   }
