@@ -75,7 +75,7 @@ type RulesActionsType = {
   loadFunctions: () => Promise<unknown>,
   loadMetricsConfig: () => Promise<unknown>,
   updateMetricsConfig: () => Promise<unknown>,
-  listPaginated: (pagination: Pagination) => Promise<unknown>,
+  listPaginated: (pagination: Pagination) => Promise<PaginatedRules>,
 };
 
 export const RulesActions = singletonActions(
@@ -164,12 +164,13 @@ export const RulesStore = singletonStore(
             perPage: response.per_page,
             query: response.query,
           },
-        }),
-        (error) => {
-          if (!error.additional || error.additional.status !== 404) {
-            UserNotification.error(`Loading rules list failed with status: ${error}`, 'Could not load rules.');
-          }
-        });
+        }));
+
+      promise.catch((error) => {
+        if (!error.additional || error.additional.status !== 404) {
+          UserNotification.error(`Loading rules list failed with status: ${error}`, 'Could not load rules.');
+        }
+      });
 
       RulesActions.listPaginated.promise(promise);
 
