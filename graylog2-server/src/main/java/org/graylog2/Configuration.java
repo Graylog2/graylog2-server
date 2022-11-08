@@ -207,9 +207,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "skip_preflight_checks")
     private boolean skipPreflightChecks = false;
 
-    @Parameter(value = "scripting_api_feature_preview")
-    private boolean scriptingApiFeaturePreview = false;
-
     @Parameter(value = "leader_election_mode", converter = LeaderElectionMode.Converter.class)
     private LeaderElectionMode leaderElectionMode = LeaderElectionMode.STATIC;
 
@@ -445,10 +442,6 @@ public class Configuration extends BaseConfiguration {
 
     public Duration getFailureHandlingShutdownAwait() {
         return failureHandlingShutdownAwait;
-    }
-
-    public boolean isScriptingApiFeaturePreviewTurnedOn() {
-        return scriptingApiFeaturePreview;
     }
 
     /**

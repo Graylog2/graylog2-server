@@ -73,6 +73,7 @@ import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.contentpacks.ContentPacksModule;
 import org.graylog2.database.entities.ScopedEntitiesModule;
 import org.graylog2.decorators.DecoratorBindings;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.indexer.IndexerBindings;
 import org.graylog2.indexer.retention.RetentionStrategyBindings;
 import org.graylog2.indexer.rotation.RotationStrategyBindings;
@@ -147,7 +148,7 @@ public class Server extends ServerBootstrap {
     }
 
     @Override
-    protected List<Module> getCommandBindings() {
+    protected List<Module> getCommandBindings(FeatureFlags featureFlags) {
         final ImmutableList.Builder<Module> modules = ImmutableList.builder();
         modules.add(
                 new VersionAwareStorageModule(),
@@ -187,11 +188,9 @@ public class Server extends ServerBootstrap {
                 new ClusterConfigValidatorModule(),
                 new MapWidgetModule(),
                 new SearchFiltersModule(),
-                new ScopedEntitiesModule()
+                new ScopedEntitiesModule(),
+                new ScriptingApiModule(featureFlags)
         );
-        if (configuration.isScriptingApiFeaturePreviewTurnedOn()) {
-            modules.add(new ScriptingApiModule());
-        }
         return modules.build();
     }
 

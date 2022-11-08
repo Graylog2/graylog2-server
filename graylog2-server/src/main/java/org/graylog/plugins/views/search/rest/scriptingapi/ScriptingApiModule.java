@@ -17,11 +17,20 @@
 package org.graylog.plugins.views.search.rest.scriptingapi;
 
 import org.graylog.plugins.views.ViewsModule;
+import org.graylog2.featureflag.FeatureFlags;
 
 public class ScriptingApiModule extends ViewsModule {
 
+    private final FeatureFlags featureFlags;
+
+    public ScriptingApiModule(final FeatureFlags featureFlags) {
+        this.featureFlags = featureFlags;
+    }
+
     @Override
     protected void configure() {
-        addSystemRestResource(ScriptingApiResource.class);
+        if (featureFlags.isOn("scripting_api_preview")) {
+            addSystemRestResource(ScriptingApiResource.class);
+        }
     }
 }
