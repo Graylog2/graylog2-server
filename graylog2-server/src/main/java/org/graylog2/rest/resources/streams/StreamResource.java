@@ -47,6 +47,10 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
+import org.graylog2.rest.resources.entities.EntityAttribute;
+import org.graylog2.rest.resources.entities.EntitySettings;
+import org.graylog2.rest.resources.entities.FilterOption;
+import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.streams.requests.CloneStreamRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.rest.resources.streams.responses.StreamListResponse;
@@ -111,13 +115,28 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Api(value = "Streams", description = "Manage streams", tags = {CLOUD_VISIBLE})
 @Path("/streams")
 public class StreamResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(StreamResource.class);
+    private static final List<EntityAttribute> attributes = List.of(
+            EntityAttribute.builder().id("title").title("Title").build(),
+            EntityAttribute.builder().id("description").title("Description").build(),
+            EntityAttribute.builder().id("created_at").title("Created").type("date").build(),
+            EntityAttribute.builder().id("status").title("Status").type("boolean").filterable(true).filterOptions(Set.of(
+                    FilterOption.create("paused", "Paused"),
+                    FilterOption.create("running", "Running")
+            )).build()
+    );
 
-    protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put("id", SearchQueryField.create(StreamDTO.FIELD_ID, SearchQueryField.Type.OBJECT_ID))
-            .put(StreamDTO.FIELD_TITLE, SearchQueryField.create(StreamDTO.FIELD_TITLE))
-            .put(StreamDTO.FIELD_DESCRIPTION, SearchQueryField.create(StreamDTO.FIELD_DESCRIPTION))
+    private static final EntitySettings settings = EntitySettings.builder()
+            .attributes(List.of("title", "description", "status"))
+            .sort(Sorting.create("title", Sorting.Direction.ASC))
             .build();
+
+    protected static final Map<String, SearchQueryField> SEARCH_FIELD_MAPPING = Map.of(
+            "id", SearchQueryField.create(StreamDTO.FIELD_ID, SearchQueryField.Type.OBJECT_ID),
+            StreamDTO.FIELD_TITLE, SearchQueryField.create(StreamDTO.FIELD_TITLE),
+            StreamDTO.FIELD_DESCRIPTION, SearchQueryField.create(StreamDTO.FIELD_DESCRIPTION),
+            StreamDTO.FIELD_CREATED_AT, SearchQueryField.create(StreamDTO.FIELD_CREATED_AT),
+            "status", SearchQueryField.create(StreamDTO.FIELD_DISABLED)
+    );
 
     private final PaginatedStreamService paginatedStreamService;
     private final StreamService streamService;
@@ -184,7 +203,7 @@ public class StreamResource extends RestResource {
         @ApiParam(name = "sort",
                 value = "The field to sort the result on",
                 required = true,
-                allowableValues = "title,description")
+                allowableValues = "title,description,created_at,updated_at,status")
         @DefaultValue(StreamImpl.FIELD_TITLE) @QueryParam("sort") String sort,
         @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
         @DefaultValue("asc") @QueryParam("order") String order) {
@@ -198,7 +217,7 @@ public class StreamResource extends RestResource {
         final Predicate<StreamDTO> permissionFilter = streamDTO -> isPermitted(RestPermissions.STREAMS_READ, streamDTO.id());
         final PaginatedList<StreamDTO> result = paginatedStreamService
                 .findPaginated(searchQuery, permissionFilter, page, perPage, sort, order);
-        final List<String> streamIds = result.stream().map(streamDTO -> streamDTO.id()).collect(Collectors.toList());
+        final List<String> streamIds = result.stream().map(StreamDTO::id).collect(Collectors.toList());
         final Map<String, List<StreamRule>> streamRuleMap = streamRuleService.loadForStreamIds(streamIds);
         final List<StreamDTO> streams = result.stream().map(streamDTO -> {
             List<StreamRule> rules = streamRuleMap.getOrDefault(streamDTO.id(), Collections.emptyList());
@@ -207,7 +226,7 @@ public class StreamResource extends RestResource {
         final long total = paginatedStreamService.count();
         final PaginatedList<StreamDTO> streamDTOS = new PaginatedList<>(streams,
                 result.pagination().total(), result.pagination().page(), result.pagination().perPage());
-        return StreamPageListResponse.create(query, streamDTOS.pagination(), total, sort, order, streams);
+        return StreamPageListResponse.create(query, streamDTOS.pagination(), total, sort, order, streams, attributes, settings);
     }
 
     @GET
@@ -216,13 +235,10 @@ public class StreamResource extends RestResource {
     @Deprecated
     @Produces(MediaType.APPLICATION_JSON)
     public StreamListResponse get() {
-        final List<Stream> allStreams = streamService.loadAll();
-        final List<Stream> streams = new ArrayList<>(allStreams.size());
-        for (Stream stream : allStreams) {
-            if (isPermitted(RestPermissions.STREAMS_READ, stream.getId())) {
-                streams.add(stream);
-            }
-        }
+        final List<Stream> streams = streamService.loadAll()
+                .stream()
+                .filter(stream -> isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
+                .collect(Collectors.toList());
 
         return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
     }
@@ -233,13 +249,10 @@ public class StreamResource extends RestResource {
     @ApiOperation(value = "Get a list of all enabled streams")
     @Produces(MediaType.APPLICATION_JSON)
     public StreamListResponse getEnabled() throws NotFoundException {
-        final List<Stream> enabledStreams = streamService.loadAllEnabled();
-        final List<Stream> streams = new ArrayList<>(enabledStreams.size());
-        for (Stream stream : enabledStreams) {
-            if (isPermitted(RestPermissions.STREAMS_READ, stream.getId())) {
-                streams.add(stream);
-            }
-        }
+        final List<Stream> streams = streamService.loadAllEnabled()
+                .stream()
+                .filter(stream -> isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
+                .collect(Collectors.toList());
 
         return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
     }
@@ -308,13 +321,13 @@ public class StreamResource extends RestResource {
             stream.setIndexSetId(cr.indexSetId());
         }
 
-        final Optional<IndexSet> indexSet = indexSetRegistry.get(stream.getIndexSetId());
+        final IndexSet indexSet = indexSetRegistry.get(stream.getIndexSetId())
+                .orElseThrow(() -> new BadRequestException("Index set with ID <" + stream.getIndexSetId() + "> does not exist!"));
 
-        if (!indexSet.isPresent()) {
-            throw new BadRequestException("Index set with ID <" + stream.getIndexSetId() + "> does not exist!");
-        } else if (!indexSet.get().getConfig().isWritable()) {
+        if (!indexSet.getConfig().isWritable()) {
             throw new BadRequestException("Assigned index set must be writable!");
-        } else if (!indexSet.get().getConfig().isRegularIndex()) {
+        }
+        if (!indexSet.getConfig().isRegularIndex()) {
             throw new BadRequestException("Assigned index set is not usable");
         }
 
