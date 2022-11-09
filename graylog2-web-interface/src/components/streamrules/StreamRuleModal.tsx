@@ -27,17 +27,13 @@ import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import { useStore } from 'stores/connect';
 import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
+import STREAM_RULE_TYPES from 'logic/streams/streamRuleTypes';
 
-const RULE_TYPES = {
-  FIELD_PRESENCE: 5,
-  ALWAYS_MATCHES: 7,
-  MATCH_INPUT: 8,
-};
 
 type FormValues = Partial<StreamRule>
 
-const shouldDisplayValueInput = (type: number) => type !== RULE_TYPES.FIELD_PRESENCE && type !== RULE_TYPES.ALWAYS_MATCHES;
-const shouldDisplayFieldInput = (type: number) => type !== RULE_TYPES.ALWAYS_MATCHES && type !== RULE_TYPES.MATCH_INPUT;
+const shouldDisplayValueInput = (type: number) => type !== STREAM_RULE_TYPES.FIELD_PRESENCE && type !== STREAM_RULE_TYPES.ALWAYS_MATCHES;
+const shouldDisplayFieldInput = (type: number) => type !== STREAM_RULE_TYPES.ALWAYS_MATCHES && type !== STREAM_RULE_TYPES.MATCH_INPUT;
 
 const validate = (values: FormValues) => {
   let errors = {};
@@ -128,7 +124,7 @@ const StreamRuleModal = ({
                              error={(error && touched) ? error : undefined}>
                         <Select onBlur={() => setFieldTouched(name, true)}
                                 onChange={(newValue: number) => {
-                                  if (newValue === RULE_TYPES.MATCH_INPUT || newValue === RULE_TYPES.ALWAYS_MATCHES) {
+                                  if (newValue === STREAM_RULE_TYPES.MATCH_INPUT || newValue === STREAM_RULE_TYPES.ALWAYS_MATCHES) {
                                     setFieldValue('value', undefined);
                                     setFieldValue('field', undefined);
                                   }
@@ -147,7 +143,7 @@ const StreamRuleModal = ({
                   </Field>
 
                   {shouldDisplayValueInput(values.type) && (
-                    values.type === RULE_TYPES.MATCH_INPUT
+                    values.type === STREAM_RULE_TYPES.MATCH_INPUT
                       ? (
                         <Field name="value">
                           {({ field: { name, value, onChange }, meta: { error, touched } }) => (

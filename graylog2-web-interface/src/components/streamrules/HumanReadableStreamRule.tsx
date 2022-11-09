@@ -17,84 +17,69 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-class HumanReadableStreamRule extends React.Component {
-  EMPTY_TAG = '<empty>';
+import type { Input } from 'components/messageloaders/Types';
+import type { StreamRule, StreamRuleType } from 'stores/streams/StreamsStore';
+import STREAM_RULE_TYPES from 'logic/streams/streamRuleTypes';
 
-  FIELD_PRESENCE_RULE_TYPE = 5;
+const EMPTY_TAG = '<empty>';
 
-  ALWAYS_MATCH_RULE_TYPE = 7;
+const formatRuleValue = (inputs: Array<Input>, streamRule: StreamRule) => {
+  if (streamRule.type === STREAM_RULE_TYPES.MATCH_INPUT) {
+    const input = inputs.find(({ id }) => id === streamRule.value);
 
-  MATCH_INPUT = 8;
-
-  _getTypeForInteger = (type, streamRuleTypes) => {
-    if (streamRuleTypes) {
-      return streamRuleTypes.filter((streamRuleType) => {
-        return String(streamRuleType.id) === String(type);
-      })[0];
+    if (input) {
+      return `${input.title} (${input.name}: ${input.id})`;
     }
 
-    return undefined;
-  };
+    return `<deleted input>: ${streamRule.value})`;
+  }
 
-  _findInput = (inputId) => {
-    const { inputs } = this.props;
-
-    return inputs.find((input) => input.id === inputId);
-  };
-
-  _formatRuleValue = (streamRule) => {
-    if (String(streamRule.type) === String(this.MATCH_INPUT)) {
-      const input = this._findInput(streamRule.value);
-
-      if (input) {
-        return `${input.title} (${input.name}: ${input.id})`;
-      }
-
-      return `<deleted input>: ${streamRule.value})`;
+  if (streamRule.type !== STREAM_RULE_TYPES.FIELD_PRESENCE) {
+    if (streamRule.value) {
+      return streamRule.value;
     }
 
-    if (String(streamRule.type) !== String(this.FIELD_PRESENCE_RULE_TYPE)) {
-      if (streamRule.value) {
-        return streamRule.value;
-      }
+    return EMPTY_TAG;
+  }
 
-      return this.EMPTY_TAG;
-    }
+  return null;
+};
 
-    return null;
-  };
+const formatRuleField = (streamRule: StreamRule) => {
+  if (streamRule.field) {
+    return streamRule.field;
+  }
 
-  _formatRuleField = (streamRule) => {
-    if (streamRule.field) {
-      return streamRule.field;
-    }
+  if (streamRule.type === STREAM_RULE_TYPES.MATCH_INPUT) {
+    return 'gl_source_input';
+  }
 
-    if (String(streamRule.type) === String(this.MATCH_INPUT)) {
-      return 'gl_source_input';
-    }
+  return EMPTY_TAG;
+};
 
-    return this.EMPTY_TAG;
-  };
+type Props = {
+  streamRule: StreamRule,
+  streamRuleTypes: Array<StreamRuleType>,
+  inputs: Array<Input>,
+}
 
-  render() {
-    const { streamRule, streamRuleTypes } = this.props;
-    const streamRuleType = this._getTypeForInteger(streamRule.type, streamRuleTypes);
-    const negation = (streamRule.inverted ? 'not ' : null);
-    const longDesc = (streamRuleType ? streamRuleType.long_desc : null);
+const HumanReadableStreamRule = ({ streamRule, streamRuleTypes, inputs }: Props) => {
+  const streamRuleType = streamRuleTypes.find(({ id }) => id === streamRule.type);
+  const negation = (streamRule.inverted ? 'not ' : null);
+  const longDesc = (streamRuleType ? streamRuleType.long_desc : null);
 
-    if (String(streamRule.type) === String(this.ALWAYS_MATCH_RULE_TYPE)) {
-      return (
-        <span>Rule always matches</span>
-      );
-    }
-
+  if (streamRule.type === STREAM_RULE_TYPES.ALWAYS_MATCHES) {
     return (
-      <span>
-        <em>{this._formatRuleField(streamRule)}</em> <strong>must {negation}</strong>{longDesc} <em>{this._formatRuleValue(streamRule)}</em>
-      </span>
+      <span>Rule always matches</span>
     );
   }
-}
+
+  return (
+    <span>
+      <em>{formatRuleField(streamRule)}</em> <strong>must {negation}</strong>{longDesc} <em>{formatRuleValue(inputs, streamRule)}</em>
+    </span>
+  );
+};
 
 HumanReadableStreamRule.propTypes = {
   streamRule: PropTypes.object.isRequired,
