@@ -24,12 +24,20 @@ import QueryHelper from 'components/common/QueryHelper';
 import type { Stream } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
-import useCurrentUser from 'hooks/useCurrentUser';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import ConfigurableDataTable from 'components/common/ConfigurableDataTable';
+import StreamActions from 'components/streams/StreamActions';
 
-import StreamList from './StreamList';
 import CreateStreamButton from './CreateStreamButton';
+
+const AVAILABLE_ATTRIBUTES = [
+  { id: 'title', title: 'Title' },
+  { id: 'description', title: 'Description' },
+  { id: 'disabled', title: 'Status' },
+];
+
+const VISIBLE_ATTRIBUTES = ['title', 'description', 'disabled'];
 
 type Props = {
   onStreamCreate: (stream: Stream) => Promise<void>,
@@ -37,7 +45,6 @@ type Props = {
 }
 
 const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
-  const currentUser = useCurrentUser();
   const paginationQueryParameter = usePaginationQueryParameter();
   const [searchParams, setSearchParams] = useState({
     page: paginationQueryParameter.page,
@@ -102,6 +109,8 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
     );
   }
 
+  const renderStreamActions = (listItem: Stream) => <StreamActions stream={listItem} indexSets={indexSets} streamRuleTypes={streamRuleTypes} />;
+
   return (
     <PaginatedList onChange={onPageChange}
                    totalItems={total}>
@@ -126,11 +135,10 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
             </Alert>
           )
           : (
-            <StreamList streams={streams}
-                        streamRuleTypes={streamRuleTypes}
-                        permissions={currentUser.permissions}
-                        user={currentUser}
-                        indexSets={indexSets} />
+            <ConfigurableDataTable rows={streams}
+                                   attributes={VISIBLE_ATTRIBUTES}
+                                   rowActionsRenderer={renderStreamActions}
+                                   availableAttributes={AVAILABLE_ATTRIBUTES} />
           )}
       </div>
     </PaginatedList>

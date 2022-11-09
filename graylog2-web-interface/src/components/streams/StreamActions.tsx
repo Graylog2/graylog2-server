@@ -120,9 +120,13 @@ const StreamActions = ({
 
   return (
     <ButtonToolbar className="pull-right">
-      <ShareButton entityId={stream.id} entityType="stream" onClick={toggleEntityShareModal} />
+      <ShareButton entityId={stream.id}
+                   entityType="stream"
+                   onClick={toggleEntityShareModal}
+                   bsSize="xsmall" />
       <DropdownButton title="More Actions"
                       pullRight
+                      bsSize="xsmall"
                       id={`more-actions-dropdown-${stream.id}`}
                       disabled={isNotEditable}>
         <IfPermitted permissions={[`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`]} anyPermissions>
