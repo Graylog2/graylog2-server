@@ -24,50 +24,71 @@ type Attribute = {
   type?: boolean,
 };
 
+type CustomHeaders = { [key: string]: (attribute: Attribute) => React.ReactNode }
+
+const TableHead = ({
+  selectedAttributes,
+  customHeaders,
+  displayActionsCol,
+}: {
+  selectedAttributes: Array<Attribute>,
+  customHeaders: CustomHeaders,
+  displayActionsCol: boolean
+}) => (
+  <thead>
+    <tr>
+      {selectedAttributes.map((attribute) => {
+        const headerKey = attribute.title;
+
+        return (
+          customHeaders?.[attribute.id]
+            ? customHeaders[attribute.id](attribute)
+            : <th key={headerKey}>{attribute.title}</th>
+        );
+      })}
+      {displayActionsCol ? <th className="text-right">Actions</th> : null}
+    </tr>
+  </thead>
+);
+
 type Props<ListItem extends { id: string }> = {
   rows: Array<ListItem>,
-  rowActionsRenderer?: (listItem: ListItem) => React.ReactNode,
-  cellRenderer?: (listItem: ListItem, attribute: Attribute, defaulConfigurableDataTabletRenderer: (listItem: ListItem, attribute: Attribute) => React.ReactNode) => React.ReactNode,
-  headerRenderer?: (attribute: Attribute, defaultRenderer: (attribute: Attribute) => React.ReactNode) => React.ReactNode,
+  rowActions?: (listItem: ListItem) => React.ReactNode,
+  customCells?: { [key: string]: (listItem: ListItem, attribute: Attribute, key: string) => React.ReactNode }
+  customHeaders?: CustomHeaders,
   attributes: Array<string>,
   availableAttributes: Array<Attribute>,
-}
-
-// eslint-disable-next-line react/jsx-no-useless-fragment
-const defaultHeaderRenderer = (attribute: Attribute) => <th key={attribute.title}>{attribute.title}</th>;
-// eslint-disable-next-line react/jsx-no-useless-fragment
-const defaultCellRenderer = <ListItem extends { id: string }>(listItem: ListItem, attribute: Attribute) => <td key={`${listItem.id}-${attribute.id}`}>{listItem[attribute.id]}</td>;
+};
 
 const ConfigurableDataTable = <ListItem extends { id: string }>({
   rows,
-  headerRenderer,
-  cellRenderer,
+  customHeaders,
+  customCells,
   attributes,
   availableAttributes,
-  rowActionsRenderer,
+  rowActions,
 }: Props<ListItem>) => {
   const selectedAttributes = attributes.map((attributeId) => availableAttributes.find(({ id }) => id === attributeId));
+  const displayActionsCol = typeof rowActions === 'function';
 
   return (
     <Table striped condensed hover>
-      <thead>
-        <tr>
-          {selectedAttributes.map((attribute) => (
-            typeof headerRenderer === 'function'
-              ? headerRenderer(attribute, defaultHeaderRenderer)
-              : defaultHeaderRenderer(attribute)))}
-          {typeof rowActionsRenderer === 'function' ? <th className="text-right">Actions</th> : null}
-        </tr>
-      </thead>
+      <TableHead selectedAttributes={selectedAttributes}
+                 customHeaders={customHeaders}
+                 displayActionsCol={displayActionsCol} />
       <tbody>
         {rows.map((listItem) => (
           <tr key={listItem.id}>
-            {selectedAttributes.map((attribute) => (
-              typeof cellRenderer === 'function'
-                ? cellRenderer(listItem, attribute, defaultCellRenderer)
-                : defaultCellRenderer(listItem, attribute)
-            ))}
-            {typeof rowActionsRenderer === 'function' ? <td className="text-right">{rowActionsRenderer(listItem)}</td> : null}
+            {selectedAttributes.map((attribute) => {
+              const cellKey = `${listItem.id}-${attribute.id}`;
+
+              return (
+                customCells?.[attribute.id]
+                  ? customCells[attribute.id](listItem, attribute, cellKey)
+                  : <td key={cellKey}>{listItem[attribute.id]}</td>
+              );
+            })}
+            {displayActionsCol ? <td className="text-right">{rowActions(listItem)}</td> : null}
           </tr>
         ))}
       </tbody>
@@ -76,9 +97,9 @@ const ConfigurableDataTable = <ListItem extends { id: string }>({
 };
 
 ConfigurableDataTable.defaultProps = {
-  cellRenderer: undefined,
-  headerRenderer: undefined,
-  rowActionsRenderer: undefined,
+  customCells: undefined,
+  customHeaders: undefined,
+  rowActions: undefined,
 };
 
 export default ConfigurableDataTable;

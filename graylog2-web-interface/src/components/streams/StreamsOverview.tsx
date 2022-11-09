@@ -137,7 +137,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
           : (
             <ConfigurableDataTable rows={streams}
                                    attributes={VISIBLE_ATTRIBUTES}
-                                   rowActionsRenderer={renderStreamActions}
+                                   rowActions={renderStreamActions}
                                    availableAttributes={AVAILABLE_ATTRIBUTES} />
           )}
       </div>
