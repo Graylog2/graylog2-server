@@ -38,7 +38,7 @@ public abstract class InternalLogMessage {
     public abstract String message();
 
     @JsonProperty("class_name")
-    @NotEmpty
+    @Nullable
     public abstract String className();
 
     @JsonProperty
@@ -67,7 +67,7 @@ public abstract class InternalLogMessage {
 
     @JsonCreator
     public static InternalLogMessage create(@JsonProperty("message") @NotEmpty String message,
-                                            @JsonProperty("class_name") @NotEmpty String className,
+                                            @JsonProperty("class_name") @Nullable String className,
                                             @JsonProperty("level") @NotEmpty String level,
                                             @JsonProperty("marker") @Nullable String marker,
                                             @JsonProperty("timestamp") @NotNull DateTime timestamp,
