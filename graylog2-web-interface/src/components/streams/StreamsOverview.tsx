@@ -80,7 +80,10 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
     };
   }, [loadData]);
 
-  const onPageChange = useCallback((newPage: number, newPerPage: number) => setSearchParams((cur) => ({ ...cur, page: newPage, perPage: newPerPage })), []);
+  const onPageChange = useCallback(
+    (newPage: number, newPerPage: number) => setSearchParams((cur) => ({ ...cur, page: newPage, perPage: newPerPage })),
+    [],
+  );
 
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
