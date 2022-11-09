@@ -26,6 +26,7 @@ import MessageProcessorsConfig from 'components/configurations/MessageProcessors
 import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
 import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
+import HideOnCloud from 'util/conditional/HideOnCloud';
 import IndexSetsDefaultsConfig from 'components/configurations/IndexSetsDefaultsConfig';
 import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import 'components/maps/configurations';
@@ -148,10 +149,12 @@ const ConfigurationsPage = () => {
           </ConfigletContainer>
         )}
         {indexSetsDefaultsConfig && (
-          <ConfigletContainer title="Index Set Default Configuration">
-            <IndexSetsDefaultsConfig config={indexSetsDefaultsConfig}
-                                     updateConfig={_onUpdate(INDEX_SETS_DEFAULTS_CONFIG)} />
-          </ConfigletContainer>
+          <HideOnCloud>
+            <ConfigletContainer title="Index Set Default Configuration">
+              <IndexSetsDefaultsConfig config={indexSetsDefaultsConfig}
+                                       updateConfig={_onUpdate(INDEX_SETS_DEFAULTS_CONFIG)} />
+            </ConfigletContainer>
+          </HideOnCloud>
         )}
       </>
     );
