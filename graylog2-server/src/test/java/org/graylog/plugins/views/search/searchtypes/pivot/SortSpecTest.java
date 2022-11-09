@@ -26,6 +26,13 @@ class SortSpecTest {
     @Test
     void directionDeserialize() {
         Assertions.assertThat(SortSpec.Direction.deserialize(null)).isNull();
+        Assertions.assertThat(SortSpec.Direction.deserialize("")).isNull();
+        Assertions.assertThat(SortSpec.Direction.deserialize("  ")).isNull();
+
+        Assertions.assertThatThrownBy(() -> SortSpec.Direction.deserialize("blah"))
+                        .isInstanceOf(IllegalArgumentException.class)
+                        .hasMessageContaining("Failed to parse sort direction");
+
         Assertions.assertThat(SortSpec.Direction.deserialize("asc")).isEqualTo(SortSpec.Direction.Ascending);
         Assertions.assertThat(SortSpec.Direction.deserialize("ascending")).isEqualTo(SortSpec.Direction.Ascending);
         Assertions.assertThat(SortSpec.Direction.deserialize("Ascending")).isEqualTo(SortSpec.Direction.Ascending);

@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.searchtypes.pivot;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Locale;
 
@@ -34,13 +35,14 @@ public interface SortSpec {
 
         @JsonCreator
         public static Direction deserialize(String value) {
-            if (value == null) {
+            if (value == null || StringUtils.isBlank(value)) {
                 return null;
             }
+
             return switch (value.trim().toLowerCase(Locale.ROOT)) {
                 case "descending", "desc" -> Descending;
                 case "ascending", "asc" -> Ascending;
-                default -> Descending;
+                default -> throw new IllegalArgumentException("Failed to parse sort direction:" + value);
             };
         }
     }
