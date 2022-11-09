@@ -110,18 +110,18 @@ const StreamRuleModal = ({
               <Row>
                 <Col md={8}>
                   {shouldDisplayFieldInput(values.type) && (
-                    <Field name="field">
-                      {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
-                        <TypeAheadFieldInput id={name}
-                                             onBlur={onBlur}
-                                             type="text"
-                                             label="Field"
-                                             name={name}
-                                             error={(error && touched) ? error : undefined}
-                                             defaultValue={value}
-                                             onChange={onChange} />
-                      )}
-                    </Field>
+                  <Field name="field">
+                    {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
+                      <TypeAheadFieldInput id={name}
+                                           onBlur={onBlur}
+                                           type="text"
+                                           label="Field"
+                                           name={name}
+                                           error={(error && touched) ? error : undefined}
+                                           defaultValue={value}
+                                           onChange={onChange} />
+                    )}
+                  </Field>
                   )}
 
                   <Field name="type">
