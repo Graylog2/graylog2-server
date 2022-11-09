@@ -98,13 +98,15 @@ public class MessageULIDGenerator {
         final long msbWithZeroedRandom = timestamp << 16;
         long messageSequenceNr = sequenceNr - subtrahend + OFFSET_GAP;
 
-        // If the sequenceNr counter in a MessageInput wraps while we're processing the same timestamp
-        // the messageSequenceNr can become negative. We handle this by updating the sequenceNrCache and
-        // setting the messageSequenceNr accordingly.
+        // If our multithreaded message processing reorders the messages by more than OFFSET_GAP,
+        // the messageSequenceNr can become negative.
+        // This can also happen if the sequenceNr counter in a MessageInput wraps.
+        // We handle this by updating the sequenceNrCache and setting the messageSequenceNr accordingly.
         if (messageSequenceNr < 0) {
-            LOG.warn("Message sequence number wrapped ({} -> {}). Sort order might be wrong.", subtrahend, sequenceNr);
+            LOG.warn("Got negative message sequence number ({} -> {}). Sort order might be wrong.", subtrahend, sequenceNr);
             messageSequenceNr = OFFSET_GAP;
             sequenceNrCache.put(key, sequenceNr);
+        // If we receive more than 64535 messages with the same timestamp and input, they will exhaust the 16 bit of space in the ULID.
         } else if (messageSequenceNr >= RANDOM_MSB_MASK) {
             LOG.warn("Message sequence number <{}> input <{}> timestamp <{}> does not fit into ULID ({} >= 65535). Sort order might be wrong.",
                     sequenceNr, inputId, timestamp, messageSequenceNr);
