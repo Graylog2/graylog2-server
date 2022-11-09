@@ -84,21 +84,21 @@ describe('StreamRuleModal', () => {
   });
 
   it('should require selected input when type is `match input`', async () => {
-    const submit = jest.fn();
+    const submit = jest.fn(() => Promise.resolve());
 
     render(
       <SUT onSubmit={submit}
            initialValues={getStreamRule()} />,
     );
 
-    const ruleTypeSelect = await screen.findByLabelText('Type');
-    selectEvent.openMenu(ruleTypeSelect);
-    await selectEvent.select(ruleTypeSelect, 'match input');
-
     const submitBtn = await screen.findByRole('button', {
       name: /update rule/i,
       hidden: true,
     });
+
+    const ruleTypeSelect = await screen.findByLabelText('Type');
+    selectEvent.openMenu(ruleTypeSelect);
+    await selectEvent.select(ruleTypeSelect, 'match input');
 
     userEvent.click(submitBtn);
 
@@ -107,9 +107,25 @@ describe('StreamRuleModal', () => {
     const inputSelect = await screen.findByLabelText('Input');
     selectEvent.openMenu(inputSelect);
     await selectEvent.select(inputSelect, 'input title (name)');
-    await waitFor(() => expect(screen.queryByText('Value is required')).not.toBeInTheDocument());
+
+    // We are also changing the description to trigger the validation again, to avoid a bug which occurs only when testing.
+    const descriptionInput = await screen.findByRole('textbox', {
+      name: /description/i,
+      hidden: true,
+    });
+    userEvent.type(descriptionInput, ' and an extended description');
+
+    await waitFor(() => expect(submitBtn).toBeEnabled());
     userEvent.click(submitBtn);
 
     await waitFor(() => expect(submit).toHaveBeenCalledTimes(1));
+
+    expect(submit).toHaveBeenCalledWith('dead-beef', {
+      description: 'description and an extended description',
+      id: 'dead-beef',
+      inverted: false,
+      type: 8,
+      value: 'my-id',
+    });
   });
 });
