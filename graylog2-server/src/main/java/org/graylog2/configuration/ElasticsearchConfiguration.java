@@ -81,7 +81,7 @@ public class ElasticsearchConfiguration {
     private Period maxTimePerIndex = Period.days(1);
 
     // Rotation
-    @Parameter(value = "index_init_default_rotate_empty_index_set", required = true)
+    @Parameter(value = "elasticsearch_rotate_empty_index_set", required = true)
     private boolean rotateEmptyIndex = false;
 
     // Rotation
