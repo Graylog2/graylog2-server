@@ -47,12 +47,12 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
@@ -86,11 +86,11 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     @Path("aggregate")
     @NoAuditEvent("Creating audit event manually in method body.")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response executeQuery(@ApiParam(name = "searchRequestSpec") @Valid SearchRequestSpec searchRequestSpec,
-                                 @Context SearchUser searchUser) {
+    public TabularResponse executeQuery(@ApiParam(name = "searchRequestSpec") @Valid SearchRequestSpec searchRequestSpec,
+                                        @Context SearchUser searchUser) {
 
         //Step 1: map simple request to more complex search
-        Search search = searchCreator.apply(searchRequestSpec);
+        Search search = searchCreator.mapToSearch(searchRequestSpec, searchUser);
 
         //Step 2: execute search as we usually do
         final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
@@ -102,14 +102,12 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
         if (queryResult != null) {
             final SearchType.Result aggregationResult = queryResult.searchTypes().get(AggregationSpecToPivotMapper.PIVOT_ID);
             if (aggregationResult instanceof PivotResult pivotResult) {
-                final TabularResponse tabularResponse = responseCreator.mapToResponse(searchRequestSpec, pivotResult);
-                return Response.ok(tabularResponse).build();
+                return responseCreator.mapToResponse(searchRequestSpec, pivotResult);
             }
         }
 
         LOG.warn("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
-        return Response.status(Response.Status.NOT_FOUND)
-                .build();
+        throw new NotFoundException("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
     }
 
     private void postAuditEvent(SearchJob searchJob) {

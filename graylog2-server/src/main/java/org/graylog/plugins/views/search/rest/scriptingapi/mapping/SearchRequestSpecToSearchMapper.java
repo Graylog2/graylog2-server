@@ -20,16 +20,15 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestSpec;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.plugin.streams.Stream;
 
 import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Function;
 
-public class SearchRequestSpecToSearchMapper implements Function<SearchRequestSpec, Search> {
+public class SearchRequestSpecToSearchMapper {
 
     public static final String QUERY_ID = "scripting_api_temporary_query";
 
@@ -40,8 +39,7 @@ public class SearchRequestSpecToSearchMapper implements Function<SearchRequestSp
         this.pivotCreator = pivotCreator;
     }
 
-    @Override
-    public Search apply(final SearchRequestSpec searchRequestSpec) {
+    public Search mapToSearch(final SearchRequestSpec searchRequestSpec, final SearchUser searchUser) {
 
         Query query = Query.builder()
                 .id(QUERY_ID)
@@ -50,15 +48,16 @@ public class SearchRequestSpecToSearchMapper implements Function<SearchRequestSp
                 .timerange(searchRequestSpec.timerange() != null ? searchRequestSpec.timerange() : RelativeRange.allTime())
                 .build();
 
-        if (searchRequestSpec.streams() != null && !searchRequestSpec.streams().isEmpty()) {
+        if (!searchRequestSpec.streams().isEmpty()) {
             query = query.addStreamsToFilter(new HashSet<>(searchRequestSpec.streams()));
         }
 
-        final Search search = Search.builder()
+        Search search = Search.builder()
                 .queries(ImmutableSet.of(query))
                 .build();
 
-        search.addStreamsToQueriesWithoutStreams(() -> Set.of(Stream.DEFAULT_STREAM_ID));
+
+        search = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().readableOrAllIfEmpty(searchRequestSpec.streams()));
         return search;
     }
 }

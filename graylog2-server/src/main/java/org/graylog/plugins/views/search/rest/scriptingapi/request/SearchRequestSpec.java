@@ -23,10 +23,10 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.util.Set;
 
 public record SearchRequestSpec(@JsonProperty("query") String queryString,
-                                @JsonProperty("streams") List<String> streams,
+                                @JsonProperty("streams") Set<String> streams,
                                 @JsonProperty("timerange") TimeRange timerange,
                                 @JsonProperty("aggregation") @Valid @NotNull AggregationSpec aggregationSpec) {
 
@@ -38,6 +38,9 @@ public record SearchRequestSpec(@JsonProperty("query") String queryString,
         }
         if (timerange == null) {
             timerange = DEFAULT_TIMERANGE;
+        }
+        if (streams == null) {
+            streams = Set.of();
         }
     }
 }
