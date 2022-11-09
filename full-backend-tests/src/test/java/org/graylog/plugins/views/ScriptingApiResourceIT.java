@@ -160,6 +160,37 @@ public class ScriptingApiResourceIT {
     }
 
     @ContainerMatrixTest
+    void testDuplicatedMetrics() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("""
+                        {
+                            "aggregation": {
+                              "group_by": [
+                                {
+                                  "field_name": "facility"
+                                }
+                              ],
+                              "metrics": [
+                                {
+                                  "function_name": "count",
+                                  "field_name": "facility"
+                                },
+                                {
+                                  "function_name": "count",
+                                  "field_name": "facility"
+                                }
+                              ]
+                            }
+                          }
+                        """)
+                .post("/scripting_api/aggregate")
+                .then()
+                .statusCode(404); // TODO! We should handle the duplicated metric better
+    }
+
+    @ContainerMatrixTest
     void testAggregationWithoutMatchingField() {
         final ValidatableResponse validatableResponse = given()
                 .spec(requestSpec)
@@ -225,6 +256,36 @@ public class ScriptingApiResourceIT {
 
         validateRow(validatableResponse, "another-test", 2, "POST", 3);
         validateRow(validatableResponse, "test", 1, "-", 1);
+    }
+
+    @ContainerMatrixTest
+    void testSorting() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("""
+                        {
+                            "aggregation": {
+                              "group_by": [
+                                {
+                                  "field_name": "facility"
+                                }
+                              ],
+                              "metrics": [
+                                {
+                                  "function_name": "count",
+                                  "field_name": "facility"
+                                }
+                              ]
+                            }
+                          }
+                        """)
+                .post("/scripting_api/aggregate")
+                .then()
+                .statusCode(200);
+
+        validateRow(validatableResponse, "another-test", 2);
+        validateRow(validatableResponse, "test", 1);
     }
 
     private void validateSchema(ValidatableResponse response, String name, String type, String field) {
