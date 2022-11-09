@@ -107,18 +107,18 @@ const StreamRuleModal = ({
               <Row>
                 <Col md={8}>
                   {shouldDisplayFieldInput(values.type) && (
-                    <Field name="field">
-                      {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
-                        <TypeAheadFieldInput id={name}
-                                             onBlur={onBlur}
-                                             type="text"
-                                             label="Field"
-                                             name={name}
-                                             error={(error && touched) ? error : undefined}
-                                             defaultValue={value}
-                                             onChange={onChange} />
-                      )}
-                    </Field>
+                  <Field name="field">
+                    {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
+                      <TypeAheadFieldInput id={name}
+                                           onBlur={onBlur}
+                                           type="text"
+                                           label="Field"
+                                           name={name}
+                                           error={(error && touched) ? error : undefined}
+                                           defaultValue={value}
+                                           onChange={onChange} />
+                    )}
+                  </Field>
                   )}
 
                   <Field name="type">
@@ -152,9 +152,10 @@ const StreamRuleModal = ({
                         <Field name="value">
                           {({ field: { name, value, onChange }, meta: { error, touched } }) => (
                             <Input id="value"
-                                   label="Value"
+                                   label="Input"
                                    error={(error && touched) ? error : undefined}>
-                              <Select onChange={(newValue: string) => onChange({ target: { value: newValue, name } })}
+                              <Select onBlur={() => setFieldTouched(name, true)}
+                                      onChange={(newValue: string) => onChange({ target: { value: newValue, name } })}
                                       options={inputOptions}
                                       inputId={name}
                                       placeholder="Select an input"
@@ -168,7 +169,10 @@ const StreamRuleModal = ({
                   )}
 
                   <FormikInput id="inverted" label="Inverted" name="inverted" type="checkbox" />
-                  <FormikInput id="description" label={<>Description <InputOptionalInfo /></>} name="description" type="textarea" />
+                  <FormikInput id="description"
+                               label={<>Description <InputOptionalInfo /></>}
+                               name="description"
+                               type="textarea" />
 
                   <p>
                     <strong>Result:</strong>
@@ -192,13 +196,17 @@ const StreamRuleModal = ({
                                                                             text={(
                                                                               <Icon name="lightbulb"
                                                                                     type="regular" />
-                                                                            )} />
+                                                                              )} />
                   </Well>
                 </Col>
               </Row>
             </Modal.Body>
             <Modal.Footer>
-              <ModalSubmit submitButtonText={submitButtonText} submitLoadingText={submitLoadingText} onCancel={onClose} disabledSubmit={!isValid} isSubmitting={isSubmitting} />
+              <ModalSubmit submitButtonText={submitButtonText}
+                           submitLoadingText={submitLoadingText}
+                           onCancel={onClose}
+                           disabledSubmit={!isValid}
+                           isSubmitting={isSubmitting} />
             </Modal.Footer>
           </Form>
         )}

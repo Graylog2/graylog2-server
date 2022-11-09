@@ -15,38 +15,30 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { cleanup, render, fireEvent } from 'wrappedTestingLibrary';
+import { cleanup, render, screen, waitFor } from 'wrappedTestingLibrary';
+import selectEvent from 'react-select-event';
+import userEvent from '@testing-library/user-event';
 
 import { MockStore } from 'helpers/mocking';
+import { streamRuleTypes } from 'fixtures/streamRuleTypes';
 
 import StreamRuleModal from './StreamRuleModal';
-
-jest.mock('components/common', () => ({
-  TypeAheadFieldInput: ({ defaultValue }: { defaultValue: React.ReactNode }) => (<div>{defaultValue}</div>),
-  Icon: ({ children }: { children: React.ReactNode }) => (<div>{children}</div>),
-}));
 
 jest.mock('stores/inputs/InputsStore', () => ({
   InputsActions: {
     list: jest.fn(),
   },
-  InputsStore: MockStore(['getInitialState', () => ({ inputs: [] })]),
+  InputsStore: MockStore(['getInitialState', () => ({
+    inputs: [
+      { id: 'my-id', title: 'input title', name: 'name' },
+    ],
+  })]),
 }));
 
 describe('StreamRuleModal', () => {
-  const streamRuleTypes = [
-    { id: 1, short_desc: 'match exactly', long_desc: 'match exactly', name: 'Stream rule match exactly' },
-    { id: 2, short_desc: 'match regular expression', long_desc: 'match regular expression', name: 'Stream rule match regular' },
-    { id: 3, short_desc: 'greater than', long_desc: 'greater than', name: 'Stream rule greater than' },
-    { id: 4, short_desc: 'smaller than', long_desc: 'smaller than', name: 'Stream rule smaller than' },
-    { id: 5, short_desc: 'field presence', long_desc: 'field presence', name: 'Stream rule field presence' },
-    { id: 6, short_desc: 'contain', long_desc: 'contain', name: 'Stream rule contain' },
-    { id: 7, short_desc: 'always match', long_desc: 'always match', name: 'Stream rule always match' },
-    { id: 8, short_desc: 'match input', long_desc: 'match input', name: 'Stream rule match input' },
-  ];
-
   const SUT = (props: Partial<React.ComponentProps<typeof StreamRuleModal>>) => (
-    <StreamRuleModal onSubmit={() => {}}
+    <StreamRuleModal onSubmit={() => Promise.resolve()}
+                     onClose={() => {}}
                      streamRuleTypes={streamRuleTypes}
                      submitButtonText="Update rule"
                      submitLoadingText="Updating rule..."
@@ -69,40 +61,59 @@ describe('StreamRuleModal', () => {
     };
   };
 
-  it('should render an empty StreamRuleModal', () => {
-    const container = render(<SUT />);
+  it('should render an empty StreamRuleModal', async () => {
+    render(<SUT />);
 
-    expect(container).not.toBeNull();
+    await screen.findByRole('textbox', {
+      name: /field/i,
+      hidden: true,
+    });
   });
 
-  it('should render an simple StreamRuleModal', () => {
-    const container = render(<SUT streamRule={getStreamRule()} />);
+  it('should render an simple StreamRuleModal', async () => {
+    render(<SUT initialValues={getStreamRule()} />);
 
-    expect(container).not.toBeNull();
+    const fieldInput = await screen.findByRole('textbox', {
+      name: /field/i,
+      hidden: true,
+    });
+
+    const valueInput = await screen.findByRole('textbox', {
+      name: /value/i,
+      hidden: true,
+    });
+
+    expect(fieldInput).toHaveValue('field_1');
+    expect(valueInput).toHaveValue('value_1');
   });
 
-  it('should validate the selection of match input', () => {
+  it('should require selected input when type is `match input`', async () => {
     const submit = jest.fn();
-    const inputs = [
-      { id: 'my-id', title: 'title', name: 'name' },
-    ];
-    const { getByTestId, getByText } = render(
+
+    render(
       <SUT onSubmit={submit}
-           streamRule={getStreamRule()}
-           inputs={inputs} />,
+           initialValues={getStreamRule()} />,
     );
 
-    const ruleTypeSelection = getByTestId('rule-type-selection');
-    fireEvent.change(ruleTypeSelection, { target: { name: 'type', value: 8 } });
-    const submitBtn = getByText('Update rule');
-    fireEvent.click(submitBtn);
+    const ruleTypeSelect = await screen.findByLabelText('Type');
+    selectEvent.openMenu(ruleTypeSelect);
+    await selectEvent.select(ruleTypeSelect, 'match input');
 
-    expect(submit).toHaveBeenCalledTimes(0);
+    const submitBtn = await screen.findByRole('button', {
+      name: /update rule/i,
+      hidden: true,
+    });
+    userEvent.click(submitBtn);
 
-    const inputSelection = getByTestId('input-selection');
-    fireEvent.change(inputSelection, { target: { name: 'value', value: 'my-id' } });
-    fireEvent.click(submitBtn);
+    expect(submit).not.toHaveBeenCalled();
 
-    expect(submit).toHaveBeenCalledTimes(1);
+    const inputSelect = await screen.findByLabelText('Input');
+    selectEvent.openMenu(inputSelect);
+    await selectEvent.select(inputSelect, 'input title (name)');
+
+    await waitFor(() => expect(screen.queryByText('Value is required')).not.toBeInTheDocument());
+
+    userEvent.click(submitBtn);
+    await waitFor(() => expect(submit).toHaveBeenCalledTimes(1));
   });
 });
