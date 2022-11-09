@@ -20,11 +20,13 @@ import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestSpec;
+import org.graylog.plugins.views.search.rest.scriptingapi.response.Metadata;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseData;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +44,9 @@ public class SearchTypeResultToTabularResponseMapper {
         aggregationSpec.groupings().forEach(gr -> schema.add(new ResponseSchemaEntry("Grouping", "string", gr.fieldName())));
         aggregationSpec.metrics().forEach(metric -> schema.add(new ResponseSchemaEntry("Metric : " + metric.functionName(),
                 Latest.NAME.equals(metric.functionName()) ? "string" : "numeric", metric.fieldName())));
+
+        final AbsoluteRange effectiveTimerange = pivotResult.effectiveTimerange();
+
         return new TabularResponse(
                 schema,
                 new ResponseData(
@@ -66,7 +71,8 @@ public class SearchTypeResultToTabularResponseMapper {
                                     return row;
                                 })
                                 .collect(Collectors.toList())
-                )
+                ),
+                new Metadata(effectiveTimerange)
         );
 
     }

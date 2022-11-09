@@ -17,10 +17,7 @@
 package org.graylog.plugins.views.search.rest.scriptingapi.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.lucene.util.packed.DirectMonotonicReader;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 
-import java.util.List;
-
-public record TabularResponse(@JsonProperty("schema") List<ResponseSchemaEntry> schema,
-                              @JsonProperty ResponseData data, @JsonProperty Metadata metadata) {
+public record Metadata(@JsonProperty("effective_timerange") AbsoluteRange effectiveTimerange) {
 }

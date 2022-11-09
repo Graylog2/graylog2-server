@@ -27,10 +27,13 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfi
 import org.graylog.testing.utils.GelfInputUtils;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
+import org.joda.time.DateTime;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
@@ -274,7 +277,8 @@ public class ScriptingApiResourceIT {
                               "metrics": [
                                 {
                                   "function_name": "count",
-                                  "field_name": "facility"
+                                  "field_name": "facility",
+                                  "sort": "asc"
                                 }
                               ]
                             }
@@ -284,8 +288,50 @@ public class ScriptingApiResourceIT {
                 .then()
                 .statusCode(200);
 
-        validateRow(validatableResponse, "another-test", 2);
-        validateRow(validatableResponse, "test", 1);
+        final List<List<Object>> rows = validatableResponse.extract().body().jsonPath().getList("data.rows");
+        Assertions.assertEquals(rows.size(), 2);
+        Assertions.assertEquals(Arrays.asList("test", (Object)1), rows.get(0));
+        Assertions.assertEquals(Arrays.asList("another-test", (Object)2), rows.get(1));
+    }
+
+    @ContainerMatrixTest
+    void testMetadata() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("""
+                        {
+                            "timerange": {
+                                "type": "relative",
+                                "range": 300
+                            },
+                            "aggregation": {
+                              "group_by": [
+                                {
+                                  "field_name": "facility"
+                                }
+                              ],
+                              "metrics": [
+                                {
+                                  "function_name": "count",
+                                  "field_name": "facility",
+                                  "sort": "asc"
+                                }
+                              ]
+                            }
+                          }
+                        """)
+                .post("/scripting_api/aggregate")
+                .then()
+                .statusCode(200);
+
+        validatableResponse.assertThat().body("metadata.effective_timerange.type", Matchers.equalTo("absolute"));
+        final String from = validatableResponse.extract().body().jsonPath().getString("metadata.effective_timerange.from");
+        final String to = validatableResponse.extract().body().jsonPath().getString("metadata.effective_timerange.to");
+        final DateTime fromDateTime = DateTime.parse(from);
+        final DateTime toDateTime = DateTime.parse(to);
+        final long diff = toDateTime.getMillis() - fromDateTime.getMillis();
+        Assertions.assertEquals(300_000, diff);
     }
 
     private void validateSchema(ValidatableResponse response, String name, String type, String field) {
