@@ -20,14 +20,18 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
+import org.joda.time.Duration;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 
 /**
- * In-database configuration (via ClusterConfigService) for index set defaults.
+ * In-database configuration (via ClusterConfigService) for index set
  * The values in this class are initialized from {@link ElasticsearchConfiguration} configuration properties
  * to allow users to specify defaults for default system indices on the first boot of the Graylog server.
  */
@@ -125,5 +129,23 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
         public abstract Builder retentionStrategyConfig(RetentionStrategyConfig retentionStrategyConfig);
 
         public abstract IndexSetsDefaultConfiguration build();
+    }
+
+    public IndexSetConfig.Builder createIndexSetConfig() {
+        return IndexSetConfig.builder()
+                .isWritable(true)
+                .isRegular(true)
+                .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
+                .indexAnalyzer(indexAnalyzer())
+                .shards(shards())
+                .replicas(replicas())
+                .indexOptimizationDisabled(indexOptimizationDisabled())
+                .indexOptimizationMaxNumSegments(indexOptimizationMaxNumSegments())
+                .fieldTypeRefreshInterval(Duration.standardSeconds(
+                        fieldTypeRefreshIntervalUnit().toSeconds(fieldTypeRefreshInterval())))
+                .rotationStrategyClass(rotationStrategyClass())
+                .rotationStrategy(rotationStrategyConfig())
+                .retentionStrategyClass(retentionStrategyClass())
+                .retentionStrategy(retentionStrategyConfig());
     }
 }

@@ -151,7 +151,7 @@ const ConfigurationsPage = () => {
         {indexSetsDefaultsConfig && (
           <HideOnCloud>
             <ConfigletContainer title="Index Set Default Configuration">
-              <IndexSetsDefaultsConfig config={indexSetsDefaultsConfig}
+              <IndexSetsDefaultsConfig initialConfig={indexSetsDefaultsConfig}
                                        updateConfig={_onUpdate(INDEX_SETS_DEFAULTS_CONFIG)} />
             </ConfigletContainer>
           </HideOnCloud>

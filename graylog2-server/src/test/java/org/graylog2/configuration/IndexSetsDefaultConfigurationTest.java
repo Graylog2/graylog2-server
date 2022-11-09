@@ -50,4 +50,9 @@ class IndexSetsDefaultConfigurationTest {
         final Map map = objectMapper.convertValue(indexConfig, HashMap.class);
         objectMapper.convertValue(map, IndexSetsDefaultConfiguration.class);
     }
+
+    @Test
+    void test() {
+
+    }
 }

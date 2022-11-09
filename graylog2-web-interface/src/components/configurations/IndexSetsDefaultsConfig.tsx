@@ -50,8 +50,8 @@ export type IndexConfig = {
 const TIME_UNITS = ['SECONDS', 'MINUTES'];
 
 type Props = {
-  config: IndexConfig,
-  updateConfig: (arg: IndexConfig) => void,
+  initialConfig: IndexConfig,
+  updateConfig: (arg: IndexConfig) => object,
 };
 
 const StyledDefList = styled.dl.attrs({
@@ -65,48 +65,12 @@ const StyledDefList = styled.dl.attrs({
   }
 `);
 
-const IndexSetsDefaultsConfig = ({ config, updateConfig }: Props) => {
+const IndexSetsDefaultsConfig = ({ initialConfig, updateConfig }: Props) => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [rotationStrategies, setRotationStrategies] = useState<MaintenanceOptions>();
   const [retentionStrategies, setRetentionStrategies] = useState<MaintenanceOptions>();
+  const [currentConfig, setCurrentConfig] = useState<IndexConfig>(initialConfig);
   const handleSaveConfig = async (configToSave: IndexConfig) => updateConfig(configToSave);
-
-  const saveConfig = (values, { setSubmitting }) => {
-    handleSaveConfig(values)
-      .then(() => {
-        setShowModal(false);
-      })
-      .catch(() => {
-        setSubmitting(false);
-      });
-  };
-
-  const resetConfig = () => {
-    setShowModal(false);
-  };
-
-  const rotationConfig = {
-    config: config.rotation_strategy_config,
-    strategy: config.rotation_strategy_class,
-  };
-  const retentionConfig = {
-    config: config.retention_strategy_config,
-    strategy: config.retention_strategy_class,
-  };
-
-  const getRotationConfigState = (strategy: string, data: string) => {
-    return {
-      rotation_strategy_class: strategy,
-      rotation_strategy_config: data,
-    };
-  };
-
-  const getRetentionConfigState = (strategy: string, data: string) => {
-    return {
-      retention_strategy_class: strategy,
-      retention_strategy_config: data,
-    };
-  };
 
   useEffect(() => {
     IndicesConfigurationActions.loadRotationStrategies().then((loadedRotationStrategies) => {
@@ -118,9 +82,47 @@ const IndexSetsDefaultsConfig = ({ config, updateConfig }: Props) => {
     });
   }, []);
 
-  if (!rotationStrategies || !rotationStrategies) {
+  const saveConfig = (values, { setSubmitting }) => {
+    handleSaveConfig(values)
+      .then((config) => {
+        setCurrentConfig(config as IndexConfig);
+        setShowModal(false);
+      })
+      .catch(() => {
+        setSubmitting(false);
+      });
+  };
+
+  const resetConfig = () => {
+    setShowModal(false);
+  };
+
+  if (!rotationStrategies || !rotationStrategies || !currentConfig) {
     return <Spinner />;
   }
+
+  const rotationConfig = {
+    config: currentConfig.rotation_strategy_config,
+    strategy: currentConfig.rotation_strategy_class,
+  };
+  const retentionConfig = {
+    config: currentConfig.retention_strategy_config,
+    strategy: currentConfig.retention_strategy_class,
+  };
+
+  const getRotationConfigState = (strategy: string, data: string) => {
+    return {
+      rotation_strategy_config: data,
+      rotation_strategy_class: strategy,
+    };
+  };
+
+  const getRetentionConfigState = (strategy: string, data: string) => {
+    return {
+      retention_strategy_class: strategy,
+      retention_strategy_config: data,
+    };
+  };
 
   return (
     <div>
@@ -128,17 +130,17 @@ const IndexSetsDefaultsConfig = ({ config, updateConfig }: Props) => {
       <p>Defaults for newly created index sets.</p>
       <StyledDefList>
         <dt>Index analyzer:</dt>
-        <dd>{config.index_analyzer}</dd>
+        <dd>{currentConfig.index_analyzer}</dd>
         <dt>Shards per Index:</dt>
-        <dd>{config.shards}</dd>
+        <dd>{currentConfig.shards}</dd>
         <dt>Replicas per Index:</dt>
-        <dd>{config.replicas}</dd>
+        <dd>{currentConfig.replicas}</dd>
         <dt>Index optimization disabled:</dt>
-        <dd>{config.index_optimization_disabled ? 'Yes' : 'No'}</dd>
+        <dd>{currentConfig.index_optimization_disabled ? 'Yes' : 'No'}</dd>
         <dt>Max. Number of Segments:</dt>
-        <dd>{config.index_optimization_max_num_segments}</dd>
+        <dd>{currentConfig.index_optimization_max_num_segments}</dd>
         <dt>Field type refresh interval:</dt>
-        <dd>{config.field_type_refresh_interval} {lodash.capitalize(config.field_type_refresh_interval_unit)}</dd>
+        <dd>{currentConfig.field_type_refresh_interval} {lodash.capitalize(currentConfig.field_type_refresh_interval_unit)}</dd>
         <br />
         <IndexMaintenanceStrategiesSummary config={rotationConfig}
                                            pluginExports={PluginStore.exports('indexRotationConfig')} />
@@ -158,7 +160,7 @@ const IndexSetsDefaultsConfig = ({ config, updateConfig }: Props) => {
       </p>
 
       <Modal show={showModal} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
-        <Formik onSubmit={saveConfig} initialValues={config}>
+        <Formik onSubmit={saveConfig} initialValues={currentConfig}>
           {({ values, setFieldValue, isSubmitting }) => {
             return (
               <Form>

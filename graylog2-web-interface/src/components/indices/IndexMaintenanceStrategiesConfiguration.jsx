@@ -212,6 +212,7 @@ IndexMaintenanceStrategiesConfiguration.propTypes = {
 };
 
 IndexMaintenanceStrategiesConfiguration.defaultProps = {
+  description: undefined,
   retentionStrategiesContext: {
     max_index_retention_period: undefined,
   },
