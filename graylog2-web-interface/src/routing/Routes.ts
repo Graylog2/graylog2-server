@@ -35,6 +35,7 @@ type RoutesTimeRange = RoutesRelativeTimeRange | RoutesAbsoluteTimeRange | Route
 type SearchQueryParams = {
   q: string,
   relative?: number,
+  rangetype?: string,
   from?: string,
   to?: string,
   keyword?: string,
@@ -185,6 +186,8 @@ const Routes = {
     };
 
     if (rangeType && timeRange) {
+      queryParams.rangetype = rangeType;
+
       switch (rangeType) {
         case 'relative':
           queryParams.relative = (<RoutesRelativeTimeRange>timeRange).relative;

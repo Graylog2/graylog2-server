@@ -70,6 +70,31 @@ class EventDetails extends React.Component {
       : eventDefinitionContext.title;
   };
 
+  renderReplaySearchLink = (event) => {
+    let query = '';
+    let rangeType;
+    let range;
+    let streams;
+
+    if (event.timerange_start && event.timerange_end) {
+      rangeType = 'absolute';
+      range = { from: `${event.timerange_start}`, to: `${event.timerange_end}` };
+    }
+
+    if (event.origin_context) {
+      const contextArr = event.origin_context.split(':');
+      query = `_id: ${contextArr[contextArr.length - 1]}`;
+    }
+
+    if (event.source_streams) {
+      streams = event.source_streams;
+    }
+
+    const replaySearchUrl = Routes.search_with_query(query, rangeType, range, streams);
+
+    return <Link to={replaySearchUrl}>Replay Search</Link>;
+  };
+
   render() {
     const { event, eventDefinitionContext } = this.props;
     const plugin = this.getConditionPlugin(event.event_definition_type);
@@ -94,13 +119,16 @@ class EventDetails extends React.Component {
               &emsp;
               ({plugin.displayName || event.event_definition_type})
             </dd>
+            <dd>
+              {this.renderReplaySearchLink(event)}
+            </dd>
           </dl>
         </Col>
         <Col md={6}>
           <dl>
             {event.timerange_start && event.timerange_end && (
               <>
-                <dt>Aggregation time range</dt>
+                <dt>Event time range</dt>
                 <dd>
                   <Timestamp dateTime={event.timerange_start} />
                   &ensp;&mdash;&ensp;
