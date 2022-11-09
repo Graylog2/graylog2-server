@@ -27,6 +27,34 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+// Fill the first 16 bits of the ULIDs random section (16_bit_uint_random) with
+// a sequence number that reflects the order in which messages were received by an input.
+//
+// The sequence numbers on messages are ints and don't fit into 16 bits.
+// We remember a messages' first sequence number (subtrahend) in a size limited cache per input and timestamp.
+// The sequence number will then be subtracted with this subtrahend.
+// Thus will the first received message (for a certain input and timestamp) start with a sequence of 0 [1].
+//
+// [1]
+// Since our message processing is multithreaded, messages can pass each other during processing.
+// This means that the first recorded sequence number can be higher than the one of later messages.
+// To account for this, we simply add a constant (OFFSET_GAP) to prevent negative messageSequenceNrs.
+// Therefor the first sequence does not start with 0, but with OFFSET_GAP.
+/*
+    The ULID binary layout for reference
+
+        0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                      32_bit_uint_time_high                    |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |     16_bit_uint_time_low      |       16_bit_uint_random      |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                       32_bit_uint_random                      |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                       32_bit_uint_random                      |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ */
 @Singleton
 public class MessageULIDGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(MessageULIDGenerator.class);
@@ -57,21 +85,8 @@ public class MessageULIDGenerator {
 
     @VisibleForTesting
     String createULID(String inputId, long timestamp, int sequenceNr) {
-        // Fill the first 16 bits of the ULIDs random section with a sequence number that reflects the order
-        // in which messages were received by an input.
-        //
-        // To make the sequence number fit into 16 bits, we subtract it with itself.
-        // Thus will the first received message start with a sequence of 0.
-        // We remember this initial sequence number (subtrahend) in a size limited cache per input and timestamp.
-        // This ensures that the following messages (with the same timestamp and input) are subtracted with
-        // the same sequence number, and therefore keep their order.
-        //
-        // Since our message processing is multi threaded, messages can pass each other during processing.
-        // This means that the first recorded sequence number can be higher than the one of later messages.
-        // To account for this, we simply add a constant (OFFSET_GAP) to prevent negative messageSequenceNrs.
-
         final String key = inputId + timestamp;
-        final Integer subtrahend = sequenceNrCache.get(key, k -> sequenceNr);
+        final int subtrahend = sequenceNrCache.get(key, k -> sequenceNr);
 
         if (sequenceNr == subtrahend) {
             LOG.trace("Added new timestamp <{}> for input <{}> to cache. Seq <{}>", timestamp, inputId, sequenceNr);
@@ -91,10 +106,11 @@ public class MessageULIDGenerator {
             messageSequenceNr = OFFSET_GAP;
             sequenceNrCache.put(key, sequenceNr);
         } else if (messageSequenceNr >= RANDOM_MSB_MASK) {
-            LOG.warn("Message sequence number <{}> input <{}> timestamp <{}> does not fit into ULID ({} >= 65535). Sort order might be wrong.", sequenceNr, inputId, timestamp, messageSequenceNr);
+            LOG.warn("Message sequence number <{}> input <{}> timestamp <{}> does not fit into ULID ({} >= 65535). Sort order might be wrong.",
+                    sequenceNr, inputId, timestamp, messageSequenceNr);
             messageSequenceNr %= RANDOM_MSB_MASK;
         }
-        final ULID.Value sequencedUlid = new ULID.Value(msbWithZeroedRandom + messageSequenceNr, leastSignificantBits);
+        final ULID.Value sequencedUlid = new ULID.Value(msbWithZeroedRandom | messageSequenceNr, leastSignificantBits);
         return sequencedUlid.toString();
     }
 }

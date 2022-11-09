@@ -17,10 +17,10 @@
 package org.graylog2.shared.buffers.processors;
 
 import de.huxhorn.sulky.ulid.ULID;
+import org.graylog2.plugin.Tools;
 import org.junit.Test;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,20 +34,31 @@ public class MessageULIDGeneratorTest {
     public void simpleGenerate() {
         final MessageULIDGenerator generator = new MessageULIDGenerator(new ULID());
 
-        final String ulid = generator.createULID("input", 0, 123);
-        assertThat(ulid).startsWith("000000000007T");
-        ULID.Value parsedULID = ULID.parseULID(ulid);
+        final long ts = Tools.nowUTC().getMillis();
 
         // first seen sequence (gets subtracted with itself)
+        ULID.Value parsedULID = ULID.parseULID(generator.createULID("input", ts, 123));
+        //noinspection PointlessArithmeticExpression
         assertThat(extractSequenceNr(parsedULID)).isEqualTo(123 - 123 + OFFSET_GAP);
 
         // second sequence (gets subtracted with first seen sequence)
-        parsedULID = ULID.parseULID(generator.createULID("input", 0, 128));
+        parsedULID = ULID.parseULID(generator.createULID("input", ts, 128));
         assertThat(extractSequenceNr(parsedULID)).isEqualTo(128 - 123 + OFFSET_GAP);
 
         // third sequence (gets subtracted with first seen sequence)
-        parsedULID = ULID.parseULID(generator.createULID("input", 0, 125));
+        parsedULID = ULID.parseULID(generator.createULID("input", ts, 125));
         assertThat(extractSequenceNr(parsedULID)).isEqualTo(125 - 123 + OFFSET_GAP);
+    }
+
+    @Test
+    public void keepsTimestamp() {
+        final MessageULIDGenerator generator = new MessageULIDGenerator(new ULID());
+
+        final long ts = Tools.nowUTC().getMillis();
+        final String ulid = generator.createULID("input", ts, 123);
+        ULID.Value parsedULID = ULID.parseULID(ulid);
+
+        assertThat(parsedULID.timestamp()).isEqualTo(ts);
     }
 
     @Test
@@ -63,13 +74,14 @@ public class MessageULIDGeneratorTest {
 
         // messages with a different timestamp start with a new subtrahend and should get a seqNr with OFFSET_GAP
         parsedULID = ULID.parseULID(generator.createULID("input", 42, (int) (firstSeqNr + RANDOM_MSB_MASK - OFFSET_GAP)));
+        //noinspection PointlessArithmeticExpression
         assertThat(extractSequenceNr(parsedULID)).isEqualTo(0 + OFFSET_GAP);
     }
 
     @Test
     public void sortedInput() {
         final MessageULIDGenerator generator = new MessageULIDGenerator(new ULID());
-        final long ts = Instant.now().toEpochMilli();
+        final long ts = Tools.nowUTC().getMillis();
 
         for (int seq : ImmutableList.of(1, 2, 3, 4)) {
             ULID.Value parsedULID = ULID.parseULID(generator.createULID("input", ts, seq));
@@ -81,10 +93,10 @@ public class MessageULIDGeneratorTest {
     @Test
     public void unorderedInput() {
         final MessageULIDGenerator generator = new MessageULIDGenerator(new ULID());
-        final long ts = Instant.now().toEpochMilli();
+        final long ts = Tools.nowUTC().getMillis();
 
         final ImmutableList<Integer> messageSeqences = ImmutableList.of(5, 4, 1, 2);
-        final List<String> ulidsSorted = messageSeqences.stream().map((seq) -> generator.createULID("input", ts, seq)).sorted().collect(Collectors.toList());
+        final List<String> ulidsSorted = messageSeqences.stream().map((seq) -> generator.createULID("input", ts, seq)).sorted().toList();
 
         final List<Long> seqNrsFromUlid = ulidsSorted.stream().map(((ulid) -> ULID.parseULID(ulid).getMostSignificantBits() & 0xFFFFL)).collect(Collectors.toList());
         assertThat(seqNrsFromUlid).isEqualTo(messageSeqences.stream().sorted().map(s -> OFFSET_GAP + s - 5L).collect(Collectors.toList()));
