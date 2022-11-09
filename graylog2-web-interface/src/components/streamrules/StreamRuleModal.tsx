@@ -101,7 +101,7 @@ const StreamRuleModal = ({
            onHide={onClose}
            show>
       <Formik<FormValues> initialValues={initialValues} onSubmit={_onSubmit} validate={validate}>
-        {({ values, setFieldTouched, setFieldValue, isSubmitting, isValid }) => (
+        {({ values, setFieldValue, isSubmitting, isValidating }) => (
           <Form>
             <Modal.Header closeButton>
               <Modal.Title>{title}</Modal.Title>
@@ -110,30 +110,30 @@ const StreamRuleModal = ({
               <Row>
                 <Col md={8}>
                   {shouldDisplayFieldInput(values.type) && (
-                    <Field name="field">
-                      {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
-                        <TypeAheadFieldInput id={name}
-                                             onBlur={onBlur}
-                                             type="text"
-                                             label="Field"
-                                             name={name}
-                                             error={(error && touched) ? error : undefined}
-                                             defaultValue={value}
-                                             onChange={onChange} />
-                      )}
-                    </Field>
+                  <Field name="field">
+                    {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
+                      <TypeAheadFieldInput id={name}
+                                           onBlur={onBlur}
+                                           type="text"
+                                           label="Field"
+                                           name={name}
+                                           error={(error && touched) ? error : undefined}
+                                           defaultValue={value}
+                                           onChange={onChange} />
+                    )}
+                  </Field>
                   )}
 
                   <Field name="type">
-                    {({ field: { name, value, onChange }, meta: { error, touched } }) => (
+                    {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
                       <Input label="Type"
                              id="type"
                              error={(error && touched) ? error : undefined}>
-                        <Select onBlur={() => setFieldTouched(name, true)}
+                        <Select onBlur={onBlur}
                                 onChange={(newValue: number) => {
                                   if (newValue === STREAM_RULE_TYPES.MATCH_INPUT || newValue === STREAM_RULE_TYPES.ALWAYS_MATCHES) {
-                                    setFieldValue('value', undefined);
-                                    setFieldValue('field', undefined);
+                                    setFieldValue('value', '');
+                                    setFieldValue('field', '');
                                   }
 
                                   return onChange({
@@ -153,19 +153,23 @@ const StreamRuleModal = ({
                     values.type === STREAM_RULE_TYPES.MATCH_INPUT
                       ? (
                         <Field name="value">
-                          {({ field: { name, value, onChange }, meta: { error, touched } }) => (
-                            <Input id="value"
-                                   label="Input"
-                                   error={(error && touched) ? error : undefined}>
-                              <Select onBlur={() => setFieldTouched(name, true)}
-                                      onChange={(newValue: string) => onChange({ target: { value: newValue, name } })}
-                                      options={inputOptions}
-                                      inputId={name}
-                                      placeholder="Select an input"
-                                      inputProps={{ 'aria-label': 'Select an input' }}
-                                      value={value} />
-                            </Input>
-                          )}
+                          {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => {
+                            return (
+                              <Input id="value"
+                                     label="Input"
+                                     error={(error && touched) ? error : undefined}>
+                                <Select onBlur={onBlur}
+                                        onChange={(newValue: string) => {
+                                          onChange({ target: { value: newValue, name } });
+                                        }}
+                                        options={inputOptions}
+                                        inputId={name}
+                                        placeholder="Select an input"
+                                        inputProps={{ 'aria-label': 'Select an input' }}
+                                        value={value} />
+                              </Input>
+                            );
+                          }}
                         </Field>
                       )
                       : <FormikInput id="value" label="Value" name="value" />
@@ -208,7 +212,7 @@ const StreamRuleModal = ({
               <ModalSubmit submitButtonText={submitButtonText}
                            submitLoadingText={submitLoadingText}
                            onCancel={onClose}
-                           disabledSubmit={!isValid}
+                           disabledSubmit={isValidating}
                            isSubmitting={isSubmitting} />
             </Modal.Footer>
           </Form>

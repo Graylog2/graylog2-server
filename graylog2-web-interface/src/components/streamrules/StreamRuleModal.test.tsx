@@ -108,22 +108,16 @@ describe('StreamRuleModal', () => {
     selectEvent.openMenu(inputSelect);
     await selectEvent.select(inputSelect, 'input title (name)');
 
-    // We are also changing the description to trigger the validation again, to avoid a bug which occurs only when testing.
-    const descriptionInput = await screen.findByRole('textbox', {
-      name: /description/i,
-      hidden: true,
-    });
-    userEvent.type(descriptionInput, ' and an extended description');
-
     await waitFor(() => expect(submitBtn).toBeEnabled());
     userEvent.click(submitBtn);
 
     await waitFor(() => expect(submit).toHaveBeenCalledTimes(1));
 
     expect(submit).toHaveBeenCalledWith('dead-beef', {
-      description: 'description and an extended description',
+      description: 'description',
       id: 'dead-beef',
       inverted: false,
+      field: '',
       type: 8,
       value: 'my-id',
     });
