@@ -49,7 +49,7 @@ type Props = {
 }
 
 const StreamModal = ({ initialValues, title: modalTitle, submitButtonText, submitLoadingText, onClose, onSubmit, indexSets }: Props) => {
-  const _initialValues = useMemo(() => prepareInitialValues(initialValues, indexSets), []);
+  const _initialValues = useMemo(() => prepareInitialValues(initialValues, indexSets), [indexSets, initialValues]);
 
   const indexSetOptions = useMemo(() => indexSets
     .filter((indexSet) => indexSet.can_be_default)

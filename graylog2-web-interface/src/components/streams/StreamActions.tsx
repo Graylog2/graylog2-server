@@ -63,6 +63,7 @@ const StreamActions = ({
       await StreamsStore.resume(stream.id, (response) => response);
     }
 
+    // eslint-disable-next-line no-alert
     if (!stream.disabled && window.confirm(`Do you really want to pause stream '${stream.title}'?`)) {
       await StreamsStore.pause(stream.id, (response) => response);
     }
@@ -130,8 +131,8 @@ const StreamActions = ({
                       onSelect={onToggleStreamStatus}
                       disabled={isDefaultStream || isNotEditable}>
               {changingStatus
-                ? (stream.disabled ? 'Starting Stream...' : 'Stopping Stream...')
-                : (stream.disabled ? 'Start Stream' : 'Stop Stream')}
+                ? <span>{stream.disabled ? 'Starting Stream...' : 'Stopping Stream...'}</span>
+                : <span>{stream.disabled ? 'Start Stream' : 'Stop Stream'}</span>}
             </MenuItem>
           </OverlayElement>
           <MenuItem divider />

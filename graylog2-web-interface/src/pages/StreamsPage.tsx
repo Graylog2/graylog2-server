@@ -32,7 +32,6 @@ const onSave = (stream: Stream) => StreamsStore.save(stream, () => {
   UserNotification.success('Stream has been successfully created.', 'Success');
 });
 
-
 const StreamsPage = () => {
   const { indexSets } = useStore(IndexSetsStore);
 

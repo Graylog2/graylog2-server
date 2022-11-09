@@ -29,7 +29,6 @@ import { useStore } from 'stores/connect';
 import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
 import STREAM_RULE_TYPES from 'logic/streams/streamRuleTypes';
 
-
 type FormValues = Partial<StreamRule>
 
 const shouldDisplayValueInput = (type: number) => type !== STREAM_RULE_TYPES.FIELD_PRESENCE && type !== STREAM_RULE_TYPES.ALWAYS_MATCHES;
