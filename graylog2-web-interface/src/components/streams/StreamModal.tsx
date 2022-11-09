@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import type { Stream } from 'src/stores/streams/StreamsStore';
 import { Formik, Form, Field } from 'formik';
 
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import { FormikInput, ModalSubmit, Select } from 'components/common';
+import { FormikInput, ModalSubmit, Select, InputOptionalInfo } from 'components/common';
 import { Modal, Input } from 'components/bootstrap';
 
 type FormValues = Partial<Stream>;
@@ -32,8 +32,16 @@ const prepareInitialValues = (initialValues: FormValues, indexSets: Array<IndexS
   };
 };
 
-const validate = () => {
-  const errors = {};
+const validate = (values: FormValues) => {
+  let errors = {};
+
+  if (!values.title) {
+    errors = { ...errors, title: 'Title is required' };
+  }
+
+  if (!values.index_set_id) {
+    errors = { ...errors, index_set_id: 'Index set is required' };
+  }
 
   return errors;
 };
@@ -48,7 +56,15 @@ type Props = {
   indexSets: Array<IndexSet>,
 }
 
-const StreamModal = ({ initialValues, title: modalTitle, submitButtonText, submitLoadingText, onClose, onSubmit, indexSets }: Props) => {
+const StreamModal = ({
+  initialValues,
+  title: modalTitle,
+  submitButtonText,
+  submitLoadingText,
+  onClose,
+  onSubmit,
+  indexSets,
+}: Props) => {
   const _initialValues = useMemo(() => prepareInitialValues(initialValues, indexSets), [indexSets, initialValues]);
 
   const indexSetOptions = useMemo(() => indexSets
@@ -58,9 +74,7 @@ const StreamModal = ({ initialValues, title: modalTitle, submitButtonText, submi
       label: title,
     })), [indexSets]);
 
-  const _onSubmit = (values: FormValues) => {
-    return onSubmit(values).then(() => onClose());
-  };
+  const _onSubmit = useCallback((values: FormValues) => onSubmit(values).then(() => onClose()), [onClose, onSubmit]);
 
   return (
     <Modal title={modalTitle}
@@ -75,8 +89,14 @@ const StreamModal = ({ initialValues, title: modalTitle, submitButtonText, submi
               <Modal.Title>{modalTitle}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <FormikInput label="Title" name="title" id="title" help="A descriptive name of the new stream" />
-              <FormikInput label="Description" name="description" id="description" help="What kind of messages are routed into this stream?" />
+              <FormikInput label="Title"
+                           name="title"
+                           id="title"
+                           help="A descriptive name of the new stream" />
+              <FormikInput label={<>Description <InputOptionalInfo /></>}
+                           name="description"
+                           id="description"
+                           help="What kind of messages are routed into this stream?" />
 
               <Field name="index_set_id">
                 {({ field: { name, value, onChange }, meta: { error, touched } }) => (
@@ -104,7 +124,11 @@ const StreamModal = ({ initialValues, title: modalTitle, submitButtonText, submi
 
             </Modal.Body>
             <Modal.Footer>
-              <ModalSubmit submitButtonText={submitButtonText} submitLoadingText={submitLoadingText} onCancel={onClose} disabledSubmit={!isValid} isSubmitting={isSubmitting} />
+              <ModalSubmit submitButtonText={submitButtonText}
+                           submitLoadingText={submitLoadingText}
+                           onCancel={onClose}
+                           disabledSubmit={!isValid}
+                           isSubmitting={isSubmitting} />
             </Modal.Footer>
           </Form>
         )}

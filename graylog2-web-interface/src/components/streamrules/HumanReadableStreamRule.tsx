@@ -23,7 +23,7 @@ import STREAM_RULE_TYPES from 'logic/streams/streamRuleTypes';
 
 const EMPTY_TAG = '<empty>';
 
-const formatRuleValue = (inputs: Array<Input>, streamRule: StreamRule) => {
+const formatRuleValue = (inputs: Array<Input>, streamRule: Partial<StreamRule>) => {
   if (streamRule.type === STREAM_RULE_TYPES.MATCH_INPUT) {
     const input = inputs.find(({ id }) => id === streamRule.value);
 
@@ -45,7 +45,7 @@ const formatRuleValue = (inputs: Array<Input>, streamRule: StreamRule) => {
   return null;
 };
 
-const formatRuleField = (streamRule: StreamRule) => {
+const formatRuleField = (streamRule: Partial<StreamRule>) => {
   if (streamRule.field) {
     return streamRule.field;
   }
@@ -58,7 +58,7 @@ const formatRuleField = (streamRule: StreamRule) => {
 };
 
 type Props = {
-  streamRule: StreamRule,
+  streamRule: Partial<StreamRule>,
   streamRuleTypes: Array<StreamRuleType>,
   inputs: Array<Input>,
 }
