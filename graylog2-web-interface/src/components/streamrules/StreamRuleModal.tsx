@@ -29,7 +29,7 @@ import { useStore } from 'stores/connect';
 import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
 import STREAM_RULE_TYPES from 'logic/streams/streamRuleTypes';
 
-type FormValues = Partial<StreamRule>
+type FormValues = Partial<Pick<StreamRule, 'type' | 'field' | 'description' | 'value' | 'inverted'>>
 
 const shouldDisplayValueInput = (type: number) => type !== STREAM_RULE_TYPES.FIELD_PRESENCE && type !== STREAM_RULE_TYPES.ALWAYS_MATCHES;
 const shouldDisplayFieldInput = (type: number) => type !== STREAM_RULE_TYPES.ALWAYS_MATCHES && type !== STREAM_RULE_TYPES.MATCH_INPUT;
@@ -53,7 +53,7 @@ const validate = (values: FormValues) => {
 };
 
 type Props = {
-  onSubmit: (streamRuleId: string | undefined | null, currentStreamRule: StreamRule) => Promise<void>,
+  onSubmit: (streamRuleId: string | undefined | null, currentStreamRule: FormValues) => Promise<void>,
   initialValues?: Partial<StreamRule>,
   streamRuleTypes: Array<StreamRuleType>,
   title: string,
@@ -77,16 +77,24 @@ const StreamRuleModal = ({
     InputsActions.list();
   }, []);
 
-  const _onSubmit = useCallback((values) => {
-    return onSubmit(initialValues?.id, values).then(() => onClose());
-  }, [onSubmit, initialValues?.id, onClose]);
+  const _onSubmit = useCallback(
+    (values: FormValues) => onSubmit(initialValues?.id, values).then(() => onClose()),
+    [onSubmit, initialValues?.id, onClose],
+  );
 
-  const streamRuleTypesOptions = useMemo(() => streamRuleTypes?.map(({ id, short_desc }) => ({
-    value: id,
-    label: short_desc,
-  })), [streamRuleTypes]);
+  const streamRuleTypesOptions = useMemo(
+    () => streamRuleTypes?.map(({ id, short_desc }) => ({
+      value: id,
+      label: short_desc,
+    })),
 
-  const inputOptions = useMemo(() => inputs.map(({ id, title: inputTitle, name }) => ({ label: `${inputTitle} (${name})`, value: id })), [inputs]);
+    [streamRuleTypes],
+  );
+
+  const inputOptions = useMemo(
+    () => inputs.map(({ id, title: inputTitle, name }) => ({ label: `${inputTitle} (${name})`, value: id })),
+    [inputs],
+  );
 
   return (
     <Modal title={title}
@@ -102,18 +110,18 @@ const StreamRuleModal = ({
               <Row>
                 <Col md={8}>
                   {shouldDisplayFieldInput(values.type) && (
-                  <Field name="field">
-                    {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
-                      <TypeAheadFieldInput id={name}
-                                           onBlur={onBlur}
-                                           type="text"
-                                           label="Field"
-                                           name={name}
-                                           error={(error && touched) ? error : undefined}
-                                           defaultValue={value}
-                                           onChange={onChange} />
-                    )}
-                  </Field>
+                    <Field name="field">
+                      {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
+                        <TypeAheadFieldInput id={name}
+                                             onBlur={onBlur}
+                                             type="text"
+                                             label="Field"
+                                             name={name}
+                                             error={(error && touched) ? error : undefined}
+                                             defaultValue={value}
+                                             onChange={onChange} />
+                      )}
+                    </Field>
                   )}
 
                   <Field name="type">

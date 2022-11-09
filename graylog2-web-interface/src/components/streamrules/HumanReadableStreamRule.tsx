@@ -63,7 +63,7 @@ type Props = {
   inputs: Array<Input>,
 }
 
-const HumanReadableStreamRule = ({ streamRule, streamRuleTypes, inputs }: Props) => {
+const HumanReadableStreamRule = ({ streamRule, streamRuleTypes, inputs = [] }: Props) => {
   const streamRuleType = streamRuleTypes.find(({ id }) => id === streamRule.type);
   const negation = (streamRule.inverted ? 'not ' : null);
   const longDesc = (streamRuleType ? streamRuleType.long_desc : null);
@@ -84,11 +84,7 @@ const HumanReadableStreamRule = ({ streamRule, streamRuleTypes, inputs }: Props)
 HumanReadableStreamRule.propTypes = {
   streamRule: PropTypes.object.isRequired,
   streamRuleTypes: PropTypes.array.isRequired,
-  inputs: PropTypes.array,
-};
-
-HumanReadableStreamRule.defaultProps = {
-  inputs: [],
+  inputs: PropTypes.array.isRequired,
 };
 
 export default HumanReadableStreamRule;

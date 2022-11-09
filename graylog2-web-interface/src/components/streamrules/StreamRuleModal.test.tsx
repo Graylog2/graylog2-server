@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { cleanup, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 
@@ -45,10 +45,6 @@ describe('StreamRuleModal', () => {
                      title="Bach"
                      {...props} />
   );
-
-  afterEach(() => {
-    cleanup();
-  });
 
   const getStreamRule = (type = 1) => {
     return {
@@ -103,6 +99,7 @@ describe('StreamRuleModal', () => {
       name: /update rule/i,
       hidden: true,
     });
+
     userEvent.click(submitBtn);
 
     expect(submit).not.toHaveBeenCalled();
@@ -110,10 +107,9 @@ describe('StreamRuleModal', () => {
     const inputSelect = await screen.findByLabelText('Input');
     selectEvent.openMenu(inputSelect);
     await selectEvent.select(inputSelect, 'input title (name)');
-
     await waitFor(() => expect(screen.queryByText('Value is required')).not.toBeInTheDocument());
-
     userEvent.click(submitBtn);
+
     await waitFor(() => expect(submit).toHaveBeenCalledTimes(1));
   });
 });

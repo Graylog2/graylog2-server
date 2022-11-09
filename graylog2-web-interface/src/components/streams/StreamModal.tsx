@@ -23,7 +23,7 @@ import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { FormikInput, ModalSubmit, Select, InputOptionalInfo } from 'components/common';
 import { Modal, Input } from 'components/bootstrap';
 
-type FormValues = Partial<Stream>;
+type FormValues = Partial<Pick<Stream, 'title' | 'description' | 'index_set_id' | 'remove_matches_from_default_stream'>>
 
 const prepareInitialValues = (initialValues: FormValues, indexSets: Array<IndexSet>) => {
   return {
@@ -65,16 +65,25 @@ const StreamModal = ({
   onSubmit,
   indexSets,
 }: Props) => {
-  const _initialValues = useMemo(() => prepareInitialValues(initialValues, indexSets), [indexSets, initialValues]);
+  const _initialValues = useMemo(
+    () => prepareInitialValues(initialValues, indexSets),
+    [indexSets, initialValues],
+  );
 
-  const indexSetOptions = useMemo(() => indexSets
-    .filter((indexSet) => indexSet.can_be_default)
-    .map(({ id, title }) => ({
-      value: id,
-      label: title,
-    })), [indexSets]);
+  const indexSetOptions = useMemo(
+    () => indexSets
+      .filter((indexSet) => indexSet.can_be_default)
+      .map(({ id, title }) => ({
+        value: id,
+        label: title,
+      })),
+    [indexSets],
+  );
 
-  const _onSubmit = useCallback((values: FormValues) => onSubmit(values).then(() => onClose()), [onClose, onSubmit]);
+  const _onSubmit = useCallback(
+    (values: FormValues) => onSubmit(values).then(() => onClose()),
+    [onClose, onSubmit],
+  );
 
   return (
     <Modal title={modalTitle}
