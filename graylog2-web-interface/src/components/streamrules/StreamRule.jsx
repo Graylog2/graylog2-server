@@ -19,12 +19,12 @@ import PropTypes from 'prop-types';
 import { isEmpty } from 'lodash';
 import styled from 'styled-components';
 
+import HumanReadableStreamRule from 'components/streamrules/HumanReadableStreamRule';
 import { useStore } from 'stores/connect';
 import { Icon } from 'components/common';
 import { Button, ListGroupItem } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
-import HumanReadableStreamRule from 'components/streamrules/HumanReadableStreamRule';
 import UserNotification from 'util/UserNotification';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
