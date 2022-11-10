@@ -15,8 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
 import { Table } from 'components/bootstrap';
+import { TextOverflowEllipsis } from 'components/common/index';
 
 type Attribute = {
   id: string,
@@ -26,6 +28,31 @@ type Attribute = {
 
 type CustomHeaders = { [key: string]: (attribute: Attribute) => React.ReactNode }
 export type CustomCells<ListItem extends { id: string}> = { [key: string]: (listItem: ListItem, attribute: Attribute, key: string) => React.ReactNode }
+
+const ActionsHead = styled.th`
+  text-align: right;
+`;
+
+const ActionsCell = styled.td`
+  > div {
+    display: flex;
+    justify-content: right;
+  }
+`;
+
+const DescriptionCell = styled.td`
+  max-width: 30vw;
+`;
+
+const attributeCellRenderer = {
+  description: (listItem, _attribute, key) => (
+    <DescriptionCell key={key}>
+      <TextOverflowEllipsis>
+        {listItem.description}
+      </TextOverflowEllipsis>
+    </DescriptionCell>
+  ),
+};
 
 const TableHead = ({
   selectedAttributes,
@@ -47,7 +74,7 @@ const TableHead = ({
             : <th key={headerKey}>{attribute.title}</th>
         );
       })}
-      {displayActionsCol ? <th className="text-right">Actions</th> : null}
+      {displayActionsCol ? <ActionsHead>Actions</ActionsHead> : null}
     </tr>
   </thead>
 );
@@ -82,14 +109,15 @@ const ConfigurableDataTable = <ListItem extends { id: string }>({
           <tr key={listItem.id}>
             {selectedAttributes.map((attribute) => {
               const cellKey = `${listItem.id}-${attribute.id}`;
+              const cellRenderer = customCells?.[attribute.id] ?? attributeCellRenderer[attribute.id];
 
               return (
-                customCells?.[attribute.id]
-                  ? customCells[attribute.id](listItem, attribute, cellKey)
+                cellRenderer
+                  ? cellRenderer(listItem, attribute, cellKey)
                   : <td key={cellKey}>{listItem[attribute.id]}</td>
               );
             })}
-            {displayActionsCol ? <td className="text-right">{rowActions(listItem)}</td> : null}
+            {displayActionsCol ? <ActionsCell>{rowActions(listItem)}</ActionsCell> : null}
           </tr>
         ))}
       </tbody>
