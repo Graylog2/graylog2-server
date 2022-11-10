@@ -213,6 +213,8 @@ public class AggregationEventProcessor implements EventProcessor {
                 final Message msg = resultMessage.getMessage();
                 final Event event = eventFactory.createEvent(eventDefinition, msg.getTimestamp(), eventDefinition.title());
                 event.setOriginContext(EventOriginContext.elasticsearchMessage(resultMessage.getIndex(), msg.getId()));
+                event.setTimerangeStart(parameters.timerange().getFrom());
+                event.setTimerangeEnd(parameters.timerange().getTo());
 
                 // Ensure the event has values in the "source_streams" field for permission checks to work
                 eventStreamService.buildEventSourceStreams(getStreams(parameters), ImmutableSet.copyOf(msg.getStreamIds()))
