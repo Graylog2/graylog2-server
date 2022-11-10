@@ -92,7 +92,7 @@ const StreamModal = ({
       <Formik<FormValues> initialValues={_initialValues}
                           onSubmit={_onSubmit}
                           validate={validate}>
-        {({ setFieldTouched, isSubmitting, isValidating }) => (
+        {({ isSubmitting, isValidating }) => (
           <Form>
             <Modal.Header closeButton>
               <Modal.Title>{modalTitle}</Modal.Title>
@@ -108,11 +108,11 @@ const StreamModal = ({
                            help="What kind of messages are routed into this stream?" />
 
               <Field name="index_set_id">
-                {({ field: { name, value, onChange }, meta: { error, touched } }) => (
+                {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
                   <Input label="Index Set"
                          help="Messages that match this stream will be written to the configured index set."
                          error={(error && touched) ? error : undefined}>
-                    <Select onBlur={() => setFieldTouched(name, true)}
+                    <Select onBlur={onBlur}
                             onChange={(newValue: number) => onChange({
                               target: { value: newValue, name },
                             })}
