@@ -25,6 +25,9 @@ import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
+import org.graylog.testing.utils.IndexSetUtils;
+import org.graylog.testing.utils.StreamUtils;
+import org.graylog2.plugin.streams.StreamRuleType;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
@@ -34,6 +37,7 @@ import org.junit.jupiter.api.BeforeAll;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
@@ -48,6 +52,9 @@ public class ScriptingApiResourceIT {
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;
 
+    private String stream1Id;
+    private String stream2Id;
+
     public ScriptingApiResourceIT(GraylogBackend sut, RequestSpecification requestSpec) {
         this.sut = sut;
         this.requestSpec = requestSpec;
@@ -55,15 +62,20 @@ public class ScriptingApiResourceIT {
 
     @BeforeAll
     public void beforeAll() {
+
+        final String defaultIndexSetId = IndexSetUtils.defaultIndexSetId(requestSpec);
+        this.stream1Id = StreamUtils.createStream(requestSpec, "Stream #1", defaultIndexSetId, new StreamUtils.StreamRule(StreamRuleType.EXACT.toInteger(), "stream1", "target_stream", false));
+        this.stream2Id = StreamUtils.createStream(requestSpec, "Stream #2", defaultIndexSetId, new StreamUtils.StreamRule(StreamRuleType.EXACT.toInteger(), "stream2", "target_stream", false));
+
         GelfInputUtils.createGelfHttpInput(sut, 12201, requestSpec)
                 .postMessage("""
-                        {"short_message":"search-sync-test", "host":"example.org", "facility":"test", "_level":1}
+                        {"short_message":"search-sync-test", "host":"example.org", "facility":"test", "_level":1, "_target_stream": "stream1"}
                         """)
                 .postMessage("""
-                        {"short_message":"search-sync-test-2", "host":"example.org", "facility":"another-test", "_level":2}
+                        {"short_message":"search-sync-test-2", "host":"example.org", "facility":"another-test", "_level":2, "_target_stream": "stream2"}
                         """)
                 .postMessage("""
-                        {"short_message":"search-sync-test-3", "host":"lorem-ipsum.com", "facility":"another-test", "_level":3, "_http_method":"POST"}
+                        {"short_message":"search-sync-test-3", "host":"lorem-ipsum.com", "facility":"another-test", "_level":3, "_http_method":"POST", "_target_stream": "stream2"}
                         """)
                 .waitForAllMessages();
     }
@@ -262,6 +274,38 @@ public class ScriptingApiResourceIT {
     }
 
     @ContainerMatrixTest
+    void testStreamFiltering() {
+        final String req = """
+                {
+                    "streams": ["%s"],
+                    "aggregation": {
+                      "group_by": [
+                        {
+                          "field_name": "facility"
+                        }
+                      ],
+                      "metrics": [
+                        {
+                          "function_name": "count",
+                          "field_name": "facility"
+                        }
+                      ]
+                    }
+                  }
+                """;
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body(String.format(Locale.ROOT, req, stream2Id))
+                .post("/scripting_api/aggregate")
+                .then()
+                .statusCode(200);
+
+        validateRow(validatableResponse, "another-test", 2);
+        validatableResponse.assertThat().body("data.rows", Matchers.hasSize(1));
+    }
+
+    @ContainerMatrixTest
     void testSorting() {
         final ValidatableResponse validatableResponse = given()
                 .spec(requestSpec)
@@ -333,6 +377,8 @@ public class ScriptingApiResourceIT {
         final long diff = toDateTime.getMillis() - fromDateTime.getMillis();
         Assertions.assertEquals(300_000, diff);
     }
+
+
 
     private void validateSchema(ValidatableResponse response, String name, String type, String field) {
         response.assertThat().body("schema", Matchers.hasItem(
