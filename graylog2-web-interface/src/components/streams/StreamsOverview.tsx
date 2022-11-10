@@ -16,7 +16,9 @@
  */
 import PropTypes from 'prop-types';
 import React, { useState, useEffect, useCallback } from 'react';
+import { Label } from 'react-bootstrap';
 
+import { isPermitted } from 'util/PermissionsMixin';
 import { Alert } from 'components/bootstrap';
 import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
 import Spinner from 'components/common/Spinner';
@@ -26,18 +28,59 @@ import StreamsStore from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import type { CustomCells } from 'components/common/ConfigurableDataTable';
 import ConfigurableDataTable from 'components/common/ConfigurableDataTable';
 import StreamActions from 'components/streams/StreamActions';
+import { Link } from 'components/common/router';
+import Routes from 'routing/Routes';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import CreateStreamButton from './CreateStreamButton';
 
 const AVAILABLE_ATTRIBUTES = [
   { id: 'title', title: 'Title' },
   { id: 'description', title: 'Description' },
+  { id: 'index_set_id', title: 'Index Set' },
   { id: 'disabled', title: 'Status' },
 ];
 
-const VISIBLE_ATTRIBUTES = ['title', 'description', 'disabled'];
+const VISIBLE_ATTRIBUTES = ['title', 'description', 'disabled', 'index_set_id'];
+
+const customCells = (indexSets: Array<IndexSet>, userPermissions): CustomCells<Stream> => {
+  return {
+    title: (stream, _attribute, key) => (
+      <td key={key}>
+        <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
+      </td>
+    ),
+    index_set_id: (stream, _attribute, key) => {
+      if (!isPermitted(userPermissions, ['indexsets:read'])) {
+        return null;
+      }
+
+      const indexSet = indexSets.find((is) => is.id === stream.index_set_id) || indexSets.find((is) => is.is_default);
+
+      return (
+        <td key={key}>
+          {indexSet ? (
+            <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>
+              {indexSet.title}
+            </Link>
+          ) : <i>not found</i>}
+        </td>
+      );
+    },
+    disabled: (stream, _attribute, key) => {
+      return (
+        <td key={key}>
+          <Label bsStyle={stream.disabled ? 'warning' : 'success'}>
+            {stream.disabled ? 'Stopped' : 'Running'}
+          </Label>
+        </td>
+      );
+    },
+  };
+};
 
 type Props = {
   onStreamCreate: (stream: Stream) => Promise<void>,
@@ -45,6 +88,7 @@ type Props = {
 }
 
 const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
+  const currentUser = useCurrentUser();
   const paginationQueryParameter = usePaginationQueryParameter();
   const [searchParams, setSearchParams] = useState({
     page: paginationQueryParameter.page,
@@ -138,6 +182,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
             <ConfigurableDataTable rows={streams}
                                    attributes={VISIBLE_ATTRIBUTES}
                                    rowActions={renderStreamActions}
+                                   customCells={customCells(indexSets, currentUser.permissions)}
                                    availableAttributes={AVAILABLE_ATTRIBUTES} />
           )}
       </div>
