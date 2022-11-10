@@ -17,6 +17,7 @@
 import PropTypes from 'prop-types';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Label } from 'react-bootstrap';
+import styled from 'styled-components';
 
 import { isPermitted } from 'util/PermissionsMixin';
 import { Alert } from 'components/bootstrap';
@@ -44,7 +45,11 @@ const AVAILABLE_ATTRIBUTES = [
   { id: 'disabled', title: 'Status' },
 ];
 
-const VISIBLE_ATTRIBUTES = ['title', 'description', 'disabled', 'index_set_id'];
+const VISIBLE_ATTRIBUTES = ['title', 'description', 'index_set_id', 'disabled'];
+
+const StatusCell = styled.td`
+  width: 100px;
+`;
 
 const customCells = (indexSets: Array<IndexSet>, userPermissions): CustomCells<Stream> => {
   return {
@@ -58,7 +63,7 @@ const customCells = (indexSets: Array<IndexSet>, userPermissions): CustomCells<S
         return null;
       }
 
-      const indexSet = indexSets.find((is) => is.id === stream.index_set_id) || indexSets.find((is) => is.is_default);
+      const indexSet = indexSets.find((is) => is.id === stream.index_set_id) || indexSets.find((is) => is.default);
 
       return (
         <td key={key}>
@@ -72,11 +77,11 @@ const customCells = (indexSets: Array<IndexSet>, userPermissions): CustomCells<S
     },
     disabled: (stream, _attribute, key) => {
       return (
-        <td key={key}>
+        <StatusCell key={key}>
           <Label bsStyle={stream.disabled ? 'warning' : 'success'}>
             {stream.disabled ? 'Stopped' : 'Running'}
           </Label>
-        </td>
+        </StatusCell>
       );
     },
   };

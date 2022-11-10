@@ -119,7 +119,7 @@ const StreamActions = ({
   }, [stream.id]);
 
   return (
-    <ButtonToolbar className="pull-right">
+    <ButtonToolbar>
       <ShareButton entityId={stream.id}
                    entityType="stream"
                    onClick={toggleEntityShareModal}
