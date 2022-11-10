@@ -92,7 +92,7 @@ const StreamModal = ({
       <Formik<FormValues> initialValues={_initialValues}
                           onSubmit={_onSubmit}
                           validate={validate}>
-        {({ setFieldTouched, isSubmitting, isValid }) => (
+        {({ setFieldTouched, isSubmitting, isValidating }) => (
           <Form>
             <Modal.Header closeButton>
               <Modal.Title>{modalTitle}</Modal.Title>
@@ -136,7 +136,7 @@ const StreamModal = ({
               <ModalSubmit submitButtonText={submitButtonText}
                            submitLoadingText={submitLoadingText}
                            onCancel={onClose}
-                           disabledSubmit={!isValid}
+                           disabledSubmit={isValidating}
                            isSubmitting={isSubmitting} />
             </Modal.Footer>
           </Form>
