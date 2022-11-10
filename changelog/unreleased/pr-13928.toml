@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Test to prevent pipeline rule description bug (13885)"
+
+issues = ["13885"]
+pulls = ["13879"]
