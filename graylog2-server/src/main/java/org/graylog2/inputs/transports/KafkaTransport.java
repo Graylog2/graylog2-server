@@ -574,8 +574,9 @@ public class KafkaTransport extends ThrottleableTransport {
                     "A newline separated list of Kafka properties. (e.g.: \"ssl.keystore.location=/etc/graylog/server/kafka.keystore.jks\").",
                     ConfigurationField.Optional.OPTIONAL,
                     ConfigurationField.PLACE_AT_END_POSITION,
-                    TextField.Attribute.TEXTAREA
-                    ));
+                    TextField.Attribute.TEXTAREA,
+                    TextField.Attribute.IS_SENSITIVE
+            ));
 
             return cr;
         }
