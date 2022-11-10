@@ -16,11 +16,10 @@
  */
 import PropTypes from 'prop-types';
 import React, { useState, useEffect, useCallback } from 'react';
-import { Label } from 'react-bootstrap';
 import styled from 'styled-components';
 
 import { isPermitted } from 'util/PermissionsMixin';
-import { Alert } from 'components/bootstrap';
+import { Alert, Label } from 'components/bootstrap';
 import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';
@@ -35,6 +34,7 @@ import StreamActions from 'components/streams/StreamActions';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import useCurrentUser from 'hooks/useCurrentUser';
+import StreamStatusCell from 'components/streamrules/StreamStatusCell';
 
 import CreateStreamButton from './CreateStreamButton';
 
@@ -46,10 +46,6 @@ const AVAILABLE_ATTRIBUTES = [
 ];
 
 const VISIBLE_ATTRIBUTES = ['title', 'description', 'index_set_id', 'disabled'];
-
-const StatusCell = styled.td`
-  width: 100px;
-`;
 
 const customCells = (indexSets: Array<IndexSet>, userPermissions): CustomCells<Stream> => {
   return {
@@ -75,15 +71,7 @@ const customCells = (indexSets: Array<IndexSet>, userPermissions): CustomCells<S
         </td>
       );
     },
-    disabled: (stream, _attribute, key) => {
-      return (
-        <StatusCell key={key}>
-          <Label bsStyle={stream.disabled ? 'warning' : 'success'}>
-            {stream.disabled ? 'Stopped' : 'Running'}
-          </Label>
-        </StatusCell>
-      );
-    },
+    disabled: (stream, _attribute, key) => <StreamStatusCell stream={stream} key={key} />,
   };
 };
 
