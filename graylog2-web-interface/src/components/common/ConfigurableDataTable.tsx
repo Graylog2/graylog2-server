@@ -25,6 +25,7 @@ type Attribute = {
 };
 
 type CustomHeaders = { [key: string]: (attribute: Attribute) => React.ReactNode }
+export type CustomCells<ListItem extends { id: string}> = { [key: string]: (listItem: ListItem, attribute: Attribute, key: string) => React.ReactNode }
 
 const TableHead = ({
   selectedAttributes,
@@ -54,7 +55,7 @@ const TableHead = ({
 type Props<ListItem extends { id: string }> = {
   rows: Array<ListItem>,
   rowActions?: (listItem: ListItem) => React.ReactNode,
-  customCells?: { [key: string]: (listItem: ListItem, attribute: Attribute, key: string) => React.ReactNode }
+  customCells?: CustomCells<ListItem>,
   customHeaders?: CustomHeaders,
   attributes: Array<string>,
   availableAttributes: Array<Attribute>,
