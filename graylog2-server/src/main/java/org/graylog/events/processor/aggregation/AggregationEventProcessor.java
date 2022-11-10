@@ -215,6 +215,7 @@ public class AggregationEventProcessor implements EventProcessor {
                 event.setOriginContext(EventOriginContext.elasticsearchMessage(resultMessage.getIndex(), msg.getId()));
                 event.setTimerangeStart(parameters.timerange().getFrom());
                 event.setTimerangeEnd(parameters.timerange().getTo());
+                event.setQuery(config.query());
 
                 // Ensure the event has values in the "source_streams" field for permission checks to work
                 eventStreamService.buildEventSourceStreams(getStreams(parameters), ImmutableSet.copyOf(msg.getStreamIds()))
@@ -285,6 +286,7 @@ public class AggregationEventProcessor implements EventProcessor {
             // The keyResult timestamp is set to the end of the range
             event.setTimerangeStart(keyResult.timestamp().map(t -> t.minus(config.searchWithinMs())).orElse(parameters.timerange().getFrom()));
             event.setTimerangeEnd(keyResult.timestamp().orElse(parameters.timerange().getTo()));
+            event.setQuery(config.query());
 
             sourceStreams.forEach(event::addSourceStream);
 

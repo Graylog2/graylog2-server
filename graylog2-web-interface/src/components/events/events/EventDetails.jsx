@@ -71,7 +71,6 @@ class EventDetails extends React.Component {
   };
 
   renderReplaySearchLink = (event) => {
-    let query = '';
     let rangeType;
     let range;
     let streams;
@@ -81,16 +80,11 @@ class EventDetails extends React.Component {
       range = { from: `${event.timerange_start}`, to: `${event.timerange_end}` };
     }
 
-    if (event.origin_context) {
-      const contextArr = event.origin_context.split(':');
-      query = `_id: ${contextArr[contextArr.length - 1]}`;
-    }
-
     if (event.source_streams) {
       streams = event.source_streams;
     }
 
-    const replaySearchUrl = Routes.search_with_query(query, rangeType, range, streams);
+    const replaySearchUrl = Routes.search_with_query(event.query, rangeType, range, streams);
 
     return <Link to={replaySearchUrl}>Replay Search</Link>;
   };

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface Event extends Indexable {
+    @Override
     String getId();
 
     String getEventDefinitionType();
@@ -96,6 +97,10 @@ public interface Event extends Indexable {
 
     void setGroupByFields(Map<String, String> fields);
 
+    void setQuery(String query);
+
+    String getQuery();
+
     EventDto toDto();
 
     static Event fromDto(EventDto from) {
@@ -107,6 +112,7 @@ public interface Event extends Indexable {
         event.setFields(from.fields());
         event.setGroupByFields(from.groupByFields());
         event.setPriority(from.priority());
+        event.setQuery(from.query());
 
         from.timerangeStart().ifPresent(event::setTimerangeStart);
         from.timerangeEnd().ifPresent(event::setTimerangeEnd);
