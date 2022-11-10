@@ -29,6 +29,10 @@ type Attribute = {
 type CustomHeaders = { [key: string]: (attribute: Attribute) => React.ReactNode }
 export type CustomCells<ListItem extends { id: string}> = { [key: string]: (listItem: ListItem, attribute: Attribute, key: string) => React.ReactNode }
 
+const ScrollContainer = styled.div`
+  overflow-x: auto;
+`;
+
 const ActionsHead = styled.th`
   text-align: right;
 `;
@@ -100,28 +104,30 @@ const ConfigurableDataTable = <ListItem extends { id: string }>({
   const displayActionsCol = typeof rowActions === 'function';
 
   return (
-    <Table striped condensed hover>
-      <TableHead selectedAttributes={selectedAttributes}
-                 customHeaders={customHeaders}
-                 displayActionsCol={displayActionsCol} />
-      <tbody>
-        {rows.map((listItem) => (
-          <tr key={listItem.id}>
-            {selectedAttributes.map((attribute) => {
-              const cellKey = `${listItem.id}-${attribute.id}`;
-              const cellRenderer = customCells?.[attribute.id] ?? attributeCellRenderer[attribute.id];
+    <ScrollContainer>
+      <Table striped condensed hover>
+        <TableHead selectedAttributes={selectedAttributes}
+                   customHeaders={customHeaders}
+                   displayActionsCol={displayActionsCol} />
+        <tbody>
+          {rows.map((listItem) => (
+            <tr key={listItem.id}>
+              {selectedAttributes.map((attribute) => {
+                const cellKey = `${listItem.id}-${attribute.id}`;
+                const cellRenderer = customCells?.[attribute.id] ?? attributeCellRenderer[attribute.id];
 
-              return (
-                cellRenderer
-                  ? cellRenderer(listItem, attribute, cellKey)
-                  : <td key={cellKey}>{listItem[attribute.id]}</td>
-              );
-            })}
-            {displayActionsCol ? <ActionsCell>{rowActions(listItem)}</ActionsCell> : null}
-          </tr>
-        ))}
-      </tbody>
-    </Table>
+                return (
+                  cellRenderer
+                    ? cellRenderer(listItem, attribute, cellKey)
+                    : <td key={cellKey}>{listItem[attribute.id]}</td>
+                );
+              })}
+              {displayActionsCol ? <ActionsCell>{rowActions(listItem)}</ActionsCell> : null}
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </ScrollContainer>
   );
 };
 
