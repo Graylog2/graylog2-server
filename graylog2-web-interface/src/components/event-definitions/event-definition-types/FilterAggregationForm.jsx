@@ -115,12 +115,6 @@ class FilterAggregationForm extends React.Component {
     this.setState(stateChange);
   };
 
-  handleChange = (event) => {
-    const { name } = event.target;
-
-    this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
-  };
-
   render() {
     const { conditionType } = this.state;
     const { entityTypes, eventDefinition, streams, validation, currentUser } = this.props;
