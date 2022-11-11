@@ -52,14 +52,7 @@ const GettingStartedPage = ({ system, location }: Props) => {
 
   return (
     <DocumentTitle title="Getting started">
-      <StyledRow>
-        <GettingStarted clusterId={clusterId}
-                        masterOs={operatingSystem}
-                        masterVersion={version}
-                        gettingStartedUrl={GETTING_STARTED_URL}
-                        noDismissButton={Boolean(location.query.menu)}
-                        onDismiss={_onDismiss} />
-      </StyledRow>
+      <GettingStarted />
     </DocumentTitle>
   );
 };

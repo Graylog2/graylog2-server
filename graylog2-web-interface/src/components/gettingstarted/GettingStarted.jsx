@@ -18,203 +18,143 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Qs from 'qs';
 import styled, { css } from 'styled-components';
+import moment from 'moment';
 
-import { Grid, Col, Button } from 'components/bootstrap';
-import { ContentHeadRow, Spinner, Icon } from 'components/common';
+import { Grid, Col, Button, Row, ListGroup, ListGroupItem, Table, Label } from 'components/bootstrap';
+import {
+  ContentHeadRow,
+  Spinner,
+  Icon,
+  DocumentTitle,
+  EntityListItem,
+  ControlledTableList,
+  LinkToNode,
+} from 'components/common';
 import { GettingStartedActions } from 'stores/gettingstarted/GettingStartedStore';
 
-const Container = styled.div`
+import PageContentLayout from '../layout/PageContentLayout';
+import AutoFontSizer from '../../views/components/visualizations/number/AutoFontSizer';
+import CustomHighlighting from '../../views/components/messagelist/CustomHighlighting';
+import Value from '../../views/components/Value';
+import fieldTypeFor from '../../views/logic/fieldtypes/FieldTypeFor';
+import DecoratedValue from '../../views/components/messagelist/decoration/DecoratedValue';
+import ElementDimensions from '../common/ElementDimensions';
+import { FieldTypes } from '../../views/logic/fieldtypes/FieldType';
+import PageHeader from '../common/PageHeader';
+import SectionGrid from '../common/Section/SectionGrid';
+import SectionComponent from '../common/Section/SectionComponent';
+import { Link } from '../common/router';
+import Routes from '../../routing/Routes';
+import ControlledTableListItem from '../common/ControlledTableListItem';
+import { relativeDifference } from '../../util/DateTime';
+
+const NumberBox = styled(ElementDimensions)`
   height: 100%;
-  display: grid;
-  display: -ms-grid;
-  grid-template-rows: max-content 1fr;
-  -ms-grid-rows: max-content 1fr;
-  grid-template-columns: 1fr;
-  -ms-grid-columns: 1fr;
-`;
-
-const DismissButtonSection = styled.div`
-  grid-column: 1;
-  -ms-grid-column: 1;
-  grid-row: 1;
-  -ms-grid-row: 1;
-`;
-
-const DismissButton = styled(Button)`
-  margin-right: 5px;
-  top: -4px;
-  position: relative;
-`;
-
-const ContentSection = styled.div`
-  grid-row: 2;
-  -ms-grid-row: 2;
-  grid-column: 1;
-  -ms-grid-column: 1;
-`;
-
-const GettingStartedIframe = styled.iframe(({ hidden }) => css`
-  display: ${hidden ? 'none' : 'block'};
   width: 100%;
-  height: 100%;
-`);
+  padding-bottom: 10px;
+`;
 
-class GettingStarted extends React.Component {
-  timeoutId = null;
+const FlexContainer = styled.div`
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 45px;
+`;
 
-  static propTypes = {
-    clusterId: PropTypes.string.isRequired,
-    masterOs: PropTypes.string.isRequired,
-    masterVersion: PropTypes.string.isRequired,
-    gettingStartedUrl: PropTypes.string.isRequired,
-    noDismissButton: PropTypes.bool,
-    onDismiss: PropTypes.func,
-  };
+const VisualizationContainer = styled(Col)`
+  min-height: 200px;
+  min-width: 33%;
+`;
 
-  static defaultProps = {
-    noDismissButton: false,
-    onDismiss: () => {},
-  };
+const StyledSectionComponent = styled(SectionComponent)`
+  flex-grow: 1;
+`;
+const typeLinkMap = {
+  dashboard: { link: 'DASHBOARDS_VIEWID', icon: 'grid-horizontal' },
+  search: { link: 'SEARCH_VIEWID', icon: 'folder-magnifying-glass' },
+};
 
-  constructor(props) {
-    super(props);
+const EntityItem = ({ type, title, id }) => {
+  return (
+    <ListGroupItem>
+      <Icon name="search" />
+      <Link to={Routes.pluginRoute(typeLinkMap[type].link)(id)}>{title}</Link>
+    </ListGroupItem>
+  );
+};
 
-    this.state = {
-      guideLoaded: false,
-      guideUrl: '',
-      showStaticContent: false,
-    };
-  }
+const StyledLabel = styled(Label)`
+  cursor: default;
+`;
+const lastOpen = [
+  {
+    type: 'dashboard',
+    title: 'DashboardTitle1',
+    id: '1111',
+  },
+  {
+    type: 'search',
+    title: 'SearchTitle1',
+    id: '1111',
+  },
+  {
+    type: 'dashboard',
+    title: 'DashboardTitle2',
+    id: '1111',
+  },
+];
+const activities = [{
+  timestamp: '2021-11-09T14:28:24+01:00',
+  title: 'someone action made action with smth',
+  id: '111',
+},
+{
+  timestamp: '2022-11-09T14:28:24+01:00',
+  title: 'someone action made action with smth',
+  id: '222',
+},
+];
 
-  componentDidMount() {
-    if (window.addEventListener) {
-      window.addEventListener('message', this._onMessage);
-    }
+const GettingStarted = () => {
+  console.log('!!!!!!!', relativeDifference('2021-11-09T14:28:24+01:00'));
 
-    this.timeoutId = window.setTimeout(this._displayFallbackContent, 3000);
-  }
-
-  componentWillUnmount() {
-    if (window.removeEventListener) {
-      window.removeEventListener('message', this._onMessage);
-    }
-
-    if (this.timeoutId !== null) {
-      window.clearTimeout(Number(this.timeoutId));
-      this.timeoutId = null;
-    }
-  }
-
-  _onMessage = (messageEvent) => {
-    const { gettingStartedUrl } = this.props;
-
-    // make sure we only process messages from the getting started url, otherwise this can interfere with other messages being posted
-    if (gettingStartedUrl.indexOf(messageEvent.origin) === 0) {
-      if (this.timeoutId !== null) {
-        window.clearTimeout(Number(this.timeoutId));
-        this.timeoutId = null;
-      }
-
-      this.setState({
-        guideLoaded: messageEvent.data.guideLoaded,
-        guideUrl: messageEvent.data.guideUrl,
-      });
-    }
-  };
-
-  _displayFallbackContent = () => {
-    this.setState({ showStaticContent: true });
-  };
-
-  _dismissGuide = () => {
-    const { onDismiss } = this.props;
-
-    GettingStartedActions.dismiss.triggerPromise().then(() => {
-      if (onDismiss) {
-        onDismiss();
-      }
-    });
-  };
-
-  render() {
-    const { noDismissButton, clusterId, masterOs, masterVersion, gettingStartedUrl } = this.props;
-    const { showStaticContent, guideLoaded, guideUrl } = this.state;
-
-    let dismissButton = null;
-
-    if (!noDismissButton) {
-      dismissButton = (
-        <DismissButton bsStyle="default" bsSize="small" onClick={this._dismissGuide}>
-          <Icon name="times" /> Dismiss guide
-        </DismissButton>
-      );
-    }
-
-    let gettingStartedContent = null;
-
-    if (showStaticContent) {
-      gettingStartedContent = (
-        <Grid>
-          <ContentHeadRow className="content">
-            <Col mdPush={3} md={6} className="text-center" style={{ paddingBottom: '15px' }}>
-              <span>
-                We could not load the{' '}
-                <a target="_blank" rel="noopener noreferrer" href="https://gettingstarted.graylog.org/assets/index.html">Graylog Getting Started Guide</a>.
-                Please open it directly with a browser that can access the public internet.
-              </span>
-            </Col>
-          </ContentHeadRow>
-        </Grid>
-      );
-    } else {
-      const query = Qs.stringify({
-        c: clusterId,
-        o: masterOs,
-        v: masterVersion,
-        m: noDismissButton,
-      });
-
-      const url = guideUrl === '' ? (`${gettingStartedUrl}?${query}`) : guideUrl;
-      let spinner = null;
-
-      if (!guideLoaded) {
-        spinner = (
-          <Grid>
-            <ContentHeadRow className="content">
-              <Col mdPush={3} md={6} className="text-center" style={{ paddingBottom: '15px' }}>
-                <Spinner text="Loading Graylog Getting started guide ..." />
-              </Col>
-            </ContentHeadRow>
-          </Grid>
-        );
-      }
-
-      gettingStartedContent = (
-        <>
-          {spinner}
-          <GettingStartedIframe src={url}
-                                hidden={!guideLoaded}
-                                id="getting-started-frame"
-                                frameBorder="0"
-                                scrolling="yes"
-                                title="getting-started-content">
-            <p>Sorry, no iframes</p>
-          </GettingStartedIframe>
-        </>
-      );
-    }
-
-    return (
-      <Container>
-        <DismissButtonSection>
-          <div className="pull-right">{dismissButton}</div>
-        </DismissButtonSection>
-        <ContentSection>
-          {gettingStartedContent}
-        </ContentSection>
-      </Container>
-    );
-  }
-}
+  return (
+    <>
+      <PageHeader title="Getting started">
+        <span>Some amazing description</span>
+      </PageHeader>
+      <FlexContainer>
+        <StyledSectionComponent title="Last opened">
+          <ListGroup>
+            {lastOpen.map(({ type, id, title }) => <EntityItem key={id} type={type} id={id} title={title} />)}
+          </ListGroup>
+        </StyledSectionComponent>
+        <StyledSectionComponent title="Pinned dashboard">
+          <ListGroup>
+            {lastOpen.map(({ type, id, title }) => <EntityItem key={id} type={type} id={id} title={title} />)}
+          </ListGroup>
+        </StyledSectionComponent>
+      </FlexContainer>
+      <StyledSectionComponent title="Recent activity">
+        <Table striped>
+          <tbody>
+            {
+            activities.map(({ timestamp, title, id }) => {
+              return (
+                <tr key={id}>
+                  <td><StyledLabel title={timestamp}>{relativeDifference(timestamp)}</StyledLabel></td>
+                  <td>
+                    {title}
+                  </td>
+                </tr>
+              );
+            })
+          }
+          </tbody>
+        </Table>
+      </StyledSectionComponent>
+    </>
+  );
+};
 
 export default GettingStarted;
