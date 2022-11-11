@@ -25,6 +25,8 @@ const legacyWriteText = (str: string) => {
   document.addEventListener('copy', listener);
   document.execCommand('copy');
   document.removeEventListener('copy', listener);
+
+  return Promise.resolve();
 };
 
 // Compatibility is sufficient. We not support IE or outdated iOS.
