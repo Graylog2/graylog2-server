@@ -53,7 +53,7 @@ public class JsonUtils {
     }
 
     public static JsonNode extractJson(
-            String value, ObjectMapper mapper, ExtractFlags extractFlags)
+            String value, ObjectMapper mapper, ExtractFlags extractFlags, Boolean stringify)
             throws IOException {
         if (isNullOrEmpty(value)) {
             throw new IOException("null result");
@@ -63,7 +63,11 @@ public class JsonUtils {
         ObjectNode resultRoot = mapper.createObjectNode();
         for (Map.Entry<String, Object> mapEntry : json.entrySet()) {
             for (Entry entry : parseValue(mapEntry.getKey(), mapEntry.getValue(), mapper, extractFlags)) {
-                putNodeWithType(resultRoot, entry.key(), entry.value());
+                if (stringify) {
+                    resultRoot.put(entry.key(), entry.value().toString());
+                } else {
+                    putNodeWithType(resultRoot, entry.key(), entry.value());
+                }
             }
         }
         return resultRoot;
@@ -196,17 +200,27 @@ public class JsonUtils {
     @AutoValue
     protected abstract static class ExtractFlags {
         public abstract boolean flattenObjects();
+
         public abstract boolean escapeArrays();
+
         public abstract boolean deleteArrays();
+
+        public abstract boolean stringifyValues();
+
         public static Builder builder() {
-            return new AutoValue_JsonUtils_ExtractFlags.Builder();
+            return new AutoValue_JsonUtils_ExtractFlags.Builder().stringifyValues(false);
         }
 
         @AutoValue.Builder
         public abstract static class Builder {
             public abstract Builder flattenObjects(boolean flattenObjects);
+
             public abstract Builder escapeArrays(boolean escapeArrays);
+
             public abstract Builder deleteArrays(boolean deleteArrays);
+
+            public abstract Builder stringifyValues(boolean stringifyValues);
+
             public abstract JsonUtils.ExtractFlags build();
         }
     }
