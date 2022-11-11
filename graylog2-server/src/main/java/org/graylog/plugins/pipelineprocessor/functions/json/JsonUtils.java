@@ -200,27 +200,17 @@ public class JsonUtils {
     @AutoValue
     protected abstract static class ExtractFlags {
         public abstract boolean flattenObjects();
-
         public abstract boolean escapeArrays();
-
         public abstract boolean deleteArrays();
-
-        public abstract boolean stringifyValues();
-
         public static Builder builder() {
-            return new AutoValue_JsonUtils_ExtractFlags.Builder().stringifyValues(false);
+            return new AutoValue_JsonUtils_ExtractFlags.Builder();
         }
 
         @AutoValue.Builder
         public abstract static class Builder {
             public abstract Builder flattenObjects(boolean flattenObjects);
-
             public abstract Builder escapeArrays(boolean escapeArrays);
-
             public abstract Builder deleteArrays(boolean deleteArrays);
-
-            public abstract Builder stringifyValues(boolean stringifyValues);
-
             public abstract JsonUtils.ExtractFlags build();
         }
     }

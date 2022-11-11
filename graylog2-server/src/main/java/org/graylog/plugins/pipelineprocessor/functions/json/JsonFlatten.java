@@ -64,7 +64,7 @@ public class JsonFlatten extends AbstractFunction<JsonNode> {
         this.objectMapper = objectMapper;
         valueParam = ParameterDescriptor.string("value").description("The string to parse as a JSON tree").build();
         arrayHandlerParam = ParameterDescriptor.string("array_handler").description("Determines how arrays are processed").build();
-        stringifyParam = ParameterDescriptor.bool("stringify").description("Convert all extracted values to strings").build();
+        stringifyParam = ParameterDescriptor.bool("stringify").optional().description("Convert all extracted values to strings").build();
     }
 
     @Override
@@ -99,7 +99,7 @@ public class JsonFlatten extends AbstractFunction<JsonNode> {
                 .name(NAME)
                 .returnType(JsonNode.class)
                 .params(of(
-                        valueParam, arrayHandlerParam
+                        valueParam, arrayHandlerParam, stringifyParam
                 ))
                 .description("Parses a string as a JSON tree, while flattening all containers to a single level")
                 .build();
