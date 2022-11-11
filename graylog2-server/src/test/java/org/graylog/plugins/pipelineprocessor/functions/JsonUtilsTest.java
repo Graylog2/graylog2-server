@@ -56,10 +56,20 @@ public class JsonUtilsTest {
 
     @Test
     public void extractArrayOfObjects() throws IOException {
-        String jsonString = "{\"k0\":\"v0\",\"arr1\":[{\"k11\":\"v11\",\"k12\":\"v12\"},{\"k21\":\"v21\"}]}";
+        String jsonString = "{\"k0\":\"v0\",\"arr1\":[{\"k11\":\"v11\",\"k12\":12},{\"k21\":\"v21\"}]}";
 
         // flatten objects by concatenating keys
-        String expected = "{\"k0\":\"v0\",\"arr1_0_k11\":\"v11\",\"arr1_0_k12\":\"v12\",\"arr1_1_k21\":\"v21\"}";
+        String expected = "{\"k0\":\"v0\",\"arr1_0_k11\":\"v11\",\"arr1_0_k12\":12,\"arr1_1_k21\":\"v21\"}";
+        JsonNode result = JsonUtils.extractJson(jsonString, mapper, JsonFlatten.FLAGS_FLATTEN);
+        assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
+    }
+
+    @Test
+    public void preserveTypes() throws IOException {
+        String jsonString = "{\"string\":\"s0\",\"arr1\":[{\"int\":1,\"float\":1.2},{\"bool\":true}]}";
+
+        // flatten objects by concatenating keys
+        String expected = "{\"string\":\"s0\",\"arr1_0_int\":1,\"arr1_0_float\":1.2,\"arr1_1_bool\":true}";
         JsonNode result = JsonUtils.extractJson(jsonString, mapper, JsonFlatten.FLAGS_FLATTEN);
         assertThat(mapper.writeValueAsString(result)).isEqualTo(expected);
     }

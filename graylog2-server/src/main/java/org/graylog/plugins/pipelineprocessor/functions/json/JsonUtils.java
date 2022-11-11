@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -61,10 +63,35 @@ public class JsonUtils {
         ObjectNode resultRoot = mapper.createObjectNode();
         for (Map.Entry<String, Object> mapEntry : json.entrySet()) {
             for (Entry entry : parseValue(mapEntry.getKey(), mapEntry.getValue(), mapper, extractFlags)) {
-                resultRoot.put(entry.key(), entry.value().toString());
+                putNodeWithType(resultRoot, entry.key(), entry.value());
             }
         }
         return resultRoot;
+    }
+
+    private static void putNodeWithType(ObjectNode node, String key, Object value) {
+        if (value instanceof Short) {
+            node.put(key, (Short) value);
+        } else if (value instanceof Integer) {
+            node.put(key, (Integer) value);
+        } else if (value instanceof Long) {
+            node.put(key, (Long) value);
+        } else if (value instanceof Float) {
+            node.put(key, (Float) value);
+        } else if (value instanceof Double) {
+            node.put(key, (Double) value);
+        } else if (value instanceof BigDecimal) {
+            node.put(key, (BigDecimal) value);
+        } else if (value instanceof BigInteger) {
+            node.put(key, (BigInteger) value);
+        } else if (value instanceof String) {
+            node.put(key, (String) value);
+        } else if (value instanceof Boolean) {
+            node.put(key, (Boolean) value);
+        } else {
+            LOG.debug("Unknown type \"{}\" in key \"{}\"", value.getClass(), key);
+            node.put(key, value.toString());
+        }
     }
 
     private static Collection<Entry> parseValue(
