@@ -24,10 +24,11 @@ const Wrapper = styled.div(({ theme }) => css`
   justify-content: center;
   align-items: center;
   width: 33%;
+  padding: 2%;
 `);
 
 const Container = styled.div`
-  min-width: 90%;
+  width: 100%;
 `;
 
 type Props = {
