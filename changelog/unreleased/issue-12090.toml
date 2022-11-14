@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Hide edit button for permissions config if the user doesn't have edit permissions."
+
+issues = ["12090"]
+pulls = ["13939"]
