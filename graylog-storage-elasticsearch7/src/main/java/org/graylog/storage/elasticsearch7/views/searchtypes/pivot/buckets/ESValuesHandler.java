@@ -105,24 +105,11 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
 
     private Script scriptForPivots(Collection<? extends BucketSpec> pivots) {
         final String scriptSource = Joiner.on(KEY_SEPARATOR_PHRASE).join(pivots.stream()
-                .map(bucket -> "String.valueOf((" + documentHasField(bucket.field())
-                        + " && " + fieldHasValues(bucket.field())
-                        + ") ? " + getFieldValue(bucket.field())
-                        + " : \"" + MissingBucketConstants.MISSING_BUCKET_NAME + "\")")
+                .map(bucket -> """
+                        String.valueOf((doc.containsKey('%s') && doc['%s'].size() > 0) ? doc['%s'].value : "%s")
+                        """.formatted(bucket.field(), bucket.field(), bucket.field(), MissingBucketConstants.MISSING_BUCKET_NAME))
                 .collect(Collectors.toList()));
         return new Script(scriptSource);
-    }
-
-    private String documentHasField(String fieldName) {
-        return "doc.containsKey('" + fieldName + "')";
-    }
-
-    private String fieldHasValues(String fieldName) {
-        return "doc['" + fieldName + "'].size() > 0";
-    }
-
-    private String getFieldValue(String fieldName) {
-        return "doc['" + fieldName + "'].value";
     }
 
     @Override
