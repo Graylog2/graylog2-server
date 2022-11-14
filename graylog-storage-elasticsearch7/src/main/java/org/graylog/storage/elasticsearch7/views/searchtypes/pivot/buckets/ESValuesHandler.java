@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.script.Script;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.BucketOrder;
@@ -114,7 +115,11 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
     public Stream<PivotBucket> extractBuckets(List<BucketSpec> bucketSpecs, PivotBucket initialBucket) {
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
-        final ParsedFilters filterAggregation = previousBucket.getAggregations().get(AGG_NAME);
+        final Aggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
+        if (!(aggregation instanceof final ParsedFilters filterAggregation)) {
+            // This happens when the other bucket is passed for column value extraction
+            return Stream.of(initialBucket);
+        }
         final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
         final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
         final Stream<PivotBucket> bucketStream = termsAggregation.getBuckets()
