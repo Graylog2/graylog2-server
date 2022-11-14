@@ -249,6 +249,7 @@ class EventDefinitionSummary extends React.Component {
   render() {
     const { eventDefinition, validation } = this.props;
     const { showValidation } = this.state;
+    const isSystemEventDefinition = eventDefinition.config.type === "system-notifications-v1";
 
     return (
       <Row className={styles.eventSummary}>
@@ -259,15 +260,20 @@ class EventDefinitionSummary extends React.Component {
             <Col md={5}>
               {this.renderDetails(eventDefinition)}
             </Col>
-            <Col md={5} mdOffset={1}>
-              {this.renderCondition(eventDefinition.config)}
-            </Col>
+            
+            {!isSystemEventDefinition && (
+              <Col md={5} mdOffset={1}>
+                {this.renderCondition(eventDefinition.config)}
+              </Col>
+            )}
           </Row>
           <Row>
-            <Col md={5}>
-              {this.renderFields(eventDefinition.field_spec, eventDefinition.key_spec)}
-            </Col>
-            <Col md={5} mdOffset={1}>
+            {!isSystemEventDefinition && (
+              <Col md={5}>
+                {this.renderFields(eventDefinition.field_spec, eventDefinition.key_spec)}
+              </Col>
+            )}
+            <Col md={5} mdOffset={isSystemEventDefinition ? 0 : 1}>
               {this.renderNotifications(eventDefinition.notifications, eventDefinition.notification_settings)}
             </Col>
           </Row>

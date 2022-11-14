@@ -82,6 +82,10 @@ const EventDefinitionEntry = ({
   const isScheduled = lodash.get(context, `scheduler.${eventDefinition.id}.is_scheduled`, true);
   const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(eventDefinition);
 
+  const isSystemEventDefinition = (): boolean => {
+    return eventDefinition.config.type === 'system-notifications-v1';
+  };
+
   const showActions = (): boolean => {
     return scopePermissions?.is_mutable;
   };
@@ -122,10 +126,14 @@ const EventDefinitionEntry = ({
       <ShareButton entityId={eventDefinition.id} entityType="event_definition" onClick={() => setShowEntityShareModal(true)} />
       <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
         <DropdownButton id="more-dropdown" title="More" pullRight>
-          <MenuItem onClick={handleCopy}>Duplicate</MenuItem>
-          <MenuItem divider />
+          {!isSystemEventDefinition() && (
+            <>
+              <MenuItem onClick={handleCopy}>Duplicate</MenuItem>
+              <MenuItem divider />
+            </>
+          )}
           {toggle}
-          {showActions() && (
+          {!isSystemEventDefinition() && showActions() && (
             <>
               <MenuItem divider />
               <MenuItem onClick={handleDelete} data-testid="delete-button">Delete</MenuItem>
