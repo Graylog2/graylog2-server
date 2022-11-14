@@ -93,6 +93,7 @@ class EventConditionForm extends React.Component {
   render() {
     const { eventDefinition, validation } = this.props;
     const eventDefinitionType = this.getConditionPlugin(eventDefinition.config.type);
+    const isSystemEventDefinition = eventDefinition.config.type === 'system-notifications-v1';
 
     const eventDefinitionTypeComponent = eventDefinitionType.formComponent
       ? React.createElement(eventDefinitionType.formComponent, {
@@ -106,39 +107,50 @@ class EventConditionForm extends React.Component {
         <Col md={7} lg={6}>
           <h2 className={commonStyles.title}>Event Condition</h2>
 
-          <p>
-            Configure how Graylog should create Events of this kind. You can later use those Events as input on other
-            Conditions, making it possible to build powerful Conditions based on others.
-          </p>
-
-          <FormGroup controlId="event-definition-priority" validationState={validation.errors.config ? 'error' : null}>
-            <ControlLabel>Condition Type</ControlLabel>
-            <Select placeholder="Select a Condition Type"
-                    options={this.formattedEventDefinitionTypes()}
-                    value={eventDefinition.config.type}
-                    onChange={this.handleEventDefinitionTypeChange}
-                    clearable={false}
-                    required />
-            <HelpBlock>
-              {lodash.get(validation, 'errors.config[0]', 'Choose the type of Condition for this Event.')}
-            </HelpBlock>
-          </FormGroup>
+          {isSystemEventDefinition ? (
+            <p>
+              The conditions of system notification event definitions cannot be edited.
+            </p>
+          ) : (
+            <>
+              <p>
+                Configure how Graylog should create Events of this kind. You can later use those Events as input on other
+                Conditions, making it possible to build powerful Conditions based on others.
+              </p>
+              <FormGroup controlId="event-definition-priority" validationState={validation.errors.config ? 'error' : null}>
+                <ControlLabel>Condition Type</ControlLabel>
+                <Select placeholder="Select a Condition Type"
+                        options={this.formattedEventDefinitionTypes()}
+                        value={eventDefinition.config.type}
+                        onChange={this.handleEventDefinitionTypeChange}
+                        clearable={false}
+                        required />
+                <HelpBlock>
+                  {lodash.get(validation, 'errors.config[0]', 'Choose the type of Condition for this Event.')}
+                </HelpBlock>
+              </FormGroup>
+            </>
+          )}
         </Col>
 
-        <Col md={5} lg={5} lgOffset={1}>
-          <HelpPanel className={styles.conditionTypesInfo}
-                     title="Available Conditions">
-            {this.renderConditionTypeDescriptions()}
-          </HelpPanel>
-        </Col>
-        <Clearfix />
-
-        {eventDefinitionTypeComponent && (
+        {!isSystemEventDefinition && (
           <>
-            <hr className={styles.hr} />
-            <Col md={12}>
-              {eventDefinitionTypeComponent}
+            <Col md={5} lg={5} lgOffset={1}>
+              <HelpPanel className={styles.conditionTypesInfo}
+                         title="Available Conditions">
+                {this.renderConditionTypeDescriptions()}
+              </HelpPanel>
             </Col>
+            <Clearfix />
+
+            {eventDefinitionTypeComponent && (
+              <>
+                <hr className={styles.hr} />
+                <Col md={12}>
+                  {eventDefinitionTypeComponent}
+                </Col>
+              </>
+            )}
           </>
         )}
       </Row>

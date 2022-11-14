@@ -88,6 +88,7 @@ class FieldsForm extends React.Component {
   render() {
     const { eventDefinition, validation, currentUser } = this.props;
     const { editField, showFieldForm } = this.state;
+    const isSystemEventDefinition = eventDefinition.config.type === 'system-notifications-v1';
 
     if (showFieldForm) {
       return (
@@ -108,42 +109,51 @@ class FieldsForm extends React.Component {
       <Row>
         <Col md={12}>
           <h2 className={commonStyles.title}>Event Fields <small>(optional)</small></h2>
-          <p>
-            Include additional information in Events generated from this Event Definition by adding custom Fields. That
-            can help you search Events or having more context when receiving Notifications.
-          </p>
 
-          {errors.length > 0 && (
-            <Alert bsStyle="danger" className={commonStyles.validationSummary}>
-              <h4>Fields with errors</h4>
-              <p>Please correct the following errors before saving this Event Definition:</p>
-              <ul>
-                {errors.map((error) => {
-                  return <li key={error}>{error}</li>;
-                })}
-              </ul>
-            </Alert>
-          )}
+          {isSystemEventDefinition ? (
+            <p>
+              The event fields of system notification event definitions cannot be edited.
+            </p>
+          ) : (
+            <>
+              <p>
+                Include additional information in Events generated from this Event Definition by adding custom Fields. That
+                can help you search Events or having more context when receiving Notifications.
+              </p>
 
-          {Object.keys(eventDefinition.field_spec).length > 0 && (
-            <dl>
-              <dt>
-                Keys
-                <OverlayTrigger placement="right"
-                                trigger={['click', 'hover']}
-                                overlay={<EventKeyHelpPopover id="key-header-popover" />}>
-                  <Button bsStyle="link" bsSize="xsmall"><Icon name="question-circle" /></Button>
-                </OverlayTrigger>
-              </dt>
-              <dd>{eventDefinition.key_spec.length > 0 ? eventDefinition.key_spec.join(', ') : 'No Keys configured yet.'}</dd>
-            </dl>
+              {errors.length > 0 && (
+                <Alert bsStyle="danger" className={commonStyles.validationSummary}>
+                  <h4>Fields with errors</h4>
+                  <p>Please correct the following errors before saving this Event Definition:</p>
+                  <ul>
+                    {errors.map((error) => {
+                      return <li key={error}>{error}</li>;
+                    })}
+                  </ul>
+                </Alert>
+              )}
+
+              {Object.keys(eventDefinition.field_spec).length > 0 && (
+                <dl>
+                  <dt>
+                    Keys
+                    <OverlayTrigger placement="right"
+                                    trigger={['click', 'hover']}
+                                    overlay={<EventKeyHelpPopover id="key-header-popover" />}>
+                      <Button bsStyle="link" bsSize="xsmall"><Icon name="question-circle" /></Button>
+                    </OverlayTrigger>
+                  </dt>
+                  <dd>{eventDefinition.key_spec.length > 0 ? eventDefinition.key_spec.join(', ') : 'No Keys configured yet.'}</dd>
+                </dl>
+              )}
+              <FieldsList fields={eventDefinition.field_spec}
+                          validation={validation}
+                          keys={eventDefinition.key_spec}
+                          onAddFieldClick={this.toggleFieldForm}
+                          onEditFieldClick={this.toggleFieldForm}
+                          onRemoveFieldClick={this.removeCustomField} />
+            </>
           )}
-          <FieldsList fields={eventDefinition.field_spec}
-                      validation={validation}
-                      keys={eventDefinition.key_spec}
-                      onAddFieldClick={this.toggleFieldForm}
-                      onEditFieldClick={this.toggleFieldForm}
-                      onRemoveFieldClick={this.removeCustomField} />
         </Col>
       </Row>
     );
