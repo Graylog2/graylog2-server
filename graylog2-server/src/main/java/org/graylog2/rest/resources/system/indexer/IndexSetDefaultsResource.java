@@ -32,6 +32,7 @@ import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.Duration;
 
 import javax.inject.Inject;
+import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
@@ -42,6 +43,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 @RequiresAuthentication
 @Api(value = "System/IndexSetDefaults", description = "Index set defaults")
 @Path("/system/indices/index_set_defaults")
@@ -49,11 +52,13 @@ import java.io.IOException;
 public class IndexSetDefaultsResource extends RestResource {
     private final IndexSetValidator indexSetValidator;
     private final ClusterConfigService clusterConfigService;
+    private final Validator validator;
 
     @Inject
-    public IndexSetDefaultsResource(IndexSetValidator indexSetValidator, ClusterConfigService clusterConfigService) {
+    public IndexSetDefaultsResource(IndexSetValidator indexSetValidator, ClusterConfigService clusterConfigService, Validator validator) {
         this.indexSetValidator = indexSetValidator;
         this.clusterConfigService = clusterConfigService;
+        this.validator = validator;
     }
 
     /**
@@ -68,18 +73,29 @@ public class IndexSetDefaultsResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.CLUSTER_CONFIGURATION_UPDATE)
     public Response update(@ApiParam(name = "body", value = "The payload of the index set defaults configuration", required = true)
                            @NotNull IndexSetsDefaultConfiguration config) throws IOException {
-        IndexSetValidator.Violation violation = indexSetValidator.validateRefreshInterval(
-                Duration.standardSeconds(config.fieldTypeRefreshIntervalUnit().toSeconds(config.fieldTypeRefreshInterval())));
+        // Validate scalar fields.
+        validator.validate(config).forEach(v -> {
+            throw new BadRequestException(buildFieldError(v.getPropertyPath().toString(), v.getMessage()));
+        });
+
+        // Perform common refresh interval and retention period validations.
+        IndexSetValidator.Violation violation =
+                indexSetValidator.validateRefreshInterval(Duration.standardSeconds(
+                        config.fieldTypeRefreshIntervalUnit().toSeconds(config.fieldTypeRefreshInterval())));
         if (violation != null) {
-            throw new BadRequestException(violation.message());
+            throw new BadRequestException(buildFieldError(IndexSetsDefaultConfiguration.FIELD_TYPE_REFRESH_INTERVAL, violation.message()));
         }
         violation = indexSetValidator.validateRetentionPeriod(config.rotationStrategyConfig(),
                 config.retentionStrategyConfig());
         if (violation != null) {
-            throw new BadRequestException(violation.message());
+            throw new BadRequestException(buildFieldError(IndexSetsDefaultConfiguration.RETENTION_STRATEGY_CONFIG, violation.message()));
         }
 
         clusterConfigService.write(config);
         return Response.ok(config).build();
+    }
+
+    private static String buildFieldError(String field, String message) {
+        return f("Invalid value for field [%s]: %s", field, message);
     }
 }

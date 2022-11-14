@@ -26,6 +26,9 @@ import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.joda.time.Duration;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
@@ -52,21 +55,26 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
     public static final String RETENTION_STRATEGY_CLASS = "retention_strategy_class";
     public static final String RETENTION_STRATEGY_CONFIG = "retention_strategy_config";
 
+    @NotBlank
     @JsonProperty(INDEX_ANALYZER)
     public abstract String indexAnalyzer();
 
+    @Min(1)
     @JsonProperty(SHARDS)
     public abstract int shards();
 
+    @Min(0)
     @JsonProperty(REPLICAS)
     public abstract int replicas();
 
+    @Min(1)
     @JsonProperty(INDEX_OPTIMIZATION_MAX_SEGMENTS)
     public abstract int indexOptimizationMaxNumSegments();
 
     @JsonProperty(INDEX_OPTIMIZATION_DISABLED)
     public abstract boolean indexOptimizationDisabled();
 
+    @Min(0)
     @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL)
     public abstract long fieldTypeRefreshInterval();
 
@@ -77,15 +85,19 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
      * The property names of rotation/retention settings must match those specified on
      * {@link org.graylog2.indexer.indexset.IndexSetConfig}, since shared UI components are used.
      */
+    @NotBlank
     @JsonProperty(ROTATION_STRATEGY_CLASS)
     public abstract String rotationStrategyClass();
 
+    @NotNull
     @JsonProperty(ROTATION_STRATEGY_CONFIG)
     public abstract RotationStrategyConfig rotationStrategyConfig();
 
+    @NotBlank
     @JsonProperty(RETENTION_STRATEGY_CLASS)
     public abstract String retentionStrategyClass();
 
+    @NotNull
     @JsonProperty(RETENTION_STRATEGY_CONFIG)
     public abstract RetentionStrategyConfig retentionStrategyConfig();
 

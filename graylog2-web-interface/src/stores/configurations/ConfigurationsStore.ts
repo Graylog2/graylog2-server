@@ -204,7 +204,7 @@ export const ConfigurationsStore = singletonStore(
           return config;
         },
         (error) => {
-          UserNotification.error(`Index defaults configuration update failed: ${error}`, `Could not update Url Whitelist: ${configType}`);
+          UserNotification.error(error.additional.body.message, 'Index defaults configuration update failed');
         },
       );
 
