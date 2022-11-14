@@ -40,6 +40,8 @@ import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.graylog2.audit.AuditEventTypes.SYSTEM_NOTIFICATION_CREATE;
@@ -141,9 +143,16 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
             final EventDefinitionDto systemEventDefinition =
                     dbEventDefinitionService.getSystemEventDefinitions().stream().findFirst()
                             .orElseThrow(() -> new IllegalStateException("System notification event definition not found"));
+            String details =
+                    Stream.of(notification.getDetail(Notification.KEY_TITLE),
+                                    notification.getDetail(Notification.KEY_DESCRIPTION))
+                            .map(obj -> obj == null ? null : obj.toString())
+                            .filter(str -> str != null && !str.isEmpty())
+                            .collect(Collectors.joining(" | "));
             SystemNotificationEventProcessorParameters parameters =
                     SystemNotificationEventProcessorParameters.builder()
                             .notificationType(notification.getType())
+                            .notificationDetails(details.toString())
                             .timestamp(notification.getTimestamp())
                             .build();
             eventProcessorEngine.execute(systemEventDefinition.id(), parameters);

@@ -132,8 +132,8 @@ public class IndexRotationThread extends Periodical {
                 .addNode(nodeId.toString())
                 .addType(Notification.Type.GENERIC)
                 .addSeverity(Notification.Severity.URGENT)
-                .addDetail("title", title)
-                .addDetail("description", description);
+                .addDetail(Notification.KEY_TITLE, title)
+                .addDetail(Notification.KEY_DESCRIPTION, description);
         notificationService.publishIfFirst(notification);
     }
 

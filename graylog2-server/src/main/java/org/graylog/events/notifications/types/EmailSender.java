@@ -162,8 +162,8 @@ public class EmailSender {
                     .addNode(nodeId.toString())
                     .addType(Notification.Type.GENERIC)
                     .addSeverity(Notification.Severity.NORMAL)
-                    .addDetail("title", "No recipients have been defined!")
-                    .addDetail("description", "To fix this, go to the notification configuration and add at least one alert recipient.");
+                    .addDetail(Notification.KEY_TITLE, "No recipients have been defined!")
+                    .addDetail(Notification.KEY_DESCRIPTION, "To fix this, go to the notification configuration and add at least one alert recipient.");
             notificationService.publishIfFirst(notification);
         }
 

@@ -226,7 +226,6 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
                     EventDefinitionDto.builder()
                             .title("System notification events")
                             .description("Reserved event definition for system notification events")
-                            .isSystemEvent(true)
                             .alert(false)
                             .priority(1)
                             .keySpec(ImmutableList.of())
