@@ -77,7 +77,8 @@ const EventDefinitions = ({ eventDefinitions, context, pagination, query, onPage
   }
 
   const items = eventDefinitions.map((definition) => (
-    <EventDefinitionEntry context={context}
+    <EventDefinitionEntry key={definition.id}
+                          context={context}
                           eventDefinition={definition}
                           onDisable={onDisable}
                           onEnable={onEnable}
