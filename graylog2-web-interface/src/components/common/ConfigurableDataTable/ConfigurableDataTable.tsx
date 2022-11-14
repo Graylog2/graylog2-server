@@ -16,25 +16,32 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useMemo } from 'react';
+import type * as Immutable from 'immutable';
 
+import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 import { Table } from 'components/bootstrap';
 import { TextOverflowEllipsis } from 'components/common/index';
+import TableHead from 'components/common/ConfigurableDataTable/TableHead';
+import useCurrentUser from 'hooks/useCurrentUser';
 
-type Attribute = {
+export type Attribute = {
   id: string,
   title: string,
   type?: boolean,
 };
 
-type CustomHeaders = { [key: string]: (attribute: Attribute) => React.ReactNode }
-export type CustomCells<ListItem extends { id: string}> = { [key: string]: (listItem: ListItem, attribute: Attribute, key: string) => React.ReactNode }
+export type CustomHeaders = { [key: string]: (attribute: Attribute) => React.ReactNode }
+export type CustomCells<ListItem extends { id: string }> = {
+  [key: string]: {
+    renderCell: (listItem: ListItem, attribute: Attribute, key: string) => React.ReactNode,
+    width?: string,
+    maxWidth?: string,
+  }
+}
 
 const ScrollContainer = styled.div`
   overflow-x: auto;
-`;
-
-const ActionsHead = styled.th`
-  text-align: right;
 `;
 
 const ActionsCell = styled.td`
@@ -44,52 +51,49 @@ const ActionsCell = styled.td`
   }
 `;
 
-const DescriptionCell = styled.td`
-  max-width: 30vw;
-`;
-
 const attributeCellRenderer = {
-  description: (listItem, _attribute, key) => (
-    <DescriptionCell key={key}>
+  description: {
+    renderCell: (listItem) => (
       <TextOverflowEllipsis>
         {listItem.description}
       </TextOverflowEllipsis>
-    </DescriptionCell>
-  ),
+    ),
+    maxWidth: '30vw',
+  },
 };
-
-const TableHead = ({
-  selectedAttributes,
-  customHeaders,
-  displayActionsCol,
-}: {
-  selectedAttributes: Array<Attribute>,
-  customHeaders: CustomHeaders,
-  displayActionsCol: boolean
-}) => (
-  <thead>
-    <tr>
-      {selectedAttributes.map((attribute) => {
-        const headerKey = attribute.title;
-
-        return (
-          customHeaders?.[attribute.id]
-            ? customHeaders[attribute.id](attribute)
-            : <th key={headerKey}>{attribute.title}</th>
-        );
-      })}
-      {displayActionsCol ? <ActionsHead>Actions</ActionsHead> : null}
-    </tr>
-  </thead>
-);
 
 type Props<ListItem extends { id: string }> = {
   rows: Array<ListItem>,
   rowActions?: (listItem: ListItem) => React.ReactNode,
   customCells?: CustomCells<ListItem>,
+  attributePermissions?: { [attributeId: string]: { permissions: Array<string>, any?: boolean } },
   customHeaders?: CustomHeaders,
   attributes: Array<string>,
   availableAttributes: Array<Attribute>,
+};
+
+const filterVisibleAttributes = (
+  attributes: Array<string>,
+  availableAttributes: Array<Attribute>,
+  attributePermissions: { [attributeId: string]: { permissions: Array<string>, any?: boolean } },
+  userPermissions: Immutable.List<string>,
+) => {
+  return attributes
+    .map((attributeId) => availableAttributes.find(({ id }) => id === attributeId))
+    .filter(({ id }) => {
+      if (attributePermissions?.[id]) {
+        const { permissions, any } = attributePermissions[id];
+
+        if (any) {
+          return isAnyPermitted(userPermissions, permissions);
+        }
+
+        return isPermitted(userPermissions, permissions);
+      }
+
+      return true;
+    },
+    );
 };
 
 const ConfigurableDataTable = <ListItem extends { id: string }>({
@@ -98,28 +102,34 @@ const ConfigurableDataTable = <ListItem extends { id: string }>({
   customCells,
   attributes,
   availableAttributes,
+  attributePermissions,
   rowActions,
 }: Props<ListItem>) => {
-  const selectedAttributes = attributes.map((attributeId) => availableAttributes.find(({ id }) => id === attributeId));
+  const currentUser = useCurrentUser();
+  const visibleAttributes = useMemo(
+    () => filterVisibleAttributes(attributes, availableAttributes, attributePermissions, currentUser.permissions),
+    [attributePermissions, attributes, availableAttributes, currentUser.permissions],
+  );
+
   const displayActionsCol = typeof rowActions === 'function';
 
   return (
     <ScrollContainer>
       <Table striped condensed hover>
-        <TableHead selectedAttributes={selectedAttributes}
+        <TableHead selectedAttributes={visibleAttributes}
                    customHeaders={customHeaders}
                    displayActionsCol={displayActionsCol} />
         <tbody>
           {rows.map((listItem) => (
             <tr key={listItem.id}>
-              {selectedAttributes.map((attribute) => {
+              {visibleAttributes.map((attribute) => {
                 const cellKey = `${listItem.id}-${attribute.id}`;
                 const cellRenderer = customCells?.[attribute.id] ?? attributeCellRenderer[attribute.id];
 
                 return (
-                  cellRenderer
-                    ? cellRenderer(listItem, attribute, cellKey)
-                    : <td key={cellKey}>{listItem[attribute.id]}</td>
+                  <td key={cellKey} style={{ width: cellRenderer.width, maxWidth: cellRenderer.maxWidth }}>
+                    {cellRenderer ? cellRenderer.renderCell(listItem, attribute) : listItem[attribute.id]}
+                  </td>
                 );
               })}
               {displayActionsCol ? <ActionsCell>{rowActions(listItem)}</ActionsCell> : null}
@@ -132,6 +142,7 @@ const ConfigurableDataTable = <ListItem extends { id: string }>({
 };
 
 ConfigurableDataTable.defaultProps = {
+  attributePermissions: undefined,
   customCells: undefined,
   customHeaders: undefined,
   rowActions: undefined,

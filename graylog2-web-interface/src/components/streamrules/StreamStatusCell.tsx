@@ -23,10 +23,6 @@ import { Label } from 'components/bootstrap';
 import { StreamsStore } from 'stores/streams/StreamsStore';
 import type { Stream } from 'stores/streams/StreamsStore';
 
-const StatusCell = styled.td`
-  width: 100px;
-`;
-
 const StatusLabel = styled(Label)`
   cursor: pointer;
   display: inline-flex;
@@ -56,12 +52,10 @@ const StreamStatusCell = ({ stream }: Props) => {
   }, [stream.disabled, stream.id, stream.title]);
 
   return (
-    <StatusCell>
-      <StatusLabel bsStyle={stream.disabled ? 'warning' : 'success'} onClick={toggleStreamStatus}>
-        {stream.disabled ? 'Stopped' : 'Running'}<Spacer />
-        <Icon name={stream.disabled ? 'play' : 'pause'} />
-      </StatusLabel>
-    </StatusCell>
+    <StatusLabel bsStyle={stream.disabled ? 'warning' : 'success'} onClick={toggleStreamStatus}>
+      {stream.disabled ? 'Stopped' : 'Running'}<Spacer />
+      <Icon name={stream.disabled ? 'play' : 'pause'} />
+    </StatusLabel>
   );
 };
 

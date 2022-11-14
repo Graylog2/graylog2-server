@@ -35,7 +35,7 @@ const getColorStyles = (theme, bsStyle) => {
 
 const StyledLabel = styled(BootstrapLabel)(({ bsStyle, theme }) => css`
   ${getColorStyles(theme, bsStyle)}
-  padding: 0.2em 0.6em;
+  padding: 0.3em 0.6em;
 `);
 
 const Label = forwardRef(({ ...props }, ref) => (
