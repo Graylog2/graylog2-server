@@ -214,14 +214,17 @@ public class AggregationEventProcessor implements EventProcessor {
                 final Message msg = resultMessage.getMessage();
                 final Event event = eventFactory.createEvent(eventDefinition, msg.getTimestamp(), eventDefinition.title());
                 event.setOriginContext(EventOriginContext.elasticsearchMessage(resultMessage.getIndex(), msg.getId()));
-                event.setReplayInfo(EventReplayInfo.builder()
-                        .timerangeStart(parameters.timerange().getFrom())
-                        .timerangeEnd(parameters.timerange().getTo())
-                        .query(config.query()).build());
 
                 // Ensure the event has values in the "source_streams" field for permission checks to work
                 eventStreamService.buildEventSourceStreams(getStreams(parameters), ImmutableSet.copyOf(msg.getStreamIds()))
                         .forEach(event::addSourceStream);
+
+                event.setReplayInfo(EventReplayInfo.builder()
+                        .timerangeStart(parameters.timerange().getFrom())
+                        .timerangeEnd(parameters.timerange().getTo())
+                        .query(config.query())
+                        .streams(event.getSourceStreams())
+                        .build());
 
                 eventsWithContext.add(EventWithContext.create(event, msg));
             }
@@ -291,7 +294,9 @@ public class AggregationEventProcessor implements EventProcessor {
             event.setReplayInfo(EventReplayInfo.builder()
                     .timerangeStart(event.getTimerangeStart())
                     .timerangeEnd(event.getTimerangeEnd())
-                    .query(config.query()).build());
+                    .query(config.query())
+                    .streams(sourceStreams)
+                    .build());
             sourceStreams.forEach(event::addSourceStream);
 
             final Map<String, Object> fields = new HashMap<>();

@@ -82,8 +82,8 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
       range = { from: `${replayInfo.timerange_start}`, to: `${replayInfo.timerange_end}` };
     }
 
-    if (event.source_streams) {
-      streams = event.source_streams;
+    if (replayInfo.streams) {
+      streams = replayInfo.streams;
     }
 
     const replaySearchUrl = Routes.search_with_query(replayInfo.query, rangeType, range, streams);

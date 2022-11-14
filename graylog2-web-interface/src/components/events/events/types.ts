@@ -18,6 +18,7 @@ export type EventReplayInfo = {
   'timerange_start': string,
   'timerange_end': string,
   'query': string,
+  'streams': string[]
 };
 
 export type Event = {

@@ -52,7 +52,7 @@ public abstract class EventDto {
     private static final String FIELD_PRIORITY = "priority";
     private static final String FIELD_FIELDS = "fields";
     private static final String FIELD_GROUP_BY_FIELDS = "group_by_fields";
-    private static final String FIELD_EVENT_REPLAY_INFO = "event_replay_info";
+    private static final String FIELD_REPLAY_INFO = "replay_info";
 
     @JsonProperty(FIELD_ID)
     public abstract String id();
@@ -109,7 +109,7 @@ public abstract class EventDto {
     @JsonProperty(FIELD_GROUP_BY_FIELDS)
     public abstract Map<String, String> groupByFields();
 
-    @JsonProperty(FIELD_EVENT_REPLAY_INFO)
+    @JsonProperty(FIELD_REPLAY_INFO)
     public abstract Optional<EventReplayInfo> replayInfo();
 
     public static Builder builder() {
@@ -187,7 +187,7 @@ public abstract class EventDto {
         @JsonProperty(FIELD_GROUP_BY_FIELDS)
         public abstract Builder groupByFields(Map<String, String> fields);
 
-        @JsonProperty(FIELD_EVENT_REPLAY_INFO)
+        @JsonProperty(FIELD_REPLAY_INFO)
         public abstract Builder replayInfo(@Nullable EventReplayInfo replayInfo);
 
         public abstract EventDto build();
