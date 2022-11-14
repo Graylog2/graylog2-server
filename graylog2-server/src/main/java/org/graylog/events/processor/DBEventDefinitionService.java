@@ -18,6 +18,7 @@ package org.graylog.events.processor;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.events.notifications.EventNotificationConfig;
+import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -109,6 +110,6 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
      * @return the matching event definitions
      */
     public List<EventDefinitionDto> getSystemEventDefinitions() {
-        return ImmutableList.copyOf((db.find(DBQuery.is(EventDefinitionDto.FIELD_IS_SYSTEM_EVENT, true)).iterator()));
+        return ImmutableList.copyOf((db.find(DBQuery.is(EventDefinitionDto.FIELD_SCOPE, SystemNotificationEventEntityScope.NAME)).iterator()));
     }
 }

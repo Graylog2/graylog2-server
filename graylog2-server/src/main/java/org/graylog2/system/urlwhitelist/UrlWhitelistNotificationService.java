@@ -43,8 +43,8 @@ public class UrlWhitelistNotificationService {
         final Notification notification = notificationService.buildNow()
                 .addType(Notification.Type.GENERIC)
                 .addSeverity(Notification.Severity.NORMAL)
-                .addDetail("title", "URL not whitelisted.")
-                .addDetail("description", description);
+                .addDetail(Notification.KEY_TITLE, "URL not whitelisted.")
+                .addDetail(Notification.KEY_DESCRIPTION, description);
         notificationService.publishIfFirst(notification);
     }
 

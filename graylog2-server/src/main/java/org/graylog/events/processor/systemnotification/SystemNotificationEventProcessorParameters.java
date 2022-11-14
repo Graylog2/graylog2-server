@@ -38,12 +38,16 @@ import static java.util.Objects.requireNonNull;
 public abstract class SystemNotificationEventProcessorParameters implements EventProcessorParametersWithTimerange {
     private static final String FIELD_TIMESTAMP = "timestamp";
     private static final String FIELD_NOTIFICATION_TYPE = "notification_type";
+    private static final String FIELD_NOTIFICATION_DETAILS = "notification_details";
 
     @JsonProperty(FIELD_TIMESTAMP)
     public abstract DateTime timestamp();
 
     @JsonProperty(FIELD_NOTIFICATION_TYPE)
     public abstract Notification.Type notificationType();
+
+    @JsonProperty(FIELD_NOTIFICATION_DETAILS)
+    public abstract String notificationDetails();
 
     @Override
     public EventProcessorParametersWithTimerange withTimerange(DateTime from, DateTime to) {
@@ -84,6 +88,9 @@ public abstract class SystemNotificationEventProcessorParameters implements Even
 
         @JsonProperty(FIELD_NOTIFICATION_TYPE)
         public abstract Builder notificationType(Notification.Type notificationType);
+
+        @JsonProperty(FIELD_NOTIFICATION_DETAILS)
+        public abstract Builder notificationDetails(String details);
 
         public abstract SystemNotificationEventProcessorParameters build();
     }

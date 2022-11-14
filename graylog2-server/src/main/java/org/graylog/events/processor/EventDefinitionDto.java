@@ -115,10 +115,6 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     @JsonProperty(FIELD_STORAGE)
     public abstract ImmutableList<EventStorageHandler.Config> storage();
 
-    @Override
-    @JsonProperty(FIELD_IS_SYSTEM_EVENT)
-    public abstract boolean isSystemEvent();
-
     public static Builder builder() {
         return Builder.create();
     }
@@ -161,8 +157,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
             return new AutoValue_EventDefinitionDto.Builder()
                     .fieldSpec(ImmutableMap.of())
                     .notifications(ImmutableList.of())
-                    .storage(ImmutableList.of())
-                    .isSystemEvent(false);
+                    .storage(ImmutableList.of());
         }
 
         @Override
@@ -200,9 +195,6 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
 
         @JsonProperty(FIELD_STORAGE)
         public abstract Builder storage(ImmutableList<EventStorageHandler.Config> storageHandlers);
-
-        @JsonProperty(FIELD_IS_SYSTEM_EVENT)
-        public abstract Builder isSystemEvent(boolean isSystemEvent);
 
         abstract EventDefinitionDto autoBuild();
 
