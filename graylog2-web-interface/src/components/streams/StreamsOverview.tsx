@@ -16,10 +16,9 @@
  */
 import PropTypes from 'prop-types';
 import React, { useState, useEffect, useCallback } from 'react';
-import styled from 'styled-components';
 
 import { isPermitted } from 'util/PermissionsMixin';
-import { Alert, Label } from 'components/bootstrap';
+import { Alert } from 'components/bootstrap';
 import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';
@@ -28,7 +27,7 @@ import StreamsStore from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import type { CustomCells } from 'components/common/ConfigurableDataTable';
+import type { CustomCells } from 'components/common/ConfigurableDataTable/ConfigurableDataTable';
 import ConfigurableDataTable from 'components/common/ConfigurableDataTable';
 import StreamActions from 'components/streams/StreamActions';
 import { Link } from 'components/common/router';
@@ -49,29 +48,32 @@ const VISIBLE_ATTRIBUTES = ['title', 'description', 'index_set_id', 'disabled'];
 
 const customCells = (indexSets: Array<IndexSet>, userPermissions): CustomCells<Stream> => {
   return {
-    title: (stream, _attribute, key) => (
-      <td key={key}>
+    title: {
+      renderCell: (stream) => (
         <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
-      </td>
-    ),
-    index_set_id: (stream, _attribute, key) => {
-      if (!isPermitted(userPermissions, ['indexsets:read'])) {
-        return null;
-      }
+      ),
+    },
+    index_set_id: {
+      renderCell: (stream) => {
+        if (!isPermitted(userPermissions, ['indexsets:read'])) {
+          return null;
+        }
 
-      const indexSet = indexSets.find((is) => is.id === stream.index_set_id) || indexSets.find((is) => is.default);
+        const indexSet = indexSets.find((is) => is.id === stream.index_set_id) || indexSets.find((is) => is.default);
 
-      return (
-        <td key={key}>
-          {indexSet ? (
+        return (
+          indexSet ? (
             <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>
               {indexSet.title}
             </Link>
-          ) : <i>not found</i>}
-        </td>
-      );
+          ) : <i>not found</i>
+        );
+      },
     },
-    disabled: (stream, _attribute, key) => <StreamStatusCell stream={stream} key={key} />,
+    disabled: {
+      renderCell: (stream, _attribute, key) => <StreamStatusCell stream={stream} key={key} />,
+      width: '100px',
+    },
   };
 };
 
@@ -174,6 +176,11 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
           : (
             <ConfigurableDataTable rows={streams}
                                    attributes={VISIBLE_ATTRIBUTES}
+                                   attributePermissions={{
+                                     index_set_id: {
+                                       permissions: ['indexsets:read'],
+                                     },
+                                   }}
                                    rowActions={renderStreamActions}
                                    customCells={customCells(indexSets, currentUser.permissions)}
                                    availableAttributes={AVAILABLE_ATTRIBUTES} />
