@@ -55,6 +55,7 @@ class Input extends React.Component {
       PropTypes.element,
       PropTypes.string,
     ]),
+    readOnly: PropTypes.bool,
     help: PropTypes.oneOfType([
       PropTypes.element,
       PropTypes.string,
@@ -85,6 +86,7 @@ class Input extends React.Component {
     value: undefined,
     placeholder: '',
     error: undefined,
+    readOnly: false,
     help: undefined,
     wrapperClassName: undefined,
     addonAfter: null,
