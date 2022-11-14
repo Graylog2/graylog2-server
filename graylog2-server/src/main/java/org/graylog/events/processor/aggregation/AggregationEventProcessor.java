@@ -29,6 +29,7 @@ import org.graylog.events.conditions.BooleanNumberConditionsVisitor;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventFactory;
 import org.graylog.events.event.EventOriginContext;
+import org.graylog.events.event.EventReplayInfo;
 import org.graylog.events.event.EventWithContext;
 import org.graylog.events.processor.DBEventProcessorStateService;
 import org.graylog.events.processor.EventConsumer;
@@ -213,9 +214,10 @@ public class AggregationEventProcessor implements EventProcessor {
                 final Message msg = resultMessage.getMessage();
                 final Event event = eventFactory.createEvent(eventDefinition, msg.getTimestamp(), eventDefinition.title());
                 event.setOriginContext(EventOriginContext.elasticsearchMessage(resultMessage.getIndex(), msg.getId()));
-                event.setTimerangeStart(parameters.timerange().getFrom());
-                event.setTimerangeEnd(parameters.timerange().getTo());
-                event.setQuery(config.query());
+                event.setReplayInfo(EventReplayInfo.builder()
+                        .timerangeStart(parameters.timerange().getFrom())
+                        .timerangeEnd(parameters.timerange().getTo())
+                        .query(config.query()).build());
 
                 // Ensure the event has values in the "source_streams" field for permission checks to work
                 eventStreamService.buildEventSourceStreams(getStreams(parameters), ImmutableSet.copyOf(msg.getStreamIds()))
@@ -286,8 +288,10 @@ public class AggregationEventProcessor implements EventProcessor {
             // The keyResult timestamp is set to the end of the range
             event.setTimerangeStart(keyResult.timestamp().map(t -> t.minus(config.searchWithinMs())).orElse(parameters.timerange().getFrom()));
             event.setTimerangeEnd(keyResult.timestamp().orElse(parameters.timerange().getTo()));
-            event.setQuery(config.query());
-
+            event.setReplayInfo(EventReplayInfo.builder()
+                    .timerangeStart(event.getTimerangeStart())
+                    .timerangeEnd(event.getTimerangeEnd())
+                    .query(config.query()).build());
             sourceStreams.forEach(event::addSourceStream);
 
             final Map<String, Object> fields = new HashMap<>();

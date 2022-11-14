@@ -72,20 +72,21 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
   };
 
   const renderReplaySearchLink = () => {
+    const replayInfo = event.replay_info;
     let rangeType;
     let range;
     let streams;
 
-    if (event.timerange_start && event.timerange_end) {
+    if (replayInfo.timerange_start && replayInfo.timerange_end) {
       rangeType = 'absolute';
-      range = { from: `${event.timerange_start}`, to: `${event.timerange_end}` };
+      range = { from: `${replayInfo.timerange_start}`, to: `${replayInfo.timerange_end}` };
     }
 
     if (event.source_streams) {
       streams = event.source_streams;
     }
 
-    const replaySearchUrl = Routes.search_with_query(event.query, rangeType, range, streams);
+    const replaySearchUrl = Routes.search_with_query(replayInfo.query, rangeType, range, streams);
 
     return <Link to={replaySearchUrl}>Replay Search</Link>;
   };
@@ -110,10 +111,12 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
             &emsp;
             ({(plugin && plugin.displayName) || event.event_definition_type})
           </dd>
-          <dt>Actions</dt>
-          <dd>
-            {renderReplaySearchLink()}
-          </dd>
+          {event.replay_info && (
+            <>
+              <dt>Actions</dt>
+              <dd>{renderReplaySearchLink()}</dd>
+            </>
+          )}
         </dl>
       </Col>
       <Col md={6}>

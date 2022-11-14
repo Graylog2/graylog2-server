@@ -14,6 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+export type EventReplayInfo = {
+  'timerange_start': string,
+  'timerange_end': string,
+  'query': string,
+};
+
 export type Event = {
   'id': string,
   'event_definition_id': string,
@@ -26,7 +32,7 @@ export type Event = {
   'fields': Object[],
   'group_by_fields': Object[],
   'source_streams': string[],
-  'query': string
+  'replay_info': EventReplayInfo,
 };
 
 export type EventDefinitionContext = {

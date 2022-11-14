@@ -58,7 +58,7 @@ public class EventImpl implements Event {
     private boolean alert;
     private Map<String, FieldValue> fields = new HashMap<>();
     private Map<String, FieldValue> groupByFields = new HashMap<>();
-    private String query;
+    private EventReplayInfo replayInfo;
 
     EventImpl(String eventId,
               DateTime eventTimestamp,
@@ -280,13 +280,13 @@ public class EventImpl implements Event {
     }
 
     @Override
-    public String getQuery() {
-        return query;
+    public EventReplayInfo getReplayInfo() {
+        return replayInfo;
     }
 
     @Override
-    public void setQuery(String query) {
-        this.query = query;
+    public void setReplayInfo(EventReplayInfo replayInfo) {
+        this.replayInfo = replayInfo;
     }
 
     @Override
@@ -320,7 +320,7 @@ public class EventImpl implements Event {
                 .alert(getAlert())
                 .fields(ImmutableMap.copyOf(fields))
                 .groupByFields(ImmutableMap.copyOf(groupByFields))
-                .query(getQuery())
+                .replayInfo(getReplayInfo())
                 .build();
     }
 
@@ -373,14 +373,14 @@ public class EventImpl implements Event {
                 Objects.equals(keyTuple, event.keyTuple) &&
                 Objects.equals(fields, event.fields) &&
                 Objects.equals(groupByFields, event.groupByFields) &&
-                Objects.equals(query, event.query);
+                Objects.equals(replayInfo, event.replayInfo);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(eventId, eventDefinitionType, eventDefinitionId, originContext, eventTimestamp,
                 processingTimestamp, timerangeStart, timerangeEnd, streams, sourceStreams, message, source,
-                keyTuple, priority, alert, fields, groupByFields, query);
+                keyTuple, priority, alert, fields, groupByFields, replayInfo);
     }
 
     @Override
@@ -403,7 +403,7 @@ public class EventImpl implements Event {
                 .add("alert", alert)
                 .add("fields", fields)
                 .add("groupByFields", groupByFields)
-                .add("query", query)
+                .add("replayInfo", replayInfo)
                 .toString();
     }
 

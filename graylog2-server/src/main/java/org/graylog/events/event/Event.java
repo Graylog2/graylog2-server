@@ -97,9 +97,9 @@ public interface Event extends Indexable {
 
     void setGroupByFields(Map<String, String> fields);
 
-    void setQuery(String query);
+    void setReplayInfo(EventReplayInfo replayInfo);
 
-    String getQuery();
+    EventReplayInfo getReplayInfo();
 
     EventDto toDto();
 
@@ -112,11 +112,11 @@ public interface Event extends Indexable {
         event.setFields(from.fields());
         event.setGroupByFields(from.groupByFields());
         event.setPriority(from.priority());
-        event.setQuery(from.query());
 
         from.timerangeStart().ifPresent(event::setTimerangeStart);
         from.timerangeEnd().ifPresent(event::setTimerangeEnd);
         from.originContext().ifPresent(event::setOriginContext);
+        from.replayInfo().ifPresent(event::setReplayInfo);
 
         return event;
     }
