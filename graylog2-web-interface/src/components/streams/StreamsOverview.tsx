@@ -27,13 +27,13 @@ import StreamsStore from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import type { CustomCells } from 'components/common/ConfigurableDataTable/ConfigurableDataTable';
 import ConfigurableDataTable from 'components/common/ConfigurableDataTable';
 import StreamActions from 'components/streams/StreamActions';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import useCurrentUser from 'hooks/useCurrentUser';
 import StreamStatusCell from 'components/streamrules/StreamStatusCell';
+import type { CustomCells } from 'components/common/ConfigurableDataTable';
 
 import CreateStreamButton from './CreateStreamButton';
 
