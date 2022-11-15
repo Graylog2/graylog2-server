@@ -49,6 +49,35 @@ const TableHeader = ({
   );
 };
 
+const defaultAttributeHeaderRenderer = {
+
+};
+
+const TableHeader = ({
+  headerRenderer,
+  attribute,
+}: {
+  headerRenderer: {
+    renderHeader: (attribute: Attribute) => React.ReactNode,
+    textAlign?: string,
+    width?: string,
+    maxWidth?: string,
+  },
+  attribute: Attribute
+
+}) => {
+  const content = useMemo(
+    () => (headerRenderer ? headerRenderer.renderHeader(attribute) : attribute.title),
+    [attribute, headerRenderer],
+  );
+
+  return (
+    <th style={{ width: headerRenderer.width, maxWidth: headerRenderer.maxWidth }}>
+      {content}
+    </th>
+  );
+};
+
 const ActionsHead = styled.th`
   text-align: right;
 `;
