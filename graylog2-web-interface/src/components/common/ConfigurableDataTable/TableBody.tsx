@@ -12,7 +12,7 @@ const ActionsCell = styled.td`
   }
 `;
 
-const attributeCellRenderer = {
+const defaultAttributeCellRenderer = {
   description: {
     renderCell: (listItem) => (
       <TextOverflowEllipsis>
@@ -69,10 +69,13 @@ const TableBody = <ListItem extends { id: string }>({
       {rows.map((listItem) => (
         <tr key={listItem.id}>
           {visibleAttributes.map((attribute) => {
-            const cellRenderer = customCells?.[attribute.id] ?? attributeCellRenderer[attribute.id];
+            const cellRenderer = customCells?.[attribute.id] ?? defaultAttributeCellRenderer[attribute.id];
 
             return (
-              <TableCell cellRenderer={cellRenderer} listItem={listItem} attribute={attribute} key={`${listItem.id}-${attribute.id}`} />
+              <TableCell cellRenderer={cellRenderer}
+                         listItem={listItem}
+                         attribute={attribute}
+                         key={`${listItem.id}-${attribute.id}`} />
             );
           })}
           {displayRowActions ? <ActionsCell>{rowActions(listItem)}</ActionsCell> : null}

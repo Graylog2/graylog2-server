@@ -16,8 +16,38 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useMemo } from 'react';
 
 import type { Attribute, CustomHeaders } from './ConfigurableDataTable';
+
+const defaultAttributeHeaderRenderer = {
+
+};
+
+const TableHeader = ({
+  headerRenderer,
+  attribute,
+}: {
+  headerRenderer: {
+    renderHeader: (attribute: Attribute) => React.ReactNode,
+    textAlign?: string,
+    width?: string,
+    maxWidth?: string,
+  },
+  attribute: Attribute
+
+}) => {
+  const content = useMemo(
+    () => (headerRenderer ? headerRenderer.renderHeader(attribute) : attribute.title),
+    [attribute, headerRenderer],
+  );
+
+  return (
+    <th style={{ width: headerRenderer.width, maxWidth: headerRenderer.maxWidth }}>
+      {content}
+    </th>
+  );
+};
 
 const ActionsHead = styled.th`
   text-align: right;
@@ -35,12 +65,12 @@ const TableHead = ({
   <thead>
     <tr>
       {selectedAttributes.map((attribute) => {
-        const headerKey = attribute.title;
+        const headerRenderer = customHeaders?.[attribute.id] ?? defaultAttributeHeaderRenderer[attribute.id];
 
         return (
-          customHeaders?.[attribute.id]
-            ? customHeaders[attribute.id](attribute)
-            : <th key={headerKey}>{attribute.title}</th>
+          <TableHeader headerRenderer={headerRenderer}
+                       attribute={attribute}
+                       key={attribute.title} />
         );
       })}
       {displayActionsCol ? <ActionsHead>Actions</ActionsHead> : null}
