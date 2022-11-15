@@ -61,7 +61,7 @@ class ExtractorSortModal extends React.Component {
     });
   };
 
-  _saveSorting = () => {
+  _saveSorting = async () => {
     const { input } = this.props;
     const { sortedExtractors } = this.state;
 
@@ -69,9 +69,9 @@ class ExtractorSortModal extends React.Component {
       this.close();
     }
 
-    const promise = ExtractorsActions.order.triggerPromise(input.id, sortedExtractors);
+    await ExtractorsActions.order.triggerPromise(input.id, sortedExtractors);
 
-    promise.then(() => this.close());
+    this.close();
   };
 
   render() {
@@ -94,7 +94,7 @@ class ExtractorSortModal extends React.Component {
           </Row>
         </Modal.Body>
         <Modal.Footer>
-          <ModalSubmit onCancel={this._saveSorting} submitButtonText="Update sort" />
+          <ModalSubmit onCancel={this._cancel} onSubmit={this._saveSorting} submitButtonText="Update sort" />
         </Modal.Footer>
       </BootstrapModalWrapper>
     );

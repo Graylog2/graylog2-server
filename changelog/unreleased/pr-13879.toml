@@ -1,0 +1,17 @@
+type = "security"
+message = "Update Netty from 4.1.60 to 4.1.84"
+
+pulls = ["13879"]
+
+details.user = """
+Updating the Netty library from 4.1.60 to 4.1.84
+includes plenty of fixes. 
+Please refer to https://netty.io/news for all the details.
+Some of those fixes, adress security issues.
+Here's a list of all fixed CVEs:
+ - CVE-2021-21409 - request smuggling
+ - CVE-2021-37136 - Bzip2Decoder doesn't allow setting size restrictions for decompressed data
+ - CVE-2021-37137 - SnappyFrameDecoder doesn't restrict chunk length any may buffer skippable chunks in an unnecessary way
+ - CVE-2021-21409 - Validate Content-Length header in HTTP/2 decoder
+ - CVE-2021-43797 - HTTP fails to validate against control chars in header names which may lead to HTTP request smuggling
+"""

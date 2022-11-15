@@ -159,3 +159,13 @@ pair using a colon delimiter. This will result in Teams notifications with a tem
 formatting. Existing custom templates should be updated to use HTML or Markdown in order to display properly. If using
 the old default template, it can be replaced with the one found when creating a new Teams notification. It can also be
 found in this [pull request](https://github.com/Graylog2/graylog-plugin-integrations/pull/1202).
+
+# New Functionality
+
+## Sidecar
+The Sidecar Administration UI now allows the assignment of multiple configurations
+for a single collector.
+Please note that this feature requires a Sidecar with version 1.3 or greater.
+Older versions will only run a single (random) configuration per collector.
+
+
