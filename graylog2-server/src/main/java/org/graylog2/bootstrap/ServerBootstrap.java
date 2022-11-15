@@ -231,7 +231,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 runMigrations();
             }
         } catch (Exception e) {
-            LOG.warn("Exception while running migrations", e);
+            LOG.error("Exception while running migrations", e);
             System.exit(1);
         }
 

@@ -43,10 +43,10 @@ type Props = {
 }
 
 export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props) => {
-  const descriptionRef = useRef(undefined);
   const ruleSourceRef = useRef(undefined);
   const [, setAceLoaded] = useState(false);
   const [ruleSource, setRuleSource] = useState(rule.source);
+  const [description, setDescription] = useState(rule.description);
 
   const createAnnotations = useCallback((nextErrors: Array<{ line: number, position_in_line: number, reason: string }>) => {
     const nextErrorAnnotations = nextErrors.map((e) => {
@@ -60,19 +60,15 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     const nextRule = {
       ...rule,
       source: ruleSourceRef.current.editor.getSession().getValue(),
-      description: descriptionRef.current.value,
+      description,
     };
 
     RulesActions.parse(nextRule, callback);
-  }, [rule]);
+  }, [rule, description]);
 
   useEffect(() => {
     if (ruleSourceRef.current) {
       ruleSourceRef.current.editor.session.setOption('useWorker', false);
-    }
-
-    if (descriptionRef.current) {
-      descriptionRef.current.value = rule.description;
     }
   });
 
@@ -81,7 +77,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
       const savedRule = {
         ...rule,
         source: ruleSourceRef.current.editor.getSession().getValue(),
-        description: descriptionRef.current.value,
+        description,
       };
 
       RulesActions.parse(savedRule, () => callback(savedRule));
@@ -109,8 +105,8 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     };
 
     return ({
-      descriptionRef,
-      handleDescription: (newDescription) => { descriptionRef.current.value = newDescription; },
+      description,
+      handleDescription: setDescription,
       handleSavePipelineRule,
       ruleSourceRef,
       usedInPipelines,
@@ -119,6 +115,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
       onChangeSource,
     });
   }, [
+    description,
     createAnnotations,
     rule,
     ruleSource,

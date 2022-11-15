@@ -11,6 +11,10 @@ Please make sure to create a MongoDB database backup before starting the upgrade
 * Support for Elasticsearch 6.X has been removed! Please use either Elasticsearch 7.10.2 or, preferably, latest OpenSearch.
 * Graylog 5 needs at least MongoDB 5.0. Our recommended upgrade path is to first bring your MongoDB to 5.0 and then perform the Graylog upgrade.
   Hint: Graylog 4.3.x does support MongoDB 5.0, which allows for a seamless upgrade path.
+* The `flatten_json` pipeline function now preserves the original type of the extracted values, instead
+of converting them to string. An optional flag is provided so existing rules can
+continue using the legacy behavior.
+
 
 ## Disallowing embedding the frontend by default
 
@@ -159,3 +163,13 @@ pair using a colon delimiter. This will result in Teams notifications with a tem
 formatting. Existing custom templates should be updated to use HTML or Markdown in order to display properly. If using
 the old default template, it can be replaced with the one found when creating a new Teams notification. It can also be
 found in this [pull request](https://github.com/Graylog2/graylog-plugin-integrations/pull/1202).
+
+# New Functionality
+
+## Sidecar
+The Sidecar Administration UI now allows the assignment of multiple configurations
+for a single collector.
+Please note that this feature requires a Sidecar with version 1.3 or greater.
+Older versions will only run a single (random) configuration per collector.
+
+
