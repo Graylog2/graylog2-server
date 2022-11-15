@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useMemo } from 'react';
 import type * as Immutable from 'immutable';
 
@@ -27,9 +27,11 @@ import useCurrentUser from 'hooks/useCurrentUser';
 
 import type { CustomCells, CustomHeaders, Attribute } from './types';
 
-const ScrollContainer = styled.div`
-  overflow-x: auto;
-`;
+const ScrollContainer = styled.div(({ theme }) => css`
+  @media (max-width: ${theme.breakpoints.max.md}) {
+    overflow-x: auto;
+  }
+`);
 
 type Props<ListItem extends { id: string }> = {
   rows: Array<ListItem>,
