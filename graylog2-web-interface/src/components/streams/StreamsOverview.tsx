@@ -46,36 +46,34 @@ const AVAILABLE_ATTRIBUTES = [
 
 const VISIBLE_ATTRIBUTES = ['title', 'description', 'index_set_id', 'disabled'];
 
-const customCells = (indexSets: Array<IndexSet>, userPermissions): CustomCells<Stream> => {
-  return {
-    title: {
-      renderCell: (stream) => (
-        <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
-      ),
-    },
-    index_set_id: {
-      renderCell: (stream) => {
-        if (!isPermitted(userPermissions, ['indexsets:read'])) {
-          return null;
-        }
+const customCells = (indexSets: Array<IndexSet>, userPermissions): CustomCells<Stream> => ({
+  title: {
+    renderCell: (stream) => (
+      <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
+    ),
+  },
+  index_set_id: {
+    renderCell: (stream) => {
+      if (!isPermitted(userPermissions, ['indexsets:read'])) {
+        return null;
+      }
 
-        const indexSet = indexSets.find((is) => is.id === stream.index_set_id) || indexSets.find((is) => is.default);
+      const indexSet = indexSets.find((is) => is.id === stream.index_set_id) || indexSets.find((is) => is.default);
 
-        return (
-          indexSet ? (
-            <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>
-              {indexSet.title}
-            </Link>
-          ) : <i>not found</i>
-        );
-      },
+      return (
+        indexSet ? (
+          <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>
+            {indexSet.title}
+          </Link>
+        ) : <i>not found</i>
+      );
     },
-    disabled: {
-      renderCell: (stream, _attribute, key) => <StreamStatusCell stream={stream} key={key} />,
-      width: '100px',
-    },
-  };
-};
+  },
+  disabled: {
+    renderCell: (stream) => <StreamStatusCell stream={stream} />,
+    width: '100px',
+  },
+});
 
 type Props = {
   onStreamCreate: (stream: Stream) => Promise<void>,
