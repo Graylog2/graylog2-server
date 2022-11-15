@@ -11,6 +11,10 @@ Please make sure to create a MongoDB database backup before starting the upgrade
 * Support for Elasticsearch 6.X has been removed! Please use either Elasticsearch 7.10.2 or, preferably, latest OpenSearch.
 * Graylog 5 needs at least MongoDB 5.0. Our recommended upgrade path is to first bring your MongoDB to 5.0 and then perform the Graylog upgrade.
   Hint: Graylog 4.3.x does support MongoDB 5.0, which allows for a seamless upgrade path.
+* `flatten_json` now preserves the original type of the extracted values, instead
+of converting them to string. An optional flag is provided so existing rules can
+continue using the legacy behavior.
+
 
 ## Disallowing embedding the frontend by default
 
@@ -42,11 +46,6 @@ It is now possible to change this behavior. When configuration property `stream_
 
 If all of your streams go to dedicated, separate index sets, it is advised to keep the default value of `stream_aware_field_types` property (`false`). It will decrease the load on ES/OS and stream separation across index sets already helps with showing proper fields for a query.
 On the other hand, if multiple streams go to the same index sets, and you want precise field types and suggestions, you should set it to `true`. Consider monitoring your ES/OS load after that change, especially when using huge numbers of fields and streams. 
-
-## Breaking changes to pipeline functions
-`flatten_json` now preserves the original type of the extracted values, instead
-of converting them to string. An optional flag is provided, so existing rules can 
-continue using the legacy behavior.
 
 ## API Endpoint Deprecations
 
