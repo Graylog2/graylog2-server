@@ -33,13 +33,13 @@ import javax.inject.Singleton;
 // The sequence numbers on messages are ints and don't fit into 16 bits.
 // We remember a messages' first sequence number (subtrahend) in a size limited cache per input and timestamp.
 // The sequence number will then be subtracted with this subtrahend.
-// Thus will the first received message (for a certain input and timestamp) start with a sequence of 0 [1].
+// Thus will the first received message (for a certain input and timestamp) start with a sequence of 0 (see [1]).
 //
 // [1]
 // Since our message processing is multithreaded, messages can pass each other during processing.
 // This means that the first recorded sequence number can be higher than the one of later messages.
-// To account for this, we simply add a constant (OFFSET_GAP) to prevent negative messageSequenceNrs.
-// Therefor the first sequence does not start with 0, but with OFFSET_GAP.
+// To account for this, we simply add a constant (REORDERING_GAP) to prevent negative messageSequenceNrs.
+// Therefor the first sequence does not start with 0, but with REORDERING_GAP.
 /*
     The ULID binary layout for reference
 
@@ -61,8 +61,9 @@ public class MessageULIDGenerator {
 
     private final Cache<String, Integer> sequenceNrCache;
     private final ULID ulid;
-    static final long RANDOM_MSB_MASK = 0xFFFFL;
-    static final int OFFSET_GAP = 1000;
+    static final long ULID_RANDOM_MSB_MASK = 0xFFFFL;
+
+    static final int REORDERING_GAP = 5000;
 
     @Inject
     public MessageULIDGenerator(ULID ulid) {
@@ -96,21 +97,21 @@ public class MessageULIDGenerator {
         final long leastSignificantBits = nextUlid.getLeastSignificantBits();
 
         final long msbWithZeroedRandom = timestamp << 16;
-        long messageSequenceNr = sequenceNr - subtrahend + OFFSET_GAP;
+        long messageSequenceNr = sequenceNr - subtrahend + REORDERING_GAP;
 
-        // If our multithreaded message processing reorders the messages by more than OFFSET_GAP,
+        // If our multithreaded message processing reorders the messages by more than REORDERING_GAP,
         // the messageSequenceNr can become negative.
         // This can also happen if the sequenceNr counter in a MessageInput wraps.
         // We handle this by updating the sequenceNrCache and setting the messageSequenceNr accordingly.
         if (messageSequenceNr < 0) {
             LOG.warn("Got negative message sequence number ({} -> {}). Sort order might be wrong.", subtrahend, sequenceNr);
-            messageSequenceNr = OFFSET_GAP;
+            messageSequenceNr = REORDERING_GAP;
             sequenceNrCache.put(key, sequenceNr);
-        // If we receive more than 64535 messages with the same timestamp and input, they will exhaust the 16 bit of space in the ULID.
-        } else if (messageSequenceNr >= RANDOM_MSB_MASK) {
+        // If we receive more than 60535 messages with the same timestamp and input, they will exhaust the 16 bit of space in the ULID.
+        } else if (messageSequenceNr >= ULID_RANDOM_MSB_MASK) {
             LOG.warn("Message sequence number <{}> input <{}> timestamp <{}> does not fit into ULID ({} >= 65535). Sort order might be wrong.",
                     sequenceNr, inputId, timestamp, messageSequenceNr);
-            messageSequenceNr %= RANDOM_MSB_MASK;
+            messageSequenceNr %= ULID_RANDOM_MSB_MASK;
         }
         final ULID.Value sequencedUlid = new ULID.Value(msbWithZeroedRandom | messageSequenceNr, leastSignificantBits);
         return sequencedUlid.toString();

@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.shared.buffers.processors.MessageULIDGenerator.OFFSET_GAP;
-import static org.graylog2.shared.buffers.processors.MessageULIDGenerator.RANDOM_MSB_MASK;
+import static org.graylog2.shared.buffers.processors.MessageULIDGenerator.REORDERING_GAP;
+import static org.graylog2.shared.buffers.processors.MessageULIDGenerator.ULID_RANDOM_MSB_MASK;
 
 public class MessageULIDGeneratorTest {
 
@@ -39,15 +39,15 @@ public class MessageULIDGeneratorTest {
         // first seen sequence (gets subtracted with itself)
         ULID.Value parsedULID = ULID.parseULID(generator.createULID("input", ts, 123));
         //noinspection PointlessArithmeticExpression
-        assertThat(extractSequenceNr(parsedULID)).isEqualTo(123 - 123 + OFFSET_GAP);
+        assertThat(extractSequenceNr(parsedULID)).isEqualTo(123 - 123 + REORDERING_GAP);
 
         // second sequence (gets subtracted with first seen sequence)
         parsedULID = ULID.parseULID(generator.createULID("input", ts, 128));
-        assertThat(extractSequenceNr(parsedULID)).isEqualTo(128 - 123 + OFFSET_GAP);
+        assertThat(extractSequenceNr(parsedULID)).isEqualTo(128 - 123 + REORDERING_GAP);
 
         // third sequence (gets subtracted with first seen sequence)
         parsedULID = ULID.parseULID(generator.createULID("input", ts, 125));
-        assertThat(extractSequenceNr(parsedULID)).isEqualTo(125 - 123 + OFFSET_GAP);
+        assertThat(extractSequenceNr(parsedULID)).isEqualTo(125 - 123 + REORDERING_GAP);
     }
 
     @Test
@@ -69,13 +69,13 @@ public class MessageULIDGeneratorTest {
         generator.createULID("input", 0, firstSeqNr);
 
         // Next simulate maxing out the sequence number space in the ULID (16 bit -> 65535) the result should wrap to 0
-        ULID.Value parsedULID = ULID.parseULID(generator.createULID("input", 0, (int) (firstSeqNr + RANDOM_MSB_MASK - OFFSET_GAP)));
+        ULID.Value parsedULID = ULID.parseULID(generator.createULID("input", 0, (int) (firstSeqNr + ULID_RANDOM_MSB_MASK - REORDERING_GAP)));
         assertThat(extractSequenceNr(parsedULID)).isEqualTo(0);
 
         // messages with a different timestamp start with a new subtrahend and should get a seqNr with OFFSET_GAP
-        parsedULID = ULID.parseULID(generator.createULID("input", 42, (int) (firstSeqNr + RANDOM_MSB_MASK - OFFSET_GAP)));
+        parsedULID = ULID.parseULID(generator.createULID("input", 42, (int) (firstSeqNr + ULID_RANDOM_MSB_MASK - REORDERING_GAP)));
         //noinspection PointlessArithmeticExpression
-        assertThat(extractSequenceNr(parsedULID)).isEqualTo(0 + OFFSET_GAP);
+        assertThat(extractSequenceNr(parsedULID)).isEqualTo(0 + REORDERING_GAP);
     }
 
     @Test
@@ -86,7 +86,7 @@ public class MessageULIDGeneratorTest {
         for (int seq : ImmutableList.of(1, 2, 3, 4)) {
             ULID.Value parsedULID = ULID.parseULID(generator.createULID("input", ts, seq));
             assertThat(parsedULID.timestamp()).isEqualTo(ts);
-            assertThat(parsedULID.getMostSignificantBits() & 0xFFFFL).isEqualTo(OFFSET_GAP + seq -1);
+            assertThat(parsedULID.getMostSignificantBits() & 0xFFFFL).isEqualTo(REORDERING_GAP + seq -1);
         }
     }
 
@@ -99,11 +99,11 @@ public class MessageULIDGeneratorTest {
         final List<String> ulidsSorted = messageSeqences.stream().map((seq) -> generator.createULID("input", ts, seq)).sorted().toList();
 
         final List<Long> seqNrsFromUlid = ulidsSorted.stream().map(((ulid) -> ULID.parseULID(ulid).getMostSignificantBits() & 0xFFFFL)).collect(Collectors.toList());
-        assertThat(seqNrsFromUlid).isEqualTo(messageSeqences.stream().sorted().map(s -> OFFSET_GAP + s - 5L).collect(Collectors.toList()));
+        assertThat(seqNrsFromUlid).isEqualTo(messageSeqences.stream().sorted().map(s -> REORDERING_GAP + s - 5L).collect(Collectors.toList()));
     }
 
     private long extractSequenceNr(ULID.Value ulid) {
-        return ulid.getMostSignificantBits() & MessageULIDGenerator.RANDOM_MSB_MASK;
+        return ulid.getMostSignificantBits() & MessageULIDGenerator.ULID_RANDOM_MSB_MASK;
     }
 }
 
