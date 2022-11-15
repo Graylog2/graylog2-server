@@ -28,7 +28,7 @@ import {
   DocumentTitle,
   EntityListItem,
   ControlledTableList,
-  LinkToNode,
+  LinkToNode, PaginatedList,
 } from 'components/common';
 import { GettingStartedActions } from 'stores/gettingstarted/GettingStartedStore';
 
@@ -53,44 +53,59 @@ const NumberBox = styled(ElementDimensions)`
   width: 100%;
   padding-bottom: 10px;
 `;
-
+const StyledLabel = styled(Label)`
+  cursor: default;
+  width: 85px;
+  display: block;
+`;
 const FlexContainer = styled.div`
   display: flex;
   align-items: stretch;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 45px;
 `;
 
-const VisualizationContainer = styled(Col)`
-  min-height: 200px;
-  min-width: 33%;
-`;
+const StyledSummary = styled.small(({ theme }) => css`
+  color: ${theme.colors.variant.light.primary}
+`);
 
 const StyledSectionComponent = styled(SectionComponent)`
   flex-grow: 1;
 `;
+
+const StyledListGroupItem = styled(ListGroupItem)`
+  display: flex;
+  gap: 16px;
+`;
+
+const ActionItemLink = styled(Link)(({ theme }) => css`
+  color: ${theme.colors.variant.primary};
+  &:hover {
+    color: ${theme.colors.variant.darker.primary};
+  }
+`);
+
 const typeLinkMap = {
-  dashboard: { link: 'DASHBOARDS_VIEWID', icon: 'grid-horizontal' },
-  search: { link: 'SEARCH_VIEWID', icon: 'folder-magnifying-glass' },
+  dashboard: { link: 'DASHBOARDS_VIEWID', icon: 'd' },
+  search: { link: 'SEARCH_VIEWID', icon: 's' },
 };
 
 const EntityItem = ({ type, title, id }) => {
   return (
-    <ListGroupItem>
-      <Icon name="search" />
+    <StyledListGroupItem>
+      <StyledLabel bsStyle="info">{type}</StyledLabel>
       <Link to={Routes.pluginRoute(typeLinkMap[type].link)(id)}>{title}</Link>
-    </ListGroupItem>
+    </StyledListGroupItem>
   );
 };
 
-const StyledLabel = styled(Label)`
-  cursor: default;
-`;
 const lastOpen = [
   {
     type: 'dashboard',
     title: 'DashboardTitle1',
     id: '1111',
+    summary: 'summary',
+    description: 'description dfdsfds sdfadfsa sdfsadf sad asdf dsaf sdaf das asdf adsf asdfeweqreqwreqw dc ',
   },
   {
     type: 'search',
@@ -102,56 +117,132 @@ const lastOpen = [
     title: 'DashboardTitle2',
     id: '1111',
   },
+
+  {
+    type: 'dashboard',
+    title: 'DashboardTitle1',
+    id: '1111',
+    summary: 'summary',
+    description: 'description dfdsfds sdfadfsa sdfsadf sad asdf dsaf sdaf das asdf adsf asdfeweqreqwreqw dc ',
+  },
+
+  {
+    type: 'dashboard',
+    title: 'DashboardTitle1',
+    id: '1111',
+    summary: 'summary',
+    description: 'description dfdsfds sdfadfsa sdfsadf sad asdf dsaf sdaf das asdf adsf asdfeweqreqwreqw dc ',
+  },
 ];
 const activities = [{
   timestamp: '2021-11-09T14:28:24+01:00',
-  title: 'someone action made action with smth',
+  entityType: 'search',
+  entityName: 'Bobs search',
+  action: {
+    actionUser: 'Bob',
+    actionType: 'share',
+    actedUser: 'you',
+  },
   id: '111',
 },
 {
   timestamp: '2022-11-09T14:28:24+01:00',
-  title: 'someone action made action with smth',
+  entityType: 'dashboard',
+  entityName: 'Emmas dashboard',
+  action: {
+    actionUser: 'Emma',
+    actionType: 'share',
+    actedUser: 'you',
+  },
   id: '222',
+},
+{
+  timestamp: '2021-11-09T14:28:24+01:00',
+  entityType: 'search',
+  entityName: 'Bobs search',
+  action: {
+    actionUser: 'Bob',
+    actionType: 'share',
+    actedUser: 'you',
+  },
+  id: '111',
+},
+{
+  timestamp: '2022-11-09T14:28:24+01:00',
+  entityType: 'dashboard',
+  entityName: 'Emmas dashboard',
+  action: {
+    actionUser: 'Emma',
+    actionType: 'share',
+    actedUser: 'you',
+  },
+  id: '222',
+},
+{
+  timestamp: '2021-11-09T14:28:24+01:00',
+  entityType: 'search',
+  entityName: 'Bobs search',
+  action: {
+    actionUser: 'Bob',
+    actionType: 'share',
+    actedUser: 'you',
+  },
+  id: '111',
 },
 ];
 
-const GettingStarted = () => {
-  console.log('!!!!!!!', relativeDifference('2021-11-09T14:28:24+01:00'));
+const ActionItem = ({ action, id, entityType, entityName }) => {
+  return (
+    <span>
+      {`${action.actionUser} ${action.actionType} ${entityType}`}
+      {' '}
+      <ActionItemLink to={Routes.pluginRoute(typeLinkMap[entityType].link)(id)}>{entityName}</ActionItemLink>
+      {' '}
+      {`with ${action.actedUser}`}
+    </span>
+  );
+};
 
+const GettingStarted = () => {
   return (
     <>
       <PageHeader title="Getting started">
-        <span>Some amazing description</span>
+        <span>Here you can find most used content</span>
       </PageHeader>
       <FlexContainer>
         <StyledSectionComponent title="Last opened">
           <ListGroup>
-            {lastOpen.map(({ type, id, title }) => <EntityItem key={id} type={type} id={id} title={title} />)}
+            {lastOpen.map(({ type, id, title, description, summary }) => <EntityItem key={id} type={type} id={id} title={title} description={description} summary={summary} />)}
           </ListGroup>
         </StyledSectionComponent>
-        <StyledSectionComponent title="Pinned dashboard">
-          <ListGroup>
-            {lastOpen.map(({ type, id, title }) => <EntityItem key={id} type={type} id={id} title={title} />)}
-          </ListGroup>
+        <StyledSectionComponent title="Pinned items">
+          <PaginatedList useQueryParameter={false} totalItems={20} pageSize={5} showPageSizeSelect={false} hideFirstAndLastPageLinks>
+            <ListGroup>
+              {lastOpen.map(({ type, id, title, description, summary }) => <EntityItem key={id} type={type} id={id} title={title} description={description} summary={summary} />)}
+            </ListGroup>
+          </PaginatedList>
         </StyledSectionComponent>
       </FlexContainer>
       <StyledSectionComponent title="Recent activity">
-        <Table striped>
-          <tbody>
-            {
-            activities.map(({ timestamp, title, id }) => {
-              return (
-                <tr key={id}>
-                  <td><StyledLabel title={timestamp}>{relativeDifference(timestamp)}</StyledLabel></td>
-                  <td>
-                    {title}
-                  </td>
-                </tr>
-              );
-            })
-          }
-          </tbody>
-        </Table>
+        <PaginatedList useQueryParameter={false} totalItems={20} pageSize={5} showPageSizeSelect={false} hideFirstAndLastPageLinks>
+          <Table striped>
+            <tbody>
+              {
+              activities.map(({ timestamp, action, id, entityName, entityType }) => {
+                return (
+                  <tr key={id}>
+                    <td style={{ width: 100 }}><StyledLabel title={timestamp} bsStyle="primary">{relativeDifference(timestamp)}</StyledLabel></td>
+                    <td>
+                      <ActionItem id={id} action={action} entityName={entityName} entityType={entityType} />
+                    </td>
+                  </tr>
+                );
+              })
+            }
+            </tbody>
+          </Table>
+        </PaginatedList>
+
       </StyledSectionComponent>
     </>
   );

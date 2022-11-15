@@ -27,12 +27,6 @@ import withLocation from 'routing/withLocation';
 import type { Location } from 'routing/withLocation';
 import { SystemStore } from 'stores/system/SystemStore';
 
-const GETTING_STARTED_URL = 'https://gettingstarted.graylog.org/';
-
-const StyledRow = styled(Row)`
-  height: 100%;
-`;
-
 type Props = {
   system: {
     cluster_id: string,
