@@ -8,8 +8,8 @@ export type Attribute = {
 
 export type CustomHeaders = {
   [key: string]: {
-    renderHead: (attribute: Attribute) => React.ReactNode,
-    textAlign: string,
+    renderHeader: (attribute: Attribute) => React.ReactNode,
+    textAlign?: string,
   }
 }
 

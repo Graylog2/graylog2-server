@@ -43,7 +43,7 @@ const TableHeader = ({
   );
 
   return (
-    <th style={{ width: headerRenderer.width, maxWidth: headerRenderer.maxWidth }}>
+    <th style={{ width: headerRenderer?.width, maxWidth: headerRenderer?.maxWidth }}>
       {content}
     </th>
   );

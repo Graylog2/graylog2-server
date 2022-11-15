@@ -44,7 +44,7 @@ const TableCell = <ListItem extends { id: string }>({
   );
 
   return (
-    <td style={{ width: cellRenderer.width, maxWidth: cellRenderer.maxWidth }}>
+    <td style={{ width: cellRenderer?.width, maxWidth: cellRenderer?.maxWidth }}>
       {content}
     </td>
   );
