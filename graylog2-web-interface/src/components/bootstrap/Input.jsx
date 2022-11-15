@@ -198,9 +198,17 @@ class Input extends React.Component {
     const {
       id,
       type,
+      bsStyle, // eslint-disable-line no-unused-vars
+      formGroupClassName, // eslint-disable-line no-unused-vars
+      wrapperClassName, // eslint-disable-line no-unused-vars
       label,
+      labelClassName, inputDescClassName, // eslint-disable-line no-unused-vars
       name,
+      error, // eslint-disable-line no-unused-vars
+      help, // eslint-disable-line no-unused-vars
       children,
+      addonAfter, // eslint-disable-line no-unused-vars
+      buttonAfter, // eslint-disable-line no-unused-vars
       ...controlProps
     } = this.props;
 
