@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useMemo } from 'react';
 
-import type { Attribute, CustomHeaders } from './ConfigurableDataTable';
+import type { Attribute, CustomHeaders } from './types';
 
 const defaultAttributeHeaderRenderer = {
 

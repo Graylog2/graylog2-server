@@ -15,5 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import ConfigurableDataTable from './ConfigurableDataTable';
+import type { CustomCells, CustomHeaders, Attribute } from './types';
 
+export { CustomCells, CustomHeaders, Attribute };
 export default ConfigurableDataTable;

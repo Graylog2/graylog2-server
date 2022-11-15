@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import { useMemo } from 'react';
 
 import { TextOverflowEllipsis } from 'components/common';
-import type { CustomCells, Attribute } from 'components/common/ConfigurableDataTable/ConfigurableDataTable';
+
+import type { CustomCells, Attribute } from './types';
 
 const ActionsCell = styled.td`
   > div {
@@ -63,27 +64,25 @@ const TableBody = <ListItem extends { id: string }>({
   displayRowActions,
   customCells,
   rowActions,
-}: Props<ListItem>) => {
-  return (
-    <tbody>
-      {rows.map((listItem) => (
-        <tr key={listItem.id}>
-          {visibleAttributes.map((attribute) => {
-            const cellRenderer = customCells?.[attribute.id] ?? defaultAttributeCellRenderer[attribute.id];
+}: Props<ListItem>) => (
+  <tbody>
+    {rows.map((listItem) => (
+      <tr key={listItem.id}>
+        {visibleAttributes.map((attribute) => {
+          const cellRenderer = customCells?.[attribute.id] ?? defaultAttributeCellRenderer[attribute.id];
 
-            return (
-              <TableCell cellRenderer={cellRenderer}
-                         listItem={listItem}
-                         attribute={attribute}
-                         key={`${listItem.id}-${attribute.id}`} />
-            );
-          })}
-          {displayRowActions ? <ActionsCell>{rowActions(listItem)}</ActionsCell> : null}
-        </tr>
-      ))}
-    </tbody>
+          return (
+            <TableCell cellRenderer={cellRenderer}
+                       listItem={listItem}
+                       attribute={attribute}
+                       key={`${listItem.id}-${attribute.id}`} />
+          );
+        })}
+        {displayRowActions ? <ActionsCell>{rowActions(listItem)}</ActionsCell> : null}
+      </tr>
+    ))}
+  </tbody>
   );
-};
 
 TableBody.defaultProps = {
   customCells: undefined,
