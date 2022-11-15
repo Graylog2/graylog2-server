@@ -56,14 +56,6 @@ describe('Input', () => {
     expect(wrapper.find('input[name="inputWithNameProp"]')).toExist();
   });
 
-  it('renders input w/ `readOnly` attribute', () => {
-    const wrapper = mount(
-      <Input id="inputWithReadOnly" name="inputWithReadOnly" type="text" readOnly />,
-    );
-
-    expect(wrapper.find('input[name="inputWithReadOnly"]').at(0)).toHaveProp('readOnly', true);
-  });
-
   it('renders input w/ provided error', () => {
     const wrapper = mount(<Input id="inputWithError" type="text" error="The error message" />);
 

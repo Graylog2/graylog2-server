@@ -55,7 +55,6 @@ class Input extends React.Component {
       PropTypes.element,
       PropTypes.string,
     ]),
-    readOnly: PropTypes.bool,
     help: PropTypes.oneOfType([
       PropTypes.element,
       PropTypes.string,
@@ -86,7 +85,6 @@ class Input extends React.Component {
     value: undefined,
     placeholder: '',
     error: undefined,
-    readOnly: false,
     help: undefined,
     wrapperClassName: undefined,
     addonAfter: null,
@@ -198,17 +196,17 @@ class Input extends React.Component {
     const {
       id,
       type,
-      bsStyle, // eslint-disable-line no-unused-vars
-      formGroupClassName, // eslint-disable-line no-unused-vars
-      wrapperClassName, // eslint-disable-line no-unused-vars
+      bsStyle,
+      formGroupClassName,
+      wrapperClassName,
       label,
-      labelClassName, inputDescClassName, // eslint-disable-line no-unused-vars
+      labelClassName, inputDescClassName,
       name,
-      error, // eslint-disable-line no-unused-vars
-      help, // eslint-disable-line no-unused-vars
+      error,
+      help,
       children,
-      addonAfter, // eslint-disable-line no-unused-vars
-      buttonAfter, // eslint-disable-line no-unused-vars
+      addonAfter,
+      buttonAfter,
       ...controlProps
     } = this.props;
 

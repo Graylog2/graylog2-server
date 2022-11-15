@@ -64,7 +64,7 @@ class EventDetailsForm extends React.Component {
                    help={lodash.get(validation, 'errors.title[0]', 'Title for this Event Definition, Events and Alerts created from it.')}
                    value={eventDefinition.title}
                    onChange={this.handleChange}
-                   readOnly={isSystemEventDefinition}
+                   disabled={isSystemEventDefinition}
                    required />
 
             <Input id="event-definition-description"
@@ -74,7 +74,7 @@ class EventDetailsForm extends React.Component {
                    help="Longer description for this Event Definition."
                    value={eventDefinition.description}
                    onChange={this.handleChange}
-                   readOnly={isSystemEventDefinition}
+                   disabled={isSystemEventDefinition}
                    rows={2} />
 
             <FormGroup controlId="event-definition-priority">
