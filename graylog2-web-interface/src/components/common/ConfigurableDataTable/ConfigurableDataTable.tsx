@@ -33,16 +33,6 @@ const ScrollContainer = styled.div(({ theme }) => css`
   }
 `);
 
-type Props<ListItem extends { id: string }> = {
-  rows: Array<ListItem>,
-  rowActions?: (listItem: ListItem) => React.ReactNode,
-  customCells?: CustomCells<ListItem>,
-  attributePermissions?: { [attributeId: string]: { permissions: Array<string>, any?: boolean } },
-  customHeaders?: CustomHeaders,
-  attributes: Array<string>,
-  availableAttributes: Array<Attribute>,
-};
-
 const filterVisibleAttributes = (
   attributes: Array<string>,
   availableAttributes: Array<Attribute>,
@@ -62,6 +52,26 @@ const filterVisibleAttributes = (
     return true;
   });
 
+type Props<ListItem extends { id: string }> = {
+  /** The table list items. */
+  rows: Array<ListItem>,
+  /** Actions for each row. */
+  rowActions?: (listItem: ListItem) => React.ReactNode,
+  /** Custom cell render for an attribute */
+  customCells?: CustomCells<ListItem>,
+  /** Define the permissions a user needs to view an attribute. */
+  attributePermissions?: { [attributeId: string]: { permissions: Array<string>, any?: boolean } },
+  /** Custom header render for an attribute */
+  customHeaders?: CustomHeaders,
+  /** Which attribute should be shown. */
+  attributes: Array<string>,
+  /** List of all available attributes. */
+  availableAttributes: Array<Attribute>,
+};
+
+/**
+ * Flexible data table component which allows defining custom cell renderers.
+ */
 const ConfigurableDataTable = <ListItem extends { id: string }>({
   rows,
   customHeaders,
