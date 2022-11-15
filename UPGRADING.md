@@ -11,7 +11,7 @@ Please make sure to create a MongoDB database backup before starting the upgrade
 * Support for Elasticsearch 6.X has been removed! Please use either Elasticsearch 7.10.2 or, preferably, latest OpenSearch.
 * Graylog 5 needs at least MongoDB 5.0. Our recommended upgrade path is to first bring your MongoDB to 5.0 and then perform the Graylog upgrade.
   Hint: Graylog 4.3.x does support MongoDB 5.0, which allows for a seamless upgrade path.
-* `flatten_json` now preserves the original type of the extracted values, instead
+* The `flatten_json` pipeline function now preserves the original type of the extracted values, instead
 of converting them to string. An optional flag is provided so existing rules can
 continue using the legacy behavior.
 
