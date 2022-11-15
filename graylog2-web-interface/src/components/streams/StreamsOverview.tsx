@@ -138,6 +138,12 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
     onSearch('');
   }, [onSearch]);
 
+  const renderStreamActions = useCallback((listItem: Stream) => (
+    <StreamActions stream={listItem}
+                   indexSets={indexSets}
+                   streamRuleTypes={streamRuleTypes} />
+  ), [indexSets, streamRuleTypes]);
+
   if (isLoading) {
     return (
       <div style={{ marginLeft: 10 }}>
@@ -145,8 +151,6 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
       </div>
     );
   }
-
-  const renderStreamActions = (listItem: Stream) => <StreamActions stream={listItem} indexSets={indexSets} streamRuleTypes={streamRuleTypes} />;
 
   return (
     <PaginatedList onChange={onPageChange}
