@@ -59,6 +59,7 @@ import java.util.Optional;
 
 import static java.util.Locale.US;
 import static java.util.Objects.requireNonNull;
+import static org.graylog.events.processor.systemnotification.SystemNotificationEventIndexTemplateProvider.SYSTEM_EVENT_TEMPLATE_TYPE;
 import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID;
 
@@ -99,6 +100,7 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
                 "Stores Graylog events.",
                 elasticsearchConfiguration.getDefaultEventsIndexPrefix(),
                 ElasticsearchConfiguration.DEFAULT_EVENTS_INDEX_PREFIX,
+                EVENT_TEMPLATE_TYPE,
                 Stream.DEFAULT_EVENTS_STREAM_ID,
                 "All events",
                 "Stream containing all events created by Graylog"
@@ -108,6 +110,7 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
                 "Stores Graylog system events.",
                 elasticsearchConfiguration.getDefaultSystemEventsIndexPrefix(),
                 ElasticsearchConfiguration.DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX,
+                SYSTEM_EVENT_TEMPLATE_TYPE,
                 DEFAULT_SYSTEM_EVENTS_STREAM_ID,
                 "All system events",
                 "Stream containing all system events created by Graylog"
@@ -119,12 +122,13 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
                                                String indexSetDescription,
                                                String indexPrefix,
                                                String indexPrefixConfigKey,
+                                               String indexTemplate,
                                                String streamId,
                                                String streamTitle,
                                                String streamDescription) {
         checkIndexPrefixConflicts(indexPrefix, indexPrefixConfigKey);
 
-        final IndexSet eventsIndexSet = setupEventsIndexSet(indexSetTitle, indexSetDescription, indexPrefix);
+        final IndexSet eventsIndexSet = setupEventsIndexSet(indexSetTitle, indexSetDescription, indexPrefix, indexTemplate);
         try {
             streamService.load(streamId);
         } catch (NotFoundException ignored) {
@@ -153,7 +157,7 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
         return indexSetService.findOne(query);
     }
 
-    private IndexSet setupEventsIndexSet(String indexSetTitle, String indexSetDescription, String indexPrefix) {
+    private IndexSet setupEventsIndexSet(String indexSetTitle, String indexSetDescription, String indexPrefix, String indexTemplateType) {
         final Optional<IndexSetConfig> optionalIndexSetConfig = getEventsIndexSetConfig(indexPrefix);
         if (optionalIndexSetConfig.isPresent()) {
             return mongoIndexSetFactory.create(optionalIndexSetConfig.get());
@@ -162,7 +166,7 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
         final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
                 .title(indexSetTitle)
                 .description(indexSetDescription)
-                .indexTemplateType(EVENT_TEMPLATE_TYPE)
+                .indexTemplateType(indexTemplateType)
                 .isWritable(true)
                 .isRegular(false)
                 .indexPrefix(indexPrefix)

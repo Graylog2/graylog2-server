@@ -53,8 +53,8 @@ import java.util.stream.Collectors;
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
+import static org.graylog.events.processor.systemnotification.SystemNotificationEventIndexTemplateProvider.SYSTEM_EVENT_TEMPLATE_TYPE;
 import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
-import static org.graylog2.indexer.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 
 @Singleton
 public class Searches {
@@ -253,7 +253,7 @@ public class Searches {
         final SortedSet<IndexRange> indexRanges = indexRangeService.find(range.getFrom(), range.getTo());
         final Set<String> affectedIndexNames = indexRanges.stream().map(IndexRange::indexName).collect(Collectors.toSet());
         final Set<IndexSet> eventIndexSets = indexSetRegistry.getForIndices(affectedIndexNames).stream()
-                .filter(indexSet1 -> EVENT_TEMPLATE_TYPE.equals(indexSet1.getConfig().indexTemplateType().orElse(MESSAGE_TEMPLATE_TYPE)))
+                .filter(indexSet1 -> isEventIndexType(indexSet1.getConfig().indexTemplateType()))
                 .collect(Collectors.toSet());
         for (IndexRange indexRange : indexRanges) {
             // if we aren't in a stream search, we look at all the ranges matching the time range.
@@ -282,5 +282,9 @@ public class Searches {
         }
 
         return indices.build();
+    }
+
+    private boolean isEventIndexType(Optional<String> indexType) {
+        return indexType.filter(s -> (s.equals(EVENT_TEMPLATE_TYPE) || s.equals(SYSTEM_EVENT_TEMPLATE_TYPE))).isPresent();
     }
 }

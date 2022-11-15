@@ -50,21 +50,18 @@ public abstract class SystemNotificationEventProcessorConfig implements EventPro
         public abstract SystemNotificationEventProcessorConfig build();
     }
 
-    // TODO: Implement
     @Override
     public ValidationResult validate() {
+        // Nothing to validate
         return new ValidationResult();
     }
 
     @Override
     public EventProcessorConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
-        // TODO: Don't forget to add the correct Jackson subtype mapping, so that the content pack import is successful:
-        //  e.g. registerJacksonSubtype(SigmaEventProcessorConfigEntity.class,
-        //                SigmaEventProcessorConfigEntity.TYPE_NAME);
+        // Don't export this into content packs
         return null;
     }
 
-    // TODO: Implement.
     @Override
     public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
     }
