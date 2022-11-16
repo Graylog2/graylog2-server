@@ -18,10 +18,9 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 import { useMemo, useState, useCallback } from 'react';
 import type * as Immutable from 'immutable';
-import { Badge } from 'react-bootstrap';
 
+import { Badge, Table } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
-import { Table } from 'components/bootstrap';
 import TableHead from 'components/common/ConfigurableDataTable/TableHead';
 import TableRow from 'components/common/ConfigurableDataTable/TableRow';
 import useCurrentUser from 'hooks/useCurrentUser';

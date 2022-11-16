@@ -16,10 +16,11 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useMemo, useCallback } from 'react';
+import { useCallback } from 'react';
 
 import { TextOverflowEllipsis } from 'components/common';
 
+import TableCell from './TableCell';
 import type { CustomCells, Attribute } from './types';
 import RowCheckbox from './RowCheckbox';
 
@@ -39,32 +40,6 @@ const defaultAttributeCellRenderer = {
     ),
     maxWidth: '30vw',
   },
-};
-
-const TableCell = <ListItem extends { id: string }>({
-  cellRenderer,
-  listItem,
-  attribute,
-}: {
-  cellRenderer: {
-    renderCell: (listItem: ListItem, attribute: Attribute) => React.ReactNode,
-    width?: string,
-    maxWidth?: string,
-  },
-  listItem: ListItem,
-  attribute: Attribute
-
-}) => {
-  const content = useMemo(
-    () => (cellRenderer ? cellRenderer.renderCell(listItem, attribute) : listItem[attribute.id]),
-    [attribute, cellRenderer, listItem],
-  );
-
-  return (
-    <td style={{ width: cellRenderer?.width, maxWidth: cellRenderer?.maxWidth }}>
-      {content}
-    </td>
-  );
 };
 
 type Props<ListItem extends { id: string }> = {
