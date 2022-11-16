@@ -28,11 +28,11 @@ import java.util.Map;
 public abstract class TemplateRenderRequest {
     static final String FIELD_VALUES = "values";
 
-    @JsonProperty
+    @JsonProperty(FIELD_VALUES)
     public abstract Map<String, Object> values();
 
     @JsonCreator
-    public static TemplateRenderRequest create(@JsonProperty(FIELD_VALUES) Map<String, Object> template) {
-        return new AutoValue_TemplateRenderRequest(template);
+    public static TemplateRenderRequest create(@JsonProperty(FIELD_VALUES) Map<String, Object> values) {
+        return new AutoValue_TemplateRenderRequest(values);
     }
 }

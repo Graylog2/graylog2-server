@@ -39,7 +39,7 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Api(value = "System/Notification/Message", description = "Render system notification messages", tags = {CLOUD_VISIBLE})
 @Path("/system/notification/message")
 @Consumes(MediaType.APPLICATION_JSON)
-@Produces(MediaType.APPLICATION_JSON)
+@Produces({MediaType.TEXT_HTML, MediaType.TEXT_PLAIN})
 @RequiresAuthentication
 public class SystemNotificationRenderResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SystemNotificationRenderResource.class);
@@ -49,6 +49,15 @@ public class SystemNotificationRenderResource extends RestResource {
     @Inject
     public SystemNotificationRenderResource(SystemNotificationRenderService systemNotificationRenderService) {
         this.systemNotificationRenderService = systemNotificationRenderService;
+    }
+
+    @GET
+    @Path("/test/{id}")
+    @Produces(MediaType.TEXT_PLAIN)
+    @ApiOperation(value = "Get HTML formatted message")
+    public String renderTest(@ApiParam(name = "id", required = true)
+                             @PathParam("id") String id) {
+        return id;
     }
 
     @GET
