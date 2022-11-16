@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views;
 
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiModule;
@@ -26,16 +27,21 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
 import org.graylog.testing.utils.IndexSetUtils;
+import org.graylog.testing.utils.SharingRequest;
+import org.graylog.testing.utils.SharingUtils;
 import org.graylog.testing.utils.StreamUtils;
+import org.graylog.testing.utils.UserUtils;
 import org.graylog2.plugin.streams.StreamRuleType;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -64,8 +70,31 @@ public class ScriptingApiResourceIT {
     public void beforeAll() {
 
         final String defaultIndexSetId = IndexSetUtils.defaultIndexSetId(requestSpec);
+
+        final JsonPath user = UserUtils.createUser(requestSpec, new UserUtils.User(
+                "john.doe",
+                "asdfgh",
+                "John",
+                "Doe",
+                "john.doe@example.com",
+                false,
+                30_000,
+                "Europe/Vienna",
+                Collections.emptyList(),
+                Collections.emptyList()
+        ));
+
+        final String userId = user.getString("id");
+
+
         this.stream1Id = StreamUtils.createStream(requestSpec, "Stream #1", defaultIndexSetId, new StreamUtils.StreamRule(StreamRuleType.EXACT.toInteger(), "stream1", "target_stream", false));
         this.stream2Id = StreamUtils.createStream(requestSpec, "Stream #2", defaultIndexSetId, new StreamUtils.StreamRule(StreamRuleType.EXACT.toInteger(), "stream2", "target_stream", false));
+
+        SharingUtils.setSharing(requestSpec, new SharingRequest(
+                new SharingRequest.Entity(SharingUtils.ENTITY_STREAM, stream2Id),
+                ImmutableMap.of(
+                        new SharingRequest.Entity(SharingUtils.ENTITY_USER, userId), SharingUtils.PERMISSION_VIEW
+                )));
 
         GelfInputUtils.createGelfHttpInput(sut, 12201, requestSpec)
                 .postMessage("""
@@ -78,6 +107,38 @@ public class ScriptingApiResourceIT {
                         {"short_message":"search-sync-test-3", "host":"lorem-ipsum.com", "facility":"another-test", "_level":3, "_http_method":"POST", "_target_stream": "stream2"}
                         """)
                 .waitForAllMessages();
+    }
+
+    @ContainerMatrixTest
+    void testUserWithLimitedPermissionRequest() {
+
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .auth().basic("john.doe", "asdfgh")
+                .when()
+                .body("""
+                        {
+                            "aggregation": {
+                              "group_by": [
+                                {
+                                  "field_name": "facility"
+                                }
+                              ],
+                              "metrics": [
+                                {
+                                  "function_name": "count",
+                                  "field_name": "facility"
+                                }
+                              ]
+                            }
+                          }
+                        """)
+                .post("/scripting_api/aggregate")
+                .then()
+                .statusCode(200);
+
+        validatableResponse.assertThat().body("data.rows", Matchers.hasSize(1));
+        validateRow(validatableResponse, "another-test", 2);
     }
 
     @ContainerMatrixTest
