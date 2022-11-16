@@ -106,7 +106,6 @@ describe('<ConfigurableDataTable />', () => {
 
     render(<ConfigurableDataTable attributes={selectedAttributes}
                                   rows={rows}
-                                  rowActions={(row) => `Custom actions for ${row.title}`}
                                   attributePermissions={{
                                     status: {
                                       permissions: ['status:read'],
