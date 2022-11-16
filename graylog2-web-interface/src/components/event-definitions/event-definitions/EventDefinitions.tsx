@@ -30,7 +30,7 @@ import Routes from 'routing/Routes';
 import QueryHelper from 'components/common/QueryHelper';
 
 import styles from './EventDefinitions.css';
-import type { EventDefinition } from './EventDefinitionEntry';
+import type { EventDefinition } from '../event-definitions-types';
 import EventDefinitionEntry from './EventDefinitionEntry';
 
 const EmptyContent = () => (

@@ -39,14 +39,7 @@ import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
 import EventDefinitionDescription from './EventDefinitionDescription';
 
-export type EventDefinition = {
-  id: string,
-  config: {
-    type: string,
-  },
-  title: string,
-  _scope: string,
-};
+import type { EventDefinition } from '../event-definitions-types';
 
 type Props = {
   context: {
