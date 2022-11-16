@@ -23,7 +23,7 @@ import { Alert } from 'components/bootstrap';
 import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream, StreamRuleType } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
@@ -108,6 +108,22 @@ const usePaginatedStreams = (searchParams: SearchParams): { data: { streams: Arr
   });
 };
 
+const useStreamRuleTypes = (): { data: { types: Array<StreamRuleType> } | undefined } => {
+  const { data } = useQuery(
+    ['streams', 'rule-types'],
+    () => StreamRulesStore.types(),
+    {
+      onError: (errorThrown) => {
+        UserNotification.error(`Loading stream rule types failed with status: ${errorThrown}`,
+          'Could not load stream rule types');
+      },
+      keepPreviousData: true,
+    },
+  );
+
+  return ({ data });
+};
+
 type Props = {
   onStreamCreate: (stream: Stream) => Promise<void>,
   indexSets: Array<IndexSet>
@@ -121,14 +137,8 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
     perPage: paginationQueryParameter.pageSize,
     query: '',
   });
-  const [streamRuleTypes, setStreamRuleTypes] = useState();
-  const { data: streamsData, refetch: refetchStreams } = usePaginatedStreams(searchParams);
-
-  useEffect(() => {
-    StreamRulesStore.types().then((types) => {
-      setStreamRuleTypes(types);
-    });
-  }, []);
+  const { data: streamRulesData } = useStreamRuleTypes();
+  const { data: paginatedStreams, refetch: refetchStreams } = usePaginatedStreams(searchParams);
 
   useEffect(() => {
     StreamsStore.onChange(() => refetchStreams());
@@ -157,14 +167,14 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   const renderStreamActions = useCallback((listItem: Stream) => (
     <StreamActions stream={listItem}
                    indexSets={indexSets}
-                   streamRuleTypes={streamRuleTypes} />
-  ), [indexSets, streamRuleTypes]);
+                   streamRuleTypes={streamRulesData?.types} />
+  ), [indexSets, streamRulesData?.types]);
 
-  if (!streamsData || !streamRuleTypes) {
+  if (!paginatedStreams || !streamRulesData) {
     return (<Spinner />);
   }
 
-  const { streams, pagination: { total } } = streamsData;
+  const { streams, pagination: { total } } = paginatedStreams;
 
   return (
     <PaginatedList onChange={onPageChange}
