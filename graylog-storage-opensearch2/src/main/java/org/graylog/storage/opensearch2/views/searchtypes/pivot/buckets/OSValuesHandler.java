@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.script.Script;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.BucketOrder;
@@ -86,7 +87,7 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
         bucketSpecs.stream()
                 .map(Values::field)
                 .map(QueryBuilders::existsQuery)
-                .forEach(queryBuilder::must);
+                .forEach(queryBuilder::filter);
         return AggregationBuilders.filters(name, queryBuilder)
                 .otherBucket(true);
     }
@@ -126,7 +127,9 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
 
     private Script scriptForPivots(Collection<? extends BucketSpec> pivots) {
         final String scriptSource = Joiner.on(KEY_SEPARATOR_PHRASE).join(pivots.stream()
-                .map(bucket -> "String.valueOf(doc['" + bucket.field() + "'].size() == 0 ? \"" + MissingBucketConstants.MISSING_BUCKET_NAME + "\" : doc['" + bucket.field() + "'].value)")
+                .map(bucket -> """
+                        String.valueOf((doc.containsKey('%1$s') && doc['%1$s'].size() > 0) ? doc['%1$s'].value : "%2$s")
+                        """.formatted(bucket.field(), MissingBucketConstants.MISSING_BUCKET_NAME))
                 .collect(Collectors.toList()));
         return new Script(scriptSource);
     }
@@ -135,7 +138,11 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
     public Stream<PivotBucket> extractBuckets(List<BucketSpec> bucketSpecs, PivotBucket initialBucket) {
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
-        final ParsedFilters filterAggregation = previousBucket.getAggregations().get(AGG_NAME);
+        final Aggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
+        if (!(aggregation instanceof final ParsedFilters filterAggregation)) {
+            // This happens when the other bucket is passed for column value extraction
+            return Stream.of(initialBucket);
+        }
         final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
         final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
         final Stream<PivotBucket> bucketStream = termsAggregation.getBuckets().stream()

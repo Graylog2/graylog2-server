@@ -369,6 +369,27 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
+    void testRowAndColumnPivotsWithMissingFields() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .rowGroups(Values.builder().field("missing_row_pivot").build())
+                .columnGroups(Values.builder().field("missing_column_pivot").build())
+                .series(Count.builder().build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("rows", hasSize(2));
+
+        final String searchTypeResultPath = PIVOT_PATH + ".rows";
+
+        validatableResponse
+                .rootPath(searchTypeResultPath)
+                .body(pathToMetricResult(List.of("(Empty Value)"), List.of("count()")), equalTo(1000));
+    }
+
+    @ContainerMatrixTest
     void testTwoRowPivots() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
