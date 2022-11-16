@@ -70,14 +70,14 @@ const _isFieldSortActive = (config: MessagesWidgetConfig, fieldName: string) => 
 };
 
 const DirectionStrategyAsc: DirectionStrategy = {
-  icon: 'sort-amount-down',
+  icon: 'sort-amount-up-alt',
   tooltip: (fieldName: string) => _tooltip(fieldName, Direction.Descending),
   handleSortChange: (changeSort) => changeSort(Direction.Descending),
   sortActive: true,
 };
 
 const DirectionStrategyDesc: DirectionStrategy = {
-  icon: 'sort-amount-up',
+  icon: 'sort-amount-down',
   tooltip: (fieldName: string) => _tooltip(fieldName, Direction.Ascending),
   handleSortChange: (changeSort) => changeSort(Direction.Ascending),
   sortActive: true,
