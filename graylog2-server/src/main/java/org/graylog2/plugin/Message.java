@@ -121,7 +121,7 @@ public class Message implements Messages, Indexable {
      *     <li>They are guaranteed to be lexicographically sortable (UUIDs are only lexicographically sortable when time-based ones are used)</li>
      * </ul>
      *
-     * See: https://github.com/Graylog2/graylog2-server/issues/5994
+     * See: <a href="https://github.com/Graylog2/graylog2-server/issues/5994">...</a>
      */
     public static final String FIELD_GL2_MESSAGE_ID = "gl2_message_id";
 
