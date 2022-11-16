@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -77,7 +78,7 @@ public abstract class RecentActivityDTO {
 
         @JsonCreator
         public static RecentActivityDTO.Builder create() {
-            return new AutoValue_RecentActivityDTO.Builder();
+            return new AutoValue_RecentActivityDTO.Builder().timestamp(new DateTime(DateTimeZone.UTC));
         }
 
         public abstract RecentActivityDTO build();

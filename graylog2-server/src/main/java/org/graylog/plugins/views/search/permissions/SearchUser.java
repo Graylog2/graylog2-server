@@ -24,6 +24,7 @@ import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewLike;
 import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewResolverDecoder;
+import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivityDTO;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTimeZone;
@@ -137,5 +138,17 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
     @Override
     public int hashCode() {
         return Objects.hashCode(currentUser);
+    }
+
+    private boolean canReadView(final String viewId) {
+        return isPermitted(ViewsRestPermissions.VIEW_READ, viewId);
+    }
+
+    private boolean canReadDashboard(final String viewId) {
+        return isPermitted(RestPermissions.DASHBOARDS_READ, viewId);
+    }
+
+    public boolean canSeeActivity(final RecentActivityDTO recentActivityDTO) {
+        return canReadView(recentActivityDTO.itemId()) || canReadDashboard(recentActivityDTO.itemId());
     }
 }

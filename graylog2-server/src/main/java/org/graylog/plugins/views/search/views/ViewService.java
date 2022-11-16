@@ -18,6 +18,8 @@ package org.graylog.plugins.views.search.views;
 
 import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;
+import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivityDTO;
+import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivityService;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -49,6 +51,7 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
     private final ViewRequirements.Factory viewRequirementsFactory;
     private final EntityOwnershipService entityOwnerShipService;
     private final ViewSummaryService viewSummaryService;
+    private final RecentActivityService recentActivityService;
 
     @Inject
     protected ViewService(MongoConnection mongoConnection,
@@ -56,12 +59,14 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
                           ClusterConfigService clusterConfigService,
                           ViewRequirements.Factory viewRequirementsFactory,
                           EntityOwnershipService entityOwnerShipService,
-                          ViewSummaryService viewSummaryService) {
+                          ViewSummaryService viewSummaryService,
+                          RecentActivityService recentActivityService) {
         super(mongoConnection, mapper, ViewDTO.class, COLLECTION_NAME);
         this.clusterConfigService = clusterConfigService;
         this.viewRequirementsFactory = viewRequirementsFactory;
         this.entityOwnerShipService = entityOwnerShipService;
         this.viewSummaryService = viewSummaryService;
+        this.recentActivityService = recentActivityService;
     }
 
     private PaginatedList<ViewDTO> searchPaginated(DBQuery.Query query,
@@ -180,7 +185,9 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
     public ViewDTO save(ViewDTO viewDTO) {
         try {
             final WriteResult<ViewDTO, ObjectId> save = db.insert(requirementsForView(viewDTO));
-            return save.getSavedObject();
+            var saved = save.getSavedObject();
+            recentActivityService.save(RecentActivityDTO.builder().activityType("create").itemId(saved.id()).build());
+            return saved;
         } catch (DuplicateKeyException e) {
             throw new IllegalStateException("Unable to save view, it already exists.");
         }
@@ -202,6 +209,7 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         checkArgument(viewDTO.id() != null, "Id of view must not be null.");
         final ViewDTO viewWithRequirements = requirementsForView(viewDTO);
         db.updateById(new ObjectId(viewWithRequirements.id()), viewWithRequirements);
+        recentActivityService.save(RecentActivityDTO.builder().activityType("update").itemId(viewWithRequirements.id()).build());
         return viewWithRequirements;
     }
 

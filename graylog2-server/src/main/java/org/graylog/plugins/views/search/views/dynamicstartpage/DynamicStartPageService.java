@@ -19,15 +19,16 @@ package org.graylog.plugins.views.search.views.dynamicstartpage;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.contentpacks.ContentPackService;
+import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.database.NotFoundException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DynamicStartPageService {
@@ -67,8 +68,13 @@ public class DynamicStartPageService {
     }
 
     public List<RecentActivity> findRecentActivityFor(final SearchUser searchUser) {
-        var pi = new RecentActivity("1", ActivityType.UPDATED, "Dashboard", "2", "Title", new DateTime(DateTimeZone.UTC));
-        return Collections.singletonList(pi);
+        var catalog = contentPackService.getEntityExcerpts();
+        return recentActivityService
+                .streamAll()
+                .filter(searchUser::canSeeActivity)
+                .limit(10)
+                .map(i -> new RecentActivity(i.id(), i.activityType(), catalog.get(i.itemId()).type().name(), i.itemId(), catalog.get(i.itemId()).title(), i.timestamp()))
+                .collect(Collectors.toList());
     }
 
     public void addLastOpenedFor(final ViewDTO view, final SearchUser searchUser) {

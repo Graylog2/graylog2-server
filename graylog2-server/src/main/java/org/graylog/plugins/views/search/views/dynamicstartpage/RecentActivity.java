@@ -18,5 +18,5 @@ package org.graylog.plugins.views.search.views.dynamicstartpage;
 
 import org.joda.time.DateTime;
 
-public record RecentActivity(String id, ActivityType activityType, String itemType, String itemId, String title, DateTime timestamp) {
+public record RecentActivity(String id, String activityType, String itemType, String itemId, String title, DateTime timestamp) {
 }
