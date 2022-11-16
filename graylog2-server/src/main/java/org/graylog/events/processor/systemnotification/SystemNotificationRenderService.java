@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Map;
@@ -27,20 +25,18 @@ public class SystemNotificationRenderService {
         cfg.setDefaultEncoding(UTF_8);
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         cfg.setLogTemplateExceptions(false);
+        cfg.setClassForTemplateLoading(SystemNotificationRenderService.class, "/org/graylog2/freemarker/templates/");
     }
 
     public String renderHtml(String notificationId, Map<String, Object> values) {
-        String templateName = notificationId + "_html";
-        try (Reader reader = new InputStreamReader(
-                getClass().getClassLoader().getResourceAsStream(templateName))) {
-            Template template = new Template(notificationId, reader, cfg);
-            Writer writer = new StringWriter();
+        try (Writer writer = new StringWriter()) {
+            Template template = cfg.getTemplate(notificationId + "_html.ftl");
             template.process(values, writer);
-            return template.toString();
+            return writer.toString();
         } catch (TemplateException e) {
-            throw new BadRequestException("Unable to render template " + templateName + ": " + e.getMessage());
+            throw new BadRequestException("Unable to render template " + notificationId + ": " + e.getMessage());
         } catch (IOException e) {
-            throw new BadRequestException("Unable to locate template " + templateName + ": " + e.getMessage());
+            throw new BadRequestException("Unable to locate template " + notificationId + ": " + e.getMessage());
         }
     }
 

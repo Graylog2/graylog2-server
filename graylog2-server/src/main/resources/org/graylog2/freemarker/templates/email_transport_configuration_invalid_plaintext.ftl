@@ -4,4 +4,4 @@ The configuration for the email transport subsystem has shown to be missing or i
 Please check the related section of your Graylog server configuration file.
 
 This is the detailed error message:
-{notification.details.exception}
+${exception}
