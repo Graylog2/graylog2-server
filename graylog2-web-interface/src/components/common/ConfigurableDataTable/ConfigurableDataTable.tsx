@@ -25,7 +25,7 @@ import TableHead from 'components/common/ConfigurableDataTable/TableHead';
 import TableBody from 'components/common/ConfigurableDataTable/TableBody';
 import useCurrentUser from 'hooks/useCurrentUser';
 
-import type { CustomCells, CustomHeaders, Attribute } from './types';
+import type { CustomCells, CustomHeaders, Attribute, Sort } from './types';
 
 const ScrollContainer = styled.div(({ theme }) => css`
   @media (max-width: ${theme.breakpoints.max.md}) {
@@ -63,6 +63,10 @@ type Props<ListItem extends { id: string }> = {
   attributePermissions?: { [attributeId: string]: { permissions: Array<string>, any?: boolean } },
   /** Custom header render for an attribute */
   customHeaders?: CustomHeaders,
+  /** Function to handle sort changes */
+  onSortChange: (newSort: Sort) => void
+  /** Currently active sort */
+  activeSort?: Sort,
   /** Which attribute should be shown. */
   attributes: Array<string>,
   /** List of all available attributes. */
@@ -73,13 +77,15 @@ type Props<ListItem extends { id: string }> = {
  * Flexible data table component which allows defining custom cell renderers.
  */
 const ConfigurableDataTable = <ListItem extends { id: string }>({
-  rows,
-  customHeaders,
-  customCells,
+  activeSort,
+  attributePermissions,
   attributes,
   availableAttributes,
-  attributePermissions,
+  customCells,
+  customHeaders,
+  onSortChange,
   rowActions,
+  rows,
 }: Props<ListItem>) => {
   const currentUser = useCurrentUser();
   const visibleAttributes = useMemo(
@@ -94,6 +100,8 @@ const ConfigurableDataTable = <ListItem extends { id: string }>({
       <Table striped condensed hover>
         <TableHead selectedAttributes={visibleAttributes}
                    customHeaders={customHeaders}
+                   onSortChange={onSortChange}
+                   activeSort={activeSort}
                    displayActionsCol={displayActionsCol} />
         <TableBody rows={rows}
                    customCells={customCells}
@@ -110,6 +118,7 @@ ConfigurableDataTable.defaultProps = {
   customCells: undefined,
   customHeaders: undefined,
   rowActions: undefined,
+  activeSort: undefined,
 };
 
 export default ConfigurableDataTable;

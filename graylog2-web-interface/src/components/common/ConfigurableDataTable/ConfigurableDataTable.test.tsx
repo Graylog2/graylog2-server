@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { defaultUser } from 'defaultMockValues';
 import Immutable from 'immutable';
+import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -32,10 +33,10 @@ describe('<ConfigurableDataTable />', () => {
   });
 
   const availableAttributes = [
-    { id: 'title', title: 'Title' },
-    { id: 'description', title: 'Description' },
-    { id: 'stream', title: 'Stream' },
-    { id: 'status', title: 'Status' },
+    { id: 'title', title: 'Title', sortable: true },
+    { id: 'description', title: 'Description', sortable: true },
+    { id: 'stream', title: 'Stream', sortable: true },
+    { id: 'status', title: 'Status', sortable: true },
   ];
 
   const selectedAttributes = ['title', 'description', 'status'];
@@ -52,6 +53,7 @@ describe('<ConfigurableDataTable />', () => {
   it('should render selected rows and table headers', async () => {
     render(<ConfigurableDataTable attributes={selectedAttributes}
                                   rows={rows}
+                                  onSortChange={() => {}}
                                   availableAttributes={availableAttributes} />);
 
     await screen.findByRole('columnheader', { name: /title/i });
@@ -67,6 +69,7 @@ describe('<ConfigurableDataTable />', () => {
   it('should render default cell renderer', async () => {
     render(<ConfigurableDataTable attributes={selectedAttributes}
                                   rows={rows}
+                                  onSortChange={() => {}}
                                   availableAttributes={availableAttributes} />);
 
     await screen.findByRole('columnheader', { name: /description/i });
@@ -76,6 +79,7 @@ describe('<ConfigurableDataTable />', () => {
   it('should render custom cell and header renderer', async () => {
     render(<ConfigurableDataTable attributes={selectedAttributes}
                                   rows={rows}
+                                  onSortChange={() => {}}
                                   customCells={{
                                     title: {
                                       renderCell: (listItem) => `The title: ${listItem.title}`,
@@ -95,17 +99,19 @@ describe('<ConfigurableDataTable />', () => {
   it('should render row actions', async () => {
     render(<ConfigurableDataTable attributes={selectedAttributes}
                                   rows={rows}
+                                  onSortChange={() => {}}
                                   rowActions={(row) => `Custom actions for ${row.title}`}
                                   availableAttributes={availableAttributes} />);
 
     await screen.findByText('Custom actions for Row title');
   });
 
-  it('should not render column for attribute is user does not have required permissions', async () => {
+  it('should not render column for attribute is user does not have required permissions', () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
     render(<ConfigurableDataTable attributes={selectedAttributes}
                                   rows={rows}
+                                  onSortChange={() => {}}
                                   attributePermissions={{
                                     status: {
                                       permissions: ['status:read'],
@@ -115,5 +121,36 @@ describe('<ConfigurableDataTable />', () => {
 
     expect(screen.queryByRole('columnheader', { name: /status/i })).not.toBeInTheDocument();
     expect(screen.queryByText('enabled')).not.toBeInTheDocument();
+  });
+
+  it('should display active sort', async () => {
+    asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
+
+    render(<ConfigurableDataTable attributes={selectedAttributes}
+                                  rows={rows}
+                                  onSortChange={() => {}}
+                                  activeSort={{
+                                    attributeId: 'description',
+                                    order: 'asc',
+                                  }}
+                                  availableAttributes={availableAttributes} />);
+
+    await screen.findByTitle(/sort description descending/i);
+  });
+
+  it('should sort based on attribute', async () => {
+    const onSortChange = jest.fn();
+    asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
+
+    render(<ConfigurableDataTable attributes={selectedAttributes}
+                                  rows={rows}
+                                  onSortChange={onSortChange}
+                                  availableAttributes={availableAttributes} />);
+
+    userEvent.click(await screen.findByTitle(/sort description ascending/i));
+
+    await waitFor(() => expect(onSortChange).toHaveBeenCalledTimes(1));
+
+    expect(onSortChange).toHaveBeenCalledWith({ attributeId: 'description', order: 'asc' });
   });
 });

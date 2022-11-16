@@ -19,6 +19,7 @@ import type * as React from 'react';
 export type Attribute = {
   id: string,
   title: string,
+  sortable?: boolean,
   type?: boolean,
 };
 
@@ -37,3 +38,8 @@ export type CustomCells<ListItem extends { id: string }> = {
     maxWidth?: string,
   }
 }
+
+export type Sort = {
+  attributeId: string,
+  order: 'asc' | 'desc'
+};
