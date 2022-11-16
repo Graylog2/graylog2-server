@@ -28,7 +28,7 @@ import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import ConfigurableDataTable from 'components/common/ConfigurableDataTable';
-import StreamActions from 'components/streams/StreamActions';
+import StreamActions from 'components/streams/StreamsOverview/StreamActions';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import type { CustomCells } from 'components/common/ConfigurableDataTable';

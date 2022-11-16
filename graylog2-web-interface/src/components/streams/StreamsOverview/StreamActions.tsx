@@ -32,7 +32,7 @@ import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import useCurrentUser from 'hooks/useCurrentUser';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
-import StreamModal from './StreamModal';
+import StreamModal from '../StreamModal';
 
 const StreamActions = ({
   stream,
