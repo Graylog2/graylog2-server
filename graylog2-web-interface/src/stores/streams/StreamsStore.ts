@@ -162,10 +162,6 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
             query,
           },
         };
-      })
-      .catch((errorThrown) => {
-        UserNotification.error(`Loading streams failed with status: ${errorThrown}`,
-          'Could not load streams');
       });
 
     StreamsActions.searchPaginated.promise(promise);

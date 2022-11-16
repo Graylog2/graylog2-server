@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React, { useState, useEffect, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import { isPermitted } from 'util/PermissionsMixin';
 import { Alert } from 'components/bootstrap';
@@ -34,6 +35,7 @@ import Routes from 'routing/Routes';
 import useCurrentUser from 'hooks/useCurrentUser';
 import StreamStatusCell from 'components/streamrules/StreamStatusCell';
 import type { CustomCells } from 'components/common/ConfigurableDataTable';
+import UserNotification from 'util/UserNotification';
 
 import CreateStreamButton from './CreateStreamButton';
 
@@ -51,6 +53,12 @@ const ATTRIBUTE_PERMISSIONS = {
 };
 
 const VISIBLE_ATTRIBUTES = ['title', 'description', 'index_set_id', 'disabled'];
+
+type SearchParams = {
+  page: number,
+  perPage: number,
+  query: string,
+}
 
 const customCells = (indexSets: Array<IndexSet>, userPermissions): CustomCells<Stream> => ({
   title: {
@@ -81,6 +89,25 @@ const customCells = (indexSets: Array<IndexSet>, userPermissions): CustomCells<S
   },
 });
 
+const usePaginatedStreams = (searchParams: SearchParams): { data: { streams: Array<Stream>, pagination: { total: number } } | undefined, refetch: () => void } => {
+  const { data, refetch } = useQuery(
+    ['streams', 'overview', searchParams],
+    () => StreamsStore.searchPaginated(searchParams.page, searchParams.perPage, searchParams.query),
+    {
+      onError: (errorThrown) => {
+        UserNotification.error(`Loading streams failed with status: ${errorThrown}`,
+          'Could not load streams');
+      },
+      keepPreviousData: true,
+    },
+  );
+
+  return ({
+    data,
+    refetch,
+  });
+};
+
 type Props = {
   onStreamCreate: (stream: Stream) => Promise<void>,
   indexSets: Array<IndexSet>
@@ -89,30 +116,13 @@ type Props = {
 const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   const currentUser = useCurrentUser();
   const paginationQueryParameter = usePaginationQueryParameter();
-  const [searchParams, setSearchParams] = useState({
+  const [searchParams, setSearchParams] = useState<SearchParams>({
     page: paginationQueryParameter.page,
     perPage: paginationQueryParameter.pageSize,
     query: '',
   });
   const [streamRuleTypes, setStreamRuleTypes] = useState();
-  const [listData, setListData] = useState<{
-    streams: Array<Stream>,
-    total: number
-  }>({ streams: [], total: 0 });
-  const { streams, total } = listData;
-
-  const isLoading = !streams || !streamRuleTypes;
-
-  const loadData = useCallback(() => {
-    StreamsStore.searchPaginated(searchParams.page, searchParams.perPage, searchParams.query)
-      .then(({ streams: newStreams, pagination: { total: newTotal } }) => {
-        setListData({ streams: newStreams, total: newTotal });
-      });
-  }, [searchParams]);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData, searchParams]);
+  const { data: streamsData, refetch: refetchStreams } = usePaginatedStreams(searchParams);
 
   useEffect(() => {
     StreamRulesStore.types().then((types) => {
@@ -121,14 +131,14 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   }, []);
 
   useEffect(() => {
-    StreamsStore.onChange(loadData);
-    StreamRulesStore.onChange(loadData);
+    StreamsStore.onChange(() => refetchStreams());
+    StreamRulesStore.onChange(() => refetchStreams());
 
     return () => {
-      StreamsStore.unregister(loadData);
-      StreamRulesStore.unregister(loadData);
+      StreamsStore.unregister(() => refetchStreams());
+      StreamRulesStore.unregister(() => refetchStreams());
     };
-  }, [loadData]);
+  }, [refetchStreams]);
 
   const onPageChange = useCallback(
     (newPage: number, newPerPage: number) => setSearchParams((cur) => ({ ...cur, page: newPage, perPage: newPerPage })),
@@ -150,13 +160,11 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
                    streamRuleTypes={streamRuleTypes} />
   ), [indexSets, streamRuleTypes]);
 
-  if (isLoading) {
-    return (
-      <div style={{ marginLeft: 10 }}>
-        <Spinner />
-      </div>
-    );
+  if (!streamsData || !streamRuleTypes) {
+    return (<Spinner />);
   }
+
+  const { streams, pagination: { total } } = streamsData;
 
   return (
     <PaginatedList onChange={onPageChange}
