@@ -56,6 +56,6 @@ public class ProxiedRequestsExecutorService implements Provider<ExecutorService>
         return new InstrumentedExecutorService(
                 Executors.newFixedThreadPool(proxiedRequestsMaxThreads, threadFactory),
                 metricRegistry,
-                name(this.getClass()));
+                name(this.getClass(), "http-proxied-requests-executor"));
     }
 }
