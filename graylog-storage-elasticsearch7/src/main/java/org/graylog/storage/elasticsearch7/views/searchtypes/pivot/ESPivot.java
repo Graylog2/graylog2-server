@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.sorting.PostFactumSorting;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
@@ -46,6 +47,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -199,6 +201,8 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
         final MultiBucketsAggregation.Bucket initialBucket = createInitialBucket(queryResult);
 
+        final List<PivotResult.Row> rows = new ArrayList<>();
+
         retrieveBuckets(pivot.rowGroups(), initialBucket)
                 .forEach(tuple -> {
                     final ImmutableList<String> keys = tuple.keys();
@@ -209,7 +213,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                     if (pivot.columnGroups().isEmpty() || pivot.rollup()) {
                         processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), bucket, true, "row-leaf");
                     }
-                    if (!pivot.columnGroups().isEmpty()){
+                    if (!pivot.columnGroups().isEmpty()) {
                         retrieveBuckets(pivot.columnGroups(), bucket)
                                 .forEach(columnBucketTuple -> {
                                     final ImmutableList<String> columnKeys = columnBucketTuple.keys();
@@ -218,15 +222,20 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                                     processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
                                 });
                     }
-                    resultBuilder.addRow(rowBuilder.build());
+                    rows.add(rowBuilder.build());
+                    //resultBuilder.addRow(rowBuilder.build());
                 });
 
         if (!pivot.rowGroups().isEmpty() && pivot.rollup()) {
             final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(ImmutableList.of());
             processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), initialBucket, true, "row-inner");
-            resultBuilder.addRow(rowBuilder.source("non-leaf").build());
+            rows.add(rowBuilder.source("non-leaf").build());
+            //resultBuilder.addRow(rowBuilder.source("non-leaf").build());
         }
 
+        final Optional<Comparator<PivotResult.Row>> postFactumSortingComparator = new PostFactumSorting().getPostFactumSortingComparator(pivot);
+        postFactumSortingComparator.ifPresent(rows::sort);
+        resultBuilder.addAllRows(rows);
         return resultBuilder.build();
     }
 
