@@ -44,6 +44,12 @@ const AVAILABLE_ATTRIBUTES = [
   { id: 'disabled', title: 'Status' },
 ];
 
+const ATTRIBUTE_PERMISSIONS = {
+  index_set_id: {
+    permissions: ['indexsets:read'],
+  },
+};
+
 const VISIBLE_ATTRIBUTES = ['title', 'description', 'index_set_id', 'disabled'];
 
 const customCells = (indexSets: Array<IndexSet>, userPermissions): CustomCells<Stream> => ({
@@ -178,11 +184,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
           : (
             <ConfigurableDataTable rows={streams}
                                    attributes={VISIBLE_ATTRIBUTES}
-                                   attributePermissions={{
-                                     index_set_id: {
-                                       permissions: ['indexsets:read'],
-                                     },
-                                   }}
+                                   attributePermissions={ATTRIBUTE_PERMISSIONS}
                                    rowActions={renderStreamActions}
                                    customCells={customCells(indexSets, currentUser.permissions)}
                                    availableAttributes={AVAILABLE_ATTRIBUTES} />
