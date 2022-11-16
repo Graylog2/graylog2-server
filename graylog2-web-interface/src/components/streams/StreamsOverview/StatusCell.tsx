@@ -39,7 +39,7 @@ type Props = {
   stream: Stream,
 };
 
-const StreamStatusCell = ({ stream }: Props) => {
+const StatusCell = ({ stream }: Props) => {
   const toggleStreamStatus = useCallback(async () => {
     if (stream.disabled) {
       await StreamsStore.resume(stream.id, (response) => response);
@@ -59,4 +59,4 @@ const StreamStatusCell = ({ stream }: Props) => {
   );
 };
 
-export default StreamStatusCell;
+export default StatusCell;

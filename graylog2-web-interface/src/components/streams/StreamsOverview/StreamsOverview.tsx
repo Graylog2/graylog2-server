@@ -33,11 +33,12 @@ import StreamActions from 'components/streams/StreamActions';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import useCurrentUser from 'hooks/useCurrentUser';
-import StreamStatusCell from 'components/streamrules/StreamStatusCell';
 import type { CustomCells } from 'components/common/ConfigurableDataTable';
 import UserNotification from 'util/UserNotification';
 
-import CreateStreamButton from './CreateStreamButton';
+import StatusCell from './StatusCell';
+
+import CreateStreamButton from '../CreateStreamButton';
 
 const AVAILABLE_ATTRIBUTES = [
   { id: 'title', title: 'Title' },
@@ -84,7 +85,7 @@ const customCells = (indexSets: Array<IndexSet>, userPermissions): CustomCells<S
     },
   },
   disabled: {
-    renderCell: (stream) => <StreamStatusCell stream={stream} />,
+    renderCell: (stream) => <StatusCell stream={stream} />,
     width: '100px',
   },
 });
