@@ -18,57 +18,11 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 import { useMemo } from 'react';
 
-import Icon from 'components/common/Icon';
+import SortIcon from 'components/streams/StreamsOverview/SortIcon';
 
 import type { Attribute, CustomHeaders, Sort } from './types';
 
-const defaultAttributeHeaderRenderer = {
-
-};
-
-const StyledSortIcon = styled(Icon)<{ $sortIsActive: boolean }>(({ theme, $sortIsActive }) => css`
-  margin-left: 4px;
-  cursor: pointer;
-  font-size: ${theme.fonts.size.small};
-  color: ${$sortIsActive ? theme.colors.gray[20] : theme.colors.gray[70]};
-`);
-
-const SortIconWrapper = styled.div`
-  display: inline-block;
-`;
-
-const SortIcon = ({
-  onChange,
-  activeSort,
-  attribute,
-}: {
-  onChange: (newSort: Sort) => void,
-  attribute: Attribute,
-  activeSort: Sort | undefined,
-}) => {
-  const iconName = activeSort?.order === 'asc' ? 'arrow-down-wide-short' : 'arrow-up-wide-short';
-  const attributeSortIsActive = activeSort?.attributeId === attribute.id;
-  const shouldSortAsc = !attributeSortIsActive || activeSort.order === 'desc';
-  const nextSortName = shouldSortAsc ? 'ascending' : 'descending';
-  const title = `Sort ${attribute.title.toLowerCase()} ${nextSortName}`;
-
-  const _onChange = () => {
-    if (shouldSortAsc) {
-      onChange({ attributeId: attribute.id, order: 'asc' });
-
-      return;
-    }
-
-    onChange({ attributeId: attribute.id, order: 'desc' });
-  };
-
-  return (
-    <SortIconWrapper title={title} onClick={_onChange}>
-      <StyledSortIcon name={iconName}
-                      $sortIsActive={attributeSortIsActive} />
-    </SortIconWrapper>
-  );
-};
+const defaultAttributeHeaderRenderer = {};
 
 const TableHeader = ({
   activeSort,
