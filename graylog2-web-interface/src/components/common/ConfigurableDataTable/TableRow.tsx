@@ -16,11 +16,12 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 
 import { TextOverflowEllipsis } from 'components/common';
 
 import type { CustomCells, Attribute } from './types';
+import RowCheckbox from './RowCheckbox';
 
 const ActionsCell = styled.td`
   > div {
@@ -67,42 +68,59 @@ const TableCell = <ListItem extends { id: string }>({
 };
 
 type Props<ListItem extends { id: string }> = {
-  rows: Array<ListItem>,
-  rowActions?: (listItem: ListItem) => React.ReactNode,
   customCells?: CustomCells<ListItem>,
-  visibleAttributes: Array<Attribute>,
+  displayBatchSelectCol: boolean,
   displayRowActions: boolean,
+  listItem: ListItem,
+  onToggleRowSelect: (itemId: string) => void,
+  rowActions?: (listItem: ListItem) => React.ReactNode,
+  selectedItemsIds: Array<string>,
+  visibleAttributes: Array<Attribute>,
 };
 
-const TableBody = <ListItem extends { id: string }>({
-  rows,
-  visibleAttributes,
-  displayRowActions,
+const TableRow = <ListItem extends { id: string }>({
   customCells,
+  displayBatchSelectCol,
+  displayRowActions,
+  listItem,
+  onToggleRowSelect,
   rowActions,
-}: Props<ListItem>) => (
-  <tbody>
-    {rows.map((listItem) => (
-      <tr key={listItem.id}>
-        {visibleAttributes.map((attribute) => {
-          const cellRenderer = customCells?.[attribute.id] ?? defaultAttributeCellRenderer[attribute.id];
-
-          return (
-            <TableCell cellRenderer={cellRenderer}
-                       listItem={listItem}
-                       attribute={attribute}
-                       key={`${listItem.id}-${attribute.id}`} />
-          );
-        })}
-        {displayRowActions ? <ActionsCell>{rowActions(listItem)}</ActionsCell> : null}
-      </tr>
-    ))}
-  </tbody>
+  selectedItemsIds,
+  visibleAttributes,
+}: Props<ListItem>) => {
+  const isSelected = selectedItemsIds?.includes(listItem.id);
+  const toggleRowSelect = useCallback(
+    () => onToggleRowSelect(listItem.id),
+    [listItem.id, onToggleRowSelect],
   );
 
-TableBody.defaultProps = {
+  return (
+    <tr key={listItem.id}>
+      {displayBatchSelectCol && (
+        <td style={{ width: '20px' }}>
+          <RowCheckbox onChange={toggleRowSelect}
+                       title={`${isSelected ? 'Deselect' : 'Select'} row`}
+                       checked={isSelected} />
+        </td>
+      )}
+      {visibleAttributes.map((attribute) => {
+        const cellRenderer = customCells?.[attribute.id] ?? defaultAttributeCellRenderer[attribute.id];
+
+        return (
+          <TableCell cellRenderer={cellRenderer}
+                     listItem={listItem}
+                     attribute={attribute}
+                     key={`${listItem.id}-${attribute.id}`} />
+        );
+      })}
+      {displayRowActions ? <ActionsCell>{rowActions(listItem)}</ActionsCell> : null}
+    </tr>
+  );
+};
+
+TableRow.defaultProps = {
   customCells: undefined,
   rowActions: undefined,
 };
 
-export default TableBody;
+export default TableRow;

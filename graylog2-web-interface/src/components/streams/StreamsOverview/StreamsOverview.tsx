@@ -35,6 +35,7 @@ import Routes from 'routing/Routes';
 import type { CustomCells, Sort } from 'components/common/ConfigurableDataTable';
 import UserNotification from 'util/UserNotification';
 import IndexSetCell from 'components/streams/StreamsOverview/IndexSetCell';
+import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
 import StatusCell from './StatusCell';
 
@@ -179,6 +180,14 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
                    streamRuleTypes={streamRuleTypes} />
   ), [indexSets, streamRuleTypes]);
 
+  const renderBatchActions = (selectedItemsIds) => {
+    return (
+      <ButtonToolbar>
+        <Button>Example</Button>
+      </ButtonToolbar>
+    );
+  };
+
   if (!paginatedStreams || !streamRuleTypes) {
     return (<Spinner />);
   }
@@ -213,6 +222,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
                                    attributes={VISIBLE_ATTRIBUTES}
                                    attributePermissions={ATTRIBUTE_PERMISSIONS}
                                    onSortChange={onSortChange}
+                                   batchActions={renderBatchActions}
                                    activeSort={searchParams.sort}
                                    rowActions={renderStreamActions}
                                    customCells={customCells(indexSets)}

@@ -148,17 +148,20 @@ const TableHead = ({
   selectedAttributes,
   customHeaders,
   displayActionsCol,
+  displayBatchSelectCol,
   onSortChange,
   activeSort,
 }: {
   selectedAttributes: Array<Attribute>,
   customHeaders: CustomHeaders,
   displayActionsCol: boolean
+  displayBatchSelectCol: boolean,
   onSortChange: (newSort: Sort) => void,
   activeSort: Sort
 }) => (
   <thead>
     <tr>
+      {displayBatchSelectCol && <td />}
       {selectedAttributes.map((attribute) => {
         const headerRenderer = customHeaders?.[attribute.id] ?? defaultAttributeHeaderRenderer[attribute.id];
 
