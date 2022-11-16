@@ -43,10 +43,8 @@ const emitNumberOrString = (type: string) => {
 };
 
 const emitIndexerSignature = (additionalProperties: Type) => (additionalProperties ? [ts.factory.createIndexSignature(
-  undefined,
   [readonlyModifier],
   [ts.factory.createParameterDeclaration(
-    undefined,
     undefined,
     undefined,
     ts.factory.createIdentifier('_key'),
@@ -76,14 +74,12 @@ const cleanName = (name: string) => name.replace(/>/g, '');
 const emitModel = ([name, definition]: [string, Model]) => (definition.type === 'type_literal'
   ? ts.factory.createInterfaceDeclaration(
     undefined,
-    undefined,
     cleanName(name),
     undefined,
     undefined,
     [...emitProps(definition.properties), ...emitIndexerSignature(definition.additionalProperties)],
   )
   : ts.factory.createTypeAliasDeclaration(
-    undefined,
     undefined,
     ts.factory.createIdentifier(name),
     undefined,
@@ -253,7 +249,6 @@ const emitFunctionParameter = ({
 }: Parameter) => ts.factory.createParameterDeclaration(
   undefined,
   undefined,
-  undefined,
   cleanVariableName(cleanParameterName(name)),
   (required || defaultValue) ? undefined : ts.factory.createToken(ts.SyntaxKind.QuestionToken),
   emitType(type),
@@ -304,7 +299,6 @@ const emitRoute = ({
     nodes: [
       jsDoc,
       ts.factory.createFunctionDeclaration(
-        undefined,
         [ts.factory.createToken(ts.SyntaxKind.ExportKeyword)],
         undefined,
         ts.factory.createIdentifier(functionName),
@@ -344,7 +338,6 @@ const emitApiObject = (routes: Array<Route>) => {
 
 const importDeclaration = ts.factory.createImportDeclaration(
   undefined,
-  undefined,
   ts.factory.createImportClause(false, ts.factory.createIdentifier(REQUEST_FUNCTION_NAME), undefined),
   emitString(REQUEST_FUNCTION_IMPORT),
 );
@@ -356,7 +349,6 @@ const cleanIdentifier = (name: string) => name.replace(/\//g, '');
 function emitSummary(apis: Array<Api>) {
   const packageIndexFile = ts.createSourceFile('index.ts', '', ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
   const reexports = ts.factory.createNodeArray(apis.map(({ name }) => ts.factory.createExportDeclaration(
-    undefined,
     undefined,
     false,
     ts.factory.createNamespaceExport(ts.factory.createIdentifier(cleanIdentifier(name))),
