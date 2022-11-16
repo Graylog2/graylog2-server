@@ -89,7 +89,12 @@ const customCells = (indexSets: Array<IndexSet>): CustomCells<Stream> => ({
 const usePaginatedStreams = (searchParams: SearchParams): { data: { streams: Array<Stream>, pagination: { total: number } } | undefined, refetch: () => void } => {
   const { data, refetch } = useQuery(
     ['streams', 'overview', searchParams],
-    () => StreamsStore.searchPaginated(searchParams.page, searchParams.perPage, searchParams.query),
+    () => StreamsStore.searchPaginated(
+      searchParams.page,
+      searchParams.perPage,
+      searchParams.query,
+      { sort: searchParams?.sort.attributeId, order: searchParams?.sort.order },
+    ),
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading streams failed with status: ${errorThrown}`,
