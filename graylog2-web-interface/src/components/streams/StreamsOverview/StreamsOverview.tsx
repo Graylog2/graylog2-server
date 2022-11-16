@@ -18,7 +18,6 @@ import PropTypes from 'prop-types';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-import { isPermitted } from 'util/PermissionsMixin';
 import { Alert } from 'components/bootstrap';
 import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
 import Spinner from 'components/common/Spinner';
@@ -32,9 +31,9 @@ import ConfigurableDataTable from 'components/common/ConfigurableDataTable';
 import StreamActions from 'components/streams/StreamActions';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import useCurrentUser from 'hooks/useCurrentUser';
 import type { CustomCells } from 'components/common/ConfigurableDataTable';
 import UserNotification from 'util/UserNotification';
+import IndexSetCell from 'components/streams/StreamsOverview/IndexSetCell';
 
 import StatusCell from './StatusCell';
 
@@ -61,28 +60,14 @@ type SearchParams = {
   query: string,
 }
 
-const customCells = (indexSets: Array<IndexSet>, userPermissions): CustomCells<Stream> => ({
+const customCells = (indexSets: Array<IndexSet>): CustomCells<Stream> => ({
   title: {
     renderCell: (stream) => (
       <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
     ),
   },
   index_set_id: {
-    renderCell: (stream) => {
-      if (!isPermitted(userPermissions, ['indexsets:read'])) {
-        return null;
-      }
-
-      const indexSet = indexSets.find((is) => is.id === stream.index_set_id) || indexSets.find((is) => is.default);
-
-      return (
-        indexSet ? (
-          <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>
-            {indexSet.title}
-          </Link>
-        ) : <i>not found</i>
-      );
-    },
+    renderCell: (stream) => <IndexSetCell indexSets={indexSets} stream={stream} />,
   },
   disabled: {
     renderCell: (stream) => <StatusCell stream={stream} />,
@@ -131,7 +116,6 @@ type Props = {
 }
 
 const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
-  const currentUser = useCurrentUser();
   const paginationQueryParameter = usePaginationQueryParameter();
   const [searchParams, setSearchParams] = useState<SearchParams>({
     page: paginationQueryParameter.page,
@@ -205,7 +189,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
                                    attributes={VISIBLE_ATTRIBUTES}
                                    attributePermissions={ATTRIBUTE_PERMISSIONS}
                                    rowActions={renderStreamActions}
-                                   customCells={customCells(indexSets, currentUser.permissions)}
+                                   customCells={customCells(indexSets)}
                                    availableAttributes={AVAILABLE_ATTRIBUTES} />
           )}
       </div>
