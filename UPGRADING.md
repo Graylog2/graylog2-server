@@ -114,9 +114,11 @@ The following Java Code API changes have been made in 5.0.
 
 ## Configuration File Changes
 
-| Option                                        | Action       | Description                                                     |
-|-----------------------------------------------|--------------|-----------------------------------------------------------------|
-| `mongodb_threads_allowed_to_block_multiplier` | **removed**  | Configuring this is not supported by the official MongoDB driver anymore. |
+| Option                                         | Action       | Description                                                               |
+|------------------------------------------------|--------------|---------------------------------------------------------------------------|
+| `mongodb_threads_allowed_to_block_multiplier`  | **removed**  | Configuring this is not supported by the official MongoDB driver anymore. |
+| `outputbuffer_processor_threads_max_pool_size` | **removed**  | This setting has been removed because it was not effective.               |
+| `outputbuffer_processor_keep_alive_time`       | **removed**  | This setting has been removed because it was not effective.               |
 
 ## Behaviour Changes
 

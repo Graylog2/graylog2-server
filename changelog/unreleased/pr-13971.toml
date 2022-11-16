@@ -1,0 +1,11 @@
+type = "removed"
+message = "Remove ineffective settings for output buffer processor thread pool."
+
+pulls = ["13971"]
+
+details.user = """
+Removed the following obsolete settings because they did not have the suggested effect:
+
+- `outputbuffer_processor_threads_max_pool_size`
+- `outputbuffer_processor_keep_alive_time`
+"""
