@@ -78,7 +78,7 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
         bucketSpecs.stream()
                 .map(Values::field)
                 .map(QueryBuilders::existsQuery)
-                .forEach(queryBuilder::must);
+                .forEach(queryBuilder::filter);
         return AggregationBuilders.filters(name, queryBuilder)
                 .otherBucket(true);
     }
@@ -106,7 +106,9 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
 
     private Script scriptForPivots(Collection<? extends BucketSpec> pivots) {
         final String scriptSource = Joiner.on(KEY_SEPARATOR_PHRASE).join(pivots.stream()
-                .map(bucket -> "String.valueOf(doc['" + bucket.field() + "'].size() == 0 ? \"N/A\" : doc['" + bucket.field() + "'].value)")
+                .map(bucket -> """
+                        String.valueOf((doc.containsKey('%1$s') && doc['%1$s'].size() > 0) ? doc['%1$s'].value : "%2$s")
+                        """.formatted(bucket.field(), MissingBucketConstants.MISSING_BUCKET_NAME))
                 .collect(Collectors.toList()));
         return new Script(scriptSource);
     }
