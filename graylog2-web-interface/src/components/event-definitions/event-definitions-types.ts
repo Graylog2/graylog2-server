@@ -14,6 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+type Provider = {
+  type: string,
+  template: string,
+  require_values: boolean,
+}
+
+type FieldSpec = {
+  [key: string]: {
+    data_type: string,
+    providers: Provider,
+  }
+};
+
 export type EventDefinition = {
   id: string,
   config: {
@@ -22,5 +35,7 @@ export type EventDefinition = {
   title: string,
   description: string,
   priority: number,
+  key_spec: Array<string>
+  field_spec: FieldSpec,
   _scope: string,
 };
