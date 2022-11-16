@@ -54,6 +54,7 @@ import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.DashboardsResource;
+import org.graylog.plugins.views.search.rest.DynamicStartPageResource;
 import org.graylog.plugins.views.search.rest.ExportJobsResource;
 import org.graylog.plugins.views.search.rest.FieldTypesResource;
 import org.graylog.plugins.views.search.rest.MessageExportFormatFilter;
@@ -135,6 +136,7 @@ public class ViewsBindings extends ViewsModule {
         registerExportBackendProvider();
 
         addSystemRestResource(DashboardsResource.class);
+        addSystemRestResource(DynamicStartPageResource.class);
         addSystemRestResource(FieldTypesResource.class);
         addSystemRestResource(MessagesResource.class);
         addSystemRestResource(ExportJobsResource.class);

@@ -32,6 +32,8 @@ public class GRNTypes {
     public static final GRNType TEAM = GRNType.create("team", "teams:");
     public static final GRNType USER = GRNType.create("user", "users:");
     public static final GRNType SEARCH_FILTER = GRNType.create("search_filter", "search_filters:");
+    public static final GRNType PINNED_ITEMS = GRNType.create("pinned_items", "pinned_items:");
+    public static final GRNType LAST_OPENED_ITEMS = GRNType.create("last_opened_items", "last_opened_items:");
 
     // TODO This is essentially the same as org.graylog2.contentpacks.model.ModelTypes
     // TODO find a way to unify these
@@ -49,6 +51,8 @@ public class GRNTypes {
             .add(TEAM)
             .add(USER)
             .add(SEARCH_FILTER)
+            .add(PINNED_ITEMS)
+            .add(LAST_OPENED_ITEMS)
             .build();
 
     /**

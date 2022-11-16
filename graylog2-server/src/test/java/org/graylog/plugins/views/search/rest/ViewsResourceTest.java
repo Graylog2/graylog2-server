@@ -35,6 +35,7 @@ import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewStateDTO;
 import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.search.views.WidgetPositionDTO;
+import org.graylog.plugins.views.search.views.dynamicstartpage.DynamicStartPageService;
 import org.graylog.security.UserContext;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.events.ClusterEventBus;
@@ -120,6 +121,8 @@ public class ViewsResourceTest {
 
     private ViewsResource viewsResource;
 
+    private DynamicStartPageService dspService;
+
     @BeforeEach
     public void setUp() {
         this.viewsResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain, referencedSearchFiltersHelper);
@@ -138,7 +141,7 @@ public class ViewsResourceTest {
         }
 
         ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain, Map<String, ViewResolver> viewResolvers, ReferencedSearchFiltersHelper referencedSearchFiltersHelper) {
-            super(viewService, clusterEventBus, searchDomain, viewResolvers, searchFilterVisibilityChecker, referencedSearchFiltersHelper);
+            super(viewService, dspService,clusterEventBus, searchDomain, viewResolvers, searchFilterVisibilityChecker, referencedSearchFiltersHelper);
             this.userService = userService;
         }
 

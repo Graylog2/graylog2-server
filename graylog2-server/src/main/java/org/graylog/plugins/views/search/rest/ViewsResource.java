@@ -37,6 +37,7 @@ import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewResolverDecoder;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.WidgetDTO;
+import org.graylog.plugins.views.search.views.dynamicstartpage.DynamicStartPageService;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
@@ -98,14 +99,17 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final Map<String, ViewResolver> viewResolvers;
     private final SearchFilterVisibilityChecker searchFilterVisibilityChecker;
     private final ReferencedSearchFiltersHelper referencedSearchFiltersHelper;
+    private final DynamicStartPageService dspService;
 
     @Inject
     public ViewsResource(ViewService dbService,
+                         DynamicStartPageService dspService,
                          ClusterEventBus clusterEventBus, SearchDomain searchDomain,
                          Map<String, ViewResolver> viewResolvers,
                          SearchFilterVisibilityChecker searchFilterVisibilityChecker,
                          ReferencedSearchFiltersHelper referencedSearchFiltersHelper) {
         this.dbService = dbService;
+        this.dspService = dspService;
         this.clusterEventBus = clusterEventBus;
         this.searchDomain = searchDomain;
         this.viewResolvers = viewResolvers;
@@ -161,6 +165,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         // The view resolvers must be used first, because the ID may not be a valid hex ID string.
         ViewDTO view = resolveView(id);
         if (searchUser.canReadView(view)) {
+            dspService.addLastOpenedFor(view, searchUser);
             return view;
         }
 
