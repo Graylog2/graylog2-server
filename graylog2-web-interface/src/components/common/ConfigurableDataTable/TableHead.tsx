@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useMemo } from 'react';
 
 import SortIcon from 'components/streams/StreamsOverview/SortIcon';
@@ -62,9 +62,55 @@ const defaultAttributeHeaderRenderer = {
 
 };
 
-const TableHeader = ({
-  headerRenderer,
+const StyledSortIcon = styled(Icon)<{ $sortIsActive: boolean }>(({ theme, $sortIsActive }) => css`
+  margin-left: 4px;
+  cursor: pointer;
+  font-size: ${theme.fonts.size.small};
+  color: ${$sortIsActive ? theme.colors.gray[20] : theme.colors.gray[70]};
+`);
+
+const SortIconWrapper = styled.div`
+  display: inline-block;
+`;
+
+const SortIcon = ({
+  onChange,
+  activeSort,
   attribute,
+}: {
+  onChange: (newSort: Sort) => void,
+  attribute: Attribute,
+  activeSort: Sort | undefined,
+}) => {
+  const iconName = activeSort?.order === 'asc' ? 'arrow-down-wide-short' : 'arrow-up-wide-short';
+  const attributeSortIsActive = activeSort?.attributeId === attribute.id;
+  const shouldSortAsc = !attributeSortIsActive || activeSort.order === 'desc';
+  const nextSortName = shouldSortAsc ? 'ascending' : 'descending';
+  const title = `Sort ${attribute.title.toLowerCase()} ${nextSortName}`;
+
+  const _onChange = () => {
+    if (shouldSortAsc) {
+      onChange({ attributeId: attribute.id, order: 'asc' });
+
+      return;
+    }
+
+    onChange({ attributeId: attribute.id, order: 'desc' });
+  };
+
+  return (
+    <SortIconWrapper title={title} onClick={_onChange}>
+      <StyledSortIcon name={iconName}
+                      $sortIsActive={attributeSortIsActive} />
+    </SortIconWrapper>
+  );
+};
+
+const TableHeader = ({
+  activeSort,
+  attribute,
+  headerRenderer,
+  onSortChange,
 }: {
   headerRenderer: {
     renderHeader: (attribute: Attribute) => React.ReactNode,
@@ -73,7 +119,8 @@ const TableHeader = ({
     maxWidth?: string,
   },
   attribute: Attribute
-
+  activeSort: Sort,
+  onSortChange: (newSort: Sort) => void,
 }) => {
   const content = useMemo(
     () => (headerRenderer ? headerRenderer.renderHeader(attribute) : attribute.title),
@@ -83,6 +130,12 @@ const TableHeader = ({
   return (
     <th style={{ width: headerRenderer?.width, maxWidth: headerRenderer?.maxWidth }}>
       {content}
+
+      {attribute.sortable && (
+        <SortIcon onChange={onSortChange}
+                  attribute={attribute}
+                  activeSort={activeSort} />
+      )}
     </th>
   );
 };
