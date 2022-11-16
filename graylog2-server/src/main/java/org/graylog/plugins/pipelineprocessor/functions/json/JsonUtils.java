@@ -51,7 +51,7 @@ public class JsonUtils {
     }
 
     public static JsonNode extractJson(
-            String value, ObjectMapper mapper, ExtractFlags extractFlags)
+            String value, ObjectMapper mapper, ExtractFlags extractFlags, boolean stringify)
             throws IOException {
         if (isNullOrEmpty(value)) {
             throw new IOException("null result");
@@ -61,7 +61,11 @@ public class JsonUtils {
         ObjectNode resultRoot = mapper.createObjectNode();
         for (Map.Entry<String, Object> mapEntry : json.entrySet()) {
             for (Entry entry : parseValue(mapEntry.getKey(), mapEntry.getValue(), mapper, extractFlags)) {
-                resultRoot.put(entry.key(), entry.value().toString());
+                if (stringify) {
+                    resultRoot.put(entry.key(), entry.value().toString());
+                } else {
+                    resultRoot.putPOJO(entry.key(), entry.value());
+                }
             }
         }
         return resultRoot;
