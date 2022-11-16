@@ -16,7 +16,5 @@
  */
 package org.graylog.plugins.views.search.views.dynamicstartpage;
 
-import org.joda.time.DateTime;
-
 public record LastOpenedItem(String id, String type, String title) {
 }

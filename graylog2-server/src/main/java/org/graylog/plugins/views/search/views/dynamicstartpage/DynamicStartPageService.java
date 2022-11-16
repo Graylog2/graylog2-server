@@ -19,16 +19,12 @@ package org.graylog.plugins.views.search.views.dynamicstartpage;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.contentpacks.ContentPackService;
-import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.database.NotFoundException;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DynamicStartPageService {

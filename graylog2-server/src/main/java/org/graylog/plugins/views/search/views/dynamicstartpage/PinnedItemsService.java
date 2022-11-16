@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.views.dynamicstartpage;
 
 import com.mongodb.DuplicateKeyException;
-import com.mongodb.client.model.Filters;
 import org.bson.types.ObjectId;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;

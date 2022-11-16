@@ -27,8 +27,6 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 
 @AutoValue
 @JsonDeserialize(builder = RecentActivityDTO.Builder.class)
