@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useState, useRef, useCallback, useEffect } from 'react';
+import { useContext, useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css, keyframes } from 'styled-components';
 import { Overlay, Transition } from 'react-overlays';
@@ -160,6 +160,28 @@ type QueryForm = {
   queryString: QueryValidationState,
 };
 
+type Explanations = QueryValidationState['explanations'];
+
+const deduplicateExplanations = (explanations: Explanations | undefined): Explanations => {
+  if (explanations === null || explanations.length === 0) {
+    return [];
+  }
+
+  const [deduplicated] = explanations.reduce(([prevExplanations, seen]: [Explanations, Array<string>], cur) => {
+    if (cur.errorType === 'UNKNOWN_FIELD') {
+      if (cur.relatedProperty !== undefined && !seen.includes(cur.relatedProperty)) {
+        return [[...prevExplanations, cur], [...seen, cur.relatedProperty]];
+      }
+
+      return [prevExplanations, seen];
+    }
+
+    return [[...prevExplanations, cur], seen];
+  }, [[], []]);
+
+  return deduplicated;
+};
+
 const QueryValidation = () => {
   const plugableValidationExplanation = usePluginEntities('views.elements.validationErrorExplanation');
   const [shakingPopover, shake] = useShakeTemporarily();
@@ -171,7 +193,8 @@ const QueryValidation = () => {
 
   const validationState = (queryStringErrors ?? warnings?.queryString) as QueryValidationState;
 
-  const { status, explanations } = validationState ?? {};
+  const { status, explanations = [] } = validationState ?? { explanations: [] };
+  const deduplicatedExplanations = useMemo(() => deduplicateExplanations(explanations), [explanations]);
   const hasExplanations = validationState && validationState?.status !== 'OK';
 
   return (
@@ -203,7 +226,7 @@ const QueryValidation = () => {
                          title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
                          $shaking={shakingPopover}>
             <div role="alert">
-              {explanations.map(({ errorType, errorTitle, errorMessage, id }) => (
+              {deduplicatedExplanations.map(({ errorType, errorTitle, errorMessage, id }) => (
                 <Explanation key={id}>
                   <span><b>{errorTitle}</b>: {errorMessage}</span>
                   <DocumentationLink page={getErrorDocumentationLink(errorType)}

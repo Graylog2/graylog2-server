@@ -144,4 +144,38 @@ describe('QueryValidation', () => {
 
     await waitFor(() => expect(screen.getAllByText('Parse Exception')).toHaveLength(1));
   });
+
+  it('should deduplicate "unknown field" errors referring to same field name', async () => {
+    const validationErrorForUnknownField: QueryValidationState = {
+      status: 'WARNING',
+      explanations: [{
+        id: 'foo',
+        errorType: 'UNKNOWN_FIELD',
+        beginLine: 1,
+        beginColumn: 2,
+        endLine: 1,
+        endColumn: 16,
+        errorTitle: 'Unknown field',
+        errorMessage: 'Query contains unknown field: TargetFilename',
+        relatedProperty: 'TargetFilename',
+      }, {
+        id: 'bar',
+        errorType: 'UNKNOWN_FIELD',
+        beginLine: 1,
+        beginColumn: 193,
+        endLine: 1,
+        endColumn: 207,
+        errorTitle: 'Unknown field',
+        errorMessage: 'Query contains unknown field: TargetFilename',
+        relatedProperty: 'TargetFilename',
+      }],
+    };
+    render(<SUT error={validationErrorForUnknownField} />);
+
+    await openExplanation();
+
+    const explanations = await screen.findAllByText(/Query contains unknown field: TargetFilename/i);
+
+    expect(explanations.length).toBe(1);
+  });
 });
