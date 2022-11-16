@@ -53,6 +53,7 @@ import org.graylog.events.processor.systemnotification.SystemNotificationEventEn
 import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessor;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorConfig;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorParameters;
+import org.graylog.events.processor.systemnotification.SystemNotificationRenderService;
 import org.graylog.events.rest.AvailableEntityTypesResource;
 import org.graylog.events.rest.EventDefinitionsResource;
 import org.graylog.events.rest.EventNotificationsResource;
@@ -81,6 +82,7 @@ public class EventsModule extends PluginModule {
         bind(NotificationGracePeriodService.class).asEagerSingleton();
         bind(EventProcessorExecutionMetrics.class).asEagerSingleton();
         bind(EventNotificationExecutionMetrics.class).asEagerSingleton();
+        bind(SystemNotificationRenderService.class).asEagerSingleton();
 
         addEntityScope(SystemNotificationEventEntityScope.class);
 
