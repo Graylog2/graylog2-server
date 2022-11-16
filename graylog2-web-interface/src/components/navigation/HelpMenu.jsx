@@ -31,8 +31,8 @@ const HelpMenu = ({ active }) => (
                aria-label="Help"
                noCaret>
 
-    <LinkContainer to={Routes.getting_started(true)}>
-      <MenuItem>Getting Started</MenuItem>
+    <LinkContainer to={Routes.welcome()}>
+      <MenuItem>Welcome</MenuItem>
     </LinkContainer>
 
     <MenuItem href={DocsHelper.versionedDocsHomePage()} target="_blank">
