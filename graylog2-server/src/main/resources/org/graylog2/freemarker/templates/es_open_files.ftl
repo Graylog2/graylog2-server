@@ -1,0 +1,8 @@
+<h1>Elasticsearch nodes with too low open file limit</h1>
+<span>
+There are Elasticsearch nodes in the cluster that have a too low open file limit (current limit:{' '}
+<em>${max_file_descriptors}</em> on <em>${hostname}</em>;
+should be at least 64000) This will be causing problems
+that can be hard to diagnose. Read how to raise the maximum number of open files in {' '}
+<DocumentationLink page='elasticsearch#configuration' text="the Elasticsearch setup documentation" />.
+</span>

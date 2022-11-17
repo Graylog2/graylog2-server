@@ -20,13 +20,14 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -51,16 +52,8 @@ public class SystemNotificationRenderResource extends RestResource {
         this.systemNotificationRenderService = systemNotificationRenderService;
     }
 
-    @GET
-    @Path("/test/{id}")
-    @Produces(MediaType.TEXT_PLAIN)
-    @ApiOperation(value = "Get HTML formatted message")
-    public String renderTest(@ApiParam(name = "id", required = true)
-                             @PathParam("id") String id) {
-        return id;
-    }
-
-    @GET
+    @POST
+    @NoAuditEvent("Doesn't change any data, only renders a notification message")
     @Path("/html/{id}")
     @Produces(MediaType.TEXT_HTML)
     @ApiOperation(value = "Get HTML formatted message")
@@ -72,7 +65,8 @@ public class SystemNotificationRenderResource extends RestResource {
         return systemNotificationRenderService.renderHtml(id, values);
     }
 
-    @GET
+    @POST
+    @NoAuditEvent("Doesn't change any data, only renders a notification message")
     @Path("/plaintext/{id}")
     @Produces(MediaType.TEXT_PLAIN)
     @ApiOperation(value = "Get plaintext formatted message")
