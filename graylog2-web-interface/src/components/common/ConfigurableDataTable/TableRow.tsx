@@ -44,7 +44,7 @@ const defaultAttributeCellRenderer = {
 
 type Props<ListItem extends { id: string }> = {
   customCells?: CustomCells<ListItem>,
-  displayBatchSelectCol: boolean,
+  displayBulkActionsCol: boolean,
   displayRowActions: boolean,
   listItem: ListItem,
   onToggleRowSelect: (itemId: string) => void,
@@ -55,7 +55,7 @@ type Props<ListItem extends { id: string }> = {
 
 const TableRow = <ListItem extends { id: string }>({
   customCells,
-  displayBatchSelectCol,
+  displayBulkActionsCol,
   displayRowActions,
   listItem,
   onToggleRowSelect,
@@ -71,7 +71,7 @@ const TableRow = <ListItem extends { id: string }>({
 
   return (
     <tr key={listItem.id}>
-      {displayBatchSelectCol && (
+      {displayBulkActionsCol && (
         <td style={{ width: '20px' }}>
           <RowCheckbox onChange={toggleRowSelect}
                        title={`${isSelected ? 'Deselect' : 'Select'} row`}

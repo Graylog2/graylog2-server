@@ -4,9 +4,9 @@ import styled, { css } from 'styled-components';
 
 import type { Attribute } from './types';
 
-const Td = styled.td<{ $width: string, $maxWidth: string }>(({ $width }) => css`
+const Td = styled.td<{ $width: string, $maxWidth: string }>(({ $width, $maxWidth }) => css`
   width: ${$width ?? 'auto'};
-  max-width: ${$width ?? 'none'};
+  max-width: ${$maxWidth ?? 'none'};
 `);
 
 const TableCell = <ListItem extends { id: string }>({

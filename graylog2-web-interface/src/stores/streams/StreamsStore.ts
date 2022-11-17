@@ -203,16 +203,10 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
 
     return promise;
   },
-  remove(streamId: string, callback: (() => void)) {
-    const failCallback = (errorThrown) => {
-      UserNotification.error(`Removing Stream failed with status: ${errorThrown}`,
-        'Could not remove Stream');
-    };
-
+  remove(streamId: string) {
     const url = qualifyUrl(ApiRoutes.StreamsApiController.delete(streamId).url);
 
     const promise = fetch('DELETE', url)
-      .then(callback, failCallback)
       .then(() => CurrentUserStore.reload()
         .then(this._emitChange.bind(this)));
 

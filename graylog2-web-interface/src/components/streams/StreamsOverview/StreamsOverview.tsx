@@ -35,7 +35,7 @@ import Routes from 'routing/Routes';
 import type { CustomCells, Sort } from 'components/common/ConfigurableDataTable';
 import UserNotification from 'util/UserNotification';
 import IndexSetCell from 'components/streams/StreamsOverview/IndexSetCell';
-import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
+import BulkActions from 'components/streams/StreamsOverview/BulkActions';
 
 import StatusCell from './StatusCell';
 
@@ -134,6 +134,7 @@ type Props = {
 
 const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   const paginationQueryParameter = usePaginationQueryParameter();
+
   const [searchParams, setSearchParams] = useState<SearchParams>({
     page: paginationQueryParameter.page,
     perPage: paginationQueryParameter.pageSize,
@@ -180,13 +181,12 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
                    streamRuleTypes={streamRuleTypes} />
   ), [indexSets, streamRuleTypes]);
 
-  const renderBatchActions = (selectedItemsIds) => {
-    return (
-      <ButtonToolbar>
-        <Button>Example</Button>
-      </ButtonToolbar>
-    );
-  };
+  const renderBulkActions = (
+    selectedStreamIds: Array<string>,
+    setSelectedStreamIds: (streamIds: Array<string>) => void,
+  ) => (
+    <BulkActions selectedStreamIds={selectedStreamIds} setSelectedStreamIds={setSelectedStreamIds} />
+  );
 
   if (!paginatedStreams || !streamRuleTypes) {
     return (<Spinner />);
@@ -197,7 +197,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   return (
     <PaginatedList onChange={onPageChange}
                    totalItems={total}>
-      <div style={{ marginBottom: 15 }}>
+      <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
                     onReset={onReset}
                     queryHelpComponent={<QueryHelper entityName="stream" />} />
@@ -219,10 +219,11 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
           )
           : (
             <ConfigurableDataTable rows={streams}
+                                   total={total}
                                    attributes={VISIBLE_ATTRIBUTES}
                                    attributePermissions={ATTRIBUTE_PERMISSIONS}
                                    onSortChange={onSortChange}
-                                   batchActions={renderBatchActions}
+                                   bulkActions={renderBulkActions}
                                    activeSort={searchParams.sort}
                                    rowActions={renderStreamActions}
                                    customCells={customCells(indexSets)}
