@@ -259,14 +259,16 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         pivot.series().forEach(seriesSpec -> {
             final ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> seriesHandler = this.seriesHandlers.get(seriesSpec.type());
             final Aggregation series = seriesHandler.extractAggregationFromResult(pivot, seriesSpec, aggregation, queryContext);
-            seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, this, queryContext)
-                    .map(value -> {
-                        columnKeys.addLast(value.id());
-                        final PivotResult.Value v = PivotResult.Value.create(columnKeys, value.value(), rollup, source);
-                        columnKeys.removeLast();
-                        return v;
-                    })
-                    .forEach(rowBuilder::addValue);
+            if (series != null) {
+                seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, this, queryContext)
+                        .map(value -> {
+                            columnKeys.addLast(value.id());
+                            final PivotResult.Value v = PivotResult.Value.create(columnKeys, value.value(), rollup, source);
+                            columnKeys.removeLast();
+                            return v;
+                        })
+                        .forEach(rowBuilder::addValue);
+            }
         });
     }
 
