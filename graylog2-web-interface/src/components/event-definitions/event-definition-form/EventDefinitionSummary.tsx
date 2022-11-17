@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -25,6 +26,7 @@ import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Alert, Col, Row } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
+import type User from 'logic/users/User';
 
 // Import built-in plugins
 import {} from 'components/event-definitions/event-definition-types';
@@ -33,41 +35,34 @@ import {} from 'components/event-notifications/event-notification-types';
 import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
 import styles from './EventDefinitionSummary.css';
 
+import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 
-class EventDefinitionSummary extends React.Component {
-  static propTypes = {
-    eventDefinition: PropTypes.object.isRequired,
-    notifications: PropTypes.array.isRequired,
-    validation: PropTypes.object,
-    currentUser: PropTypes.object.isRequired,
-  };
-
-  static defaultProps = {
-    validation: undefined,
-  };
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      showValidation: false,
-    };
-  }
-
-  componentDidUpdate() {
-    this.showValidation();
-  }
-
-  showValidation = () => {
-    const { showValidation } = this.state;
-
-    if (!showValidation) {
-      this.setState({ showValidation: true });
+type Props = {
+  eventDefinition: EventDefinition,
+  notifications: any,
+  validation: {
+    errors: {
+      title: string,
     }
-  };
+  },
+  currentUser: User,
+}
 
-  renderDetails = (eventDefinition) => {
+const EventDefinitionSummary = ({ eventDefinition, notifications, validation, currentUser }: Props) => {
+  const [showValidation, setShowValidation] = useState<boolean>(false);
+
+  useEffect(() => {
+    const flipShowValidation = () => {
+      if (!showValidation) {
+        setShowValidation(true);
+      }
+    };
+
+    flipShowValidation();
+  }, [showValidation, setShowValidation]);
+
+  const renderDetails = () => {
     return (
       <>
         <h3 className={commonStyles.title}>Details</h3>
@@ -83,7 +78,7 @@ class EventDefinitionSummary extends React.Component {
     );
   };
 
-  getPlugin = (name, type) => {
+  const getPlugin = (name, type) => {
     if (type === undefined) {
       return {};
     }
@@ -91,9 +86,8 @@ class EventDefinitionSummary extends React.Component {
     return PluginStore.exports(name).find((edt) => edt.type === type) || {};
   };
 
-  renderCondition = (config) => {
-    const { currentUser } = this.props;
-    const conditionPlugin = this.getPlugin('eventDefinitionTypes', config.type);
+  const renderCondition = (config) => {
+    const conditionPlugin = getPlugin('eventDefinitionTypes', config.type);
     const component = (conditionPlugin.summaryComponent
       ? React.createElement(conditionPlugin.summaryComponent, {
         config: config,
@@ -110,15 +104,13 @@ class EventDefinitionSummary extends React.Component {
     );
   };
 
-  renderField = (fieldName, config, keys) => {
-    const { currentUser } = this.props;
-
+  const renderField = (fieldName, config, keys) => {
     if (!config.providers || config.providers.length === 0) {
       return <span key={fieldName}>No field value provider configured.</span>;
     }
 
     const provider = config.providers[0] || {};
-    const fieldProviderPlugin = this.getPlugin('fieldValueProviders', provider.type);
+    const fieldProviderPlugin = getPlugin('fieldValueProviders', provider.type);
 
     return (fieldProviderPlugin.summaryComponent
       ? React.createElement(fieldProviderPlugin.summaryComponent, {
@@ -132,19 +124,19 @@ class EventDefinitionSummary extends React.Component {
     );
   };
 
-  renderFieldList = (fieldNames, fields, keys) => {
+  const renderFieldList = (fieldNames, fields, keys) => {
     return (
       <>
         <dl>
           <dt>Keys</dt>
           <dd>{keys.length > 0 ? keys.join(', ') : 'No Keys configured for Events based on this Definition.'}</dd>
         </dl>
-        {fieldNames.sort(naturalSort).map((fieldName) => this.renderField(fieldName, fields[fieldName], keys))}
+        {fieldNames.sort(naturalSort).map((fieldName) => renderField(fieldName, fields[fieldName], keys))}
       </>
     );
   };
 
-  renderFields = (fields, keys) => {
+  const renderFields = (fields, keys) => {
     const fieldNames = Object.keys(fields);
 
     return (
@@ -152,19 +144,18 @@ class EventDefinitionSummary extends React.Component {
         <h3 className={commonStyles.title}>Fields</h3>
         {fieldNames.length === 0
           ? <p>No Fields configured for Events based on this Definition.</p>
-          : this.renderFieldList(fieldNames, fields, keys)}
+          : renderFieldList(fieldNames, fields, keys)}
       </>
     );
   };
 
-  renderNotification = (definitionNotification) => {
-    const { notifications } = this.props;
+  const renderNotification = (definitionNotification) => {
     const notification = notifications.find((n) => n.id === definitionNotification.notification_id);
 
     let content;
 
     if (notification) {
-      const notificationPlugin = this.getPlugin('eventNotificationTypes', notification.config.type);
+      const notificationPlugin = getPlugin('eventNotificationTypes', notification.config.type);
 
       content = (notificationPlugin.summaryComponent
         ? React.createElement(notificationPlugin.summaryComponent, {
@@ -189,7 +180,7 @@ class EventDefinitionSummary extends React.Component {
     );
   };
 
-  renderNotificationSettings = (notificationSettings) => {
+  const renderNotificationSettings = (notificationSettings) => {
     const formattedDuration = moment.duration(notificationSettings.grace_period_ms)
       .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
 
@@ -212,9 +203,7 @@ class EventDefinitionSummary extends React.Component {
     );
   };
 
-  renderNotifications = (definitionNotifications, notificationSettings) => {
-    const { currentUser } = this.props;
-
+  const renderNotifications = (definitionNotifications, notificationSettings) => {
     const effectiveDefinitionNotifications = definitionNotifications
       .filter((n) => isPermitted(currentUser.permissions, `eventnotifications:read:${n.notification_id}`));
     const notificationsWithMissingPermissions = definitionNotifications
@@ -238,49 +227,56 @@ class EventDefinitionSummary extends React.Component {
           ? <p>This Event is not configured to trigger any Notifications.</p>
           : (
             <>
-              {this.renderNotificationSettings(notificationSettings)}
-              {definitionNotifications.map(this.renderNotification)}
+              {renderNotificationSettings(notificationSettings)}
+              {definitionNotifications.map(renderNotification)}
             </>
           )}
       </>
     );
   };
 
-  render() {
-    const { eventDefinition, validation } = this.props;
-    const { showValidation } = this.state;
-    const isSystemEventDefinition = eventDefinition.config.type === "system-notifications-v1";
+  const isSystemEventDefinition = eventDefinition.config.type === 'system-notifications-v1';
 
-    return (
-      <Row className={styles.eventSummary}>
-        <Col md={12}>
-          <h2 className={commonStyles.title}>Event Summary</h2>
-          {showValidation && <EventDefinitionValidationSummary validation={validation} />}
-          <Row>
+  return (
+    <Row className={styles.eventSummary}>
+      <Col md={12}>
+        <h2 className={commonStyles.title}>Event Summary</h2>
+        {showValidation && <EventDefinitionValidationSummary validation={validation} />}
+        <Row>
+          <Col md={5}>
+            {renderDetails()}
+          </Col>
+
+          {!isSystemEventDefinition && (
+            <Col md={5} mdOffset={1}>
+              {renderCondition(eventDefinition.config)}
+            </Col>
+          )}
+        </Row>
+        <Row>
+          {!isSystemEventDefinition && (
             <Col md={5}>
-              {this.renderDetails(eventDefinition)}
+              {renderFields(eventDefinition.field_spec, eventDefinition.key_spec)}
             </Col>
-            
-            {!isSystemEventDefinition && (
-              <Col md={5} mdOffset={1}>
-                {this.renderCondition(eventDefinition.config)}
-              </Col>
-            )}
-          </Row>
-          <Row>
-            {!isSystemEventDefinition && (
-              <Col md={5}>
-                {this.renderFields(eventDefinition.field_spec, eventDefinition.key_spec)}
-              </Col>
-            )}
-            <Col md={5} mdOffset={isSystemEventDefinition ? 0 : 1}>
-              {this.renderNotifications(eventDefinition.notifications, eventDefinition.notification_settings)}
-            </Col>
-          </Row>
-        </Col>
-      </Row>
-    );
-  }
-}
+          )}
+          <Col md={5} mdOffset={isSystemEventDefinition ? 0 : 1}>
+            {renderNotifications(eventDefinition.notifications, eventDefinition.notification_settings)}
+          </Col>
+        </Row>
+      </Col>
+    </Row>
+  );
+};
+
+EventDefinitionSummary.propTypes = {
+  eventDefinition: PropTypes.object.isRequired,
+  notifications: PropTypes.array.isRequired,
+  validation: PropTypes.object,
+  currentUser: PropTypes.object.isRequired,
+};
+
+EventDefinitionSummary.defaultProps = {
+  validation: undefined,
+};
 
 export default EventDefinitionSummary;

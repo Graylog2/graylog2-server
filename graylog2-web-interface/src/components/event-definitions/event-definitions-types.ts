@@ -27,6 +27,10 @@ type FieldSpec = {
   }
 };
 
+type Notification = {
+  notification_id: number,
+}
+
 export type EventDefinition = {
   id: string,
   config: {
@@ -37,5 +41,10 @@ export type EventDefinition = {
   priority: number,
   key_spec: Array<string>
   field_spec: FieldSpec,
+  notifications: Array<Notification>,
+  notifications_settings: {
+    backlog_size: number,
+    grace_period_ms: number,
+  }
   _scope: string,
 };
