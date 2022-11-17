@@ -129,8 +129,6 @@ describe('<ConfigurableDataTable />', () => {
   });
 
   it('should display active sort', async () => {
-    asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
-
     render(<ConfigurableDataTable attributes={selectedAttributes}
                                   rows={rows}
                                   onSortChange={() => {}}
@@ -146,7 +144,6 @@ describe('<ConfigurableDataTable />', () => {
 
   it('should sort based on attribute', async () => {
     const onSortChange = jest.fn();
-    asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
     render(<ConfigurableDataTable attributes={selectedAttributes}
                                   rows={rows}
@@ -159,5 +156,49 @@ describe('<ConfigurableDataTable />', () => {
     await waitFor(() => expect(onSortChange).toHaveBeenCalledTimes(1));
 
     expect(onSortChange).toHaveBeenCalledWith({ attributeId: 'description', order: 'asc' });
+  });
+
+  it('should provide selected item ids for bulk actions', async () => {
+    const renderBulkActions = jest.fn(() => <div>Custom bulk actions</div>);
+
+    render(<ConfigurableDataTable attributes={selectedAttributes}
+                                  rows={rows}
+                                  onSortChange={() => {}}
+                                  bulkActions={renderBulkActions}
+                                  availableAttributes={availableAttributes}
+                                  total={1} />);
+
+    const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select row/i });
+    userEvent.click(rowCheckboxes[0]);
+
+    await screen.findByText('Custom bulk actions');
+
+    await waitFor(() => expect(renderBulkActions).toHaveBeenCalledWith(['row-id'], expect.any(Function)));
+  });
+
+  it('should provide bulk actions with function to update selected items', async () => {
+    const selectedItemInfo = '1 item selected';
+    const renderBulkActions = (_selectedItemIds: Array<string>, setSelectedItemIds: (selectedItemIds: Array<string>) => void) => (
+      <button onClick={() => setSelectedItemIds([])} type="button">Reset selection</button>
+    );
+    asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
+
+    render(<ConfigurableDataTable attributes={selectedAttributes}
+                                  rows={rows}
+                                  onSortChange={() => {}}
+                                  bulkActions={renderBulkActions}
+                                  availableAttributes={availableAttributes}
+                                  total={1} />);
+
+    const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select row/i });
+    userEvent.click(rowCheckboxes[0]);
+
+    await screen.findByText(selectedItemInfo);
+    const customBulkAction = await screen.findByRole('button', { name: /reset selection/i });
+
+    userEvent.click(customBulkAction);
+
+    expect(screen.queryByText(selectedItemInfo)).not.toBeInTheDocument();
+    expect(rowCheckboxes[0]).not.toBeChecked();
   });
 });

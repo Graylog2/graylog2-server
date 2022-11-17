@@ -129,13 +129,13 @@ const ConfigurableDataTable = <ListItem extends { id: string }>({
 
   const unselectAllItems = useCallback(() => setSelectedItemsIds([]), []);
   const displayActionsCol = typeof rowActions === 'function';
-  const displayBulkActionsCol = !!bulkActions?.length;
+  const displayBulkActionsCol = typeof bulkActions === 'function';
 
   return (
     <ScrollContainer>
       <ActionsRow>
         <div>
-          {(!!bulkActions?.length && !!selectedItemsIds?.length) && (
+          {(displayBulkActionsCol && !!selectedItemsIds?.length) && (
             <BulkActionsWrapper>
               {selectedItemsIds.length} {StringUtils.pluralize(selectedItemsIds.length, 'item', 'items')} selected
               <BulkActions>
