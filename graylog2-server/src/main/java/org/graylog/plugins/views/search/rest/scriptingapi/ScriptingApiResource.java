@@ -55,6 +55,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -119,12 +121,14 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     @NoAuditEvent("Creating audit event manually in method body.")
     @Produces(MediaType.TEXT_PLAIN)
     public String executeQueryAsciiOutput(@ApiParam(name = "searchRequestSpec") @Valid SearchRequestSpec searchRequestSpec,
-                                        @Context SearchUser searchUser) {
+                                          @Context SearchUser searchUser) {
         final TabularResponse response = executeQuery(searchRequestSpec, searchUser);
         AsciiTable at = new AsciiTable();
+        at.getContext().setWidth(response.schema().size() * 25);
         at.addRule();
         at.addRow(response.schema().stream().map(ResponseSchemaEntry::name).collect(Collectors.toList()));
-        at.addRow(response.schema().stream().map(s -> s.type() + " / " + s.field()).collect(Collectors.toList()));
+        at.addRow(response.schema().stream().map(f -> f.field() != null ? f.field() : "").collect(Collectors.toList()));
+        at.addRow(response.schema().stream().map(f -> f.type() != null ? f.type() : "").collect(Collectors.toList()));
         at.addRule();
         response.data().rows().forEach(at::addRow);
         at.addRule();
