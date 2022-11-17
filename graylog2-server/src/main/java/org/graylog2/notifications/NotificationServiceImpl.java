@@ -25,6 +25,7 @@ import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorParameters;
+import org.graylog.events.processor.systemnotification.SystemNotificationRenderService;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.cluster.Node;
@@ -40,8 +41,6 @@ import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.graylog2.audit.AuditEventTypes.SYSTEM_NOTIFICATION_CREATE;
@@ -54,16 +53,19 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
     private final AuditEventSender auditEventSender;
     private final EventProcessorEngine eventProcessorEngine;
     private final DBEventDefinitionService dbEventDefinitionService;
+    private final SystemNotificationRenderService systemNotificationRenderService;
 
     @Inject
     public NotificationServiceImpl(
             NodeId nodeId, MongoConnection mongoConnection, AuditEventSender auditEventSender,
-            EventProcessorEngine eventProcessorEngine, DBEventDefinitionService dbEventDefinitionService) {
+            EventProcessorEngine eventProcessorEngine, DBEventDefinitionService dbEventDefinitionService,
+            SystemNotificationRenderService systemNotificationRenderService) {
         super(mongoConnection);
         this.nodeId = checkNotNull(nodeId);
         this.auditEventSender = auditEventSender;
         this.eventProcessorEngine = eventProcessorEngine;
         this.dbEventDefinitionService = dbEventDefinitionService;
+        this.systemNotificationRenderService = systemNotificationRenderService;
         collection(NotificationImpl.class).createIndex(NotificationImpl.FIELD_TYPE);
     }
 
@@ -143,16 +145,10 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
             final EventDefinitionDto systemEventDefinition =
                     dbEventDefinitionService.getSystemEventDefinitions().stream().findFirst()
                             .orElseThrow(() -> new IllegalStateException("System notification event definition not found"));
-            String details =
-                    Stream.of(notification.getDetail(Notification.KEY_TITLE),
-                                    notification.getDetail(Notification.KEY_DESCRIPTION))
-                            .map(obj -> obj == null ? null : obj.toString())
-                            .filter(str -> str != null && !str.isEmpty())
-                            .collect(Collectors.joining(" | "));
             SystemNotificationEventProcessorParameters parameters =
                     SystemNotificationEventProcessorParameters.builder()
                             .notificationType(notification.getType())
-                            .notificationDetails(details.toString())
+                            .notificationDetails(systemNotificationRenderService.renderPlainText(notification))
                             .timestamp(notification.getTimestamp())
                             .build();
             eventProcessorEngine.execute(systemEventDefinition.id(), parameters);

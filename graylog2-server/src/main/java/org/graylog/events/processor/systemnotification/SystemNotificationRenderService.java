@@ -4,6 +4,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import net.htmlparser.jericho.Source;
+import org.graylog2.notifications.Notification;
 
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
@@ -31,6 +32,10 @@ public class SystemNotificationRenderService {
         cfg.setClassForTemplateLoading(SystemNotificationRenderService.class, "/org/graylog2/freemarker/templates/");
     }
 
+    public String renderHtml(Notification notification) {
+        return renderHtml(notification.getType().toString().toLowerCase(), notification.getDetails());
+    }
+
     public String renderHtml(String notificationId, Map<String, Object> values) {
         try (Writer writer = new StringWriter()) {
             Template template = cfg.getTemplate(notificationId + ".ftl");
@@ -41,6 +46,10 @@ public class SystemNotificationRenderService {
         } catch (IOException e) {
             throw new BadRequestException("Unable to locate template " + notificationId + ": " + e.getMessage());
         }
+    }
+
+    public String renderPlainText(Notification notification) {
+        return renderPlainText(notification.getType().toString().toLowerCase(), notification.getDetails());
     }
 
     public String renderPlainText(String notificationId, Map<String, Object> values) {
