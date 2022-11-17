@@ -178,7 +178,7 @@ const AppRouter = () => {
                              path={Routes.ALERTS.NOTIFICATIONS.show(':notificationId')}
                              component={ShowEventNotificationPage} />
 
-                      {!isCloud && <Route exact path={Routes.SYSTEM.INPUTS} component={InputsPage} />}
+                      <Route exact path={Routes.SYSTEM.INPUTS} component={InputsPage} />
                       {!isCloud && <Route exact path={Routes.node_inputs(':nodeId')} component={NodeInputsPage} />}
                       {!isCloud && (
                       <Route exact path={Routes.global_input_extractors(':inputId')} component={ExtractorsPage} />

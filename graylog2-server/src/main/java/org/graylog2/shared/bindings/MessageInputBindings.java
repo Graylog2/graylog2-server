@@ -18,6 +18,7 @@ package org.graylog2.shared.bindings;
 
 import com.google.inject.multibindings.MapBinder;
 import org.graylog.plugins.beats.BeatsInputPluginModule;
+import org.graylog2.Configuration;
 import org.graylog2.inputs.codecs.CodecsModule;
 import org.graylog2.inputs.gelf.amqp.GELFAMQPInput;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
@@ -39,29 +40,38 @@ import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
 
 public class MessageInputBindings extends Graylog2Module {
+
+    private final Configuration configuration;
+
+    public MessageInputBindings(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
     @Override
     protected void configure() {
         install(new TransportsModule());
         install(new CodecsModule());
 
         final MapBinder<String, MessageInput.Factory<? extends MessageInput>> inputMapBinder = inputsMapBinder();
-        // new style inputs, using transports and codecs
-        installInput(inputMapBinder, RawTCPInput.class, RawTCPInput.Factory.class);
-        installInput(inputMapBinder, RawUDPInput.class, RawUDPInput.Factory.class);
-        installInput(inputMapBinder, RawAMQPInput.class, RawAMQPInput.Factory.class);
-        installInput(inputMapBinder, RawKafkaInput.class, RawKafkaInput.Factory.class);
-        installInput(inputMapBinder, SyslogTCPInput.class, SyslogTCPInput.Factory.class);
-        installInput(inputMapBinder, SyslogUDPInput.class, SyslogUDPInput.Factory.class);
-        installInput(inputMapBinder, SyslogAMQPInput.class, SyslogAMQPInput.Factory.class);
-        installInput(inputMapBinder, SyslogKafkaInput.class, SyslogKafkaInput.Factory.class);
+        if (!configuration.isCloud()) {
+            // new style inputs, using transports and codecs
+            installInput(inputMapBinder, RawTCPInput.class, RawTCPInput.Factory.class);
+            installInput(inputMapBinder, RawUDPInput.class, RawUDPInput.Factory.class);
+            installInput(inputMapBinder, RawAMQPInput.class, RawAMQPInput.Factory.class);
+            installInput(inputMapBinder, RawKafkaInput.class, RawKafkaInput.Factory.class);
+            installInput(inputMapBinder, SyslogTCPInput.class, SyslogTCPInput.Factory.class);
+            installInput(inputMapBinder, SyslogUDPInput.class, SyslogUDPInput.Factory.class);
+            installInput(inputMapBinder, SyslogAMQPInput.class, SyslogAMQPInput.Factory.class);
+            installInput(inputMapBinder, SyslogKafkaInput.class, SyslogKafkaInput.Factory.class);
+            installInput(inputMapBinder, GELFTCPInput.class, GELFTCPInput.Factory.class);
+            installInput(inputMapBinder, GELFHttpInput.class, GELFHttpInput.Factory.class);
+            installInput(inputMapBinder, GELFUDPInput.class, GELFUDPInput.Factory.class);
+            installInput(inputMapBinder, GELFAMQPInput.class, GELFAMQPInput.Factory.class);
+            installInput(inputMapBinder, GELFKafkaInput.class, GELFKafkaInput.Factory.class);
+            install(new BeatsInputPluginModule());
+        }
         installInput(inputMapBinder, FakeHttpMessageInput.class, FakeHttpMessageInput.Factory.class);
-        installInput(inputMapBinder, GELFTCPInput.class, GELFTCPInput.Factory.class);
-        installInput(inputMapBinder, GELFHttpInput.class, GELFHttpInput.Factory.class);
-        installInput(inputMapBinder, GELFUDPInput.class, GELFUDPInput.Factory.class);
-        installInput(inputMapBinder, GELFAMQPInput.class, GELFAMQPInput.Factory.class);
-        installInput(inputMapBinder, GELFKafkaInput.class, GELFKafkaInput.Factory.class);
         installInput(inputMapBinder, JsonPathInput.class, JsonPathInput.Factory.class);
 
-        install(new BeatsInputPluginModule());
     }
 }

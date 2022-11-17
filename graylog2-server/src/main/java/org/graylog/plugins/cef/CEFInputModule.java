@@ -31,14 +31,16 @@ import org.graylog2.plugin.PluginModule;
 public class CEFInputModule extends PluginModule {
     @Override
     protected void configure() {
-        // Register message input.
-        addCodec(CEFCodec.NAME, CEFCodec.class);
+        if (!isCloud()) {
+            // Register message input.
+            addCodec(CEFCodec.NAME, CEFCodec.class);
 
-        addMessageInput(CEFUDPInput.class);
-        addMessageInput(CEFTCPInput.class);
+            addMessageInput(CEFUDPInput.class);
+            addMessageInput(CEFTCPInput.class);
 
-        addMessageInput(CEFAmqpInput.class);
-        addMessageInput(CEFKafkaInput.class);
+            addMessageInput(CEFAmqpInput.class);
+            addMessageInput(CEFKafkaInput.class);
+        }
 
         // Register pipeline function.
         addMessageProcessorFunction(CEFParserFunction.NAME, CEFParserFunction.class);
@@ -49,7 +51,7 @@ public class CEFInputModule extends PluginModule {
     }
 
     private MapBinder<String, Function<?>> processorFunctionBinder(Binder binder) {
-        return MapBinder.newMapBinder(binder, TypeLiteral.get(String.class), new TypeLiteral<Function<?>>() {});
+        return MapBinder.newMapBinder(binder, TypeLiteral.get(String.class), new TypeLiteral<>() {});
     }
 
     private void addMessageProcessorFunction(Binder binder, String name, Class<? extends Function<?>> functionClass) {
