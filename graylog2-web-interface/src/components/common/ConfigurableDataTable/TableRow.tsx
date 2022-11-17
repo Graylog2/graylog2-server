@@ -49,7 +49,7 @@ type Props<ListItem extends { id: string }> = {
   listItem: ListItem,
   onToggleRowSelect: (itemId: string) => void,
   rowActions?: (listItem: ListItem) => React.ReactNode,
-  selectedItemsIds: Array<string>,
+  isSelected: boolean,
   visibleAttributes: Array<Attribute>,
 };
 
@@ -60,10 +60,9 @@ const TableRow = <ListItem extends { id: string }>({
   listItem,
   onToggleRowSelect,
   rowActions,
-  selectedItemsIds,
+  isSelected,
   visibleAttributes,
 }: Props<ListItem>) => {
-  const isSelected = selectedItemsIds?.includes(listItem.id);
   const toggleRowSelect = useCallback(
     () => onToggleRowSelect(listItem.id),
     [listItem.id, onToggleRowSelect],
@@ -98,4 +97,4 @@ TableRow.defaultProps = {
   rowActions: undefined,
 };
 
-export default TableRow;
+export default React.memo(TableRow);
