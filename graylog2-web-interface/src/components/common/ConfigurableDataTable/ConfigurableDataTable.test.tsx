@@ -54,7 +54,8 @@ describe('<ConfigurableDataTable />', () => {
     render(<ConfigurableDataTable attributes={selectedAttributes}
                                   rows={rows}
                                   onSortChange={() => {}}
-                                  availableAttributes={availableAttributes} />);
+                                  availableAttributes={availableAttributes}
+                                  total={1} />);
 
     await screen.findByRole('columnheader', { name: /title/i });
     await screen.findByRole('columnheader', { name: /status/i });
@@ -70,7 +71,8 @@ describe('<ConfigurableDataTable />', () => {
     render(<ConfigurableDataTable attributes={selectedAttributes}
                                   rows={rows}
                                   onSortChange={() => {}}
-                                  availableAttributes={availableAttributes} />);
+                                  availableAttributes={availableAttributes}
+                                  total={1} />);
 
     await screen.findByRole('columnheader', { name: /description/i });
     await screen.findByText('Row description');
@@ -90,18 +92,20 @@ describe('<ConfigurableDataTable />', () => {
                                       renderHeader: (attribute) => `Custom ${attribute.title} Header`,
                                     },
                                   }}
-                                  availableAttributes={availableAttributes} />);
+                                  availableAttributes={availableAttributes}
+                                  total={1} />);
 
     await screen.findByRole('columnheader', { name: /custom title header/i });
     await screen.findByText('The title: Row title');
   });
 
   it('should render row actions', async () => {
-    render(<ConfigurableDataTable attributes={selectedAttributes}
-                                  rows={rows}
-                                  onSortChange={() => {}}
-                                  rowActions={(row) => `Custom actions for ${row.title}`}
-                                  availableAttributes={availableAttributes} />);
+    render(<ConfigurableDataTable<{ id: string, title: string }> attributes={selectedAttributes}
+                                                                 rows={rows}
+                                                                 onSortChange={() => {}}
+                                                                 rowActions={(row) => `Custom actions for ${row.title}`}
+                                                                 availableAttributes={availableAttributes}
+                                                                 total={1} />);
 
     await screen.findByText('Custom actions for Row title');
   });
@@ -117,7 +121,8 @@ describe('<ConfigurableDataTable />', () => {
                                       permissions: ['status:read'],
                                     },
                                   }}
-                                  availableAttributes={availableAttributes} />);
+                                  availableAttributes={availableAttributes}
+                                  total={1} />);
 
     expect(screen.queryByRole('columnheader', { name: /status/i })).not.toBeInTheDocument();
     expect(screen.queryByText('enabled')).not.toBeInTheDocument();
@@ -133,7 +138,8 @@ describe('<ConfigurableDataTable />', () => {
                                     attributeId: 'description',
                                     order: 'asc',
                                   }}
-                                  availableAttributes={availableAttributes} />);
+                                  availableAttributes={availableAttributes}
+                                  total={1} />);
 
     await screen.findByTitle(/sort description descending/i);
   });
@@ -145,7 +151,8 @@ describe('<ConfigurableDataTable />', () => {
     render(<ConfigurableDataTable attributes={selectedAttributes}
                                   rows={rows}
                                   onSortChange={onSortChange}
-                                  availableAttributes={availableAttributes} />);
+                                  availableAttributes={availableAttributes}
+                                  total={1} />);
 
     userEvent.click(await screen.findByTitle(/sort description ascending/i));
 
