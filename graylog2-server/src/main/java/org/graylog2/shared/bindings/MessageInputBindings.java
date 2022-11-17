@@ -24,6 +24,7 @@ import org.graylog2.inputs.gelf.http.GELFHttpInput;
 import org.graylog2.inputs.gelf.kafka.GELFKafkaInput;
 import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
 import org.graylog2.inputs.gelf.udp.GELFUDPInput;
+import org.graylog2.inputs.internal.InternalMetricsInput;
 import org.graylog2.inputs.misc.jsonpath.JsonPathInput;
 import org.graylog2.inputs.random.FakeHttpMessageInput;
 import org.graylog2.inputs.raw.amqp.RawAMQPInput;
@@ -61,6 +62,7 @@ public class MessageInputBindings extends Graylog2Module {
         installInput(inputMapBinder, GELFAMQPInput.class, GELFAMQPInput.Factory.class);
         installInput(inputMapBinder, GELFKafkaInput.class, GELFKafkaInput.Factory.class);
         installInput(inputMapBinder, JsonPathInput.class, JsonPathInput.Factory.class);
+        installInput(inputMapBinder, InternalMetricsInput.class,InternalMetricsInput.Factory.class);
 
         install(new BeatsInputPluginModule());
     }
