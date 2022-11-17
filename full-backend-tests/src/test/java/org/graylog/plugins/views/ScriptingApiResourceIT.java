@@ -232,20 +232,21 @@ public class ScriptingApiResourceIT {
                 .extract().body().asString().trim();
 
         String expected = """
-                ┌───────────────────────────────────────┬──────────────────────────────────────┐
-                │Grouping                               │Metric : count                        │
-                │string / facility                      │numeric / facility                    │
-                ├───────────────────────────────────────┼──────────────────────────────────────┤
-                │another-test                           │2                                     │
-                │test                                   │1                                     │
-                └───────────────────────────────────────┴──────────────────────────────────────┘
+                ┌────────────────────────┬───────────────────────┐
+                │Grouping                │Metric : count         │
+                │facility                │facility               │
+                │string                  │numeric                │
+                ├────────────────────────┼───────────────────────┤
+                │another-test            │2                      │
+                │test                    │1                      │
+                └────────────────────────┴───────────────────────┘
                 """;
 
         org.assertj.core.api.Assertions.assertThat(response).isEqualTo(expected.trim());
     }
 
 
-        @ContainerMatrixTest
+    @ContainerMatrixTest
     void testTwoAggregations() {
         final ValidatableResponse validatableResponse = given()
                 .spec(requestSpec)
@@ -439,8 +440,8 @@ public class ScriptingApiResourceIT {
 
         final List<List<Object>> rows = validatableResponse.extract().body().jsonPath().getList("data.rows");
         Assertions.assertEquals(rows.size(), 2);
-        Assertions.assertEquals(Arrays.asList("test", (Object)1), rows.get(0));
-        Assertions.assertEquals(Arrays.asList("another-test", (Object)2), rows.get(1));
+        Assertions.assertEquals(Arrays.asList("test", (Object) 1), rows.get(0));
+        Assertions.assertEquals(Arrays.asList("another-test", (Object) 2), rows.get(1));
     }
 
     @ContainerMatrixTest
@@ -482,7 +483,6 @@ public class ScriptingApiResourceIT {
         final long diff = toDateTime.getMillis() - fromDateTime.getMillis();
         Assertions.assertEquals(300_000, diff);
     }
-
 
 
     private void validateSchema(ValidatableResponse response, String name, String type, String field) {
