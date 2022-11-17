@@ -32,19 +32,19 @@ type Notification = {
 }
 
 export type EventDefinition = {
-  id: string,
-  config: {
+  id?: string,
+  config?: {
     type: string,
   },
   title: string,
-  description: string,
-  priority: number,
-  key_spec: Array<string>
-  field_spec: FieldSpec,
-  notifications: Array<Notification>,
-  notifications_settings: {
+  description?: string,
+  priority?: number,
+  key_spec?: Array<string>
+  field_spec?: FieldSpec,
+  notification_settings?: {
     backlog_size: number,
     grace_period_ms: number,
   }
-  _scope: string,
+  notifications?: Array<Notification>,
+  _scope?: string,
 };
