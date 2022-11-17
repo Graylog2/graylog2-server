@@ -44,6 +44,7 @@ import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.joda.time.DateTime;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -99,13 +100,14 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
             searchSourceBuilder.fetchSource(messageList.fields().toArray(new String[0]), new String[0]);
         }
 
-        final List<Sort> sorts = firstNonNull(messageList.sort(), Collections.singletonList(Sort.create(Message.FIELD_TIMESTAMP, Sort.Order.DESC)));
+        List<Sort> sorts = firstNonNull(messageList.sort(), Collections.singletonList(Sort.create(Message.FIELD_TIMESTAMP, Sort.Order.DESC)));
 
         // Always add gl2_message_id as a second sort order, if sorting by timestamp is requested.
         // The gl2_message_id contains a sequence nr that represents the order in which messages were received.
         // If messages have identical timestamps, we can still sort them correctly.
         final Optional<Sort> timeStampSort = sorts.stream().filter(s -> s.field().equals(Message.FIELD_TIMESTAMP)).findFirst();
         if (timeStampSort.isPresent()) {
+            sorts = new ArrayList<>(sorts);
             final Sort msgIdSort = Sort.create(Message.FIELD_GL2_MESSAGE_ID, timeStampSort.get().order());
             sorts.add(sorts.indexOf(timeStampSort.get()) + 1, msgIdSort);
         }
