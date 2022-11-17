@@ -26,24 +26,35 @@ const Bulb = styled.span`
   font-weight: 600;
 `;
 
-type Directions = DirectionJson | 'DESC' | 'ASC' | 'asc' | 'desc' | undefined | null;
-type Props = {
-  direction: Directions,
-  onChange: (direction: Directions) => void,
+// type Directions = DirectionJson | 'DESC' | 'ASC' | 'asc' | 'desc' | undefined | null;
+type Props<AscDirection extends string, DescDirection extends string> = {
+  activeDirection: AscDirection | DescDirection | null,
+  ascId: string,
+  descId: string
+  onChange: (activeDirection: AscDirection | DescDirection | null) => void,
   ariaLabel?: string,
   title?: string,
-  bulbText?: string | number | undefined,
+  order?: number,
   dataTestId?: string | undefined
 }
 
-const SortIcon = ({ direction, onChange, ariaLabel, title, bulbText, dataTestId }: Props) => {
-  const handleSortChange = useCallback(() => onChange(direction), [direction, onChange]);
+const SortIcon = <AscDirection extends string, DescDirection extends string>({
+  activeDirection,
+  onChange,
+  ariaLabel,
+  title,
+  order,
+  dataTestId,
+  ascId,
+  descId,
+}: Props<AscDirection, DescDirection>) => {
+  const handleSortChange = useCallback(() => onChange(activeDirection), [activeDirection, onChange]);
   const iconName = useMemo(() => {
-    if (new Set(['Ascending', 'ASC', 'asc']).has(direction)) return 'arrow-up-short-wide';
+    if (activeDirection === ascId) return 'arrow-up-short-wide';
 
     return 'arrow-down-wide-short';
-  }, [direction]);
-  const sortActive = !!direction;
+  }, [activeDirection, ascId]);
+  const sortActive = !!activeDirection;
 
   return (
     <StyledSortIcon className={sortActive ? 'active' : ''}
@@ -53,7 +64,7 @@ const SortIcon = ({ direction, onChange, ariaLabel, title, bulbText, dataTestId 
                     onClick={handleSortChange}
                     data-testid={dataTestId}>
       <Icon name={iconName} />
-      {bulbText && <Bulb>{bulbText}</Bulb>}
+      {order && <Bulb>{order}</Bulb>}
     </StyledSortIcon>
   );
 };
@@ -61,6 +72,8 @@ const SortIcon = ({ direction, onChange, ariaLabel, title, bulbText, dataTestId 
 SortIcon.defaultProps = {
   ariaLabel: 'Sort',
   title: 'Sort',
-  bulbText: undefined,
+  order: undefined,
   dataTestId: undefined,
 };
+
+export default SortIcon;
