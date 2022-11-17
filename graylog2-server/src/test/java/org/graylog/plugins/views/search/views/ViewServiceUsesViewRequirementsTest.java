@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.views;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivityService;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
@@ -87,7 +88,8 @@ public class ViewServiceUsesViewRequirementsTest {
                 clusterConfigService,
                 viewRequirementsFactory,
                 mock(EntityOwnershipService.class),
-                mock(ViewSummaryService.class));
+                mock(ViewSummaryService.class),
+                mock(RecentActivityService.class));
         when(viewRequirementsFactory.create(any(ViewDTO.class))).then(invocation -> new ViewRequirements(Collections.emptySet(), invocation.getArgument(0)));
     }
 
