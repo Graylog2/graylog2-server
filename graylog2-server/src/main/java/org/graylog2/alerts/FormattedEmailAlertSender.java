@@ -196,8 +196,8 @@ public class FormattedEmailAlertSender implements AlertSender {
                     .addNode(nodeId.toString())
                     .addType(Notification.Type.GENERIC)
                     .addSeverity(Notification.Severity.NORMAL)
-                    .addDetail(Notification.KEY_TITLE, "Stream \"" + stream.getTitle() + "\" is alerted, but no recipients have been defined!")
-                    .addDetail(Notification.KEY_DESCRIPTION, "To fix this, go to the alerting configuration of the stream and add at least one alert recipient.");
+                    .addDetail("title", "Stream \"" + stream.getTitle() + "\" is alerted, but no recipients have been defined!")
+                    .addDetail("description", "To fix this, go to the alerting configuration of the stream and add at least one alert recipient.");
             notificationService.publishIfFirst(notification);
         }
 

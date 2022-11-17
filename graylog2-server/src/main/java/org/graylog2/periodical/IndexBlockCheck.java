@@ -87,8 +87,8 @@ public class IndexBlockCheck extends Periodical {
                 .addNode(nodeId.toString())
                 .addType(Notification.Type.ES_INDEX_BLOCKED)
                 .addSeverity(Notification.Severity.URGENT)
-                .addDetail(Notification.KEY_TITLE, title)
-                .addDetail(Notification.KEY_DESCRIPTION, description)
+                .addDetail("title", title)
+                .addDetail("description", description)
                 .addDetail("blockDetails", indicesBlockStatus.toBlockDetails());
         notificationService.publishIfFirst(notification);
     }
