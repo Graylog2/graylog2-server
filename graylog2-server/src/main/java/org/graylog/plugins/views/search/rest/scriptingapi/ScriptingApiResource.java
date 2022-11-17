@@ -17,10 +17,7 @@
 package org.graylog.plugins.views.search.rest.scriptingapi;
 
 import com.google.common.eventbus.EventBus;
-import de.vandermeer.asciitable.AT_Context;
 import de.vandermeer.asciitable.AsciiTable;
-import de.vandermeer.asciithemes.TA_Grid;
-import de.vandermeer.asciithemes.TA_GridThemes;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -58,7 +55,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-
 import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
