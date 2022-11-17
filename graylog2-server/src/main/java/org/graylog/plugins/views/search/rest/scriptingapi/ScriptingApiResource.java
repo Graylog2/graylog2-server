@@ -17,6 +17,10 @@
 package org.graylog.plugins.views.search.rest.scriptingapi;
 
 import com.google.common.eventbus.EventBus;
+import de.vandermeer.asciitable.AT_Context;
+import de.vandermeer.asciitable.AsciiTable;
+import de.vandermeer.asciithemes.TA_Grid;
+import de.vandermeer.asciithemes.TA_GridThemes;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -34,6 +38,7 @@ import org.graylog.plugins.views.search.rest.scriptingapi.mapping.AggregationSpe
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchRequestSpecToSearchMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchTypeResultToTabularResponseMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestSpec;
+import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -54,11 +59,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import java.util.stream.Collectors;
+
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @Api(value = "ScriptingApi", tags = {CLOUD_VISIBLE})
 @Path("/scripting_api")
-@Produces(MediaType.APPLICATION_JSON)
 @Consumes({MediaType.APPLICATION_JSON})
 @RequiresAuthentication
 public class ScriptingApiResource extends RestResource implements PluginRestResource {
@@ -108,6 +114,25 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
 
         LOG.warn("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
         throw new NotFoundException("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
+    }
+
+    @POST
+    @ApiOperation(value = "Execute aggregation specified by `searchRequestSpec`",
+                  response = TabularResponse.class)
+    @Path("aggregate")
+    @NoAuditEvent("Creating audit event manually in method body.")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String executeQueryAsciiOutput(@ApiParam(name = "searchRequestSpec") @Valid SearchRequestSpec searchRequestSpec,
+                                        @Context SearchUser searchUser) {
+        final TabularResponse response = executeQuery(searchRequestSpec, searchUser);
+        AsciiTable at = new AsciiTable();
+        at.addRule();
+        at.addRow(response.schema().stream().map(ResponseSchemaEntry::name).collect(Collectors.toList()));
+        at.addRow(response.schema().stream().map(s -> s.type() + " / " + s.field()).collect(Collectors.toList()));
+        at.addRule();
+        response.data().rows().forEach(at::addRow);
+        at.addRule();
+        return at.render();
     }
 
     private void postAuditEvent(SearchJob searchJob) {

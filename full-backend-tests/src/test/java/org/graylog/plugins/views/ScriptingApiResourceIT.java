@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views;
 
+import io.restassured.http.Header;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
@@ -39,6 +40,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
+import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -202,6 +204,48 @@ public class ScriptingApiResourceIT {
     }
 
     @ContainerMatrixTest
+    void testAsciiRender() {
+        final String response = given()
+                .spec(requestSpec)
+                .header(new Header("Accept", MediaType.TEXT_PLAIN))
+                .when()
+                .body("""
+                        {
+                            "aggregation": {
+                              "group_by": [
+                                {
+                                  "field_name": "facility"
+                                }
+                              ],
+                              "metrics": [
+                                {
+                                  "function_name": "count",
+                                  "field_name": "facility"
+                                }
+                              ]
+                            }
+                          }
+                        """)
+                .post("/scripting_api/aggregate")
+                .then()
+                .statusCode(200)
+                .extract().body().asString().trim();
+
+        String expected = """
+                ┌───────────────────────────────────────┬──────────────────────────────────────┐
+                │Grouping                               │Metric : count                        │
+                │string / facility                      │numeric / facility                    │
+                ├───────────────────────────────────────┼──────────────────────────────────────┤
+                │another-test                           │2                                     │
+                │test                                   │1                                     │
+                └───────────────────────────────────────┴──────────────────────────────────────┘
+                """;
+
+        org.assertj.core.api.Assertions.assertThat(response).isEqualTo(expected.trim());
+    }
+
+
+        @ContainerMatrixTest
     void testTwoAggregations() {
         final ValidatableResponse validatableResponse = given()
                 .spec(requestSpec)
