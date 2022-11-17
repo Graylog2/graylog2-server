@@ -34,11 +34,16 @@ import org.graylog.plugins.views.search.rest.SearchJobDTO;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.AggregationSpecToPivotMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchRequestSpecToSearchMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchTypeResultToTabularResponseMapper;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationSpec;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
@@ -48,15 +53,18 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -133,6 +141,65 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
         response.data().rows().forEach(at::addRow);
         at.addRule();
         return at.render();
+    }
+
+    @GET
+    @ApiOperation(value = "Execute aggregation specified by query parameters",
+                  response = TabularResponse.class)
+    @Path("aggregateSimple")
+    @NoAuditEvent("Creating audit event manually in method body.")
+    @Produces(MediaType.APPLICATION_JSON)
+    public TabularResponse executeQuery(@QueryParam("query") String query,
+                                        @QueryParam("streams") Set<String> streams,
+                                        @QueryParam("timerange") String timerangeKeyword,
+                                        @QueryParam("groups") List<String> groups,
+                                        @QueryParam("metrics") List<String> metrics,
+                                        @Context SearchUser searchUser) {
+        SearchRequestSpec searchRequestSpec = simpleQueryParamsToFullRequestSpecification(query, streams, timerangeKeyword, groups, metrics);
+        return executeQuery(searchRequestSpec, searchUser);
+    }
+
+    @GET
+    @ApiOperation(value = "Execute aggregation specified by query parameters",
+                  response = TabularResponse.class)
+    @Path("aggregateSimple")
+    @NoAuditEvent("Creating audit event manually in method body.")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String executeQueryAsciiOutput(@QueryParam("query") String query,
+                                          @QueryParam("streams") Set<String> streams,
+                                          @QueryParam("timerange") String timerangeKeyword,
+                                          @QueryParam("groups") List<String> groups,
+                                          @QueryParam("metrics") List<String> metrics,
+                                          @Context SearchUser searchUser) {
+        SearchRequestSpec searchRequestSpec = simpleQueryParamsToFullRequestSpecification(query, streams, timerangeKeyword, groups, metrics);
+        return executeQueryAsciiOutput(searchRequestSpec, searchUser);
+    }
+
+    private SearchRequestSpec simpleQueryParamsToFullRequestSpecification(String query, Set<String> streams, String timerangeKeyword, List<String> groups, List<String> metrics) {
+        if (groups == null || groups.isEmpty()) {
+            throw new BadRequestException("At least one grouping has to be provided!");
+        }
+        if (metrics == null || metrics.isEmpty()) {
+            metrics = List.of("count:");
+        }
+        if (!metrics.stream().allMatch(m -> m.contains(":"))) {
+            throw new BadRequestException("All metrics need to be defined as \"function\":\"field_name\"");
+        }
+
+        SearchRequestSpec searchRequestSpec = new SearchRequestSpec(
+                query,
+                streams,
+                timerangeKeyword != null ? KeywordRange.create(timerangeKeyword, "UTC") : null,
+                new AggregationSpec(
+                        groups.stream().map(gr -> new Grouping(gr, Values.DEFAULT_LIMIT, null)).collect(Collectors.toList()),
+                        metrics.stream().map(metric -> {
+                            final String[] split = metric.split(":");
+                            return new Metric(split.length > 1 ? split[1] : null, split[0], null);
+                        }).collect(Collectors.toList()),
+                        false
+                )
+        );
+        return searchRequestSpec;
     }
 
     private void postAuditEvent(SearchJob searchJob) {
