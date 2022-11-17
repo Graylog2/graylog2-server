@@ -90,8 +90,8 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
     const conditionPlugin = getPlugin('eventDefinitionTypes', config.type);
     const component = (conditionPlugin.summaryComponent
       ? React.createElement(conditionPlugin.summaryComponent, {
-        config: config,
-        currentUser: currentUser,
+        config,
+        currentUser,
       })
       : <p>Condition plugin <em>{config.type}</em> does not provide a summary.</p>
     );
@@ -114,11 +114,11 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
 
     return (fieldProviderPlugin.summaryComponent
       ? React.createElement(fieldProviderPlugin.summaryComponent, {
-        fieldName: fieldName,
-        config: config,
+        fieldName,
+        config,
         keys: keys,
         key: fieldName,
-        currentUser: currentUser,
+        currentUser,
       })
       : <p key={fieldName}>Provider plugin <em>{provider.type}</em> does not provide a summary.</p>
     );
