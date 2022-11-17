@@ -3,8 +3,7 @@ package org.graylog.events.processor.systemnotification;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.htmlparser.jericho.Source;
 
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
@@ -16,7 +15,11 @@ import java.util.Map;
 import static org.apache.commons.lang.CharEncoding.UTF_8;
 
 public class SystemNotificationRenderService {
-    private static final Logger LOG = LoggerFactory.getLogger(SystemNotificationRenderService.class);
+    public enum RenderFormat {
+        FORMAT_HTML,
+        FORMAT_PLAINTEXT
+    }
+
     private static final freemarker.template.Configuration cfg =
             new freemarker.template.Configuration(freemarker.template.Configuration.VERSION_2_3_28);
 
@@ -30,7 +33,7 @@ public class SystemNotificationRenderService {
 
     public String renderHtml(String notificationId, Map<String, Object> values) {
         try (Writer writer = new StringWriter()) {
-            Template template = cfg.getTemplate(notificationId + "_html.ftl");
+            Template template = cfg.getTemplate(notificationId + ".ftl");
             template.process(values, writer);
             return writer.toString();
         } catch (TemplateException e) {
@@ -41,6 +44,8 @@ public class SystemNotificationRenderService {
     }
 
     public String renderPlainText(String notificationId, Map<String, Object> values) {
-        return null;
+        String html = renderHtml(notificationId, values);
+        String plaintext = new Source(html).getRenderer().toString();
+        return plaintext;
     }
 }
