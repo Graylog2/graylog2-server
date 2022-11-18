@@ -164,6 +164,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         for (Message message : messages) {
             message.ensureValidTimestamp();
 
+            // If a message is received via the Cluster-to-Cluster Forwarder, it already has this field set
             if (!message.hasField(Message.FIELD_GL2_MESSAGE_ID) || isNullOrEmpty(message.getFieldAs(String.class, Message.FIELD_GL2_MESSAGE_ID))) {
                 // Set the message ID once all message processors have finished
                 // See documentation of Message.FIELD_GL2_MESSAGE_ID for details
