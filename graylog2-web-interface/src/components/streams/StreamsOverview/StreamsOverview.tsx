@@ -17,8 +17,9 @@
 import PropTypes from 'prop-types';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import styled from 'styled-components';
 
-import { Alert } from 'components/bootstrap';
+import { Alert, Label } from 'components/bootstrap';
 import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';
@@ -38,6 +39,12 @@ import IndexSetCell from 'components/streams/StreamsOverview/IndexSetCell';
 import StatusCell from './StatusCell';
 
 import CreateStreamButton from '../CreateStreamButton';
+
+const DefaultLabel = styled(Label)`
+  display: inline-flex;
+  margin-left: 5px;
+  vertical-align: inherit;
+`;
 
 const AVAILABLE_ATTRIBUTES = [
   { id: 'title', title: 'Title' },
@@ -63,7 +70,10 @@ type SearchParams = {
 const customCells = (indexSets: Array<IndexSet>): CustomCells<Stream> => ({
   title: {
     renderCell: (stream) => (
-      <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
+      <>
+        <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
+        {stream.is_default && <DefaultLabel bsStyle="primary" bsSize="xsmall">Default</DefaultLabel>}
+      </>
     ),
   },
   index_set_id: {
