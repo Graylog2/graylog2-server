@@ -201,4 +201,30 @@ describe('<ConfigurableDataTable />', () => {
     expect(screen.queryByText(selectedItemInfo)).not.toBeInTheDocument();
     expect(rowCheckboxes[0]).not.toBeChecked();
   });
+
+  it('should select all items', async () => {
+    asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
+
+    render(<ConfigurableDataTable attributes={selectedAttributes}
+                                  rows={rows}
+                                  onSortChange={() => {}}
+                                  bulkActions={() => <div />}
+                                  availableAttributes={availableAttributes}
+                                  total={1} />);
+
+    const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select row/i });
+
+    expect(rowCheckboxes[0]).not.toBeChecked();
+
+    const selectAllCheckbox = await screen.findByRole('checkbox', { name: /all visible rows/i });
+    userEvent.click(selectAllCheckbox);
+
+    expect(rowCheckboxes[0]).toBeChecked();
+
+    await screen.findByText('1 item selected');
+
+    userEvent.click(selectAllCheckbox);
+
+    expect(rowCheckboxes[0]).not.toBeChecked();
+  });
 });

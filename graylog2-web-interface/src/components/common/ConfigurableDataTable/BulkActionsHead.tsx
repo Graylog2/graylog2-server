@@ -65,6 +65,7 @@ type Props<ListItem extends { id: string }> = {
 
 const BulkActionsHead = <ListItem extends { id: string }>({ rows, setSelectedItemsIds, selectedItemsIds }: Props<ListItem>) => {
   const { checkboxRef, checkboxStatus } = useCheckboxStatus(rows, selectedItemsIds);
+  const title = `${checkboxStatus === 'CHECKED' ? 'Deselect' : 'all visible rows'}`;
 
   const onBulkSelect = () => {
     setSelectedItemsIds((cur) => {
@@ -80,7 +81,11 @@ const BulkActionsHead = <ListItem extends { id: string }>({ rows, setSelectedIte
 
   return (
     <td>
-      <RowCheckbox inputRef={checkboxRef} onChange={onBulkSelect} checked={checkboxStatus === 'CHECKED'} />
+      <RowCheckbox inputRef={(ref) => { checkboxRef.current = ref; }}
+                   onChange={onBulkSelect}
+                   checked={checkboxStatus === 'CHECKED'}
+                   title={title}
+                   disabled={!rows?.length} />
     </td>
   );
 };

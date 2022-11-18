@@ -169,7 +169,11 @@ const TableHead = <ListItem extends { id: string }>({
   return (
     <thead>
       <tr>
-        {displayBulkActionsCol && <BulkActionsHead rows={rows} selectedItemsIds={selectedItemsIds} setSelectedItemsIds={setSelectedItemsIds} />}
+        {displayBulkActionsCol && (
+          <BulkActionsHead rows={rows}
+                           selectedItemsIds={selectedItemsIds}
+                           setSelectedItemsIds={setSelectedItemsIds} />
+        )}
         {selectedAttributes.map((attribute) => {
           const headerRenderer = customHeaders?.[attribute.id] ?? defaultAttributeHeaderRenderer[attribute.id];
 
