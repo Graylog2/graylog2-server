@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 import { uniq } from 'lodash';
-import { Button } from 'react-bootstrap';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
+import { Button } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -38,6 +38,7 @@ const BulkActions = ({ selectedStreamIds, setSelectedStreamIds }: Props) => {
   const descriptor = StringUtils.pluralize(selectedItemsAmount, 'stream', 'streams');
 
   const onDelete = useCallback(() => {
+    // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}?`)) {
       const deleteCalls = selectedStreamIds.map((streamId) => fetch('DELETE', qualifyUrl(ApiRoutes.StreamsApiController.delete(streamId).url)).then(() => streamId));
 
