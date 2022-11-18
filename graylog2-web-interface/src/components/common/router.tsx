@@ -57,7 +57,7 @@ const isLeftClickEvent = (e: React.MouseEvent) => (e.button === 0);
 
 const isModifiedEvent = (e: React.MouseEvent) => !!(e.metaKey || e.altKey || e.ctrlKey || e.shiftKey);
 
-const LinkContainer = ({ children, onClick, to: toProp, relativeActive, ...rest }: Props) => {
+const LinkContainer = ({ children, onClick, to: toProp, relativeActive, disabled, ...rest }: Props) => {
   const { pathname } = useLocation();
   const { props: { onClick: childrenOnClick, className, disabled }, type: { displayName } } = React.Children.only(children);
   const to = (typeof toProp === 'object' && 'pathname' in toProp) ? toProp.pathname : toProp;
@@ -65,7 +65,7 @@ const LinkContainer = ({ children, onClick, to: toProp, relativeActive, ...rest 
     [pathname, to, className, displayName, relativeActive],
   );
   const _onClick = useCallback((e: React.MouseEvent) => {
-    if (!isLeftClickEvent(e) || isModifiedEvent(e)) {
+    if (!isLeftClickEvent(e) || isModifiedEvent(e) || disabled) {
       return;
     }
 
