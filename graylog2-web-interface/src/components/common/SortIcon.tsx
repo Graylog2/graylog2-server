@@ -81,7 +81,7 @@ const SortIcon = <AscDirection extends string, DescDirection extends string>({
                     aria-label={ariaLabel}
                     onClick={handleSortChange}
                     data-testid={dataTestId}>
-      <Icon name={iconName} className={className} />
+      <Icon name={iconName} className={className} data-testid="sort-icon-svg" />
       {order && <Bulb>{order}</Bulb>}
     </StyledSortIcon>
   );
