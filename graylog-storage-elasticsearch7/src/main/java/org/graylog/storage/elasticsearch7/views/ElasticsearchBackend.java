@@ -276,7 +276,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                         resultsMap.put(searchTypeId, searchTypeResult);
                     }
                 } catch (Exception e) {
-                    LOG.debug("Unable to extract results: ", e);
+                    LOG.warn("Unable to extract results: ", e);
                     queryContext.addError(new SearchTypeError(query, searchTypeId, e));
                 }
             }
