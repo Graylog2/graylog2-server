@@ -47,6 +47,58 @@ class SystemNotificationRenderServiceTest {
         assertThat(renderResponse.description()).containsSequence("<span>");
     }
 
+    @Test
+    void plainRenderTestWithReplace() {
+        notification = new NotificationImpl()
+                .addNode("node")
+                .addSeverity(Notification.Severity.URGENT)
+                .addType(Notification.Type.EMAIL_TRANSPORT_CONFIGURATION_INVALID)
+                .addDetail("title", "title")
+                .addDetail("description", "description")
+                .addDetail("dummy", "dummy")
+                .addDetail("exception", new Exception("My Test Exception"))
+                .addTimestamp(DateTime.now());
+        when(notificationService.getByType(any())).thenReturn(Optional.of(notification));
+
+        String plainText = renderService.renderPlainText(notification);
+        assertThat(plainText).containsSequence("java.lang.Exception: My Test Exception");
+        assertThat(plainText).doesNotContain("<span>");
+    }
+
+    @Test
+    void testCloudTrue() {
+        String url = "http://my.system.input";
+        notification = new NotificationImpl()
+                .addNode("node")
+                .addSeverity(Notification.Severity.URGENT)
+                .addType(Notification.Type.NO_INPUT_RUNNING)
+                .addDetail("SYSTEM_INPUTS", url)
+                .addDetail("exception", new Exception("My Test Exception"))
+                .addTimestamp(DateTime.now());
+        when(notificationService.getByType(any())).thenReturn(Optional.of(notification));
+        when(graylogConfig.isCloud()).thenReturn(true);
+
+        TemplateRenderResponse renderResponse = renderService.renderHtml(notification);
+        assertThat(renderResponse.description()).doesNotContain("click <a href=\"" + url + "\">here");
+    }
+
+    @Test
+    void testCloudFalse() {
+        String url = "http://my.system.input";
+        notification = new NotificationImpl()
+                .addNode("node")
+                .addSeverity(Notification.Severity.URGENT)
+                .addType(Notification.Type.NO_INPUT_RUNNING)
+                .addDetail("SYSTEM_INPUTS", url)
+                .addDetail("exception", new Exception("My Test Exception"))
+                .addTimestamp(DateTime.now());
+        when(notificationService.getByType(any())).thenReturn(Optional.of(notification));
+        when(graylogConfig.isCloud()).thenReturn(false);
+
+        TemplateRenderResponse renderResponse = renderService.renderHtml(notification);
+        assertThat(renderResponse.description()).containsSequence("click <a href=\"" + url + "\">here");
+    }
+
     @Disabled
     @Test
     void missingTemplates() {

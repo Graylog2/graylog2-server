@@ -1,7 +1,12 @@
-<h1>Elasticsearch cluster unhealthy (RED)</h1>
+<#if _title>
+Elasticsearch cluster unhealthy (RED)
+</#if>
+
+<#if _description>
 <span>
 The Elasticsearch cluster state is RED which means shards are unassigned.
 This usually indicates a crashed and corrupt cluster and needs to be investigated. Graylog will write
 into the local disk journal. Read how to fix this in {' '}
-<DocumentationLink page='elasticsearch#cluster-status-explained' text="the Elasticsearch setup documentation." />
+<a href="https://docs.graylog.org/docs/elasticsearch#cluster-status-explained">the Elasticsearch setup documentation</a>
 </span>
+</#if>
