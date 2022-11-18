@@ -57,30 +57,33 @@ public class JsonFlatten extends AbstractFunction<JsonNode> {
     private final ObjectMapper objectMapper;
     private final ParameterDescriptor<String, String> valueParam;
     private final ParameterDescriptor<String, String> arrayHandlerParam;
+    private final ParameterDescriptor<Boolean, Boolean> stringifyParam;
 
     @Inject
     public JsonFlatten(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
         valueParam = ParameterDescriptor.string("value").description("The string to parse as a JSON tree").build();
         arrayHandlerParam = ParameterDescriptor.string("array_handler").description("Determines how arrays are processed").build();
+        stringifyParam = ParameterDescriptor.bool("stringify").optional().description("Convert all extracted values to strings").build();
     }
 
     @Override
     public JsonNode evaluate(FunctionArgs args, EvaluationContext context) {
         final String value = valueParam.required(args, context);
         final String arrayHandler = arrayHandlerParam.required(args, context);
+        final boolean stringify = stringifyParam.optional(args, context).orElse(true);
 
         try {
             switch (arrayHandler) {
                 case OPTION_IGNORE:
                     // ignore all top-level arrays
-                    return JsonUtils.extractJson(value, objectMapper, FLAGS_IGNORE);
+                    return JsonUtils.extractJson(value, objectMapper, FLAGS_IGNORE, stringify);
                 case OPTION_JSON:
                     // return top-level arrays as valid JSON strings
-                    return JsonUtils.extractJson(value, objectMapper, FLAGS_JSON);
+                    return JsonUtils.extractJson(value, objectMapper, FLAGS_JSON, stringify);
                 case OPTION_FLATTEN:
                     // explode all arrays and objects into top-level key/values
-                    return JsonUtils.extractJson(value, objectMapper, FLAGS_FLATTEN);
+                    return JsonUtils.extractJson(value, objectMapper, FLAGS_FLATTEN, stringify);
                 default:
                     LOG.warn("Unknown parameter array_handler: {}", arrayHandler);
             }
@@ -96,7 +99,7 @@ public class JsonFlatten extends AbstractFunction<JsonNode> {
                 .name(NAME)
                 .returnType(JsonNode.class)
                 .params(of(
-                        valueParam, arrayHandlerParam
+                        valueParam, arrayHandlerParam, stringifyParam
                 ))
                 .description("Parses a string as a JSON tree, while flattening all containers to a single level")
                 .build();
