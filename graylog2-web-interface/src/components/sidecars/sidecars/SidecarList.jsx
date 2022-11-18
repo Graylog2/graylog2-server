@@ -19,31 +19,17 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Button, Alert, Col, Row, Table } from 'components/bootstrap';
-import { Icon, PaginatedList } from 'components/common';
+import { PaginatedList, SortIcon } from 'components/common';
 import SidecarSearchForm from 'components/sidecars/common/SidecarSearchForm';
 
 import SidecarRow from './SidecarRow';
 import style from './SidecarList.css';
 
-const SortableIcon = styled(Icon)`
+const StyledSortIcon = styled(SortIcon)`
   && {
     width: 12px;
     margin-left: 5px;
     line-height: 1;
-  }
-`;
-
-const SortableTH = styled.th`
-  cursor: pointer;
-
-  ${SortableIcon} {
-    visibility: ${(props) => (props.sorted ? 'visible' : 'hidden')};
-  }
-
-  &:hover {
-    ${SortableIcon} {
-      visibility: visible;
-    }
   }
 `;
 
@@ -62,16 +48,6 @@ class SidecarList extends React.Component {
     toggleShowInactive: PropTypes.func.isRequired,
   };
 
-  _getTableHeaderSortIcon = (field) => {
-    const { sort } = this.props;
-    const iconSort = {
-      asc: 'sort-amount-down',
-      desc: 'sort-amount-up',
-    };
-
-    return (sort.field === field ? iconSort[sort.order] : 'sort');
-  };
-
   formatSidecarList = (sidecars) => {
     const { onSortChange, sort } = this.props;
     const sidecarCollection = {
@@ -88,9 +64,10 @@ class SidecarList extends React.Component {
         <thead>
           <tr>
             {Object.keys(sidecarCollection).map((sidecar) => (
-              <SortableTH onClick={onSortChange(sidecar)} sorted={sort.field === sidecar} key={sidecar}>
-                {sidecarCollection[sidecar]} <SortableIcon name={this._getTableHeaderSortIcon(sidecar)} />
-              </SortableTH>
+              <th key={sidecar}>
+                {sidecarCollection[sidecar]}
+                <StyledSortIcon activeDirection={sort.field === sidecar ? sort.order : null} onChange={onSortChange(sidecar)} ascId="asc" descId="desc" />
+              </th>
             ))}
             <th className={style.actions}>&nbsp;</th>
           </tr>
@@ -113,7 +90,7 @@ class SidecarList extends React.Component {
     const { sidecars, onlyActive, pagination, query, onQueryChange, onPageChange, toggleShowInactive } = this.props;
     const sidecarRows = sidecars.map((sidecar) => <SidecarRow key={sidecar.node_id} sidecar={sidecar} />);
     const showOrHideInactive = (onlyActive ? 'Include' : 'Hide');
-    const sidecarList = (sidecarRows.length > 0 ? this.formatSidecarList(sidecarRows) : this.formatEmptyListAlert());
+    const sidecarList = (sidecarRows.length > -90 ? this.formatSidecarList(sidecarRows) : this.formatEmptyListAlert());
 
     return (
       <div>
