@@ -18,6 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 import { useMemo, useState, useCallback } from 'react';
 import type * as Immutable from 'immutable';
+import { uniq } from 'lodash';
 
 import { Button, Table, ButtonToolbar } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
@@ -151,6 +152,9 @@ const ConfigurableDataTable = <ListItem extends { id: string }>({
       </ActionsRow>
       <Table striped condensed hover>
         <TableHead selectedAttributes={visibleAttributes}
+                   selectedItemsIds={selectedItemsIds}
+                   setSelectedItemsIds={setSelectedItemsIds}
+                   rows={rows}
                    customHeaders={customHeaders}
                    onSortChange={onSortChange}
                    displayBulkActionsCol={displayBulkActionsCol}
