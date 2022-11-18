@@ -26,7 +26,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.FixedRecvByteBufAllocator;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
@@ -146,22 +145,6 @@ public class UdpTransportTest {
     }
 
     @Test
-    public void transportTruncatesDataLargerRecvBufferSizeOnLinux() throws Exception {
-        assumeTrue("Skipping test intended for Linux systems", SystemUtils.IS_OS_LINUX);
-
-        final CountingChannelUpstreamHandler handler = new CountingChannelUpstreamHandler();
-        final UdpTransport transport = launchTransportForBootStrapTest(handler);
-        await().atMost(5, TimeUnit.SECONDS).until(() -> transport.getLocalAddress() != null);
-        final InetSocketAddress localAddress = (InetSocketAddress) transport.getLocalAddress();
-
-        sendUdpDatagram(BIND_ADDRESS, localAddress.getPort(), 2 * RECV_BUFFER_SIZE);
-        await().atMost(5, TimeUnit.SECONDS).until(() -> !handler.getBytesWritten().isEmpty());
-        transport.stop();
-
-        assertThat(handler.getBytesWritten()).containsExactly(RECV_BUFFER_SIZE);
-    }
-
-    @Test
     public void receiveBufferSizeIsDefaultSize() {
         assertThat(udpTransport.getBootstrap(mock(MessageInput.class)).config().options().get(ChannelOption.SO_RCVBUF)).isEqualTo(RECV_BUFFER_SIZE);
     }
@@ -177,13 +160,6 @@ public class UdpTransportTest {
         UdpTransport udpTransport = new UdpTransport(config, eventLoopGroupFactory, nettyTransportConfiguration, throughputCounter, new LocalMetricRegistry());
 
         assertThat(udpTransport.getBootstrap(mock(MessageInput.class)).config().options().get(ChannelOption.SO_RCVBUF)).isEqualTo(recvBufferSize);
-    }
-
-    @Test
-    public void receiveBufferSizePredictorIsUsingDefaultSize() {
-        FixedRecvByteBufAllocator recvByteBufAllocator =
-                (FixedRecvByteBufAllocator) udpTransport.getBootstrap(mock(MessageInput.class)).config().options().get(ChannelOption.RCVBUF_ALLOCATOR);
-        assertThat(recvByteBufAllocator.newHandle().guess()).isEqualTo(RECV_BUFFER_SIZE);
     }
 
     @Test
