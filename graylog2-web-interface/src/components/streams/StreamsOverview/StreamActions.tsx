@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useState, useCallback } from 'react';
 
-import { ShareButton, OverlayElement, IfPermitted } from 'components/common';
-import { Tooltip, ButtonToolbar, DropdownButton, MenuItem } from 'components/bootstrap';
+import { ShareButton, IfPermitted, HoverForHelp } from 'components/common';
+import { ButtonToolbar, DropdownButton, MenuItem } from 'components/bootstrap';
 import type { Stream, StreamRule, StreamRuleType } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { LinkContainer } from 'components/common/router';
@@ -33,6 +33,8 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 import StreamModal from '../StreamModal';
+
+const DefaultStreamHelp = () => <HoverForHelp displayLeftMargin>Action not available for the default stream</HoverForHelp>;
 
 const StreamActions = ({
   stream,
@@ -53,9 +55,6 @@ const StreamActions = ({
 
   const isDefaultStream = stream.is_default;
   const isNotEditable = !stream.is_editable;
-  const defaultStreamTooltip = isDefaultStream
-    ? <Tooltip id="default-stream-tooltip">Action not available for the default stream</Tooltip> : null;
-
   const onToggleStreamStatus = useCallback(async () => {
     setChangingStatus(true);
 
@@ -130,15 +129,14 @@ const StreamActions = ({
                       id={`more-actions-dropdown-${stream.id}`}
                       disabled={isNotEditable}>
         <IfPermitted permissions={[`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`]} anyPermissions>
-          <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream} className="overlay-trigger">
-            <MenuItem bsStyle="success"
-                      onSelect={onToggleStreamStatus}
-                      disabled={isDefaultStream || isNotEditable}>
-              {changingStatus
-                ? <span>{stream.disabled ? 'Starting Stream...' : 'Stopping Stream...'}</span>
-                : <span>{stream.disabled ? 'Start Stream' : 'Stop Stream'}</span>}
-            </MenuItem>
-          </OverlayElement>
+          <MenuItem bsStyle="success"
+                    onSelect={onToggleStreamStatus}
+                    disabled={isDefaultStream || isNotEditable}>
+            {changingStatus
+              ? <span>{stream.disabled ? 'Starting Stream...' : 'Stopping Stream...'}</span>
+              : <span>{stream.disabled ? 'Start Stream' : 'Stop Stream'}</span>}
+            {isDefaultStream && <DefaultStreamHelp />}
+          </MenuItem>
           <MenuItem divider />
         </IfPermitted>
         <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
