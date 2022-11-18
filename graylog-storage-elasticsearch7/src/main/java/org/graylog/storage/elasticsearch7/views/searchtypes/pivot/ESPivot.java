@@ -87,10 +87,8 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         final AggregationBuilder rootAggregation = createdAggregations.root();
         final AggregationBuilder leafAggregation = createdAggregations.leaf();
         final List<AggregationBuilder> metrics = createdAggregations.metrics();
-        if (!pivot.rowGroups().isEmpty() && (pivot.columnGroups().isEmpty() || pivot.rollup())) {
-            seriesStream(pivot, queryContext, "metrics")
-                    .forEach(aggregation -> metrics.forEach(metric -> metric.subAggregation(aggregation)));
-        }
+        seriesStream(pivot, queryContext, "metrics")
+                .forEach(aggregation -> metrics.forEach(metric -> metric.subAggregation(aggregation)));
 
         if (!pivot.columnGroups().isEmpty()) {
             final BucketSpecHandler.CreatedAggregations<AggregationBuilder> columnsAggregation = createPivots(BucketSpecHandler.Direction.Column, query, pivot, pivot.columnGroups(), queryContext);
@@ -259,16 +257,14 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         pivot.series().forEach(seriesSpec -> {
             final ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> seriesHandler = this.seriesHandlers.get(seriesSpec.type());
             final Aggregation series = seriesHandler.extractAggregationFromResult(pivot, seriesSpec, aggregation, queryContext);
-            if (series != null) {
-                seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, this, queryContext)
-                        .map(value -> {
-                            columnKeys.addLast(value.id());
-                            final PivotResult.Value v = PivotResult.Value.create(columnKeys, value.value(), rollup, source);
-                            columnKeys.removeLast();
-                            return v;
-                        })
-                        .forEach(rowBuilder::addValue);
-            }
+            seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, this, queryContext)
+                    .map(value -> {
+                        columnKeys.addLast(value.id());
+                        final PivotResult.Value v = PivotResult.Value.create(columnKeys, value.value(), rollup, source);
+                        columnKeys.removeLast();
+                        return v;
+                    })
+                    .forEach(rowBuilder::addValue);
         });
     }
 
