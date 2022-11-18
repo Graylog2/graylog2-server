@@ -41,6 +41,7 @@ import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.graylog2.audit.AuditEventTypes.SYSTEM_NOTIFICATION_CREATE;
@@ -120,6 +121,17 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
         }
 
         return notifications;
+    }
+
+    @Override
+    public Optional<Notification> getByType(Notification.Type type) {
+        DBObject dbObject = findOne(NotificationImpl.class,
+                new BasicDBObject(NotificationImpl.FIELD_TYPE, type.toString().toLowerCase(Locale.ENGLISH)));
+        if (dbObject != null) {
+            return Optional.of(new NotificationImpl(new ObjectId(dbObject.get("_id").toString()), dbObject.toMap()));
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override

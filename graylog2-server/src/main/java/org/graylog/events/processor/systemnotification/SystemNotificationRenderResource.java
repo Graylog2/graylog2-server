@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.notifications.Notification;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,27 +55,27 @@ public class SystemNotificationRenderResource extends RestResource {
 
     @POST
     @NoAuditEvent("Doesn't change any data, only renders a notification message")
-    @Path("/html/{id}")
+    @Path("/html/{type}")
     @Produces(MediaType.TEXT_HTML)
     @ApiOperation(value = "Get HTML formatted message")
-    public String renderHtml(@ApiParam(name = "id", required = true)
-                             @PathParam("id") String id,
-                             @ApiParam(name = "JSON body", required = false)
-                             TemplateRenderRequest request) {
+    public TemplateRenderResponse renderHtml(@ApiParam(name = "type", required = true)
+                                             @PathParam("type") Notification.Type type,
+                                             @ApiParam(name = "JSON body", required = false)
+                                             TemplateRenderRequest request) {
         Map<String, Object> values = (request != null) ? request.values() : new HashMap<>();
-        return systemNotificationRenderService.renderHtml(id, values);
+        return systemNotificationRenderService.renderHtml(type, values);
     }
 
     @POST
     @NoAuditEvent("Doesn't change any data, only renders a notification message")
-    @Path("/plaintext/{id}")
+    @Path("/plaintext/{type}")
     @Produces(MediaType.TEXT_PLAIN)
     @ApiOperation(value = "Get plaintext formatted message")
-    public String renderPlainText(@ApiParam(name = "id", required = true)
-                                  @PathParam("id") String id,
+    public String renderPlainText(@ApiParam(name = "type", required = true)
+                                  @PathParam("type") Notification.Type type,
                                   @ApiParam(name = "JSON body", required = false)
                                   TemplateRenderRequest request) {
         Map<String, Object> values = (request != null) ? request.values() : new HashMap<>();
-        return systemNotificationRenderService.renderPlainText(id, values);
+        return systemNotificationRenderService.renderPlainText(type, values);
     }
 }
