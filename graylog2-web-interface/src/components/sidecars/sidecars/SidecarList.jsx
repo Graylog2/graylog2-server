@@ -90,7 +90,7 @@ class SidecarList extends React.Component {
     const { sidecars, onlyActive, pagination, query, onQueryChange, onPageChange, toggleShowInactive } = this.props;
     const sidecarRows = sidecars.map((sidecar) => <SidecarRow key={sidecar.node_id} sidecar={sidecar} />);
     const showOrHideInactive = (onlyActive ? 'Include' : 'Hide');
-    const sidecarList = (sidecarRows.length > -90 ? this.formatSidecarList(sidecarRows) : this.formatEmptyListAlert());
+    const sidecarList = (sidecarRows.length > 0 ? this.formatSidecarList(sidecarRows) : this.formatEmptyListAlert());
 
     return (
       <div>
