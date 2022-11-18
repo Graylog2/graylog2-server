@@ -70,7 +70,7 @@ import java.util.stream.Collectors;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @Api(value = "ScriptingApi", tags = {CLOUD_VISIBLE})
-@Path("/scripting_api")
+@Path("/search")
 @Consumes({MediaType.APPLICATION_JSON})
 @RequiresAuthentication
 public class ScriptingApiResource extends RestResource implements PluginRestResource {
@@ -146,7 +146,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     @GET
     @ApiOperation(value = "Execute aggregation specified by query parameters",
                   response = TabularResponse.class)
-    @Path("aggregateSimple")
+    @Path("aggregate")
     @NoAuditEvent("Creating audit event manually in method body.")
     @Produces(MediaType.APPLICATION_JSON)
     public TabularResponse executeQuery(@QueryParam("query") String query,
@@ -162,7 +162,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     @GET
     @ApiOperation(value = "Execute aggregation specified by query parameters",
                   response = TabularResponse.class)
-    @Path("aggregateSimple")
+    @Path("aggregate")
     @NoAuditEvent("Creating audit event manually in method body.")
     @Produces(MediaType.TEXT_PLAIN)
     public String executeQueryAsciiOutput(@QueryParam("query") String query,

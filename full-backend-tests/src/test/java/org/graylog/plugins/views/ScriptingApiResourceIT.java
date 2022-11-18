@@ -135,7 +135,7 @@ public class ScriptingApiResourceIT {
                             }
                           }
                         """)
-                .post("/scripting_api/aggregate")
+                .post("/search/aggregate")
                 .then()
                 .statusCode(200);
 
@@ -165,7 +165,7 @@ public class ScriptingApiResourceIT {
                             }
                           }
                         """)
-                .post("/scripting_api/aggregate")
+                .post("/search/aggregate")
                 .then()
                 .statusCode(200);
 
@@ -195,7 +195,7 @@ public class ScriptingApiResourceIT {
                             }
                           }
                         """)
-                .post("/scripting_api/aggregate")
+                .post("/search/aggregate")
                 .then()
                 .statusCode(200);
 
@@ -226,7 +226,7 @@ public class ScriptingApiResourceIT {
                             }
                           }
                         """)
-                .post("/scripting_api/aggregate")
+                .post("/search/aggregate")
                 .then()
                 .statusCode(200)
                 .extract().body().asString().trim();
@@ -272,7 +272,7 @@ public class ScriptingApiResourceIT {
                             }
                           }
                         """)
-                .post("/scripting_api/aggregate")
+                .post("/search/aggregate")
                 .then()
                 .statusCode(200);
 
@@ -306,7 +306,7 @@ public class ScriptingApiResourceIT {
                             }
                           }
                         """)
-                .post("/scripting_api/aggregate")
+                .post("/search/aggregate")
                 .then()
                 .statusCode(404); // TODO! We should handle the duplicated metric better
     }
@@ -333,7 +333,7 @@ public class ScriptingApiResourceIT {
                             }
                           }
                         """)
-                .post("/scripting_api/aggregate")
+                .post("/search/aggregate")
                 .then()
                 .statusCode(200);
 
@@ -371,7 +371,7 @@ public class ScriptingApiResourceIT {
                             }
                           }
                         """)
-                .post("/scripting_api/aggregate")
+                .post("/search/aggregate")
                 .then()
                 .statusCode(200);
 
@@ -403,7 +403,7 @@ public class ScriptingApiResourceIT {
                 .spec(requestSpec)
                 .when()
                 .body(String.format(Locale.ROOT, req, stream2Id))
-                .post("/scripting_api/aggregate")
+                .post("/search/aggregate")
                 .then()
                 .statusCode(200);
 
@@ -434,7 +434,7 @@ public class ScriptingApiResourceIT {
                             }
                           }
                         """)
-                .post("/scripting_api/aggregate")
+                .post("/search/aggregate")
                 .then()
                 .statusCode(200);
 
@@ -471,7 +471,7 @@ public class ScriptingApiResourceIT {
                             }
                           }
                         """)
-                .post("/scripting_api/aggregate")
+                .post("/search/aggregate")
                 .then()
                 .statusCode(200);
 
