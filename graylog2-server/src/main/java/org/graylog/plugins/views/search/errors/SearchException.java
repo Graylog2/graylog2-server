@@ -24,6 +24,11 @@ public class SearchException extends RuntimeException {
         this.error = error;
     }
 
+    public SearchException(SearchError error, Throwable t) {
+        super(t);
+        this.error = error;
+    }
+
     public SearchError error() {
         return error;
     }
