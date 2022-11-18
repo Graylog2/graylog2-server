@@ -170,7 +170,7 @@ describe('Headers', () => {
       const ascIcon = wrapper
         .find('FieldSortIcon[fieldName="foo"]')
         .find('button[data-testid="sort-icon-foo"].active')
-        .find('Icon[name="sort-amount-down"]');
+        .find('Icon[name="arrow-up-short-wide"]');
 
       expect(ascIcon).toExist();
     });
@@ -181,7 +181,7 @@ describe('Headers', () => {
       const dscIcon = wrapper
         .find('FieldSortIcon[fieldName="bar"]')
         .find('button[data-testid="sort-icon-bar"].active')
-        .find('Icon[name="sort-amount-up"]');
+        .find('Icon[name="arrow-down-wide-short"]');
 
       expect(dscIcon).toExist();
     });
@@ -192,7 +192,7 @@ describe('Headers', () => {
       const inactiveIcon = wrapper
         .find('FieldSortIcon[fieldName="avg(foo)"]')
         .find('button[data-testid="sort-icon-avg(foo)"]:not(.active)')
-        .find('Icon[name="sort-amount-down"]');
+        .find('Icon[name="arrow-down-wide-short"]');
 
       expect(inactiveIcon).toExist();
     });
