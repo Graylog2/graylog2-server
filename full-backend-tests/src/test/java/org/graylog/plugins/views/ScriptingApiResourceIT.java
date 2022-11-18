@@ -245,6 +245,43 @@ public class ScriptingApiResourceIT {
         org.assertj.core.api.Assertions.assertThat(response).isEqualTo(expected.trim());
     }
 
+    @ContainerMatrixTest
+    void testGetRequestAcii() {
+        final String response = given()
+                .spec(requestSpec)
+                .header(new Header("Accept", MediaType.TEXT_PLAIN))
+                .when()
+                .get("/search/aggregate?groups=facility&metrics=count:facility")
+                .then()
+                .statusCode(200)
+                .extract().body().asString().trim();
+
+        String expected = """
+                ┌────────────────────────┬───────────────────────┐
+                │Grouping                │Metric : count         │
+                │facility                │facility               │
+                │string                  │numeric                │
+                ├────────────────────────┼───────────────────────┤
+                │another-test            │2                      │
+                │test                    │1                      │
+                └────────────────────────┴───────────────────────┘
+                """;
+        org.assertj.core.api.Assertions.assertThat(response).isEqualTo(expected.trim());
+    }
+
+    @ContainerMatrixTest
+    void testGetRequestJson() {
+        final ValidatableResponse response = given()
+                .spec(requestSpec)
+                .header(new Header("Accept", MediaType.APPLICATION_JSON))
+                .when()
+                .get("/search/aggregate?groups=facility&metrics=count:facility")
+                .then()
+                .statusCode(200);
+
+        validateRow(response, "another-test", 2);
+        validateRow(response, "test", 1);
+    }
 
     @ContainerMatrixTest
     void testTwoAggregations() {
