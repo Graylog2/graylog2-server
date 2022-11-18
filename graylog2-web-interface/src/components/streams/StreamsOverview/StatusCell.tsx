@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useCallback } from 'react';
 
 import { Icon } from 'components/common';
@@ -23,12 +23,12 @@ import { Label } from 'components/bootstrap';
 import { StreamsStore } from 'stores/streams/StreamsStore';
 import type { Stream } from 'stores/streams/StreamsStore';
 
-const StatusLabel = styled(Label)`
-  cursor: pointer;
+const StatusLabel = styled(Label)(({ $clickable }: { $clickable: boolean }) => css`
+  cursor: ${$clickable ? 'pointer' : 'default'};
   display: inline-flex;
   justify-content: center;
   gap: 4px;
-`;
+`);
 
 const Spacer = styled.div`
   border-left: 1px solid currentColor;
@@ -40,6 +40,7 @@ type Props = {
 };
 
 const StatusCell = ({ stream }: Props) => {
+  const disableChange = stream.is_default || !stream.is_editable;
   const toggleStreamStatus = useCallback(async () => {
     if (stream.disabled) {
       await StreamsStore.resume(stream.id, (response) => response);
@@ -52,9 +53,16 @@ const StatusCell = ({ stream }: Props) => {
   }, [stream.disabled, stream.id, stream.title]);
 
   return (
-    <StatusLabel bsStyle={stream.disabled ? 'warning' : 'success'} onClick={toggleStreamStatus}>
-      {stream.disabled ? 'Stopped' : 'Running'}<Spacer />
-      <Icon name={stream.disabled ? 'play' : 'pause'} />
+    <StatusLabel bsStyle={stream.disabled ? 'warning' : 'success'}
+                 onClick={disableChange ? undefined : toggleStreamStatus}
+                 $clickable={!disableChange}>
+      {stream.disabled ? 'Stopped' : 'Running'}
+      {!disableChange && (
+        <>
+          <Spacer />
+          <Icon name={stream.disabled ? 'play' : 'pause'} />
+        </>
+      )}
     </StatusLabel>
   );
 };
