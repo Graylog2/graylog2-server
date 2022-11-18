@@ -1245,3 +1245,8 @@ metric_mappings:
     wildcard_extract_labels:
       - "type"
       - "enabled"
+
+  - metric_name: "http_proxied_requests_executor"
+    match_pattern: "org.graylog2.shared.bindings.providers.ProxiedRequestsExecutorService.http-proxied-requests-executor.*"
+    wildcard_extract_labels:
+      - "type"
