@@ -41,7 +41,7 @@ const StreamActions = ({
 }: {
   stream: Stream,
   indexSets: Array<IndexSet>,
-  streamRuleTypes: Array<StreamRuleType>
+  streamRuleTypes: Array<StreamRuleType> | undefined
 }) => {
   const currentUser = useCurrentUser();
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);

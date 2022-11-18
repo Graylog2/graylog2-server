@@ -94,7 +94,7 @@ const usePaginatedStreams = (searchParams: SearchParams): { data: { streams: Arr
   });
 };
 
-const useStreamRuleTypes = (): { data: { types: Array<StreamRuleType> } | undefined } => {
+const useStreamRuleTypes = (): { data: Array<StreamRuleType> | undefined } => {
   const { data } = useQuery(
     ['streams', 'rule-types'],
     () => StreamRulesStore.types(),
@@ -122,7 +122,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
     perPage: paginationQueryParameter.pageSize,
     query: '',
   });
-  const { data: streamRulesData } = useStreamRuleTypes();
+  const { data: streamRuleTypes } = useStreamRuleTypes();
   const { data: paginatedStreams, refetch: refetchStreams } = usePaginatedStreams(searchParams);
 
   useEffect(() => {
@@ -152,10 +152,10 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   const renderStreamActions = useCallback((listItem: Stream) => (
     <StreamActions stream={listItem}
                    indexSets={indexSets}
-                   streamRuleTypes={streamRulesData?.types} />
-  ), [indexSets, streamRulesData?.types]);
+                   streamRuleTypes={streamRuleTypes} />
+  ), [indexSets, streamRuleTypes]);
 
-  if (!paginatedStreams || !streamRulesData) {
+  if (!paginatedStreams || !streamRuleTypes) {
     return (<Spinner />);
   }
 
