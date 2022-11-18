@@ -16,6 +16,7 @@ import java.util.Map;
 import static org.apache.commons.lang.CharEncoding.UTF_8;
 
 public class SystemNotificationRenderService {
+    static final String KEY_NODE_ID = "node_id";
     static final String KEY_TITLE = "_title";
     static final String KEY_DESCRIPTION = "_description";
     static final String KEY_CLOUD = "_cloud";
@@ -43,7 +44,10 @@ public class SystemNotificationRenderService {
     public TemplateRenderResponse renderHtml(Notification.Type type, Map<String, Object> values) {
         Notification notification = notificationService.getByType(type)
                 .orElseThrow(() -> new IllegalArgumentException("Event type is not currently active"));
+
+        // Add all data for template expansion into the details map
         values.putAll(notification.getDetails());
+        values.put(KEY_NODE_ID, notification.getNodeId());
         values.put(KEY_CLOUD, graylogConfig.isCloud());
 
         try (StringWriter writer = new StringWriter()) {
@@ -77,6 +81,9 @@ public class SystemNotificationRenderService {
         String plainTitle = new Source(templateRenderResponse.title()).getRenderer().toString();
         String plainDescription = new Source(templateRenderResponse.description()).getRenderer().toString();
 
-        return plainTitle + "\n" + plainDescription;
+        StringBuilder msg = new StringBuilder();
+        msg.append("*** ").append(plainTitle.trim()).append(" ***");
+        msg.append("\n\n").append(plainDescription.trim());
+        return msg.toString();
     }
 }
