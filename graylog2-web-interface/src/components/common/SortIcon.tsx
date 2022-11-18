@@ -2,7 +2,6 @@ import styled, { css } from 'styled-components';
 import React, { useCallback, useMemo } from 'react';
 
 import Icon from 'components/common/Icon';
-import type { DirectionJson } from 'views/logic/aggregationbuilder/Direction';
 
 const StyledSortIcon = styled.button(({ theme }) => {
   return css`
@@ -26,16 +25,16 @@ const Bulb = styled.span`
   font-weight: 600;
 `;
 
-// type Directions = DirectionJson | 'DESC' | 'ASC' | 'asc' | 'desc' | undefined | null;
 type Props<AscDirection extends string, DescDirection extends string> = {
   activeDirection: AscDirection | DescDirection | null,
-  ascId: string,
-  descId: string
+  ascId?: string,
+  descId?: string
   onChange: (activeDirection: AscDirection | DescDirection | null) => void,
   ariaLabel?: string,
   title?: string,
   order?: number,
   dataTestId?: string | undefined
+  className?: string
 }
 
 const SortIcon = <AscDirection extends string, DescDirection extends string>({
@@ -47,13 +46,15 @@ const SortIcon = <AscDirection extends string, DescDirection extends string>({
   dataTestId,
   ascId,
   descId,
+  className,
 }: Props<AscDirection, DescDirection>) => {
   const handleSortChange = useCallback(() => onChange(activeDirection), [activeDirection, onChange]);
   const iconName = useMemo(() => {
     if (activeDirection === ascId) return 'arrow-up-short-wide';
+    if (activeDirection === descId) return 'arrow-down-wide-short';
 
     return 'arrow-down-wide-short';
-  }, [activeDirection, ascId]);
+  }, [activeDirection, ascId, descId]);
   const sortActive = !!activeDirection;
 
   return (
@@ -63,7 +64,7 @@ const SortIcon = <AscDirection extends string, DescDirection extends string>({
                     aria-label={ariaLabel}
                     onClick={handleSortChange}
                     data-testid={dataTestId}>
-      <Icon name={iconName} />
+      <Icon name={iconName} className={className} />
       {order && <Bulb>{order}</Bulb>}
     </StyledSortIcon>
   );
@@ -74,6 +75,9 @@ SortIcon.defaultProps = {
   title: 'Sort',
   order: undefined,
   dataTestId: undefined,
+  ascId: 'Ascending',
+  descId: 'Descending',
+  className: '',
 };
 
 export default SortIcon;
