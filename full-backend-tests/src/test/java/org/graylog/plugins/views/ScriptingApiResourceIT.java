@@ -50,6 +50,7 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.hasEntry;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, mongoVersions = MongodbServer.MONGO5,
@@ -119,24 +120,23 @@ public class ScriptingApiResourceIT {
                 .auth().basic("john.doe", "asdfgh")
                 .when()
                 .body("""
-                        {
-                            "aggregation": {
-                              "group_by": [
-                                {
-                                  "field_name": "facility"
-                                }
-                              ],
-                              "metrics": [
-                                {
-                                  "function_name": "count",
-                                  "field_name": "facility"
-                                }
-                              ]
-                            }
-                          }
-                        """)
+                         {
+                           "group_by": [
+                             {
+                               "field": "facility"
+                             }
+                           ],
+                           "metrics": [
+                             {
+                               "function": "count",
+                               "field": "facility"
+                             }
+                           ]
+                        }
+                         """)
                 .post("/search/aggregate")
                 .then()
+                .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
         validatableResponse.assertThat().body("data.rows", Matchers.hasSize(1));
@@ -150,23 +150,22 @@ public class ScriptingApiResourceIT {
                 .when()
                 .body("""
                         {
-                            "aggregation": {
-                              "group_by": [
-                                {
-                                  "field_name": "facility"
-                                }
-                              ],
-                              "metrics": [
-                                {
-                                  "function_name": "count",
-                                  "field_name": "facility"
-                                }
-                              ]
+                          "group_by": [
+                            {
+                              "field": "facility"
                             }
+                          ],
+                          "metrics": [
+                            {
+                              "function": "count",
+                              "field": "facility"
+                            }
+                          ]
                           }
                         """)
                 .post("/search/aggregate")
                 .then()
+                .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
         validateSchema(validatableResponse, "Grouping", "string", "facility");
@@ -180,23 +179,22 @@ public class ScriptingApiResourceIT {
                 .when()
                 .body("""
                         {
-                            "aggregation": {
-                              "group_by": [
-                                {
-                                  "field_name": "facility"
-                                }
-                              ],
-                              "metrics": [
-                                {
-                                  "function_name": "count",
-                                  "field_name": "facility"
-                                }
-                              ]
+                          "group_by": [
+                            {
+                              "field": "facility"
                             }
-                          }
+                          ],
+                          "metrics": [
+                            {
+                              "function": "count",
+                              "field": "facility"
+                            }
+                          ]
+                        }
                         """)
                 .post("/search/aggregate")
                 .then()
+                .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
         validateRow(validatableResponse, "another-test", 2);
@@ -211,23 +209,22 @@ public class ScriptingApiResourceIT {
                 .when()
                 .body("""
                         {
-                            "aggregation": {
-                              "group_by": [
-                                {
-                                  "field_name": "facility"
-                                }
-                              ],
-                              "metrics": [
-                                {
-                                  "function_name": "count",
-                                  "field_name": "facility"
-                                }
-                              ]
+                          "group_by": [
+                            {
+                              "field": "facility"
                             }
-                          }
+                          ],
+                          "metrics": [
+                            {
+                              "function": "count",
+                              "field": "facility"
+                            }
+                          ]
+                        }
                         """)
                 .post("/search/aggregate")
                 .then()
+                .log().ifStatusCodeMatches(not(200))
                 .statusCode(200)
                 .extract().body().asString().trim();
 
@@ -253,6 +250,7 @@ public class ScriptingApiResourceIT {
                 .when()
                 .get("/search/aggregate?groups=facility&metrics=count:facility")
                 .then()
+                .log().ifStatusCodeMatches(not(200))
                 .statusCode(200)
                 .extract().body().asString().trim();
 
@@ -277,6 +275,7 @@ public class ScriptingApiResourceIT {
                 .when()
                 .get("/search/aggregate?groups=facility&metrics=count:facility")
                 .then()
+                .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
         validateRow(response, "another-test", 2);
@@ -290,27 +289,26 @@ public class ScriptingApiResourceIT {
                 .when()
                 .body("""
                         {
-                            "aggregation": {
-                              "group_by": [
-                                {
-                                  "field_name": "facility"
-                                }
-                              ],
-                              "metrics": [
-                                {
-                                  "function_name": "count",
-                                  "field_name": "facility"
-                                },
-                                {
-                                  "function_name": "latest",
-                                  "field_name": "level"
-                                }
-                              ]
+                          "group_by": [
+                            {
+                              "field": "facility"
                             }
-                          }
+                          ],
+                          "metrics": [
+                            {
+                              "function": "count",
+                              "field": "facility"
+                            },
+                            {
+                              "function": "latest",
+                              "field": "level"
+                            }
+                          ]
+                        }
                         """)
                 .post("/search/aggregate")
                 .then()
+                .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
         validateRow(validatableResponse, "another-test", 2, 3);
@@ -324,24 +322,22 @@ public class ScriptingApiResourceIT {
                 .when()
                 .body("""
                         {
-                            "aggregation": {
-                              "group_by": [
-                                {
-                                  "field_name": "facility"
-                                }
-                              ],
-                              "metrics": [
-                                {
-                                  "function_name": "count",
-                                  "field_name": "facility"
-                                },
-                                {
-                                  "function_name": "count",
-                                  "field_name": "facility"
-                                }
-                              ]
+                          "group_by": [
+                            {
+                              "field": "facility"
                             }
-                          }
+                          ],
+                          "metrics": [
+                            {
+                              "function": "count",
+                              "field": "facility"
+                            },
+                            {
+                              "function": "count",
+                              "field": "facility"
+                            }
+                          ]
+                        }
                         """)
                 .post("/search/aggregate")
                 .then()
@@ -355,23 +351,22 @@ public class ScriptingApiResourceIT {
                 .when()
                 .body("""
                         {
-                            "aggregation": {
-                              "group_by": [
-                                {
-                                  "field_name": "http_method"
-                                }
-                              ],
-                              "metrics": [
-                                {
-                                  "function_name": "count",
-                                  "field_name": "facility"
-                                }
-                              ]
+                          "group_by": [
+                            {
+                              "field": "http_method"
                             }
-                          }
+                          ],
+                          "metrics": [
+                            {
+                              "function": "count",
+                              "field": "facility"
+                            }
+                          ]
+                        }
                         """)
                 .post("/search/aggregate")
                 .then()
+                .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
         validateRow(validatableResponse, "POST", 1);
@@ -385,31 +380,30 @@ public class ScriptingApiResourceIT {
                 .when()
                 .body("""
                         {
-                            "aggregation": {
-                              "group_by": [
-                                {
-                                  "field_name": "facility"
-                                }
-                              ],
-                              "metrics": [
-                                {
-                                  "function_name": "count",
-                                  "field_name": "facility"
-                                },
-                                {
-                                  "function_name": "latest",
-                                  "field_name": "http_method"
-                                },
-                                 {
-                                  "function_name": "latest",
-                                  "field_name": "level"
-                                }
-                              ]
+                          "group_by": [
+                            {
+                              "field": "facility"
                             }
-                          }
+                          ],
+                          "metrics": [
+                            {
+                              "function": "count",
+                              "field": "facility"
+                            },
+                            {
+                              "function": "latest",
+                              "field": "http_method"
+                            },
+                             {
+                              "function": "latest",
+                              "field": "level"
+                            }
+                          ]
+                        }
                         """)
                 .post("/search/aggregate")
                 .then()
+                .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
         validateRow(validatableResponse, "another-test", 2, "POST", 3);
@@ -420,21 +414,19 @@ public class ScriptingApiResourceIT {
     void testStreamFiltering() {
         final String req = """
                 {
-                    "streams": ["%s"],
-                    "aggregation": {
-                      "group_by": [
-                        {
-                          "field_name": "facility"
-                        }
-                      ],
-                      "metrics": [
-                        {
-                          "function_name": "count",
-                          "field_name": "facility"
-                        }
-                      ]
+                   "streams": ["%s"],
+                  "group_by": [
+                    {
+                      "field": "facility"
                     }
-                  }
+                  ],
+                  "metrics": [
+                    {
+                      "function": "count",
+                      "field": "facility"
+                    }
+                  ]
+                }
                 """;
         final ValidatableResponse validatableResponse = given()
                 .spec(requestSpec)
@@ -442,6 +434,7 @@ public class ScriptingApiResourceIT {
                 .body(String.format(Locale.ROOT, req, stream2Id))
                 .post("/search/aggregate")
                 .then()
+                .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
         validateRow(validatableResponse, "another-test", 2);
@@ -455,24 +448,23 @@ public class ScriptingApiResourceIT {
                 .when()
                 .body("""
                         {
-                            "aggregation": {
-                              "group_by": [
-                                {
-                                  "field_name": "facility"
-                                }
-                              ],
-                              "metrics": [
-                                {
-                                  "function_name": "count",
-                                  "field_name": "facility",
-                                  "sort": "asc"
-                                }
-                              ]
+                          "group_by": [
+                            {
+                              "field": "facility"
                             }
-                          }
+                          ],
+                          "metrics": [
+                            {
+                              "function": "count",
+                              "field": "facility",
+                              "sort": "asc"
+                            }
+                          ]
+                        }
                         """)
                 .post("/search/aggregate")
                 .then()
+                .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
         final List<List<Object>> rows = validatableResponse.extract().body().jsonPath().getList("data.rows");
@@ -492,24 +484,23 @@ public class ScriptingApiResourceIT {
                                 "type": "relative",
                                 "range": 300
                             },
-                            "aggregation": {
-                              "group_by": [
-                                {
-                                  "field_name": "facility"
-                                }
-                              ],
-                              "metrics": [
-                                {
-                                  "function_name": "count",
-                                  "field_name": "facility",
-                                  "sort": "asc"
-                                }
-                              ]
+                          "group_by": [
+                            {
+                              "field": "facility"
                             }
+                          ],
+                          "metrics": [
+                            {
+                              "function": "count",
+                              "field": "facility",
+                              "sort": "asc"
+                            }
+                          ]
                           }
                         """)
                 .post("/search/aggregate")
                 .then()
+                .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
         validatableResponse.assertThat().body("metadata.effective_timerange.type", Matchers.equalTo("absolute"));

@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
 import com.google.common.collect.ImmutableList;
-import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.Metadata;
@@ -36,13 +35,12 @@ public class SearchTypeResultToTabularResponseMapper {
 
     public TabularResponse mapToResponse(final SearchRequestSpec searchRequestSpec,
                                          final PivotResult pivotResult) {
-        final AggregationSpec aggregationSpec = searchRequestSpec.aggregationSpec();
-        final int numGroupings = aggregationSpec.groupings().size();
-        final int numMetrics = aggregationSpec.metrics().size();
+        final int numGroupings = searchRequestSpec.groupings().size();
+        final int numMetrics = searchRequestSpec.metrics().size();
         final int numColumns = numGroupings + numMetrics;
         List<ResponseSchemaEntry> schema = new ArrayList<>(numColumns);
-        aggregationSpec.groupings().forEach(gr -> schema.add(new ResponseSchemaEntry("Grouping", "string", gr.fieldName())));
-        aggregationSpec.metrics().forEach(metric -> schema.add(new ResponseSchemaEntry("Metric : " + metric.functionName(),
+        searchRequestSpec.groupings().forEach(gr -> schema.add(new ResponseSchemaEntry("Grouping", "string", gr.fieldName())));
+        searchRequestSpec.metrics().forEach(metric -> schema.add(new ResponseSchemaEntry("Metric : " + metric.functionName(),
                 Latest.NAME.equals(metric.functionName()) ? "string" : "numeric", metric.fieldName())));
 
         final AbsoluteRange effectiveTimerange = pivotResult.effectiveTimerange();
@@ -60,7 +58,7 @@ public class SearchTypeResultToTabularResponseMapper {
                                         row.add("-"); //sometimes pivotRow does not have enough keys - empty value!
                                     }
                                     final ImmutableList<PivotResult.Value> values = pivRow.values();
-                                    for (Metric metric : aggregationSpec.metrics()) {
+                                    for (Metric metric : searchRequestSpec.metrics()) {
                                         row.add(values.stream()
                                                 .filter(value -> value.key().contains(metric.sortColumnName()))
                                                 .findFirst()
