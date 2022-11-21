@@ -139,7 +139,7 @@ public class ScriptingApiResourceIT {
                 .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
-        validatableResponse.assertThat().body("data.rows", Matchers.hasSize(1));
+        validatableResponse.assertThat().body("datarows", Matchers.hasSize(1));
         validateRow(validatableResponse, "another-test", 2);
     }
 
@@ -438,7 +438,7 @@ public class ScriptingApiResourceIT {
                 .statusCode(200);
 
         validateRow(validatableResponse, "another-test", 2);
-        validatableResponse.assertThat().body("data.rows", Matchers.hasSize(1));
+        validatableResponse.assertThat().body("datarows", Matchers.hasSize(1));
     }
 
     @ContainerMatrixTest
@@ -467,7 +467,7 @@ public class ScriptingApiResourceIT {
                 .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
-        final List<List<Object>> rows = validatableResponse.extract().body().jsonPath().getList("data.rows");
+        final List<List<Object>> rows = validatableResponse.extract().body().jsonPath().getList("datarows");
         Assertions.assertEquals(rows.size(), 2);
         Assertions.assertEquals(Arrays.asList("test", (Object) 1), rows.get(0));
         Assertions.assertEquals(Arrays.asList("another-test", (Object) 2), rows.get(1));
@@ -531,7 +531,7 @@ public class ScriptingApiResourceIT {
         expected.add(key);
         expected.addAll(Arrays.asList(values));
 
-        response.assertThat().body("data.rows", Matchers.hasItem(Matchers.equalTo(expected)));
+        response.assertThat().body("datarows", Matchers.hasItem(Matchers.equalTo(expected)));
     }
 
     private Matcher<Map<? extends String, ?>> entry(String key, Object value) {

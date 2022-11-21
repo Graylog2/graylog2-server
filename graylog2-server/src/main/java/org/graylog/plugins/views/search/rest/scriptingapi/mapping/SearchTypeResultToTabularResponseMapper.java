@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.Metadata;
-import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseData;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
@@ -47,7 +46,6 @@ public class SearchTypeResultToTabularResponseMapper {
 
         return new TabularResponse(
                 schema,
-                new ResponseData(
                         pivotResult.rows()
                                 .stream()
                                 .map(pivRow -> {
@@ -68,8 +66,7 @@ public class SearchTypeResultToTabularResponseMapper {
                                     }
                                     return row;
                                 })
-                                .collect(Collectors.toList())
-                ),
+                                .collect(Collectors.toList()),
                 new Metadata(effectiveTimerange)
         );
 
