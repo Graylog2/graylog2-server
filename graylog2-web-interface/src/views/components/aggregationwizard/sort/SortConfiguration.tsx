@@ -83,6 +83,7 @@ const Sort = React.memo(({ index }: Props) => {
   const currentSort = values.sort[index];
   const optionIndex = options.findIndex((option) => (option.type === currentSort.type && option.field === currentSort.field));
   const selectedOption = optionIndex > -1 ? optionIndex : undefined;
+  const invalidSort = selectedOption === undefined && 'field' in currentSort;
 
   return (
     <div data-testid={`sort-element-${index}`}>
@@ -94,10 +95,12 @@ const Sort = React.memo(({ index }: Props) => {
                    error={error}
                    labelClassName="col-sm-3"
                    wrapperClassName="col-sm-9">
-              <Select options={numberIndexedOptions}
+              <Select options={invalidSort ? [{ label: currentSort.field, value: 0 }] : numberIndexedOptions}
+                      disabled={invalidSort}
+                      allowCreate={invalidSort}
                       clearable={false}
                       name={name}
-                      value={selectedOption}
+                      value={invalidSort ? 0 : selectedOption}
                       placeholder="Specify field/metric to be sorted on"
                       aria-label="Select field for sorting"
                       size="small"
@@ -120,6 +123,7 @@ const Sort = React.memo(({ index }: Props) => {
                  labelClassName="col-sm-3"
                  wrapperClassName="col-sm-9">
             <Select options={directionOptions}
+                    disabled={invalidSort}
                     clearable={false}
                     name={name}
                     aria-label="Select direction for sorting"
