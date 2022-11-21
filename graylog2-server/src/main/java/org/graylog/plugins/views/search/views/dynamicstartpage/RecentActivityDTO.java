@@ -44,7 +44,7 @@ public abstract class RecentActivityDTO {
     public abstract String id();
 
     @JsonProperty(FIELD_ACTIVITY_TYPE)
-    public abstract String activityType();
+    public abstract ActivityType activityType();
 
     @JsonProperty(FIELD_ITEM_ID)
     public abstract String itemId();
@@ -66,7 +66,7 @@ public abstract class RecentActivityDTO {
         public abstract RecentActivityDTO.Builder id(String id);
 
         @JsonProperty(FIELD_ACTIVITY_TYPE)
-        public abstract RecentActivityDTO.Builder activityType(String activityType);
+        public abstract RecentActivityDTO.Builder activityType(ActivityType activityType);
 
         @JsonProperty(FIELD_ITEM_ID)
         public abstract RecentActivityDTO.Builder itemId(String itemId);

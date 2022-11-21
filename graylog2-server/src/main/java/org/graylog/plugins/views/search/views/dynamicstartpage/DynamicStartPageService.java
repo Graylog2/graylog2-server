@@ -73,7 +73,7 @@ public class DynamicStartPageService {
         var catalog = contentPackService.getEntityExcerpts();
         var items = lastOpenedService
                 .findForUser(searchUser)
-                .orElseThrow(NotFoundException::new)
+                .orElse(LastOpenedItemsDTO.builder().userId(searchUser.getUser().getId()).build())
                 .items()
                 .stream()
                 .map(i -> new LastOpenedItem(i, catalog.get(i).type().name(), catalog.get(i).title()))
@@ -87,7 +87,7 @@ public class DynamicStartPageService {
         var catalog = contentPackService.getEntityExcerpts();
         var items = pinnedItemsService
                 .findForUser(searchUser)
-                .orElseThrow(NotFoundException::new)
+                .orElse(PinnedItemsDTO.builder().userId(searchUser.getUser().getId()).build())
                 .items()
                 .stream()
                 .map(i -> new PinnedItem(i, catalog.get(i).type().name(), catalog.get(i).title()))
@@ -146,6 +146,7 @@ public class DynamicStartPageService {
 
     @Subscribe
     public void createRecentActivityFor(EntitySharesUpdateEvent updateEvent) {
-        recentActivityService.save(RecentActivityDTO.builder().activityType("update").itemId(updateEvent.entity().entity()).build());
+ //       updateEvent.creates()
+        recentActivityService.save(RecentActivityDTO.builder().activityType(ActivityType.UPDATE).itemId(updateEvent.entity().entity()).build());
     }
 }

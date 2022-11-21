@@ -16,7 +16,35 @@
  */
 package org.graylog.plugins.views.search.views.dynamicstartpage;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public enum ActivityType {
-    SHARED_WITH_YOU,
-    UPDATED
+    @JsonProperty("create")
+    CREATE("create"),
+    @JsonProperty("delete")
+    DELETE("delete"),
+    @JsonProperty("update")
+    UPDATE("update"),
+    @JsonProperty("shared")
+    SHARED("shared"),
+    @JsonProperty("unshared")
+    UNSHARED("unshared");
+
+    private final String activity;
+
+    ActivityType(final String type) {
+        this.activity = type;
+    }
+
+    @Override
+    public String toString() {
+        return switch (this) {
+            case CREATE -> "create";
+            case DELETE -> "delete";
+            case UPDATE -> "update";
+            case SHARED -> "shared";
+            case UNSHARED -> "unshared";
+        };
+    }
+
 }
