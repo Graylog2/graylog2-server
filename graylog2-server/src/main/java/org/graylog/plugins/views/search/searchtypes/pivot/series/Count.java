@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.TypedBuilder;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -40,6 +39,7 @@ public abstract class Count implements SeriesSpec {
     @Override
     public abstract String id();
 
+    @Override
     @Nullable
     @JsonProperty
     public abstract String field();
@@ -50,15 +50,17 @@ public abstract class Count implements SeriesSpec {
 
     @AutoValue.Builder
     @JsonPOJOBuilder(withPrefix = "")
-    public abstract static class Builder extends TypedBuilder<Count, Builder> {
+    public abstract static class Builder extends SeriesSpecBuilder<Count, Builder> {
         @JsonCreator
         public static Builder create() {
             return Count.builder();
         }
 
+        @Override
         @JsonProperty
         public abstract Builder id(String id);
 
+        @Override
         @JsonProperty
         public abstract Builder field(@Nullable String field);
 
@@ -66,6 +68,7 @@ public abstract class Count implements SeriesSpec {
         abstract String field();
         abstract Count autoBuild();
 
+        @Override
         public Count build() {
             if (!id().isPresent()) {
                 id(NAME + "(" + Strings.nullToEmpty(field()) + ")");

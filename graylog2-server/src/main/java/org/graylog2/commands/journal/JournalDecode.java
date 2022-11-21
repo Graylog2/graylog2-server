@@ -25,6 +25,7 @@ import com.google.common.collect.Range;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.inputs.codecs.CodecsModule;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
@@ -49,9 +50,9 @@ public class JournalDecode extends AbstractJournalCommand {
     }
 
     @Override
-    protected List<Module> getCommandBindings() {
+    protected List<Module> getCommandBindings(FeatureFlags featureFlags) {
         return ImmutableList.<Module>builder()
-                .addAll(super.getCommandBindings())
+                .addAll(super.getCommandBindings(featureFlags))
                 .add(new CodecsModule())
                 .add(new ObjectMapperModule(getClass().getClassLoader()))
                 .build();

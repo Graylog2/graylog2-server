@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.TypedBuilder;
 
 import java.util.Optional;
 
@@ -38,6 +37,7 @@ public abstract class Percentile implements SeriesSpec {
     @Override
     public abstract String id();
 
+    @Override
     @JsonProperty
     public abstract String field();
 
@@ -54,13 +54,17 @@ public abstract class Percentile implements SeriesSpec {
     }
 
     @AutoValue.Builder
-    public abstract static class Builder extends TypedBuilder<Percentile, Builder> {
+    public abstract static class Builder extends SeriesSpecBuilder<Percentile, Builder> {
         @JsonCreator
-        public  static Builder create() { return Percentile.builder(); }
+        public static Builder create() {
+            return Percentile.builder();
+        }
 
+        @Override
         @JsonProperty
         public abstract Builder id(String id);
 
+        @Override
         @JsonProperty
         public abstract Builder field(String field);
 
@@ -72,6 +76,7 @@ public abstract class Percentile implements SeriesSpec {
         abstract Double percentile();
         abstract Percentile autoBuild();
 
+        @Override
         public Percentile build() {
             if (!id().isPresent()) {
                 id(NAME + "(" + field() + "," + percentile().toString() + ")");

@@ -1,0 +1,5 @@
+type = "changed"
+message = "Change default value for `http_thread_pool_size` and `proxied_requests_thread_pool_size` to 64."
+
+issues = ["Graylog2/graylog-plugin-enterprise#4325"]
+pulls = ["13960"]
