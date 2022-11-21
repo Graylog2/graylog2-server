@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.searchtypes.pivot.buckets;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.junit.jupiter.api.Test;
 
@@ -34,6 +35,13 @@ class ValuesBucketOrderingTest {
     @Test
     void staysInSameOrderIfNoPivotIsUsedForSort() {
         final List<Values> orderedBuckets = ValuesBucketOrdering.orderBuckets(List.of(fooPivot, barPivot, bazPivot), Collections.emptyList());
+
+        assertThat(orderedBuckets).containsExactly(fooPivot, barPivot, bazPivot);
+    }
+
+    @Test
+    void staysInSameOrderIfNoPivotSortsAreUsedForSort() {
+        final List<Values> orderedBuckets = ValuesBucketOrdering.orderBuckets(List.of(fooPivot, barPivot, bazPivot), List.of(SeriesSort.create("max(took_ms)", SortSpec.Direction.Descending)));
 
         assertThat(orderedBuckets).containsExactly(fooPivot, barPivot, bazPivot);
     }
