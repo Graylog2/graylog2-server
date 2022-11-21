@@ -24,12 +24,15 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
 //no column/row choice, assuming API does not care about visualization, and we can ignore it
-public record Grouping(@JsonProperty("field_name") @Valid @NotBlank String fieldName,
+public record Grouping(@JsonProperty("field") @Valid @NotBlank String fieldName,
                        @JsonProperty("limit") int limit,
                        @JsonProperty("sort") SortSpec.Direction sort) implements Sortable {
 
+    public Grouping(String fieldName) {
+        this(fieldName, Values.DEFAULT_LIMIT, null);
+    }
 
-    public Grouping(@JsonProperty("field_name") @Valid @NotBlank String fieldName,
+    public Grouping(@JsonProperty("field") @Valid @NotBlank String fieldName,
                     @JsonProperty("limit") int limit,
                     @JsonProperty("sort") SortSpec.Direction sort) {
         this.fieldName = fieldName;

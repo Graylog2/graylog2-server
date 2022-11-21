@@ -23,8 +23,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import javax.validation.Valid;
 
 //TODO: one or two metrics seem to have additional fields (i.e. percentile)
-public record Metric(@JsonProperty("field_name") @Valid String fieldName,
-                     @JsonProperty("function_name") @Valid @NotBlank String functionName,
+public record Metric(@JsonProperty("field") @Valid String fieldName,
+                     @JsonProperty("function") @Valid @NotBlank String functionName,
                      @JsonProperty("sort") SortSpec.Direction sort) implements Sortable {
 
     @Override

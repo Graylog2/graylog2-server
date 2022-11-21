@@ -43,7 +43,7 @@ public class SearchRequestSpecToSearchMapper {
 
         Query query = Query.builder()
                 .id(QUERY_ID)
-                .searchTypes(Set.of(pivotCreator.apply(searchRequestSpec.aggregationSpec())))
+                .searchTypes(Set.of(pivotCreator.apply(searchRequestSpec)))
                 .query(searchRequestSpec.queryString() != null ? ElasticsearchQueryString.of(searchRequestSpec.queryString()) : ElasticsearchQueryString.empty())
                 .timerange(searchRequestSpec.timerange() != null ? searchRequestSpec.timerange() : RelativeRange.allTime())
                 .build();

@@ -34,16 +34,15 @@ import org.graylog.plugins.views.search.rest.SearchJobDTO;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.AggregationSpecToPivotMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchRequestSpecToSearchMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchTypeResultToTabularResponseMapper;
-import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
-import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
@@ -186,20 +185,25 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
             throw new BadRequestException("All metrics need to be defined as \"function\":\"field_name\"");
         }
 
-        SearchRequestSpec searchRequestSpec = new SearchRequestSpec(
+        return new SearchRequestSpec(
                 query,
                 streams,
-                timerangeKeyword != null ? KeywordRange.create(timerangeKeyword, "UTC") : null,
-                new AggregationSpec(
-                        groups.stream().map(gr -> new Grouping(gr, Values.DEFAULT_LIMIT, null)).collect(Collectors.toList()),
-                        metrics.stream().map(metric -> {
-                            final String[] split = metric.split(":");
-                            return new Metric(split.length > 1 ? split[1] : null, split[0], null);
-                        }).collect(Collectors.toList()),
-                        false
-                )
+                parseTimeRange(timerangeKeyword),
+                groups.stream().map(Grouping::new).collect(Collectors.toList()),
+                metrics.stream().map(this::parseMetric).collect(Collectors.toList()),
+                false
         );
-        return searchRequestSpec;
+    }
+
+    private TimeRange parseTimeRange(String timerangeKeyword) {
+        return timerangeKeyword != null ? KeywordRange.create(timerangeKeyword, "UTC") : null;
+    }
+
+    private Metric parseMetric(String metric) {
+        final String[] split = metric.split(":");
+        final String fieldName = split.length > 1 ? split[1] : null;
+        final String functionName = split[0];
+        return new Metric(fieldName, functionName, null);
     }
 
     private void postAuditEvent(SearchJob searchJob) {

@@ -16,8 +16,8 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
-import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Sortable;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class AggregationSpecToPivotMapper implements Function<AggregationSpec, Pivot> {
+public class AggregationSpecToPivotMapper implements Function<SearchRequestSpec, Pivot> {
 
     public static final String PIVOT_ID = "scripting_api_temporary_pivot";
 
@@ -46,7 +46,7 @@ public class AggregationSpecToPivotMapper implements Function<AggregationSpec, P
     }
 
     @Override
-    public Pivot apply(final AggregationSpec aggregationSpec) {
+    public Pivot apply(final SearchRequestSpec aggregationSpec) {
         final Pivot.Builder pivotBuilder = Pivot.builder()
                 .id(PIVOT_ID)
                 .rollup(false)
