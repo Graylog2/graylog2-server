@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -56,5 +57,22 @@ class ValuesBucketOrderingTest {
         final List<Values> orderedBuckets = ValuesBucketOrdering.orderBuckets(List.of(fooPivot, barPivot, bazPivot), pivotSorts);
 
         assertThat(orderedBuckets).containsExactly(bazPivot, barPivot, fooPivot);
+    }
+
+    @Test
+    void reordersKeysBasedOnSortConfiguration() {
+        final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderKeysFunction(List.of(fooPivot, barPivot, bazPivot), List.of(
+                PivotSort.create("baz", SortSpec.Direction.Descending),
+                PivotSort.create("bar", SortSpec.Direction.Ascending)
+        ));
+
+        assertThat(reorderKeys.apply(List.of("baz", "bar", "foo"))).containsExactly("foo", "bar", "baz");
+    }
+
+    @Test
+    void reorderKeysFunctionDoesNotDoAnythingIfNoSortsSpecified() {
+        final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderKeysFunction(List.of(fooPivot, barPivot, bazPivot), List.of());
+
+        assertThat(reorderKeys.apply(List.of("baz", "bar", "foo"))).containsExactly("baz", "bar", "foo");
     }
 }
