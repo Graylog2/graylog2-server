@@ -47,7 +47,7 @@ describe('LinkContainer', () => {
       </LinkContainer>,
     );
 
-    fireEvent.click(await findByText('All Alerts'));
+    fireEvent.click(await screen.findByText('All Alerts'));
 
     expect(onClick).toHaveBeenCalled();
   });
