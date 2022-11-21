@@ -18,7 +18,6 @@ package org.graylog2.lookup;
 
 import com.google.inject.Scopes;
 import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.MapBinderBinding;
 import org.graylog2.Configuration;
 import org.graylog2.lookup.adapters.CSVFileDataAdapter;
 import org.graylog2.lookup.adapters.DSVHTTPDataAdapter;
@@ -61,11 +60,6 @@ public class LookupModule extends Graylog2Module {
                 CaffeineLookupCache.Factory.class,
                 CaffeineLookupCache.Config.class);
 
-        installLookupDataAdapter(CSVFileDataAdapter.NAME,
-                CSVFileDataAdapter.class,
-                CSVFileDataAdapter.Factory.class,
-                CSVFileDataAdapter.Config.class);
-
         installLookupDataAdapter2(DnsLookupDataAdapter.NAME,
                 DnsLookupDataAdapter.class,
                 DnsLookupDataAdapter.Factory.class,
@@ -80,6 +74,15 @@ public class LookupModule extends Graylog2Module {
                 DSVHTTPDataAdapter.class,
                 DSVHTTPDataAdapter.Factory.class,
                 DSVHTTPDataAdapter.Config.class);
+
+        if (!configuration.isCloud()) {
+            installLookupDataAdapter(CSVFileDataAdapter.NAME,
+                    CSVFileDataAdapter.class,
+                    CSVFileDataAdapter.Factory.class,
+                    CSVFileDataAdapter.Config.class);
+        }
+
+
     }
 
 }
