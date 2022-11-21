@@ -19,24 +19,48 @@ package org.graylog.plugins.views.search.rest.scriptingapi.parsing;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
-import javax.inject.Inject;
+import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 //TODO: unit tests + error handling
 public class TimerangeParser {
 
-    private final ShortTimerangeFormatParser shortTimerangeFormatParser;
+    private static final Pattern SHORT_FORMAT_PATTERN = Pattern.compile("^[0-9]+[a-zA-Z]$");
+    private static final Map<String, String> SHORT_TO_LONG_PERIOD_MAPPING = Map.of(
+            "s", "seconds",
+            "m", "minutes",
+            "h", "hours",
+            "d", "days",
+            "w", "weeks",
+            "M", "months",
+            "y", "years"
+    );
 
-    @Inject
-    public TimerangeParser(ShortTimerangeFormatParser shortTimerangeFormatParser) {
-        this.shortTimerangeFormatParser = shortTimerangeFormatParser;
-    }
-
-    public TimeRange parseTimeRange(final String timerangeKeyword) {
+    public static TimeRange parseTimeRange(final String timerangeKeyword) {
         if (timerangeKeyword == null) {
             return null;
         }
-        final Optional<TimeRange> shortTimeRange = shortTimerangeFormatParser.parse(timerangeKeyword);
+        final Optional<TimeRange> shortTimeRange = parse(timerangeKeyword);
         return shortTimeRange.orElseGet(() -> KeywordRange.create(timerangeKeyword, "UTC"));
+    }
+
+    public static Optional<TimeRange> parse(final String shortTimerange) {
+        if (shortTimerange != null && SHORT_FORMAT_PATTERN.matcher(shortTimerange).matches()) {
+            final String numberPart = shortTimerange.substring(0, shortTimerange.length() - 1);
+            final String periodPart = shortTimerange.substring(shortTimerange.length() - 1);
+            String longPeriodPart = SHORT_TO_LONG_PERIOD_MAPPING.get(periodPart);
+            if (longPeriodPart != null) {
+                if ("1".equals(numberPart)) {
+                    longPeriodPart = longPeriodPart.substring(0, longPeriodPart.length() - 1); //removing last "s"
+                }
+                return Optional.of(
+                        KeywordRange.create(
+                                "last " + numberPart + " " + longPeriodPart,
+                                "UTC")
+                );
+            }
+        }
+        return Optional.empty();
     }
 }

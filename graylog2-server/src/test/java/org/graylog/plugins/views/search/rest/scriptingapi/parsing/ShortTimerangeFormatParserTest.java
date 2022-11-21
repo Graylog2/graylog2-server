@@ -17,57 +17,49 @@
 package org.graylog.plugins.views.search.rest.scriptingapi.parsing;
 
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ShortTimerangeFormatParserTest {
 
-    private ShortTimerangeFormatParser toTest;
-
-    @BeforeEach
-    void setUp() {
-        toTest = new ShortTimerangeFormatParser();
-    }
-
     @Test
     void returnsEmptyOptionalOnNullInput() {
-        assertThat(toTest.parse(null)).isEmpty();
+        assertThat(TimerangeParser.parse(null)).isEmpty();
     }
 
     @Test
     void returnsEmptyOptionalOnBadInput() {
-        assertThat(toTest.parse("#$%")).isEmpty();
-        assertThat(toTest.parse("13days")).isEmpty();
-        assertThat(toTest.parse("42x")).isEmpty();
-        assertThat(toTest.parse("-13days")).isEmpty();
-        assertThat(toTest.parse("1,5d")).isEmpty();
-        assertThat(toTest.parse("d13d")).isEmpty();
-        assertThat(toTest.parse("")).isEmpty();
+        assertThat(TimerangeParser.parse("#$%")).isEmpty();
+        assertThat(TimerangeParser.parse("13days")).isEmpty();
+        assertThat(TimerangeParser.parse("42x")).isEmpty();
+        assertThat(TimerangeParser.parse("-13days")).isEmpty();
+        assertThat(TimerangeParser.parse("1,5d")).isEmpty();
+        assertThat(TimerangeParser.parse("d13d")).isEmpty();
+        assertThat(TimerangeParser.parse("")).isEmpty();
     }
 
     @Test
     void returnsProperTimeRangeOnGoodInput() {
-        assertThat(toTest.parse("12s"))
+        assertThat(TimerangeParser.parse("12s"))
                 .isPresent()
                 .contains(KeywordRange.create("last 12 seconds", "UTC"));
-        assertThat(toTest.parse("42m"))
+        assertThat(TimerangeParser.parse("42m"))
                 .isPresent()
                 .contains(KeywordRange.create("last 42 minutes", "UTC"));
-        assertThat(toTest.parse("1h"))
+        assertThat(TimerangeParser.parse("1h"))
                 .isPresent()
                 .contains(KeywordRange.create("last 1 hour", "UTC"));
-        assertThat(toTest.parse("1d"))
+        assertThat(TimerangeParser.parse("1d"))
                 .isPresent()
                 .contains(KeywordRange.create("last 1 day", "UTC"));
-        assertThat(toTest.parse("2w"))
+        assertThat(TimerangeParser.parse("2w"))
                 .isPresent()
                 .contains(KeywordRange.create("last 2 weeks", "UTC"));
-        assertThat(toTest.parse("3M"))
+        assertThat(TimerangeParser.parse("3M"))
                 .isPresent()
                 .contains(KeywordRange.create("last 3 months", "UTC"));
-        assertThat(toTest.parse("1000y"))
+        assertThat(TimerangeParser.parse("1000y"))
                 .isPresent()
                 .contains(KeywordRange.create("last 1000 years", "UTC"));
     }

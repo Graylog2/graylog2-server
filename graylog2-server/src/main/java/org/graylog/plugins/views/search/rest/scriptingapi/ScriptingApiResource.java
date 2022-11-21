@@ -32,7 +32,6 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.SearchJobDTO;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.AggregationSpecToPivotMapper;
-import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryParamsToFullRequestSpecificationMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchRequestSpecToSearchMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchTypeResultToTabularResponseMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestSpec;
@@ -75,19 +74,16 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     private final EventBus serverEventBus;
     private final SearchRequestSpecToSearchMapper searchCreator;
     private final SearchTypeResultToTabularResponseMapper responseCreator;
-    private final QueryParamsToFullRequestSpecificationMapper queryParamsToFullRequestSpecificationMapper;
 
     @Inject
     public ScriptingApiResource(final SearchExecutor searchExecutor,
                                 final EventBus serverEventBus,
                                 final SearchRequestSpecToSearchMapper searchCreator,
-                                final SearchTypeResultToTabularResponseMapper responseCreator,
-                                final QueryParamsToFullRequestSpecificationMapper queryParamsToFullRequestSpecificationMapper) {
+                                final SearchTypeResultToTabularResponseMapper responseCreator) {
         this.searchExecutor = searchExecutor;
         this.serverEventBus = serverEventBus;
         this.searchCreator = searchCreator;
         this.responseCreator = responseCreator;
-        this.queryParamsToFullRequestSpecificationMapper = queryParamsToFullRequestSpecificationMapper;
     }
 
     @POST
@@ -153,7 +149,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                                         @QueryParam("groups") List<String> groups,
                                         @QueryParam("metrics") List<String> metrics,
                                         @Context SearchUser searchUser) {
-        SearchRequestSpec searchRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(query, streams, timerangeKeyword, groups, metrics);
+        SearchRequestSpec searchRequestSpec = SearchRequestSpec.fromSimpleParams(query, streams, timerangeKeyword, groups, metrics);
         return executeQuery(searchRequestSpec, searchUser);
     }
 
@@ -169,7 +165,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                                           @QueryParam("groups") List<String> groups,
                                           @QueryParam("metrics") List<String> metrics,
                                           @Context SearchUser searchUser) {
-        SearchRequestSpec searchRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(query, streams, timerangeKeyword, groups, metrics);
+        SearchRequestSpec searchRequestSpec = SearchRequestSpec.fromSimpleParams(query, streams, timerangeKeyword, groups, metrics);
         return executeQueryAsciiOutput(searchRequestSpec, searchUser);
     }
 

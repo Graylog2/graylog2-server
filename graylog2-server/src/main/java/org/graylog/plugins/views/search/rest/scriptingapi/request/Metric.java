@@ -27,6 +27,16 @@ public record Metric(@JsonProperty("field") @Valid String fieldName,
                      @JsonProperty("function") @Valid @NotBlank String functionName,
                      @JsonProperty("sort") SortSpec.Direction sort) implements Sortable {
 
+    /**
+     * @param metric Expects strings in format function_name:field_name
+     */
+    public static Metric parseMetric(final String metric) {
+        final String[] split = metric.split(":");
+        final String fieldName = split.length > 1 ? split[1] : null;
+        final String functionName = split[0];
+        return new Metric(fieldName, functionName, null);
+    }
+
     @Override
     public String sortColumnName() {
         return functionName() + "(" + (fieldName() != null ? fieldName() : "") + ")";
