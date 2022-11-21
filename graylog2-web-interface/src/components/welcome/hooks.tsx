@@ -4,41 +4,32 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 import UserNotification from 'util/UserNotification';
-import { activities, DEFAULT_PAGINATION, lastOpen } from 'components/welcome/helpers';
+import { DEFAULT_PAGINATION } from 'components/welcome/helpers';
+import type { PaginatedLastOpen, PaginatedPinned, RequestQuery, PaginatedRecentActivities } from 'components/welcome/types';
 
-export const urlPrefix = '/';
+export const urlPrefix = '/dynamicstartpage';
 export const LAST_OPEN_QUERY_KEY = 'last_open_query_key';
 export const PINNED_ITEMS_QUERY_KEY = 'pinned_items_query_key';
 export const RECENT_ACTIONS_QUERY_KEY = 'recent_actions_query_key';
 
-function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+const fetchLastOpen = async ({ page }: RequestQuery): Promise<PaginatedLastOpen> => {
+  const url = PaginationURL(`${urlPrefix}/lastOpened`, page, 5, '');
 
-const fetchLastOpen = async ({ page, per_page }) => {
-  const url = PaginationURL(`${urlPrefix}/ttttt/paginated`, page, per_page, '');
-
-  // return fetch('GET', qualifyUrl(url));
-  await delay(700);
-
-  return Promise.resolve({ lastOpen: lastOpen, pagination: { total: 10 } });
+  return fetch('GET', qualifyUrl(url));
 };
 
-const fetchPinnedItems = async ({ page, per_page }) => {
-  const url = PaginationURL(`${urlPrefix}/ttttt/paginated`, page, per_page, '');
+const fetchPinnedItems = async ({ page }: RequestQuery): Promise<PaginatedPinned> => {
+  const url = PaginationURL(`${urlPrefix}/pinnedItems`, page, 5, '');
 
-  // return fetch('GET', qualifyUrl(url));
-  await delay(500);
-
-  return Promise.resolve({ pinnedItems: lastOpen, pagination: { total: 10 } });
+  return fetch('GET', qualifyUrl(url));
 };
 
-const fetchRecentActivities = async ({ page, per_page }) => {
-  const url = PaginationURL(`${urlPrefix}/ttttt/paginated`, page, per_page, '');
-  // return fetch('GET', qualifyUrl(url));
-  await delay(1000);
+const fetchRecentActivities = async ({ page }: RequestQuery): Promise<PaginatedRecentActivities> => {
+  const url = PaginationURL(`${urlPrefix}/recentActivity`, page, 5, '');
 
-  return Promise.resolve({ resentActivities: activities, pagination: { total: 10 } });
+  return fetch('GET', qualifyUrl(url)).then((data) => {
+    return data;
+  });
 };
 
 export const useLastOpen = (pagination) => {
