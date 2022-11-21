@@ -24,19 +24,12 @@ import { RowContentStyles } from 'components/bootstrap/Row';
 const FlatContentRow = styled.div`
   ${RowContentStyles};
   
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   padding: 9px;
   margin-left: -15px;
   margin-right: -15px;
-
-  .row {
-    margin-left: -9px;
-    margin-right: -9px;
-  }
-
-  div[class*="col-"] {
-    padding-right: 9px;
-    padding-left: 9px;
-  }
 `;
 
 export default FlatContentRow;

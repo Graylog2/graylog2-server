@@ -32,10 +32,9 @@ type Props = {
 export const EMPTY_RANGE = '----/--/-- --:--:--.---';
 export const EMPTY_OUTPUT = { from: EMPTY_RANGE, until: EMPTY_RANGE };
 
-const TimeRangeWrapper = styled.p(({ theme }) => css`
+const TimeRangeWrapper = styled.div(({ theme }) => css`
   width: 100%;
   padding: 3px 9px;
-  margin: 0 0 0 12px;
   display: flex;
   justify-content: space-around;
   background-color: ${theme.colors.table.backgroundAlt};

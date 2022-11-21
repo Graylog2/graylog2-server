@@ -39,10 +39,13 @@ type Props = {
   value: TimeRange | NoTimeRangeOverride,
 };
 
-const FlexContainer = styled.span`
+const FlexContainer = styled.div`
   display: flex;
   align-items: stretch;
   justify-content: space-between;
+  flex: 1;
+  min-width: 430px;
+  gap: 10px;
 `;
 
 const TimeRangeInput = ({
