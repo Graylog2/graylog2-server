@@ -28,8 +28,6 @@ import SearchButton from 'views/components/searchbar/SearchButton';
 import QueryInput from 'views/components/searchbar/queryinput/AsyncQueryInput';
 import DashboardActionsMenu from 'views/components/DashboardActionsMenu';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
-import BottomRow from 'views/components/searchbar/BottomRow';
-import ViewActionsWrapper from 'views/components/searchbar/ViewActionsWrapper';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import FormWarningsContext from 'contexts/FormWarningsContext';
@@ -55,12 +53,7 @@ import type { DashboardFormValues } from './DashboardSearchBarForm';
 import DashboardSearchForm from './DashboardSearchBarForm';
 import PluggableSearchBarControls from './searchbar/PluggableSearchBarControls';
 
-const Container = styled.div`
-  display: grid;
-  row-gap: 10px;
-`;
-
-const TopRow = styled.div(({ theme }) => css`
+const TimeRangeRow = styled.div(({ theme }) => css`
   display: flex;
   justify-content: space-between;
   gap: 10px;
@@ -70,10 +63,10 @@ const TopRow = styled.div(({ theme }) => css`
   }
 `);
 
-const StyledTimeRangeInput = styled(TimeRangeInput)(({ theme }) => `
+const StyledTimeRangeInput = styled(TimeRangeInput)(({ theme }) => css`
   flex: 0.2;
-  flex-basis: 700px;
-
+  flex-basis: 380px;
+  
   @media (max-width: ${theme.breakpoints.max.sm}) {
     flex 1;
     flex-basis: auto;
@@ -81,11 +74,18 @@ const StyledTimeRangeInput = styled(TimeRangeInput)(({ theme }) => `
 `);
 
 const RefreshControlsWrapper = styled.div(({ theme }) => css`
-  margin-left: 18px;
-
   @media (max-width: ${theme.breakpoints.max.sm}) {
     display: flex;
     justify-content: flex-end;
+  }
+`);
+
+const SearchQueryRow = styled.div(({ theme }) => css`
+  display: flex;
+  gap: 10px;
+
+  @media (max-width: ${theme.breakpoints.max.sm}) {
+    flex-direction: column;
   }
 `);
 
@@ -93,6 +93,12 @@ const SearchButtonAndQuery = styled.div`
   flex: 1;
   display: flex;
   align-items: flex-start;
+  gap: 10px;
+`;
+
+const SearchInputAndValidation = styled.div`
+  display: flex;
+  flex: 1;
 `;
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
@@ -141,36 +147,35 @@ const DashboardSearchBar = () => {
     <WidgetFocusContext.Consumer>
       {({ focusedWidget: { editing } = { editing: false } }) => (
         <ScrollToHint value={queryString}>
-          <FlatContentRow>
-            <FormWarningsProvider>
-              <DashboardSearchForm initialValues={initialValues}
-                                   limitDuration={limitDuration}
-                                   onSubmit={submitForm}
-                                   validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls, userTimezone)}>
-                {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
-                  const disableSearchSubmit = isSubmitting || isValidating || !isValid;
+          <FormWarningsProvider>
+            <DashboardSearchForm initialValues={initialValues}
+                                 limitDuration={limitDuration}
+                                 onSubmit={submitForm}
+                                 validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls, userTimezone)}>
+              {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
+                const disableSearchSubmit = isSubmitting || isValidating || !isValid;
 
-                  return (
-                    <Container>
-                      <ValidateOnParameterChange parameters={parameters} />
-                      <TopRow>
-                        <StyledTimeRangeInput onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                              value={values?.timerange}
-                                              limitDuration={limitDuration}
-                                              hasErrorOnMount={!!errors.timerange}
-                                              noOverride />
-                        <RefreshControlsWrapper>
-                          <RefreshControls />
-                        </RefreshControlsWrapper>
-                      </TopRow>
+                return (
+                  <FlatContentRow>
+                    <ValidateOnParameterChange parameters={parameters} />
+                    <TimeRangeRow>
+                      <StyledTimeRangeInput onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                            value={values?.timerange}
+                                            limitDuration={limitDuration}
+                                            hasErrorOnMount={!!errors.timerange}
+                                            noOverride />
+                      <RefreshControlsWrapper>
+                        <RefreshControls />
+                      </RefreshControlsWrapper>
+                    </TimeRangeRow>
 
-                      <BottomRow>
-                        <SearchButtonAndQuery>
-                          <SearchButton disabled={disableSearchSubmit}
-                                        glyph="filter"
-                                        displaySpinner={isSubmitting}
-                                        dirty={dirty} />
-
+                    <SearchQueryRow>
+                      <SearchButtonAndQuery>
+                        <SearchButton disabled={disableSearchSubmit}
+                                      glyph="filter"
+                                      displaySpinner={isSubmitting}
+                                      dirty={dirty} />
+                        <SearchInputAndValidation>
                           <Field name="queryString">
                             {({ field: { name, value, onChange }, meta: { error } }) => (
                               <FormWarningsContext.Consumer>
@@ -192,21 +197,17 @@ const DashboardSearchBar = () => {
                           </Field>
 
                           <QueryValidation />
-                        </SearchButtonAndQuery>
+                        </SearchInputAndValidation>
+                      </SearchButtonAndQuery>
 
-                        {!editing && (
-                          <ViewActionsWrapper>
-                            <DashboardActionsMenu />
-                          </ViewActionsWrapper>
-                        )}
-                      </BottomRow>
-                      <PluggableSearchBarControls showLeftControls={false} />
-                    </Container>
-                  );
-                }}
-              </DashboardSearchForm>
-            </FormWarningsProvider>
-          </FlatContentRow>
+                      {!editing && <DashboardActionsMenu />}
+                    </SearchQueryRow>
+                    <PluggableSearchBarControls showLeftControls={false} />
+                  </FlatContentRow>
+                );
+              }}
+            </DashboardSearchForm>
+          </FormWarningsProvider>
         </ScrollToHint>
       )}
     </WidgetFocusContext.Consumer>
