@@ -300,7 +300,7 @@ public class ScriptingApiResourceIT {
                               "field": "facility"
                             },
                             {
-                              "function": "latest",
+                              "function": "max",
                               "field": "level"
                             }
                           ]
@@ -311,8 +311,8 @@ public class ScriptingApiResourceIT {
                 .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
-        validateRow(validatableResponse, "another-test", 2, 3);
-        validateRow(validatableResponse, "test", 1, 1);
+        validateRow(validatableResponse, "another-test", 2, 3.0f);
+        validateRow(validatableResponse, "test", 1, 1.0f);
     }
 
     @ContainerMatrixTest
@@ -395,7 +395,7 @@ public class ScriptingApiResourceIT {
                               "field": "http_method"
                             },
                              {
-                              "function": "latest",
+                              "function": "max",
                               "field": "level"
                             }
                           ]
@@ -406,8 +406,8 @@ public class ScriptingApiResourceIT {
                 .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
-        validateRow(validatableResponse, "another-test", 2, "POST", 3);
-        validateRow(validatableResponse, "test", 1, "-", 1);
+        validateRow(validatableResponse, "another-test", 2, "POST", 3.0f);
+        validateRow(validatableResponse, "test", 1, "-", 1.0f);
     }
 
     @ContainerMatrixTest
