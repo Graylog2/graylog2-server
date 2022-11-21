@@ -76,7 +76,7 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time> {
     }
 
     @Override
-    public Stream<PivotBucket> extractBuckets(List<BucketSpec> bucketSpecs, PivotBucket initialBucket) {
+    public Stream<PivotBucket> extractBuckets(Pivot pivot, List<BucketSpec> bucketSpecs, PivotBucket initialBucket) {
         if (bucketSpecs.isEmpty()) {
             return Stream.empty();
         }
@@ -94,7 +94,7 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time> {
                         return Stream.of(PivotBucket.create(keys, bucket));
                     }
 
-                    return extractBuckets(bucketSpecs.subList(0, bucketSpecs.size()), PivotBucket.create(keys, bucket));
+                    return extractBuckets(pivot, bucketSpecs.subList(0, bucketSpecs.size()), PivotBucket.create(keys, bucket));
                 });
     }
 }
