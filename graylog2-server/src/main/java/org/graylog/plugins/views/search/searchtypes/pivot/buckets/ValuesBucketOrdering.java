@@ -52,20 +52,7 @@ public class ValuesBucketOrdering {
                 .collect(Collectors.toList());
 
         return bucketSpec.stream()
-                .sorted((s1, s2) -> {
-                    int s1Index = sortFields.indexOf(s1.field());
-                    int s2Index = sortFields.indexOf(s2.field());
-                    if (s1Index == s2Index) {
-                        return 0;
-                    }
-                    if (s1Index == -1) {
-                        return 1;
-                    }
-                    if (s2Index == -1) {
-                        return -1;
-                    }
-                    return Integer.compare(s1Index, s2Index);
-                })
+                .sorted(new ValuesBucketComparator<>(sortFields))
                 .collect(Collectors.toList());
     }
 
