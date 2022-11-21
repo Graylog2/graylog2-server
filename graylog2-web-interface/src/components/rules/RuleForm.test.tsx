@@ -25,6 +25,9 @@ describe('RuleForm', () => {
     const ruleToUpdate = {
       source: 'source1',
       description: 'description1',
+      title: 'title1',
+      created_at: 'created_at1',
+      modified_at: 'modified_at1',
     };
 
     const { getByLabelText } = render(
@@ -37,6 +40,6 @@ describe('RuleForm', () => {
 
     expect(descriptionInput).toBeInTheDocument();
 
-    expect(descriptionInput.value).toBe(ruleToUpdate.description);
+    expect(descriptionInput).toHaveValue(ruleToUpdate.description);
   });
 });
