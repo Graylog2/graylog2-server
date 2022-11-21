@@ -39,7 +39,7 @@ class ValuesBucketOrderingTest {
 
     @Test
     void pivotUsedForSortIsPulledToTop() {
-        final List<SortSpec> pivotSorts = List.of(PivotSort.create("pivot", "baz", SortSpec.Direction.Descending));
+        final List<SortSpec> pivotSorts = List.of(PivotSort.create("baz", SortSpec.Direction.Descending));
 
         final List<Values> orderedBuckets = ValuesBucketOrdering.orderBuckets(List.of(fooPivot, barPivot, bazPivot), pivotSorts);
 
@@ -49,8 +49,8 @@ class ValuesBucketOrderingTest {
     @Test
     void multiplePivotsUsedForSortArePulledToTop() {
         final List<SortSpec> pivotSorts = List.of(
-                PivotSort.create("pivot", "baz", SortSpec.Direction.Descending),
-                PivotSort.create("pivot", "bar", SortSpec.Direction.Ascending)
+                PivotSort.create("baz", SortSpec.Direction.Descending),
+                PivotSort.create("bar", SortSpec.Direction.Ascending)
         );
 
         final List<Values> orderedBuckets = ValuesBucketOrdering.orderBuckets(List.of(fooPivot, barPivot, bazPivot), pivotSorts);

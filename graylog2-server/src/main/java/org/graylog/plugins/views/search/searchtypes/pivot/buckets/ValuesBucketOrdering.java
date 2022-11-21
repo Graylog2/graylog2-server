@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.searchtypes.pivot.buckets;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 
 import java.util.List;
@@ -28,7 +29,7 @@ import java.util.stream.IntStream;
 
 public class ValuesBucketOrdering {
     private static boolean isGroupingSort(SortSpec sort) {
-        return "pivot".equals(sort.type());
+        return PivotSort.Type.equals(sort.type());
     }
 
     private static boolean hasGroupingSort(List<SortSpec> sorts) {
