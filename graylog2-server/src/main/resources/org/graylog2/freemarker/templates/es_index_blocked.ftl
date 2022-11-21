@@ -7,8 +7,8 @@ ${title}
 ${description}<br />
 <#list blockDetails>
     <ul>
-    <#items as line1, line2>
-        <li>{line1}: ${line2}</li>
+    <#items as line>
+        <li>${line[0]}: ${line[1]}</li>
     </#items>
     </ul>
 </#list>

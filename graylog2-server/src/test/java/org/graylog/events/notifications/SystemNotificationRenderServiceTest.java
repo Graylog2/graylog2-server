@@ -7,9 +7,10 @@ import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -79,7 +80,7 @@ class SystemNotificationRenderServiceTest {
         when(graylogConfig.isCloud()).thenReturn(true);
 
         TemplateRenderResponse renderResponse = renderService.renderHtml(notification);
-        assertThat(renderResponse.description()).doesNotContain("click <a href=\"" + url + "\">here");
+        assertThat(renderResponse.description()).doesNotContain(url);
     }
 
     @Test
@@ -96,10 +97,28 @@ class SystemNotificationRenderServiceTest {
         when(graylogConfig.isCloud()).thenReturn(false);
 
         TemplateRenderResponse renderResponse = renderService.renderHtml(notification);
-        assertThat(renderResponse.description()).containsSequence("click <a href=\"" + url + "\">here");
+        assertThat(renderResponse.description()).containsSequence(url);
     }
 
-    @Disabled
+    @Test
+    void testFtlLooping() {
+        List<String[]> blockDetails = new ArrayList<>();
+        blockDetails.add(new String[]{"11", "12"});
+        blockDetails.add(new String[]{"21", "22"});
+        notification = new NotificationImpl()
+                .addNode("node")
+                .addSeverity(Notification.Severity.URGENT)
+                .addType(Notification.Type.ES_INDEX_BLOCKED)
+                .addDetail("title", "my title")
+                .addDetail("description", "my description")
+                .addDetail("blockDetails", blockDetails)
+                .addTimestamp(DateTime.now());
+        when(notificationService.getByType(any())).thenReturn(Optional.of(notification));
+
+        TemplateRenderResponse renderResponse = renderService.renderHtml(notification);
+        assertThat(renderResponse.description()).containsSequence("11: 12");
+    }
+
     @Test
     void missingTemplates() {
         for (Notification.Type type : Notification.Type.values()) {
