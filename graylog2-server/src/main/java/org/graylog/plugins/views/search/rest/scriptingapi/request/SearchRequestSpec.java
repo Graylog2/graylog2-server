@@ -30,8 +30,7 @@ public record SearchRequestSpec(@JsonProperty("query") String queryString,
                                 @JsonProperty("streams") Set<String> streams,
                                 @JsonProperty("timerange") TimeRange timerange,
                                 @JsonProperty("group_by") @Valid @NotEmpty List<Grouping> groupings,
-                                @JsonProperty("metrics") @Valid @NotEmpty List<Metric> metrics,
-                                @JsonProperty("grouping_sort_has_priority") boolean groupingSortHasPriority) {
+                                @JsonProperty("metrics") @Valid @NotEmpty List<Metric> metrics) {
 
     public static final RelativeRange DEFAULT_TIMERANGE = RelativeRange.create(24 * 60 * 60);
 
@@ -48,6 +47,6 @@ public record SearchRequestSpec(@JsonProperty("query") String queryString,
     }
 
     public boolean hasCustomSort() {
-        return groupings().stream().anyMatch(gr -> gr.sort() != null) || metrics().stream().anyMatch(m -> m.sort() != null);
+        return metrics().stream().anyMatch(m -> m.sort() != null);
     }
 }
