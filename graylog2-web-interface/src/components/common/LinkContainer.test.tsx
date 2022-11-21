@@ -26,6 +26,14 @@ import { LinkContainer } from './router';
 jest.mock('util/History');
 
 describe('LinkContainer', () => {
+  const hasHref = (element: HTMLElement | HTMLAnchorElement): element is HTMLAnchorElement => {
+    return 'href' in element;
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should use component passed in children', async () => {
     render(
       <LinkContainer to="/">
@@ -88,7 +96,7 @@ describe('LinkContainer', () => {
 
     const button = await screen.findByText('Alerts');
 
-    expect(button.href).toEqual('http://localhost/alerts');
+    expect(hasHref(button) ? button.href : null).toEqual('http://localhost/alerts');
   });
 
   it('should stop event in generated `onClick`', async () => {
@@ -109,5 +117,29 @@ describe('LinkContainer', () => {
     await waitFor(() => expect(childOnClick).toHaveBeenCalled());
 
     expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('should not redirect onclick, when children is disabled', async () => {
+    render(
+      <LinkContainer to="/">
+        <Button bsStyle="info" disabled>All Alerts</Button>
+      </LinkContainer>,
+    );
+
+    fireEvent.click(await screen.findByText('All Alerts'));
+
+    expect(history.push).not.toHaveBeenCalled();
+  });
+
+  it('should add target URL as href to children, when children is disabled', async () => {
+    render(
+      <LinkContainer to="/alerts">
+        <Button bsStyle="info" onClick={jest.fn()} disabled>Alerts</Button>
+      </LinkContainer>,
+    );
+
+    const button = await screen.findByText('Alerts');
+
+    expect(hasHref(button) ? button.href : null).toBeNull();
   });
 });
