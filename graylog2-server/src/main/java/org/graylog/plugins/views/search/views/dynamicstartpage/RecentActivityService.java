@@ -19,8 +19,10 @@ package org.graylog.plugins.views.search.views.dynamicstartpage;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
+import org.mongojack.DBQuery;
 
 import javax.inject.Inject;
+import java.util.stream.Stream;
 
 public class RecentActivityService extends PaginatedDbService<RecentActivityDTO> {
     private static final String COLLECTION_NAME = "recent_activity";
@@ -29,5 +31,9 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
     protected RecentActivityService(MongoConnection mongoConnection,
                                  MongoJackObjectMapperProvider mapper) {
         super(mongoConnection, mapper, RecentActivityDTO.class, COLLECTION_NAME);
+    }
+
+    public Stream<RecentActivityDTO> streamAllInReverseOrder() {
+        return streamQueryWithSort(DBQuery.empty(), getSortBuilder("desc", "timestamp"));
     }
 }

@@ -27,15 +27,18 @@ import org.graylog.plugins.views.search.views.dynamicstartpage.PinnedItem;
 import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivity;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotEmpty;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
@@ -61,15 +64,19 @@ public class DynamicStartPageResource extends RestResource implements PluginRest
     @GET
     @Path("/lastOpened")
     @ApiOperation("Get the Last Opened Items for the Dynamic Start Page for the user")
-    public List<LastOpenedItem> getLastOpened(@Context SearchUser searchUser) throws NotFoundException {
-        return service.findLastOpenedFor(searchUser);
+    public PaginatedResponse<LastOpenedItem> getLastOpened(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                           @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
+                                                           @Context SearchUser searchUser) throws NotFoundException {
+        return service.findLastOpenedFor(searchUser, page, perPage);
     }
 
     @GET
     @Path("/pinnedItems")
     @ApiOperation("Get the Pinned Items for the Dynamic Start Page for the user")
-    public List<PinnedItem> getPinnedItems(@Context SearchUser searchUser) throws NotFoundException {
-        return service.findPinnedItemsFor(searchUser);
+    public PaginatedResponse<PinnedItem> getPinnedItems(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                           @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
+                                           @Context SearchUser searchUser) throws NotFoundException {
+        return service.findPinnedItemsFor(searchUser, page, perPage);
     }
 
     @PUT
@@ -82,7 +89,9 @@ public class DynamicStartPageResource extends RestResource implements PluginRest
     @GET
     @Path("/recentActivity")
     @ApiOperation("Get Recent Activities for the Dynamic Start Page for the user")
-    public List<RecentActivity> getRecentActivity(@Context SearchUser searchUser) {
-        return service.findRecentActivityFor(searchUser);
+    public PaginatedResponse<RecentActivity> getRecentActivity(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                  @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
+                                                  @Context SearchUser searchUser) {
+        return service.findRecentActivityFor(searchUser, page, perPage);
     }
 }
