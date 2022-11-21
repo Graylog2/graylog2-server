@@ -145,6 +145,23 @@ public class UdpTransportTest {
     }
 
     @Test
+    public void transportCanRecvLargeUDPPacketsOnLinux() throws Exception {
+        assumeTrue("Skipping test intended for Linux systems", SystemUtils.IS_OS_LINUX);
+
+        final CountingChannelUpstreamHandler handler = new CountingChannelUpstreamHandler();
+        final UdpTransport transport = launchTransportForBootStrapTest(handler);
+        await().atMost(5, TimeUnit.SECONDS).until(() -> transport.getLocalAddress() != null);
+        final InetSocketAddress localAddress = (InetSocketAddress) transport.getLocalAddress();
+
+        final int maxUDPSize = 65507; // Maximum theoretical size of a UDP payload over IPv4
+        sendUdpDatagram(BIND_ADDRESS, localAddress.getPort(), maxUDPSize);
+        await().atMost(5, TimeUnit.SECONDS).until(() -> !handler.getBytesWritten().isEmpty());
+        transport.stop();
+
+        assertThat(handler.getBytesWritten()).containsExactly(maxUDPSize);
+    }
+
+    @Test
     public void receiveBufferSizeIsDefaultSize() {
         assertThat(udpTransport.getBootstrap(mock(MessageInput.class)).config().options().get(ChannelOption.SO_RCVBUF)).isEqualTo(RECV_BUFFER_SIZE);
     }
