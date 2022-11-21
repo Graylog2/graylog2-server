@@ -8,7 +8,9 @@
 »${reason}«. This means that you are unable to receive any messages from this input.
 This is often an indication of persistent network failures.
         <#if _cloud == false>
-            You can click {' '} <a href="${SYSTEM_INPUTS}" target="_blank" rel="noreferrer">here</a> to see the input.
+            <#if SYSTEM_INPUTS?has_content>
+                You can click {' '} <a href="${SYSTEM_INPUTS}" target="_blank" rel="noreferrer">here</a> to see the input.
+            </#if>
         </#if>
     </span>
 </#if>

@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.apache.commons.lang.CharEncoding.UTF_8;
@@ -62,7 +63,12 @@ public class SystemNotificationRenderService {
                 .orElseThrow(() -> new IllegalArgumentException("Event type is not currently active"));
 
         // Add all data for template expansion into the details map
-        values.putAll(notification.getDetails());
+        if (values == null) {
+            values = new HashMap<>();
+        }
+        if (notification.getDetails() != null) {
+            values.putAll(notification.getDetails());
+        }
         values.put(KEY_NODE_ID, notification.getNodeId());
         values.put(KEY_CLOUD, graylogConfig.isCloud());
 
