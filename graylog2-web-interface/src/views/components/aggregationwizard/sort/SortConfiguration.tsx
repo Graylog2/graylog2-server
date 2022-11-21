@@ -56,13 +56,18 @@ type Option = {
 const Sort = React.memo(({ index }: Props) => {
   const { values, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const { metrics = [], groupBy: { groupings = [] } = {} } = values;
-  const metricsOptions: Array<OptionValue> = metrics.map(formatSeries)
+  const otherSorts = values?.sort?.filter((_, idx) => index !== idx) ?? [];
+  const hasMetrics = otherSorts.find((s) => s.type === 'metric');
+  const hasGroupings = otherSorts.find((s) => s.type === 'groupBy');
+
+  const metricsOptions: Array<OptionValue> = hasGroupings ? [] : metrics.map(formatSeries)
     .map(({ field, label }) => ({
       type: 'metric',
       field,
       label,
     }));
-  const rowPivotOptions: Array<OptionValue> = groupings.filter((grouping) => (grouping.direction === 'row'))
+  const rowPivotOptions: Array<OptionValue> = (hasGroupings || hasMetrics) ? [] : groupings
+    .filter((grouping) => (grouping.direction === 'row'))
     .map(formatGrouping).map((groupBy) => ({
       type: 'groupBy',
       field: groupBy,
