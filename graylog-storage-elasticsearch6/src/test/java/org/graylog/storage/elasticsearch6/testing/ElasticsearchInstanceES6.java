@@ -41,8 +41,8 @@ public class ElasticsearchInstanceES6 extends TestableSearchServerInstance {
     private final JestClient jestClient;
     private final FixtureImporter fixtureImporter;
 
-    public ElasticsearchInstanceES6(String image, SearchVersion version, Network network) {
-        super(image, version, network);
+    public ElasticsearchInstanceES6(String image, SearchVersion version, Network network, String heapSize) {
+        super(image, version, network, heapSize);
         this.jestClient = jestClientFrom();
         this.client = new ClientES6(jestClient);
         this.fixtureImporter = new FixtureImporterES6(jestClient);
@@ -68,19 +68,19 @@ public class ElasticsearchInstanceES6 extends TestableSearchServerInstance {
     }
 
     public static TestableSearchServerInstance create() {
-        return create(Network.newNetwork());
+        return create(SearchServer.ES6.getSearchVersion(), Network.newNetwork(), "2g");
     }
 
-    public static TestableSearchServerInstance create(Network network) {
-        return create(SearchServer.ES6.getSearchVersion(), network);
+    public static TestableSearchServerInstance create(String heapSize) {
+        return create(SearchServer.ES6.getSearchVersion(), Network.newNetwork(), heapSize);
     }
 
-    public static TestableSearchServerInstance create(SearchVersion version, Network network) {
+    private static TestableSearchServerInstance create(SearchVersion version, Network network, String heapSize) {
         final String image = imageNameFrom(version);
 
         LOG.debug("Creating instance {}", image);
 
-        return new ElasticsearchInstanceES6(image, version, network);
+        return new ElasticsearchInstanceES6(image, version, network, heapSize);
     }
 
     protected static String imageNameFrom(SearchVersion version) {

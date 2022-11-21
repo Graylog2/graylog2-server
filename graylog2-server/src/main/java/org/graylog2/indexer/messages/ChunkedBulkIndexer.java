@@ -41,10 +41,14 @@ public class ChunkedBulkIndexer {
         for (;;) {
             try {
                 return bulkIndex.apply(new Chunk(messageList, offset, chunkSize));
-            } catch (ChunkedBulkIndexer.EntityTooLargeException e) {
-                LOG.warn("Bulk index failed with 'Request Entity Too Large' error. Retrying by splitting up batch size <{}>.", chunkSize);
+            } catch (EntityTooLargeException e) {
+                if (e instanceof TooManyRequestsException) {
+                    LOG.warn("Bulk index failed with 'Too many requests' error. Retrying by splitting up batch size <{}>.", chunkSize);
+                } else {
+                    LOG.warn("Bulk index failed with 'Request Entity Too Large' error. Retrying by splitting up batch size <{}>.", chunkSize);
+                }
                 if (chunkSize == messageList.size()) {
-                    LOG.warn("Consider lowering the \"output_batch_size\" setting.");
+                    LOG.warn("Consider lowering the \"output_batch_size\" setting. Or resizing your Search cluster");
                 }
                 offset += e.indexedSuccessfully;
                 chunkSize /= 2;
@@ -69,11 +73,15 @@ public class ChunkedBulkIndexer {
 
     public static class EntityTooLargeException extends Exception {
         public final int indexedSuccessfully;
-        public final List<Messages.IndexingError> failedItems;
 
-        public EntityTooLargeException(int indexedSuccessfully, List<Messages.IndexingError> failedItems)  {
+        public EntityTooLargeException(int indexedSuccessfully)  {
             this.indexedSuccessfully = indexedSuccessfully;
-            this.failedItems = failedItems;
+        }
+    }
+
+    public static class TooManyRequestsException extends EntityTooLargeException {
+        public TooManyRequestsException(int indexedSuccessfully) {
+            super(indexedSuccessfully);
         }
     }
 }
