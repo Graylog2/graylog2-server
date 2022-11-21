@@ -87,10 +87,8 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         final AggregationBuilder rootAggregation = createdAggregations.root();
         final AggregationBuilder leafAggregation = createdAggregations.leaf();
         final List<AggregationBuilder> metricsAggregations = createdAggregations.metrics();
-        if (!pivot.rowGroups().isEmpty() && (pivot.columnGroups().isEmpty() || pivot.rollup())) {
-            seriesStream(pivot, queryContext, "metrics")
-                    .forEach(aggregation -> metricsAggregations.forEach(metricsAggregation -> metricsAggregation.subAggregation(aggregation)));
-        }
+        seriesStream(pivot, queryContext, "metrics")
+                .forEach(aggregation -> metricsAggregations.forEach(metricsAggregation -> metricsAggregation.subAggregation(aggregation)));
 
         if (!pivot.columnGroups().isEmpty()) {
             final BucketSpecHandler.CreatedAggregations<AggregationBuilder> createdColumnsAggregations = createPivots(BucketSpecHandler.Direction.Column, query, pivot, pivot.columnGroups(), queryContext);

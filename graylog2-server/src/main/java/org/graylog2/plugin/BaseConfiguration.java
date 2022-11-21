@@ -103,7 +103,7 @@ public abstract class BaseConfiguration extends PathConfiguration {
     private String installationSource = "unknown";
 
     @Parameter(value = "proxied_requests_thread_pool_size", required = true, validator = PositiveIntegerValidator.class)
-    private int proxiedRequestsThreadPoolSize = 32;
+    private int proxiedRequestsThreadPoolSize = 64;
 
     public int getProcessBufferProcessors() {
         return processBufferProcessors;

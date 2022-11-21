@@ -27,4 +27,18 @@ public final class StringUtils {
         return String.format(Locale.ENGLISH, format, args);
     }
 
+    public static String humanReadableByteCount(final long bytes)
+    {
+        final String[] units = { "B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB" };
+        final int base = 1024;
+
+        // When using the smallest unit no decimal point is needed, because it's the exact number.
+        if (bytes < base) {
+            return bytes + " " + units[0];
+        }
+
+        final int exponent = (int) (Math.log(bytes) / Math.log(base));
+        final String unit = units[exponent];
+        return StringUtils.f("%.1f %s", bytes / Math.pow(base, exponent), unit);
+    }
 }

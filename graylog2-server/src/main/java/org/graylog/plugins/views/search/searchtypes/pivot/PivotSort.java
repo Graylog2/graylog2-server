@@ -46,4 +46,9 @@ public abstract class PivotSort implements SortSpec {
                                    @JsonProperty(FIELD_DIRECTION) Direction direction) {
         return new AutoValue_PivotSort(type, field, direction);
     }
+
+    public static PivotSort create(String field,
+                                   Direction direction) {
+        return new AutoValue_PivotSort(PivotSort.Type, field, direction);
+    }
 }
