@@ -56,7 +56,7 @@ public class SystemNotificationEventProcessor implements EventProcessor {
 
         String message = eventParameters.notificationType().name();
         if (eventParameters.notificationDetails() != null) {
-            message += eventParameters.notificationDetails();
+            message += "\n" + eventParameters.notificationDetails();
         }
         final Event event = eventFactory.createEvent(eventDefinition, eventParameters.timestamp(), message);
 

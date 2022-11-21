@@ -1,4 +1,4 @@
-<#if _title>The following indices could not be archived yet</#if>
+<#if _title>Indices could not be archived yet</#if>
 
 <#if _description><span>
 There was an error while archiving some indices. Graylog will continue trying to archive those
