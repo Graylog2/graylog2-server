@@ -14,7 +14,6 @@
             "source": "affenmann.info",
             "message": "hello from es fixture",
             "timestamp": "2015-01-01 01:00:00.000",
-            "gl2_message_id": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
             "streams": [
               "000000000000000000000001"
             ]
