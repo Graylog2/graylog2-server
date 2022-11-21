@@ -1,8 +1,7 @@
-package org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets;
+package org.graylog.plugins.views.search.searchtypes.pivot.buckets;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -10,15 +9,14 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ESValuesHandlerTest {
-    private final ESValuesHandler esValuesHandler = new ESValuesHandler();
+class ValuesBucketOrderingTest {
     private final Values fooPivot = Values.builder().field("foo").build();
     private final Values barPivot = Values.builder().field("bar").build();
     private final Values bazPivot = Values.builder().field("baz").build();
 
     @Test
     void staysInSameOrderIfNoPivotIsUsedForSort() {
-        final List<Values> orderedBuckets = esValuesHandler.orderBuckets(List.of(fooPivot, barPivot, bazPivot), Collections.emptyList());
+        final List<Values> orderedBuckets = ValuesBucketOrdering.orderBuckets(List.of(fooPivot, barPivot, bazPivot), Collections.emptyList());
 
         assertThat(orderedBuckets).containsExactly(fooPivot, barPivot, bazPivot);
     }
@@ -27,7 +25,7 @@ class ESValuesHandlerTest {
     void pivotUsedForSortIsPulledToTop() {
         final List<SortSpec> pivotSorts = List.of(PivotSort.create("pivot", "baz", SortSpec.Direction.Descending));
 
-        final List<Values> orderedBuckets = esValuesHandler.orderBuckets(List.of(fooPivot, barPivot, bazPivot), pivotSorts);
+        final List<Values> orderedBuckets = ValuesBucketOrdering.orderBuckets(List.of(fooPivot, barPivot, bazPivot), pivotSorts);
 
         assertThat(orderedBuckets).containsExactly(bazPivot, fooPivot, barPivot);
     }
@@ -39,7 +37,7 @@ class ESValuesHandlerTest {
                 PivotSort.create("pivot", "bar", SortSpec.Direction.Ascending)
         );
 
-        final List<Values> orderedBuckets = esValuesHandler.orderBuckets(List.of(fooPivot, barPivot, bazPivot), pivotSorts);
+        final List<Values> orderedBuckets = ValuesBucketOrdering.orderBuckets(List.of(fooPivot, barPivot, bazPivot), pivotSorts);
 
         assertThat(orderedBuckets).containsExactly(bazPivot, barPivot, fooPivot);
     }

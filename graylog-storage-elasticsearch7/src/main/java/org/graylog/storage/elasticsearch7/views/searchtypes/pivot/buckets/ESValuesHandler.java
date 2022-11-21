@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
@@ -24,8 +23,8 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
-import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.ValuesBucketOrdering;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.script.Script;
@@ -45,11 +44,9 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.PivotBucket;
 import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
@@ -64,69 +61,12 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
     public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, List<Values> bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
         final int limit = extractLimit(direction, pivot).orElse(Values.DEFAULT_LIMIT);
-        final List<Values> orderedBuckets = orderBuckets(bucketSpec, pivot.sort());
+        final List<Values> orderedBuckets = ValuesBucketOrdering.orderBuckets(bucketSpec, pivot.sort());
         final AggregationBuilder termsAggregation = createTerms(orderedBuckets, ordering, limit);
         final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets)
                 .subAggregation(termsAggregation);
 
         return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
-    }
-
-    private boolean isGroupingSort(SortSpec sort) {
-        return "pivot".equals(sort.type());
-    }
-
-    private boolean hasGroupingSort(List<SortSpec> sorts) {
-        return sorts.stream().anyMatch(this::isGroupingSort);
-    }
-
-    private boolean needsReordering(List<? extends BucketSpec> bucketSpec, List<SortSpec> sorts) {
-        return bucketSpec.size() >= 2 && !sorts.isEmpty() && hasGroupingSort(sorts);
-    }
-
-    @VisibleForTesting
-    <T extends BucketSpec> List<T> orderBuckets(List<T> bucketSpec, List<SortSpec> sorts) {
-        if (!needsReordering(bucketSpec, sorts)) {
-            return bucketSpec;
-        }
-
-        final List<String> sortFields = sorts.stream()
-                .filter(this::isGroupingSort)
-                .map(SortSpec::field)
-                .collect(Collectors.toList());
-
-        return bucketSpec.stream()
-                .sorted((s1, s2) -> {
-                    int s1Index = sortFields.indexOf(s1.field());
-                    int s2Index = sortFields.indexOf(s2.field());
-                    if (s1Index == s2Index) {
-                        return 0;
-                    }
-                    if (s1Index == -1) {
-                        return 1;
-                    }
-                    if (s2Index == -1) {
-                        return -1;
-                    }
-                    return Integer.compare(s1Index, s2Index);
-                })
-                .collect(Collectors.toList());
-    }
-
-    private Function<List<String>, List<String>> reorderKeysFunction(List<BucketSpec> bucketSpecs, List<SortSpec> sorts) {
-        if (!needsReordering(bucketSpecs, sorts)) {
-            return Function.identity();
-        }
-
-        final List<BucketSpec> orderedBuckets = orderBuckets(bucketSpecs, sorts);
-        final Map<Integer, Integer> mapping = IntStream.range(0, bucketSpecs.size())
-                .boxed()
-                .collect(Collectors.toMap(Function.identity(), i -> orderedBuckets.indexOf(bucketSpecs.get(i))));
-
-        return (keys) -> IntStream.range(0, bucketSpecs.size())
-                .boxed()
-                .map(i -> keys.get(mapping.get(i)))
-                .collect(Collectors.toList());
     }
 
     private Optional<Integer> extractLimit(Direction direction, Pivot pivot) {
@@ -188,7 +128,7 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
         final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
         final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
 
-        final Function<List<String>, List<String>> reorderKeys = reorderKeysFunction(bucketSpecs, pivot.sort());
+        final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderKeysFunction(bucketSpecs, pivot.sort());
         final Stream<PivotBucket> bucketStream = termsAggregation.getBuckets()
                 .stream()
                 .map(bucket -> {
