@@ -83,7 +83,7 @@ const LinkContainer = ({ children, onClick, to: toProp, relativeActive, ...rest 
     if (!disabled) {
       history.push(to);
     }
-  }, [childrenOnClick, onClick, to]);
+  }, [childrenOnClick, disabled, onClick, to]);
 
   return React.cloneElement(React.Children.only(children), {
     ...rest,
