@@ -28,6 +28,7 @@ import javax.ws.rs.BadRequestException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import static org.apache.commons.lang.CharEncoding.UTF_8;
@@ -73,7 +74,7 @@ public class SystemNotificationRenderService {
         values.put(KEY_CLOUD, graylogConfig.isCloud());
 
         try (StringWriter writer = new StringWriter()) {
-            Template template = cfg.getTemplate(type.toString().toLowerCase() + ".ftl");
+            Template template = cfg.getTemplate(type.toString().toLowerCase(Locale.ENGLISH) + ".ftl");
 
             values.put(KEY_TITLE, true);
             values.put(KEY_DESCRIPTION, false);

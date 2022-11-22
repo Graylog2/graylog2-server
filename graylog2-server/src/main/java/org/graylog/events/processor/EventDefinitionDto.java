@@ -66,7 +66,6 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     private static final String FIELD_KEY_SPEC = "key_spec";
     private static final String FIELD_NOTIFICATION_SETTINGS = "notification_settings";
     private static final String FIELD_STORAGE = "storage";
-    public static final String FIELD_IS_SYSTEM_EVENT = "is_system_event";
 
     @Override
     @Id

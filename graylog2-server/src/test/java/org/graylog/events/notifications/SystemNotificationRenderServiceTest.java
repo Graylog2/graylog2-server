@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -138,7 +139,7 @@ class SystemNotificationRenderServiceTest {
     @Test
     void missingTemplates() {
         for (Notification.Type type : Notification.Type.values()) {
-            if (SystemNotificationRenderService.class.getResource(type.toString().toLowerCase()) == null) {
+            if (SystemNotificationRenderService.class.getResource(type.toString().toLowerCase(Locale.ENGLISH)) == null) {
                 System.out.println("Missing FTL: " + type);
             }
         }
