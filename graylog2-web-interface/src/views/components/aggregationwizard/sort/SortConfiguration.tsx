@@ -61,6 +61,7 @@ const Sort = React.memo(({ index }: Props) => {
   const hasGroupings = otherSorts.find((s) => s.type === 'groupBy');
 
   const metricsOptions: Array<OptionValue> = hasGroupings ? [] : metrics.map(formatSeries)
+    .filter((metric) => !(metric.label.startsWith('latest(')))
     .map(({ field, label }) => ({
       type: 'metric',
       field,
