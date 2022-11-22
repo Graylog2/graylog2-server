@@ -196,7 +196,10 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         }
 
         message.setMessageQueueId(raw.getMessageQueueId());
-        message.setSequenceNr(raw.getSequenceNr());
+        // Some input paths set the sequenceNr through the Codec, not the RawMessage
+        if (message.getSequenceNr() == 0) {
+            message.setSequenceNr(raw.getSequenceNr());
+        }
         message.recordTiming(serverStatus, "parse", decodeTime);
         metricRegistry.timer(name(baseMetricName, "parseTime")).update(decodeTime, TimeUnit.NANOSECONDS);
 
