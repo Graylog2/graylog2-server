@@ -17,8 +17,12 @@
 import * as React from 'react';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
+import { useCallback } from 'react';
+import { useFormikContext } from 'formik';
 
 import IconButton from 'components/common/IconButton';
+import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import type { AggregationElement } from 'views/components/aggregationwizard/AggregationElementType';
 
 const Wrapper = styled.div(({ theme }) => css`
   border-radius: 6px;
@@ -94,38 +98,44 @@ const ElementActions = styled.div(({ theme }) => css`
   padding-left: 5px;
 `);
 
-const StyledIconButton = styled(IconButton)(({ theme }) => `
+const StyledIconButton = styled(IconButton)(({ theme }) => css`
   color: ${theme.colors.global.textDefault};
 `);
 
 type Props = {
-  allowCreate: boolean,
+  aggregationElement: AggregationElement<keyof WidgetConfigFormValues>,
   children: React.ReactNode,
-  elementTitle: string,
-  onCreate: () => void,
-  sectionTitle?: string,
-  isEmpty?: boolean,
+  onCreate: (
+    elementKey: string,
+    values: WidgetConfigFormValues,
+    setValues: (formValues: WidgetConfigFormValues) => void,
+  ) => void,
 }
 
 const ElementConfigurationSection = ({
-  allowCreate,
+  aggregationElement,
   children,
-  elementTitle,
-  isEmpty,
   onCreate,
-  sectionTitle,
 }: Props) => {
-  const title = sectionTitle ?? elementTitle;
+  const { values, setValues } = useFormikContext<WidgetConfigFormValues>();
+  const { title, sectionTitle, allowCreate, key: elementKey, isEmpty: isElementEmpty } = aggregationElement;
+  const elementFormValues = values[elementKey];
+  const isAllowCreate = allowCreate(values);
+  const isEmpty = isElementEmpty(elementFormValues);
+  const headerTitle = sectionTitle ?? title;
+
+  const _onCreate = useCallback(
+    () => onCreate(elementKey, values, setValues),
+    [onCreate, setValues, elementKey, values],
+  );
 
   return (
-    <Wrapper data-testid={`${title}-section`}>
+    <Wrapper data-testid={`${headerTitle}-section`}>
       <Header $isEmpty={isEmpty}>
-        <ElementTitle $isEmpty={isEmpty}>
-          {title}
-        </ElementTitle>
+        <ElementTitle $isEmpty={isEmpty}>{headerTitle}</ElementTitle>
         <ElementActions>
-          {allowCreate && (
-            <StyledIconButton title={`Add a ${elementTitle}`} name="plus" onClick={onCreate} />
+          {isAllowCreate && (
+            <StyledIconButton title={`Add a ${title}`} name="plus" onClick={_onCreate} />
           )}
         </ElementActions>
       </Header>
@@ -136,9 +146,4 @@ const ElementConfigurationSection = ({
   );
 };
 
-ElementConfigurationSection.defaultProps = {
-  sectionTitle: undefined,
-  isEmpty: false,
-};
-
-export default ElementConfigurationSection;
+export default React.memo(ElementConfigurationSection);

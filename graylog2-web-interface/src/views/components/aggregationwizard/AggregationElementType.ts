@@ -33,9 +33,6 @@ export type AggregationElement<T extends keyof WidgetConfigFormValues> = {
   onCreate?: (formValues: WidgetConfigFormValues) => WidgetConfigFormValues,
   onDeleteAll?: (formValues: WidgetConfigFormValues) => WidgetConfigFormValues,
   isEmpty: (formValues: WidgetConfigFormValues[T]) => boolean,
-  component: React.ComponentType<{
-    config: AggregationWidgetConfig,
-    onConfigChange: (newConfig: AggregationWidgetConfig) => void
-  }>,
+  component: React.ComponentType,
   validate?: (formValues: WidgetConfigFormValues) => WidgetConfigValidationErrors,
 }

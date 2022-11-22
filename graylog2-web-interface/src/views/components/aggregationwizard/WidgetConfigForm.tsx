@@ -165,4 +165,4 @@ const WidgetConfigForm = ({ children, onSubmit, initialValues, validate, config 
   );
 };
 
-export default WidgetConfigForm;
+export default React.memo(WidgetConfigForm);

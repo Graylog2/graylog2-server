@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
 import { useFormikContext, FieldArray } from 'formik';
 
 import MetricConfiguration from './MetricConfiguration';
@@ -25,30 +24,25 @@ import ElementConfigurationContainer from '../ElementConfigurationContainer';
 import type { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 const MetricsConfiguration = () => {
-  const { values: { metrics }, setValues, values } = useFormikContext<WidgetConfigFormValues>();
-
-  const removeMetric = useCallback((index) => () => {
-    setValues(MetricElement.onRemove(index, values));
-  }, [setValues, values]);
+  const { values: { metrics } } = useFormikContext<WidgetConfigFormValues>();
 
   return (
     <FieldArray name="metrics"
                 validateOnChange={false}
                 render={() => (
                   <>
-                    {metrics.map((_metric, index) => {
-                      return (
-                        // eslint-disable-next-line react/no-array-index-key
-                        <ElementConfigurationContainer key={`metrics-${index}`}
-                                                       onRemove={removeMetric(index)}
-                                                       elementTitle={MetricElement.title}>
-                          <MetricConfiguration index={index} />
-                        </ElementConfigurationContainer>
-                      );
-                    })}
+                    {metrics.map((_metric, index) => (
+                      // eslint-disable-next-line react/no-array-index-key
+                      <ElementConfigurationContainer key={`metrics-${index}`}
+                                                     index={index}
+                                                     onRemove={MetricElement.onRemove}
+                                                     elementTitle={MetricElement.title}>
+                        <MetricConfiguration index={index} />
+                      </ElementConfigurationContainer>
+                    ))}
                   </>
                 )} />
   );
 };
 
-export default MetricsConfiguration;
+export default React.memo(MetricsConfiguration);

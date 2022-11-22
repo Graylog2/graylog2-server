@@ -18,8 +18,10 @@ import * as React from 'react';
 import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
+import { useFormikContext } from 'formik';
 
 import { Icon, IconButton } from 'components/common';
+import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
 const Container = styled.div(({ theme }) => css`
   display: flex;
@@ -48,17 +50,42 @@ const DragHandle = styled.div`
   min-height: 25px;
 `;
 
+const RemoveElementButton = ({ onRemove, elementTitle, index }: {
+  onRemove: (index: number, values: WidgetConfigFormValues) => void,
+  elementTitle: string,
+  index: number,
+}) => {
+  const { values } = useFormikContext();
+  const onClick = () => onRemove(index, values);
+
+  return (
+    <IconButton onClick={onClick}
+                name="trash-alt"
+                title={`Remove ${elementTitle}`} />
+  );
+};
+
 type Props = {
   children: React.ReactNode,
-  onRemove?: () => void,
-  elementTitle: string,
-  draggableProps?: DraggableProvidedDraggableProps;
-  dragHandleProps?: DraggableProvidedDragHandleProps;
   className?: string,
+  dragHandleProps?: DraggableProvidedDragHandleProps;
+  draggableProps?: DraggableProvidedDraggableProps;
+  elementTitle: string,
+  index?: number,
+  onRemove?: (index: number, values: WidgetConfigFormValues) => void,
   testIdPrefix?: string,
 };
 
-const ElementConfigurationContainer = forwardRef<HTMLDivElement, Props>(({ children, onRemove, testIdPrefix, dragHandleProps, className, draggableProps, elementTitle }: Props, ref) => (
+const ElementConfigurationContainer = forwardRef<HTMLDivElement, Props>(({
+  children,
+  className,
+  dragHandleProps,
+  draggableProps,
+  elementTitle,
+  index,
+  onRemove,
+  testIdPrefix,
+}: Props, ref) => (
   <Container className={className} ref={ref} {...(draggableProps ?? {})}>
     <ElementConfiguration>
       {children}
@@ -69,7 +96,11 @@ const ElementConfigurationContainer = forwardRef<HTMLDivElement, Props>(({ child
           <Icon name="bars" />
         </DragHandle>
       )}
-      {onRemove && <IconButton onClick={onRemove} name="trash-alt" title={`Remove ${elementTitle}`} />}
+      {onRemove && (
+        <RemoveElementButton onRemove={onRemove}
+                             index={index}
+                             elementTitle={elementTitle} />
+      )}
     </ElementActions>
   </Container>
 ));
@@ -79,7 +110,8 @@ ElementConfigurationContainer.defaultProps = {
   draggableProps: undefined,
   dragHandleProps: undefined,
   onRemove: undefined,
+  index: undefined,
   testIdPrefix: 'configuration',
 };
 
-export default ElementConfigurationContainer;
+export default React.memo(ElementConfigurationContainer);

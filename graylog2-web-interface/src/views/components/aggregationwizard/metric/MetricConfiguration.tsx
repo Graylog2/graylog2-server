@@ -37,7 +37,7 @@ const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { 
 
 const percentileOptions = [25.0, 50.0, 75.0, 90.0, 95.0, 99.0].map((value) => ({ label: value, value }));
 
-const Metric = ({ index }: Props) => {
+const MetricConfiguration = ({ index }: Props) => {
   const metricFieldSelectRef = useRef(null);
   const functions = useStore(AggregationFunctionsStore);
   const functionOptions = Object.values(functions)
@@ -134,4 +134,4 @@ const Metric = ({ index }: Props) => {
   );
 };
 
-export default Metric;
+export default React.memo(MetricConfiguration);

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -67,8 +67,8 @@ const TimeRangeInput = ({
     throw new Error(`Value is of type ${value.type}, but only these types are valid: ${validTypes}`);
   }
 
-  const toggleShow = () => setShow(!show);
-  const hideTimeRangeDropDown = () => show && toggleShow();
+  const toggleShow = useCallback(() => setShow(!show), [show]);
+  const hideTimeRangeDropDown = useCallback(() => show && toggleShow(), [show, toggleShow]);
 
   return (
     <FlexContainer className={className}>

@@ -15,10 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useFormikContext } from 'formik';
 import styled from 'styled-components';
 
-import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import StickyBottomActions from 'views/components/widgets/StickyBottomActions';
 import SaveOrCancelButtons from 'views/components/widgets/SaveOrCancelButtons';
 
@@ -32,21 +30,8 @@ const Container = styled.div`
   height: 100%;
 `;
 
-const _sortConfiguredElements = (
-  values: WidgetConfigFormValues,
-  aggregationElementsByKey: { [k: string]: AggregationElement<keyof WidgetConfigFormValues> },
-) => Object.keys(aggregationElementsByKey)
-  .map((elementKey: keyof WidgetConfigFormValues) => [elementKey, values[aggregationElementsByKey[elementKey].key]] as [keyof WidgetConfigFormValues, WidgetConfigFormValues[keyof WidgetConfigFormValues]])
-  .sort(
-    ([elementKey1], [elementKey2]) => (
-      aggregationElementsByKey[elementKey1].order - aggregationElementsByKey[elementKey2].order
-    ),
-  );
-
 type Props = {
   aggregationElementsByKey: { [k: string]: AggregationElement<keyof WidgetConfigFormValues> },
-  config: AggregationWidgetConfig,
-  onConfigChange: (config: AggregationWidgetConfig) => void,
   onCreate: (
     elementKey: string,
     values: WidgetConfigFormValues,
@@ -56,43 +41,29 @@ type Props = {
   onCancel: () => void,
 }
 
-const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChange, onCreate, onSubmit, onCancel }: Props) => {
-  const { values, setValues } = useFormikContext<WidgetConfigFormValues>();
+const ElementsConfiguration = ({ aggregationElementsByKey, onCreate, onSubmit, onCancel }: Props) => (
+  <Container>
+    <StickyBottomActions actions={(
+      <>
+        <ElementsConfigurationActions />
+        <SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />
+      </>
+    )}>
+      <div>
+        {Object.values(aggregationElementsByKey).map((aggregationElement) => {
+          const { component: ConfigurationSection } = aggregationElement;
 
-  return (
-    <Container>
-      <StickyBottomActions actions={(
-        <>
-          <ElementsConfigurationActions />
-          <SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />
-        </>
-      )}>
-        <div>
-          {_sortConfiguredElements(values, aggregationElementsByKey).map(([elementKey, elementFormValues]) => {
-            const aggregationElement = aggregationElementsByKey[elementKey];
-
-            if (!aggregationElement) {
-              throw new Error(`Aggregation element with key ${elementKey} is missing but configured for this widget.`);
-            }
-
-            const { component: ConfigurationSection, isEmpty } = aggregationElement;
-            const empty = isEmpty(elementFormValues);
-
-            return (
-              <ElementConfigurationSection allowCreate={aggregationElement.allowCreate(values)}
-                                           isEmpty={empty}
-                                           onCreate={() => onCreate(aggregationElement.key, values, setValues)}
-                                           elementTitle={aggregationElement.title}
-                                           sectionTitle={aggregationElement.sectionTitle}
-                                           key={aggregationElement.key}>
-                <ConfigurationSection config={config} onConfigChange={onConfigChange} />
-              </ElementConfigurationSection>
-            );
-          })}
-        </div>
-      </StickyBottomActions>
-    </Container>
-  );
-};
+          return (
+            <ElementConfigurationSection aggregationElement={aggregationElement}
+                                         onCreate={onCreate}
+                                         key={aggregationElement.key}>
+              <ConfigurationSection />
+            </ElementConfigurationSection>
+          );
+        })}
+      </div>
+    </StickyBottomActions>
+  </Container>
+);
 
 export default ElementsConfiguration;

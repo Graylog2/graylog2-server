@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef } from 'react';
+import { useRef, useCallback } from 'react';
 import { Overlay } from 'react-overlays';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
@@ -63,12 +63,12 @@ const TimeRangeDropdownButton = ({
   const { submitForm, isValid } = useFormikContext();
   const containerRef = useRef();
 
-  const _onClick = (e) => {
+  const _onClick = useCallback((e) => {
     e.currentTarget.blur();
     toggleShow();
-  };
+  }, [toggleShow]);
 
-  const selectRelativeTimeRangePreset = (from) => {
+  const selectRelativeTimeRangePreset = useCallback((from) => {
     const nextTimeRange: RelativeTimeRangeWithEnd = {
       type: 'relative',
       from,
@@ -78,13 +78,13 @@ const TimeRangeDropdownButton = ({
     if (isValid) {
       submitForm();
     }
-  };
+  }, [isValid, setCurrentTimeRange, submitForm]);
 
-  const _onPresetSelectToggle = (open: boolean) => {
+  const _onPresetSelectToggle = useCallback((open: boolean) => {
     if (open) {
       onPresetSelectOpen();
     }
-  };
+  }, [onPresetSelectOpen]);
 
   const dropdown = showPresetDropdown
     ? (

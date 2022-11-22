@@ -26,7 +26,11 @@ import ElementsConfiguration from './ElementsConfiguration';
 import aggregationElements from './aggregationElementDefinitions';
 import VisualizationContainer from './VisualizationContainer';
 
-const aggregationElementsByKey = Object.fromEntries(aggregationElements.map((element) => [element.key, element]));
+const aggregationElementsByKey = Object.fromEntries(
+  aggregationElements
+    .sort((element1, element2) => element1.order - element2.order)
+    .map((element) => [element.key, element]),
+);
 
 const _initialFormValues = (config: AggregationWidgetConfig) => {
   return aggregationElements.reduce((formValues, element) => ({
@@ -114,11 +118,9 @@ const AggregationWizard = ({ onChange, config, children, onSubmit, onCancel }: E
         <Controls>
           <Section data-testid="configure-elements-section">
             <ElementsConfiguration aggregationElementsByKey={aggregationElementsByKey}
-                                   config={config}
                                    onCreate={onCreateElement}
                                    onSubmit={onSubmit}
-                                   onCancel={onCancel}
-                                   onConfigChange={onChange} />
+                                   onCancel={onCancel} />
           </Section>
         </Controls>
         <VisualizationContainer>

@@ -63,29 +63,28 @@ const SettingsSeparator = styled.hr(({ theme }) => css`
 `);
 
 const GroupingsConfiguration = () => {
-  const { values: { groupBy }, values, setValues, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
+  const { values: { groupBy }, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const disableColumnRollup = !groupBy?.groupings?.find(({ direction }) => direction === 'column');
-  const removeGrouping = useCallback((index) => () => {
-    setValues(GroupingElement.onRemove(index, values));
-  }, [setValues, values]);
 
   const isEmpty = (groupBy?.groupings ?? []).length === 0;
 
   const hasValuesRowPivots = groupBy?.groupings?.find(({ direction, field }) => (direction === 'row' && field?.type === 'values')) !== undefined;
   const hasValuesColumnPivots = groupBy?.groupings?.find(({ direction, field }) => (direction === 'column' && field?.type === 'values')) !== undefined;
+  const onChangeSort = useCallback((newGroupings) => setFieldValue('groupBy.groupings', newGroupings), [setFieldValue]);
 
   const GroupingsItem = useCallback(({ item, index, dragHandleProps, draggableProps, className, ref }: GroupingsItemProps) => (
     <ElementConfigurationContainer key={`grouping-${item.id}`}
                                    dragHandleProps={dragHandleProps}
                                    draggableProps={draggableProps}
                                    className={className}
+                                   index={index}
                                    testIdPrefix={`grouping-${index}`}
-                                   onRemove={removeGrouping(index)}
+                                   onRemove={GroupingElement.onRemove}
                                    elementTitle={GroupingElement.title}
                                    ref={ref}>
       <GroupingConfiguration index={index} />
     </ElementConfigurationContainer>
-  ), [removeGrouping]);
+  ), []);
 
   return (
     <>
@@ -93,7 +92,7 @@ const GroupingsConfiguration = () => {
                   validateOnChange={false}
                   render={() => (
                     <SortableList items={groupBy?.groupings}
-                                  onMoveItem={(newGroupings) => setFieldValue('groupBy.groupings', newGroupings)}
+                                  onMoveItem={onChangeSort}
                                   customListItemRender={GroupingsItem} />
                   )} />
       {!isEmpty && (
@@ -115,16 +114,16 @@ const GroupingsConfiguration = () => {
               )}
             </Field>
             {hasValuesRowPivots && (
-            <FormikFormGroup label="Row Limit"
-                             name="groupBy.rowLimit"
-                             type="number"
-                             bsSize="small" />
+              <FormikFormGroup label="Row Limit"
+                               name="groupBy.rowLimit"
+                               type="number"
+                               bsSize="small" />
             )}
             {hasValuesColumnPivots && (
-            <FormikFormGroup label="Column Limit"
-                             name="groupBy.columnLimit"
-                             type="number"
-                             bsSize="small" />
+              <FormikFormGroup label="Column Limit"
+                               name="groupBy.columnLimit"
+                               type="number"
+                               bsSize="small" />
             )}
           </ElementConfigurationContainer>
         </>
@@ -133,4 +132,4 @@ const GroupingsConfiguration = () => {
   );
 };
 
-export default GroupingsConfiguration;
+export default React.memo(GroupingsConfiguration);

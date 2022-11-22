@@ -17,41 +17,65 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import { FieldArray, useFormikContext } from 'formik';
+import type { DraggableProvidedDragHandleProps, DraggableProvidedDraggableProps } from 'react-beautiful-dnd';
 
 import { SortableList } from 'components/common';
-import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import type { WidgetConfigFormValues, SortFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
 import SortConfiguration from './SortConfiguration';
 import SortElement from './SortElement';
 
 import ElementConfigurationContainer from '../ElementConfigurationContainer';
 
+type ListItemProps = {
+  /* eslint-disable react/no-unused-prop-types */
+  className: string,
+  dragHandleProps: DraggableProvidedDragHandleProps,
+  draggableProps: DraggableProvidedDraggableProps,
+  index: number,
+  item: SortFormValues,
+  ref: React.Ref<HTMLDivElement>,
+  /* eslint-enable react/no-unused-prop-types */
+}
+
 const SortsConfiguration = () => {
-  const { values: { sort }, setFieldValue, setValues, values } = useFormikContext<WidgetConfigFormValues>();
-  const removeSort = useCallback((index) => () => {
-    setValues(SortElement.onRemove(index, values));
-  }, [setValues, values]);
+  const { values: { sort }, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
+
+  const onChangeSort = useCallback(
+    (newSort: Array<SortFormValues>) => setFieldValue('sort', newSort),
+    [setFieldValue],
+  );
+
+  const customListItemRender = useCallback(({
+    className,
+    dragHandleProps,
+    draggableProps,
+    index,
+    item,
+    ref,
+  }: ListItemProps) => (
+    <ElementConfigurationContainer key={`sort-${item.id}`}
+                                   dragHandleProps={dragHandleProps}
+                                   draggableProps={draggableProps}
+                                   className={className}
+                                   testIdPrefix={`sort-${index}`}
+                                   index={index}
+                                   onRemove={SortElement.onRemove}
+                                   elementTitle={SortElement.title}
+                                   ref={ref}>
+      <SortConfiguration index={index} />
+    </ElementConfigurationContainer>
+  ), []);
 
   return (
     <FieldArray name="sort"
                 validateOnChange={false}
                 render={() => (
-                  <SortableList items={sort}
-                                onMoveItem={(newSort) => setFieldValue('sort', newSort)}
-                                customListItemRender={({ item, index, dragHandleProps, draggableProps, className, ref }) => (
-                                  <ElementConfigurationContainer key={`sort-${item.id}`}
-                                                                 dragHandleProps={dragHandleProps}
-                                                                 draggableProps={draggableProps}
-                                                                 className={className}
-                                                                 testIdPrefix={`sort-${index}`}
-                                                                 onRemove={removeSort(index)}
-                                                                 elementTitle={SortElement.title}
-                                                                 ref={ref}>
-                                    <SortConfiguration index={index} />
-                                  </ElementConfigurationContainer>
-                                )} />
+                  <SortableList<SortFormValues> items={sort}
+                                                onMoveItem={onChangeSort}
+                                                customListItemRender={customListItemRender} />
                 )} />
   );
 };
 
-export default SortsConfiguration;
+export default React.memo(SortsConfiguration);

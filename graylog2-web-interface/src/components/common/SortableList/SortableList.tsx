@@ -123,11 +123,11 @@ SortableList.propTypes = {
 
 SortableList.defaultProps = {
   alignItemContent: undefined,
-  items: [],
-  disableDragging: false,
-  displayOverlayInPortal: false,
   customContentRender: undefined,
   customListItemRender: undefined,
+  disableDragging: false,
+  displayOverlayInPortal: false,
+  items: [],
 };
 
 export default SortableList;

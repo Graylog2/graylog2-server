@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
@@ -48,4 +48,4 @@ const VisualizationContainer = ({ children }: Props) => {
   );
 };
 
-export default VisualizationContainer;
+export default React.memo(VisualizationContainer);

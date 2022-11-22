@@ -128,4 +128,4 @@ const VisualizationConfiguration = () => {
   );
 };
 
-export default VisualizationConfiguration;
+export default React.memo(VisualizationConfiguration);
