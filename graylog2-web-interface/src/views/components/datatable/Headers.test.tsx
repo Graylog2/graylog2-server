@@ -169,7 +169,7 @@ describe('Headers', () => {
 
       const ascIcon = wrapper
         .find('FieldSortIcon[fieldName="foo"]')
-        .find('button[data-testid="sort-icon-foo"].active')
+        .find('button[title="Sort foo Descending"].active')
         .find('Icon[name="arrow-up-short-wide"]');
 
       expect(ascIcon).toExist();
@@ -180,7 +180,7 @@ describe('Headers', () => {
 
       const dscIcon = wrapper
         .find('FieldSortIcon[fieldName="bar"]')
-        .find('button[data-testid="sort-icon-bar"].active')
+        .find('button[title="Remove bar sort"].active')
         .find('Icon[name="arrow-down-wide-short"]');
 
       expect(dscIcon).toExist();
@@ -191,7 +191,7 @@ describe('Headers', () => {
 
       const inactiveIcon = wrapper
         .find('FieldSortIcon[fieldName="avg(foo)"]')
-        .find('button[data-testid="sort-icon-avg(foo)"]:not(.active)')
+        .find('button[title="Sort avg(foo) Ascending"]:not(.active)')
         .find('Icon[name="arrow-down-wide-short"]');
 
       expect(inactiveIcon).toExist();
@@ -202,11 +202,11 @@ describe('Headers', () => {
 
       const fooButton = wrapper
         .find('FieldSortIcon[fieldName="foo"]')
-        .find('button[data-testid="sort-icon-foo"].active')
+        .find('button[title="Sort foo Descending"].active')
         .find('span').text();
       const barButton = wrapper
         .find('FieldSortIcon[fieldName="bar"]')
-        .find('button[data-testid="sort-icon-bar"].active')
+        .find('button[title="Remove bar sort"].active')
         .find('span').text();
 
       expect(fooButton).toBe('1');

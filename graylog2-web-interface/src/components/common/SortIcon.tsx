@@ -16,7 +16,7 @@
  */
 
 import styled, { css } from 'styled-components';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 
 import Icon from 'components/common/Icon';
 
@@ -34,53 +34,46 @@ const StyledSortIcon = styled.button(({ theme }) => {
   `;
 });
 
-const Bulb = styled.span`
+const Bulb = styled.span(({ theme }) => css`
   position: absolute;
   top: 0;
   right: 0;
-  font-size: 0.75rem;
+  font-size: ${theme.fonts.size.small};
   font-weight: 600;
-`;
+`);
 
 type Props<AscDirection extends string, DescDirection extends string> = {
   activeDirection: AscDirection | DescDirection | null,
   ascId?: string,
   descId?: string
   onChange: (activeDirection: AscDirection | DescDirection | null) => void,
-  ariaLabel?: string,
   title?: string,
   order?: number,
-  dataTestId?: string | undefined
   className?: string
 }
 
 const SortIcon = <AscDirection extends string, DescDirection extends string>({
   activeDirection,
   onChange,
-  ariaLabel,
   title,
   order,
-  dataTestId,
   ascId,
   descId,
   className,
 }: Props<AscDirection, DescDirection>) => {
   const handleSortChange = useCallback(() => onChange(activeDirection), [activeDirection, onChange]);
-  const iconName = useMemo(() => {
-    if (activeDirection === ascId) return 'arrow-up-short-wide';
-    if (activeDirection === descId) return 'arrow-down-wide-short';
+  const iconName = activeDirection === ascId && activeDirection !== descId
+    ? 'arrow-up-short-wide'
+    : 'arrow-down-wide-short';
 
-    return 'arrow-down-wide-short';
-  }, [activeDirection, ascId, descId]);
   const sortActive = !!activeDirection;
 
   return (
     <StyledSortIcon className={sortActive ? 'active' : ''}
                     title={title}
                     type="button"
-                    aria-label={ariaLabel}
-                    onClick={handleSortChange}
-                    data-testid={dataTestId}>
+                    aria-label={title}
+                    onClick={handleSortChange}>
       <Icon name={iconName} className={className} data-testid="sort-icon-svg" />
       {order && <Bulb>{order}</Bulb>}
     </StyledSortIcon>
@@ -88,10 +81,8 @@ const SortIcon = <AscDirection extends string, DescDirection extends string>({
 };
 
 SortIcon.defaultProps = {
-  ariaLabel: 'Sort',
   title: 'Sort',
   order: undefined,
-  dataTestId: undefined,
   ascId: 'Ascending',
   descId: 'Descending',
   className: '',
