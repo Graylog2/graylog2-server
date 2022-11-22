@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.eventbus.EventBus;
 import de.vandermeer.asciitable.AsciiTable;
 import io.swagger.annotations.Api;
@@ -41,6 +42,7 @@ import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularRespon
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -58,6 +60,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -141,9 +145,34 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
         return at.render();
     }
 
+    @POST
+    @ApiOperation(value = "Execute aggregation specified by `searchRequestSpec`")
+    @Path("aggregate")
+    @NoAuditEvent("Creating audit event manually in method body.")
+    @Produces(MoreMediaTypes.TEXT_CSV)
+    public Response executeQueryCsvOutput(@ApiParam(name = "searchRequestSpec") @Valid SearchRequestSpec searchRequestSpec,
+                                          @Context SearchUser searchUser) {
+        final StringWriter stringWriter = new StringWriter();
+        final CSVWriter csvWriter = new CSVWriter(stringWriter);
+
+        final TabularResponse response = executeQuery(searchRequestSpec, searchUser);
+
+        // header
+        csvWriter.writeNext(response.schema().stream().map(ResponseSchemaEntry::name).toArray(String[]::new));
+
+        // rows
+        response.datarows().stream()
+                .map(row -> row.stream().map(String::valueOf).toArray(String[]::new))
+                .forEach(csvWriter::writeNext);
+
+        final String timestamp = DateTime.now(DateTimeZone.UTC).toString("yyyy-MM-dd-HH-mm-ss");
+        return Response.ok(stringWriter.toString())
+                 .header("Content-Disposition", "attachment; filename=aggregation-" + timestamp + ".csv")
+                .build();
+    }
+
     @GET
-    @ApiOperation(value = "Execute aggregation specified by query parameters",
-                  response = TabularResponse.class)
+    @ApiOperation(value = "Execute aggregation specified by query parameters")
     @Path("aggregate")
     @NoAuditEvent("Creating audit event manually in method body.")
     @Produces(MediaType.APPLICATION_JSON)
@@ -171,6 +200,22 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                                           @Context SearchUser searchUser) {
         SearchRequestSpec searchRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(query, streams, timerangeKeyword, groups, metrics);
         return executeQueryAsciiOutput(searchRequestSpec, searchUser);
+    }
+
+    @GET
+    @ApiOperation(value = "Execute aggregation specified by query parameters",
+                  response = TabularResponse.class)
+    @Path("aggregate")
+    @NoAuditEvent("Creating audit event manually in method body.")
+    @Produces(MoreMediaTypes.TEXT_CSV)
+    public Response executeQueryCsvOutput(@QueryParam("query") String query,
+                                          @QueryParam("streams") Set<String> streams,
+                                          @QueryParam("timerange") String timerangeKeyword,
+                                          @QueryParam("groups") List<String> groups,
+                                          @QueryParam("metrics") List<String> metrics,
+                                          @Context SearchUser searchUser) {
+        SearchRequestSpec searchRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(query, streams, timerangeKeyword, groups, metrics);
+        return executeQueryCsvOutput(searchRequestSpec, searchUser);
     }
 
     private void postAuditEvent(SearchJob searchJob) {

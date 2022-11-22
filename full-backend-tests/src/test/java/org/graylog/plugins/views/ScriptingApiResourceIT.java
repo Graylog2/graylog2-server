@@ -33,14 +33,18 @@ import org.graylog.testing.utils.SharingUtils;
 import org.graylog.testing.utils.StreamUtils;
 import org.graylog.testing.utils.UserUtils;
 import org.graylog2.plugin.streams.StreamRuleType;
+import org.graylog2.rest.MoreMediaTypes;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.Csv;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.CsvParser;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import javax.ws.rs.core.MediaType;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -265,6 +269,71 @@ public class ScriptingApiResourceIT {
                 └────────────────────────┴───────────────────────┘
                 """;
         org.assertj.core.api.Assertions.assertThat(response).isEqualTo(expected.trim());
+    }
+
+    @ContainerMatrixTest
+    void testCsvRender() {
+        final InputStream response = given()
+                .spec(requestSpec)
+                .header(new Header("Accept", MoreMediaTypes.TEXT_CSV))
+                .when()
+                .body("""
+                        {
+                          "group_by": [
+                            {
+                              "field": "facility"
+                            }
+                          ],
+                          "metrics": [
+                            {
+                              "function": "count",
+                              "field": "facility"
+                            }
+                          ]
+                        }
+                        """)
+                .post("/search/aggregate")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200)
+                .extract().body().asInputStream();
+
+        final CsvParser csvParser = new CsvParser(Csv.parseRfc4180());
+        final List<String[]> lines = csvParser.parseAll(response);
+
+
+
+        // headers
+        Assertions.assertArrayEquals(lines.get(0), new String[]{"Grouping", "Metric : count"});
+
+        //rows
+        Assertions.assertArrayEquals(lines.get(1), new String[]{"another-test", "2"});
+        Assertions.assertArrayEquals(lines.get(2), new String[]{"test", "1"});
+    }
+
+    @ContainerMatrixTest
+    void testGetRequestCsv() {
+
+        final InputStream response = given()
+                .spec(requestSpec)
+                .header(new Header("Accept", MoreMediaTypes.TEXT_CSV))
+                .when()
+                .get("/search/aggregate?groups=facility&metrics=count:facility")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200)
+                .extract().body().asInputStream();
+
+
+        final CsvParser csvParser = new CsvParser(Csv.parseRfc4180());
+        final List<String[]> lines = csvParser.parseAll(response);
+
+        // headers
+        Assertions.assertArrayEquals(lines.get(0), new String[]{"Grouping", "Metric : count"});
+
+        //rows
+        Assertions.assertArrayEquals(lines.get(1), new String[]{"another-test", "2"});
+        Assertions.assertArrayEquals(lines.get(2), new String[]{"test", "1"});
     }
 
     @ContainerMatrixTest
