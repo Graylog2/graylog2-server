@@ -29,13 +29,10 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
-import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotBucketSpecHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.PivotBucket;
 
 import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
@@ -79,7 +76,7 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
     }
 
     @Override
-    public Stream<PivotBucket> extractBuckets(List<BucketSpec> bucketSpecs, PivotBucket initialBucket) {
+    public Stream<PivotBucket> extractBuckets(Pivot pivot, List<BucketSpec> bucketSpecs, PivotBucket initialBucket) {
         if (bucketSpecs.isEmpty()) {
             return Stream.empty();
         }
@@ -97,7 +94,7 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
                         return Stream.of(PivotBucket.create(keys, bucket));
                     }
 
-                    return extractBuckets(bucketSpecs.subList(0, bucketSpecs.size()), PivotBucket.create(keys, bucket));
+                    return extractBuckets(pivot, bucketSpecs.subList(0, bucketSpecs.size()), PivotBucket.create(keys, bucket));
                 });
     }
 }
