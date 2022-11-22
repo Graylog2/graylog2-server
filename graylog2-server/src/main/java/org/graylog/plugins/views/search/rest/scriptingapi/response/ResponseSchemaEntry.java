@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -30,10 +31,13 @@ public record ResponseSchemaEntry(
         @JsonProperty("field") String fieldName) {
 
     public static ResponseSchemaEntry groupBy(String fieldName) {
+        Objects.requireNonNull(fieldName);
         return new ResponseSchemaEntry(ResponseEntryType.GROUPING, ResponseEntryDataType.STRING, null, fieldName);
     }
 
     public static ResponseSchemaEntry metric(String functionName, ResponseEntryDataType dataType, String fieldName) {
+        Objects.requireNonNull(functionName);
+        Objects.requireNonNull(dataType);
         return new ResponseSchemaEntry(ResponseEntryType.METRIC, dataType, functionName, fieldName);
     }
 
