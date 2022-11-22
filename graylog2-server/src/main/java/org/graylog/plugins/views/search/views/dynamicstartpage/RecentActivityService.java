@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.views.dynamicstartpage;
 
+import com.google.common.eventbus.EventBus;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
@@ -26,14 +27,22 @@ import java.util.stream.Stream;
 
 public class RecentActivityService extends PaginatedDbService<RecentActivityDTO> {
     private static final String COLLECTION_NAME = "recent_activity";
+    private final EventBus eventBus;
 
     @Inject
     protected RecentActivityService(MongoConnection mongoConnection,
-                                 MongoJackObjectMapperProvider mapper) {
+                                    MongoJackObjectMapperProvider mapper,
+                                    EventBus eventBus) {
         super(mongoConnection, mapper, RecentActivityDTO.class, COLLECTION_NAME);
+        this.eventBus = eventBus;
     }
 
     public Stream<RecentActivityDTO> streamAllInReverseOrder() {
         return streamQueryWithSort(DBQuery.empty(), getSortBuilder("desc", "timestamp"));
+    }
+
+
+    public void postRecentActivity(final ActivityType type, final String itemId, final String itemType, final String itemTitle) {
+        eventBus.post(new RecentActivityEvent(RecentActivityDTO.builder().activityType(type).itemId(itemId).itemType(itemType).itemTitle(itemTitle).build()));
     }
 }

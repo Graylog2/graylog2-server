@@ -35,6 +35,8 @@ public abstract class RecentActivityDTO {
     public static final String FIELD_ID = "id";
     public static final String FIELD_ACTIVITY_TYPE = "activity_type";
     public static final String FIELD_ITEM_ID = "item_id";
+    public static final String FIELD_ITEM_TYPE = "item_type";
+    public static final String FIELD_ITEM_TITLE = "item_title";
     public static final String FIELD_TIMESTAMP = "timestamp";
 
     @ObjectId
@@ -48,6 +50,12 @@ public abstract class RecentActivityDTO {
 
     @JsonProperty(FIELD_ITEM_ID)
     public abstract String itemId();
+
+    @JsonProperty(FIELD_ITEM_TYPE)
+    public abstract String itemType();
+
+    @JsonProperty(FIELD_ITEM_TITLE)
+    public abstract String itemTitle();
 
     @JsonProperty(FIELD_TIMESTAMP)
     public abstract DateTime timestamp();
@@ -70,6 +78,12 @@ public abstract class RecentActivityDTO {
 
         @JsonProperty(FIELD_ITEM_ID)
         public abstract RecentActivityDTO.Builder itemId(String itemId);
+
+        @JsonProperty(FIELD_ITEM_TYPE)
+        public abstract RecentActivityDTO.Builder itemType(String itemType);
+
+        @JsonProperty(FIELD_ITEM_TITLE)
+        public abstract RecentActivityDTO.Builder itemTitle(String itemTitle);
 
         @JsonProperty(FIELD_TIMESTAMP)
         public abstract RecentActivityDTO.Builder timestamp(DateTime timestamp);

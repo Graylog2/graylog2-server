@@ -22,7 +22,6 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.security.events.EntitySharesUpdateEvent;
 import org.graylog2.contentpacks.ContentPackService;
-import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.PaginatedResponse;
@@ -30,7 +29,6 @@ import org.graylog2.rest.models.PaginatedResponse;
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DynamicStartPageService {
@@ -98,25 +96,13 @@ public class DynamicStartPageService {
         return PaginatedResponse.create("pinnedItems", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
     }
 
-    private String getType(final Map<String, EntityExcerpt> catalog, final String id) {
-        if(!catalog.containsKey(id)) return "Unknown entity in catalog: " + id;
-
-        return catalog.get(id).type().name();
-    }
-
-    private String getTitle(final Map<String, EntityExcerpt> catalog, final String id) {
-        if(!catalog.containsKey(id)) return "Unknown entity in catalog: " + id;
-
-        return catalog.get(id).title();
-    }
-
     public PaginatedResponse<RecentActivity> findRecentActivityFor(final SearchUser searchUser, int page, int perPage) {
         final var catalog = contentPackService.getEntityExcerpts();
         final var items = recentActivityService
                 .streamAllInReverseOrder()
                 .filter(searchUser::canSeeActivity)
                 .limit(MAXIMUM_ACTIVITY)
-                .map(i -> new RecentActivity(i.id(), i.activityType(), getType(catalog, i.itemId()), i.itemId(), getTitle(catalog, i.itemId()), i.timestamp()))
+                .map(i -> new RecentActivity(i.id(), i.activityType(), i.itemType(), i.itemId(), i.itemTitle(), i.timestamp()))
                 .collect(Collectors.toList());
         return PaginatedResponse.create("recentActivity", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
     }
@@ -157,13 +143,29 @@ public class DynamicStartPageService {
             pinnedItemsService.create(items, searchUser);
         }
     }
+    @Subscribe
+    public void createRecentActivityFor(final RecentActivityEvent event) {
+        recentActivityService.save(event.activity());
+    }
 
     @Subscribe
     public void createRecentActivityFor(final EntitySharesUpdateEvent event) {
+        var catalog = contentPackService.getEntityExcerpts();
         event.creates()
-                .forEach(e -> recentActivityService.save(RecentActivityDTO.builder().activityType(ActivityType.SHARED).itemId(event.entity().entity()).build()) );
+                .forEach(e -> recentActivityService.save(RecentActivityDTO.builder()
+                        .activityType(ActivityType.SHARED)
+                        .itemId(event.entity().entity())
+                        .itemType(event.entity().type())
+                        .itemTitle(catalog.get(event.entity().entity()).title())
+                        .build())
+                );
 
         event.deletes()
-                .forEach(e -> recentActivityService.save(RecentActivityDTO.builder().activityType(ActivityType.UNSHARED).itemId(event.entity().entity()).build()) );
+                .forEach(e -> recentActivityService.save(RecentActivityDTO.builder()
+                        .activityType(ActivityType.UNSHARED)
+                        .itemId(event.entity().entity())
+                        .itemType(event.entity().type())
+                        .itemTitle(catalog.get(event.entity().entity()).title())
+                        .build()) );
     }
 }
