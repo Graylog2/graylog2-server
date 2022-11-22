@@ -97,12 +97,11 @@ public class DynamicStartPageService {
     }
 
     public PaginatedResponse<RecentActivity> findRecentActivityFor(final SearchUser searchUser, int page, int perPage) {
-        final var catalog = contentPackService.getEntityExcerpts();
         final var items = recentActivityService
                 .streamAllInReverseOrder()
                 .filter(searchUser::canSeeActivity)
                 .limit(MAXIMUM_ACTIVITY)
-                .map(i -> new RecentActivity(i.id(), i.activityType(), i.itemType(), i.itemId(), i.itemTitle(), i.timestamp()))
+                .map(i -> new RecentActivity(i.id(), i.activityType(), i.itemType(), i.itemId(), i.itemTitle(), i.userName(), i.timestamp()))
                 .collect(Collectors.toList());
         return PaginatedResponse.create("recentActivity", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
     }
@@ -157,6 +156,7 @@ public class DynamicStartPageService {
                         .itemId(event.entity().entity())
                         .itemType(event.entity().type())
                         .itemTitle(catalog.get(event.entity().entity()).title())
+                        .userName(event.user().getFullName())
                         .build())
                 );
 
@@ -166,6 +166,7 @@ public class DynamicStartPageService {
                         .itemId(event.entity().entity())
                         .itemType(event.entity().type())
                         .itemTitle(catalog.get(event.entity().entity()).title())
+                        .userName(event.user().getFullName())
                         .build()) );
     }
 }
