@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.views;
 
 import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;
+import org.graylog.plugins.views.search.views.dynamicstartpage.ActivityType;
 import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivityDTO;
 import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivityService;
 import org.graylog.security.entities.EntityOwnershipService;
@@ -186,7 +187,7 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         try {
             final WriteResult<ViewDTO, ObjectId> save = db.insert(requirementsForView(viewDTO));
             var saved = save.getSavedObject();
-            recentActivityService.save(RecentActivityDTO.builder().activityType("create").itemId(saved.id()).build());
+            recentActivityService.save(RecentActivityDTO.builder().activityType(ActivityType.CREATE).itemId(saved.id()).build());
             return saved;
         } catch (DuplicateKeyException e) {
             throw new IllegalStateException("Unable to save view, it already exists.");
@@ -209,7 +210,7 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         checkArgument(viewDTO.id() != null, "Id of view must not be null.");
         final ViewDTO viewWithRequirements = requirementsForView(viewDTO);
         db.updateById(new ObjectId(viewWithRequirements.id()), viewWithRequirements);
-        recentActivityService.save(RecentActivityDTO.builder().activityType("update").itemId(viewWithRequirements.id()).build());
+        recentActivityService.save(RecentActivityDTO.builder().activityType(ActivityType.UPDATE).itemId(viewWithRequirements.id()).build());
         return viewWithRequirements;
     }
 
