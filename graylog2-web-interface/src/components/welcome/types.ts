@@ -1,5 +1,5 @@
 export type EntityItemType = 'search' | 'dashboard';
-export type ActivityType = 'create' | 'update' | 'share' | 'delete'
+export type RecentActivityType = 'create' | 'update' | 'share' | 'delete'
 export type Pagination = {
     page: number,
     per_page: number,
@@ -13,7 +13,7 @@ export type PinnedItem = {
   title: string
 }
 
-export type LastOpenItem = {
+export type LastOpenedItem = {
   id: string,
   type: EntityItemType,
   title: string
@@ -21,7 +21,7 @@ export type LastOpenItem = {
 
 export type RecentActivityResponseItem = {
   id: string,
-  activity_type: ActivityType,
+  activity_type: RecentActivityType,
   item_type: EntityItemType,
   item_id: string,
   title: string,
@@ -30,31 +30,43 @@ export type RecentActivityResponseItem = {
 
 export type RecentActivityItem = {
   id: string,
-  activityType: ActivityType,
+  activityType: RecentActivityType,
   itemType: EntityItemType,
   itemId: string,
   title: string,
   timestamp: string
 }
 
-export type PaginatedResponseRecentActivities = {
-  activities: Array<RecentActivityResponseItem>,
-  pagination: Pagination,
+export type PaginatedResponseRecentActivity = {
+  recentActivity: Array<RecentActivityResponseItem>,
+  page: number,
+  per_page: number,
+  count: number,
+  total: number,
 }
 
-export type PaginatedRecentActivities = {
-  activities: Array<RecentActivityItem>,
-  pagination: Pagination,
+export type PaginatedRecentActivity = {
+  recentActivity: Array<RecentActivityItem>,
+  page: number,
+  per_page: number,
+  count: number,
+  total: number,
 }
 
-export type PaginatedLastOpen = {
-  activities: Array<LastOpenItem>,
-  pagination: Pagination,
+export type PaginatedLastOpened = {
+  lastOpened: Array<LastOpenedItem>,
+  page: number,
+  per_page: number,
+  count: number,
+  total: number,
 }
 
-export type PaginatedPinned = {
-  activities: Array<PinnedItem>,
-  pagination: Pagination,
+export type PaginatedPinnedItems = {
+  pinnedItems: Array<PinnedItem>,
+  page: number,
+  per_page: number,
+  count: number,
+  total: number,
 }
 
 export type RequestQuery = {

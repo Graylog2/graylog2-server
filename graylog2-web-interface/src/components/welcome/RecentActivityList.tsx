@@ -8,7 +8,8 @@ import { relativeDifference } from 'util/DateTime';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
 import { StyledLabel } from 'components/welcome/EntityListItem';
-import { useRecentActivities } from 'components/welcome/hooks';
+import { useRecentActivity } from 'components/welcome/hooks';
+import type { EntityItemType, RecentActivityType } from 'components/welcome/types';
 
 const ActionItemLink = styled(Link)(({ theme }) => css`
   color: ${theme.colors.variant.primary};
@@ -17,32 +18,36 @@ const ActionItemLink = styled(Link)(({ theme }) => css`
   }
 `);
 
-const ActionItem = ({ action, id, entityType, entityName }) => {
+type Props = { itemType: EntityItemType, itemId: string, activityType: RecentActivityType, title: string};
+
+const ActionItem = ({ itemType, itemId, activityType, title }: Props) => {
   return (
     <span>
-      {`${action.actionUser} ${action.actionType} ${entityType}`}
+      {`The ${itemType}`}
       {' '}
-      <ActionItemLink target="_blank" to={Routes.pluginRoute(typeLinkMap[entityType].link)(id)}>{entityName}</ActionItemLink>
-      {' '}
-      {`with ${action.actedUser}`}
+      <ActionItemLink target="_blank" to={Routes.pluginRoute(typeLinkMap[itemType].link)(itemId)}>{title}</ActionItemLink>
+      {' was '}
+      {`${activityType}d`}
     </span>
   );
 };
 
 const RecentActivityList = () => {
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
-  const { data: { resentActivities, pagination: { total } }, isFetching } = useRecentActivities(pagination);
+  const { data: { recentActivity, total }, isFetching } = useRecentActivity(pagination);
   const onPageChange = useCallback((newPage) => {
     setPagination((cur) => ({ ...cur, page: newPage }));
   }, [setPagination]);
 
+  if (isFetching) return <Spinner />;
+  if (!recentActivity.length) return <i>There is no recent activity</i>;
+
   return (
     <PaginatedList onChange={onPageChange} useQueryParameter={false} activePage={pagination.page} totalItems={total} pageSize={pagination.per_page} showPageSizeSelect={false} hideFirstAndLastPageLinks>
-      {isFetching ? <Spinner /> : (
-        <Table striped>
-          <tbody>
-            {
-              resentActivities.map(({ timestamp, action, id, entityName, entityType }) => {
+      <Table striped data-testid="recent-activity-table">
+        <tbody>
+          {
+              recentActivity.map(({ id, timestamp, activityType, itemType, itemId, title }) => {
                 return (
                   <tr key={id}>
                     <td style={{ width: 100 }}>
@@ -50,15 +55,14 @@ const RecentActivityList = () => {
                       </StyledLabel>
                     </td>
                     <td>
-                      <ActionItem id={id} action={action} entityName={entityName} entityType={entityType} />
+                      <ActionItem itemId={itemId} activityType={activityType} title={title} itemType={itemType} />
                     </td>
                   </tr>
                 );
               })
         }
-          </tbody>
-        </Table>
-      )}
+        </tbody>
+      </Table>
     </PaginatedList>
   );
 };

@@ -5,6 +5,7 @@ import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { ListGroupItem, Label } from 'components/bootstrap';
 import { typeLinkMap } from 'components/welcome/helpers';
+import type { LastOpenedItem } from 'components/welcome/types';
 
 const StyledListGroupItem = styled(ListGroupItem)`
   display: flex;
@@ -17,7 +18,7 @@ export const StyledLabel = styled(Label)`
   display: block;
 `;
 
-const EntityItem = ({ type, title, id }) => {
+const EntityItem = ({ type, title, id }: LastOpenedItem) => {
   return (
     <StyledListGroupItem>
       <StyledLabel bsStyle="info">{type}</StyledLabel>

@@ -17,12 +17,12 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import PageHeader from 'components/common/PageHeader';
+import SectionComponent from 'components/common/Section/SectionComponent';
+
 import LastOpenList from './LastOpenList';
 import PinnedItemsList from './PinnedItemsList';
 import RecentActivityList from './RecentActivityList';
-
-import PageHeader from '../common/PageHeader';
-import SectionComponent from '../common/Section/SectionComponent';
 
 const FlexContainer = styled.div`
   display: flex;
@@ -35,25 +35,23 @@ const StyledSectionComponent = styled(SectionComponent)`
   flex-grow: 1;
 `;
 
-const Welcome = () => {
-  return (
-    <>
-      <PageHeader title="Welcome to Graylog">
-        <span>Here you can find most used content</span>
-      </PageHeader>
-      <FlexContainer>
-        <StyledSectionComponent title="Last opened">
-          <LastOpenList />
-        </StyledSectionComponent>
-        <StyledSectionComponent title="Pinned items">
-          <PinnedItemsList />
-        </StyledSectionComponent>
-      </FlexContainer>
-      <StyledSectionComponent title="Recent activity">
-        <RecentActivityList />
+const Welcome = () => (
+  <>
+    <PageHeader title="Welcome to Graylog">
+      <span>Here you can find most used content</span>
+    </PageHeader>
+    <FlexContainer>
+      <StyledSectionComponent title="Last opened">
+        <LastOpenList />
       </StyledSectionComponent>
-    </>
-  );
-};
+      <StyledSectionComponent title="Pinned items">
+        <PinnedItemsList />
+      </StyledSectionComponent>
+    </FlexContainer>
+    <StyledSectionComponent title="Recent activity">
+      <RecentActivityList />
+    </StyledSectionComponent>
+  </>
+);
 
 export default Welcome;
