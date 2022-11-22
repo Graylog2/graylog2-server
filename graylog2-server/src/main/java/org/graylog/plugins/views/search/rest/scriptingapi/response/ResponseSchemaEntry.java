@@ -16,9 +16,44 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record ResponseSchemaEntry(@JsonProperty String name,
-                                  @JsonProperty String type,
-                                  @JsonProperty String field) {
+import java.util.Locale;
+import java.util.Optional;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record ResponseSchemaEntry(
+        @JsonProperty("column_type") ResponseEntryType type,
+        @JsonProperty("type") ResponseEntryDataType dataType,
+        @JsonProperty("function") String functionName,
+        @JsonProperty("field") String fieldName) {
+
+    public static ResponseSchemaEntry groupBy(String fieldName) {
+        return new ResponseSchemaEntry(ResponseEntryType.GROUPING, ResponseEntryDataType.STRING, null, fieldName);
+    }
+
+    public static ResponseSchemaEntry metric(String functionName, ResponseEntryDataType dataType, String fieldName) {
+        return new ResponseSchemaEntry(ResponseEntryType.METRIC, dataType, functionName, fieldName);
+    }
+
+    /**
+     * @return Human readable label like:
+     * grouping: http_method
+     * metric: count(action)
+     * metric: avg(took_ms)
+     */
+    @JsonProperty
+    public String name() {
+        return type + ": " + getFunctionLabel();
+    }
+
+    private String getFunctionLabel() {
+        if (functionName != null) {
+            final String safeFieldName = Optional.ofNullable(fieldName).orElse("");
+            return String.format(Locale.ROOT, "%s(%s)", functionName, safeFieldName);
+        } else {
+            return fieldName;
+        }
+    }
 }

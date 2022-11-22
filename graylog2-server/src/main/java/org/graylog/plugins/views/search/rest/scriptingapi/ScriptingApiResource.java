@@ -133,8 +133,6 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
         at.getContext().setWidth(response.schema().size() * 25);
         at.addRule();
         at.addRow(response.schema().stream().map(ResponseSchemaEntry::name).collect(Collectors.toList()));
-        at.addRow(response.schema().stream().map(f -> f.field() != null ? f.field() : "").collect(Collectors.toList()));
-        at.addRow(response.schema().stream().map(f -> f.type() != null ? f.type() : "").collect(Collectors.toList()));
         at.addRule();
         response.datarows().forEach(at::addRow);
         at.addRule();
