@@ -32,17 +32,14 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.SearchJobDTO;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.AggregationSpecToPivotMapper;
+import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryParamsToFullRequestSpecificationMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchRequestSpecToSearchMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchTypeResultToTabularResponseMapper;
-import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
-import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
@@ -52,7 +49,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -79,16 +75,19 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     private final EventBus serverEventBus;
     private final SearchRequestSpecToSearchMapper searchCreator;
     private final SearchTypeResultToTabularResponseMapper responseCreator;
+    private final QueryParamsToFullRequestSpecificationMapper queryParamsToFullRequestSpecificationMapper;
 
     @Inject
     public ScriptingApiResource(final SearchExecutor searchExecutor,
                                 final EventBus serverEventBus,
                                 final SearchRequestSpecToSearchMapper searchCreator,
-                                final SearchTypeResultToTabularResponseMapper responseCreator) {
+                                final SearchTypeResultToTabularResponseMapper responseCreator,
+                                final QueryParamsToFullRequestSpecificationMapper queryParamsToFullRequestSpecificationMapper) {
         this.searchExecutor = searchExecutor;
         this.serverEventBus = serverEventBus;
         this.searchCreator = searchCreator;
         this.responseCreator = responseCreator;
+        this.queryParamsToFullRequestSpecificationMapper = queryParamsToFullRequestSpecificationMapper;
     }
 
     @POST
@@ -154,7 +153,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                                         @QueryParam("groups") List<String> groups,
                                         @QueryParam("metrics") List<String> metrics,
                                         @Context SearchUser searchUser) {
-        SearchRequestSpec searchRequestSpec = simpleQueryParamsToFullRequestSpecification(query, streams, timerangeKeyword, groups, metrics);
+        SearchRequestSpec searchRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(query, streams, timerangeKeyword, groups, metrics);
         return executeQuery(searchRequestSpec, searchUser);
     }
 
@@ -170,40 +169,8 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                                           @QueryParam("groups") List<String> groups,
                                           @QueryParam("metrics") List<String> metrics,
                                           @Context SearchUser searchUser) {
-        SearchRequestSpec searchRequestSpec = simpleQueryParamsToFullRequestSpecification(query, streams, timerangeKeyword, groups, metrics);
+        SearchRequestSpec searchRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(query, streams, timerangeKeyword, groups, metrics);
         return executeQueryAsciiOutput(searchRequestSpec, searchUser);
-    }
-
-    private SearchRequestSpec simpleQueryParamsToFullRequestSpecification(String query, Set<String> streams, String timerangeKeyword, List<String> groups, List<String> metrics) {
-        if (groups == null || groups.isEmpty()) {
-            throw new BadRequestException("At least one grouping has to be provided!");
-        }
-        if (metrics == null || metrics.isEmpty()) {
-            metrics = List.of("count:");
-        }
-        if (!metrics.stream().allMatch(m -> m.contains(":"))) {
-            throw new BadRequestException("All metrics need to be defined as \"function\":\"field_name\"");
-        }
-
-        return new SearchRequestSpec(
-                query,
-                streams,
-                parseTimeRange(timerangeKeyword),
-                groups.stream().map(Grouping::new).collect(Collectors.toList()),
-                metrics.stream().map(this::parseMetric).collect(Collectors.toList()),
-                false
-        );
-    }
-
-    private TimeRange parseTimeRange(String timerangeKeyword) {
-        return timerangeKeyword != null ? KeywordRange.create(timerangeKeyword, "UTC") : null;
-    }
-
-    private Metric parseMetric(String metric) {
-        final String[] split = metric.split(":");
-        final String fieldName = split.length > 1 ? split[1] : null;
-        final String functionName = split[0];
-        return new Metric(fieldName, functionName, null);
     }
 
     private void postAuditEvent(SearchJob searchJob) {
