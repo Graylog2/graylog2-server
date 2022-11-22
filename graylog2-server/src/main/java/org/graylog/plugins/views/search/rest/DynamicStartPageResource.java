@@ -20,11 +20,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.dynamicstartpage.DynamicStartPageService;
 import org.graylog.plugins.views.search.views.dynamicstartpage.LastOpenedItem;
 import org.graylog.plugins.views.search.views.dynamicstartpage.PinnedItem;
 import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivity;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.models.PaginatedResponse;
@@ -82,6 +84,7 @@ public class DynamicStartPageResource extends RestResource implements PluginRest
     @PUT
     @Path("/pinItem/{id}")
     @ApiOperation("Pin a dashboard for inclusion on the Dynamic Start Page for the user")
+    @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_PIN_ITEM)
     public void pinItem(@ApiParam(name = "id", required = true) @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
         service.addPinnedItemFor(id ,searchUser);
     }

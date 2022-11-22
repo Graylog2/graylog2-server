@@ -52,6 +52,10 @@ public class ViewsAuditEventTypes implements PluginAuditEventTypes {
     public static final String EXPORT_JOB = "export_job";
     public static final String EXPORT_JOB_CREATED = PREFIX + EXPORT_JOB + ":created";
 
+    public static final String DYNAMIC_STARTUP_PAGE = "dynamic_startup_page";
+
+    public static final String DYNAMIC_STARTUP_PAGE_PIN_ITEM = PREFIX + DYNAMIC_STARTUP_PAGE + ":piItem";
+
     private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.<String>builder()
             .add(VIEW_CREATE)
             .add(VIEW_UPDATE)
