@@ -119,13 +119,15 @@ public class ViewsResourceTest {
     @Mock
     private ReferencedSearchFiltersHelper referencedSearchFiltersHelper;
 
+    @Mock
     private ViewsResource viewsResource;
 
+    @Mock
     private DynamicStartPageService dspService;
 
     @BeforeEach
     public void setUp() {
-        this.viewsResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain, referencedSearchFiltersHelper);
+        this.viewsResource = new ViewsTestResource(viewService, dspService, clusterEventBus, userService, searchDomain, referencedSearchFiltersHelper);
         when(searchUser.canCreateDashboards()).thenReturn(true);
         this.search = mock(Search.class, RETURNS_DEEP_STUBS);
         doReturn(SEARCH_ID).when(search).id();
@@ -136,12 +138,12 @@ public class ViewsResourceTest {
     }
 
     class ViewsTestResource extends ViewsResource {
-        ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain, ReferencedSearchFiltersHelper referencedSearchFiltersHelper) {
-            this(viewService, clusterEventBus, userService, searchDomain, new HashMap<>(), referencedSearchFiltersHelper);
+        ViewsTestResource(ViewService viewService, DynamicStartPageService dynamicStartPageService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain, ReferencedSearchFiltersHelper referencedSearchFiltersHelper) {
+            this(viewService, dynamicStartPageService, clusterEventBus, userService, searchDomain, new HashMap<>(), referencedSearchFiltersHelper);
         }
 
-        ViewsTestResource(ViewService viewService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain, Map<String, ViewResolver> viewResolvers, ReferencedSearchFiltersHelper referencedSearchFiltersHelper) {
-            super(viewService, dspService,clusterEventBus, searchDomain, viewResolvers, searchFilterVisibilityChecker, referencedSearchFiltersHelper);
+        ViewsTestResource(ViewService viewService, DynamicStartPageService dspService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain, Map<String, ViewResolver> viewResolvers, ReferencedSearchFiltersHelper referencedSearchFiltersHelper) {
+            super(viewService, dspService, clusterEventBus, searchDomain, viewResolvers, searchFilterVisibilityChecker, referencedSearchFiltersHelper);
             this.userService = userService;
         }
 
@@ -309,7 +311,7 @@ public class ViewsResourceTest {
     }
 
     private void prepareUpdate(final ViewDTO.Type viewType) {
-        this.viewsResource = spy(new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain, referencedSearchFiltersHelper));
+        this.viewsResource = spy(new ViewsTestResource(viewService, dspService, clusterEventBus, userService, searchDomain, referencedSearchFiltersHelper));
 
         ViewDTO originalView = mock(ViewDTO.class);
         final ViewDTO.Builder originalViewBuilder = mockView(viewType, originalView);
@@ -386,7 +388,7 @@ public class ViewsResourceTest {
         final String resolverName = "test-resolver";
         final Map<String, ViewResolver> viewResolvers = new HashMap<>();
         viewResolvers.put(resolverName, new TestViewResolver());
-        final ViewsResource testResource = new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain, viewResolvers, referencedSearchFiltersHelper);
+        final ViewsResource testResource = new ViewsTestResource(viewService, dspService, clusterEventBus, userService, searchDomain, viewResolvers, referencedSearchFiltersHelper);
 
         // Verify that view for valid id is found.
         when(searchUser.canReadView(any())).thenReturn(true);
