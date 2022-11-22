@@ -76,6 +76,8 @@ public class ViewsAuditEventTypes implements PluginAuditEventTypes {
 
             .add(EXPORT_JOB_CREATED)
 
+            .add(DYNAMIC_STARTUP_PAGE_PIN_ITEM)
+
             .build();
 
     @Override
