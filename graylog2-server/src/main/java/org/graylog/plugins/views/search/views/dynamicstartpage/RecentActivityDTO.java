@@ -59,6 +59,7 @@ public abstract class RecentActivityDTO {
     public abstract String itemTitle();
 
     @JsonProperty(FIELD_USER_NAME)
+    @Nullable
     public abstract String userName();
 
     @JsonProperty(FIELD_TIMESTAMP)

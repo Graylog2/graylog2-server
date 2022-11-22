@@ -187,7 +187,7 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         try {
             final WriteResult<ViewDTO, ObjectId> save = db.insert(requirementsForView(viewDTO));
             var saved = save.getSavedObject();
-            recentActivityService.save(RecentActivityDTO.builder().activityType(ActivityType.CREATE).itemId(saved.id()).build());
+            recentActivityService.postRecentActivity(ActivityType.CREATE, saved.id(), saved.type().name(), saved.title());
             return saved;
         } catch (DuplicateKeyException e) {
             throw new IllegalStateException("Unable to save view, it already exists.");
@@ -210,7 +210,7 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         checkArgument(viewDTO.id() != null, "Id of view must not be null.");
         final ViewDTO viewWithRequirements = requirementsForView(viewDTO);
         db.updateById(new ObjectId(viewWithRequirements.id()), viewWithRequirements);
-        recentActivityService.save(RecentActivityDTO.builder().activityType(ActivityType.UPDATE).itemId(viewWithRequirements.id()).build());
+        recentActivityService.postRecentActivity(ActivityType.UPDATE, viewDTO.id(), viewDTO.type().name(), viewDTO.title());
         return viewWithRequirements;
     }
 
