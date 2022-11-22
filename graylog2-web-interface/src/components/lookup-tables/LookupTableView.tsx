@@ -157,7 +157,7 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
                    onChange={handleInputOnChange}
                    help="Key to look up a value for."
                    value={lookupKey.value} />
-            <Button type="submit" bsStyle="success" disabled={!lookupKey.valid}>Look up</Button>
+            <Button type="submit" name="lookupbutton" bsStyle="success" disabled={!lookupKey.valid}>Look up</Button>
           </fieldset>
         </form>
         {lookupResult && (
