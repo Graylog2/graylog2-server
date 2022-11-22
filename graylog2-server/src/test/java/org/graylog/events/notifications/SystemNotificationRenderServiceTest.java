@@ -22,15 +22,20 @@ import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.graylog.events.processor.systemnotification.SystemNotificationRenderService.TEMPLATE_BASE_PATH;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -56,7 +61,7 @@ class SystemNotificationRenderServiceTest {
                 .addDetail("description", "description")
                 .addDetail("dummy", "dummy")
                 .addDetail("exception", new Exception("My Test Exception"))
-                .addTimestamp(DateTime.now());
+                .addTimestamp(DateTime.now(DateTimeZone.UTC));
         when(notificationService.getByType(any())).thenReturn(Optional.of(notification));
 
         TemplateRenderResponse renderResponse = renderService.renderHtml(notification);
@@ -75,7 +80,7 @@ class SystemNotificationRenderServiceTest {
                 .addDetail("description", "description")
                 .addDetail("dummy", "dummy")
                 .addDetail("exception", new Exception("My Test Exception"))
-                .addTimestamp(DateTime.now());
+                .addTimestamp(DateTime.now(DateTimeZone.UTC));
         when(notificationService.getByType(any())).thenReturn(Optional.of(notification));
 
         String plainText = renderService.renderPlainText(notification);
@@ -92,7 +97,7 @@ class SystemNotificationRenderServiceTest {
                 .addType(Notification.Type.NO_INPUT_RUNNING)
                 .addDetail("SYSTEM_INPUTS", url)
                 .addDetail("exception", new Exception("My Test Exception"))
-                .addTimestamp(DateTime.now());
+                .addTimestamp(DateTime.now(DateTimeZone.UTC));
         when(notificationService.getByType(any())).thenReturn(Optional.of(notification));
         when(graylogConfig.isCloud()).thenReturn(true);
 
@@ -109,7 +114,7 @@ class SystemNotificationRenderServiceTest {
                 .addType(Notification.Type.NO_INPUT_RUNNING)
                 .addDetail("SYSTEM_INPUTS", url)
                 .addDetail("exception", new Exception("My Test Exception"))
-                .addTimestamp(DateTime.now());
+                .addTimestamp(DateTime.now(DateTimeZone.UTC));
         when(notificationService.getByType(any())).thenReturn(Optional.of(notification));
         when(graylogConfig.isCloud()).thenReturn(false);
 
@@ -129,7 +134,7 @@ class SystemNotificationRenderServiceTest {
                 .addDetail("title", "my title")
                 .addDetail("description", "my description")
                 .addDetail("blockDetails", blockDetails)
-                .addTimestamp(DateTime.now());
+                .addTimestamp(DateTime.now(DateTimeZone.UTC));
         when(notificationService.getByType(any())).thenReturn(Optional.of(notification));
 
         TemplateRenderResponse renderResponse = renderService.renderHtml(notification);
@@ -138,10 +143,16 @@ class SystemNotificationRenderServiceTest {
 
     @Test
     void missingTemplates() {
-        for (Notification.Type type : Notification.Type.values()) {
-            if (SystemNotificationRenderService.class.getResource(type.toString().toLowerCase(Locale.ENGLISH)) == null) {
-                System.out.println("Missing FTL: " + type);
-            }
-        }
+        Arrays.stream(Notification.Type.values())
+                // deprecated notification types from pre-5.0.
+                .filter(t -> t != Notification.Type.MULTI_MASTER && t != Notification.Type.NO_MASTER)
+                .map(t -> {
+                    String templateFile = TEMPLATE_BASE_PATH + t.toString().toLowerCase(Locale.ENGLISH) + ".ftl";
+                    if (SystemNotificationRenderServiceTest.class.getResource(templateFile) == null) {
+                        fail("Missing template: " + templateFile);
+                    }
+                    return t;
+                })
+                .collect(Collectors.toList());
     }
 }

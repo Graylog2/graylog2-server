@@ -34,10 +34,11 @@ import java.util.Map;
 import static org.apache.commons.lang.CharEncoding.UTF_8;
 
 public class SystemNotificationRenderService {
-    static final String KEY_NODE_ID = "node_id";
-    static final String KEY_TITLE = "_title";
-    static final String KEY_DESCRIPTION = "_description";
-    static final String KEY_CLOUD = "_cloud";
+    private static final String KEY_NODE_ID = "node_id";
+    private static final String KEY_TITLE = "_title";
+    private static final String KEY_DESCRIPTION = "_description";
+    private static final String KEY_CLOUD = "_cloud";
+    public static final String TEMPLATE_BASE_PATH = "/org/graylog2/freemarker/templates/";
     private NotificationService notificationService;
     private org.graylog2.Configuration graylogConfig;
     private static final freemarker.template.Configuration cfg =
@@ -52,7 +53,7 @@ public class SystemNotificationRenderService {
         cfg.setDefaultEncoding(UTF_8);
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         cfg.setLogTemplateExceptions(false);
-        cfg.setClassForTemplateLoading(SystemNotificationRenderService.class, "/org/graylog2/freemarker/templates/");
+        cfg.setClassForTemplateLoading(SystemNotificationRenderService.class, TEMPLATE_BASE_PATH);
     }
 
     public TemplateRenderResponse renderHtml(Notification notification) {
