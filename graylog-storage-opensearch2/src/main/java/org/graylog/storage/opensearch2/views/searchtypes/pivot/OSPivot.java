@@ -87,10 +87,8 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         final AggregationBuilder rootAggregation = createdAggregations.root();
         final AggregationBuilder leafAggregation = createdAggregations.leaf();
         final List<AggregationBuilder> metricsAggregations = createdAggregations.metrics();
-        if (!pivot.rowGroups().isEmpty() && (pivot.columnGroups().isEmpty() || pivot.rollup())) {
-            seriesStream(pivot, queryContext, "metrics")
-                    .forEach(aggregation -> metricsAggregations.forEach(metricsAggregation -> metricsAggregation.subAggregation(aggregation)));
-        }
+        seriesStream(pivot, queryContext, "metrics")
+                .forEach(aggregation -> metricsAggregations.forEach(metricsAggregation -> metricsAggregation.subAggregation(aggregation)));
 
         if (!pivot.columnGroups().isEmpty()) {
             final BucketSpecHandler.CreatedAggregations<AggregationBuilder> createdColumnsAggregations = createPivots(BucketSpecHandler.Direction.Column, query, pivot, pivot.columnGroups(), queryContext);
@@ -198,7 +196,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
 
         final MultiBucketsAggregation.Bucket initialBucket = createInitialBucket(queryResult);
 
-        retrieveBuckets(pivot.rowGroups(), initialBucket)
+        retrieveBuckets(pivot, pivot.rowGroups(), initialBucket)
                 .forEach(tuple -> {
                     final ImmutableList<String> keys = tuple.keys();
                     final MultiBucketsAggregation.Bucket bucket = tuple.bucket();
@@ -209,7 +207,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                         processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), bucket, true, "row-leaf");
                     }
                     if (!pivot.columnGroups().isEmpty()){
-                        retrieveBuckets(pivot.columnGroups(), bucket)
+                        retrieveBuckets(pivot, pivot.columnGroups(), bucket)
                                 .forEach(columnBucketTuple -> {
                                     final ImmutableList<String> columnKeys = columnBucketTuple.keys();
                                     final MultiBucketsAggregation.Bucket columnBucket = columnBucketTuple.bucket();
@@ -229,13 +227,13 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         return resultBuilder.build();
     }
 
-    private Stream<PivotBucket> retrieveBuckets(List<BucketSpec> pivots, MultiBucketsAggregation.Bucket initialBucket) {
+    private Stream<PivotBucket> retrieveBuckets(Pivot pivot, List<BucketSpec> pivots, MultiBucketsAggregation.Bucket initialBucket) {
         Stream<PivotBucket> result = Stream.of(PivotBucket.create(ImmutableList.of(), initialBucket));
 
         for (Tuple2<String, List<BucketSpec>> group : groupByConsecutiveType(pivots)) {
             result = result.flatMap((tuple) -> {
                 final OSPivotBucketSpecHandler<? extends BucketSpec> bucketHandler = bucketHandlers.get(group.v1());
-                return bucketHandler.extractBuckets(group.v2(), tuple);
+                return bucketHandler.extractBuckets(pivot, group.v2(), tuple);
             });
         }
 
