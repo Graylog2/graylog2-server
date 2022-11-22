@@ -44,7 +44,7 @@ const StartPageF = () => {
       return;
     }
 
-    redirect(Routes.SEARCH);
+    redirect(Routes.WELCOME);
   }, [currentUser?.startpage]);
 
   useEffect(() => {
