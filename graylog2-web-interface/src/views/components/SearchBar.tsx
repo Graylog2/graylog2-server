@@ -146,7 +146,7 @@ const SearchBar = ({
 
   return (
     <WidgetFocusContext.Consumer>
-      {({ focusedWidget: { editing } = { editing: true } }) => (
+      {({ focusedWidget: { editing } = { editing: false } }) => (
         <ScrollToHint value={query.query_string}>
           <FormWarningsProvider>
             <SearchBarForm initialValues={initialValues}
