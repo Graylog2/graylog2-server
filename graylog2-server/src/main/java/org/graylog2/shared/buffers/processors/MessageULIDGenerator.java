@@ -26,12 +26,15 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Objects;
+
+import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_NODE;
 
 // Fill the first 16 bits of the ULIDs random section (16_bit_uint_random) with
 // a sequence number that reflects the order in which messages were received by an input.
 //
 // The sequence numbers on messages are ints and don't fit into 16 bits.
-// We remember a messages' first sequence number (subtrahend) in a size limited cache per input and timestamp.
+// We remember a messages' first sequence number (subtrahend) in a size limited cache per nodeId, input and timestamp.
 // The sequence number will then be subtracted with this subtrahend.
 // Thus will the first received message (for a certain input and timestamp) start with a sequence of 0 (see [1]).
 //
@@ -77,7 +80,8 @@ public class MessageULIDGenerator {
 
     public String createULID(Message message) {
         try {
-            return createULID(message.getSourceInputId(), message.getTimestamp().getMillis(), message.getSequenceNr());
+            return createULID(Objects.toString(message.getField(FIELD_GL2_SOURCE_NODE)),
+                    message.getSourceInputId(), message.getTimestamp().getMillis(), message.getSequenceNr());
         } catch (Exception e) {
             LOG.error("Exception while creating ULID.", e);
             return ulid.nextULID(message.getTimestamp().getMillis());
@@ -85,9 +89,9 @@ public class MessageULIDGenerator {
     }
 
     @VisibleForTesting
-    String createULID(String inputId, long timestamp, int sequenceNr) {
-        final String key = inputId + timestamp;
-        final int subtrahend = sequenceNrCache.get(key, k -> sequenceNr);
+    String createULID(String sourceNodeId, String inputId, long timestamp, int sequenceNr) {
+        final String cacheKey = sourceNodeId + "|" + inputId + "|" + timestamp;
+        final int subtrahend = sequenceNrCache.get(cacheKey, k -> sequenceNr);
 
         if (sequenceNr == subtrahend) {
             LOG.trace("Added new timestamp <{}> for input <{}> to cache. Seq <{}>", timestamp, inputId, sequenceNr);
@@ -106,7 +110,7 @@ public class MessageULIDGenerator {
         if (messageSequenceNr < 0) {
             LOG.warn("Got negative message sequence number ({} -> {}). Sort order might be wrong.", subtrahend, sequenceNr);
             messageSequenceNr = REORDERING_GAP;
-            sequenceNrCache.put(key, sequenceNr);
+            sequenceNrCache.put(cacheKey, sequenceNr);
         // If we receive more than 60535 messages with the same timestamp and input, they will exhaust the 16 bit of space in the ULID.
         } else if (messageSequenceNr >= ULID_RANDOM_MSB_MASK) {
             LOG.warn("Message sequence number <{}> input <{}> timestamp <{}> does not fit into ULID ({} >= 65535). Sort order might be wrong.",
