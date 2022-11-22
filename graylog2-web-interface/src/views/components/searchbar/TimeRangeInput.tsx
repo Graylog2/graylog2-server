@@ -20,6 +20,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
+import { SEARCH_BAR_GAP } from 'views/components/searchbar/Constants';
 
 import TimeRangeDropdownButton from './TimeRangeDropdownButton';
 import type { TimeRangeType } from './date-time-picker/TimeRangeDropdown';
@@ -45,7 +46,7 @@ const FlexContainer = styled.div`
   justify-content: space-between;
   flex: 1;
   min-width: 430px;
-  gap: 10px;
+  gap: ${SEARCH_BAR_GAP};
 `;
 
 const TimeRangeInput = ({

@@ -19,14 +19,11 @@ import styled from 'styled-components';
 import { RowContentStyles } from 'components/bootstrap/Row';
 
 /*
- * Component with the same styling like the bootstrap `Row` but with a smaller padding.
+ * Component with the same styling as the bootstrap `Row` but with a smaller padding.
  */
 const FlatContentRow = styled.div`
   ${RowContentStyles};
   
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
   padding: 9px;
   margin-left: -15px;
   margin-right: -15px;

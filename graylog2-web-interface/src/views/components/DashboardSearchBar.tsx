@@ -22,7 +22,7 @@ import styled, { css } from 'styled-components';
 
 import { useStore } from 'stores/connect';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
-import { FlatContentRow, Spinner } from 'components/common';
+import { Spinner } from 'components/common';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import QueryInput from 'views/components/searchbar/queryinput/AsyncQueryInput';
@@ -48,6 +48,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import useUserDateTime from 'hooks/useUserDateTime';
 import SearchInputAndValidationContainer from 'views/components/searchbar/SearchInputAndValidationContainer';
+import { SEARCH_BAR_GAP } from 'views/components/searchbar/Constants';
 
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
@@ -55,11 +56,12 @@ import DashboardSearchForm from './DashboardSearchBarForm';
 import PluggableSearchBarControls from './searchbar/PluggableSearchBarControls';
 import SearchButtonAndQuery from './searchbar/SearchButtonAndQueryContianer';
 import SearchQueryRow from './searchbar/SearchQueryRow';
+import SearchBarContainer from './SearchBarContainer';
 
 const TimeRangeRow = styled.div(({ theme }) => css`
   display: flex;
   justify-content: space-between;
-  gap: 10px;
+  gap: ${SEARCH_BAR_GAP};
 
   @media (max-width: ${theme.breakpoints.max.sm}) {
     flex-direction: column;
@@ -131,7 +133,7 @@ const DashboardSearchBar = () => {
                 const disableSearchSubmit = isSubmitting || isValidating || !isValid;
 
                 return (
-                  <FlatContentRow>
+                  <SearchBarContainer>
                     <ValidateOnParameterChange parameters={parameters} />
                     <TimeRangeRow>
                       <StyledTimeRangeInput onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
@@ -176,7 +178,7 @@ const DashboardSearchBar = () => {
                       {!editing && <DashboardActionsMenu />}
                     </SearchQueryRow>
                     <PluggableSearchBarControls showLeftControls={false} />
-                  </FlatContentRow>
+                  </SearchBarContainer>
                 );
               }}
             </DashboardSearchForm>

@@ -23,7 +23,7 @@ import styled from 'styled-components';
 import moment from 'moment';
 
 import connect, { useStore } from 'stores/connect';
-import { Spinner, FlatContentRow } from 'components/common';
+import { Spinner } from 'components/common';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import SearchActionsMenu from 'views/components/searchbar/saved-search/SearchActionsMenu';
 import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
@@ -54,6 +54,8 @@ import type { SearchBarControl } from 'views/types';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import useUserDateTime from 'hooks/useUserDateTime';
 import TimeRangeRow from 'views/components/searchbar/TimeRangeRow';
+import SearchBarContainer from 'views/components/SearchBarContainer';
+import { SEARCH_BAR_GAP } from 'views/components/searchbar/Constants';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 import SearchButtonAndQuery from './searchbar/SearchButtonAndQueryContianer';
@@ -66,16 +68,9 @@ import {
   pluggableValidationPayload,
 } from '../logic/searchbar/pluggableSearchBarControlsHandler';
 
-type Props = {
-  availableStreams: Array<{ key: string, value: string }>,
-  currentQuery: Query,
-  onSubmit?: (update: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, query: Query) => Promise<any>
-  queryFilters: Immutable.Map<QueryId, FilterType>,
-};
-
 const StreamsAndRefresh = styled.div`
   display: flex;
-  gap: 10px;
+  gap: ${SEARCH_BAR_GAP};
   flex: 1.5;
 `;
 
@@ -123,6 +118,13 @@ const _validateQueryString = (values: SearchBarFormValues, pluggableSearchBarCon
   return debouncedValidateQuery(request, userTimezone);
 };
 
+type Props = {
+  availableStreams: Array<{ key: string, value: string }>,
+  currentQuery: Query,
+  onSubmit?: (update: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, query: Query) => Promise<any>
+  queryFilters: Immutable.Map<QueryId, FilterType>,
+};
+
 const SearchBar = ({
   availableStreams,
   currentQuery,
@@ -159,7 +161,7 @@ const SearchBar = ({
                 return (
                   <>
                     <ValidateOnParameterChange parameters={parameters} />
-                    <FlatContentRow>
+                    <SearchBarContainer>
                       <TimeRangeRow>
                         <TimeRangeInput limitDuration={limitDuration}
                                         onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
@@ -215,7 +217,7 @@ const SearchBar = ({
                         {!editing && <SearchActionsMenu />}
                       </SearchQueryRow>
                       <PluggableSearchBarControls />
-                    </FlatContentRow>
+                    </SearchBarContainer>
                   </>
                 );
               }}

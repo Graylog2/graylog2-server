@@ -16,13 +16,13 @@
  */
 import styled from 'styled-components';
 
+import { FlatContentRow } from 'components/common';
 import { SEARCH_BAR_GAP } from 'views/components/searchbar/Constants';
 
-const SearchButtonAndQuery = styled.div`
-  flex: 1;
+const SearchBarContainer = styled(FlatContentRow)`
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
   gap: ${SEARCH_BAR_GAP};
 `;
 
-export default SearchButtonAndQuery;
+export default SearchBarContainer;

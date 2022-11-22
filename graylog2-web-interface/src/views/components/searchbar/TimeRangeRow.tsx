@@ -16,9 +16,11 @@
  */
 import styled, { css } from 'styled-components';
 
+import { SEARCH_BAR_GAP } from 'views/components/searchbar/Constants';
+
 const TimeRangeRow = styled.div(({ theme }) => css`
   display: flex;
-  gap: 10px;
+  gap: ${SEARCH_BAR_GAP};
   align-items: flex-start;
 
   @media (max-width: ${theme.breakpoints.max.md}) {

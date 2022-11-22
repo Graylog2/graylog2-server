@@ -53,6 +53,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
 import TimeRangeRow from 'views/components/searchbar/TimeRangeRow';
 import SearchQueryRow from 'views/components/searchbar/SearchQueryRow';
+import { SEARCH_BAR_GAP } from 'views/components/searchbar/Constants';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeInput from './searchbar/TimeRangeInput';
@@ -66,7 +67,7 @@ import PluggableSearchBarControls from './searchbar/PluggableSearchBarControls';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: ${SEARCH_BAR_GAP};
 `;
 
 const SearchInputAndValidation = styled.div`

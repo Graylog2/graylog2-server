@@ -14,15 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import styled from 'styled-components';
 
-import { SEARCH_BAR_GAP } from 'views/components/searchbar/Constants';
-
-const SearchButtonAndQuery = styled.div`
-  flex: 1;
-  display: flex;
-  align-items: flex-start;
-  gap: ${SEARCH_BAR_GAP};
-`;
-
-export default SearchButtonAndQuery;
+// eslint-disable-next-line import/prefer-default-export
+export const SEARCH_BAR_GAP = '10px';
