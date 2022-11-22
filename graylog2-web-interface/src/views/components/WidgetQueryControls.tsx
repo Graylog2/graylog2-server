@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useCallback, useEffect, useContext, useRef, useMemo } from 'react';
 import { Field } from 'formik';
 import moment from 'moment';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { isEmpty } from 'lodash';
 import { useIsFetching } from '@tanstack/react-query';
 
@@ -31,7 +31,6 @@ import { WidgetActions } from 'views/stores/WidgetStore';
 import type { SearchBarFormValues } from 'views/Constants';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
-import { Row, Col } from 'components/bootstrap';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import { GlobalOverrideStore, GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
@@ -63,22 +62,34 @@ import WidgetQueryOverride from './WidgetQueryOverride';
 import PluggableSearchBarControls from './searchbar/PluggableSearchBarControls';
 
 const Container = styled.div`
-  display: grid;
-  row-gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 `;
+
+const TimeRangeRow = styled.div(({ theme }) => css`
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+
+  @media (max-width: ${theme.breakpoints.max.md}) {
+    flex-direction: column;
+
+    > div {
+      width: 100%;
+    }
+  }
+`);
 
 const SecondRow = styled.div`
   display: flex;
+  gap: 10px;
   align-items: flex-start;
-
-  .query {
-    flex: 1;
-  }
 `;
 
-const WidgetTopRow = styled(Row)`
-  margin-top: 10px;
-  margin-bottom: 10px;
+const SearchInputAndValidation = styled.div`
+  display: flex;
+  flex: 1;
 `;
 
 type Props = {
@@ -187,59 +198,56 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
             <Container>
               <PropagateDisableSubmissionState formKey="widget-query-controls" disableSubmission={disableSearchSubmit} />
               <ValidateOnParameterChange parameters={parameters} />
-              <WidgetTopRow>
-                <Col md={6}>
-                  {!hasTimeRangeOverride && (
-                    <TimeRangeInput disabled={hasTimeRangeOverride}
-                                    limitDuration={limitDuration}
-                                    onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                    value={values?.timerange}
-                                    hasErrorOnMount={!!errors.timerange}
-                                    position="right" />
-                  )}
-                  {hasTimeRangeOverride && (
-                    <TimeRangeOverrideInfo value={globalOverride?.timerange} onReset={_resetTimeRangeOverride} />
-                  )}
-                </Col>
+              <TimeRangeRow>
+                {!hasTimeRangeOverride && (
+                <TimeRangeInput disabled={hasTimeRangeOverride}
+                                limitDuration={limitDuration}
+                                onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                                value={values?.timerange}
+                                hasErrorOnMount={!!errors.timerange}
+                                position="right" />
+                )}
+                {hasTimeRangeOverride && (
+                <TimeRangeOverrideInfo value={globalOverride?.timerange} onReset={_resetTimeRangeOverride} />
+                )}
 
-                <Col md={6}>
-                  <Field name="streams">
-                    {({ field: { name, value, onChange } }) => (
-                      <StreamsFilter value={value}
-                                     streams={availableStreams}
-                                     onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
-                    )}
-                  </Field>
-                </Col>
-              </WidgetTopRow>
+                <Field name="streams">
+                  {({ field: { name, value, onChange } }) => (
+                    <StreamsFilter value={value}
+                                   streams={availableStreams}
+                                   onChange={(newStreams) => onChange({ target: { value: newStreams, name } })} />
+                  )}
+                </Field>
+              </TimeRangeRow>
 
               <SecondRow>
                 <SearchButton disabled={disableSearchSubmit}
                               dirty={dirty}
                               displaySpinner={isSubmitting} />
+                <SearchInputAndValidation>
+                  <Field name="queryString">
+                    {({ field: { name, value, onChange }, meta: { error } }) => (
+                      <FormWarningsContext.Consumer>
+                        {({ warnings }) => (
+                          <QueryInput value={value}
+                                      timeRange={!isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange}
+                                      streams={values?.streams}
+                                      placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
+                                      error={error}
+                                      disableExecution={disableSearchSubmit}
+                                      isValidating={isValidatingQuery}
+                                      warning={warnings.queryString}
+                                      validate={validateForm}
+                                      name={name}
+                                      onChange={onChange}
+                                      onExecute={handleSubmit as () => void} />
+                        )}
+                      </FormWarningsContext.Consumer>
+                    )}
+                  </Field>
 
-                <Field name="queryString">
-                  {({ field: { name, value, onChange }, meta: { error } }) => (
-                    <FormWarningsContext.Consumer>
-                      {({ warnings }) => (
-                        <QueryInput value={value}
-                                    timeRange={!isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange}
-                                    streams={values?.streams}
-                                    placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
-                                    error={error}
-                                    disableExecution={disableSearchSubmit}
-                                    isValidating={isValidatingQuery}
-                                    warning={warnings.queryString}
-                                    validate={validateForm}
-                                    name={name}
-                                    onChange={onChange}
-                                    onExecute={handleSubmit as () => void} />
-                      )}
-                    </FormWarningsContext.Consumer>
-                  )}
-                </Field>
-
-                <QueryValidation />
+                  <QueryValidation />
+                </SearchInputAndValidation>
 
                 {hasQueryOverride
                   && <WidgetQueryOverride value={globalOverride?.query} onReset={_resetQueryOverride} />}
