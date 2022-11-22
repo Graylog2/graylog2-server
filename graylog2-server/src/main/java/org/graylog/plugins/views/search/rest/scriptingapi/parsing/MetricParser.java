@@ -14,11 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest.scriptingapi.response;
+package org.graylog.plugins.views.search.rest.scriptingapi.parsing;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 
-import java.util.List;
+//TODO: unit tests + error handling
+public class MetricParser {
 
-public record ResponseData(@JsonProperty List<List<Object>> rows) {
+    public Metric parseMetric(final String metric) {
+        final String[] split = metric.split(":");
+        final String fieldName = split.length > 1 ? split[1] : null;
+        final String functionName = split[0];
+        return new Metric(fieldName, functionName, null);
+    }
 }

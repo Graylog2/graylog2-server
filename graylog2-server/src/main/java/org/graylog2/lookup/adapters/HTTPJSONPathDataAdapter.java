@@ -284,7 +284,7 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
         public Config defaultConfiguration() {
             return Config.builder()
                     .type(NAME)
-                    .url("")
+                    .url("https://example.invalid/api/lookup?key=${key}")
                     .singleValueJSONPath("$.value")
                     .userAgent("Graylog Lookup - https://www.graylog.org/")
                     .headers(Collections.emptyMap())
