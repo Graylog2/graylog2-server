@@ -17,7 +17,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { LinkContainer } from 'components/common/router';
 import { MenuItem, NavDropdown } from 'components/bootstrap';
 import { ExternalLink, Icon } from 'components/common';
 import AppConfig from 'util/AppConfig';
@@ -30,10 +29,6 @@ const HelpMenu = ({ active }) => (
                title={<Icon name="question-circle" size="lg" />}
                aria-label="Help"
                noCaret>
-
-    <LinkContainer to={Routes.welcome()}>
-      <MenuItem>Welcome</MenuItem>
-    </LinkContainer>
 
     <MenuItem href={DocsHelper.versionedDocsHomePage()} target="_blank">
       <ExternalLink>Documentation</ExternalLink>

@@ -21,7 +21,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 import UserNotification from 'util/UserNotification';
-import { DEFAULT_PAGINATION } from 'components/welcome/helpers';
+import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
 import type {
   PaginatedLastOpened,
   PaginatedPinnedItems,

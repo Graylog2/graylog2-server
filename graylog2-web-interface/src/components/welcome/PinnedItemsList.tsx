@@ -18,9 +18,9 @@
 import React, { useCallback, useState } from 'react';
 
 import { ListGroup } from 'components/bootstrap';
-import { DEFAULT_PAGINATION } from 'components/welcome/helpers';
+import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
 import EntityItem from 'components/welcome/EntityListItem';
-import { PaginatedList, Spinner } from 'components/common';
+import { EmptyResult, PaginatedList, Spinner } from 'components/common';
 import { usePinnedItems } from 'components/welcome/hooks';
 
 const PinnedItemsList = () => {
@@ -31,7 +31,7 @@ const PinnedItemsList = () => {
   }, [setPagination]);
 
   if (isFetching) return <Spinner />;
-  if (!pinnedItems.length) return <i>There are no pinned items</i>;
+  if (!pinnedItems.length) return <EmptyResult>There are no pinned items</EmptyResult>;
 
   return (
     <PaginatedList onChange={onPageChange} useQueryParameter={false} activePage={pagination.page} totalItems={total} pageSize={pagination.per_page} showPageSizeSelect={false} hideFirstAndLastPageLinks>

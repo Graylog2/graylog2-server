@@ -24,12 +24,7 @@ import LastOpenList from './LastOpenList';
 import PinnedItemsList from './PinnedItemsList';
 import RecentActivityList from './RecentActivityList';
 
-const FlexContainer = styled.div`
-  display: flex;
-  align-items: stretch;
-  flex-wrap: nowrap;
-  gap: 45px;
-`;
+import SectionGrid from '../common/Section/SectionGrid';
 
 const StyledSectionComponent = styled(SectionComponent)`
   flex-grow: 1;
@@ -40,14 +35,14 @@ const Welcome = () => (
     <PageHeader title="Welcome to Graylog">
       <span>Here you can find most used content</span>
     </PageHeader>
-    <FlexContainer>
+    <SectionGrid>
       <StyledSectionComponent title="Last opened">
         <LastOpenList />
       </StyledSectionComponent>
       <StyledSectionComponent title="Pinned items">
         <PinnedItemsList />
       </StyledSectionComponent>
-    </FlexContainer>
+    </SectionGrid>
     <StyledSectionComponent title="Recent activity">
       <RecentActivityList />
     </StyledSectionComponent>

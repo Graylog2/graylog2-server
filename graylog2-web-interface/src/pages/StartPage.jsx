@@ -27,7 +27,7 @@ const redirect = (page) => {
   history.replace(page);
 };
 
-const StartPageF = () => {
+const StartPage = () => {
   const { currentUser } = useStore(CurrentUserStore);
   const isLoading = !currentUser;
   const redirectToStartPage = useCallback(() => {
@@ -60,4 +60,4 @@ const StartPageF = () => {
   return <Spinner />;
 };
 
-export default StartPageF;
+export default StartPage;

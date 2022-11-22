@@ -265,7 +265,6 @@ const Routes = {
   edit_extractor: (nodeId: string, inputId: string, extractorId: string) => `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
 
   edit_input_extractor: (nodeId: string, inputId: string, extractorId: string) => `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
-  welcome: () => Routes.WELCOME,
   filtered_metrics: (nodeId: string, filter: string) => `${Routes.SYSTEM.METRICS(nodeId)}?filter=${filter}`,
   global_api_browser: () => Routes.GLOBAL_API_BROWSER_URL,
 } as const;

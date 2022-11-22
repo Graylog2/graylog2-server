@@ -18,16 +18,16 @@
 import React from 'react';
 
 import { ListGroup } from 'components/bootstrap';
-import { DEFAULT_PAGINATION } from 'components/welcome/helpers';
+import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
 import EntityItem from 'components/welcome/EntityListItem';
 import { useLastOpened } from 'components/welcome/hooks';
-import { Spinner } from 'components/common';
+import { EmptyResult, Spinner } from 'components/common';
 
 const LastOpenList = () => {
   const { data: { lastOpened }, isFetching } = useLastOpened(DEFAULT_PAGINATION);
 
   if (isFetching) return <Spinner />;
-  if (!lastOpened.length) return <i>There are no last opened items</i>;
+  if (!lastOpened.length) return <EmptyResult>There are no last opened items</EmptyResult>;
 
   return (
     <ListGroup data-testid="last-opened-list">

@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { ListGroupItem, Label } from 'components/bootstrap';
-import { typeLinkMap } from 'components/welcome/helpers';
+import { typeLinkMap } from 'components/welcome/Constants';
 import type { LastOpenedItem } from 'components/welcome/types';
 
 const StyledListGroupItem = styled(ListGroupItem)`
@@ -31,7 +31,7 @@ const StyledListGroupItem = styled(ListGroupItem)`
 
 export const StyledLabel = styled(Label)`
   cursor: default;
-  width: 85px;
+  width: 95px;
   display: block;
 `;
 

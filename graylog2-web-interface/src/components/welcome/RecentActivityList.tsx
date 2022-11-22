@@ -19,8 +19,8 @@ import React, { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Table } from 'components/bootstrap';
-import { DEFAULT_PAGINATION, typeLinkMap } from 'components/welcome/helpers';
-import { PaginatedList, Spinner } from 'components/common';
+import { DEFAULT_PAGINATION, typeLinkMap } from 'components/welcome/Constants';
+import { EmptyResult, PaginatedList, Spinner } from 'components/common';
 import { relativeDifference } from 'util/DateTime';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
@@ -57,7 +57,7 @@ const RecentActivityList = () => {
   }, [setPagination]);
 
   if (isFetching) return <Spinner />;
-  if (!recentActivity.length) return <i>There is no recent activity</i>;
+  if (!recentActivity.length) return <EmptyResult>There is no recent activity</EmptyResult>;
 
   return (
     <PaginatedList onChange={onPageChange} useQueryParameter={false} activePage={pagination.page} totalItems={total} pageSize={pagination.per_page} showPageSizeSelect={false} hideFirstAndLastPageLinks>
@@ -67,7 +67,7 @@ const RecentActivityList = () => {
               recentActivity.map(({ id, timestamp, activityType, itemType, itemId, title }) => {
                 return (
                   <tr key={id}>
-                    <td style={{ width: 100 }}>
+                    <td style={{ width: 110 }}>
                       <StyledLabel title={timestamp} bsStyle="primary">{relativeDifference(timestamp)}
                       </StyledLabel>
                     </td>
