@@ -135,8 +135,8 @@ end`;
           <p style={{ marginBottom: 10, padding: 0 }}>
             Single value: <code>Jane Doe</code><br />
             Multi value:
-            <pre>{noMultiResult}</pre>
           </p>
+          <pre>{noMultiResult}</pre>
         </Col>
       </Row>
       <Row>
@@ -152,8 +152,8 @@ end`;
           <p style={{ marginBottom: 10, padding: 0 }}>
             Single value: <code>Jane Doe</code><br />
             Multi value:
-            <pre>{mapResult}</pre>
           </p>
+          <pre>{mapResult}</pre>
         </Col>
       </Row>
       <Row>
@@ -169,8 +169,8 @@ end`;
           <p style={{ marginBottom: 10, padding: 0 }}>
             Single value: <code>jane@example.com</code><br />
             Multi value:
-            <pre>{listResult}</pre>
           </p>
+          <pre>{listResult}</pre>
         </Col>
       </Row>
       <Row>
@@ -186,8 +186,8 @@ end`;
           <p style={{ marginBottom: 10, padding: 0 }}>
             Single value: <code>Jane Doe</code><br />
             Multi value:
-            <pre>{smallMapResult}</pre>
           </p>
+          <pre>{smallMapResult}</pre>
         </Col>
       </Row>
 

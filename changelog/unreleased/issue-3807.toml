@@ -1,0 +1,5 @@
+type = "added" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Feature preview of Scripting API."
+
+issues = ["3807"]
+pulls = ["13809"]

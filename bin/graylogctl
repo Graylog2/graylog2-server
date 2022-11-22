@@ -46,17 +46,18 @@ done
 
 # take variables from environment if set
 GRAYLOGCTL_DIR=${GRAYLOGCTL_DIR:=$(dirname "$GRAYLOGCTL")}
+GRAYLOG_JVM_DIR="$(dirname "$GRAYLOGCTL_DIR")/jvm"
 GRAYLOG_SERVER_JAR=${GRAYLOG_SERVER_JAR:=graylog.jar}
 GRAYLOG_CONF=${GRAYLOG_CONF:=/etc/graylog/server/server.conf}
 GRAYLOG_PID=${GRAYLOG_PID:=/tmp/graylog.pid}
 LOG_FILE=${LOG_FILE:=log/graylog-server.log}
 LOG4J=${LOG4J:=}
-DEFAULT_JAVA_OPTS="-Dlog4j2.formatMsgNoLookups=true -Djdk.tls.acknowledgeCloseNotify=true -Xms1g -Xmx1g -XX:NewRatio=1 -server -XX:+ResizeTLAB -XX:-OmitStackTraceInFastThrow"
-if $JAVA_CMD -XX:+PrintFlagsFinal 2>&1 |grep -q UseParNewGC; then
-	DEFAULT_JAVA_OPTS="${DEFAULT_JAVA_OPTS} -XX:+UseParNewGC"
-fi
-if $JAVA_CMD -XX:+PrintFlagsFinal 2>&1 |grep -q UseConcMarkSweepGC; then
-	DEFAULT_JAVA_OPTS="${DEFAULT_JAVA_OPTS} -XX:+UseConcMarkSweepGC -XX:+CMSConcurrentMTEnabled -XX:+CMSClassUnloadingEnabled"
+DEFAULT_JAVA_OPTS="-Dlog4j2.formatMsgNoLookups=true -Djdk.tls.acknowledgeCloseNotify=true -Xms1g -Xmx1g -XX:+UseG1GC -server -XX:-OmitStackTraceInFastThrow"
+
+if [ -z "$JAVA_HOME" ] && [ -d "$GRAYLOG_JVM_DIR" ]; then
+	echo "Using bundled JVM in $GRAYLOG_JVM_DIR"
+	export JAVA_HOME="$GRAYLOG_JVM_DIR"
+	JAVA_CMD="$GRAYLOG_JVM_DIR/bin/java"
 fi
 
 JAVA_OPTS="${JAVA_OPTS:="$DEFAULT_JAVA_OPTS"}"
