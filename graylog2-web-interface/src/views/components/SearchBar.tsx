@@ -19,7 +19,7 @@ import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Field } from 'formik';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import moment from 'moment';
 
 import connect, { useStore } from 'stores/connect';
@@ -53,8 +53,12 @@ import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnPara
 import type { SearchBarControl } from 'views/types';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import useUserDateTime from 'hooks/useUserDateTime';
+import TimeRangeRow from 'views/components/searchbar/TimeRangeRow';
 
 import SearchBarForm from './searchbar/SearchBarForm';
+import SearchButtonAndQuery from './searchbar/SearchButtonAndQueryContianer';
+import SearchQueryRow from './searchbar/SearchQueryRow';
+import SearchInputAndValidationContainer from './searchbar/SearchInputAndValidationContainer';
 
 import {
   executeSearchSubmitHandler as executePluggableSubmitHandler,
@@ -69,45 +73,10 @@ type Props = {
   queryFilters: Immutable.Map<QueryId, FilterType>,
 };
 
-const TimeRangeRow = styled.div(({ theme }) => css`
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-
-  @media (max-width: ${theme.breakpoints.max.md}) {
-    flex-direction: column;
-    
-    > div {
-      flex: 1;
-      width: 100%;
-    }
-  }
-`);
-
 const StreamsAndRefresh = styled.div`
   display: flex;
   gap: 10px;
   flex: 1.5;
-`;
-
-const SearchQueryRow = styled.div(({ theme }) => css`
-  display: flex;
-  gap: 10px;
-
-  @media (max-width: ${theme.breakpoints.max.sm}) {
-    flex-direction: column;
-  }
-`);
-
-const SearchButtonAndQuery = styled.div`
-  display: flex;
-  flex: 1;
-  gap: 10px;
-`;
-
-const SearchInputAndValidation = styled.div`
-  display: flex;
-  flex: 1;
 `;
 
 const defaultOnSubmit = async (values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, currentQuery: Query) => {
@@ -177,7 +146,7 @@ const SearchBar = ({
 
   return (
     <WidgetFocusContext.Consumer>
-      {({ focusedWidget: { editing } = { editing: false } }) => (
+      {({ focusedWidget: { editing } = { editing: true } }) => (
         <ScrollToHint value={query.query_string}>
           <FormWarningsProvider>
             <SearchBarForm initialValues={initialValues}
@@ -218,7 +187,7 @@ const SearchBar = ({
                           <SearchButton disabled={disableSearchSubmit}
                                         dirty={dirty}
                                         displaySpinner={isSubmitting} />
-                          <SearchInputAndValidation>
+                          <SearchInputAndValidationContainer>
                             <Field name="queryString">
                               {({ field: { name, value, onChange }, meta: { error } }) => (
                                 <FormWarningsContext.Consumer>
@@ -241,7 +210,7 @@ const SearchBar = ({
                             </Field>
 
                             <QueryValidation />
-                          </SearchInputAndValidation>
+                          </SearchInputAndValidationContainer>
                         </SearchButtonAndQuery>
                         {!editing && <SearchActionsMenu />}
                       </SearchQueryRow>

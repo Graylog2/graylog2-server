@@ -47,11 +47,14 @@ import type { SearchBarControl } from 'views/types';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import useUserDateTime from 'hooks/useUserDateTime';
+import SearchInputAndValidationContainer from 'views/components/searchbar/SearchInputAndValidationContainer';
 
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
 import DashboardSearchForm from './DashboardSearchBarForm';
 import PluggableSearchBarControls from './searchbar/PluggableSearchBarControls';
+import SearchButtonAndQuery from './searchbar/SearchButtonAndQueryContianer';
+import SearchQueryRow from './searchbar/SearchQueryRow';
 
 const TimeRangeRow = styled.div(({ theme }) => css`
   display: flex;
@@ -68,38 +71,10 @@ const StyledTimeRangeInput = styled(TimeRangeInput)(({ theme }) => css`
   flex-basis: 380px;
   
   @media (max-width: ${theme.breakpoints.max.sm}) {
-    flex 1;
+    flex: 1;
     flex-basis: auto;
   }
 `);
-
-const RefreshControlsWrapper = styled.div(({ theme }) => css`
-  @media (max-width: ${theme.breakpoints.max.sm}) {
-    display: flex;
-    justify-content: flex-end;
-  }
-`);
-
-const SearchQueryRow = styled.div(({ theme }) => css`
-  display: flex;
-  gap: 10px;
-
-  @media (max-width: ${theme.breakpoints.max.sm}) {
-    flex-direction: column;
-  }
-`);
-
-const SearchButtonAndQuery = styled.div`
-  flex: 1;
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-`;
-
-const SearchInputAndValidation = styled.div`
-  display: flex;
-  flex: 1;
-`;
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
@@ -164,9 +139,7 @@ const DashboardSearchBar = () => {
                                             limitDuration={limitDuration}
                                             hasErrorOnMount={!!errors.timerange}
                                             noOverride />
-                      <RefreshControlsWrapper>
-                        <RefreshControls />
-                      </RefreshControlsWrapper>
+                      <RefreshControls />
                     </TimeRangeRow>
 
                     <SearchQueryRow>
@@ -175,7 +148,7 @@ const DashboardSearchBar = () => {
                                       glyph="filter"
                                       displaySpinner={isSubmitting}
                                       dirty={dirty} />
-                        <SearchInputAndValidation>
+                        <SearchInputAndValidationContainer>
                           <Field name="queryString">
                             {({ field: { name, value, onChange }, meta: { error } }) => (
                               <FormWarningsContext.Consumer>
@@ -197,7 +170,7 @@ const DashboardSearchBar = () => {
                           </Field>
 
                           <QueryValidation />
-                        </SearchInputAndValidation>
+                        </SearchInputAndValidationContainer>
                       </SearchButtonAndQuery>
 
                       {!editing && <DashboardActionsMenu />}

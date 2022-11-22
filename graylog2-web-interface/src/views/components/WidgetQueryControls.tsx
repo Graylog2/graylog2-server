@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useCallback, useEffect, useContext, useRef, useMemo } from 'react';
 import { Field } from 'formik';
 import moment from 'moment';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { isEmpty } from 'lodash';
 import { useIsFetching } from '@tanstack/react-query';
 
@@ -51,6 +51,8 @@ import {
 import type { SearchBarControl } from 'views/types';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
+import TimeRangeRow from 'views/components/searchbar/TimeRangeRow';
+import SearchQueryRow from 'views/components/searchbar/SearchQueryRow';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeInput from './searchbar/TimeRangeInput';
@@ -65,26 +67,6 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
-`;
-
-const TimeRangeRow = styled.div(({ theme }) => css`
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-
-  @media (max-width: ${theme.breakpoints.max.md}) {
-    flex-direction: column;
-
-    > div {
-      width: 100%;
-    }
-  }
-`);
-
-const SecondRow = styled.div`
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
 `;
 
 const SearchInputAndValidation = styled.div`
@@ -208,7 +190,8 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                                 position="right" />
                 )}
                 {hasTimeRangeOverride && (
-                <TimeRangeOverrideInfo value={globalOverride?.timerange} onReset={_resetTimeRangeOverride} />
+                  <TimeRangeOverrideInfo value={globalOverride?.timerange}
+                                         onReset={_resetTimeRangeOverride} />
                 )}
 
                 <Field name="streams">
@@ -220,7 +203,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                 </Field>
               </TimeRangeRow>
 
-              <SecondRow>
+              <SearchQueryRow>
                 <SearchButton disabled={disableSearchSubmit}
                               dirty={dirty}
                               displaySpinner={isSubmitting} />
@@ -249,9 +232,11 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                   <QueryValidation />
                 </SearchInputAndValidation>
 
-                {hasQueryOverride
-                  && <WidgetQueryOverride value={globalOverride?.query} onReset={_resetQueryOverride} />}
-              </SecondRow>
+                {hasQueryOverride && (
+                  <WidgetQueryOverride value={globalOverride?.query}
+                                       onReset={_resetQueryOverride} />
+                )}
+              </SearchQueryRow>
               <PluggableSearchBarControls />
             </Container>
           );
