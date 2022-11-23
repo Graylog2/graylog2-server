@@ -35,7 +35,7 @@ type MaxmindAdapterFieldSetProps = {
 const MaxmindAdapterFieldSet = ({ config, updateConfig, handleFormEvent, validationState, validationMessage }: MaxmindAdapterFieldSetProps) => {
   const isCloud = AppConfig.isCloud();
 
-  const pathesForCloud = {
+  const pathsForCloud = {
     IPINFO_STANDARD_LOCATION: '/etc/graylog/server/standard_location.mmdb',
     IPINFO_ASN: '/etc/graylog/server/asn.mmdb',
   };
@@ -73,7 +73,7 @@ const MaxmindAdapterFieldSet = ({ config, updateConfig, handleFormEvent, validat
     const newConfig = ObjectUtils.clone(config);
 
     if (isCloud) {
-      newConfig.path = pathesForCloud[id];
+      newConfig.path = pathsForCloud[id];
     }
 
     newConfig.database_type = id;
