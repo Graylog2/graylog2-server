@@ -17,7 +17,9 @@
 package org.graylog.testing.utils;
 
 import com.google.common.collect.ImmutableMap;
+import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
 import org.slf4j.Logger;
@@ -34,7 +36,11 @@ public final class GelfInputUtils {
     private GelfInputUtils() {
     }
 
-    public static void createGelfHttpInput(int mappedPort, int gelfHttpPort, RequestSpecification requestSpecification) {
+    public static TestGelfInput createGelfHttpInput(GraylogBackend backend, int gelfHttpPort, RequestSpecification requestSpecification) {
+        return createGelfHttpInput(backend.mappedPortFor(gelfHttpPort), gelfHttpPort, requestSpecification);
+    }
+
+    public static TestGelfInput createGelfHttpInput(int mappedPort, int gelfHttpPort, RequestSpecification requestSpecification) {
 
         final ArrayList<Integer> inputs = given()
                 .spec(requestSpecification)
@@ -62,6 +68,8 @@ public final class GelfInputUtils {
         }
 
         waitForGelfInputOnPort(mappedPort, requestSpecification);
+
+        return new TestGelfInput(requestSpecification, mappedPort);
     }
 
     private static void waitForGelfInputOnPort(int mappedPort, RequestSpecification requestSpecification) {

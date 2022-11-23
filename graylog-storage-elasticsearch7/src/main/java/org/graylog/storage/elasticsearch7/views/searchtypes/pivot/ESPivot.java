@@ -17,7 +17,6 @@
 package org.graylog.storage.elasticsearch7.views.searchtypes.pivot;
 
 import com.google.common.collect.ImmutableList;
-import one.util.streamex.EntryStream;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
@@ -78,7 +77,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         contextMap.put(pivot.id(), aggTypes);
 
         // add global rollup series if those were requested
-        if (pivot.rollup()) {
+        if (pivot.rollup() || (pivot.rowGroups().isEmpty() && pivot.columnGroups().isEmpty())) {
             seriesStream(pivot, queryContext, "global rollup")
                     .forEach(searchSourceBuilder::aggregation);
         }
@@ -87,10 +86,8 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         final AggregationBuilder rootAggregation = createdAggregations.root();
         final AggregationBuilder leafAggregation = createdAggregations.leaf();
         final List<AggregationBuilder> metrics = createdAggregations.metrics();
-        if (!pivot.rowGroups().isEmpty() && (pivot.columnGroups().isEmpty() || pivot.rollup())) {
-            seriesStream(pivot, queryContext, "metrics")
-                    .forEach(aggregation -> metrics.forEach(metric -> metric.subAggregation(aggregation)));
-        }
+        seriesStream(pivot, queryContext, "metrics")
+                .forEach(aggregation -> metrics.forEach(metric -> metric.subAggregation(aggregation)));
 
         if (!pivot.columnGroups().isEmpty()) {
             final BucketSpecHandler.CreatedAggregations<AggregationBuilder> columnsAggregation = createPivots(BucketSpecHandler.Direction.Column, query, pivot, pivot.columnGroups(), queryContext);
@@ -172,8 +169,10 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
 
     private Stream<AggregationBuilder> seriesStream(Pivot pivot, ESGeneratedQueryContext queryContext, String reason) {
-        return EntryStream.of(pivot.series())
-                .mapKeyValue((integer, seriesSpec) -> {
+        return pivot.series()
+                .stream()
+                .distinct()
+                .map((seriesSpec) -> {
                     final String seriesName = queryContext.seriesName(seriesSpec, pivot);
                     LOG.debug("Adding {} series '{}' with name '{}'", reason, seriesSpec.type(), seriesName);
                     final ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> esPivotSeriesSpecHandler = seriesHandlers.get(seriesSpec.type());
@@ -199,7 +198,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
         final MultiBucketsAggregation.Bucket initialBucket = createInitialBucket(queryResult);
 
-        retrieveBuckets(pivot.rowGroups(), initialBucket)
+        retrieveBuckets(pivot, pivot.rowGroups(), initialBucket)
                 .forEach(tuple -> {
                     final ImmutableList<String> keys = tuple.keys();
                     final MultiBucketsAggregation.Bucket bucket = tuple.bucket();
@@ -210,7 +209,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                         processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), bucket, true, "row-leaf");
                     }
                     if (!pivot.columnGroups().isEmpty()){
-                        retrieveBuckets(pivot.columnGroups(), bucket)
+                        retrieveBuckets(pivot, pivot.columnGroups(), bucket)
                                 .forEach(columnBucketTuple -> {
                                     final ImmutableList<String> columnKeys = columnBucketTuple.keys();
                                     final MultiBucketsAggregation.Bucket columnBucket = columnBucketTuple.bucket();
@@ -230,14 +229,14 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         return resultBuilder.build();
     }
 
-    private Stream<PivotBucket> retrieveBuckets(List<BucketSpec> pivots, MultiBucketsAggregation.Bucket initialBucket) {
+    private Stream<PivotBucket> retrieveBuckets(Pivot pivot, List<BucketSpec> pivots, MultiBucketsAggregation.Bucket initialBucket) {
         Stream<PivotBucket> result = Stream.of(PivotBucket.create(ImmutableList.of(), initialBucket));
 
         for (Tuple2<String, List<BucketSpec>> group : groupByConsecutiveType(pivots)) {
             result = result.flatMap((tuple) -> {
                 final ESPivotBucketSpecHandler<? extends BucketSpec> bucketHandler = bucketHandlers.get(group.v1());
 
-                return bucketHandler.extractBuckets(group.v2(), tuple);
+                return bucketHandler.extractBuckets(pivot, group.v2(), tuple);
             });
         }
 
@@ -259,16 +258,14 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         pivot.series().forEach(seriesSpec -> {
             final ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> seriesHandler = this.seriesHandlers.get(seriesSpec.type());
             final Aggregation series = seriesHandler.extractAggregationFromResult(pivot, seriesSpec, aggregation, queryContext);
-            if (series != null) {
-                seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, this, queryContext)
-                        .map(value -> {
-                            columnKeys.addLast(value.id());
-                            final PivotResult.Value v = PivotResult.Value.create(columnKeys, value.value(), rollup, source);
-                            columnKeys.removeLast();
-                            return v;
-                        })
-                        .forEach(rowBuilder::addValue);
-            }
+            seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, this, queryContext)
+                    .map(value -> {
+                        columnKeys.addLast(value.id());
+                        final PivotResult.Value v = PivotResult.Value.create(columnKeys, value.value(), rollup, source);
+                        columnKeys.removeLast();
+                        return v;
+                    })
+                    .forEach(rowBuilder::addValue);
         });
     }
 

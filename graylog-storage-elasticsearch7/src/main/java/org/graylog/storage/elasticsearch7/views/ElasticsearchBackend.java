@@ -28,6 +28,7 @@ import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.errors.SearchError;
+import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.plugins.views.search.filter.AndFilter;
@@ -269,9 +270,14 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 ElasticsearchException e = checkForFailedShards(multiSearchResponse).get();
                 queryContext.addError(SearchTypeErrorParser.parse(query, searchTypeId, e));
             } else {
-                final SearchType.Result searchTypeResult = handler.extractResult(job, query, searchType, multiSearchResponse.getResponse(), queryContext);
-                if (searchTypeResult != null) {
-                    resultsMap.put(searchTypeId, searchTypeResult);
+                try {
+                    final SearchType.Result searchTypeResult = handler.extractResult(job, query, searchType, multiSearchResponse.getResponse(), queryContext);
+                    if (searchTypeResult != null) {
+                        resultsMap.put(searchTypeId, searchTypeResult);
+                    }
+                } catch (Exception e) {
+                    LOG.warn("Unable to extract results: ", e);
+                    queryContext.addError(new SearchTypeError(query, searchTypeId, e));
                 }
             }
         }

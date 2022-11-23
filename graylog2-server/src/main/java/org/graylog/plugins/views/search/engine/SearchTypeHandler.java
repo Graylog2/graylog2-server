@@ -54,7 +54,7 @@ public interface SearchTypeHandler<S extends SearchType, Q, R> {
         } catch (SearchException e) {
             throw e;
         } catch (Throwable t) {
-            throw new SearchException(new SearchTypeError(query, searchType.id(), t));
+            throw new SearchException(new SearchTypeError(query, searchType.id(), t), t);
         }
     }
 

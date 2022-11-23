@@ -269,10 +269,16 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                 ElasticsearchException e = checkForFailedShards(multiSearchResponse).get();
                 queryContext.addError(SearchTypeErrorParser.parse(query, searchTypeId, e));
             } else {
-                final SearchType.Result searchTypeResult = handler.extractResult(job, query, searchType, multiSearchResponse.getResponse(), queryContext);
-                if (searchTypeResult != null) {
-                    resultsMap.put(searchTypeId, searchTypeResult);
+                try {
+                    final SearchType.Result searchTypeResult = handler.extractResult(job, query, searchType, multiSearchResponse.getResponse(), queryContext);
+                    if (searchTypeResult != null) {
+                        resultsMap.put(searchTypeId, searchTypeResult);
+                    }
+                } catch (Exception e) {
+                    LOG.warn("Unable to extract results: ", e);
+                    queryContext.addError(new SearchTypeError(query, searchTypeId, e));
                 }
+
             }
         }
 

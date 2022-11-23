@@ -38,6 +38,7 @@ import org.graylog.plugins.pipelineprocessor.PipelineConfig;
 import org.graylog.plugins.sidecar.SidecarModule;
 import org.graylog.plugins.views.ViewsBindings;
 import org.graylog.plugins.views.ViewsConfig;
+import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiModule;
 import org.graylog.plugins.views.search.searchfilters.module.SearchFiltersModule;
 import org.graylog.scheduler.JobSchedulerConfiguration;
 import org.graylog.scheduler.JobSchedulerModule;
@@ -72,6 +73,7 @@ import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.contentpacks.ContentPacksModule;
 import org.graylog2.database.entities.ScopedEntitiesModule;
 import org.graylog2.decorators.DecoratorBindings;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.indexer.IndexerBindings;
 import org.graylog2.indexer.retention.RetentionStrategyBindings;
 import org.graylog2.indexer.rotation.RotationStrategyBindings;
@@ -146,7 +148,7 @@ public class Server extends ServerBootstrap {
     }
 
     @Override
-    protected List<Module> getCommandBindings() {
+    protected List<Module> getCommandBindings(FeatureFlags featureFlags) {
         final ImmutableList.Builder<Module> modules = ImmutableList.builder();
         modules.add(
                 new VersionAwareStorageModule(),
@@ -186,7 +188,8 @@ public class Server extends ServerBootstrap {
                 new ClusterConfigValidatorModule(),
                 new MapWidgetModule(),
                 new SearchFiltersModule(),
-                new ScopedEntitiesModule()
+                new ScopedEntitiesModule(),
+                new ScriptingApiModule(featureFlags)
         );
         return modules.build();
     }
