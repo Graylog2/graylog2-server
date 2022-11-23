@@ -337,7 +337,9 @@ public class ScriptingApiResourceIT {
                         """)
                 .post("/search/aggregate")
                 .then()
-                .statusCode(404); // TODO! We should handle the duplicated metric better
+                .statusCode(200);
+        validateRow(validatableResponse, "another-test", 2, 2);
+        validateRow(validatableResponse, "test", 1, 1);
     }
 
     @ContainerMatrixTest
