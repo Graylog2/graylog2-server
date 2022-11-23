@@ -126,6 +126,7 @@ public class UnboundLDAPConnectorTest extends AbstractLdapTestUnit {
                 .userUniqueIdAttribute("entryUUID")
                 .userNameAttribute("uid")
                 .userFullNameAttribute("cn")
+                .emailAttributes(ImmutableList.of("mail"))
                 .build();
         final LDAPUser entry = connector.searchUserByPrincipal(connection, searchConfig, "john").orElse(null);
 
