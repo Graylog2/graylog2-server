@@ -132,7 +132,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         "   hosts: [\"192.168.1.1:5044\"]\n" +
                         "path:\n" +
                         "  data: ${sidecar.spoolDir!\"C:\\Program Files\\Graylog\\sidecar\\cache\\winlogbeat\"}\\data\n" +
-                        "  logs: ${sidecar.spoolDir!\"C:\\Program Files\\Graylog\\sidecar\\cache\\winlogbeat\"}\\logs\n" +
+                        "  logs: ${sidecar.spoolDir!\"C:\\Program Files\\Graylog\\sidecar\"}\\logs\n" +
                         "tags:\n" +
                         " - windows\n" +
                         "winlogbeat:\n" +
