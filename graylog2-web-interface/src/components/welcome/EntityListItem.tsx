@@ -22,7 +22,7 @@ import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { ListGroupItem, Label } from 'components/bootstrap';
 import { typeLinkMap } from 'components/welcome/Constants';
-import type { LastOpenedItem } from 'components/welcome/types';
+import type { EntityItemType } from 'components/welcome/types';
 
 const StyledListGroupItem = styled(ListGroupItem)`
   display: flex;
@@ -35,7 +35,13 @@ export const StyledLabel = styled(Label)`
   display: block;
 `;
 
-const EntityItem = ({ type, title, id }: LastOpenedItem) => {
+type Props = {
+  id: string,
+  title: string,
+  type: EntityItemType,
+}
+
+const EntityItem = ({ type, title, id }: Props) => {
   return (
     <StyledListGroupItem>
       <StyledLabel bsStyle="info">{type}</StyledLabel>
