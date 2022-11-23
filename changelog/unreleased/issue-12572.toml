@@ -1,0 +1,5 @@
+type = "added" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "The list of fields can now show only the fields that are present in selected streams, if `stream_aware_field_types` config property is set to true."
+
+issues = ["12572", "9397"]
+pulls = ["13363"]
