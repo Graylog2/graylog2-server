@@ -139,8 +139,8 @@ const StreamActions = ({
         </IfPermitted>
         <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
           <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream} className="overlay-trigger">
-            <LinkContainer disabled={isDefaultStream || isNotEditable} to={Routes.stream_edit(stream.id)}>
-              <MenuItem>
+            <LinkContainer to={Routes.stream_edit(stream.id)}>
+              <MenuItem disabled={isDefaultStream || isNotEditable}>
                 Manage Rules
               </MenuItem>
             </LinkContainer>
