@@ -31,6 +31,8 @@ import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 
 type Props = {
+  action: 'create' | 'edit',
+  entityTypes: any,
   eventDefinition: EventDefinition,
   validation: {
     errors: {
@@ -42,7 +44,7 @@ type Props = {
   onChange: (name: string, value: string | number) => void,
 }
 
-const EventConditionForm = ({ eventDefinition, validation, currentUser, onChange }: Props) => {
+const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, currentUser, onChange }: Props) => {
   const getConditionPlugin = (type): any => {
     if (type === undefined) {
       return {};
@@ -100,6 +102,8 @@ const EventConditionForm = ({ eventDefinition, validation, currentUser, onChange
 
   const eventDefinitionTypeComponent = eventDefinitionType.formComponent
     ? React.createElement(eventDefinitionType.formComponent, {
+      action,
+      entityTypes,
       currentUser,
       validation,
       eventDefinition,
@@ -164,6 +168,8 @@ const EventConditionForm = ({ eventDefinition, validation, currentUser, onChange
 };
 
 EventConditionForm.propTypes = {
+  action: PropTypes.oneOf(['create', 'edit']),
+  entityTypes: PropTypes.object,
   eventDefinition: PropTypes.object.isRequired,
   currentUser: PropTypes.object.isRequired, // Prop is passed down to pluggable entities
   validation: PropTypes.object.isRequired,
