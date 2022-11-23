@@ -1,0 +1,5 @@
+type = "added"
+message = "Allow pinning row pivot columns in data table widget."
+
+issues = ["Graylog2/graylog-plugin-enterprise#249"]
+pulls = ["13510"]

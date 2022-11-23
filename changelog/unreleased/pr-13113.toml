@@ -1,0 +1,15 @@
+type = "changed"
+message = "Retry on Elasticsearch Request entity too large errors"
+
+issues = [""]
+pulls = ["13113, 7071"]
+
+contributors = [""]
+
+details.user = """
+An elastic cluster might not have enough memory available to
+accept a full bulk index request. It can reject it with
+a HTTP/1.1 429 Too Many Requests exception.
+In this case we retry the request by splitting the message batch
+in half, and try again.
+"""

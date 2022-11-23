@@ -1,0 +1,6 @@
+type = "added"
+message = "Show Elasticsearch/OpenSearch cluster health on index sets overview page."
+contributors = ["@supahgreg"]
+
+issues = ["13017"]
+pulls = ["13024"]
