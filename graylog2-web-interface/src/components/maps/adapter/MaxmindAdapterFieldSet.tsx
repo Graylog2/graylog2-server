@@ -57,7 +57,7 @@ const MaxmindAdapterFieldSet = ({ config, updateConfig, handleFormEvent, validat
     databaseTypes.concat(ipInfoDatabaseTypes);
   }
 
-  const _update = (value: number, unit: string, enabled: boolean, name: string) => {
+  const update = (value: number, unit: string, enabled: boolean, name: string) => {
     const newConfig = ObjectUtils.clone(config);
 
     newConfig[name] = enabled ? value : 0;
@@ -66,10 +66,10 @@ const MaxmindAdapterFieldSet = ({ config, updateConfig, handleFormEvent, validat
   };
 
   const updateCheckInterval = (value: number, unit: string, enabled: boolean) => {
-    _update(value, unit, enabled, 'check_interval');
+    update(value, unit, enabled, 'check_interval');
   };
 
-  const _onDbTypeSelect = (id: string) => {
+  const onDbTypeSelect = (id: string) => {
     const newConfig = ObjectUtils.clone(config);
 
     if (isCloud) {
@@ -107,7 +107,7 @@ const MaxmindAdapterFieldSet = ({ config, updateConfig, handleFormEvent, validat
                 clearable={false}
                 options={databaseTypes}
                 matchProp="label"
-                onChange={_onDbTypeSelect}
+                onChange={onDbTypeSelect}
                 value={config.database_type} />
       </Input>
       <TimeUnitInput label="Refresh file"
