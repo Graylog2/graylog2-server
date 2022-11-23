@@ -1,25 +1,5 @@
-# PLEASE REMOVE COMMENTS AND OPTIONAL FIELDS! THANKS!
-
-# Entry type according to https://keepachangelog.com/en/1.0.0/
-# One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
 type = "added"
 message = "Provide ability to configure an email attribute for LDAP."
 
 issues = ["11131"]
 pulls = ["14041"]
-
-contributors = [""]
-
-details.user = """
-This text contains a more detailed description of the change for users.
-
-It can be written in Markdown to support [links](https://example.com) and
-other elements.
-"""
-
-details.ops = """
-This text contains operations related details for the change.
-
-It can be written in Markdown to support [links](https://example.com) and
-other elements.
-"""
