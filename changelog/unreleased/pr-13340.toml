@@ -1,0 +1,8 @@
+type = "c"
+message = "OpenSearch 2 Support"
+
+pulls = ["13340", "graylog-plugin-enterprise#4005"]
+
+details.user = """
+Initial support for OpenSearch 2
+"""
