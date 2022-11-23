@@ -25,7 +25,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
-import org.graylog.plugins.views.search.searchtypes.pivot.series.SeriesSpecBuilder;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares;
@@ -33,24 +32,23 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
 
 import java.util.function.Function;
 
-public class MetricToSeriesSpecBuilderMapper implements Function<Metric, SeriesSpecBuilder<? extends SeriesSpec, ? extends SeriesSpecBuilder<? extends SeriesSpec, ?>>> {
+public class MetricToSeriesSpecMapper implements Function<Metric, SeriesSpec> {
 
     @Override
-    public SeriesSpecBuilder<? extends SeriesSpec, ? extends SeriesSpecBuilder<? extends SeriesSpec, ?>> apply(final Metric metric) {
+    public SeriesSpec apply(final Metric metric) {
         return switch (metric.functionName()) {
-            case Average.NAME -> Average.builder();
-            case Cardinality.NAME -> Cardinality.builder();
-            case Count.NAME -> Count.builder();
-            case Latest.NAME -> Latest.builder();
-            case Max.NAME -> Max.builder();
-            case Min.NAME -> Min.builder();
-            case Percentile.NAME -> Percentile.builder();
-            case StdDev.NAME -> StdDev.builder();
-            case Sum.NAME -> Sum.builder();
-            case SumOfSquares.NAME -> SumOfSquares.builder();
-            case Variance.NAME -> Variance.builder();
-            default -> Count.builder(); //TODO: do we want to have a default at all?
-
+            case Average.NAME -> Average.builder().field(metric.fieldName()).build();
+            case Cardinality.NAME -> Cardinality.builder().field(metric.fieldName()).build();
+            case Count.NAME -> Count.builder().field(metric.fieldName()).build();
+            case Latest.NAME -> Latest.builder().field(metric.fieldName()).build();
+            case Max.NAME -> Max.builder().field(metric.fieldName()).build();
+            case Min.NAME -> Min.builder().field(metric.fieldName()).build();
+            case Percentile.NAME -> Percentile.builder().field(metric.fieldName()).build();
+            case StdDev.NAME -> StdDev.builder().field(metric.fieldName()).build();
+            case Sum.NAME -> Sum.builder().field(metric.fieldName()).build();
+            case SumOfSquares.NAME -> SumOfSquares.builder().field(metric.fieldName()).build();
+            case Variance.NAME -> Variance.builder().field(metric.fieldName()).build();
+            default -> Count.builder().field(metric.fieldName()).build(); //TODO: do we want to have a default at all?
         };
     }
 }
