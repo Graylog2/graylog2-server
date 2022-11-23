@@ -22,8 +22,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.TypedBuilder;
 public abstract class SeriesSpecBuilder<V, B> extends TypedBuilder<V, B> {
 
     @JsonProperty
-    public abstract B id(String id);
+    public abstract SeriesSpecBuilder<V, B> id(String id);
 
     @JsonProperty
-    public abstract B field(String field);
+    public abstract SeriesSpecBuilder<V, B> field(String field);
 }
