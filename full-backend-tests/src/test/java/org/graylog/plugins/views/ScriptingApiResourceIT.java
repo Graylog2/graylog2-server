@@ -300,7 +300,7 @@ public class ScriptingApiResourceIT {
 
 
         // headers
-        Assertions.assertArrayEquals(lines.get(0), new String[]{"Grouping", "Metric : count"});
+        Assertions.assertArrayEquals(lines.get(0), new String[]{"grouping: facility", "metric: count(facility)"});
 
         //rows
         Assertions.assertArrayEquals(lines.get(1), new String[]{"another-test", "2"});
@@ -325,7 +325,7 @@ public class ScriptingApiResourceIT {
         final List<String[]> lines = csvParser.parseAll(response);
 
         // headers
-        Assertions.assertArrayEquals(lines.get(0), new String[]{"Grouping", "Metric : count"});
+        Assertions.assertArrayEquals(lines.get(0), new String[]{"grouping: facility", "metric: count(facility)"});
 
         //rows
         Assertions.assertArrayEquals(lines.get(1), new String[]{"another-test", "2"});
