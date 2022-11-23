@@ -172,8 +172,8 @@ public class ScriptingApiResourceIT {
                 .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
-        validateSchema(validatableResponse, "Grouping", "string", "facility");
-        validateSchema(validatableResponse, "Metric : count", "numeric", "facility");
+        validateSchema(validatableResponse, "grouping: facility", "string", "facility");
+        validateSchema(validatableResponse, "metric: count(facility)", "numeric", "facility");
     }
 
     @ContainerMatrixTest
@@ -234,9 +234,7 @@ public class ScriptingApiResourceIT {
 
         String expected = """
                 ┌────────────────────────┬───────────────────────┐
-                │Grouping                │Metric : count         │
-                │facility                │facility               │
-                │string                  │numeric                │
+                │grouping: facility      │metric: count(facility)│
                 ├────────────────────────┼───────────────────────┤
                 │another-test            │2                      │
                 │test                    │1                      │
@@ -260,9 +258,7 @@ public class ScriptingApiResourceIT {
 
         String expected = """
                 ┌────────────────────────┬───────────────────────┐
-                │Grouping                │Metric : count         │
-                │facility                │facility               │
-                │string                  │numeric                │
+                │grouping: facility      │metric: count(facility)│
                 ├────────────────────────┼───────────────────────┤
                 │another-test            │2                      │
                 │test                    │1                      │
