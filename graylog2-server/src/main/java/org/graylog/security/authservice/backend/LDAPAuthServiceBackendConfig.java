@@ -143,7 +143,7 @@ public abstract class LDAPAuthServiceBackendConfig implements AuthServiceBackend
                     .systemUserDn("")
                     .systemUserPassword(EncryptedValue.createUnset())
                     .userUniqueIdAttribute("entryUUID")
-                    .emailAttributes(ImmutableList.of("mail", "fc822Mailbox"));
+                    .emailAttributes(ImmutableList.of("mail", "rfc822Mailbox"));
         }
 
         @JsonProperty(FIELD_SERVERS)
