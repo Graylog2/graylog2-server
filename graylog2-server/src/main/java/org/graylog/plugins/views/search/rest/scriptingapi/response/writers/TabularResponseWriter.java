@@ -70,6 +70,25 @@ public class TabularResponseWriter implements MessageBodyWriter<TabularResponse>
     }
 
     private void writeAsciiTable(TabularResponse response, OutputStream outputStream) {
+        try (final PrintStream printStream = new PrintStream(outputStream, true, StandardCharsets.UTF_8)) {
+            printStream.print(renderAsciiTable(response));
+        }
+    }
+
+    private void writeCsv(TabularResponse response, OutputStream outputStream) throws IOException {
+        try (final CSVWriter csvWriter = new CSVWriter(new PrintWriter(outputStream, true, StandardCharsets.UTF_8))) {
+            // header
+            csvWriter.writeNext(response.schema().stream().map(ResponseSchemaEntry::name).toArray(String[]::new));
+
+            // rows
+            response.datarows().stream()
+                    .map(row -> row.stream().map(String::valueOf).toArray(String[]::new))
+                    .forEach(csvWriter::writeNext);
+
+        }
+    }
+
+    private static String renderAsciiTable(TabularResponse response) {
         AsciiTable at = new AsciiTable();
         at.getContext().setWidth(response.schema().size() * 25);
         at.addRule();
@@ -77,23 +96,6 @@ public class TabularResponseWriter implements MessageBodyWriter<TabularResponse>
         at.addRule();
         response.datarows().forEach(at::addRow);
         at.addRule();
-        final String rendered = at.render();
-        final PrintStream printStream = new PrintStream(outputStream, true, StandardCharsets.UTF_8);
-        printStream.print(rendered);
-        printStream.close();
-    }
-
-    private void writeCsv(TabularResponse response, OutputStream outputStream) throws IOException {
-        final CSVWriter csvWriter = new CSVWriter(new PrintWriter(outputStream, true, StandardCharsets.UTF_8));
-
-        // header
-        csvWriter.writeNext(response.schema().stream().map(ResponseSchemaEntry::name).toArray(String[]::new));
-
-        // rows
-        response.datarows().stream()
-                .map(row -> row.stream().map(String::valueOf).toArray(String[]::new))
-                .forEach(csvWriter::writeNext);
-
-        csvWriter.close();
+        return at.render();
     }
 }
