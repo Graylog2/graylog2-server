@@ -1,0 +1,5 @@
+type = "f"
+message = "Display a system notification if message ingest for an active write index is blocked."
+
+issues = ["10930"]
+pulls = ["12893"]

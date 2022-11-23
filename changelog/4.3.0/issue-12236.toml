@@ -1,0 +1,5 @@
+type = "f"
+message = "Improve chart widget rendering when searching in all messages without any result."
+
+issues = ["12236"]
+pulls = ["12242"]

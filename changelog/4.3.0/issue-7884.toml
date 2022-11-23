@@ -1,0 +1,7 @@
+type = "f"
+message = "Improve `Ctrl+f`/`Command+f` and `Shift+Enter` handling in the search query form."
+
+contributors = ["supahgreg"]
+
+issues = ["7884", "8348"]
+pulls = ["11511"]

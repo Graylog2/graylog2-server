@@ -1,0 +1,5 @@
+type = "a"
+message = "Add visual indicator to allow users to see where pipeline rules are used."
+
+issues = ["9724"]
+pulls = ["11474"]

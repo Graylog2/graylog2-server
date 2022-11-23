@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix problems with Sidecar content pack export and installation."
+
+issues = ["12778"]
+pulls = ["13632", "13645"]

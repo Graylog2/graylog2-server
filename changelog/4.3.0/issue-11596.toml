@@ -1,0 +1,7 @@
+type = "f"
+message = "Fix dashboard widget issues with non-english locales."
+
+contributors = ["supahgreg"]
+
+issues = ["11596"]
+pulls = ["11601", "11637"]

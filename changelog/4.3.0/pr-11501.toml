@@ -1,0 +1,4 @@
+type = "a"
+message = "Add config file setting to allow the configuration of an upper limit for time based index rotation."
+
+pulls = ["11501"]

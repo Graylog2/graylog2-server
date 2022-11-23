@@ -1,0 +1,4 @@
+type = "r"
+message = "Remove job scheduler API resource."
+
+pulls = ["12884"]

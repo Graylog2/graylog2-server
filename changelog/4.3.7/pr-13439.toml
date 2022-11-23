@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Adjust name of the \"JSON path from HTTP API\" input to clarify its use case."
+
+pulls = ["13439"]

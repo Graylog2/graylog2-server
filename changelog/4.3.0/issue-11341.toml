@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix date time formatter in charts for users without a configured timezone."
+
+issues = ["11341"]
+pulls = ["12161"]

@@ -1,0 +1,5 @@
+type = "a"
+message = "Add support for multiline search queries."
+
+issues = ["6530"]
+pulls = ["11906"]

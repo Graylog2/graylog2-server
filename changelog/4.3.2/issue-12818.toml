@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix divide-by-zero exception in server pre-flight check."
+
+issues = ["12818", "12820"]
+pulls = ["12863"]

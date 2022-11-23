@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix problem with API incompatibility between Elasticsearch and OpenSearch when asking for the blocked status of indices."
+
+pulls = ["12934"]

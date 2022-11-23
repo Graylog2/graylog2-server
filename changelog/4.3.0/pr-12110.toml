@@ -1,0 +1,5 @@
+type = "f"
+message = "Improve field name completion performance on the search page."
+
+issues = ["11930"]
+pulls = ["12110"]

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix validation issue with dashboards."
+
+issues = ["13013"]
+pulls = ["13500"]

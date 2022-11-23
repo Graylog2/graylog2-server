@@ -1,0 +1,5 @@
+type = "a"
+message = "Add `flatten_json` pipeline function to support parsing JSON arrays."
+
+issues = ["8706"]
+pulls = ["11708"]

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix CEF parser to allow bigger numerical values for number fields."
+
+issues = ["7371"]
+pulls = ["13812"]

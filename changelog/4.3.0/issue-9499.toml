@@ -1,0 +1,7 @@
+type = "f"
+message = "Improve consistency for the logged in indicator on the user details page."
+
+contributors = ["supahgreg"]
+
+issues = ["9499"]
+pulls = ["11481"]

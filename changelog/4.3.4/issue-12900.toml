@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix NullPointerException when sending email notifications without a configured sender."
+
+issues = ["12900"]
+pulls = ["13055"]

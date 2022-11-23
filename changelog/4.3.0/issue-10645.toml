@@ -1,0 +1,7 @@
+type = "f"
+message = "Fix frontend DEV server proxying with large requests."
+
+contributors = ["supahgreg"]
+
+issues = ["10645"]
+pulls = ["11482"]

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix Microsoft Teams notification to handle fields with colon characters."
+
+issues = ["1096", "1200"]
+pulls = ["1205"]

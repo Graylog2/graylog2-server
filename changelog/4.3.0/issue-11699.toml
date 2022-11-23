@@ -1,0 +1,5 @@
+type = "a"
+message = "Add field type icon for the \"ip\" data type."
+
+issues = ["11699"]
+pulls = ["11733"]

@@ -1,0 +1,5 @@
+type = "a"
+message = "Add latest-value metric to aggregation builder."
+
+issues = ["8296"]
+pulls = ["11542"]
