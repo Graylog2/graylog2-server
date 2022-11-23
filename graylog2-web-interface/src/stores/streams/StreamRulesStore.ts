@@ -86,7 +86,7 @@ export const StreamRulesStore = singletonStore(
 
       const url = URLUtils.qualifyUrl(ApiRoutes.StreamRulesApiController.create(streamId).url);
 
-      fetch('POST', url, data)
+      return fetch('POST', url, data)
         .then(callback, failCallback)
         .then(this._emitChange.bind(this));
     },
