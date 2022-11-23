@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.Metadata;
+import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseEntryDataType;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
@@ -38,9 +39,9 @@ public class SearchTypeResultToTabularResponseMapper {
         final int numMetrics = searchRequestSpec.metrics().size();
         final int numColumns = numGroupings + numMetrics;
         List<ResponseSchemaEntry> schema = new ArrayList<>(numColumns);
-        searchRequestSpec.groupings().forEach(gr -> schema.add(new ResponseSchemaEntry("Grouping", "string", gr.fieldName())));
-        searchRequestSpec.metrics().forEach(metric -> schema.add(new ResponseSchemaEntry("Metric : " + metric.functionName(),
-                Latest.NAME.equals(metric.functionName()) ? "string" : "numeric", metric.fieldName())));
+        searchRequestSpec.groupings().forEach(gr -> schema.add(ResponseSchemaEntry.groupBy(gr.fieldName())));
+        searchRequestSpec.metrics().forEach(metric -> schema.add(ResponseSchemaEntry.metric(metric.functionName(),
+                Latest.NAME.equals(metric.functionName()) ? ResponseEntryDataType.STRING : ResponseEntryDataType.NUMERIC, metric.fieldName())));
 
         final AbsoluteRange effectiveTimerange = pivotResult.effectiveTimerange();
 
