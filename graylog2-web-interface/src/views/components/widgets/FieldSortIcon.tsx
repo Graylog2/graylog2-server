@@ -90,8 +90,7 @@ const FieldSortIcon = ({ fieldName, config, onSortChange, setLoadingState }: Pro
   return (
     <SortIcon activeDirection={activeDirection}
               onChange={() => handleSortChange(changeSort)}
-              title={tooltip(fieldName)}
-              dataTestId="messages-sort-icon" />
+              title={tooltip(fieldName)} />
   );
 };
 

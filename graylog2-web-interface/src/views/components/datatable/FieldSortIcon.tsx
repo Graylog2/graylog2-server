@@ -98,7 +98,7 @@ const FieldSortIcon = ({ fieldName, type, sortConfigMap, onSortChange, setLoadin
   const title = tooltip(fieldName);
 
   return (
-    <SortIcon onChange={() => handleSortChange(changeSort)} dataTestId={`sort-icon-${fieldName}`} activeDirection={activeDirection} title={title} order={order} />
+    <SortIcon onChange={() => handleSortChange(changeSort)} activeDirection={activeDirection} title={title} order={order} />
   );
 };
 
