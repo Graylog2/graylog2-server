@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import { mount } from 'wrappedEnzyme';
 
 import {
   createLookupTable,
@@ -36,6 +37,14 @@ const renderedLUT = (scope: string) => {
   const dataAdapter = createLookupTableAdapter();
 
   return render(<LookupTableView table={table} cache={cache} dataAdapter={dataAdapter} />);
+};
+
+const mountLUT = (scope: string) => {
+  const table = createLookupTable(1, { _scope: scope });
+  const cache = createLookupTableCache();
+  const dataAdapter = createLookupTableAdapter();
+
+  return mount(<LookupTableView table={table} cache={cache} dataAdapter={dataAdapter} />);
 };
 
 describe('LookupTableView', () => {
@@ -65,5 +74,18 @@ describe('LookupTableView', () => {
     renderedLUT('ILLUMINATE');
 
     expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
+  });
+
+  it('should allow non-word-characters in lookup tables key field', () => {
+    const nonWordCharactersKey = '177.228.126.200';
+
+    const wrapper = mountLUT('DEFAULT');
+
+    wrapper.find('input[name="lookupkey"]').simulate('change', { target: { name: 'lookupkey', value: nonWordCharactersKey } });
+
+    expect(wrapper.find('input[name="lookupkey"]').length).toBe(1);
+    expect(wrapper.find('input[name="lookupkey"]').prop('value')).toBe(nonWordCharactersKey);
+
+    expect(wrapper.find('button[name="lookupbutton"]').prop('disabled')).toBe(false);
   });
 });

@@ -513,6 +513,31 @@ public class SearchAggregationsIT {
         );
     }
 
+    @ContainerMatrixTest
+    void testTopLevelSeries() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(false)
+                .series(List.of(Max.builder().field("took_ms").build(), Min.builder().field("took_ms").build()))
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000));
+
+        final String searchTypeResultPath = PIVOT_PATH + ".rows";
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000))
+                .body("rows", hasSize(1));
+
+        final List<List<Float>> rows = validatableResponse
+                .extract()
+                .jsonPath().getList(searchTypeResultPath + "*.values*.value");
+
+        assertThat(rows).containsExactly(List.of(5300.0f, 36.0f));
+    }
+
     private String listToGroovy(Collection<String> strings) {
         final List<String> quotedStrings = strings.stream()
                 .map(string -> "'" + string + "'")
