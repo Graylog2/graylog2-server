@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
-import { SEARCH_BAR_GAP } from 'views/components/searchbar/Constants';
+import { SEARCH_BAR_GAP } from 'views/components/searchbar/SearchBarLayout';
 
 import TimeRangeDropdownButton from './TimeRangeDropdownButton';
 import type { TimeRangeType } from './date-time-picker/TimeRangeDropdown';

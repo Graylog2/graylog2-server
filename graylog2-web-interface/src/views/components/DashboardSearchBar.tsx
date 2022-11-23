@@ -47,16 +47,18 @@ import type { SearchBarControl } from 'views/types';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import useUserDateTime from 'hooks/useUserDateTime';
-import SearchInputAndValidationContainer from 'views/components/searchbar/SearchInputAndValidationContainer';
-import { SEARCH_BAR_GAP } from 'views/components/searchbar/Constants';
+import {
+  SEARCH_BAR_GAP,
+  SearchBarContainer,
+  SearchQueryRow,
+  SearchButtonAndQuery,
+  SearchInputAndValidationContainer,
+} from 'views/components/searchbar/SearchBarLayout';
 
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
 import DashboardSearchForm from './DashboardSearchBarForm';
 import PluggableSearchBarControls from './searchbar/PluggableSearchBarControls';
-import SearchButtonAndQuery from './searchbar/SearchButtonAndQueryContianer';
-import SearchQueryRow from './searchbar/SearchQueryRow';
-import SearchBarContainer from './SearchBarContainer';
 
 const TimeRangeRow = styled.div(({ theme }) => css`
   display: flex;

@@ -53,14 +53,16 @@ import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnPara
 import type { SearchBarControl } from 'views/types';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import useUserDateTime from 'hooks/useUserDateTime';
-import TimeRangeRow from 'views/components/searchbar/TimeRangeRow';
-import SearchBarContainer from 'views/components/SearchBarContainer';
-import { SEARCH_BAR_GAP } from 'views/components/searchbar/Constants';
+import {
+  SEARCH_BAR_GAP,
+  TimeRangeRow,
+  SearchBarContainer,
+  SearchQueryRow,
+  SearchButtonAndQuery,
+  SearchInputAndValidationContainer,
+} from 'views/components/searchbar/SearchBarLayout';
 
 import SearchBarForm from './searchbar/SearchBarForm';
-import SearchButtonAndQuery from './searchbar/SearchButtonAndQueryContianer';
-import SearchQueryRow from './searchbar/SearchQueryRow';
-import SearchInputAndValidationContainer from './searchbar/SearchInputAndValidationContainer';
 
 import {
   executeSearchSubmitHandler as executePluggableSubmitHandler,

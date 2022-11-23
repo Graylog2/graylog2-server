@@ -51,9 +51,11 @@ import {
 import type { SearchBarControl } from 'views/types';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
-import TimeRangeRow from 'views/components/searchbar/TimeRangeRow';
-import SearchQueryRow from 'views/components/searchbar/SearchQueryRow';
-import { SEARCH_BAR_GAP } from 'views/components/searchbar/Constants';
+import {
+  SEARCH_BAR_GAP,
+  TimeRangeRow,
+  SearchQueryRow,
+} from 'views/components/searchbar/SearchBarLayout';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeInput from './searchbar/TimeRangeInput';

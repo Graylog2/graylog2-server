@@ -16,9 +16,17 @@
  */
 import styled, { css } from 'styled-components';
 
-import { SEARCH_BAR_GAP } from 'views/components/searchbar/Constants';
+import { FlatContentRow } from 'components/common';
 
-const SearchQueryRow = styled.div(({ theme }) => css`
+export const SEARCH_BAR_GAP = '10px';
+
+export const SearchBarContainer = styled(FlatContentRow)`
+  display: flex;
+  flex-direction: column;
+  gap: ${SEARCH_BAR_GAP};
+`;
+
+export const SearchQueryRow = styled.div(({ theme }) => css`
   display: flex;
   gap: ${SEARCH_BAR_GAP};
   align-items: flex-start;
@@ -32,4 +40,28 @@ const SearchQueryRow = styled.div(({ theme }) => css`
   }
 `);
 
-export default SearchQueryRow;
+export const SearchButtonAndQuery = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: ${SEARCH_BAR_GAP};
+`;
+
+export const SearchInputAndValidationContainer = styled.div`
+  display: flex;
+  flex: 1;
+`;
+
+export const TimeRangeRow = styled.div(({ theme }) => css`
+  display: flex;
+  gap: ${SEARCH_BAR_GAP};
+  align-items: flex-start;
+
+  @media (max-width: ${theme.breakpoints.max.md}) {
+    flex-direction: column;
+
+    > div {
+      width: 100%;
+    }
+  }
+`);
