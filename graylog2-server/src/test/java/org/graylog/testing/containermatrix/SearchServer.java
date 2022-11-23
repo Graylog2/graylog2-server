@@ -25,10 +25,10 @@ public enum SearchServer {
     ES7(ELASTICSEARCH, "7.10.2"),
     OS1(OPENSEARCH, "1.3.1"),
     OS2(OPENSEARCH, "2.0.1"),
-    OS2_2(OPENSEARCH, "2.2.1");
+    OS2_3(OPENSEARCH, "2.3.0");
 
     public static final SearchServer DEFAULT_VERSION = OS1;
-    public static final SearchServer DEFAULT_OPENSEARCH_VERSION = OS2;
+    public static final SearchServer DEFAULT_OPENSEARCH_VERSION = OS2_3;
 
     private final SearchVersion searchVersion;
 
