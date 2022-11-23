@@ -17,6 +17,8 @@
 package org.graylog.plugins.views.search.rest.scriptingapi;
 
 import org.graylog.plugins.views.ViewsModule;
+import org.graylog.plugins.views.search.export.SimpleMessageChunkCsvWriter;
+import org.graylog.plugins.views.search.rest.scriptingapi.response.writers.TabularResponseWriter;
 import org.graylog2.featureflag.FeatureFlags;
 
 public class ScriptingApiModule extends ViewsModule {
@@ -32,6 +34,7 @@ public class ScriptingApiModule extends ViewsModule {
     protected void configure() {
         if (featureFlags.isOn(FEATURE_FLAG)) {
             addSystemRestResource(ScriptingApiResource.class);
+            jerseyAdditionalComponentsBinder().addBinding().toInstance(TabularResponseWriter.class);
         }
     }
 }
