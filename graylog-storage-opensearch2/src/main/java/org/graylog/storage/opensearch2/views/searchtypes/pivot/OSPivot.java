@@ -78,7 +78,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         contextMap.put(pivot.id(), aggTypes);
 
         // add global rollup series if those were requested
-        if (pivot.rollup()) {
+        if (pivot.rollup() || (pivot.rowGroups().isEmpty() && pivot.columnGroups().isEmpty())) {
             seriesStream(pivot, queryContext, "global rollup")
                     .forEach(searchSourceBuilder::aggregation);
         }
