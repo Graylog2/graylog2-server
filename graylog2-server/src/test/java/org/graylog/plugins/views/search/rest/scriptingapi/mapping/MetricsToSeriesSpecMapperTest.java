@@ -36,13 +36,13 @@ class MetricsToSeriesSpecMapperTest {
 
     private MetricsToSeriesSpecMapper toTest;
     private Map<String, SeriesDescription> availableFunctions;
-    private MetricToSeriesSpecBuilderMapper metricToSeriesSpecBuilderMapper;
+    private MetricToSeriesSpecMapper metricToSeriesSpecMapper;
 
     @BeforeEach
     void setUp() {
         availableFunctions = Map.of("avg", SeriesDescription.create("avg", "Average"));
-        metricToSeriesSpecBuilderMapper = mock(MetricToSeriesSpecBuilderMapper.class);
-        toTest = new MetricsToSeriesSpecMapper(availableFunctions, metricToSeriesSpecBuilderMapper);
+        metricToSeriesSpecMapper = mock(MetricToSeriesSpecMapper.class);
+        toTest = new MetricsToSeriesSpecMapper(availableFunctions, metricToSeriesSpecMapper);
     }
 
     @Test
@@ -53,7 +53,7 @@ class MetricsToSeriesSpecMapperTest {
     @Test
     void constructsProperSeriesSpec() {
         final Metric metric = new Metric("took_ms", "avg", null);
-        doReturn(Average.builder()).when(metricToSeriesSpecBuilderMapper).apply(metric);
+        doReturn(Average.builder().field("took_ms").build()).when(metricToSeriesSpecMapper).apply(metric);
         final SeriesSpec result = toTest.apply(metric);
         assertThat(result)
                 .isNotNull()

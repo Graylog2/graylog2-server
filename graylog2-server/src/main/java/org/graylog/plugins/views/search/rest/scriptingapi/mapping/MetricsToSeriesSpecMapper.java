@@ -30,13 +30,13 @@ import java.util.stream.Collectors;
 public class MetricsToSeriesSpecMapper implements Function<Metric, SeriesSpec> {
 
     private final List<String> availableMetricTypes;
-    private final MetricToSeriesSpecBuilderMapper seriesSpecBuilderCreator;
+    private final MetricToSeriesSpecMapper seriesSpecCreator;
 
     @Inject
     public MetricsToSeriesSpecMapper(final Map<String, SeriesDescription> availableFunctions,
-                                     final MetricToSeriesSpecBuilderMapper seriesSpecBuilderCreator) {
+                                     final MetricToSeriesSpecMapper seriesSpecCreator) {
         this.availableMetricTypes = availableFunctions.values().stream().map(SeriesDescription::type).collect(Collectors.toList());
-        this.seriesSpecBuilderCreator = seriesSpecBuilderCreator;
+        this.seriesSpecCreator = seriesSpecCreator;
     }
 
     @Override
@@ -44,7 +44,7 @@ public class MetricsToSeriesSpecMapper implements Function<Metric, SeriesSpec> {
         if (!availableMetricTypes.contains(metric.functionName())) {
             throw new BadRequestException("Unrecognized metric : " + metric.functionName() + ", valid metrics : " + availableMetricTypes);
         }
-        return seriesSpecBuilderCreator.apply(metric).field(metric.fieldName()).build();
+        return seriesSpecCreator.apply(metric);
     }
 
 }
