@@ -82,18 +82,18 @@ public class DynamicStartPageResource extends RestResource implements PluginRest
     }
 
     @PUT
-    @Path("/pinItem/{id}")
-    @ApiOperation("Add a view for inclusion on the Dynamic Start Page for the user")
-    @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_PIN_ITEM)
-    public void pinItem(@ApiParam(name = "id", required = true) @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
+    @Path("/addToFavorites/{id}")
+    @ApiOperation("Add an item for inclusion on the Dynamic Start Page for the user")
+    @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_ADD_FAVORITE_ITEM)
+    public void addItemToFavorites(@ApiParam(name = "id", required = true) @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
         service.addFavoriteItemFor(id, searchUser);
     }
 
     @DELETE
-    @Path("/unpinItem/{id}")
-    @ApiOperation("Remove a view from inclusion on the Dynamic Start Page for the user")
-    @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_UNPIN_ITEM)
-    public void unpinItem(@ApiParam(name = "id", required = true) @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
+    @Path("/removeFromFavorites/{id}")
+    @ApiOperation("Remove an item from inclusion on the Dynamic Start Page for the user")
+    @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_REMOVE_FAVORITE_ITEM)
+    public void removeItemFromFavorites(@ApiParam(name = "id", required = true) @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
         service.removeFavoriteItemFor(id, searchUser);
     }
 
