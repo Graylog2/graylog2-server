@@ -30,33 +30,33 @@ import org.mongojack.WriteResult;
 import javax.inject.Inject;
 import java.util.Optional;
 
-public class PinnedItemsService extends PaginatedDbService<PinnedItemsDTO> {
-    private static final String COLLECTION_NAME = "pinned_items";
+public class FavoriteItemsService extends PaginatedDbService<FavoriteItemsDTO> {
+    private static final String COLLECTION_NAME = "favorite_items";
 
     private final EntityOwnershipService entityOwnerShipService;
 
     @Inject
-    protected PinnedItemsService(final MongoConnection mongoConnection,
-                                 final MongoJackObjectMapperProvider mapper,
-                                 final EntityOwnershipService entityOwnerShipService) {
-        super(mongoConnection, mapper, PinnedItemsDTO.class, COLLECTION_NAME);
+    protected FavoriteItemsService(final MongoConnection mongoConnection,
+                                   final MongoJackObjectMapperProvider mapper,
+                                   final EntityOwnershipService entityOwnerShipService) {
+        super(mongoConnection, mapper, FavoriteItemsDTO.class, COLLECTION_NAME);
         this.entityOwnerShipService = entityOwnerShipService;
     }
 
-    public Optional<PinnedItemsDTO> findForUser(final SearchUser searchUser) {
-        return streamQuery(DBQuery.is(PinnedItemsDTO.FIELD_USER_ID, searchUser.getUser().getId())).findAny();
+    public Optional<FavoriteItemsDTO> findForUser(final SearchUser searchUser) {
+        return streamQuery(DBQuery.is(FavoriteItemsDTO.FIELD_USER_ID, searchUser.getUser().getId())).findAny();
     }
 
-    public Optional<PinnedItemsDTO> create(final PinnedItemsDTO pinnedItem, final SearchUser searchUser) {
+    public Optional<FavoriteItemsDTO> create(final FavoriteItemsDTO favoriteItem, final SearchUser searchUser) {
         try {
-            final WriteResult<PinnedItemsDTO, ObjectId> result = db.insert(pinnedItem);
-            final PinnedItemsDTO savedObject = result.getSavedObject();
+            final WriteResult<FavoriteItemsDTO, ObjectId> result = db.insert(favoriteItem);
+            final FavoriteItemsDTO savedObject = result.getSavedObject();
             if (savedObject != null) {
-                entityOwnerShipService.registerNewEntity(savedObject.id(), searchUser.getUser(), GRNTypes.PINNED_ITEMS);
+                entityOwnerShipService.registerNewEntity(savedObject.id(), searchUser.getUser(), GRNTypes.FAVORITE_ITEMS);
             }
             return Optional.ofNullable(savedObject);
         } catch (DuplicateKeyException e) {
-            throw new IllegalStateException("Unable to create a pinned item collection, collection with this id already exists : " + pinnedItem.id());
+            throw new IllegalStateException("Unable to create a Favorite Items collection, collection with this id already exists : " + favoriteItem.id());
         }
     }
 }

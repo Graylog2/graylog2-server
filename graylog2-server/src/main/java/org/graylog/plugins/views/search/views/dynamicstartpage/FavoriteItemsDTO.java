@@ -29,9 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @AutoValue
-@JsonDeserialize(builder = PinnedItemsDTO.Builder.class)
+@JsonDeserialize(builder = FavoriteItemsDTO.Builder.class)
 @WithBeanGetter
-public abstract class PinnedItemsDTO {
+public abstract class FavoriteItemsDTO {
     public static final String FIELD_ID = "id";
     public static final String FIELD_USER_ID = "user_id";
     public static final String FIELD_ITEMS = "items";
@@ -48,31 +48,31 @@ public abstract class PinnedItemsDTO {
     @JsonProperty(FIELD_ITEMS)
     public abstract List<String> items();
 
-    public static PinnedItemsDTO.Builder builder() {
-        return PinnedItemsDTO.Builder.create();
+    public static FavoriteItemsDTO.Builder builder() {
+        return FavoriteItemsDTO.Builder.create();
     }
 
-    public abstract PinnedItemsDTO.Builder toBuilder();
+    public abstract FavoriteItemsDTO.Builder toBuilder();
 
     @AutoValue.Builder
     public static abstract class Builder {
         @ObjectId
         @Id
         @JsonProperty(FIELD_ID)
-        public abstract PinnedItemsDTO.Builder id(String id);
+        public abstract FavoriteItemsDTO.Builder id(String id);
 
         @JsonProperty(FIELD_USER_ID)
-        public abstract PinnedItemsDTO.Builder userId(String userId);
+        public abstract FavoriteItemsDTO.Builder userId(String userId);
 
         @JsonProperty(FIELD_ITEMS)
-        public abstract PinnedItemsDTO.Builder items(List<String> items);
+        public abstract FavoriteItemsDTO.Builder items(List<String> items);
 
         @JsonCreator
-        public static PinnedItemsDTO.Builder create() {
-            return new AutoValue_PinnedItemsDTO.Builder()
+        public static FavoriteItemsDTO.Builder create() {
+            return new AutoValue_FavoriteItemsDTO.Builder()
                     .items(new ArrayList<>());
         }
 
-        public abstract PinnedItemsDTO build();
+        public abstract FavoriteItemsDTO build();
     }
 }

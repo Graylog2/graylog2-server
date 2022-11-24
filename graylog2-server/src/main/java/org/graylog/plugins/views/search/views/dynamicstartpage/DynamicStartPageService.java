@@ -35,7 +35,7 @@ public class DynamicStartPageService {
     private final ContentPackService contentPackService;
     private final LastOpenedService lastOpenedService;
     private final RecentActivityService recentActivityService;
-    private final PinnedItemsService pinnedItemsService;
+    private final FavoriteItemsService favoriteItemsService;
     private final EventBus eventBus;
 
     private final long MAXIMUM_ITEMS = 10;
@@ -45,12 +45,12 @@ public class DynamicStartPageService {
     public DynamicStartPageService(ContentPackService contentPackService,
                                    LastOpenedService lastOpenedService,
                                    RecentActivityService recentActivityService,
-                                   PinnedItemsService pinnedItemsService,
+                                   FavoriteItemsService favoriteItemsService,
                                    EventBus eventBus) {
         this.contentPackService = contentPackService;
         this.lastOpenedService = lastOpenedService;
         this.recentActivityService = recentActivityService;
-        this.pinnedItemsService = pinnedItemsService;
+        this.favoriteItemsService = favoriteItemsService;
         this.eventBus = eventBus;
         this.eventBus.register(this);
     }
@@ -83,17 +83,17 @@ public class DynamicStartPageService {
         return PaginatedResponse.create("lastOpened", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
     }
 
-    public PaginatedResponse<PinnedItem> findPinnedItemsFor(final SearchUser searchUser, int page, int perPage) throws NotFoundException {
+    public PaginatedResponse<FavoriteItem> findFavoriteItemsFor(final SearchUser searchUser, int page, int perPage) throws NotFoundException {
         var catalog = contentPackService.getEntityExcerpts();
-        var items = pinnedItemsService
+        var items = favoriteItemsService
                 .findForUser(searchUser)
-                .orElse(PinnedItemsDTO.builder().userId(searchUser.getUser().getId()).build())
+                .orElse(FavoriteItemsDTO.builder().userId(searchUser.getUser().getId()).build())
                 .items()
                 .stream()
-                .map(i -> new PinnedItem(i, catalog.get(i).type().name(), catalog.get(i).title()))
+                .map(i -> new FavoriteItem(i, catalog.get(i).type().name(), catalog.get(i).title()))
                 .collect(Collectors.toList());
         Collections.reverse(items);
-        return PaginatedResponse.create("pinnedItems", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
+        return PaginatedResponse.create("favoriteItems", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
     }
 
     public PaginatedResponse<RecentActivity> findRecentActivityFor(final SearchUser searchUser, int page, int perPage) {
@@ -125,10 +125,10 @@ public class DynamicStartPageService {
         }
     }
 
-    public void addPinnedItemFor(final String id, final SearchUser searchUser) {
-        var pinnedItems = pinnedItemsService.findForUser(searchUser);
-        if(pinnedItems.isPresent()) {
-            final var items = pinnedItems.get().items();
+    public void addFavoriteItemFor(final String id, final SearchUser searchUser) {
+        var favoriteItems = favoriteItemsService.findForUser(searchUser);
+        if(favoriteItems.isPresent()) {
+            final var items = favoriteItems.get().items();
             if(items.contains(id)) {
                 items.remove(id);
             }
@@ -136,10 +136,10 @@ public class DynamicStartPageService {
                 items.remove(0);
             }
             items.add(id);
-            pinnedItemsService.save(pinnedItems.get());
+            favoriteItemsService.save(favoriteItems.get());
         } else {
-            var items = PinnedItemsDTO.builder().userId(searchUser.getUser().getId()).items(Collections.singletonList(id)).build();
-            pinnedItemsService.create(items, searchUser);
+            var items = FavoriteItemsDTO.builder().userId(searchUser.getUser().getId()).items(Collections.singletonList(id)).build();
+            favoriteItemsService.create(items, searchUser);
         }
     }
     @Subscribe

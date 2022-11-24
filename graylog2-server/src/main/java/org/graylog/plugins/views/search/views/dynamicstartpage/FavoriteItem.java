@@ -16,5 +16,5 @@
  */
 package org.graylog.plugins.views.search.views.dynamicstartpage;
 
-public record PinnedItem(String id, String type, String title) {
+public record FavoriteItem(String id, String type, String title) {
 }

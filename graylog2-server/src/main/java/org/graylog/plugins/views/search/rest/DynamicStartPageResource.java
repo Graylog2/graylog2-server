@@ -24,7 +24,7 @@ import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.dynamicstartpage.DynamicStartPageService;
 import org.graylog.plugins.views.search.views.dynamicstartpage.LastOpenedItem;
-import org.graylog.plugins.views.search.views.dynamicstartpage.PinnedItem;
+import org.graylog.plugins.views.search.views.dynamicstartpage.FavoriteItem;
 import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivity;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
@@ -43,7 +43,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import java.util.List;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
@@ -73,12 +72,12 @@ public class DynamicStartPageResource extends RestResource implements PluginRest
     }
 
     @GET
-    @Path("/pinnedItems")
-    @ApiOperation("Get the Pinned Items for the Dynamic Start Page for the user")
-    public PaginatedResponse<PinnedItem> getPinnedItems(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                           @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
-                                           @Context SearchUser searchUser) throws NotFoundException {
-        return service.findPinnedItemsFor(searchUser, page, perPage);
+    @Path("/favoriteItems")
+    @ApiOperation("Get the Favorite Items for the Dynamic Start Page for the user")
+    public PaginatedResponse<FavoriteItem> getPinnedItems(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                          @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
+                                                          @Context SearchUser searchUser) throws NotFoundException {
+        return service.findFavoriteItemsFor(searchUser, page, perPage);
     }
 
     @PUT
@@ -86,7 +85,7 @@ public class DynamicStartPageResource extends RestResource implements PluginRest
     @ApiOperation("Pin a dashboard for inclusion on the Dynamic Start Page for the user")
     @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_PIN_ITEM)
     public void pinItem(@ApiParam(name = "id", required = true) @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
-        service.addPinnedItemFor(id ,searchUser);
+        service.addFavoriteItemFor(id ,searchUser);
     }
 
     @GET
