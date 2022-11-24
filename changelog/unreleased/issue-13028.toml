@@ -2,4 +2,4 @@ type = "fixed"
 message = "When using the index time rotation strategy, roatating of empty index sets is skipped."
 
 issues = ["13028"]
-pulls = ["13735, graylog-plugin-enterprise#3869"]
+pulls = ["13735", "graylog-plugin-enterprise#3869"]

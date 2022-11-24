@@ -2,7 +2,7 @@ type = "changed"
 message = "Retry on Elasticsearch Request entity too large errors"
 
 issues = [""]
-pulls = ["13113, 7071"]
+pulls = ["13113", "7071"]
 
 contributors = [""]
 
