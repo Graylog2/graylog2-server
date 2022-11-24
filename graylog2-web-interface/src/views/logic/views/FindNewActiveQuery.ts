@@ -14,15 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import styled from 'styled-components';
 
-const ViewActionsWrapper = styled.div(({ theme }) => `
-  margin-left: 18px;
+// Returns a new query ID, in case the active query gets deleted.
+import type { List } from 'immutable';
 
-  @media (max-width: ${theme.breakpoints.max.sm}) {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 10px;
-  }
-`);
-export default ViewActionsWrapper;
+const FindNewActiveQueryId = (queryIds: List<string>, activeQueryId: string) => {
+  const currentQueryIdIndex = queryIds.indexOf(activeQueryId);
+  const newQueryIdIndex = Math.min(0, currentQueryIdIndex - 1);
+
+  return queryIds.filter((queryId) => (queryId !== activeQueryId))
+    .get(newQueryIdIndex);
+};
+
+export default FindNewActiveQueryId;

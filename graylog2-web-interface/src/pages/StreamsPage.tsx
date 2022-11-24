@@ -18,31 +18,28 @@ import React, { useEffect } from 'react';
 
 import { Row, Col } from 'components/bootstrap';
 import CreateStreamButton from 'components/streams/CreateStreamButton';
-import StreamComponent from 'components/streams/StreamComponent';
+import StreamsOverview from 'components/streams/StreamsOverview';
 import PageHeader from 'components/common/PageHeader';
 import { DocumentTitle, IfPermitted, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
+import type { Stream } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
-import useCurrentUser from 'hooks/useCurrentUser';
 import { useStore } from 'stores/connect';
 
+const onSave = (stream: Stream) => StreamsStore.save(stream, () => {
+  UserNotification.success('Stream has been successfully created.', 'Success');
+});
+
 const StreamsPage = () => {
-  const currentUser = useCurrentUser();
   const { indexSets } = useStore(IndexSetsStore);
 
   useEffect(() => {
     IndexSetsActions.list(false);
-  });
+  }, []);
 
-  const isLoading = !currentUser || !indexSets;
-
-  const onSave = (_, stream) => {
-    StreamsStore.save(stream, () => {
-      UserNotification.success('Stream has been successfully created.', 'Success');
-    });
-  };
+  const isLoading = !indexSets;
 
   if (isLoading) {
     return <Spinner />;
@@ -50,33 +47,30 @@ const StreamsPage = () => {
 
   return (
     <DocumentTitle title="Streams">
-      <div>
-        <PageHeader title="Streams"
-                    documentationLink={{
-                      title: 'Streams documentation',
-                      path: DocsHelper.PAGES.STREAMS,
-                    }}
-                    actions={(
-                      <IfPermitted permissions="streams:create">
-                        <CreateStreamButton bsStyle="success"
-                                            onSave={onSave}
-                                            indexSets={indexSets} />
-                      </IfPermitted>
+      <PageHeader title="Streams"
+                  documentationLink={{
+                    title: 'Streams documentation',
+                    path: DocsHelper.PAGES.STREAMS,
+                  }}
+                  actions={(
+                    <IfPermitted permissions="streams:create">
+                      <CreateStreamButton bsStyle="success"
+                                          onCreate={onSave}
+                                          indexSets={indexSets} />
+                    </IfPermitted>
           )}>
-          <span>
-            You can route incoming messages into streams by applying rules against them. Messages matching
-            the rules of a stream are routed into it. A message can also be routed into multiple streams.
-          </span>
-        </PageHeader>
+        <span>
+          You can route incoming messages into streams by applying rules against them. Messages matching
+          the rules of a stream are routed into it. A message can also be routed into multiple streams.
+        </span>
+      </PageHeader>
 
-        <Row className="content">
-          <Col md={12}>
-            <StreamComponent currentUser={currentUser}
-                             onStreamSave={onSave}
-                             indexSets={indexSets} />
-          </Col>
-        </Row>
-      </div>
+      <Row className="content">
+        <Col md={12}>
+          <StreamsOverview onStreamCreate={onSave}
+                           indexSets={indexSets} />
+        </Col>
+      </Row>
     </DocumentTitle>
   );
 };

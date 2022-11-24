@@ -94,8 +94,8 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       return promise;
     },
 
-    setOrder(newOrder: Immutable.OrderedSet<{ id: QueryId }>) {
-      const newQueries = newOrder.map(({ id }) => {
+    setOrder(newOrderedQueryIds: Immutable.OrderedSet<QueryId>) {
+      const newQueries = newOrderedQueryIds.map((id) => {
         return this.queries.get(id);
       });
       const promise: Promise<QueriesList> = this._propagateQueryChange(newQueries).then(() => newQueries);

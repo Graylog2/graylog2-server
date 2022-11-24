@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix bug when installing Sidecar collector configuration in Content Pack."
+
+issues = ["12778"]
+pulls = ["13632"]

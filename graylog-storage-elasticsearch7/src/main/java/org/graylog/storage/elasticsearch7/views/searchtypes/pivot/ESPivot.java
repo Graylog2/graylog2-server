@@ -17,7 +17,6 @@
 package org.graylog.storage.elasticsearch7.views.searchtypes.pivot;
 
 import com.google.common.collect.ImmutableList;
-import one.util.streamex.EntryStream;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
@@ -170,8 +169,10 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
 
     private Stream<AggregationBuilder> seriesStream(Pivot pivot, ESGeneratedQueryContext queryContext, String reason) {
-        return EntryStream.of(pivot.series())
-                .mapKeyValue((integer, seriesSpec) -> {
+        return pivot.series()
+                .stream()
+                .distinct()
+                .map((seriesSpec) -> {
                     final String seriesName = queryContext.seriesName(seriesSpec, pivot);
                     LOG.debug("Adding {} series '{}' with name '{}'", reason, seriesSpec.type(), seriesName);
                     final ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> esPivotSeriesSpecHandler = seriesHandlers.get(seriesSpec.type());

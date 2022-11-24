@@ -1,0 +1,10 @@
+type = "changed"
+message = "Replacing nested with linear bucketing in aggregations."
+
+issues = ["8111"]
+pulls = ["13805", "13806", "13855"]
+
+details.user = """
+Previously, grouping over multiple fields in an aggregation was achieved by nesting aggregations. This potentially resulted in unpredictable results and numbers of buckets being generated.
+Aggregations do now return linear buckets and allow specifying single limits for row/column pivots.
+"""

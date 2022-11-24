@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useMemo, useState } from 'react';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import type { FormikProps } from 'formik';
 import { Form, Formik } from 'formik';
@@ -39,10 +38,6 @@ type Props = {
   formRef?: React.Ref<FormikProps<SearchBarFormValues>>,
   validateQueryString: (values: SearchBarFormValues) => Promise<QueryValidationState>,
 }
-
-const StyledForm = styled(Form)`
-  height: 100%;
-`;
 
 const _isFunction = (children: Props['children']): children is (props: FormikProps<SearchBarFormValues>) => React.ReactElement => isFunction(children);
 
@@ -79,9 +74,9 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
                                  validateOnBlur={false}
                                  validateOnMount={validateOnMount}>
       {(...args) => (
-        <StyledForm>
+        <Form>
           {_isFunction(children) ? children(...args) : children}
-        </StyledForm>
+        </Form>
       )}
     </Formik>
   );
