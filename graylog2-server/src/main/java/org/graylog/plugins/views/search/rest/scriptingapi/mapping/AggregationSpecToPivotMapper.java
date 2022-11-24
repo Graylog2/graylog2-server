@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -35,11 +36,11 @@ public class AggregationSpecToPivotMapper implements Function<SearchRequestSpec,
     public static final String PIVOT_ID = "scripting_api_temporary_pivot";
 
     private final GroupingToBucketSpecMapper rowGroupCreator;
-    private final MetricsToSeriesSpecMapper seriesCreator;
+    private final MetricToSeriesSpecMapper seriesCreator;
 
     @Inject
     public AggregationSpecToPivotMapper(final GroupingToBucketSpecMapper rowGroupCreator,
-                                        final MetricsToSeriesSpecMapper seriesCreator) {
+                                        final MetricToSeriesSpecMapper seriesCreator) {
         this.rowGroupCreator = rowGroupCreator;
         this.seriesCreator = seriesCreator;
     }
@@ -55,6 +56,7 @@ public class AggregationSpecToPivotMapper implements Function<SearchRequestSpec,
                         .collect(Collectors.toList())
                 ).series(aggregationSpec.metrics()
                         .stream()
+                        .filter(Objects::nonNull)
                         .map(seriesCreator)
                         .collect(Collectors.toList())
                 );

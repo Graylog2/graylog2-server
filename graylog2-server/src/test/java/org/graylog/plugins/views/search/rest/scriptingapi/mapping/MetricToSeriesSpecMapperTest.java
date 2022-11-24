@@ -16,44 +16,42 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
-import org.graylog.plugins.views.search.rest.SeriesDescription;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
+import org.graylog.plugins.views.search.rest.scriptingapi.validation.MetricValidator;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.ws.rs.BadRequestException;
-import java.util.Map;
+import javax.validation.ValidationException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
-class MetricsToSeriesSpecMapperTest {
+class MetricToSeriesSpecMapperTest {
 
-    private MetricsToSeriesSpecMapper toTest;
-    private Map<String, SeriesDescription> availableFunctions;
-    private MetricToSeriesSpecMapper metricToSeriesSpecMapper;
+    private MetricToSeriesSpecMapper toTest;
+    private MetricValidator metricValidator;
 
     @BeforeEach
     void setUp() {
-        availableFunctions = Map.of("avg", SeriesDescription.create("avg", "Average"));
-        metricToSeriesSpecMapper = mock(MetricToSeriesSpecMapper.class);
-        toTest = new MetricsToSeriesSpecMapper(availableFunctions, metricToSeriesSpecMapper);
+        metricValidator = mock(MetricValidator.class);
+        toTest = new MetricToSeriesSpecMapper(metricValidator);
     }
 
     @Test
-    void throwsBadRequestExceptionOnUnavailableFunction() {
-        assertThrows(BadRequestException.class, () -> toTest.apply(new Metric("http_method", "unknown", null)));
+    void throwsExceptionWhenValidatorThrowsException() {
+        doThrow(ValidationException.class).when(metricValidator).validate(any());
+        assertThrows(ValidationException.class, () -> toTest.apply(new Metric("http_method", "unknown", null)));
     }
 
     @Test
     void constructsProperSeriesSpec() {
         final Metric metric = new Metric("took_ms", "avg", null);
-        doReturn(Average.builder().field("took_ms").build()).when(metricToSeriesSpecMapper).apply(metric);
         final SeriesSpec result = toTest.apply(metric);
         assertThat(result)
                 .isNotNull()

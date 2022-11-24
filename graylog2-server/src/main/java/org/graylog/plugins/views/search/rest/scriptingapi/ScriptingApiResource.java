@@ -47,6 +47,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.validation.ValidationException;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -94,25 +96,29 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     public TabularResponse executeQuery(@ApiParam(name = "searchRequestSpec") @Valid SearchRequestSpec searchRequestSpec,
                                         @Context SearchUser searchUser) {
 
-        //Step 1: map simple request to more complex search
-        Search search = searchCreator.mapToSearch(searchRequestSpec, searchUser);
+        try {
+            //Step 1: map simple request to more complex search
+            Search search = searchCreator.mapToSearch(searchRequestSpec, searchUser);
 
-        //Step 2: execute search as we usually do
-        final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
-        postAuditEvent(searchJob);
+            //Step 2: execute search as we usually do
+            final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
+            postAuditEvent(searchJob);
 
-        //Step 3: take complex response and try to map it to simpler, tabular form
-        final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
-        final QueryResult queryResult = searchJobDTO.results().get(SearchRequestSpecToSearchMapper.QUERY_ID);
-        if (queryResult != null) {
-            final SearchType.Result aggregationResult = queryResult.searchTypes().get(AggregationSpecToPivotMapper.PIVOT_ID);
-            if (aggregationResult instanceof PivotResult pivotResult) {
-                return responseCreator.mapToResponse(searchRequestSpec, pivotResult);
+            //Step 3: take complex response and try to map it to simpler, tabular form
+            final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
+            final QueryResult queryResult = searchJobDTO.results().get(SearchRequestSpecToSearchMapper.QUERY_ID);
+            if (queryResult != null) {
+                final SearchType.Result aggregationResult = queryResult.searchTypes().get(AggregationSpecToPivotMapper.PIVOT_ID);
+                if (aggregationResult instanceof PivotResult pivotResult) {
+                    return responseCreator.mapToResponse(searchRequestSpec, pivotResult);
+                }
             }
-        }
 
-        LOG.warn("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
-        throw new NotFoundException("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
+            LOG.warn("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
+            throw new NotFoundException("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
+        } catch (IllegalArgumentException | ValidationException ex) {
+            throw new BadRequestException(ex.getMessage(), ex);
+        }
     }
 
     @GET
@@ -125,8 +131,12 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                                         @QueryParam("groups") List<String> groups,
                                         @QueryParam("metrics") List<String> metrics,
                                         @Context SearchUser searchUser) {
-        SearchRequestSpec searchRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(query, streams, timerangeKeyword, groups, metrics);
-        return executeQuery(searchRequestSpec, searchUser);
+        try {
+            SearchRequestSpec searchRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(query, streams, timerangeKeyword, groups, metrics);
+            return executeQuery(searchRequestSpec, searchUser);
+        } catch (IllegalArgumentException ex) {
+            throw new BadRequestException(ex.getMessage(), ex);
+        }
     }
 
     private void postAuditEvent(SearchJob searchJob) {
