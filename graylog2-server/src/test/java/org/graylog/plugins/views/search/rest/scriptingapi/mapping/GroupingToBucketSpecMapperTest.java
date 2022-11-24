@@ -18,7 +18,6 @@ package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,7 +42,7 @@ class GroupingToBucketSpecMapperTest {
 
     @Test
     void buildsBucketSpecCorrectly() {
-        Grouping grouping = new Grouping("source", 3, SortSpec.Direction.Ascending);
+        Grouping grouping = new Grouping("source", 3);
         final BucketSpec bucketSpec = toTest.apply(grouping);
 
         assertThat(bucketSpec)
@@ -56,7 +55,7 @@ class GroupingToBucketSpecMapperTest {
 
     @Test
     void usesDefaultLimitIfWrongLimitProvided() {
-        Grouping grouping = new Grouping("source", -42, null);
+        Grouping grouping = new Grouping("source", -42);
         final BucketSpec bucketSpec = toTest.apply(grouping);
 
         assertThat(bucketSpec)

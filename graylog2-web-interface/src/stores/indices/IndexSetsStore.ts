@@ -88,7 +88,7 @@ type IndexSetsStoreState = {
   indexSet: IndexSet,
 }
 type IndexSetsActionsType = {
-  list: () => Promise<unknown>,
+  list: (stats: boolean) => Promise<unknown>,
   listPaginated: () => Promise<unknown>,
   get: (indexSetId: string) => Promise<unknown>,
   update: (indexSet: IndexSet) => Promise<unknown>,

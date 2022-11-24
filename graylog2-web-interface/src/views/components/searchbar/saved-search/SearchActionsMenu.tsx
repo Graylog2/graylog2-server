@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useTheme } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useState, useContext, useRef } from 'react';
 
 import { useStore } from 'stores/connect';
@@ -44,6 +44,11 @@ import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchList from './SavedSearchList';
+
+const Container = styled(ButtonGroup)`
+  display: flex;
+  justify-content: flex-end;
+`;
 
 const _isAllowedToEdit = (view: View, currentUser: User | undefined | null) => (
   view.owner === currentUser?.username
@@ -145,7 +150,7 @@ const SearchActionsMenu = () => {
   };
 
   return (
-    <ButtonGroup aria-label="Search Meta Buttons">
+    <Container aria-label="Search Meta Buttons">
       <Button title={title} ref={formTarget} onClick={toggleFormModal}>
         <Icon style={{ color: loaded ? savedSearchColor : undefined }} name="star" type={loaded ? 'solid' : 'regular'} /> Save
       </Button>
@@ -206,7 +211,7 @@ const SearchActionsMenu = () => {
                           description="Search for a User or Team to add as collaborator on this saved search."
                           onClose={toggleShareSearch} />
       )}
-    </ButtonGroup>
+    </Container>
   );
 };
 

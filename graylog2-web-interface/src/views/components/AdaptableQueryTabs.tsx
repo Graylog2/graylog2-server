@@ -20,6 +20,7 @@ import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import { OrderedSet } from 'immutable';
 
 import { ModifiedNavDropdown as NavDropdown } from 'components/bootstrap/NavDropdown';
 import type { QueryId } from 'views/logic/queries/Query';
@@ -27,7 +28,6 @@ import type QueryTitleEditModal from 'views/components/queries/QueryTitleEditMod
 import { Nav, NavItem, MenuItem } from 'components/bootstrap';
 import { Icon, IconButton } from 'components/common';
 import QueryTitle from 'views/components/queries/QueryTitle';
-import type { ListItemType } from 'components/common/SortableList/ListItem';
 import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabsConfiguration';
 
 import type { QueryTabsProps } from './QueryTabs';
@@ -38,10 +38,10 @@ interface Props extends QueryTabsProps {
 }
 
 interface TabsTypes {
-  navItems: Array<ReactNode>,
-  menuItems: Array<ReactNode>,
-  lockedItems: Array<ReactNode>,
-  queriesList: Array<ListItemType>,
+  navItems: OrderedSet<ReactNode>,
+  menuItems: OrderedSet<ReactNode>,
+  lockedItems: OrderedSet<ReactNode>,
+  queriesList: OrderedSet<{ id: string, title: string }>,
 }
 
 const CLASS_HIDDEN = 'hidden';
@@ -170,15 +170,15 @@ const adjustTabsVisibility = (maxWidth, lockedTab, setLockedTab) => {
   }
 };
 
-const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemove, onSelect, queryTitleEditModal }: Props) => {
+const AdaptableQueryTabs = ({ maxWidth, queries, titles, activeQueryId, onRemove, onSelect, queryTitleEditModal, dashboardId }: Props) => {
   const [openedMore, setOpenedMore] = useState<boolean>(false);
   const [lockedTab, setLockedTab] = useState<QueryId>();
   const [showConfigurationModal, setShowConfigurationModal] = useState<boolean>(false);
   const currentTabs = useMemo((): TabsTypes => {
-    const navItems = [];
-    const menuItems = [];
-    const lockedItems = [];
-    const queriesList = [];
+    let navItems = OrderedSet();
+    let menuItems = OrderedSet();
+    let lockedItems = OrderedSet();
+    let queriesList = OrderedSet<{ id: string, title: string }>();
 
     queries.keySeq().forEach((id, idx) => {
       const openTitleEditModal = (activeQueryTitle: string) => {
@@ -189,7 +189,7 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
 
       const title = titles.get(id, `Page#${idx + 1}`);
       const tabTitle = (
-        <QueryTitle active={id === selectedQueryId}
+        <QueryTitle active={id === activeQueryId}
                     id={id}
                     onClose={() => onRemove(id)}
                     openEditModal={openTitleEditModal}
@@ -197,7 +197,7 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
                     title={title} />
       );
 
-      navItems.push(lockedTab === id ? null : (
+      navItems = navItems.add(lockedTab === id ? null : (
         <NavItem eventKey={id}
                  key={id}
                  data-tab-id={id}
@@ -209,18 +209,19 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
         </NavItem>
       ));
 
-      menuItems.push(lockedTab === id ? null : (
+      menuItems = menuItems.add(lockedTab === id ? null : (
         <MenuItem eventKey={id}
                   key={id}
                   data-tab-id={id}
                   onClick={() => {
                     setLockedTab(id);
                     onSelect(id);
-                  }}>{tabTitle}
+                  }}>
+          {tabTitle}
         </MenuItem>
       ));
 
-      lockedItems.push(lockedTab !== id ? null : (
+      lockedItems = lockedItems.add(lockedTab !== id ? null : (
         <NavItem eventKey={id}
                  key={id}
                  data-tab-id={id}
@@ -230,22 +231,19 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
         </NavItem>
       ));
 
-      queriesList.push({
-        id,
-        title,
-      });
+      queriesList = queriesList.add({ id, title });
     });
 
     return { navItems, menuItems, lockedItems, queriesList };
-  }, [lockedTab, onRemove, onSelect, queries, queryTitleEditModal, selectedQueryId, titles]);
+  }, [lockedTab, onRemove, onSelect, queries, queryTitleEditModal, activeQueryId, titles]);
 
   useEffect(() => {
     adjustTabsVisibility(maxWidth, lockedTab, setLockedTab);
-  }, [maxWidth, lockedTab, selectedQueryId]);
+  }, [maxWidth, lockedTab, activeQueryId]);
 
   return (
     <Container>
-      <StyledQueryNav bsStyle="tabs" activeKey={selectedQueryId} id="dashboard-tabs">
+      <StyledQueryNav bsStyle="tabs" activeKey={activeQueryId} id="dashboard-tabs">
         {currentTabs.navItems}
 
         <NavDropdown eventKey="more"
@@ -273,9 +271,11 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, selectedQueryId, onRemo
       </StyledQueryNav>
       <IconButton title="Open pages configuration" name="cog" onClick={() => setShowConfigurationModal(true)} />
       {showConfigurationModal && (
-      <AdaptableQueryTabsConfiguration show={showConfigurationModal}
-                                       setShow={setShowConfigurationModal}
-                                       queriesList={currentTabs.queriesList} />
+        <AdaptableQueryTabsConfiguration show={showConfigurationModal}
+                                         setShow={setShowConfigurationModal}
+                                         queriesList={currentTabs.queriesList}
+                                         activeQueryId={activeQueryId}
+                                         dashboardId={dashboardId} />
       )}
     </Container>
   );
@@ -285,7 +285,7 @@ AdaptableQueryTabs.propTypes = {
   maxWidth: PropTypes.number.isRequired,
   queries: ImmutablePropTypes.orderedSetOf(PropTypes.string).isRequired,
   titles: PropTypes.object.isRequired,
-  selectedQueryId: PropTypes.string.isRequired,
+  activeQueryId: PropTypes.string.isRequired,
   onRemove: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
   queryTitleEditModal: PropTypes.oneOfType([

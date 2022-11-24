@@ -17,10 +17,10 @@
 package org.graylog.plugins.views.search.rest.scriptingapi.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.lucene.util.packed.DirectMonotonicReader;
 
 import java.util.List;
 
 public record TabularResponse(@JsonProperty("schema") List<ResponseSchemaEntry> schema,
-                              @JsonProperty ResponseData data, @JsonProperty Metadata metadata) {
+                              @JsonProperty List<List<Object>> datarows,
+                              @JsonProperty Metadata metadata) {
 }

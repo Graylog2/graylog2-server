@@ -26,8 +26,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 
 import javax.inject.Inject;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -36,11 +36,11 @@ public class AggregationSpecToPivotMapper implements Function<SearchRequestSpec,
     public static final String PIVOT_ID = "scripting_api_temporary_pivot";
 
     private final GroupingToBucketSpecMapper rowGroupCreator;
-    private final MetricsToSeriesSpecMapper seriesCreator;
+    private final MetricToSeriesSpecMapper seriesCreator;
 
     @Inject
     public AggregationSpecToPivotMapper(final GroupingToBucketSpecMapper rowGroupCreator,
-                                        final MetricsToSeriesSpecMapper seriesCreator) {
+                                        final MetricToSeriesSpecMapper seriesCreator) {
         this.rowGroupCreator = rowGroupCreator;
         this.seriesCreator = seriesCreator;
     }
@@ -56,19 +56,12 @@ public class AggregationSpecToPivotMapper implements Function<SearchRequestSpec,
                         .collect(Collectors.toList())
                 ).series(aggregationSpec.metrics()
                         .stream()
+                        .filter(Objects::nonNull)
                         .map(seriesCreator)
                         .collect(Collectors.toList())
                 );
         if (aggregationSpec.hasCustomSort()) {
-            List<SortSpec> sortSpecs = new LinkedList<>();
-            if (aggregationSpec.groupingSortHasPriority()) {
-                sortSpecs.addAll(getSortSpecs(aggregationSpec.groupings()));
-                sortSpecs.addAll(getSortSpecs(aggregationSpec.metrics()));
-            } else {
-                sortSpecs.addAll(getSortSpecs(aggregationSpec.metrics()));
-                sortSpecs.addAll(getSortSpecs(aggregationSpec.groupings()));
-            }
-            pivotBuilder.sort(sortSpecs);
+            pivotBuilder.sort(getSortSpecs(aggregationSpec.metrics()));
         }
         return pivotBuilder
                 .build();
