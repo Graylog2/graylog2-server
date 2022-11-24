@@ -59,7 +59,7 @@ public class SearchTypeResultToTabularResponseMapper {
                                     final ImmutableList<PivotResult.Value> values = pivRow.values();
                                     for (Metric metric : searchRequestSpec.metrics()) {
                                         row.add(values.stream()
-                                                .filter(value -> value.key().contains(metric.sortColumnName()))
+                                                .filter(value -> value.key().contains(metric.columnName()))
                                                 .findFirst()
                                                 .map(PivotResult.Value::value)
                                                 .orElse("-")

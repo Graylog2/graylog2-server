@@ -16,11 +16,11 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.request;
 
-import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
+import java.util.Optional;
 
-public interface Sortable {
+public interface MetricConfiguration {
 
-    SortSpec.Direction sort();
-
-    String columnName();
+    default Optional<String> columnName(final Metric metric) {
+        return Optional.empty();
+    }
 }

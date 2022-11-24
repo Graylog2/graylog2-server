@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.PercentileConfiguration;
 import org.graylog.plugins.views.search.rest.scriptingapi.validation.MetricValidator;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
@@ -54,7 +55,10 @@ public class MetricToSeriesSpecMapper implements Function<Metric, SeriesSpec> {
             case Latest.NAME -> Latest.builder().field(metric.fieldName()).build();
             case Max.NAME -> Max.builder().field(metric.fieldName()).build();
             case Min.NAME -> Min.builder().field(metric.fieldName()).build();
-            case Percentile.NAME -> Percentile.builder().field(metric.fieldName()).build();
+            case Percentile.NAME -> Percentile.builder()
+                    .field(metric.fieldName())
+                    .percentile(((PercentileConfiguration) metric.configuration()).percentile())
+                    .build();
             case StdDev.NAME -> StdDev.builder().field(metric.fieldName()).build();
             case Sum.NAME -> Sum.builder().field(metric.fieldName()).build();
             case SumOfSquares.NAME -> SumOfSquares.builder().field(metric.fieldName()).build();

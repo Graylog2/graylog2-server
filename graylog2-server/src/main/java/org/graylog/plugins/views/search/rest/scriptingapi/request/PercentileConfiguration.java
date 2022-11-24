@@ -16,11 +16,19 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.request;
 
-import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
 
-public interface Sortable {
+import java.util.Optional;
 
-    SortSpec.Direction sort();
+public record PercentileConfiguration(@JsonProperty("percentile") Double percentile) implements MetricConfiguration {
 
-    String columnName();
+    @Override
+    public Optional<String> columnName(final Metric metric) {
+        return Optional.of(Percentile.builder()
+                .field(metric.fieldName())
+                .percentile(percentile())
+                .build()
+                .literal());
+    }
 }

@@ -89,7 +89,7 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                         Set.of(),
                         DEFAULT_TIMERANGE,
                         List.of(new Grouping("http_method")),
-                        List.of(new Metric(null, "count", null))
+                        List.of(new Metric(null, "count"))
                 )
         );
 
@@ -104,7 +104,7 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                         Set.of(),
                         DEFAULT_TIMERANGE,
                         List.of(new Grouping("http_method")),
-                        List.of(new Metric(null, "count", null))
+                List.of(new Metric(null, "count"))
                 )
         );
     }
@@ -123,7 +123,7 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                         Set.of("000000000000000000000001"),
                         KeywordRange.create("last 1 day", "UTC"),
                         List.of(new Grouping("http_method"), new Grouping("controller")),
-                        List.of(new Metric("took_ms", "avg", null))
+                List.of(new Metric("took_ms", "avg"))
                 )
         );
     }

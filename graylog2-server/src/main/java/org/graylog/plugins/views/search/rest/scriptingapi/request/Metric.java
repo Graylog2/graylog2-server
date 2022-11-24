@@ -17,19 +17,61 @@
 package org.graylog.plugins.views.search.rest.scriptingapi.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.github.rvesse.airline.annotations.restrictions.NotBlank;
 import org.apache.commons.lang.StringUtils;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 
 import javax.validation.Valid;
+import java.util.Objects;
+import java.util.Optional;
 
-//TODO: one or two metrics seem to have additional fields (i.e. percentile)
-public record Metric(@JsonProperty("field") @Valid String fieldName,
-                     @JsonProperty("function") @Valid @NotBlank String functionName,
-                     @JsonProperty("sort") SortSpec.Direction sort) implements Sortable {
+//TODO: move back to record if this one got solved: https://github.com/FasterXML/jackson-databind/issues/3342
+public class Metric implements Sortable {
+
+    @JsonProperty("field")
+    private String fieldName;
+
+    @JsonProperty("function")
+    @NotBlank
+    private @Valid String functionName;
+
+    @JsonProperty("sort")
+    private SortSpec.Direction sort;
+
+    @JsonProperty("configuration")
+    @JsonTypeInfo(include = JsonTypeInfo.As.EXTERNAL_PROPERTY,
+                  use = JsonTypeInfo.Id.NAME,
+                  property = "function")
+    @JsonSubTypes({
+            @JsonSubTypes.Type(name = "percentile", value = PercentileConfiguration.class)
+    })
+    private MetricConfiguration configuration;
+
+    public Metric(@JsonProperty("field") String fieldName,
+                  @JsonProperty("function") String functionName,
+                  @JsonProperty("sort") SortSpec.Direction sort,
+                  @JsonProperty("configuration") MetricConfiguration configuration) {
+        this.fieldName = fieldName;
+        this.functionName = functionName;
+        this.sort = sort;
+        this.configuration = configuration;
+    }
+
+
+    public Metric(final String fieldName, final String functionName) {
+        this(fieldName, functionName, null, null);
+    }
 
     @Override
-    public String sortColumnName() {
+    public String columnName() {
+        if (configuration() != null) {
+            final Optional<String> configBasedColumnName = configuration().columnName(this);
+            if (configBasedColumnName.isPresent()) {
+                return configBasedColumnName.get();
+            }
+        }
         return functionName() + "(" + (fieldName() != null ? fieldName() : "") + ")";
     }
 
@@ -46,6 +88,53 @@ public record Metric(@JsonProperty("field") @Valid String fieldName,
         final String[] split = metricString.split(":");
         final String functionName = split[0];
         final String fieldName = split.length > 1 ? split[1] : null;
-        return new Metric(fieldName, functionName, null);
+        return new Metric(fieldName, functionName);
     }
+
+    public String fieldName() {
+        return fieldName;
+    }
+
+    public String functionName() {
+        return functionName;
+    }
+
+    @Override
+    public SortSpec.Direction sort() {
+        return sort;
+    }
+
+    public MetricConfiguration configuration() {
+        return configuration;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
+        var that = (Metric) obj;
+        return Objects.equals(this.fieldName, that.fieldName) &&
+                Objects.equals(this.functionName, that.functionName) &&
+                Objects.equals(this.sort, that.sort) &&
+                Objects.equals(this.configuration, that.configuration);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fieldName, functionName, sort, configuration);
+    }
+
+    @Override
+    public String toString() {
+        return "Metric[" +
+                "fieldName=" + fieldName + ", " +
+                "functionName=" + functionName + ", " +
+                "sort=" + sort + ", " +
+                "configuration=" + configuration + ']';
+    }
+
 }
