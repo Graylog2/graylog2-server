@@ -32,8 +32,7 @@ import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import usePluginEntities from 'hooks/usePluginEntities';
 
-const Container = styled.div`
-  margin-right: 5px;
+const Container = styled.div`;
   margin-left: 5px;
   width: 25px;
   min-height: 34px;
@@ -42,7 +41,7 @@ const Container = styled.div`
   justify-content: center;
 `;
 
-const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable }) => `
+const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable }) => css`
   padding: 0;
   background: transparent;
   border: 0;
@@ -51,7 +50,7 @@ const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable
   cursor: ${$clickable ? 'pointer' : 'default'};
 `);
 
-const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $status: string }) => `
+const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $status: string }) => css`
   color: ${$status === 'ERROR' ? theme.colors.variant.danger : theme.colors.variant.warning};
   font-size: 22px;
 `);

@@ -25,7 +25,7 @@ import { Icon } from 'components/common';
 import LoaderTabs from 'components/messageloaders/LoaderTabs';
 import MatchingTypeSwitcher from 'components/streams/MatchingTypeSwitcher';
 import StreamRuleList from 'components/streamrules/StreamRuleList';
-import StreamRuleForm from 'components/streamrules/StreamRuleForm';
+import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import Spinner from 'components/common/Spinner';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
@@ -119,7 +119,7 @@ class StreamRulesEditor extends React.Component {
   _onStreamRuleFormSubmit = (streamRuleId, data) => {
     const { streamId } = this.props;
 
-    StreamRulesStore.create(streamId, data, () => {});
+    return StreamRulesStore.create(streamId, data, () => {});
   };
 
   _onAddStreamRule = (event) => {
@@ -179,12 +179,12 @@ class StreamRulesEditor extends React.Component {
                 Add stream rule
               </Button>
               {showStreamRuleForm && (
-                <StreamRuleForm title="New Stream Rule"
-                                onClose={() => this.setState({ showStreamRuleForm: false })}
-                                streamRuleTypes={streamRuleTypes}
-                                submitButtonText="Create Rule"
-                                submitLoadingText="Creating Rule..."
-                                onSubmit={this._onStreamRuleFormSubmit} />
+                <StreamRuleModal title="New Stream Rule"
+                                 onClose={() => this.setState({ showStreamRuleForm: false })}
+                                 streamRuleTypes={streamRuleTypes}
+                                 submitButtonText="Create Rule"
+                                 submitLoadingText="Creating Rule..."
+                                 onSubmit={this._onStreamRuleFormSubmit} />
               )}
             </div>
 

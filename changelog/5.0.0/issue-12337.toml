@@ -1,0 +1,5 @@
+type = "a"
+message = "Add ability for inputs to specify encoding"
+
+issues = ["12337"]
+pulls = ["12654"]

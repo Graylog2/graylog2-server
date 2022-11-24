@@ -1,0 +1,11 @@
+type = "fixed"
+message = "Fix journal directory preflight size check"
+
+issues = ["13454"]
+pulls = ["13470"]
+
+contributors = [""]
+
+details.user = """
+Include the already used size of the journal directory into the size calcalation.
+"""

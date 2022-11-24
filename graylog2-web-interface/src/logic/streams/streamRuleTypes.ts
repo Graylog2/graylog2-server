@@ -14,14 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import styled from 'styled-components';
 
-const BottomRow = styled.div(({ theme }) => `
-  display: flex;
+// The actual stream types will be provided by the backend.
+// This map is only being used for frontend related logic.
+const STREAM_RULE_TYPES = {
+  FIELD_PRESENCE: 5,
+  ALWAYS_MATCHES: 7,
+  MATCH_INPUT: 8,
+};
 
-  @media (max-width: ${theme.breakpoints.max.sm}) {
-    flex-direction: column;
-  }
-`);
-
-export default BottomRow;
+export default STREAM_RULE_TYPES;

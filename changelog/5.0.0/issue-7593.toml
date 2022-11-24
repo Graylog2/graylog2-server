@@ -1,0 +1,6 @@
+type = "changed"
+message = "'Outdated version' notifications now include links to the changelog pages."
+contributors = ["@supahgreg"]
+
+issues = ["7593", "7689"]
+pulls = ["12648"]
