@@ -21,18 +21,21 @@ import com.google.common.eventbus.Subscribe;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.security.events.EntitySharesUpdateEvent;
-import org.graylog2.contentpacks.ContentPackService;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.lookup.Catalog;
 import org.graylog2.rest.models.PaginatedResponse;
 
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class DynamicStartPageService {
-    private final ContentPackService contentPackService;
+    private final Catalog catalog;
     private final LastOpenedService lastOpenedService;
     private final RecentActivityService recentActivityService;
     private final FavoriteItemsService favoriteItemsService;
@@ -42,12 +45,12 @@ public class DynamicStartPageService {
     private final long MAXIMUM_ACTIVITY = 100;
 
     @Inject
-    public DynamicStartPageService(ContentPackService contentPackService,
+    public DynamicStartPageService(Catalog catalog,
                                    LastOpenedService lastOpenedService,
                                    RecentActivityService recentActivityService,
                                    FavoriteItemsService favoriteItemsService,
                                    EventBus eventBus) {
-        this.contentPackService = contentPackService;
+        this.catalog = catalog;
         this.lastOpenedService = lastOpenedService;
         this.recentActivityService = recentActivityService;
         this.favoriteItemsService = favoriteItemsService;
@@ -69,39 +72,51 @@ public class DynamicStartPageService {
         return sourceList.subList(fromIndex, Math.min(fromIndex + pageSize, sourceList.size()));
     }
 
-    public PaginatedResponse<LastOpenedItem> findLastOpenedFor(final SearchUser searchUser, int page, int perPage) throws NotFoundException {
-        var catalog = contentPackService.getEntityExcerpts();
+    public PaginatedResponse<LastOpenedItem> findLastOpenedFor(final SearchUser searchUser, int page, int perPage) {
         var items = lastOpenedService
                 .findForUser(searchUser)
                 .orElse(LastOpenedItemsDTO.builder().userId(searchUser.getUser().getId()).build())
                 .items()
                 .stream()
-                .map(i -> new LastOpenedItem(i, catalog.get(i).type().name(), catalog.get(i).title()))
+                .map(i -> new LastOpenedItem(i, catalog.getType(i), catalog.getTitle(i)))
                 .collect(Collectors.toList());
         Collections.reverse(items);
 
         return PaginatedResponse.create("lastOpened", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
     }
 
-    public PaginatedResponse<FavoriteItem> findFavoriteItemsFor(final SearchUser searchUser, int page, int perPage) throws NotFoundException {
-        var catalog = contentPackService.getEntityExcerpts();
+    public PaginatedResponse<FavoriteItem> findFavoriteItemsFor(final SearchUser searchUser, int page, int perPage) {
         var items = favoriteItemsService
                 .findForUser(searchUser)
                 .orElse(FavoriteItemsDTO.builder().userId(searchUser.getUser().getId()).build())
                 .items()
                 .stream()
-                .map(i -> new FavoriteItem(i, catalog.get(i).type().name(), catalog.get(i).title()))
+                .map(i -> new FavoriteItem(i, catalog.getType(i), catalog.getTitle(i)))
                 .collect(Collectors.toList());
         Collections.reverse(items);
         return PaginatedResponse.create("favoriteItems", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
     }
 
+    /**
+     * TODO: replace with real search that filters out views by permissions in mongo and filters shares by grn (if possible, because of teams)
+     * if all fails, keep it like it is now and add to searchUser.canSeeActivity()
+     * @param searchUser
+     * @param page
+     * @param perPage
+     * @return
+     */
     public PaginatedResponse<RecentActivity> findRecentActivityFor(final SearchUser searchUser, int page, int perPage) {
         final var items = recentActivityService
                 .streamAllInReverseOrder()
                 .filter(searchUser::canSeeActivity)
                 .limit(MAXIMUM_ACTIVITY)
-                .map(i -> new RecentActivity(i.id(), i.activityType(), i.itemType(), i.itemId(), i.itemTitle(), i.userName(), i.timestamp()))
+                .map(i -> new RecentActivity(i.id(),
+                        i.activityType(),
+                        i.itemType() == null ? catalog.getType(i.itemId()) : "Unknown Entity: " + i.itemId(),
+                        i.itemId(),
+                        i.itemTitle() == null ? catalog.getTitle(i.itemId()) : "Unknown Entity: " + i.itemId(),
+                        i.userName(),
+                        i.timestamp()))
                 .collect(Collectors.toList());
         return PaginatedResponse.create("recentActivity", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
     }
@@ -146,10 +161,7 @@ public class DynamicStartPageService {
     public void removeFavoriteItemFor(final String id, final SearchUser searchUser) {
         var favoriteItems = favoriteItemsService.findForUser(searchUser);
         if(favoriteItems.isPresent()) {
-            final var items = favoriteItems.get().items();
-            if(items.contains(id)) {
-                items.remove(id);
-            }
+            favoriteItems.get().items().remove(id);
             favoriteItemsService.save(favoriteItems.get());
         }
     }
@@ -159,26 +171,30 @@ public class DynamicStartPageService {
         recentActivityService.save(event.activity());
     }
 
+    private <T> Predicate<T> distinctByKey(
+            Function<? super T, ?> keyExtractor) {
+
+        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+    }
+
     @Subscribe
     public void createRecentActivityFor(final EntitySharesUpdateEvent event) {
-        var catalog = contentPackService.getEntityExcerpts();
-        event.creates()
+        event.creates().stream().filter(distinctByKey(EntitySharesUpdateEvent.Share::grantee))
                 .forEach(e -> recentActivityService.save(RecentActivityDTO.builder()
                         .activityType(ActivityType.SHARED)
                         .itemId(event.entity().entity())
-                        .itemType(event.entity().type())
-                        .itemTitle(catalog.get(event.entity().entity()).title())
                         .userName(event.user().getFullName())
+                        .grantee(e.grantee().toString())
                         .build())
                 );
 
-        event.deletes()
+        event.deletes().stream().filter(distinctByKey(EntitySharesUpdateEvent.Share::grantee))
                 .forEach(e -> recentActivityService.save(RecentActivityDTO.builder()
                         .activityType(ActivityType.UNSHARED)
                         .itemId(event.entity().entity())
-                        .itemType(event.entity().type())
-                        .itemTitle(catalog.get(event.entity().entity()).title())
                         .userName(event.user().getFullName())
+                        .grantee(e.grantee().toString())
                         .build()) );
     }
 }

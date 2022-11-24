@@ -27,7 +27,6 @@ import org.graylog.plugins.views.search.views.dynamicstartpage.LastOpenedItem;
 import org.graylog.plugins.views.search.views.dynamicstartpage.FavoriteItem;
 import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivity;
 import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -47,10 +46,6 @@ import javax.ws.rs.core.MediaType;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-/**
- *  TODO: Audit-Log?
- *
- */
 @Api(value = "DynamicStartupPage", tags = {CLOUD_VISIBLE})
 @Path("/dynamicstartpage")
 @Produces(MediaType.APPLICATION_JSON)
@@ -68,7 +63,7 @@ public class DynamicStartPageResource extends RestResource implements PluginRest
     @ApiOperation("Get the Last Opened Items for the Dynamic Start Page for the user")
     public PaginatedResponse<LastOpenedItem> getLastOpened(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                            @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
-                                                           @Context SearchUser searchUser) throws NotFoundException {
+                                                           @Context SearchUser searchUser) {
         return service.findLastOpenedFor(searchUser, page, perPage);
     }
 
@@ -77,7 +72,7 @@ public class DynamicStartPageResource extends RestResource implements PluginRest
     @ApiOperation("Get the Favorite Items for the Dynamic Start Page for the user")
     public PaginatedResponse<FavoriteItem> getFavoriteItems(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                           @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
-                                                          @Context SearchUser searchUser) throws NotFoundException {
+                                                          @Context SearchUser searchUser) {
         return service.findFavoriteItemsFor(searchUser, page, perPage);
     }
 
