@@ -476,7 +476,6 @@ public class SearchAggregationsIT {
         );
     }
 
-
     @ContainerMatrixTest
     void testTwoRowPivotsWithMetricsSorting() {
         final Pivot pivot = Pivot.builder()
@@ -536,6 +535,71 @@ public class SearchAggregationsIT {
                 .jsonPath().getList(searchTypeResultPath + "*.values*.value");
 
         assertThat(rows).containsExactly(List.of(5300.0f, 36.0f));
+    }
+
+    @ContainerMatrixTest
+    void testTwoIdenticalSeries() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .series(List.of(
+                        Max.builder().field("took_ms").build(),
+                        Max.builder().field("took_ms").build()
+                ))
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000));
+
+        final String searchTypeResultPath = PIVOT_PATH + ".rows";
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000))
+                .body("rows", hasSize(1));
+
+        final List<List<Float>> rows = validatableResponse
+                .extract()
+                .jsonPath().getList(searchTypeResultPath + "*.values*.value");
+
+        assertThat(rows).containsExactly(List.of(5300.0f, 5300.0f));
+    }
+
+    @ContainerMatrixTest
+    void testTwoIdenticalSeriesOneWithCustomId() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .series(List.of(
+                        Max.builder().id("Maximum Response Time").field("took_ms").build(),
+                        Max.builder().field("took_ms").build()
+                ))
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000));
+
+        final String searchTypeResultPath = PIVOT_PATH + ".rows";
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000))
+                .body("rows", hasSize(1));
+
+        final List<List<List<String>>> rowKeys = validatableResponse
+                .extract()
+                .jsonPath().getList(searchTypeResultPath + "*.values*.key");
+
+        assertThat(rowKeys).containsExactly(List.of(
+                Collections.singletonList("Maximum Response Time"),
+                Collections.singletonList("max(took_ms)")
+        ));
+
+        final List<List<Float>> rowValues = validatableResponse
+                .extract()
+                .jsonPath().getList(searchTypeResultPath + "*.values*.value");
+
+        assertThat(rowValues).containsExactly(List.of(5300.0f, 5300.0f));
     }
 
     private String listToGroovy(Collection<String> strings) {
