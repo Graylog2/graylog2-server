@@ -62,6 +62,7 @@ public class TabularResponseWriter implements MessageBodyWriter<TabularResponse>
             case MediaType.APPLICATION_JSON -> writeJson(tabularResponse, outputStream);
             case MediaType.TEXT_PLAIN -> writeAsciiTable(tabularResponse, outputStream);
             case MoreMediaTypes.TEXT_CSV -> writeCsv(tabularResponse, outputStream);
+            default -> throw new IllegalArgumentException("Media type " + mediaType + " not supported");
         }
     }
 
