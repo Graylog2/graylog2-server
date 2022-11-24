@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useState, useCallback } from 'react';
 
-import { ShareButton, OverlayElement, IfPermitted } from 'components/common';
-import { Tooltip, ButtonToolbar, DropdownButton, MenuItem } from 'components/bootstrap';
+import { ShareButton, IfPermitted, HoverForHelp } from 'components/common';
+import { ButtonToolbar, DropdownButton, MenuItem } from 'components/bootstrap';
 import type { Stream, StreamRule, StreamRuleType } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { LinkContainer } from 'components/common/router';
@@ -32,7 +32,9 @@ import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import useCurrentUser from 'hooks/useCurrentUser';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
-import StreamModal from './StreamModal';
+import StreamModal from '../StreamModal';
+
+const DefaultStreamHelp = () => <HoverForHelp displayLeftMargin>Action not available for the default stream</HoverForHelp>;
 
 const StreamActions = ({
   stream,
@@ -41,7 +43,7 @@ const StreamActions = ({
 }: {
   stream: Stream,
   indexSets: Array<IndexSet>,
-  streamRuleTypes: Array<StreamRuleType>
+  streamRuleTypes: Array<StreamRuleType> | undefined
 }) => {
   const currentUser = useCurrentUser();
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
@@ -53,9 +55,6 @@ const StreamActions = ({
 
   const isDefaultStream = stream.is_default;
   const isNotEditable = !stream.is_editable;
-  const defaultStreamTooltip = isDefaultStream
-    ? <Tooltip id="default-stream-tooltip">Action not available for the default stream</Tooltip> : null;
-
   const onToggleStreamStatus = useCallback(async () => {
     setChangingStatus(true);
 
@@ -119,46 +118,47 @@ const StreamActions = ({
   }, [stream.id]);
 
   return (
-    <ButtonToolbar className="pull-right">
-      <ShareButton entityId={stream.id} entityType="stream" onClick={toggleEntityShareModal} />
+    <ButtonToolbar>
+      <ShareButton entityId={stream.id}
+                   entityType="stream"
+                   onClick={toggleEntityShareModal}
+                   bsSize="xsmall" />
       <DropdownButton title="More Actions"
                       pullRight
+                      bsSize="xsmall"
                       id={`more-actions-dropdown-${stream.id}`}
                       disabled={isNotEditable}>
         <IfPermitted permissions={[`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`]} anyPermissions>
-          <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream} className="overlay-trigger">
-            <MenuItem bsStyle="success"
-                      onSelect={onToggleStreamStatus}
-                      disabled={isDefaultStream || isNotEditable}>
-              {changingStatus
-                ? <span>{stream.disabled ? 'Starting Stream...' : 'Stopping Stream...'}</span>
-                : <span>{stream.disabled ? 'Start Stream' : 'Stop Stream'}</span>}
-            </MenuItem>
-          </OverlayElement>
+          <MenuItem bsStyle="success"
+                    onSelect={onToggleStreamStatus}
+                    disabled={isDefaultStream || isNotEditable}>
+            {changingStatus
+              ? <span>{stream.disabled ? 'Starting Stream...' : 'Stopping Stream...'}</span>
+              : <span>{stream.disabled ? 'Start Stream' : 'Stop Stream'}</span>}
+            {isDefaultStream && <DefaultStreamHelp />}
+          </MenuItem>
           <MenuItem divider />
         </IfPermitted>
         <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
-          <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream} className="overlay-trigger">
-            <LinkContainer to={Routes.stream_edit(stream.id)}>
-              <MenuItem disabled={isDefaultStream || isNotEditable}>
-                Manage Rules
-              </MenuItem>
-            </LinkContainer>
-          </OverlayElement>
+          <LinkContainer to={Routes.stream_edit(stream.id)}>
+            <MenuItem disabled={isDefaultStream || isNotEditable}>
+              Manage Rules {isDefaultStream && <DefaultStreamHelp />}
+            </MenuItem>
+          </LinkContainer>
         </IfPermitted>
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
           <MenuItem onSelect={toggleUpdateModal} disabled={isDefaultStream}>
-            Edit stream
+            Edit stream {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
           <MenuItem onSelect={toggleStreamRuleModal} disabled={isDefaultStream}>
-            Quick add rule
+            Quick add rule {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
         <IfPermitted permissions={['streams:create', `streams:read:${stream.id}`]}>
           <MenuItem onSelect={toggleCloneModal} disabled={isDefaultStream}>
-            Clone this stream
+            Clone this stream {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
@@ -186,7 +186,7 @@ const StreamActions = ({
         </IfPermitted>
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
           <MenuItem onSelect={onDelete} disabled={isDefaultStream}>
-            Delete this stream
+            Delete this stream {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
       </DropdownButton>
