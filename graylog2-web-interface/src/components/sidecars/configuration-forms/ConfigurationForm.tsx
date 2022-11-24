@@ -299,13 +299,13 @@ const ConfigurationForm = ({
               </FormGroup>
 
               <FormGroup controlId="tags">
-                <ControlLabel>Configuration Tags</ControlLabel>
+                <ControlLabel>Configuration Assignment Tags</ControlLabel>
                 <div>
                   <ConfigurationTagsSelect availableTags={formData.tags.map((tag) => ({ name: tag }))}
                                            tags={formData.tags}
                                            onChange={_onTagsChange} />
                 </div>
-                <HelpBlock>Choose tags to use for this configuration.</HelpBlock>
+                <HelpBlock>Sidecars which are configured with a matching tag will automatically receive this configuration.</HelpBlock>
               </FormGroup>
 
               <FormGroup controlId="collector_id">

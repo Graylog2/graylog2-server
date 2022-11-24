@@ -181,7 +181,7 @@ public abstract class CmdLineTool implements CliCommand {
         return debug;
     }
 
-    protected abstract List<Module> getCommandBindings();
+    protected abstract List<Module> getCommandBindings(FeatureFlags featureFlags);
 
     protected abstract List<Object> getCommandConfigurationBeans();
 
@@ -492,7 +492,7 @@ public abstract class CmdLineTool implements CliCommand {
         try {
             final ImmutableList.Builder<Module> builder = ImmutableList.builder();
             builder.addAll(getSharedBindingsModules());
-            builder.addAll(getCommandBindings());
+            builder.addAll(getCommandBindings(featureFlags));
             builder.addAll(Arrays.asList(modules));
             builder.add(binder -> {
                 binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader);

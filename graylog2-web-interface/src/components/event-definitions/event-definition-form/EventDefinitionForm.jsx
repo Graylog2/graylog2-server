@@ -18,6 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import styled from 'styled-components';
 
 import { Button, Col, Row } from 'components/bootstrap';
 import { ModalSubmit, Wizard } from 'components/common';
@@ -37,6 +38,10 @@ const getConditionPlugin = (type) => {
 
   return PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type) || {};
 };
+
+const WizardContainer = styled.div`
+  margin-bottom: 10px;
+`;
 
 class EventDefinitionForm extends React.Component {
   static propTypes = {
@@ -177,13 +182,15 @@ class EventDefinitionForm extends React.Component {
     return (
       <Row>
         <Col md={12}>
-          <Wizard steps={steps}
-                  activeStep={activeStep}
-                  onStepChange={this.handleStepChange}
-                  horizontal
-                  justified
-                  containerClassName=""
-                  hidePreviousNextButtons />
+          <WizardContainer>
+            <Wizard steps={steps}
+                    activeStep={activeStep}
+                    onStepChange={this.handleStepChange}
+                    horizontal
+                    justified
+                    containerClassName=""
+                    hidePreviousNextButtons />
+          </WizardContainer>
           {this.renderButtons(activeStep, eventDefinition?.id)}
         </Col>
       </Row>

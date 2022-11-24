@@ -88,7 +88,7 @@ public class UdpTransport extends NettyTransport {
         return new Bootstrap()
                 .group(eventLoopGroup)
                 .channelFactory(new DatagramChannelFactory(transportType))
-                .option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(getRecvBufferSize()))
+                .option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(65535)) // Maximum possible UDP packet size
                 .option(ChannelOption.SO_RCVBUF, getRecvBufferSize())
                 .option(UnixChannelOption.SO_REUSEPORT, true)
                 .handler(getChannelInitializer(getChannelHandlers(input)))
