@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
-import org.graylog.plugins.views.search.rest.scriptingapi.parsing.MetricParser;
 import org.graylog.plugins.views.search.rest.scriptingapi.parsing.TimerangeParser;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
@@ -28,7 +27,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.ws.rs.BadRequestException;
 import java.util.List;
 import java.util.Set;
 
@@ -44,18 +42,16 @@ class QueryParamsToFullRequestSpecificationMapperTest {
     private QueryParamsToFullRequestSpecificationMapper toTest;
 
     @Mock
-    private MetricParser metricParser;
-    @Mock
     private TimerangeParser timerangeParser;
 
     @BeforeEach
     void setUp() {
-        toTest = new QueryParamsToFullRequestSpecificationMapper(timerangeParser, metricParser);
+        toTest = new QueryParamsToFullRequestSpecificationMapper(timerangeParser);
     }
 
     @Test
-    void throwsBadRequestExceptionOnNullGroups() {
-        assertThrows(BadRequestException.class, () -> toTest.simpleQueryParamsToFullRequestSpecification("*",
+    void throwsExceptionOnNullGroups() {
+        assertThrows(IllegalArgumentException.class, () -> toTest.simpleQueryParamsToFullRequestSpecification("*",
                 Set.of(),
                 "42d",
                 null,
@@ -63,8 +59,8 @@ class QueryParamsToFullRequestSpecificationMapperTest {
     }
 
     @Test
-    void throwsBadRequestExceptionOnEmptyGroups() {
-        assertThrows(BadRequestException.class, () -> toTest.simpleQueryParamsToFullRequestSpecification("*",
+    void throwsExceptionOnEmptyGroups() {
+        assertThrows(IllegalArgumentException.class, () -> toTest.simpleQueryParamsToFullRequestSpecification("*",
                 Set.of(),
                 "42d",
                 List.of(),
@@ -72,8 +68,8 @@ class QueryParamsToFullRequestSpecificationMapperTest {
     }
 
     @Test
-    void throwsBadRequestExceptionOnWrongMetricFormat() {
-        assertThrows(BadRequestException.class, () -> toTest.simpleQueryParamsToFullRequestSpecification("*",
+    void throwsExceptionOnWrongMetricFormat() {
+        assertThrows(IllegalArgumentException.class, () -> toTest.simpleQueryParamsToFullRequestSpecification("*",
                 Set.of(),
                 "42d",
                 List.of("http_method"),
@@ -82,7 +78,6 @@ class QueryParamsToFullRequestSpecificationMapperTest {
 
     @Test
     void usesProperDefaults() {
-        doReturn(new Metric(null, "count", null)).when(metricParser).parseMetric("count:");
         SearchRequestSpec searchRequestSpec = toTest.simpleQueryParamsToFullRequestSpecification(null,
                 null,
                 null,
@@ -116,7 +111,6 @@ class QueryParamsToFullRequestSpecificationMapperTest {
 
     @Test
     void createsProperRequestSpec() {
-        doReturn(new Metric("took_ms", "avg", null)).when(metricParser).parseMetric("avg:took_ms");
         doReturn(KeywordRange.create("last 1 day", "UTC")).when(timerangeParser).parseTimeRange("1d");
         final SearchRequestSpec searchRequestSpec = toTest.simpleQueryParamsToFullRequestSpecification("http_method:GET",
                 Set.of("000000000000000000000001"),

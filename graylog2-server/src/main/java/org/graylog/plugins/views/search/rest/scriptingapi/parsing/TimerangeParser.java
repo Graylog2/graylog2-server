@@ -16,13 +16,13 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.parsing;
 
+import org.apache.commons.lang.StringUtils;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.inject.Inject;
 import java.util.Optional;
 
-//TODO: unit tests + error handling
 public class TimerangeParser {
 
     private final ShortTimerangeFormatParser shortTimerangeFormatParser;
@@ -33,10 +33,14 @@ public class TimerangeParser {
     }
 
     public TimeRange parseTimeRange(final String timerangeKeyword) {
-        if (timerangeKeyword == null) {
-            return null;
+        try {
+            if (StringUtils.isBlank(timerangeKeyword)) {
+                return null;
+            }
+            final Optional<TimeRange> shortTimeRange = shortTimerangeFormatParser.parse(timerangeKeyword);
+            return shortTimeRange.orElseGet(() -> KeywordRange.create(timerangeKeyword, "UTC"));
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Could not parse timerange " + timerangeKeyword + ". It should have a short format (i.e. '2h') or natural date format (i.e. 'last 2 hours')");
         }
-        final Optional<TimeRange> shortTimeRange = shortTimerangeFormatParser.parse(timerangeKeyword);
-        return shortTimeRange.orElseGet(() -> KeywordRange.create(timerangeKeyword, "UTC"));
     }
 }
