@@ -34,6 +34,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotEmpty;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -74,7 +75,7 @@ public class DynamicStartPageResource extends RestResource implements PluginRest
     @GET
     @Path("/favoriteItems")
     @ApiOperation("Get the Favorite Items for the Dynamic Start Page for the user")
-    public PaginatedResponse<FavoriteItem> getPinnedItems(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+    public PaginatedResponse<FavoriteItem> getFavoriteItems(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                           @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
                                                           @Context SearchUser searchUser) throws NotFoundException {
         return service.findFavoriteItemsFor(searchUser, page, perPage);
@@ -82,10 +83,18 @@ public class DynamicStartPageResource extends RestResource implements PluginRest
 
     @PUT
     @Path("/pinItem/{id}")
-    @ApiOperation("Pin a dashboard for inclusion on the Dynamic Start Page for the user")
+    @ApiOperation("Add a view for inclusion on the Dynamic Start Page for the user")
     @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_PIN_ITEM)
     public void pinItem(@ApiParam(name = "id", required = true) @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
-        service.addFavoriteItemFor(id ,searchUser);
+        service.addFavoriteItemFor(id, searchUser);
+    }
+
+    @DELETE
+    @Path("/unpinItem/{id}")
+    @ApiOperation("Remove a view from inclusion on the Dynamic Start Page for the user")
+    @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_UNPIN_ITEM)
+    public void unpinItem(@ApiParam(name = "id", required = true) @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
+        service.removeFavoriteItemFor(id, searchUser);
     }
 
     @GET

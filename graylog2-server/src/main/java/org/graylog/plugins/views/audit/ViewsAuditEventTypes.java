@@ -54,7 +54,8 @@ public class ViewsAuditEventTypes implements PluginAuditEventTypes {
 
     public static final String DYNAMIC_STARTUP_PAGE = "dynamic_startup_page";
 
-    public static final String DYNAMIC_STARTUP_PAGE_PIN_ITEM = PREFIX + DYNAMIC_STARTUP_PAGE + ":piItem";
+    public static final String DYNAMIC_STARTUP_PAGE_PIN_ITEM = PREFIX + DYNAMIC_STARTUP_PAGE + ":pinItem";
+    public static final String DYNAMIC_STARTUP_PAGE_UNPIN_ITEM = PREFIX + DYNAMIC_STARTUP_PAGE + ":unpinItem";
 
     private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.<String>builder()
             .add(VIEW_CREATE)
@@ -77,6 +78,7 @@ public class ViewsAuditEventTypes implements PluginAuditEventTypes {
             .add(EXPORT_JOB_CREATED)
 
             .add(DYNAMIC_STARTUP_PAGE_PIN_ITEM)
+            .add(DYNAMIC_STARTUP_PAGE_UNPIN_ITEM)
 
             .build();
 

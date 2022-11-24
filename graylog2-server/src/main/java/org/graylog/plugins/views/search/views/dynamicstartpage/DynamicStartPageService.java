@@ -142,6 +142,18 @@ public class DynamicStartPageService {
             favoriteItemsService.create(items, searchUser);
         }
     }
+
+    public void removeFavoriteItemFor(final String id, final SearchUser searchUser) {
+        var favoriteItems = favoriteItemsService.findForUser(searchUser);
+        if(favoriteItems.isPresent()) {
+            final var items = favoriteItems.get().items();
+            if(items.contains(id)) {
+                items.remove(id);
+            }
+            favoriteItemsService.save(favoriteItems.get());
+        }
+    }
+
     @Subscribe
     public void createRecentActivityFor(final RecentActivityEvent event) {
         recentActivityService.save(event.activity());
