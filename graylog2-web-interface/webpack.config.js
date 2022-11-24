@@ -94,7 +94,7 @@ const webpackConfig = {
           loader: 'esbuild-loader',
           options: {
             loader: 'tsx',
-            target: 'es2015',
+            target: 'chrome105,edge105,firefox91,safari15'.split(','),
           },
         },
         exclude: /node_modules\/(?!graylog-web-plugin)|\.node_cache/,
