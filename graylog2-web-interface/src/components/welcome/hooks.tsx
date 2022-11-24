@@ -24,7 +24,7 @@ import UserNotification from 'util/UserNotification';
 import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
 import type {
   PaginatedLastOpened,
-  PaginatedPinnedItems,
+  PaginatedFavoriteItems,
   RequestQuery,
   PaginatedRecentActivity,
   PaginatedResponseRecentActivity,
@@ -41,8 +41,8 @@ const fetchLastOpen = async ({ page }: RequestQuery): Promise<PaginatedLastOpene
   return fetch('GET', qualifyUrl(url));
 };
 
-const fetchPinnedItems = async ({ page }: RequestQuery): Promise<PaginatedPinnedItems> => {
-  const url = PaginationURL(`${urlPrefix}/pinnedItems`, page, 5, '');
+const fetchFavoriteItems = async ({ page }: RequestQuery): Promise<PaginatedFavoriteItems> => {
+  const url = PaginationURL(`${urlPrefix}/favoriteItems`, page, 5, '');
 
   return fetch('GET', qualifyUrl(url));
 };
@@ -82,15 +82,15 @@ export const useLastOpened = (pagination: RequestQuery): { data: PaginatedLastOp
   });
 };
 
-export const usePinnedItems = (pagination: RequestQuery): {data: PaginatedPinnedItems, isFetching: boolean} => {
-  return useQuery([PINNED_ITEMS_QUERY_KEY, pagination], () => fetchPinnedItems(pagination), {
+export const useFavoriteItems = (pagination: RequestQuery): {data: PaginatedFavoriteItems, isFetching: boolean} => {
+  return useQuery([PINNED_ITEMS_QUERY_KEY, pagination], () => fetchFavoriteItems(pagination), {
     onError: (errorThrown) => {
-      UserNotification.error(`Loading pinned items failed with status: ${errorThrown}`,
-        'Could not load pinned items');
+      UserNotification.error(`Loading favorite items failed with status: ${errorThrown}`,
+        'Could not load favorite items');
     },
     retry: 0,
     initialData: {
-      pinnedItems: [],
+      favoriteItems: [],
       ...DEFAULT_PAGINATION,
     },
   });

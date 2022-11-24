@@ -21,7 +21,7 @@ import PageHeader from 'components/common/PageHeader';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 import LastOpenList from './LastOpenList';
-import PinnedItemsList from './PinnedItemsList';
+import FavoriteItemsList from './FavoriteItemsList';
 import RecentActivityList from './RecentActivityList';
 
 import SectionGrid from '../common/Section/SectionGrid';
@@ -39,8 +39,8 @@ const Welcome = () => (
       <StyledSectionComponent title="Last opened">
         <LastOpenList />
       </StyledSectionComponent>
-      <StyledSectionComponent title="Pinned items">
-        <PinnedItemsList />
+      <StyledSectionComponent title="Favorite items">
+        <FavoriteItemsList />
       </StyledSectionComponent>
     </SectionGrid>
     <StyledSectionComponent title="Recent activity">

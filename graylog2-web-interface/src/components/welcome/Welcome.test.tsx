@@ -20,7 +20,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import Welcome from 'components/welcome/Welcome';
 import { asMock } from 'helpers/mocking';
-import { useLastOpened, usePinnedItems, useRecentActivity } from 'components/welcome/hooks';
+import { useLastOpened, useFavoriteItems, useRecentActivity } from 'components/welcome/hooks';
 
 jest.mock('routing/Routes', () => ({ pluginRoute: () => () => '/route' }));
 
@@ -39,9 +39,9 @@ jest.mock('components/welcome/hooks', () => ({
     },
     isFetching: false,
   })),
-  usePinnedItems: jest.fn(() => ({
+  useFavoriteItems: jest.fn(() => ({
     data: {
-      pinnedItems: [{ id: '4', title: 'Title 4', type: 'dashboard' }, {
+      favoriteItems: [{ id: '4', title: 'Title 4', type: 'dashboard' }, {
         id: '3',
         title: 'Title 3',
         type: 'dashboard',
@@ -99,19 +99,19 @@ describe('Welcome', () => {
     });
   });
 
-  describe('Pinned items list', () => {
+  describe('Favorite items list', () => {
     it('Show items', async () => {
       render(<Welcome />);
-      const list = await screen.findByTestId('pinned-items-list');
+      const list = await screen.findByTestId('favorite-items-list');
 
       expect(list).toHaveTextContent('Title 3');
       expect(list).toHaveTextContent('Title 4');
     });
 
     it('Show no items', async () => {
-      asMock(usePinnedItems).mockImplementation(() => ({ data: { pinnedItems: [], page: 1, count: 0, total: 0, per_page: 5 }, isFetching: false }));
+      asMock(useFavoriteItems).mockImplementation(() => ({ data: { favoriteItems: [], page: 1, count: 0, total: 0, per_page: 5 }, isFetching: false }));
       render(<Welcome />);
-      await screen.findByText('There are no pinned items');
+      await screen.findByText('There are no favorite items');
     });
   });
 

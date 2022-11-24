@@ -21,25 +21,25 @@ import { ListGroup } from 'components/bootstrap';
 import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
 import EntityItem from 'components/welcome/EntityListItem';
 import { EmptyResult, PaginatedList, Spinner } from 'components/common';
-import { usePinnedItems } from 'components/welcome/hooks';
+import { useFavoriteItems } from 'components/welcome/hooks';
 
-const PinnedItemsList = () => {
+const FavoriteItemsList = () => {
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
-  const { data: { pinnedItems, total }, isFetching } = usePinnedItems(pagination);
+  const { data: { favoriteItems, total }, isFetching } = useFavoriteItems(pagination);
   const onPageChange = useCallback((newPage) => {
     setPagination((cur) => ({ ...cur, page: newPage }));
   }, [setPagination]);
 
   if (isFetching) return <Spinner />;
-  if (!pinnedItems.length) return <EmptyResult>There are no pinned items</EmptyResult>;
+  if (!favoriteItems.length) return <EmptyResult>There are no favorite items</EmptyResult>;
 
   return (
     <PaginatedList onChange={onPageChange} useQueryParameter={false} activePage={pagination.page} totalItems={total} pageSize={pagination.per_page} showPageSizeSelect={false} hideFirstAndLastPageLinks>
-      <ListGroup data-testid="pinned-items-list">
-        {pinnedItems.map(({ type, id, title }) => <EntityItem key={id} type={type} id={id} title={title} />)}
+      <ListGroup data-testid="favorite-items-list">
+        {favoriteItems.map(({ type, id, title }) => <EntityItem key={id} type={type} id={id} title={title} />)}
       </ListGroup>
     </PaginatedList>
   );
 };
 
-export default PinnedItemsList;
+export default FavoriteItemsList;

@@ -24,7 +24,7 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import suppressConsole from 'helpers/suppressConsole';
 import { qualifyUrl } from 'util/URLUtils';
-import { urlPrefix, useLastOpened, usePinnedItems, useRecentActivity } from 'components/welcome/hooks';
+import { urlPrefix, useLastOpened, useFavoriteItems, useRecentActivity } from 'components/welcome/hooks';
 import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
 
 const getUrl = (url: string) => qualifyUrl(`${urlPrefix}/${url}?page=1&per_page=5`);
@@ -51,8 +51,8 @@ const mockLastOpened = {
   page: 1,
 };
 
-const mockPinnedItems = {
-  lastOpened: [{
+const mockFavoriteItems = {
+  favoriteItems: [{
     type: 'search',
     id: '1',
     title: 'Title 1',
@@ -122,26 +122,26 @@ describe('Hooks for welcome page', () => {
     });
   });
 
-  describe('usePinned custom hook', () => {
+  describe('useFavorite custom hook', () => {
     afterEach(() => {
       jest.clearAllMocks();
     });
 
     it('Test return initial data and take from fetch', async () => {
-      asMock(fetch).mockImplementation(() => Promise.resolve(mockPinnedItems));
-      const { result, waitFor } = renderHook(() => usePinnedItems(DEFAULT_PAGINATION), { wrapper });
+      asMock(fetch).mockImplementation(() => Promise.resolve(mockFavoriteItems));
+      const { result, waitFor } = renderHook(() => useFavoriteItems(DEFAULT_PAGINATION), { wrapper });
 
       await waitFor(() => result.current.isFetching);
       await waitFor(() => !result.current.isFetching);
 
-      expect(fetch).toHaveBeenCalledWith('GET', getUrl('pinnedItems'));
-      expect(result.current.data).toEqual(mockLastOpened);
+      expect(fetch).toHaveBeenCalledWith('GET', getUrl('favoriteItems'));
+      expect(result.current.data).toEqual(mockFavoriteItems);
     });
 
     it('Test trigger notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => usePinnedItems(DEFAULT_PAGINATION), { wrapper });
+      const { result, waitFor } = renderHook(() => useFavoriteItems(DEFAULT_PAGINATION), { wrapper });
 
       await suppressConsole(async () => {
         await waitFor(() => result.current.isFetching);
@@ -149,8 +149,8 @@ describe('Hooks for welcome page', () => {
       });
 
       expect(UserNotification.error).toHaveBeenCalledWith(
-        'Loading pinned items failed with status: Error: Error',
-        'Could not load pinned items');
+        'Loading favorite items failed with status: Error: Error',
+        'Could not load favorite items');
     });
   });
 

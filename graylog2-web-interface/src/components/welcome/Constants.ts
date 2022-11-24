@@ -18,6 +18,8 @@
 export const typeLinkMap = {
   dashboard: { link: 'DASHBOARDS_VIEWID' },
   search: { link: 'SEARCH_VIEWID' },
+  DASHBOARD: { link: 'DASHBOARDS_VIEWID' },
+  SEARCH: { link: 'SEARCH_VIEWID' },
 };
 
 export const DEFAULT_PAGINATION = {

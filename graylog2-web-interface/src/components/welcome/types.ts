@@ -24,7 +24,7 @@ export type Pagination = {
     total: number,
 }
 
-export type PinnedItem = {
+export type FavoriteItem = {
   id: string,
   type: EntityItemType,
   title: string
@@ -78,8 +78,8 @@ export type PaginatedLastOpened = {
   total: number,
 }
 
-export type PaginatedPinnedItems = {
-  pinnedItems: Array<PinnedItem>,
+export type PaginatedFavoriteItems = {
+  favoriteItems: Array<FavoriteItem>,
   page: number,
   per_page: number,
   count: number,
