@@ -18,15 +18,17 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useMemo } from 'react';
 
-import type { Attribute, CustomHeaders } from './types';
+import SortIcon from 'components/streams/StreamsOverview/SortIcon';
 
-const defaultAttributeHeaderRenderer = {
+import type { Attribute, CustomHeaders, Sort } from './types';
 
-};
+const defaultAttributeHeaderRenderer = {};
 
 const TableHeader = ({
-  headerRenderer,
+  activeSort,
   attribute,
+  headerRenderer,
+  onSortChange,
 }: {
   headerRenderer: {
     renderHeader: (attribute: Attribute) => React.ReactNode,
@@ -35,7 +37,8 @@ const TableHeader = ({
     maxWidth?: string,
   },
   attribute: Attribute
-
+  activeSort: Sort,
+  onSortChange: (newSort: Sort) => void,
 }) => {
   const content = useMemo(
     () => (headerRenderer ? headerRenderer.renderHeader(attribute) : attribute.title),
@@ -45,6 +48,12 @@ const TableHeader = ({
   return (
     <th style={{ width: headerRenderer?.width, maxWidth: headerRenderer?.maxWidth }}>
       {content}
+
+      {attribute.sortable && (
+        <SortIcon onChange={onSortChange}
+                  attribute={attribute}
+                  activeSort={activeSort} />
+      )}
     </th>
   );
 };
@@ -57,10 +66,14 @@ const TableHead = ({
   selectedAttributes,
   customHeaders,
   displayActionsCol,
+  onSortChange,
+  activeSort,
 }: {
   selectedAttributes: Array<Attribute>,
   customHeaders: CustomHeaders,
   displayActionsCol: boolean
+  onSortChange: (newSort: Sort) => void,
+  activeSort: Sort
 }) => (
   <thead>
     <tr>
@@ -70,6 +83,8 @@ const TableHead = ({
         return (
           <TableHeader headerRenderer={headerRenderer}
                        attribute={attribute}
+                       onSortChange={onSortChange}
+                       activeSort={activeSort}
                        key={attribute.title} />
         );
       })}

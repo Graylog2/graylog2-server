@@ -32,7 +32,7 @@ import ConfigurableDataTable from 'components/common/ConfigurableDataTable';
 import StreamActions from 'components/streams/StreamsOverview/StreamActions';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import type { CustomCells } from 'components/common/ConfigurableDataTable';
+import type { CustomCells, Sort } from 'components/common/ConfigurableDataTable';
 import UserNotification from 'util/UserNotification';
 import IndexSetCell from 'components/streams/StreamsOverview/IndexSetCell';
 
@@ -47,10 +47,10 @@ const DefaultLabel = styled(Label)`
 `;
 
 const AVAILABLE_ATTRIBUTES = [
-  { id: 'title', title: 'Title' },
-  { id: 'description', title: 'Description' },
-  { id: 'index_set_id', title: 'Index Set' },
-  { id: 'disabled', title: 'Status' },
+  { id: 'title', title: 'Title', sortable: true },
+  { id: 'description', title: 'Description', sortable: true },
+  { id: 'index_set_id', title: 'Index Set', sortable: true },
+  { id: 'disabled', title: 'Status', sortable: true },
 ];
 
 const ATTRIBUTE_PERMISSIONS = {
@@ -65,6 +65,7 @@ type SearchParams = {
   page: number,
   perPage: number,
   query: string,
+  sort: Sort
 }
 
 const customCells = (indexSets: Array<IndexSet>): CustomCells<Stream> => ({
@@ -88,7 +89,12 @@ const customCells = (indexSets: Array<IndexSet>): CustomCells<Stream> => ({
 const usePaginatedStreams = (searchParams: SearchParams): { data: { streams: Array<Stream>, pagination: { total: number } } | undefined, refetch: () => void } => {
   const { data, refetch } = useQuery(
     ['streams', 'overview', searchParams],
-    () => StreamsStore.searchPaginated(searchParams.page, searchParams.perPage, searchParams.query),
+    () => StreamsStore.searchPaginated(
+      searchParams.page,
+      searchParams.perPage,
+      searchParams.query,
+      { sort: searchParams?.sort.attributeId, order: searchParams?.sort.order },
+    ),
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading streams failed with status: ${errorThrown}`,
@@ -131,6 +137,10 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
     page: paginationQueryParameter.page,
     perPage: paginationQueryParameter.pageSize,
     query: '',
+    sort: {
+      attributeId: 'title',
+      order: 'asc',
+    },
   });
   const { data: streamRuleTypes } = useStreamRuleTypes();
   const { data: paginatedStreams, refetch: refetchStreams } = usePaginatedStreams(searchParams);
@@ -158,6 +168,10 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   const onReset = useCallback(() => {
     onSearch('');
   }, [onSearch]);
+
+  const onSortChange = useCallback((newSort: Sort) => {
+    setSearchParams((cur) => ({ ...cur, sort: newSort }));
+  }, []);
 
   const renderStreamActions = useCallback((listItem: Stream) => (
     <StreamActions stream={listItem}
@@ -198,6 +212,8 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
             <ConfigurableDataTable rows={streams}
                                    attributes={VISIBLE_ATTRIBUTES}
                                    attributePermissions={ATTRIBUTE_PERMISSIONS}
+                                   onSortChange={onSortChange}
+                                   activeSort={searchParams.sort}
                                    rowActions={renderStreamActions}
                                    customCells={customCells(indexSets)}
                                    availableAttributes={AVAILABLE_ATTRIBUTES} />
