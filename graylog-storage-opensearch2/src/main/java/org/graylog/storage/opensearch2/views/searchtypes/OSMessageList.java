@@ -114,6 +114,9 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
         sorts.forEach(sort -> {
             final FieldSortBuilder fieldSort = SortBuilders.fieldSort(sort.field())
                     .order(toSortOrder(sort.order()));
+            if (sort.field().equals(Message.FIELD_GL2_MESSAGE_ID)) {
+                fieldSort.unmappedType("keyword"); // old indices might not have a mapping for gl2_message_id
+            }
             final Optional<String> fieldType = queryContext.fieldType(effectiveStreamIds, sort.field());
             searchSourceBuilder.sort(fieldType.map(fieldSort::unmappedType).orElse(fieldSort));
         });
