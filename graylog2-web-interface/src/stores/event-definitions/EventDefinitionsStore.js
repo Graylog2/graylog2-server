@@ -102,7 +102,7 @@ export const EventDefinitionsStore = singletonStore(
       const promise = fetch('GET', this.eventDefinitionsUrl({ query: { per_page: 0 } }));
 
       promise.then((response) => {
-        this.all = response.event_definitions;
+        this.all = response.entities;
         this.context = response.context;
         this.propagateChanges();
 
@@ -122,7 +122,7 @@ export const EventDefinitionsStore = singletonStore(
       }));
 
       promise.then((response) => {
-        this.eventDefinitions = response.event_definitions;
+        this.eventDefinitions = response.entities;
         this.context = response.context;
         this.query = response.query;
 

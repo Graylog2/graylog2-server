@@ -133,11 +133,11 @@ type PaginatedBackendsResponse = PaginatedResponseType & {
   context: {
     active_backend: AuthenticationBackendJSON | null | undefined,
   },
-  backends: Array<AuthenticationBackendJSON>,
+  entities: Array<AuthenticationBackendJSON>,
 };
 
 type PaginatedUsersResponse = PaginatedResponseType & {
-  users: Array<UserOverviewJSON>,
+  entities: Array<UserOverviewJSON>,
 };
 
 export const AuthenticationStore = singletonStore(
@@ -234,7 +234,7 @@ export const AuthenticationStore = singletonStore(
           context: {
             activeBackend: response.context.active_backend,
           },
-          list: Immutable.List(response.backends.map((backend) => AuthenticationBackend.fromJSON(backend))),
+          list: Immutable.List(response.entities.map((backend) => AuthenticationBackend.fromJSON(backend))),
           pagination: {
             page: response.page,
             perPage: response.per_page,
@@ -254,7 +254,7 @@ export const AuthenticationStore = singletonStore(
 
       const promise = fetch('GET', qualifyUrl(url))
         .then((response: PaginatedUsersResponse) => ({
-          list: Immutable.List(response.users.map((user) => UserOverview.fromJSON(user))),
+          list: Immutable.List(response.entities.map((user) => UserOverview.fromJSON(user))),
           pagination: {
             page: response.page,
             perPage: response.per_page,

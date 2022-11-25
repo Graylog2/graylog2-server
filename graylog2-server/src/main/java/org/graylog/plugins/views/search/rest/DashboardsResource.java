@@ -47,7 +47,7 @@ import static java.util.Locale.ENGLISH;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Dashboards", tags = {CLOUD_VISIBLE})
+@Api(value = "Dashboards", description = "Provide a list of existing dashboards", tags = {CLOUD_VISIBLE})
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/dashboards")
 public class DashboardsResource extends RestResource {
@@ -94,7 +94,7 @@ public class DashboardsResource extends RestResource {
                     page,
                     perPage);
 
-            return PaginatedResponse.create("views", result, query);
+            return PaginatedResponse.create(result, query);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), e);
         }

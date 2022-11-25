@@ -202,7 +202,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
                 .collect(Collectors.toList());
         final PaginatedList<PipelineSource> pipelines = new PaginatedList<>(pipelineList,
                 result.pagination().total(), result.pagination().page(), result.pagination().perPage());
-        return PaginatedResponse.create("pipelines", pipelines);
+        return PaginatedResponse.create(pipelines);
     }
 
     @ApiOperation(value = "Get a processing pipeline", notes = "It can take up to a second until the change is applied")

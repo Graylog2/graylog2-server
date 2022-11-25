@@ -31,7 +31,7 @@ import User from 'logic/users/User';
 import type { PaginatedListJSON, Pagination, PaginatedList } from 'stores/PaginationTypes';
 
 export type PaginatedUsersResponse = PaginatedListJSON & {
-  users: Array<UserOverviewJSON>;
+  entities: Array<UserOverviewJSON>;
   context: {
     admin_user: UserOverviewJSON;
   };
@@ -203,7 +203,7 @@ export const UsersStore = singletonStore('core.Users', () => Reflux.createStore(
   loadUsers(query: Query = {}): Promise<Immutable.List<User>> {
     const url = usersUrl({ url: ApiRoutes.UsersApiController.list().url, query });
     const promise = fetch('GET', url).then(({
-      users,
+      entities: users,
     }) => Immutable.List(users.map((user) => UserOverview.fromJSON(user))));
     UsersActions.loadUsers.promise(promise);
 
@@ -219,7 +219,7 @@ export const UsersStore = singletonStore('core.Users', () => Reflux.createStore(
 
     const promise = fetch('GET', qualifyUrl(url)).then((response: PaginatedUsersResponse) => ({
       adminUser: response.context.admin_user ? UserOverview.fromJSON(response.context.admin_user) : undefined,
-      list: Immutable.List(response.users.map((user) => UserOverview.fromJSON(user))),
+      list: Immutable.List(response.entities.map((user) => UserOverview.fromJSON(user))),
       pagination: {
         page: response.page,
         perPage: response.per_page,

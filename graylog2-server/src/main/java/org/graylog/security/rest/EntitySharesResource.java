@@ -105,7 +105,7 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
 
         final GranteeSharesService.SharesResponse response = granteeSharesService.getPaginatedSharesFor(grnRegistry.ofUser(user), paginationParameters, capabilityFilter, entityTypeFilter);
 
-        return PaginatedResponse.create("entities", response.paginatedEntities(), Collections.singletonMap("grantee_capabilities", response.capabilities()));
+        return PaginatedResponse.create(response.paginatedEntities(), Collections.singletonMap("grantee_capabilities", response.capabilities()));
     }
 
     @POST

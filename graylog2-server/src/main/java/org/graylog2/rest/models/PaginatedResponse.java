@@ -17,62 +17,81 @@
 package org.graylog2.rest.models;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.database.PaginatedList;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @JsonAutoDetect
-public class PaginatedResponse<T> {
-    private final String listKey;
-    private final PaginatedList<T> paginatedList;
-    private final String query;
-    private final Map<String, Object> context;
-
-    private PaginatedResponse(String listKey, PaginatedList<T> paginatedList, @Nullable String query, @Nullable Map<String, Object> context) {
-        this.listKey = listKey;
-        this.paginatedList = paginatedList;
-        this.query = query;
-        this.context = context;
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@AutoValue
+public abstract class PaginatedResponse<T> {
+    @JsonProperty("entities")
+    @JsonInclude()
+    public List<T> entities() {
+        return new ArrayList<>(paginatedList());
     }
 
-    @JsonValue
-    public Map<String, Object> jsonValue() {
-        final ImmutableMap.Builder<String, Object> builder = ImmutableMap.<String, Object>builder()
-                .putAll(paginatedList.pagination().asMap())
-                .put(listKey, new ArrayList<>(paginatedList));
+    @JsonIgnore
+    public abstract PaginatedList<T> paginatedList();
 
-        if (query != null) {
-            builder.put("query", query);
-        }
+    @JsonProperty("query")
+    @Nullable
+    @JsonInclude()
+    public abstract String query();
 
-        if (paginatedList.grandTotal().isPresent()) {
-            builder.put("grand_total", paginatedList.grandTotal().get());
-        }
+    @JsonProperty("context")
+    @Nullable
+    public abstract Map<String, Object> context();
 
-        if (context != null && !context.isEmpty()) {
-            builder.put("context", context);
-        }
-
-        return builder.build();
+    @JsonProperty("grand_total")
+    public Optional<Long> grandTotal() {
+        return paginatedList().grandTotal();
     }
 
-    public static <T> PaginatedResponse<T> create(String listKey, PaginatedList<T> paginatedList) {
-        return new PaginatedResponse<>(listKey, paginatedList, null, null);
+    @JsonProperty("total")
+    public int total() {
+        return paginatedList().pagination().total();
     }
 
-    public static <T> PaginatedResponse<T> create(String listKey, PaginatedList<T> paginatedList, Map<String, Object> context) {
-        return new PaginatedResponse<>(listKey, paginatedList, null, context);
+    @JsonProperty("count")
+    public int count() {
+        return paginatedList().pagination().count();
     }
 
-    public static <T> PaginatedResponse<T> create(String listKey, PaginatedList<T> paginatedList, String query) {
-        return new PaginatedResponse<>(listKey, paginatedList, query, null);
+    @JsonProperty("page")
+    public int page() {
+        return paginatedList().pagination().page();
     }
 
-    public static <T> PaginatedResponse<T> create(String listKey, PaginatedList<T> paginatedList, String query, Map<String, Object> context) {
-        return new PaginatedResponse<>(listKey, paginatedList, query, context);
+    @JsonProperty("per_page")
+    public int perPage() {
+        return paginatedList().pagination().perPage();
+    }
+
+
+    public static <T> PaginatedResponse<T> create(PaginatedList<T> paginatedList) {
+        return create(paginatedList, null, null);
+    }
+
+    public static <T> PaginatedResponse<T> create(PaginatedList<T> paginatedList, Map<String, Object> context) {
+        return create(paginatedList, null, context);
+    }
+
+    public static <T> PaginatedResponse<T> create(PaginatedList<T> paginatedList, String query) {
+        return create(paginatedList, query, null);
+    }
+
+    public static <T> PaginatedResponse<T> create(PaginatedList<T> paginatedList, String query, Map<String, Object> context) {
+        return new AutoValue_PaginatedResponse<>(paginatedList, query, context);
     }
 }

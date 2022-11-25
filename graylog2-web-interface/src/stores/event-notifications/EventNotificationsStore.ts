@@ -137,7 +137,7 @@ export const EventNotificationsStore = singletonStore(
       const promise = fetch('GET', this.eventNotificationsUrl({ query: { per_page: 0 } }));
 
       promise.then((response) => {
-        this.all = response.notifications;
+        this.all = response.entities;
         this.propagateChanges();
 
         return response;
@@ -156,7 +156,7 @@ export const EventNotificationsStore = singletonStore(
       }));
 
       promise.then((response) => {
-        this.notifications = response.notifications;
+        this.notifications = response.entities;
         this.query = response.query;
 
         this.pagination = {

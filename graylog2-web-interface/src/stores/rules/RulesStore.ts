@@ -47,7 +47,7 @@ export type RulesContext = {
   }
 };
 export type PaginatedRulesResponse = PaginatedListJSON & {
-  rules: Array<RuleType>,
+  entities: Array<RuleType>,
   context: RulesContext,
 };
 
@@ -155,7 +155,7 @@ export const RulesStore = singletonStore(
       const url = PaginationURL(ApiRoutes.RulesController.paginatedList().url, page, perPage, query);
       const promise = fetch('GET', qualifyUrl(url))
         .then((response: PaginatedRulesResponse) => ({
-          list: response.rules,
+          list: response.entities,
           context: response.context,
           pagination: {
             count: response.count,

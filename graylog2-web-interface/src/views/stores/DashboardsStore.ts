@@ -21,9 +21,11 @@ import { singletonActions, singletonStore } from 'logic/singleton';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
+import type { PaginatedListJSON } from 'stores/PaginationTypes';
 
 import type { PaginatedViews, SortField, SortOrder } from './ViewManagementStore';
 
+import type { ViewJson } from '../logic/views/View';
 import View from '../logic/views/View';
 
 type DashboardsActionsType = RefluxActions<{
@@ -51,6 +53,10 @@ export type DashboardsStoreState = {
   list: Array<View> | undefined;
 };
 
+type PaginatedDashboardsResponse = PaginatedListJSON & {
+  entities: Array<ViewJson>,
+};
+
 const DashboardsStore: Store<DashboardsStoreState> = singletonStore(
   'views.Dashboards',
   () => Reflux.createStore({
@@ -71,8 +77,8 @@ const DashboardsStore: Store<DashboardsStoreState> = singletonStore(
     },
     search(query = '', page = 1, perPage = 10, sortBy = 'title', order = 'asc') {
       const promise = fetch('GET', `${dashboardsUrl}?query=${query}&page=${page}&per_page=${perPage}&sort=${sortBy}&order=${order}`)
-        .then((response) => {
-          this.dashboards = response.views.map((item) => View.fromJSON(item));
+        .then((response: PaginatedDashboardsResponse) => {
+          this.dashboards = response.entities.map((item) => View.fromJSON(item));
 
           this.pagination = {
             total: response.total,

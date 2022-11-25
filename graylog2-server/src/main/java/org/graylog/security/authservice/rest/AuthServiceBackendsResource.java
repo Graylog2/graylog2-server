@@ -127,7 +127,6 @@ public class AuthServiceBackendsResource extends RestResource {
         final PaginatedList<AuthServiceBackendDTO> list = dbService.findPaginated(paginationParameters, this::checkReadPermission);
 
         return PaginatedResponse.create(
-                "backends",
                 list,
                 Collections.singletonMap("active_backend", activeBackendConfig)
         );
@@ -201,7 +200,6 @@ public class AuthServiceBackendsResource extends RestResource {
                 parseSearchQuery(query), page, perPage, sort, order, activeConfig.id());
 
         return PaginatedResponse.create(
-                "users",
                 userList,
                 query,
                 Collections.singletonMap("roles", createRoleContext(userList.delegate()))

@@ -45,7 +45,7 @@ describe('UsersStore', () => {
   describe('loadUsers', () => {
     it('should load json users and return them as value classes', async () => {
       const jsonList = userOverviewList.map((u) => u.toJSON()).toArray();
-      asMock(fetch).mockReturnValueOnce(Promise.resolve({ users: jsonList }));
+      asMock(fetch).mockReturnValueOnce(Promise.resolve({ entities: jsonList }));
 
       const result = await UsersActions.loadUsers();
 
@@ -61,7 +61,7 @@ describe('UsersStore', () => {
         context: {
           admin_user: admin.toJSON(),
         },
-        users: jsonList,
+        entities: jsonList,
         ...paginationJSON,
       }));
 
@@ -77,7 +77,7 @@ describe('UsersStore', () => {
         context: {
           admin_user: null,
         },
-        users: jsonList,
+        entities: jsonList,
         ...paginationJSON,
       }));
 

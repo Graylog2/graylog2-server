@@ -44,7 +44,7 @@ public class PaginatedResponseTest {
     public void serialize() throws Exception {
         final ImmutableList<String> values = ImmutableList.of("hello", "world");
         final PaginatedList<String> paginatedList = new PaginatedList<>(values, values.size(), 1, 10);
-        final PaginatedResponse<String> response = PaginatedResponse.create("foo", paginatedList);
+        final PaginatedResponse<String> response = PaginatedResponse.create(paginatedList);
 
         final DocumentContext ctx = JsonPath.parse(objectMapper.writeValueAsString(response));
         final JsonPathAssert jsonPathAssert = JsonPathAssert.assertThat(ctx);
@@ -53,8 +53,8 @@ public class PaginatedResponseTest {
         jsonPathAssert.jsonPathAsInteger("$.count").isEqualTo(2);
         jsonPathAssert.jsonPathAsInteger("$.page").isEqualTo(1);
         jsonPathAssert.jsonPathAsInteger("$.per_page").isEqualTo(10);
-        jsonPathAssert.jsonPathAsString("$.foo[0]").isEqualTo("hello");
-        jsonPathAssert.jsonPathAsString("$.foo[1]").isEqualTo("world");
+        jsonPathAssert.jsonPathAsString("$.entities[0]").isEqualTo("hello");
+        jsonPathAssert.jsonPathAsString("$.entities[1]").isEqualTo("world");
         assertThatThrownBy(() -> jsonPathAssert.jsonPathAsString("$.context")).isInstanceOf(PathNotFoundException.class);
     }
 
@@ -63,7 +63,7 @@ public class PaginatedResponseTest {
         final ImmutableList<String> values = ImmutableList.of("hello", "world");
         final ImmutableMap<String, Object> context = ImmutableMap.of("context1", "wow");
         final PaginatedList<String> paginatedList = new PaginatedList<>(values, values.size(), 1, 10);
-        final PaginatedResponse<String> response = PaginatedResponse.create("foo", paginatedList, context);
+        final PaginatedResponse<String> response = PaginatedResponse.create(paginatedList, context);
 
         final DocumentContext ctx = JsonPath.parse(objectMapper.writeValueAsString(response));
         final JsonPathAssert jsonPathAssert = JsonPathAssert.assertThat(ctx);
@@ -72,8 +72,8 @@ public class PaginatedResponseTest {
         jsonPathAssert.jsonPathAsInteger("$.count").isEqualTo(2);
         jsonPathAssert.jsonPathAsInteger("$.page").isEqualTo(1);
         jsonPathAssert.jsonPathAsInteger("$.per_page").isEqualTo(10);
-        jsonPathAssert.jsonPathAsString("$.foo[0]").isEqualTo("hello");
-        jsonPathAssert.jsonPathAsString("$.foo[1]").isEqualTo("world");
+        jsonPathAssert.jsonPathAsString("$.entities[0]").isEqualTo("hello");
+        jsonPathAssert.jsonPathAsString("$.entities[1]").isEqualTo("world");
         jsonPathAssert.jsonPathAsString("$.context.context1").isEqualTo("wow");
     }
 
@@ -81,7 +81,7 @@ public class PaginatedResponseTest {
     public void serializeWithQuery() throws Exception {
         final ImmutableList<String> values = ImmutableList.of("hello", "world");
         final PaginatedList<String> paginatedList = new PaginatedList<>(values, values.size(), 1, 10);
-        final PaginatedResponse<String> response = PaginatedResponse.create("foo", paginatedList, "query1");
+        final PaginatedResponse<String> response = PaginatedResponse.create(paginatedList, "query1");
 
         final DocumentContext ctx = JsonPath.parse(objectMapper.writeValueAsString(response));
         final JsonPathAssert jsonPathAssert = JsonPathAssert.assertThat(ctx);
@@ -91,8 +91,8 @@ public class PaginatedResponseTest {
         jsonPathAssert.jsonPathAsInteger("$.count").isEqualTo(2);
         jsonPathAssert.jsonPathAsInteger("$.page").isEqualTo(1);
         jsonPathAssert.jsonPathAsInteger("$.per_page").isEqualTo(10);
-        jsonPathAssert.jsonPathAsString("$.foo[0]").isEqualTo("hello");
-        jsonPathAssert.jsonPathAsString("$.foo[1]").isEqualTo("world");
+        jsonPathAssert.jsonPathAsString("$.entities[0]").isEqualTo("hello");
+        jsonPathAssert.jsonPathAsString("$.entities[1]").isEqualTo("world");
         assertThatThrownBy(() -> jsonPathAssert.jsonPathAsString("$.context")).isInstanceOf(PathNotFoundException.class);
     }
 
@@ -101,7 +101,7 @@ public class PaginatedResponseTest {
         final ImmutableList<String> values = ImmutableList.of("hello", "world");
         final ImmutableMap<String, Object> context = ImmutableMap.of("context1", "wow");
         final PaginatedList<String> paginatedList = new PaginatedList<>(values, values.size(), 1, 10);
-        final PaginatedResponse<String> response = PaginatedResponse.create("foo", paginatedList, "query1", context);
+        final PaginatedResponse<String> response = PaginatedResponse.create(paginatedList, "query1", context);
 
         final DocumentContext ctx = JsonPath.parse(objectMapper.writeValueAsString(response));
         final JsonPathAssert jsonPathAssert = JsonPathAssert.assertThat(ctx);
@@ -111,8 +111,8 @@ public class PaginatedResponseTest {
         jsonPathAssert.jsonPathAsInteger("$.count").isEqualTo(2);
         jsonPathAssert.jsonPathAsInteger("$.page").isEqualTo(1);
         jsonPathAssert.jsonPathAsInteger("$.per_page").isEqualTo(10);
-        jsonPathAssert.jsonPathAsString("$.foo[0]").isEqualTo("hello");
-        jsonPathAssert.jsonPathAsString("$.foo[1]").isEqualTo("world");
+        jsonPathAssert.jsonPathAsString("$.entities[0]").isEqualTo("hello");
+        jsonPathAssert.jsonPathAsString("$.entities[1]").isEqualTo("world");
         jsonPathAssert.jsonPathAsString("$.context.context1").isEqualTo("wow");
     }
 }
