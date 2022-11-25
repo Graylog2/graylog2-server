@@ -20,6 +20,7 @@ import { useMemo } from 'react';
 
 import SortIcon from 'components/streams/StreamsOverview/SortIcon';
 
+import BulkActionsHead from './BulkActionsHead';
 import type { Attribute, CustomHeaders, Sort } from './types';
 
 const defaultAttributeHeaderRenderer = {};
@@ -62,35 +63,50 @@ const ActionsHead = styled.th`
   text-align: right;
 `;
 
-const TableHead = ({
+const TableHead = <ListItem extends { id: string }>({
   selectedAttributes,
   customHeaders,
   displayActionsCol,
+  displayBulkActionsCol,
   onSortChange,
   activeSort,
+  rows,
+  selectedItemsIds,
+  setSelectedItemsIds,
 }: {
   selectedAttributes: Array<Attribute>,
   customHeaders: CustomHeaders,
   displayActionsCol: boolean
+  displayBulkActionsCol: boolean,
   onSortChange: (newSort: Sort) => void,
-  activeSort: Sort
-}) => (
-  <thead>
-    <tr>
-      {selectedAttributes.map((attribute) => {
-        const headerRenderer = customHeaders?.[attribute.id] ?? defaultAttributeHeaderRenderer[attribute.id];
+  activeSort: Sort,
+  rows: Array<ListItem>
+  selectedItemsIds: Array<string>,
+  setSelectedItemsIds: React.Dispatch<React.SetStateAction<Array<string>>>
+}) => {
+  return (
+    <thead>
+      <tr>
+        {displayBulkActionsCol && (
+          <BulkActionsHead rows={rows}
+                           selectedItemsIds={selectedItemsIds}
+                           setSelectedItemsIds={setSelectedItemsIds} />
+        )}
+        {selectedAttributes.map((attribute) => {
+          const headerRenderer = customHeaders?.[attribute.id] ?? defaultAttributeHeaderRenderer[attribute.id];
 
-        return (
-          <TableHeader headerRenderer={headerRenderer}
-                       attribute={attribute}
-                       onSortChange={onSortChange}
-                       activeSort={activeSort}
-                       key={attribute.title} />
-        );
-      })}
-      {displayActionsCol ? <ActionsHead>Actions</ActionsHead> : null}
-    </tr>
-  </thead>
-);
+          return (
+            <TableHeader headerRenderer={headerRenderer}
+                         attribute={attribute}
+                         onSortChange={onSortChange}
+                         activeSort={activeSort}
+                         key={attribute.title} />
+          );
+        })}
+        {displayActionsCol ? <ActionsHead>Actions</ActionsHead> : null}
+      </tr>
+    </thead>
+  );
+};
 
 export default TableHead;
