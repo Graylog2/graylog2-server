@@ -22,9 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.TypedBuilder;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 @AutoValue
@@ -38,6 +36,7 @@ public abstract class SumOfSquares implements SeriesSpec {
     @Override
     public abstract String id();
 
+    @Override
     @JsonProperty
     public abstract String field();
 
@@ -46,13 +45,17 @@ public abstract class SumOfSquares implements SeriesSpec {
     }
 
     @AutoValue.Builder
-    public abstract static class Builder extends TypedBuilder<SumOfSquares, Builder> {
+    public abstract static class Builder extends SeriesSpecBuilder<SumOfSquares, Builder> {
         @JsonCreator
-        public static Builder create() { return builder(); }
+        public static Builder create() {
+            return builder();
+        }
 
+        @Override
         @JsonProperty
         public abstract Builder id(String id);
 
+        @Override
         @JsonProperty
         public abstract Builder field(String field);
 
@@ -60,6 +63,7 @@ public abstract class SumOfSquares implements SeriesSpec {
         abstract String field();
         abstract SumOfSquares autoBuild();
 
+        @Override
         public SumOfSquares build() {
             if (!id().isPresent()) {
                 id(NAME + "(" + field() + ")");

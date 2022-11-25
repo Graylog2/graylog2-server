@@ -1,0 +1,16 @@
+type = "changed"
+message = "Sorting options in aggregations have been limited for deterministic results."
+
+issues = ["13957"]
+pulls = ["14017"]
+
+details.user = """
+Unfortunately, the new bucketing strategy produces better results, but does not support all combinations of multi-sorts.
+In order to only support combinations which provide deterministic results, sorting for new widgets has been limited to:
+
+  - Only one sort if a grouping field is used
+  - One or more metrics/series
+
+No combinations are allowed. Old widgets are still supported, but may not always return the expected results. Due to the
+shortcomings of the old bucketing strategy, this might have already been the case.
+"""

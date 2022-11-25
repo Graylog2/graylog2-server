@@ -78,14 +78,8 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "outputbuffer_processors", required = true, validators = PositiveIntegerValidator.class)
     private int outputBufferProcessors = 3;
 
-    @Parameter(value = "outputbuffer_processor_threads_max_pool_size", required = true, validators = PositiveIntegerValidator.class)
-    private int outputBufferProcessorThreadsMaxPoolSize = 30;
-
     @Parameter(value = "outputbuffer_processor_threads_core_pool_size", required = true, validators = PositiveIntegerValidator.class)
     private int outputBufferProcessorThreadsCorePoolSize = 3;
-
-    @Parameter(value = "outputbuffer_processor_keep_alive_time", validators = PositiveIntegerValidator.class)
-    private int outputBufferProcessorKeepAliveTime = 5000;
 
     @Parameter(value = "node_id_file", validators = NodeIdFileValidator.class)
     private String nodeIdFile = "/etc/graylog/server/node-id";
@@ -283,14 +277,6 @@ public class Configuration extends BaseConfiguration {
 
     public int getOutputBufferProcessorThreadsCorePoolSize() {
         return outputBufferProcessorThreadsCorePoolSize;
-    }
-
-    public int getOutputBufferProcessorThreadsMaxPoolSize() {
-        return outputBufferProcessorThreadsMaxPoolSize;
-    }
-
-    public int getOutputBufferProcessorKeepAliveTime() {
-        return outputBufferProcessorKeepAliveTime;
     }
 
     public boolean isCloud() {

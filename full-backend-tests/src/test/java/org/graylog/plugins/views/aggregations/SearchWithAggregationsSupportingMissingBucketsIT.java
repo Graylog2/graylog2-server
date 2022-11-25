@@ -163,6 +163,21 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
     }
 
     @ContainerMatrixTest
+    void testRowAndColumnPivotHasProperMissingBucket() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(false)
+                .series(Count.builder().build(), Average.builder().field("age").build())
+                .rowGroups(Values.builder().field("firstName").limit(1).build())
+                .columnGroups(Values.builder().field("lastName").limit(1).build())
+                .build();
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse
+                .rootPath(PIVOT_RESULTS_PATH)
+                .body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "'] }.values.value", hasItems(1, 60.0f));
+    }
+
+    @ContainerMatrixTest
     void testMissingBucketIsNotPresentIfItHasZeroValues() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)

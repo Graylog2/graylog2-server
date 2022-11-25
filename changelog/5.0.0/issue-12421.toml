@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix incorrect prometheus mapping for input metrics."
+
+issues = ["12421"]
+pulls = ["12560"]

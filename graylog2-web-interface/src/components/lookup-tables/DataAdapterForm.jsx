@@ -310,7 +310,9 @@ class DataAdapterForm extends React.Component {
 
     return (
       <>
-        {this._renderTitle(title, pluginDisplayName, create)}
+        <p>
+          {this._renderTitle(title, pluginDisplayName, create)}
+        </p>
         <Row>
           <Col lg={formRowWidth}>
             <form className="form form-horizontal" onSubmit={this._save}>
