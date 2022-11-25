@@ -101,7 +101,7 @@ const DashboardsStore: Store<DashboardsStoreState> = singletonStore(
           };
         });
 
-      promise.catch((error) => {
+      promise.catch((error: Error) => {
         UserNotification.error(`Fetching dashboards failed with status: ${error}`,
           'Could not retrieve dashboards');
       });

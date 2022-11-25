@@ -24,6 +24,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import type { Pagination, PaginatedListJSON, ListPagination } from 'stores/PaginationTypes';
+import type FetchError from 'logic/errors/FetchError';
 
 export type RuleType = {
   id?: string,
@@ -138,7 +139,7 @@ export const RulesStore = singletonStore(
     },
 
     list() {
-      const failCallback = (error) => {
+      const failCallback = (error: Error) => {
         UserNotification.error(`Fetching rules failed with status: ${error.message}`,
           'Could not retrieve processing rules');
       };
@@ -166,7 +167,7 @@ export const RulesStore = singletonStore(
           },
         }));
 
-      promise.catch((error) => {
+      promise.catch((error: FetchError) => {
         if (!error.additional || error.additional.status !== 404) {
           UserNotification.error(`Loading rules list failed with status: ${error}`, 'Could not load rules.');
         }
@@ -178,7 +179,7 @@ export const RulesStore = singletonStore(
     },
 
     get(ruleId) {
-      const failCallback = (error) => {
+      const failCallback = (error: Error) => {
         UserNotification.error(`Fetching rule "${ruleId}" failed with status: ${error.message}`,
           `Could not retrieve processing rule "${ruleId}"`);
       };
@@ -193,7 +194,7 @@ export const RulesStore = singletonStore(
     },
 
     save(ruleSource: RuleType) {
-      const failCallback = (error) => {
+      const failCallback = (error: Error) => {
         UserNotification.error(`Saving rule "${ruleSource.title}" failed with status: ${error.message}`,
           `Could not save processing rule "${ruleSource.title}"`);
       };
@@ -245,7 +246,7 @@ export const RulesStore = singletonStore(
       return promise;
     },
     delete(rule) {
-      const failCallback = (error) => {
+      const failCallback = (error: Error) => {
         UserNotification.error(`Deleting rule "${rule.title}" failed with status: ${error.message}`,
           `Could not delete processing rule "${rule.title}"`);
       };

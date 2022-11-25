@@ -41,7 +41,6 @@ import { loadDashboard } from 'views/logic/views/Actions';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { ViewStore } from 'views/stores/ViewStore';
-import MockAction from 'helpers/mocking/MockAction';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
@@ -78,7 +77,7 @@ jest.mock('views/stores/CurrentQueryStore', () => ({
 
 jest.mock('views/stores/DashboardsStore', () => ({
   DashboardsActions: {
-    search: MockAction(),
+    search: mockAction(),
   },
   DashboardsStore: MockStore(),
 }));
