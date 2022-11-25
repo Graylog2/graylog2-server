@@ -72,9 +72,9 @@ public class AggregationSpecToPivotMapper implements Function<SearchRequestSpec,
                 .filter(sortable -> sortable.sort() != null)
                 .map(sortable -> {
                     if (sortable instanceof Metric) {
-                        return SeriesSort.create(sortable.sortColumnName(), sortable.sort());
+                        return SeriesSort.create(sortable.columnName(), sortable.sort());
                     }
-                    return PivotSort.create(sortable.sortColumnName(), sortable.sort());
+                    return PivotSort.create(sortable.columnName(), sortable.sort());
                 })
                 .collect(Collectors.toList());
     }

@@ -24,11 +24,13 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import javax.inject.Inject;
 import javax.validation.ValidationException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public class MetricValidator {
 
     private final Collection<String> availableMetricTypes;
+    private final Collection<String> UNSORTABLE_METRICS = List.of("latest", "percentile");
 
     @Inject
     public MetricValidator(final Map<String, SeriesDescription> availableFunctions) {
@@ -44,6 +46,9 @@ public class MetricValidator {
         }
         if (!hasFieldIfFunctionNeedsIt(metric)) {
             throw new ValidationException(metric.functionName() + " metric requires field name to be provided after a colon, i.e. " + metric.functionName() + ":http_status_code");
+        }
+        if (metric.sort() != null && UNSORTABLE_METRICS.contains(metric.functionName())) {
+            throw new ValidationException(metric.functionName() + " metric cannot be used to sort aggregations");
         }
     }
 
