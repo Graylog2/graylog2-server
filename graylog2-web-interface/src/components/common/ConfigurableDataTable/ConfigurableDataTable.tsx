@@ -16,14 +16,15 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import { useMemo } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import type * as Immutable from 'immutable';
 
+import { Button, Table, ButtonToolbar } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
-import { Table } from 'components/bootstrap';
 import TableHead from 'components/common/ConfigurableDataTable/TableHead';
-import TableBody from 'components/common/ConfigurableDataTable/TableBody';
+import TableRow from 'components/common/ConfigurableDataTable/TableRow';
 import useCurrentUser from 'hooks/useCurrentUser';
+import StringUtils from 'util/StringUtils';
 
 import type { CustomCells, CustomHeaders, Attribute, Sort } from './types';
 
@@ -32,6 +33,23 @@ const ScrollContainer = styled.div(({ theme }) => css`
     overflow-x: auto;
   }
 `);
+
+const ActionsRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  min-height: 22px;
+`;
+
+const BulkActionsWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const BulkActions = styled(ButtonToolbar)`
+  margin-left: 5px;
+`;
 
 const filterVisibleAttributes = (
   attributes: Array<string>,
@@ -57,6 +75,8 @@ type Props<ListItem extends { id: string }> = {
   rows: Array<ListItem>,
   /** Actions for each row. */
   rowActions?: (listItem: ListItem) => React.ReactNode,
+  /** Suported batch operations */
+  bulkActions?: (selectedItemsIds: Array<string>, setSelectedItemsIds: (streamIds: Array<string>) => void) => React.ReactNode
   /** Custom cell render for an attribute */
   customCells?: CustomCells<ListItem>,
   /** Define the permissions a user needs to view an attribute. */
@@ -71,6 +91,8 @@ type Props<ListItem extends { id: string }> = {
   attributes: Array<string>,
   /** List of all available attributes. */
   availableAttributes: Array<Attribute>,
+  /** Total amount of items */
+  total: number,
 };
 
 /**
@@ -82,43 +104,86 @@ const ConfigurableDataTable = <ListItem extends { id: string }>({
   attributes,
   availableAttributes,
   customCells,
+  bulkActions,
   customHeaders,
   onSortChange,
   rowActions,
   rows,
+  total,
 }: Props<ListItem>) => {
+  const [selectedItemsIds, setSelectedItemsIds] = useState<Array<string>>([]);
   const currentUser = useCurrentUser();
   const visibleAttributes = useMemo(
     () => filterVisibleAttributes(attributes, availableAttributes, attributePermissions, currentUser.permissions),
     [attributePermissions, attributes, availableAttributes, currentUser.permissions],
   );
+  const onToggleRowSelect = useCallback((itemId: string) => {
+    setSelectedItemsIds(((cur) => {
+      if (cur.includes(itemId)) {
+        return cur.filter((id) => id !== itemId);
+      }
 
+      return [...cur, itemId];
+    }));
+  }, []);
+
+  const unselectAllItems = useCallback(() => setSelectedItemsIds([]), []);
   const displayActionsCol = typeof rowActions === 'function';
+  const displayBulkActionsCol = typeof bulkActions === 'function';
 
   return (
     <ScrollContainer>
+      <ActionsRow>
+        <div>
+          {(displayBulkActionsCol && !!selectedItemsIds?.length) && (
+            <BulkActionsWrapper>
+              {selectedItemsIds.length} {StringUtils.pluralize(selectedItemsIds.length, 'item', 'items')} selected
+              <BulkActions>
+                {bulkActions(selectedItemsIds, setSelectedItemsIds)}
+                <Button bsSize="xsmall" onClick={unselectAllItems}>Cancel</Button>
+              </BulkActions>
+            </BulkActionsWrapper>
+          )}
+        </div>
+        <div>
+          Total {total}
+        </div>
+      </ActionsRow>
       <Table striped condensed hover>
         <TableHead selectedAttributes={visibleAttributes}
+                   selectedItemsIds={selectedItemsIds}
+                   setSelectedItemsIds={setSelectedItemsIds}
+                   rows={rows}
                    customHeaders={customHeaders}
                    onSortChange={onSortChange}
+                   displayBulkActionsCol={displayBulkActionsCol}
                    activeSort={activeSort}
                    displayActionsCol={displayActionsCol} />
-        <TableBody rows={rows}
-                   customCells={customCells}
-                   rowActions={rowActions}
-                   displayRowActions={displayActionsCol}
-                   visibleAttributes={visibleAttributes} />
+        <tbody>
+          {rows.map((listItem) => (
+            <TableRow listItem={listItem}
+                      key={listItem.id}
+                      onToggleRowSelect={onToggleRowSelect}
+                      customCells={customCells}
+                      isSelected={!!selectedItemsIds?.includes(listItem.id)}
+                      rowActions={rowActions}
+                      displayBulkActionsCol={displayBulkActionsCol}
+                      displayRowActions={displayActionsCol}
+                      visibleAttributes={visibleAttributes} />
+          ))}
+        </tbody>
       </Table>
     </ScrollContainer>
   );
 };
 
 ConfigurableDataTable.defaultProps = {
+  activeSort: undefined,
   attributePermissions: undefined,
+  bulkActions: undefined,
   customCells: undefined,
   customHeaders: undefined,
   rowActions: undefined,
-  activeSort: undefined,
 };
 
 export default ConfigurableDataTable;
