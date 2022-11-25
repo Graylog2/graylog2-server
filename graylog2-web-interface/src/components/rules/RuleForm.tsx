@@ -106,6 +106,8 @@ const RuleForm = ({ create }: Props) => {
         <PipelinesUsingRule create={create} />
 
         <Input id="rule-source-editor" label="Rule source" help="Rule source, see quick reference for more information." error={errorMessage}>
+          {/* TODO: Figure out issue with props */}
+          {/* @ts-ignore */}
           <SourceCodeEditor id={`source${create ? '-create' : '-edit'}`}
                             mode="pipeline"
                             onLoad={onAceLoaded}
