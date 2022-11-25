@@ -17,16 +17,13 @@
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
 import com.google.common.collect.ImmutableList;
-import org.apache.commons.collections.CollectionUtils;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.rest.SearchJobDTO;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
-import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.Metadata;
-import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.slf4j.Logger;
@@ -37,11 +34,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class SearchJobToTabularResponseMapper {
+public class AggregationTabularResponseCreator implements TabularResponseCreator {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SearchJobToTabularResponseMapper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AggregationTabularResponseCreator.class);
 
-    public TabularResponse mapToResponse(SearchRequestSpec searchRequestSpec, SearchJob searchJob) throws AggregationFailedException {
+    public TabularResponse mapToResponse(final AggregationRequestSpec searchRequestSpec, final SearchJob searchJob) throws AggregationFailedException {
         final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
         final QueryResult queryResult = searchJobDTO.results().get(SearchRequestSpecToSearchMapper.QUERY_ID);
 
@@ -57,26 +54,17 @@ public class SearchJobToTabularResponseMapper {
         throw new AggregationFailedException("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
     }
 
-    private TabularResponse mapToResponse(final SearchRequestSpec searchRequestSpec,
+    private TabularResponse mapToResponse(final AggregationRequestSpec searchRequestSpec,
                                           final PivotResult pivotResult) {
         return new TabularResponse(
-                getSchema(searchRequestSpec),
+                searchRequestSpec.getSchema(),
                 getDatarows(searchRequestSpec, pivotResult),
-                getMetadata(pivotResult)
+                new Metadata(pivotResult.effectiveTimerange())
         );
     }
 
-    private static List<ResponseSchemaEntry> getSchema(SearchRequestSpec searchRequestSpec) {
-        final Stream<ResponseSchemaEntry> groupings = searchRequestSpec.groupings().stream()
-                .map(gr -> ResponseSchemaEntry.groupBy(gr.fieldName()));
-
-        final Stream<ResponseSchemaEntry> metrics = searchRequestSpec.metrics().stream()
-                .map(metric -> ResponseSchemaEntry.metric(metric.functionName(), metric.fieldName()));
-
-        return Stream.concat(groupings, metrics).collect(Collectors.toList());
-    }
-
-    private static List<List<Object>> getDatarows(SearchRequestSpec searchRequestSpec, PivotResult pivotResult) {
+    private static List<List<Object>> getDatarows(final AggregationRequestSpec searchRequestSpec,
+                                                  final PivotResult pivotResult) {
         final int numGroupings = searchRequestSpec.groupings().size();
 
         return pivotResult.rows()
@@ -95,22 +83,11 @@ public class SearchJobToTabularResponseMapper {
                 .collect(Collectors.toList());
     }
 
-    private static Metadata getMetadata(PivotResult pivotResult) {
-        return new Metadata(pivotResult.effectiveTimerange());
-    }
-
     private static Object metricValue(ImmutableList<PivotResult.Value> values, Metric metric) {
         return values.stream()
                 .filter(value -> value.key().contains(metric.columnName()))
                 .findFirst()
                 .map(PivotResult.Value::value)
                 .orElse("-");
-    }
-
-    private void throwErrorIfAnyAvailable(QueryResult queryResult) throws AggregationFailedException {
-        if (!CollectionUtils.isEmpty(queryResult.errors())) {
-            final String errorText = queryResult.errors().stream().map(SearchError::description).collect(Collectors.joining(", "));
-            throw new AggregationFailedException("Failed to obtain aggregation results. Reason:" + errorText);
-        }
     }
 }
