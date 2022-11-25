@@ -188,7 +188,7 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
         callback(streams);
       });
   },
-  get(streamId: string, callback: ((stream: Stream) => void)): Promise<StreamResponse> {
+  get(streamId: string, callback: ((stream: Stream) => void)) {
     const failCallback = (errorThrown) => {
       UserNotification.error(`Loading Stream failed with status: ${errorThrown}`,
         'Could not retrieve Stream');
