@@ -27,7 +27,6 @@ import useDashboards from 'views/logic/dashboards/useDashboards';
 import { simpleView } from 'views/test/ViewFixtures';
 import UserDateTimeContext from 'contexts/UserDateTimeContext';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import mockAction from 'helpers/mocking/MockAction';
 
 import DashboardsPage from './DashboardsPage';
 
