@@ -24,7 +24,7 @@ const Wrapper = styled.div(({ theme }) => css`
   justify-content: center;
   align-items: center;
   width: 33%;
-  padding: 2%;
+  padding: 30px;
 `);
 
 const Container = styled.div`

@@ -42,6 +42,7 @@ const BackgroundText = styled.div`
   justify-content: center;
   height: 100%;
   width: 100%;
+  padding: 0 30px;
 `;
 
 const BackgroundImage = styled.img`
@@ -69,7 +70,6 @@ const TextContainer = styled.div`
   justify-self: center;
   align-self: center;
   height: auto;
-  width: 50%;
 `;
 
 const WelcomeMessage = styled.strong(({ theme }) => css`
