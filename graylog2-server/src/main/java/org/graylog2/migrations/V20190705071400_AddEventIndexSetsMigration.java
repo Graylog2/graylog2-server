@@ -126,7 +126,7 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
                                                String streamId,
                                                String streamTitle,
                                                String streamDescription) {
-        checkIndexPrefixConflicts(indexPrefix, indexPrefixConfigKey);
+        checkIndexPrefixConflicts(indexPrefix, indexPrefixConfigKey, indexTemplate);
 
         final IndexSet eventsIndexSet = setupEventsIndexSet(indexSetTitle, indexSetDescription, indexPrefix, indexTemplate);
         try {
@@ -136,9 +136,9 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
         }
     }
 
-    private void checkIndexPrefixConflicts(String indexPrefix, String configKey) {
+    private void checkIndexPrefixConflicts(String indexPrefix, String configKey, String templateType) {
         final DBQuery.Query query = DBQuery.and(
-                DBQuery.notEquals(IndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
+                DBQuery.notEquals(IndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE, Optional.of(templateType)),
                 DBQuery.is(IndexSetConfig.FIELD_INDEX_PREFIX, indexPrefix)
         );
 
@@ -149,16 +149,16 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
         }
     }
 
-    private Optional<IndexSetConfig> getEventsIndexSetConfig(String indexPrefix) {
+    private Optional<IndexSetConfig> getEventsIndexSetConfig(String indexPrefix, String templateType) {
         final DBQuery.Query query = DBQuery.and(
-                DBQuery.is(IndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
+                DBQuery.is(IndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE, Optional.of(templateType)),
                 DBQuery.is(IndexSetConfig.FIELD_INDEX_PREFIX, indexPrefix)
         );
         return indexSetService.findOne(query);
     }
 
     private IndexSet setupEventsIndexSet(String indexSetTitle, String indexSetDescription, String indexPrefix, String indexTemplateType) {
-        final Optional<IndexSetConfig> optionalIndexSetConfig = getEventsIndexSetConfig(indexPrefix);
+        final Optional<IndexSetConfig> optionalIndexSetConfig = getEventsIndexSetConfig(indexPrefix, indexTemplateType);
         if (optionalIndexSetConfig.isPresent()) {
             return mongoIndexSetFactory.create(optionalIndexSetConfig.get());
         }
