@@ -33,6 +33,7 @@ import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.SearchJobDTO;
+import org.graylog.plugins.views.search.rest.scriptingapi.mapping.AggregationFailedException;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.AggregationSpecToPivotMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryParamsToFullRequestSpecificationMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchRequestSpecToSearchMapper;
@@ -111,7 +112,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
 
             //Step 3: take complex response and try to map it to simpler, tabular form
             return responseCreator.mapToResponse(searchRequestSpec, searchJob);
-        } catch (IllegalArgumentException | ValidationException ex) {
+        } catch (IllegalArgumentException | ValidationException | AggregationFailedException ex) {
             throw new BadRequestException(ex.getMessage(), ex);
         }
     }

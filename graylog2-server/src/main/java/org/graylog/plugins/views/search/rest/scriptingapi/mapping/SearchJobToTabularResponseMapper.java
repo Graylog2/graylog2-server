@@ -32,8 +32,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.NotFoundException;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,7 +41,7 @@ public class SearchJobToTabularResponseMapper {
 
     private static final Logger LOG = LoggerFactory.getLogger(SearchJobToTabularResponseMapper.class);
 
-    public TabularResponse mapToResponse(SearchRequestSpec searchRequestSpec, SearchJob searchJob) {
+    public TabularResponse mapToResponse(SearchRequestSpec searchRequestSpec, SearchJob searchJob) throws AggregationFailedException {
         final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
         final QueryResult queryResult = searchJobDTO.results().get(SearchRequestSpecToSearchMapper.QUERY_ID);
 
@@ -56,7 +54,7 @@ public class SearchJobToTabularResponseMapper {
         }
 
         LOG.warn("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
-        throw new NotFoundException("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
+        throw new AggregationFailedException("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
     }
 
     private TabularResponse mapToResponse(final SearchRequestSpec searchRequestSpec,
@@ -109,10 +107,10 @@ public class SearchJobToTabularResponseMapper {
                 .orElse("-");
     }
 
-    private void throwErrorIfAnyAvailable(QueryResult queryResult) {
+    private void throwErrorIfAnyAvailable(QueryResult queryResult) throws AggregationFailedException {
         if (!CollectionUtils.isEmpty(queryResult.errors())) {
             final String errorText = queryResult.errors().stream().map(SearchError::description).collect(Collectors.joining(", "));
-            throw new BadRequestException("Failed to obtain aggregation results. Reason:" + errorText);
+            throw new AggregationFailedException("Failed to obtain aggregation results. Reason:" + errorText);
         }
     }
 }
