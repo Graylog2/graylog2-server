@@ -46,4 +46,10 @@ public abstract class SeriesSort implements SortSpec {
                                     @JsonProperty(FIELD_DIRECTION) Direction direction) {
         return new AutoValue_SeriesSort(type, field, direction);
     }
+
+
+    public static SeriesSort create(String field,
+                                    Direction direction) {
+        return new AutoValue_SeriesSort(SeriesSort.Type, field, direction);
+    }
 }

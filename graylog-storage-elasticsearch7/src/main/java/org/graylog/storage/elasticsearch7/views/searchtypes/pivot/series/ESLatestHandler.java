@@ -39,7 +39,10 @@ public class ESLatestHandler extends ESPivotSeriesSpecHandler<Latest, TopHits> {
     @Nonnull
     @Override
     public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Latest latestSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
-        final TopHitsAggregationBuilder latest = AggregationBuilders.topHits(name).size(1).sort(SortBuilders.fieldSort("timestamp").order(SortOrder.DESC));
+        final TopHitsAggregationBuilder latest = AggregationBuilders.topHits(name)
+                .size(1)
+                .fetchSource(latestSpec.field(), null)
+                .sort(SortBuilders.fieldSort("timestamp").order(SortOrder.DESC));
         record(queryContext, pivot, latestSpec, name, TopHits.class);
         return Optional.of(latest);
     }
