@@ -23,6 +23,8 @@ export type Column = {
   sortable?: boolean,
   title: string,
   type?: boolean,
+  permissions?: Array<string>
+  anyPermissions?: boolean,
 };
 
 export type ColumnRenderer<Entity extends { id: string }> = {
