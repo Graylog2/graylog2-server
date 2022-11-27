@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useCallback } from 'react';
+import { merge } from 'lodash';
 
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
