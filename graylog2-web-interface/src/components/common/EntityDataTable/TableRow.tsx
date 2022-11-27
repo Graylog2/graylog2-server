@@ -46,10 +46,10 @@ type Props<ListItem extends { id: string }> = {
   customCells?: CustomCells<ListItem>,
   displayBulkActionsCol: boolean,
   displayRowActions: boolean,
+  isSelected: boolean,
   listItem: ListItem,
   onToggleRowSelect: (itemId: string) => void,
   rowActions?: (listItem: ListItem) => React.ReactNode,
-  isSelected: boolean,
   visibleAttributes: Array<Attribute>,
 };
 
@@ -57,10 +57,10 @@ const TableRow = <ListItem extends { id: string }>({
   customCells,
   displayBulkActionsCol,
   displayRowActions,
+  isSelected,
   listItem,
   onToggleRowSelect,
   rowActions,
-  isSelected,
   visibleAttributes,
 }: Props<ListItem>) => {
   const toggleRowSelect = useCallback(

@@ -71,26 +71,26 @@ const filterVisibleAttributes = (
   });
 
 type Props<ListItem extends { id: string }> = {
-  /** The table list items. */
-  rows: Array<ListItem>,
-  /** Actions for each row. */
-  rowActions?: (listItem: ListItem) => React.ReactNode,
-  /** Suported batch operations */
-  bulkActions?: (selectedItemsIds: Array<string>, setSelectedItemsIds: (streamIds: Array<string>) => void) => React.ReactNode
-  /** Custom cell render for an attribute */
-  customCells?: CustomCells<ListItem>,
-  /** Define the permissions a user needs to view an attribute. */
-  attributePermissions?: { [attributeId: string]: { permissions: Array<string>, any?: boolean } },
-  /** Custom header render for an attribute */
-  customHeaders?: CustomHeaders,
-  /** Function to handle sort changes */
-  onSortChange: (newSort: Sort) => void
   /** Currently active sort */
   activeSort?: Sort,
+  /** Define the permissions a user needs to view an attribute. */
+  attributePermissions?: { [attributeId: string]: { permissions: Array<string>, any?: boolean } },
   /** Which attribute should be shown. */
   attributes: Array<string>,
   /** List of all available attributes. */
   availableAttributes: Array<Attribute>,
+  /** Supported batch operations */
+  bulkActions?: (selectedItemsIds: Array<string>, setSelectedItemsIds: (streamIds: Array<string>) => void) => React.ReactNode
+  /** Custom cell render for an attribute */
+  customCells?: CustomCells<ListItem>,
+  /** Custom header render for an attribute */
+  customHeaders?: CustomHeaders,
+  /** Function to handle sort changes */
+  onSortChange: (newSort: Sort) => void
+  /** The table list items. */
+  rows: Array<ListItem>,
+  /** Actions for each row. */
+  rowActions?: (listItem: ListItem) => React.ReactNode,
   /** Total amount of items */
   total: number,
 };
@@ -103,8 +103,8 @@ const EntityDataTable = <ListItem extends { id: string }>({
   attributePermissions,
   attributes,
   availableAttributes,
-  customCells,
   bulkActions,
+  customCells,
   customHeaders,
   onSortChange,
   rowActions,

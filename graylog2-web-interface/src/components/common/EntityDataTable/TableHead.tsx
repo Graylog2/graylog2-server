@@ -31,14 +31,14 @@ const TableHeader = ({
   headerRenderer,
   onSortChange,
 }: {
+  activeSort: Sort,
+  attribute: Attribute
   headerRenderer: {
     renderHeader: (attribute: Attribute) => React.ReactNode,
     textAlign?: string,
     width?: string,
     maxWidth?: string,
   },
-  attribute: Attribute
-  activeSort: Sort,
   onSortChange: (newSort: Sort) => void,
 }) => {
   const content = useMemo(
@@ -64,23 +64,23 @@ const ActionsHead = styled.th`
 `;
 
 const TableHead = <ListItem extends { id: string }>({
-  selectedAttributes,
+  activeSort,
   customHeaders,
   displayActionsCol,
   displayBulkActionsCol,
   onSortChange,
-  activeSort,
   rows,
+  selectedAttributes,
   selectedItemsIds,
   setSelectedItemsIds,
 }: {
-  selectedAttributes: Array<Attribute>,
+  activeSort: Sort,
   customHeaders: CustomHeaders,
   displayActionsCol: boolean
   displayBulkActionsCol: boolean,
   onSortChange: (newSort: Sort) => void,
-  activeSort: Sort,
   rows: Array<ListItem>
+  selectedAttributes: Array<Attribute>,
   selectedItemsIds: Array<string>,
   setSelectedItemsIds: React.Dispatch<React.SetStateAction<Array<string>>>
 }) => {

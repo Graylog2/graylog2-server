@@ -63,7 +63,11 @@ type Props<ListItem extends { id: string }> = {
   setSelectedItemsIds: React.Dispatch<React.SetStateAction<Array<string>>>
 }
 
-const BulkActionsHead = <ListItem extends { id: string }>({ rows, setSelectedItemsIds, selectedItemsIds }: Props<ListItem>) => {
+const BulkActionsHead = <ListItem extends { id: string }>({
+  rows,
+  setSelectedItemsIds,
+  selectedItemsIds,
+}: Props<ListItem>) => {
   const { checkboxRef, checkboxStatus } = useCheckboxStatus(rows, selectedItemsIds);
   const title = `${checkboxStatus === 'CHECKED' ? 'Deselect' : 'all visible rows'}`;
 

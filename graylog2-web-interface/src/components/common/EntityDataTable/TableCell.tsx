@@ -26,18 +26,17 @@ const Td = styled.td<{ $width: string, $maxWidth: string }>(({ $width, $maxWidth
 `);
 
 const TableCell = <ListItem extends { id: string }>({
+  attribute,
   cellRenderer,
   listItem,
-  attribute,
 }: {
+  attribute: Attribute
   cellRenderer: {
     renderCell: (listItem: ListItem, attribute: Attribute) => React.ReactNode,
     width?: string,
     maxWidth?: string,
   },
   listItem: ListItem,
-  attribute: Attribute
-
 }) => {
   const content = useMemo(
     () => (cellRenderer ? cellRenderer.renderCell(listItem, attribute) : listItem[attribute.id]),
