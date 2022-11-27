@@ -60,8 +60,6 @@ const PaginatedList = ({
 }: Props) => {
   const { page, setPage, pageSize: queryParamPageSize, setPageSize } = usePaginationQueryParameter(pageSizes, propPageSize);
 
-  console.log({ queryParamPageSize, propPageSize });
-
   const [{ currentPage, currentPageSize }, setPagination] = React.useState({
     currentPage: useQueryParameter ? page : Math.max(activePage, INITIAL_PAGE),
     currentPageSize: (useQueryParameter && showPageSizeSelect) ? queryParamPageSize : propPageSize,

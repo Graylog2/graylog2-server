@@ -36,6 +36,7 @@ import type { ColumnRenderers, Sort } from 'components/common/EntityDataTable';
 import UserNotification from 'util/UserNotification';
 import IndexSetCell from 'components/streams/StreamsOverview/IndexSetCell';
 import BulkActions from 'components/streams/StreamsOverview/BulkActions';
+import ThroughputCell from 'components/streams/StreamsOverview/ThroughputCell';
 
 import StatusCell from './StatusCell';
 
@@ -51,10 +52,11 @@ const COLUMN_DEFINITIONS = [
   { id: 'title', title: 'Title', sortable: true },
   { id: 'description', title: 'Description', sortable: true },
   { id: 'index_set_id', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },
+  { id: 'throughput', title: 'Throughput' },
   { id: 'disabled', title: 'Status', sortable: true },
 ];
 
-const VISIBLE_COLUMNS = ['title', 'description', 'index_set_id', 'disabled'];
+const VISIBLE_COLUMNS = ['title', 'description', 'index_set_id', 'throughput', 'disabled'];
 
 type SearchParams = {
   page: number,
@@ -74,6 +76,9 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
   },
   index_set_id: {
     renderCell: (stream) => <IndexSetCell indexSets={indexSets} stream={stream} />,
+  },
+  throughput: {
+    renderCell: (stream) => <ThroughputCell stream={stream} />,
   },
   disabled: {
     renderCell: (stream) => <StatusCell stream={stream} />,
