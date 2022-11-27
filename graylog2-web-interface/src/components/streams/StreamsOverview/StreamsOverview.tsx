@@ -82,6 +82,9 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
     renderCell: (stream) => <ThroughputCell stream={stream} />,
     staticWidth: 120,
   },
+  throughput: {
+    renderCell: (stream) => <ThroughputCell stream={stream} />,
+  },
   disabled: {
     renderCell: (stream) => <StatusCell stream={stream} />,
     staticWidth: 100,
