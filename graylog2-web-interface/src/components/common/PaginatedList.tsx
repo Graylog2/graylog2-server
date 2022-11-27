@@ -22,7 +22,7 @@ import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import Pagination from './Pagination';
 import PageSizeSelect from './PageSizeSelect';
 
-const DEFAULT_PAGE_SIZES = [10, 50, 100];
+const DEFAULT_PAGE_SIZES = [10, 20, 50, 100];
 export const INITIAL_PAGE = 1;
 
 type Props = {
@@ -58,7 +58,9 @@ const PaginatedList = ({
   totalItems,
   useQueryParameter,
 }: Props) => {
-  const { page, setPage, pageSize: queryParamPageSize, setPageSize } = usePaginationQueryParameter(pageSizes);
+  const { page, setPage, pageSize: queryParamPageSize, setPageSize } = usePaginationQueryParameter(pageSizes, propPageSize);
+
+  console.log({ queryParamPageSize, propPageSize });
 
   const [{ currentPage, currentPageSize }, setPagination] = React.useState({
     currentPage: useQueryParameter ? page : Math.max(activePage, INITIAL_PAGE),

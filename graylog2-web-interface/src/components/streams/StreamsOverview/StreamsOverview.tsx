@@ -58,7 +58,7 @@ const VISIBLE_COLUMNS = ['title', 'description', 'index_set_id', 'disabled'];
 
 type SearchParams = {
   page: number,
-  perPage: number,
+  pageSize: number,
   query: string,
   sort: Sort
 }
@@ -86,7 +86,7 @@ const usePaginatedStreams = (searchParams: SearchParams): { data: { streams: Arr
     ['streams', 'overview', searchParams],
     () => StreamsStore.searchPaginated(
       searchParams.page,
-      searchParams.perPage,
+      searchParams.pageSize,
       searchParams.query,
       { sort: searchParams?.sort.columnId, order: searchParams?.sort.order },
     ),
@@ -127,11 +127,10 @@ type Props = {
 }
 
 const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
-  const paginationQueryParameter = usePaginationQueryParameter();
-
+  const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
   const [searchParams, setSearchParams] = useState<SearchParams>({
     page: paginationQueryParameter.page,
-    perPage: paginationQueryParameter.pageSize,
+    pageSize: paginationQueryParameter.pageSize,
     query: '',
     sort: {
       columnId: 'title',
@@ -152,7 +151,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   }, [refetchStreams]);
 
   const onPageChange = useCallback(
-    (newPage: number, newPerPage: number) => setSearchParams((cur) => ({ ...cur, page: newPage, perPage: newPerPage })),
+    (newPage: number, newPageSize: number) => setSearchParams((cur) => ({ ...cur, page: newPage, pageSize: newPageSize })),
     [],
   );
 
@@ -190,6 +189,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
 
   return (
     <PaginatedList onChange={onPageChange}
+                   pageSize={searchParams.pageSize}
                    totalItems={total}>
       <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
