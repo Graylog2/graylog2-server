@@ -215,7 +215,6 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
             <EntityDataTable data={streams} // data
                              total={total}
                              attributes={VISIBLE_ATTRIBUTES}
-                             attributePermissions={ATTRIBUTE_PERMISSIONS}
                              onSortChange={onSortChange}
                              bulkActions={renderBulkActions}
                              activeSort={searchParams.sort}

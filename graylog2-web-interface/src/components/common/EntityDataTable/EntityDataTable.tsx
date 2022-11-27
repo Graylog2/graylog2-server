@@ -54,15 +54,12 @@ const BulkActions = styled(ButtonToolbar)`
 const filterVisibleAttributes = (
   attributes: Array<string>,
   availableAttributes: Array<Attribute>,
-  attributePermissions: { [attributeId: string]: { permissions: Array<string>, any?: boolean } },
   userPermissions: Immutable.List<string>,
 ) => attributes
   .map((attributeId) => availableAttributes.find(({ id }) => id === attributeId))
-  .filter(({ id }) => {
-    if (attributePermissions?.[id]) {
-      const { permissions, any } = attributePermissions[id];
-
-      return any
+  .filter(({ permissions, anyPermissions }) => {
+    if (permissions?.length) {
+      return anyPermissions
         ? isAnyPermitted(userPermissions, permissions)
         : isPermitted(userPermissions, permissions);
     }
@@ -73,8 +70,6 @@ const filterVisibleAttributes = (
 type Props<Entity extends { id: string }> = {
   /** Currently active sort */
   activeSort?: Sort,
-  /** Define the permissions a user needs to view an attribute. */
-  attributePermissions?: { [attributeId: string]: { permissions: Array<string>, any?: boolean } },
   /** Which attribute should be shown. */
   attributes: Array<string>,
   /** List of all available attributes. */
@@ -100,7 +95,6 @@ type Props<Entity extends { id: string }> = {
  */
 const EntityDataTable = <Entity extends { id: string }>({
   activeSort,
-  attributePermissions,
   attributes,
   availableAttributes,
   bulkActions,
@@ -114,8 +108,8 @@ const EntityDataTable = <Entity extends { id: string }>({
   const [selectedItemsIds, setSelectedItemsIds] = useState<Array<string>>([]);
   const currentUser = useCurrentUser();
   const visibleAttributes = useMemo(
-    () => filterVisibleAttributes(attributes, availableAttributes, attributePermissions, currentUser.permissions),
-    [attributePermissions, attributes, availableAttributes, currentUser.permissions],
+    () => filterVisibleAttributes(attributes, availableAttributes, currentUser.permissions),
+    [attributes, availableAttributes, currentUser.permissions],
   );
   const onToggleRowSelect = useCallback((itemId: string) => {
     setSelectedItemsIds(((cur) => {
@@ -179,7 +173,6 @@ const EntityDataTable = <Entity extends { id: string }>({
 
 EntityDataTable.defaultProps = {
   activeSort: undefined,
-  attributePermissions: undefined,
   bulkActions: undefined,
   customCells: undefined,
   customHeaders: undefined,

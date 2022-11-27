@@ -21,6 +21,8 @@ export type Attribute = {
   title: string,
   sortable?: boolean,
   type?: boolean,
+  permissions?: Array<string>
+  anyPermissions?: boolean,
 };
 
 export type CustomHeaders = {
