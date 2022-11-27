@@ -25,6 +25,11 @@ export type Column = {
   type?: boolean,
   permissions?: Array<string>
   anyPermissions?: boolean,
+  id: string,
+  permissions?: Array<string>
+  sortable?: boolean,
+  title: string,
+  type?: boolean,
 };
 
 export type ColumnRenderer<Entity extends { id: string }> = {
