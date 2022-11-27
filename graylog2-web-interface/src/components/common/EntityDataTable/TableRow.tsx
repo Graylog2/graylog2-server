@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useCallback } from 'react';
+import { merge } from 'lodash';
 
 import TableCell from './TableCell';
 import type { ColumnRenderers, Column } from './types';

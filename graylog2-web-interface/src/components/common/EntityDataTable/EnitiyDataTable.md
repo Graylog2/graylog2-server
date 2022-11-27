@@ -2,23 +2,19 @@ Define custom cell and header renderer:
 ```js
 import EntityDataTable from './EntityDataTable';
 
-<EntityDataTable attributes={['title', 'description']}
-                 rows={[{
+<EntityDataTable visibleColumns={['title', 'description']}
+                 data={[{
                    id: 'row-id',
                    title: 'Row title',
                    description: 'Row description',
                  }]}
-                 availableAttributes={[
+                 columnDefinitions={[
                    { id: 'title', title: 'Title' },
                    { id: 'description', title: 'Description' },
                  ]}
-                 customCells={{
+                 columnRenderers={{
                    title: {
                      renderCell: (listItem) => `The title: ${listItem.title}`,
-                   },
-                 }}
-                 customHeaders={{
-                   title: {
                      renderHeader: (attribute) => `Custom ${attribute.title}`,
                    },
                  }}
@@ -29,13 +25,13 @@ Render row actions:
 ```js
 import EntityDataTable from './EntityDataTable';
 
-<EntityDataTable attributes={['title', 'description']}
-                 rows={[{
+<EntityDataTable visibleColumns={['title', 'description']}
+                 data={[{
                    id: 'row-id',
                    title: 'Row title',
                    description: 'Row description',
                  }]}
-                 availableAttributes={[
+                 columnDefinitions={[
                    { id: 'title', title: 'Title' },
                    { id: 'description', title: 'Description' },
                  ]}
@@ -47,13 +43,13 @@ Only render a column when the user has the required permissions:
 ```js
 import EntityDataTable from './EntityDataTable';
 
-<EntityDataTable attributes={['title', 'description']}
-                 rows={[{
+<EntityDataTable visibleColumns={['title', 'description']}
+                 data={[{
                    id: 'row-id',
                    title: 'Row title',
                    description: 'Row description',
                  }]}
-                 availableAttributes={[
+                 columnDefinitions={[
                    { id: 'title', title: 'Title' },
                    { id: 'description', title: 'Description' },
                  ]}
