@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useMemo, useEffect, useRef } from 'react';
 import { uniq } from 'lodash';
 
-import RowCheckbox from 'components/common/ConfigurableDataTable/RowCheckbox';
+import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 
 type CheckboxStatus = 'CHECKED' | 'UNCHECKED' | 'PARTIAL';
 

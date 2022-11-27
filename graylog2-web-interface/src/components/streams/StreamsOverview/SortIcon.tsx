@@ -18,7 +18,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import type { Sort, Attribute } from 'components/common/ConfigurableDataTable';
+import type { Sort, Attribute } from 'components/common/EntityDataTable';
 
 import Icon from '../../common/Icon';
 

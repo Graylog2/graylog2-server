@@ -28,11 +28,11 @@ import StreamsStore from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import ConfigurableDataTable from 'components/common/ConfigurableDataTable';
+import EntityDataTable from 'components/common/EntityDataTable';
 import StreamActions from 'components/streams/StreamsOverview/StreamActions';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import type { CustomCells, Sort } from 'components/common/ConfigurableDataTable';
+import type { CustomCells, Sort } from 'components/common/EntityDataTable';
 import UserNotification from 'util/UserNotification';
 import IndexSetCell from 'components/streams/StreamsOverview/IndexSetCell';
 import BulkActions from 'components/streams/StreamsOverview/BulkActions';
@@ -218,16 +218,16 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
             </Alert>
           )
           : (
-            <ConfigurableDataTable rows={streams}
-                                   total={total}
-                                   attributes={VISIBLE_ATTRIBUTES}
-                                   attributePermissions={ATTRIBUTE_PERMISSIONS}
-                                   onSortChange={onSortChange}
-                                   bulkActions={renderBulkActions}
-                                   activeSort={searchParams.sort}
-                                   rowActions={renderStreamActions}
-                                   customCells={customCells(indexSets)}
-                                   availableAttributes={AVAILABLE_ATTRIBUTES} />
+            <EntityDataTable rows={streams}
+                             total={total}
+                             attributes={VISIBLE_ATTRIBUTES}
+                             attributePermissions={ATTRIBUTE_PERMISSIONS}
+                             onSortChange={onSortChange}
+                             bulkActions={renderBulkActions}
+                             activeSort={searchParams.sort}
+                             rowActions={renderStreamActions}
+                             customCells={customCells(indexSets)}
+                             availableAttributes={AVAILABLE_ATTRIBUTES} />
           )}
       </div>
     </PaginatedList>

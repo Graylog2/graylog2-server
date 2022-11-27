@@ -23,11 +23,11 @@ import userEvent from '@testing-library/user-event';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 
-import ConfigurableDataTable from './ConfigurableDataTable';
+import EntityDataTable from './EntityDataTable';
 
 jest.mock('hooks/useCurrentUser');
 
-describe('<ConfigurableDataTable />', () => {
+describe('<EntityDataTable />', () => {
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
   });
@@ -51,11 +51,11 @@ describe('<ConfigurableDataTable />', () => {
   ];
 
   it('should render selected rows and table headers', async () => {
-    render(<ConfigurableDataTable attributes={selectedAttributes}
-                                  rows={rows}
-                                  onSortChange={() => {}}
-                                  availableAttributes={availableAttributes}
-                                  total={1} />);
+    render(<EntityDataTable attributes={selectedAttributes}
+                            rows={rows}
+                            onSortChange={() => {}}
+                            availableAttributes={availableAttributes}
+                            total={1} />);
 
     await screen.findByRole('columnheader', { name: /title/i });
     await screen.findByRole('columnheader', { name: /status/i });
@@ -68,44 +68,44 @@ describe('<ConfigurableDataTable />', () => {
   });
 
   it('should render default cell renderer', async () => {
-    render(<ConfigurableDataTable attributes={selectedAttributes}
-                                  rows={rows}
-                                  onSortChange={() => {}}
-                                  availableAttributes={availableAttributes}
-                                  total={1} />);
+    render(<EntityDataTable attributes={selectedAttributes}
+                            rows={rows}
+                            onSortChange={() => {}}
+                            availableAttributes={availableAttributes}
+                            total={1} />);
 
     await screen.findByRole('columnheader', { name: /description/i });
     await screen.findByText('Row description');
   });
 
   it('should render custom cell and header renderer', async () => {
-    render(<ConfigurableDataTable attributes={selectedAttributes}
-                                  rows={rows}
-                                  onSortChange={() => {}}
-                                  customCells={{
-                                    title: {
-                                      renderCell: (listItem) => `The title: ${listItem.title}`,
-                                    },
-                                  }}
-                                  customHeaders={{
-                                    title: {
-                                      renderHeader: (attribute) => `Custom ${attribute.title} Header`,
-                                    },
-                                  }}
-                                  availableAttributes={availableAttributes}
-                                  total={1} />);
+    render(<EntityDataTable attributes={selectedAttributes}
+                            rows={rows}
+                            onSortChange={() => {}}
+                            customCells={{
+                              title: {
+                                renderCell: (listItem) => `The title: ${listItem.title}`,
+                              },
+                            }}
+                            customHeaders={{
+                              title: {
+                                renderHeader: (attribute) => `Custom ${attribute.title} Header`,
+                              },
+                            }}
+                            availableAttributes={availableAttributes}
+                            total={1} />);
 
     await screen.findByRole('columnheader', { name: /custom title header/i });
     await screen.findByText('The title: Row title');
   });
 
   it('should render row actions', async () => {
-    render(<ConfigurableDataTable<{ id: string, title: string }> attributes={selectedAttributes}
-                                                                 rows={rows}
-                                                                 onSortChange={() => {}}
-                                                                 rowActions={(row) => `Custom actions for ${row.title}`}
-                                                                 availableAttributes={availableAttributes}
-                                                                 total={1} />);
+    render(<EntityDataTable<{ id: string, title: string }> attributes={selectedAttributes}
+                                                           rows={rows}
+                                                           onSortChange={() => {}}
+                                                           rowActions={(row) => `Custom actions for ${row.title}`}
+                                                           availableAttributes={availableAttributes}
+                                                           total={1} />);
 
     await screen.findByText('Custom actions for Row title');
   });
@@ -113,31 +113,31 @@ describe('<ConfigurableDataTable />', () => {
   it('should not render column for attribute is user does not have required permissions', () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
-    render(<ConfigurableDataTable attributes={selectedAttributes}
-                                  rows={rows}
-                                  onSortChange={() => {}}
-                                  attributePermissions={{
-                                    status: {
-                                      permissions: ['status:read'],
-                                    },
-                                  }}
-                                  availableAttributes={availableAttributes}
-                                  total={1} />);
+    render(<EntityDataTable attributes={selectedAttributes}
+                            rows={rows}
+                            onSortChange={() => {}}
+                            attributePermissions={{
+                              status: {
+                                permissions: ['status:read'],
+                              },
+                            }}
+                            availableAttributes={availableAttributes}
+                            total={1} />);
 
     expect(screen.queryByRole('columnheader', { name: /status/i })).not.toBeInTheDocument();
     expect(screen.queryByText('enabled')).not.toBeInTheDocument();
   });
 
   it('should display active sort', async () => {
-    render(<ConfigurableDataTable attributes={selectedAttributes}
-                                  rows={rows}
-                                  onSortChange={() => {}}
-                                  activeSort={{
-                                    attributeId: 'description',
-                                    order: 'asc',
-                                  }}
-                                  availableAttributes={availableAttributes}
-                                  total={1} />);
+    render(<EntityDataTable attributes={selectedAttributes}
+                            rows={rows}
+                            onSortChange={() => {}}
+                            activeSort={{
+                              attributeId: 'description',
+                              order: 'asc',
+                            }}
+                            availableAttributes={availableAttributes}
+                            total={1} />);
 
     await screen.findByTitle(/sort description descending/i);
   });
@@ -145,11 +145,11 @@ describe('<ConfigurableDataTable />', () => {
   it('should sort based on attribute', async () => {
     const onSortChange = jest.fn();
 
-    render(<ConfigurableDataTable attributes={selectedAttributes}
-                                  rows={rows}
-                                  onSortChange={onSortChange}
-                                  availableAttributes={availableAttributes}
-                                  total={1} />);
+    render(<EntityDataTable attributes={selectedAttributes}
+                            rows={rows}
+                            onSortChange={onSortChange}
+                            availableAttributes={availableAttributes}
+                            total={1} />);
 
     userEvent.click(await screen.findByTitle(/sort description ascending/i));
 
@@ -161,12 +161,12 @@ describe('<ConfigurableDataTable />', () => {
   it('should provide selected item ids for bulk actions', async () => {
     const renderBulkActions = jest.fn(() => <div>Custom bulk actions</div>);
 
-    render(<ConfigurableDataTable attributes={selectedAttributes}
-                                  rows={rows}
-                                  onSortChange={() => {}}
-                                  bulkActions={renderBulkActions}
-                                  availableAttributes={availableAttributes}
-                                  total={1} />);
+    render(<EntityDataTable attributes={selectedAttributes}
+                            rows={rows}
+                            onSortChange={() => {}}
+                            bulkActions={renderBulkActions}
+                            availableAttributes={availableAttributes}
+                            total={1} />);
 
     const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select row/i });
     userEvent.click(rowCheckboxes[0]);
@@ -183,12 +183,12 @@ describe('<ConfigurableDataTable />', () => {
     );
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
-    render(<ConfigurableDataTable attributes={selectedAttributes}
-                                  rows={rows}
-                                  onSortChange={() => {}}
-                                  bulkActions={renderBulkActions}
-                                  availableAttributes={availableAttributes}
-                                  total={1} />);
+    render(<EntityDataTable attributes={selectedAttributes}
+                            rows={rows}
+                            onSortChange={() => {}}
+                            bulkActions={renderBulkActions}
+                            availableAttributes={availableAttributes}
+                            total={1} />);
 
     const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select row/i });
     userEvent.click(rowCheckboxes[0]);
@@ -205,12 +205,12 @@ describe('<ConfigurableDataTable />', () => {
   it('should select all items', async () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
-    render(<ConfigurableDataTable attributes={selectedAttributes}
-                                  rows={rows}
-                                  onSortChange={() => {}}
-                                  bulkActions={() => <div />}
-                                  availableAttributes={availableAttributes}
-                                  total={1} />);
+    render(<EntityDataTable attributes={selectedAttributes}
+                            rows={rows}
+                            onSortChange={() => {}}
+                            bulkActions={() => <div />}
+                            availableAttributes={availableAttributes}
+                            total={1} />);
 
     const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select row/i });
 

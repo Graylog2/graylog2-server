@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import ConfigurableDataTable from './ConfigurableDataTable';
+import EntityDataTable from './EntityDataTable';
 import type { CustomCells, CustomHeaders, Attribute, Sort } from './types';
 
 export { CustomCells, CustomHeaders, Attribute, Sort };
-export default ConfigurableDataTable;
+export default EntityDataTable;

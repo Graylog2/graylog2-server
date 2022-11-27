@@ -21,8 +21,8 @@ import type * as Immutable from 'immutable';
 
 import { Button, Table, ButtonToolbar } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
-import TableHead from 'components/common/ConfigurableDataTable/TableHead';
-import TableRow from 'components/common/ConfigurableDataTable/TableRow';
+import TableHead from 'components/common/EntityDataTable/TableHead';
+import TableRow from 'components/common/EntityDataTable/TableRow';
 import useCurrentUser from 'hooks/useCurrentUser';
 import StringUtils from 'util/StringUtils';
 
@@ -98,7 +98,7 @@ type Props<ListItem extends { id: string }> = {
 /**
  * Flexible data table component which allows defining custom cell renderers.
  */
-const ConfigurableDataTable = <ListItem extends { id: string }>({
+const EntityDataTable = <ListItem extends { id: string }>({
   activeSort,
   attributePermissions,
   attributes,
@@ -177,7 +177,7 @@ const ConfigurableDataTable = <ListItem extends { id: string }>({
   );
 };
 
-ConfigurableDataTable.defaultProps = {
+EntityDataTable.defaultProps = {
   activeSort: undefined,
   attributePermissions: undefined,
   bulkActions: undefined,
@@ -186,4 +186,4 @@ ConfigurableDataTable.defaultProps = {
   rowActions: undefined,
 };
 
-export default ConfigurableDataTable;
+export default EntityDataTable;
