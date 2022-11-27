@@ -32,15 +32,15 @@ describe('<EntityDataTable />', () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
   });
 
-  const availableAttributes = [
+  const columnDefinitions = [
     { id: 'title', title: 'Title', sortable: true },
     { id: 'description', title: 'Description', sortable: true },
     { id: 'stream', title: 'Stream', sortable: true },
-    { id: 'status', title: 'Status', sortable: true },
+    { id: 'status', title: 'Status', sortable: true, permissions: ['status:read'] },
   ];
 
-  const selectedAttributes = ['title', 'description', 'status'];
-  const rows = [
+  const visibleColumns = ['title', 'description', 'status'];
+  const data = [
     {
       id: 'row-id',
       title: 'Row title',
@@ -50,11 +50,11 @@ describe('<EntityDataTable />', () => {
     },
   ];
 
-  it('should render selected rows and table headers', async () => {
-    render(<EntityDataTable attributes={selectedAttributes}
-                            rows={rows}
+  it('should render selected columns and table headers', async () => {
+    render(<EntityDataTable visibleColumns={visibleColumns}
+                            data={data}
                             onSortChange={() => {}}
-                            availableAttributes={availableAttributes}
+                            columnDefinitions={columnDefinitions}
                             total={1} />);
 
     await screen.findByRole('columnheader', { name: /title/i });
@@ -68,10 +68,10 @@ describe('<EntityDataTable />', () => {
   });
 
   it('should render default cell renderer', async () => {
-    render(<EntityDataTable attributes={selectedAttributes}
-                            rows={rows}
+    render(<EntityDataTable visibleColumns={visibleColumns}
+                            data={data}
                             onSortChange={() => {}}
-                            availableAttributes={availableAttributes}
+                            columnDefinitions={columnDefinitions}
                             total={1} />);
 
     await screen.findByRole('columnheader', { name: /description/i });
@@ -79,20 +79,16 @@ describe('<EntityDataTable />', () => {
   });
 
   it('should render custom cell and header renderer', async () => {
-    render(<EntityDataTable attributes={selectedAttributes}
-                            rows={rows}
+    render(<EntityDataTable visibleColumns={visibleColumns}
+                            data={data}
                             onSortChange={() => {}}
-                            customCells={{
+                            columnRenderers={{
                               title: {
                                 renderCell: (listItem) => `The title: ${listItem.title}`,
+                                renderHeader: (column) => `Custom ${column.title} Header`,
                               },
                             }}
-                            customHeaders={{
-                              title: {
-                                renderHeader: (attribute) => `Custom ${attribute.title} Header`,
-                              },
-                            }}
-                            availableAttributes={availableAttributes}
+                            columnDefinitions={columnDefinitions}
                             total={1} />);
 
     await screen.findByRole('columnheader', { name: /custom title header/i });
@@ -100,28 +96,23 @@ describe('<EntityDataTable />', () => {
   });
 
   it('should render row actions', async () => {
-    render(<EntityDataTable<{ id: string, title: string }> attributes={selectedAttributes}
-                                                           rows={rows}
+    render(<EntityDataTable<{ id: string, title: string }> visibleColumns={visibleColumns}
+                                                           data={data}
                                                            onSortChange={() => {}}
                                                            rowActions={(row) => `Custom actions for ${row.title}`}
-                                                           availableAttributes={availableAttributes}
+                                                           columnDefinitions={columnDefinitions}
                                                            total={1} />);
 
     await screen.findByText('Custom actions for Row title');
   });
 
-  it('should not render column for attribute is user does not have required permissions', () => {
+  it('should not render column if user does not have required permissions', () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
-    render(<EntityDataTable attributes={selectedAttributes}
-                            rows={rows}
+    render(<EntityDataTable visibleColumns={visibleColumns}
+                            data={data}
                             onSortChange={() => {}}
-                            attributePermissions={{
-                              status: {
-                                permissions: ['status:read'],
-                              },
-                            }}
-                            availableAttributes={availableAttributes}
+                            columnDefinitions={columnDefinitions}
                             total={1} />);
 
     expect(screen.queryByRole('columnheader', { name: /status/i })).not.toBeInTheDocument();
@@ -129,43 +120,43 @@ describe('<EntityDataTable />', () => {
   });
 
   it('should display active sort', async () => {
-    render(<EntityDataTable attributes={selectedAttributes}
-                            rows={rows}
+    render(<EntityDataTable visibleColumns={visibleColumns}
+                            data={data}
                             onSortChange={() => {}}
                             activeSort={{
-                              attributeId: 'description',
+                              columnId: 'description',
                               order: 'asc',
                             }}
-                            availableAttributes={availableAttributes}
+                            columnDefinitions={columnDefinitions}
                             total={1} />);
 
     await screen.findByTitle(/sort description descending/i);
   });
 
-  it('should sort based on attribute', async () => {
+  it('should sort based on column', async () => {
     const onSortChange = jest.fn();
 
-    render(<EntityDataTable attributes={selectedAttributes}
-                            rows={rows}
+    render(<EntityDataTable visibleColumns={visibleColumns}
+                            data={data}
                             onSortChange={onSortChange}
-                            availableAttributes={availableAttributes}
+                            columnDefinitions={columnDefinitions}
                             total={1} />);
 
     userEvent.click(await screen.findByTitle(/sort description ascending/i));
 
     await waitFor(() => expect(onSortChange).toHaveBeenCalledTimes(1));
 
-    expect(onSortChange).toHaveBeenCalledWith({ attributeId: 'description', order: 'asc' });
+    expect(onSortChange).toHaveBeenCalledWith({ columnId: 'description', order: 'asc' });
   });
 
   it('should provide selected item ids for bulk actions', async () => {
     const renderBulkActions = jest.fn(() => <div>Custom bulk actions</div>);
 
-    render(<EntityDataTable attributes={selectedAttributes}
-                            rows={rows}
+    render(<EntityDataTable visibleColumns={visibleColumns}
+                            data={data}
                             onSortChange={() => {}}
                             bulkActions={renderBulkActions}
-                            availableAttributes={availableAttributes}
+                            columnDefinitions={columnDefinitions}
                             total={1} />);
 
     const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select row/i });
@@ -183,11 +174,11 @@ describe('<EntityDataTable />', () => {
     );
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
-    render(<EntityDataTable attributes={selectedAttributes}
-                            rows={rows}
+    render(<EntityDataTable visibleColumns={visibleColumns}
+                            data={data}
                             onSortChange={() => {}}
                             bulkActions={renderBulkActions}
-                            availableAttributes={availableAttributes}
+                            columnDefinitions={columnDefinitions}
                             total={1} />);
 
     const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select row/i });
@@ -205,18 +196,18 @@ describe('<EntityDataTable />', () => {
   it('should select all items', async () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
-    render(<EntityDataTable attributes={selectedAttributes}
-                            rows={rows}
+    render(<EntityDataTable visibleColumns={visibleColumns}
+                            data={data}
                             onSortChange={() => {}}
                             bulkActions={() => <div />}
-                            availableAttributes={availableAttributes}
+                            columnDefinitions={columnDefinitions}
                             total={1} />);
 
     const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select row/i });
 
     expect(rowCheckboxes[0]).not.toBeChecked();
 
-    const selectAllCheckbox = await screen.findByRole('checkbox', { name: /all visible rows/i });
+    const selectAllCheckbox = await screen.findByRole('checkbox', { name: /all visible entites/i });
     userEvent.click(selectAllCheckbox);
 
     expect(rowCheckboxes[0]).toBeChecked();

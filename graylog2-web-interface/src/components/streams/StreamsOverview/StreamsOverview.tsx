@@ -32,7 +32,7 @@ import EntityDataTable from 'components/common/EntityDataTable';
 import StreamActions from 'components/streams/StreamsOverview/StreamActions';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import type { CustomCells, Sort } from 'components/common/EntityDataTable';
+import type { ColumnRenderers, Sort } from 'components/common/EntityDataTable';
 import UserNotification from 'util/UserNotification';
 import IndexSetCell from 'components/streams/StreamsOverview/IndexSetCell';
 import BulkActions from 'components/streams/StreamsOverview/BulkActions';
@@ -54,7 +54,7 @@ const COLUMN_DEFINITIONS = [
   { id: 'disabled', title: 'Status', sortable: true },
 ];
 
-const VISIBLE_ATTRIBUTES = ['title', 'description', 'index_set_id', 'disabled'];
+const VISIBLE_COLUMNS = ['title', 'description', 'index_set_id', 'disabled'];
 
 type SearchParams = {
   page: number,
@@ -63,7 +63,7 @@ type SearchParams = {
   sort: Sort
 }
 
-const customCells = (indexSets: Array<IndexSet>): CustomCells<Stream> => ({
+const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stream> => ({
   title: {
     renderCell: (stream) => (
       <>
@@ -88,7 +88,7 @@ const usePaginatedStreams = (searchParams: SearchParams): { data: { streams: Arr
       searchParams.page,
       searchParams.perPage,
       searchParams.query,
-      { sort: searchParams?.sort.attributeId, order: searchParams?.sort.order },
+      { sort: searchParams?.sort.columnId, order: searchParams?.sort.order },
     ),
     {
       onError: (errorThrown) => {
@@ -134,7 +134,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
     perPage: paginationQueryParameter.pageSize,
     query: '',
     sort: {
-      attributeId: 'title',
+      columnId: 'title',
       order: 'asc',
     },
   });
@@ -212,15 +212,15 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
             </Alert>
           )
           : (
-            <EntityDataTable data={streams} // data
+            <EntityDataTable data={streams}
                              total={total}
-                             attributes={VISIBLE_ATTRIBUTES}
+                             visibleColumns={VISIBLE_COLUMNS}
                              onSortChange={onSortChange}
                              bulkActions={renderBulkActions}
                              activeSort={searchParams.sort}
                              rowActions={renderStreamActions}
-                             customCells={customCells(indexSets)}
-                             availableAttributes={COLUMN_DEFINITIONS} />
+                             columnRenderers={customColumnRenderers(indexSets)}
+                             columnDefinitions={COLUMN_DEFINITIONS} />
           )}
       </div>
     </PaginatedList>

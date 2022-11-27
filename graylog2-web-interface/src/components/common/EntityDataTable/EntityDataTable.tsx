@@ -26,7 +26,7 @@ import TableRow from 'components/common/EntityDataTable/TableRow';
 import useCurrentUser from 'hooks/useCurrentUser';
 import StringUtils from 'util/StringUtils';
 
-import type { CustomCells, CustomHeaders, Attribute, Sort } from './types';
+import type { ColumnRenderers, Column, Sort } from './types';
 
 const ScrollContainer = styled.div(({ theme }) => css`
   @media (max-width: ${theme.breakpoints.max.md}) {
@@ -51,35 +51,35 @@ const BulkActions = styled(ButtonToolbar)`
   margin-left: 5px;
 `;
 
-const filterVisibleAttributes = (
-  attributes: Array<string>,
-  availableAttributes: Array<Attribute>,
+const filterAccessibleColumns = (
+  columns: Array<Column>,
   userPermissions: Immutable.List<string>,
-) => attributes
-  .map((attributeId) => availableAttributes.find(({ id }) => id === attributeId))
-  .filter(({ permissions, anyPermissions }) => {
-    if (permissions?.length) {
-      return anyPermissions
-        ? isAnyPermitted(userPermissions, permissions)
-        : isPermitted(userPermissions, permissions);
-    }
+) => columns.filter(({ permissions, anyPermissions }) => {
+  if (permissions?.length) {
+    return anyPermissions
+      ? isAnyPermitted(userPermissions, permissions)
+      : isPermitted(userPermissions, permissions);
+  }
 
-    return true;
-  });
+  return true;
+});
+
+const filterVisibleColumns = (
+  columnDefinitions: Array<Column>,
+  visibleColumns: Array<string>,
+) => visibleColumns.map((columnId) => columnDefinitions
+  .find(({ id }) => id === columnId))
+  .filter((column) => !!column);
 
 type Props<Entity extends { id: string }> = {
   /** Currently active sort */
   activeSort?: Sort,
-  /** Which attribute should be shown. */
-  attributes: Array<string>,
-  /** List of all available attributes. */
-  availableAttributes: Array<Attribute>,
   /** Supported batch operations */
-  bulkActions?: (selectedItemsIds: Array<string>, setSelectedItemsIds: (streamIds: Array<string>) => void) => React.ReactNode
-  /** Custom cell render for an attribute */
-  customCells?: CustomCells<Entity>,
-  /** Custom header render for an attribute */
-  customHeaders?: CustomHeaders,
+  bulkActions?: (selectedEntities: Array<string>, setSelectedEntities: (streamIds: Array<string>) => void) => React.ReactNode
+  /** List of all available columns. */
+  columnDefinitions: Array<Column>,
+  /** Custom cell and header renderer for a column */
+  columnRenderers?: ColumnRenderers<Entity>,
   /** The table data. */
   data: Array<Entity>,
   /** Function to handle sort changes */
@@ -88,6 +88,8 @@ type Props<Entity extends { id: string }> = {
   rowActions?: (entity: Entity) => React.ReactNode,
   /** Total amount of items */
   total: number,
+  /** Which columns should be displayed. */
+  visibleColumns: Array<string>,
 };
 
 /**
@@ -95,24 +97,29 @@ type Props<Entity extends { id: string }> = {
  */
 const EntityDataTable = <Entity extends { id: string }>({
   activeSort,
-  attributes,
-  availableAttributes,
   bulkActions,
-  customCells,
-  customHeaders,
+  columnRenderers: customColumnRenderers,
+  columnDefinitions,
+  data,
   onSortChange,
   rowActions,
-  data,
   total,
+  visibleColumns,
 }: Props<Entity>) => {
-  const [selectedItemsIds, setSelectedItemsIds] = useState<Array<string>>([]);
   const currentUser = useCurrentUser();
-  const visibleAttributes = useMemo(
-    () => filterVisibleAttributes(attributes, availableAttributes, currentUser.permissions),
-    [attributes, availableAttributes, currentUser.permissions],
+  const [selectedEntities, setSelectedEntities] = useState<Array<string>>([]);
+  const accessibleColumns = useMemo(
+    () => filterAccessibleColumns(columnDefinitions, currentUser.permissions),
+    [columnDefinitions, currentUser.permissions],
   );
-  const onToggleRowSelect = useCallback((itemId: string) => {
-    setSelectedItemsIds(((cur) => {
+
+  const columns = useMemo(
+    () => filterVisibleColumns(accessibleColumns, visibleColumns),
+    [accessibleColumns, visibleColumns],
+  );
+
+  const onToggleEntitySelect = useCallback((itemId: string) => {
+    setSelectedEntities(((cur) => {
       if (cur.includes(itemId)) {
         return cur.filter((id) => id !== itemId);
       }
@@ -121,7 +128,7 @@ const EntityDataTable = <Entity extends { id: string }>({
     }));
   }, []);
 
-  const unselectAllItems = useCallback(() => setSelectedItemsIds([]), []);
+  const unselectAllItems = useCallback(() => setSelectedEntities([]), []);
   const displayActionsCol = typeof rowActions === 'function';
   const displayBulkActionsCol = typeof bulkActions === 'function';
 
@@ -129,11 +136,11 @@ const EntityDataTable = <Entity extends { id: string }>({
     <ScrollContainer>
       <ActionsRow>
         <div>
-          {(displayBulkActionsCol && !!selectedItemsIds?.length) && (
+          {(displayBulkActionsCol && !!selectedEntities?.length) && (
             <BulkActionsWrapper>
-              {selectedItemsIds.length} {StringUtils.pluralize(selectedItemsIds.length, 'item', 'items')} selected
+              {selectedEntities.length} {StringUtils.pluralize(selectedEntities.length, 'item', 'items')} selected
               <BulkActions>
-                {bulkActions(selectedItemsIds, setSelectedItemsIds)}
+                {bulkActions(selectedEntities, setSelectedEntities)}
                 <Button bsSize="xsmall" onClick={unselectAllItems}>Cancel</Button>
               </BulkActions>
             </BulkActionsWrapper>
@@ -144,11 +151,11 @@ const EntityDataTable = <Entity extends { id: string }>({
         </div>
       </ActionsRow>
       <Table striped condensed hover>
-        <TableHead selectedAttributes={visibleAttributes}
-                   selectedItemsIds={selectedItemsIds}
-                   setSelectedItemsIds={setSelectedItemsIds}
+        <TableHead columns={columns}
+                   selectedEntities={selectedEntities}
+                   setSelectedEntities={setSelectedEntities}
                    data={data}
-                   customHeaders={customHeaders}
+                   customColumnRenderers={customColumnRenderers}
                    onSortChange={onSortChange}
                    displayBulkActionsCol={displayBulkActionsCol}
                    activeSort={activeSort}
@@ -157,13 +164,13 @@ const EntityDataTable = <Entity extends { id: string }>({
           {data.map((entity) => (
             <TableRow entity={entity}
                       key={entity.id}
-                      onToggleRowSelect={onToggleRowSelect}
-                      customCells={customCells}
-                      isSelected={!!selectedItemsIds?.includes(entity.id)}
+                      onToggleEntitySelect={onToggleEntitySelect}
+                      customColumnRenderers={customColumnRenderers}
+                      isSelected={!!selectedEntities?.includes(entity.id)}
                       rowActions={rowActions}
-                      displayBulkActionsCol={displayBulkActionsCol}
-                      displayRowActions={displayActionsCol}
-                      visibleAttributes={visibleAttributes} />
+                      displaySelect={displayBulkActionsCol}
+                      displayActions={displayActionsCol}
+                      columns={columns} />
           ))}
         </tbody>
       </Table>
@@ -174,8 +181,7 @@ const EntityDataTable = <Entity extends { id: string }>({
 EntityDataTable.defaultProps = {
   activeSort: undefined,
   bulkActions: undefined,
-  customCells: undefined,
-  customHeaders: undefined,
+  columnRenderers: undefined,
   rowActions: undefined,
 };
 

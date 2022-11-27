@@ -18,33 +18,29 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
-import type { Attribute } from './types';
+import type { Column, ColumnRenderer } from './types';
 
-const Td = styled.td<{ $width: string, $maxWidth: string }>(({ $width, $maxWidth }) => css`
+const Td = styled.td<{ $width: string | undefined, $maxWidth: string| undefined }>(({ $width, $maxWidth }) => css`
   width: ${$width ?? 'auto'};
   max-width: ${$maxWidth ?? 'none'};
 `);
 
 const TableCell = <Entity extends { id: string }>({
-  attribute,
-  cellRenderer,
+  column,
+  columnRenderer,
   entity,
 }: {
-  attribute: Attribute
-  cellRenderer: {
-    renderCell: (entity: Entity, attribute: Attribute) => React.ReactNode,
-    width?: string,
-    maxWidth?: string,
-  },
+  column: Column
+  columnRenderer: ColumnRenderer<Entity>,
   entity: Entity,
 }) => {
   const content = useMemo(
-    () => (cellRenderer ? cellRenderer.renderCell(entity, attribute) : entity[attribute.id]),
-    [attribute, cellRenderer, entity],
+    () => (typeof columnRenderer?.renderCell === 'function' ? columnRenderer.renderCell(entity, column) : entity[column.id]),
+    [column, columnRenderer, entity],
   );
 
   return (
-    <Td $width={cellRenderer?.width} $maxWidth={cellRenderer?.maxWidth}>
+    <Td $width={columnRenderer?.width} $maxWidth={columnRenderer?.maxWidth}>
       {content}
     </Td>
   );

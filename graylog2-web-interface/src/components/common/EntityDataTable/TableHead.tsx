@@ -15,47 +15,47 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useMemo } from 'react';
+import { merge } from 'lodash';
 
 import SortIcon from 'components/streams/StreamsOverview/SortIcon';
 
 import BulkActionsHead from './BulkActionsHead';
-import type { Attribute, CustomHeaders, Sort } from './types';
+import type { Column, Sort, ColumnRenderers, ColumnRenderer } from './types';
+import DefaultColumnRenderers from './DefaultColumnRenderers';
 
-const defaultAttributeHeaderRenderer = {};
+const Th = styled.th<{ $width: string | undefined, $maxWidth: string| undefined }>(({ $width, $maxWidth }) => css`
+  width: ${$width ?? 'auto'};
+  max-width: ${$maxWidth ?? 'none'};
+`);
 
-const TableHeader = ({
+const TableHeader = <Entity extends { id: string }>({
   activeSort,
-  attribute,
-  headerRenderer,
+  column,
+  columnRenderer,
   onSortChange,
 }: {
   activeSort: Sort,
-  attribute: Attribute
-  headerRenderer: {
-    renderHeader: (attribute: Attribute) => React.ReactNode,
-    textAlign?: string,
-    width?: string,
-    maxWidth?: string,
-  },
+  column: Column
+  columnRenderer: ColumnRenderer<Entity>
   onSortChange: (newSort: Sort) => void,
 }) => {
   const content = useMemo(
-    () => (headerRenderer ? headerRenderer.renderHeader(attribute) : attribute.title),
-    [attribute, headerRenderer],
+    () => (typeof columnRenderer?.renderHeader === 'function' ? columnRenderer.renderHeader(column) : column.title),
+    [column, columnRenderer],
   );
 
   return (
-    <th style={{ width: headerRenderer?.width, maxWidth: headerRenderer?.maxWidth }}>
+    <Th $width={columnRenderer?.width} $maxWidth={columnRenderer?.maxWidth}>
       {content}
 
-      {attribute.sortable && (
+      {column.sortable && (
         <SortIcon onChange={onSortChange}
-                  attribute={attribute}
+                  column={column}
                   activeSort={activeSort} />
       )}
-    </th>
+    </Th>
   );
 };
 
@@ -65,48 +65,46 @@ const ActionsHead = styled.th`
 
 const TableHead = <Entity extends { id: string }>({
   activeSort,
-  customHeaders,
+  columns,
+  customColumnRenderers,
+  data,
   displayActionsCol,
   displayBulkActionsCol,
   onSortChange,
-  data,
-  selectedAttributes,
-  selectedItemsIds,
-  setSelectedItemsIds,
+  selectedEntities,
+  setSelectedEntities,
 }: {
   activeSort: Sort,
-  customHeaders: CustomHeaders,
+  columns: Array<Column>,
+  customColumnRenderers: ColumnRenderers<Entity> | undefined,
+  data: Array<Entity>
   displayActionsCol: boolean
   displayBulkActionsCol: boolean,
   onSortChange: (newSort: Sort) => void,
-  data: Array<Entity>
-  selectedAttributes: Array<Attribute>,
-  selectedItemsIds: Array<string>,
-  setSelectedItemsIds: React.Dispatch<React.SetStateAction<Array<string>>>
-}) => {
-  return (
-    <thead>
-      <tr>
-        {displayBulkActionsCol && (
-          <BulkActionsHead data={data}
-                           selectedItemsIds={selectedItemsIds}
-                           setSelectedItemsIds={setSelectedItemsIds} />
-        )}
-        {selectedAttributes.map((attribute) => {
-          const headerRenderer = customHeaders?.[attribute.id] ?? defaultAttributeHeaderRenderer[attribute.id];
+  selectedEntities: Array<string>,
+  setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>
+}) => (
+  <thead>
+    <tr>
+      {displayBulkActionsCol && (
+        <BulkActionsHead data={data}
+                         selectedEntities={selectedEntities}
+                         setSelectedEntities={setSelectedEntities} />
+      )}
+      {columns.map((column) => {
+        const columnRenderer = merge(DefaultColumnRenderers[column.id] ?? {}, customColumnRenderers?.[column.id] ?? {});
 
-          return (
-            <TableHeader headerRenderer={headerRenderer}
-                         attribute={attribute}
-                         onSortChange={onSortChange}
-                         activeSort={activeSort}
-                         key={attribute.title} />
-          );
-        })}
-        {displayActionsCol ? <ActionsHead>Actions</ActionsHead> : null}
-      </tr>
-    </thead>
+        return (
+          <TableHeader<Entity> columnRenderer={columnRenderer}
+                               column={column}
+                               onSortChange={onSortChange}
+                               activeSort={activeSort}
+                               key={column.title} />
+        );
+      })}
+      {displayActionsCol ? <ActionsHead>Actions</ActionsHead> : null}
+    </tr>
+  </thead>
   );
-};
 
 export default TableHead;

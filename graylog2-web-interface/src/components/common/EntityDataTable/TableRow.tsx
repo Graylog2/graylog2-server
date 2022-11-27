@@ -17,11 +17,12 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useCallback } from 'react';
+import { merge } from 'lodash';
 
-import { TextOverflowEllipsis } from 'components/common';
+import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
 
 import TableCell from './TableCell';
-import type { CustomCells, Attribute } from './types';
+import type { ColumnRenderers, Column } from './types';
 import RowCheckbox from './RowCheckbox';
 
 const ActionsCell = styled.td`
@@ -31,69 +32,58 @@ const ActionsCell = styled.td`
   }
 `;
 
-const defaultAttributeCellRenderer = {
-  description: {
-    renderCell: (entity) => (
-      <TextOverflowEllipsis>
-        {entity.description}
-      </TextOverflowEllipsis>
-    ),
-    maxWidth: '30vw',
-  },
-};
-
 type Props<Entity extends { id: string }> = {
-  customCells?: CustomCells<Entity>,
-  displayBulkActionsCol: boolean,
-  displayRowActions: boolean,
-  isSelected: boolean,
+  columns: Array<Column>,
+  customColumnRenderers?: ColumnRenderers<Entity> | undefined,
+  displaySelect: boolean,
+  displayActions: boolean,
   entity: Entity,
-  onToggleRowSelect: (itemId: string) => void,
+  isSelected: boolean,
+  onToggleEntitySelect: (entityId: string) => void,
   rowActions?: (entity: Entity) => React.ReactNode,
-  visibleAttributes: Array<Attribute>,
 };
 
 const TableRow = <Entity extends { id: string }>({
-  customCells,
-  displayBulkActionsCol,
-  displayRowActions,
-  isSelected,
+  columns,
+  customColumnRenderers,
+  displaySelect,
+  displayActions,
   entity,
-  onToggleRowSelect,
+  isSelected,
+  onToggleEntitySelect,
   rowActions,
-  visibleAttributes,
 }: Props<Entity>) => {
   const toggleRowSelect = useCallback(
-    () => onToggleRowSelect(entity.id),
-    [entity.id, onToggleRowSelect],
+    () => onToggleEntitySelect(entity.id),
+    [entity.id, onToggleEntitySelect],
   );
 
   return (
     <tr key={entity.id}>
-      {displayBulkActionsCol && (
+      {displaySelect && (
         <td style={{ width: '20px' }}>
           <RowCheckbox onChange={toggleRowSelect}
                        title={`${isSelected ? 'Deselect' : 'Select'} row`}
                        checked={isSelected} />
         </td>
       )}
-      {visibleAttributes.map((attribute) => {
-        const cellRenderer = customCells?.[attribute.id] ?? defaultAttributeCellRenderer[attribute.id];
+      {columns.map((column) => {
+        const columnRenderer = merge(DefaultColumnRenderers[column.id] ?? {}, customColumnRenderers?.[column.id] ?? {});
 
         return (
-          <TableCell cellRenderer={cellRenderer}
+          <TableCell columnRenderer={columnRenderer}
                      entity={entity}
-                     attribute={attribute}
-                     key={`${entity.id}-${attribute.id}`} />
+                     column={column}
+                     key={`${entity.id}-${column.id}`} />
         );
       })}
-      {displayRowActions ? <ActionsCell>{rowActions(entity)}</ActionsCell> : null}
+      {displayActions ? <ActionsCell>{rowActions(entity)}</ActionsCell> : null}
     </tr>
   );
 };
 
 TableRow.defaultProps = {
-  customCells: undefined,
+  customColumnRenderers: undefined,
   rowActions: undefined,
 };
 

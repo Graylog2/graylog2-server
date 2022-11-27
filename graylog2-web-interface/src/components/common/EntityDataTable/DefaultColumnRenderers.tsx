@@ -14,8 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import EntityDataTable from './EntityDataTable';
-import type { ColumnRenderers, Column, Sort } from './types';
 
-export { ColumnRenderers, Column, Sort };
-export default EntityDataTable;
+import React from 'react';
+
+import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
+
+const DefaultColumnRenderers = {
+  description: {
+    renderCell: (entity) => (
+      <TextOverflowEllipsis>
+        {entity.description}
+      </TextOverflowEllipsis>
+    ),
+    maxWidth: '30vw',
+  },
+};
+
+export default DefaultColumnRenderers;

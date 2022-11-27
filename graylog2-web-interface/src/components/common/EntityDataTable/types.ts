@@ -16,32 +16,28 @@
  */
 import type * as React from 'react';
 
-export type Attribute = {
-  id: string,
-  title: string,
-  sortable?: boolean,
-  type?: boolean,
-  permissions?: Array<string>
+export type Column = {
   anyPermissions?: boolean,
+  id: string,
+  permissions?: Array<string>
+  sortable?: boolean,
+  title: string,
+  type?: boolean,
 };
 
-export type CustomHeaders = {
-  [key: string]: {
-    renderHeader: (attribute: Attribute) => React.ReactNode,
-    textAlign?: string,
-  }
+export type ColumnRenderer<Entity extends { id: string }> = {
+  maxWidth?: string,
+  renderCell?: (entity: Entity, column: Column) => React.ReactNode,
+  renderHeader?: (column: Column) => React.ReactNode,
+  textAlign?: string,
+  width?: string,
 }
 
-export type CustomCells<ListItem extends { id: string }> = {
-  [attributeId: string]: {
-    renderCell: (listItem: ListItem, attribute: Attribute) => React.ReactNode,
-    textAlign?: string,
-    width?: string,
-    maxWidth?: string,
-  }
+export type ColumnRenderers<Entity extends { id: string }> = {
+  [columnId: string]: ColumnRenderer<Entity>
 }
 
 export type Sort = {
-  attributeId: string,
+  columnId: string,
   order: 'asc' | 'desc'
 };

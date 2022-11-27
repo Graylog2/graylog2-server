@@ -18,7 +18,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import type { Sort, Attribute } from 'components/common/EntityDataTable';
+import type { Sort, Column } from 'components/common/EntityDataTable';
 
 import Icon from '../../common/Icon';
 
@@ -46,25 +46,25 @@ const SORT_ORDER_NAMES = {
 const SortIcon = ({
   onChange,
   activeSort,
-  attribute,
+  column,
 }: {
   onChange: (newSort: Sort) => void,
-  attribute: Attribute,
+  column: Column,
   activeSort: Sort | undefined,
 }) => {
-  const attributeSortIsActive = activeSort?.attributeId === attribute.id;
-  const nextSortOrder = !attributeSortIsActive || activeSort.order === SORT_ORDERS.DESC ? SORT_ORDERS.ASC : SORT_ORDERS.DESC;
-  const title = `Sort ${attribute.title.toLowerCase()} ${SORT_ORDER_NAMES[nextSortOrder]}`;
+  const columnSortIsActive = activeSort?.columnId === column.id;
+  const nextSortOrder = !columnSortIsActive || activeSort.order === SORT_ORDERS.DESC ? SORT_ORDERS.ASC : SORT_ORDERS.DESC;
+  const title = `Sort ${column.title.toLowerCase()} ${SORT_ORDER_NAMES[nextSortOrder]}`;
   const iconName = activeSort?.order === SORT_ORDERS.DESC ? 'arrow-up-wide-short' : 'arrow-down-wide-short';
 
   const _onChange = () => {
-    onChange({ attributeId: attribute.id, order: nextSortOrder });
+    onChange({ columnId: column.id, order: nextSortOrder });
   };
 
   return (
     <Wrapper title={title} onClick={_onChange}>
       <StyledIcon name={iconName}
-                  $sortIsActive={attributeSortIsActive} />
+                  $sortIsActive={columnSortIsActive} />
     </Wrapper>
   );
 };
