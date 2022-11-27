@@ -33,43 +33,43 @@ const ActionsCell = styled.td`
 
 const defaultAttributeCellRenderer = {
   description: {
-    renderCell: (listItem) => (
+    renderCell: (entity) => (
       <TextOverflowEllipsis>
-        {listItem.description}
+        {entity.description}
       </TextOverflowEllipsis>
     ),
     maxWidth: '30vw',
   },
 };
 
-type Props<ListItem extends { id: string }> = {
-  customCells?: CustomCells<ListItem>,
+type Props<Entity extends { id: string }> = {
+  customCells?: CustomCells<Entity>,
   displayBulkActionsCol: boolean,
   displayRowActions: boolean,
   isSelected: boolean,
-  listItem: ListItem,
+  entity: Entity,
   onToggleRowSelect: (itemId: string) => void,
-  rowActions?: (listItem: ListItem) => React.ReactNode,
+  rowActions?: (entity: Entity) => React.ReactNode,
   visibleAttributes: Array<Attribute>,
 };
 
-const TableRow = <ListItem extends { id: string }>({
+const TableRow = <Entity extends { id: string }>({
   customCells,
   displayBulkActionsCol,
   displayRowActions,
   isSelected,
-  listItem,
+  entity,
   onToggleRowSelect,
   rowActions,
   visibleAttributes,
-}: Props<ListItem>) => {
+}: Props<Entity>) => {
   const toggleRowSelect = useCallback(
-    () => onToggleRowSelect(listItem.id),
-    [listItem.id, onToggleRowSelect],
+    () => onToggleRowSelect(entity.id),
+    [entity.id, onToggleRowSelect],
   );
 
   return (
-    <tr key={listItem.id}>
+    <tr key={entity.id}>
       {displayBulkActionsCol && (
         <td style={{ width: '20px' }}>
           <RowCheckbox onChange={toggleRowSelect}
@@ -82,12 +82,12 @@ const TableRow = <ListItem extends { id: string }>({
 
         return (
           <TableCell cellRenderer={cellRenderer}
-                     listItem={listItem}
+                     entity={entity}
                      attribute={attribute}
-                     key={`${listItem.id}-${attribute.id}`} />
+                     key={`${entity.id}-${attribute.id}`} />
         );
       })}
-      {displayRowActions ? <ActionsCell>{rowActions(listItem)}</ActionsCell> : null}
+      {displayRowActions ? <ActionsCell>{rowActions(entity)}</ActionsCell> : null}
     </tr>
   );
 };

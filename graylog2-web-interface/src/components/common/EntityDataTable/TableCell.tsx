@@ -25,22 +25,22 @@ const Td = styled.td<{ $width: string, $maxWidth: string }>(({ $width, $maxWidth
   max-width: ${$maxWidth ?? 'none'};
 `);
 
-const TableCell = <ListItem extends { id: string }>({
+const TableCell = <Entity extends { id: string }>({
   attribute,
   cellRenderer,
-  listItem,
+  entity,
 }: {
   attribute: Attribute
   cellRenderer: {
-    renderCell: (listItem: ListItem, attribute: Attribute) => React.ReactNode,
+    renderCell: (entity: Entity, attribute: Attribute) => React.ReactNode,
     width?: string,
     maxWidth?: string,
   },
-  listItem: ListItem,
+  entity: Entity,
 }) => {
   const content = useMemo(
-    () => (cellRenderer ? cellRenderer.renderCell(listItem, attribute) : listItem[attribute.id]),
-    [attribute, cellRenderer, listItem],
+    () => (cellRenderer ? cellRenderer.renderCell(entity, attribute) : entity[attribute.id]),
+    [attribute, cellRenderer, entity],
   );
 
   return (

@@ -70,7 +70,7 @@ const filterVisibleAttributes = (
     return true;
   });
 
-type Props<ListItem extends { id: string }> = {
+type Props<Entity extends { id: string }> = {
   /** Currently active sort */
   activeSort?: Sort,
   /** Define the permissions a user needs to view an attribute. */
@@ -82,15 +82,15 @@ type Props<ListItem extends { id: string }> = {
   /** Supported batch operations */
   bulkActions?: (selectedItemsIds: Array<string>, setSelectedItemsIds: (streamIds: Array<string>) => void) => React.ReactNode
   /** Custom cell render for an attribute */
-  customCells?: CustomCells<ListItem>,
+  customCells?: CustomCells<Entity>,
   /** Custom header render for an attribute */
   customHeaders?: CustomHeaders,
+  /** The table data. */
+  data: Array<Entity>,
   /** Function to handle sort changes */
-  onSortChange: (newSort: Sort) => void
-  /** The table list items. */
-  rows: Array<ListItem>,
+  onSortChange: (newSort: Sort) => void,
   /** Actions for each row. */
-  rowActions?: (listItem: ListItem) => React.ReactNode,
+  rowActions?: (entity: Entity) => React.ReactNode,
   /** Total amount of items */
   total: number,
 };
@@ -98,7 +98,7 @@ type Props<ListItem extends { id: string }> = {
 /**
  * Flexible data table component which allows defining custom cell renderers.
  */
-const EntityDataTable = <ListItem extends { id: string }>({
+const EntityDataTable = <Entity extends { id: string }>({
   activeSort,
   attributePermissions,
   attributes,
@@ -108,9 +108,9 @@ const EntityDataTable = <ListItem extends { id: string }>({
   customHeaders,
   onSortChange,
   rowActions,
-  rows,
+  data,
   total,
-}: Props<ListItem>) => {
+}: Props<Entity>) => {
   const [selectedItemsIds, setSelectedItemsIds] = useState<Array<string>>([]);
   const currentUser = useCurrentUser();
   const visibleAttributes = useMemo(
@@ -153,19 +153,19 @@ const EntityDataTable = <ListItem extends { id: string }>({
         <TableHead selectedAttributes={visibleAttributes}
                    selectedItemsIds={selectedItemsIds}
                    setSelectedItemsIds={setSelectedItemsIds}
-                   rows={rows}
+                   data={data}
                    customHeaders={customHeaders}
                    onSortChange={onSortChange}
                    displayBulkActionsCol={displayBulkActionsCol}
                    activeSort={activeSort}
                    displayActionsCol={displayActionsCol} />
         <tbody>
-          {rows.map((listItem) => (
-            <TableRow listItem={listItem}
-                      key={listItem.id}
+          {data.map((entity) => (
+            <TableRow entity={entity}
+                      key={entity.id}
                       onToggleRowSelect={onToggleRowSelect}
                       customCells={customCells}
-                      isSelected={!!selectedItemsIds?.includes(listItem.id)}
+                      isSelected={!!selectedItemsIds?.includes(entity.id)}
                       rowActions={rowActions}
                       displayBulkActionsCol={displayBulkActionsCol}
                       displayRowActions={displayActionsCol}

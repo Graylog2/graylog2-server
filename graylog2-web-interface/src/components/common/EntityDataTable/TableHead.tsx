@@ -63,13 +63,13 @@ const ActionsHead = styled.th`
   text-align: right;
 `;
 
-const TableHead = <ListItem extends { id: string }>({
+const TableHead = <Entity extends { id: string }>({
   activeSort,
   customHeaders,
   displayActionsCol,
   displayBulkActionsCol,
   onSortChange,
-  rows,
+  data,
   selectedAttributes,
   selectedItemsIds,
   setSelectedItemsIds,
@@ -79,7 +79,7 @@ const TableHead = <ListItem extends { id: string }>({
   displayActionsCol: boolean
   displayBulkActionsCol: boolean,
   onSortChange: (newSort: Sort) => void,
-  rows: Array<ListItem>
+  data: Array<Entity>
   selectedAttributes: Array<Attribute>,
   selectedItemsIds: Array<string>,
   setSelectedItemsIds: React.Dispatch<React.SetStateAction<Array<string>>>
@@ -88,7 +88,7 @@ const TableHead = <ListItem extends { id: string }>({
     <thead>
       <tr>
         {displayBulkActionsCol && (
-          <BulkActionsHead rows={rows}
+          <BulkActionsHead data={data}
                            selectedItemsIds={selectedItemsIds}
                            setSelectedItemsIds={setSelectedItemsIds} />
         )}

@@ -57,23 +57,23 @@ const useCheckboxStatus = (rows, selectedItemsIds) => {
   };
 };
 
-type Props<ListItem extends { id: string }> = {
-  rows: Array<ListItem>
+type Props<Entity extends { id: string }> = {
+  data: Array<Entity>
   selectedItemsIds: Array<string>,
   setSelectedItemsIds: React.Dispatch<React.SetStateAction<Array<string>>>
 }
 
-const BulkActionsHead = <ListItem extends { id: string }>({
-  rows,
+const BulkActionsHead = <Entity extends { id: string }>({
+  data,
   setSelectedItemsIds,
   selectedItemsIds,
-}: Props<ListItem>) => {
-  const { checkboxRef, checkboxStatus } = useCheckboxStatus(rows, selectedItemsIds);
+}: Props<Entity>) => {
+  const { checkboxRef, checkboxStatus } = useCheckboxStatus(data, selectedItemsIds);
   const title = `${checkboxStatus === 'CHECKED' ? 'Deselect' : 'all visible rows'}`;
 
   const onBulkSelect = () => {
     setSelectedItemsIds((cur) => {
-      const rowsIds = rows.map(({ id }) => id);
+      const rowsIds = data.map(({ id }) => id);
 
       if (checkboxStatus === 'CHECKED') {
         return cur.filter((itemId) => !rowsIds.includes(itemId));
@@ -89,7 +89,7 @@ const BulkActionsHead = <ListItem extends { id: string }>({
                    onChange={onBulkSelect}
                    checked={checkboxStatus === 'CHECKED'}
                    title={title}
-                   disabled={!rows?.length} />
+                   disabled={!data?.length} />
     </td>
   );
 };

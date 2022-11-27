@@ -47,18 +47,12 @@ const DefaultLabel = styled(Label)`
   vertical-align: inherit;
 `;
 
-const AVAILABLE_ATTRIBUTES = [
+const COLUMN_DEFINITIONS = [
   { id: 'title', title: 'Title', sortable: true },
   { id: 'description', title: 'Description', sortable: true },
-  { id: 'index_set_id', title: 'Index Set', sortable: true },
+  { id: 'index_set_id', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },
   { id: 'disabled', title: 'Status', sortable: true },
 ];
-
-const ATTRIBUTE_PERMISSIONS = {
-  index_set_id: {
-    permissions: ['indexsets:read'],
-  },
-};
 
 const VISIBLE_ATTRIBUTES = ['title', 'description', 'index_set_id', 'disabled'];
 
@@ -218,7 +212,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
             </Alert>
           )
           : (
-            <EntityDataTable rows={streams}
+            <EntityDataTable data={streams} // data
                              total={total}
                              attributes={VISIBLE_ATTRIBUTES}
                              attributePermissions={ATTRIBUTE_PERMISSIONS}
@@ -227,7 +221,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
                              activeSort={searchParams.sort}
                              rowActions={renderStreamActions}
                              customCells={customCells(indexSets)}
-                             availableAttributes={AVAILABLE_ATTRIBUTES} />
+                             availableAttributes={COLUMN_DEFINITIONS} />
           )}
       </div>
     </PaginatedList>
