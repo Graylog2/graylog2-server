@@ -159,7 +159,7 @@ describe('<EntityDataTable />', () => {
                             columnDefinitions={columnDefinitions}
                             total={1} />);
 
-    const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select row/i });
+    const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select entity/i });
     userEvent.click(rowCheckboxes[0]);
 
     await screen.findByText('Custom bulk actions');
@@ -181,7 +181,7 @@ describe('<EntityDataTable />', () => {
                             columnDefinitions={columnDefinitions}
                             total={1} />);
 
-    const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select row/i });
+    const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select entity/i });
     userEvent.click(rowCheckboxes[0]);
 
     await screen.findByText(selectedItemInfo);
@@ -203,11 +203,11 @@ describe('<EntityDataTable />', () => {
                             columnDefinitions={columnDefinitions}
                             total={1} />);
 
-    const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select row/i });
+    const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select entity/i });
 
     expect(rowCheckboxes[0]).not.toBeChecked();
 
-    const selectAllCheckbox = await screen.findByRole('checkbox', { name: /all visible entites/i });
+    const selectAllCheckbox = await screen.findByRole('checkbox', { name: /select all visible entities/i });
     userEvent.click(selectAllCheckbox);
 
     expect(rowCheckboxes[0]).toBeChecked();

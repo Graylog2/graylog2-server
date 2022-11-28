@@ -63,7 +63,7 @@ const TableRow = <Entity extends { id: string }>({
       {displaySelect && (
         <td style={{ width: '20px' }}>
           <RowCheckbox onChange={toggleRowSelect}
-                       title={`${isSelected ? 'Deselect' : 'Select'} row`}
+                       title={`${isSelected ? 'Deselect' : 'Select'} entity`}
                        checked={isSelected} />
         </td>
       )}
