@@ -223,7 +223,6 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
           )
           : (
             <EntityDataTable data={streams}
-                             total={total}
                              visibleColumns={visibleColumns}
                              onColumnsChange={onColumnsChange}
                              onSortChange={onSortChange}

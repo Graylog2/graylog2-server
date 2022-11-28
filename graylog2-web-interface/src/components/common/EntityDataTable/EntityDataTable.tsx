@@ -89,8 +89,6 @@ type Props<Entity extends { id: string }> = {
   onSortChange: (newSort: Sort) => void,
   /** Actions for each row. */
   rowActions?: (entity: Entity) => React.ReactNode,
-  /** Total amount of items */
-  total: number,
   /** Which columns should be displayed. */
   visibleColumns: Array<string>,
 };
@@ -106,7 +104,6 @@ const EntityDataTable = <Entity extends { id: string }>({
   data,
   onSortChange,
   rowActions,
-  total,
   onColumnsChange,
   visibleColumns,
 }: Props<Entity>) => {

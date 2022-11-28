@@ -33,7 +33,7 @@ const StyledPopover = styled(Popover)`
   }
 `;
 
-const ColumnsVisibilityCheckbox = styled(Checkbox)`
+const ColumnCheckbox = styled(Checkbox)`
   display: inline-block;
   vertical-align: sub;
   margin: 0;
@@ -45,7 +45,7 @@ const ListItem = styled.div`
   display: flex;
 `;
 
-const ItemTitle = styled(TextOverflowEllipsis)`
+const ColumnTitle = styled(TextOverflowEllipsis)`
   display: inline;
 `;
 
@@ -78,8 +78,8 @@ const ColumnListItem = ({
 
   return (
     <ListItem role="menuitem" onClick={toggleVisibility} title={`${isSelected ? 'Hide' : 'Show'} ${column.title}`}>
-      <ColumnsVisibilityCheckbox checked={isSelected} />
-      <ItemTitle>{column.title}</ItemTitle>
+      <ColumnCheckbox checked={isSelected} />
+      <ColumnTitle>{column.title}</ColumnTitle>
     </ListItem>
   );
 };
@@ -107,7 +107,7 @@ const ColumnsVisibilitySelect = ({ onChange, selectedColumns, allColumns }: Prop
       {showSelect && (
         <Portal>
           <Overlay target={buttonRef.current} placement="bottom" show onHide={toggleColumnSelect} rootClose>
-            <StyledPopover id="create-filter-search-popover">
+            <StyledPopover id="columns-visibility-select">
               {allColumns.map((column) => (
                 <ColumnListItem column={column}
                                 onClick={onChange}
