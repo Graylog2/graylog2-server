@@ -36,7 +36,7 @@ public class DynamicStartPageService {
     private final EventBus eventBus;
 
     private final long MAXIMUM_ITEMS = 100;
-    private final long MAXIMUM_RECENT_ACTIVITIES = 1000;
+    private final long MAXIMUM_RECENT_ACTIVITIES = 10000;
 
     @Inject
     public DynamicStartPageService(Catalog catalog,
