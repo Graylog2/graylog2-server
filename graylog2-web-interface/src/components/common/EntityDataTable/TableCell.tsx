@@ -20,8 +20,8 @@ import styled, { css } from 'styled-components';
 
 import type { Column, ColumnRenderer } from './types';
 
-const Td = styled.td<{ $width: string | undefined, $maxWidth: string| undefined }>(({ $width, $maxWidth }) => css`
-  width: ${$width ?? 'auto'};
+const Td = styled.td<{ $width: number | undefined, $maxWidth: string| undefined }>(({ $width, $maxWidth }) => css`
+  width: ${$width ? `${$width}px` : 'auto'};
   max-width: ${$maxWidth ?? 'none'};
 `);
 
@@ -29,10 +29,12 @@ const TableCell = <Entity extends { id: string }>({
   column,
   columnRenderer,
   entity,
+  colWidth,
 }: {
   column: Column
-  columnRenderer: ColumnRenderer<Entity>,
+  columnRenderer: ColumnRenderer<Entity> | undefined,
   entity: Entity,
+  colWidth: number
 }) => {
   const content = useMemo(
     () => (typeof columnRenderer?.renderCell === 'function' ? columnRenderer.renderCell(entity, column) : entity[column.id]),
@@ -40,7 +42,7 @@ const TableCell = <Entity extends { id: string }>({
   );
 
   return (
-    <Td $width={columnRenderer?.width} $maxWidth={columnRenderer?.maxWidth}>
+    <Td $width={colWidth} $maxWidth={columnRenderer?.maxWidth}>
       {content}
     </Td>
   );

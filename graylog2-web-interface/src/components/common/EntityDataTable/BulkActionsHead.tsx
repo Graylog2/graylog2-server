@@ -84,7 +84,7 @@ const BulkActionsHead = <Entity extends { id: string }>({
   };
 
   return (
-    <td>
+    <td style={{ width: '20px' }}>
       <RowCheckbox inputRef={(ref) => { checkboxRef.current = ref; }}
                    onChange={onBulkSelect}
                    checked={checkboxStatus === 'CHECKED'}

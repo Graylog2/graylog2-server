@@ -37,7 +37,8 @@ export type ColumnRenderer<Entity extends { id: string }> = {
   renderCell?: (entity: Entity, column: Column) => React.ReactNode,
   renderHeader?: (column: Column) => React.ReactNode,
   textAlign?: string,
-  width?: string,
+  width?: number,
+  flexWidth?: number,
 }
 
 export type ColumnRenderers<Entity extends { id: string }> = {

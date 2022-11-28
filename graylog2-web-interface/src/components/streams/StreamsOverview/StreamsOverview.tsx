@@ -76,13 +76,15 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
   },
   index_set_id: {
     renderCell: (stream) => <IndexSetCell indexSets={indexSets} stream={stream} />,
+    flexWidth: 0.7,
   },
   throughput: {
     renderCell: (stream) => <ThroughputCell stream={stream} />,
+    width: 120,
   },
   disabled: {
     renderCell: (stream) => <StatusCell stream={stream} />,
-    width: '100px',
+    width: 100,
   },
 });
 

@@ -18,6 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 import { useMemo, useState, useCallback } from 'react';
 import type * as Immutable from 'immutable';
+import { merge } from 'lodash';
 
 import { Button, Table, ButtonToolbar } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
@@ -26,14 +27,21 @@ import TableRow from 'components/common/EntityDataTable/TableRow';
 import useCurrentUser from 'hooks/useCurrentUser';
 import StringUtils from 'util/StringUtils';
 import ColumnsVisibilitySelect from 'components/common/EntityDataTable/ColumnsVisibilitySelect';
+import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
+import useCalculateColumnWidths from 'components/common/EntityDataTable/hooks/useCalculateColumnsWidths';
+import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
 
 import type { ColumnRenderers, Column, Sort } from './types';
 
 const ScrollContainer = styled.div(({ theme }) => css`
-  @media (max-width: ${theme.breakpoints.max.md}) {
+  //@media (max-width: ${theme.breakpoints.max.md}) {
     overflow-x: auto;
-  }
+  //}
 `);
+
+const StyledTable = styled(Table)`
+  table-layout: fixed;
+`;
 
 const ActionsRow = styled.div`
   display: flex;
@@ -109,6 +117,7 @@ const EntityDataTable = <Entity extends { id: string }>({
 }: Props<Entity>) => {
   const currentUser = useCurrentUser();
   const [selectedEntities, setSelectedEntities] = useState<Array<string>>([]);
+  const columnRenderers = merge(DefaultColumnRenderers, customColumnRenderers ?? {});
   const accessibleColumns = useMemo(
     () => filterAccessibleColumns(columnDefinitions, currentUser.permissions),
     [columnDefinitions, currentUser.permissions],
@@ -132,9 +141,10 @@ const EntityDataTable = <Entity extends { id: string }>({
   const unselectAllItems = useCallback(() => setSelectedEntities([]), []);
   const displayActionsCol = typeof rowActions === 'function';
   const displayBulkActionsCol = typeof bulkActions === 'function';
+  const { actionsRef, tableRef, columnsWidths, actionsColWidth } = useCalculateColumnWidths<Entity>(columns, columnRenderers, displayActionsCol, displayBulkActionsCol);
 
   return (
-    <ScrollContainer>
+    <ScrollContainer ref={tableRef}>
       <ActionsRow>
         <div>
           {(displayBulkActionsCol && !!selectedEntities?.length) && (
@@ -153,30 +163,36 @@ const EntityDataTable = <Entity extends { id: string }>({
                                    onChange={onColumnsChange} />
         </div>
       </ActionsRow>
-      <Table striped condensed hover>
+      <StyledTable striped condensed hover>
         <TableHead columns={columns}
+                   columnsWidths={columnsWidths}
                    selectedEntities={selectedEntities}
                    setSelectedEntities={setSelectedEntities}
                    data={data}
-                   customColumnRenderers={customColumnRenderers}
+                   columnRenderers={columnRenderers}
                    onSortChange={onSortChange}
                    displayBulkActionsCol={displayBulkActionsCol}
                    activeSort={activeSort}
+                   actionsColWidth={actionsColWidth}
                    displayActionsCol={displayActionsCol} />
         <tbody>
-          {data.map((entity) => (
+          {data.map((entity, index) => (
             <TableRow entity={entity}
                       key={entity.id}
+                      index={index}
+                      actionsRef={actionsRef}
                       onToggleEntitySelect={onToggleEntitySelect}
-                      customColumnRenderers={customColumnRenderers}
+                      columnRenderers={columnRenderers}
+                      columnsWidths={columnsWidths}
                       isSelected={!!selectedEntities?.includes(entity.id)}
                       rowActions={rowActions}
                       displaySelect={displayBulkActionsCol}
                       displayActions={displayActionsCol}
+                      actionsColWidth={actionsColWidth}
                       columns={columns} />
           ))}
         </tbody>
-      </Table>
+      </StyledTable>
     </ScrollContainer>
   );
 };
@@ -188,4 +204,8 @@ EntityDataTable.defaultProps = {
   rowActions: undefined,
 };
 
-export default EntityDataTable;
+export default (props) => (
+  <WindowDimensionsContextProvider>
+    <EntityDataTable {...props} />
+  </WindowDimensionsContextProvider>
+);
