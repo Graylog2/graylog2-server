@@ -22,22 +22,22 @@ import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 
 type CheckboxStatus = 'CHECKED' | 'UNCHECKED' | 'PARTIAL';
 
-const useCheckboxStatus = (rows, selectedEntities) => {
+const useCheckboxStatus = <Entity extends { id: string }>(data: Array<Entity>, selectedEntityIds: Array<string>) => {
   const checkboxRef = useRef<HTMLInputElement>();
 
   const checkboxStatus: CheckboxStatus = useMemo(() => {
-    const selectedRows = rows.filter(({ id }) => selectedEntities.includes(id));
+    const selectedEntites = data.filter(({ id }) => selectedEntityIds.includes(id));
 
-    if (selectedRows.length === 0) {
+    if (selectedEntites.length === 0) {
       return 'UNCHECKED';
     }
 
-    if (selectedRows.length === rows.length) {
+    if (selectedEntites.length === data.length) {
       return 'CHECKED';
     }
 
     return 'PARTIAL';
-  }, [rows, selectedEntities]);
+  }, [data, selectedEntityIds]);
 
   useEffect(() => {
     if (checkboxRef.current) {
@@ -73,13 +73,13 @@ const BulkActionsHead = <Entity extends { id: string }>({
 
   const onBulkSelect = () => {
     setSelectedEntities((cur) => {
-      const rowsIds = data.map(({ id }) => id);
+      const entityIds = data.map(({ id }) => id);
 
       if (checkboxStatus === 'CHECKED') {
-        return cur.filter((itemId) => !rowsIds.includes(itemId));
+        return cur.filter((itemId) => !entityIds.includes(itemId));
       }
 
-      return uniq([...cur, ...rowsIds]);
+      return uniq([...cur, ...entityIds]);
     });
   };
 

@@ -93,7 +93,7 @@ type Props<Entity extends { id: string }> = {
 };
 
 /**
- * Flexible data table component which allows defining custom cell renderers.
+ * Flexible data table component which allows defining custom column renderers.
  */
 const EntityDataTable = <Entity extends { id: string }>({
   activeSort,

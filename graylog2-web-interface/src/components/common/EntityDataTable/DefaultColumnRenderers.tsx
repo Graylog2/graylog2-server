@@ -21,7 +21,7 @@ import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 
 const DefaultColumnRenderers = {
   description: {
-    renderCell: (entity) => (
+    renderCell: (entity: { description: string }) => (
       <TextOverflowEllipsis>
         {entity.description}
       </TextOverflowEllipsis>
