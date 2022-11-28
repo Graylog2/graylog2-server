@@ -23,10 +23,12 @@ const TableCell = <Entity extends { id: string }>({
   column,
   columnRenderer,
   entity,
+  colWidth,
 }: {
   column: Column
   columnRenderer: ColumnRenderer<Entity> | undefined,
   entity: Entity,
+  colWidth: number
 }) => {
   const content = useMemo(
     () => (typeof columnRenderer?.renderCell === 'function' ? columnRenderer.renderCell(entity, column) : entity[column.id]),
