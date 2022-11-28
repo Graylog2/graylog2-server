@@ -75,6 +75,8 @@ const chunksSortMode = (c1, c2) => {
   return 0;
 };
 
+const target = 'chrome105,edge105,firefox91,safari15'.split(',');
+
 const webpackConfig = {
   name: 'app',
   dependencies: ['vendor'],
@@ -94,7 +96,7 @@ const webpackConfig = {
           loader: 'esbuild-loader',
           options: {
             loader: 'tsx',
-            target: 'chrome105,edge105,firefox91,safari15'.split(','),
+            target,
           },
         },
         exclude: /node_modules\/(?!graylog-web-plugin)|\.node_cache/,
@@ -249,7 +251,7 @@ if (TARGET.startsWith('build')) {
     optimization: {
       moduleIds: 'deterministic',
       minimizer: [new ESBuildMinifyPlugin({
-        target: 'es2015',
+        target,
       })],
     },
     plugins: [
