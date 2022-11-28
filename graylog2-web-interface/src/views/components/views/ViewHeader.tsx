@@ -28,6 +28,7 @@ import onSaveView from 'views/logic/views/OnSaveViewAction';
 import View from 'views/logic/views/View';
 import Routes from 'routing/Routes';
 import viewTitle from 'views/logic/views/ViewTitle';
+import FavoriteIcon from 'views/components/FavoriteIcon';
 
 const links = {
   [View.Type.Dashboard]: {
@@ -91,12 +92,15 @@ const ViewHeader = () => {
         <TitleWrapper>
           <span>{title}</span>
           {isSavedView && (
-          <EditButton onClick={toggleMetadataEdit}
-                      role="button"
-                      title={`Edit ${typeText} ${view.title} metadata`}
-                      tabIndex={0}>
-            <Icon name="pen-to-square" />
-          </EditButton>
+            <>
+              <EditButton onClick={toggleMetadataEdit}
+                          role="button"
+                          title={`Edit ${typeText} ${view.title} metadata`}
+                          tabIndex={0}>
+                <Icon name="pen-to-square" />
+              </EditButton>
+              <FavoriteIcon isFavorite id={view.id} />
+            </>
           )}
         </TitleWrapper>
         {showMetadataEdit && (
