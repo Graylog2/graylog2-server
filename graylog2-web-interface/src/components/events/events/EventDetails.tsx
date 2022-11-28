@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import lodash from 'lodash';
 
 import useCurrentUser from 'hooks/useCurrentUser';
+import usePluginEntities from 'hooks/usePluginEntities';
 import { isPermitted } from 'util/PermissionsMixin';
 import { Link } from 'components/common/router';
 import { Col, Row } from 'components/bootstrap';
@@ -33,15 +33,17 @@ type Props = {
 };
 
 const EventDetails = ({ event, eventDefinitionContext }: Props) => {
+  const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
+
   const getConditionPlugin = (type: string): EventDefinitionType => {
     if (type === undefined) {
       return null;
     }
 
-    return PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type);
+    return eventDefinitionTypes.find((edt) => edt.type === type);
   };
 
-  const renderEventFields = (eventFields) => {
+  const renderEventFields = (eventFields: Object[]) => {
     const fieldNames = Object.keys(eventFields);
 
     return (
