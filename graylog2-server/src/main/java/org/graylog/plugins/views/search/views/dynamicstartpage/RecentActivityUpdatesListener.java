@@ -42,6 +42,7 @@ public class RecentActivityUpdatesListener {
                 .itemId(event.itemId())
                 .itemType(event.itemType())
                 .itemTitle(event.itemTitle())
+                .userName(event.userName())
                 .build());
     }
 
