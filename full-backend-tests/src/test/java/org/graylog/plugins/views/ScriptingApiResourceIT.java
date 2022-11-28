@@ -582,6 +582,34 @@ public class ScriptingApiResourceIT {
         assertThat(diff).isCloseTo(300_000, within(10_000f));
     }
 
+    @ContainerMatrixTest
+    void testErrorHandling() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("""
+                        {
+                          "group_by": [
+                            {
+                              "field": "facility"
+                            }
+                          ],
+                          "metrics": [
+                            {
+                              "function": "max",
+                              "field": "facility"
+                            }
+                          ]
+                        }
+                        """)
+                .post("/search/aggregate")
+                .then()
+                .statusCode(400)
+                .assertThat()
+                .body("type", Matchers.equalTo("ApiError"))
+                .body("message", Matchers.containsString("Failed to obtain aggregation results"));
+    }
+
 
     private void validateSchema(ValidatableResponse response, String name, String type, String field) {
         response.assertThat().body("schema", Matchers.hasItem(

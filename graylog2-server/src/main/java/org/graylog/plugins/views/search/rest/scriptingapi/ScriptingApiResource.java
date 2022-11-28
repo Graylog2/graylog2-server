@@ -20,20 +20,23 @@ import com.google.common.eventbus.EventBus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
+import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.SearchJobDTO;
+import org.graylog.plugins.views.search.rest.scriptingapi.mapping.AggregationFailedException;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.AggregationSpecToPivotMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryParamsToFullRequestSpecificationMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchRequestSpecToSearchMapper;
-import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchTypeResultToTabularResponseMapper;
+import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchJobToTabularResponseMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
@@ -67,19 +70,18 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Consumes({MediaType.APPLICATION_JSON})
 @RequiresAuthentication
 public class ScriptingApiResource extends RestResource implements PluginRestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(ScriptingApiResource.class);
 
     private final SearchExecutor searchExecutor;
     private final EventBus serverEventBus;
     private final SearchRequestSpecToSearchMapper searchCreator;
-    private final SearchTypeResultToTabularResponseMapper responseCreator;
+    private final SearchJobToTabularResponseMapper responseCreator;
     private final QueryParamsToFullRequestSpecificationMapper queryParamsToFullRequestSpecificationMapper;
 
     @Inject
     public ScriptingApiResource(final SearchExecutor searchExecutor,
                                 final EventBus serverEventBus,
                                 final SearchRequestSpecToSearchMapper searchCreator,
-                                final SearchTypeResultToTabularResponseMapper responseCreator,
+                                final SearchJobToTabularResponseMapper responseCreator,
                                 final QueryParamsToFullRequestSpecificationMapper queryParamsToFullRequestSpecificationMapper) {
         this.searchExecutor = searchExecutor;
         this.serverEventBus = serverEventBus;
@@ -95,7 +97,6 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     @NoAuditEvent("Creating audit event manually in method body.")
     public TabularResponse executeQuery(@ApiParam(name = "searchRequestSpec") @Valid SearchRequestSpec searchRequestSpec,
                                         @Context SearchUser searchUser) {
-
         try {
             //Step 1: map simple request to more complex search
             Search search = searchCreator.mapToSearch(searchRequestSpec, searchUser);
@@ -105,18 +106,8 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
             postAuditEvent(searchJob);
 
             //Step 3: take complex response and try to map it to simpler, tabular form
-            final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
-            final QueryResult queryResult = searchJobDTO.results().get(SearchRequestSpecToSearchMapper.QUERY_ID);
-            if (queryResult != null) {
-                final SearchType.Result aggregationResult = queryResult.searchTypes().get(AggregationSpecToPivotMapper.PIVOT_ID);
-                if (aggregationResult instanceof PivotResult pivotResult) {
-                    return responseCreator.mapToResponse(searchRequestSpec, pivotResult);
-                }
-            }
-
-            LOG.warn("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
-            throw new NotFoundException("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
-        } catch (IllegalArgumentException | ValidationException ex) {
+            return responseCreator.mapToResponse(searchRequestSpec, searchJob);
+        } catch (IllegalArgumentException | ValidationException | AggregationFailedException ex) {
             throw new BadRequestException(ex.getMessage(), ex);
         }
     }

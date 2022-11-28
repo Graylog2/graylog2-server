@@ -14,21 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest.scriptingapi.response;
+package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-class ResponseSchemaEntryTest {
-
-    @Test
-    void name() {
-        Assertions.assertThat(ResponseSchemaEntry.groupBy("http_method").name()).isEqualTo("grouping: http_method");
-
-        Assertions.assertThat(ResponseSchemaEntry.metric("max", "took_ms").name())
-                .isEqualTo("metric: max(took_ms)");
-
-        Assertions.assertThat(ResponseSchemaEntry.metric("count", null).name())
-                .isEqualTo("metric: count()");
+public class AggregationFailedException extends Exception {
+    public AggregationFailedException(String message) {
+        super(message);
     }
 }
