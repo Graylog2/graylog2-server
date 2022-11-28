@@ -101,6 +101,7 @@ import org.graylog.plugins.views.search.validation.validators.InvalidOperatorsVa
 import org.graylog.plugins.views.search.validation.validators.UnknownFieldsValidator;
 import org.graylog.plugins.views.search.views.RequiresParameterSupport;
 import org.graylog.plugins.views.search.views.ViewRequirements;
+import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivityUpdatesListener;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AreaVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
@@ -187,6 +188,8 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(TimeUnitIntervalDTO.class);
         registerJacksonSubtype(AutoInterval.class);
         registerJacksonSubtype(AutoIntervalDTO.class);
+
+        bind(RecentActivityUpdatesListener.class).asEagerSingleton();
 
         bind(SearchJobService.class).to(InMemorySearchJobService.class).in(Scopes.SINGLETON);
         bind(MappedFieldTypesService.class).to(MappedFieldTypesServiceImpl.class).in(Scopes.SINGLETON);

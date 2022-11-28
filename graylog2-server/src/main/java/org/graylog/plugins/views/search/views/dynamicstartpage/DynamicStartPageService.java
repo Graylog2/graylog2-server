@@ -35,8 +35,8 @@ public class DynamicStartPageService {
     private final FavoriteItemsService favoriteItemsService;
     private final EventBus eventBus;
 
-    private final long MAXIMUM_ITEMS = 10;
-    private final long MAXIMUM_ACTIVITY = 100;
+    private final long MAXIMUM_ITEMS = 100;
+    private final long MAXIMUM_RECENT_ACTIVITIES = 1000;
 
     @Inject
     public DynamicStartPageService(Catalog catalog,
@@ -103,7 +103,7 @@ public class DynamicStartPageService {
         final var items = recentActivityService
                 .streamAllInReverseOrder()
                 .filter(searchUser::canSeeActivity)
-                .limit(MAXIMUM_ACTIVITY)
+                .limit(MAXIMUM_RECENT_ACTIVITIES)
                 .map(i -> new RecentActivity(i.id(),
                         i.activityType(),
                         i.itemType() == null ? catalog.getType(i.itemId()) : "Unknown Entity: " + i.itemId(),
@@ -115,18 +115,19 @@ public class DynamicStartPageService {
         return PaginatedResponse.create("recentActivity", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
     }
 
+    // works on the existing list, side-effect
+    private void addItemToCappedList(final List<String> items, String id) {
+        items.remove(id);
+        if(items.size() >= MAXIMUM_ITEMS) {
+            items.remove(0);
+        }
+        items.add(id);
+    }
+
     public void addLastOpenedFor(final ViewDTO view, final SearchUser searchUser) {
         var lastOpenedItems = lastOpenedService.findForUser(searchUser);
         if(lastOpenedItems.isPresent()) {
-            final var id = view.id();
-            final var items = lastOpenedItems.get().items();
-            if(items.contains(id)) {
-                items.remove(id);
-            }
-            if(items.size() >= MAXIMUM_ITEMS) {
-                items.remove(0);
-            }
-            items.add(id);
+            addItemToCappedList(lastOpenedItems.get().items(), view.id());
             lastOpenedService.save(lastOpenedItems.get());
         } else {
             var items = LastOpenedItemsDTO.builder().userId(searchUser.getUser().getId()).items(Collections.singletonList(view.id())).build();
@@ -137,14 +138,7 @@ public class DynamicStartPageService {
     public void addFavoriteItemFor(final String id, final SearchUser searchUser) {
         var favoriteItems = favoriteItemsService.findForUser(searchUser);
         if(favoriteItems.isPresent()) {
-            final var items = favoriteItems.get().items();
-            if(items.contains(id)) {
-                items.remove(id);
-            }
-            if(items.size() >= MAXIMUM_ITEMS) {
-                items.remove(0);
-            }
-            items.add(id);
+            addItemToCappedList(favoriteItems.get().items(),id);
             favoriteItemsService.save(favoriteItems.get());
         } else {
             var items = FavoriteItemsDTO.builder().userId(searchUser.getUser().getId()).items(Collections.singletonList(id)).build();
