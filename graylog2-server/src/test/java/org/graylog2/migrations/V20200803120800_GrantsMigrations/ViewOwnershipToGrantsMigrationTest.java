@@ -22,7 +22,6 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.views.ViewRequirements;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
-import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivityService;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.entities.EntityOwnershipService;
@@ -66,14 +65,13 @@ class ViewOwnershipToGrantsMigrationTest {
                GRNRegistry grnRegistry,
                @Mock ClusterConfigService clusterConfigService,
                @Mock UserService userService,
-               @Mock ViewSummaryService viewSummaryService,
-               @Mock RecentActivityService recentActivityService) {
+               @Mock ViewSummaryService viewSummaryService) {
 
         this.userService = userService;
         this.grantService = new DBGrantService(mongodb.mongoConnection(), objectMapperProvider, grnRegistry);
 
         final EntityOwnershipService entityOwnershipService = new EntityOwnershipService(grantService, grnRegistry);
-        final TestViewService viewService = new TestViewService(mongodb.mongoConnection(), objectMapperProvider, clusterConfigService, entityOwnershipService, viewSummaryService, recentActivityService);
+        final TestViewService viewService = new TestViewService(mongodb.mongoConnection(), objectMapperProvider, clusterConfigService, entityOwnershipService, viewSummaryService);
 
         this.migration = new ViewOwnerShipToGrantsMigration(userService, grantService, "admin", viewService, grnRegistry);
     }
@@ -136,9 +134,8 @@ class ViewOwnershipToGrantsMigrationTest {
                                MongoJackObjectMapperProvider mapper,
                                ClusterConfigService clusterConfigService,
                                EntityOwnershipService entityOwnerShipService,
-                               ViewSummaryService viewSummaryService,
-                               RecentActivityService recentActivityService) {
-            super(mongoConnection, mapper, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityOwnerShipService, viewSummaryService, recentActivityService);
+                               ViewSummaryService viewSummaryService) {
+            super(mongoConnection, mapper, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityOwnerShipService, viewSummaryService);
         }
     }
 }

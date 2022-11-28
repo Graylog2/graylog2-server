@@ -37,6 +37,7 @@ import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewResolverDecoder;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.WidgetDTO;
+import org.graylog.plugins.views.search.views.dynamicstartpage.ActivityType;
 import org.graylog.plugins.views.search.views.dynamicstartpage.DynamicStartPageService;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -99,17 +100,17 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final Map<String, ViewResolver> viewResolvers;
     private final SearchFilterVisibilityChecker searchFilterVisibilityChecker;
     private final ReferencedSearchFiltersHelper referencedSearchFiltersHelper;
-    private final DynamicStartPageService dspService;
+    private final DynamicStartPageService dynamicStartPageService;
 
     @Inject
     public ViewsResource(ViewService dbService,
-                         DynamicStartPageService dspService,
+                         DynamicStartPageService dynamicStartPageService,
                          ClusterEventBus clusterEventBus, SearchDomain searchDomain,
                          Map<String, ViewResolver> viewResolvers,
                          SearchFilterVisibilityChecker searchFilterVisibilityChecker,
                          ReferencedSearchFiltersHelper referencedSearchFiltersHelper) {
         this.dbService = dbService;
-        this.dspService = dspService;
+        this.dynamicStartPageService = dynamicStartPageService;
         this.clusterEventBus = clusterEventBus;
         this.searchDomain = searchDomain;
         this.viewResolvers = viewResolvers;
@@ -165,7 +166,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         // The view resolvers must be used first, because the ID may not be a valid hex ID string.
         ViewDTO view = resolveView(id);
         if (searchUser.canReadView(view)) {
-            dspService.addLastOpenedFor(view, searchUser);
+            dynamicStartPageService.addLastOpenedFor(view, searchUser);
             return view;
         }
 
@@ -209,7 +210,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         validateIntegrity(dto, searchUser, true);
 
         final User user = userContext.getUser();
-        return dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
+        var result =  dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
+        dynamicStartPageService.addRecentActivity(ActivityType.CREATE, result.id(), result.type().name(), result.title(), user.getFullName());
+        return result;
     }
 
     private void validateIntegrity(ViewDTO dto, SearchUser searchUser, boolean newCreation) {
@@ -322,7 +325,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         validateIntegrity(updatedDTO, searchUser, false);
 
-        return dbService.update(updatedDTO);
+        var result = dbService.update(updatedDTO);
+        dynamicStartPageService.addRecentActivity(ActivityType.UPDATE, result.id(), result.type().name(), result.title(), searchUser.getUser().getFullName());
+        return result;
     }
 
     @PUT
@@ -348,6 +353,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         dbService.delete(id);
         triggerDeletedEvent(view);
+        dynamicStartPageService.addRecentActivity(ActivityType.DELETE, view.id(), view.type().name(), view.title(), searchUser.getUser().getFullName());
         return view;
     }
 

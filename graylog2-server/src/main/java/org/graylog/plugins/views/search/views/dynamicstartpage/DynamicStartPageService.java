@@ -19,7 +19,6 @@ package org.graylog.plugins.views.search.views.dynamicstartpage;
 import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.lookup.Catalog;
 import org.graylog2.rest.models.PaginatedResponse;
@@ -93,11 +92,11 @@ public class DynamicStartPageService {
     }
 
     private String getType(RecentActivityDTO i) {
-        return i.itemType() == null ? catalog.getType(i.itemId()) : "Unknown Entity: " + i.itemId();
+        return i.itemType() == null ? catalog.getType(i.itemId()) : i.itemType();
     }
 
     private String getTitle(RecentActivityDTO i) {
-        return i.itemTitle() == null ? catalog.getTitle(i.itemId()) : "Unknown Entity: " + i.itemId();
+        return i.itemTitle() == null ? catalog.getTitle(i.itemId()) : i.itemTitle();
     }
 
     public PaginatedResponse<RecentActivity> findRecentActivityFor(final SearchUser searchUser, int page, int perPage) {
@@ -152,7 +151,7 @@ public class DynamicStartPageService {
         }
     }
 
-    public void addRecentActivity(final String id, final SearchUser searchUser) {
-        recentActivityService.postRecentActivity(ActivityType.UPDATE, id, null, null);
+    public void addRecentActivity(final ActivityType activityType, final String id, final String type, final String title, final String userName) {
+        recentActivityService.postRecentActivity(activityType, id, type, title, userName);
     }
 }

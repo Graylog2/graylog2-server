@@ -16,6 +16,6 @@
  */
 package org.graylog.plugins.views.search.views.dynamicstartpage;
 
-public record RecentActivityEvent(ActivityType activityType, String itemId, String itemType, String itemTitle) {
+public record RecentActivityEvent(ActivityType activityType, String itemId, String itemType, String itemTitle, String userName) {
 }
 

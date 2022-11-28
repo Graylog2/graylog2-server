@@ -54,6 +54,7 @@ public class RecentActivityUpdatesListener {
 
     @Subscribe
     public void createRecentActivityFor(final EntitySharesUpdateEvent event) {
+        // TODO: maybe remove the filter again? It should be unnecessary, was just a try to remove creation of duplicates
         event.creates().stream().filter(distinctByKey(EntitySharesUpdateEvent.Share::grantee))
                 .forEach(e -> recentActivityService.save(RecentActivityDTO.builder()
                         .activityType(ActivityType.SHARED)
@@ -63,6 +64,7 @@ public class RecentActivityUpdatesListener {
                         .build())
                 );
 
+        // TODO: maybe remove the filter again? It should be unnecessary, was just a try to remove creation of duplicates
         event.deletes().stream().filter(distinctByKey(EntitySharesUpdateEvent.Share::grantee))
                 .forEach(e -> recentActivityService.save(RecentActivityDTO.builder()
                         .activityType(ActivityType.UNSHARED)
