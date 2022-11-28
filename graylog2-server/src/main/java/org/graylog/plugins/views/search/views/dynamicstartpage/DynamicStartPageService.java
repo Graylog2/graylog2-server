@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.views.dynamicstartpage;
 import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.lookup.Catalog;
 import org.graylog2.rest.models.PaginatedResponse;
