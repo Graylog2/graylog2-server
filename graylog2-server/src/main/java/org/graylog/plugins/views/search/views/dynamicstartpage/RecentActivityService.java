@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.views.dynamicstartpage;
 
 import com.google.common.eventbus.EventBus;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
@@ -28,6 +29,8 @@ import java.util.stream.Stream;
 public class RecentActivityService extends PaginatedDbService<RecentActivityDTO> {
     private static final String COLLECTION_NAME = "recent_activity";
     private final EventBus eventBus;
+
+    private final long MAXIMUM_RECENT_ACTIVITIES = 10000;
 
     @Inject
     protected RecentActivityService(MongoConnection mongoConnection,
@@ -44,5 +47,17 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
 
     public void postRecentActivity(final ActivityType type, final String itemId, final String itemType, final String itemTitle) {
         eventBus.post(new RecentActivityEvent(type, itemId, itemType, itemTitle));
+    }
+
+    public Stream<RecentActivityDTO> _findRecentActivitiesFor(SearchUser user) {
+        return this.streamAllInReverseOrder()
+                .filter(user::canSeeActivity)
+                .limit(MAXIMUM_RECENT_ACTIVITIES);
+    }
+
+    public Stream<RecentActivityDTO> findRecentActivitiesFor(SearchUser user) {
+        return this.streamAllInReverseOrder()
+                .filter(user::canSeeActivity)
+                .limit(MAXIMUM_RECENT_ACTIVITIES);
     }
 }

@@ -36,7 +36,6 @@ public class DynamicStartPageService {
     private final EventBus eventBus;
 
     private final long MAXIMUM_ITEMS = 100;
-    private final long MAXIMUM_RECENT_ACTIVITIES = 10000;
 
     @Inject
     public DynamicStartPageService(Catalog catalog,
@@ -92,24 +91,21 @@ public class DynamicStartPageService {
         return PaginatedResponse.create("favoriteItems", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
     }
 
-    /**
-     * TODO: replace with real search that filters out views by permissions in mongo and filters shares by grn (if possible, because of teams)
-     * if all fails, keep it like it is now and add to searchUser.canSeeActivity()
-     * @param searchUser
-     * @param page
-     * @param perPage
-     * @return
-     */
+    private String getType(RecentActivityDTO i) {
+        return i.itemType() == null ? catalog.getType(i.itemId()) : "Unknown Entity: " + i.itemId();
+    }
+
+    private String getTitle(RecentActivityDTO i) {
+        return i.itemTitle() == null ? catalog.getTitle(i.itemId()) : "Unknown Entity: " + i.itemId();
+    }
+
     public PaginatedResponse<RecentActivity> findRecentActivityFor(final SearchUser searchUser, int page, int perPage) {
-        final var items = recentActivityService
-                .streamAllInReverseOrder()
-                .filter(searchUser::canSeeActivity)
-                .limit(MAXIMUM_RECENT_ACTIVITIES)
-                .map(i -> new RecentActivity(i.id(),
+        final var items = recentActivityService.findRecentActivitiesFor(searchUser)
+                 .map(i -> new RecentActivity(i.id(),
                         i.activityType(),
-                        i.itemType() == null ? catalog.getType(i.itemId()) : "Unknown Entity: " + i.itemId(),
+                        getType(i),
                         i.itemId(),
-                        i.itemTitle() == null ? catalog.getTitle(i.itemId()) : "Unknown Entity: " + i.itemId(),
+                        getTitle(i),
                         i.userName(),
                         i.timestamp()))
                 .collect(Collectors.toList());
