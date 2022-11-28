@@ -14,16 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { css } from 'styled-components';
+import React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
 
-import bgImage from 'images/auth/loginbg.jpg';
+import LoginBox from './LoginBox';
 
-const authStyles = css(({ theme }) => css`
-  body {
-    /* we love science */
-    background: url(${bgImage}) no-repeat center center fixed ${theme.colors.global.background};
-    background-size: cover;
-  }
-`);
+describe('LoginBox', () => {
+  it('renders a button after the input if buttonAfter is passed', async () => {
+    render(<LoginBox><button type="button">Click me</button></LoginBox>);
 
-export default authStyles;
+    await screen.findByRole('button', { name: 'Click me' });
+  });
+});
