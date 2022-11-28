@@ -96,7 +96,7 @@ public class Metric implements Sortable {
     }
 
     public String functionName() {
-        return functionName.toLowerCase(Locale.ROOT);
+        return Optional.ofNullable(functionName).map(fn -> fn.toLowerCase(Locale.ROOT)).orElse(null);
     }
 
     @Override
