@@ -40,7 +40,7 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
         this.eventBus = eventBus;
     }
 
-    public Stream<RecentActivityDTO> streamAllInReverseOrder() {
+    private Stream<RecentActivityDTO> streamAllInReverseOrder() {
         return streamQueryWithSort(DBQuery.empty(), getSortBuilder("desc", "timestamp"));
     }
 

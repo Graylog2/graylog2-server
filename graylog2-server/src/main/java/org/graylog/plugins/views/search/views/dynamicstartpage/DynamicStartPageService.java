@@ -151,4 +151,8 @@ public class DynamicStartPageService {
             favoriteItemsService.save(favoriteItems.get());
         }
     }
+
+    public void addRecentActivity(final String id, final SearchUser searchUser) {
+        recentActivityService.postRecentActivity(ActivityType.UPDATE, id, null, null);
+    }
 }

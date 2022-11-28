@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.views.dynamicstartpage;
 
+import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.graylog.security.events.EntitySharesUpdateEvent;
 
@@ -29,8 +30,9 @@ public class RecentActivityUpdatesListener {
     private final RecentActivityService recentActivityService;
 
     @Inject
-    public RecentActivityUpdatesListener(RecentActivityService recentActivityService) {
+    public RecentActivityUpdatesListener(EventBus eventBus, RecentActivityService recentActivityService) {
         this.recentActivityService = recentActivityService;
+        eventBus.register(this);
     }
 
     @Subscribe
