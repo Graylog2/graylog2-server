@@ -56,7 +56,7 @@ const COLUMN_DEFINITIONS = [
   { id: 'disabled', title: 'Status', sortable: true },
 ];
 
-const VISIBLE_COLUMNS = ['title', 'description', 'index_set_id', 'throughput', 'disabled'];
+const INITIAL_COLUMNS = ['title', 'description', 'index_set_id', 'throughput', 'disabled'];
 
 type SearchParams = {
   page: number,
@@ -132,6 +132,7 @@ type Props = {
 }
 
 const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
+  const [visibleColumns, setVisibleColumns] = useState(INITIAL_COLUMNS);
   const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
   const [searchParams, setSearchParams] = useState<SearchParams>({
     page: paginationQueryParameter.page,
@@ -168,6 +169,10 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   const onReset = useCallback(() => {
     onSearch('');
   }, [onSearch]);
+
+  const onColumnsChange = useCallback((newVisibleColumns: Array<string>) => {
+    setVisibleColumns(newVisibleColumns);
+  }, []);
 
   const onSortChange = useCallback((newSort: Sort) => {
     setSearchParams((cur) => ({ ...cur, sort: newSort }));
@@ -219,7 +224,8 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
           : (
             <EntityDataTable data={streams}
                              total={total}
-                             visibleColumns={VISIBLE_COLUMNS}
+                             visibleColumns={visibleColumns}
+                             onColumnsChange={onColumnsChange}
                              onSortChange={onSortChange}
                              bulkActions={renderBulkActions}
                              activeSort={searchParams.sort}
