@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import bgImage from 'images/auth/banner-bg.jpg';
 
 import LoginBox from 'components/login/LoginBox';
 import PublicNotifications from 'components/common/PublicNotifications';
-import bgImage from 'images/auth/banner-bg.jpeg';
 import graylogLogo from 'images/auth/gl_logo_horiz.svg';
 
 const Logo = styled.img`
