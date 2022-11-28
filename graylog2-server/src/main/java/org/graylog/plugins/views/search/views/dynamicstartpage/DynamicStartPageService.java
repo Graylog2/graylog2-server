@@ -17,10 +17,8 @@
 package org.graylog.plugins.views.search.views.dynamicstartpage;
 
 import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
-import org.graylog.security.events.EntitySharesUpdateEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.lookup.Catalog;
 import org.graylog2.rest.models.PaginatedResponse;
@@ -28,10 +26,6 @@ import org.graylog2.rest.models.PaginatedResponse;
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class DynamicStartPageService {
@@ -164,37 +158,5 @@ public class DynamicStartPageService {
             favoriteItems.get().items().remove(id);
             favoriteItemsService.save(favoriteItems.get());
         }
-    }
-
-    @Subscribe
-    public void createRecentActivityFor(final RecentActivityEvent event) {
-        recentActivityService.save(event.activity());
-    }
-
-    private <T> Predicate<T> distinctByKey(
-            Function<? super T, ?> keyExtractor) {
-
-        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
-        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
-    }
-
-    @Subscribe
-    public void createRecentActivityFor(final EntitySharesUpdateEvent event) {
-        event.creates().stream().filter(distinctByKey(EntitySharesUpdateEvent.Share::grantee))
-                .forEach(e -> recentActivityService.save(RecentActivityDTO.builder()
-                        .activityType(ActivityType.SHARED)
-                        .itemId(event.entity().entity())
-                        .userName(event.user().getFullName())
-                        .grantee(e.grantee().toString())
-                        .build())
-                );
-
-        event.deletes().stream().filter(distinctByKey(EntitySharesUpdateEvent.Share::grantee))
-                .forEach(e -> recentActivityService.save(RecentActivityDTO.builder()
-                        .activityType(ActivityType.UNSHARED)
-                        .itemId(event.entity().entity())
-                        .userName(event.user().getFullName())
-                        .grantee(e.grantee().toString())
-                        .build()) );
     }
 }

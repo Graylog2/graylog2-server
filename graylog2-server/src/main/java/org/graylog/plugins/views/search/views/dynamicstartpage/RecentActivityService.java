@@ -43,6 +43,6 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
 
 
     public void postRecentActivity(final ActivityType type, final String itemId, final String itemType, final String itemTitle) {
-        eventBus.post(new RecentActivityEvent(RecentActivityDTO.builder().activityType(type).itemId(itemId).itemType(itemType).itemTitle(itemTitle).build()));
+        eventBus.post(new RecentActivityEvent(type, itemId, itemType, itemTitle));
     }
 }
