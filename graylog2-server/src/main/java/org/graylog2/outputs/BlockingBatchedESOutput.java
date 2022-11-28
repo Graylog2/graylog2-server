@@ -21,6 +21,7 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.Messages;
@@ -163,7 +164,8 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
     public void stop() {
         if (cluster.isConnected() && cluster.isDeflectorHealthy()) {
             // Try to flush current batch. Time-limited to avoid blocking shutdown too long.
-            final ExecutorService executorService = Executors.newSingleThreadExecutor();
+            final ExecutorService executorService = Executors.newSingleThreadExecutor(
+                    new ThreadFactoryBuilder().setNameFormat("es-output-shutdown-flush").build());
             try {
                 executorService.submit(this::forceFlush).get(shutdownTimeoutMs, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
