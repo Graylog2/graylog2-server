@@ -23,7 +23,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.resources.entities.EntityAttribute;
-import org.graylog2.rest.resources.entities.EntitySettings;
+import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.streams.StreamDTO;
 
 import javax.annotation.Nullable;
@@ -59,7 +59,7 @@ public abstract class StreamPageListResponse {
     public abstract List<EntityAttribute> attributes();
 
     @JsonProperty
-    public abstract EntitySettings settings();
+    public abstract EntityDefaults defaults();
 
     @JsonCreator
     public static StreamPageListResponse create(
@@ -70,7 +70,7 @@ public abstract class StreamPageListResponse {
             @JsonProperty("order") @Nullable String order,
             @JsonProperty("streams") Collection<StreamDTO> streams,
             @JsonProperty("attributes") List<EntityAttribute> attributes,
-            @JsonProperty("settings") EntitySettings settings) {
-        return new AutoValue_StreamPageListResponse(query, paginationInfo, total, sort, order, streams, attributes, settings);
+            @JsonProperty("defaults") EntityDefaults defaults) {
+        return new AutoValue_StreamPageListResponse(query, paginationInfo, total, sort, order, streams, attributes, defaults);
     }
 }

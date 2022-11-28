@@ -24,10 +24,7 @@ import java.util.List;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class EntitySettings {
-    @JsonProperty("attributes")
-    public abstract List<String> attributes();
-
+public abstract class EntityDefaults {
     @JsonProperty("sort")
     public abstract Sorting sort();
 
@@ -37,12 +34,11 @@ public abstract class EntitySettings {
 
     @AutoValue.Builder
     public static abstract class Builder {
-        public abstract Builder attributes(List<String> attributes);
         public abstract Builder sort(Sorting sort);
 
         public static Builder builder() {
-            return new AutoValue_EntitySettings.Builder();
+            return new AutoValue_EntityDefaults.Builder();
         }
-        public abstract EntitySettings build();
+        public abstract EntityDefaults build();
     }
 }
