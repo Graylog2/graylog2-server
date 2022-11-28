@@ -88,6 +88,7 @@ public class DynamicStartPageService {
                 .map(i -> new FavoriteItem(i, catalog.getType(i), catalog.getTitle(i)))
                 .collect(Collectors.toList());
         Collections.reverse(items);
+
         return PaginatedResponse.create("favoriteItems", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
     }
 

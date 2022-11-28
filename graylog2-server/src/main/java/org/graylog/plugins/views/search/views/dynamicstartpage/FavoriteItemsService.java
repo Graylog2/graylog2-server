@@ -30,6 +30,9 @@ import org.mongojack.WriteResult;
 import javax.inject.Inject;
 import java.util.Optional;
 
+/*
+ * TODO: remove entity, if a user is deleted?
+ */
 public class FavoriteItemsService extends PaginatedDbService<FavoriteItemsDTO> {
     private static final String COLLECTION_NAME = "favorite_items";
 

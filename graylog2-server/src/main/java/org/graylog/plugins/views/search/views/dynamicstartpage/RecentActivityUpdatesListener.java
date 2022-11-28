@@ -19,7 +19,12 @@ public class RecentActivityUpdatesListener {
 
     @Subscribe
     public void createRecentActivityFor(final RecentActivityEvent event) {
-        recentActivityService.save(RecentActivityDTO.builder().activityType(event.activityType()).itemId(event.itemId()).itemType(event.itemType()).itemTitle(event.itemTitle()).build());
+        recentActivityService.save(RecentActivityDTO.builder()
+                .activityType(event.activityType())
+                .itemId(event.itemId())
+                .itemType(event.itemType())
+                .itemTitle(event.itemTitle())
+                .build());
     }
 
     private <T> Predicate<T> distinctByKey(

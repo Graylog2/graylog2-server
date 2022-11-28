@@ -101,7 +101,7 @@ public abstract class RecentActivityDTO {
         public abstract RecentActivityDTO.Builder userName(String userName);
 
         @JsonProperty(FIELD_GRANTEE)
-        public abstract RecentActivityDTO.Builder grantee(String userName);
+        public abstract RecentActivityDTO.Builder grantee(String grantee);
 
         @JsonProperty(FIELD_TIMESTAMP)
         public abstract RecentActivityDTO.Builder timestamp(DateTime timestamp);

@@ -149,6 +149,7 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
     }
 
     public boolean canSeeActivity(final RecentActivityDTO recentActivityDTO) {
-        return canReadView(recentActivityDTO.itemId()) || canReadDashboard(recentActivityDTO.itemId());
+        var id = recentActivityDTO.itemId();
+        return canReadView(id) || canReadDashboard(id) || canReadStream(id);
     }
 }
