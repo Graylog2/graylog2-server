@@ -34,9 +34,20 @@ const StyledPopover = styled(Popover)`
 `;
 
 const ColumnCheckbox = styled(Checkbox)`
-  display: inline-block;
-  vertical-align: sub;
-  margin: 0;
+  &.checkbox {
+    margin: 0 5px 0 0;
+
+    label {
+      display: flex;
+      align-items: center;
+      padding: 0;
+
+      input {
+        margin: 0;
+        position: relative;
+      }
+    }
+  }
 `;
 
 const ListItem = styled.div`
@@ -78,7 +89,7 @@ const ColumnListItem = ({
 
   return (
     <ListItem role="menuitem" onClick={toggleVisibility} title={`${isSelected ? 'Hide' : 'Show'} ${column.title}`}>
-      <ColumnCheckbox checked={isSelected} />
+      <ColumnCheckbox checked={isSelected} onChange={toggleVisibility} />
       <ColumnTitle>{column.title}</ColumnTitle>
     </ListItem>
   );
@@ -100,8 +111,8 @@ const ColumnsVisibilitySelect = ({ onChange, selectedColumns, allColumns }: Prop
 
   return (
     <>
-      <Button onClick={toggleColumnSelect} ref={buttonRef} bsSize="small">
-        <Icon name="gear" /> Columns
+      <Button onClick={toggleColumnSelect} ref={buttonRef} bsSize="small" title="Select columns to display">
+        <Icon name="cog" /> Columns
       </Button>
 
       {showSelect && (
