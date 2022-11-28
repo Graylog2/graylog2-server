@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.graylog.plugins.views.search.rest.scriptingapi.parsing.TimerangeParser;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
@@ -23,7 +24,7 @@ import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestS
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,10 +42,10 @@ public class QueryParamsToFullRequestSpecificationMapper {
                                                                          final String timerangeKeyword,
                                                                          List<String> groups,
                                                                          List<String> metrics) {
-        if (groups == null || groups.isEmpty()) {
+        if (CollectionUtils.isEmpty(groups)) {
             throw new IllegalArgumentException("At least one grouping has to be provided!");
         }
-        if (metrics == null || metrics.isEmpty()) {
+        if (CollectionUtils.isEmpty(metrics)) {
             metrics = List.of("count:");
         }
         if (!metrics.stream().allMatch(m -> m.contains(":") || "count".equals(m))) {
@@ -59,7 +60,7 @@ public class QueryParamsToFullRequestSpecificationMapper {
                 streams,
                 timerangeParser.parseTimeRange(timerangeKeyword),
                 groups.stream().map(Grouping::new).collect(Collectors.toList()),
-                metrics.stream().map(Metric::fromStringRepresentation).filter(Objects::nonNull).collect(Collectors.toList())
+                metrics.stream().map(Metric::fromStringRepresentation).flatMap(Optional::stream).collect(Collectors.toList())
         );
     }
 

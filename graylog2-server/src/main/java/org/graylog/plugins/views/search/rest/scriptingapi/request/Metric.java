@@ -24,6 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 
 import javax.validation.Valid;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -49,8 +50,7 @@ public class Metric implements Sortable {
     })
     private MetricConfiguration configuration;
 
-    public Metric(@JsonProperty("field") String fieldName,
-                  @JsonProperty("function") String functionName,
+    public Metric(@JsonProperty("function") String functionName, @JsonProperty("field") String fieldName,
                   @JsonProperty("sort") SortSpec.Direction sort,
                   @JsonProperty("configuration") MetricConfiguration configuration) {
         this.fieldName = fieldName;
@@ -60,8 +60,8 @@ public class Metric implements Sortable {
     }
 
 
-    public Metric(final String fieldName, final String functionName) {
-        this(fieldName, functionName, null, null);
+    public Metric(final String functionName, final String fieldName) {
+        this(functionName, fieldName, null, null);
     }
 
     @Override
@@ -81,14 +81,14 @@ public class Metric implements Sortable {
      * @param metricString String representation in the form of "function:field", i.e. "avg:took_ms" or "latest:source" (you can ommit field for count function : "count" or "count:")
      * @return new Metric, or null if metricString input string is blank
      */
-    public static Metric fromStringRepresentation(final String metricString) {
+    public static Optional<Metric>  fromStringRepresentation(final String metricString) {
         if (StringUtils.isBlank(metricString)) {
-            return null;
+            return Optional.empty();
         }
         final String[] split = metricString.split(":");
         final String functionName = split[0];
         final String fieldName = split.length > 1 ? split[1] : null;
-        return new Metric(fieldName, functionName);
+        return Optional.of(new Metric(functionName, fieldName));
     }
 
     public String fieldName() {
@@ -96,7 +96,7 @@ public class Metric implements Sortable {
     }
 
     public String functionName() {
-        return functionName;
+        return functionName.toLowerCase(Locale.ROOT);
     }
 
     @Override

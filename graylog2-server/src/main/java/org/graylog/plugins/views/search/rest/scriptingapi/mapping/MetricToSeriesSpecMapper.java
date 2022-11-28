@@ -33,6 +33,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
 
 import javax.inject.Inject;
+import java.util.Locale;
 import java.util.function.Function;
 
 public class MetricToSeriesSpecMapper implements Function<Metric, SeriesSpec> {
