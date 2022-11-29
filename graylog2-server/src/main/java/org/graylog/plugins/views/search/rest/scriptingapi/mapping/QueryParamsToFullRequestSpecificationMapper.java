@@ -50,6 +50,9 @@ public class QueryParamsToFullRequestSpecificationMapper {
         if (!metrics.stream().allMatch(m -> m.contains(":") || "count".equals(m))) {
             throw new IllegalArgumentException("All metrics need to be defined as \"function\":\"field_name\"");
         }
+        if (metrics.stream().anyMatch(m -> m.startsWith("percentile:"))) {
+            throw new IllegalArgumentException("Percentile metric cannot be used in simplified query format. Please use POST request instead, specifying configuration for percentile metric");
+        }
 
         return new SearchRequestSpec(
                 query,

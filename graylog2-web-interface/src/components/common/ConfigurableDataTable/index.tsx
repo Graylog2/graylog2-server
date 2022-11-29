@@ -14,15 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import ConfigurableDataTable from './ConfigurableDataTable';
+import type { CustomCells, CustomHeaders, Attribute, Sort } from './types';
 
-import LoginBox from './LoginBox';
-
-describe('LoginBox', () => {
-  it('renders a button after the input if buttonAfter is passed', () => {
-    const { container } = render(<LoginBox><div /></LoginBox>);
-
-    expect(container).toMatchSnapshot();
-  });
-});
+export { CustomCells, CustomHeaders, Attribute, Sort };
+export default ConfigurableDataTable;

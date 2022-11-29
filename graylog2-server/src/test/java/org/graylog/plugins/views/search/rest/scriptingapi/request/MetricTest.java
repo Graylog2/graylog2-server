@@ -27,12 +27,12 @@ class MetricTest {
         Metric count = Metric.fromStringRepresentation("count");
         assertThat(count)
                 .isNotNull()
-                .isEqualTo(new Metric(null, "count", null));
+                .isEqualTo(new Metric(null, "count"));
 
         count = Metric.fromStringRepresentation("count:");
         assertThat(count)
                 .isNotNull()
-                .isEqualTo(new Metric(null, "count", null));
+                .isEqualTo(new Metric(null, "count"));
     }
 
     @Test
@@ -40,12 +40,12 @@ class MetricTest {
         Metric count = Metric.fromStringRepresentation("count:stars");
         assertThat(count)
                 .isNotNull()
-                .isEqualTo(new Metric("stars", "count", null));
+                .isEqualTo(new Metric("stars", "count"));
 
         count = Metric.fromStringRepresentation("avg:salary");
         assertThat(count)
                 .isNotNull()
-                .isEqualTo(new Metric("salary", "avg", null));
+                .isEqualTo(new Metric("salary", "avg"));
     }
 
 }

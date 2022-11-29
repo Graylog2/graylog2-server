@@ -70,7 +70,7 @@ export type PaginatedPipelineResponse = PaginatedListJSON & {
 
 export type PaginatedPipelines = PaginatedList<PipelineType>;
 
-const listFailCallback = (error) => {
+const listFailCallback = (error: Error) => {
   UserNotification.error(`Fetching pipelines failed with status: ${error.message}`,
     'Could not retrieve processing pipelines');
 };
@@ -126,7 +126,8 @@ export const PipelinesStore = singletonStore(
           count: response.count,
           total: response.total,
         },
-      }), listFailCallback);
+      }));
+      promise.catch(listFailCallback);
 
       PipelinesActions.listPaginated.promise(promise);
 

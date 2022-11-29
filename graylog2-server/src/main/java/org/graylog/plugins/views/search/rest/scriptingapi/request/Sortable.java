@@ -22,5 +22,5 @@ public interface Sortable {
 
     SortSpec.Direction sort();
 
-    String sortColumnName();
+    String columnName();
 }

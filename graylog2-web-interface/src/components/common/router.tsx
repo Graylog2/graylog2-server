@@ -65,7 +65,7 @@ const LinkContainer = ({ children, onClick, to: toProp, relativeActive, ...rest 
     [pathname, to, className, displayName, relativeActive],
   );
   const _onClick = useCallback((e: React.MouseEvent) => {
-    if (!isLeftClickEvent(e) || isModifiedEvent(e)) {
+    if (!isLeftClickEvent(e) || isModifiedEvent(e) || disabled) {
       return;
     }
 

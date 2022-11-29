@@ -14,27 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+package org.graylog.plugins.views.search.rest.scriptingapi.request;
 
-import { Label } from 'components/bootstrap';
+import java.util.Optional;
 
-class StreamStateBadge extends React.Component {
-  static propTypes = {
-    stream: PropTypes.object.isRequired,
-  };
+public interface MetricConfiguration {
 
-  render() {
-    if (this.props.stream.is_default) {
-      return <Label bsStyle="primary">Default</Label>;
+    default Optional<String> columnName(final Metric metric) {
+        return Optional.empty();
     }
-
-    if (!this.props.stream.disabled) {
-      return null;
-    }
-
-    return <Label bsStyle="warning">Stopped</Label>;
-  }
 }
-
-export default StreamStateBadge;

@@ -14,16 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { css } from 'styled-components';
+package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
-import bgImage from 'images/auth/loginbg.jpg';
-
-const authStyles = css(({ theme }) => css`
-  body {
-    /* we love science */
-    background: url(${bgImage}) no-repeat center center fixed ${theme.colors.global.background};
-    background-size: cover;
-  }
-`);
-
-export default authStyles;
+public class AggregationFailedException extends Exception {
+    public AggregationFailedException(String message) {
+        super(message);
+    }
+}

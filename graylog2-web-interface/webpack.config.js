@@ -98,6 +98,18 @@ const webpackConfig = {
             presets: [require('babel-preset-graylog')],
           },
         },
+        include: /node_modules\/graylog-web-plugin/,
+      },
+      {
+        test: /\.[jt]s(x)?$/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: 'target/web/cache',
+            // eslint-disable-next-line global-require
+            presets: [require('babel-preset-graylog')],
+          },
+        },
         exclude: /node_modules|\.node_cache/,
       },
       {
@@ -109,7 +121,7 @@ const webpackConfig = {
         type: 'asset/resource',
       },
       {
-        test: /\.(png|gif|jpg)(\?.+)?$/,
+        test: /\.(png|gif|jpg|jpeg)(\?.+)?$/,
         type: 'asset',
       },
       {

@@ -14,27 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 import styled from 'styled-components';
 
-import { Icon } from 'components/common';
+import { Checkbox } from 'components/bootstrap';
 
-const Header = styled.h1`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 21px;
-  margin-top: 6px;
+const RowCheckbox = styled(Checkbox)`
+  &.checkbox {
+    margin: 0;
+  
+    label {
+      display: flex;
+      align-items: center;
+      padding: 0;
+      
+      input {
+        width: 14px;
+        height: 14px;
+        cursor: pointer;
+        margin: 0;
+        position: relative;
+      }
+    }
+  }
 `;
 
-const HeaderIcon = styled(Icon)`
-  margin-right: 9px;
-`;
-
-const LoginHeader = () => (
-  <Header>
-    <HeaderIcon name="users" />Welcome to Graylog
-  </Header>
-);
-
-export default LoginHeader;
+export default RowCheckbox;
