@@ -31,6 +31,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 
 public class SearchRequestSpecToSearchMapper {
 
@@ -46,11 +47,19 @@ public class SearchRequestSpecToSearchMapper {
         this.messageListCreator = messageListCreator;
     }
 
-    public Search mapToSearch(final SearchRequestSpec searchRequestSpec, final SearchUser searchUser) {
+    public Search mapToSearch(MessagesRequestSpec messagesRequestSpec, SearchUser searchUser) {
+        return mapToSearch(messagesRequestSpec, searchUser, messageListCreator);
+    }
+
+    public  Search mapToSearch(AggregationRequestSpec aggregationRequestSpec, SearchUser searchUser) {
+        return mapToSearch(aggregationRequestSpec, searchUser, pivotCreator);
+    }
+
+    private <T extends SearchRequestSpec> Search mapToSearch(final T searchRequestSpec, final SearchUser searchUser, Function<T, ? extends SearchType> searchTypeCreator) {
 
         Query query = Query.builder()
                 .id(QUERY_ID)
-                .searchTypes(getSearchTypes(searchRequestSpec))
+                .searchTypes(Set.of(searchTypeCreator.apply(searchRequestSpec)))
                 .query(ElasticsearchQueryString.ofNullable(searchRequestSpec.queryString()))
                 .timerange(getTimerange(searchRequestSpec))
                 .build();
@@ -67,15 +76,5 @@ public class SearchRequestSpecToSearchMapper {
 
     private TimeRange getTimerange(SearchRequestSpec searchRequestSpec) {
         return searchRequestSpec.timerange() != null ? searchRequestSpec.timerange() : RelativeRange.allTime();
-    }
-
-    private Set<SearchType> getSearchTypes(final SearchRequestSpec searchRequestSpec) {
-        if (searchRequestSpec instanceof AggregationRequestSpec aggregationRequestSpec) {
-            return Set.of(pivotCreator.apply(aggregationRequestSpec));
-        } else if (searchRequestSpec instanceof MessagesRequestSpec messagesRequestSpec) {
-            return Set.of(messageListCreator.apply(messagesRequestSpec));
-        } else {
-            return Set.of();
-        }
     }
 }
