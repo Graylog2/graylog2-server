@@ -35,18 +35,24 @@ const ActionItemLink = styled(Link)(({ theme }) => css`
   }
 `);
 
-type Props = { itemType: EntityItemType, itemId: string, activityType: RecentActivityType, title: string};
+type Props = { itemType: EntityItemType, itemId: string, activityType: RecentActivityType, itemTitle: string, userName?: string };
 
-const ActionItem = ({ itemType, itemId, activityType, title }: Props) => {
+const ActionItem = ({ itemType, itemId, activityType, itemTitle, userName }: Props) => {
+  const link = typeLinkMap[itemType] ? Routes.pluginRoute(typeLinkMap[itemType].link)(itemId) : undefined;
+
   return (
-    <span>
-      {`The ${itemType}`}
-      {' '}
-      <ActionItemLink target="_blank" to={Routes.pluginRoute(typeLinkMap[itemType].link)(itemId)}>{title}</ActionItemLink>
+    <div>
+      {`The ${itemType} `}
+      <ActionItemLink target="_blank" to={link}>{itemTitle}</ActionItemLink>
       {' was '}
       {`${activityType}d`}
-    </span>
+      {userName ? ` by ${userName}` : ''}
+    </div>
   );
+};
+
+ActionItem.defaultProps = {
+  userName: null,
 };
 
 const RecentActivityList = () => {
@@ -64,7 +70,7 @@ const RecentActivityList = () => {
       <Table striped data-testid="recent-activity-table">
         <tbody>
           {
-              recentActivity.map(({ id, timestamp, activityType, itemType, itemId, title }) => {
+              recentActivity.map(({ id, timestamp, activityType, itemType, itemId, itemTitle, userName }) => {
                 return (
                   <tr key={id}>
                     <td style={{ width: 110 }}>
@@ -72,7 +78,7 @@ const RecentActivityList = () => {
                       </StyledLabel>
                     </td>
                     <td>
-                      <ActionItem itemId={itemId} activityType={activityType} title={title} itemType={itemType} />
+                      <ActionItem itemId={itemId} activityType={activityType} itemTitle={itemTitle} itemType={itemType} userName={userName} />
                     </td>
                   </tr>
                 );

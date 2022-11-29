@@ -58,11 +58,12 @@ const fetchRecentActivities = async ({ page }: RequestQuery): Promise<PaginatedR
       total: data.total,
       recentActivity: data.recentActivity.map((activity) => ({
         id: activity.id,
-        title: activity.title,
+        itemTitle: activity.item_title,
         timestamp: activity.timestamp,
         activityType: activity.activity_type,
         itemType: activity.item_type,
         itemId: activity.item_id,
+        userName: activity.user_name,
       })),
     });
   });

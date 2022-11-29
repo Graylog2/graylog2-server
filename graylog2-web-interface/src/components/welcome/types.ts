@@ -41,8 +41,9 @@ export type RecentActivityResponseItem = {
   activity_type: RecentActivityType,
   item_type: EntityItemType,
   item_id: string,
-  title: string,
-  timestamp: string
+  item_title: string,
+  timestamp: string,
+  user_name?: string,
 }
 
 export type RecentActivityItem = {
@@ -50,8 +51,9 @@ export type RecentActivityItem = {
   activityType: RecentActivityType,
   itemType: EntityItemType,
   itemId: string,
-  title: string,
-  timestamp: string
+  itemTitle: string,
+  timestamp: string,
+  userName?: string
 }
 
 export type PaginatedResponseRecentActivity = {
