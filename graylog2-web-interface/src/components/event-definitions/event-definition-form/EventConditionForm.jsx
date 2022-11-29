@@ -35,6 +35,7 @@ class EventConditionForm extends React.Component {
     currentUser: PropTypes.object.isRequired, // Prop is passed down to pluggable entities
     validation: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
+    action: PropTypes.string.isRequired,
   };
 
   getConditionPlugin = (type) => {
@@ -90,6 +91,14 @@ class EventConditionForm extends React.Component {
     return <dl>{typeDescriptions}</dl>;
   };
 
+  disabledSelect = () => {
+    console.log(this.props.eventDefinition);
+    console.table(this.formattedEventDefinitionTypes());
+
+    return !this.formattedEventDefinitionTypes().some((edt) => this.props.eventDefinition.config.type === edt.value)
+      && this.props.action === 'edit';
+  };
+
   render() {
     const { eventDefinition, validation } = this.props;
     const eventDefinitionType = this.getConditionPlugin(eventDefinition.config.type);
@@ -118,19 +127,21 @@ class EventConditionForm extends React.Component {
                     value={eventDefinition.config.type}
                     onChange={this.handleEventDefinitionTypeChange}
                     clearable={false}
+                    disabled={this.disabledSelect()}
                     required />
             <HelpBlock>
               {lodash.get(validation, 'errors.config[0]', 'Choose the type of Condition for this Event.')}
             </HelpBlock>
           </FormGroup>
         </Col>
-
-        <Col md={5} lg={5} lgOffset={1}>
-          <HelpPanel className={styles.conditionTypesInfo}
-                     title="Available Conditions">
-            {this.renderConditionTypeDescriptions()}
-          </HelpPanel>
-        </Col>
+        {!this.disabledSelect() && (
+          <Col md={5} lg={5} lgOffset={1}>
+            <HelpPanel className={styles.conditionTypesInfo}
+                      title="Available Conditions">
+              {this.renderConditionTypeDescriptions()}
+            </HelpPanel>
+          </Col>
+        )}
         <Clearfix />
 
         {eventDefinitionTypeComponent && (
