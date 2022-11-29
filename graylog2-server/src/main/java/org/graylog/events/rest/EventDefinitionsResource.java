@@ -32,6 +32,8 @@ import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog.events.processor.EventProcessorParametersWithTimerange;
+import org.graylog.grn.GRNTypes;
+import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivityService;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -94,17 +96,20 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private final EventDefinitionContextService contextService;
     private final EventProcessorEngine engine;
     private final SearchQueryParser searchQueryParser;
+    private final RecentActivityService recentActivityService;
 
     @Inject
     public EventDefinitionsResource(DBEventDefinitionService dbService,
                                     EventDefinitionHandler eventDefinitionHandler,
                                     EventDefinitionContextService contextService,
-                                    EventProcessorEngine engine) {
+                                    EventProcessorEngine engine,
+                                    RecentActivityService recentActivityService) {
         this.dbService = dbService;
         this.eventDefinitionHandler = eventDefinitionHandler;
         this.contextService = contextService;
         this.engine = engine;
         this.searchQueryParser = new SearchQueryParser(EventDefinitionDto.FIELD_TITLE, SEARCH_FIELD_MAPPING);
+        this.recentActivityService = recentActivityService;
     }
 
     @GET
@@ -161,6 +166,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
         final EventDefinitionDto entity = schedule ? eventDefinitionHandler.create(dto, Optional.of(userContext.getUser())) : eventDefinitionHandler.createWithoutSchedule(dto, Optional.of(userContext.getUser()));
+        recentActivityService.create(entity.id(), GRNTypes.EVENT_DEFINITION, userContext.getUser());
         return Response.ok().entity(entity).build();
     }
 
@@ -170,7 +176,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_UPDATE)
     public Response update(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                            @ApiParam("schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
-                           @ApiParam(name = "JSON Body") EventDefinitionDto dto) {
+                           @ApiParam(name = "JSON Body") EventDefinitionDto dto,
+                           @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
         checkEventDefinitionPermissions(dto, "update");
         dbService.get(definitionId)
@@ -184,6 +191,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         if (result.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
+        recentActivityService.update(definitionId, GRNTypes.EVENT_DEFINITION, userContext.getUser());
         return Response.ok().entity(eventDefinitionHandler.update(dto, schedule)).build();
     }
 
@@ -191,8 +199,12 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Path("{definitionId}")
     @ApiOperation("Delete event definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_DELETE)
-    public void delete(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
+    public void delete(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
+                       @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_DELETE, definitionId);
+        dbService.get(definitionId).ifPresent(d ->
+                recentActivityService.delete(d.id(), GRNTypes.EVENT_DEFINITION, d.title(), userContext.getUser())
+        );
         eventDefinitionHandler.delete(definitionId);
     }
 

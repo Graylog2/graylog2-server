@@ -22,7 +22,6 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.security.PermissionAndRoleResolver;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -32,7 +31,6 @@ import org.graylog2.plugin.database.users.User;
 import org.mongojack.DBQuery;
 
 import javax.inject.Inject;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -77,6 +75,10 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
         postRecentActivity(new RecentActivityEvent(ActivityType.UPDATE, grnRegistry.newGRN(grn, id), user.getUser().getFullName()));
     }
 
+    public void update(String id, GRNType grn, User user) {
+        postRecentActivity(new RecentActivityEvent(ActivityType.UPDATE, grnRegistry.newGRN(grn, id), user.getFullName()));
+    }
+
     public void delete(String id, GRNType grn, String title, SearchUser user) {
         postRecentActivity(new RecentActivityEvent(ActivityType.DELETE, grnRegistry.newGRN(grn, id), title, user.getUser().getFullName()));
     }
@@ -87,6 +89,10 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
 
     public void delete(String id, GRNType grn, String title) {
         postRecentActivity(new RecentActivityEvent(ActivityType.DELETE, grnRegistry.newGRN(grn, id), title, null));
+    }
+
+    public void delete(String id, GRNType grn, String title, User user) {
+        postRecentActivity(new RecentActivityEvent(ActivityType.DELETE, grnRegistry.newGRN(grn, id), title, user.getFullName()));
     }
 
     public Stream<RecentActivityDTO> _findRecentActivitiesFor(SearchUser user) {
