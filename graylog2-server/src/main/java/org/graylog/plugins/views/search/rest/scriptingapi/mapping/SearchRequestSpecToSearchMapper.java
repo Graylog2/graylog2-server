@@ -59,7 +59,7 @@ public class SearchRequestSpecToSearchMapper {
                 .addStreamsToQueriesWithoutStreams(() -> searchUser.streams().readableOrAllIfEmpty(searchRequestSpec.streams()));
     }
 
-    private static TimeRange getTimerange(SearchRequestSpec searchRequestSpec) {
+    private TimeRange getTimerange(SearchRequestSpec searchRequestSpec) {
         return searchRequestSpec.timerange() != null ? searchRequestSpec.timerange() : RelativeRange.allTime();
     }
 }
