@@ -112,10 +112,12 @@ public class MessageULIDGenerator {
             messageSequenceNr = REORDERING_GAP;
             sequenceNrCache.put(cacheKey, sequenceNr);
         // If we receive more than 60535 messages with the same timestamp and input, they will exhaust the 16 bit of space in the ULID.
+        // We handle this by updating the sequenceNrCache and setting the messageSequenceNr accordingly.
         } else if (messageSequenceNr >= ULID_RANDOM_MSB_MASK) {
             LOG.warn("Message sequence number <{}> input <{}> timestamp <{}> does not fit into ULID ({} >= 65535). Sort order might be wrong.",
                     sequenceNr, inputId, timestamp, messageSequenceNr);
-            messageSequenceNr %= ULID_RANDOM_MSB_MASK;
+            messageSequenceNr = REORDERING_GAP;
+            sequenceNrCache.put(cacheKey, sequenceNr);
         }
         final ULID.Value sequencedUlid = new ULID.Value(msbWithZeroedRandom | messageSequenceNr, leastSignificantBits);
         return sequencedUlid.toString();

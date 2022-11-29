@@ -68,12 +68,16 @@ public class MessageULIDGeneratorTest {
         final int firstSeqNr = 42;
         generator.createULID("node", "input", 0, firstSeqNr);
 
-        // Next simulate maxing out the sequence number space in the ULID (16 bit -> 65535) the result should wrap to 0
+        // Next simulate maxing out the sequence number space in the ULID (16 bit -> 65535) the result should wrap to REORDERING_GAP
         ULID.Value parsedULID = ULID.parseULID(generator.createULID("node", "input", 0, (int) (firstSeqNr + ULID_RANDOM_MSB_MASK - REORDERING_GAP)));
-        assertThat(extractSequenceNr(parsedULID)).isEqualTo(0);
+        assertThat(extractSequenceNr(parsedULID)).isEqualTo(REORDERING_GAP);
+
+        // Once we wrap, we reset the cache to the last wrapped number. The sequence will start from the beginning
+        parsedULID = ULID.parseULID(generator.createULID("node", "input", 0, (int) (firstSeqNr + ULID_RANDOM_MSB_MASK - REORDERING_GAP + 1)));
+        assertThat(extractSequenceNr(parsedULID)).isEqualTo(REORDERING_GAP + 1);
 
         // messages with a different timestamp start with a new subtrahend and should get a seqNr with OFFSET_GAP
-        parsedULID = ULID.parseULID(generator.createULID("node", "input", 42, (int) (firstSeqNr + ULID_RANDOM_MSB_MASK - REORDERING_GAP)));
+        parsedULID = ULID.parseULID(generator.createULID("node", "input", 23, (int) (firstSeqNr + ULID_RANDOM_MSB_MASK - REORDERING_GAP)));
         //noinspection PointlessArithmeticExpression
         assertThat(extractSequenceNr(parsedULID)).isEqualTo(0 + REORDERING_GAP);
     }
