@@ -14,27 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import styled from 'styled-components';
+import React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
 
-import { Icon } from 'components/common';
+import LoginBox from './LoginBox';
 
-const Header = styled.h1`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 21px;
-  margin-top: 6px;
-`;
+describe('LoginBox', () => {
+  it('renders a button after the input if buttonAfter is passed', async () => {
+    render(<LoginBox><button type="button">Click me</button></LoginBox>);
 
-const HeaderIcon = styled(Icon)`
-  margin-right: 9px;
-`;
-
-const LoginHeader = () => (
-  <Header>
-    <HeaderIcon name="users" />Welcome to Graylog
-  </Header>
-);
-
-export default LoginHeader;
+    await screen.findByRole('button', { name: 'Click me' });
+  });
+});

@@ -14,14 +14,32 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import styled, { css } from 'styled-components';
 
 import { ModalSubmit } from 'components/common';
 import { Input } from 'components/bootstrap';
 import { SessionActions } from 'stores/sessions/SessionStore';
 
-const LoginForm = ({ onErrorChange }) => {
+type Props = {
+  onErrorChange: (message?: string) => void,
+};
+
+const SigninButton = styled(ModalSubmit)(({ theme }) => css`
+  button.btn-success {
+    background-color: ${theme.colors.brand.primary};
+    border-color: ${theme.colors.brand.primary};
+    
+    :hover {
+      background-color: ${theme.colors.brand.primary};
+      border-color: ${theme.colors.brand.primary};
+    }
+  }
+`);
+
+const LoginForm = ({ onErrorChange }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   let promise;
   let usernameInput;
@@ -65,21 +83,21 @@ const LoginForm = ({ onErrorChange }) => {
       <Input ref={(username) => { usernameInput = username; }}
              id="username"
              type="text"
-             placeholder="Username"
+             label="Username"
              autoFocus
              required />
 
       <Input ref={(password) => { passwordInput = password; }}
              id="password"
              type="password"
-             placeholder="Password"
+             label="Password"
              required />
 
-      <ModalSubmit displayCancel={false}
-                   isSubmitting={isLoading}
-                   isAsyncSubmit
-                   submitLoadingText="Signing in..."
-                   submitButtonText="Sign in" />
+      <SigninButton displayCancel={false}
+                    isSubmitting={isLoading}
+                    isAsyncSubmit
+                    submitLoadingText="Signing in..."
+                    submitButtonText="Sign in" />
     </form>
   );
 };

@@ -16,23 +16,29 @@
  */
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled from 'styled-components';
 
-import { Button, Modal, Well } from 'components/bootstrap';
-import { Icon } from 'components/common';
+import Button from 'components/bootstrap/Button';
+import Modal from 'components/bootstrap/Modal';
+import Well from 'components/bootstrap/Well';
+import Icon from 'components/common/Icon';
 import DocumentTitle from 'components/common/DocumentTitle';
-import authStyles from 'theme/styles/authStyles';
 import { qualifyUrl } from 'util/URLUtils';
+import LoginChrome from 'components/login/LoginChrome';
+import type { ServerError } from 'stores/sessions/ServerAvailabilityStore';
 
 const StyledIcon = styled(Icon)`
   margin-left: 6px;
 `;
 
-const ServerUnavailableStyles = createGlobalStyle`
-  ${authStyles}
-`;
+type Props = {
+  server: {
+    up: false,
+    error?: ServerError,
+  },
+};
 
-const ServerUnavailablePage = ({ server }) => {
+const ServerUnavailablePage = ({ server }: Props) => {
   const [showDetails, setShowDetails] = useState(false);
 
   const _toggleDetails = () => setShowDetails(!showDetails);
@@ -101,35 +107,36 @@ const ServerUnavailablePage = ({ server }) => {
 
   return (
     <DocumentTitle title="Server unavailable">
-      <ServerUnavailableStyles />
-      <Modal show>
-        <Modal.Header>
-          <Modal.Title><Icon name="exclamation-triangle" /> Server currently unavailable</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div>
-            <p>
-              We are experiencing problems connecting to the Graylog server running on <i>{qualifyUrl('')}</i>.
-              Please verify that the server is healthy and working correctly.
-            </p>
-            <p>You will be automatically redirected to the previous page once we can connect to the server.</p>
-            <p>
-              Do you need a hand?{' '}
-              <a href="https://www.graylog.org/community-support" rel="noopener noreferrer" target="_blank">We can help you</a>.
-            </p>
+      <LoginChrome>
+        <Modal show>
+          <Modal.Header>
+            <Modal.Title><Icon name="exclamation-triangle" /> Server currently unavailable</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
             <div>
-              <Button bsStyle="primary"
-                      tabIndex={0}
-                      onClick={_toggleDetails}
-                      bsSize="sm">
-                {showDetails ? 'Less details' : 'More details'}
-                <StyledIcon name={showDetails ? 'chevron-up' : 'chevron-down'} />
-              </Button>
-              {_formatErrorMessage()}
+              <p>
+                We are experiencing problems connecting to the Graylog server running on <i>{qualifyUrl('')}</i>.
+                Please verify that the server is healthy and working correctly.
+              </p>
+              <p>You will be automatically redirected to the previous page once we can connect to the server.</p>
+              <p>
+                Do you need a hand?{' '}
+                <a href="https://www.graylog.org/community-support" rel="noopener noreferrer" target="_blank">We can help you</a>.
+              </p>
+              <div>
+                <Button bsStyle="primary"
+                        tabIndex={0}
+                        onClick={_toggleDetails}
+                        bsSize="sm">
+                  {showDetails ? 'Less details' : 'More details'}
+                  <StyledIcon name={showDetails ? 'chevron-up' : 'chevron-down'} />
+                </Button>
+                {_formatErrorMessage()}
+              </div>
             </div>
-          </div>
-        </Modal.Body>
-      </Modal>
+          </Modal.Body>
+        </Modal>
+      </LoginChrome>
     </DocumentTitle>
   );
 };

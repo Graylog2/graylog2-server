@@ -18,7 +18,7 @@ import * as React from 'react';
 import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 
-import {} from 'components/authentication/bindings'; // Bind all authentication plugins
+import 'components/authentication/bindings'; // Bind all authentication plugins
 import history from 'util/History';
 import Routes from 'routing/Routes';
 

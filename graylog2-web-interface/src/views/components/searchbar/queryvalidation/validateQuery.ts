@@ -77,12 +77,12 @@ export const validateQuery = (
         beginColumn,
         endColumn,
         relatedProperty,
-      }));
+      } as const));
 
       return ({
         status: result.status,
         explanations,
-      });
+      } as const);
     }
 
     return undefined;
@@ -91,6 +91,7 @@ export const validateQuery = (
 
     return ({
       status: 'OK',
+      explanations: [],
     });
   });
 };
