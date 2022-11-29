@@ -27,6 +27,4 @@ const WelcomePage = () => {
   );
 };
 
-WelcomePage.displayName = 'WelcomePage';
-
 export default WelcomePage;

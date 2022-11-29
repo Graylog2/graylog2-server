@@ -70,7 +70,7 @@ const RecentActivityList = () => {
 
   return (
     <PaginatedList onChange={onPageChange} useQueryParameter={false} activePage={pagination.page} totalItems={total} pageSize={pagination.per_page} showPageSizeSelect={false} hideFirstAndLastPageLinks>
-      <Table striped data-testid="recent-activity-table">
+      <Table striped>
         <tbody>
           {
               recentActivity.map(({ id, timestamp, activityType, itemType, itemId, itemTitle, userName }) => {

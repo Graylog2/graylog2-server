@@ -61,7 +61,7 @@ jest.mock('components/welcome/hooks', () => ({
           activityType: 'share',
           itemType: 'dashboard',
           itemId: '5',
-          title: 'Title 5',
+          itemTitle: 'Title 5',
           timestamp: '2022-01-01',
         },
         {
@@ -69,7 +69,7 @@ jest.mock('components/welcome/hooks', () => ({
           activityType: 'deleted',
           itemType: 'search',
           itemId: '6',
-          title: 'Title 6',
+          itemTitle: 'Title 6',
           timestamp: '2022-01-03',
         },
       ],
@@ -86,10 +86,14 @@ describe('Welcome', () => {
   describe('Last opened list', () => {
     it('Show items', async () => {
       render(<Welcome />);
-      const list = await screen.findByTestId('last-opened-list');
 
-      expect(list).toHaveTextContent('Title 1');
-      expect(list).toHaveTextContent('Title 2');
+      await screen.findByRole('link', {
+        name: /Title 1/i,
+      });
+
+      await screen.findByRole('link', {
+        name: /Title 2/i,
+      });
     });
 
     it('Show no items', async () => {
@@ -102,10 +106,14 @@ describe('Welcome', () => {
   describe('Favorite items list', () => {
     it('Show items', async () => {
       render(<Welcome />);
-      const list = await screen.findByTestId('favorite-items-list');
 
-      expect(list).toHaveTextContent('Title 3');
-      expect(list).toHaveTextContent('Title 4');
+      await screen.findByRole('link', {
+        name: /Title 3/i,
+      });
+
+      await screen.findByRole('link', {
+        name: /Title 4/i,
+      });
     });
 
     it('Show no items', async () => {
@@ -118,10 +126,14 @@ describe('Welcome', () => {
   describe('Recent activity list', () => {
     it('Show items', async () => {
       render(<Welcome />);
-      const list = await screen.findByTestId('recent-activity-table');
 
-      expect(list).toHaveTextContent('Title 5');
-      expect(list).toHaveTextContent('Title 6');
+      await screen.findByRole('link', {
+        name: /Title 5/i,
+      });
+
+      await screen.findByRole('link', {
+        name: /Title 6/i,
+      });
     });
 
     it('Show no items', async () => {

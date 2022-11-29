@@ -35,7 +35,7 @@ const FavoriteItemsList = () => {
 
   return (
     <PaginatedList onChange={onPageChange} useQueryParameter={false} activePage={pagination.page} totalItems={total} pageSize={pagination.per_page} showPageSizeSelect={false} hideFirstAndLastPageLinks>
-      <ListGroup data-testid="favorite-items-list">
+      <ListGroup>
         {favoriteItems.map(({ type, id, title }) => <EntityItem key={id} type={type} id={id} title={title} />)}
       </ListGroup>
     </PaginatedList>

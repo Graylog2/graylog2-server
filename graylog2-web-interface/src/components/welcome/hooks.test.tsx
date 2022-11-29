@@ -36,7 +36,7 @@ const queryClient = new QueryClient({
   },
 });
 
-const wrapper = ({ children }) => (
+const wrapper = ({ children }: { children: React.ReactNode }) => (
   <QueryClientProvider client={queryClient}>
     {children}
   </QueryClientProvider>
@@ -66,7 +66,7 @@ const mockedRecentActivityResponse = {
     activity_type: 'share',
     item_type: 'dashboard',
     item_id: '5',
-    title: 'Title 5',
+    item_title: 'Title 5',
     timestamp: '2022-01-01',
   }],
   page: 1,
@@ -79,7 +79,7 @@ const mockedRecentActivity = {
     activityType: 'share',
     itemType: 'dashboard',
     itemId: '5',
-    title: 'Title 5',
+    itemTitle: 'Title 5',
     timestamp: '2022-01-01',
   }],
   page: 1,

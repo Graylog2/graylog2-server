@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export type EntityItemType = 'search' | 'dashboard';
+export type EntityItemType = 'search' | 'dashboard' | 'search-filter';
 export type RecentActivityType = 'create' | 'update' | 'share' | 'delete'
 export type Pagination = {
-    page: number,
-    per_page: number,
-    count: number,
-    total: number,
+  page: number,
+  per_page: number,
+  count: number,
+  total: number,
 }
 
 export type FavoriteItem = {

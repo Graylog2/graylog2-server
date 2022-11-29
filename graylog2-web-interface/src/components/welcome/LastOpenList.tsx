@@ -30,7 +30,7 @@ const LastOpenList = () => {
   if (!lastOpened.length) return <EmptyResult>There are no last opened items</EmptyResult>;
 
   return (
-    <ListGroup data-testid="last-opened-list">
+    <ListGroup>
       {lastOpened.map(({ type, id, title }) => <EntityItem key={id} type={type} id={id} title={title} />)}
     </ListGroup>
   );
