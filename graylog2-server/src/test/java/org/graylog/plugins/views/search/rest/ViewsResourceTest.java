@@ -138,6 +138,9 @@ public class ViewsResourceTest {
         when(searchDomain.getForUser(eq(SEARCH_ID), eq(searchUser))).thenReturn(Optional.of(search));
         when(viewService.get(VIEW_ID)).thenReturn(Optional.of(view));
         when(searchFilterVisibilityChecker.checkSearchFilterVisibility(any(), any())).thenReturn(new SearchFilterVisibilityCheckStatus());
+        final var dto = ViewDTO.builder().searchId("1").title("2").state(new HashMap<>()).build();
+        when(viewService.saveWithOwner(any(), any())).thenReturn(dto);
+        when(viewService.update(any())).thenReturn(dto);
     }
 
     class ViewsTestResource extends ViewsResource {
