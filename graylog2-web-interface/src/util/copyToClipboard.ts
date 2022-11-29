@@ -14,8 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
+// Simple fallback if the clipboard API does not exist/is inaccessible
+const legacyWriteText = (str: string) => {
+  const listener = (e: ClipboardEvent) => {
+    e.clipboardData.setData('text/plain', str);
+    e.preventDefault();
+  };
+
+  document.addEventListener('copy', listener);
+  document.execCommand('copy');
+  document.removeEventListener('copy', listener);
+
+  return Promise.resolve();
+};
+
 // Compatibility is sufficient. We not support IE or outdated iOS.
 // eslint-disable-next-line compat/compat
-const copyToClipboard = (text: string) => navigator.clipboard.writeText(text);
+const copyToClipboard = (text: string) => (navigator.clipboard && window.isSecureContext
+  // eslint-disable-next-line compat/compat
+  ? navigator.clipboard.writeText(text)
+  : legacyWriteText(text));
 
 export default copyToClipboard;

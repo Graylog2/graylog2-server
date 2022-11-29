@@ -40,7 +40,7 @@ import static org.graylog.plugins.views.search.aggregations.MissingBucketConstan
 import static org.graylog.testing.containermatrix.SearchServer.ES7;
 import static org.graylog.testing.containermatrix.SearchServer.OS1;
 import static org.graylog.testing.containermatrix.SearchServer.OS2;
-import static org.graylog.testing.containermatrix.SearchServer.OS2_2;
+import static org.graylog.testing.containermatrix.SearchServer.OS2_LATEST;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
@@ -48,7 +48,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
-@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, searchVersions = {OS1, ES7, OS2, OS2_2})
+@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, searchVersions = {OS1, ES7, OS2, OS2_LATEST})
 public class SearchWithAggregationsSupportingMissingBucketsIT {
 
     @SuppressWarnings("unused")
@@ -160,6 +160,21 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         //Empty buckets verification
         //We have only one entry with missing first name {(...)"lastName": "Cooper","age": 60(...)}, so both empty buckets will have the same values
         validatableResponse.body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "'] }.values.value", hasItems(2, 60.0f));
+    }
+
+    @ContainerMatrixTest
+    void testRowAndColumnPivotHasProperMissingBucket() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(false)
+                .series(Count.builder().build(), Average.builder().field("age").build())
+                .rowGroups(Values.builder().field("firstName").limit(1).build())
+                .columnGroups(Values.builder().field("lastName").limit(1).build())
+                .build();
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse
+                .rootPath(PIVOT_RESULTS_PATH)
+                .body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "'] }.values.value", hasItems(1, 60.0f));
     }
 
     @ContainerMatrixTest

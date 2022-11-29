@@ -145,7 +145,7 @@ public class ViewsBindings extends ViewsModule {
         addSystemRestResource(SearchMetadataResource.class);
         addSystemRestResource(ViewsResource.class);
         addSystemRestResource(SuggestionsResource.class);
-         addSystemRestResource(QueryValidationResource.class);
+        addSystemRestResource(QueryValidationResource.class);
 
         addPermissions(ViewsRestPermissions.class);
 

@@ -30,7 +30,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>5.0.0-beta.5</version>
+    <version>5.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -168,6 +168,7 @@
         <zkclient.version>0.11</zkclient.version>
         <zookeeper.version>3.5.7</zookeeper.version>
         <cron-utils.version>9.1.6</cron-utils.version>
+        <asciitable.version>0.3.2</asciitable.version>
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>

@@ -1,0 +1,10 @@
+type = "fixed"
+message = "Filter autocompletion suggestions to currently selected streams."
+
+pulls = ["13553"]
+
+details.user = """
+In previous versions, when the currently selected streams share their index sets with other, inaccessible streams, autocompletion
+suggestions could potentially contain values from documents which are not readable by the current user. This is fixed by
+adding a filter to the request which is limiting values to the currently selected streams.
+"""

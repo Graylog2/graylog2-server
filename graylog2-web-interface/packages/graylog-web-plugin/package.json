@@ -1,16 +1,8 @@
 {
   "name": "graylog-web-plugin",
-  "version": "5.0.0-beta.5",
+  "version": "5.1.0-SNAPSHOT",
   "description": "Helper code for streamlining Graylog web interface plugin development",
   "main": "index.js",
-  "scripts": {
-    "test": "eslint src/*",
-    "build": "babel -d lib/ src/",
-    "preparebuild": "yarn install --ignore-scripts",
-    "compile": "yarn run preparebuild && yarn run build",
-    "prepublish": "yarn run compile",
-    "preinstall": "test -d src/ && yarn run compile"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Graylog2/graylog-web-plugin.git"
@@ -27,7 +19,7 @@
   },
   "homepage": "https://github.com/Graylog2/graylog-web-plugin#readme",
   "files": [
-    "lib/",
+    "src/",
     "templates/",
     "index.js",
     "plugin.js",
@@ -37,7 +29,7 @@
     "extends": "graylog"
   },
   "dependencies": {
-    "@tanstack/react-query": "4.13.0",
+    "@tanstack/react-query": "4.18.0",
     "@types/create-react-class": "15.6.3",
     "@types/jquery": "3.5.14",
     "@types/react": "18.0.25",
@@ -49,7 +41,7 @@
     "jest-preset-graylog": "file:../jest-preset-graylog",
     "jquery": "3.6.1",
     "moment": "2.29.4",
-    "moment-timezone": "0.5.38",
+    "moment-timezone": "0.5.39",
     "prop-types": "15.8.1",
     "react": "16.14.0",
     "react-bootstrap": "0.33.1",
@@ -59,14 +51,10 @@
     "react-router-dom": "5.3.0",
     "reflux": "0.2.13",
     "styled-components": "5.3.6",
-    "typescript": "4.8.4",
-    "webpack": "5.74.0",
+    "typescript": "4.9.3",
+    "webpack": "5.75.0",
     "webpack-cleanup-plugin": "0.5.1",
-    "webpack-cli": "4.10.0",
+    "webpack-cli": "5.0.0",
     "webpack-merge": "4.2.2"
-  },
-  "devDependencies": {
-    "@babel/cli": "7.16.8",
-    "babel-plugin-add-module-exports": "^1.0.4"
   }
 }

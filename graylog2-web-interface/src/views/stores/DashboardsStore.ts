@@ -21,9 +21,11 @@ import { singletonActions, singletonStore } from 'logic/singleton';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
+import type { PaginatedListJSON } from 'stores/PaginationTypes';
 
 import type { PaginatedViews, SortField, SortOrder } from './ViewManagementStore';
 
+import type { ViewJson } from '../logic/views/View';
 import View from '../logic/views/View';
 
 type DashboardsActionsType = RefluxActions<{
@@ -51,6 +53,10 @@ export type DashboardsStoreState = {
   list: Array<View> | undefined;
 };
 
+type PaginatedDashboardsResponse = PaginatedListJSON & {
+  views: Array<ViewJson>,
+};
+
 const DashboardsStore: Store<DashboardsStoreState> = singletonStore(
   'views.Dashboards',
   () => Reflux.createStore({
@@ -70,16 +76,19 @@ const DashboardsStore: Store<DashboardsStoreState> = singletonStore(
       };
     },
     search(query = '', page = 1, perPage = 10, sortBy = 'title', order = 'asc') {
-      const promise = fetch('GET', `${dashboardsUrl}?query=${query}&page=${page}&per_page=${perPage}&sort=${sortBy}&order=${order}`)
+      const promise = fetch<PaginatedDashboardsResponse>('GET', `${dashboardsUrl}?query=${query}&page=${page}&per_page=${perPage}&sort=${sortBy}&order=${order}`)
         .then((response) => {
-          this.dashboards = response.views.map((item) => View.fromJSON(item));
+          const dashboards = response.views.map((item) => View.fromJSON(item));
 
-          this.pagination = {
+          const pagination = {
             total: response.total,
             count: response.count,
             page: response.page,
             perPage: response.per_page,
           };
+
+          this.dashboards = dashboards;
+          this.pagination = pagination;
 
           this.trigger({
             list: this.dashboards,
@@ -87,14 +96,15 @@ const DashboardsStore: Store<DashboardsStoreState> = singletonStore(
           });
 
           return {
-            list: this.dashboards,
-            pagination: this.pagination,
+            list: dashboards,
+            pagination: pagination,
           };
-        })
-        .catch((error) => {
-          UserNotification.error(`Fetching dashboards failed with status: ${error}`,
-            'Could not retrieve dashboards');
         });
+
+      promise.catch((error: Error) => {
+        UserNotification.error(`Fetching dashboards failed with status: ${error}`,
+          'Could not retrieve dashboards');
+      });
 
       DashboardsActions.search.promise(promise);
     },

@@ -23,6 +23,7 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.rest.QueryDTO;
 import org.graylog.plugins.views.search.rest.SearchDTO;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
@@ -32,6 +33,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
@@ -51,13 +53,13 @@ import static org.graylog.plugins.views.aggregations.AggregationTestHelpers.seri
 import static org.graylog.testing.containermatrix.SearchServer.ES7;
 import static org.graylog.testing.containermatrix.SearchServer.OS1;
 import static org.graylog.testing.containermatrix.SearchServer.OS2;
-import static org.graylog.testing.containermatrix.SearchServer.OS2_2;
+import static org.graylog.testing.containermatrix.SearchServer.OS2_LATEST;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
-@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, searchVersions = {ES7, OS1, OS2, OS2_2})
+@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, searchVersions = {ES7, OS1, OS2, OS2_LATEST})
 public class SearchAggregationsIT {
     private static final String PIVOT_NAME = "pivotaggregation";
     private static final String PIVOT_PATH = "results.query1.search_types." + PIVOT_NAME;
@@ -433,6 +435,170 @@ public class SearchAggregationsIT {
         validatableResponse
                 .rootPath(searchTypeResultPath)
                 .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
+    }
+
+    @ContainerMatrixTest
+    void testTwoRowPivotsWithSorting() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(false)
+                .rowGroups(
+                        Values.builder().field("http_method").limit(15).build(),
+                        Values.builder().field("http_response_code").limit(15).build()
+                )
+                .sort(PivotSort.create("http_response_code", SortSpec.Direction.Ascending))
+                .series(Count.builder().build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000))
+                .body("rows", hasSize(10));
+
+        final String searchTypeResultPath = PIVOT_PATH + ".rows";
+
+        final List<List<String>> rows = validatableResponse
+                .extract()
+                .jsonPath().getList(searchTypeResultPath + "*.key");
+
+        assertThat(rows).containsExactly(
+                List.of("GET", "200"),
+                List.of("PUT", "200"),
+                List.of("POST", "201"),
+                List.of("DELETE", "204"),
+                List.of("DELETE", "500"),
+                List.of("GET", "500"),
+                List.of("POST", "500"),
+                List.of("GET", "504"),
+                List.of("POST", "504"),
+                List.of("PUT", "504")
+        );
+    }
+
+    @ContainerMatrixTest
+    void testTwoRowPivotsWithMetricsSorting() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(false)
+                .rowGroups(
+                        Values.builder().field("action").limit(15).build(),
+                        Values.builder().field("controller").limit(15).build()
+                )
+                .series(List.of(Max.builder().field("took_ms").build(), Min.builder().field("took_ms").build()))
+                .sort(SeriesSort.create("min(took_ms)", SortSpec.Direction.Ascending), SeriesSort.create("max(took_ms)", SortSpec.Direction.Descending))
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000));
+
+        final String searchTypeResultPath = PIVOT_PATH + ".rows";
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000))
+                .body("rows", hasSize(5));
+
+        final List<List<Float>> rows = validatableResponse
+                .extract()
+                .jsonPath().getList(searchTypeResultPath + "*.values*.value");
+
+        assertThat(rows).containsExactly(
+                List.of(5300.0f, 36.0f),
+                List.of(5000.0f, 36.0f),
+                List.of(174.0f, 36.0f),
+                List.of(138.0f, 36.0f),
+                List.of(147.0f, 37.0f)
+        );
+    }
+
+    @ContainerMatrixTest
+    void testTopLevelSeries() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(false)
+                .series(List.of(Max.builder().field("took_ms").build(), Min.builder().field("took_ms").build()))
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000));
+
+        final String searchTypeResultPath = PIVOT_PATH + ".rows";
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000))
+                .body("rows", hasSize(1));
+
+        final List<List<Float>> rows = validatableResponse
+                .extract()
+                .jsonPath().getList(searchTypeResultPath + "*.values*.value");
+
+        assertThat(rows).containsExactly(List.of(5300.0f, 36.0f));
+    }
+
+    @ContainerMatrixTest
+    void testTwoIdenticalSeries() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .series(List.of(
+                        Max.builder().field("took_ms").build(),
+                        Max.builder().field("took_ms").build()
+                ))
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000));
+
+        final String searchTypeResultPath = PIVOT_PATH + ".rows";
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000))
+                .body("rows", hasSize(1));
+
+        final List<List<Float>> rows = validatableResponse
+                .extract()
+                .jsonPath().getList(searchTypeResultPath + "*.values*.value");
+
+        assertThat(rows).containsExactly(List.of(5300.0f, 5300.0f));
+    }
+
+    @ContainerMatrixTest
+    void testTwoIdenticalSeriesOneWithCustomId() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .series(List.of(
+                        Max.builder().id("Maximum Response Time").field("took_ms").build(),
+                        Max.builder().field("took_ms").build()
+                ))
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000));
+
+        final String searchTypeResultPath = PIVOT_PATH + ".rows";
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000))
+                .body("rows", hasSize(1));
+
+        final List<List<List<String>>> rowKeys = validatableResponse
+                .extract()
+                .jsonPath().getList(searchTypeResultPath + "*.values*.key");
+
+        assertThat(rowKeys).containsExactly(List.of(
+                Collections.singletonList("Maximum Response Time"),
+                Collections.singletonList("max(took_ms)")
+        ));
+
+        final List<List<Float>> rowValues = validatableResponse
+                .extract()
+                .jsonPath().getList(searchTypeResultPath + "*.values*.value");
+
+        assertThat(rowValues).containsExactly(List.of(5300.0f, 5300.0f));
     }
 
     private String listToGroovy(Collection<String> strings) {

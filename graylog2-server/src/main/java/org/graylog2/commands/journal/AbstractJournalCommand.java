@@ -21,6 +21,7 @@ import org.graylog2.Configuration;
 import org.graylog2.audit.AuditBindings;
 import org.graylog2.bindings.ConfigurationModule;
 import org.graylog2.bootstrap.CmdLineTool;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.shared.bindings.SchedulerBindings;
@@ -48,7 +49,7 @@ public abstract class AbstractJournalCommand extends CmdLineTool {
     }
 
     @Override
-    protected List<Module> getCommandBindings() {
+    protected List<Module> getCommandBindings(FeatureFlags featureFlags) {
         return Arrays.asList(new ConfigurationModule(configuration),
                 new ServerStatusBindings(capabilities()),
                 new SchedulerBindings(),
