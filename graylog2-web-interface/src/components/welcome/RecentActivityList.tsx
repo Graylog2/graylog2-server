@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Table } from 'components/bootstrap';
-import { DEFAULT_PAGINATION, typeLinkMap } from 'components/welcome/Constants';
+import { DEFAULT_PAGINATION, entityTypeMap } from 'components/welcome/Constants';
 import { EmptyResult, PaginatedList, Spinner } from 'components/common';
 import { relativeDifference } from 'util/DateTime';
 import Routes from 'routing/Routes';
@@ -38,12 +38,15 @@ const ActionItemLink = styled(Link)(({ theme }) => css`
 type Props = { itemType: EntityItemType, itemId: string, activityType: RecentActivityType, itemTitle: string, userName?: string };
 
 const ActionItem = ({ itemType, itemId, activityType, itemTitle, userName }: Props) => {
-  const link = typeLinkMap[itemType] ? Routes.pluginRoute(typeLinkMap[itemType].link)(itemId) : undefined;
+  const { typeTitle } = entityTypeMap[itemType];
+  const entityLink = useMemo(() => {
+    return entityTypeMap[itemType] ? Routes.pluginRoute(entityTypeMap[itemType].link)(itemId) : undefined;
+  }, [itemId, itemType]);
 
   return (
     <div>
-      {`The ${itemType} `}
-      <ActionItemLink target="_blank" to={link}>{itemTitle}</ActionItemLink>
+      {`The ${typeTitle} `}
+      <ActionItemLink target="_blank" to={entityLink}>{itemTitle}</ActionItemLink>
       {' was '}
       {`${activityType}d`}
       {userName ? ` by ${userName}` : ''}

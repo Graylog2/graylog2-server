@@ -15,11 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export const typeLinkMap = {
-  dashboard: { link: 'DASHBOARDS_VIEWID' },
-  search: { link: 'SEARCH_VIEWID' },
-  DASHBOARD: { link: 'DASHBOARDS_VIEWID' },
-  SEARCH: { link: 'SEARCH_VIEWID' },
+export const entityTypeMap = {
+  dashboard: { link: 'DASHBOARDS_VIEWID', typeTitle: 'dashboard' },
+  search: { link: 'SEARCH_VIEWID', typeTitle: 'search' },
+  search_filter: { link: 'MY-FILTERS_DETAILS_FILTERID', typeTitle: 'search filter' },
 };
 
 export const DEFAULT_PAGINATION = {

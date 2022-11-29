@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { ListGroupItem, Label } from 'components/bootstrap';
-import { typeLinkMap } from 'components/welcome/Constants';
+import { entityTypeMap } from 'components/welcome/Constants';
 import type { EntityItemType } from 'components/welcome/types';
 
 const StyledListGroupItem = styled(ListGroupItem)`
@@ -42,10 +42,14 @@ type Props = {
 }
 
 const EntityItem = ({ type, title, id }: Props) => {
+  const entityLink = useMemo(() => {
+    return entityTypeMap[type] ? Routes.pluginRoute(entityTypeMap[type].link)(id) : undefined;
+  }, [type, id]);
+
   return (
     <StyledListGroupItem>
-      <StyledLabel bsStyle="info">{type}</StyledLabel>
-      <Link target="_blank" to={Routes.pluginRoute(typeLinkMap[type].link)(id)}>{title}</Link>
+      <StyledLabel bsStyle="info">{entityTypeMap[type].typeTitle}</StyledLabel>
+      <Link target="_blank" to={entityLink}>{title}</Link>
     </StyledListGroupItem>
   );
 };
