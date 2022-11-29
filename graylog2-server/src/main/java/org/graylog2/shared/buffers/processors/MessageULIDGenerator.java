@@ -108,13 +108,13 @@ public class MessageULIDGenerator {
         // This can also happen if the sequenceNr counter in a MessageInput wraps.
         // We handle this by updating the sequenceNrCache and setting the messageSequenceNr accordingly.
         if (messageSequenceNr < 0) {
-            LOG.warn("Got negative message sequence number ({} -> {}). Sort order might be wrong.", subtrahend, sequenceNr);
+            LOG.warn("Got negative message sequence number ({} -> {}). Sort order might be wrong for equal timestamps.", subtrahend, sequenceNr);
             messageSequenceNr = REORDERING_GAP;
             sequenceNrCache.put(cacheKey, sequenceNr);
         // If we receive more than 60535 messages with the same timestamp and input, they will exhaust the 16 bit of space in the ULID.
         // We handle this by updating the sequenceNrCache and setting the messageSequenceNr accordingly.
         } else if (messageSequenceNr >= ULID_RANDOM_MSB_MASK) {
-            LOG.warn("Message sequence number <{}> input <{}> timestamp <{}> does not fit into ULID ({} >= 65535). Sort order might be wrong.",
+            LOG.warn("Message sequence number <{}> input <{}> timestamp <{}> does not fit into ULID ({} >= 65535). Sort order might be wrong for equal timestamps.",
                     sequenceNr, inputId, timestamp, messageSequenceNr);
             messageSequenceNr = REORDERING_GAP;
             sequenceNrCache.put(cacheKey, sequenceNr);
