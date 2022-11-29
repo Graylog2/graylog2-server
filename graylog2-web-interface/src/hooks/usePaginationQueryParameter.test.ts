@@ -86,7 +86,7 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     asMock(useLocation).mockReturnValue({
       search: `?page=${currentPage}`,
-    } as Location<{ search: string }>);
+    } as Location);
 
     const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
 
@@ -100,7 +100,7 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     asMock(useLocation).mockReturnValue({
       search: `?pageSize=${currentPageSize}`,
-    } as Location<{ search: string }>);
+    } as Location);
 
     const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
 
@@ -114,7 +114,7 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     asMock(useLocation).mockReturnValue({
       search: `?pageSize=${currentPageSize}`,
-    } as Location<{ search: string }>);
+    } as Location);
 
     const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
 
