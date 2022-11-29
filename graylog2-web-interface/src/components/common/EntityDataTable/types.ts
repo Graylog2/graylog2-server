@@ -30,9 +30,15 @@ export type ColumnRenderer<Entity extends { id: string }> = {
   renderCell?: (entity: Entity, column: Column) => React.ReactNode,
   renderHeader?: (column: Column) => React.ReactNode,
   textAlign?: string,
+<<<<<<< HEAD
   minWidth?: number, // px
   width?: number, // fraction of unassigned table width, similar to CSS unit fr.
   staticWidth?: number, // px
+=======
+  minWidth?: number,
+  width?: number, // fraction of unassigned table width, similar to CSS unit fr.
+  staticWidth?: number,
+>>>>>>> 8ed64d04a3 (Refactoring)
 }
 
 export type ColumnRenderers<Entity extends { id: string }> = {
