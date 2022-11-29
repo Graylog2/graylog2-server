@@ -161,6 +161,7 @@ const EntityDataTable = <Entity extends { id: string }>({
     () => filterVisibleColumns(accessibleColumns, visibleColumns),
     [accessibleColumns, visibleColumns],
   );
+  const columnsIds = useMemo(() => columns.map(({ id }) => id), [columns]);
 
   const { tableRef, actionsRef, actionsColWidth, columnsWidths } = useElementsWidths({
     columns,
