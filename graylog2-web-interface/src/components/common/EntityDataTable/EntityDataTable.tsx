@@ -35,9 +35,9 @@ import TableRow from './TableRow';
 import type { ColumnRenderers, Column, Sort } from './types';
 
 const ScrollContainer = styled.div(({ theme }) => css`
-  //@media (max-width: ${theme.breakpoints.max.md}) {
+  @media (max-width: ${theme.breakpoints.max.md}) {
     overflow-x: auto;
-  //}
+  }
 `);
 
 const StyledTable = styled(Table)`
@@ -220,12 +220,10 @@ const EntityDataTable = <Entity extends { id: string }>({
                       actionsRef={actionsRef}
                       onToggleEntitySelect={onToggleEntitySelect}
                       columnRenderers={columnRenderers}
-                      columnsWidths={columnsWidths}
                       isSelected={!!selectedEntities?.includes(entity.id)}
                       rowActions={rowActions}
                       displaySelect={displayBulkSelectCol}
                       displayActions={displayActionsCol}
-                      actionsColWidth={actionsColWidth}
                       columns={columns} />
           ))}
         </tbody>
