@@ -100,7 +100,7 @@ public class DynamicStartPageService {
     }
 
     public PaginatedResponse<RecentActivity> findRecentActivityFor(final SearchUser searchUser, int page, int perPage) {
-        final var items = recentActivityService.findRecentActivitiesFor(searchUser)
+        final var items = recentActivityService.findRecentActivitiesFor(searchUser, page, perPage).stream()
                  .map(i -> new RecentActivity(i.id(),
                         i.activityType(),
                         getType(i),
@@ -109,7 +109,7 @@ public class DynamicStartPageService {
                         i.userName(),
                         i.timestamp()))
                 .collect(Collectors.toList());
-        return PaginatedResponse.create("recentActivity", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
+        return PaginatedResponse.create("recentActivity", new PaginatedList<>(items, items.size(), page, perPage));
     }
 
     // works on the existing list, side-effect

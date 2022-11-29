@@ -20,15 +20,13 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import org.graylog2.contentpacks.ContentPackService;
-import org.graylog2.database.NotFoundException;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-/**
- * TODO: convert into LookupTable
- */
+@Singleton
 public class Catalog {
     private final ContentPackService contentPackService;
     private final LoadingCache<String, String> titleCache;

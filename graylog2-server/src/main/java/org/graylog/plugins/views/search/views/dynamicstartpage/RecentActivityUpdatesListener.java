@@ -39,8 +39,9 @@ public class RecentActivityUpdatesListener {
     public void createRecentActivityFor(final RecentActivityEvent event) {
         recentActivityService.save(RecentActivityDTO.builder()
                 .activityType(event.activityType())
-                .itemId(event.itemId())
-                .itemType(event.itemType())
+                .itemId(event.grn().entity())
+                .itemGrn(event.grn().toString())
+                .itemType(event.grn().type())
                 .itemTitle(event.itemTitle())
                 .userName(event.userName())
                 .build());
@@ -60,6 +61,7 @@ public class RecentActivityUpdatesListener {
                 .forEach(e -> recentActivityService.save(RecentActivityDTO.builder()
                         .activityType(ActivityType.SHARE)
                         .itemId(event.entity().entity())
+                        .itemGrn(event.entity().toString())
                         .userName(event.user().getFullName())
                         .grantee(e.grantee().toString())
                         .build())
@@ -70,6 +72,7 @@ public class RecentActivityUpdatesListener {
                 .forEach(e -> recentActivityService.save(RecentActivityDTO.builder()
                         .activityType(ActivityType.UNSHARE)
                         .itemId(event.entity().entity())
+                        .itemGrn(event.entity().toString())
                         .userName(event.user().getFullName())
                         .grantee(e.grantee().toString())
                         .build()) );

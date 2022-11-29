@@ -22,6 +22,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
@@ -37,9 +38,7 @@ import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewResolverDecoder;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.WidgetDTO;
-import org.graylog.plugins.views.search.views.dynamicstartpage.ActivityType;
 import org.graylog.plugins.views.search.views.dynamicstartpage.DynamicStartPageService;
-import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivityEvent;
 import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivityService;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -216,7 +215,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         final User user = userContext.getUser();
         var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
-        recentActivityService.create(result.id(), searchUser);
+        recentActivityService.create(result.id(),result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
         return result;
     }
 
@@ -331,7 +330,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         validateIntegrity(updatedDTO, searchUser, false);
 
         var result = dbService.update(updatedDTO);
-        recentActivityService.update(result.id(), searchUser);
+        recentActivityService.update(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
         return result;
     }
 
@@ -358,7 +357,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         dbService.delete(id);
         triggerDeletedEvent(view);
-        recentActivityService.delete(view.id(), view.type(), view.title(), searchUser);
+        recentActivityService.delete(view.id(), view.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, view.title(), searchUser);
         return view;
     }
 

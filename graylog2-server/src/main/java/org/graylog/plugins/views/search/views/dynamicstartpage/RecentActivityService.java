@@ -17,28 +17,42 @@
 package org.graylog.plugins.views.search.views.dynamicstartpage;
 
 import com.google.common.eventbus.EventBus;
+import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
+import org.graylog.grn.GRNType;
+import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.security.PermissionAndRoleResolver;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
+import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.database.users.User;
 import org.mongojack.DBQuery;
 
 import javax.inject.Inject;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class RecentActivityService extends PaginatedDbService<RecentActivityDTO> {
     private static final String COLLECTION_NAME = "recent_activity";
     private final EventBus eventBus;
+    private final GRNRegistry grnRegistry;
+    private final PermissionAndRoleResolver permissionAndRoleResolver;
 
     private final long MAXIMUM_RECENT_ACTIVITIES = 10000;
 
     @Inject
     protected RecentActivityService(MongoConnection mongoConnection,
                                     MongoJackObjectMapperProvider mapper,
-                                    EventBus eventBus) {
+                                    EventBus eventBus,
+                                    GRNRegistry grnRegistry,
+                                    PermissionAndRoleResolver permissionAndRoleResolver) {
         super(mongoConnection, mapper, RecentActivityDTO.class, COLLECTION_NAME);
+        this.grnRegistry = grnRegistry;
+        this.permissionAndRoleResolver = permissionAndRoleResolver;
         this.eventBus = eventBus;
     }
 
@@ -51,20 +65,28 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
         eventBus.post(event);
     }
 
-    public void create(String id, SearchUser user) {
-        postRecentActivity(new RecentActivityEvent(ActivityType.CREATE, id, user.getUser().getFullName()));
+    public void create(String id, GRNType grn, SearchUser user) {
+        postRecentActivity(new RecentActivityEvent(ActivityType.CREATE, grnRegistry.newGRN(grn, id), user.getUser().getFullName()));
     }
 
-    public void update(String id, SearchUser user) {
-        postRecentActivity(new RecentActivityEvent(ActivityType.UPDATE, id, user.getUser().getFullName()));
+    public void create(String id, GRNType grn, User user) {
+        postRecentActivity(new RecentActivityEvent(ActivityType.CREATE, grnRegistry.newGRN(grn, id), user.getFullName()));
     }
 
-    public void delete(String id, ViewDTO.Type type, String title, SearchUser user) {
-        postRecentActivity(new RecentActivityEvent(ActivityType.DELETE, id, type.name(), title, user.getUser().getFullName()));
+    public void update(String id, GRNType grn, SearchUser user) {
+        postRecentActivity(new RecentActivityEvent(ActivityType.UPDATE, grnRegistry.newGRN(grn, id), user.getUser().getFullName()));
     }
 
-    public void delete(String id, ModelType type, String title, SearchUser user) {
-        postRecentActivity(new RecentActivityEvent(ActivityType.DELETE, id, type.name(), title, user.getUser().getFullName()));
+    public void delete(String id, GRNType grn, String title, SearchUser user) {
+        postRecentActivity(new RecentActivityEvent(ActivityType.DELETE, grnRegistry.newGRN(grn, id), title, user.getUser().getFullName()));
+    }
+
+    public void delete(String id, GRNType grn) {
+        postRecentActivity(new RecentActivityEvent(ActivityType.DELETE, grnRegistry.newGRN(grn, id), null, null));
+    }
+
+    public void delete(String id, GRNType grn, String title) {
+        postRecentActivity(new RecentActivityEvent(ActivityType.DELETE, grnRegistry.newGRN(grn, id), title, null));
     }
 
     public Stream<RecentActivityDTO> _findRecentActivitiesFor(SearchUser user) {
@@ -73,9 +95,17 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
                 .limit(MAXIMUM_RECENT_ACTIVITIES);
     }
 
-    public Stream<RecentActivityDTO> findRecentActivitiesFor(SearchUser user) {
-        return this.streamAllInReverseOrder()
-                .filter(user::canSeeActivity)
-                .limit(MAXIMUM_RECENT_ACTIVITIES);
+    public PaginatedList<RecentActivityDTO> findRecentActivitiesFor(SearchUser user, int page, int perPage) {
+        var sort = getSortBuilder("desc", RecentActivityDTO.FIELD_TIMESTAMP);
+        // no permission check for local admin
+        if(user.getUser().isLocalAdmin()) {
+            return findPaginatedWithQueryAndSort(DBQuery.empty(), sort, page, perPage);
+        }
+
+        // filter relevant activities by permissions
+        final var principal = grnRegistry.newGRN(GRNTypes.USER, user.getUser().getId());
+        final var grns = permissionAndRoleResolver.resolveGrantees(principal).stream().map(GRN::toString).collect(Collectors.toList());
+        var query = DBQuery.in(RecentActivityDTO.FIELD_GRANTEE, grns);
+        return findPaginatedWithQueryAndSort(query, sort, page, perPage);
     }
 }

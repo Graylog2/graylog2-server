@@ -34,6 +34,7 @@ import javax.annotation.Nullable;
 public abstract class RecentActivityDTO {
     public static final String FIELD_ID = "id";
     public static final String FIELD_ACTIVITY_TYPE = "activity_type";
+    public static final String FIELD_ITEM_GRN = "item_grn";
     public static final String FIELD_ITEM_ID = "item_id";
     public static final String FIELD_ITEM_TYPE = "item_type";
     public static final String FIELD_ITEM_TITLE = "item_title";
@@ -49,6 +50,9 @@ public abstract class RecentActivityDTO {
 
     @JsonProperty(FIELD_ACTIVITY_TYPE)
     public abstract ActivityType activityType();
+
+    @JsonProperty(FIELD_ITEM_GRN)
+    public abstract String itemGrn();
 
     @JsonProperty(FIELD_ITEM_ID)
     public abstract String itemId();
@@ -87,6 +91,9 @@ public abstract class RecentActivityDTO {
 
         @JsonProperty(FIELD_ACTIVITY_TYPE)
         public abstract RecentActivityDTO.Builder activityType(ActivityType activityType);
+
+        @JsonProperty(FIELD_ITEM_GRN)
+        public abstract RecentActivityDTO.Builder itemGrn(String itemGrn);
 
         @JsonProperty(FIELD_ITEM_ID)
         public abstract RecentActivityDTO.Builder itemId(String itemId);
