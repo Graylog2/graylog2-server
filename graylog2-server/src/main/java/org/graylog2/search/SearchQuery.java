@@ -18,6 +18,9 @@ package org.graylog2.search;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.mongodb.client.model.Filters;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.mongojack.DBQuery;
 
 import java.util.ArrayList;
@@ -79,6 +82,38 @@ public class SearchQuery {
                 .map(value -> value.getOperator().buildQuery(field, value.getValue()))
                 .collect(Collectors.toList())
                 .toArray(new DBQuery.Query[0]);
+    }
+
+    public Bson toBson() {
+        if (queryMap.isEmpty()) {
+            return new Document();
+        }
+
+        final List<Bson> dbQueries = new ArrayList<>();
+
+        for (Map.Entry<String, Collection<SearchQueryParser.FieldValue>> entry : queryMap.asMap().entrySet()) {
+            final List<Bson> queries = new ArrayList<>();
+
+            final List<SearchQueryParser.FieldValue> include = selectValues(entry.getValue(), value -> !value.isNegate());
+            final List<SearchQueryParser.FieldValue> exclude = selectValues(entry.getValue(), SearchQueryParser.FieldValue::isNegate);
+
+            if (!include.isEmpty()) {
+                queries.add(Filters.or(toBson(entry.getKey(), include)));
+            }
+            if (!exclude.isEmpty()) {
+                queries.add(Filters.nor(toBson(entry.getKey(), exclude)));
+            }
+
+            dbQueries.add(Filters.and(queries));
+        }
+
+        return Filters.and(dbQueries);
+    }
+
+    private List<Bson> toBson(String field, List<SearchQueryParser.FieldValue> values) {
+        return values.stream()
+                .map(value -> value.getOperator().buildBson(field, value.getValue()))
+                .collect(Collectors.toList());
     }
 
     private List<SearchQueryParser.FieldValue> selectValues(Collection<SearchQueryParser.FieldValue> values,
