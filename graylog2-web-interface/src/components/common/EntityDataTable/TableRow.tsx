@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useCallback } from 'react';
 
 import TableCell from './TableCell';
@@ -24,25 +24,22 @@ import RowCheckbox from './RowCheckbox';
 
 export const BULK_SELECT_COLUMN_WIDTH = 20;
 
-const ActionsCell = styled.th<{ $width: number | undefined }>(({ $width }) => css`
-  width: ${$width ? `${$width}px` : 'auto'};
+const ActionsCell = styled.th`
   text-align: right;
 
   .btn-toolbar {
     display: inline-flex;
   }
-`);
+`;
 
 const ActionsRef = styled.div`
   display: inline-flex;
 `;
 
 type Props<Entity extends { id: string }> = {
-  actionsColWidth: number | undefined,
-  actionsRef: React.Ref<HTMLDivElement>
+  actionsRef: React.RefObject<HTMLDivElement>
   columns: Array<Column>,
   columnRenderers: ColumnRenderers<Entity>,
-  columnsWidths: { [columnId: string]: number },
   displaySelect: boolean,
   displayActions: boolean,
   entity: Entity,
@@ -53,10 +50,8 @@ type Props<Entity extends { id: string }> = {
 };
 
 const TableRow = <Entity extends { id: string }>({
-  actionsColWidth,
   columns,
   columnRenderers,
-  columnsWidths,
   displaySelect,
   displayActions,
   entity,
@@ -74,7 +69,7 @@ const TableRow = <Entity extends { id: string }>({
   return (
     <tr key={entity.id}>
       {displaySelect && (
-        <td style={{ width: BULK_SELECT_COLUMN_WIDTH }}>
+        <td>
           <RowCheckbox onChange={toggleRowSelect}
                        title={`${isSelected ? 'Deselect' : 'Select'} entity`}
                        checked={isSelected} />
@@ -87,12 +82,11 @@ const TableRow = <Entity extends { id: string }>({
           <TableCell columnRenderer={columnRenderer}
                      entity={entity}
                      column={column}
-                     colWidth={columnsWidths[column.id]}
                      key={`${entity.id}-${column.id}`} />
         );
       })}
       {displayActions ? (
-        <ActionsCell $width={actionsColWidth}>
+        <ActionsCell>
           {index === 0 ? <ActionsRef ref={actionsRef}>{rowActions(entity)}</ActionsRef> : rowActions(entity)}
         </ActionsCell>
       ) : null}

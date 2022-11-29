@@ -23,9 +23,8 @@ import SortIcon from 'components/streams/StreamsOverview/SortIcon';
 import BulkActionsHead from './BulkActionsHead';
 import type { Column, Sort, ColumnRenderers, ColumnRenderer } from './types';
 
-const Th = styled.th<{ $width: number | undefined, $maxWidth: string| undefined }>(({ $width, $maxWidth }) => css`
+const Th = styled.th<{ $width: number | undefined }>(({ $width }) => css`
   width: ${$width ? `${$width}px` : 'auto'};
-  max-width: ${$maxWidth ?? 'none'};
 `);
 
 const TableHeader = <Entity extends { id: string }>({
@@ -47,7 +46,7 @@ const TableHeader = <Entity extends { id: string }>({
   );
 
   return (
-    <Th $width={colWidth} $maxWidth={columnRenderer?.maxWidth}>
+    <Th $width={colWidth}>
       {content}
 
       {column.sortable && (

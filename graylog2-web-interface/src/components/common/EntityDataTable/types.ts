@@ -33,7 +33,7 @@ export type Column = {
 };
 
 export type ColumnRenderer<Entity extends { id: string }> = {
-  maxWidth?: string,
+  minWidth?: number,
   renderCell?: (entity: Entity, column: Column) => React.ReactNode,
   renderHeader?: (column: Column) => React.ReactNode,
   textAlign?: string,

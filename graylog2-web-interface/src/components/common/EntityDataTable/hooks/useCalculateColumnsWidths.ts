@@ -21,6 +21,8 @@ import type { Column, ColumnRenderers } from 'components/common/EntityDataTable'
 import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/TableRow';
 import WindowDimensionsContext from 'contexts/WindowDimensionsContext';
 
+const DEFAULT_COL_MIN_WIDTH = 150;
+
 const calculateAvailableWidth = ({
   tableWidth,
   displayBulkActionsCol,
@@ -43,12 +45,12 @@ const calculateAvailableWidth = ({
   }
 
   if (displayActionsCol && actionsRef.current) {
-    availableWidth -= actionsRef.current.offsetWidth + 20;
+    availableWidth -= actionsRef.current.offsetWidth;
   }
 
-  columns.forEach((column) => {
-    if (columnRenderers[column.id] && 'width' in columnRenderers[column.id]) {
-      availableWidth -= columnRenderers[column.id].width;
+  columns.forEach(({ id }) => {
+    if (columnRenderers[id] && 'width' in columnRenderers[id]) {
+      availableWidth -= columnRenderers[id].width;
     }
   });
 
@@ -60,7 +62,7 @@ const calculateColumnsWidth = ({
   columns,
   columnRenderers,
 }: {
-  columnRenderers: { [columnId: string]: { width?: number, flexWidth?: number } }
+  columnRenderers: { [columnId: string]: { width?: number, flexWidth?: number, minWidth?: number } }
   columns: Array<{ id: string }>,
   availableWidth: number,
 }) => {
@@ -70,12 +72,19 @@ const calculateColumnsWidth = ({
     return total + flexWidth;
   }, 0);
 
-  const defaultColWidth = availableWidth / flexTotal;
+  const oneColFr = availableWidth / flexTotal;
 
   return columns.reduce((widths, { id }) => {
-    const width = columnRenderers[id]?.width ?? (defaultColWidth * (columnRenderers[id].flexWidth ?? 1));
+    const { width, flexWidth, minWidth } = columnRenderers[id] ?? {};
 
-    return { ...widths, [id]: width };
+    const targetWidth = width ?? (oneColFr * (flexWidth ?? 1));
+    const targetMinWidth = minWidth ?? DEFAULT_COL_MIN_WIDTH;
+
+    if (!width && targetWidth < targetMinWidth) {
+      return { ...widths, [id]: targetMinWidth };
+    }
+
+    return { ...widths, [id]: targetWidth };
   }, []);
 };
 
@@ -105,7 +114,6 @@ const useCalculateColumnWidths = <Entity extends { id: string }>(columns: Array<
     tableRef,
     actionsRef,
     columnsWidths: columnsWidths,
-    actionsColWidth: (actionsRef.current?.offsetWidth ?? 0) + 20,
   };
 };
 
