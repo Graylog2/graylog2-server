@@ -28,7 +28,7 @@ import withPaginationQueryParameter from 'components/common/withPaginationQueryP
 
 import Events, { PAGE_SIZES } from './Events';
 
-import {} from 'components/event-definitions/event-definition-types';
+import 'components/event-definitions/event-definition-types';
 
 const LOCAL_STORAGE_ITEM = 'events-last-search';
 
