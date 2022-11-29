@@ -87,6 +87,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
 
     @POST
     @ApiOperation(value = "Execute query specified by `queryRequestSpec`",
+                  nickname = "messagesByQueryRequestSpec",
                   response = TabularResponse.class)
     @Path("messages")
     @NoAuditEvent("Creating audit event manually in method body.")
@@ -109,15 +110,15 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     }
 
     @GET
-    @ApiOperation(value = "Execute query specified by query parameters")
+    @ApiOperation(value = "Execute query specified by query parameters", nickname = "messagesByQueryParameters")
     @Path("messages")
     @NoAuditEvent("Creating audit event manually in method body.")
-    public TabularResponse executeQuery(@QueryParam("query") String query,
-                                        @QueryParam("streams") Set<String> streams,
-                                        @QueryParam("timerange") String timerangeKeyword,
-                                        @QueryParam("fields") List<String> fields,
-                                        @QueryParam("from") int from,
-                                        @QueryParam("size") int size,
+    public TabularResponse executeQuery(@ApiParam(name = "query") @QueryParam("query") String query,
+                                        @ApiParam(name = "streams") @QueryParam("streams") Set<String> streams,
+                                        @ApiParam(name = "timerange") @QueryParam("timerange") String timerangeKeyword,
+                                        @ApiParam(name = "fields") @QueryParam("fields") List<String> fields,
+                                        @ApiParam(name = "from") @QueryParam("from") int from,
+                                        @ApiParam(name = "size") @QueryParam("size") int size,
                                         @Context SearchUser searchUser) {
         try {
             MessagesRequestSpec messagesRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(query,
@@ -134,6 +135,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
 
     @POST
     @ApiOperation(value = "Execute aggregation specified by `searchRequestSpec`",
+                  nickname = "aggregateSearchRequestSpec",
                   response = TabularResponse.class)
     @Path("aggregate")
     @NoAuditEvent("Creating audit event manually in method body.")
@@ -155,14 +157,14 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     }
 
     @GET
-    @ApiOperation(value = "Execute aggregation specified by query parameters")
+    @ApiOperation(value = "Execute aggregation specified by query parameters", nickname = "aggregateForQueryParameters")
     @Path("aggregate")
     @NoAuditEvent("Creating audit event manually in method body.")
-    public TabularResponse executeQuery(@QueryParam("query") String query,
-                                        @QueryParam("streams") Set<String> streams,
-                                        @QueryParam("timerange") String timerangeKeyword,
-                                        @QueryParam("groups") List<String> groups,
-                                        @QueryParam("metrics") List<String> metrics,
+    public TabularResponse executeQuery(@ApiParam(name = "query") @QueryParam("query") String query,
+                                        @ApiParam(name = "streams") @QueryParam("streams") Set<String> streams,
+                                        @ApiParam(name = "timerange") @QueryParam("timerange") String timerangeKeyword,
+                                        @ApiParam(name = "groups") @QueryParam("groups") List<String> groups,
+                                        @ApiParam(name = "metrics") @QueryParam("metrics") List<String> metrics,
                                         @Context SearchUser searchUser) {
         try {
             AggregationRequestSpec aggregationRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(query, streams, timerangeKeyword, groups, metrics);
