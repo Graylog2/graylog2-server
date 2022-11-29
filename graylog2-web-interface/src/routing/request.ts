@@ -19,7 +19,7 @@ import Qs from 'qs';
 import { Builder } from 'logic/rest/FetchProvider';
 import * as URLUtils from 'util/URLUtils';
 
-type Query = { [key: string]: string | number | boolean };
+type Query = { [key: string]: string | number | boolean | string[] };
 type Headers = { [key: string]: string | number | boolean | string[] };
 type Methods = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
