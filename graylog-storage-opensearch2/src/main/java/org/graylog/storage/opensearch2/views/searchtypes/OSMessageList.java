@@ -105,11 +105,12 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
         // Always add gl2_message_id as a second sort order, if sorting by timestamp is requested.
         // The gl2_message_id contains a sequence nr that represents the order in which messages were received.
         // If messages have identical timestamps, we can still sort them correctly.
-        final Optional<Sort> timeStampSort = sorts.stream().filter(s -> s.field().equals(Message.FIELD_TIMESTAMP)).findFirst();
-        if (timeStampSort.isPresent()) {
+        final Optional<Sort> timeStampSort = findSort(sorts, Message.FIELD_TIMESTAMP);
+        final Optional<Sort> msgIdSort = findSort(sorts, Message.FIELD_GL2_MESSAGE_ID);
+        if (timeStampSort.isPresent() && msgIdSort.isEmpty()) {
             sorts = new ArrayList<>(sorts);
-            final Sort msgIdSort = Sort.create(Message.FIELD_GL2_MESSAGE_ID, timeStampSort.get().order());
-            sorts.add(sorts.indexOf(timeStampSort.get()) + 1, msgIdSort);
+            final Sort newMsgIdSort = Sort.create(Message.FIELD_GL2_MESSAGE_ID, timeStampSort.get().order());
+            sorts.add(sorts.indexOf(timeStampSort.get()) + 1, newMsgIdSort);
         }
         sorts.forEach(sort -> {
             final FieldSortBuilder fieldSort = SortBuilders.fieldSort(sort.field())
@@ -120,6 +121,10 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
             final Optional<String> fieldType = queryContext.fieldType(effectiveStreamIds, sort.field());
             searchSourceBuilder.sort(fieldType.map(fieldSort::unmappedType).orElse(fieldSort));
         });
+    }
+
+    private static Optional<Sort> findSort(List<Sort> sorts, String search) {
+        return sorts.stream().filter(s -> s.field().equals(search)).findFirst();
     }
 
     private SortOrder toSortOrder(Sort.Order sortOrder) {
