@@ -31,6 +31,7 @@ import org.graylog2.rest.models.streams.alerts.AlertConditionSummary;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Date;
 
 @AutoValue
 @WithBeanGetter
@@ -72,7 +73,7 @@ public abstract class StreamDTO {
     public abstract String description();
 
     @JsonProperty(FIELD_CREATED_AT)
-    public abstract String createdAt();
+    public abstract Date createdAt();
 
     @JsonProperty(FIELD_RULES)
     @Nullable
@@ -145,7 +146,7 @@ public abstract class StreamDTO {
         public abstract Builder description(String description);
 
         @JsonProperty(FIELD_CREATED_AT)
-        public abstract Builder createdAt(String createdAt);
+        public abstract Builder createdAt(Date createdAt);
 
         @JsonProperty(FIELD_CONTENT_PACK)
         public abstract Builder contentPack(String contentPack);
@@ -195,7 +196,7 @@ public abstract class StreamDTO {
                 .title(document.getString(FIELD_TITLE))
                 .description(document.getString(FIELD_DESCRIPTION))
                 .matchingType(document.getString(FIELD_MATCHING_TYPE))
-                .createdAt(document.getDate(FIELD_CREATED_AT).toString())
+                .createdAt(document.getDate(FIELD_CREATED_AT))
                 .contentPack(document.getString(FIELD_CONTENT_PACK))
                 .isEditable(document.getBoolean(FIELD_IS_EDITABLE, true))
                 .isDefault(document.getBoolean(FIELD_DEFAULT_STREAM))
