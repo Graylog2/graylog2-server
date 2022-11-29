@@ -21,6 +21,8 @@ import com.google.inject.assistedinject.Assisted;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventFactory;
 import org.graylog.events.event.EventWithContext;
+import org.graylog.events.fields.FieldValue;
+import org.graylog.events.fields.FieldValueType;
 import org.graylog.events.processor.EventConsumer;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessor;
@@ -32,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class SystemNotificationEventProcessor implements EventProcessor {
@@ -55,10 +58,13 @@ public class SystemNotificationEventProcessor implements EventProcessor {
         LOG.debug("Creating system event for notification: {}", eventParameters.notificationType());
 
         String message = eventParameters.notificationType().name();
-        if (eventParameters.notificationDetails() != null) {
-            message += "\n" + eventParameters.notificationDetails();
+        if (eventParameters.notificationMessage() != null) {
+            message += ": " + eventParameters.notificationMessage();
         }
         final Event event = eventFactory.createEvent(eventDefinition, eventParameters.timestamp(), message);
+        for (Map.Entry<String, Object> entry: eventParameters.notificationDetails().entrySet()) {
+            event.setField(entry.getKey(), FieldValue.builder().dataType(FieldValueType.STRING).value(entry.getValue().toString()).build());
+        }
 
         final ImmutableList.Builder<EventWithContext> eventsWithContext = ImmutableList.builder();
         eventsWithContext.add(EventWithContext.create(event));

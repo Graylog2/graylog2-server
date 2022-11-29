@@ -1,5 +1,4 @@
-<#if _title>Elasticsearch version is incompatible</#if> {
-const { initial_version: initialVersion, current_version: currentVersion } = notification.details;
+<#if _title>Elasticsearch version is incompatible</#if>
 
 <#if _description><span>
 The Elasticsearch version which is currently running (${current_version}) has a different major version than

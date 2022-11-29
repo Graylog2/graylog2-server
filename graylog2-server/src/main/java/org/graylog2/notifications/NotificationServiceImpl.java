@@ -84,12 +84,12 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
     }
 
     @Override
-    public boolean fixed(NotificationImpl.Type type) {
+    public boolean fixed(Notification.Type type) {
         return fixed(type, null);
     }
 
     @Override
-    public boolean fixed(NotificationImpl.Type type, Node node) {
+    public boolean fixed(Notification.Type type, Node node) {
         BasicDBObject qry = new BasicDBObject();
         qry.put(NotificationImpl.FIELD_TYPE, type.toString().toLowerCase(Locale.ENGLISH));
         if (node != null) {
@@ -104,7 +104,7 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
     }
 
     @Override
-    public boolean isFirst(NotificationImpl.Type type) {
+    public boolean isFirst(Notification.Type type) {
         return findOne(NotificationImpl.class, new BasicDBObject(NotificationImpl.FIELD_TYPE, type.toString().toLowerCase(Locale.ENGLISH))) == null;
     }
 
@@ -157,10 +157,14 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
             final EventDefinitionDto systemEventDefinition =
                     dbEventDefinitionService.getSystemEventDefinitions().stream().findFirst()
                             .orElseThrow(() -> new IllegalStateException("System notification event definition not found"));
+
+            SystemNotificationRenderService.RenderResponse renderResponse = systemNotificationRenderService.render(notification);
+            notification.addDetail("message_details", renderResponse.description);
             SystemNotificationEventProcessorParameters parameters =
                     SystemNotificationEventProcessorParameters.builder()
                             .notificationType(notification.getType())
-                            .notificationDetails(systemNotificationRenderService.renderPlainText(notification))
+                            .notificationMessage(renderResponse.title)
+                            .notificationDetails(notification.getDetails())
                             .timestamp(notification.getTimestamp())
                             .build();
             eventProcessorEngine.execute(systemEventDefinition.id(), parameters);
@@ -170,7 +174,7 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
             auditEventSender.failure(AuditActor.system(nodeId), SYSTEM_NOTIFICATION_CREATE, notification.asMap());
             return false;
         } catch (EventProcessorException processorException) {
-            LOG.error("Failed to create event for system notification {}", notification, processorException);
+            LOG.error("Failed to create event for system notification {}", notification.getType().toString(), processorException);
             return false;
         }
 

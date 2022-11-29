@@ -23,7 +23,6 @@ import freemarker.core.TemplateConfiguration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import net.htmlparser.jericho.Source;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 
@@ -38,6 +37,8 @@ import java.util.Map;
 import static org.apache.commons.lang.CharEncoding.UTF_8;
 
 public class SystemNotificationRenderService {
+    public enum Format {HTML, PLAINTEXT}
+
     private static final String KEY_NODE_ID = "node_id";
     private static final String KEY_TITLE = "_title";
     private static final String KEY_DESCRIPTION = "_description";
@@ -63,10 +64,11 @@ public class SystemNotificationRenderService {
         tcHTML.setOutputFormat(HTMLOutputFormat.INSTANCE);
         cfg.setTemplateConfigurations(
                 new ConditionalTemplateConfigurationFactory(
-                        new PathGlobMatcher("**"),
+                        new PathGlobMatcher(Format.HTML.name() + "/**"),
                         tcHTML));
     }
 
+/*
     public TemplateRenderResponse renderHtml(Notification notification) {
         return renderHtml(notification.getType(), notification.getDetails());
     }
@@ -120,5 +122,59 @@ public class SystemNotificationRenderService {
         msg.append("*** ").append(plainTitle.trim()).append(" ***");
         msg.append("\n\n").append(plainDescription.trim());
         return msg.toString();
+    }
+*/
+
+    public RenderResponse render(Notification.Type type, Format format, Map<String, Object> values) {
+        Notification notification = notificationService.getByType(type)
+                .orElseThrow(() -> new IllegalArgumentException("Event type is not currently active"));
+        return render(notification, format, values);
+    }
+
+    public RenderResponse render(Notification notification) {
+        return render(notification, Format.PLAINTEXT, null);
+    }
+
+    public RenderResponse render(Notification notification, Format format, Map<String, Object> values) {
+        // Add top level data for template expansion into the details map
+        if (values == null) {
+            values = new HashMap<>();
+        }
+        if (notification.getDetails() != null) {
+            values.putAll(notification.getDetails());
+        }
+        values.put(KEY_NODE_ID, notification.getNodeId());
+        values.put(KEY_CLOUD, graylogConfig.isCloud());
+
+        final String templateRelPath = format.toString() + "/" + notification.getType().toString().toLowerCase(Locale.ENGLISH) + ".ftl";
+        try (StringWriter writer = new StringWriter()) {
+            Template template = cfg.getTemplate(templateRelPath);
+
+            values.put(KEY_TITLE, true);
+            values.put(KEY_DESCRIPTION, false);
+            template.process(values, writer);
+            String title = writer.toString();
+
+            writer.getBuffer().setLength(0);
+            values.put(KEY_TITLE, false);
+            values.put(KEY_DESCRIPTION, true);
+            template.process(values, writer);
+            String description = writer.toString();
+
+            return new RenderResponse(title, description);
+        } catch (TemplateException e) {
+            throw new BadRequestException("Unable to render template " + notification.getType().toString() + ": " + e.getMessage());
+        } catch (IOException e) {
+            throw new BadRequestException("Unable to locate template " + notification.getType().toString() + ": " + e.getMessage());
+        }
+    }
+
+    public class RenderResponse {
+        public String title;
+        public String description;
+        public RenderResponse(String title, String description) {
+            this.title = title;
+            this.description = description;
+        }
     }
 }

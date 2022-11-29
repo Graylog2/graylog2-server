@@ -26,12 +26,16 @@ import org.graylog2.notifications.Notification;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @AutoValue
 @JsonTypeName(SystemNotificationEventProcessorConfig.TYPE_NAME)
 @JsonDeserialize(builder = SystemNotificationEventProcessorParameters.Builder.class)
 public abstract class SystemNotificationEventProcessorParameters implements EventProcessorParameters {
     private static final String FIELD_TIMESTAMP = "timestamp";
     private static final String FIELD_NOTIFICATION_TYPE = "notification_type";
+    private static final String FIELD_NOTIFICATION_MESSAGE = "notification_message";
     private static final String FIELD_NOTIFICATION_DETAILS = "notification_details";
 
     @JsonProperty(FIELD_TIMESTAMP)
@@ -40,8 +44,11 @@ public abstract class SystemNotificationEventProcessorParameters implements Even
     @JsonProperty(FIELD_NOTIFICATION_TYPE)
     public abstract Notification.Type notificationType();
 
+    @JsonProperty(FIELD_NOTIFICATION_MESSAGE)
+    public abstract String notificationMessage();
+
     @JsonProperty(FIELD_NOTIFICATION_DETAILS)
-    public abstract String notificationDetails();
+    public abstract Map<String, Object> notificationDetails();
 
     public abstract Builder toBuilder();
 
@@ -56,6 +63,7 @@ public abstract class SystemNotificationEventProcessorParameters implements Even
             return new AutoValue_SystemNotificationEventProcessorParameters.Builder()
                     .timestamp(DateTime.now(DateTimeZone.UTC))
                     .type(SystemNotificationEventProcessorConfig.TYPE_NAME)
+                    .notificationDetails(new HashMap<>())
                     .notificationType(Notification.Type.GENERIC);
         }
 
@@ -65,8 +73,11 @@ public abstract class SystemNotificationEventProcessorParameters implements Even
         @JsonProperty(FIELD_NOTIFICATION_TYPE)
         public abstract Builder notificationType(Notification.Type notificationType);
 
+        @JsonProperty(FIELD_NOTIFICATION_MESSAGE)
+        public abstract Builder notificationMessage(String details);
+
         @JsonProperty(FIELD_NOTIFICATION_DETAILS)
-        public abstract Builder notificationDetails(String details);
+        public abstract Builder notificationDetails(Map<String, Object> details);
 
         public abstract SystemNotificationEventProcessorParameters build();
     }

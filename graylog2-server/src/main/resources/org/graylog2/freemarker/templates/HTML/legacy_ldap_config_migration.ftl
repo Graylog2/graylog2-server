@@ -1,4 +1,4 @@
-<#if _title>Legacy LDAP/Active Directory configuration has been migrated to an Authentication Service</#if> {
+<#if _title>Legacy LDAP/Active Directory configuration has been migrated to an Authentication Service</#if>
 
 <#if _description><span>
     <#if AUTHENTICATION_BACKEND?has_content>

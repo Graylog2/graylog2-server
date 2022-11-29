@@ -60,8 +60,7 @@ public class SystemNotificationRenderResource extends RestResource {
                                              @PathParam("type") Notification.Type type,
                                              @ApiParam(name = "JSON body", required = false)
                                              TemplateRenderRequest request) {
-        Map<String, Object> values = (request != null) ? request.values() : new HashMap<>();
-        return systemNotificationRenderService.renderHtml(type, values);
+        return render(type, SystemNotificationRenderService.Format.HTML, request);
     }
 
     @POST
@@ -69,11 +68,20 @@ public class SystemNotificationRenderResource extends RestResource {
     @Path("/plaintext/{type}")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Get plaintext formatted message")
-    public String renderPlainText(@ApiParam(name = "type", required = true)
+    public TemplateRenderResponse renderPlainText(@ApiParam(name = "type", required = true)
                                   @PathParam("type") Notification.Type type,
                                   @ApiParam(name = "JSON body", required = false)
                                   TemplateRenderRequest request) {
+        return render(type, SystemNotificationRenderService.Format.PLAINTEXT, request);
+    }
+
+    private TemplateRenderResponse render(
+            Notification.Type type,
+            SystemNotificationRenderService.Format format,
+            TemplateRenderRequest request) {
         Map<String, Object> values = (request != null) ? request.values() : new HashMap<>();
-        return systemNotificationRenderService.renderPlainText(type, values);
+        SystemNotificationRenderService.RenderResponse renderResponse =
+                systemNotificationRenderService.render(type, format, values);
+        return TemplateRenderResponse.create(renderResponse.title, renderResponse.description);
     }
 }

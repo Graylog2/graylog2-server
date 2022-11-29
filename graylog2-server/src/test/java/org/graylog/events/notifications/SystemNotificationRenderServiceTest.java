@@ -17,7 +17,6 @@
 package org.graylog.events.notifications;
 
 import org.graylog.events.processor.systemnotification.SystemNotificationRenderService;
-import org.graylog.events.processor.systemnotification.TemplateRenderResponse;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
@@ -64,10 +63,11 @@ class SystemNotificationRenderServiceTest {
                 .addTimestamp(DateTime.now(DateTimeZone.UTC));
         when(notificationService.getByType(any())).thenReturn(Optional.of(notification));
 
-        TemplateRenderResponse renderResponse = renderService.renderHtml(notification);
-        assertThat(renderResponse.title()).isEqualToIgnoringWhitespace("Email Transport Configuration is missing or invalid!");
-        assertThat(renderResponse.description()).containsSequence("java.lang.Exception: My Test Exception");
-        assertThat(renderResponse.description()).containsSequence("<span>");
+        SystemNotificationRenderService.RenderResponse renderResponse =
+                renderService.render(notification, SystemNotificationRenderService.Format.HTML, null);
+        assertThat(renderResponse.title).isEqualToIgnoringWhitespace("Email Transport Configuration is missing or invalid!");
+        assertThat(renderResponse.description).containsSequence("java.lang.Exception: My Test Exception");
+        assertThat(renderResponse.description).containsSequence("<span>");
     }
 
     @Test
@@ -83,9 +83,9 @@ class SystemNotificationRenderServiceTest {
                 .addTimestamp(DateTime.now(DateTimeZone.UTC));
         when(notificationService.getByType(any())).thenReturn(Optional.of(notification));
 
-        String plainText = renderService.renderPlainText(notification);
-        assertThat(plainText).containsSequence("java.lang.Exception: My Test Exception");
-        assertThat(plainText).doesNotContain("<span>");
+        SystemNotificationRenderService.RenderResponse renderResponse = renderService.render(notification);
+        assertThat(renderResponse.description).containsSequence("java.lang.Exception: My Test Exception");
+        assertThat(renderResponse.description).doesNotContain("<span>");
     }
 
     @Test
@@ -101,8 +101,9 @@ class SystemNotificationRenderServiceTest {
         when(notificationService.getByType(any())).thenReturn(Optional.of(notification));
         when(graylogConfig.isCloud()).thenReturn(true);
 
-        TemplateRenderResponse renderResponse = renderService.renderHtml(notification);
-        assertThat(renderResponse.description()).doesNotContain(url);
+        SystemNotificationRenderService.RenderResponse renderResponse =
+                renderService.render(notification, SystemNotificationRenderService.Format.HTML, null);
+        assertThat(renderResponse.description).doesNotContain(url);
     }
 
     @Test
@@ -118,8 +119,9 @@ class SystemNotificationRenderServiceTest {
         when(notificationService.getByType(any())).thenReturn(Optional.of(notification));
         when(graylogConfig.isCloud()).thenReturn(false);
 
-        TemplateRenderResponse renderResponse = renderService.renderHtml(notification);
-        assertThat(renderResponse.description()).containsSequence(url);
+        SystemNotificationRenderService.RenderResponse renderResponse =
+                renderService.render(notification, SystemNotificationRenderService.Format.HTML, null);
+        assertThat(renderResponse.description).containsSequence(url);
     }
 
     @Test
@@ -137,22 +139,26 @@ class SystemNotificationRenderServiceTest {
                 .addTimestamp(DateTime.now(DateTimeZone.UTC));
         when(notificationService.getByType(any())).thenReturn(Optional.of(notification));
 
-        TemplateRenderResponse renderResponse = renderService.renderHtml(notification);
-        assertThat(renderResponse.description()).containsSequence("11: 12");
+        SystemNotificationRenderService.RenderResponse renderResponse =
+                renderService.render(notification, SystemNotificationRenderService.Format.HTML, null);
+        assertThat(renderResponse.description).containsSequence("11: 12");
     }
 
     @Test
     void missingTemplates() {
-        Arrays.stream(Notification.Type.values())
-                // deprecated notification types from pre-5.0.
-                .filter(t -> t != Notification.Type.MULTI_MASTER && t != Notification.Type.NO_MASTER)
-                .map(t -> {
-                    String templateFile = TEMPLATE_BASE_PATH + t.toString().toLowerCase(Locale.ENGLISH) + ".ftl";
-                    if (SystemNotificationRenderServiceTest.class.getResource(templateFile) == null) {
-                        fail("Missing template: " + templateFile);
-                    }
-                    return t;
-                })
-                .collect(Collectors.toList());
-    }
+        for (SystemNotificationRenderService.Format f: SystemNotificationRenderService.Format.values()) {
+            String basePath = TEMPLATE_BASE_PATH + f.toString() + "/";
+            Arrays.stream(Notification.Type.values())
+                    // deprecated notification types from pre-5.0.
+                    .filter(t -> t != Notification.Type.MULTI_MASTER && t != Notification.Type.NO_MASTER)
+                    .map(t -> {
+                        String templateFile = basePath + t.toString().toLowerCase(Locale.ENGLISH) + ".ftl";
+                        if (SystemNotificationRenderServiceTest.class.getResource(templateFile) == null) {
+                            fail("Missing template: " + templateFile);
+                        }
+                        return t;
+                    })
+                    .collect(Collectors.toList());
+       }
+   }
 }
