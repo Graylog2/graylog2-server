@@ -16,14 +16,16 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.graylog.plugins.views.search.rest.scriptingapi.parsing.TimerangeParser;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
-import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestSpec;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,27 +38,45 @@ public class QueryParamsToFullRequestSpecificationMapper {
         this.timerangeParser = timerangeParser;
     }
 
-    public SearchRequestSpec simpleQueryParamsToFullRequestSpecification(final String query,
-                                                                         final Set<String> streams,
-                                                                         final String timerangeKeyword,
-                                                                         List<String> groups,
-                                                                         List<String> metrics) {
-        if (groups == null || groups.isEmpty()) {
+    public MessagesRequestSpec simpleQueryParamsToFullRequestSpecification(final String query,
+                                                                           final Set<String> streams,
+                                                                           final String timerangeKeyword,
+                                                                           final List<String> fields,
+                                                                           final int from,
+                                                                           final int size) {
+
+        return new MessagesRequestSpec(query,
+                streams,
+                timerangeParser.parseTimeRange(timerangeKeyword),
+                from,
+                size,
+                fields);
+    }
+
+    public AggregationRequestSpec simpleQueryParamsToFullRequestSpecification(final String query,
+                                                                              final Set<String> streams,
+                                                                              final String timerangeKeyword,
+                                                                              List<String> groups,
+                                                                              List<String> metrics) {
+        if (CollectionUtils.isEmpty(groups)) {
             throw new IllegalArgumentException("At least one grouping has to be provided!");
         }
-        if (metrics == null || metrics.isEmpty()) {
+        if (CollectionUtils.isEmpty(metrics)) {
             metrics = List.of("count:");
         }
         if (!metrics.stream().allMatch(m -> m.contains(":") || "count".equals(m))) {
             throw new IllegalArgumentException("All metrics need to be defined as \"function\":\"field_name\"");
         }
+        if (metrics.stream().anyMatch(m -> m.startsWith("percentile:"))) {
+            throw new IllegalArgumentException("Percentile metric cannot be used in simplified query format. Please use POST request instead, specifying configuration for percentile metric");
+        }
 
-        return new SearchRequestSpec(
+        return new AggregationRequestSpec(
                 query,
                 streams,
                 timerangeParser.parseTimeRange(timerangeKeyword),
                 groups.stream().map(Grouping::new).collect(Collectors.toList()),
-                metrics.stream().map(Metric::fromStringRepresentation).filter(Objects::nonNull).collect(Collectors.toList())
+                metrics.stream().map(Metric::fromStringRepresentation).flatMap(Optional::stream).collect(Collectors.toList())
         );
     }
 

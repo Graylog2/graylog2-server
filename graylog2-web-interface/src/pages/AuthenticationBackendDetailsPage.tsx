@@ -20,7 +20,7 @@ import { useState, useEffect } from 'react';
 import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 import withParams from 'routing/withParams';
 import { LinkContainer } from 'components/common/router';
-import {} from 'components/authentication/bindings'; // Bind all authentication plugins
+import 'components/authentication/bindings'; // Bind all authentication plugins
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';

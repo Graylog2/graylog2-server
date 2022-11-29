@@ -14,15 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { render } from 'wrappedTestingLibrary';
+package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
-import LoginBox from './LoginBox';
-
-describe('LoginBox', () => {
-  it('renders a button after the input if buttonAfter is passed', () => {
-    const { container } = render(<LoginBox><div /></LoginBox>);
-
-    expect(container).toMatchSnapshot();
-  });
-});
+public class AggregationFailedException extends Exception {
+    public AggregationFailedException(String message) {
+        super(message);
+    }
+}

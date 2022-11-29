@@ -17,35 +17,29 @@
 package org.graylog.plugins.views.search.rest.scriptingapi;
 
 import com.google.common.eventbus.EventBus;
-import de.vandermeer.asciitable.AsciiTable;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
-import org.graylog.plugins.views.search.rest.SearchJobDTO;
-import org.graylog.plugins.views.search.rest.scriptingapi.mapping.AggregationSpecToPivotMapper;
+import org.graylog.plugins.views.search.rest.scriptingapi.mapping.AggregationFailedException;
+import org.graylog.plugins.views.search.rest.scriptingapi.mapping.AggregationTabularResponseCreator;
+import org.graylog.plugins.views.search.rest.scriptingapi.mapping.MessagesTabularResponseCreator;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryParamsToFullRequestSpecificationMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchRequestSpecToSearchMapper;
-import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchTypeResultToTabularResponseMapper;
-import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestSpec;
-import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
-import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -53,16 +47,13 @@ import javax.validation.ValidationException;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
@@ -71,115 +62,113 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Consumes({MediaType.APPLICATION_JSON})
 @RequiresAuthentication
 public class ScriptingApiResource extends RestResource implements PluginRestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(ScriptingApiResource.class);
 
     private final SearchExecutor searchExecutor;
     private final EventBus serverEventBus;
     private final SearchRequestSpecToSearchMapper searchCreator;
-    private final SearchTypeResultToTabularResponseMapper responseCreator;
+    private final AggregationTabularResponseCreator aggregationTabularResponseCreator;
+    private final MessagesTabularResponseCreator messagesTabularResponseCreator;
     private final QueryParamsToFullRequestSpecificationMapper queryParamsToFullRequestSpecificationMapper;
 
     @Inject
     public ScriptingApiResource(final SearchExecutor searchExecutor,
                                 final EventBus serverEventBus,
                                 final SearchRequestSpecToSearchMapper searchCreator,
-                                final SearchTypeResultToTabularResponseMapper responseCreator,
+                                final AggregationTabularResponseCreator aggregationTabularResponseCreator,
+                                final MessagesTabularResponseCreator messagesTabularResponseCreator,
                                 final QueryParamsToFullRequestSpecificationMapper queryParamsToFullRequestSpecificationMapper) {
         this.searchExecutor = searchExecutor;
         this.serverEventBus = serverEventBus;
         this.searchCreator = searchCreator;
-        this.responseCreator = responseCreator;
+        this.aggregationTabularResponseCreator = aggregationTabularResponseCreator;
+        this.messagesTabularResponseCreator = messagesTabularResponseCreator;
         this.queryParamsToFullRequestSpecificationMapper = queryParamsToFullRequestSpecificationMapper;
     }
 
     @POST
-    @ApiOperation(value = "Execute aggregation specified by `searchRequestSpec`",
+    @ApiOperation(value = "Execute query specified by `queryRequestSpec`",
+                  nickname = "messagesByQueryRequestSpec",
                   response = TabularResponse.class)
-    @Path("aggregate")
+    @Path("messages")
     @NoAuditEvent("Creating audit event manually in method body.")
-    @Produces(MediaType.APPLICATION_JSON)
-    public TabularResponse executeQuery(@ApiParam(name = "searchRequestSpec") @Valid SearchRequestSpec searchRequestSpec,
+    public TabularResponse executeQuery(@ApiParam(name = "queryRequestSpec") @Valid MessagesRequestSpec messagesRequestSpec,
                                         @Context SearchUser searchUser) {
-
         try {
             //Step 1: map simple request to more complex search
-            Search search = searchCreator.mapToSearch(searchRequestSpec, searchUser);
+            Search search = searchCreator.mapToSearch(messagesRequestSpec, searchUser);
 
             //Step 2: execute search as we usually do
             final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
             postAuditEvent(searchJob);
 
             //Step 3: take complex response and try to map it to simpler, tabular form
-            final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
-            final QueryResult queryResult = searchJobDTO.results().get(SearchRequestSpecToSearchMapper.QUERY_ID);
-            if (queryResult != null) {
-                final SearchType.Result aggregationResult = queryResult.searchTypes().get(AggregationSpecToPivotMapper.PIVOT_ID);
-                if (aggregationResult instanceof PivotResult pivotResult) {
-                    return responseCreator.mapToResponse(searchRequestSpec, pivotResult);
-                }
-            }
+            return messagesTabularResponseCreator.mapToResponse(messagesRequestSpec, searchJob);
 
-            LOG.warn("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
-            throw new NotFoundException("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
-        } catch (IllegalArgumentException | ValidationException ex) {
+        } catch (IllegalArgumentException | ValidationException | AggregationFailedException ex) {
+            throw new BadRequestException(ex.getMessage(), ex);
+        }
+    }
+
+    @GET
+    @ApiOperation(value = "Execute query specified by query parameters", nickname = "messagesByQueryParameters")
+    @Path("messages")
+    @NoAuditEvent("Creating audit event manually in method body.")
+    public TabularResponse executeQuery(@ApiParam(name = "query") @QueryParam("query") String query,
+                                        @ApiParam(name = "streams") @QueryParam("streams") Set<String> streams,
+                                        @ApiParam(name = "timerange") @QueryParam("timerange") String timerangeKeyword,
+                                        @ApiParam(name = "fields") @QueryParam("fields") List<String> fields,
+                                        @ApiParam(name = "from") @QueryParam("from") int from,
+                                        @ApiParam(name = "size") @QueryParam("size") int size,
+                                        @Context SearchUser searchUser) {
+        try {
+            MessagesRequestSpec messagesRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(query,
+                    streams,
+                    timerangeKeyword,
+                    fields,
+                    from,
+                    size);
+            return executeQuery(messagesRequestSpec, searchUser);
+        } catch (IllegalArgumentException ex) {
             throw new BadRequestException(ex.getMessage(), ex);
         }
     }
 
     @POST
     @ApiOperation(value = "Execute aggregation specified by `searchRequestSpec`",
+                  nickname = "aggregateSearchRequestSpec",
                   response = TabularResponse.class)
     @Path("aggregate")
     @NoAuditEvent("Creating audit event manually in method body.")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String executeQueryAsciiOutput(@ApiParam(name = "searchRequestSpec") @Valid SearchRequestSpec searchRequestSpec,
-                                          @Context SearchUser searchUser) {
-        final TabularResponse response = executeQuery(searchRequestSpec, searchUser);
-        AsciiTable at = new AsciiTable();
-        at.getContext().setWidth(response.schema().size() * 25);
-        at.addRule();
-        at.addRow(response.schema().stream().map(ResponseSchemaEntry::name).collect(Collectors.toList()));
-        at.addRule();
-        response.datarows().forEach(at::addRow);
-        at.addRule();
-        return at.render();
-    }
-
-    @GET
-    @ApiOperation(value = "Execute aggregation specified by query parameters",
-                  response = TabularResponse.class)
-    @Path("aggregate")
-    @NoAuditEvent("Creating audit event manually in method body.")
-    @Produces(MediaType.APPLICATION_JSON)
-    public TabularResponse executeQuery(@QueryParam("query") String query,
-                                        @QueryParam("streams") Set<String> streams,
-                                        @QueryParam("timerange") String timerangeKeyword,
-                                        @QueryParam("groups") List<String> groups,
-                                        @QueryParam("metrics") List<String> metrics,
+    public TabularResponse executeQuery(@ApiParam(name = "searchRequestSpec") @Valid AggregationRequestSpec aggregationRequestSpec,
                                         @Context SearchUser searchUser) {
         try {
-            SearchRequestSpec searchRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(query, streams, timerangeKeyword, groups, metrics);
-            return executeQuery(searchRequestSpec, searchUser);
-        } catch (IllegalArgumentException ex) {
+            //Step 1: map simple request to more complex search
+            Search search = searchCreator.mapToSearch(aggregationRequestSpec, searchUser);
+
+            //Step 2: execute search as we usually do
+            final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
+            postAuditEvent(searchJob);
+
+            //Step 3: take complex response and try to map it to simpler, tabular form
+            return aggregationTabularResponseCreator.mapToResponse(aggregationRequestSpec, searchJob);
+        } catch (IllegalArgumentException | ValidationException | AggregationFailedException ex) {
             throw new BadRequestException(ex.getMessage(), ex);
         }
     }
 
     @GET
-    @ApiOperation(value = "Execute aggregation specified by query parameters",
-                  response = TabularResponse.class)
+    @ApiOperation(value = "Execute aggregation specified by query parameters", nickname = "aggregateForQueryParameters")
     @Path("aggregate")
     @NoAuditEvent("Creating audit event manually in method body.")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String executeQueryAsciiOutput(@QueryParam("query") String query,
-                                          @QueryParam("streams") Set<String> streams,
-                                          @QueryParam("timerange") String timerangeKeyword,
-                                          @QueryParam("groups") List<String> groups,
-                                          @QueryParam("metrics") List<String> metrics,
-                                          @Context SearchUser searchUser) {
+    public TabularResponse executeQuery(@ApiParam(name = "query") @QueryParam("query") String query,
+                                        @ApiParam(name = "streams") @QueryParam("streams") Set<String> streams,
+                                        @ApiParam(name = "timerange") @QueryParam("timerange") String timerangeKeyword,
+                                        @ApiParam(name = "groups") @QueryParam("groups") List<String> groups,
+                                        @ApiParam(name = "metrics") @QueryParam("metrics") List<String> metrics,
+                                        @Context SearchUser searchUser) {
         try {
-            SearchRequestSpec searchRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(query, streams, timerangeKeyword, groups, metrics);
-            return executeQueryAsciiOutput(searchRequestSpec, searchUser);
+            AggregationRequestSpec aggregationRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(query, streams, timerangeKeyword, groups, metrics);
+            return executeQuery(aggregationRequestSpec, searchUser);
         } catch (IllegalArgumentException ex) {
             throw new BadRequestException(ex.getMessage(), ex);
         }

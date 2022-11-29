@@ -46,12 +46,12 @@ class MetricToSeriesSpecMapperTest {
     @Test
     void throwsExceptionWhenValidatorThrowsException() {
         doThrow(ValidationException.class).when(metricValidator).validate(any());
-        assertThrows(ValidationException.class, () -> toTest.apply(new Metric("http_method", "unknown", null)));
+        assertThrows(ValidationException.class, () -> toTest.apply(new Metric("unknown", "http_method")));
     }
 
     @Test
     void constructsProperSeriesSpec() {
-        final Metric metric = new Metric("took_ms", "avg", null);
+        final Metric metric = new Metric("avg", "took_ms");
         final SeriesSpec result = toTest.apply(metric);
         assertThat(result)
                 .isNotNull()

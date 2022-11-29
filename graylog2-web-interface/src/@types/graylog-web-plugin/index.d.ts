@@ -93,6 +93,13 @@ interface InputConfiguration {
   component: React.ComponentType<{}>;
   embeddedComponent?: React.ComponentType<{}>;
 }
+interface ProviderType {
+  type: string;
+  formComponent: React.ComponentType<{
+    onErrorChange: (error?: string) => void;
+    setLoginFormState: (loginFormState: string) => void;
+  }>;
+}
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
@@ -106,7 +113,8 @@ declare module 'graylog-web-plugin/plugin' {
     pageFooter?: Array<PluginPageFooter>;
     cloud?: Array<PluginCloud>;
     forwarder?: Array<PluginForwarder>;
-    inputConfiguration?: Array<InputConfiguration>
+    inputConfiguration?: Array<InputConfiguration>;
+    loginProviderType?: Array<ProviderType>;
   }
 
   interface PluginRegistration {

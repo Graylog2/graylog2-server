@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.rest.scriptingapi.validation;
 
 import org.graylog.plugins.views.search.rest.SeriesDescription;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.PercentileConfiguration;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,21 +49,27 @@ class MetricValidatiorTest {
 
     @Test
     void throwsExceptionOnMetricWithNoFunctionName() {
-        assertThrows(ValidationException.class, () -> toTest.validate(new Metric("field", null, SortSpec.Direction.Ascending)));
+        assertThrows(ValidationException.class, () -> toTest.validate(new Metric(null, "field", SortSpec.Direction.Ascending, null)));
     }
 
     @Test
     void throwsExceptionOnMetricWithIllegalFunctionName() {
-        assertThrows(ValidationException.class, () -> toTest.validate(new Metric("field", "bum", SortSpec.Direction.Ascending)));
+        assertThrows(ValidationException.class, () -> toTest.validate(new Metric("bum", "field", SortSpec.Direction.Ascending, null)));
     }
 
     @Test
     void throwsExceptionOnMetricMissingFieldName() {
         //check count metric is fine with no field
-        toTest.validate(new Metric(null, "count", SortSpec.Direction.Ascending));
+        toTest.validate(new Metric("count", null, SortSpec.Direction.Ascending, null));
         //check other metrics throw exception on missing field
-        assertThrows(ValidationException.class, () -> toTest.validate(new Metric("", "avg", SortSpec.Direction.Ascending)));
-        assertThrows(ValidationException.class, () -> toTest.validate(new Metric(null, "avg", SortSpec.Direction.Ascending)));
+        assertThrows(ValidationException.class, () -> toTest.validate(new Metric("avg", "", SortSpec.Direction.Ascending, null)));
+        assertThrows(ValidationException.class, () -> toTest.validate(new Metric("avg", null, SortSpec.Direction.Ascending, null)));
+    }
+
+    @Test
+    void throwsExceptionWhenTryingToSortOnUnsortableMetrics() {
+        assertThrows(ValidationException.class, () -> toTest.validate(new Metric("latest", "source", SortSpec.Direction.Ascending, null)));
+        assertThrows(ValidationException.class, () -> toTest.validate(new Metric("percentile", "source", SortSpec.Direction.Descending, new PercentileConfiguration(25.0d))));
     }
 
 }

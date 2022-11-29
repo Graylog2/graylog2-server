@@ -54,7 +54,8 @@ describe('<ConfigurableDataTable />', () => {
     render(<ConfigurableDataTable attributes={selectedAttributes}
                                   rows={rows}
                                   onSortChange={() => {}}
-                                  availableAttributes={availableAttributes} />);
+                                  availableAttributes={availableAttributes}
+                                  total={1} />);
 
     await screen.findByRole('columnheader', { name: /title/i });
     await screen.findByRole('columnheader', { name: /status/i });
@@ -70,7 +71,8 @@ describe('<ConfigurableDataTable />', () => {
     render(<ConfigurableDataTable attributes={selectedAttributes}
                                   rows={rows}
                                   onSortChange={() => {}}
-                                  availableAttributes={availableAttributes} />);
+                                  availableAttributes={availableAttributes}
+                                  total={1} />);
 
     await screen.findByRole('columnheader', { name: /description/i });
     await screen.findByText('Row description');
@@ -90,18 +92,20 @@ describe('<ConfigurableDataTable />', () => {
                                       renderHeader: (attribute) => `Custom ${attribute.title} Header`,
                                     },
                                   }}
-                                  availableAttributes={availableAttributes} />);
+                                  availableAttributes={availableAttributes}
+                                  total={1} />);
 
     await screen.findByRole('columnheader', { name: /custom title header/i });
     await screen.findByText('The title: Row title');
   });
 
   it('should render row actions', async () => {
-    render(<ConfigurableDataTable attributes={selectedAttributes}
-                                  rows={rows}
-                                  onSortChange={() => {}}
-                                  rowActions={(row) => `Custom actions for ${row.title}`}
-                                  availableAttributes={availableAttributes} />);
+    render(<ConfigurableDataTable<{ id: string, title: string }> attributes={selectedAttributes}
+                                                                 rows={rows}
+                                                                 onSortChange={() => {}}
+                                                                 rowActions={(row) => `Custom actions for ${row.title}`}
+                                                                 availableAttributes={availableAttributes}
+                                                                 total={1} />);
 
     await screen.findByText('Custom actions for Row title');
   });
@@ -117,15 +121,14 @@ describe('<ConfigurableDataTable />', () => {
                                       permissions: ['status:read'],
                                     },
                                   }}
-                                  availableAttributes={availableAttributes} />);
+                                  availableAttributes={availableAttributes}
+                                  total={1} />);
 
     expect(screen.queryByRole('columnheader', { name: /status/i })).not.toBeInTheDocument();
     expect(screen.queryByText('enabled')).not.toBeInTheDocument();
   });
 
   it('should display active sort', async () => {
-    asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
-
     render(<ConfigurableDataTable attributes={selectedAttributes}
                                   rows={rows}
                                   onSortChange={() => {}}
@@ -133,24 +136,95 @@ describe('<ConfigurableDataTable />', () => {
                                     attributeId: 'description',
                                     order: 'asc',
                                   }}
-                                  availableAttributes={availableAttributes} />);
+                                  availableAttributes={availableAttributes}
+                                  total={1} />);
 
     await screen.findByTitle(/sort description descending/i);
   });
 
   it('should sort based on attribute', async () => {
     const onSortChange = jest.fn();
-    asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
     render(<ConfigurableDataTable attributes={selectedAttributes}
                                   rows={rows}
                                   onSortChange={onSortChange}
-                                  availableAttributes={availableAttributes} />);
+                                  availableAttributes={availableAttributes}
+                                  total={1} />);
 
     userEvent.click(await screen.findByTitle(/sort description ascending/i));
 
     await waitFor(() => expect(onSortChange).toHaveBeenCalledTimes(1));
 
     expect(onSortChange).toHaveBeenCalledWith({ attributeId: 'description', order: 'asc' });
+  });
+
+  it('should provide selected item ids for bulk actions', async () => {
+    const renderBulkActions = jest.fn(() => <div>Custom bulk actions</div>);
+
+    render(<ConfigurableDataTable attributes={selectedAttributes}
+                                  rows={rows}
+                                  onSortChange={() => {}}
+                                  bulkActions={renderBulkActions}
+                                  availableAttributes={availableAttributes}
+                                  total={1} />);
+
+    const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select row/i });
+    userEvent.click(rowCheckboxes[0]);
+
+    await screen.findByText('Custom bulk actions');
+
+    await waitFor(() => expect(renderBulkActions).toHaveBeenCalledWith(['row-id'], expect.any(Function)));
+  });
+
+  it('should provide bulk actions with function to update selected items', async () => {
+    const selectedItemInfo = '1 item selected';
+    const renderBulkActions = (_selectedItemIds: Array<string>, setSelectedItemIds: (selectedItemIds: Array<string>) => void) => (
+      <button onClick={() => setSelectedItemIds([])} type="button">Reset selection</button>
+    );
+    asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
+
+    render(<ConfigurableDataTable attributes={selectedAttributes}
+                                  rows={rows}
+                                  onSortChange={() => {}}
+                                  bulkActions={renderBulkActions}
+                                  availableAttributes={availableAttributes}
+                                  total={1} />);
+
+    const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select row/i });
+    userEvent.click(rowCheckboxes[0]);
+
+    await screen.findByText(selectedItemInfo);
+    const customBulkAction = await screen.findByRole('button', { name: /reset selection/i });
+
+    userEvent.click(customBulkAction);
+
+    expect(screen.queryByText(selectedItemInfo)).not.toBeInTheDocument();
+    expect(rowCheckboxes[0]).not.toBeChecked();
+  });
+
+  it('should select all items', async () => {
+    asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
+
+    render(<ConfigurableDataTable attributes={selectedAttributes}
+                                  rows={rows}
+                                  onSortChange={() => {}}
+                                  bulkActions={() => <div />}
+                                  availableAttributes={availableAttributes}
+                                  total={1} />);
+
+    const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select row/i });
+
+    expect(rowCheckboxes[0]).not.toBeChecked();
+
+    const selectAllCheckbox = await screen.findByRole('checkbox', { name: /all visible rows/i });
+    userEvent.click(selectAllCheckbox);
+
+    expect(rowCheckboxes[0]).toBeChecked();
+
+    await screen.findByText('1 item selected');
+
+    userEvent.click(selectAllCheckbox);
+
+    expect(rowCheckboxes[0]).not.toBeChecked();
   });
 });

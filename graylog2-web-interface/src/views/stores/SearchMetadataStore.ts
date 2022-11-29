@@ -65,7 +65,7 @@ export const SearchMetadataStore: Store<SearchMetadata> = singletonStore(
     },
 
     parseSearchId(searchId: string): Promise<SearchMetadata> {
-      const promise = fetch('GET', parseSearchIdUrl, searchId)
+      const promise = fetch('GET', parseSearchIdUrl(searchId))
         .then(SearchMetadata.fromJSON)
         .then((metadata) => {
           this.state = metadata;

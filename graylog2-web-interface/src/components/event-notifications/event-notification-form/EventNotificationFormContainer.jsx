@@ -27,7 +27,7 @@ import EventNotificationForm from './EventNotificationForm';
 
 // Import built-in Event Notification Types
 
-import {} from '../event-notification-types';
+import '../event-notification-types';
 
 const initialValidation = {
   errors: {},

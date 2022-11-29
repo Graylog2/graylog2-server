@@ -14,29 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { PluginStore } from 'graylog-web-plugin/plugin';
-import styled, { createGlobalStyle } from 'styled-components';
+import * as React from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 
-import { DocumentTitle } from 'components/common';
-import { Alert, Button } from 'components/bootstrap';
+import LoginChrome from 'components/login/LoginChrome';
+import DocumentTitle from 'components/common/DocumentTitle';
+import Alert from 'components/bootstrap/Alert';
+import Button from 'components/bootstrap/Button';
 import LoginForm from 'components/login/LoginForm';
-import LoginBox from 'components/login/LoginBox';
-import authStyles from 'theme/styles/authStyles';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import AppConfig from 'util/AppConfig';
 import { LOGIN_INITIALIZING_STATE, LOGIN_INITIALIZED_STATE } from 'logic/authentication/constants';
 import { SessionActions } from 'stores/sessions/SessionStore';
-import LoginHeader from 'components/login/LoginHeader';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import LoadingPage from './LoadingPage';
-
-const LoginPageStyles = createGlobalStyle`
-  ${authStyles}
-`;
 
 const StyledButton = styled(Button)`
   margin-top: 1em;
@@ -48,7 +43,7 @@ const StyledPre = styled.pre`
   white-space: pre-line;
 `;
 
-const useActiveBackend = (isCloud) => {
+const useActiveBackend = (isCloud: boolean) => {
   const cloudBackendLoader = () => {
     if (isCloud) {
       return Promise.resolve('oidc-v1');
@@ -62,7 +57,12 @@ const useActiveBackend = (isCloud) => {
   return [data, isSuccess];
 };
 
-const ErrorFallback = ({ error, resetErrorBoundary }) => {
+type ErrorFallbackProps = {
+  error: Error;
+  resetErrorBoundary: (...args: Array<unknown>) => void;
+};
+
+const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => {
   const isCloud = AppConfig.isCloud();
 
   return (
@@ -83,25 +83,8 @@ const ErrorFallback = ({ error, resetErrorBoundary }) => {
   );
 };
 
-ErrorFallback.propTypes = {
-  error: PropTypes.shape({
-    message: PropTypes.string.isRequired,
-  }).isRequired,
-  resetErrorBoundary: PropTypes.func.isRequired,
-};
-
-const LoginPage = () => {
+const useValidateSession = () => {
   const [didValidateSession, setDidValidateSession] = useState(false);
-  const [lastError, setLastError] = useState(undefined);
-  const [useFallback, setUseFallback] = useState(false);
-  const [enableExternalBackend, setEnableExternalBackend] = useState(true);
-  const [loginFormState, setLoginFormState] = useState(LOGIN_INITIALIZING_STATE);
-  const isCloud = AppConfig.isCloud();
-  const [activeBackend, isBackendDetermined] = useActiveBackend(isCloud);
-
-  const registeredLoginComponents = PluginStore.exports('loginProviderType');
-  const loginComponent = registeredLoginComponents.find((c) => c.type === activeBackend);
-  const hasCustomLogin = loginComponent && loginComponent.formComponent;
 
   useEffect(() => {
     const sessionPromise = SessionActions.validate().then((response) => {
@@ -115,15 +98,46 @@ const LoginPage = () => {
     };
   }, []);
 
+  return didValidateSession;
+};
+
+const LoginPage = () => {
+  const didValidateSession = useValidateSession();
+  const [lastError, setLastError] = useState<string | undefined>(undefined);
+  const [useFallback, setUseFallback] = useState(false);
+  const [enableExternalBackend, setEnableExternalBackend] = useState(true);
+  const [loginFormState, setLoginFormState] = useState(LOGIN_INITIALIZING_STATE);
+  const isCloud = AppConfig.isCloud();
+  const [activeBackend, isBackendDetermined] = useActiveBackend(isCloud);
+
+  const registeredLoginComponents = usePluginEntities('loginProviderType');
+  const loginComponent = useMemo(() => registeredLoginComponents.find((c) => c.type === activeBackend), [activeBackend, registeredLoginComponents]);
+  const CustomLogin = loginComponent?.formComponent;
+  const hasCustomLogin = CustomLogin !== undefined;
+
   useEffect(() => {
     setLastError(undefined);
   }, [useFallback]);
 
-  const resetLastError = () => {
+  const resetLastError = useCallback(() => {
     setLastError(undefined);
-  };
+  }, []);
 
-  const formatLastError = () => {
+  const PluggableLoginForm = useCallback(() => {
+    if (!useFallback && CustomLogin) {
+      return (
+        <ErrorBoundary FallbackComponent={ErrorFallback}
+                       onError={() => setEnableExternalBackend(false)}
+                       onReset={() => setUseFallback(true)}>
+          <CustomLogin onErrorChange={setLastError} setLoginFormState={setLoginFormState} />
+        </ErrorBoundary>
+      );
+    }
+
+    return <LoginForm onErrorChange={setLastError} />;
+  }, [CustomLogin, useFallback]);
+
+  const LastError = useCallback(() => {
     if (lastError) {
       return (
         <div className="form-group">
@@ -135,23 +149,7 @@ const LoginPage = () => {
     }
 
     return null;
-  };
-
-  const renderLoginForm = () => {
-    if (!useFallback && hasCustomLogin) {
-      const { formComponent: PluginLoginForm } = loginComponent;
-
-      return (
-        <ErrorBoundary FallbackComponent={ErrorFallback}
-                       onError={() => setEnableExternalBackend(false)}
-                       onReset={() => setUseFallback(true)}>
-          <PluginLoginForm onErrorChange={setLastError} setLoginFormState={setLoginFormState} />
-        </ErrorBoundary>
-      );
-    }
-
-    return <LoginForm onErrorChange={setLastError} />;
-  };
+  }, [lastError, resetLastError]);
 
   if (!didValidateSession || !isBackendDetermined) {
     return (
@@ -166,17 +164,15 @@ const LoginPage = () => {
 
   return (
     <DocumentTitle title="Sign in">
-      <LoginBox>
-        <LoginHeader />
-        <LoginPageStyles />
-        {formatLastError()}
-        {renderLoginForm()}
+      <LoginChrome>
+        <LastError />
+        <PluggableLoginForm />
         {shouldDisplayFallbackLink && (
-        <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>
-          {`Login with ${useFallback ? loginComponent.type.replace(/^\w/, (c) => c.toUpperCase()) : 'default method'}`}
-        </StyledButton>
+          <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>
+            {`Login with ${useFallback ? loginComponent.type.replace(/^\w/, (c) => c.toUpperCase()) : 'default method'}`}
+          </StyledButton>
         )}
-      </LoginBox>
+      </LoginChrome>
     </DocumentTitle>
   );
 };

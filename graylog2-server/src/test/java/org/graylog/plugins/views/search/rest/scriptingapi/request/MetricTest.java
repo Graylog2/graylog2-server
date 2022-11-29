@@ -18,34 +18,32 @@ package org.graylog.plugins.views.search.rest.scriptingapi.request;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MetricTest {
 
     @Test
     void parsesCountMetricCorrectlyEvenWithoutTheFieldName() {
-        Metric count = Metric.fromStringRepresentation("count");
+        Optional<Metric> count = Metric.fromStringRepresentation("count");
         assertThat(count)
-                .isNotNull()
-                .isEqualTo(new Metric(null, "count", null));
+                .hasValue(new Metric("count", null));
 
         count = Metric.fromStringRepresentation("count:");
         assertThat(count)
-                .isNotNull()
-                .isEqualTo(new Metric(null, "count", null));
+                .hasValue(new Metric("count", null));
     }
 
     @Test
     void parsesMetricsCorrectly() {
-        Metric count = Metric.fromStringRepresentation("count:stars");
+        Optional<Metric> count = Metric.fromStringRepresentation("count:stars");
         assertThat(count)
-                .isNotNull()
-                .isEqualTo(new Metric("stars", "count", null));
+                .hasValue(new Metric("count", "stars"));
 
         count = Metric.fromStringRepresentation("avg:salary");
         assertThat(count)
-                .isNotNull()
-                .isEqualTo(new Metric("salary", "avg", null));
+                .hasValue(new Metric("avg", "salary"));
     }
 
 }

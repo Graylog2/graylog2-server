@@ -188,7 +188,7 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
         callback(streams);
       });
   },
-  get(streamId: string, callback: ((stream: Stream) => void)): Promise<StreamResponse> {
+  get(streamId: string, callback: ((stream: Stream) => void)) {
     const failCallback = (errorThrown) => {
       UserNotification.error(`Loading Stream failed with status: ${errorThrown}`,
         'Could not retrieve Stream');
@@ -203,16 +203,10 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
 
     return promise;
   },
-  remove(streamId: string, callback: (() => void)) {
-    const failCallback = (errorThrown) => {
-      UserNotification.error(`Removing Stream failed with status: ${errorThrown}`,
-        'Could not remove Stream');
-    };
-
+  remove(streamId: string) {
     const url = qualifyUrl(ApiRoutes.StreamsApiController.delete(streamId).url);
 
     const promise = fetch('DELETE', url)
-      .then(callback, failCallback)
       .then(() => CurrentUserStore.reload()
         .then(this._emitChange.bind(this)));
 
