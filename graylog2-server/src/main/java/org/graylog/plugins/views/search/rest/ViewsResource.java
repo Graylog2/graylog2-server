@@ -39,6 +39,7 @@ import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.search.views.dynamicstartpage.ActivityType;
 import org.graylog.plugins.views.search.views.dynamicstartpage.DynamicStartPageService;
+import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivityEvent;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
@@ -210,8 +211,8 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         validateIntegrity(dto, searchUser, true);
 
         final User user = userContext.getUser();
-        var result =  dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
-        dynamicStartPageService.addRecentActivity(ActivityType.CREATE, result.id(), result.type().name(), result.title(), user.getFullName());
+        var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
+        dynamicStartPageService.addRecentActivity(new RecentActivityEvent(ActivityType.CREATE, result, user.getFullName()));
         return result;
     }
 
@@ -326,7 +327,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         validateIntegrity(updatedDTO, searchUser, false);
 
         var result = dbService.update(updatedDTO);
-        dynamicStartPageService.addRecentActivity(ActivityType.UPDATE, result.id(), result.type().name(), result.title(), searchUser.getUser().getFullName());
+        dynamicStartPageService.addRecentActivity(new RecentActivityEvent(ActivityType.UPDATE, result, searchUser.getUser().getFullName()));
         return result;
     }
 
@@ -353,7 +354,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         dbService.delete(id);
         triggerDeletedEvent(view);
-        dynamicStartPageService.addRecentActivity(ActivityType.DELETE, view.id(), view.type().name(), view.title(), searchUser.getUser().getFullName());
+        dynamicStartPageService.addRecentActivity(new RecentActivityEvent(ActivityType.DELETE, view, searchUser.getUser().getFullName()));
         return view;
     }
 

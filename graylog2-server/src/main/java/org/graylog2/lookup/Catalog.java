@@ -94,9 +94,9 @@ public class Catalog {
 
     public String getType(final String id) {
         try {
-            var title = typeCache.get(id);
-            if(title != null) {
-                return title;
+            var type = typeCache.get(id);
+            if(type != null) {
+                return type.toLowerCase();
             } else {
                 return "Unknown entity: " + id;
             }

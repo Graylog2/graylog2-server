@@ -16,6 +16,14 @@
  */
 package org.graylog.plugins.views.search.views.dynamicstartpage;
 
+import org.graylog.plugins.views.search.views.ViewDTO;
+
 public record RecentActivityEvent(ActivityType activityType, String itemId, String itemType, String itemTitle, String userName) {
+    public RecentActivityEvent(ActivityType activityType, String itemId, String itemType, String itemTitle) {
+        this(activityType, itemId, itemType, itemTitle, null);
+    }
+    public RecentActivityEvent(ActivityType activityType, ViewDTO view, String userName) {
+        this(activityType, view.id(), view.type().name(), view.title(), userName);
+    }
 }
 

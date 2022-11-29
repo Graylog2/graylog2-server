@@ -151,7 +151,7 @@ public class DynamicStartPageService {
         }
     }
 
-    public void addRecentActivity(final ActivityType activityType, final String id, final String type, final String title, final String userName) {
-        recentActivityService.postRecentActivity(activityType, id, type, title, userName);
+    public void addRecentActivity(final RecentActivityEvent event) {
+        recentActivityService.postRecentActivity(event);
     }
 }

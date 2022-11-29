@@ -45,8 +45,8 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
     }
 
 
-    public void postRecentActivity(final ActivityType type, final String itemId, final String itemType, final String itemTitle, final String userName) {
-        eventBus.post(new RecentActivityEvent(type, itemId, itemType, itemTitle, userName));
+    public void postRecentActivity(final RecentActivityEvent event) {
+        eventBus.post(event);
     }
 
     public Stream<RecentActivityDTO> _findRecentActivitiesFor(SearchUser user) {

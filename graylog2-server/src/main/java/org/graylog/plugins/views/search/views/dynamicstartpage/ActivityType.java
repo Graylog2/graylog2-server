@@ -25,10 +25,10 @@ public enum ActivityType {
     DELETE("delete"),
     @JsonProperty("update")
     UPDATE("update"),
-    @JsonProperty("shared")
-    SHARED("shared"),
-    @JsonProperty("unshared")
-    UNSHARED("unshared");
+    @JsonProperty("share")
+    SHARE("share"),
+    @JsonProperty("unshare")
+    UNSHARE("unshare");
 
     private final String activity;
 
@@ -42,8 +42,8 @@ public enum ActivityType {
             case CREATE -> "create";
             case DELETE -> "delete";
             case UPDATE -> "update";
-            case SHARED -> "shared";
-            case UNSHARED -> "unshared";
+            case SHARE -> "share";
+            case UNSHARE -> "unshare";
         };
     }
 
