@@ -95,12 +95,6 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
         postRecentActivity(new RecentActivityEvent(ActivityType.DELETE, grnRegistry.newGRN(grn, id), title, user.getFullName()));
     }
 
-    public Stream<RecentActivityDTO> _findRecentActivitiesFor(SearchUser user) {
-        return this.streamAllInReverseOrder()
-                .filter(user::canSeeActivity)
-                .limit(MAXIMUM_RECENT_ACTIVITIES);
-    }
-
     public PaginatedList<RecentActivityDTO> findRecentActivitiesFor(SearchUser user, int page, int perPage) {
         var sort = getSortBuilder("desc", RecentActivityDTO.FIELD_TIMESTAMP);
         // no permission check for local admin

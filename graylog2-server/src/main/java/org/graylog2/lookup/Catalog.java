@@ -23,6 +23,7 @@ import org.graylog2.contentpacks.ContentPackService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -94,7 +95,7 @@ public class Catalog {
         try {
             var type = typeCache.get(id);
             if(type != null) {
-                return type.toLowerCase();
+                return type.toLowerCase(Locale.ROOT);
             } else {
                 return "Unknown entity: " + id;
             }
