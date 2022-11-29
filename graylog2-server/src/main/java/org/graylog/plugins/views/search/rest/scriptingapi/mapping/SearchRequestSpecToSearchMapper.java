@@ -23,6 +23,7 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestSpec;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.inject.Inject;
 import java.util.HashSet;
@@ -44,20 +45,21 @@ public class SearchRequestSpecToSearchMapper {
         Query query = Query.builder()
                 .id(QUERY_ID)
                 .searchTypes(Set.of(pivotCreator.apply(searchRequestSpec)))
-                .query(searchRequestSpec.queryString() != null ? ElasticsearchQueryString.of(searchRequestSpec.queryString()) : ElasticsearchQueryString.empty())
-                .timerange(searchRequestSpec.timerange() != null ? searchRequestSpec.timerange() : RelativeRange.allTime())
+                .query(ElasticsearchQueryString.ofNullable(searchRequestSpec.queryString()))
+                .timerange(getTimerange(searchRequestSpec))
                 .build();
 
         if (!searchRequestSpec.streams().isEmpty()) {
             query = query.addStreamsToFilter(new HashSet<>(searchRequestSpec.streams()));
         }
 
-        Search search = Search.builder()
+        return Search.builder()
                 .queries(ImmutableSet.of(query))
-                .build();
+                .build()
+                .addStreamsToQueriesWithoutStreams(() -> searchUser.streams().readableOrAllIfEmpty(searchRequestSpec.streams()));
+    }
 
-
-        search = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().readableOrAllIfEmpty(searchRequestSpec.streams()));
-        return search;
+    private TimeRange getTimerange(SearchRequestSpec searchRequestSpec) {
+        return searchRequestSpec.timerange() != null ? searchRequestSpec.timerange() : RelativeRange.allTime();
     }
 }
