@@ -35,9 +35,9 @@ import TableRow from './TableRow';
 import type { ColumnRenderers, Column, Sort } from './types';
 
 const ScrollContainer = styled.div(({ theme }) => css`
-  //@media (max-width: ${theme.breakpoints.max.md}) {
+  @media (max-width: ${theme.breakpoints.max.md}) {
     overflow-x: auto;
-  //}
+  }
 `);
 
 const StyledTable = styled(Table)`
@@ -211,7 +211,6 @@ const EntityDataTable = <Entity extends { id: string }>({
                    onSortChange={onSortChange}
                    displayBulkSelectCol={displayBulkSelectCol}
                    activeSort={activeSort}
-                   actionsColWidth={actionsColWidth}
                    displayActionsCol={displayActionsCol} />
         <tbody>
           {data.map((entity, index) => (
@@ -225,7 +224,6 @@ const EntityDataTable = <Entity extends { id: string }>({
                       rowActions={rowActions}
                       displaySelect={displayBulkSelectCol}
                       displayActions={displayActionsCol}
-                      actionsColWidth={actionsColWidth}
                       columns={columns} />
           ))}
         </tbody>

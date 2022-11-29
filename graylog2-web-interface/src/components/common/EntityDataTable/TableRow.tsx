@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useCallback } from 'react';
 
 import TableCell from './TableCell';
@@ -28,7 +28,7 @@ const ActionsCell = styled.th`
   .btn-toolbar {
     display: inline-flex;
   }
-`);
+`;
 
 const ActionsRef = styled.div`
   display: inline-flex;
@@ -52,7 +52,6 @@ type Props<Entity extends { id: string }> = {
 };
 
 const TableRow = <Entity extends { id: string }>({
-  actionsColWidth,
   columns,
   columnRenderers,
   displaySelect,
@@ -85,7 +84,6 @@ const TableRow = <Entity extends { id: string }>({
           <TableCell columnRenderer={columnRenderer}
                      entity={entity}
                      column={column}
-                     colWidth={columnsWidths[column.id]}
                      key={`${entity.id}-${column.id}`} />
         );
       })}
