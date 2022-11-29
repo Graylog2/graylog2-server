@@ -49,6 +49,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Java6Assertions.within;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.hasEntry;
@@ -506,8 +508,8 @@ public class ScriptingApiResourceIT {
         final String to = validatableResponse.extract().body().jsonPath().getString("metadata.effective_timerange.to");
         final DateTime fromDateTime = DateTime.parse(from);
         final DateTime toDateTime = DateTime.parse(to);
-        final long diff = toDateTime.getMillis() - fromDateTime.getMillis();
-        Assertions.assertEquals(300_000, diff);
+        final float diff = toDateTime.getMillis() - fromDateTime.getMillis();
+        assertThat(diff).isCloseTo(300_000, within(10_000f));
     }
 
 
