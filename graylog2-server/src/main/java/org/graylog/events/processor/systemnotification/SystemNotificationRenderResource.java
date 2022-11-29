@@ -36,9 +36,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
-@Api(value = "System/Notification/Message", description = "Render system notification messages", tags = {CLOUD_VISIBLE})
+@Api(value = "System/Notification/Message", description = "Render system notification messages")
 @Path("/system/notification/message")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces({MediaType.TEXT_HTML, MediaType.TEXT_PLAIN})
@@ -56,7 +54,7 @@ public class SystemNotificationRenderResource extends RestResource {
     @POST
     @NoAuditEvent("Doesn't change any data, only renders a notification message")
     @Path("/html/{type}")
-    @Produces(MediaType.TEXT_HTML)
+    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Get HTML formatted message")
     public TemplateRenderResponse renderHtml(@ApiParam(name = "type", required = true)
                                              @PathParam("type") Notification.Type type,
@@ -69,7 +67,7 @@ public class SystemNotificationRenderResource extends RestResource {
     @POST
     @NoAuditEvent("Doesn't change any data, only renders a notification message")
     @Path("/plaintext/{type}")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Get plaintext formatted message")
     public String renderPlainText(@ApiParam(name = "type", required = true)
                                   @PathParam("type") Notification.Type type,

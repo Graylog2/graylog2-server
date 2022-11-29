@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;
-import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
@@ -30,10 +29,12 @@ import org.graylog.events.processor.systemnotification.SystemNotificationEventPr
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
@@ -60,6 +61,7 @@ import java.util.Optional;
 import static java.util.Locale.US;
 import static java.util.Objects.requireNonNull;
 import static org.graylog.events.processor.systemnotification.SystemNotificationEventIndexTemplateProvider.SYSTEM_EVENT_TEMPLATE_TYPE;
+import static org.graylog2.configuration.ElasticsearchConfiguration.DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX;
 import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID;
 
@@ -72,6 +74,8 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     private final IndexSetValidator indexSetValidator;
     private final StreamService streamService;
     private final DBEventDefinitionService dbService;
+    private final IndexSetRegistry indexSetRegistry;
+    private final IndexSetCleanupJob.Factory indexSetCleanupJobFactory;
 
     @Inject
     public V20190705071400_AddEventIndexSetsMigration(ElasticsearchConfiguration elasticsearchConfiguration,
@@ -79,13 +83,17 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
                                                       IndexSetService indexSetService,
                                                       IndexSetValidator indexSetValidator,
                                                       StreamService streamService,
-                                                      DBEventDefinitionService dbService) {
+                                                      DBEventDefinitionService dbService,
+                                                      IndexSetRegistry indexSetRegistry,
+                                                      IndexSetCleanupJob.Factory indexSetCleanupJobFactory) {
         this.elasticsearchConfiguration = elasticsearchConfiguration;
         this.mongoIndexSetFactory = mongoIndexSetFactory;
         this.indexSetService = indexSetService;
         this.indexSetValidator = indexSetValidator;
         this.streamService = streamService;
         this.dbService = dbService;
+        this.indexSetRegistry = indexSetRegistry;
+        this.indexSetCleanupJobFactory = indexSetCleanupJobFactory;
     }
 
     @Override
@@ -105,17 +113,40 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
                 "All events",
                 "Stream containing all events created by Graylog"
         );
+
+        deleteObsoleteStreamAndIndexSet();
         ensureEventsStreamAndIndexSet(
                 "Graylog System Events",
                 "Stores Graylog system events.",
                 elasticsearchConfiguration.getDefaultSystemEventsIndexPrefix(),
-                ElasticsearchConfiguration.DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX,
+                DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX,
                 SYSTEM_EVENT_TEMPLATE_TYPE,
                 DEFAULT_SYSTEM_EVENTS_STREAM_ID,
                 "All system events",
                 "Stream containing all system events created by Graylog"
         );
         ensureSystemNotificationEventsDefinition();
+    }
+
+    // Delete previously created System Events which use Event template instead of System Events template
+    private void deleteObsoleteStreamAndIndexSet() {
+        Optional<IndexSetConfig> optSystemEventConfig =
+                getEventsIndexSetConfig(elasticsearchConfiguration.getDefaultSystemEventsIndexPrefix(), EVENT_TEMPLATE_TYPE);
+        if (optSystemEventConfig.isPresent()) {
+            String id = optSystemEventConfig.get().id();
+            try {
+                for (Stream stream: streamService.loadAllWithIndexSet(id)) {
+                    streamService.destroy(stream);
+                }
+                final IndexSet indexSet = indexSetRegistry.get(id)
+                        .orElseThrow(() -> new javax.ws.rs.NotFoundException("Index set <" + id + "> not found."));
+                indexSetService.delete(id);
+                indexSetCleanupJobFactory.create(indexSet).execute();
+            }
+            catch (Exception e) {
+                LOG.debug("Ignored exception while deleting obsolete system event stream and index set", e);
+            }
+        }
     }
 
     private void ensureEventsStreamAndIndexSet(String indexSetTitle,
@@ -237,8 +268,6 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
                                     .gracePeriodMs(0) // Defaults to 0 in the UI
                                     .backlogSize(0) // Defaults to 0 in the UI
                                     .build())
-                            // Empty notifications list by default. The user will specify later in the UI.
-                            .notifications(ImmutableList.<EventNotificationHandler.Config>builder().build())
                             .config(SystemNotificationEventProcessorConfig.builder().build())
                             .storage(ImmutableList.of(PersistToStreamsStorageHandler.Config.createWithSystemEventsStream()))
                             .scope(SystemNotificationEventEntityScope.NAME)

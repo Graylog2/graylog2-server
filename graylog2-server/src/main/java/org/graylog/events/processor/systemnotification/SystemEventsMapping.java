@@ -19,10 +19,11 @@ package org.graylog.events.processor.systemnotification;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.EventsIndexMapping7;
 
-public class SystemNotificationEventsIndexMapping7 extends EventsIndexMapping7 {
+public class SystemEventsMapping extends EventsIndexMapping7 {
     @Override
     protected ImmutableMap<String, Object> fieldProperties() {
         return map()
+                .putAll(super.fieldProperties())
                 .put("id", map()
                         .put("type", "keyword")
                         .build())
@@ -68,29 +69,6 @@ public class SystemNotificationEventsIndexMapping7 extends EventsIndexMapping7 {
                         .put("type", "object")
                         .put("dynamic", true)
                         .build())
-                /* TODO: Enable the typed fields once we decided if that's the way to go
-                .put("fields_typed", map()
-                        .put("type", "object")
-                        .put("properties", map()
-                                .put("long", map()
-                                        .put("type", "object")
-                                        .put("dynamic", true)
-                                        .build())
-                                .put("double", map()
-                                        .put("type", "object")
-                                        .put("dynamic", true)
-                                        .build())
-                                .put("boolean", map()
-                                        .put("type", "object")
-                                        .put("dynamic", true)
-                                        .build())
-                                .put("ip", map()
-                                        .put("type", "object")
-                                        .put("dynamic", true)
-                                        .build())
-                                .build())
-                        .build())
-                 */
                 .build();
     }
 }

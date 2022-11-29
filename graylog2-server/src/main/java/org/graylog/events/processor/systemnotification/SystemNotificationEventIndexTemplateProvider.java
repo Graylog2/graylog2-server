@@ -34,7 +34,7 @@ public class SystemNotificationEventIndexTemplateProvider implements IndexTempla
     @Override
     public IndexMappingTemplate create(@Nonnull SearchVersion elasticsearchVersion, @Nonnull IndexSetConfig indexSetConfig) {
         if (elasticsearchVersion.satisfies(ELASTICSEARCH, "^7.0.0") || elasticsearchVersion.satisfies(OPENSEARCH, "^1.0.0 | ^2.0.0")) {
-            return new SystemNotificationEventsIndexMapping7();
+            return new SystemEventsMapping();
         } else {
             throw new ElasticsearchException("Unsupported Search version: " + elasticsearchVersion);
         }

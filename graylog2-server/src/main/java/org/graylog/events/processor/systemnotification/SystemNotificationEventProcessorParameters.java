@@ -21,21 +21,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.events.processor.EventProcessorParametersWithTimerange;
+import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog2.notifications.Notification;
-import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Objects.requireNonNull;
 
 @AutoValue
 @JsonTypeName(SystemNotificationEventProcessorConfig.TYPE_NAME)
 @JsonDeserialize(builder = SystemNotificationEventProcessorParameters.Builder.class)
-public abstract class SystemNotificationEventProcessorParameters implements EventProcessorParametersWithTimerange {
+public abstract class SystemNotificationEventProcessorParameters implements EventProcessorParameters {
     private static final String FIELD_TIMESTAMP = "timestamp";
     private static final String FIELD_NOTIFICATION_TYPE = "notification_type";
     private static final String FIELD_NOTIFICATION_DETAILS = "notification_details";
@@ -49,15 +43,6 @@ public abstract class SystemNotificationEventProcessorParameters implements Even
     @JsonProperty(FIELD_NOTIFICATION_DETAILS)
     public abstract String notificationDetails();
 
-    @Override
-    public EventProcessorParametersWithTimerange withTimerange(DateTime from, DateTime to) {
-        requireNonNull(from, "from cannot be null");
-        requireNonNull(to, "to cannot be null");
-        checkArgument(to.isAfter(from), "to must be after from");
-
-        return toBuilder().timerange(AbsoluteRange.create(from, to)).build();
-    }
-
     public abstract Builder toBuilder();
 
     public static Builder builder() {
@@ -65,20 +50,11 @@ public abstract class SystemNotificationEventProcessorParameters implements Even
     }
 
     @AutoValue.Builder
-    public abstract static class Builder implements EventProcessorParametersWithTimerange.Builder<Builder> {
+    public abstract static class Builder implements EventProcessorParameters.Builder<Builder> {
         @JsonCreator
         public static Builder create() {
-            final RelativeRange timerange;
-            try {
-                timerange = RelativeRange.create(3600);
-            } catch (InvalidRangeParametersException e) {
-                // This should not happen!
-                throw new RuntimeException(e);
-            }
-
             return new AutoValue_SystemNotificationEventProcessorParameters.Builder()
                     .timestamp(DateTime.now(DateTimeZone.UTC))
-                    .timerange(timerange)
                     .type(SystemNotificationEventProcessorConfig.TYPE_NAME)
                     .notificationType(Notification.Type.GENERIC);
         }
