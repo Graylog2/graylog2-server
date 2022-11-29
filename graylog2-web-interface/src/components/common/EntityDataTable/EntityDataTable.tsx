@@ -209,7 +209,6 @@ const EntityDataTable = <Entity extends { id: string }>({
                    onSortChange={onSortChange}
                    displayBulkSelectCol={displayBulkSelectCol}
                    activeSort={activeSort}
-                   actionsColWidth={actionsColWidth}
                    displayActionsCol={displayActionsCol} />
         <tbody>
           {data.map((entity, index) => (
@@ -223,7 +222,6 @@ const EntityDataTable = <Entity extends { id: string }>({
                       rowActions={rowActions}
                       displaySelect={displayBulkSelectCol}
                       displayActions={displayActionsCol}
-                      actionsColWidth={actionsColWidth}
                       columns={columns} />
           ))}
         </tbody>
