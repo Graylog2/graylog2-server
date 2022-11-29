@@ -22,7 +22,7 @@ import { Icon } from 'components/common';
 
 type Props = {
   children: React.ReactNode,
-  className: string | null | undefined,
+  className?: string,
 };
 
 /**

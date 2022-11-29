@@ -22,6 +22,10 @@ import { Col, Row } from 'components/bootstrap';
 import { Spinner, NoEntitiesExist } from 'components/common';
 import Output from 'components/outputs/Output';
 
+const sortByTitle = (output1, output2) => {
+  return naturalSort(output1.title.toLowerCase(), output2.title.toLowerCase());
+};
+
 class OutputList extends React.Component {
   static propTypes = {
     streamId: PropTypes.string,
@@ -31,11 +35,6 @@ class OutputList extends React.Component {
     onUpdate: PropTypes.func.isRequired,
     getTypeDefinition: PropTypes.func.isRequired,
     types: PropTypes.object.isRequired,
-  };
-
-  // eslint-disable-next-line class-methods-use-this
-  _sortByTitle = (output1, output2) => {
-    return naturalSort(output1.title.toLowerCase(), output2.title.toLowerCase());
   };
 
   _formatOutput = (output) => {
@@ -68,7 +67,7 @@ class OutputList extends React.Component {
       );
     }
 
-    const outputs = this.props.outputs.sort(this._sortByTitle).map(this._formatOutput);
+    const outputs = this.props.outputs.sort(sortByTitle).map(this._formatOutput);
 
     return <div>{outputs}</div>;
   }

@@ -22,7 +22,7 @@ import { Icon } from 'components/common';
 
 type Props = {
   children: React.ReactNode,
-  className: string | null | undefined,
+  className?: string,
 };
 
 /**
@@ -34,7 +34,7 @@ const NoEntitiesExist = ({ children, className }: Props) => (
 );
 
 NoEntitiesExist.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  children: PropTypes.oneOfType([PropTypes.node]),
   className: PropTypes.string,
 };
 
