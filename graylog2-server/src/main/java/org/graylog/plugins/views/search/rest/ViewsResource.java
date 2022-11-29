@@ -40,6 +40,7 @@ import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.search.views.dynamicstartpage.ActivityType;
 import org.graylog.plugins.views.search.views.dynamicstartpage.DynamicStartPageService;
 import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivityEvent;
+import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivityService;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
@@ -102,16 +103,19 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final SearchFilterVisibilityChecker searchFilterVisibilityChecker;
     private final ReferencedSearchFiltersHelper referencedSearchFiltersHelper;
     private final DynamicStartPageService dynamicStartPageService;
+    private final RecentActivityService recentActivityService;
 
     @Inject
     public ViewsResource(ViewService dbService,
                          DynamicStartPageService dynamicStartPageService,
+                         RecentActivityService recentActivityService,
                          ClusterEventBus clusterEventBus, SearchDomain searchDomain,
                          Map<String, ViewResolver> viewResolvers,
                          SearchFilterVisibilityChecker searchFilterVisibilityChecker,
                          ReferencedSearchFiltersHelper referencedSearchFiltersHelper) {
         this.dbService = dbService;
         this.dynamicStartPageService = dynamicStartPageService;
+        this.recentActivityService = recentActivityService;
         this.clusterEventBus = clusterEventBus;
         this.searchDomain = searchDomain;
         this.viewResolvers = viewResolvers;
@@ -212,7 +216,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         final User user = userContext.getUser();
         var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
-        dynamicStartPageService.addRecentActivity(new RecentActivityEvent(ActivityType.CREATE, result, user.getFullName()));
+        recentActivityService.create(result.id(), searchUser);
         return result;
     }
 
@@ -327,7 +331,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         validateIntegrity(updatedDTO, searchUser, false);
 
         var result = dbService.update(updatedDTO);
-        dynamicStartPageService.addRecentActivity(new RecentActivityEvent(ActivityType.UPDATE, result, searchUser.getUser().getFullName()));
+        recentActivityService.update(result.id(), searchUser);
         return result;
     }
 
@@ -354,7 +358,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         dbService.delete(id);
         triggerDeletedEvent(view);
-        dynamicStartPageService.addRecentActivity(new RecentActivityEvent(ActivityType.DELETE, view, searchUser.getUser().getFullName()));
+        recentActivityService.delete(view.id(), view.type(), view.title(), searchUser);
         return view;
     }
 

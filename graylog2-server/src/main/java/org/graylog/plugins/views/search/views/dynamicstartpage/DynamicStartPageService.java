@@ -150,8 +150,4 @@ public class DynamicStartPageService {
             favoriteItemsService.save(favoriteItems.get());
         }
     }
-
-    public void addRecentActivity(final RecentActivityEvent event) {
-        recentActivityService.postRecentActivity(event);
-    }
 }

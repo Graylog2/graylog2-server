@@ -18,7 +18,9 @@ package org.graylog.plugins.views.search.views.dynamicstartpage;
 
 import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.mongojack.DBQuery;
@@ -45,8 +47,24 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
     }
 
 
-    public void postRecentActivity(final RecentActivityEvent event) {
+    private void postRecentActivity(final RecentActivityEvent event) {
         eventBus.post(event);
+    }
+
+    public void create(String id, SearchUser user) {
+        postRecentActivity(new RecentActivityEvent(ActivityType.CREATE, id, user.getUser().getFullName()));
+    }
+
+    public void update(String id, SearchUser user) {
+        postRecentActivity(new RecentActivityEvent(ActivityType.UPDATE, id, user.getUser().getFullName()));
+    }
+
+    public void delete(String id, ViewDTO.Type type, String title, SearchUser user) {
+        postRecentActivity(new RecentActivityEvent(ActivityType.DELETE, id, type.name(), title, user.getUser().getFullName()));
+    }
+
+    public void delete(String id, ModelType type, String title, SearchUser user) {
+        postRecentActivity(new RecentActivityEvent(ActivityType.DELETE, id, type.name(), title, user.getUser().getFullName()));
     }
 
     public Stream<RecentActivityDTO> _findRecentActivitiesFor(SearchUser user) {
