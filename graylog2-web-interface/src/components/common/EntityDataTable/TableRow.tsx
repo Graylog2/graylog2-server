@@ -22,8 +22,6 @@ import TableCell from './TableCell';
 import type { ColumnRenderers, Column } from './types';
 import RowCheckbox from './RowCheckbox';
 
-export const BULK_SELECT_COLUMN_WIDTH = 20;
-
 const ActionsCell = styled.th`
   text-align: right;
 

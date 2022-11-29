@@ -28,8 +28,9 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import StringUtils from 'util/StringUtils';
 import ColumnsVisibilitySelect from 'components/common/EntityDataTable/ColumnsVisibilitySelect';
 import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
-import useCalculateColumnWidths from 'components/common/EntityDataTable/hooks/useCalculateColumnsWidths';
+import useColumnWidths from 'components/common/EntityDataTable/hooks/useColumnWidths';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
+import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 
 import type { ColumnRenderers, Column, Sort } from './types';
 
@@ -41,6 +42,10 @@ const ScrollContainer = styled.div(({ theme }) => css`
 
 const StyledTable = styled(Table)`
   table-layout: fixed;
+
+  thead > tr > th, tbody > tr > td {
+    padding: ${CELL_PADDING}px;
+  }
 `;
 
 const ActionsRow = styled.div`
@@ -127,6 +132,7 @@ const EntityDataTable = <Entity extends { id: string }>({
     () => filterVisibleColumns(accessibleColumns, visibleColumns),
     [accessibleColumns, visibleColumns],
   );
+  const columnsIds = useMemo(() => columns.map(({ id }) => id), [columns]);
 
   const onToggleEntitySelect = useCallback((itemId: string) => {
     setSelectedEntities(((cur) => {
@@ -140,14 +146,21 @@ const EntityDataTable = <Entity extends { id: string }>({
 
   const unselectAllItems = useCallback(() => setSelectedEntities([]), []);
   const displayActionsCol = typeof rowActions === 'function';
-  const displayBulkActionsCol = typeof bulkActions === 'function';
-  const { actionsRef, tableRef, columnsWidths } = useCalculateColumnWidths<Entity>(columns, columnRenderers, displayActionsCol, displayBulkActionsCol);
+  const displayBulkSelectCol = typeof bulkActions === 'function';
+  const { actionsRef, tableRef, columnsWidths } = useColumnWidths<Entity>({
+    columnsIds,
+    columnRenderers,
+    displayActionsCol,
+    displayBulkSelectCol,
+  });
+
+  const actionsColWidth = actionsRef?.current?.offsetWidth ? (actionsRef.current.offsetWidth ?? 0) + CELL_PADDING * 2 : undefined;
 
   return (
     <ScrollContainer ref={tableRef}>
       <ActionsRow>
         <div>
-          {(displayBulkActionsCol && !!selectedEntities?.length) && (
+          {(displayBulkSelectCol && !!selectedEntities?.length) && (
             <BulkActionsWrapper>
               {selectedEntities.length} {StringUtils.pluralize(selectedEntities.length, 'item', 'items')} selected
               <BulkActions>
@@ -165,14 +178,14 @@ const EntityDataTable = <Entity extends { id: string }>({
       </ActionsRow>
       <StyledTable striped condensed hover>
         <TableHead columns={columns}
-                   actionsColWidth={actionsRef?.current?.offsetWidth}
+                   actionsColWidth={actionsColWidth}
                    columnsWidths={columnsWidths}
                    selectedEntities={selectedEntities}
                    setSelectedEntities={setSelectedEntities}
                    data={data}
                    columnRenderers={columnRenderers}
                    onSortChange={onSortChange}
-                   displayBulkActionsCol={displayBulkActionsCol}
+                   displayBulkSelectCol={displayBulkSelectCol}
                    activeSort={activeSort}
                    displayActionsCol={displayActionsCol} />
         <tbody>
@@ -185,7 +198,7 @@ const EntityDataTable = <Entity extends { id: string }>({
                       columnRenderers={columnRenderers}
                       isSelected={!!selectedEntities?.includes(entity.id)}
                       rowActions={rowActions}
-                      displaySelect={displayBulkActionsCol}
+                      displaySelect={displayBulkSelectCol}
                       displayActions={displayActionsCol}
                       columns={columns} />
           ))}
@@ -202,8 +215,8 @@ EntityDataTable.defaultProps = {
   rowActions: undefined,
 };
 
-export default (props) => (
+export default <Entity extends { id: string }>(props) => (
   <WindowDimensionsContextProvider>
-    <EntityDataTable {...props} />
+    <EntityDataTable<Entity> {...props} />
   </WindowDimensionsContextProvider>
 );

@@ -20,7 +20,7 @@ import { useMemo } from 'react';
 
 import SortIcon from 'components/streams/StreamsOverview/SortIcon';
 
-import BulkActionsHead from './BulkActionsHead';
+import BulkSelectHead from './BulkSelectHead';
 import type { Column, Sort, ColumnRenderers, ColumnRenderer } from './types';
 
 const Th = styled.th<{ $width: number | undefined }>(({ $width }) => css`
@@ -71,7 +71,7 @@ const TableHead = <Entity extends { id: string }>({
   columnsWidths,
   data,
   displayActionsCol,
-  displayBulkActionsCol,
+  displayBulkSelectCol,
   onSortChange,
   selectedEntities,
   setSelectedEntities,
@@ -83,17 +83,17 @@ const TableHead = <Entity extends { id: string }>({
   columnRenderers: ColumnRenderers<Entity>,
   data: Array<Entity>
   displayActionsCol: boolean
-  displayBulkActionsCol: boolean,
+  displayBulkSelectCol: boolean,
   onSortChange: (newSort: Sort) => void,
   selectedEntities: Array<string>,
   setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>
 }) => (
   <thead>
     <tr>
-      {displayBulkActionsCol && (
-        <BulkActionsHead data={data}
-                         selectedEntities={selectedEntities}
-                         setSelectedEntities={setSelectedEntities} />
+      {displayBulkSelectCol && (
+        <BulkSelectHead data={data}
+                        selectedEntities={selectedEntities}
+                        setSelectedEntities={setSelectedEntities} />
       )}
       {columns.map((column) => {
         const columnRenderer = columnRenderers[column.id];

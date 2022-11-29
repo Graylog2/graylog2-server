@@ -32,13 +32,14 @@ export type Column = {
   type?: boolean,
 };
 
+// A column render should have either a `width` and optionally a `minWidth` or only a `staticWidth`.
 export type ColumnRenderer<Entity extends { id: string }> = {
-  minWidth?: number,
   renderCell?: (entity: Entity, column: Column) => React.ReactNode,
   renderHeader?: (column: Column) => React.ReactNode,
   textAlign?: string,
-  width?: number,
-  flexWidth?: number,
+  minWidth?: number,
+  width?: number, // fraction of unassigned table width, similar to CSS unit fr.
+  staticWidth?: number,
 }
 
 export type ColumnRenderers<Entity extends { id: string }> = {
