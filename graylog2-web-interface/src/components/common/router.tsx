@@ -23,7 +23,7 @@ const NAV_CHILDREN = ['Button', 'NavItem'];
 
 const _targetPathname = (target: string) => String(target).split(/[?#]/)[0];
 
-const _setActiveClassName = (pathname: string, to: string, currentClassName: string, displayName: string) => {
+const _setActiveClassName = (pathname: string, to: string, currentClassName: string, displayName: string, relativeActive: boolean) => {
   const targetPathname = _targetPathname(to);
   const isActive = relativeActive ? pathname.startsWith(targetPathname) : targetPathname === pathname;
   const isNavComponent = NAV_CHILDREN.includes(displayName);
@@ -60,7 +60,6 @@ const LinkContainer = ({ children, onClick, to: toProp, relativeActive, ...rest 
     [pathname, to, className, displayName, relativeActive],
   );
   const handleClick = useLinkClickHandler(to);
-  const navigate = useNavigate();
   const _onClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!isLeftClickEvent(e) || isModifiedEvent(e) || disabled) {
       return;
@@ -78,9 +77,9 @@ const LinkContainer = ({ children, onClick, to: toProp, relativeActive, ...rest 
     }
 
     if (!disabled) {
-      handleClick(to);
+      handleClick(e);
     }
-  }, [childrenOnClick, navigate, disabled, onClick, to]);
+  }, [disabled, childrenOnClick, onClick, handleClick]);
 
   return React.cloneElement(React.Children.only(children), {
     ...rest,
