@@ -17,6 +17,11 @@
 package org.graylog.plugins.views.search.views.dynamicstartpage;
 
 import com.google.common.eventbus.EventBus;
+import com.mongodb.BasicDBObjectBuilder;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
+import com.mongodb.client.model.CreateCollectionOptions;
+import org.bson.types.ObjectId;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
@@ -29,7 +34,9 @@ import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.users.User;
 import org.mongojack.DBQuery;
+import org.mongojack.JacksonDBCollection;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -40,7 +47,7 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
     private final GRNRegistry grnRegistry;
     private final PermissionAndRoleResolver permissionAndRoleResolver;
 
-    private final long MAXIMUM_RECENT_ACTIVITIES = 10000;
+    private static final long MAXIMUM_RECENT_ACTIVITIES = 10000;
 
     @Inject
     protected RecentActivityService(MongoConnection mongoConnection,
@@ -48,7 +55,12 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
                                     EventBus eventBus,
                                     GRNRegistry grnRegistry,
                                     PermissionAndRoleResolver permissionAndRoleResolver) {
-        super(mongoConnection, mapper, RecentActivityDTO.class, COLLECTION_NAME);
+        super(mongoConnection, mapper, RecentActivityDTO.class, COLLECTION_NAME,
+                BasicDBObjectBuilder.start()
+                        .add("capped", true)
+                        .add("max", MAXIMUM_RECENT_ACTIVITIES)
+                        .get(),
+                null );
         this.grnRegistry = grnRegistry;
         this.permissionAndRoleResolver = permissionAndRoleResolver;
         this.eventBus = eventBus;
