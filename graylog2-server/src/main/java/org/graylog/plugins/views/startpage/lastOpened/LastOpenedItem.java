@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.startpage;
+package org.graylog.plugins.views.startpage.lastOpened;
 
 public record LastOpenedItem(String id, String type, String title) {
 }

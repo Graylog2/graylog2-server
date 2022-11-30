@@ -31,7 +31,7 @@ import org.graylog.events.notifications.NotificationDto;
 import org.graylog.events.notifications.NotificationResourceHandler;
 import org.graylog.events.notifications.types.EmailEventNotificationConfig;
 import org.graylog.grn.GRNTypes;
-import org.graylog.plugins.views.startpage.RecentActivityService;
+import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.audit.jersey.AuditEvent;

@@ -101,7 +101,7 @@ import org.graylog.plugins.views.search.validation.validators.InvalidOperatorsVa
 import org.graylog.plugins.views.search.validation.validators.UnknownFieldsValidator;
 import org.graylog.plugins.views.search.views.RequiresParameterSupport;
 import org.graylog.plugins.views.search.views.ViewRequirements;
-import org.graylog.plugins.views.startpage.RecentActivityUpdatesListener;
+import org.graylog.plugins.views.startpage.recentActivities.RecentActivityUpdatesListener;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AreaVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;

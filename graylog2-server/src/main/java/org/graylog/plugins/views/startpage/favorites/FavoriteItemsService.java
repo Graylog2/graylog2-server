@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.startpage;
+package org.graylog.plugins.views.startpage.favorites;
 
 import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;

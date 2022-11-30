@@ -14,9 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.startpage;
+package org.graylog.plugins.views.startpage.favorites;
 
-import org.joda.time.DateTime;
-
-public record RecentActivity(String id, ActivityType activityType, String itemType, String itemId, String itemTitle, String userName, DateTime timestamp) {
+public record FavoriteItem(String id, String type, String title) {
 }

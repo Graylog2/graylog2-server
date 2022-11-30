@@ -36,7 +36,7 @@ import org.graylog.plugins.views.search.views.ViewStateDTO;
 import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.search.views.WidgetPositionDTO;
 import org.graylog.plugins.views.startpage.StartPageService;
-import org.graylog.plugins.views.startpage.RecentActivityService;
+import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.events.ClusterEventBus;
