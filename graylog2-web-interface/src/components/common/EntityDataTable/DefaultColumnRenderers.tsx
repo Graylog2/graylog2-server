@@ -28,6 +28,22 @@ const DefaultColumnRenderers = {
     ),
     width: 2,
   },
+  summary: {
+    renderCell: (entity: { summary: string }) => (
+      <TextOverflowEllipsis>
+        {entity.summary}
+      </TextOverflowEllipsis>
+    ),
+    width: 1.5,
+  },
+  owner: {
+    renderCell: (entity: { owner: string }) => (
+      <TextOverflowEllipsis>
+        {entity.owner}
+      </TextOverflowEllipsis>
+    ),
+    staticWidth: 120,
+  },
 };
 
 export default DefaultColumnRenderers;

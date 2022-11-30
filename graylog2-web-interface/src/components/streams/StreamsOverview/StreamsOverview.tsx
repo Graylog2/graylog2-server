@@ -82,9 +82,6 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
     renderCell: (stream) => <ThroughputCell stream={stream} />,
     staticWidth: 120,
   },
-  throughput: {
-    renderCell: (stream) => <ThroughputCell stream={stream} />,
-  },
   disabled: {
     renderCell: (stream) => <StatusCell stream={stream} />,
     staticWidth: 100,
@@ -180,7 +177,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   }, []);
 
   const onSortChange = useCallback((newSort: Sort) => {
-    setSearchParams((cur) => ({ ...cur, sort: newSort }));
+    setSearchParams((cur) => ({ ...cur, sort: newSort, page: 1 }));
   }, []);
 
   const renderStreamActions = useCallback((listItem: Stream) => (

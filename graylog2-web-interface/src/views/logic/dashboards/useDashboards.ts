@@ -19,15 +19,16 @@ import { useEffect } from 'react';
 import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
 import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore';
 import { useStore } from 'stores/connect';
+import type { SortOrder } from 'views/stores/ViewManagementStore';
 
 export type Dashboards = DashboardsStoreState;
 
-const useDashboards = (searchQuery: string, page: number, pageSize: number): Readonly<Dashboards> => {
+const useDashboards = (searchQuery: string, page: number, pageSize: number, sortBy?: string, order?: SortOrder): Readonly<Dashboards> => {
   const dashboards = useStore(DashboardsStore);
 
   useEffect(() => {
-    DashboardsActions.search(searchQuery, page, pageSize);
-  }, [searchQuery, page, pageSize]);
+    DashboardsActions.search(searchQuery, page, pageSize, sortBy, order);
+  }, [searchQuery, page, pageSize, sortBy, order]);
 
   return dashboards;
 };
