@@ -26,6 +26,7 @@ import { Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type { Event, EventDefinitionContext } from 'components/events/events/types';
+import ReplaySearchButton from 'views/components/widgets/ReplaySearchButton';
 
 type Props = {
   event: Event,
@@ -75,22 +76,18 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
 
   const renderReplaySearchLink = () => {
     const replayInfo = event.replay_info;
-    let rangeType;
     let range;
     let streams;
 
     if (replayInfo.timerange_start && replayInfo.timerange_end) {
-      rangeType = 'absolute';
-      range = { from: `${replayInfo.timerange_start}`, to: `${replayInfo.timerange_end}` };
+      range = { type: 'absolute', from: `${replayInfo.timerange_start}`, to: `${replayInfo.timerange_end}` };
     }
 
     if (replayInfo.streams) {
       streams = replayInfo.streams;
     }
 
-    const replaySearchUrl = Routes.search_with_query(replayInfo.query, rangeType, range, streams);
-
-    return <Link to={replaySearchUrl}>Replay Search</Link>;
+    return <ReplaySearchButton query={replayInfo.query} timerange={range} streams={streams} />;
   };
 
   return (
