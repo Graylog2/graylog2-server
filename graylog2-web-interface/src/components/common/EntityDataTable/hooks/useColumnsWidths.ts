@@ -22,7 +22,7 @@ import {
   DEFAULT_COL_WIDTH,
 } from 'components/common/EntityDataTable/Constants';
 
-const calculateAvailableWidth = ({
+const assignableTableWidth = ({
   tableWidth,
   actionsColWidth,
   bulkSelectColWidth,
@@ -91,7 +91,7 @@ const useColumnsWidths = <Entity extends { id: string }>({
     }
 
     // Calculate available width for columns which do not have a static width
-    const assignableWidth = calculateAvailableWidth({
+    const assignableWidth = assignableTableWidth({
       actionsColWidth,
       columnRenderers,
       columnsIds,
