@@ -84,13 +84,15 @@ const EventDefinitionEntry = ({
       return undefined;
     }
 
-    let titleSuffix = <span>{plugin?.displayName ?? eventDefinition.config.type}</span>;
+    const plugin = getConditionPlugin(eventDefinition.config.type);
+
+    let suffix = <span>{plugin?.displayName ?? eventDefinition.config.type}</span>;
 
     if (!isScheduled) {
-      titleSuffix = (<span>{titleSuffix} <Label bsStyle="warning">disabled</Label></span>);
+      suffix = (<span>{suffix} <Label bsStyle="warning">disabled</Label></span>);
     }
 
-    return titleSuffix;
+    return suffix;
   };
 
   const showActions = (): boolean => {
@@ -130,26 +132,26 @@ const EventDefinitionEntry = ({
           </LinkContainer>
         </IfPermitted>
       )}
+
       <ShareButton entityId={eventDefinition.id} entityType="event_definition" onClick={() => setShowEntityShareModal(true)} />
-        {!isSystemEventDefinition() && (
-          <DropdownButton id="more-dropdown" title="More" pullRight>
-            <MenuItem onClick={handleCopy}>Duplicate</MenuItem>
-            <MenuItem divider />
-            {toggle}
-            {showActions() && (
-              <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
-                <>
-                  <MenuItem divider />
-                  <MenuItem onClick={handleDelete} data-testid="delete-button">Delete</MenuItem>
-                </>
-              </IfPermitted>
-            )}
-          </DropdownButton>
-        )}
+
+      {!isSystemEventDefinition() && (
+        <DropdownButton id="more-dropdown" title="More" pullRight>
+          <MenuItem onClick={handleCopy}>Duplicate</MenuItem>
+          <MenuItem divider />
+
+          {toggle}
+
+          {showActions() && (
+            <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
+              <MenuItem divider />
+              <MenuItem onClick={handleDelete} data-testid="delete-button">Delete</MenuItem>
+            </IfPermitted>
+          )}
+        </DropdownButton>
+      )}
     </ButtonToolbar>
   );
-
-  const plugin = getConditionPlugin(eventDefinition.config.type);
 
   const linkTitle = <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{eventDefinition.title}</Link>;
 

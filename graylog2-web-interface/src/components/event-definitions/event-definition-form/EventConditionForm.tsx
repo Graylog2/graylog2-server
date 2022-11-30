@@ -167,6 +167,11 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
   );
 };
 
+EventConditionForm.defaultProps = {
+  action: 'create',
+  entityTypes: undefined,
+};
+
 EventConditionForm.propTypes = {
   action: PropTypes.oneOf(['create', 'edit']),
   entityTypes: PropTypes.object,
