@@ -17,6 +17,8 @@
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.PercentileConfiguration;
+import org.graylog.plugins.views.search.rest.scriptingapi.validation.MetricValidator;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Cardinality;
@@ -30,12 +32,22 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
 
+import javax.inject.Inject;
 import java.util.function.Function;
 
 public class MetricToSeriesSpecMapper implements Function<Metric, SeriesSpec> {
 
+    private final MetricValidator metricValidator;
+
+    @Inject
+    public MetricToSeriesSpecMapper(final MetricValidator metricValidator) {
+        this.metricValidator = metricValidator;
+    }
+
     @Override
     public SeriesSpec apply(final Metric metric) {
+        metricValidator.validate(metric);
+
         return switch (metric.functionName()) {
             case Average.NAME -> Average.builder().field(metric.fieldName()).build();
             case Cardinality.NAME -> Cardinality.builder().field(metric.fieldName()).build();
@@ -43,7 +55,10 @@ public class MetricToSeriesSpecMapper implements Function<Metric, SeriesSpec> {
             case Latest.NAME -> Latest.builder().field(metric.fieldName()).build();
             case Max.NAME -> Max.builder().field(metric.fieldName()).build();
             case Min.NAME -> Min.builder().field(metric.fieldName()).build();
-            case Percentile.NAME -> Percentile.builder().field(metric.fieldName()).build();
+            case Percentile.NAME -> Percentile.builder()
+                    .field(metric.fieldName())
+                    .percentile(((PercentileConfiguration) metric.configuration()).percentile())
+                    .build();
             case StdDev.NAME -> StdDev.builder().field(metric.fieldName()).build();
             case Sum.NAME -> Sum.builder().field(metric.fieldName()).build();
             case SumOfSquares.NAME -> SumOfSquares.builder().field(metric.fieldName()).build();
@@ -51,4 +66,6 @@ public class MetricToSeriesSpecMapper implements Function<Metric, SeriesSpec> {
             default -> Count.builder().field(metric.fieldName()).build(); //TODO: do we want to have a default at all?
         };
     }
+
+
 }

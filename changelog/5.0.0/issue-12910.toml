@@ -1,0 +1,5 @@
+type = "added"
+message = "Event definition page now includes a button to edit it directly"
+
+issues = ["12910"]
+pulls = ["13248"]

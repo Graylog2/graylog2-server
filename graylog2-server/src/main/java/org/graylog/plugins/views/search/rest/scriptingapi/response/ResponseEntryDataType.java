@@ -22,7 +22,8 @@ import java.util.Locale;
 
 public enum ResponseEntryDataType {
     STRING,
-    NUMERIC;
+    NUMERIC,
+    UNKNOWN;//TODO: may be temporary
 
     @JsonValue
     @Override

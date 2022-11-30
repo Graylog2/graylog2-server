@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import {} from 'components/authentication/bindings'; // Bind all authentication plugins
+import 'components/authentication/bindings'; // Bind all authentication plugins
 import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 import GettingStarted from 'components/authentication/BackendCreate/GettingStarted';
 import { DocumentTitle, PageHeader } from 'components/common';

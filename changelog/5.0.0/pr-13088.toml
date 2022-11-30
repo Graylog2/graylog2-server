@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Improve server startup to log all errors to the log file instead of writing some of them to STDERR."
+
+pulls = ["13088"]

@@ -22,7 +22,7 @@ import withPaginationQueryParameter from 'components/common/withPaginationQueryP
 import connect from 'stores/connect';
 import { EventDefinitionsActions, EventDefinitionsStore } from 'stores/event-definitions/EventDefinitionsStore';
 
-import {} from 'components/event-definitions/event-definition-types';
+import 'components/event-definitions/event-definition-types';
 
 import EventDefinitions, { PAGE_SIZES } from './EventDefinitions';
 

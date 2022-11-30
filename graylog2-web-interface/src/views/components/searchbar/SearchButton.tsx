@@ -26,7 +26,6 @@ import type { IconName } from 'components/common/Icon';
 
 const StyledButton = styled(Button)(({ theme, $dirty }: { theme: DefaultTheme, $dirty: boolean }) => css`
   position: relative;
-  margin-right: 12px;
   min-width: 63px;
   
   &&&.disabled {

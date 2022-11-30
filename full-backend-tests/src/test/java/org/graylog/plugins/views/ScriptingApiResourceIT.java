@@ -33,14 +33,18 @@ import org.graylog.testing.utils.SharingUtils;
 import org.graylog.testing.utils.StreamUtils;
 import org.graylog.testing.utils.UserUtils;
 import org.graylog2.plugin.streams.StreamRuleType;
+import org.graylog2.rest.MoreMediaTypes;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.Csv;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.CsvParser;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import javax.ws.rs.core.MediaType;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,6 +53,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.withPrecision;
+import static org.assertj.core.api.Java6Assertions.within;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.hasEntry;
@@ -237,7 +244,7 @@ public class ScriptingApiResourceIT {
                 └────────────────────────┴───────────────────────┘
                 """;
 
-        org.assertj.core.api.Assertions.assertThat(response).isEqualTo(expected.trim());
+        assertThat(response).isEqualTo(expected.trim());
     }
 
     @ContainerMatrixTest
@@ -260,7 +267,72 @@ public class ScriptingApiResourceIT {
                 │test                    │1                      │
                 └────────────────────────┴───────────────────────┘
                 """;
-        org.assertj.core.api.Assertions.assertThat(response).isEqualTo(expected.trim());
+        assertThat(response).isEqualTo(expected.trim());
+    }
+
+    @ContainerMatrixTest
+    void testCsvRender() {
+        final InputStream response = given()
+                .spec(requestSpec)
+                .header(new Header("Accept", MoreMediaTypes.TEXT_CSV))
+                .when()
+                .body("""
+                        {
+                          "group_by": [
+                            {
+                              "field": "facility"
+                            }
+                          ],
+                          "metrics": [
+                            {
+                              "function": "count",
+                              "field": "facility"
+                            }
+                          ]
+                        }
+                        """)
+                .post("/search/aggregate")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200)
+                .extract().body().asInputStream();
+
+        final CsvParser csvParser = new CsvParser(Csv.parseRfc4180());
+        final List<String[]> lines = csvParser.parseAll(response);
+
+
+
+        // headers
+        Assertions.assertArrayEquals(lines.get(0), new String[]{"grouping: facility", "metric: count(facility)"});
+
+        //rows
+        Assertions.assertArrayEquals(lines.get(1), new String[]{"another-test", "2"});
+        Assertions.assertArrayEquals(lines.get(2), new String[]{"test", "1"});
+    }
+
+    @ContainerMatrixTest
+    void testGetRequestCsv() {
+
+        final InputStream response = given()
+                .spec(requestSpec)
+                .header(new Header("Accept", MoreMediaTypes.TEXT_CSV))
+                .when()
+                .get("/search/aggregate?groups=facility&metrics=count:facility")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200)
+                .extract().body().asInputStream();
+
+
+        final CsvParser csvParser = new CsvParser(Csv.parseRfc4180());
+        final List<String[]> lines = csvParser.parseAll(response);
+
+        // headers
+        Assertions.assertArrayEquals(lines.get(0), new String[]{"grouping: facility", "metric: count(facility)"});
+
+        //rows
+        Assertions.assertArrayEquals(lines.get(1), new String[]{"another-test", "2"});
+        Assertions.assertArrayEquals(lines.get(2), new String[]{"test", "1"});
     }
 
     @ContainerMatrixTest
@@ -337,7 +409,9 @@ public class ScriptingApiResourceIT {
                         """)
                 .post("/search/aggregate")
                 .then()
-                .statusCode(404); // TODO! We should handle the duplicated metric better
+                .statusCode(200);
+        validateRow(validatableResponse, "another-test", 2, 2);
+        validateRow(validatableResponse, "test", 1, 1);
     }
 
     @ContainerMatrixTest
@@ -504,8 +578,36 @@ public class ScriptingApiResourceIT {
         final String to = validatableResponse.extract().body().jsonPath().getString("metadata.effective_timerange.to");
         final DateTime fromDateTime = DateTime.parse(from);
         final DateTime toDateTime = DateTime.parse(to);
-        final long diff = toDateTime.getMillis() - fromDateTime.getMillis();
-        Assertions.assertEquals(300_000, diff);
+        final float diff = toDateTime.getMillis() - fromDateTime.getMillis();
+        assertThat(diff).isCloseTo(300_000, within(10_000f));
+    }
+
+    @ContainerMatrixTest
+    void testErrorHandling() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("""
+                        {
+                          "group_by": [
+                            {
+                              "field": "facility"
+                            }
+                          ],
+                          "metrics": [
+                            {
+                              "function": "max",
+                              "field": "facility"
+                            }
+                          ]
+                        }
+                        """)
+                .post("/search/aggregate")
+                .then()
+                .statusCode(400)
+                .assertThat()
+                .body("type", Matchers.equalTo("ApiError"))
+                .body("message", Matchers.containsString("Failed to obtain aggregation results"));
     }
 
 

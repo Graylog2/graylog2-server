@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.rest.scriptingapi.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -35,10 +36,15 @@ public record ResponseSchemaEntry(
         return new ResponseSchemaEntry(ResponseEntryType.GROUPING, ResponseEntryDataType.STRING, null, fieldName);
     }
 
-    public static ResponseSchemaEntry metric(String functionName, ResponseEntryDataType dataType, String fieldName) {
+    public static ResponseSchemaEntry metric(String functionName, String fieldName) {
         Objects.requireNonNull(functionName);
-        Objects.requireNonNull(dataType);
+        ResponseEntryDataType dataType = Latest.NAME.equals(functionName) ? ResponseEntryDataType.STRING : ResponseEntryDataType.NUMERIC;
         return new ResponseSchemaEntry(ResponseEntryType.METRIC, dataType, functionName, fieldName);
+    }
+
+    //TODO : do we want to examine ES/OS mapping and fetch exact type for a field?
+    public static ResponseSchemaEntry field(String fieldName) {
+        return new ResponseSchemaEntry(ResponseEntryType.FIELD, ResponseEntryDataType.UNKNOWN, null, fieldName);
     }
 
     /**
