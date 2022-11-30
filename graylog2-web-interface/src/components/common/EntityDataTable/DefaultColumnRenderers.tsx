@@ -14,8 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import ConfigurableDataTable from './ConfigurableDataTable';
-import type { CustomCells, CustomHeaders, Attribute, Sort } from './types';
 
-export { CustomCells, CustomHeaders, Attribute, Sort };
-export default ConfigurableDataTable;
+import React from 'react';
+
+import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
+
+const DefaultColumnRenderers = {
+  description: {
+    renderCell: (entity: { description: string }) => (
+      <TextOverflowEllipsis>
+        {entity.description}
+      </TextOverflowEllipsis>
+    ),
+    maxWidth: '30vw',
+  },
+};
+
+export default DefaultColumnRenderers;

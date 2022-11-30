@@ -306,7 +306,7 @@ describe('DataTable', () => {
 
       const sortButton = wrapper
         .find('FieldSortIcon[fieldName="timestamp"]')
-        .find('button[data-testid="sort-icon-timestamp"]');
+        .find('button[title="Sort timestamp Ascending"]');
       sortButton.simulate('click');
 
       expect(WidgetActions.updateConfig)
@@ -324,7 +324,7 @@ describe('DataTable', () => {
 
       const sortButton = wrapper
         .find('FieldSortIcon[fieldName="timestamp"]')
-        .find('button[data-testid="sort-icon-timestamp"]');
+        .find('button[title="Sort timestamp Descending"]');
       sortButton.simulate('click');
 
       expect(WidgetActions.updateConfig)
@@ -342,7 +342,7 @@ describe('DataTable', () => {
 
       const sortButton = wrapper
         .find('FieldSortIcon[fieldName="timestamp"]')
-        .find('button[data-testid="sort-icon-timestamp"]');
+        .find('button[title="Remove timestamp sort"]');
 
       sortButton.simulate('click');
 

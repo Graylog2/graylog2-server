@@ -1,0 +1,19 @@
+type = "added"
+message = "Make messages with identical timestamps sortable by ULID"
+
+issues = ["2741"]
+pulls = ["6711"]
+
+contributors = [""]
+
+details.user = """
+If a batch of messages was received with identical timestamps
+(the same millisecond), the original receive order is kept by the
+encoded sequence number which directly follows the timestamp.
+We embedd this into the ULID of the `gl2_message_id` field,
+which can be used to sort these messages.
+
+CAVEAT:
+The sequence number is generated per node and input.
+This means that sorting will not work if an input is load balanced over multiple nodes.
+"""
