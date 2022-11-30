@@ -86,6 +86,32 @@ const filterVisibleColumns = (
   .find(({ id }) => id === columnId))
   .filter((column) => !!column);
 
+const useElementsWidths = <Entity extends { id: string }>({
+  columns,
+  columnRenderers,
+  displayBulkSelectCol,
+}: {
+  columns: Array<Column>,
+  columnRenderers: ColumnRenderers<Entity>,
+  displayBulkSelectCol: boolean
+}) => {
+  const tableRef = useRef<HTMLTableElement>();
+  const actionsRef = useRef<HTMLDivElement>();
+  const { width: tableWidth } = useElementDimensions(tableRef);
+  const columnsIds = useMemo(() => columns.map(({ id }) => id), [columns]);
+  const actionsColWidth = actionsRef.current?.offsetWidth ? (actionsRef.current.offsetWidth ?? 0) + CELL_PADDING * 2 : 0;
+
+  const columnsWidths = useColumnsWidths<Entity>({
+    actionsColWidth,
+    bulkSelectColWidth: displayBulkSelectCol ? BULK_SELECT_COLUMN_WIDTH : 0,
+    columnRenderers,
+    columnsIds,
+    tableWidth,
+  });
+
+  return { tableRef, actionsRef, columnsWidths, actionsColWidth };
+};
+
 type Props<Entity extends { id: string }> = {
   /** Currently active sort */
   activeSort?: Sort,
@@ -121,12 +147,11 @@ const EntityDataTable = <Entity extends { id: string }>({
   onColumnsChange,
   visibleColumns,
 }: Props<Entity>) => {
-  const tableRef = useRef<HTMLTableElement>();
-  const { width: tableWidth } = useElementDimensions(tableRef);
-  const actionsRef = useRef<HTMLDivElement>();
   const currentUser = useCurrentUser();
   const [selectedEntities, setSelectedEntities] = useState<Array<string>>([]);
   const columnRenderers = merge(DefaultColumnRenderers, customColumnRenderers);
+  const displayActionsCol = typeof rowActions === 'function';
+  const displayBulkSelectCol = typeof bulkActions === 'function';
 
   const accessibleColumns = useMemo(
     () => filterAccessibleColumns(columnDefinitions, currentUser.permissions),
@@ -137,7 +162,12 @@ const EntityDataTable = <Entity extends { id: string }>({
     () => filterVisibleColumns(accessibleColumns, visibleColumns),
     [accessibleColumns, visibleColumns],
   );
-  const columnsIds = useMemo(() => columns.map(({ id }) => id), [columns]);
+
+  const { tableRef, actionsRef, actionsColWidth, columnsWidths } = useElementsWidths({
+    columns,
+    columnRenderers,
+    displayBulkSelectCol,
+  });
 
   const onToggleEntitySelect = useCallback((itemId: string) => {
     setSelectedEntities(((cur) => {
@@ -150,17 +180,6 @@ const EntityDataTable = <Entity extends { id: string }>({
   }, []);
 
   const unselectAllItems = useCallback(() => setSelectedEntities([]), []);
-  const displayActionsCol = typeof rowActions === 'function';
-  const displayBulkSelectCol = typeof bulkActions === 'function';
-  const actionsColWidth = actionsRef.current?.offsetWidth ? (actionsRef.current.offsetWidth ?? 0) + CELL_PADDING * 2 : 0;
-
-  const columnsWidths = useColumnsWidths<Entity>({
-    actionsColWidth,
-    bulkSelectColWidth: displayBulkSelectCol ? BULK_SELECT_COLUMN_WIDTH : 0,
-    columnRenderers,
-    columnsIds,
-    tableWidth,
-  });
 
   return (
     <ScrollContainer ref={tableRef}>
