@@ -23,13 +23,6 @@ export type Column = {
   sortable?: boolean,
   title: string,
   type?: boolean,
-  permissions?: Array<string>
-  anyPermissions?: boolean,
-  id: string,
-  permissions?: Array<string>
-  sortable?: boolean,
-  title: string,
-  type?: boolean,
 };
 
 // A column render should have either a `width` and optionally a `minWidth` or only a `staticWidth`.
