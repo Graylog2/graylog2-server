@@ -14,14 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.views.dynamicstartpage;
+package org.graylog.plugins.views.startpage;
 
 import com.google.common.eventbus.EventBus;
 import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.client.model.CreateCollectionOptions;
-import org.bson.types.ObjectId;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
@@ -34,12 +30,9 @@ import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.users.User;
 import org.mongojack.DBQuery;
-import org.mongojack.JacksonDBCollection;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class RecentActivityService extends PaginatedDbService<RecentActivityDTO> {
     private static final String COLLECTION_NAME = "recent_activity";

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.views.dynamicstartpage;
+package org.graylog.plugins.views.startpage;
 
 import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;
@@ -33,33 +33,33 @@ import java.util.Optional;
 /*
  * TODO: remove entity, if a user is deleted?
  */
-public class LastOpenedService extends PaginatedDbService<LastOpenedItemsDTO> {
-    private static final String COLLECTION_NAME = "last_opened_items";
+public class FavoriteItemsService extends PaginatedDbService<FavoriteItemsDTO> {
+    private static final String COLLECTION_NAME = "favorite_items";
 
     private final EntityOwnershipService entityOwnerShipService;
 
     @Inject
-    protected LastOpenedService(MongoConnection mongoConnection,
-                                 MongoJackObjectMapperProvider mapper,
-                                final EntityOwnershipService entityOwnerShipService) {
-        super(mongoConnection, mapper, LastOpenedItemsDTO.class, COLLECTION_NAME);
+    protected FavoriteItemsService(final MongoConnection mongoConnection,
+                                   final MongoJackObjectMapperProvider mapper,
+                                   final EntityOwnershipService entityOwnerShipService) {
+        super(mongoConnection, mapper, FavoriteItemsDTO.class, COLLECTION_NAME);
         this.entityOwnerShipService = entityOwnerShipService;
     }
 
-    public Optional<LastOpenedItemsDTO> findForUser(final SearchUser searchUser) {
-        return streamQuery(DBQuery.is(LastOpenedItemsDTO.FIELD_USER_ID, searchUser.getUser().getId())).findAny();
+    public Optional<FavoriteItemsDTO> findForUser(final SearchUser searchUser) {
+        return streamQuery(DBQuery.is(FavoriteItemsDTO.FIELD_USER_ID, searchUser.getUser().getId())).findAny();
     }
 
-    public Optional<LastOpenedItemsDTO> create(final LastOpenedItemsDTO lastOpenedItems, final SearchUser searchUser) {
+    public Optional<FavoriteItemsDTO> create(final FavoriteItemsDTO favoriteItem, final SearchUser searchUser) {
         try {
-            final WriteResult<LastOpenedItemsDTO, ObjectId> result = db.insert(lastOpenedItems);
-            final LastOpenedItemsDTO savedObject = result.getSavedObject();
+            final WriteResult<FavoriteItemsDTO, ObjectId> result = db.insert(favoriteItem);
+            final FavoriteItemsDTO savedObject = result.getSavedObject();
             if (savedObject != null) {
-                entityOwnerShipService.registerNewEntity(savedObject.id(), searchUser.getUser(), GRNTypes.LAST_OPENED_ITEMS);
+                entityOwnerShipService.registerNewEntity(savedObject.id(), searchUser.getUser(), GRNTypes.FAVORITE_ITEMS);
             }
             return Optional.ofNullable(savedObject);
         } catch (DuplicateKeyException e) {
-            throw new IllegalStateException("Unable to create a last opened collection, collection with this id already exists : " + lastOpenedItems.id());
+            throw new IllegalStateException("Unable to create a Favorite Items collection, collection with this id already exists : " + favoriteItem.id());
         }
     }
 }

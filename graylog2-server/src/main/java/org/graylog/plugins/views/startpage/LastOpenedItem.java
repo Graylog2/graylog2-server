@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.views.dynamicstartpage;
+package org.graylog.plugins.views.startpage;
 
-public record FavoriteItem(String id, String type, String title) {
+public record LastOpenedItem(String id, String type, String title) {
 }

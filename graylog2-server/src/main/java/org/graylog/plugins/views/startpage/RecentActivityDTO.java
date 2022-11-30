@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.views.dynamicstartpage;
+package org.graylog.plugins.views.startpage;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -115,7 +115,7 @@ public abstract class RecentActivityDTO {
 
         @JsonCreator
         public static RecentActivityDTO.Builder create() {
-            return new AutoValue_RecentActivityDTO.Builder().timestamp(new DateTime(DateTimeZone.UTC));
+            return new $AutoValue_RecentActivityDTO.Builder().timestamp(new DateTime(DateTimeZone.UTC));
         }
 
         public abstract RecentActivityDTO build();

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.views.dynamicstartpage;
+package org.graylog.plugins.views.startpage;
 
 import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.views.search.permissions.SearchUser;
@@ -28,7 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DynamicStartPageService {
+public class StartPageService {
     private final Catalog catalog;
     private final LastOpenedService lastOpenedService;
     private final RecentActivityService recentActivityService;
@@ -37,11 +37,11 @@ public class DynamicStartPageService {
     private final long MAXIMUM_ITEMS = 100;
 
     @Inject
-    public DynamicStartPageService(Catalog catalog,
-                                   LastOpenedService lastOpenedService,
-                                   RecentActivityService recentActivityService,
-                                   FavoriteItemsService favoriteItemsService,
-                                   EventBus eventBus) {
+    public StartPageService(Catalog catalog,
+                            LastOpenedService lastOpenedService,
+                            RecentActivityService recentActivityService,
+                            FavoriteItemsService favoriteItemsService,
+                            EventBus eventBus) {
         this.catalog = catalog;
         this.lastOpenedService = lastOpenedService;
         this.recentActivityService = recentActivityService;

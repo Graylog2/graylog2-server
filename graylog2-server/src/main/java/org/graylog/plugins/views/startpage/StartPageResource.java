@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest;
+package org.graylog.plugins.views.startpage;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,10 +22,6 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog.plugins.views.search.views.dynamicstartpage.DynamicStartPageService;
-import org.graylog.plugins.views.search.views.dynamicstartpage.LastOpenedItem;
-import org.graylog.plugins.views.search.views.dynamicstartpage.FavoriteItem;
-import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivity;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.models.PaginatedResponse;
@@ -46,21 +42,21 @@ import javax.ws.rs.core.MediaType;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "DynamicStartupPage", tags = {CLOUD_VISIBLE})
-@Path("/dynamicstartpage")
+@Api(value = "StartupPage", tags = {CLOUD_VISIBLE})
+@Path("/startpage")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-public class DynamicStartPageResource extends RestResource implements PluginRestResource {
-    private final DynamicStartPageService service;
+public class StartPageResource extends RestResource implements PluginRestResource {
+    private final StartPageService service;
 
     @Inject
-    public DynamicStartPageResource(DynamicStartPageService service) {
+    public StartPageResource(StartPageService service) {
         this.service = service;
     }
 
     @GET
     @Path("/lastOpened")
-    @ApiOperation("Get the Last Opened Items for the Dynamic Start Page for the user")
+    @ApiOperation("Get the Last Opened Items for the Start Page for the user")
     public PaginatedResponse<LastOpenedItem> getLastOpened(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                            @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
                                                            @Context SearchUser searchUser) {
@@ -69,7 +65,7 @@ public class DynamicStartPageResource extends RestResource implements PluginRest
 
     @GET
     @Path("/favoriteItems")
-    @ApiOperation("Get the Favorite Items for the Dynamic Start Page for the user")
+    @ApiOperation("Get the Favorite Items for the Start Page for the user")
     public PaginatedResponse<FavoriteItem> getFavoriteItems(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                           @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
                                                           @Context SearchUser searchUser) {
@@ -78,7 +74,7 @@ public class DynamicStartPageResource extends RestResource implements PluginRest
 
     @PUT
     @Path("/addToFavorites/{id}")
-    @ApiOperation("Add an item for inclusion on the Dynamic Start Page for the user")
+    @ApiOperation("Add an item for inclusion on the Start Page for the user")
     @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_ADD_FAVORITE_ITEM)
     public void addItemToFavorites(@ApiParam(name = "id", required = true) @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
         service.addFavoriteItemFor(id, searchUser);
@@ -86,7 +82,7 @@ public class DynamicStartPageResource extends RestResource implements PluginRest
 
     @DELETE
     @Path("/removeFromFavorites/{id}")
-    @ApiOperation("Remove an item from inclusion on the Dynamic Start Page for the user")
+    @ApiOperation("Remove an item from inclusion on the Start Page for the user")
     @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_REMOVE_FAVORITE_ITEM)
     public void removeItemFromFavorites(@ApiParam(name = "id", required = true) @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
         service.removeFavoriteItemFor(id, searchUser);
@@ -94,7 +90,7 @@ public class DynamicStartPageResource extends RestResource implements PluginRest
 
     @GET
     @Path("/recentActivity")
-    @ApiOperation("Get Recent Activities for the Dynamic Start Page for the user")
+    @ApiOperation("Get Recent Activities for the Start Page for the user")
     public PaginatedResponse<RecentActivity> getRecentActivity(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                   @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
                                                   @Context SearchUser searchUser) {

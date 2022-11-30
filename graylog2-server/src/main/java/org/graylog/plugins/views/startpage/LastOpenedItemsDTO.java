@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.views.dynamicstartpage;
+package org.graylog.plugins.views.startpage;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -69,7 +69,7 @@ public abstract class LastOpenedItemsDTO {
 
         @JsonCreator
         public static LastOpenedItemsDTO.Builder create() {
-            return new AutoValue_LastOpenedItemsDTO.Builder()
+            return new $AutoValue_LastOpenedItemsDTO.Builder()
                     .items(new ArrayList<>());
         }
 

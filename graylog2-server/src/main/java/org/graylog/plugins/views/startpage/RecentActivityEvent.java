@@ -14,10 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.views.dynamicstartpage;
+package org.graylog.plugins.views.startpage;
 
 import org.graylog.grn.GRN;
-import org.graylog.grn.GRNType;
 
 /*
  * Used with two constructors: activityType, itemId and userName for all Events except DELETE.

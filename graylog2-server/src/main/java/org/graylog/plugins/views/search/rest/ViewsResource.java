@@ -38,8 +38,8 @@ import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewResolverDecoder;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.WidgetDTO;
-import org.graylog.plugins.views.search.views.dynamicstartpage.DynamicStartPageService;
-import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivityService;
+import org.graylog.plugins.views.startpage.StartPageService;
+import org.graylog.plugins.views.startpage.RecentActivityService;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
@@ -101,19 +101,19 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final Map<String, ViewResolver> viewResolvers;
     private final SearchFilterVisibilityChecker searchFilterVisibilityChecker;
     private final ReferencedSearchFiltersHelper referencedSearchFiltersHelper;
-    private final DynamicStartPageService dynamicStartPageService;
+    private final StartPageService startPageService;
     private final RecentActivityService recentActivityService;
 
     @Inject
     public ViewsResource(ViewService dbService,
-                         DynamicStartPageService dynamicStartPageService,
+                         StartPageService startPageService,
                          RecentActivityService recentActivityService,
                          ClusterEventBus clusterEventBus, SearchDomain searchDomain,
                          Map<String, ViewResolver> viewResolvers,
                          SearchFilterVisibilityChecker searchFilterVisibilityChecker,
                          ReferencedSearchFiltersHelper referencedSearchFiltersHelper) {
         this.dbService = dbService;
-        this.dynamicStartPageService = dynamicStartPageService;
+        this.startPageService = startPageService;
         this.recentActivityService = recentActivityService;
         this.clusterEventBus = clusterEventBus;
         this.searchDomain = searchDomain;
@@ -170,7 +170,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         // The view resolvers must be used first, because the ID may not be a valid hex ID string.
         ViewDTO view = resolveView(id);
         if (searchUser.canReadView(view)) {
-            dynamicStartPageService.addLastOpenedFor(view, searchUser);
+            startPageService.addLastOpenedFor(view, searchUser);
             return view;
         }
 
