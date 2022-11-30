@@ -36,8 +36,7 @@
   },
   "include": [
     "src",
-    "test",
-    "node_modules/jest-environment-enzyme/lib/index.d.ts"
+    "test"
   ],
   "ts-node": {
     "compilerOptions": {
