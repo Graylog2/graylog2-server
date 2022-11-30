@@ -28,7 +28,7 @@ const fetchIndexDefaults: () => Promise<IndexConfig> = () => {
 
 const useIndexDefaults = () => {
   const { data, isLoading } = useQuery(
-    [index-defaults'],
+    ['index-defaults'],
     fetchIndexDefaults,
     {
       onError: (fetchError: Error) => {
