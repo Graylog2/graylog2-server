@@ -33,7 +33,6 @@ public class DynamicStartPageService {
     private final LastOpenedService lastOpenedService;
     private final RecentActivityService recentActivityService;
     private final FavoriteItemsService favoriteItemsService;
-    private final EventBus eventBus;
 
     private final long MAXIMUM_ITEMS = 100;
 
@@ -47,8 +46,7 @@ public class DynamicStartPageService {
         this.lastOpenedService = lastOpenedService;
         this.recentActivityService = recentActivityService;
         this.favoriteItemsService = favoriteItemsService;
-        this.eventBus = eventBus;
-        this.eventBus.register(this);
+        eventBus.register(this);
     }
 
     private <T> List<T> getPage(List<T> sourceList, int page, int pageSize) {
