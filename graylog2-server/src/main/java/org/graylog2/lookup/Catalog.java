@@ -29,52 +29,33 @@ import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class Catalog {
+    record Entry(String type, String title) {}
+
     private final ContentPackService contentPackService;
-    private final LoadingCache<String, String> titleCache;
-    private final LoadingCache<String, String> typeCache;
+    private final LoadingCache<String, Entry> cache;
 
     private final int MAXIMUM_CACHE_SIZE = 10000;
 
     @Inject
     public Catalog(ContentPackService contentPackService) {
         this.contentPackService = contentPackService;
-        this.titleCache = createTitleCache();
-        this.typeCache = createTypeCache();
+        this.cache = createCache();
     }
 
-    private LoadingCache<String, String> createTitleCache() {
+    private LoadingCache<String, Entry> createCache() {
         return CacheBuilder
                 .newBuilder()
                 .maximumSize(MAXIMUM_CACHE_SIZE)
                 .expireAfterAccess(1, TimeUnit.SECONDS)
                 .build(new CacheLoader<>() {
                     @Override
-                    public String load(String id) {
+                    public Entry load(String id) {
                         var catalog = contentPackService.getEntityExcerpts();
                         var excerpt = catalog.get(id);
                         if (excerpt != null) {
-                            return excerpt.title();
+                            return new Entry(excerpt.type().name(), excerpt.title());
                         } else {
-                            return "Unknown entity: " + id;
-                        }
-                    }
-                });
-    }
-
-    private LoadingCache<String, String> createTypeCache() {
-        return CacheBuilder
-                .newBuilder()
-                .maximumSize(MAXIMUM_CACHE_SIZE)
-                .expireAfterAccess(1, TimeUnit.SECONDS)
-                .build(new CacheLoader<>() {
-                    @Override
-                    public String load(String id) {
-                        var catalog = contentPackService.getEntityExcerpts();
-                        var excerpt = catalog.get(id);
-                        if (excerpt != null) {
-                            return excerpt.type().name();
-                        } else {
-                            return "Unknown entity: " + id;
+                            return new Entry("Unknown entity: " + id, "Unknown entity: " + id);
                         }
                     }
                 });
@@ -82,9 +63,9 @@ public class Catalog {
 
     public String getTitle(final String id) {
         try {
-            var title = titleCache.get(id);
-            if(title != null) {
-                return title;
+            var item = cache.get(id);
+            if(item.title() != null) {
+                return item.title();
             } else {
                 return "Unknown entity: " + id;
             }
@@ -95,9 +76,9 @@ public class Catalog {
 
     public String getType(final String id) {
         try {
-            var type = typeCache.get(id);
-            if(type != null) {
-                return type.toLowerCase(Locale.ROOT);
+            var item = cache.get(id);
+            if(item.type() != null) {
+                return item.type().toLowerCase(Locale.ROOT);
             } else {
                 return "Unknown entity: " + id;
             }
