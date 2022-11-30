@@ -51,6 +51,7 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
         super(mongoConnection, mapper, RecentActivityDTO.class, COLLECTION_NAME,
                 BasicDBObjectBuilder.start()
                         .add("capped", true)
+                        .add("size", MAXIMUM_RECENT_ACTIVITIES * 1024)
                         .add("max", MAXIMUM_RECENT_ACTIVITIES)
                         .get(),
                 null );
