@@ -154,7 +154,7 @@ const IndexSetsDefaultsConfig = ({ initialConfig, updateConfig }: Props) => {
                   bsSize="xs"
                   onClick={() => {
                     setShowModal(true);
-                  }}>Update
+                  }}>Edit configuration
           </Button>
         </IfPermitted>
       </p>
