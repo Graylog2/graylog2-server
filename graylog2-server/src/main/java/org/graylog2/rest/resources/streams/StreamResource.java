@@ -212,18 +212,25 @@ public class StreamResource extends RestResource {
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
+
         final Predicate<StreamDTO> permissionFilter = streamDTO -> isPermitted(RestPermissions.STREAMS_READ, streamDTO.id());
         final PaginatedList<StreamDTO> result = paginatedStreamService
                 .findPaginated(searchQuery, permissionFilter, page, perPage, sort, order);
-        final List<String> streamIds = result.stream().map(StreamDTO::id).collect(Collectors.toList());
+
+        final List<String> streamIds = result.stream().map(StreamDTO::id).toList();
         final Map<String, List<StreamRule>> streamRuleMap = streamRuleService.loadForStreamIds(streamIds);
-        final List<StreamDTO> streams = result.stream().map(streamDTO -> {
-            List<StreamRule> rules = streamRuleMap.getOrDefault(streamDTO.id(), Collections.emptyList());
-            return streamDTO.toBuilder().rules(rules).build();
-        }).collect(Collectors.toList());
+
+        final List<StreamDTO> streams = result
+                .stream()
+                .map(streamDTO -> {
+                    final List<StreamRule> rules = streamRuleMap.getOrDefault(streamDTO.id(), Collections.emptyList());
+                    return streamDTO.toBuilder().rules(rules).build();
+                })
+                .toList();
         final long total = paginatedStreamService.count();
-        final PaginatedList<StreamDTO> streamDTOS = new PaginatedList<>(streams,
-                result.pagination().total(), result.pagination().page(), result.pagination().perPage());
+        final PaginatedList<StreamDTO> streamDTOS = new PaginatedList<>(
+                streams, result.pagination().total(), result.pagination().page(), result.pagination().perPage()
+        );
         return StreamPageListResponse.create(query, streamDTOS.pagination(), total, sort, order, streams, attributes, settings);
     }
 
@@ -236,7 +243,7 @@ public class StreamResource extends RestResource {
         final List<Stream> streams = streamService.loadAll()
                 .stream()
                 .filter(stream -> isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
-                .collect(Collectors.toList());
+                .toList();
 
         return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
     }
@@ -250,7 +257,7 @@ public class StreamResource extends RestResource {
         final List<Stream> streams = streamService.loadAllEnabled()
                 .stream()
                 .filter(stream -> isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
-                .collect(Collectors.toList());
+                .toList();
 
         return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
     }
