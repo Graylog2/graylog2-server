@@ -83,6 +83,7 @@ const EventDetailsForm = ({ eventDefinition, validation, onChange }: Props) => {
                     value={lodash.toString(eventDefinition.priority)}
                     onChange={handlePriorityChange}
                     clearable={false}
+                    disabled={isSystemEventDefinition}
                     required />
             <HelpBlock>Choose the priority for Events created from this Definition.</HelpBlock>
           </FormGroup>
