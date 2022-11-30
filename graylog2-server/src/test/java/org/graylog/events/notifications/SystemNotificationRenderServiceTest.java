@@ -64,7 +64,7 @@ class SystemNotificationRenderServiceTest {
         when(notificationService.getByType(any())).thenReturn(Optional.of(notification));
 
         SystemNotificationRenderService.RenderResponse renderResponse =
-                renderService.render(notification, SystemNotificationRenderService.Format.HTML, null);
+                renderService.render(notification.getType(), SystemNotificationRenderService.Format.HTML, null);
         assertThat(renderResponse.title).isEqualToIgnoringWhitespace("Email Transport Configuration is missing or invalid!");
         assertThat(renderResponse.description).containsSequence("java.lang.Exception: My Test Exception");
         assertThat(renderResponse.description).containsSequence("<span>");
@@ -81,7 +81,6 @@ class SystemNotificationRenderServiceTest {
                 .addDetail("dummy", "dummy")
                 .addDetail("exception", new Exception("My Test Exception"))
                 .addTimestamp(DateTime.now(DateTimeZone.UTC));
-        when(notificationService.getByType(any())).thenReturn(Optional.of(notification));
 
         SystemNotificationRenderService.RenderResponse renderResponse = renderService.render(notification);
         assertThat(renderResponse.description).containsSequence("java.lang.Exception: My Test Exception");
@@ -98,7 +97,6 @@ class SystemNotificationRenderServiceTest {
                 .addDetail("SYSTEM_INPUTS", url)
                 .addDetail("exception", new Exception("My Test Exception"))
                 .addTimestamp(DateTime.now(DateTimeZone.UTC));
-        when(notificationService.getByType(any())).thenReturn(Optional.of(notification));
         when(graylogConfig.isCloud()).thenReturn(true);
 
         SystemNotificationRenderService.RenderResponse renderResponse =
@@ -116,7 +114,6 @@ class SystemNotificationRenderServiceTest {
                 .addDetail("SYSTEM_INPUTS", url)
                 .addDetail("exception", new Exception("My Test Exception"))
                 .addTimestamp(DateTime.now(DateTimeZone.UTC));
-        when(notificationService.getByType(any())).thenReturn(Optional.of(notification));
         when(graylogConfig.isCloud()).thenReturn(false);
 
         SystemNotificationRenderService.RenderResponse renderResponse =

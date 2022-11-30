@@ -68,63 +68,6 @@ public class SystemNotificationRenderService {
                         tcHTML));
     }
 
-/*
-    public TemplateRenderResponse renderHtml(Notification notification) {
-        return renderHtml(notification.getType(), notification.getDetails());
-    }
-
-    public TemplateRenderResponse renderHtml(Notification.Type type, Map<String, Object> values) {
-        Notification notification = notificationService.getByType(type)
-                .orElseThrow(() -> new IllegalArgumentException("Event type is not currently active"));
-
-        // Add all data for template expansion into the details map
-        if (values == null) {
-            values = new HashMap<>();
-        }
-        if (notification.getDetails() != null) {
-            values.putAll(notification.getDetails());
-        }
-        values.put(KEY_NODE_ID, notification.getNodeId());
-        values.put(KEY_CLOUD, graylogConfig.isCloud());
-
-        try (StringWriter writer = new StringWriter()) {
-            Template template = cfg.getTemplate(type.toString().toLowerCase(Locale.ENGLISH) + ".ftl");
-
-            values.put(KEY_TITLE, true);
-            values.put(KEY_DESCRIPTION, false);
-            template.process(values, writer);
-            String title = writer.toString();
-
-            writer.getBuffer().setLength(0);
-            values.put(KEY_TITLE, false);
-            values.put(KEY_DESCRIPTION, true);
-            template.process(values, writer);
-            String description = writer.toString();
-
-            return TemplateRenderResponse.create(title, description);
-        } catch (TemplateException e) {
-            throw new BadRequestException("Unable to render template " + type.toString() + ": " + e.getMessage());
-        } catch (IOException e) {
-            throw new BadRequestException("Unable to locate template " + type.toString() + ": " + e.getMessage());
-        }
-    }
-
-    public String renderPlainText(Notification notification) {
-        return renderPlainText(notification.getType(), notification.getDetails());
-    }
-
-    public String renderPlainText(Notification.Type type, Map<String, Object> values) {
-        TemplateRenderResponse templateRenderResponse = renderHtml(type, values);
-        String plainTitle = new Source(templateRenderResponse.title()).getRenderer().toString();
-        String plainDescription = new Source(templateRenderResponse.description()).getRenderer().toString();
-
-        StringBuilder msg = new StringBuilder();
-        msg.append("*** ").append(plainTitle.trim()).append(" ***");
-        msg.append("\n\n").append(plainDescription.trim());
-        return msg.toString();
-    }
-*/
-
     public RenderResponse render(Notification.Type type, Format format, Map<String, Object> values) {
         Notification notification = notificationService.getByType(type)
                 .orElseThrow(() -> new IllegalArgumentException("Event type is not currently active"));
@@ -143,7 +86,9 @@ public class SystemNotificationRenderService {
         if (notification.getDetails() != null) {
             values.putAll(notification.getDetails());
         }
-        values.put(KEY_NODE_ID, notification.getNodeId());
+        if (notification.getNodeId() != null) {
+            values.put(KEY_NODE_ID, notification.getNodeId());
+        }
         values.put(KEY_CLOUD, graylogConfig.isCloud());
 
         final String templateRelPath = format.toString() + "/" + notification.getType().toString().toLowerCase(Locale.ENGLISH) + ".ftl";
