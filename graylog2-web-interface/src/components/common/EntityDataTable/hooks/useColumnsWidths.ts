@@ -99,11 +99,7 @@ const useColumnsWidths = <Entity extends { id: string }>({
       tableWidth,
     });
 
-    setColumnWidths(columnsWidth({
-      assignableWidth,
-      columnsIds,
-      columnRenderers,
-    }));
+    setColumnWidths(columnsWidth({ assignableWidth, columnsIds, columnRenderers }));
   }, [actionsColWidth, bulkSelectColWidth, columnRenderers, columnsIds, tableWidth]);
 
   return columnsWidths;

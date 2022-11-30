@@ -27,8 +27,8 @@ import StringUtils from 'util/StringUtils';
 import ColumnsVisibilitySelect from 'components/common/EntityDataTable/ColumnsVisibilitySelect';
 import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
 import { CELL_PADDING, BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
-import useElementDimensions from 'hooks/useElementDimensions';
 import useColumnsWidths from 'components/common/EntityDataTable/hooks/useColumnsWidths';
+import useElementDimensions from 'hooks/useElementDimensions';
 
 import TableHead from './TableHead';
 import TableRow from './TableRow';
