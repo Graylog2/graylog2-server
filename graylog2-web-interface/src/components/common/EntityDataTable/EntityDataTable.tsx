@@ -146,9 +146,6 @@ const EntityDataTable = <Entity extends { id: string }>({
   onColumnsChange,
   visibleColumns,
 }: Props<Entity>) => {
-  const tableRef = useRef<HTMLTableElement>();
-  const { width: tableWidth } = useElementDimensions(tableRef);
-  const actionsRef = useRef<HTMLDivElement>();
   const currentUser = useCurrentUser();
   const [selectedEntities, setSelectedEntities] = useState<Array<string>>([]);
   const columnRenderers = merge(DefaultColumnRenderers, customColumnRenderers);
@@ -164,7 +161,12 @@ const EntityDataTable = <Entity extends { id: string }>({
     () => filterVisibleColumns(accessibleColumns, visibleColumns),
     [accessibleColumns, visibleColumns],
   );
-  const columnsIds = useMemo(() => columns.map(({ id }) => id), [columns]);
+
+  const { tableRef, actionsRef, actionsColWidth, columnsWidths } = useElementsWidths({
+    columns,
+    columnRenderers,
+    displayBulkSelectCol,
+  });
 
   const { tableRef, actionsRef, actionsColWidth, columnsWidths } = useElementsWidths({
     columns,
