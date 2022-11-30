@@ -62,11 +62,7 @@ import EntityDataTable from './EntityDataTable';
 
 
 Change the width of a column, with the related column renderer. Column renderers can have
-<<<<<<< HEAD:graylog2-web-interface/src/components/common/EntityDataTable/EntityDataTable.md
 - either a `width` defined as a fraction like `2`. If no width is defined we are using a default of `1`.
-=======
-- either a `width` defined as a fraction like `2`. If no width is defined we are using a default of `1`. 
->>>>>>> 07c9bd81e5 (Extend documentation):graylog2-web-interface/src/components/common/EntityDataTable/EnitiyDataTable.md
   The width defines which fraction of the assignable space the column should claim. It works similar to the css attribute `flex`.
   Optionally you can also define a `minWidth` to override the default min width for flexible columns. This can be helpful to ensure a column has enough space, no matter how large the table width is.
 - or a `staticWidth` in px. Useful when the cells contain e.g. just an icon and its width never changes.
