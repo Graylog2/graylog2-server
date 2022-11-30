@@ -20,17 +20,13 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
-import org.joda.time.Duration;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -141,23 +137,5 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
         public abstract Builder retentionStrategyConfig(RetentionStrategyConfig retentionStrategyConfig);
 
         public abstract IndexSetsDefaultConfiguration build();
-    }
-
-    public IndexSetConfig.Builder createIndexSetConfig() {
-        return IndexSetConfig.builder()
-                .isWritable(true)
-                .isRegular(true)
-                .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
-                .indexAnalyzer(indexAnalyzer())
-                .shards(shards())
-                .replicas(replicas())
-                .indexOptimizationDisabled(indexOptimizationDisabled())
-                .indexOptimizationMaxNumSegments(indexOptimizationMaxNumSegments())
-                .fieldTypeRefreshInterval(Duration.standardSeconds(
-                        fieldTypeRefreshIntervalUnit().toSeconds(fieldTypeRefreshInterval())))
-                .rotationStrategyClass(rotationStrategyClass())
-                .rotationStrategy(rotationStrategyConfig())
-                .retentionStrategyClass(retentionStrategyClass())
-                .retentionStrategy(retentionStrategyConfig());
     }
 }
