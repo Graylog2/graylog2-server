@@ -178,7 +178,6 @@ const EntityDataTable = <Entity extends { id: string }>({
   }, []);
 
   const unselectAllItems = useCallback(() => setSelectedEntities([]), []);
-  const displayActionsCol = typeof rowActions === 'function';
 
   return (
     <ScrollContainer ref={tableRef}>
