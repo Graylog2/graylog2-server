@@ -22,7 +22,8 @@ import java.util.Locale;
 
 public enum ResponseEntryType {
     GROUPING,
-    METRIC;
+    METRIC,
+    FIELD;
 
     @JsonValue
     @Override
