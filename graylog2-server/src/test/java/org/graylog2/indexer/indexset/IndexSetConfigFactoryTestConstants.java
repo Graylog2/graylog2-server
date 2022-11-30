@@ -24,7 +24,10 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConf
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-public class IndexSetConfigFactoryTest {
+public class IndexSetConfigFactoryTestConstants {
+    private IndexSetConfigFactoryTestConstants() {
+    }
+
     public static final IndexSetConfig TEST_INDEX_SET_CONFIG = IndexSetConfig.builder()
             .isWritable(false)
             .title("Title")
@@ -46,5 +49,4 @@ public class IndexSetConfigFactoryTest {
             .indexOptimizationDisabled(false)
             .isRegular(false)
             .build();
-
 }
