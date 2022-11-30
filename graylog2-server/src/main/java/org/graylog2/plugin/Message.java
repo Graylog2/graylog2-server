@@ -121,7 +121,7 @@ public class Message implements Messages, Indexable {
      *     <li>They are guaranteed to be lexicographically sortable (UUIDs are only lexicographically sortable when time-based ones are used)</li>
      * </ul>
      *
-     * See: https://github.com/Graylog2/graylog2-server/issues/5994
+     * See: <a href="https://github.com/Graylog2/graylog2-server/issues/5994">...</a>
      */
     public static final String FIELD_GL2_MESSAGE_ID = "gl2_message_id";
 
@@ -279,6 +279,7 @@ public class Message implements Messages, Indexable {
      * was involved.
      */
     private Object messageQueueId;
+    private int sequenceNr = 0;
 
     private DateTime receiveTime;
     private DateTime processingTime;
@@ -842,6 +843,14 @@ public class Message implements Messages, Indexable {
 
     public void setMessageQueueId(Object messageQueueId) {
         this.messageQueueId = messageQueueId;
+    }
+
+    public void setSequenceNr(int sequenceNr) {
+        this.sequenceNr = sequenceNr;
+    }
+
+    public int getSequenceNr() {
+        return sequenceNr;
     }
 
     @Nullable

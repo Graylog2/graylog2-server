@@ -50,6 +50,7 @@ import org.graylog2.shared.buffers.InputBufferImpl;
 import org.graylog2.shared.buffers.NoopInputBuffer;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.processors.DecodingProcessor;
+import org.graylog2.shared.buffers.processors.MessageULIDGenerator;
 import org.graylog2.shared.inputs.InputRegistry;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -80,6 +81,7 @@ public class GenericBindings extends Graylog2Module {
         if (!isMigrationCommand) {
             bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
         }
+        bind(MessageULIDGenerator.class).asEagerSingleton();
 
         bind(ThroughputCounter.class);
 
