@@ -22,10 +22,11 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.rest.SearchJobDTO;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
-import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.Metadata;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
+import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,13 +41,17 @@ public class AggregationTabularResponseCreator implements TabularResponseCreator
 
     public TabularResponse mapToResponse(final AggregationRequestSpec searchRequestSpec, final SearchJob searchJob) throws AggregationFailedException {
         final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
+
+
         final QueryResult queryResult = searchJobDTO.results().get(SearchRequestSpecToSearchMapper.QUERY_ID);
 
         if (queryResult != null) {
             throwErrorIfAnyAvailable(queryResult);
             final SearchType.Result aggregationResult = queryResult.searchTypes().get(AggregationSpecToPivotMapper.PIVOT_ID);
+
             if (aggregationResult instanceof PivotResult pivotResult) {
-                return mapToResponse(searchRequestSpec, pivotResult);
+                final List<SeriesSpec> requestedSeries = extractSeries(queryResult);
+                return mapToResponse(searchRequestSpec, pivotResult, requestedSeries);
             }
         }
 
@@ -54,17 +59,25 @@ public class AggregationTabularResponseCreator implements TabularResponseCreator
         throw new AggregationFailedException("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
     }
 
+    private List<SeriesSpec> extractSeries(QueryResult queryResult) {
+        return queryResult.query().searchTypes().stream().filter(t -> AggregationSpecToPivotMapper.PIVOT_ID.equals(t.id())).findFirst().stream()
+                .filter(searchType -> searchType instanceof Pivot)
+                .map(pivot -> (Pivot) pivot)
+                .flatMap(pivot -> pivot.series().stream())
+                .collect(Collectors.toList());
+    }
+
     private TabularResponse mapToResponse(final AggregationRequestSpec searchRequestSpec,
-                                          final PivotResult pivotResult) {
+                                          final PivotResult pivotResult, List<SeriesSpec> requestedSeries) {
         return new TabularResponse(
                 searchRequestSpec.getSchema(),
-                getDatarows(searchRequestSpec, pivotResult),
+                getDatarows(searchRequestSpec, pivotResult, requestedSeries),
                 new Metadata(pivotResult.effectiveTimerange())
         );
     }
 
     private static List<List<Object>> getDatarows(final AggregationRequestSpec searchRequestSpec,
-                                                  final PivotResult pivotResult) {
+                                                  final PivotResult pivotResult, List<SeriesSpec> series) {
         final int numGroupings = searchRequestSpec.groupings().size();
 
         return pivotResult.rows()
@@ -75,24 +88,22 @@ public class AggregationTabularResponseCreator implements TabularResponseCreator
                             Collections.nCopies(numGroupings - pivRow.key().size(), "-").stream()  //sometimes pivotRow does not have enough keys - empty value!
                     );
 
-                    final Stream<Object> metrics = searchRequestSpec.metrics().stream()
-                            .map(m -> metricValue(pivRow.values(), m));
+                    final Stream<Object> metrics = series.stream().map(s -> metricValue(s, pivRow.values()));
 
                     return Stream.concat(groupings, metrics).collect(Collectors.toList());
                 })
                 .collect(Collectors.toList());
     }
 
-    private static Object metricValue(ImmutableList<PivotResult.Value> values, Metric metric) {
+    private static Object metricValue(SeriesSpec seriesSpec, ImmutableList<PivotResult.Value> values) {
         return values.stream()
-                .filter(value -> isMetricValue(metric, value))
+                .filter(value -> isMetricValue(seriesSpec, value))
                 .findFirst()
                 .map(PivotResult.Value::value)
                 .orElse("-");
     }
 
-    private static boolean isMetricValue(Metric metric, PivotResult.Value value) {
-        // TODO: how to get rid of the columnName() method here? how to uniquely identify value based only on the metric information?
-        return value.key().contains(metric.columnName());
+    private static boolean isMetricValue(SeriesSpec metric, PivotResult.Value value) {
+        return value.key().contains(metric.literal());
     }
 }

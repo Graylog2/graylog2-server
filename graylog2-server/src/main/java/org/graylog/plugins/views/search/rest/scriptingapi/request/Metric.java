@@ -64,17 +64,6 @@ public class Metric implements Sortable {
         this(functionName, fieldName, null, null);
     }
 
-    @Override
-    public String columnName() {
-        if (configuration() != null) {
-            final Optional<String> configBasedColumnName = configuration().columnName(this);
-            if (configBasedColumnName.isPresent()) {
-                return configBasedColumnName.get();
-            }
-        }
-        return functionName() + "(" + (fieldName() != null ? fieldName() : "") + ")";
-    }
-
     /**
      * Creates a new Metric from its string representation
      *

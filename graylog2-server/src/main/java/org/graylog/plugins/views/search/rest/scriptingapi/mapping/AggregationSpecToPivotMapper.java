@@ -16,21 +16,18 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
-import org.graylog.plugins.views.search.rest.scriptingapi.request.Sortable;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
-import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -56,44 +53,30 @@ public class AggregationSpecToPivotMapper implements Function<AggregationRequest
                 .map(rowGroupCreator)
                 .collect(Collectors.toList());
 
-        final Map<Metric, SeriesSpec> series = aggregationSpec.metrics()
+        final List<ImmutablePair<Metric, SeriesSpec>> series = aggregationSpec.metrics()
                 .stream()
                 .filter(Objects::nonNull)
-                .collect(Collectors.toMap(Function.identity(), seriesCreator));
+                .map(m -> ImmutablePair.of(m, seriesCreator.apply(m)))
+                .collect(Collectors.toList());
 
         final Pivot.Builder pivotBuilder = Pivot.builder()
                 .id(PIVOT_ID)
                 .rollup(false)
                 .rowGroups(groups)
-                .series(new ArrayList<>(series.values()));
+                .series(series.stream().map(ImmutablePair::getValue).collect(Collectors.toList()));
 
         if (aggregationSpec.hasCustomSort()) {
             final List<SortSpec> newSort = getSortSpecs(series);
-            final List<SortSpec> oldSort = getSortSpecs(aggregationSpec.metrics());
-
-            if (!Objects.equals(newSort, oldSort)) {
-                throw new IllegalArgumentException("different sorts: " + oldSort + "," + newSort);
-            }
             pivotBuilder.sort(newSort);
         }
         return pivotBuilder
                 .build();
     }
 
-    private List<SortSpec> getSortSpecs(Map<Metric, SeriesSpec> series) {
-        return series.entrySet().stream()
+    private List<SortSpec> getSortSpecs(List<ImmutablePair<Metric, SeriesSpec>> series) {
+        return series.stream()
                 .filter(e -> e.getKey().sort() != null)
                 .map(sortable -> SeriesSort.create(sortable.getValue().literal(), sortable.getKey().sort()))
                 .collect(Collectors.toList());
     }
-
-    @Deprecated
-    private List<SortSpec> getSortSpecs(final Collection<Metric> groupings) {
-        return groupings.stream()
-                .filter(sortable -> sortable.sort() != null)
-                .map(sortable -> SeriesSort.create(sortable.columnName(), sortable.sort()))
-                .collect(Collectors.toList());
-    }
-
-
 }
