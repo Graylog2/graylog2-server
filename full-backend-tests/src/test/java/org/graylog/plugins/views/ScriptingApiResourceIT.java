@@ -54,7 +54,6 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.withPrecision;
 import static org.assertj.core.api.Java6Assertions.within;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.CoreMatchers.not;
@@ -608,6 +607,31 @@ public class ScriptingApiResourceIT {
                 .assertThat()
                 .body("type", Matchers.equalTo("ApiError"))
                 .body("message", Matchers.containsString("Failed to obtain aggregation results"));
+    }
+
+    @ContainerMatrixTest
+    void testMessages() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("""
+                        {
+                          "fields": ["source", "facility", "level"]
+                        }
+                        """)
+                .post("/search/messages")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200);
+
+        validateSchema(validatableResponse, "field: source", "unknown", "source");
+        validateSchema(validatableResponse, "field: facility", "unknown", "facility");
+        validateSchema(validatableResponse, "field: level", "unknown", "level");
+
+        validateRow(validatableResponse, "lorem-ipsum.com", "another-test", 3);
+        validateRow(validatableResponse, "example.org", "another-test", 2);
+        validateRow(validatableResponse, "example.org", "test", 1);
+
     }
 
 
