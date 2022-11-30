@@ -146,6 +146,9 @@ const EntityDataTable = <Entity extends { id: string }>({
   onColumnsChange,
   visibleColumns,
 }: Props<Entity>) => {
+  const tableRef = useRef<HTMLTableElement>();
+  const { width: tableWidth } = useElementDimensions(tableRef);
+  const actionsRef = useRef<HTMLDivElement>();
   const currentUser = useCurrentUser();
   const [selectedEntities, setSelectedEntities] = useState<Array<string>>([]);
   const columnRenderers = merge(DefaultColumnRenderers, customColumnRenderers);
