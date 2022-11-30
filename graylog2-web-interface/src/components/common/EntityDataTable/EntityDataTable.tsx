@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useRef } from 'react';
 import type * as Immutable from 'immutable';
 import { merge } from 'lodash';
 
@@ -30,7 +30,8 @@ import ColumnsVisibilitySelect from 'components/common/EntityDataTable/ColumnsVi
 import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
 import useColumnsWidths from 'components/common/EntityDataTable/hooks/useColumnsWidths';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
-import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+import { CELL_PADDING, BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
+import useElementDimensions from 'hooks/useElementDimensions';
 
 import type { ColumnRenderers, Column, Sort } from './types';
 
@@ -120,9 +121,13 @@ const EntityDataTable = <Entity extends { id: string }>({
   onColumnsChange,
   visibleColumns,
 }: Props<Entity>) => {
+  const tableRef = useRef<HTMLTableElement>();
+  const { width: tableWidth } = useElementDimensions(tableRef);
+  const actionsRef = useRef<HTMLDivElement>();
   const currentUser = useCurrentUser();
   const [selectedEntities, setSelectedEntities] = useState<Array<string>>([]);
   const columnRenderers = merge(DefaultColumnRenderers, customColumnRenderers ?? {});
+
   const accessibleColumns = useMemo(
     () => filterAccessibleColumns(columnDefinitions, currentUser.permissions),
     [columnDefinitions, currentUser.permissions],
@@ -147,14 +152,15 @@ const EntityDataTable = <Entity extends { id: string }>({
   const unselectAllItems = useCallback(() => setSelectedEntities([]), []);
   const displayActionsCol = typeof rowActions === 'function';
   const displayBulkSelectCol = typeof bulkActions === 'function';
-  const { actionsRef, tableRef, columnsWidths } = useColumnsWidths<Entity>({
-    columnsIds,
-    columnRenderers,
-    displayActionsCol,
-    displayBulkSelectCol,
-  });
+  const actionsColWidth = actionsRef.current?.offsetWidth ? (actionsRef.current.offsetWidth ?? 0) + CELL_PADDING * 2 : 0;
 
-  const actionsColWidth = actionsRef?.current?.offsetWidth ? (actionsRef.current.offsetWidth ?? 0) + CELL_PADDING * 2 : undefined;
+  const columnsWidths = useColumnsWidths<Entity>({
+    actionsColWidth,
+    bulkSelectColWidth: displayBulkSelectCol ? BULK_SELECT_COLUMN_WIDTH : 0,
+    columnRenderers,
+    columnsIds,
+    tableWidth,
+  });
 
   return (
     <ScrollContainer ref={tableRef}>

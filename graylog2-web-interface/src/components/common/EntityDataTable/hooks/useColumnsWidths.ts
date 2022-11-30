@@ -14,35 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type * as React from 'react';
-import { useRef, useState, useLayoutEffect, useContext } from 'react';
+import { useState, useLayoutEffect, useContext } from 'react';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import WindowDimensionsContext from 'contexts/WindowDimensionsContext';
 import {
-  BULK_SELECT_COLUMN_WIDTH,
   DEFAULT_COL_MIN_WIDTH,
   DEFAULT_COL_WIDTH,
-  CELL_PADDING,
 } from 'components/common/EntityDataTable/Constants';
 
 const calculateAvailableWidth = ({
   tableWidth,
-  displayBulkSelectCol,
-  displayActionsCol,
-  actionsRef,
+  actionsColWidth,
+  bulkSelectColWidth,
   columnsIds,
   columnRenderers,
 }: {
-  actionsRef: React.RefObject<HTMLDivElement>,
+  actionsColWidth: number,
+  bulkSelectColWidth: number,
   columnRenderers: { [columnId: string]: { staticWidth?: number } }
   columnsIds: Array<string>,
-  displayActionsCol: boolean,
-  displayBulkSelectCol: boolean,
   tableWidth: number,
 }) => {
-  const bulkSelectColWidth = displayBulkSelectCol ? BULK_SELECT_COLUMN_WIDTH : 0;
-  const actionsColWidth = displayActionsCol && actionsRef.current ? (actionsRef.current.offsetWidth + CELL_PADDING * 2) : 0;
   const staticColsWidth = columnsIds.reduce((total, id) => total + (columnRenderers[id]?.staticWidth ?? 0), 0);
 
   return tableWidth - bulkSelectColWidth - actionsColWidth - staticColsWidth;
@@ -77,44 +70,39 @@ const columnsWidth = ({
   }));
 };
 
-const useColumnsWidths = <Entity extends { id: string }>(
-  {
-    columnsIds,
-    columnRenderers,
-    displayActionsCol,
-    displayBulkSelectCol,
-  }: {
+const useColumnsWidths = <Entity extends { id: string }>({
+  actionsColWidth,
+  bulkSelectColWidth,
+  columnRenderers,
+  columnsIds,
+  tableWidth,
+}: {
+  actionsColWidth: number,
+  bulkSelectColWidth: number,
+  columnRenderers: ColumnRenderers<Entity>,
   columnsIds: Array<string>,
-    columnRenderers: ColumnRenderers<Entity>,
-    displayActionsCol: boolean,
-    displayBulkSelectCol: boolean,
+  tableWidth: number,
 },
 ) => {
-  const tableRef = useRef<HTMLTableElement>();
-  const actionsRef = useRef<HTMLDivElement>();
   const [columnsWidths, setColumnWidths] = useState({});
-  const windowDimensions = useContext(WindowDimensionsContext);
 
   useLayoutEffect(() => {
-    if (tableRef.current) {
-      // Calculate available width for columns which do not have a static width
-      const assignableWidth = calculateAvailableWidth({
-        actionsRef,
-        columnRenderers,
-        columnsIds,
-        displayActionsCol,
-        displayBulkSelectCol,
-        tableWidth: tableRef.current.clientWidth,
-      });
-      setColumnWidths(columnsWidth({ assignableWidth, columnsIds, columnRenderers }));
+    if (!tableWidth) {
+      return;
     }
-  }, [columnRenderers, columnsIds, displayActionsCol, displayBulkSelectCol, windowDimensions?.width]);
 
-  return {
-    tableRef,
-    actionsRef,
-    columnsWidths,
-  };
+    // Calculate available width for columns which do not have a static width
+    const assignableWidth = calculateAvailableWidth({
+      actionsColWidth,
+      columnRenderers,
+      columnsIds,
+      bulkSelectColWidth,
+      tableWidth,
+    });
+    setColumnWidths(columnsWidth({ assignableWidth, columnsIds, columnRenderers }));
+  }, [actionsColWidth, bulkSelectColWidth, columnRenderers, columnsIds, tableWidth]);
+
+  return columnsWidths;
 };
 
 export default useColumnsWidths;
