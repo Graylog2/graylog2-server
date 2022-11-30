@@ -33,6 +33,8 @@ public class Catalog {
     private final LoadingCache<String, String> titleCache;
     private final LoadingCache<String, String> typeCache;
 
+    private final int MAXIMUM_CACHE_SIZE = 10000;
+
     @Inject
     public Catalog(ContentPackService contentPackService) {
         this.contentPackService = contentPackService;
@@ -43,7 +45,7 @@ public class Catalog {
     private LoadingCache<String, String> createTitleCache() {
         return CacheBuilder
                 .newBuilder()
-                .maximumSize(100)
+                .maximumSize(MAXIMUM_CACHE_SIZE)
                 .expireAfterAccess(1, TimeUnit.SECONDS)
                 .build(new CacheLoader<>() {
                     @Override
@@ -62,7 +64,7 @@ public class Catalog {
     private LoadingCache<String, String> createTypeCache() {
         return CacheBuilder
                 .newBuilder()
-                .maximumSize(100)
+                .maximumSize(MAXIMUM_CACHE_SIZE)
                 .expireAfterAccess(1, TimeUnit.SECONDS)
                 .build(new CacheLoader<>() {
                     @Override
