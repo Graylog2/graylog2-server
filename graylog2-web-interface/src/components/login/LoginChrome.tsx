@@ -51,10 +51,10 @@ const BackgroundImage = styled.img`
 `;
 
 const NotificationsContainer = styled.div`
-  position: fixed;
+  position: absolute;
   top: 0;
   margin-top: 5px;
-  width: 75%;
+  width: 100%;
 `;
 
 const LoginContainer = styled.div`
