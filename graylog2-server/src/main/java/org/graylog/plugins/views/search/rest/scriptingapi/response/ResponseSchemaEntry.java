@@ -42,6 +42,11 @@ public record ResponseSchemaEntry(
         return new ResponseSchemaEntry(ResponseEntryType.METRIC, dataType, functionName, fieldName);
     }
 
+    //TODO : do we want to examine ES/OS mapping and fetch exact type for a field?
+    public static ResponseSchemaEntry field(String fieldName) {
+        return new ResponseSchemaEntry(ResponseEntryType.FIELD, ResponseEntryDataType.UNKNOWN, null, fieldName);
+    }
+
     /**
      * @return Human readable label like:
      * grouping: http_method

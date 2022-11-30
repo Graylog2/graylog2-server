@@ -20,15 +20,15 @@ import lodash from 'lodash';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import moment from 'moment';
 
-import {} from 'moment-duration-format';
+import 'moment-duration-format';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Alert, Col, Row } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 
 // Import built-in plugins
-import {} from 'components/event-definitions/event-definition-types';
-import {} from 'components/event-notifications/event-notification-types';
+import 'components/event-definitions/event-definition-types';
+import 'components/event-notifications/event-notification-types';
 
 import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
 import styles from './EventDefinitionSummary.css';
