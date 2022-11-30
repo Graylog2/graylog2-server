@@ -18,26 +18,26 @@ import * as React from 'react';
 import { useMemo, useEffect, useRef } from 'react';
 import { uniq } from 'lodash';
 
-import RowCheckbox from 'components/common/ConfigurableDataTable/RowCheckbox';
+import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 
 type CheckboxStatus = 'CHECKED' | 'UNCHECKED' | 'PARTIAL';
 
-const useCheckboxStatus = (rows, selectedItemsIds) => {
+const useCheckboxStatus = <Entity extends { id: string }>(data: Array<Entity>, selectedEntityIds: Array<string>) => {
   const checkboxRef = useRef<HTMLInputElement>();
 
   const checkboxStatus: CheckboxStatus = useMemo(() => {
-    const selectedRows = rows.filter(({ id }) => selectedItemsIds.includes(id));
+    const selectedEntites = data.filter(({ id }) => selectedEntityIds.includes(id));
 
-    if (selectedRows.length === 0) {
+    if (selectedEntites.length === 0) {
       return 'UNCHECKED';
     }
 
-    if (selectedRows.length === rows.length) {
+    if (selectedEntites.length === data.length) {
       return 'CHECKED';
     }
 
     return 'PARTIAL';
-  }, [rows, selectedItemsIds]);
+  }, [data, selectedEntityIds]);
 
   useEffect(() => {
     if (checkboxRef.current) {
@@ -57,25 +57,29 @@ const useCheckboxStatus = (rows, selectedItemsIds) => {
   };
 };
 
-type Props<ListItem extends { id: string }> = {
-  rows: Array<ListItem>
-  selectedItemsIds: Array<string>,
-  setSelectedItemsIds: React.Dispatch<React.SetStateAction<Array<string>>>
+type Props<Entity extends { id: string }> = {
+  data: Array<Entity>
+  selectedEntities: Array<string>,
+  setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>
 }
 
-const BulkActionsHead = <ListItem extends { id: string }>({ rows, setSelectedItemsIds, selectedItemsIds }: Props<ListItem>) => {
-  const { checkboxRef, checkboxStatus } = useCheckboxStatus(rows, selectedItemsIds);
-  const title = `${checkboxStatus === 'CHECKED' ? 'Deselect' : 'all visible rows'}`;
+const BulkActionsHead = <Entity extends { id: string }>({
+  data,
+  setSelectedEntities,
+  selectedEntities,
+}: Props<Entity>) => {
+  const { checkboxRef, checkboxStatus } = useCheckboxStatus(data, selectedEntities);
+  const title = `${checkboxStatus === 'CHECKED' ? 'Deselect' : 'Select'} all visible entities`;
 
   const onBulkSelect = () => {
-    setSelectedItemsIds((cur) => {
-      const rowsIds = rows.map(({ id }) => id);
+    setSelectedEntities((cur) => {
+      const entityIds = data.map(({ id }) => id);
 
       if (checkboxStatus === 'CHECKED') {
-        return cur.filter((itemId) => !rowsIds.includes(itemId));
+        return cur.filter((itemId) => !entityIds.includes(itemId));
       }
 
-      return uniq([...cur, ...rowsIds]);
+      return uniq([...cur, ...entityIds]);
     });
   };
 
@@ -85,7 +89,7 @@ const BulkActionsHead = <ListItem extends { id: string }>({ rows, setSelectedIte
                    onChange={onBulkSelect}
                    checked={checkboxStatus === 'CHECKED'}
                    title={title}
-                   disabled={!rows?.length} />
+                   disabled={!data?.length} />
     </td>
   );
 };

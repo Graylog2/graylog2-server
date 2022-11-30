@@ -14,32 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type * as React from 'react';
+import EntityDataTable from './EntityDataTable';
+import type { ColumnRenderers, Column, Sort } from './types';
 
-export type Attribute = {
-  id: string,
-  title: string,
-  sortable?: boolean,
-  type?: boolean,
-};
-
-export type CustomHeaders = {
-  [key: string]: {
-    renderHeader: (attribute: Attribute) => React.ReactNode,
-    textAlign?: string,
-  }
-}
-
-export type CustomCells<ListItem extends { id: string }> = {
-  [attributeId: string]: {
-    renderCell: (listItem: ListItem, attribute: Attribute) => React.ReactNode,
-    textAlign?: string,
-    width?: string,
-    maxWidth?: string,
-  }
-}
-
-export type Sort = {
-  attributeId: string,
-  order: 'asc' | 'desc'
-};
+export { ColumnRenderers, Column, Sort };
+export default EntityDataTable;
