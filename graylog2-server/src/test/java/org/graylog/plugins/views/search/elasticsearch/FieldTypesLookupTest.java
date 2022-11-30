@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -104,5 +105,63 @@ public class FieldTypesLookupTest {
 
         final Optional<String> result = this.fieldTypesLookup.getType(ImmutableSet.of("stream1", "stream2"), "somefield");
         assertThat(result).contains("long");
+    }
+
+    @Test
+    void getTypesReturnsEmptyMapIfFieldTypesAreEmpty() {
+        assertThat(fieldTypesLookup.getTypes(Set.of("SomeStream"), Set.of("somefield"))).isEmpty();
+    }
+
+    @Test
+    void getTypesReturnsEmptyMapIfStreamsAreEmpty() {
+        assertThat(fieldTypesLookup.getTypes(Set.of(), Set.of("somefield"))).isEmpty();
+    }
+
+    @Test
+    void getTypesReturnsEmptyMapIfMultipleTypesExistForField() {
+        when(this.indexFieldTypesService.findForStreamIds(Collections.singleton("stream1"))).thenReturn(ImmutableSet.of(
+                IndexFieldTypesDTO.create("indexSet1", "stream1", ImmutableSet.of(
+                        FieldTypeDTO.create("somefield", "long")
+                )),
+                IndexFieldTypesDTO.create("indexSet2", "stream1", ImmutableSet.of(
+                        FieldTypeDTO.create("somefield", "float")
+                ))
+        ));
+
+        assertThat(fieldTypesLookup.getTypes(Set.of("stream1"), Set.of("somefield"))).isEmpty();
+    }
+
+    @Test
+    void getTypesReturnsEmptyMapForNonExistingFields() {
+        when(this.indexFieldTypesService.findForStreamIds(ImmutableSet.of("stream1", "stream2"))).thenReturn(ImmutableSet.of(
+                IndexFieldTypesDTO.create("indexSet1", "stream1", ImmutableSet.of(
+                        FieldTypeDTO.create("existing_field", "long")
+                )),
+                IndexFieldTypesDTO.create("indexSet2", "stream2", ImmutableSet.of(
+                        FieldTypeDTO.create("existing_field", "long")
+                ))
+        ));
+
+        assertThat(fieldTypesLookup.getTypes(Set.of("stream1", "stream2"), Set.of("somefield1", "somefield2"))).isEmpty();
+    }
+
+    @Test
+    void getTypesBehavesCorrectlyIfMultipleScenariosAreMixed() {
+        when(this.indexFieldTypesService.findForStreamIds(Set.of("stream1", "stream2"))).thenReturn(Set.of(
+                IndexFieldTypesDTO.create("indexSet1", "stream1", Set.of(
+                        FieldTypeDTO.create("good_field", "long"),
+                        FieldTypeDTO.create("bad_field", "ip")
+                )),
+                IndexFieldTypesDTO.create("indexSet2", "stream2", Set.of(
+                        FieldTypeDTO.create("good_field", "long"),
+                        FieldTypeDTO.create("bad_field", "text")
+                ))
+        ));
+
+        assertThat(fieldTypesLookup.getTypes(Set.of("stream1", "stream2"), Set.of("good_field", "bad_field", "unknown_field")))
+                .satisfies(result -> assertThat(result).doesNotContainKey("bad_field")) //different type in different streams
+                .satisfies(result -> assertThat(result).doesNotContainKey("unknown_field")) //no type info
+                .satisfies(result -> assertThat(result).containsEntry("good_field", "long")); //proper type info
+
     }
 }
