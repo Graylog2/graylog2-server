@@ -22,5 +22,6 @@ public interface Sortable {
 
     SortSpec.Direction sort();
 
+    @Deprecated(forRemoval = true)
     String columnName();
 }

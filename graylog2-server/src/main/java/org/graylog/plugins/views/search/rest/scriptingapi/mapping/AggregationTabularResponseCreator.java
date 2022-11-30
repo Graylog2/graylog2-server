@@ -85,9 +85,14 @@ public class AggregationTabularResponseCreator implements TabularResponseCreator
 
     private static Object metricValue(ImmutableList<PivotResult.Value> values, Metric metric) {
         return values.stream()
-                .filter(value -> value.key().contains(metric.columnName()))
+                .filter(value -> isMetricValue(metric, value))
                 .findFirst()
                 .map(PivotResult.Value::value)
                 .orElse("-");
+    }
+
+    private static boolean isMetricValue(Metric metric, PivotResult.Value value) {
+        // TODO: how to get rid of the columnName() method here? how to uniquely identify value based only on the metric information?
+        return value.key().contains(metric.columnName());
     }
 }
