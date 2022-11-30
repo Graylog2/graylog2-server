@@ -28,7 +28,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import StringUtils from 'util/StringUtils';
 import ColumnsVisibilitySelect from 'components/common/EntityDataTable/ColumnsVisibilitySelect';
 import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
-import useColumnWidths from 'components/common/EntityDataTable/hooks/useColumnWidths';
+import useColumnsWidths from 'components/common/EntityDataTable/hooks/useColumnsWidths';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
 import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 
@@ -147,7 +147,7 @@ const EntityDataTable = <Entity extends { id: string }>({
   const unselectAllItems = useCallback(() => setSelectedEntities([]), []);
   const displayActionsCol = typeof rowActions === 'function';
   const displayBulkSelectCol = typeof bulkActions === 'function';
-  const { actionsRef, tableRef, columnsWidths } = useColumnWidths<Entity>({
+  const { actionsRef, tableRef, columnsWidths } = useColumnsWidths<Entity>({
     columnsIds,
     columnRenderers,
     displayActionsCol,

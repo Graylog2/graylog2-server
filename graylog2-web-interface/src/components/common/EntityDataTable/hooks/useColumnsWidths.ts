@@ -77,7 +77,7 @@ const columnsWidth = ({
   }));
 };
 
-const useColumnWidths = <Entity extends { id: string }>(
+const useColumnsWidths = <Entity extends { id: string }>(
   {
     columnsIds,
     columnRenderers,
@@ -117,4 +117,4 @@ const useColumnWidths = <Entity extends { id: string }>(
   };
 };
 
-export default useColumnWidths;
+export default useColumnsWidths;
