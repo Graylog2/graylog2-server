@@ -46,7 +46,7 @@ public abstract class LastOpenedItemsDTO {
     public abstract String userId();
 
     @JsonProperty(FIELD_ITEMS)
-    public abstract List<String> items();
+    public abstract List<Item> items();
 
     public static LastOpenedItemsDTO.Builder builder() {
         return LastOpenedItemsDTO.Builder.create();
@@ -65,12 +65,12 @@ public abstract class LastOpenedItemsDTO {
         public abstract LastOpenedItemsDTO.Builder userId(String userId);
 
         @JsonProperty(FIELD_ITEMS)
-        public abstract LastOpenedItemsDTO.Builder items(List<String> items);
+        public abstract LastOpenedItemsDTO.Builder items(List<Item> items);
 
         @JsonCreator
         public static LastOpenedItemsDTO.Builder create() {
             return new $AutoValue_LastOpenedItemsDTO.Builder()
-                    .items(new ArrayList<>());
+                    .items(new ArrayList<Item>());
         }
 
         public abstract LastOpenedItemsDTO build();

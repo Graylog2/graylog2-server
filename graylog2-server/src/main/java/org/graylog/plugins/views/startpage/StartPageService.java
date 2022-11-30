@@ -22,6 +22,7 @@ import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.startpage.favorites.FavoriteItem;
 import org.graylog.plugins.views.startpage.favorites.FavoriteItemsDTO;
 import org.graylog.plugins.views.startpage.favorites.FavoriteItemsService;
+import org.graylog.plugins.views.startpage.lastOpened.Item;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedItem;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedItemsDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedService;
@@ -31,8 +32,11 @@ import org.graylog.plugins.views.startpage.recentActivities.RecentActivityServic
 import org.graylog2.database.PaginatedList;
 import org.graylog2.lookup.Catalog;
 import org.graylog2.rest.models.PaginatedResponse;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -78,7 +82,7 @@ public class StartPageService {
                 .orElse(LastOpenedItemsDTO.builder().userId(searchUser.getUser().getId()).build())
                 .items()
                 .stream()
-                .map(i -> new LastOpenedItem(i, catalog.getType(i), catalog.getTitle(i)))
+                .map(i -> new LastOpenedItem(i.id(), catalog.getType(i.id()), catalog.getTitle(i.id()), i.timestamp()))
                 .collect(Collectors.toList());
         Collections.reverse(items);
 
@@ -129,12 +133,20 @@ public class StartPageService {
     }
 
     public void addLastOpenedFor(final ViewDTO view, final SearchUser searchUser) {
-        var lastOpenedItems = lastOpenedService.findForUser(searchUser);
+        final var lastOpenedItems = lastOpenedService.findForUser(searchUser);
+        final var item = new Item(view.id(), DateTime.now(DateTimeZone.UTC));
         if(lastOpenedItems.isPresent()) {
-            addItemToCappedList(lastOpenedItems.get().items(), view.id());
-            lastOpenedService.save(lastOpenedItems.get());
+            var loi = lastOpenedItems.get();
+            var items = loi.items().stream().filter(i -> !i.id().equals(item.id())).limit(MAXIMUM_ITEMS - 1).toList();
+            loi.items().clear();
+            loi.items().addAll(items);
+            loi.items().add(item);
+            lastOpenedService.save(loi);
         } else {
-            var items = LastOpenedItemsDTO.builder().userId(searchUser.getUser().getId()).items(Collections.singletonList(view.id())).build();
+            var items = LastOpenedItemsDTO.builder()
+                    .userId(searchUser.getUser().getId())
+                    .items(Collections.singletonList(item))
+                    .build();
             lastOpenedService.create(items, searchUser);
         }
     }
