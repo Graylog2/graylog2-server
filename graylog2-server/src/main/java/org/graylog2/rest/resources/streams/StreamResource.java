@@ -499,6 +499,26 @@ public class StreamResource extends RestResource {
         return Response.created(streamUri).entity(result).build();
     }
 
+    @PUT
+    @Path("/indexSet/{indexSetId}")
+    @Timed
+    @ApiOperation(value = "Assign multiple streams to index set")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Index set not found.")
+    })
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @AuditEvent(type = AuditEventTypes.STREAM_UPDATE)
+    public Response assignToIndexSet(@ApiParam(name = "indexSetId", required = true) @PathParam("indexSetId") String indexSetId,
+                                    @ApiParam(name = "JSON body", required = true) @Valid @NotNull List<String> streamIds) {
+        return indexSetRegistry.get(indexSetId)
+                .map(indexSet -> {
+                    streamService.addToIndexSet(indexSetId, streamIds);
+                    return Response.ok().build();
+                })
+                .orElse(Response.status(Response.Status.NOT_FOUND).build());
+    }
+
     private StreamResponse streamToResponse(Stream stream) {
         return StreamResponse.create(
             stream.getId(),
