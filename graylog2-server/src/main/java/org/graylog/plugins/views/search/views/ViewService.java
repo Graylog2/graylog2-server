@@ -18,10 +18,6 @@ package org.graylog.plugins.views.search.views;
 
 import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;
-import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog.plugins.views.search.views.dynamicstartpage.ActivityType;
-import org.graylog.plugins.views.search.views.dynamicstartpage.DynamicStartPageService;
-import org.graylog.plugins.views.search.views.dynamicstartpage.RecentActivityEvent;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
