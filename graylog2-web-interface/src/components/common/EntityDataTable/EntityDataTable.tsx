@@ -126,7 +126,8 @@ const EntityDataTable = <Entity extends { id: string }>({
   const actionsRef = useRef<HTMLDivElement>();
   const currentUser = useCurrentUser();
   const [selectedEntities, setSelectedEntities] = useState<Array<string>>([]);
-  const columnRenderers = merge(DefaultColumnRenderers, customColumnRenderers ?? {});
+  const columnRenderers = merge(DefaultColumnRenderers, customColumnRenderers);
+  console.log({ columnRenderers, DefaultColumnRenderers, customColumnRenderers });
 
   const accessibleColumns = useMemo(
     () => filterAccessibleColumns(columnDefinitions, currentUser.permissions),

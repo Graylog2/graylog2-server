@@ -14,10 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useState, useLayoutEffect, useContext } from 'react';
+import { useState, useLayoutEffect } from 'react';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
-import WindowDimensionsContext from 'contexts/WindowDimensionsContext';
 import {
   DEFAULT_COL_MIN_WIDTH,
   DEFAULT_COL_WIDTH,
@@ -99,7 +98,12 @@ const useColumnsWidths = <Entity extends { id: string }>({
       bulkSelectColWidth,
       tableWidth,
     });
-    setColumnWidths(columnsWidth({ assignableWidth, columnsIds, columnRenderers }));
+
+    setColumnWidths(columnsWidth({
+      assignableWidth,
+      columnsIds,
+      columnRenderers,
+    }));
   }, [actionsColWidth, bulkSelectColWidth, columnRenderers, columnsIds, tableWidth]);
 
   return columnsWidths;
