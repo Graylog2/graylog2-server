@@ -33,6 +33,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -79,7 +80,7 @@ public class ESMessageListTest {
 
     @Test
     public void passesTypeOfSortingFieldAsUnmappedType() {
-        final MessageList messageList = someMessageListWithSorting("stream1", "somefield");
+        final MessageList messageList = someMessageListWithSorting("stream1", "somefield", Sort.Order.ASC);
         final ESGeneratedQueryContext context = mockQueryContext(messageList);
         when(context.fieldType(Collections.singleton("stream1"), "somefield")).thenReturn(Optional.of("long"));
 
@@ -91,7 +92,7 @@ public class ESMessageListTest {
 
     @Test
     public void passesNullForUnmappedTypeIfTypeIsNotFound() {
-        final MessageList messageList = someMessageListWithSorting("stream1", "somefield");
+        final MessageList messageList = someMessageListWithSorting("stream1", "somefield", Sort.Order.ASC);
         final ESGeneratedQueryContext context = mockQueryContext(messageList);
         when(context.fieldType(Collections.singleton("stream1"), "somefield")).thenReturn(Optional.empty());
 
@@ -100,6 +101,49 @@ public class ESMessageListTest {
         final DocumentContext doc = JsonPath.parse(queryContext.searchSourceBuilder(messageList).toString());
         assertThat(doc.read("$.sort[0].somefield", Map.class)).doesNotContainKey("unmapped_type");
     }
+
+    @Test
+    public void addsGl2MessageIdtoSort() {
+        final MessageList messageList = someMessageListWithSorting("stream1", "timestamp", Sort.Order.ASC);
+        final ESGeneratedQueryContext context = mockQueryContext(messageList);
+
+        final ESGeneratedQueryContext queryContext = generateQueryPartWithContextFor(messageList, true, context);
+        final DocumentContext doc = JsonPath.parse(queryContext.searchSourceBuilder(messageList).toString());
+
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[0].timestamp.order").isEqualTo("asc");
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[1].gl2_message_id.order").isEqualTo("asc");
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[1].gl2_message_id.unmapped_type").isEqualTo("keyword");
+    }
+
+    @Test
+    public void addsGl2MessageIdtoSortWithOrder() {
+        final MessageList messageList = someMessageListWithSorting("stream1", "timestamp", Sort.Order.DESC);
+        final ESGeneratedQueryContext context = mockQueryContext(messageList);
+
+        final ESGeneratedQueryContext queryContext = generateQueryPartWithContextFor(messageList, true, context);
+        final DocumentContext doc = JsonPath.parse(queryContext.searchSourceBuilder(messageList).toString());
+
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[0].timestamp.order").isEqualTo("desc");
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[1].gl2_message_id.order").isEqualTo("desc");
+    }
+
+    @Test
+    public void onlyAddsGl2MessageIdWhenNotAlreadyPresent() {
+        final MessageList messageList = someMessageList().toBuilder()
+                .sort(List.of(
+                        Sort.create("gl2_message_id", Sort.Order.DESC),
+                        Sort.create("timestamp", Sort.Order.ASC)
+                ))
+                .build();
+        final ESGeneratedQueryContext context = mockQueryContext(messageList);
+        final ESGeneratedQueryContext queryContext = generateQueryPartWithContextFor(messageList, true, context);
+        final DocumentContext doc = JsonPath.parse(queryContext.searchSourceBuilder(messageList).toString());
+
+        assertThat((List<?>) doc.read("$.sort")).hasSize(2);
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[0].gl2_message_id.order").isEqualTo("desc");
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[1].timestamp.order").isEqualTo("asc");
+    }
+
 
     private Query someQuery() {
         return Query.builder()
@@ -126,13 +170,13 @@ public class ESMessageListTest {
                 .build();
     }
 
-    private MessageList someMessageListWithSorting(String stream, String sortField) {
+    private MessageList someMessageListWithSorting(String stream, String sortField, Sort.Order order) {
         return MessageList.builder()
                 .id("amessagelist")
                 .limit(100)
                 .offset(0)
                 .streams(Collections.singleton(stream))
-                .sort(Collections.singletonList(Sort.create(sortField, Sort.Order.ASC)))
+                .sort(Collections.singletonList(Sort.create(sortField, order)))
                 .build();
     }
 
