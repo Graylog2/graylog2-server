@@ -25,6 +25,7 @@ import TableHead from 'components/common/EntityDataTable/TableHead';
 import TableRow from 'components/common/EntityDataTable/TableRow';
 import useCurrentUser from 'hooks/useCurrentUser';
 import StringUtils from 'util/StringUtils';
+import ColumnsVisibilitySelect from 'components/common/EntityDataTable/ColumnsVisibilitySelect';
 
 import type { ColumnRenderers, Column, Sort } from './types';
 
@@ -82,12 +83,12 @@ type Props<Entity extends { id: string }> = {
   columnRenderers?: ColumnRenderers<Entity>,
   /** The table data. */
   data: Array<Entity>,
+  /** Function to handle changes of columns visibility */
+  onColumnsChange: (columnIds: Array<string>) => void,
   /** Function to handle sort changes */
   onSortChange: (newSort: Sort) => void,
   /** Actions for each row. */
   rowActions?: (entity: Entity) => React.ReactNode,
-  /** Total amount of items */
-  total: number,
   /** Which columns should be displayed. */
   visibleColumns: Array<string>,
 };
@@ -103,7 +104,7 @@ const EntityDataTable = <Entity extends { id: string }>({
   data,
   onSortChange,
   rowActions,
-  total,
+  onColumnsChange,
   visibleColumns,
 }: Props<Entity>) => {
   const currentUser = useCurrentUser();
@@ -147,7 +148,9 @@ const EntityDataTable = <Entity extends { id: string }>({
           )}
         </div>
         <div>
-          Total {total}
+          <ColumnsVisibilitySelect allColumns={accessibleColumns}
+                                   selectedColumns={visibleColumns}
+                                   onChange={onColumnsChange} />
         </div>
       </ActionsRow>
       <Table striped condensed hover>
