@@ -36,9 +36,9 @@ import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.indexer.ranges.IndexRange;
+import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.ResultChunk;
 import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesClusterConfig;
@@ -249,7 +249,7 @@ public abstract class SearchResource extends RestResource {
         return buildSearchResponse(query, result, fieldList, tookMs, timeRange, decorate, streamId);
     }
 
-    protected ChunkedOutput<ResultChunk> buildChunkedOutput(final ScrollResult scroll) {
+    protected ChunkedOutput<ResultChunk> buildChunkedOutput(final ChunkedResult scroll) {
         final ChunkedOutput<ResultChunk> output = new ChunkedOutput<>(ResultChunk.class);
 
         LOG.debug("[{}] Scroll result contains a total of {} messages", scroll.getQueryHash(), scroll.totalHits());
@@ -288,7 +288,7 @@ public abstract class SearchResource extends RestResource {
         }
     }
 
-    protected Runnable createScrollChunkProducer(final ScrollResult scroll,
+    protected Runnable createScrollChunkProducer(final ChunkedResult scroll,
                                                  final ChunkedOutput<ResultChunk> output) {
         return () -> {
             try {

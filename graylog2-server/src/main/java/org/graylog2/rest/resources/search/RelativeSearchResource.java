@@ -28,8 +28,8 @@ import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.decorators.DecoratorProcessor;
+import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.ResultChunk;
-import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -128,7 +128,7 @@ public class RelativeSearchResource extends SearchResource {
         final List<String> fieldList = parseFields(fields);
         final TimeRange timeRange = buildRelativeTimeRange(range);
 
-        final ScrollResult scroll = searches
+        final ChunkedResult scroll = searches
                 .scroll(query, timeRange, limit, offset, fieldList, filter, batchSize);
         return buildChunkedOutput(scroll);
     }

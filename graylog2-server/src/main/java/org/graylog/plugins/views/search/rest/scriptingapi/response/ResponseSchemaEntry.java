@@ -42,9 +42,8 @@ public record ResponseSchemaEntry(
         return new ResponseSchemaEntry(ResponseEntryType.METRIC, dataType, functionName, fieldName);
     }
 
-    //TODO : do we want to examine ES/OS mapping and fetch exact type for a field?
-    public static ResponseSchemaEntry field(String fieldName) {
-        return new ResponseSchemaEntry(ResponseEntryType.FIELD, ResponseEntryDataType.UNKNOWN, null, fieldName);
+    public static ResponseSchemaEntry field(String fieldName, ResponseEntryDataType dataType) {
+        return new ResponseSchemaEntry(ResponseEntryType.FIELD, dataType, null, fieldName);
     }
 
     /**
