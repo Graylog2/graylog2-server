@@ -19,7 +19,7 @@ import { renderHook } from '@testing-library/react-hooks';
 import useColumnsWidths from './useColumnsWidths';
 
 describe('useColumnsWidths hook test', () => {
-  it('should calculate width for columns with flexible with', async () => {
+  it('should calculate width for columns with flexible width', async () => {
     const columnRenderers = {
       title: { width: 1 },
       description: { width: 2 },
@@ -58,7 +58,7 @@ describe('useColumnsWidths hook test', () => {
     });
   });
 
-  it('should consider with of bulk select and actions col', async () => {
+  it('should consider width of bulk select and actions col', async () => {
     const columnRenderers = {
       title: { width: 1 },
       description: { width: 2 },
