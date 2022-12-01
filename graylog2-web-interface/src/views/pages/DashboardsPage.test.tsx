@@ -19,6 +19,19 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import DashboardsPage from './DashboardsPage';
 
+jest.mock('views/logic/dashboards/useDashboards', () => () => ({
+  data: {
+    pagination: {
+      total: 0,
+      page: 1,
+      perPage: 5,
+      count: 0,
+    },
+    list: [],
+  },
+  refetch: () => {},
+}));
+
 jest.mock('routing/Routes', () => ({
   pluginRoute: jest.fn(),
 }));
