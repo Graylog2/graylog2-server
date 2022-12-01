@@ -14,21 +14,42 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { ButtonToolbar, DropdownButton, MenuItem } from 'components/bootstrap';
 import { ShareButton, IfPermitted } from 'components/common';
 import type View from 'views/logic/views/View';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
+import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
+import type { PaginatedViews } from 'views/stores/ViewManagementStore';
+import { ViewManagementActions } from 'views/stores/ViewManagementStore';
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
+
+// eslint-disable-next-line no-alert
+const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
 
 type Props = {
   dashboard: View,
-  onDashboardDelete: (dashboard: View) => void,
+  loadDashboards: () => Promise<PaginatedViews | void>,
 }
 
-const DashboardActions = ({ dashboard, onDashboardDelete }: Props) => {
+const DashboardActions = ({ dashboard, loadDashboards }: Props) => {
   const [showShareModal, setShowShareModal] = useState(false);
+  const paginationQueryParameter = usePaginationQueryParameter();
+
+  const onDashboardDelete = useCallback(async () => {
+    const pluginDashboardDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingDashboard');
+
+    const result = await iterateConfirmationHooks([...pluginDashboardDeletionHooks, defaultDashboardDeletionHook], dashboard);
+
+    if (result) {
+      await ViewManagementActions.delete(dashboard);
+      await loadDashboards();
+      paginationQueryParameter.resetPage();
+    }
+  }, [dashboard, loadDashboards, paginationQueryParameter]);
 
   return (
     <>
@@ -43,7 +64,7 @@ const DashboardActions = ({ dashboard, onDashboardDelete }: Props) => {
                         id={`dashboard-actions-dropdown-${dashboard.id}`}
                         pullRight>
           <IfPermitted permissions={[`view:edit:${dashboard.id}`, 'view:edit']} anyPermissions>
-            <MenuItem onSelect={() => onDashboardDelete(dashboard)}>Delete</MenuItem>
+            <MenuItem onSelect={onDashboardDelete}>Delete</MenuItem>
           </IfPermitted>
         </DropdownButton>
       </ButtonToolbar>
