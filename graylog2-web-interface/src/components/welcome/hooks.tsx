@@ -30,7 +30,7 @@ import type {
   PaginatedResponseRecentActivity,
 } from 'components/welcome/types';
 
-export const urlPrefix = '/dynamicstartpage';
+export const urlPrefix = '/startpage';
 export const LAST_OPEN_QUERY_KEY = 'last_open_query_key';
 export const PINNED_ITEMS_QUERY_KEY = 'pinned_items_query_key';
 export const RECENT_ACTIONS_QUERY_KEY = 'recent_actions_query_key';

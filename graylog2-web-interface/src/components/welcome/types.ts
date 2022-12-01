@@ -31,6 +31,7 @@ export type FavoriteItem = {
 }
 
 export type LastOpenedItem = {
+  timestamp: string,
   id: string,
   type: EntityItemType,
   title: string
