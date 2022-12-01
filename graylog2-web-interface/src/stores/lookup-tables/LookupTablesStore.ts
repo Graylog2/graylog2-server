@@ -74,7 +74,7 @@ type LookupTablesStoreState = {
 }
 
 type LookupTableActionsType = {
-  searchPaginated: (page: number, perPage: number, query: string, resolve: boolean) => Promise<unknown>,
+  searchPaginated: (page: number, perPage: number, query?: string, resolve?: boolean) => Promise<unknown>,
   reloadPage: () => Promise<unknown>,
   get: (idOrName: string) => Promise<unknown>,
   create: (table: LookupTable) => Promise<unknown>,
@@ -160,7 +160,7 @@ export const LookupTablesStore = singletonStore(
       return promise;
     },
 
-    searchPaginated(page: number, perPage: number, query: string, resolve: boolean = true) {
+    searchPaginated(page: number, perPage: number, query: string = null, resolve: boolean = true) {
       const url = this._url(PaginationURL('tables', page, perPage, query, { resolve }));
       const promise = fetch('GET', url);
 

@@ -16,12 +16,12 @@
  */
 import React from 'react';
 
-import { OverlayTrigger, PaginatedList, SearchForm, Spinner, Icon } from 'components/common';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
-import CacheTableEntry from 'components/lookup-tables/CacheTableEntry';
+import { OverlayTrigger, PaginatedList, SearchForm, Icon, Spinner } from 'components/common';
+import LUTTableEntry from 'components/lookup-tables/LUTTableEntry';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
-import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
-import type { LookupTableCache, PaginationType } from 'logic/lookup-tables/types';
+import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
+import type { LookupTable, LookupTableAdapter, LookupTableCache, PaginationType } from 'logic/lookup-tables/types';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 
 import Styles from './Overview.css';
@@ -40,44 +40,98 @@ const buildHelpPopover = () => {
         <tbody>
           <tr>
             <td>id</td>
-            <td>Cache ID</td>
+            <td>Lookup Table ID</td>
           </tr>
           <tr>
             <td>title</td>
-            <td>The title of the cache</td>
+            <td>The title of the lookup table</td>
           </tr>
           <tr>
             <td>name</td>
-            <td>The reference name of the cache</td>
+            <td>The reference name of the lookup table</td>
           </tr>
           <tr>
             <td>description</td>
-            <td>The description of cache</td>
+            <td>The description of lookup table</td>
           </tr>
         </tbody>
       </Table>
       <p><strong>Examples</strong></p>
       <p>
-        Find caches by parts of their names:<br />
-        <kbd>name:guava</kbd><br />
-        <kbd>name:gua</kbd>
+        Find lookup tables by parts of their names:<br />
+        <kbd>name:geoip</kbd><br />
+        <kbd>name:geo</kbd>
       </p>
       <p>
         Searching without a field name matches against the <code>title</code> field:<br />
-        <kbd>guava</kbd> <br />is the same as<br />
-        <kbd>title:guava</kbd>
+        <kbd>geoip</kbd> <br />is the same as<br />
+        <kbd>title:geoip</kbd>
       </p>
     </Popover>
   );
 };
 
-type Props = {
+type ItemProps = {
+  table: LookupTable,
   caches: LookupTableCache[],
+  dataAdapters: LookupTableAdapter[],
+  errorStates: { [key: string]: { [key: string]: string } },
+};
+
+const LUTItem = ({ table, caches, dataAdapters, errorStates }: ItemProps) => {
+  const lookupName = (id: string, map: LookupTableCache[] | LookupTableAdapter[]) => {
+    const empty = { title: 'none' };
+
+    if (!map) return empty;
+
+    return map[id] || empty;
+  };
+
+  const lookupAdapterError = () => {
+    if (errorStates.dataAdapters && dataAdapters) {
+      const adapter = dataAdapters[table.data_adapter_id];
+
+      if (!adapter) return null;
+
+      return errorStates.dataAdapters[adapter.name];
+    }
+
+    return null;
+  };
+
+  const cache = lookupName(table.cache_id, caches);
+  const dataAdapter = lookupName(table.data_adapter_id, dataAdapters);
+  const errors = {
+    table: errorStates.tables[table.name],
+    cache: null,
+    dataAdapter: lookupAdapterError(),
+  };
+
+  return (
+    <LUTTableEntry table={table}
+                   cache={cache}
+                   dataAdapter={dataAdapter}
+                   errors={errors} />
+  );
+};
+
+type Props = {
+  tables: LookupTable[],
+  caches: LookupTableCache[],
+  dataAdapters: LookupTableAdapter[],
   pagination: PaginationType,
+  errorStates: { [key: string]: { [key: string]: string } },
   paginationQueryParameter: PaginationQueryParameterResult,
 };
 
-const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props) => {
+const LookupTablesOverview = ({
+  tables,
+  caches,
+  dataAdapters,
+  pagination,
+  errorStates,
+  paginationQueryParameter,
+}: Props) => {
   const { currentPage, currentPageSize, resetPage } = React.useMemo(() => ({
     currentPage: paginationQueryParameter.page || 1,
     currentPageSize: paginationQueryParameter.pageSize || 10,
@@ -85,24 +139,24 @@ const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props)
   }), [paginationQueryParameter]);
 
   const onPageChange = (newPage: number, newPerPage: number) => {
-    LookupTableCachesActions.searchPaginated(newPage, newPerPage, pagination.query);
+    LookupTablesActions.searchPaginated(newPage, newPerPage, pagination.query);
   };
 
   const onSearch = (query: string, resetLoadingStateCb: () => void) => {
     resetPage();
-    LookupTableCachesActions.searchPaginated(1, currentPageSize, query).then(resetLoadingStateCb);
+    LookupTablesActions.searchPaginated(1, currentPageSize, query).then(resetLoadingStateCb);
   };
 
   const onReset = () => {
     resetPage();
-    LookupTableCachesActions.searchPaginated(currentPage, currentPageSize);
+    LookupTablesActions.searchPaginated(currentPage, currentPageSize);
   };
 
   return (
     <Row className="content">
       <Col md={12}>
         <h2 style={{ marginBottom: 16 }}>
-          Configured lookup Caches <small>{pagination.total} total</small>
+          Configured lookup tables <small>{pagination.total} total</small>
         </h2>
         <PaginatedList activePage={currentPage}
                        pageSize={currentPageSize}
@@ -110,10 +164,7 @@ const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props)
                        totalItems={pagination.total}>
           <SearchForm onSearch={onSearch} onReset={onReset}>
             <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover()}>
-              <Button bsStyle="link"
-                      className={Styles.searchHelpButton}>
-                <Icon name="question-circle" fixedWidth />
-              </Button>
+              <Button bsStyle="link" className={Styles.searchHelpButton}><Icon name="question-circle" fixedWidth /></Button>
             </OverlayTrigger>
           </SearchForm>
           <div style={{ overflowX: 'auto' }}>
@@ -123,16 +174,18 @@ const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props)
                   <th className={Styles.rowTitle}>Title</th>
                   <th className={Styles.rowDescription}>Description</th>
                   <th className={Styles.rowName}>Name</th>
-                  <th>Entries</th>
-                  <th>Hit rate</th>
-                  <th>Throughput</th>
+                  <th className={Styles.rowCache}>Cache</th>
+                  <th className={Styles.rowAdapter}>Data Adapter</th>
                   <th className={Styles.rowActions}>Actions</th>
                 </tr>
               </thead>
-              {caches.length === 0
+              {tables.length === 0
                 ? <Spinner text="Loading caches" />
-                : caches.map((cache: LookupTableCache) => (
-                  <CacheTableEntry key={cache.id} cache={cache} />
+                : tables.map((table: LookupTable) => (
+                  <LUTItem table={table}
+                           caches={caches}
+                           dataAdapters={dataAdapters}
+                           errorStates={errorStates} />
                 ))}
             </Table>
           </div>
@@ -142,4 +195,4 @@ const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props)
   );
 };
 
-export default withPaginationQueryParameter(CachesOverview as React.ComponentType<Props>);
+export default withPaginationQueryParameter(LookupTablesOverview as React.ComponentType<Props>);
