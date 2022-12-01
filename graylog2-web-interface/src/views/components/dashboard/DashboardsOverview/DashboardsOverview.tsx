@@ -47,11 +47,16 @@ const COLUMN_DEFINITIONS = [
   { id: 'owner', title: 'Owner', sortable: true },
 ];
 
-const customColumnRenderers = (requirementsProvided: Array<string>): ColumnRenderers<View> => ({
-  title: {
-    renderCell: (dashboard) => <TitleCell dashboard={dashboard} requirementsProvided={requirementsProvided} />,
-  },
-});
+const useCustomColumnRenderers = () => {
+  const requirementsProvided = usePluginEntities('views.requires.provided');
+  const customColumnRenderers: ColumnRenderers<View> = useMemo(() => ({
+    title: {
+      renderCell: (dashboard) => <TitleCell dashboard={dashboard} requirementsProvided={requirementsProvided} />,
+    },
+  }), [requirementsProvided]);
+
+  return customColumnRenderers;
+};
 
 const DashboardList = () => {
   const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
@@ -65,6 +70,7 @@ const DashboardList = () => {
       order: 'asc',
     },
   });
+  const columnRenderers = useCustomColumnRenderers();
   const paginatedDashboards = useDashboards(
     searchParams.query,
     searchParams.page,
@@ -73,15 +79,21 @@ const DashboardList = () => {
     searchParams.sort.order,
   );
 
-  const loadDashboards = useCallback(() => DashboardsActions.search(searchParams.query, searchParams.page, searchParams.pageSize, searchParams.sort.columnId, searchParams.sort.order), [searchParams]);
+  const loadDashboards = useCallback(
+    () => DashboardsActions.search(
+      searchParams.query,
+      searchParams.page,
+      searchParams.pageSize,
+      searchParams.sort.columnId,
+      searchParams.sort.order,
+    ),
+    [searchParams],
+  );
 
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
     setSearchParams((cur) => ({ ...cur, query: newQuery, page: 1 }));
   }, [paginationQueryParameter]);
-
-  const requirementsProvided = usePluginEntities('views.requires.provided');
-  const columnRenderers = useMemo(() => customColumnRenderers(requirementsProvided), [requirementsProvided]);
 
   const onColumnsChange = useCallback((newVisibleColumns: Array<string>) => {
     setVisibleColumns(newVisibleColumns);
