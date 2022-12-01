@@ -14,23 +14,43 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
-import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
-import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore';
-import { useStore } from 'stores/connect';
-import type { SortOrder } from 'views/stores/ViewManagementStore';
+import { DashboardsActions } from 'views/stores/DashboardsStore';
+import type { Sort } from 'components/common/EntityDataTable';
+import UserNotification from 'util/UserNotification';
+import type View from 'views/logic/views/View';
 
-export type Dashboards = DashboardsStoreState;
+type SearchParams = {
+  page: number,
+  pageSize: number,
+  query: string,
+  sort: Sort
+}
 
-const useDashboards = (searchQuery: string, page: number, pageSize: number, sortBy?: string, order?: SortOrder): Readonly<Dashboards> => {
-  const dashboards = useStore(DashboardsStore);
+const useDashboards = (searchParams: SearchParams): {
+  data: {
+    list: Readonly<Array<View>>,
+    pagination: { total: number }
+  } | undefined,
+  refetch: () => void
+} => {
+  const { data, refetch } = useQuery(
+    ['streams', 'overview', searchParams],
+    () => DashboardsActions.search(searchParams.query, searchParams.page, searchParams.pageSize, searchParams.sort.columnId, searchParams.sort.order),
+    {
+      onError: (errorThrown) => {
+        UserNotification.error(`Loading streams failed with status: ${errorThrown}`,
+          'Could not load streams');
+      },
+      keepPreviousData: true,
+    },
+  );
 
-  useEffect(() => {
-    DashboardsActions.search(searchQuery, page, pageSize, sortBy, order);
-  }, [searchQuery, page, pageSize, sortBy, order]);
-
-  return dashboards;
+  return ({
+    data,
+    refetch,
+  });
 };
 
 export default useDashboards;

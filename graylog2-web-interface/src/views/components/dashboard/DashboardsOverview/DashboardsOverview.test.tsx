@@ -41,7 +41,7 @@ jest.mock('views/stores/DashboardsStore', () => ({
   DashboardsStore: MockStore(),
 }));
 
-const createPaginatedDashboards = (count = 1) => {
+const loadDashboardsResponse = (count = 1) => {
   const dashboards: Array<View> = [];
 
   if (count > 0) {
@@ -62,19 +62,22 @@ const createPaginatedDashboards = (count = 1) => {
   }
 
   return {
-    pagination: {
-      total: count,
-      page: count > 0 ? count : 1,
-      perPage: 5,
-      count,
+    data: {
+      pagination: {
+        total: count,
+        page: count > 0 ? count : 1,
+        perPage: 5,
+        count,
+      },
+      list: dashboards,
     },
-    list: dashboards,
+    refetch: () => {},
   };
 };
 
 describe('DashboardsOverview', () => {
   it('should render empty', async () => {
-    asMock(useDashboards).mockReturnValue(createPaginatedDashboards(0));
+    asMock(useDashboards).mockReturnValue(loadDashboardsResponse(0));
 
     render(<DashboardsOverview />);
 
@@ -82,7 +85,7 @@ describe('DashboardsOverview', () => {
   });
 
   it('should render list', async () => {
-    asMock(useDashboards).mockReturnValue(createPaginatedDashboards(3));
+    asMock(useDashboards).mockReturnValue(loadDashboardsResponse(3));
 
     render(<DashboardsOverview />);
 

@@ -55,7 +55,7 @@ describe('DashboardActions', () => {
   it('does not delete dashboard when user clicks cancel', async () => {
     asMock(window.confirm).mockReturnValue(false);
 
-    render(<DashboardActions dashboard={simpleView()} loadDashboards={() => Promise.resolve()} />);
+    render(<DashboardActions dashboard={simpleView()} refetchDashboards={() => Promise.resolve()} />);
 
     await clickDashboardAction('foo', 'Delete');
 
@@ -67,7 +67,7 @@ describe('DashboardActions', () => {
   it('deletes dashboard when user confirms deletion', async () => {
     asMock(window.confirm).mockReturnValue(true);
 
-    render(<DashboardActions dashboard={simpleView()} loadDashboards={() => Promise.resolve()} />);
+    render(<DashboardActions dashboard={simpleView()} refetchDashboards={() => Promise.resolve()} />);
 
     await clickDashboardAction('foo', 'Delete');
 
@@ -97,7 +97,7 @@ describe('DashboardActions', () => {
     });
 
     it('triggers hook when deleting dashboard', async () => {
-      render(<DashboardActions dashboard={simpleDashboard} loadDashboards={() => Promise.resolve()} />);
+      render(<DashboardActions dashboard={simpleDashboard} refetchDashboards={() => Promise.resolve()} />);
 
       await clickDashboardAction('foo', 'Delete');
 
@@ -109,7 +109,7 @@ describe('DashboardActions', () => {
     it('does not delete dashboard when hook returns false', async () => {
       asMock(deletingDashboard).mockResolvedValue(false);
 
-      render(<DashboardActions dashboard={simpleDashboard} loadDashboards={() => Promise.resolve()} />);
+      render(<DashboardActions dashboard={simpleDashboard} refetchDashboards={() => Promise.resolve()} />);
 
       await clickDashboardAction('foo', 'Delete');
 
@@ -122,7 +122,7 @@ describe('DashboardActions', () => {
       asMock(deletingDashboard).mockReturnValue(null);
       asMock(window.confirm).mockReturnValue(true);
 
-      render(<DashboardActions dashboard={simpleDashboard} loadDashboards={() => Promise.resolve()} />);
+      render(<DashboardActions dashboard={simpleDashboard} refetchDashboards={() => Promise.resolve()} />);
 
       await clickDashboardAction('foo', 'Delete');
 
@@ -138,7 +138,7 @@ describe('DashboardActions', () => {
       asMock(deletingDashboard).mockImplementation(() => { throw error; });
       asMock(window.confirm).mockReturnValue(true);
 
-      render(<DashboardActions dashboard={simpleDashboard} loadDashboards={() => Promise.resolve()} />);
+      render(<DashboardActions dashboard={simpleDashboard} refetchDashboards={() => Promise.resolve()} />);
 
       /* eslint-disable no-console */
       const oldConsoleTrace = console.trace;

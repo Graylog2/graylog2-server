@@ -26,7 +26,6 @@ import useDashboards from 'views/logic/dashboards/useDashboards';
 import usePluginEntities from 'hooks/usePluginEntities';
 import DashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
 import { Alert } from 'components/bootstrap';
-import { DashboardsActions } from 'views/stores/DashboardsStore';
 
 import TitleCell from './TitleCell';
 
@@ -71,24 +70,7 @@ const DashboardList = () => {
     },
   });
   const columnRenderers = useCustomColumnRenderers();
-  const paginatedDashboards = useDashboards(
-    searchParams.query,
-    searchParams.page,
-    searchParams.pageSize,
-    searchParams.sort.columnId,
-    searchParams.sort.order,
-  );
-
-  const loadDashboards = useCallback(
-    () => DashboardsActions.search(
-      searchParams.query,
-      searchParams.page,
-      searchParams.pageSize,
-      searchParams.sort.columnId,
-      searchParams.sort.order,
-    ),
-    [searchParams],
-  );
+  const { data: paginatedDashboards, refetch } = useDashboards(searchParams);
 
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
@@ -100,8 +82,8 @@ const DashboardList = () => {
   }, []);
 
   const renderDashboardActions = useCallback((dashboard: View) => (
-    <DashboardActions dashboard={dashboard} loadDashboards={loadDashboards} />
-  ), [loadDashboards]);
+    <DashboardActions dashboard={dashboard} refetchDashboards={refetch} />
+  ), [refetch]);
 
   const onReset = useCallback(() => {
     onSearch('');

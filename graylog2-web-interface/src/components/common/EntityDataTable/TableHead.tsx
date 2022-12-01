@@ -17,7 +17,6 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 import { useMemo } from 'react';
-import { merge } from 'lodash';
 
 import SortIcon from 'components/streams/StreamsOverview/SortIcon';
 

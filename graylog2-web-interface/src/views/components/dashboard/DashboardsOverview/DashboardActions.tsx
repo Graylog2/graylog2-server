@@ -23,7 +23,6 @@ import type View from 'views/logic/views/View';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
-import type { PaginatedViews } from 'views/stores/ViewManagementStore';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
@@ -32,10 +31,10 @@ const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are y
 
 type Props = {
   dashboard: View,
-  loadDashboards: () => Promise<PaginatedViews | void>,
+  refetchDashboards: () => void,
 }
 
-const DashboardActions = ({ dashboard, loadDashboards }: Props) => {
+const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const paginationQueryParameter = usePaginationQueryParameter();
 
@@ -46,10 +45,10 @@ const DashboardActions = ({ dashboard, loadDashboards }: Props) => {
 
     if (result) {
       await ViewManagementActions.delete(dashboard);
-      await loadDashboards();
+      refetchDashboards();
       paginationQueryParameter.resetPage();
     }
-  }, [dashboard, loadDashboards, paginationQueryParameter]);
+  }, [dashboard, refetchDashboards, paginationQueryParameter]);
 
   return (
     <>
