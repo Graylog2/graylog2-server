@@ -14,24 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.results;
+package org.graylog2.storage.providers;
 
-public abstract class IndexQueryResult {
-    private final String originalQuery;
-    private final String builtQuery;
+import org.graylog2.indexer.results.MultiChunkResultRetriever;
+import org.graylog2.storage.DetectedSearchVersion;
+import org.graylog2.storage.SearchVersion;
+import org.graylog2.storage.VersionAwareProvider;
 
-    public IndexQueryResult(final String originalQuery, final String builtQuery) {
-        this.originalQuery = originalQuery;
-        this.builtQuery = builtQuery;
+import javax.inject.Inject;
+import javax.inject.Provider;
+import java.util.Map;
+
+public class MultiChunkResultRetrieverProvider extends VersionAwareProvider<MultiChunkResultRetriever> {
+    @Inject
+    public MultiChunkResultRetrieverProvider(@DetectedSearchVersion SearchVersion version, Map<SearchVersion, Provider<MultiChunkResultRetriever>> pluginBindings) {
+        super(version, pluginBindings);
     }
-
-    public String getOriginalQuery() {
-        return originalQuery;
-    }
-
-    public String getBuiltQuery() {
-        return builtQuery;
-    }
-
-    public abstract long tookMs();
 }

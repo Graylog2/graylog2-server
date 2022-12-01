@@ -26,33 +26,28 @@ import org.graylog2.indexer.searches.ChunkCommand;
 import javax.inject.Inject;
 import java.util.Set;
 
-@Deprecated
-public class Scroll implements MultiChunkResultRetriever {
-    private static final String DEFAULT_SCROLLTIME = "1m";
+public class PaginationES7 implements MultiChunkResultRetriever {
     private final ElasticsearchClient client;
-    private final ScrollResultES7.Factory scrollResultFactory;
     private final SearchRequestFactory searchRequestFactory;
 
     @Inject
-    public Scroll(ElasticsearchClient client,
-                  ScrollResultES7.Factory scrollResultFactory,
-                  SearchRequestFactory searchRequestFactory) {
+    public PaginationES7(final ElasticsearchClient client,
+                         final SearchRequestFactory searchRequestFactory) {
         this.client = client;
-        this.scrollResultFactory = scrollResultFactory;
         this.searchRequestFactory = searchRequestFactory;
     }
 
     @Override
-    public ChunkedResult retrieveChunkedResult(ChunkCommand chunkCommand) {
+    public ChunkedResult retrieveChunkedResult(final ChunkCommand chunkCommand) {
         final SearchSourceBuilder searchQuery = searchRequestFactory.create(chunkCommand);
-        final SearchRequest request = scrollBuilder(searchQuery, chunkCommand.indices());
-        final SearchResponse result = client.singleSearch(request, "Unable to perform scroll search");
-        return scrollResultFactory.create(result, searchQuery.toString(), DEFAULT_SCROLLTIME, chunkCommand.fields(), chunkCommand.limit().orElse(-1));
+        final SearchRequest request = buildSearchRequest(searchQuery, chunkCommand.indices());
+        final SearchResponse result = client.search(request, "Unable to perform search-after pagination search");
+        return new PaginationResultES7(client, request, result, searchQuery.toString(), chunkCommand.fields(), chunkCommand.limit().orElse(-1));
     }
 
-    private SearchRequest scrollBuilder(SearchSourceBuilder query, Set<String> indices) {
+    private SearchRequest buildSearchRequest(final SearchSourceBuilder query,
+                                             final Set<String> indices) {
         return new SearchRequest(indices.toArray(new String[0]))
-                .source(query)
-                .scroll(DEFAULT_SCROLLTIME);
+                .source(query);
     }
 }
