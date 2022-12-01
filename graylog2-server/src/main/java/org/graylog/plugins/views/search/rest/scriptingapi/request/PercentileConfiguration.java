@@ -17,18 +17,6 @@
 package org.graylog.plugins.views.search.rest.scriptingapi.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
-
-import java.util.Optional;
 
 public record PercentileConfiguration(@JsonProperty("percentile") Double percentile) implements MetricConfiguration {
-
-    @Override
-    public Optional<String> columnName(final Metric metric) {
-        return Optional.of(Percentile.builder()
-                .field(metric.fieldName())
-                .percentile(percentile())
-                .build()
-                .literal());
-    }
 }
