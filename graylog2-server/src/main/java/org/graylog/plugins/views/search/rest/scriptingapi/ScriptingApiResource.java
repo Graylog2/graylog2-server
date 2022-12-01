@@ -52,8 +52,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
@@ -120,11 +122,17 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                                         @ApiParam(name = "from") @QueryParam("from") int from,
                                         @ApiParam(name = "size") @QueryParam("size") int size,
                                         @Context SearchUser searchUser) {
+
+        // allow comma separated list of fields
+        final List<String> allFields = fields.stream()
+                .flatMap(f -> Arrays.stream(f.split(",")))
+                .collect(Collectors.toList());
+
         try {
             MessagesRequestSpec messagesRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(query,
                     streams,
                     timerangeKeyword,
-                    fields,
+                    allFields,
                     from,
                     size);
             return executeQuery(messagesRequestSpec, searchUser);
