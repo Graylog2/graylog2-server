@@ -28,6 +28,7 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
 import org.graylog.testing.utils.IndexSetUtils;
+import org.graylog.testing.utils.SearchUtils;
 import org.graylog.testing.utils.SharingRequest;
 import org.graylog.testing.utils.SharingUtils;
 import org.graylog.testing.utils.StreamUtils;
@@ -116,6 +117,8 @@ public class ScriptingApiResourceIT {
                         {"short_message":"search-sync-test-3", "host":"lorem-ipsum.com", "facility":"another-test", "_level":3, "_http_method":"POST", "_target_stream": "stream2"}
                         """)
                 .waitForAllMessages();
+
+        SearchUtils.waitForFieldTypeDefinitions(requestSpec, "source", "facility", "level");
     }
 
     @ContainerMatrixTest
@@ -624,9 +627,9 @@ public class ScriptingApiResourceIT {
                 .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
-        validateSchema(validatableResponse, "field: source", "unknown", "source");
-        validateSchema(validatableResponse, "field: facility", "unknown", "facility");
-        validateSchema(validatableResponse, "field: level", "unknown", "level");
+        validateSchema(validatableResponse, "field: source", "string", "source");
+        validateSchema(validatableResponse, "field: facility", "string", "facility");
+        validateSchema(validatableResponse, "field: level", "numeric", "level");
 
         validateRow(validatableResponse, "lorem-ipsum.com", "another-test", 3);
         validateRow(validatableResponse, "example.org", "another-test", 2);
