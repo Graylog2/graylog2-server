@@ -18,7 +18,7 @@ package org.graylog2.indexer.results;
 
 import java.io.IOException;
 
-public interface ScrollResult {
+public interface ChunkedResult {
     ResultChunk nextChunk() throws IOException;
 
     String getQueryHash();

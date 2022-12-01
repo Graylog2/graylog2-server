@@ -16,12 +16,9 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.request;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
-import java.util.List;
 import java.util.Set;
 
 public interface SearchRequestSpec {
@@ -36,6 +33,4 @@ public interface SearchRequestSpec {
 
     TimeRange timerange();
 
-    @JsonIgnore
-    List<ResponseSchemaEntry> getSchema();
 }
