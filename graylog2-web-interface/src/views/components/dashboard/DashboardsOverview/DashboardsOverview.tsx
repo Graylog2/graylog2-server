@@ -24,7 +24,7 @@ import type View from 'views/logic/views/View';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import useDashboards from 'views/logic/dashboards/useDashboards';
 import usePluginEntities from 'hooks/usePluginEntities';
-import DashboardActions from 'views/components/views/DashboardsOverview/DashboardActions';
+import DashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
 import { Alert } from 'components/bootstrap';
 import { DashboardsActions } from 'views/stores/DashboardsStore';
 

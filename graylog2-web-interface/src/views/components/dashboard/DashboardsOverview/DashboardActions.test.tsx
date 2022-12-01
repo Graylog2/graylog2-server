@@ -22,7 +22,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { asMock } from 'helpers/mocking';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import DashboardActions from 'views/components/views/DashboardsOverview/DashboardActions';
+import DashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
 import { simpleView } from 'views/test/ViewFixtures';
 
 jest.mock('views/stores/ViewManagementStore', () => ({

@@ -21,7 +21,7 @@ import { Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, IfPermitted } from 'components/common';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import DashboardsOverview from 'views/components/views/DashboardsOverview';
+import DashboardsOverview from 'views/components/dashboard/DashboardsOverview';
 
 const DashboardsPage = () => (
   <DocumentTitle title="Dashboards">
