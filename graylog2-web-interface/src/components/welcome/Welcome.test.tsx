@@ -22,7 +22,10 @@ import Welcome from 'components/welcome/Welcome';
 import { asMock } from 'helpers/mocking';
 import { useLastOpened, useFavoriteItems, useRecentActivity } from 'components/welcome/hooks';
 
-jest.mock('routing/Routes', () => ({ pluginRoute: () => () => '/route' }));
+jest.mock('routing/Routes', () => ({
+  SEARCH: '/search',
+  pluginRoute: () => () => '/route',
+}));
 
 jest.mock('components/welcome/hooks', () => ({
   useLastOpened: jest.fn(() => ({
@@ -99,7 +102,7 @@ describe('Welcome', () => {
     it('Show no items', async () => {
       asMock(useLastOpened).mockImplementation(() => ({ data: { lastOpened: [], page: 1, count: 0, total: 0, per_page: 5 }, isFetching: false }));
       render(<Welcome />);
-      await screen.findByText('There are no last opened items');
+      await screen.findByText(/You do not have opened any searches\/dashboards yet/i);
     });
   });
 
@@ -119,7 +122,7 @@ describe('Welcome', () => {
     it('Show no items', async () => {
       asMock(useFavoriteItems).mockImplementation(() => ({ data: { favoriteItems: [], page: 1, count: 0, total: 0, per_page: 5 }, isFetching: false }));
       render(<Welcome />);
-      await screen.findByText('There are no favorite items');
+      await screen.findByText(/You do not have any favorite items yet./i);
     });
   });
 
@@ -139,7 +142,7 @@ describe('Welcome', () => {
     it('Show no items', async () => {
       asMock(useRecentActivity).mockImplementation(() => ({ data: { recentActivity: [], page: 1, count: 0, total: 0, per_page: 5 }, isFetching: false }));
       render(<Welcome />);
-      await screen.findByText('There is no recent activity');
+      await screen.findByText(/There is no recent activity/i);
     });
   });
 });

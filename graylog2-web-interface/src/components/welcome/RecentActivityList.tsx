@@ -66,7 +66,16 @@ const RecentActivityList = () => {
   }, [setPagination]);
 
   if (isFetching) return <Spinner />;
-  if (!recentActivity.length) return <EmptyResult>There is no recent activity</EmptyResult>;
+
+  if (recentActivity.length === 0) {
+    return (
+      <EmptyResult>
+        There is no recent activity yet.
+        <p />
+        Whenever any other user will update content you have access to, or share new content with you, it will show up here.
+      </EmptyResult>
+    );
+  }
 
   return (
     <PaginatedList onChange={onPageChange} useQueryParameter={false} activePage={pagination.page} totalItems={total} pageSize={pagination.per_page} showPageSizeSelect={false} hideFirstAndLastPageLinks>

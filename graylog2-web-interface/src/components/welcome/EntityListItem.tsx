@@ -49,7 +49,7 @@ const EntityItem = ({ type, title, id }: Props) => {
   return (
     <StyledListGroupItem>
       <StyledLabel bsStyle="info">{entityTypeMap[type].typeTitle}</StyledLabel>
-      <Link target="_blank" to={entityLink}>{title}</Link>
+      <Link to={entityLink}>{title}</Link>
     </StyledListGroupItem>
   );
 };

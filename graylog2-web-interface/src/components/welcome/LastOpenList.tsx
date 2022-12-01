@@ -22,12 +22,24 @@ import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
 import EntityItem from 'components/welcome/EntityListItem';
 import { useLastOpened } from 'components/welcome/hooks';
 import { EmptyResult, Spinner } from 'components/common';
+import { Link } from 'components/common/router';
+import Routes from 'routing/Routes';
 
 const LastOpenList = () => {
   const { data: { lastOpened }, isFetching } = useLastOpened(DEFAULT_PAGINATION);
 
   if (isFetching) return <Spinner />;
-  if (!lastOpened.length) return <EmptyResult>There are no last opened items</EmptyResult>;
+
+  if (lastOpened.length === 0) {
+    return (
+      <EmptyResult>
+        You do not have opened any searches/dashboards yet.
+        <p />
+        From now on, whenever you open a saved search/dashboard, it will show up here.
+        In the meantime, you can start a new <Link to={Routes.SEARCH}>Search</Link> or <Link to={Routes.pluginRoute('DASHBOARDS_NEW')}>Dashboard</Link>.
+      </EmptyResult>
+    );
+  }
 
   return (
     <ListGroup>

@@ -31,7 +31,15 @@ const FavoriteItemsList = () => {
   }, [setPagination]);
 
   if (isFetching) return <Spinner />;
-  if (!favoriteItems.length) return <EmptyResult>There are no favorite items</EmptyResult>;
+
+  if (favoriteItems.length === 0) {
+    return (
+      <EmptyResult>
+        You do not have any favorite items yet.
+        Star any search/dashboard for it to show up here.
+      </EmptyResult>
+    );
+  }
 
   return (
     <PaginatedList onChange={onPageChange} useQueryParameter={false} activePage={pagination.page} totalItems={total} pageSize={pagination.per_page} showPageSizeSelect={false} hideFirstAndLastPageLinks>
