@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback, useMemo } from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { PaginatedList, SearchForm, Spinner } from 'components/common';
 import QueryHelper from 'components/common/QueryHelper';
@@ -23,12 +22,11 @@ import type { ColumnRenderers, Sort } from 'components/common/EntityDataTable';
 import EntityDataTable from 'components/common/EntityDataTable';
 import type View from 'views/logic/views/View';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
-import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import { DashboardsActions } from 'views/stores/DashboardsStore';
 import useDashboards from 'views/logic/dashboards/useDashboards';
 import usePluginEntities from 'hooks/usePluginEntities';
 import DashboardActions from 'views/components/views/DashboardsOverview/DashboardActions';
+import { Alert } from 'components/bootstrap';
+import { DashboardsActions } from 'views/stores/DashboardsStore';
 
 import TitleCell from './TitleCell';
 
@@ -38,9 +36,6 @@ type SearchParams = {
   query: string,
   sort: Sort
 }
-
-// eslint-disable-next-line no-alert
-const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
 
 const INITIAL_COLUMNS = ['title', 'description', 'summary'];
 
@@ -70,7 +65,15 @@ const DashboardList = () => {
       order: 'asc',
     },
   });
-  const { list: dashboards, pagination } = useDashboards(searchParams.query, searchParams.page, searchParams.pageSize, searchParams.sort.columnId, searchParams.sort.order);
+  const paginatedDashboards = useDashboards(
+    searchParams.query,
+    searchParams.page,
+    searchParams.pageSize,
+    searchParams.sort.columnId,
+    searchParams.sort.order,
+  );
+
+  const loadDashboards = useCallback(() => DashboardsActions.search(searchParams.query, searchParams.page, searchParams.pageSize, searchParams.sort.columnId, searchParams.sort.order), [searchParams]);
 
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
@@ -80,26 +83,13 @@ const DashboardList = () => {
   const requirementsProvided = usePluginEntities('views.requires.provided');
   const columnRenderers = useMemo(() => customColumnRenderers(requirementsProvided), [requirementsProvided]);
 
-  const handleDashboardDelete = useCallback(async (view: View) => {
-    const pluginDashboardDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingDashboard');
-
-    const result = await iterateConfirmationHooks([...pluginDashboardDeletionHooks, defaultDashboardDeletionHook], view);
-
-    if (result) {
-      await ViewManagementActions.delete(view);
-      await DashboardsActions.search(searchParams.query, searchParams.page, searchParams.pageSize, searchParams.sort.columnId, searchParams.sort.order);
-      paginationQueryParameter.resetPage();
-    }
-  }, [paginationQueryParameter, searchParams]);
-
   const onColumnsChange = useCallback((newVisibleColumns: Array<string>) => {
     setVisibleColumns(newVisibleColumns);
   }, []);
 
   const renderDashboardActions = useCallback((dashboard: View) => (
-    <DashboardActions dashboard={dashboard}
-                      onDashboardDelete={handleDashboardDelete} />
-  ), [handleDashboardDelete]);
+    <DashboardActions dashboard={dashboard} loadDashboards={loadDashboards} />
+  ), [loadDashboards]);
 
   const onReset = useCallback(() => {
     onSearch('');
@@ -115,9 +105,11 @@ const DashboardList = () => {
     paginationQueryParameter.resetPage();
   }, [paginationQueryParameter]);
 
-  if (!dashboards) {
-    return <Spinner text="Loading dashboards..." />;
+  if (!paginatedDashboards) {
+    return <Spinner />;
   }
+
+  const { list: dashboards, pagination } = paginatedDashboards;
 
   return (
     <PaginatedList onChange={onPageChange}
@@ -129,14 +121,27 @@ const DashboardList = () => {
                     onReset={onReset}
                     topMargin={0} />
       </div>
-      <EntityDataTable data={dashboards}
-                       visibleColumns={visibleColumns}
-                       onColumnsChange={onColumnsChange}
-                       onSortChange={onSortChange}
-                       activeSort={searchParams.sort}
-                       rowActions={renderDashboardActions}
-                       columnRenderers={columnRenderers}
-                       columnDefinitions={COLUMN_DEFINITIONS} />
+      {!dashboards?.length && (
+        <Alert>
+          {!searchParams.query ? (
+            <>
+              No dashboards have been created yet.
+            </>
+          ) : (
+            'No dashboards have been found.'
+          )}
+        </Alert>
+      )}
+      {dashboards?.length && (
+        <EntityDataTable data={dashboards}
+                         visibleColumns={visibleColumns}
+                         onColumnsChange={onColumnsChange}
+                         onSortChange={onSortChange}
+                         activeSort={searchParams.sort}
+                         rowActions={renderDashboardActions}
+                         columnRenderers={columnRenderers}
+                         columnDefinitions={COLUMN_DEFINITIONS} />
+      )}
     </PaginatedList>
   );
 };
