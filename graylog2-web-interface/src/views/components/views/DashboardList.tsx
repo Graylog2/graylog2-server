@@ -14,12 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { ButtonToolbar, DropdownButton, MenuItem } from 'components/bootstrap';
-import { IfPermitted, PaginatedList, SearchForm, Spinner, ShareButton } from 'components/common';
+import { IfPermitted, PaginatedList, SearchForm, Spinner, ShareButton, HoverForHelp } from 'components/common';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import QueryHelper from 'components/common/QueryHelper';
 import type ViewClass from 'views/logic/views/View';
@@ -34,6 +34,7 @@ import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import { DashboardsActions } from 'views/stores/DashboardsStore';
 import useDashboards from 'views/logic/dashboards/useDashboards';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import ViewTypeLabel from '../ViewTypeLabel';
 
@@ -43,6 +44,11 @@ type SearchParams = {
   query: string,
   sort: Sort
 }
+
+type Plugin = {
+  name: string,
+  url: string,
+};
 
 // eslint-disable-next-line no-alert
 const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
@@ -57,13 +63,34 @@ const COLUMN_DEFINITIONS = [
   { id: 'owner', title: 'Owner', sortable: true },
 ];
 
-const CUSTOM_COLUMN_RENDERERS: ColumnRenderers<View> = {
+const missingRequirements = (requires, requirementsProvided) => (
+  Object.entries(requires)
+    .filter(([require]) => !requirementsProvided.includes(require))
+    .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {})
+);
+
+const Requirements = ({ requirements }: { requirements: Array<Plugin> }) => (
+  <div>
+    {Object.values(requirements).map(({ url, name }) => (
+      <a href={url} target="_blank" rel="noopener noreferrer"><strong>{name}</strong></a>
+    ))}
+  </div>
+);
+
+const customColumnRenderers = (requirementsProvided): ColumnRenderers<View> => ({
   title: {
-    renderCell: (dashboard) => (
-      <Link to={Routes.pluginRoute('DASHBOARDS_VIEWID')(dashboard.id)}>{dashboard.title}</Link>
-    ),
+    renderCell: ({ id, requires, title }) => {
+      const _missingRequirements = missingRequirements(requires, requirementsProvided);
+      const isMissingRequirements = Object.keys(_missingRequirements).length > 0;
+
+      if (isMissingRequirements) {
+        return <>{title} <HoverForHelp title="Missing Requirements"><Requirements requirements={_missingRequirements} /></HoverForHelp></>;
+      }
+
+      return <Link to={Routes.pluginRoute('DASHBOARDS_VIEWID')(id)}>{title}</Link>;
+    },
   },
-};
+});
 
 const ItemActions = ({ dashboard, onDashboardDelete, setDashboardToShare }) => {
   return (
@@ -104,6 +131,9 @@ const DashboardList = () => {
     paginationQueryParameter.resetPage();
     setSearchParams((cur) => ({ ...cur, query: newQuery }));
   }, [paginationQueryParameter]);
+
+  const requirementsProvided = usePluginEntities('views.requires.provided');
+  const columnRenderers = useMemo(() => customColumnRenderers(requirementsProvided), []);
 
   const handleDashboardDelete = useCallback(async (view: View) => {
     const pluginDashboardDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingDashboard');
@@ -182,7 +212,7 @@ const DashboardList = () => {
                          onSortChange={onSortChange}
                          activeSort={searchParams.sort}
                          rowActions={renderStreamActions}
-                         columnRenderers={CUSTOM_COLUMN_RENDERERS}
+                         columnRenderers={columnRenderers}
                          columnDefinitions={COLUMN_DEFINITIONS} />
       </PaginatedList>
     </>

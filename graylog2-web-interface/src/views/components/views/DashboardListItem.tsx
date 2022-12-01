@@ -72,10 +72,6 @@ type MissingRequirementProps = {
   plugin: Plugin,
 };
 
-const MissingRequirement = ({ plugin }: MissingRequirementProps) => (
-  <a href={plugin.url} target="_blank" rel="noopener noreferrer"><strong>{plugin.name}</strong></a>
-);
-
 const Requirements = ({ requires, requirementsProvided }: RequirementsProps) => {
   const missing = missingRequirements(requires, requirementsProvided);
 
