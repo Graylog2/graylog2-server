@@ -50,8 +50,8 @@ public class AggregationTabularResponseCreator implements TabularResponseCreator
             final SearchType.Result aggregationResult = queryResult.searchTypes().get(AggregationSpecToPivotMapper.PIVOT_ID);
 
             if (aggregationResult instanceof PivotResult pivotResult) {
-                final List<SeriesSpec> requestedSeries = extractSeries(queryResult);
-                return mapToResponse(searchRequestSpec, pivotResult, requestedSeries);
+                final List<SeriesSpec> seriesSpecs = extractSeriesSpec(queryResult);
+                return mapToResponse(searchRequestSpec, pivotResult, seriesSpecs);
             }
         }
 
@@ -59,7 +59,7 @@ public class AggregationTabularResponseCreator implements TabularResponseCreator
         throw new AggregationFailedException("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
     }
 
-    private List<SeriesSpec> extractSeries(QueryResult queryResult) {
+    private List<SeriesSpec> extractSeriesSpec(QueryResult queryResult) {
         return queryResult.query().searchTypes().stream().filter(t -> AggregationSpecToPivotMapper.PIVOT_ID.equals(t.id())).findFirst().stream()
                 .filter(searchType -> searchType instanceof Pivot)
                 .map(pivot -> (Pivot) pivot)
@@ -68,16 +68,16 @@ public class AggregationTabularResponseCreator implements TabularResponseCreator
     }
 
     private TabularResponse mapToResponse(final AggregationRequestSpec searchRequestSpec,
-                                          final PivotResult pivotResult, List<SeriesSpec> requestedSeries) {
+                                          final PivotResult pivotResult, List<SeriesSpec> seriesSpec) {
         return new TabularResponse(
                 searchRequestSpec.getSchema(),
-                getDatarows(searchRequestSpec, pivotResult, requestedSeries),
+                getDatarows(searchRequestSpec, pivotResult, seriesSpec),
                 new Metadata(pivotResult.effectiveTimerange())
         );
     }
 
     private static List<List<Object>> getDatarows(final AggregationRequestSpec searchRequestSpec,
-                                                  final PivotResult pivotResult, List<SeriesSpec> series) {
+                                                  final PivotResult pivotResult, List<SeriesSpec> seriesSpecs) {
         final int numGroupings = searchRequestSpec.groupings().size();
 
         return pivotResult.rows()
@@ -88,7 +88,8 @@ public class AggregationTabularResponseCreator implements TabularResponseCreator
                             Collections.nCopies(numGroupings - pivRow.key().size(), "-").stream()  //sometimes pivotRow does not have enough keys - empty value!
                     );
 
-                    final Stream<Object> metrics = series.stream().map(s -> metricValue(s, pivRow.values()));
+                    final ImmutableList<PivotResult.Value> values = pivRow.values();
+                    final Stream<Object> metrics = seriesSpecs.stream().map(s -> metricValue(s, values));
 
                     return Stream.concat(groupings, metrics).collect(Collectors.toList());
                 })
