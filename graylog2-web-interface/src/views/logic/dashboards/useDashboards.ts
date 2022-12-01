@@ -36,12 +36,12 @@ const useDashboards = (searchParams: SearchParams): {
   refetch: () => void
 } => {
   const { data, refetch } = useQuery(
-    ['streams', 'overview', searchParams],
+    ['dashboards', 'overview', searchParams],
     () => DashboardsActions.search(searchParams.query, searchParams.page, searchParams.pageSize, searchParams.sort.columnId, searchParams.sort.order),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading streams failed with status: ${errorThrown}`,
-          'Could not load streams');
+        UserNotification.error(`Loading dashboards failed with status: ${errorThrown}`,
+          'Could not load dashboards');
       },
       keepPreviousData: true,
     },
