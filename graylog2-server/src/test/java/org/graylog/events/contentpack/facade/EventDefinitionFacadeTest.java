@@ -324,7 +324,7 @@ public class EventDefinitionFacadeTest {
                 objectMapper, eventDefinitionHandler, new HashSet<>(), jobDefinitionService, mockEventDefinitionService, userService);
         EventDefinitionDto dto = validEventDefinitionDto(mockEventProcessorConfig);
 
-        when(mockEventProcessorConfig.isContentPackExportable()).thenReturn(false);
+        when(mockEventProcessorConfig.isUserPresentable()).thenReturn(false);
         when(mockEventDefinitionService.streamAll()).thenReturn(Stream.of(dto));
 
         final Set<EntityExcerpt> excerpts = testFacade.listEntityExcerpts();

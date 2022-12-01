@@ -92,9 +92,6 @@ class EventConditionForm extends React.Component {
   };
 
   disabledSelect = () => {
-    console.log(this.props.eventDefinition);
-    console.table(this.formattedEventDefinitionTypes());
-
     return !this.formattedEventDefinitionTypes().some((edt) => this.props.eventDefinition.config.type === edt.value)
       && this.props.action === 'edit';
   };
