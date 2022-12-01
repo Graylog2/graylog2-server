@@ -52,7 +52,6 @@ public record AggregationRequestSpec(@JsonProperty("query") String queryString,
         return metrics().stream().anyMatch(m -> m.sort() != null);
     }
 
-    @Override
     @JsonIgnore
     public List<ResponseSchemaEntry> getSchema() {
         final Stream<ResponseSchemaEntry> groupings = groupings().stream()
