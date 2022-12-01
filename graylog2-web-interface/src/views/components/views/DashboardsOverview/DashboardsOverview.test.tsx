@@ -20,7 +20,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 
-import DashboardList from './DashboardList';
+import DashboardsOverview from '.';
 
 jest.mock('routing/Routes', () => ({ pluginRoute: () => () => '/route' }));
 
@@ -55,15 +55,15 @@ const createPaginatedDashboards = (count = 1) => {
   };
 };
 
-describe('render the DashboardList', () => {
+describe('DashboardsOverview', () => {
   it('should render empty', async () => {
     const dashboards = createPaginatedDashboards(0);
 
     render(
-      <DashboardList dashboards={dashboards.list}
-                     pagination={dashboards.pagination}
-                     handleSearch={() => {}}
-                     handleDashboardDelete={() => {}} />);
+      <DashboardsOverview dashboards={dashboards.list}
+                          pagination={dashboards.pagination}
+                          handleSearch={() => {}}
+                          handleDashboardDelete={() => {}} />);
 
     await screen.findByText('There are no dashboards present/matching the filter!');
   });
@@ -71,10 +71,10 @@ describe('render the DashboardList', () => {
   it('should render list', async () => {
     const dashboards = createPaginatedDashboards(3);
 
-    render(<DashboardList dashboards={dashboards.list}
-                          pagination={dashboards.pagination}
-                          handleSearch={() => {}}
-                          handleDashboardDelete={() => {}} />);
+    render(<DashboardsOverview dashboards={dashboards.list}
+                               pagination={dashboards.pagination}
+                               handleSearch={() => {}}
+                               handleDashboardDelete={() => {}} />);
 
     await screen.findByText('search-title-0');
     await screen.findByText('search-title-1');

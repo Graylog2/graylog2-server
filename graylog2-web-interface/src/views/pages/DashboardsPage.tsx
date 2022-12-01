@@ -20,8 +20,8 @@ import { LinkContainer } from 'components/common/router';
 import { Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, IfPermitted } from 'components/common';
 import Routes from 'routing/Routes';
-import DashboardList from 'views/components/views/DashboardList';
 import DocsHelper from 'util/DocsHelper';
+import DashboardsOverview from 'views/components/views/DashboardsOverview';
 
 const DashboardsPage = () => (
   <DocumentTitle title="Dashboards">
@@ -45,7 +45,7 @@ const DashboardsPage = () => (
 
     <Row className="content">
       <Col md={12}>
-        <DashboardList />
+        <DashboardsOverview />
       </Col>
     </Row>
   </DocumentTitle>
