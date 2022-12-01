@@ -69,7 +69,7 @@ public class QueryValidationResourceIT {
         final boolean isMessagePresent = SearchUtils.waitForMessage(requestSpec, "query-validation-test");
         assertThat(isMessagePresent).isTrue();
 
-        SearchUtils.waitForFieldTypeDefinition(requestSpec, "level");
+        SearchUtils.waitForFieldTypeDefinitions(requestSpec, "level");
     }
 
 

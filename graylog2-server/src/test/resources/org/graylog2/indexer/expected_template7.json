@@ -38,6 +38,9 @@
         "type": "date",
         "format": "uuuu-MM-dd HH:mm:ss.SSS"
       },
+      "gl2_message_id": {
+        "type": "keyword"
+      },
       "source": {
         "type": "text",
         "analyzer": "analyzer_keyword",

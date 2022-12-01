@@ -16,7 +16,6 @@
  */
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
-import type { $PropertyType, $Shape } from 'utility-types';
 import URI from 'urijs';
 
 import type { UserOverviewJSON, AccountStatus } from 'logic/users/UserOverview';
@@ -38,19 +37,19 @@ export type PaginatedUsersResponse = PaginatedListJSON & {
 };
 
 export type UserCreate = {
-  email: $PropertyType<UserJSON, 'email'>;
-  full_name: $PropertyType<UserJSON, 'full_name'>;
-  first_name: $PropertyType<UserJSON, 'first_name'>;
-  last_name: $PropertyType<UserJSON, 'last_name'>;
+  email: UserJSON['email'];
+  full_name: UserJSON['full_name'];
+  first_name: UserJSON['first_name'];
+  last_name: UserJSON['last_name'];
   password: string;
-  permissions: $PropertyType<UserJSON, 'permissions'>;
-  roles: $PropertyType<UserJSON, 'roles'>;
-  session_timeout_ms: $PropertyType<UserJSON, 'session_timeout_ms'>;
-  timezone: $PropertyType<UserJSON, 'timezone'>;
-  username: $PropertyType<UserJSON, 'username'>;
+  permissions: UserJSON['permissions'];
+  roles: UserJSON['roles'];
+  session_timeout_ms: UserJSON['session_timeout_ms'];
+  timezone: UserJSON['timezone'];
+  username: UserJSON['username'];
 };
 
-export type UserUpdate = $Shape<UserCreate & {
+export type UserUpdate = Partial<UserCreate & {
   old_password: string;
 }>;
 
@@ -204,7 +203,7 @@ export const UsersStore = singletonStore('core.Users', () => Reflux.createStore(
     const url = usersUrl({ url: ApiRoutes.UsersApiController.list().url, query });
     const promise = fetch('GET', url).then(({
       users,
-    }) => Immutable.List(users.map((user) => UserOverview.fromJSON(user))));
+    }) => Immutable.List<User>(users.map((user) => UserOverview.fromJSON(user))));
     UsersActions.loadUsers.promise(promise);
 
     return promise;

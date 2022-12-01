@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Uses whitespace analyzer for query parsing and validation. This is needed to prevent unexpected field value parsing."
+
+issues = ["12888"]
+pulls = ["12918"]

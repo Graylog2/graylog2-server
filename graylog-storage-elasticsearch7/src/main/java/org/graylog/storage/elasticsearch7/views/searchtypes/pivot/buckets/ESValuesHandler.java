@@ -24,6 +24,7 @@ import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.ValuesBucketOrdering;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.script.Script;
@@ -44,6 +45,7 @@ import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -59,8 +61,9 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
     public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, List<Values> bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
         final int limit = extractLimit(direction, pivot).orElse(Values.DEFAULT_LIMIT);
-        final AggregationBuilder termsAggregation = createTerms(bucketSpec, ordering, limit);
-        final FiltersAggregationBuilder filterAggregation = createFilter(name, bucketSpec)
+        final List<Values> orderedBuckets = ValuesBucketOrdering.orderBuckets(bucketSpec, pivot.sort());
+        final AggregationBuilder termsAggregation = createTerms(orderedBuckets, ordering, limit);
+        final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets)
                 .subAggregation(termsAggregation);
 
         return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
@@ -114,7 +117,7 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
     }
 
     @Override
-    public Stream<PivotBucket> extractBuckets(List<BucketSpec> bucketSpecs, PivotBucket initialBucket) {
+    public Stream<PivotBucket> extractBuckets(Pivot pivot, List<BucketSpec> bucketSpecs, PivotBucket initialBucket) {
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
         final Aggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
@@ -124,12 +127,14 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
         }
         final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
         final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
+
+        final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderKeysFunction(bucketSpecs, pivot.sort());
         final Stream<PivotBucket> bucketStream = termsAggregation.getBuckets()
                 .stream()
                 .map(bucket -> {
                     final ImmutableList<String> keys = ImmutableList.<String>builder()
                             .addAll(previousKeys)
-                            .addAll(splitKeys(bucket.getKeyAsString()))
+                            .addAll(reorderKeys.apply(splitKeys(bucket.getKeyAsString())))
                             .build();
 
                     return PivotBucket.create(keys, bucket);

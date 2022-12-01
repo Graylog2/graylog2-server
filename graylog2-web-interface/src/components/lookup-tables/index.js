@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import {} from './adapters';
-import {} from './caches';
+import './adapters';
+import './caches';
 
 export { default as LookupTablesOverview } from './LookupTablesOverview';
 export { default as LUTTableEntry } from './LUTTableEntry';

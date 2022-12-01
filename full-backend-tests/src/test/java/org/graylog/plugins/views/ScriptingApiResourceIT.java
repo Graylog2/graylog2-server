@@ -28,19 +28,24 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
 import org.graylog.testing.utils.IndexSetUtils;
+import org.graylog.testing.utils.SearchUtils;
 import org.graylog.testing.utils.SharingRequest;
 import org.graylog.testing.utils.SharingUtils;
 import org.graylog.testing.utils.StreamUtils;
 import org.graylog.testing.utils.UserUtils;
 import org.graylog2.plugin.streams.StreamRuleType;
+import org.graylog2.rest.MoreMediaTypes;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.Csv;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.CsvParser;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import javax.ws.rs.core.MediaType;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,6 +54,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Java6Assertions.within;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.hasEntry;
@@ -110,6 +117,8 @@ public class ScriptingApiResourceIT {
                         {"short_message":"search-sync-test-3", "host":"lorem-ipsum.com", "facility":"another-test", "_level":3, "_http_method":"POST", "_target_stream": "stream2"}
                         """)
                 .waitForAllMessages();
+
+        SearchUtils.waitForFieldTypeDefinitions(requestSpec, "source", "facility", "level");
     }
 
     @ContainerMatrixTest
@@ -139,7 +148,7 @@ public class ScriptingApiResourceIT {
                 .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
-        validatableResponse.assertThat().body("data.rows", Matchers.hasSize(1));
+        validatableResponse.assertThat().body("datarows", Matchers.hasSize(1));
         validateRow(validatableResponse, "another-test", 2);
     }
 
@@ -168,8 +177,8 @@ public class ScriptingApiResourceIT {
                 .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
-        validateSchema(validatableResponse, "Grouping", "string", "facility");
-        validateSchema(validatableResponse, "Metric : count", "numeric", "facility");
+        validateSchema(validatableResponse, "grouping: facility", "string", "facility");
+        validateSchema(validatableResponse, "metric: count(facility)", "numeric", "facility");
     }
 
     @ContainerMatrixTest
@@ -230,16 +239,14 @@ public class ScriptingApiResourceIT {
 
         String expected = """
                 ┌────────────────────────┬───────────────────────┐
-                │Grouping                │Metric : count         │
-                │facility                │facility               │
-                │string                  │numeric                │
+                │grouping: facility      │metric: count(facility)│
                 ├────────────────────────┼───────────────────────┤
                 │another-test            │2                      │
                 │test                    │1                      │
                 └────────────────────────┴───────────────────────┘
                 """;
 
-        org.assertj.core.api.Assertions.assertThat(response).isEqualTo(expected.trim());
+        assertThat(response).isEqualTo(expected.trim());
     }
 
     @ContainerMatrixTest
@@ -256,15 +263,78 @@ public class ScriptingApiResourceIT {
 
         String expected = """
                 ┌────────────────────────┬───────────────────────┐
-                │Grouping                │Metric : count         │
-                │facility                │facility               │
-                │string                  │numeric                │
+                │grouping: facility      │metric: count(facility)│
                 ├────────────────────────┼───────────────────────┤
                 │another-test            │2                      │
                 │test                    │1                      │
                 └────────────────────────┴───────────────────────┘
                 """;
-        org.assertj.core.api.Assertions.assertThat(response).isEqualTo(expected.trim());
+        assertThat(response).isEqualTo(expected.trim());
+    }
+
+    @ContainerMatrixTest
+    void testCsvRender() {
+        final InputStream response = given()
+                .spec(requestSpec)
+                .header(new Header("Accept", MoreMediaTypes.TEXT_CSV))
+                .when()
+                .body("""
+                        {
+                          "group_by": [
+                            {
+                              "field": "facility"
+                            }
+                          ],
+                          "metrics": [
+                            {
+                              "function": "count",
+                              "field": "facility"
+                            }
+                          ]
+                        }
+                        """)
+                .post("/search/aggregate")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200)
+                .extract().body().asInputStream();
+
+        final CsvParser csvParser = new CsvParser(Csv.parseRfc4180());
+        final List<String[]> lines = csvParser.parseAll(response);
+
+
+
+        // headers
+        Assertions.assertArrayEquals(lines.get(0), new String[]{"grouping: facility", "metric: count(facility)"});
+
+        //rows
+        Assertions.assertArrayEquals(lines.get(1), new String[]{"another-test", "2"});
+        Assertions.assertArrayEquals(lines.get(2), new String[]{"test", "1"});
+    }
+
+    @ContainerMatrixTest
+    void testGetRequestCsv() {
+
+        final InputStream response = given()
+                .spec(requestSpec)
+                .header(new Header("Accept", MoreMediaTypes.TEXT_CSV))
+                .when()
+                .get("/search/aggregate?groups=facility&metrics=count:facility")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200)
+                .extract().body().asInputStream();
+
+
+        final CsvParser csvParser = new CsvParser(Csv.parseRfc4180());
+        final List<String[]> lines = csvParser.parseAll(response);
+
+        // headers
+        Assertions.assertArrayEquals(lines.get(0), new String[]{"grouping: facility", "metric: count(facility)"});
+
+        //rows
+        Assertions.assertArrayEquals(lines.get(1), new String[]{"another-test", "2"});
+        Assertions.assertArrayEquals(lines.get(2), new String[]{"test", "1"});
     }
 
     @ContainerMatrixTest
@@ -341,7 +411,9 @@ public class ScriptingApiResourceIT {
                         """)
                 .post("/search/aggregate")
                 .then()
-                .statusCode(404); // TODO! We should handle the duplicated metric better
+                .statusCode(200);
+        validateRow(validatableResponse, "another-test", 2, 2);
+        validateRow(validatableResponse, "test", 1, 1);
     }
 
     @ContainerMatrixTest
@@ -438,7 +510,7 @@ public class ScriptingApiResourceIT {
                 .statusCode(200);
 
         validateRow(validatableResponse, "another-test", 2);
-        validatableResponse.assertThat().body("data.rows", Matchers.hasSize(1));
+        validatableResponse.assertThat().body("datarows", Matchers.hasSize(1));
     }
 
     @ContainerMatrixTest
@@ -467,7 +539,7 @@ public class ScriptingApiResourceIT {
                 .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
-        final List<List<Object>> rows = validatableResponse.extract().body().jsonPath().getList("data.rows");
+        final List<List<Object>> rows = validatableResponse.extract().body().jsonPath().getList("datarows");
         Assertions.assertEquals(rows.size(), 2);
         Assertions.assertEquals(Arrays.asList("test", (Object) 1), rows.get(0));
         Assertions.assertEquals(Arrays.asList("another-test", (Object) 2), rows.get(1));
@@ -508,8 +580,61 @@ public class ScriptingApiResourceIT {
         final String to = validatableResponse.extract().body().jsonPath().getString("metadata.effective_timerange.to");
         final DateTime fromDateTime = DateTime.parse(from);
         final DateTime toDateTime = DateTime.parse(to);
-        final long diff = toDateTime.getMillis() - fromDateTime.getMillis();
-        Assertions.assertEquals(300_000, diff);
+        final float diff = toDateTime.getMillis() - fromDateTime.getMillis();
+        assertThat(diff).isCloseTo(300_000, within(10_000f));
+    }
+
+    @ContainerMatrixTest
+    void testErrorHandling() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("""
+                        {
+                          "group_by": [
+                            {
+                              "field": "facility"
+                            }
+                          ],
+                          "metrics": [
+                            {
+                              "function": "max",
+                              "field": "facility"
+                            }
+                          ]
+                        }
+                        """)
+                .post("/search/aggregate")
+                .then()
+                .statusCode(400)
+                .assertThat()
+                .body("type", Matchers.equalTo("ApiError"))
+                .body("message", Matchers.containsString("Failed to obtain aggregation results"));
+    }
+
+    @ContainerMatrixTest
+    void testMessages() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("""
+                        {
+                          "fields": ["source", "facility", "level"]
+                        }
+                        """)
+                .post("/search/messages")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200);
+
+        validateSchema(validatableResponse, "field: source", "string", "source");
+        validateSchema(validatableResponse, "field: facility", "string", "facility");
+        validateSchema(validatableResponse, "field: level", "numeric", "level");
+
+        validateRow(validatableResponse, "lorem-ipsum.com", "another-test", 3);
+        validateRow(validatableResponse, "example.org", "another-test", 2);
+        validateRow(validatableResponse, "example.org", "test", 1);
+
     }
 
 
@@ -531,7 +656,7 @@ public class ScriptingApiResourceIT {
         expected.add(key);
         expected.addAll(Arrays.asList(values));
 
-        response.assertThat().body("data.rows", Matchers.hasItem(Matchers.equalTo(expected)));
+        response.assertThat().body("datarows", Matchers.hasItem(Matchers.equalTo(expected)));
     }
 
     private Matcher<Map<? extends String, ?>> entry(String key, Object value) {

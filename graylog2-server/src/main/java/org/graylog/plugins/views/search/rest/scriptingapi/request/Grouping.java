@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.rest.scriptingapi.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 
 import javax.validation.Valid;
@@ -25,18 +24,15 @@ import javax.validation.constraints.NotBlank;
 
 //no column/row choice, assuming API does not care about visualization, and we can ignore it
 public record Grouping(@JsonProperty("field") @Valid @NotBlank String fieldName,
-                       @JsonProperty("limit") int limit,
-                       @JsonProperty("sort") SortSpec.Direction sort) implements Sortable {
+                       @JsonProperty("limit") int limit) {
 
     public Grouping(String fieldName) {
-        this(fieldName, Values.DEFAULT_LIMIT, null);
+        this(fieldName, Values.DEFAULT_LIMIT);
     }
 
     public Grouping(@JsonProperty("field") @Valid @NotBlank String fieldName,
-                    @JsonProperty("limit") int limit,
-                    @JsonProperty("sort") SortSpec.Direction sort) {
+                    @JsonProperty("limit") int limit) {
         this.fieldName = fieldName;
-        this.sort = sort;
         if (limit <= 0) {
             this.limit = Values.DEFAULT_LIMIT;
         } else {
@@ -44,8 +40,4 @@ public record Grouping(@JsonProperty("field") @Valid @NotBlank String fieldName,
         }
     }
 
-    @Override
-    public String sortColumnName() {
-        return fieldName();
-    }
 }

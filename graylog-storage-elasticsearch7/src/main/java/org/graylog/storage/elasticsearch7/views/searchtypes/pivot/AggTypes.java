@@ -22,14 +22,15 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.H
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 
-import java.util.IdentityHashMap;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This solely exists to hide the nasty type signature of the aggregation type map from the rest of the code.
  * It's just ugly and in the way.
  */
 public class AggTypes {
-    final IdentityHashMap<PivotSpec, Tuple2<String, Class<? extends Aggregation>>> aggTypeMap = new IdentityHashMap<>();
+    final Map<PivotSpec, Tuple2<String, Class<? extends Aggregation>>> aggTypeMap = new HashMap<>();
 
     public void record(PivotSpec pivotSpec, String name, Class<? extends Aggregation> aggClass) {
         aggTypeMap.put(pivotSpec, Tuple.tuple(name, aggClass));

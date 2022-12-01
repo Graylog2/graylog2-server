@@ -20,7 +20,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import useQuery from 'routing/useQuery';
 
 export const DEFAULT_PAGE = 1;
-export const DEFAULT_PAGE_SIZES = [10, 50, 100];
+export const DEFAULT_PAGE_SIZES = [10, 20, 50, 100];
 
 export type PaginationQueryParameterResult = {
   page: number;
@@ -30,7 +30,7 @@ export type PaginationQueryParameterResult = {
   setPageSize: (newPageSize: number) => void;
 };
 
-const usePaginationQueryParameter = (PAGE_SIZES: number[] = DEFAULT_PAGE_SIZES): PaginationQueryParameterResult => {
+const usePaginationQueryParameter = (PAGE_SIZES: number[] = DEFAULT_PAGE_SIZES, defaultPageSize: number = PAGE_SIZES[0]): PaginationQueryParameterResult => {
   const { page: pageQueryParameter, pageSize: pageSizeQueryParameter } = useQuery();
   const history = useHistory();
   const { search, pathname } = useLocation();
@@ -54,7 +54,7 @@ const usePaginationQueryParameter = (PAGE_SIZES: number[] = DEFAULT_PAGE_SIZES):
   const page = (Number.isInteger(pageQueryParameterAsNumber) && pageQueryParameterAsNumber > 0) ? pageQueryParameterAsNumber : DEFAULT_PAGE;
 
   const pageSizeQueryParameterAsNumber = Number(pageSizeQueryParameter);
-  const pageSize = (Number.isInteger(pageSizeQueryParameterAsNumber) && PAGE_SIZES?.includes(pageSizeQueryParameterAsNumber)) ? pageSizeQueryParameterAsNumber : PAGE_SIZES[0];
+  const pageSize = (Number.isInteger(pageSizeQueryParameterAsNumber) && PAGE_SIZES?.includes(pageSizeQueryParameterAsNumber)) ? pageSizeQueryParameterAsNumber : defaultPageSize;
 
   return { page, setPage, resetPage, pageSize, setPageSize };
 };

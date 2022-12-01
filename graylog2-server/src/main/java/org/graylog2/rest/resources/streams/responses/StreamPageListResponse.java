@@ -22,10 +22,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.rest.resources.entities.EntityAttribute;
+import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.streams.StreamDTO;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.List;
 
 @JsonAutoDetect
 @AutoValue
@@ -52,6 +55,12 @@ public abstract class StreamPageListResponse {
     @JsonProperty
     public abstract Collection<StreamDTO> streams();
 
+    @JsonProperty
+    public abstract List<EntityAttribute> attributes();
+
+    @JsonProperty
+    public abstract EntityDefaults defaults();
+
     @JsonCreator
     public static StreamPageListResponse create(
             @JsonProperty("query") @Nullable String query,
@@ -59,7 +68,9 @@ public abstract class StreamPageListResponse {
             @JsonProperty("total") long total,
             @JsonProperty("sort") @Nullable String sort,
             @JsonProperty("order") @Nullable String order,
-            @JsonProperty("streams") Collection<StreamDTO> streams) {
-        return new AutoValue_StreamPageListResponse(query, paginationInfo, total, sort, order, streams);
+            @JsonProperty("streams") Collection<StreamDTO> streams,
+            @JsonProperty("attributes") List<EntityAttribute> attributes,
+            @JsonProperty("defaults") EntityDefaults defaults) {
+        return new AutoValue_StreamPageListResponse(query, paginationInfo, total, sort, order, streams, attributes, defaults);
     }
 }

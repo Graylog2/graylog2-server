@@ -132,11 +132,11 @@ describe('FetchProvider', () => {
   });
 
   it.each([
-    ['GET with json', 'GET', 'test1', { text: 'test' }],
-    ['POST with json', 'POST', 'test2', { text: 'test' }],
-    ['POST with text', 'POST', 'test3', 'uuid-beef-feed'],
-    ['POST without content', 'POST', 'test4', null],
-    ['DELETE without content and status 204', 'DELETE', 'test5', null],
+    ['GET with json', 'GET' as const, 'test1', { text: 'test' }],
+    ['POST with json', 'POST' as const, 'test2', { text: 'test' }],
+    ['POST with text', 'POST' as const, 'test3', 'uuid-beef-feed'],
+    ['POST without content', 'POST' as const, 'test4', null],
+    ['DELETE without content and status 204', 'DELETE' as const, 'test5', null],
   ])('should receive a %s', async (_text, method, url, expectedResponse) => {
     return fetch(method, `${baseUrl}/${url}`).then((response) => {
       expect(response).toStrictEqual(expectedResponse);

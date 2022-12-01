@@ -82,7 +82,7 @@ module.exports = {
         },
         {
           name: 'Common',
-          components: 'src/components/common/[A-Z]*.{jsx,tsx}',
+          components: 'src/components/common/**/[A-Z]*.{jsx,tsx}',
           ignore: [
             ...defaultComponentIgnore,
             'src/components/common/URLWhiteListFormModal.tsx',
