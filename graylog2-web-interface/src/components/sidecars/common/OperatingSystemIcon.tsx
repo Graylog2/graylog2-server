@@ -65,7 +65,7 @@ const matchIcon = (os: string) => {
 };
 
 const OperatingSystemIcon = ({ operatingSystem }: Props) => {
-  const { iconName, iconType } = matchIcon(operatingSystem.trim().toLowerCase());
+  const { iconName, iconType } = matchIcon(operatingSystem?.trim().toLowerCase() ?? '');
 
   return (
     <SidecarIcon name={iconName} type={iconType} fixedWidth />
