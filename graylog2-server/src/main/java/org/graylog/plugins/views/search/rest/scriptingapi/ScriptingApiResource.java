@@ -102,7 +102,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
             postAuditEvent(searchJob);
 
             //Step 3: take complex response and try to map it to simpler, tabular form
-            return messagesTabularResponseCreator.mapToResponse(messagesRequestSpec, searchJob);
+            return messagesTabularResponseCreator.mapToResponse(messagesRequestSpec, searchJob, searchUser);
 
         } catch (IllegalArgumentException | ValidationException | AggregationFailedException ex) {
             throw new BadRequestException(ex.getMessage(), ex);
