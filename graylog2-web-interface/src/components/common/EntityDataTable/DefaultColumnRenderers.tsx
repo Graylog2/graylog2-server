@@ -18,8 +18,15 @@
 import React from 'react';
 
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
+import { Timestamp } from 'components/common';
 
 const DefaultColumnRenderers = {
+  created_at: {
+    renderCell: (entity: { created_at: string }) => (
+      <Timestamp dateTime={entity.created_at} />
+    ),
+    staticWidth: 160,
+  },
   description: {
     renderCell: (entity: { description: string }) => (
       <TextOverflowEllipsis>
