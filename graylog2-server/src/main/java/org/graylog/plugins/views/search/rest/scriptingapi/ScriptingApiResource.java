@@ -52,12 +52,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
- import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+import static org.graylog2.shared.utilities.StringUtils.splitOnComma;
 
 @Api(value = "ScriptingApi", tags = {CLOUD_VISIBLE})
 @Path("/search")
@@ -123,16 +122,11 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                                         @ApiParam(name = "size") @QueryParam("size") int size,
                                         @Context SearchUser searchUser) {
 
-        // allow comma separated list of fields
-        final List<String> allFields = fields.stream()
-                .flatMap(f -> Arrays.stream(f.split(",")))
-                .collect(Collectors.toList());
-
         try {
             MessagesRequestSpec messagesRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(query,
-                    streams,
+                    splitOnComma(streams),
                     timerangeKeyword,
-                    allFields,
+                    splitOnComma(fields),
                     from,
                     size);
             return executeQuery(messagesRequestSpec, searchUser);
@@ -175,7 +169,13 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                                         @ApiParam(name = "metrics") @QueryParam("metrics") List<String> metrics,
                                         @Context SearchUser searchUser) {
         try {
-            AggregationRequestSpec aggregationRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(query, streams, timerangeKeyword, groups, metrics);
+            AggregationRequestSpec aggregationRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(
+                    query,
+                    splitOnComma(streams),
+                    timerangeKeyword,
+                    groups,
+                    splitOnComma(metrics)
+            );
             return executeQuery(aggregationRequestSpec, searchUser);
         } catch (IllegalArgumentException ex) {
             throw new BadRequestException(ex.getMessage(), ex);

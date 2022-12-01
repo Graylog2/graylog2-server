@@ -16,7 +16,12 @@
  */
 package org.graylog2.shared.utilities;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class StringUtils {
 
@@ -40,5 +45,17 @@ public final class StringUtils {
         final int exponent = (int) (Math.log(bytes) / Math.log(base));
         final String unit = units[exponent];
         return StringUtils.f("%.1f %s", bytes / Math.pow(base, exponent), unit);
+    }
+
+    public static Set<String> splitOnComma(Set<String> values) {
+        return split(values.stream()).collect(Collectors.toSet());
+    }
+
+    public static List<String> splitOnComma(List<String> values) {
+        return split(values.stream()).collect(Collectors.toList());
+    }
+
+    private static Stream<String> split(Stream<String> values) {
+        return values.flatMap(v -> Arrays.stream(v.split(",")));
     }
 }
