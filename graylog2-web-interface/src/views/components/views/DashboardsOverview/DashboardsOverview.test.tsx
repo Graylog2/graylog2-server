@@ -19,10 +19,27 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
+import { MockStore, asMock } from 'helpers/mocking';
+import useDashboards from 'views/logic/dashboards/useDashboards';
 
-import DashboardsOverview from '.';
+import DashboardsOverview from './DashboardsOverview';
 
 jest.mock('routing/Routes', () => ({ pluginRoute: () => () => '/route' }));
+
+jest.mock('views/logic/dashboards/useDashboards');
+
+jest.mock('views/stores/ViewManagementStore', () => ({
+  ViewManagementActions: {
+    delete: jest.fn(),
+  },
+}));
+
+jest.mock('views/stores/DashboardsStore', () => ({
+  DashboardsActions: {
+    search: () => Promise.resolve(),
+  },
+  DashboardsStore: MockStore(),
+}));
 
 const createPaginatedDashboards = (count = 1) => {
   const dashboards: Array<View> = [];
@@ -57,24 +74,17 @@ const createPaginatedDashboards = (count = 1) => {
 
 describe('DashboardsOverview', () => {
   it('should render empty', async () => {
-    const dashboards = createPaginatedDashboards(0);
+    asMock(useDashboards).mockReturnValue(createPaginatedDashboards(0));
 
-    render(
-      <DashboardsOverview dashboards={dashboards.list}
-                          pagination={dashboards.pagination}
-                          handleSearch={() => {}}
-                          handleDashboardDelete={() => {}} />);
+    render(<DashboardsOverview />);
 
-    await screen.findByText('There are no dashboards present/matching the filter!');
+    await screen.findByText('No dashboards have been created yet.');
   });
 
   it('should render list', async () => {
-    const dashboards = createPaginatedDashboards(3);
+    asMock(useDashboards).mockReturnValue(createPaginatedDashboards(3));
 
-    render(<DashboardsOverview dashboards={dashboards.list}
-                               pagination={dashboards.pagination}
-                               handleSearch={() => {}}
-                               handleDashboardDelete={() => {}} />);
+    render(<DashboardsOverview />);
 
     await screen.findByText('search-title-0');
     await screen.findByText('search-title-1');
