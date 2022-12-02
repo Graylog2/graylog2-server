@@ -7,24 +7,86 @@ pulls = ["13018"]
 contributors = [""]
 
 details.user = """
-Adds the capability to configure in-database global index set defaults on the System > Configurations page. The new defaults apply
-to subsequent index creation everywhere in Graylog (currently Illuminate installations, and the
-System > Index Sets > Create Index set flow).
+# Overview
+Adds two new Index Set-related functionalities:
+1) Adds the ability to specify Index Set initialization default settings in the server configuration file for new Graylog clusters.
+2) Adds the ability to subsequently maintain the current Index Set defaults from the System > Configurations page
+   and through the Graylog API.
 
-On the first server boot, the index set default configuration values are initialized from the corresponding `server.conf`
-values. This allows for both the index defaults configuration, and for system indices (Default, Events, and System
-Events index sets) to be created with the specified defaults.
+## New Graylog Cluster Index Set Initialization Defaults
+New Graylog server clusters can now initialize the settings for Index Sets with the following server configuration
+values. Please see the sample [graylog.conf](https://github.com/Graylog2/graylog2-server/blob/master/misc/graylog.conf) file for more details and example values.
 
-The `server.conf` configuration properties were un-deprecated, since Graylog intends to maintain them as initialization
-defaults Going Forward.
+- `elasticsearch_analyzer`
+- `elasticsearch_shards`
+- `elasticsearch_replicas`
+- `disable_index_optimization`
+- `index_optimization_max_num_segments`
+- `index_field_type_periodical_full_refresh_interval`
+- `rotation_strategy`
+- `elasticsearch_max_docs_per_index`
+- `elasticsearch_max_size_per_index`
+- `elasticsearch_max_time_per_index`
+- `retention_strategy`
+- `elasticsearch_max_number_of_indices`
 
-The following defaults are also now being used:
+_Many of these `server.conf` configuration properties were un-deprecated as part of this feature, since Graylog intends
+to maintain them going forward._
 
-Shards: 1
-Rotation Strategy: Size - 10GB
+Once the first Graylog server instance is started to establish the cluster, the following system indexes will be created
+with the specified defaults.
+
+- Default index set
+- Graylog Events
+- Graylog System Events
+- Graylog Message Failures
+- Restored Archives
+
+## In-database Cluster Index Set Defaults
+
+The current in-database defaults for new Index Sets can now be edited from the new System > Configuration >
+Index Set defaults configuration area. The default values set here will be used for all new index sets created:
+
+- Those created from the System > Index Sets page.
+- New indexes created through the Graylog Illuminate system.
+
+Once Graylog 5.1 is installed, these in-database defaults will be established, and the server configuration option
+values described above will no longer be used.
+
+## New Index Default values
+Unless user-specified defaults are specified, the following new defaults will be effective for all new index sets created:
+
+- Shards: 1 (previously 4 in many cases)
+- Rotation Strategy: Index Size - 10GB (previously Index Time [1D] in many cases)
 """
 
 details.ops = """
-The in-database index default configuration can also be edited VIA the Graylog API.
-TODO Dan: Add instructions.
+The in-database Index Set default configuration can also be edited VIA the Graylog API:
+
+```
+curl 'http://graylog-server:8080/api/system/indices/index_set_defaults' \
+  -X 'PUT' \
+  -H 'Content-Type: application/json' \
+  -H 'X-Requested-By: my-api-request' \
+  --data-raw '
+  {
+     "index_analyzer":"standard",
+     "shards":5,
+     "replicas":5,
+     "index_optimization_max_num_segments":1,
+     "index_optimization_disabled":false,
+     "field_type_refresh_interval":28,
+     "field_type_refresh_interval_unit":"SECONDS",
+     "rotation_strategy_class":"org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
+     "rotation_strategy_config":{
+        "type":"org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
+        "max_docs_per_index":10
+     },
+     "retention_strategy_class":"org.graylog2.indexer.retention.strategies.ClosingRetentionStrategy",
+     "retention_strategy_config":{
+        "max_number_of_indices":10,
+        "type":"org.graylog2.indexer.retention.strategies.ClosingRetentionStrategyConfig"
+     }
+  }'
+```
 """
