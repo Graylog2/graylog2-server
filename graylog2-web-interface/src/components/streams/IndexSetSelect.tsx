@@ -18,7 +18,7 @@ import * as React from 'react';
 import { Field } from 'formik';
 import { useMemo } from 'react';
 
-import { Select } from 'components/common';
+import Select from 'components/common/Select';
 import { Input } from 'components/bootstrap';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
@@ -43,6 +43,7 @@ const IndexSetSelect = ({ indexSets, help }: Props) => {
       {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
         <Input label="Index Set"
                help={help}
+               id={name}
                error={(error && touched) ? error : undefined}>
           <Select onBlur={onBlur}
                   onChange={(newValue: number) => onChange({

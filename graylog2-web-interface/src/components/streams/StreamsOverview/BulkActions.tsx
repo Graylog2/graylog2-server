@@ -24,14 +24,19 @@ import { Button, Modal } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
 import type FetchError from 'logic/errors/FetchError';
+import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
-import { ModalSubmit, IfPermitted } from 'components/common';
+import ModalSubmit from 'components/common/ModalSubmit';
+import IfPermitted from 'components/common/IfPermitted';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { Streams } from '@graylog/server-api';
 
 import IndexSetSelect from '../IndexSetSelect';
+
+type AssignIndexSetFormValues = {
+  index_set_id: string | undefined,
+}
 
 const AssignIndexSetModal = ({
   selectedStreamIds,
@@ -47,15 +52,15 @@ const AssignIndexSetModal = ({
   descriptor: string,
 }) => {
   const modalTitle = `Assign Index Set To ${selectedStreamIds.length} ${StringUtils.capitalizeFirstLetter(descriptor)}`;
-  const onSubmit = ({ index_set_id: indexSetId }) => Streams.assignToIndexSet(indexSetId, selectedStreamIds).then(() => {
+  const onSubmit = ({ index_set_id: indexSetId }: AssignIndexSetFormValues) => Streams.assignToIndexSet(indexSetId, selectedStreamIds).then(() => {
     refetchStreams();
     UserNotification.success(`Index set was assigned to ${selectedStreamIds.length} ${descriptor} successfully.`, 'Success');
     toggleShowModal();
   }).catch((error: FetchError) => {
-    UserNotification.error(`Assigning index set failed with status: ${error}`);
+    UserNotification.error(`Assigning index set failed with status: ${error}`, 'Error');
   });
 
-  const validate = ({ index_set_id }) => {
+  const validate = ({ index_set_id }: AssignIndexSetFormValues) => {
     let errors = {};
 
     if (!index_set_id) {
