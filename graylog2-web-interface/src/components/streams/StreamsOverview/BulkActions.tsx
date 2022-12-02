@@ -17,23 +17,95 @@
 import * as React from 'react';
 import { uniq } from 'lodash';
 import { useQueryClient } from '@tanstack/react-query';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
+import { Formik, Form } from 'formik';
 
-import { Button } from 'components/bootstrap';
+import { Button, Modal } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import type FetchError from 'logic/errors/FetchError';
 import UserNotification from 'util/UserNotification';
+import { ModalSubmit, IfPermitted } from 'components/common';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import { Streams } from '@graylog/server-api';
+
+import IndexSetSelect from '../IndexSetSelect';
+
+const AssignIndexSetModal = ({
+  selectedStreamIds,
+  toggleShowModal,
+  indexSets,
+  refetchStreams,
+  descriptor,
+}: {
+  selectedStreamIds: Array<string>,
+  toggleShowModal: () => void,
+  indexSets: Array<IndexSet>,
+  refetchStreams: () => void,
+  descriptor: string,
+}) => {
+  const modalTitle = `Assign Index Set To ${selectedStreamIds.length} ${StringUtils.capitalizeFirstLetter(descriptor)}`;
+  const onSubmit = ({ index_set_id: indexSetId }) => Streams.assignToIndexSet(indexSetId, selectedStreamIds).then(() => {
+    refetchStreams();
+    UserNotification.success(`Index set was assigned to ${selectedStreamIds.length} ${descriptor} successfully.`, 'Success');
+    toggleShowModal();
+  }).catch((error: FetchError) => {
+    UserNotification.error(`Assigning index set failed with status: ${error}`);
+  });
+
+  const validate = ({ index_set_id }) => {
+    let errors = {};
+
+    if (!index_set_id) {
+      errors = { ...errors, index_set_id: 'Index set is required' };
+    }
+
+    return errors;
+  };
+
+  return (
+    <Modal title={modalTitle}
+           onHide={toggleShowModal}
+           show>
+      <Formik initialValues={{ index_set_id: undefined }}
+              onSubmit={onSubmit}
+              validate={validate}>
+        {({ isSubmitting, isValidating }) => (
+          <Form>
+            <Modal.Header closeButton>
+              <Modal.Title>{modalTitle}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <IndexSetSelect indexSets={indexSets}
+                              help="Messages that match the selected streams will be written to the configured index set." />
+            </Modal.Body>
+            <Modal.Footer>
+              <ModalSubmit submitButtonText="Assign index set"
+                           submitLoadingText="Assigning index set..."
+                           onCancel={toggleShowModal}
+                           disabledSubmit={isValidating}
+                           isSubmitting={isSubmitting} />
+            </Modal.Footer>
+          </Form>
+        )}
+      </Formik>
+    </Modal>
+  );
+};
 
 type Props = {
   selectedStreamIds: Array<string>,
   setSelectedStreamIds: (streamIds: Array<string>) => void,
+  indexSets: Array<IndexSet>
+  refetchStreams: () => void
 }
 
-const BulkActions = ({ selectedStreamIds, setSelectedStreamIds }: Props) => {
+const BulkActions = ({ selectedStreamIds, refetchStreams, setSelectedStreamIds, indexSets }: Props) => {
   const queryClient = useQueryClient();
+  const [showIndexSetModal, setShowIndexSetModal] = useState(false);
+
   const selectedItemsAmount = selectedStreamIds?.length;
   const descriptor = StringUtils.pluralize(selectedItemsAmount, 'stream', 'streams');
 
@@ -68,8 +140,24 @@ const BulkActions = ({ selectedStreamIds, setSelectedStreamIds }: Props) => {
     }
   }, [descriptor, queryClient, selectedItemsAmount, selectedStreamIds, setSelectedStreamIds]);
 
+  const toggleAssignIndexSetModal = useCallback(() => {
+    setShowIndexSetModal((cur) => !cur);
+  }, []);
+
   return (
-    <Button bsSize="xsmall" bsStyle="danger" onClick={onDelete}>Delete</Button>
+    <>
+      <IfPermitted permissions="indexsets:read">
+        <Button bsSize="xsmall" onClick={toggleAssignIndexSetModal}>Assign index set</Button>
+      </IfPermitted>
+      <Button bsSize="xsmall" bsStyle="danger" onClick={onDelete}>Delete</Button>
+      {showIndexSetModal && (
+        <AssignIndexSetModal selectedStreamIds={selectedStreamIds}
+                             toggleShowModal={toggleAssignIndexSetModal}
+                             indexSets={indexSets}
+                             descriptor={descriptor}
+                             refetchStreams={refetchStreams} />
+      )}
+    </>
   );
 };
 
