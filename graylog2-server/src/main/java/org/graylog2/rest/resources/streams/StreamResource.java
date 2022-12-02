@@ -511,12 +511,28 @@ public class StreamResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.STREAM_UPDATE)
     public Response assignToIndexSet(@ApiParam(name = "indexSetId", required = true) @PathParam("indexSetId") String indexSetId,
                                     @ApiParam(name = "JSON body", required = true) @Valid @NotNull List<String> streamIds) {
+        checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
+        streamIds.forEach(streamId -> {
+            checkPermission(RestPermissions.STREAMS_EDIT, streamId);
+            checkNotEditableStream(streamId, "The stream with id <" + streamId + "> cannot be edited.");
+        });
+
         return indexSetRegistry.get(indexSetId)
                 .map(indexSet -> {
+                    checkIndexSet(indexSet);
+
                     streamService.addToIndexSet(indexSetId, streamIds);
                     return Response.ok().build();
                 })
                 .orElse(Response.status(Response.Status.NOT_FOUND).build());
+    }
+
+    private void checkIndexSet(IndexSet indexSet) {
+        if (!indexSet.getConfig().isWritable()) {
+            throw new BadRequestException("Assigned index set must be writable!");
+        } else if (!indexSet.getConfig().isRegularIndex()) {
+            throw new BadRequestException("Assigned index set is not usable");
+        }
     }
 
     private StreamResponse streamToResponse(Stream stream) {
