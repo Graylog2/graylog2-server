@@ -152,7 +152,7 @@ const BulkActions = ({ selectedStreamIds, refetchStreams, setSelectedStreamIds, 
   return (
     <>
       <IfPermitted permissions="indexsets:read">
-        <Button bsSize="xsmall" onClick={toggleAssignIndexSetModal}>Assign index set</Button>
+        <Button bsSize="xsmall" bsStyle="info" onClick={toggleAssignIndexSetModal}>Assign index set</Button>
       </IfPermitted>
       <Button bsSize="xsmall" bsStyle="danger" onClick={onDelete}>Delete</Button>
       {showIndexSetModal && (
