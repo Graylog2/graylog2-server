@@ -126,7 +126,7 @@ const DashboardList = () => {
           )}
         </Alert>
       )}
-      {dashboards?.length && (
+      {!!dashboards?.length && (
         <EntityDataTable data={dashboards}
                          visibleColumns={visibleColumns}
                          onColumnsChange={onColumnsChange}
