@@ -149,6 +149,7 @@ const EntityDataTable = <Entity extends { id: string }>({
   const currentUser = useCurrentUser();
   const [selectedEntities, setSelectedEntities] = useState<Array<string>>([]);
   const columnRenderers = merge(DefaultColumnRenderers, customColumnRenderers);
+  const displayActionsCol = typeof rowActions === 'function';
   const displayBulkSelectCol = typeof bulkActions === 'function';
 
   const accessibleColumns = useMemo(
