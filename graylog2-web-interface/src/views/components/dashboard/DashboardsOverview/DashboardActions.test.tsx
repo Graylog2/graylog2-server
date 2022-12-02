@@ -36,11 +36,11 @@ describe('DashboardActions', () => {
 
   const simpleDashboard = simpleView();
 
-  const clickDashboardAction = async (dashboardId: string, action: string) => {
-    const actionsButton = (await screen.findAllByTestId(`dashboard-actions-dropdown-${dashboardId}`))[0];
+  const clickDashboardAction = async (action: string) => {
+    const actionsButton = await screen.findByRole('button', { name: /more actions/i });
     userEvent.click(actionsButton);
 
-    userEvent.click((await screen.findAllByRole('menuitem', { name: action }))[0]);
+    userEvent.click(await screen.findByRole('menuitem', { name: action }));
   };
 
   beforeEach(() => {
@@ -57,7 +57,7 @@ describe('DashboardActions', () => {
 
     render(<DashboardActions dashboard={simpleView()} refetchDashboards={() => Promise.resolve()} />);
 
-    await clickDashboardAction('foo', 'Delete');
+    await clickDashboardAction('Delete');
 
     await waitFor(() => expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete "Foo"?'));
 
@@ -69,7 +69,7 @@ describe('DashboardActions', () => {
 
     render(<DashboardActions dashboard={simpleView()} refetchDashboards={() => Promise.resolve()} />);
 
-    await clickDashboardAction('foo', 'Delete');
+    await clickDashboardAction('Delete');
 
     await waitFor(() => expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete "Foo"?'));
 
@@ -99,7 +99,7 @@ describe('DashboardActions', () => {
     it('triggers hook when deleting dashboard', async () => {
       render(<DashboardActions dashboard={simpleDashboard} refetchDashboards={() => Promise.resolve()} />);
 
-      await clickDashboardAction('foo', 'Delete');
+      await clickDashboardAction('Delete');
 
       await waitFor(() => expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' })));
 
@@ -111,7 +111,7 @@ describe('DashboardActions', () => {
 
       render(<DashboardActions dashboard={simpleDashboard} refetchDashboards={() => Promise.resolve()} />);
 
-      await clickDashboardAction('foo', 'Delete');
+      await clickDashboardAction('Delete');
 
       await waitFor(() => expect(deletingDashboard).toHaveBeenCalledWith(simpleDashboard));
 
@@ -124,7 +124,7 @@ describe('DashboardActions', () => {
 
       render(<DashboardActions dashboard={simpleDashboard} refetchDashboards={() => Promise.resolve()} />);
 
-      await clickDashboardAction('foo', 'Delete');
+      await clickDashboardAction('Delete');
 
       await waitFor(() => expect(deletingDashboard).toHaveBeenCalledWith(simpleDashboard));
 
@@ -144,7 +144,7 @@ describe('DashboardActions', () => {
       const oldConsoleTrace = console.trace;
       console.trace = jest.fn();
 
-      await clickDashboardAction('foo', 'Delete');
+      await clickDashboardAction('Delete');
 
       await waitFor(() => expect(console.trace).toHaveBeenCalledWith('Exception occurred in deletion confirmation hook: ', error));
       console.trace = oldConsoleTrace;

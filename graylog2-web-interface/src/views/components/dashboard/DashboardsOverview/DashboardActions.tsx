@@ -59,7 +59,6 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
                      onClick={() => setShowShareModal(true)} />
         <DropdownButton bsSize="xsmall"
                         title="More Actions"
-                        data-testid={`dashboard-actions-dropdown-${dashboard.id}`}
                         id={`dashboard-actions-dropdown-${dashboard.id}`}
                         pullRight>
           <IfPermitted permissions={[`view:edit:${dashboard.id}`, 'view:edit']} anyPermissions>
