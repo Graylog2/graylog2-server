@@ -21,7 +21,6 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.DefaultIndexSetCreated;
 import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.indexer.indexset.IndexSetConfigFactory;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.management.IndexManagementConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -40,6 +39,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,10 +58,10 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
     private IndexSetService indexSetService;
     @Mock
     private ClusterConfigService clusterConfigService;
-    @Mock
-    private IndexSetConfigFactory indexSetConfigFactory;
 
     private final ElasticsearchConfiguration elasticsearchConfiguration = new ElasticsearchConfiguration();
+    private RotationStrategy rotationStrategy = new StubRotationStrategy();
+    private RetentionStrategy retentionStrategy = new StubRetentionStrategy();
     private Migration migration;
 
 
@@ -69,9 +69,10 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
     public void setUpService() throws Exception {
         migration = new V20161116172100_DefaultIndexSetMigration(
                 elasticsearchConfiguration,
+                Collections.singletonMap("test", () -> rotationStrategy),
+                Collections.singletonMap("test", () -> retentionStrategy),
                 indexSetService,
-                clusterConfigService,
-                indexSetConfigFactory);
+                clusterConfigService);
     }
 
     @Test

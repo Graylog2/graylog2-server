@@ -40,7 +40,7 @@ public class IndexSetConfigFactoryTestConstants {
             .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
             .retentionStrategy(NoopRetentionStrategyConfig.create(Integer.MAX_VALUE))
             .retentionStrategyClass(NoopRetentionStrategy.class.getCanonicalName())
-            .shards(4)
+            .shards(1)
             .replicas(0)
             .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
             .indexTemplateName("template")
