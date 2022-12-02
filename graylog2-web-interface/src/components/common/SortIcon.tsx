@@ -16,7 +16,7 @@
  */
 
 import styled, { css } from 'styled-components';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import Icon from 'components/common/Icon';
 
@@ -34,55 +34,64 @@ const StyledSortIcon = styled.button(({ theme }) => {
   `;
 });
 
-const Bulb = styled.span(({ theme }) => css`
+const Bulb = styled.span`
   position: absolute;
   top: 0;
   right: 0;
-  font-size: ${theme.fonts.size.small};
+  font-size: 0.75rem;
   font-weight: 600;
-`);
+`;
 
 type Props<AscDirection extends string, DescDirection extends string> = {
   activeDirection: AscDirection | DescDirection | null,
   ascId?: string,
   descId?: string
   onChange: (activeDirection: AscDirection | DescDirection | null) => void,
+  ariaLabel?: string,
   title?: string,
   order?: number,
+  dataTestId?: string | undefined
   className?: string
 }
 
 const SortIcon = <AscDirection extends string, DescDirection extends string>({
   activeDirection,
   onChange,
+  ariaLabel,
   title,
   order,
+  dataTestId,
   ascId,
   descId,
   className,
 }: Props<AscDirection, DescDirection>) => {
   const handleSortChange = useCallback(() => onChange(activeDirection), [activeDirection, onChange]);
-  const iconName = activeDirection === ascId && activeDirection !== descId
-    ? 'arrow-up-short-wide'
-    : 'arrow-down-wide-short';
+  const iconName = useMemo(() => {
+    if (activeDirection === ascId) return 'arrow-up-short-wide';
+    if (activeDirection === descId) return 'arrow-down-wide-short';
 
+    return 'arrow-down-wide-short';
+  }, [activeDirection, ascId, descId]);
   const sortActive = !!activeDirection;
 
   return (
     <StyledSortIcon className={sortActive ? 'active' : ''}
                     title={title}
                     type="button"
-                    aria-label={title}
-                    onClick={handleSortChange}>
-      <Icon name={iconName} className={className} data-testid="sort-icon-svg" />
+                    aria-label={ariaLabel}
+                    onClick={handleSortChange}
+                    data-testid={dataTestId}>
+      <Icon name={iconName} className={className} />
       {order && <Bulb>{order}</Bulb>}
     </StyledSortIcon>
   );
 };
 
 SortIcon.defaultProps = {
+  ariaLabel: 'Sort',
   title: 'Sort',
   order: undefined,
+  dataTestId: undefined,
   ascId: 'Ascending',
   descId: 'Descending',
   className: '',
