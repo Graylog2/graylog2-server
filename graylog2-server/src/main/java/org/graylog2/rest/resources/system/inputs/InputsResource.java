@@ -62,8 +62,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
 @RequiresAuthentication
-@Api(value = "System/Inputs", description = "Message inputs")
+@Api(value = "System/Inputs", description = "Message inputs", tags = {CLOUD_VISIBLE})
 @Path("/system/inputs")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
