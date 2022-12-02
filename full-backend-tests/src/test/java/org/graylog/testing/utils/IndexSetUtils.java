@@ -16,11 +16,21 @@
  */
 package org.graylog.testing.utils;
 
+import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
+import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
+import org.joda.time.Duration;
+import org.joda.time.Period;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
+import static org.graylog.testing.utils.SerializationUtils.serialize;
+import static org.hamcrest.Matchers.notNullValue;
 
 public class IndexSetUtils {
     private IndexSetUtils() {}
@@ -34,5 +44,48 @@ public class IndexSetUtils {
                 .statusCode(200)
                 .assertThat()
                 .extract().body().jsonPath().getString("index_sets.find { it.default == true }.id");
+    }
+
+    public static String createIndexSet(RequestSpecification requestSpec, IndexSetSummary indexSetSummary) {
+        return given()
+                .spec(requestSpec)
+                .log().ifValidationFails()
+                .when()
+                .body(indexSetSummary)
+                .post("/system/indices/index_sets")
+                .then()
+                .log().ifError()
+                .log().ifValidationFails()
+                .statusCode(200)
+                .assertThat().body("id", notNullValue())
+                .extract().body().jsonPath().getString("id");
+    }
+
+    public static String createIndexSet(RequestSpecification requestSpec, String title, String description, String prefix) {
+        var indexSetSummary = IndexSetSummary.create(null,
+                title,
+                description,
+                false,
+                true,
+                false,
+                prefix,
+                4,
+                0,
+                "org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy",
+                TimeBasedRotationStrategyConfig.builder()
+                        .rotationPeriod(Period.days(1))
+                        .rotateEmptyIndexSet(false)
+                        .build(),
+                "org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy",
+                DeletionRetentionStrategyConfig.create(20),
+                ZonedDateTime.now(ZoneId.of("UTC")),
+                "standard",
+                1,
+                false,
+                Duration.standardSeconds(5L),
+                null
+        );
+
+        return createIndexSet(requestSpec, indexSetSummary);
     }
 }
