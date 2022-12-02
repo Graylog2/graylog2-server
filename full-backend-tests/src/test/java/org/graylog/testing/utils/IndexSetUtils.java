@@ -16,7 +16,6 @@
  */
 package org.graylog.testing.utils;
 
-import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
@@ -26,10 +25,8 @@ import org.joda.time.Period;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Map;
 
 import static io.restassured.RestAssured.given;
-import static org.graylog.testing.utils.SerializationUtils.serialize;
 import static org.hamcrest.Matchers.notNullValue;
 
 public class IndexSetUtils {

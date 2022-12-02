@@ -18,8 +18,6 @@ package org.graylog2.rest.resources.streams;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -69,7 +67,6 @@ import org.graylog2.streams.PaginatedStreamService;
 import org.graylog2.streams.StreamDTO;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRouterEngine;
-import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
