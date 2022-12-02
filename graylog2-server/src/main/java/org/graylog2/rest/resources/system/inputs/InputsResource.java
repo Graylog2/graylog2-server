@@ -17,8 +17,6 @@
 package org.graylog2.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -26,24 +24,20 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.Configuration;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.configuration.ConfigurationException;
-import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.configuration.fields.ConfigurationField;
-import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputSummary;
 import org.graylog2.rest.models.system.inputs.responses.InputsList;
-import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,8 +58,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -81,12 +73,14 @@ public class InputsResource extends AbstractInputsResource {
 
     private final InputService inputService;
     private final MessageInputFactory messageInputFactory;
+    private final Configuration configuration;
 
     @Inject
-    public InputsResource(InputService inputService, MessageInputFactory messageInputFactory) {
+    public InputsResource(InputService inputService, MessageInputFactory messageInputFactory, Configuration configuration) {
         super(messageInputFactory.getAvailableInputs());
         this.inputService = inputService;
         this.messageInputFactory = messageInputFactory;
+        this.configuration = configuration;
     }
 
     @GET
@@ -133,6 +127,7 @@ public class InputsResource extends AbstractInputsResource {
     public Response create(@ApiParam(name = "JSON body", required = true)
                            @Valid @NotNull InputCreateRequest lr) throws ValidationException {
         try {
+            throwBadRequestIfNotGlobal(lr);
             // TODO Configuration type values need to be checked. See ConfigurationMapConverter.convertValues()
             final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node());
 
@@ -182,6 +177,8 @@ public class InputsResource extends AbstractInputsResource {
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_UPDATE)
     public Response update(@ApiParam(name = "JSON body", required = true) @Valid @NotNull InputCreateRequest lr,
                            @ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException, NoSuchInputTypeException, ConfigurationException, ValidationException {
+
+        throwBadRequestIfNotGlobal(lr);
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         final Input input = inputService.find(inputId);
@@ -201,5 +198,11 @@ public class InputsResource extends AbstractInputsResource {
                 .build(input.getId());
 
         return Response.created(inputUri).entity(InputCreated.create(input.getId())).build();
+    }
+
+    private void throwBadRequestIfNotGlobal(InputCreateRequest lr) {
+        if (configuration.isCloud() && !lr.global()) {
+            throw new BadRequestException("Only global inputs are allowed in the cloud environment!");
+        }
     }
 }
