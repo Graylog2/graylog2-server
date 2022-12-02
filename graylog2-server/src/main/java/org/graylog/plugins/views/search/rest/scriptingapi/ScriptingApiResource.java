@@ -125,7 +125,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
 
         try {
             MessagesRequestSpec messagesRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(query,
-                    StringUtils.splitByComma(streams),
+                    splitByComma(streams),
                     timerangeKeyword,
                     splitByComma(fields),
                     from,
