@@ -113,6 +113,6 @@ public class AssignStreamsToIndexSetIT {
                 .body(streamIds)
                 .put(STREAMS_RESOURCE + "/indexSet/" + indexSetId)
                 .then()
-                .log().ifError();
+                .log().ifValidationFails();
     }
 }
