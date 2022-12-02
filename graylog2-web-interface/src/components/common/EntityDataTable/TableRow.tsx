@@ -36,10 +36,6 @@ const ActionsRef = styled.div`
   display: inline-flex;
 `;
 
-const ActionsRef = styled.div`
-  display: inline-flex;
-`;
-
 type Props<Entity extends { id: string }> = {
   actionsRef: React.RefObject<HTMLDivElement>
   columns: Array<Column>,

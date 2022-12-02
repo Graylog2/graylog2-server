@@ -166,12 +166,6 @@ const EntityDataTable = <Entity extends { id: string }>({
     displayBulkSelectCol,
   });
 
-  const { tableRef, actionsRef, actionsColWidth, columnsWidths } = useElementsWidths({
-    columns,
-    columnRenderers,
-    displayBulkSelectCol,
-  });
-
   const onToggleEntitySelect = useCallback((itemId: string) => {
     setSelectedEntities(((cur) => {
       if (cur.includes(itemId)) {
