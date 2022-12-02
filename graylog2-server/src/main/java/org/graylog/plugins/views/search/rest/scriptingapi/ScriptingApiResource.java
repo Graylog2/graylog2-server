@@ -174,7 +174,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                     query,
                     StringUtils.splitByComma(streams),
                     timerangeKeyword,
-                    groups,
+                    splitByComma(groups),
                     splitByComma(metrics)
             );
             return executeQuery(aggregationRequestSpec, searchUser);
