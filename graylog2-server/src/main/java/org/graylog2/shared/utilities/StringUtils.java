@@ -17,8 +17,10 @@
 package org.graylog2.shared.utilities;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -48,14 +50,20 @@ public final class StringUtils {
     }
 
     public static Set<String> splitByComma(Set<String> values) {
-        return split(values.stream()).collect(Collectors.toSet());
+        return split(values).collect(Collectors.toSet());
     }
 
     public static List<String> splitByComma(List<String> values) {
-        return split(values.stream()).collect(Collectors.toList());
+        return split(values).collect(Collectors.toList());
     }
 
-    private static Stream<String> split(Stream<String> values) {
-        return values.flatMap(v -> Arrays.stream(v.split(",")));
+    private static Stream<String> split(Collection<String> values) {
+        if(values == null) {
+            return Stream.empty();
+        }
+        return values.stream()
+                .filter(Objects::nonNull)
+                .flatMap(v -> Arrays.stream(v.split(",")))
+                .filter(s -> !s.trim().isEmpty());
     }
 }
