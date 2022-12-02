@@ -16,6 +16,7 @@
  */
 package org.graylog.testing.utils;
 
+import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
