@@ -313,7 +313,7 @@ public class StreamResource extends RestResource {
         }
 
         final Boolean removeMatchesFromDefaultStream = cr.removeMatchesFromDefaultStream();
-        if(removeMatchesFromDefaultStream != null) {
+        if (removeMatchesFromDefaultStream != null) {
             stream.setRemoveMatchesFromDefaultStream(removeMatchesFromDefaultStream);
         }
 
@@ -454,32 +454,24 @@ public class StreamResource extends RestResource {
         final String creatorUser = getCurrentUser().getName();
 
         final List<StreamRule> sourceStreamRules = streamRuleService.loadForStream(sourceStream);
-        final ImmutableSet.Builder<StreamRule> newStreamRules = ImmutableSet.builderWithExpectedSize(sourceStreamRules.size());
-        for (StreamRule streamRule : sourceStreamRules) {
-            final Map<String, Object> streamRuleData = Maps.newHashMapWithExpectedSize(6);
+        final Set<StreamRule> newStreamRules = sourceStreamRules
+                .stream()
+                .map(streamRule -> streamRuleService.copy(null, streamRule))
+                .collect(Collectors.toSet());
 
-            streamRuleData.put(StreamRuleImpl.FIELD_TYPE, streamRule.getType().toInteger());
-            streamRuleData.put(StreamRuleImpl.FIELD_FIELD, streamRule.getField());
-            streamRuleData.put(StreamRuleImpl.FIELD_VALUE, streamRule.getValue());
-            streamRuleData.put(StreamRuleImpl.FIELD_INVERTED, streamRule.getInverted());
-            streamRuleData.put(StreamRuleImpl.FIELD_DESCRIPTION, streamRule.getDescription());
-
-            final StreamRule newStreamRule = streamRuleService.create(streamRuleData);
-            newStreamRules.add(newStreamRule);
-        }
-
-        final Map<String, Object> streamData = Maps.newHashMap();
-        streamData.put(StreamImpl.FIELD_TITLE, cr.title());
-        streamData.put(StreamImpl.FIELD_DESCRIPTION, cr.description());
-        streamData.put(StreamImpl.FIELD_CREATOR_USER_ID, creatorUser);
-        streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.nowUTC());
-        streamData.put(StreamImpl.FIELD_MATCHING_TYPE, sourceStream.getMatchingType().toString());
-        streamData.put(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, cr.removeMatchesFromDefaultStream());
-        streamData.put(StreamImpl.FIELD_DISABLED, true);
-        streamData.put(StreamImpl.FIELD_INDEX_SET_ID, cr.indexSetId());
+        final Map<String, Object> streamData = Map.of(
+            StreamImpl.FIELD_TITLE, cr.title(),
+            StreamImpl.FIELD_DESCRIPTION, cr.description(),
+            StreamImpl.FIELD_CREATOR_USER_ID, creatorUser,
+            StreamImpl.FIELD_CREATED_AT, Tools.nowUTC(),
+            StreamImpl.FIELD_MATCHING_TYPE, sourceStream.getMatchingType().toString(),
+            StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, cr.removeMatchesFromDefaultStream(),
+            StreamImpl.FIELD_DISABLED, true,
+            StreamImpl.FIELD_INDEX_SET_ID, cr.indexSetId()
+        );
 
         final Stream stream = streamService.create(streamData);
-        final String savedStreamId = streamService.saveWithRulesAndOwnership(stream, newStreamRules.build(), userContext.getUser());
+        final String savedStreamId = streamService.saveWithRulesAndOwnership(stream, newStreamRules, userContext.getUser());
         final ObjectId savedStreamObjectId = new ObjectId(savedStreamId);
 
         final Set<ObjectId> outputIds = sourceStream.getOutputs().stream()
