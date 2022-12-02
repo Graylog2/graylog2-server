@@ -53,6 +53,7 @@ import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.streams.requests.CloneStreamRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
+import org.graylog2.rest.resources.streams.responses.StreamCreatedResponse;
 import org.graylog2.rest.resources.streams.responses.StreamListResponse;
 import org.graylog2.rest.resources.streams.responses.StreamPageListResponse;
 import org.graylog2.rest.resources.streams.responses.StreamResponse;
@@ -159,7 +160,7 @@ public class StreamResource extends RestResource {
 
     @POST
     @Timed
-    @ApiOperation(value = "Create a stream")
+    @ApiOperation(value = "Create a stream", response = StreamCreatedResponse.class)
     @RequiresPermissions(RestPermissions.STREAMS_CREATE)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -171,18 +172,14 @@ public class StreamResource extends RestResource {
         stream.setDisabled(true);
 
         final IndexSet indexSet = stream.getIndexSet();
-        if (!indexSet.getConfig().isWritable()) {
-            throw new BadRequestException("Assigned index set must be writable!");
-        } else if (!indexSet.getConfig().isRegularIndex()) {
-            throw new BadRequestException("Assigned index set is not usable");
-        }
+        checkIndexSet(indexSet);
 
-    final Set<StreamRule> streamRules = cr.rules().stream()
+        final Set<StreamRule> streamRules = cr.rules().stream()
                 .map(streamRule -> streamRuleService.create(null, streamRule))
                 .collect(Collectors.toSet());
         final String id = streamService.saveWithRulesAndOwnership(stream, streamRules, userContext.getUser());
 
-        final Map<String, String> result = ImmutableMap.of("stream_id", id);
+        var result = new StreamCreatedResponse(id);
         final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)
             .path("{streamId}")
             .build(id);
@@ -438,7 +435,7 @@ public class StreamResource extends RestResource {
     @POST
     @Path("/{streamId}/clone")
     @Timed
-    @ApiOperation(value = "Clone a stream")
+    @ApiOperation(value = "Clone a stream", response = StreamCreatedResponse.class)
     @ApiResponses(value = {
         @ApiResponse(code = 404, message = "Stream not found."),
         @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
@@ -491,7 +488,7 @@ public class StreamResource extends RestResource {
                 .collect(Collectors.toSet());
         streamService.addOutputs(savedStreamObjectId, outputIds);
 
-        final Map<String, String> result = ImmutableMap.of("stream_id", savedStreamId);
+        var result = new StreamCreatedResponse(savedStreamId);
         final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)
             .path("{streamId}")
             .build(savedStreamId);
