@@ -21,6 +21,4 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 public interface Sortable {
 
     SortSpec.Direction sort();
-
-    String columnName();
 }

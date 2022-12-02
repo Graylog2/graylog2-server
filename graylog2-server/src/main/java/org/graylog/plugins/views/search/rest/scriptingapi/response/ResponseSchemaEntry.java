@@ -42,6 +42,10 @@ public record ResponseSchemaEntry(
         return new ResponseSchemaEntry(ResponseEntryType.METRIC, dataType, functionName, fieldName);
     }
 
+    public static ResponseSchemaEntry field(String fieldName, ResponseEntryDataType dataType) {
+        return new ResponseSchemaEntry(ResponseEntryType.FIELD, dataType, null, fieldName);
+    }
+
     /**
      * @return Human readable label like:
      * grouping: http_method

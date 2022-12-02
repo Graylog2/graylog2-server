@@ -17,18 +17,16 @@
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
 import com.google.common.collect.ImmutableList;
-import org.apache.commons.collections.CollectionUtils;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.rest.SearchJobDTO;
-import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
-import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestSpec;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.Metadata;
-import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
+import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,19 +35,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class SearchJobToTabularResponseMapper {
+public class AggregationTabularResponseCreator implements TabularResponseCreator {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SearchJobToTabularResponseMapper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AggregationTabularResponseCreator.class);
 
-    public TabularResponse mapToResponse(SearchRequestSpec searchRequestSpec, SearchJob searchJob) throws AggregationFailedException {
+    public TabularResponse mapToResponse(final AggregationRequestSpec searchRequestSpec, final SearchJob searchJob) throws AggregationFailedException {
         final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
+
+
         final QueryResult queryResult = searchJobDTO.results().get(SearchRequestSpecToSearchMapper.QUERY_ID);
 
         if (queryResult != null) {
             throwErrorIfAnyAvailable(queryResult);
             final SearchType.Result aggregationResult = queryResult.searchTypes().get(AggregationSpecToPivotMapper.PIVOT_ID);
+
             if (aggregationResult instanceof PivotResult pivotResult) {
-                return mapToResponse(searchRequestSpec, pivotResult);
+                final List<SeriesSpec> seriesSpecs = extractSeriesSpec(queryResult);
+                return mapToResponse(searchRequestSpec, pivotResult, seriesSpecs);
             }
         }
 
@@ -57,26 +59,25 @@ public class SearchJobToTabularResponseMapper {
         throw new AggregationFailedException("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
     }
 
-    private TabularResponse mapToResponse(final SearchRequestSpec searchRequestSpec,
-                                          final PivotResult pivotResult) {
+    private List<SeriesSpec> extractSeriesSpec(QueryResult queryResult) {
+        return queryResult.query().searchTypes().stream().filter(t -> AggregationSpecToPivotMapper.PIVOT_ID.equals(t.id())).findFirst().stream()
+                .filter(searchType -> searchType instanceof Pivot)
+                .map(pivot -> (Pivot) pivot)
+                .flatMap(pivot -> pivot.series().stream())
+                .collect(Collectors.toList());
+    }
+
+    private TabularResponse mapToResponse(final AggregationRequestSpec searchRequestSpec,
+                                          final PivotResult pivotResult, List<SeriesSpec> seriesSpec) {
         return new TabularResponse(
-                getSchema(searchRequestSpec),
-                getDatarows(searchRequestSpec, pivotResult),
-                getMetadata(pivotResult)
+                searchRequestSpec.getSchema(),
+                getDatarows(searchRequestSpec, pivotResult, seriesSpec),
+                new Metadata(pivotResult.effectiveTimerange())
         );
     }
 
-    private static List<ResponseSchemaEntry> getSchema(SearchRequestSpec searchRequestSpec) {
-        final Stream<ResponseSchemaEntry> groupings = searchRequestSpec.groupings().stream()
-                .map(gr -> ResponseSchemaEntry.groupBy(gr.fieldName()));
-
-        final Stream<ResponseSchemaEntry> metrics = searchRequestSpec.metrics().stream()
-                .map(metric -> ResponseSchemaEntry.metric(metric.functionName(), metric.fieldName()));
-
-        return Stream.concat(groupings, metrics).collect(Collectors.toList());
-    }
-
-    private static List<List<Object>> getDatarows(SearchRequestSpec searchRequestSpec, PivotResult pivotResult) {
+    private static List<List<Object>> getDatarows(final AggregationRequestSpec searchRequestSpec,
+                                                  final PivotResult pivotResult, List<SeriesSpec> seriesSpecs) {
         final int numGroupings = searchRequestSpec.groupings().size();
 
         return pivotResult.rows()
@@ -87,30 +88,23 @@ public class SearchJobToTabularResponseMapper {
                             Collections.nCopies(numGroupings - pivRow.key().size(), "-").stream()  //sometimes pivotRow does not have enough keys - empty value!
                     );
 
-                    final Stream<Object> metrics = searchRequestSpec.metrics().stream()
-                            .map(m -> metricValue(pivRow.values(), m));
+                    final ImmutableList<PivotResult.Value> values = pivRow.values();
+                    final Stream<Object> metrics = seriesSpecs.stream().map(s -> metricValue(s, values));
 
                     return Stream.concat(groupings, metrics).collect(Collectors.toList());
                 })
                 .collect(Collectors.toList());
     }
 
-    private static Metadata getMetadata(PivotResult pivotResult) {
-        return new Metadata(pivotResult.effectiveTimerange());
-    }
-
-    private static Object metricValue(ImmutableList<PivotResult.Value> values, Metric metric) {
+    private static Object metricValue(SeriesSpec seriesSpec, ImmutableList<PivotResult.Value> values) {
         return values.stream()
-                .filter(value -> value.key().contains(metric.columnName()))
+                .filter(value -> isMetricValue(seriesSpec, value))
                 .findFirst()
                 .map(PivotResult.Value::value)
                 .orElse("-");
     }
 
-    private void throwErrorIfAnyAvailable(QueryResult queryResult) throws AggregationFailedException {
-        if (!CollectionUtils.isEmpty(queryResult.errors())) {
-            final String errorText = queryResult.errors().stream().map(SearchError::description).collect(Collectors.joining(", "));
-            throw new AggregationFailedException("Failed to obtain aggregation results. Reason:" + errorText);
-        }
+    private static boolean isMetricValue(SeriesSpec metric, PivotResult.Value value) {
+        return value.key().contains(metric.literal());
     }
 }

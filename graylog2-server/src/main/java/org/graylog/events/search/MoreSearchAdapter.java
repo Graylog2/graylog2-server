@@ -31,5 +31,5 @@ public interface MoreSearchAdapter {
     interface ScrollEventsCallback {
         void accept(List<ResultMessage> results, AtomicBoolean requestContinue) throws EventProcessorException;
     }
-    void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams, String scrollTime, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException;
+    void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException;
 }

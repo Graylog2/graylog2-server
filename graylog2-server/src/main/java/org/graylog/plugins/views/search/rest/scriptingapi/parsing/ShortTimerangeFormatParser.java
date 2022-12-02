@@ -53,6 +53,5 @@ class ShortTimerangeFormatParser {
             }
         }
         return Optional.empty();
-
     }
 }
