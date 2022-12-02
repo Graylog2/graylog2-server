@@ -21,9 +21,6 @@ import org.junit.Test;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 
-import java.util.Arrays;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class StringUtilsTest {
@@ -40,11 +37,11 @@ public class StringUtilsTest {
 
     @Test
     public void testSplitOnComma() {
-        Assertions.assertThat(StringUtils.splitOnComma(ImmutableList.of("one", "two,three")))
+        Assertions.assertThat(StringUtils.splitByComma(ImmutableList.of("one", "two,three")))
                 .hasSize(3)
                 .containsExactlyInAnyOrder("one", "two", "three");
 
-        Assertions.assertThat(StringUtils.splitOnComma(ImmutableSet.of("one", "two,three")))
+        Assertions.assertThat(StringUtils.splitByComma(ImmutableSet.of("one", "two,three")))
                 .hasSize(3)
                 .containsExactlyInAnyOrder("one", "two", "three");
 

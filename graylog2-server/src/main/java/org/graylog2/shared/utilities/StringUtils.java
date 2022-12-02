@@ -47,11 +47,11 @@ public final class StringUtils {
         return StringUtils.f("%.1f %s", bytes / Math.pow(base, exponent), unit);
     }
 
-    public static Set<String> splitOnComma(Set<String> values) {
+    public static Set<String> splitByComma(Set<String> values) {
         return split(values.stream()).collect(Collectors.toSet());
     }
 
-    public static List<String> splitOnComma(List<String> values) {
+    public static List<String> splitByComma(List<String> values) {
         return split(values.stream()).collect(Collectors.toList());
     }
 

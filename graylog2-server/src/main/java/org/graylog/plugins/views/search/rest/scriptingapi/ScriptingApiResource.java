@@ -38,6 +38,7 @@ import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularRespon
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.utilities.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -56,7 +57,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-import static org.graylog2.shared.utilities.StringUtils.splitOnComma;
+import static org.graylog2.shared.utilities.StringUtils.splitByComma;
 
 @Api(value = "ScriptingApi", tags = {CLOUD_VISIBLE})
 @Path("/search")
@@ -124,9 +125,9 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
 
         try {
             MessagesRequestSpec messagesRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(query,
-                    splitOnComma(streams),
+                    StringUtils.splitByComma(streams),
                     timerangeKeyword,
-                    splitOnComma(fields),
+                    splitByComma(fields),
                     from,
                     size);
             return executeQuery(messagesRequestSpec, searchUser);
@@ -171,10 +172,10 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
         try {
             AggregationRequestSpec aggregationRequestSpec = queryParamsToFullRequestSpecificationMapper.simpleQueryParamsToFullRequestSpecification(
                     query,
-                    splitOnComma(streams),
+                    StringUtils.splitByComma(streams),
                     timerangeKeyword,
                     groups,
-                    splitOnComma(metrics)
+                    splitByComma(metrics)
             );
             return executeQuery(aggregationRequestSpec, searchUser);
         } catch (IllegalArgumentException ex) {
