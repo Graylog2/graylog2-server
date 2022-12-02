@@ -17,13 +17,37 @@
 package org.graylog.plugins.views.search.rest.scriptingapi.response;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.apache.commons.lang.StringUtils;
 
+import java.util.Arrays;
 import java.util.Locale;
+import java.util.Set;
 
 public enum ResponseEntryDataType {
-    STRING,
-    NUMERIC,
-    UNKNOWN;//TODO: may be temporary
+    STRING(Set.of("keyword", "text")),
+    NUMERIC(Set.of("long", "integer", "short", "byte", "double", "float", "half_float", "scaled_float")),
+    DATE(Set.of("date")),
+    BOOLEAN(Set.of("boolean")),
+    BINARY(Set.of("binary")),
+    IP(Set.of("ip")),
+    GEO(Set.of("geo_point", "geo_shape")),
+    UNKNOWN(Set.of());
+
+    private final Set<String> correspondingSearchEngineTypes;
+
+    ResponseEntryDataType(Set<String> correspondingSearchEngineTypes) {
+        this.correspondingSearchEngineTypes = correspondingSearchEngineTypes;
+    }
+
+    public static ResponseEntryDataType fromSearchEngineType(final String type) {
+        if (StringUtils.isBlank(type)) {
+            return UNKNOWN;
+        }
+        return Arrays.stream(ResponseEntryDataType.values())
+                .filter(dataType -> dataType.correspondingSearchEngineTypes.contains(type))
+                .findFirst()
+                .orElse(UNKNOWN);
+    }
 
     @JsonValue
     @Override

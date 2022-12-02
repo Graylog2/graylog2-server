@@ -42,6 +42,13 @@ import StatusCell from './StatusCell';
 
 import CreateStreamButton from '../CreateStreamButton';
 
+type SearchParams = {
+  page: number,
+  pageSize: number,
+  query: string,
+  sort: Sort
+}
+
 const DefaultLabel = styled(Label)`
   display: inline-flex;
   margin-left: 5px;
@@ -56,14 +63,7 @@ const COLUMN_DEFINITIONS = [
   { id: 'disabled', title: 'Status', sortable: true },
 ];
 
-const VISIBLE_COLUMNS = ['title', 'description', 'index_set_id', 'throughput', 'disabled'];
-
-type SearchParams = {
-  page: number,
-  pageSize: number,
-  query: string,
-  sort: Sort
-}
+const INITIAL_COLUMNS = ['title', 'description', 'index_set_id', 'throughput', 'disabled'];
 
 const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stream> => ({
   title: {
@@ -76,13 +76,15 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
   },
   index_set_id: {
     renderCell: (stream) => <IndexSetCell indexSets={indexSets} stream={stream} />,
+    width: 0.7,
   },
   throughput: {
     renderCell: (stream) => <ThroughputCell stream={stream} />,
+    staticWidth: 120,
   },
   disabled: {
     renderCell: (stream) => <StatusCell stream={stream} />,
-    width: '100px',
+    staticWidth: 100,
   },
 });
 
@@ -132,6 +134,7 @@ type Props = {
 }
 
 const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
+  const [visibleColumns, setVisibleColumns] = useState(INITIAL_COLUMNS);
   const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
   const [searchParams, setSearchParams] = useState<SearchParams>({
     page: paginationQueryParameter.page,
@@ -168,6 +171,10 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   const onReset = useCallback(() => {
     onSearch('');
   }, [onSearch]);
+
+  const onColumnsChange = useCallback((newVisibleColumns: Array<string>) => {
+    setVisibleColumns(newVisibleColumns);
+  }, []);
 
   const onSortChange = useCallback((newSort: Sort) => {
     setSearchParams((cur) => ({ ...cur, sort: newSort }));
@@ -218,8 +225,8 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
           )
           : (
             <EntityDataTable data={streams}
-                             total={total}
-                             visibleColumns={VISIBLE_COLUMNS}
+                             visibleColumns={visibleColumns}
+                             onColumnsChange={onColumnsChange}
                              onSortChange={onSortChange}
                              bulkActions={renderBulkActions}
                              activeSort={searchParams.sort}

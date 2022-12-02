@@ -26,7 +26,7 @@ const DefaultColumnRenderers = {
         {entity.description}
       </TextOverflowEllipsis>
     ),
-    maxWidth: '30vw',
+    width: 2,
   },
 };
 

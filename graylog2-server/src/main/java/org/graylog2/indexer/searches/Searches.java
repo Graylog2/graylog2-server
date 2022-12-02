@@ -28,9 +28,9 @@ import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
+import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
-import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.timeranges.TimeRanges;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -105,7 +105,7 @@ public class Searches {
     }
 
     @Deprecated
-    public ScrollResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter, int batchSize) {
+    public ChunkedResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter, int batchSize) {
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
         final Set<String> indexWildcards = indexSetRegistry.getForIndices(affectedIndices).stream()
                 .map(IndexSet::getIndexWildcard)
@@ -113,7 +113,7 @@ public class Searches {
 
         final Sorting sorting = new Sorting("_doc", Sorting.Direction.ASC);
 
-        ScrollCommand.Builder scrollCommandBuilder = ScrollCommand.builder()
+        ChunkCommand.Builder scrollCommandBuilder = ChunkCommand.builder()
                 .query(query)
                 .range(range)
                 .offset(offset)
@@ -124,9 +124,9 @@ public class Searches {
 
         // limit > 0 instead of ScrollCommand.NO_LIMIT is a fix for #9817, the caller of this method are only in the legacy-API
         scrollCommandBuilder = limit > 0 ? scrollCommandBuilder.limit(limit) : scrollCommandBuilder;
-        scrollCommandBuilder = batchSize != ScrollCommand.NO_BATCHSIZE ? scrollCommandBuilder.batchSize(batchSize) : scrollCommandBuilder;
+        scrollCommandBuilder = batchSize != ChunkCommand.NO_BATCHSIZE ? scrollCommandBuilder.batchSize(batchSize) : scrollCommandBuilder;
 
-        final ScrollResult result = searchesAdapter.scroll(scrollCommandBuilder.build());
+        final ChunkedResult result = searchesAdapter.scroll(scrollCommandBuilder.build());
 
         recordEsMetrics(result.tookMs(), range);
 

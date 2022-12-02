@@ -21,7 +21,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuil
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
-import org.graylog2.indexer.searches.ScrollCommand;
+import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Message;
@@ -57,10 +57,10 @@ public class SearchRequestFactory {
         return create(SearchCommand.from(config));
     }
 
-    public SearchSourceBuilder create(final ScrollCommand scrollCommand) {
-        final SearchSourceBuilder searchSourceBuilder = create(SearchCommand.from(scrollCommand));
-        searchSourceBuilder.fetchSource(scrollCommand.fields().toArray(new String[0]), new String[0]);
-        scrollCommand.batchSize()
+    public SearchSourceBuilder create(final ChunkCommand chunkCommand) {
+        final SearchSourceBuilder searchSourceBuilder = create(SearchCommand.from(chunkCommand));
+        searchSourceBuilder.fetchSource(chunkCommand.fields().toArray(new String[0]), new String[0]);
+        chunkCommand.batchSize()
                 .ifPresent(batchSize -> searchSourceBuilder.size(Math.toIntExact(batchSize)));
         return searchSourceBuilder;
     }

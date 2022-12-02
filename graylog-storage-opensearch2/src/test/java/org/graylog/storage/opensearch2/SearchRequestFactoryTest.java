@@ -17,7 +17,7 @@
 package org.graylog.storage.opensearch2;
 
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
-import org.graylog2.indexer.searches.ScrollCommand;
+import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +39,7 @@ class SearchRequestFactoryTest {
 
     @Test
     void searchIncludesTimerange() {
-        final SearchSourceBuilder search = this.searchRequestFactory.create(ScrollCommand.builder()
+        final SearchSourceBuilder search = this.searchRequestFactory.create(ChunkCommand.builder()
                 .indices(Collections.singleton("graylog_0"))
                 .range(AbsoluteRange.create(
                         DateTime.parse("2020-07-23T11:03:32.243Z"),
@@ -57,7 +57,7 @@ class SearchRequestFactoryTest {
 
     @Test
     void scrollSearchDoesNotHighlgiht() {
-        final SearchSourceBuilder search = this.searchRequestFactory.create(ScrollCommand.builder()
+        final SearchSourceBuilder search = this.searchRequestFactory.create(ChunkCommand.builder()
                 .indices(Collections.singleton("graylog_0"))
                 .range(AbsoluteRange.create(
                         DateTime.parse("2020-07-23T11:03:32.243Z"),
@@ -70,7 +70,7 @@ class SearchRequestFactoryTest {
 
     @Test
     void searchIncludesProperSourceFields() {
-        final SearchSourceBuilder search = this.searchRequestFactory.create(ScrollCommand.builder()
+        final SearchSourceBuilder search = this.searchRequestFactory.create(ChunkCommand.builder()
                 .indices(Collections.singleton("graylog_0"))
                 .range(AbsoluteRange.create(
                         DateTime.parse("2020-07-23T11:03:32.243Z"),
@@ -89,7 +89,7 @@ class SearchRequestFactoryTest {
 
     @Test
     void searchIncludesSize() {
-        final SearchSourceBuilder search = this.searchRequestFactory.create(ScrollCommand.builder()
+        final SearchSourceBuilder search = this.searchRequestFactory.create(ChunkCommand.builder()
                 .indices(Collections.singleton("graylog_0"))
                 .range(AbsoluteRange.create(
                         DateTime.parse("2020-07-23T11:03:32.243Z"),

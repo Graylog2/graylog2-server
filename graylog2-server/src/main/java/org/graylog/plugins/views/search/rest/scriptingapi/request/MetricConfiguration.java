@@ -16,11 +16,5 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.request;
 
-import java.util.Optional;
-
 public interface MetricConfiguration {
-
-    default Optional<String> columnName(final Metric metric) {
-        return Optional.empty();
-    }
 }

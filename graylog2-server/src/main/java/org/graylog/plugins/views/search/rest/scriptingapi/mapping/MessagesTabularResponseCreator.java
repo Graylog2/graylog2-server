@@ -19,6 +19,8 @@ package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.SearchJobDTO;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.Metadata;
@@ -27,14 +29,27 @@ import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class MessagesTabularResponseCreator implements TabularResponseCreator {
 
     private static final Logger LOG = LoggerFactory.getLogger(MessagesTabularResponseCreator.class);
 
-    public TabularResponse mapToResponse(final MessagesRequestSpec messagesRequestSpec, final SearchJob searchJob) throws AggregationFailedException {
+    private final FieldTypesLookup fieldTypesLookup;
+
+    @Inject
+    public MessagesTabularResponseCreator(final FieldTypesLookup fieldTypesLookup) {
+        this.fieldTypesLookup = fieldTypesLookup;
+    }
+
+    public TabularResponse mapToResponse(final MessagesRequestSpec messagesRequestSpec,
+                                         final SearchJob searchJob,
+                                         final SearchUser searchUser) throws AggregationFailedException {
         final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
         final QueryResult queryResult = searchJobDTO.results().get(SearchRequestSpecToSearchMapper.QUERY_ID);
 
@@ -42,7 +57,7 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
             throwErrorIfAnyAvailable(queryResult);
             final SearchType.Result messageListResult = queryResult.searchTypes().get(MessagesSpecToMessageListMapper.MESSAGE_LIST_ID);
             if (messageListResult instanceof MessageList.Result messagesResult) {
-                return mapToResponse(messagesRequestSpec, messagesResult);
+                return mapToResponse(messagesRequestSpec, messagesResult, searchUser);
             }
         }
 
@@ -51,9 +66,13 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
     }
 
     private TabularResponse mapToResponse(final MessagesRequestSpec searchRequestSpec,
-                                          final MessageList.Result messageListResult) {
+                                          final MessageList.Result messageListResult,
+                                          final SearchUser searchUser) {
+        final Set<String> streams = searchUser.streams().readableOrAllIfEmpty(searchRequestSpec.streams());
+        final Map<String, String> fieldTypes = fieldTypesLookup.getTypes(streams, new HashSet<>(searchRequestSpec.fields()));
+
         return new TabularResponse(
-                searchRequestSpec.getSchema(),
+                searchRequestSpec.getSchema(fieldTypes),
                 getDatarows(searchRequestSpec, messageListResult),
                 new Metadata(messageListResult.effectiveTimerange())
         );
