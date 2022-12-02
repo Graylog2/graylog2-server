@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,6 +42,7 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
@@ -97,6 +99,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -505,6 +508,17 @@ public class StreamResource extends RestResource {
             checkPermission(RestPermissions.STREAMS_EDIT, streamId);
             checkNotEditableStream(streamId, "The stream with id <" + streamId + "> cannot be edited.");
         });
+
+        final Set<String> existingStreams = streamService.loadByIds(streamIds)
+                .stream()
+                .map(Persisted::getId)
+                .collect(Collectors.toSet());
+
+        final Set<String> missingStreams = Sets.difference(new HashSet<>(streamIds), existingStreams);
+
+        if (!missingStreams.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Missing streams: " + missingStreams).build();
+        }
 
         return indexSetRegistry.get(indexSetId)
                 .map(indexSet -> {
