@@ -186,7 +186,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
                           matchProp="label"
                           value={_activeSelection()}
                           onChange={_onSelect}
-                          clearable={false}/>
+                          clearable={false} />
           </Input>
         </Col>
       </Row>
