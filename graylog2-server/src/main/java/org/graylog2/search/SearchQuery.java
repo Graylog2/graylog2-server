@@ -113,14 +113,14 @@ public class SearchQuery {
     private List<Bson> toBson(String field, List<SearchQueryParser.FieldValue> values) {
         return values.stream()
                 .map(value -> value.getOperator().buildBson(field, value.getValue()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<SearchQueryParser.FieldValue> selectValues(Collection<SearchQueryParser.FieldValue> values,
                                                             Function<SearchQueryParser.FieldValue, Boolean> callback) {
         return values.stream()
                 .filter(callback::apply)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public String getQueryString() {

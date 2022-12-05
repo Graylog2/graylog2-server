@@ -75,7 +75,7 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
         final List<StreamDTO> streamsList = StreamSupport.stream(result.spliterator(), false)
                 .map(StreamDTO::fromDocument)
                 .filter(filter)
-                .collect(Collectors.toList());
+                .toList();
 
         final long grandTotal = db.find(DBQuery.empty()).toArray()
                 .stream()
@@ -86,7 +86,7 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
                 ? streamsList.stream()
                     .skip((long) perPage * Math.max(0, page - 1))
                     .limit(perPage)
-                    .collect(Collectors.toList())
+                    .toList()
                 : streamsList;
 
         return new PaginatedList<>(paginatedStreams, streamsList.size(), page, perPage, grandTotal);
