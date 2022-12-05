@@ -57,7 +57,7 @@ values described above will no longer be used.
 Unless user-specified defaults are specified, the following new defaults will be effective for all new index sets created:
 
 - Shards: 1 (previously 4 in many cases)
-- Rotation Strategy: Index Size - 10GB (previously Index Time [1D] in many cases)
+- Rotation Strategy: Index Size - 30GB (previously Index Time [1D] in many cases)
 """
 
 details.ops = """
