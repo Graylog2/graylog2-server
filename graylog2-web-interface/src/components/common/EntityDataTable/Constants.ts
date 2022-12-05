@@ -15,19 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React from 'react';
-
-import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
-
-const DefaultColumnRenderers = {
-  description: {
-    renderCell: (entity: { description: string }) => (
-      <TextOverflowEllipsis>
-        {entity.description}
-      </TextOverflowEllipsis>
-    ),
-    width: 2,
-  },
-};
-
-export default DefaultColumnRenderers;
+export const CELL_PADDING = 5; // px
+export const BULK_SELECT_COLUMN_WIDTH = 20; // px
+export const DEFAULT_COL_MIN_WIDTH = 150; // px
+export const DEFAULT_COL_WIDTH = 1; // fraction, similar to CSS unit fr.

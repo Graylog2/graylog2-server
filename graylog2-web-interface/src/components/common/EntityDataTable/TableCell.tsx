@@ -16,14 +16,8 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
-import styled, { css } from 'styled-components';
 
 import type { Column, ColumnRenderer } from './types';
-
-const Td = styled.td<{ $width: string | undefined, $maxWidth: string| undefined }>(({ $width, $maxWidth }) => css`
-  width: ${$width ?? 'auto'};
-  max-width: ${$maxWidth ?? 'none'};
-`);
 
 const TableCell = <Entity extends { id: string }>({
   column,
@@ -31,7 +25,7 @@ const TableCell = <Entity extends { id: string }>({
   entity,
 }: {
   column: Column
-  columnRenderer: ColumnRenderer<Entity>,
+  columnRenderer: ColumnRenderer<Entity> | undefined,
   entity: Entity,
 }) => {
   const content = useMemo(
@@ -39,11 +33,7 @@ const TableCell = <Entity extends { id: string }>({
     [column, columnRenderer, entity],
   );
 
-  return (
-    <Td $width={columnRenderer?.width} $maxWidth={columnRenderer?.maxWidth}>
-      {content}
-    </Td>
-  );
+  return (<td>{content}</td>);
 };
 
 export default TableCell;
