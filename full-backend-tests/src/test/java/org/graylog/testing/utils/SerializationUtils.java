@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.aggregations;
+package org.graylog.testing.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,8 +23,8 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-class AggregationTestHelpers {
-    static InputStream serialize(Object request) {
+public class SerializationUtils {
+    public static InputStream serialize(Object request) {
         try {
             final ObjectMapper objectMapper = new ObjectMapperProvider().get();
             return new ByteArrayInputStream(objectMapper.writeValueAsBytes(request));
