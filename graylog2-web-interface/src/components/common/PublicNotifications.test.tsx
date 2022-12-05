@@ -134,4 +134,14 @@ describe('PublicNotifications', () => {
 
     expect(alerts.length).toBe(1);
   });
+
+  it('should render from AppConfig when no plugins are configured', () => {
+    asMock(usePluginEntities).mockImplementation(() => ([]));
+
+    render(<PublicNotifications readFromConfig />);
+
+    const alerts = screen.getAllByRole('alert');
+
+    expect(alerts.length).toBe(1);
+  });
 });
