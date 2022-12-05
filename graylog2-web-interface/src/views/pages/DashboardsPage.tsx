@@ -27,11 +27,10 @@ import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import useDashboards from 'views/logic/dashboards/useDashboards';
 import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
+import DocsHelper from 'util/DocsHelper';
 
 import type View from '../logic/views/View';
 import { DashboardsActions } from '../stores/DashboardsStore';
-
-import DocsHelper from 'util/DocsHelper';
 
 // eslint-disable-next-line no-alert
 const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
