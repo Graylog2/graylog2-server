@@ -18,6 +18,7 @@ package org.graylog2.streams;
 
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
+import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
@@ -30,18 +31,11 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
-@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5)
+@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, serverLifecycle = Lifecycle.CLASS)
 public class StreamsIT {
     private static final String STREAMS_RESOURCE = "/streams";
 
     private final RequestSpecification requestSpec;
-
-    private String defaultIndexSetId;
-    private String newIndexSetId;
-    private String newIndexSetId2;
-    private String stream1Id;
-    private String stream2Id;
-    private String stream3Id;
 
     public StreamsIT(RequestSpecification requestSpec) {
         this.requestSpec = requestSpec;
@@ -49,12 +43,12 @@ public class StreamsIT {
 
     @BeforeAll
     void beforeAll() {
-        this.defaultIndexSetId = IndexSetUtils.defaultIndexSetId(requestSpec);
-        this.newIndexSetId = IndexSetUtils.createIndexSet(requestSpec, "Test Indices", "Some test indices", "test");
-        this.newIndexSetId2 = IndexSetUtils.createIndexSet(requestSpec, "More Test Indices", "Some more test indices", "moretest");
-        this.stream1Id = StreamUtils.createStream(requestSpec, "New Stream", newIndexSetId);
-        this.stream2Id = StreamUtils.createStream(requestSpec, "New Stream 2", defaultIndexSetId);
-        this.stream3Id = StreamUtils.createStream(requestSpec, "New Stream 3", newIndexSetId2);
+        final String defaultIndexSetId = IndexSetUtils.defaultIndexSetId(requestSpec);
+        final String newIndexSetId = IndexSetUtils.createIndexSet(requestSpec, "Test Indices", "Some test indices", "streamstest");
+        final String newIndexSetId2 = IndexSetUtils.createIndexSet(requestSpec, "More Test Indices", "Some more test indices", "moretest");
+        StreamUtils.createStream(requestSpec, "New Stream", newIndexSetId);
+        StreamUtils.createStream(requestSpec, "New Stream 2", defaultIndexSetId);
+        StreamUtils.createStream(requestSpec, "New Stream 3", newIndexSetId2);
     }
 
     @ContainerMatrixTest
