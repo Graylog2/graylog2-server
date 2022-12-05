@@ -90,7 +90,7 @@ public class ElasticsearchConfiguration {
 
     // Rotation
     @Parameter(value = "elasticsearch_max_size_per_index", validator = PositiveLongValidator.class, required = true)
-    private long maxSizePerIndex = 10L * 1024 * 1024 * 1024; // 10GB
+    private long maxSizePerIndex = 30L * 1024 * 1024 * 1024; // 30GB
 
     // Retention
     @Parameter(value = "elasticsearch_max_number_of_indices", required = true, validator = PositiveIntegerValidator.class)

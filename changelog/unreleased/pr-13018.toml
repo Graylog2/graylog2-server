@@ -70,23 +70,23 @@ curl 'http://graylog-server:8080/api/system/indices/index_set_defaults' \
   -H 'X-Requested-By: my-api-request' \
   --data-raw '
   {
-     "index_analyzer":"standard",
-     "shards":5,
-     "replicas":5,
-     "index_optimization_max_num_segments":1,
-     "index_optimization_disabled":false,
-     "field_type_refresh_interval":28,
-     "field_type_refresh_interval_unit":"SECONDS",
-     "rotation_strategy_class":"org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
-     "rotation_strategy_config":{
-        "type":"org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
-        "max_docs_per_index":10
-     },
-     "retention_strategy_class":"org.graylog2.indexer.retention.strategies.ClosingRetentionStrategy",
-     "retention_strategy_config":{
-        "max_number_of_indices":10,
-        "type":"org.graylog2.indexer.retention.strategies.ClosingRetentionStrategyConfig"
-     }
+    "index_analyzer": "standard",
+    "shards": 1,
+    "replicas": 0,
+    "index_optimization_max_num_segments": 1,
+    "index_optimization_disabled": false,
+    "field_type_refresh_interval": 300,
+    "field_type_refresh_interval_unit": "SECONDS",
+    "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy",
+    "rotation_strategy_config": {
+      "type": "org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategyConfig",
+      "max_size": 32212254720
+    },
+    "retention_strategy_class": "org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy",
+    "retention_strategy_config": {
+      "type": "org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig",
+      "max_number_of_indices": 20
+    }
   }'
 ```
 """
