@@ -29,76 +29,74 @@ type Props = {
   onReset: () => void,
 };
 
-const SidecarSearchForm = ({ query, onSearch, onReset, children }: Props) => {
-  const queryHelpPopover = (
-    <Popover id="search-query-help" className={style.popoverWide} title="Search Syntax Help">
-      <p><strong>Available search fields</strong></p>
-      <Table condensed>
-        <thead>
-          <tr>
-            <th>Field</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>name</td>
-            <td>Sidecar name</td>
-          </tr>
-          <tr>
-            <td>status</td>
-            <td>Status of the sidecar as it appears in the list, i.e. running, failing, or unknown</td>
-          </tr>
-          <tr>
-            <td>operating_system</td>
-            <td>Operating system the sidecar is running on</td>
-          </tr>
-          <tr>
-            <td>last_seen</td>
-            <td>Date and time when the sidecar last communicated with Graylog</td>
-          </tr>
-          <tr>
-            <td>node_id</td>
-            <td>Identifier of the sidecar</td>
-          </tr>
-          <tr>
-            <td>sidecar_version</td>
-            <td>Sidecar version</td>
-          </tr>
-        </tbody>
-      </Table>
-      <p><strong>Examples</strong></p>
-      <p>
-        Find sidecars that did not communicate with Graylog since a date:<br />
-        <kbd>{'last_seen:<=2018-04-10'}</kbd><br />
-      </p>
-      <p>
-        Find sidecars with <code>failing</code> or <code>unknown</code> status:<br />
-        <kbd>status:failing status:unknown</kbd><br />
-      </p>
-    </Popover>
-  );
+const queryHelpPopover = (
+  <Popover id="search-query-help" className={style.popoverWide} title="Search Syntax Help">
+    <p><strong>Available search fields</strong></p>
+    <Table condensed>
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>name</td>
+          <td>Sidecar name</td>
+        </tr>
+        <tr>
+          <td>status</td>
+          <td>Status of the sidecar as it appears in the list, i.e. running, failing, or unknown</td>
+        </tr>
+        <tr>
+          <td>operating_system</td>
+          <td>Operating system the sidecar is running on</td>
+        </tr>
+        <tr>
+          <td>last_seen</td>
+          <td>Date and time when the sidecar last communicated with Graylog</td>
+        </tr>
+        <tr>
+          <td>node_id</td>
+          <td>Identifier of the sidecar</td>
+        </tr>
+        <tr>
+          <td>sidecar_version</td>
+          <td>Sidecar version</td>
+        </tr>
+      </tbody>
+    </Table>
+    <p><strong>Examples</strong></p>
+    <p>
+      Find sidecars that did not communicate with Graylog since a date:<br />
+      <kbd>last_seen:&lt;=2018-04-10</kbd><br />
+    </p>
+    <p>
+      Find sidecars with <code>failing</code> or <code>unknown</code> status:<br />
+      <kbd>status:failing status:unknown</kbd><br />
+    </p>
+  </Popover>
+);
 
-  const queryHelp = (
-    <OverlayTrigger trigger="click" rootClose placement="right" overlay={queryHelpPopover}>
-      <Button bsStyle="link"><Icon name="question-circle" /></Button>
-    </OverlayTrigger>
-  );
+const queryHelp = (
+  <OverlayTrigger trigger="click" rootClose placement="right" overlay={queryHelpPopover}>
+    <Button bsStyle="link"><Icon name="question-circle" /></Button>
+  </OverlayTrigger>
+);
 
-  return (
-    <SearchForm query={query}
-                onSearch={onSearch}
-                onReset={onReset}
-                searchButtonLabel="Find"
-                placeholder="Find sidecars"
-                queryWidth={400}
-                queryHelpComponent={queryHelp}
-                topMargin={0}
-                useLoadingState>
-      {children}
-    </SearchForm>
-  );
-};
+const SidecarSearchForm = ({ query, onSearch, onReset, children }: Props) => (
+  <SearchForm query={query}
+              onSearch={onSearch}
+              onReset={onReset}
+              searchButtonLabel="Find"
+              placeholder="Find sidecars"
+              queryWidth={400}
+              queryHelpComponent={queryHelp}
+              topMargin={0}
+              useLoadingState>
+    {children}
+  </SearchForm>
+);
 
 SidecarSearchForm.propTypes = {
   query: PropTypes.string.isRequired,
