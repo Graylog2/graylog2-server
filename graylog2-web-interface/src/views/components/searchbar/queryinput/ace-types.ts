@@ -20,10 +20,23 @@ export type Token = {
   value: string,
 };
 
+type EventName = 'tokenizerUpdate';
+
+type Tokenizer = {
+  bgTokenizer: {
+    currentLine: number,
+    lines: Array<Array<Line>>,
+  }
+};
+type EventCallback = {
+  tokenizerUpdate: (input: string, tokenizer: Tokenizer) => void,
+};
+
 export type Session = {
   getTokens: (no: number) => Array<Token>,
   getTokenAt: (no: number, idx: number) => Token | undefined | null,
   getValue: () => string,
+  on: <T extends EventName>(event: T, cb: EventCallback[T]) => void,
 };
 
 export type Renderer = {
@@ -60,6 +73,7 @@ export type Editor = {
   completer: Completer,
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   completers: Array<AutoCompleter>,
+  execCommand: (command: string) => void,
   session: Session,
   renderer: Renderer,
   setFontSize: (newFontSize: number) => void,
@@ -89,5 +103,5 @@ export type Line = {
 
 export interface AutoCompleter {
   getCompletions(editor: Editor, session: Session, position: Position, prefix: string, callback: ResultsCallback): void;
-  shouldShowCompletions(currentLine, lines): boolean;
+  shouldShowCompletions(currentLine: number, lines: Array<Array<Line>>): boolean;
 }
