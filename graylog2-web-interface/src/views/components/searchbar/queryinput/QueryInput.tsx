@@ -118,7 +118,7 @@ const _onLoadEditor = (editor, isInitialTokenizerUpdate: React.MutableRefObject<
 // This is necessary for configuration options which rely on external data.
 // Unfortunately it is not possible to configure for example the command once
 // with the `onLoad` or `commands` prop, because the reference for the related function will be outdated.
-const _updateEditorConfiguration = (node, completer, onExecute) => {
+const _updateEditorConfiguration = (node: { editor: Editor; }, completer: AutoCompleter, onExecute: (editor: Editor) => void) => {
   const editor = node && node.editor;
 
   if (editor) {
@@ -201,7 +201,7 @@ const QueryInput = ({
     isValidating,
     validate,
   }), [onExecuteProp, value, error, disableExecution, isValidating, validate]);
-  const updateEditorConfiguration = useCallback((node) => _updateEditorConfiguration(node, completer, onExecute), [onExecute, completer]);
+  const updateEditorConfiguration = useCallback((node: { editor: Editor }) => _updateEditorConfiguration(node, completer, onExecute), [onExecute, completer]);
   const _onChange = useCallback((newQuery) => {
     onChange({ target: { value: newQuery, name } });
 
