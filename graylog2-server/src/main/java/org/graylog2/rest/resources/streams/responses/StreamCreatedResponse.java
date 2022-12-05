@@ -14,19 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.plugin.indexer.retention;
+package org.graylog2.rest.resources.streams.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = RetentionStrategyConfig.TYPE_FIELD, visible = true)
-public interface RetentionStrategyConfig {
-    String TYPE_FIELD = "type";
-    String MAX_NUMBER_OF_INDEXES_FIELD = "max_number_of_indices";
-
-    @JsonProperty(TYPE_FIELD)
-    String type();
-
-    @JsonProperty(MAX_NUMBER_OF_INDEXES_FIELD)
-    int maxNumberOfIndices();
+public record StreamCreatedResponse(@JsonProperty("stream_id") String streamId) {
 }
