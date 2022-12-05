@@ -93,7 +93,7 @@ const DashboardsPage = () => {
       </PageHeader>
       <Row className="content">
         <Col md={12}>
-          {!!list?.length && !searchQuery
+          {!list?.length && !searchQuery
             ? noDashboardsFound
             : (
               <DashboardList dashboards={list}
