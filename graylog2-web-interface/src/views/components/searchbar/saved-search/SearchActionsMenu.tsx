@@ -43,7 +43,7 @@ import {
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 
 import SavedSearchForm from './SavedSearchForm';
-import SavedSearchList from './SavedSearchList';
+import SavedSearchesModal from './SavedSearchesModal';
 
 const Container = styled(ButtonGroup)`
   display: flex;
@@ -169,9 +169,9 @@ const SearchActionsMenu = () => {
         <Icon name="folder" type="regular" /> Load
       </Button>
       {showList && (
-        <SavedSearchList deleteSavedSearch={deleteSavedSearch}
-                         toggleModal={toggleListModal}
-                         activeSavedSearchId={view.id} />
+        <SavedSearchesModal deleteSavedSearch={deleteSavedSearch}
+                            toggleModal={toggleListModal}
+                            activeSavedSearchId={view.id} />
       )}
       <ShareButton entityType="search"
                    entityId={view.id}
