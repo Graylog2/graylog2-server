@@ -172,7 +172,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return eventDefinitionService.streamAll()
-                .filter(ed -> ed.config().isUserPresentable())
+                .filter(ed -> ed.config().isContentPackExportable())
                 .map(this::createExcerpt)
                 .collect(Collectors.toSet());
     }
