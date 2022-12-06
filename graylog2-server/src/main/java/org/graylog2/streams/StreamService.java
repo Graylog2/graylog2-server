@@ -70,4 +70,6 @@ public interface StreamService extends PersistedService {
     void removeOutputFromAllStreams(Output output);
 
     List<Stream> loadAllWithIndexSet(String indexSetId);
+
+    void addToIndexSet(String indexSetId, Collection<String> streamIds);
 }
