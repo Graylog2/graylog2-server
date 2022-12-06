@@ -104,6 +104,7 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
           return [];
         }),
     );
+    console.log({ results });
     const uniqResults = uniqBy(sortBy(results.flat(), ['score', 'name']), 'name');
 
     callback(null, uniqResults);

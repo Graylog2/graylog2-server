@@ -147,7 +147,12 @@ const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
                        enableLiveAutocompletion={enableAutocompletion}
                        onBlur={onBlur}
                        onChange={onChange}
-                       onExecute={onExecute} />
+                       onExecute={onExecute}
+                       setOptions={{
+                         enableBasicAutocompletion: true,
+                         enableLiveAutocompletion: true,
+                         enableSnippets: true,
+                       }} />
     );
   }
 

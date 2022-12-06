@@ -98,9 +98,16 @@ const _onLoadEditor = (editor, isInitialTokenizerUpdate: React.MutableRefObject<
     editor.commands.removeCommands(['find', 'indent', 'outdent']);
 
     editor.session.on('tokenizerUpdate', (_input, { bgTokenizer: { currentLine, lines } }) => {
+      console.log('session.on');
+
       if (!isInitialTokenizerUpdate.current) {
+        console.log('!isInitialTokenizerUpdate.current');
+
         editor.completers.forEach((completer) => {
+          console.log({ completer, currentLine, lines });
+
           if (completer?.shouldShowCompletions(currentLine, lines)) {
+            console.log('shouldShowCompletions');
             editor.execCommand('startAutocomplete');
           }
         });
@@ -191,6 +198,7 @@ const QueryInput = ({
   const isInitialTokenizerUpdate = useRef(true);
   const { enableSmartSearch } = useContext(UserPreferencesContext);
   const completer = useCompleter({ streams, timeRange, completerFactory, userTimezone });
+  // console.log({ completer });
   const onLoadEditor = useCallback((editor: Editor) => _onLoadEditor(editor, isInitialTokenizerUpdate), []);
   const onExecute = useCallback((editor: Editor) => handleExecution({
     editor,
@@ -203,6 +211,7 @@ const QueryInput = ({
   }), [onExecuteProp, value, error, disableExecution, isValidating, validate]);
   const updateEditorConfiguration = useCallback((node) => _updateEditorConfiguration(node, completer, onExecute), [onExecute, completer]);
   const _onChange = useCallback((newQuery) => {
+    console.log({ newQuery });
     onChange({ target: { value: newQuery, name } });
 
     return Promise.resolve(newQuery);
