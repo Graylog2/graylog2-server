@@ -38,6 +38,7 @@ import org.graylog2.rest.MoreMediaTypes;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.Csv;
@@ -637,6 +638,7 @@ public class ScriptingApiResourceIT {
 
     }
 
+    @Ignore("Unstable order of the messages causes random failures of the test")
     @ContainerMatrixTest
     void testMessagesGetRequestAscii() {
         final String response = given()
