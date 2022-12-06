@@ -49,11 +49,11 @@ import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.plugins.views.aggregations.AggregationTestHelpers.serialize;
 import static org.graylog.testing.containermatrix.SearchServer.ES7;
 import static org.graylog.testing.containermatrix.SearchServer.OS1;
 import static org.graylog.testing.containermatrix.SearchServer.OS2;
 import static org.graylog.testing.containermatrix.SearchServer.OS2_LATEST;
+import static org.graylog.testing.utils.SerializationUtils.serialize;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;

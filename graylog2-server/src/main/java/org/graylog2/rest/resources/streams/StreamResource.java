@@ -18,10 +18,9 @@ package org.graylog2.rest.resources.streams;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,6 +40,7 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
@@ -53,6 +53,7 @@ import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.streams.requests.CloneStreamRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
+import org.graylog2.rest.resources.streams.responses.StreamCreatedResponse;
 import org.graylog2.rest.resources.streams.responses.StreamListResponse;
 import org.graylog2.rest.resources.streams.responses.StreamPageListResponse;
 import org.graylog2.rest.resources.streams.responses.StreamResponse;
@@ -66,7 +67,6 @@ import org.graylog2.streams.PaginatedStreamService;
 import org.graylog2.streams.StreamDTO;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRouterEngine;
-import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
@@ -96,6 +96,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -159,7 +160,7 @@ public class StreamResource extends RestResource {
 
     @POST
     @Timed
-    @ApiOperation(value = "Create a stream")
+    @ApiOperation(value = "Create a stream", response = StreamCreatedResponse.class)
     @RequiresPermissions(RestPermissions.STREAMS_CREATE)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -171,18 +172,14 @@ public class StreamResource extends RestResource {
         stream.setDisabled(true);
 
         final IndexSet indexSet = stream.getIndexSet();
-        if (!indexSet.getConfig().isWritable()) {
-            throw new BadRequestException("Assigned index set must be writable!");
-        } else if (!indexSet.getConfig().isRegularIndex()) {
-            throw new BadRequestException("Assigned index set is not usable");
-        }
+        checkIndexSet(indexSet);
 
-    final Set<StreamRule> streamRules = cr.rules().stream()
+        final Set<StreamRule> streamRules = cr.rules().stream()
                 .map(streamRule -> streamRuleService.create(null, streamRule))
                 .collect(Collectors.toSet());
         final String id = streamService.saveWithRulesAndOwnership(stream, streamRules, userContext.getUser());
 
-        final Map<String, String> result = ImmutableMap.of("stream_id", id);
+        var result = new StreamCreatedResponse(id);
         final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)
             .path("{streamId}")
             .build(id);
@@ -316,7 +313,7 @@ public class StreamResource extends RestResource {
         }
 
         final Boolean removeMatchesFromDefaultStream = cr.removeMatchesFromDefaultStream();
-        if(removeMatchesFromDefaultStream != null) {
+        if (removeMatchesFromDefaultStream != null) {
             stream.setRemoveMatchesFromDefaultStream(removeMatchesFromDefaultStream);
         }
 
@@ -438,7 +435,7 @@ public class StreamResource extends RestResource {
     @POST
     @Path("/{streamId}/clone")
     @Timed
-    @ApiOperation(value = "Clone a stream")
+    @ApiOperation(value = "Clone a stream", response = StreamCreatedResponse.class)
     @ApiResponses(value = {
         @ApiResponse(code = 404, message = "Stream not found."),
         @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
@@ -457,32 +454,24 @@ public class StreamResource extends RestResource {
         final String creatorUser = getCurrentUser().getName();
 
         final List<StreamRule> sourceStreamRules = streamRuleService.loadForStream(sourceStream);
-        final ImmutableSet.Builder<StreamRule> newStreamRules = ImmutableSet.builderWithExpectedSize(sourceStreamRules.size());
-        for (StreamRule streamRule : sourceStreamRules) {
-            final Map<String, Object> streamRuleData = Maps.newHashMapWithExpectedSize(6);
+        final Set<StreamRule> newStreamRules = sourceStreamRules
+                .stream()
+                .map(streamRule -> streamRuleService.copy(null, streamRule))
+                .collect(Collectors.toSet());
 
-            streamRuleData.put(StreamRuleImpl.FIELD_TYPE, streamRule.getType().toInteger());
-            streamRuleData.put(StreamRuleImpl.FIELD_FIELD, streamRule.getField());
-            streamRuleData.put(StreamRuleImpl.FIELD_VALUE, streamRule.getValue());
-            streamRuleData.put(StreamRuleImpl.FIELD_INVERTED, streamRule.getInverted());
-            streamRuleData.put(StreamRuleImpl.FIELD_DESCRIPTION, streamRule.getDescription());
-
-            final StreamRule newStreamRule = streamRuleService.create(streamRuleData);
-            newStreamRules.add(newStreamRule);
-        }
-
-        final Map<String, Object> streamData = Maps.newHashMap();
-        streamData.put(StreamImpl.FIELD_TITLE, cr.title());
-        streamData.put(StreamImpl.FIELD_DESCRIPTION, cr.description());
-        streamData.put(StreamImpl.FIELD_CREATOR_USER_ID, creatorUser);
-        streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.nowUTC());
-        streamData.put(StreamImpl.FIELD_MATCHING_TYPE, sourceStream.getMatchingType().toString());
-        streamData.put(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, cr.removeMatchesFromDefaultStream());
-        streamData.put(StreamImpl.FIELD_DISABLED, true);
-        streamData.put(StreamImpl.FIELD_INDEX_SET_ID, cr.indexSetId());
+        final Map<String, Object> streamData = Map.of(
+            StreamImpl.FIELD_TITLE, cr.title(),
+            StreamImpl.FIELD_DESCRIPTION, cr.description(),
+            StreamImpl.FIELD_CREATOR_USER_ID, creatorUser,
+            StreamImpl.FIELD_CREATED_AT, Tools.nowUTC(),
+            StreamImpl.FIELD_MATCHING_TYPE, sourceStream.getMatchingType().toString(),
+            StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, cr.removeMatchesFromDefaultStream(),
+            StreamImpl.FIELD_DISABLED, true,
+            StreamImpl.FIELD_INDEX_SET_ID, cr.indexSetId()
+        );
 
         final Stream stream = streamService.create(streamData);
-        final String savedStreamId = streamService.saveWithRulesAndOwnership(stream, newStreamRules.build(), userContext.getUser());
+        final String savedStreamId = streamService.saveWithRulesAndOwnership(stream, newStreamRules, userContext.getUser());
         final ObjectId savedStreamObjectId = new ObjectId(savedStreamId);
 
         final Set<ObjectId> outputIds = sourceStream.getOutputs().stream()
@@ -491,12 +480,59 @@ public class StreamResource extends RestResource {
                 .collect(Collectors.toSet());
         streamService.addOutputs(savedStreamObjectId, outputIds);
 
-        final Map<String, String> result = ImmutableMap.of("stream_id", savedStreamId);
+        var result = new StreamCreatedResponse(savedStreamId);
         final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)
             .path("{streamId}")
             .build(savedStreamId);
 
         return Response.created(streamUri).entity(result).build();
+    }
+
+    @PUT
+    @Path("/indexSet/{indexSetId}")
+    @Timed
+    @ApiOperation(value = "Assign multiple streams to index set")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Index set not found.")
+    })
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @AuditEvent(type = AuditEventTypes.STREAM_UPDATE)
+    public Response assignToIndexSet(@ApiParam(name = "indexSetId", required = true) @PathParam("indexSetId") String indexSetId,
+                                    @ApiParam(name = "JSON body", required = true) @Valid @NotNull List<String> streamIds) {
+        checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
+        streamIds.forEach(streamId -> {
+            checkPermission(RestPermissions.STREAMS_EDIT, streamId);
+            checkNotEditableStream(streamId, "The stream with id <" + streamId + "> cannot be edited.");
+        });
+
+        final Set<String> existingStreams = streamService.loadByIds(streamIds)
+                .stream()
+                .map(Persisted::getId)
+                .collect(Collectors.toSet());
+
+        final Set<String> missingStreams = Sets.difference(new HashSet<>(streamIds), existingStreams);
+
+        if (!missingStreams.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Missing streams: " + missingStreams).build();
+        }
+
+        return indexSetRegistry.get(indexSetId)
+                .map(indexSet -> {
+                    checkIndexSet(indexSet);
+
+                    streamService.addToIndexSet(indexSetId, streamIds);
+                    return Response.ok().build();
+                })
+                .orElse(Response.status(Response.Status.NOT_FOUND).build());
+    }
+
+    private void checkIndexSet(IndexSet indexSet) {
+        if (!indexSet.getConfig().isWritable()) {
+            throw new BadRequestException("Assigned index set must be writable!");
+        } else if (!indexSet.getConfig().isRegularIndex()) {
+            throw new BadRequestException("Assigned index set is not usable");
+        }
     }
 
     private StreamResponse streamToResponse(Stream stream) {

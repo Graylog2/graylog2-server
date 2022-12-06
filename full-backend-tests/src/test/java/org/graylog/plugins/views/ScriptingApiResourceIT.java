@@ -637,6 +637,31 @@ public class ScriptingApiResourceIT {
 
     }
 
+    @ContainerMatrixTest
+    void testMessagesGetRequestAscii() {
+        final List<String> response = given()
+                .spec(requestSpec)
+                .when()
+                .header(new Header("Accept", MediaType.TEXT_PLAIN))
+                .get("/search/messages?fields=source,facility,level")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .extract().body().asString().strip().lines().toList();
+
+        final List<String> expected = """
+                ┌────────────────────────┬────────────────────────┬───────────────────────┐
+                │field: source           │field: facility         │field: level           │
+                ├────────────────────────┼────────────────────────┼───────────────────────┤
+                │lorem-ipsum.com         │another-test            │3                      │
+                │example.org             │another-test            │2                      │
+                │example.org             │test                    │1                      │
+                └────────────────────────┴────────────────────────┴───────────────────────┘
+                """.strip().lines().toList();
+
+        assertThat(response.size()).isEqualTo(expected.size());
+        assertThat(expected.containsAll(response)).isTrue();
+    }
+
 
     private void validateSchema(ValidatableResponse response, String name, String type, String field) {
         response.assertThat().body("schema", Matchers.hasItem(

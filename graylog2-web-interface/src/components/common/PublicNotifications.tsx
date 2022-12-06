@@ -80,7 +80,7 @@ const PublicNotifications = ({ readFromConfig }: Props) => {
   }
 
   const publicNotifications = Object.keys(allNotification).map((notificationId) => {
-    if (dismissedNotifications.has(notificationId)) {
+    if (dismissedNotifications?.has(notificationId)) {
       return null;
     }
 
