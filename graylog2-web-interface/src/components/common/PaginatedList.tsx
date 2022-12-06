@@ -66,13 +66,15 @@ const PaginatedList = ({
   });
 
   React.useEffect(() => {
-    setPagination({
-      currentPage: Math.max(page, INITIAL_PAGE),
-      currentPageSize: queryParamPageSize,
-    });
+    if (useQueryParameter) {
+      setPagination({
+        currentPage: Math.max(page, INITIAL_PAGE),
+        currentPageSize: queryParamPageSize,
+      });
 
-    if (onChange) onChange(Math.max(page, INITIAL_PAGE), queryParamPageSize);
-  }, [page, queryParamPageSize, onChange]);
+      if (onChange) onChange(Math.max(page, INITIAL_PAGE), queryParamPageSize);
+    }
+  }, [page, queryParamPageSize, onChange, useQueryParameter]);
 
   const numberPages = React.useMemo(() => (
     currentPageSize > 0 ? Math.ceil(totalItems / currentPageSize) : 0
