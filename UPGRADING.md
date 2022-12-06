@@ -166,12 +166,87 @@ formatting. Existing custom templates should be updated to use HTML or Markdown 
 the old default template, it can be replaced with the one found when creating a new Teams notification. It can also be
 found in this [pull request](https://github.com/Graylog2/graylog-plugin-integrations/pull/1202).
 
+## Operating Systems
+
+Graylog 5.0 removes official support for the following Linux distributions:
+
+- Debian 8, 9
+- Ubuntu 16.04, 18.04
+- RHEL/CentOS 6
+
+## Operating System Packages
+
+### JVM Dependency
+
+The Graylog 5.0 operating system packages bundle version 17 of the JVM, so it's no longer required to install any
+JVM/Java packages to run Graylog. You can configure Graylog to use an external JVM if required.
+
+### Removed Packages
+
+The following operating system packages are no longer available in Graylog 5.0.
+
+- `graylog-integrations-plugins`
+- `graylog-enterprise-plugins`
+- `graylog-enterprise-integrations-plugins`
+
+Use the `graylog-enterprise` or `graylog-server` package instead.
+
+### RPM Digest Changes
+
+The RPM packages switched from the legacy `SHA1` digest to `SHA256` for package signatures.
+The checksums of the files inside the package switched from the legacy `MD5` to `SHA256`.
+
+### Package Upgrade
+
+#### RPM
+
+Install the latest [graylog-5.0-repository RPM package](https://downloads.graylog.org/repo/packages/graylog-5.0-repository_latest.rpm) to update the repository metadata.
+
+**When using Graylog Operations**
+
+```
+sudo rpm -Uvh https://downloads.graylog.org/repo/packages/graylog-5.0-repository_latest.rpm
+sudo yum clean all
+sudo yum install graylog-enterprise
+```
+
+**When using Graylog Open**
+
+```
+sudo rpm -Uvh https://downloads.graylog.org/repo/packages/graylog-5.0-repository_latest.rpm
+sudo yum clean all
+sudo yum install graylog-server
+```
+
+If you are using the plugin packages, you have to remove them before upgrading.
+
+#### DEB
+
+Install the latest [graylog-5.0-repository DEB package](https://downloads.graylog.org/repo/packages/graylog-5.0-repository_latest.deb) to update the repository metadata.
+
+**When using Graylog Operations**
+
+```
+wget https://downloads.graylog.org/repo/packages/graylog-5.0-repository_latest.deb
+sudo dpkg -i graylog-5.0-repository_latest.deb
+sudo apt-get update
+sudo apt-get install graylog-enterprise
+```
+
+**When using Graylog Open**
+
+```
+wget https://downloads.graylog.org/repo/packages/graylog-5.0-repository_latest.deb
+sudo dpkg -i graylog-5.0-repository_latest.deb
+sudo apt-get update
+sudo apt-get install graylog-server
+```
+
 # New Functionality
 
 ## Sidecar
+
 The Sidecar Administration UI now allows the assignment of multiple configurations
 for a single collector.
 Please note that this feature requires a Sidecar with version 1.3 or greater.
 Older versions will only run a single (random) configuration per collector.
-
-
