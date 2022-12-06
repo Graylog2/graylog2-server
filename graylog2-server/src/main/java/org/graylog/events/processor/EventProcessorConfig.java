@@ -74,10 +74,20 @@ public interface EventProcessorConfig extends ContentPackable<EventProcessorConf
     }
 
     /**
+     * Returns whether this config type is allowed to be exported in a Content Pack.
+     *
+     * @return whether the config type can be exported in a Content Pack
+     */
+    @JsonIgnore
+    default boolean isContentPackExportable() {
+        return true;
+    }
+
+    /**
      * Returns whether this config type should be presented to users,
      * as opposed to being used for background functionality.
      *
-     * i.e. Should this be able to be exported in a Content Pack or modified on the Event Definitions Page
+     * i.e. Should this be able to be presented and modified on the Event Definitions Page.
      *
      * @return whether the config type should be presented to users
      */
