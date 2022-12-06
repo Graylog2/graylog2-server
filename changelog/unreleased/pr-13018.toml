@@ -33,7 +33,7 @@ values. Please see the sample [graylog.conf](https://github.com/Graylog2/graylog
 If you are using a pre-existing version of the `graylog.conf` configuration file, it is recommended that you review the
 aforemtioned settings there before upgrading, to ensure the in-database defaults are established as expected with the
 upgrade to Graylog 5.1. Although the `graylog.conf` sample configuration file now ships with all index default example
-properties commented out, you may be using an older version of the file where certain index default values were persent
+properties commented out, you may be using an older version of the file where certain index default values were present
 and not commented-out.
 
 All previously deprecated index set configuration properties in `org.graylog2.configuration.ElasticsearchConfiguration`
