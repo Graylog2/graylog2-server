@@ -639,16 +639,16 @@ public class ScriptingApiResourceIT {
 
     @ContainerMatrixTest
     void testMessagesGetRequestAscii() {
-        final String response = given()
+        final List<String> response = given()
                 .spec(requestSpec)
                 .when()
                 .header(new Header("Accept", MediaType.TEXT_PLAIN))
                 .get("/search/messages?fields=source,facility,level")
                 .then()
                 .log().ifStatusCodeMatches(not(200))
-                .extract().body().asString().trim();
+                .extract().body().asString().strip().lines().toList();
 
-        String expected = """
+        final List<String> expected = """
                 ┌────────────────────────┬────────────────────────┬───────────────────────┐
                 │field: source           │field: facility         │field: level           │
                 ├────────────────────────┼────────────────────────┼───────────────────────┤
@@ -656,9 +656,10 @@ public class ScriptingApiResourceIT {
                 │example.org             │another-test            │2                      │
                 │example.org             │test                    │1                      │
                 └────────────────────────┴────────────────────────┴───────────────────────┘
-                """;
+                """.strip().lines().toList();
 
-        assertThat(response).isEqualTo(expected.trim());
+        assertThat(response.size()).isEqualTo(expected.size());
+        assertThat(expected.containsAll(response)).isTrue();
     }
 
 
