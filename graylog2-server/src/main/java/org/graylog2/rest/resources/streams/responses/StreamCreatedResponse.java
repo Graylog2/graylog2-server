@@ -14,20 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.rest.resources.streams.responses;
 
-import React from 'react';
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
-
-const DefaultColumnRenderers = {
-  description: {
-    renderCell: (entity: { description: string }) => (
-      <TextOverflowEllipsis>
-        {entity.description}
-      </TextOverflowEllipsis>
-    ),
-    width: 2,
-  },
-};
-
-export default DefaultColumnRenderers;
+public record StreamCreatedResponse(@JsonProperty("stream_id") String streamId) {
+}

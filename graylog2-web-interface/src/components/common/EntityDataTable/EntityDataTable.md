@@ -59,3 +59,38 @@ import EntityDataTable from './EntityDataTable';
                    },
                  }} />
 ```
+
+
+Change the width of a column, with the related column renderer. Column renderers can have
+- either a `width` defined as a fraction like `2`. If no width is defined we are using a default of `1`.
+  The width defines which fraction of the assignable space the column should claim. It works similar to the css attribute `flex`.
+  Optionally you can also define a `minWidth` to override the default min width for flexible columns. This can be helpful to ensure a column has enough space, no matter how large the table width is.
+- or a `staticWidth` in px. Useful when the cells contain e.g. just an icon and its width never changes.
+
+Please have a look at the default column renderers defined in the `EntityDataTable` since they contain predefined widths for common attributes like `description`.
+
+```js
+import EntityDataTable from './EntityDataTable';
+
+<EntityDataTable visibleColumns={['title', 'summary', 'status']}
+                 data={[{
+                   id: 'row-id',
+                   title: 'Entity title',
+                   summary: 'Entity summary',
+                   status: 'status',
+                 }]}
+                 columnDefinitions={[
+                   { id: 'title', title: 'Title' },
+                   { id: 'summary', title: 'Summary' },
+                   { id: 'status', title: 'Status' },
+                 ]}
+                 columnRenderers={{
+                   summary: {
+                     width: 2,
+                     minWidth: 200
+                   },
+                   status: {
+                     staticWidth: 100
+                   }
+                 }}/>
+```
