@@ -75,7 +75,7 @@ const TextContainer = styled.div`
 
 const WelcomeMessage = styled.strong(({ theme }) => css`
   display: block;
-  font-size: ${theme.fonts.size.huge};
+  font-size: ${theme.fonts.size.extraLarge};
   font-weight: 800;
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
@@ -89,7 +89,7 @@ const BrandName = styled.h3(({ theme }) => css`
 const Claim = styled.h1(({ theme }) => css`
   color: ${theme.colors.brand.secondary};
   text-transform: uppercase;
-  font-size: 2.5rem;
+  font-size: ${theme.fonts.size.huge};
   line-height: 1;
 `);
 const Highlight = styled.span(({ theme }) => css`
