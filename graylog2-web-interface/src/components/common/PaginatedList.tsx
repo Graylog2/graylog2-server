@@ -83,8 +83,8 @@ const PaginatedList = ({
   const _onChangePageSize = React.useCallback((event: React.ChangeEvent<HTMLOptionElement>) => {
     event.preventDefault();
     const newPageSize = Number(event.target.value);
-
     setPagination({ currentPage: INITIAL_PAGE, currentPageSize: newPageSize });
+
     if (useQueryParameter) setPageSize(newPageSize);
     if (onChange) onChange(INITIAL_PAGE, newPageSize);
   }, [onChange, setPageSize, useQueryParameter]);
