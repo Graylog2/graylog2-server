@@ -5,7 +5,7 @@ Upgrading to Graylog 5.1.x
 
 ## Index Default Configuration
 Support for configuring system index initialization defaults, and ongoing in-database index set defaults has been added.
-Please see the corresponding change log entry [pr-31018.toml](https://github.com/Graylog2/graylog2-server/blob/master/changelog/5.1.0/issue-1065.toml)
+Please see the corresponding change log entry [pr-13018.toml](https://github.com/Graylog2/graylog2-server/blob/master/changelog/5.1.0/pr-13018.toml)
 for  important details to be aware of before upgrading to Graylog `5.1.x`.
 
 # API Changes
@@ -20,7 +20,7 @@ The following Java Code API changes have been made.
 
 All previously deprecated index set configuration properties in `org.graylog2.configuration.ElasticsearchConfiguration`
 have been un-deprecated, as Graylog intends to maintain them going forward. Please see the corresponding change log
-[pr-31018.toml](https://github.com/Graylog2/graylog2-server/blob/master/changelog/5.1.0/issue-1065.toml) for more
+[pr-13018.toml](https://github.com/Graylog2/graylog2-server/blob/master/changelog/5.1.0/pr-13018.toml) for more
 information.
 
 ## Breaking Changes
