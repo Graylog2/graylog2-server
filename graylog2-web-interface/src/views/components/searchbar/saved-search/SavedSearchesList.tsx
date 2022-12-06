@@ -43,6 +43,8 @@ const INITIAL_COLUMNS = ['title'];
 const COLUMN_DEFINITIONS = [
   { id: 'created_at', title: 'Created At', sortable: true },
   { id: 'title', title: 'Title', sortable: true },
+  { id: 'description', title: 'Description', sortable: true },
+  { id: 'summary', title: 'Summary', sortable: true },
   { id: 'owner', title: 'Owner', sortable: true },
 ];
 
