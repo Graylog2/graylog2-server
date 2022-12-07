@@ -127,14 +127,14 @@ const DashboardList = () => {
         </Alert>
       )}
       {!!dashboards?.length && (
-        <EntityDataTable data={dashboards}
-                         visibleColumns={visibleColumns}
-                         onColumnsChange={onColumnsChange}
-                         onSortChange={onSortChange}
-                         activeSort={searchParams.sort}
-                         rowActions={renderDashboardActions}
-                         columnRenderers={columnRenderers}
-                         columnDefinitions={COLUMN_DEFINITIONS} />
+        <EntityDataTable<View> data={dashboards}
+                               visibleColumns={visibleColumns}
+                               onColumnsChange={onColumnsChange}
+                               onSortChange={onSortChange}
+                               activeSort={searchParams.sort}
+                               rowActions={renderDashboardActions}
+                               columnRenderers={columnRenderers}
+                               columnDefinitions={COLUMN_DEFINITIONS} />
       )}
     </PaginatedList>
   );

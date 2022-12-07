@@ -81,8 +81,8 @@ const TableHead = <Entity extends { id: string }>({
   columns: Array<Column>,
   columnsWidths: { [columnId: string]: number },
   columnRenderers: ColumnRenderers<Entity>,
-  data: Array<Entity>
-  displayActionsCol: boolean
+  data: Readonly<Array<Entity>>,
+  displayActionsCol: boolean,
   displayBulkSelectCol: boolean,
   onSortChange: (newSort: Sort) => void,
   selectedEntities: Array<string>,
