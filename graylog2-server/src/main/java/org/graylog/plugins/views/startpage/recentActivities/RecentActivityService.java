@@ -43,16 +43,28 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
     private static final long MAXIMUM_RECENT_ACTIVITIES = 10000;
 
     @Inject
-    protected RecentActivityService(MongoConnection mongoConnection,
-                                    MongoJackObjectMapperProvider mapper,
-                                    EventBus eventBus,
-                                    GRNRegistry grnRegistry,
-                                    PermissionAndRoleResolver permissionAndRoleResolver) {
+    protected RecentActivityService(final MongoConnection mongoConnection,
+                                    final MongoJackObjectMapperProvider mapper,
+                                    final EventBus eventBus,
+                                    final GRNRegistry grnRegistry,
+                                    final  PermissionAndRoleResolver permissionAndRoleResolver) {
+        this(mongoConnection, mapper, eventBus, grnRegistry, permissionAndRoleResolver, MAXIMUM_RECENT_ACTIVITIES);
+    }
+
+    /*
+     * Constructor to set a low maximum in tests to check the capped collection.
+     */
+    protected RecentActivityService(final MongoConnection mongoConnection,
+                                    final MongoJackObjectMapperProvider mapper,
+                                    final EventBus eventBus,
+                                    final GRNRegistry grnRegistry,
+                                    final PermissionAndRoleResolver permissionAndRoleResolver,
+                                    final long maximum) {
         super(mongoConnection, mapper, RecentActivityDTO.class, COLLECTION_NAME,
                 BasicDBObjectBuilder.start()
                         .add("capped", true)
-                        .add("size", MAXIMUM_RECENT_ACTIVITIES * 1024)
-                        .add("max", MAXIMUM_RECENT_ACTIVITIES)
+                        .add("size", maximum * 1024)
+                        .add("max", maximum)
                         .get(),
                 null );
         this.grnRegistry = grnRegistry;
@@ -82,14 +94,6 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
 
     public void delete(String id, GRNType grn, String title, SearchUser user) {
         postRecentActivity(new RecentActivityEvent(ActivityType.DELETE, grnRegistry.newGRN(grn, id), title, user.getUser().getFullName()));
-    }
-
-    public void delete(String id, GRNType grn) {
-        postRecentActivity(new RecentActivityEvent(ActivityType.DELETE, grnRegistry.newGRN(grn, id), null, null));
-    }
-
-    public void delete(String id, GRNType grn, String title) {
-        postRecentActivity(new RecentActivityEvent(ActivityType.DELETE, grnRegistry.newGRN(grn, id), title, null));
     }
 
     public void delete(String id, GRNType grn, String title, User user) {

@@ -111,16 +111,16 @@ public class StartPageService {
     }
 
     public PaginatedResponse<RecentActivity> findRecentActivityFor(final SearchUser searchUser, int page, int perPage) {
-        final var items = recentActivityService.findRecentActivitiesFor(searchUser, page, perPage).stream()
+        final var items = recentActivityService.findRecentActivitiesFor(searchUser, page, perPage);
+        final var mapped = items.stream()
                  .map(i -> new RecentActivity(i.id(),
                         i.activityType(),
                         getType(i),
                         i.itemId(),
                         getTitle(i),
                         i.userName(),
-                        i.timestamp()))
-                .collect(Collectors.toList());
-        return PaginatedResponse.create("recentActivity", new PaginatedList<>(items, items.size(), page, perPage));
+                        i.timestamp())).toList();
+        return PaginatedResponse.create("recentActivity", new PaginatedList<>(mapped, items.pagination().total(), page, perPage));
     }
 
     // works on the existing list, side-effect
