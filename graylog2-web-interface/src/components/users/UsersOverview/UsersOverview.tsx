@@ -22,7 +22,7 @@ import type { PaginatedUsers } from 'stores/users/UsersStore';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import { UsersActions } from 'stores/users/UsersStore';
 import useCurrentUser from 'hooks/useCurrentUser';
-import { DataTable, Spinner, PaginatedList, EmptyResult } from 'components/common';
+import { DataTable, Spinner, PaginatedList, NoSearchResult } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 import type UserOverview from 'logic/users/UserOverview';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
@@ -135,7 +135,7 @@ const UsersOverview = () => {
                        headers={TABLE_HEADERS}
                        headerCellFormatter={_headerCellFormatter}
                        sortByKey="fullName"
-                       noDataText={<EmptyResult>No users have been found.</EmptyResult>}
+                       noDataText={<NoSearchResult>No users have been found.</NoSearchResult>}
                        rows={users.toJS()}
                        customFilter={searchFilter}
                        dataRowFormatter={buildUsersOverviewItem(currentUser)}
