@@ -15,8 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 interface EventDefinitionType {
-  type: string;
-  displayName: string;
+  type: string,
+  displayName: string,
+  sortOrder: number,
+  description: string,
+  defaultConfig: any,
+  formComponent: any,
 }
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {

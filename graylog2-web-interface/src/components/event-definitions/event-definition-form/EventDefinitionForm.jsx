@@ -24,10 +24,10 @@ import { Button, Col, Row } from 'components/bootstrap';
 import { ModalSubmit, Wizard } from 'components/common';
 
 import EventDetailsForm from './EventDetailsForm';
-import EventConditionForm from './EventConditionForm';
 import FieldsForm from './FieldsForm';
 import NotificationsForm from './NotificationsForm';
 import EventDefinitionSummary from './EventDefinitionSummary';
+import EventConditionForm from './EventConditionForm';
 
 const STEP_KEYS = ['event-details', 'condition', 'fields', 'notifications', 'summary'];
 
