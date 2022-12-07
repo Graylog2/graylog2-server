@@ -18,11 +18,11 @@ import * as React from 'react';
 import { render, screen, within, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import selectEvent from 'react-select-event';
+import { Streams } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
 import BulkActions from 'components/streams/StreamsOverview/BulkActions';
 import { indexSets } from 'fixtures/indexSets';
-import { Streams } from '@graylog/server-api';
 import { asMock } from 'helpers/mocking';
 import suppressConsole from 'helpers/suppressConsole';
 

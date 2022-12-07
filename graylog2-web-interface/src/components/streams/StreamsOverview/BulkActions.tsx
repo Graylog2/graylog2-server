@@ -19,6 +19,7 @@ import { uniq } from 'lodash';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { Formik, Form } from 'formik';
+import { Streams } from '@graylog/server-api';
 
 import { Button, Modal } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
@@ -30,7 +31,6 @@ import UserNotification from 'util/UserNotification';
 import ModalSubmit from 'components/common/ModalSubmit';
 import IfPermitted from 'components/common/IfPermitted';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import { Streams } from '@graylog/server-api';
 
 import IndexSetSelect from '../IndexSetSelect';
 
