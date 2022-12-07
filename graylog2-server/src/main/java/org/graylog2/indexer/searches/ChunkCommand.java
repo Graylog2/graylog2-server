@@ -30,16 +30,22 @@ import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class ScrollCommand {
+public abstract class ChunkCommand {
     public static final int NO_BATCHSIZE = -1;
     public static final int NO_LIMIT = -1;
 
     public abstract String query();
+
     public abstract Set<String> indices();
+
     public abstract Optional<Set<String>> streams();
+
     public abstract Optional<Sorting> sorting();
+
     public abstract Optional<String> filter();
+
     public abstract Optional<TimeRange> range();
+
     public abstract OptionalInt limit();
     public abstract OptionalInt offset();
     public abstract List<String> fields();
@@ -47,7 +53,7 @@ public abstract class ScrollCommand {
     public abstract boolean highlight();
 
     public static Builder builder() {
-        return new AutoValue_ScrollCommand.Builder()
+        return new AutoValue_ChunkCommand.Builder()
                 .query("")
                 .fields(Collections.emptyList())
                 .highlight(false);
@@ -67,6 +73,6 @@ public abstract class ScrollCommand {
         public abstract Builder batchSize(int batchSize);
         public abstract Builder highlight(boolean highlight);
 
-        public abstract ScrollCommand build();
+        public abstract ChunkCommand build();
     }
 }

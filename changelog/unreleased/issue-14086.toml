@@ -1,0 +1,15 @@
+type = "c"
+message = "Changed bulk indexing retry failure log-level from error to warning."
+
+issues = ["14086"]
+pulls = ["14088"]
+
+details.user = """
+The log-level for OpenSearch/Elasticsearch bulk indexing retry attempts has been changed from `ERROR` to `WARN`.
+
+While bulk indexing retries might indicate an issue with the Opensearch backend, it also might be a temporary condition
+that would resolve on its own (for example, temporary high memory pressure). Warn is a better log-level for such a case.
+
+Example message:
+> WARN Caught exception during bulk indexing: [specific error], retrying (attempt #1).
+"""

@@ -22,6 +22,7 @@ import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 
 import javax.inject.Inject;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -49,6 +50,27 @@ public class FieldTypesLookup {
     public Optional<String> getType(Set<String> streamIds, String field) {
         final Map<String, Set<String>> allFieldTypes = this.get(streamIds);
         final Set<String> fieldTypes = allFieldTypes.get(field);
+        return typeFromFieldType(fieldTypes);
+    }
+
+    /**
+     * It may be inefficient to call getType() method for multiple fields, if the list of streams does not change.
+     * In that scenario this method will be better, hitting Mongo DB only once.
+     */
+    public Map<String, String> getTypes(final Set<String> streamIds,
+                                        final Set<String> fields) {
+        final Map<String, Set<String>> allFieldTypes = this.get(streamIds);
+
+        final Map<String, String> result = new HashMap<>(fields.size());
+        fields.forEach(field -> {
+            final Set<String> fieldTypes = allFieldTypes.get(field);
+            typeFromFieldType(fieldTypes).ifPresent(s -> result.put(field, s));
+        });
+
+        return result;
+    }
+
+    private Optional<String> typeFromFieldType(Set<String> fieldTypes) {
         return fieldTypes == null || fieldTypes.size() > 1 ? Optional.empty() : fieldTypes.stream().findFirst();
     }
 }

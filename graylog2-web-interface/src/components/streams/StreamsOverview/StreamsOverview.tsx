@@ -28,18 +28,26 @@ import StreamsStore from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import ConfigurableDataTable from 'components/common/ConfigurableDataTable';
+import EntityDataTable from 'components/common/EntityDataTable';
 import StreamActions from 'components/streams/StreamsOverview/StreamActions';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import type { CustomCells, Sort } from 'components/common/ConfigurableDataTable';
+import type { ColumnRenderers, Sort } from 'components/common/EntityDataTable';
 import UserNotification from 'util/UserNotification';
 import IndexSetCell from 'components/streams/StreamsOverview/IndexSetCell';
 import BulkActions from 'components/streams/StreamsOverview/BulkActions';
+import ThroughputCell from 'components/streams/StreamsOverview/ThroughputCell';
 
 import StatusCell from './StatusCell';
 
 import CreateStreamButton from '../CreateStreamButton';
+
+type SearchParams = {
+  page: number,
+  pageSize: number,
+  query: string,
+  sort: Sort
+}
 
 const DefaultLabel = styled(Label)`
   display: inline-flex;
@@ -47,29 +55,17 @@ const DefaultLabel = styled(Label)`
   vertical-align: inherit;
 `;
 
-const AVAILABLE_ATTRIBUTES = [
+const COLUMN_DEFINITIONS = [
   { id: 'title', title: 'Title', sortable: true },
   { id: 'description', title: 'Description', sortable: true },
-  { id: 'index_set_id', title: 'Index Set', sortable: true },
+  { id: 'index_set_id', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },
+  { id: 'throughput', title: 'Throughput' },
   { id: 'disabled', title: 'Status', sortable: true },
 ];
 
-const ATTRIBUTE_PERMISSIONS = {
-  index_set_id: {
-    permissions: ['indexsets:read'],
-  },
-};
+const INITIAL_COLUMNS = ['title', 'description', 'index_set_id', 'throughput', 'disabled'];
 
-const VISIBLE_ATTRIBUTES = ['title', 'description', 'index_set_id', 'disabled'];
-
-type SearchParams = {
-  page: number,
-  perPage: number,
-  query: string,
-  sort: Sort
-}
-
-const customCells = (indexSets: Array<IndexSet>): CustomCells<Stream> => ({
+const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stream> => ({
   title: {
     renderCell: (stream) => (
       <>
@@ -80,10 +76,15 @@ const customCells = (indexSets: Array<IndexSet>): CustomCells<Stream> => ({
   },
   index_set_id: {
     renderCell: (stream) => <IndexSetCell indexSets={indexSets} stream={stream} />,
+    width: 0.7,
+  },
+  throughput: {
+    renderCell: (stream) => <ThroughputCell stream={stream} />,
+    staticWidth: 120,
   },
   disabled: {
     renderCell: (stream) => <StatusCell stream={stream} />,
-    width: '100px',
+    staticWidth: 100,
   },
 });
 
@@ -92,9 +93,9 @@ const usePaginatedStreams = (searchParams: SearchParams): { data: { streams: Arr
     ['streams', 'overview', searchParams],
     () => StreamsStore.searchPaginated(
       searchParams.page,
-      searchParams.perPage,
+      searchParams.pageSize,
       searchParams.query,
-      { sort: searchParams?.sort.attributeId, order: searchParams?.sort.order },
+      { sort: searchParams?.sort.columnId, order: searchParams?.sort.order },
     ),
     {
       onError: (errorThrown) => {
@@ -133,14 +134,14 @@ type Props = {
 }
 
 const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
-  const paginationQueryParameter = usePaginationQueryParameter();
-
+  const [visibleColumns, setVisibleColumns] = useState(INITIAL_COLUMNS);
+  const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
   const [searchParams, setSearchParams] = useState<SearchParams>({
     page: paginationQueryParameter.page,
-    perPage: paginationQueryParameter.pageSize,
+    pageSize: paginationQueryParameter.pageSize,
     query: '',
     sort: {
-      attributeId: 'title',
+      columnId: 'title',
       order: 'asc',
     },
   });
@@ -158,7 +159,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   }, [refetchStreams]);
 
   const onPageChange = useCallback(
-    (newPage: number, newPerPage: number) => setSearchParams((cur) => ({ ...cur, page: newPage, perPage: newPerPage })),
+    (newPage: number, newPageSize: number) => setSearchParams((cur) => ({ ...cur, page: newPage, pageSize: newPageSize })),
     [],
   );
 
@@ -170,6 +171,10 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   const onReset = useCallback(() => {
     onSearch('');
   }, [onSearch]);
+
+  const onColumnsChange = useCallback((newVisibleColumns: Array<string>) => {
+    setVisibleColumns(newVisibleColumns);
+  }, []);
 
   const onSortChange = useCallback((newSort: Sort) => {
     setSearchParams((cur) => ({ ...cur, sort: newSort }));
@@ -196,6 +201,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
 
   return (
     <PaginatedList onChange={onPageChange}
+                   pageSize={searchParams.pageSize}
                    totalItems={total}>
       <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
@@ -218,16 +224,15 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
             </Alert>
           )
           : (
-            <ConfigurableDataTable rows={streams}
-                                   total={total}
-                                   attributes={VISIBLE_ATTRIBUTES}
-                                   attributePermissions={ATTRIBUTE_PERMISSIONS}
-                                   onSortChange={onSortChange}
-                                   bulkActions={renderBulkActions}
-                                   activeSort={searchParams.sort}
-                                   rowActions={renderStreamActions}
-                                   customCells={customCells(indexSets)}
-                                   availableAttributes={AVAILABLE_ATTRIBUTES} />
+            <EntityDataTable data={streams}
+                             visibleColumns={visibleColumns}
+                             onColumnsChange={onColumnsChange}
+                             onSortChange={onSortChange}
+                             bulkActions={renderBulkActions}
+                             activeSort={searchParams.sort}
+                             rowActions={renderStreamActions}
+                             columnRenderers={customColumnRenderers(indexSets)}
+                             columnDefinitions={COLUMN_DEFINITIONS} />
           )}
       </div>
     </PaginatedList>

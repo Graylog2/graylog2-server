@@ -14,32 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type * as React from 'react';
+package org.graylog2.indexer.results;
 
-export type Attribute = {
-  id: string,
-  title: string,
-  sortable?: boolean,
-  type?: boolean,
-};
+import java.io.IOException;
 
-export type CustomHeaders = {
-  [key: string]: {
-    renderHeader: (attribute: Attribute) => React.ReactNode,
-    textAlign?: string,
-  }
+public interface ChunkedResult {
+    ResultChunk nextChunk() throws IOException;
+
+    String getQueryHash();
+
+    long totalHits();
+
+    void cancel() throws IOException;
+
+    long tookMs();
+
 }
-
-export type CustomCells<ListItem extends { id: string }> = {
-  [attributeId: string]: {
-    renderCell: (listItem: ListItem, attribute: Attribute) => React.ReactNode,
-    textAlign?: string,
-    width?: string,
-    maxWidth?: string,
-  }
-}
-
-export type Sort = {
-  attributeId: string,
-  order: 'asc' | 'desc'
-};

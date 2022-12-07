@@ -14,8 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import ConfigurableDataTable from './ConfigurableDataTable';
-import type { CustomCells, CustomHeaders, Attribute, Sort } from './types';
+package org.graylog2.indexer.results;
 
-export { CustomCells, CustomHeaders, Attribute, Sort };
-export default ConfigurableDataTable;
+import org.graylog2.indexer.searches.ChunkCommand;
+
+public interface MultiChunkResultRetriever {
+
+    ChunkedResult retrieveChunkedResult(ChunkCommand chunkCommand);
+}

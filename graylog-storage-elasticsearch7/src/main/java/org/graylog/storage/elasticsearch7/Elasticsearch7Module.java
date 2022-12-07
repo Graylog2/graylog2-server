@@ -35,6 +35,7 @@ import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
+import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
@@ -57,6 +58,7 @@ public class Elasticsearch7Module extends VersionAwareModule {
         bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterES7.class);
         bindForSupportedVersion(IndexToolsAdapter.class).to(IndexToolsAdapterES7.class);
         bindForSupportedVersion(MessagesAdapter.class).to(MessagesAdapterES7.class);
+        bindForSupportedVersion(MultiChunkResultRetriever.class).to(PaginationES7.class);
         bindForSupportedVersion(MoreSearchAdapter.class).to(MoreSearchAdapterES7.class);
         bindForSupportedVersion(NodeAdapter.class).to(NodeAdapterES7.class);
         bindForSupportedVersion(SearchesAdapter.class).to(SearchesAdapterES7.class);

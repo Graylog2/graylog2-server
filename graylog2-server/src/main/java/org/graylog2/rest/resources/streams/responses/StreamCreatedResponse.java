@@ -14,19 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.results;
+package org.graylog2.rest.resources.streams.responses;
 
-import java.io.IOException;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public interface ScrollResult {
-    ResultChunk nextChunk() throws IOException;
-
-    String getQueryHash();
-
-    long totalHits();
-
-    void cancel() throws IOException;
-
-    long tookMs();
-
+public record StreamCreatedResponse(@JsonProperty("stream_id") String streamId) {
 }

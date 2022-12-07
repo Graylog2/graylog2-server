@@ -19,7 +19,7 @@ package org.graylog2.plugin.indexer.retention;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = RetentionStrategyConfig.TYPE_FIELD, visible = true)
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = RetentionStrategyConfig.TYPE_FIELD, visible = true)
 public interface RetentionStrategyConfig {
     String TYPE_FIELD = "type";
     String MAX_NUMBER_OF_INDEXES_FIELD = "max_number_of_indices";
