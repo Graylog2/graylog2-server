@@ -22,17 +22,16 @@ import { merge } from 'lodash';
 
 import { Button, Table, ButtonToolbar } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
-import TableHead from 'components/common/EntityDataTable/TableHead';
-import TableRow from 'components/common/EntityDataTable/TableRow';
 import useCurrentUser from 'hooks/useCurrentUser';
 import StringUtils from 'util/StringUtils';
 import ColumnsVisibilitySelect from 'components/common/EntityDataTable/ColumnsVisibilitySelect';
 import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
-import useColumnsWidths from 'components/common/EntityDataTable/hooks/useColumnsWidths';
-import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
 import { CELL_PADDING, BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
+import useColumnsWidths from 'components/common/EntityDataTable/hooks/useColumnsWidths';
 import useElementDimensions from 'hooks/useElementDimensions';
 
+import TableHead from './TableHead';
+import TableRow from './TableRow';
 import type { ColumnRenderers, Column, Sort } from './types';
 
 const ScrollContainer = styled.div(({ theme }) => css`
@@ -240,8 +239,4 @@ EntityDataTable.defaultProps = {
   rowActions: undefined,
 };
 
-export default <Entity extends { id: string }>(props) => (
-  <WindowDimensionsContextProvider>
-    <EntityDataTable<Entity> {...props} />
-  </WindowDimensionsContextProvider>
-);
+export default EntityDataTable;

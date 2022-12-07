@@ -190,7 +190,10 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
     selectedStreamIds: Array<string>,
     setSelectedStreamIds: (streamIds: Array<string>) => void,
   ) => (
-    <BulkActions selectedStreamIds={selectedStreamIds} setSelectedStreamIds={setSelectedStreamIds} />
+    <BulkActions selectedStreamIds={selectedStreamIds}
+                 setSelectedStreamIds={setSelectedStreamIds}
+                 refetchStreams={refetchStreams}
+                 indexSets={indexSets} />
   );
 
   if (!paginatedStreams || !streamRuleTypes) {

@@ -20,8 +20,8 @@ import lodash from 'lodash';
 import styled, { css } from 'styled-components';
 
 import { Link, LinkContainer } from 'components/common/router';
-import { OverlayTrigger, EmptyEntity, IfPermitted, PaginatedList, Timestamp, Icon } from 'components/common';
-import { Alert, Col, Label, Row, Table, Tooltip, Button } from 'components/bootstrap';
+import { OverlayTrigger, EmptyEntity, NoSearchResult, NoEntitiesExist, IfPermitted, PaginatedList, Timestamp, Icon } from 'components/common';
+import { Col, Label, Row, Table, Tooltip, Button } from 'components/bootstrap';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import Routes from 'routing/Routes';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
@@ -238,9 +238,19 @@ class Events extends React.Component {
       return renderEmptyContent();
     }
 
-    const filter = parameters.filter.alerts;
+    const { query, filter: { alerts: filter } } = parameters;
     const excludedFile = filter === 'exclude' ? 'Events' : 'Alerts & Events';
     const entity = (filter === 'only' ? 'Alerts' : excludedFile);
+
+    const emptyListComponent = query ? (
+      <NoSearchResult>
+        No {entity} found for the current search criteria.
+      </NoSearchResult>
+    ) : (
+      <NoEntitiesExist>
+        No {entity} exist.
+      </NoEntitiesExist>
+    );
 
     return (
       <Row>
@@ -257,7 +267,7 @@ class Events extends React.Component {
                          totalItems={totalEvents}
                          onChange={onPageChange}>
             {eventList.length === 0 ? (
-              <Alert bsStyle="info">No {entity} found for the current search criteria.</Alert>
+              emptyListComponent
             ) : (
               <EventsTable id="events-table">
                 <thead>
