@@ -1,0 +1,5 @@
+type = "added"
+message = "Added output_batch_size to the values exposed by the system/configuration API call."
+
+issues = ["9461"]
+pulls = ["14123"]

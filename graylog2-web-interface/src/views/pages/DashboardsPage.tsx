@@ -18,16 +18,16 @@ import * as React from 'react';
 import { useState } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import DocsHelper from 'util/DocsHelper';
 import { LinkContainer } from 'components/common/router';
 import { Col, Row, Button } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, IfPermitted } from 'components/common';
+import { DocumentTitle, PageHeader, IfPermitted, NoEntitiesExist } from 'components/common';
 import Routes from 'routing/Routes';
 import DashboardList from 'views/components/views/DashboardList';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import useDashboards from 'views/logic/dashboards/useDashboards';
 import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
+import DocsHelper from 'util/DocsHelper';
 
 import type View from '../logic/views/View';
 import { DashboardsActions } from '../stores/DashboardsStore';
@@ -58,6 +58,20 @@ const DashboardsPage = () => {
 
   const { list, pagination } = useDashboards(searchQuery, page, pageSize);
 
+  const createDashboardButtonText = (
+    <IfPermitted permissions="dashboards:create">
+      <LinkContainer to={Routes.pluginRoute('DASHBOARDS_NEW')}>
+        <Button bsSize="small" bsStyle="success" className="btn-text">Create one now</Button>
+      </LinkContainer>
+    </IfPermitted>
+  );
+
+  const noDashboardsFound = (
+    <NoEntitiesExist>
+      No dashboards have been created yet. {createDashboardButtonText}
+    </NoEntitiesExist>
+  );
+
   return (
     <DocumentTitle title="Dashboards">
       <PageHeader title="Dashboards"
@@ -67,7 +81,7 @@ const DashboardsPage = () => {
                         <Button bsStyle="success">Create new dashboard</Button>
                       </LinkContainer>
                     </IfPermitted>
-                    )}
+                  )}
                   documentationLink={{
                     title: 'Dashboard documentation',
                     path: DocsHelper.PAGES.DASHBOARDS,
@@ -77,19 +91,20 @@ const DashboardsPage = () => {
           chart you create in other parts of Graylog with one click.
         </span>
       </PageHeader>
-
       <Row className="content">
         <Col md={12}>
-          <DashboardList dashboards={list}
-                         pagination={pagination}
-                         handleSearch={handleSearch}
-                         handleDashboardDelete={handleDashboardDelete} />
+          {!list?.length && !searchQuery
+            ? noDashboardsFound
+            : (
+              <DashboardList dashboards={list}
+                             pagination={pagination}
+                             handleSearch={handleSearch}
+                             handleDashboardDelete={handleDashboardDelete} />
+            )}
         </Col>
       </Row>
     </DocumentTitle>
   );
 };
-
-DashboardsPage.propTypes = {};
 
 export default DashboardsPage;
