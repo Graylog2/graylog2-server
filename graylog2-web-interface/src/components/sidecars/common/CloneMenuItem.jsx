@@ -51,7 +51,7 @@ const CloneMenuItem = ({ error, id, showModal, name, onChange, onClose, onSave, 
                           title="Clone"
                           onSubmitForm={onSave}
                           onCancel={onClose}
-                          submitButtonDisabled={!!error}
+                          submitButtonDisabled={Boolean(error)}
                           submitButtonText="Done">
         <fieldset>
           <Input type="text"
