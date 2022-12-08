@@ -26,6 +26,7 @@ export const NotificationsActions = singletonActions(
   () => Reflux.createActions({
     delete: { asyncResult: true },
     list: { asyncResult: true },
+    getMessage: { asyncResult: true },
   }),
 );
 
@@ -34,6 +35,7 @@ export const NotificationsStore = singletonStore(
   () => Reflux.createStore({
     listenables: [NotificationsActions],
     notifications: undefined,
+    message: undefined,
     promises: {},
 
     init() {
@@ -68,5 +70,15 @@ export const NotificationsStore = singletonStore(
     deleteCompleted() {
       this.list();
     },
+    getMessage(type, options) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.getHtmlMessage(type).url);
+      const promise = fetch('POST', url, options);
+
+      promise.then((response) => {
+        this.message = response;
+        this.trigger({ message: this.message });
+      })
+      NotificationsActions.getMessage.promise(promise);
+    }
   }),
 );
