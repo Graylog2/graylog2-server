@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static org.graylog2.plugin.GlobalMetricNames.PROCESS_BUFFER_USAGE;
 import static org.joda.time.DateTimeZone.UTC;
 
 @Singleton
@@ -183,6 +184,18 @@ public class MongoDBProcessingStatusRecorderService extends AbstractIdleService 
         final Meter meter = metricRegistry.getMeters((name, metric) -> metricName.equals(name)).get(metricName);
         if (meter != null) {
             return meter.getOneMinuteRate();
+        }
+        return 0;
+    }
+
+    @Override
+    public long getProcessBufferUsage() {
+        //noinspection unchecked
+        final Gauge<Long> gauge = (Gauge<Long>) metricRegistry
+                .getGauges((name, metric) -> name.equals(PROCESS_BUFFER_USAGE))
+                .get(PROCESS_BUFFER_USAGE);
+        if (gauge != null) {
+            return gauge.getValue();
         }
         return 0;
     }

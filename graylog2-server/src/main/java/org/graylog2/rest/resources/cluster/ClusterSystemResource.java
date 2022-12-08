@@ -85,7 +85,7 @@ public class ClusterSystemResource extends ProxiedResource {
         final Node targetNode = nodeService.byNodeId(nodeId);
 
         final RemoteSystemResource remoteSystemResource = remoteInterfaceProvider.get(targetNode,
-                this.authenticationToken,
+                getAuthenticationToken(),
                 RemoteSystemResource.class);
         final Response<SystemJVMResponse> response = remoteSystemResource.jvm().execute();
         if (response.isSuccessful()) {
@@ -106,7 +106,7 @@ public class ClusterSystemResource extends ProxiedResource {
         final Node targetNode = nodeService.byNodeId(nodeId);
 
         final RemoteSystemResource remoteSystemResource = remoteInterfaceProvider.get(targetNode,
-                this.authenticationToken,
+                getAuthenticationToken(),
                 RemoteSystemResource.class);
         final Response<SystemThreadDumpResponse> response = remoteSystemResource.threadDump().execute();
         if (response.isSuccessful()) {
@@ -127,7 +127,7 @@ public class ClusterSystemResource extends ProxiedResource {
         final Node targetNode = nodeService.byNodeId(nodeId);
 
         final RemoteSystemResource remoteSystemResource = remoteInterfaceProvider.get(targetNode,
-                this.authenticationToken,
+                getAuthenticationToken(),
                 RemoteSystemResource.class);
         final Response<SystemProcessBufferDumpResponse> response = remoteSystemResource.processBufferDump().execute();
         if (response.isSuccessful()) {

@@ -43,6 +43,7 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.jackson.AutoValueSubtypeResolver;
 import org.graylog2.jackson.DeserializationProblemHandlerModule;
+import org.graylog2.jackson.JodaDurationCompatSerializer;
 import org.graylog2.jackson.JodaTimePeriodKeyDeserializer;
 import org.graylog2.jackson.SemverDeserializer;
 import org.graylog2.jackson.SemverRequirementDeserializer;
@@ -59,6 +60,7 @@ import org.graylog2.shared.jackson.SizeSerializer;
 import org.graylog2.shared.plugins.GraylogClassLoader;
 import org.graylog2.shared.rest.RangeJsonSerializer;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,6 +134,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                         .addSerializer(new VersionSerializer())
                         .addSerializer(new SemverSerializer())
                         .addSerializer(new SemverRequirementSerializer())
+                        .addSerializer(Duration.class, new JodaDurationCompatSerializer())
                         .addSerializer(GRN.class, new ToStringSerializer())
                         .addSerializer(EncryptedValue.class, new EncryptedValueSerializer())
                         .addDeserializer(Version.class, new VersionDeserializer())

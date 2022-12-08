@@ -24,7 +24,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.A
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Avg;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.AvgAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivot;
+import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
 
 import javax.annotation.Nonnull;
@@ -34,7 +34,7 @@ import java.util.stream.Stream;
 public class ESAverageHandler extends ESPivotSeriesSpecHandler<Average, Avg> {
     @Nonnull
     @Override
-    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Average avgSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Average avgSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
         final AvgAggregationBuilder avg = AggregationBuilders.avg(name).field(avgSpec.field());
         record(queryContext, pivot, avgSpec, name, Avg.class);
         return Optional.of(avg);
@@ -44,7 +44,7 @@ public class ESAverageHandler extends ESPivotSeriesSpecHandler<Average, Avg> {
     public Stream<ESPivotSeriesSpecHandler.Value> doHandleResult(Pivot pivot, Average pivotSpec,
                                                                  SearchResponse searchResult,
                                                                  Avg avgAggregation,
-                                                                 ESPivot searchTypeHandler,
+                                                                 ESSearchTypeHandler<Pivot> searchTypeHandler,
                                                                  ESGeneratedQueryContext esGeneratedQueryContext) {
         return Stream.of(ESPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Average.NAME, avgAggregation.getValue()));
     }

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 type NumberFieldAttributes = 'only_negative' | 'only_positive' | 'is_port_number';
-type TextFieldAttributes = 'is_password' | 'textarea';
+type TextFieldAttributes = 'is_password' | 'textarea' | 'is_sensitive';
 type ListFieldAttributes = 'allow_create';
 
 export type NumberField = {

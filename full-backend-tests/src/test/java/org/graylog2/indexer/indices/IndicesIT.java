@@ -78,11 +78,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 // these tests only test the SearchServer, so there is only one MongoDB-version necessary (needed, to launch the tests)
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, mongoVersions = MongodbServer.MONGO4)
+@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, mongoVersions = MongodbServer.MONGO5)
 public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
     private static final String INDEX_NAME = "graylog_0";
-    private final Set<String> indicesToCleanUp = new HashSet<>();
-
     private static final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
             .id("index-set-1")
             .title("Index set 1")
@@ -101,10 +99,10 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
             .indexOptimizationDisabled(false)
             .build();
     protected static final IndexSet indexSet = new TestIndexSet(indexSetConfig);
-
+    private final Set<String> indicesToCleanUp = new HashSet<>();
+    protected Indices indices;
     @SuppressWarnings("UnstableApiUsage")
     private EventBus eventBus;
-    protected Indices indices;
 
     public IndicesIT(SearchServerInstance elasticsearch) {
         super(elasticsearch);
@@ -425,31 +423,6 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
                 .hasMessage("No index template with name 'template-1' (type - 'null') found in Elasticsearch");
     }
 
-    @SuppressWarnings("UnstableApiUsage")
-    public static final class IndicesEventListener {
-        final List<IndicesClosedEvent> indicesClosedEvents = Collections.synchronizedList(new ArrayList<>());
-        final List<IndicesDeletedEvent> indicesDeletedEvents = Collections.synchronizedList(new ArrayList<>());
-        final List<IndicesReopenedEvent> indicesReopenedEvents = Collections.synchronizedList(new ArrayList<>());
-
-        @Subscribe
-        @SuppressWarnings("unused")
-        public void handleIndicesClosedEvent(IndicesClosedEvent event) {
-            indicesClosedEvents.add(event);
-        }
-
-        @Subscribe
-        @SuppressWarnings("unused")
-        public void handleIndicesDeletedEvent(IndicesDeletedEvent event) {
-            indicesDeletedEvents.add(event);
-        }
-
-        @Subscribe
-        @SuppressWarnings("unused")
-        public void handleIndicesReopenedEvent(IndicesReopenedEvent event) {
-            indicesReopenedEvents.add(event);
-        }
-    }
-
     @ContainerMatrixTest
     public void getIndices() {
         final IndexSet indexSet = new TestIndexSet(indexSetConfig.toBuilder().indexPrefix("indices_it").build());
@@ -473,7 +446,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
         final String index = createRandomIndex("indices_it_");
         String uuid = indices.getIndexId(index);
         assertThat(uuid).isNotEmpty();
-        assert(Base64.isBase64(uuid));
+        assert (Base64.isBase64(uuid));
     }
 
     @ContainerMatrixTest
@@ -634,5 +607,30 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
         indices.cycleAlias(deflector, index2, index1);
 
         assertThat(indices.exists(index1)).isTrue();
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    public static final class IndicesEventListener {
+        final List<IndicesClosedEvent> indicesClosedEvents = Collections.synchronizedList(new ArrayList<>());
+        final List<IndicesDeletedEvent> indicesDeletedEvents = Collections.synchronizedList(new ArrayList<>());
+        final List<IndicesReopenedEvent> indicesReopenedEvents = Collections.synchronizedList(new ArrayList<>());
+
+        @Subscribe
+        @SuppressWarnings("unused")
+        public void handleIndicesClosedEvent(IndicesClosedEvent event) {
+            indicesClosedEvents.add(event);
+        }
+
+        @Subscribe
+        @SuppressWarnings("unused")
+        public void handleIndicesDeletedEvent(IndicesDeletedEvent event) {
+            indicesDeletedEvents.add(event);
+        }
+
+        @Subscribe
+        @SuppressWarnings("unused")
+        public void handleIndicesReopenedEvent(IndicesReopenedEvent event) {
+            indicesReopenedEvents.add(event);
+        }
     }
 }

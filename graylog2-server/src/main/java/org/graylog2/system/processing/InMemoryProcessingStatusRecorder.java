@@ -42,6 +42,8 @@ public class InMemoryProcessingStatusRecorder implements ProcessingStatusRecorde
     final AtomicDouble readMessages1m = new AtomicDouble(0);
     @VisibleForTesting
     final AtomicDouble writtenMessages1m = new AtomicDouble(0);
+    @VisibleForTesting
+    final AtomicLong processBufferUsage = new AtomicLong(0);
 
     @Override
     public Lifecycle getNodeLifecycleStatus() {
@@ -76,6 +78,11 @@ public class InMemoryProcessingStatusRecorder implements ProcessingStatusRecorde
     @Override
     public double getJournalInfoWrittenMessages1mRate() {
         return writtenMessages1m.get();
+    }
+
+    @Override
+    public long getProcessBufferUsage() {
+        return processBufferUsage.get();
     }
 
     @Override

@@ -1,0 +1,5 @@
+type = "removed"
+message = "Removed support for Elasticsearch 6"
+
+issues = ["13317"]
+pulls = ["13321", "graylog-plugin-enterprise#3992", "graylog-project-internal#77", "graylog-plugin-enterprise#4035"]

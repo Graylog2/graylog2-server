@@ -1,0 +1,5 @@
+type = "changed"
+message = "When selecting roles from the dropdown they are now automatically assigned to the team/user"
+
+issues = ["graylog2-server#9933", "graylog-plugin-enterprise#3969"]
+pulls = ["graylog2-server#13277", "graylog-plugin-enterprise#4002"]

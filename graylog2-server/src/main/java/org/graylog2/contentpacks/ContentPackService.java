@@ -185,8 +185,7 @@ public class ContentPackService {
                 final NativeEntity<Stream> streamNativeEntity = streamFacade.findExisting(streamEntity, Collections.emptyMap()).get();
                 entities.put(streamEntityDescriptor, streamNativeEntity.entity());
             } catch (Exception e) {
-                e.printStackTrace();
-                LOG.debug("Failed to load system stream <{}>", id);
+                LOG.debug("Failed to load system stream <{}>", id, e);
             }
         }
         return entities;

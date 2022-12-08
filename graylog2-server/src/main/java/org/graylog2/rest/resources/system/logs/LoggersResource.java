@@ -35,6 +35,7 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.impl.ThrowableProxy;
+import org.apache.logging.log4j.util.ReadOnlyStringMap;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
@@ -69,6 +70,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 @RequiresAuthentication
 @Api(value = "System/Loggers", description = "Internal Graylog loggers")
@@ -257,7 +259,7 @@ public class LoggersResource extends RestResource {
                     new DateTime(event.getTimeMillis(), DateTimeZone.UTC),
                     throwable,
                     event.getThreadName(),
-                    event.getContextData().toMap()
+                    Optional.ofNullable(event.getContextData()).map(ReadOnlyStringMap::toMap).orElse(Map.of())
             ));
         }
 

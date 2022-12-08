@@ -21,7 +21,7 @@ import userEvent from '@testing-library/user-event';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
-import { asMock } from 'helpers/mocking';
+import { asMock, MockStore } from 'helpers/mocking';
 import Routes from 'routing/Routes';
 import useDashboards from 'views/logic/dashboards/useDashboards';
 import { simpleView } from 'views/test/ViewFixtures';
@@ -40,6 +40,13 @@ jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
     delete: jest.fn(),
   },
+}));
+
+jest.mock('views/stores/DashboardsStore', () => ({
+  DashboardsActions: {
+    search: () => Promise.resolve(),
+  },
+  DashboardsStore: MockStore(),
 }));
 
 const SUT = () => (

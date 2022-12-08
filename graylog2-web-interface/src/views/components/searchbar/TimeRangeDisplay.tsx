@@ -32,15 +32,13 @@ type Props = {
 export const EMPTY_RANGE = '----/--/-- --:--:--.---';
 export const EMPTY_OUTPUT = { from: EMPTY_RANGE, until: EMPTY_RANGE };
 
-const TimeRangeWrapper = styled.p(({ theme }) => css`
+const TimeRangeWrapper = styled.div(({ theme }) => css`
   width: 100%;
-  padding: 3px 9px;
-  margin: 0 0 0 12px;
+  padding: 3px 13px;
   display: flex;
   justify-content: space-around;
   background-color: ${theme.colors.table.backgroundAlt};
   align-items: center;
-  border-radius: 4px;
 
   > span {
     flex: 1;
@@ -114,11 +112,11 @@ const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => {
   return (
     <TimeRangeWrapper aria-label="Search Time Range, Opens Time Range Selector On Click" role="button" onClick={toggleDropdownShow}>
       {!(timerange && 'type' in timerange)
-        ? <span><code>No Override</code></span>
+        ? <span>No Override</span>
         : (
           <>
-            <span data-testid="from"><strong>From</strong>: <code>{from}</code></span>
-            <span data-testid="to"><strong>Until</strong>: <code>{until}</code></span>
+            <span data-testid="from">From: <strong>{from}</strong></span>
+            <span data-testid="to">Until: <strong>{until}</strong></span>
           </>
         )}
     </TimeRangeWrapper>

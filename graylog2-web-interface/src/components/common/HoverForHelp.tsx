@@ -41,8 +41,9 @@ const StyledPopover = styled(Popover)(({ theme }) => css`
   }
 `);
 
-const StyledIcon = styled(Icon)<{ $type: Type }>(({ theme, $type }) => css`
+const StyledIcon = styled(Icon)<{ $type: Type, $displayLeftMargin: boolean }>(({ theme, $type, $displayLeftMargin }) => css`
   color: ${$type === 'error' ? theme.colors.variant.danger : 'inherit'};
+  margin-left: ${$displayLeftMargin ? '0.3em' : 0};
 `);
 
 const iconName = (type: Type) => {
@@ -60,6 +61,7 @@ type Type = 'info' | 'error';
 type Props = {
   children: React.ReactNode,
   className?: string,
+  displayLeftMargin?: boolean,
   id?: string,
   placement?: 'top' | 'right' | 'bottom' | 'left',
   iconSize?: SizeProp
@@ -70,16 +72,33 @@ type Props = {
   type?: 'info' | 'error',
 };
 
-const HoverForHelp = ({ children, className, title, id, pullRight, placement, testId, type, iconSize, trigger }: Props) => (
+const HoverForHelp = ({
+  children,
+  className,
+  displayLeftMargin,
+  title,
+  id,
+  pullRight,
+  placement,
+  testId,
+  type,
+  iconSize,
+  trigger,
+}: Props) => (
   <OverlayTrigger trigger={trigger}
                   placement={placement}
                   overlay={<StyledPopover title={title} id={id}>{children}</StyledPopover>}
                   testId={testId}>
-    <StyledIcon className={`${className} ${pullRight ? 'pull-right' : ''}`} name={iconName(type)} $type={type} size={iconSize} />
+    <StyledIcon className={`${className} ${pullRight ? 'pull-right' : ''}`}
+                name={iconName(type)}
+                $type={type}
+                $displayLeftMargin={displayLeftMargin}
+                size={iconSize} />
   </OverlayTrigger>
 );
 
 HoverForHelp.propTypes = {
+  displayLeftMargin: PropTypes.bool,
   children: PropTypes.any.isRequired,
   className: PropTypes.string,
   id: PropTypes.string,
@@ -100,6 +119,7 @@ HoverForHelp.defaultProps = {
   type: 'info',
   iconSize: undefined,
   trigger: ['hover', 'focus'],
+  displayLeftMargin: false,
 };
 
 /** @component */

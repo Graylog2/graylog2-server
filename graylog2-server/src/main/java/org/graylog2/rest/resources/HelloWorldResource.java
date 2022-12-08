@@ -43,6 +43,8 @@ public class HelloWorldResource extends RestResource {
     private final NodeId nodeId;
     private final ClusterConfigService clusterConfigService;
 
+    private static final String LOWEST_PRIORITY = ";q=0";
+
     @Inject
     public HelloWorldResource(NodeId nodeId,
                               ClusterConfigService clusterConfigService) {
@@ -67,7 +69,7 @@ public class HelloWorldResource extends RestResource {
     @GET
     @Timed
     @ApiOperation(value = "Redirecting to web console if it runs on same port.")
-    @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_XHTML_XML})
+    @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_XHTML_XML, MediaType.WILDCARD + LOWEST_PRIORITY})
     public Response redirectToWebConsole() {
         return Response
             .temporaryRedirect(URI.create(HttpConfiguration.PATH_WEB))

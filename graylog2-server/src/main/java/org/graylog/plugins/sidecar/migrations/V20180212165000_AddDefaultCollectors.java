@@ -79,8 +79,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         "output.logstash:\n" +
                         "   hosts: [\"192.168.1.1:5044\"]\n" +
                         "path:\n" +
-                        "  data: ${sidecar.spoolDir}/data\n" +
-                        "  logs: ${sidecar.spoolDir}/log"
+                        "  data: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/data\n" +
+                        "  logs: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/log"
         );
         ensureCollector(
                 "filebeat",
@@ -98,8 +98,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         "output.logstash:\n" +
                         "   hosts: [\"192.168.1.1:5044\"]\n" +
                         "path:\n" +
-                        "  data: ${sidecar.spoolDir}/data\n" +
-                        "  logs: ${sidecar.spoolDir}/log"
+                        "  data: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/data\n" +
+                        "  logs: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/log"
         );
         ensureCollector(
                 "filebeat",
@@ -117,8 +117,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         "output.logstash:\n" +
                         "   hosts: [\"192.168.1.1:5044\"]\n" +
                         "path:\n" +
-                        "  data: ${sidecar.spoolDir}/data\n" +
-                        "  logs: ${sidecar.spoolDir}/log"
+                        "  data: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/data\n" +
+                        "  logs: ${sidecar.spoolDir!\"/var/lib/graylog-sidecar/collectors/filebeat\"}/log"
         );
         ensureCollector(
                 "winlogbeat",
@@ -131,8 +131,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         "output.logstash:\n" +
                         "   hosts: [\"192.168.1.1:5044\"]\n" +
                         "path:\n" +
-                        "  data: ${sidecar.spoolDir}\\data\n" +
-                        "  logs: ${sidecar.spoolDir}\\logs\n" +
+                        "  data: ${sidecar.spoolDir!\"C:\\\\Program Files\\\\Graylog\\\\sidecar\\\\cache\\\\winlogbeat\"}\\data\n" +
+                        "  logs: ${sidecar.spoolDir!\"C:\\\\Program Files\\\\Graylog\\\\sidecar\"}\\logs\n" +
                         "tags:\n" +
                         " - windows\n" +
                         "winlogbeat:\n" +
@@ -164,9 +164,9 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         "Group nxlog\n" +
                         "\n" +
                         "Moduledir /usr/lib/nxlog/modules\n" +
-                        "CacheDir ${sidecar.spoolDir}/data\n" +
-                        "PidFile ${sidecar.spoolDir}/nxlog.pid\n" +
-                        "LogFile ${sidecar.spoolDir}/nxlog.log\n" +
+                        "CacheDir ${sidecar.spoolDir!\"/var/spool/nxlog\"}/data\n" +
+                        "PidFile ${sidecar.spoolDir!\"/var/run/nxlog\"}/nxlog.pid\n" +
+                        "LogFile ${sidecar.spoolDir!\"/var/log/nxlog\"}/nxlog.log\n" +
                         "LogLevel INFO\n" +
                         "\n" +
                         "\n" +
@@ -217,7 +217,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "C:\\Program Files (x86)\\nxlog\\nxlog.exe",
                 "-c \"%s\"",
                 "-v -f -c \"%s\"",
-                "define ROOT ${sidecar.spoolDir}\\nxlog\n" +
+                "define ROOT ${sidecar.spoolDir!\"C:\\\\Program Files (x86)\"}\\nxlog\n" +
                         "\n" +
                         "Moduledir %ROOT%\\modules\n" +
                         "CacheDir %ROOT%\\data\n" +
@@ -302,8 +302,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         "output.logstash:\n" +
                         "   hosts: [\"192.168.1.1:5044\"]\n" +
                         "path:\n" +
-                        "  data: ${sidecar.spoolDir}\\data\n" +
-                        "  logs: ${sidecar.spoolDir}\\logs\n" +
+                        "  data: ${sidecar.spoolDir!\"C:\\\\Program Files\\\\Graylog\\\\sidecar\\\\cache\\\\filebeat\"}\\data\n" +
+                        "  logs: ${sidecar.spoolDir!\"C:\\\\Program Files\\\\Graylog\\\\sidecar\"}\\logs\n" +
                         "tags:\n" +
                         " - windows\n" +
                         "filebeat.inputs:\n" +

@@ -32,8 +32,16 @@ export const ServerAvailabilityActions = singletonActions(
   ]),
 ) as unknown as ServerAvailabilityActionsType;
 
+export type ServerError = {
+  message: string,
+  originalError: {
+    method: string,
+    url: string,
+    status: number,
+  },
+};
 export type ServerAvailabilityStoreState = {
-  server: { up: true } | { up: false, error: string },
+  server: { up: true } | { up: false, error: ServerError },
 };
 
 const ping = (url: string) => window.fetch(url, {

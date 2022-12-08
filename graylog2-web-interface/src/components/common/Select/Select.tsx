@@ -178,7 +178,7 @@ const controlFocus = ({ size, theme }) => (base, { isFocused }) => {
 
 const valueContainer = ({ size }) => (base) => ({
   ...base,
-  padding: size === 'small' ? '0 8px' : '2px 12px',
+  padding: size === 'small' ? '0 8px' : '2px 10px',
 });
 
 type OverriddenComponents = {

@@ -26,6 +26,7 @@ import { RefreshActions, RefreshStore } from 'views/stores/RefreshStore';
 
 const FlexibleButtonGroup = styled(ButtonGroup)`
   display: flex;
+  justify-content: flex-end;
 
   > .btn-group {
     .btn:first-child {

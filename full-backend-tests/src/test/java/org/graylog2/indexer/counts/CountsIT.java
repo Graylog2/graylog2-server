@@ -48,7 +48,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 // these tests only test the SearchServer, so there is only one MongoDB-version necessary (needed, to launch the tests)
-@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO4)
+@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CountsIT extends ContainerMatrixElasticsearchBaseTest {
     private static final String INDEX_NAME_1 = "index_set_1_counts_test_0";

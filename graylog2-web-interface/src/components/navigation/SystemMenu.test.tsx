@@ -19,6 +19,7 @@ import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
 import { useLocation } from 'react-router-dom';
 import type { Location } from 'history';
+import type { ReactWrapper } from 'enzyme';
 
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -151,6 +152,10 @@ describe('SystemMenu', () => {
   });
 
   describe('sets a location-specific title for the dropdown', () => {
+    const getDropdownTitle = (wrapper: ReactWrapper) => wrapper.find('NavDropdown')
+      .at(1)
+      .prop<React.ReactElement>('title')
+      .props.children;
     let SystemMenu;
 
     beforeEach(() => {
@@ -170,21 +175,21 @@ describe('SystemMenu', () => {
     it('uses a default title if location is not matched', () => {
       const wrapper = mount(<SystemMenu />);
 
-      expect(wrapper.find('NavDropdown').at(1)).toHaveProp('title', 'System');
+      expect(getDropdownTitle(wrapper)).toBe('System');
     });
 
     it('uses a custom title if location is matched', () => {
       asMock(useLocation).mockReturnValue({ pathname: '/system/overview' } as Location<{ pathname: string }>);
       const wrapper = mount(<SystemMenu />);
 
-      expect(wrapper.find('NavDropdown').at(1)).toHaveProp('title', 'System / Overview');
+      expect(getDropdownTitle(wrapper)).toBe('System / Overview');
     });
 
     it('uses a custom title for a plugin route if location is matched', () => {
       asMock(useLocation).mockReturnValue({ pathname: '/system/licenses' } as Location<{ pathname: string }>);
       const wrapper = mount(<SystemMenu />);
 
-      expect(wrapper.find('NavDropdown').at(1)).toHaveProp('title', 'System / Licenses');
+      expect(getDropdownTitle(wrapper)).toBe('System / Licenses');
     });
   });
 });

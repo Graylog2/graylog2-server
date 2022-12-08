@@ -29,10 +29,11 @@ import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.ToXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog2.indexer.results.ChunkedResult;
+import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.results.ResultChunk;
 import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.indexer.results.ScrollResult;
-import org.graylog2.indexer.searches.ScrollCommand;
+import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -63,17 +64,17 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     private final OpenSearchClient client;
     private final Boolean allowLeadingWildcard;
     private final SortOrderMapper sortOrderMapper;
-    private final Scroll scroll;
+    private final MultiChunkResultRetriever multiChunkResultRetriever;
 
     @Inject
     public MoreSearchAdapterOS2(OpenSearchClient client,
                                 @Named("allow_leading_wildcard_searches") Boolean allowLeadingWildcard,
                                 SortOrderMapper sortOrderMapper,
-                                Scroll scroll) {
+                                MultiChunkResultRetriever multiChunkResultRetriever) {
         this.client = client;
         this.allowLeadingWildcard = allowLeadingWildcard;
         this.sortOrderMapper = sortOrderMapper;
-        this.scroll = scroll;
+        this.multiChunkResultRetriever = multiChunkResultRetriever;
     }
 
     @Override
@@ -134,18 +135,18 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     }
 
     @Override
-    public void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams, String scrollTime, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException {
-        final ScrollCommand scrollCommand = buildScrollCommand(queryString, timeRange, affectedIndices, streams, batchSize);
+    public void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException {
+        final ChunkCommand chunkCommand = buildScrollCommand(queryString, timeRange, affectedIndices, streams, batchSize);
 
-        final ScrollResult scrollResult = scroll.scroll(scrollCommand);
+        final ChunkedResult chunkedResult = multiChunkResultRetriever.retrieveChunkedResult(chunkCommand);
 
         final AtomicBoolean continueScrolling = new AtomicBoolean(true);
 
         final Stopwatch stopwatch = Stopwatch.createStarted();
         try {
-            ResultChunk scrollChunk = scrollResult.nextChunk();
-            while (continueScrolling.get() && scrollChunk != null) {
-                final List<ResultMessage> messages = scrollChunk.messages();
+            ResultChunk resultChunk = chunkedResult.nextChunk();
+            while (continueScrolling.get() && resultChunk != null) {
+                final List<ResultMessage> messages = resultChunk.messages();
 
                 LOG.debug("Passing <{}> messages to callback", messages.size());
                 resultCallback.accept(Collections.unmodifiableList(messages), continueScrolling);
@@ -155,7 +156,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
                     break;
                 }
 
-                scrollChunk = scrollResult.nextChunk();
+                resultChunk = chunkedResult.nextChunk();
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -163,15 +164,15 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
             try {
                 // Tell Elasticsearch that we are done with the scroll so it can release resources as soon as possible
                 // instead of waiting for the scroll timeout to kick in.
-                scrollResult.cancel();
+                chunkedResult.cancel();
             } catch (Exception ignored) {
             }
             LOG.debug("Scrolling done - took {} ms", stopwatch.stop().elapsed(TimeUnit.MILLISECONDS));
         }
     }
 
-    private ScrollCommand buildScrollCommand(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams, int batchSize) {
-        ScrollCommand.Builder commandBuilder = ScrollCommand.builder()
+    private ChunkCommand buildScrollCommand(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams, int batchSize) {
+        ChunkCommand.Builder commandBuilder = ChunkCommand.builder()
                 .query(queryString)
                 .range(timeRange)
                 .indices(affectedIndices)

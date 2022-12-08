@@ -32,9 +32,9 @@ import { EventNotificationsActions, EventNotificationsStore } from 'stores/event
 import EventDefinitionForm from './EventDefinitionForm';
 
 // Import built-in plugins
-import {} from 'components/event-definitions/event-definition-types';
+import 'components/event-definitions/event-definition-types';
 
-import {} from 'components/event-notifications/event-notification-types';
+import 'components/event-notifications/event-notification-types';
 
 class EventDefinitionFormContainer extends React.Component {
   static propTypes = {

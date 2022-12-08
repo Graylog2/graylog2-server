@@ -20,13 +20,14 @@ const path = require('path');
 const webpack = require('webpack');
 const AssetsPlugin = require('assets-webpack-plugin');
 const merge = require('webpack-merge');
-const TerserPlugin = require('terser-webpack-plugin');
+const { ESBuildMinifyPlugin } = require('esbuild-loader');
 
 const ROOT_PATH = path.resolve(__dirname);
 const BUILD_PATH = path.resolve(ROOT_PATH, 'target/web/build');
 const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
 
 const vendorModules = require('./vendor.modules');
+const supportedBrowsers = require('./supportedBrowsers');
 
 const TARGET = process.env.npm_lifecycle_event || 'build';
 process.env.BABEL_ENV = TARGET;
@@ -97,15 +98,8 @@ if (TARGET.startsWith('build')) {
     optimization: {
       concatenateModules: false,
       sideEffects: false,
-      minimizer: [new TerserPlugin({
-        terserOptions: {
-          compress: {
-            warnings: false,
-          },
-          mangle: {
-            reserved: ['$super', '$', 'exports', 'require'],
-          },
-        },
+      minimizer: [new ESBuildMinifyPlugin({
+        target: supportedBrowsers,
       })],
     },
     plugins: [

@@ -103,7 +103,7 @@ public class OSGeneratedQueryContext implements GeneratedQueryContext {
     }
 
     public String seriesName(SeriesSpec seriesSpec, Pivot pivot) {
-        return pivot.id() + "-series-" + seriesSpec.literal();
+        return pivot.id() + "-series-" + seriesSpec.id();
     }
 
     public Optional<String> fieldType(Set<String> streamIds, String field) {

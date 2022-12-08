@@ -26,7 +26,8 @@ public class TextField extends AbstractConfigurationField {
 
     public enum Attribute {
         IS_PASSWORD,
-        TEXTAREA
+        TEXTAREA,
+        IS_SENSITIVE
     }
 
     private String defaultValue;
