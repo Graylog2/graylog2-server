@@ -18,8 +18,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Button, Alert, Col, Row, Table } from 'components/bootstrap';
-import { Icon, PaginatedList } from 'components/common';
+import { Button, Col, Row, Table } from 'components/bootstrap';
+import { Icon, PaginatedList, NoSearchResult, NoEntitiesExist } from 'components/common';
 import SidecarSearchForm from 'components/sidecars/common/SidecarSearchForm';
 
 import SidecarRow from './SidecarRow';
@@ -102,18 +102,36 @@ class SidecarList extends React.Component {
     );
   };
 
-  formatEmptyListAlert = () => {
+  formatNoMatchingListAlert = () => {
     const { onlyActive } = this.props;
     const showInactiveHint = (onlyActive ? ' and/or click on "Include inactive sidecars"' : null);
 
-    return <Alert>There are no sidecars to show. Try adjusting your search filter{showInactiveHint}.</Alert>;
+    return (
+      <NoSearchResult>
+        <Icon name="info-circle" />&nbsp;There are no sidecars matching the search criteria. Try adjusting your search filter{showInactiveHint}.
+      </NoSearchResult>
+    );
+  };
+
+  renderEmptyList = () => {
+    const { query } = this.props;
+
+    if (query) {
+      return this.formatNoMatchingListAlert();
+    }
+
+    return (
+      <NoEntitiesExist>
+        There are no sidecars configured.
+      </NoEntitiesExist>
+    );
   };
 
   render() {
     const { sidecars, onlyActive, pagination, query, onQueryChange, onPageChange, toggleShowInactive } = this.props;
     const sidecarRows = sidecars.map((sidecar) => <SidecarRow key={sidecar.node_id} sidecar={sidecar} />);
     const showOrHideInactive = (onlyActive ? 'Include' : 'Hide');
-    const sidecarList = (sidecarRows.length > 0 ? this.formatSidecarList(sidecarRows) : this.formatEmptyListAlert());
+    const sidecarList = (sidecarRows.length > 0 ? this.formatSidecarList(sidecarRows) : this.renderEmptyList());
 
     return (
       <div>
