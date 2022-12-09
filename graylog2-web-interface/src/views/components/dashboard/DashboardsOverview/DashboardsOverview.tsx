@@ -57,7 +57,7 @@ const useCustomColumnRenderers = () => {
   return customColumnRenderers;
 };
 
-const DashboardList = () => {
+const DashboardsOverview = () => {
   const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
   const [visibleColumns, setVisibleColumns] = useState(INITIAL_COLUMNS);
   const [searchParams, setSearchParams] = useState<SearchParams>({
@@ -140,4 +140,4 @@ const DashboardList = () => {
   );
 };
 
-export default DashboardList;
+export default DashboardsOverview;

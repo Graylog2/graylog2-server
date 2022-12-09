@@ -89,7 +89,6 @@ describe('DashboardActions', () => {
       PluginStore.register(plugin);
       asMock(ViewManagementActions.delete).mockClear();
       asMock(ViewManagementActions.delete).mockImplementation((view) => Promise.resolve(view));
-      // mockDashboards(simpleDashboardList);
     });
 
     afterEach(() => {
