@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { render, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 
 import asMock from 'helpers/mocking/AsMock';
@@ -23,6 +23,7 @@ import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import Query, { filtersForQuery } from 'views/logic/queries/Query';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
+import SearchActions from 'views/actions/SearchActions';
 
 import FieldTypesContext from './FieldTypesContext';
 import DefaultFieldTypesProvider from './DefaultFieldTypesProvider';
@@ -71,5 +72,22 @@ describe('DefaultFieldTypesProvider', () => {
     const fieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('queryId') };
 
     expect(consume).toHaveBeenCalledWith(fieldTypes);
+  });
+
+  it('refetches field types upon search refresh', async () => {
+    asMock(useCurrentQuery).mockReturnValue(Query.builder().id('foobar').build());
+    const refetchMock = jest.fn();
+
+    asMock(useFieldTypes).mockImplementation((streams) => (streams.length === 0
+      ? { data: simpleFields().toArray(), refetch: refetchMock }
+      : { data: simpleQueryFields('foo').get('foo').toArray(), refetch: refetchMock }));
+
+    renderSUT();
+
+    SearchActions.refresh();
+
+    await waitFor(() => {
+      expect(refetchMock).toHaveBeenCalledTimes(2);
+    });
   });
 });

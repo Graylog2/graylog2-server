@@ -23,9 +23,9 @@ import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import { filtersToStreamSet } from 'views/logic/queries/Query';
 import type { RelativeTimeRange } from 'views/logic/queries/Query';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
+import SearchActions from 'views/actions/SearchActions';
 
 import FieldTypesContext from './FieldTypesContext';
-import SearchActions from 'views/actions/SearchActions';
 
 const defaultId = '';
 const defaultTimeRange: RelativeTimeRange = { type: 'relative', from: 300 };
