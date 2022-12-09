@@ -49,7 +49,7 @@ public class CatApi {
     public Map<String, String> aliases() {
         final Request request = request("GET", "aliases");
         request.addParameter("h", "alias,index");
-        var response = perform(request, new TypeReference<List<AliasSummaryResponse>>() {}, "Unable to retrieve aliases");
+        final List<AliasSummaryResponse> response = perform(request, new TypeReference<List<AliasSummaryResponse>>() {}, "Unable to retrieve aliases");
 
         return response.stream()
                 .collect(Collectors.toMap(AliasSummaryResponse::alias, AliasSummaryResponse::index));

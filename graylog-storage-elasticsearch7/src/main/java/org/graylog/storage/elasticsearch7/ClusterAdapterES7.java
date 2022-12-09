@@ -54,6 +54,7 @@ import javax.inject.Named;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -291,13 +292,13 @@ public class ClusterAdapterES7 implements ClusterAdapter {
             return Optional.of(HealthStatus.Green);
         }
 
-        var aliasMapping = catApi.aliases();
-        var mappedIndices = indices
+        final Map<String, String> aliasMapping = catApi.aliases();
+        final Set<String> mappedIndices = indices
                 .stream()
                 .map(index -> aliasMapping.getOrDefault(index, index))
                 .collect(Collectors.toSet());
 
-        var indexSummaries = catApi.indices()
+        final Set<IndexSummaryResponse> indexSummaries = catApi.indices()
                 .stream()
                 .filter(indexSummary -> mappedIndices.contains(indexSummary.index()))
                 .collect(Collectors.toSet());
