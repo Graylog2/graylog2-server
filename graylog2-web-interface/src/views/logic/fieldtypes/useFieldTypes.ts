@@ -24,6 +24,7 @@ import type { FieldTypeMappingJSON } from 'views/logic/fieldtypes/FieldTypeMappi
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { adjustFormat, toUTCFromTz } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
+import { singleton } from 'logic/singleton';
 
 const fieldTypesUrl = qualifyUrl('/views/fields');
 
@@ -50,7 +51,9 @@ const createFieldTypeRequest = (streams: Array<string>, timerange: TimeRange): F
   return request;
 };
 
-const fetchAllFieldTypes = (streams: Array<string>, timerange: TimeRange): Promise<Array<FieldTypeMapping>> => fetch('POST', fieldTypesUrl, createFieldTypeRequest(streams, timerange))
+const fetchAllFieldTypes = (streams: Array<string>, timerange: TimeRange): Promise<Array<FieldTypeMapping>> => fetch(
+  'POST', fieldTypesUrl, createFieldTypeRequest(streams, timerange),
+)
   .then(_deserializeFieldTypes);
 
 const normalizeTimeRange = (timerange: TimeRange, userTz: string): TimeRange => {
@@ -66,7 +69,7 @@ const normalizeTimeRange = (timerange: TimeRange, userTz: string): TimeRange => 
   }
 };
 
-const useFieldTypes = (streams: Array<string>, timerange: TimeRange): { data: FieldTypeMapping[] } => {
+const useFieldTypes = (streams: Array<string>, timerange: TimeRange): { data: FieldTypeMapping[], refetch: () => void } => {
   const { userTimezone } = useUserDateTime();
   const _timerange = useMemo(() => normalizeTimeRange(timerange, userTimezone), [timerange, userTimezone]);
 
@@ -77,4 +80,4 @@ const useFieldTypes = (streams: Array<string>, timerange: TimeRange): { data: Fi
   );
 };
 
-export default useFieldTypes;
+export default singleton('hooks.useFieldTypes', () => useFieldTypes);
