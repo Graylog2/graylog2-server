@@ -30,6 +30,8 @@ import DefaultFieldTypesProvider from './DefaultFieldTypesProvider';
 jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
 
+const refetch = () => {};
+
 describe('DefaultFieldTypesProvider', () => {
   const renderSUT = () => {
     const consume = jest.fn();
@@ -47,7 +49,7 @@ describe('DefaultFieldTypesProvider', () => {
 
   it('provides no field types with empty store', () => {
     asMock(useCurrentQuery).mockReturnValue(Query.builder().id('foobar').build());
-    asMock(useFieldTypes).mockReturnValue({ data: undefined });
+    asMock(useFieldTypes).mockReturnValue({ data: undefined, refetch });
 
     const consume = renderSUT();
 
@@ -61,8 +63,8 @@ describe('DefaultFieldTypesProvider', () => {
       .build());
 
     asMock(useFieldTypes).mockImplementation((streams) => (streams.length === 0
-      ? { data: simpleFields().toArray() }
-      : { data: simpleQueryFields('foo').get('foo').toArray() }));
+      ? { data: simpleFields().toArray(), refetch }
+      : { data: simpleQueryFields('foo').get('foo').toArray(), refetch }));
 
     const consume = renderSUT();
 

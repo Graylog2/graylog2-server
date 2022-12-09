@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 
@@ -25,6 +25,7 @@ import type { RelativeTimeRange } from 'views/logic/queries/Query';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 
 import FieldTypesContext from './FieldTypesContext';
+import SearchActions from 'views/actions/SearchActions';
 
 const defaultId = '';
 const defaultTimeRange: RelativeTimeRange = { type: 'relative', from: 300 };
@@ -32,11 +33,18 @@ const defaultTimeRange: RelativeTimeRange = { type: 'relative', from: 300 };
 const DefaultFieldTypesProvider = ({ children }: { children: React.ReactElement }) => {
   const currentQuery = useCurrentQuery();
   const currentStreams = useMemo(() => filtersToStreamSet(currentQuery?.filter).toArray(), [currentQuery?.filter]);
-  const { data: currentFieldTypes } = useFieldTypes(currentStreams, currentQuery?.timerange || defaultTimeRange);
-  const { data: allFieldTypes } = useFieldTypes([], currentQuery?.timerange || defaultTimeRange);
+  const { data: currentFieldTypes, refetch: refreshCurrentTypes } = useFieldTypes(currentStreams, currentQuery?.timerange || defaultTimeRange);
+  const { data: allFieldTypes, refetch: refreshAllTypes } = useFieldTypes([], currentQuery?.timerange || defaultTimeRange);
   const queryFields = useMemo(() => Immutable.Map({ [currentQuery?.id || defaultId]: Immutable.List(currentFieldTypes) }), [currentFieldTypes, currentQuery?.id]);
   const all = useMemo(() => Immutable.List(allFieldTypes ?? []), [allFieldTypes]);
   const fieldTypes = useMemo(() => ({ all, queryFields }), [all, queryFields]);
+
+  useEffect(() => {
+    return SearchActions.refresh.listen(() => {
+      refreshCurrentTypes();
+      refreshAllTypes();
+    });
+  }, [refreshAllTypes, refreshCurrentTypes]);
 
   return (
     <FieldTypesContext.Provider value={fieldTypes}>
