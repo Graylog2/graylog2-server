@@ -33,7 +33,6 @@ import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
@@ -107,7 +106,7 @@ class ClusterAdapterES7Test {
     @Test
     void returnsEmptyOptionalForHealthWhenElasticsearchExceptionThrown() {
         when(client.execute(any())).thenThrow(new ElasticsearchException("Exception"));
-        final Optional<HealthStatus> healthStatus = clusterAdapter.health(Collections.singletonList("foo_index"));
+        final Optional<HealthStatus> healthStatus = clusterAdapter.health();
         assertThat(healthStatus).isEmpty();
     }
 
