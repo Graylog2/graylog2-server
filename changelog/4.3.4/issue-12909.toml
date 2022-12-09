@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix field schema compatibility issue with the GeoIP message processor."
+
+issues = ["12909"]
+pulls = ["13094"]

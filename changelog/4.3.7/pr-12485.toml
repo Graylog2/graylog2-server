@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix error on the \"show message\" page for messages from a Forwarder."
+
+issues = ["graylog-plugin-enterprise#3472"]
+pulls = ["12485"]

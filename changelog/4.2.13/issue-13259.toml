@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Don't toggle the message details view when selecting the message text."
+
+issues = ["13259"]
+pulls = ["13341"]

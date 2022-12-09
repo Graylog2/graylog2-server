@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix edit button on index set details page."
+
+issues = ["12997"]
+pulls = ["13000"]

@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix permission issue for permalinks to messages."
+
+issues = ["11540"]
+pulls = ["11541"]

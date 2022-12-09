@@ -1,0 +1,5 @@
+type = "a"
+message = "Add field value suggestions for search queries."
+
+issues = ["11491"]
+pulls = ["11585", "11787"]

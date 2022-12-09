@@ -76,7 +76,7 @@ public class ClusterSystemShutdownResource extends ProxiedResource {
         final Node targetNode = nodeService.byNodeId(nodeId);
 
         RemoteSystemShutdownResource remoteSystemShutdownResource = remoteInterfaceProvider.get(targetNode,
-                this.authenticationToken,
+                getAuthenticationToken(),
                 RemoteSystemShutdownResource.class);
         final Response response = remoteSystemShutdownResource.shutdown().execute();
         if (response.code() != ACCEPTED.getStatusCode()) {

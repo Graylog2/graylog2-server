@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix authentication problem with proxied API endpoints when using trusted header authentication."
+
+issues = ["13721"]
+pulls = ["13735"]

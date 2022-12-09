@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix `NullPointerException` in `IndexerClusterCheckerThread` periodical job."
+
+issues = ["12858"]
+pulls = ["12979"]

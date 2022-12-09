@@ -1,0 +1,5 @@
+type = "f"
+message = "Improve content pack import to handle missing streams."
+
+issues = ["10008"]
+pulls = ["10972"]

@@ -93,7 +93,14 @@ public class Beats2Codec extends AbstractCodec {
         if (agentOrBeat.isMissingNode()) {
             agentOrBeat = event.path("beat");
         }
-        final String hostname = agentOrBeat.path("hostname").asText(BEATS_UNKNOWN);
+
+        JsonNode agentName = agentOrBeat.path("hostname");
+        if (agentName.isMissingNode()) {
+            // Compatibility for beats >= 8.0
+            agentName = agentOrBeat.path("name");
+        }
+
+        final String hostname = agentName.asText(BEATS_UNKNOWN);
 
         final Message gelfMessage = new Message(message, hostname, timestamp);
         gelfMessage.addField("beats_type", beatsType);

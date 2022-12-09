@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix field naming issue with GeoIP processor when schema enforcement is disabled."
+
+issues = ["12904"]
+pulls = ["12930"]

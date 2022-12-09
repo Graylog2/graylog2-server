@@ -1,0 +1,5 @@
+type = "f"
+message = "Unlock event definition jobs after a server crash to make sure they continue to execute."
+
+issues = ["8612"]
+pulls = ["11249"]

@@ -175,7 +175,10 @@ public class MessagesAdapterES7 implements MessagesAdapter {
         } catch (ElasticsearchException e) {
             for (ElasticsearchException cause : e.guessRootCauses()) {
                 if (cause.status().equals(RestStatus.REQUEST_ENTITY_TOO_LARGE)) {
-                    throw new ChunkedBulkIndexer.EntityTooLargeException(indexedSuccessfully, indexingErrorsFrom(chunk));
+                    throw new ChunkedBulkIndexer.EntityTooLargeException(indexedSuccessfully);
+                }
+                if (cause.status().equals(RestStatus.TOO_MANY_REQUESTS)) {
+                    throw new ChunkedBulkIndexer.TooManyRequestsException(indexedSuccessfully);
                 }
             }
             throw new org.graylog2.indexer.ElasticsearchException(e);

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix problem with \"Latest Value\" aggregation widget."
+
+issues = ["13593"]
+pulls = ["13640"]

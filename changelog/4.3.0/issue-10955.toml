@@ -1,0 +1,10 @@
+type = "c"
+message = "Persist input state to avoid automatic starting of manually stopped inputs after a server restart."
+
+issues = ["10955"]
+pulls = ["11362"]
+
+details.user = """
+To restore the previous behavior and automatically start the manually stopped
+inputs, `auto_restart_inputs = true` can be set in the server config.
+"""

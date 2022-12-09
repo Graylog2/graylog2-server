@@ -78,7 +78,7 @@ public class ClusterLoadBalancerStatusResource extends ProxiedResource {
         final Node targetNode = nodeService.byNodeId(nodeId);
 
         RemoteLoadBalancerStatusResource remoteLoadBalancerStatusResource = remoteInterfaceProvider.get(targetNode,
-                this.authenticationToken,
+                getAuthenticationToken(),
                 RemoteLoadBalancerStatusResource.class);
         final Response response = remoteLoadBalancerStatusResource.override(status).execute();
         if (!response.isSuccessful()) {

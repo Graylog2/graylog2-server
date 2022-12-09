@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix `--dump-default-config` server command."
+
+pulls = ["13507"]

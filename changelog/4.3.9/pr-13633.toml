@@ -1,0 +1,4 @@
+type = "a"
+message = "Add `includeToday` parameter to the `/api/system/cluster/traffic` API endpoint."
+
+pulls = ["13633"]

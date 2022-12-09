@@ -1,0 +1,4 @@
+type = "c"
+message = "Remove and/or replace the term `master` with the term `leader` to move towards more inclusive naming."
+
+pulls = ["11766"]

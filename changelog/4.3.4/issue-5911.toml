@@ -1,0 +1,5 @@
+type = "added"
+message = "Add an optional default parameter to the `set_field` pipeline processing function."
+
+issues = ["5911"]
+pulls = ["13132"]

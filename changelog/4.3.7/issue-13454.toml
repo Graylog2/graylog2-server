@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix disk calculation in message journal pre-flight check."
+
+issues = ["13454"]
+pulls = ["13470"]

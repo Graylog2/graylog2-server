@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix search query validation for leading-wildcard queries."
+
+issues = ["12725"]
+pulls = ["12727"]

@@ -1,0 +1,5 @@
+type = "c"
+message = "Switch to cookie based API authentication for the frontend."
+
+issues = ["6831"]
+pulls = ["11788"]

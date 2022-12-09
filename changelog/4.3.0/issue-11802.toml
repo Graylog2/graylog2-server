@@ -1,0 +1,7 @@
+type = "f"
+message = "Fix page reload problem in API browser."
+
+contributors = ["supahgreg"]
+
+issues = ["11802"]
+pulls = ["12000"]

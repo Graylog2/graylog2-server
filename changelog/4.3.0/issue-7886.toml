@@ -1,0 +1,7 @@
+type = "f"
+message = "Limit the vertical space consumed by the event definition filter preview."
+
+contributors = ["supahgreg"]
+
+issues = ["7886"]
+pulls = ["11512"]

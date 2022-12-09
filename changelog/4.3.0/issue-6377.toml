@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix DNS lookup for the `http_proxy_uri` to resolve dynamically."
+
+issues = ["6377"]
+pulls = ["11813"]

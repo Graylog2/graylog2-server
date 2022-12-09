@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix `source` field extraction for Beats version 8 and later."
+
+issues = ["13254"]
+pulls = ["13895"]

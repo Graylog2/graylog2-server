@@ -1,0 +1,5 @@
+type = "a"
+message = "Add configuration setting to avoid rotating indices in empty index sets."
+
+issues = ["13028"]
+pulls = ["13099"]
