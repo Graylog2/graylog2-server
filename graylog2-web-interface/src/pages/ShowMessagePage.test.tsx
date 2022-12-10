@@ -73,7 +73,7 @@ const SimpleShowMessagePage = ({ index, messageId }: SimpleShowMessagePageProps)
 describe('ShowMessagePage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    asMock(useFieldTypes).mockReturnValue({ data: [] });
+    asMock(useFieldTypes).mockReturnValue({ data: [], refetch: () => {} });
   });
 
   it('triggers a node list refresh on mount', async () => {
