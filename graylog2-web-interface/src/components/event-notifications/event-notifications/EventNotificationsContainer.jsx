@@ -25,7 +25,7 @@ import withPaginationQueryParameter from 'components/common/withPaginationQueryP
 import EventNotifications, { PAGE_SIZES } from './EventNotifications';
 // Import built-in Event Notification Types
 
-import {} from '../event-notification-types';
+import '../event-notification-types';
 
 const fetchData = ({ page, pageSize, query }) => {
   return EventNotificationsActions.listPaginated({

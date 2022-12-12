@@ -25,10 +25,10 @@ class ResponseSchemaEntryTest {
     void name() {
         Assertions.assertThat(ResponseSchemaEntry.groupBy("http_method").name()).isEqualTo("grouping: http_method");
 
-        Assertions.assertThat(ResponseSchemaEntry.metric("max", ResponseEntryDataType.STRING, "took_ms").name())
+        Assertions.assertThat(ResponseSchemaEntry.metric("max", "took_ms").name())
                 .isEqualTo("metric: max(took_ms)");
 
-        Assertions.assertThat(ResponseSchemaEntry.metric("count", ResponseEntryDataType.STRING, null).name())
+        Assertions.assertThat(ResponseSchemaEntry.metric("count", null).name())
                 .isEqualTo("metric: count()");
     }
 }

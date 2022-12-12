@@ -89,11 +89,11 @@ export class Builder {
 
   private accept: string;
 
-  private responseHandler: (response: any) => any;
+  private responseHandler: (response: unknown) => unknown;
 
-  private errorHandler: (error: any) => any;
+  private errorHandler: (error: unknown) => unknown;
 
-  constructor(method, url) {
+  constructor(method: Method, url: string) {
     this.method = method;
     this.url = url.replace(/([^:])\/\//, '$1/');
 
@@ -141,7 +141,7 @@ export class Builder {
     this.body = { body: maybeStringify(body), mimeType: 'application/json' };
     this.accept = mimeType;
 
-    this.responseHandler = (resp) => {
+    this.responseHandler = (resp: { ok: boolean, text: () => string }) => {
       if (resp.ok) {
         reportServerSuccess();
 
@@ -184,7 +184,7 @@ export class Builder {
     return this;
   }
 
-  build() {
+  build(): Promise<any> {
     const headers: RequestHeaders = this.body && this.body.mimeType
       ? { ...this.options, 'Content-Type': this.body.mimeType }
       : this.options;
@@ -193,7 +193,7 @@ export class Builder {
       headers.Accept = this.accept;
     }
 
-    return CancellablePromise.of(window.fetch(this.url, {
+    return CancellablePromise.of<unknown>(window.fetch(this.url, {
       method: this.method,
       headers,
       body: this.body ? this.body.body : undefined,
@@ -202,7 +202,7 @@ export class Builder {
   }
 }
 
-function queuePromiseIfNotLoggedin(promise) {
+function queuePromiseIfNotLoggedin<T>(promise: () => Promise<T>): () => Promise<T> {
   const { SessionStore, SessionActions } = importSessionStore();
 
   if (!SessionStore.isLoggedIn()) {
@@ -216,7 +216,9 @@ function queuePromiseIfNotLoggedin(promise) {
   return promise;
 }
 
-export default function fetch(method, url, body?) {
+type Method = 'GET' | 'PUT' | 'POST' | 'DELETE';
+
+export default function fetch<T = any>(method: Method, url: string, body?: any): Promise<T> {
   const promise = () => new Builder(method, url)
     .json(body)
     .build();

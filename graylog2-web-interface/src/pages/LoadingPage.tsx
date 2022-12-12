@@ -16,31 +16,21 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { createGlobalStyle } from 'styled-components';
 
-import { DocumentTitle, Spinner } from 'components/common';
-import LoginBox from 'components/login/LoginBox';
-import authStyles from 'theme/styles/authStyles';
-import LoginHeader from 'components/login/LoginHeader';
+import DocumentTitle from 'components/common/DocumentTitle';
+import Spinner from 'components/common/Spinner';
+import LoginChrome from 'components/login/LoginChrome';
 
 type Props = {
   text: string,
 };
 
-const LoadingPageStyles = createGlobalStyle`
-  ${authStyles}
-`;
-
 const LoadingPage = ({ text }: Props) => {
   return (
     <DocumentTitle title="Loading...">
-      <LoadingPageStyles />
-      <LoginBox>
-        <LoginHeader />
-        <p>
-          <Spinner text={text} delay={0} />
-        </p>
-      </LoginBox>
+      <LoginChrome>
+        <Spinner text={text} delay={0} />
+      </LoginChrome>
     </DocumentTitle>
   );
 };

@@ -16,14 +16,12 @@
  */
 package org.graylog2.indexer.results;
 
-public class IndexQueryResult {
+public abstract class IndexQueryResult {
     private final String originalQuery;
-    private final long tookMs;
     private final String builtQuery;
 
-    public IndexQueryResult(String originalQuery, String builtQuery, long tookMs) {
+    public IndexQueryResult(final String originalQuery, final String builtQuery) {
         this.originalQuery = originalQuery;
-        this.tookMs = tookMs;
         this.builtQuery = builtQuery;
     }
 
@@ -35,7 +33,5 @@ public class IndexQueryResult {
         return builtQuery;
     }
 
-    public long tookMs() {
-        return tookMs;
-    }
+    public abstract long tookMs();
 }

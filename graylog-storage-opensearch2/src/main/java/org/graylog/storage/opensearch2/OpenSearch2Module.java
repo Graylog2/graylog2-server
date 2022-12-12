@@ -35,6 +35,7 @@ import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
+import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
@@ -57,6 +58,7 @@ public class OpenSearch2Module extends VersionAwareModule {
         bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterOS2.class);
         bindForSupportedVersion(IndexToolsAdapter.class).to(IndexToolsAdapterOS2.class);
         bindForSupportedVersion(MessagesAdapter.class).to(MessagesAdapterOS2.class);
+        bindForSupportedVersion(MultiChunkResultRetriever.class).to(PaginationOS2.class);
         bindForSupportedVersion(MoreSearchAdapter.class).to(MoreSearchAdapterOS2.class);
         bindForSupportedVersion(NodeAdapter.class).to(NodeAdapterOS2.class);
         bindForSupportedVersion(SearchesAdapter.class).to(SearchesAdapterOS2.class);
