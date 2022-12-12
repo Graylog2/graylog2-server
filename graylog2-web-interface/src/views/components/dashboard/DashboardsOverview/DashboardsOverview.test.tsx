@@ -19,12 +19,29 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
+import { MockStore, asMock } from 'helpers/mocking';
+import useDashboards from 'views/logic/dashboards/useDashboards';
 
-import DashboardList from './DashboardList';
+import DashboardsOverview from './DashboardsOverview';
 
 jest.mock('routing/Routes', () => ({ pluginRoute: () => () => '/route' }));
 
-const createPaginatedDashboards = (count = 1) => {
+jest.mock('views/logic/dashboards/useDashboards');
+
+jest.mock('views/stores/ViewManagementStore', () => ({
+  ViewManagementActions: {
+    delete: jest.fn(),
+  },
+}));
+
+jest.mock('views/stores/DashboardsStore', () => ({
+  DashboardsActions: {
+    search: () => Promise.resolve(),
+  },
+  DashboardsStore: MockStore(),
+}));
+
+const loadDashboardsResponse = (count = 1) => {
   const dashboards: Array<View> = [];
 
   if (count > 0) {
@@ -45,36 +62,32 @@ const createPaginatedDashboards = (count = 1) => {
   }
 
   return {
-    pagination: {
-      total: count,
-      page: count > 0 ? count : 1,
-      perPage: 5,
-      count,
+    data: {
+      pagination: {
+        total: count,
+        page: count > 0 ? count : 1,
+        perPage: 5,
+        count,
+      },
+      list: dashboards,
     },
-    list: dashboards,
+    refetch: () => {},
   };
 };
 
-describe('render the DashboardList', () => {
+describe('DashboardsOverview', () => {
   it('should render empty', async () => {
-    const dashboards = createPaginatedDashboards(0);
+    asMock(useDashboards).mockReturnValue(loadDashboardsResponse(0));
 
-    render(
-      <DashboardList dashboards={dashboards.list}
-                     pagination={dashboards.pagination}
-                     handleSearch={() => {}}
-                     handleDashboardDelete={() => {}} />);
+    render(<DashboardsOverview />);
 
-    await screen.findByText('There are no dashboards present/matching the filter!');
+    await screen.findByText('No dashboards have been created yet.');
   });
 
   it('should render list', async () => {
-    const dashboards = createPaginatedDashboards(3);
+    asMock(useDashboards).mockReturnValue(loadDashboardsResponse(3));
 
-    render(<DashboardList dashboards={dashboards.list}
-                          pagination={dashboards.pagination}
-                          handleSearch={() => {}}
-                          handleDashboardDelete={() => {}} />);
+    render(<DashboardsOverview />);
 
     await screen.findByText('search-title-0');
     await screen.findByText('search-title-1');

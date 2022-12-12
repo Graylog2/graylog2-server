@@ -21,7 +21,7 @@ import { useMemo } from 'react';
 import SortIcon from 'components/streams/StreamsOverview/SortIcon';
 
 import BulkSelectHead from './BulkSelectHead';
-import type { Column, Sort, ColumnRenderers, ColumnRenderer } from './types';
+import type { Column, Sort, ColumnRenderer, ColumnRenderers } from './types';
 
 const Th = styled.th<{ $width: number | undefined }>(({ $width }) => css`
   width: ${$width ? `${$width}px` : 'auto'};
@@ -81,8 +81,8 @@ const TableHead = <Entity extends { id: string }>({
   columns: Array<Column>,
   columnsWidths: { [columnId: string]: number },
   columnRenderers: ColumnRenderers<Entity>,
-  data: Array<Entity>
-  displayActionsCol: boolean
+  data: Readonly<Array<Entity>>,
+  displayActionsCol: boolean,
   displayBulkSelectCol: boolean,
   onSortChange: (newSort: Sort) => void,
   selectedEntities: Array<string>,

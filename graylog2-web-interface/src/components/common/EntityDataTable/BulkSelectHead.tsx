@@ -23,7 +23,7 @@ import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Cons
 
 type CheckboxStatus = 'CHECKED' | 'UNCHECKED' | 'PARTIAL';
 
-const useCheckboxStatus = <Entity extends { id: string }>(data: Array<Entity>, selectedEntityIds: Array<string>) => {
+const useCheckboxStatus = <Entity extends { id: string }>(data: Readonly<Array<Entity>>, selectedEntityIds: Array<string>) => {
   const checkboxRef = useRef<HTMLInputElement>();
 
   const checkboxStatus: CheckboxStatus = useMemo(() => {
@@ -59,9 +59,9 @@ const useCheckboxStatus = <Entity extends { id: string }>(data: Array<Entity>, s
 };
 
 type Props<Entity extends { id: string }> = {
-  data: Array<Entity>
+  data: Readonly<Array<Entity>>,
   selectedEntities: Array<string>,
-  setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>
+  setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>,
 }
 
 const BulkSelectHead = <Entity extends { id: string }>({

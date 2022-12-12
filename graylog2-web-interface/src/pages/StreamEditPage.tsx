@@ -66,7 +66,7 @@ const StreamEditPage = () => {
   return (
     <DocumentTitle title={`Rules of Stream ${stream.title}`}>
       <div>
-        <PageHeader title={<span>Rules of Stream &raquo;{stream.title}&raquo;</span>}
+        <PageHeader title={<span>Rules of Stream &quot;{stream.title}&quot;</span>}
                     documentationLink={{
                       title: 'Streams documentation',
                       path: DocsHelper.PAGES.STREAMS,

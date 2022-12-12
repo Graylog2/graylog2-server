@@ -1,0 +1,4 @@
+type = "added"
+message = "Add option to sort streams returned by API endpoint to be sorted by index set title."
+
+pulls = ["14085"]
