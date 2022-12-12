@@ -43,18 +43,21 @@ const AssignIndexSetModal = ({
   toggleShowModal,
   indexSets,
   refetchStreams,
+  setSelectedStreamIds,
   descriptor,
 }: {
-  selectedStreamIds: Array<string>,
-  toggleShowModal: () => void,
+  descriptor: string,
   indexSets: Array<IndexSet>,
   refetchStreams: () => void,
-  descriptor: string,
+  setSelectedStreamIds: (streamIds: Array<string>) => void
+  selectedStreamIds: Array<string>,
+  toggleShowModal: () => void,
 }) => {
   const modalTitle = `Assign Index Set To ${selectedStreamIds.length} ${StringUtils.capitalizeFirstLetter(descriptor)}`;
   const onSubmit = ({ index_set_id: indexSetId }: AssignIndexSetFormValues) => Streams.assignToIndexSet(indexSetId, selectedStreamIds).then(() => {
     refetchStreams();
     UserNotification.success(`Index set was assigned to ${selectedStreamIds.length} ${descriptor} successfully.`, 'Success');
+    setSelectedStreamIds([]);
     toggleShowModal();
   }).catch((error: FetchError) => {
     UserNotification.error(`Assigning index set failed with status: ${error}`, 'Error');
@@ -156,6 +159,7 @@ const BulkActions = ({ selectedStreamIds, refetchStreams, setSelectedStreamIds, 
       <Button bsSize="xsmall" bsStyle="danger" onClick={onDelete}>Delete</Button>
       {showIndexSetModal && (
         <AssignIndexSetModal selectedStreamIds={selectedStreamIds}
+                             setSelectedStreamIds={setSelectedStreamIds}
                              toggleShowModal={toggleAssignIndexSetModal}
                              indexSets={indexSets}
                              descriptor={descriptor}
