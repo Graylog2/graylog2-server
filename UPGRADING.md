@@ -4,8 +4,7 @@ Upgrading to Graylog 5.1.x
 ## New Functionality
 
 ### Index Default Configuration
-Support for configuring system index initialization defaults, and ongoing in-database index set defaults has been added.
-This adds two new Index Set-related functionalities:
+Support for configuring index defaults has been added:
 1) Adds the ability to specify Index Set initialization default settings in the server configuration file for new Graylog clusters.
 2) Adds the ability to subsequently maintain the current Index Set defaults from the System > Configurations page
    and through the Graylog API.
