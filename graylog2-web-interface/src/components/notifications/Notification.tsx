@@ -24,11 +24,11 @@ import DOMPurify from 'dompurify';
 import { Alert, Button } from 'components/bootstrap';
 import { RelativeTime, Icon, Spinner } from 'components/common';
 import NotificationsFactory from 'logic/notifications/NotificationsFactory';
-import { Notification, NotificationsActions, NotificationsStore } from 'stores/notifications/NotificationsStore';
+import { NotificationType, NotificationsActions, NotificationsStore } from 'stores/notifications/NotificationsStore';
 import { useStore } from 'stores/connect';
 
 type Props = {
-  notification: Notification, 
+  notification: NotificationType, 
 };
 
 const StyledButton = styled(Button)`

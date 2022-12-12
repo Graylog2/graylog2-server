@@ -14,18 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
 
-import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import DocsHelper from 'util/DocsHelper';
-import DocumentationLink from 'components/support/DocumentationLink';
-import HideOnCloud from 'util/conditional/HideOnCloud';
 
 class NotificationsFactory {
-  static getForNotification(notification) {
-  }
-
   static getValuesForNotification(notification) {
     switch (notification.type) {
       case 'legacy_ldap_config_migration': {
