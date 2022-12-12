@@ -65,8 +65,8 @@ const PaginatedList = ({
     currentPageSize: (useQueryParameter && showPageSizeSelect) ? queryParamPageSize : propPageSize,
   });
 
-  React.useEffect(() => {
-    if (useQueryParameter) {
+  const executeOnChageCB = React.useCallback(() => {
+    if (currentPage !== page || currentPageSize !== queryParamPageSize) {
       setPagination({
         currentPage: Math.max(page, INITIAL_PAGE),
         currentPageSize: queryParamPageSize,
@@ -74,7 +74,11 @@ const PaginatedList = ({
 
       if (onChange) onChange(Math.max(page, INITIAL_PAGE), queryParamPageSize);
     }
-  }, [page, queryParamPageSize, onChange, useQueryParameter]);
+  }, [page, queryParamPageSize, currentPage, currentPageSize, onChange]);
+
+  React.useEffect(() => {
+    if (useQueryParameter) executeOnChageCB();
+  }, [useQueryParameter, executeOnChageCB]);
 
   const numberPages = React.useMemo(() => (
     currentPageSize > 0 ? Math.ceil(totalItems / currentPageSize) : 0
