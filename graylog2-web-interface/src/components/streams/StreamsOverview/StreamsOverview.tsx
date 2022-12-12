@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 
@@ -148,6 +148,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   });
   const { data: streamRuleTypes } = useStreamRuleTypes();
   const { data: paginatedStreams, refetch: refetchStreams } = usePaginatedStreams(searchParams);
+  const columnRenderers = useMemo(() => customColumnRenderers(indexSets), []);
 
   useEffect(() => {
     StreamsStore.onChange(() => refetchStreams());
@@ -235,7 +236,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
                                      bulkActions={renderBulkActions}
                                      activeSort={searchParams.sort}
                                      rowActions={renderStreamActions}
-                                     columnRenderers={customColumnRenderers(indexSets)}
+                                     columnRenderers={columnRenderers}
                                      columnDefinitions={COLUMN_DEFINITIONS} />
           )}
       </div>

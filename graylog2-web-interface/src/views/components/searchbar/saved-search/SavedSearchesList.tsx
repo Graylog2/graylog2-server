@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 
@@ -199,7 +199,10 @@ const SavedSearchesList = ({
     </Button>
   ), [activeSavedSearchId, deleteSavedSearch, refetch]);
 
-  const columnRenderers = customColumnRenderers(onLoadSavedSearch);
+  const columnRenderers = useMemo(
+    () => customColumnRenderers(onLoadSavedSearch),
+    [activeSavedSearchId, onLoadSavedSearch],
+  );
 
   if (isLoading) {
     return <Spinner />;
