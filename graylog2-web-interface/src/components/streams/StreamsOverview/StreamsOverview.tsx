@@ -177,7 +177,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   }, []);
 
   const onSortChange = useCallback((newSort: Sort) => {
-    setSearchParams((cur) => ({ ...cur, sort: newSort }));
+    setSearchParams((cur) => ({ ...cur, sort: newSort, page: 1 }));
   }, []);
 
   const renderStreamActions = useCallback((listItem: Stream) => (
