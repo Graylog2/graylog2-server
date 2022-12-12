@@ -25,18 +25,30 @@ import { ConfigurationVariableActions } from 'stores/sidecars/ConfigurationVaria
 import EditConfigurationVariableModal from './EditConfigurationVariableModal';
 import ConfigurationHelperStyle from './ConfigurationHelper.css';
 
+const _renderConfigList = (configurations) => {
+  return (
+    <ul className={ConfigurationHelperStyle.ulStyle}>
+      {configurations.map((conf) => <li key={conf.id}><a href={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(conf.id)}>{conf.name}</a></li>)}
+    </ul>
+  );
+};
+
 class ConfigurationVariablesHelper extends React.Component {
   static propTypes = {
     onVariableRename: PropTypes.func.isRequired,
   };
 
-  state = {
-    showModal: false,
-    showConfirmModal: false,
-    configurationVariables: undefined,
-    errorModalContent: {},
-    variableToDelete: {},
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showModal: false,
+      showConfirmModal: false,
+      configurationVariables: undefined,
+      errorModalContent: {},
+      variableToDelete: {},
+    };
+  }
 
   componentDidMount() {
     this._reloadVariables();
@@ -61,14 +73,6 @@ class ConfigurationVariablesHelper extends React.Component {
     this.setState({ showModal: false, showConfirmModal: false });
   };
 
-  _renderConfigList = (configurations) => {
-    return (
-      <ul className={ConfigurationHelperStyle.ulStyle}>
-        {configurations.map((conf) => <li key={conf.id}><a href={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(conf.id)}>{conf.name}</a></li>)}
-      </ul>
-    );
-  };
-
   _handleDeleteConfirm = () => {
     const { variableToDelete } = this.state;
 
@@ -83,7 +87,7 @@ class ConfigurationVariablesHelper extends React.Component {
       ConfigurationVariableActions.getConfigurations(configVar).then((response) => {
         // Variable still in use: Report error
         if (response.length > 0) {
-          this.setState({ errorModalContent: this._renderConfigList(response) });
+          this.setState({ errorModalContent: _renderConfigList(response) });
           this._openErrorModal();
           // Not in use, ask for confirmation
         } else {

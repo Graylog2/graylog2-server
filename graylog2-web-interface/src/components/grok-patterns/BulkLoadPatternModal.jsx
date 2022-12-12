@@ -38,11 +38,11 @@ class BulkLoadPatternModal extends React.Component {
 
   _openModal = () => {
     this.setState({ showModal: true });
-  }
+  };
 
   _closeModal = () => {
     this.setState({ importStrategy: 'ABORT_ON_CONFLICT', showModal: false });
-  }
+  };
 
   _onSubmit = (evt) => {
     evt.preventDefault();

@@ -53,6 +53,7 @@ class SourceViewModal extends React.Component {
     this.setState(SourceViewModal.initialState);
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => {
     this._loadConfiguration();
     this.setState({ showModal: true });

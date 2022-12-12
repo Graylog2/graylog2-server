@@ -29,13 +29,15 @@ class IndexSetDeletionForm extends React.Component {
     onDelete: PropTypes.func.isRequired,
   };
 
-  state = {
-    showModal: false,
-    assignedStreams: undefined,
-    deleteIndices: true,
-  };
+  constructor(props) {
+    super(props);
 
-  forms = {};
+    this.state = {
+      showModal: false,
+      assignedStreams: undefined,
+      deleteIndices: true,
+    };
+  }
 
   _onModalOpen = () => {
     StreamsStore.load((streams) => {
@@ -51,6 +53,7 @@ class IndexSetDeletionForm extends React.Component {
     });
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => {
     this.setState({ showModal: true }, this._onModalOpen);
   };
