@@ -60,6 +60,7 @@ const COLUMN_DEFINITIONS = [
   { id: 'description', title: 'Description', sortable: true },
   { id: 'index_set_title', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },
   { id: 'throughput', title: 'Throughput' },
+  { id: 'created_at', title: 'Created At', sortable: true },
   { id: 'disabled', title: 'Status', sortable: true },
 ];
 
