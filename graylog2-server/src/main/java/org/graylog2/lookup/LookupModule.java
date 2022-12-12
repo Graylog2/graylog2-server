@@ -18,7 +18,6 @@ package org.graylog2.lookup;
 
 import com.google.inject.Scopes;
 import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.MapBinderBinding;
 import org.graylog2.Configuration;
 import org.graylog2.lookup.adapters.CSVFileDataAdapter;
 import org.graylog2.lookup.adapters.DSVHTTPDataAdapter;
