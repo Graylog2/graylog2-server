@@ -21,13 +21,13 @@ import { useMemo } from 'react';
 import SortIcon from 'components/streams/StreamsOverview/SortIcon';
 
 import BulkSelectHead from './BulkSelectHead';
-import type { Column, Sort, ColumnRenderer, ColumnRenderers } from './types';
+import type { Column, Sort, ColumnRenderer, ColumnRenderers, EntityBase } from './types';
 
 const Th = styled.th<{ $width: number | undefined }>(({ $width }) => css`
   width: ${$width ? `${$width}px` : 'auto'};
 `);
 
-const TableHeader = <Entity extends { id: string }>({
+const TableHeader = <Entity extends EntityBase>({
   activeSort,
   column,
   columnRenderer,
@@ -63,7 +63,7 @@ const ActionsHead = styled.th<{ $width: number | undefined }>(({ $width }) => cs
   width: ${$width ? `${$width}px` : 'auto'};
 `);
 
-const TableHead = <Entity extends { id: string }>({
+const TableHead = <Entity extends EntityBase>({
   actionsColWidth,
   activeSort,
   columns,

@@ -16,6 +16,10 @@
  */
 import type * as React from 'react';
 
+export type EntityBase = {
+  id: string,
+}
+
 export type Column = {
   anyPermissions?: boolean,
   id: string,
@@ -26,7 +30,7 @@ export type Column = {
 };
 
 // A column render should have either a `width` and optionally a `minWidth` or only a `staticWidth`.
-export type ColumnRenderer<Entity extends { id: string }> = {
+export type ColumnRenderer<Entity extends EntityBase> = {
   renderCell?: (entity: Entity, column: Column) => React.ReactNode,
   renderHeader?: (column: Column) => React.ReactNode,
   textAlign?: string,
@@ -35,7 +39,7 @@ export type ColumnRenderer<Entity extends { id: string }> = {
   staticWidth?: number, // px
 }
 
-export type ColumnRenderers<Entity extends { id: string }> = {
+export type ColumnRenderers<Entity extends EntityBase> = {
   [columnId: string]: ColumnRenderer<Entity>
 }
 

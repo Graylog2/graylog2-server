@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 
-import type { Column, ColumnRenderer } from './types';
+import type { Column, ColumnRenderer, EntityBase } from './types';
 
-const TableCell = <Entity extends { id: string }>({
+const TableCell = <Entity extends EntityBase>({
   column,
   columnRenderer,
   entity,

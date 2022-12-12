@@ -32,7 +32,7 @@ import useElementDimensions from 'hooks/useElementDimensions';
 
 import TableHead from './TableHead';
 import TableRow from './TableRow';
-import type { ColumnRenderers, Column, Sort } from './types';
+import type { ColumnRenderers, Column, Sort, EntityBase } from './types';
 
 const ScrollContainer = styled.div`
   overflow-x: auto;
@@ -83,7 +83,7 @@ const filterVisibleColumns = (
   .find(({ id }) => id === columnId))
   .filter((column) => !!column);
 
-const useElementsWidths = <Entity extends { id: string }>({
+const useElementsWidths = <Entity extends EntityBase>({
   columns,
   columnRenderers,
   displayBulkSelectCol,
@@ -109,7 +109,7 @@ const useElementsWidths = <Entity extends { id: string }>({
   return { tableRef, actionsRef, columnsWidths, actionsColWidth };
 };
 
-type Props<Entity extends { id: string }> = {
+type Props<Entity extends EntityBase> = {
   /** Currently active sort */
   activeSort?: Sort,
   /** Supported batch operations */
@@ -133,7 +133,7 @@ type Props<Entity extends { id: string }> = {
 /**
  * Flexible data table component which allows defining custom column renderers.
  */
-const EntityDataTable = <Entity extends { id: string }>({
+const EntityDataTable = <Entity extends EntityBase>({
   activeSort,
   bulkActions,
   columnRenderers: customColumnRenderers,
