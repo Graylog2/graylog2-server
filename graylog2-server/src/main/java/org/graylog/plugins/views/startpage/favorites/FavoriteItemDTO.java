@@ -16,5 +16,9 @@
  */
 package org.graylog.plugins.views.startpage.favorites;
 
-public record Item(String id, String type) {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record FavoriteItemDTO(@JsonProperty(FIELD_ID) String id, @JsonProperty(FIELD_TYPE) String type) {
+    public static final String FIELD_ID = "id";
+    public static final String FIELD_TYPE = "type";
 }

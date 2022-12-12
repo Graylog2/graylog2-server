@@ -43,9 +43,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import java.util.Optional;
+
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "StartupPage", tags = {CLOUD_VISIBLE})
+@Api(value = "StartPage", tags = {CLOUD_VISIBLE})
 @Path("/startpage")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
@@ -71,8 +73,9 @@ public class StartPageResource extends RestResource implements PluginRestResourc
     @ApiOperation("Get the Favorite Items for the Start Page for the user")
     public PaginatedResponse<FavoriteItem> getFavoriteItems(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                             @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
+                                                            @ApiParam(name = "type") @QueryParam("type") Optional<String> type,
                                                             @Context SearchUser searchUser) {
-        return service.findFavoriteItemsFor(searchUser, page, perPage);
+        return service.findFavoriteItemsFor(searchUser, type, page, perPage);
     }
 
     @PUT
