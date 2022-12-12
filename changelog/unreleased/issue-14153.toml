@@ -1,0 +1,8 @@
+type = "fixed"
+message = "Use PKCS5 instead of ISO10126 padding for secrets encryption"
+
+issues = ["14153"]
+pulls = ["14193"]
+
+contributors = [""]
+
