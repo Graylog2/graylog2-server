@@ -28,7 +28,8 @@ type Props = {
 };
 
 const SavedSearchesModal = ({ toggleModal, deleteSavedSearch, activeSavedSearchId }: Props) => (
-  <Modal show>
+  <Modal show
+         bsSize="large">
     <Modal.Body>
       <SavedSearchesList deleteSavedSearch={deleteSavedSearch}
                          activeSavedSearchId={activeSavedSearchId}

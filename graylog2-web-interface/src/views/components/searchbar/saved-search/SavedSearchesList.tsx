@@ -39,7 +39,7 @@ type SearchParams = {
   sort: Sort
 }
 
-const INITIAL_COLUMNS = ['title'];
+const INITIAL_COLUMNS = ['title', 'description', 'summary'];
 const COLUMN_DEFINITIONS = [
   { id: 'created_at', title: 'Created At', sortable: true },
   { id: 'title', title: 'Title', sortable: true },
