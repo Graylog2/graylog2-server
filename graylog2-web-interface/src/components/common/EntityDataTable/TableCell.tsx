@@ -16,8 +16,13 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
+import styled from 'styled-components';
 
 import type { Column, ColumnRenderer, EntityBase } from './types';
+
+const Td = styled.td`
+  word-break: break-word;
+`;
 
 const TableCell = <Entity extends EntityBase>({
   column,
@@ -33,7 +38,7 @@ const TableCell = <Entity extends EntityBase>({
     [column, columnRenderer, entity],
   );
 
-  return (<td>{content}</td>);
+  return (<Td>{content}</Td>);
 };
 
 export default TableCell;
