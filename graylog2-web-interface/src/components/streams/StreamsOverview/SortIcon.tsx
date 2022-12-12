@@ -16,22 +16,17 @@
  */
 
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import type { Sort, Column } from 'components/common/EntityDataTable';
+import CommonSortIcon from 'components/common/SortIcon';
 
-import Icon from '../../common/Icon';
-
-const Wrapper = styled.div`
+const StyledCommonSortIcon = styled(CommonSortIcon)`
   display: inline-block;
-`;
-
-const StyledIcon = styled(Icon)<{ $sortIsActive: boolean }>(({ theme, $sortIsActive }) => css`
-  margin-left: 4px;
+  margin-left: 6px;
+  padding: 0;
   cursor: pointer;
-  font-size: ${theme.fonts.size.small};
-  color: ${$sortIsActive ? theme.colors.gray[20] : theme.colors.gray[70]};
-`);
+`;
 
 const SORT_ORDERS = {
   ASC: 'asc',
@@ -55,17 +50,17 @@ const SortIcon = ({
   const columnSortIsActive = activeSort?.columnId === column.id;
   const nextSortOrder = !columnSortIsActive || activeSort.order === SORT_ORDERS.DESC ? SORT_ORDERS.ASC : SORT_ORDERS.DESC;
   const title = `Sort ${column.title.toLowerCase()} ${SORT_ORDER_NAMES[nextSortOrder]}`;
-  const iconName = activeSort?.order === SORT_ORDERS.DESC ? 'arrow-up-wide-short' : 'arrow-down-wide-short';
 
   const _onChange = () => {
     onChange({ columnId: column.id, order: nextSortOrder });
   };
 
   return (
-    <Wrapper title={title} onClick={_onChange}>
-      <StyledIcon name={iconName}
-                  $sortIsActive={columnSortIsActive} />
-    </Wrapper>
+    <StyledCommonSortIcon activeDirection={columnSortIsActive ? activeSort.order : undefined}
+                          onChange={_onChange}
+                          title={title}
+                          ascId={SORT_ORDERS.ASC}
+                          descId={SORT_ORDERS.DESC} />
   );
 };
 
