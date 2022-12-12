@@ -66,6 +66,8 @@ import static org.graylog2.shared.utilities.StringUtils.splitByComma;
 @RequiresAuthentication
 public class ScriptingApiResource extends RestResource implements PluginRestResource {
 
+    private final int MAX_RESULT_WINDOW = 10_000; //default "index.max_result_window" for both ES and OS
+
     private final SearchExecutor searchExecutor;
     private final EventBus serverEventBus;
     private final SearchRequestSpecToSearchMapper searchCreator;
@@ -96,6 +98,11 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     @NoAuditEvent("Creating audit event manually in method body.")
     public TabularResponse executeQuery(@ApiParam(name = "queryRequestSpec") @Valid MessagesRequestSpec messagesRequestSpec,
                                         @Context SearchUser searchUser) {
+
+        if (messagesRequestSpec.from() + messagesRequestSpec.size() > MAX_RESULT_WINDOW) {
+            throw new BadRequestException("The maximum value of [from + size] exceeds the indexer limit of " + MAX_RESULT_WINDOW);
+        }
+
         try {
             //Step 1: map simple request to more complex search
             Search search = searchCreator.mapToSearch(messagesRequestSpec, searchUser);
