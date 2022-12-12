@@ -17,11 +17,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
+import DOMPurify from 'dompurify';
 
 import { Alert, Button } from 'components/bootstrap';
-import { RelativeTime, Icon } from 'components/common';
+import { RelativeTime, Icon, Spinner } from 'components/common';
 import NotificationsFactory from 'logic/notifications/NotificationsFactory';
-import { NotificationsActions } from 'stores/notifications/NotificationsStore';
+import { NotificationsActions, NotificationsStore } from 'stores/notifications/NotificationsStore';
+import connect from 'stores/connect';
 
 const StyledButton = styled(Button)`
   float: right;
@@ -48,10 +50,23 @@ const NotificationTimestamp = styled.span(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
 `);
 
+const _sanitizeDescription = (description) => {
+  return DOMPurify.sanitize(description);
+};
+
 class Notification extends React.Component {
   static propTypes = {
     notification: PropTypes.object.isRequired,
+    message: PropTypes.object.isRequired,
   };
+
+  componentDidMount() {
+    const { message, notification } = this.props;
+
+    if (!message && notification) {
+      NotificationsActions.getHtmlMessage(this.props.notification.type, NotificationsFactory.getValuesForNotification(notification));
+    }
+  }
 
   _onClose = () => {
     const { notification } = this.props;
@@ -62,9 +77,13 @@ class Notification extends React.Component {
     }
   };
 
+  /* eslint-disable react/no-danger */
   render() {
-    const { notification } = this.props;
-    const notificationView = NotificationsFactory.getForNotification(notification);
+    const { notification, message } = this.props;
+
+    if (!message) {
+      return <Spinner />;
+    }
 
     return (
       <StyledAlert bsStyle="danger">
@@ -74,18 +93,20 @@ class Notification extends React.Component {
 
         <NotificationHead>
           <Icon name="bolt" />{' '}
-          {notificationView.title}{' '}
+          <span />
+          {message.title}{' '}
 
           <NotificationTimestamp>
             (triggered <RelativeTime dateTime={notification.timestamp} />)
           </NotificationTimestamp>
         </NotificationHead>
-        <div className="notification-description">
-          {notificationView.description}
-        </div>
+        <div dangerouslySetInnerHTML={{ __html: _sanitizeDescription(message.description) }}
+             className="notification-description" />
       </StyledAlert>
     );
   }
 }
 
-export default Notification;
+export default connect(Notification, { notificationsStore: NotificationsStore }, ({ notificationsStore }) => {
+  return { message: notificationsStore.message };
+});

@@ -26,7 +26,7 @@ export const NotificationsActions = singletonActions(
   () => Reflux.createActions({
     delete: { asyncResult: true },
     list: { asyncResult: true },
-    getMessage: { asyncResult: true },
+    getHtmlMessage: { asyncResult: true },
   }),
 );
 
@@ -42,12 +42,18 @@ export const NotificationsStore = singletonStore(
       this.list();
     },
     getInitialState() {
-      if (this.notifications) {
-        return this.notifications;
-      }
-
-      return {};
+      return {
+        notifications: this.notifications,
+        message: this.message,
+      };
     },
+    propagateChanges() {
+      this.trigger({
+        notifications: this.notifications,
+        message: this.message,
+      });
+    },
+
     list() {
       const url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.list().url);
       const promise = this.promises.list || fetchPeriodically('GET', url)
@@ -58,8 +64,8 @@ export const NotificationsStore = singletonStore(
       NotificationsActions.list.promise(promise);
     },
     listCompleted(response) {
-      this.notifications = response;
-      this.trigger(response);
+      this.notifications = response.notifications;
+      this.propagateChanges();
     },
     delete(type) {
       const url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.delete(type).url);
@@ -69,16 +75,18 @@ export const NotificationsStore = singletonStore(
     },
     deleteCompleted() {
       this.list();
+      this.propagateChanges();
     },
-    getMessage(type, options) {
+    getHtmlMessage(type, options = { values: {} }) {
       const url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.getHtmlMessage(type).url);
       const promise = fetch('POST', url, options);
 
       promise.then((response) => {
         this.message = response;
-        this.trigger({ message: this.message });
-      })
-      NotificationsActions.getMessage.promise(promise);
-    }
+        this.propagateChanges();
+      });
+
+      NotificationsActions.getHtmlMessage.promise(promise);
+    },
   }),
 );

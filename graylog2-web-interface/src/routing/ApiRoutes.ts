@@ -207,7 +207,7 @@ const ApiRoutes = {
   NotificationsApiController: {
     delete: (type: string) => { return { url: `/system/notifications/${type}` }; },
     list: () => { return { url: '/system/notifications' }; },
-    getHtmlMessage: (type: string) => { return { url: `/system/notifications/message/html/${type}` }; },
+    getHtmlMessage: (type: string) => { return { url: `/system/notification/message/html/${type.toLocaleUpperCase()}` }; },
   },
   OutputsApiController: {
     index: () => { return { url: '/system/outputs' }; },
