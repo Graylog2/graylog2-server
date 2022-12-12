@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public record FavoriteItemsForUserDTO(
+public record FavoritesForUserDTO(
         @ObjectId
         @Id
         @Nullable
@@ -34,12 +34,13 @@ public record FavoriteItemsForUserDTO(
         String userId,
         @Nullable
         @JsonProperty(FIELD_ITEMS)
-        List<FavoriteItemDTO> items) {
+        List<FavoriteDTO> items
+) {
     public static final String FIELD_ID = "id";
     public static final String FIELD_USER_ID = "user_id";
     public static final String FIELD_ITEMS = "items";
 
-    public FavoriteItemsForUserDTO {
+    public FavoritesForUserDTO {
         /*
          * always have at least an empty list, avoid null
          * @Nullable is necessary to reduce problems if someone manually edits in MongoDB
@@ -49,8 +50,8 @@ public record FavoriteItemsForUserDTO(
         }
     }
 
-    public FavoriteItemsForUserDTO(@JsonProperty(FIELD_USER_ID) String userId,
-                                   @Nullable @JsonProperty(FIELD_ITEMS) List<FavoriteItemDTO> items) {
+    public FavoritesForUserDTO(@JsonProperty(FIELD_USER_ID) String userId,
+                               @Nullable @JsonProperty(FIELD_ITEMS) List<FavoriteDTO> items) {
         this(null, userId, items);
     }
 }

@@ -16,5 +16,5 @@
  */
 package org.graylog.plugins.views.startpage.favorites;
 
-public record FavoriteItem(String id, String type, String title) {
+public record Favorite(String id, String type, String title) {
 }

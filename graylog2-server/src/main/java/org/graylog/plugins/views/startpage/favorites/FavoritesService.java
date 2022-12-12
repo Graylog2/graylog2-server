@@ -33,33 +33,33 @@ import java.util.Optional;
 /*
  * TODO: remove entity, if a user is deleted?
  */
-public class FavoriteItemsService extends PaginatedDbService<FavoriteItemsForUserDTO> {
-    private static final String COLLECTION_NAME = "favorite_items";
+public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
+    private static final String COLLECTION_NAME = "favorites";
 
     private final EntityOwnershipService entityOwnerShipService;
 
     @Inject
-    protected FavoriteItemsService(final MongoConnection mongoConnection,
-                                   final MongoJackObjectMapperProvider mapper,
-                                   final EntityOwnershipService entityOwnerShipService) {
-        super(mongoConnection, mapper, FavoriteItemsForUserDTO.class, COLLECTION_NAME);
+    protected FavoritesService(final MongoConnection mongoConnection,
+                               final MongoJackObjectMapperProvider mapper,
+                               final EntityOwnershipService entityOwnerShipService) {
+        super(mongoConnection, mapper, FavoritesForUserDTO.class, COLLECTION_NAME);
         this.entityOwnerShipService = entityOwnerShipService;
     }
 
-    public Optional<FavoriteItemsForUserDTO> findForUser(final SearchUser searchUser) {
-        return streamQuery(DBQuery.is(FavoriteItemsForUserDTO.FIELD_USER_ID, searchUser.getUser().getId())).findAny();
+    public Optional<FavoritesForUserDTO> findForUser(final SearchUser searchUser) {
+        return streamQuery(DBQuery.is(FavoritesForUserDTO.FIELD_USER_ID, searchUser.getUser().getId())).findAny();
     }
 
-    public Optional<FavoriteItemsForUserDTO> create(final FavoriteItemsForUserDTO favoriteItem, final SearchUser searchUser) {
+    public Optional<FavoritesForUserDTO> create(final FavoritesForUserDTO favorite, final SearchUser searchUser) {
         try {
-            final WriteResult<FavoriteItemsForUserDTO, ObjectId> result = db.insert(favoriteItem);
-            final FavoriteItemsForUserDTO savedObject = result.getSavedObject();
+            final WriteResult<FavoritesForUserDTO, ObjectId> result = db.insert(favorite);
+            final FavoritesForUserDTO savedObject = result.getSavedObject();
             if (savedObject != null) {
-                entityOwnerShipService.registerNewEntity(savedObject.id(), searchUser.getUser(), GRNTypes.FAVORITE_ITEMS);
+                entityOwnerShipService.registerNewEntity(savedObject.id(), searchUser.getUser(), GRNTypes.FAVORITE);
             }
             return Optional.ofNullable(savedObject);
         } catch (DuplicateKeyException e) {
-            throw new IllegalStateException("Unable to create a Favorite Items collection, collection with this id already exists : " + favoriteItem.id());
+            throw new IllegalStateException("Unable to create a Favorites collection, collection with this id already exists : " + favorite.id());
         }
     }
 }

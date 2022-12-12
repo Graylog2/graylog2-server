@@ -19,10 +19,10 @@ package org.graylog.plugins.views.startpage;
 import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
-import org.graylog.plugins.views.startpage.favorites.FavoriteItem;
-import org.graylog.plugins.views.startpage.favorites.FavoriteItemDTO;
-import org.graylog.plugins.views.startpage.favorites.FavoriteItemsForUserDTO;
-import org.graylog.plugins.views.startpage.favorites.FavoriteItemsService;
+import org.graylog.plugins.views.startpage.favorites.Favorite;
+import org.graylog.plugins.views.startpage.favorites.FavoriteDTO;
+import org.graylog.plugins.views.startpage.favorites.FavoritesForUserDTO;
+import org.graylog.plugins.views.startpage.favorites.FavoritesService;
 import org.graylog.plugins.views.startpage.lastOpened.Item;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedItem;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedItemsDTO;
@@ -46,20 +46,20 @@ public class StartPageService {
     private final Catalog catalog;
     private final LastOpenedService lastOpenedService;
     private final RecentActivityService recentActivityService;
-    private final FavoriteItemsService favoriteItemsService;
+    private final FavoritesService favoritesService;
 
-    private final long MAXIMUM_ITEMS = 100;
+    private final long MAXIMUM_LAST_OPENED_PER_USER = 100;
 
     @Inject
     public StartPageService(Catalog catalog,
                             LastOpenedService lastOpenedService,
                             RecentActivityService recentActivityService,
-                            FavoriteItemsService favoriteItemsService,
+                            FavoritesService favoritesService,
                             EventBus eventBus) {
         this.catalog = catalog;
         this.lastOpenedService = lastOpenedService;
         this.recentActivityService = recentActivityService;
-        this.favoriteItemsService = favoriteItemsService;
+        this.favoritesService = favoritesService;
         eventBus.register(this);
     }
 
@@ -90,15 +90,14 @@ public class StartPageService {
         return PaginatedResponse.create("lastOpened", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
     }
 
-    public PaginatedResponse<FavoriteItem> findFavoriteItemsFor(final SearchUser searchUser, final Optional<String> type, final int page, final int perPage) {
-        var items = favoriteItemsService
+    public PaginatedResponse<Favorite> findFavoritesFor(final SearchUser searchUser, final Optional<String> type, final int page, final int perPage) {
+        var items = favoritesService
                 .findForUser(searchUser)
-                .orElse(new FavoriteItemsForUserDTO(searchUser.getUser().getId(), List.of()))
+                .orElse(new FavoritesForUserDTO(searchUser.getUser().getId(), List.of()))
                 .items()
                 .stream().filter(i -> type.isPresent() ? i.type().equals(type.get()) : true)
-                .map(i -> new FavoriteItem(i.id(), i.type(), catalog.getTitle(i.id())))
-                .collect(Collectors.toList());
-        Collections.reverse(items);
+                .map(i -> new Favorite(i.id(), i.type(), catalog.getTitle(i.id())))
+                .toList();
 
         return PaginatedResponse.create("favoriteItems", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
     }
@@ -129,7 +128,7 @@ public class StartPageService {
         final var item = new Item(view.id(), DateTime.now(DateTimeZone.UTC));
         if(lastOpenedItems.isPresent()) {
             var loi = lastOpenedItems.get();
-            var items = loi.items().stream().filter(i -> !i.id().equals(item.id())).limit(MAXIMUM_ITEMS - 1).toList();
+            var items = loi.items().stream().filter(i -> !i.id().equals(item.id())).limit(MAXIMUM_LAST_OPENED_PER_USER - 1).toList();
             loi.items().clear();
             loi.items().addAll(items);
             loi.items().add(item);
@@ -144,26 +143,26 @@ public class StartPageService {
     }
 
     public void addFavoriteItemFor(final String id, final SearchUser searchUser) {
-        final var favoriteItems = favoriteItemsService.findForUser(searchUser);
-        final var item = new FavoriteItemDTO(id, catalog.getType(id));
+        final var favoriteItems = favoritesService.findForUser(searchUser);
+        final var item = new FavoriteDTO(id, catalog.getType(id));
         if(favoriteItems.isPresent()) {
             var fi = favoriteItems.get();
-            var items = fi.items().stream().filter(i -> !i.id().equals(item.id())).limit(MAXIMUM_ITEMS - 1).toList();
-            fi.items().clear();
-            fi.items().addAll(items);
             fi.items().add(item);
-            favoriteItemsService.save(fi);
+            favoritesService.save(fi);
         } else {
-            var items = new FavoriteItemsForUserDTO(searchUser.getUser().getId(), List.of(item));
-            favoriteItemsService.create(items, searchUser);
+            var items = new FavoritesForUserDTO(searchUser.getUser().getId(), List.of(item));
+            favoritesService.create(items, searchUser);
         }
     }
 
     public void removeFavoriteItemFor(final String id, final SearchUser searchUser) {
-        var favoriteItems = favoriteItemsService.findForUser(searchUser);
-        if(favoriteItems.isPresent()) {
-            favoriteItems.get().items().remove(id);
-            favoriteItemsService.save(favoriteItems.get());
+        var favoriteItems = favoritesService.findForUser(searchUser);
+        if(favoriteItems.isPresent() && favoriteItems.get().items() != null) {
+            var fi = favoriteItems.get();
+            var items = fi.items().stream().filter(i -> !i.id().equals(id)).toList();
+            fi.items().clear();
+            fi.items().addAll(items);
+            favoritesService.save(fi);
         }
     }
 }

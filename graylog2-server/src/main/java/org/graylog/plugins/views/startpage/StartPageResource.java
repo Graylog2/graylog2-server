@@ -22,7 +22,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog.plugins.views.startpage.favorites.FavoriteItem;
+import org.graylog.plugins.views.startpage.favorites.Favorite;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedItem;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivity;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -71,11 +71,11 @@ public class StartPageResource extends RestResource implements PluginRestResourc
     @GET
     @Path("/favoriteItems")
     @ApiOperation("Get the Favorite Items for the Start Page for the user")
-    public PaginatedResponse<FavoriteItem> getFavoriteItems(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                            @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
-                                                            @ApiParam(name = "type") @QueryParam("type") Optional<String> type,
-                                                            @Context SearchUser searchUser) {
-        return service.findFavoriteItemsFor(searchUser, type, page, perPage);
+    public PaginatedResponse<Favorite> getFavoriteItems(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                        @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
+                                                        @ApiParam(name = "type") @QueryParam("type") Optional<String> type,
+                                                        @Context SearchUser searchUser) {
+        return service.findFavoritesFor(searchUser, type, page, perPage);
     }
 
     @PUT

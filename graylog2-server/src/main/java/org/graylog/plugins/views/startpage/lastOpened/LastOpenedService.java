@@ -55,7 +55,7 @@ public class LastOpenedService extends PaginatedDbService<LastOpenedItemsDTO> {
             final WriteResult<LastOpenedItemsDTO, ObjectId> result = db.insert(lastOpenedItems);
             final LastOpenedItemsDTO savedObject = result.getSavedObject();
             if (savedObject != null) {
-                entityOwnerShipService.registerNewEntity(savedObject.id(), searchUser.getUser(), GRNTypes.LAST_OPENED_ITEMS);
+                entityOwnerShipService.registerNewEntity(savedObject.id(), searchUser.getUser(), GRNTypes.LAST_OPENED);
             }
             return Optional.ofNullable(savedObject);
         } catch (DuplicateKeyException e) {
