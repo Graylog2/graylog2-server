@@ -34,7 +34,7 @@ import java.util.Optional;
  * TODO: remove entity, if a user is deleted?
  */
 public class LastOpenedService extends PaginatedDbService<LastOpenedForUserDTO> {
-    private static final String COLLECTION_NAME = "last_opened_items";
+    private static final String COLLECTION_NAME = "last_opened";
 
     private final EntityOwnershipService entityOwnerShipService;
 
