@@ -17,8 +17,8 @@
 import React, { useState, useCallback } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { ButtonToolbar, DropdownButton, MenuItem } from 'components/bootstrap';
-import { ShareButton, IfPermitted } from 'components/common';
+import { ShareButton } from 'components/common';
+import { Button } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
@@ -52,20 +52,11 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
 
   return (
     <>
-      <ButtonToolbar>
-        <ShareButton bsSize="xsmall"
-                     entityId={dashboard.id}
-                     entityType="dashboard"
-                     onClick={() => setShowShareModal(true)} />
-        <DropdownButton bsSize="xsmall"
-                        title="More Actions"
-                        id={`dashboard-actions-dropdown-${dashboard.id}`}
-                        pullRight>
-          <IfPermitted permissions={[`view:edit:${dashboard.id}`, 'view:edit']} anyPermissions>
-            <MenuItem onSelect={onDashboardDelete}>Delete</MenuItem>
-          </IfPermitted>
-        </DropdownButton>
-      </ButtonToolbar>
+      <ShareButton bsSize="xsmall"
+                   entityId={dashboard.id}
+                   entityType="dashboard"
+                   onClick={() => setShowShareModal(true)} />
+      <Button bsSize="xsmall" onClick={onDashboardDelete} bsStyle="danger">Delete</Button>
       {showShareModal && (
         <EntityShareModal entityId={dashboard.id}
                           entityType="dashboard"

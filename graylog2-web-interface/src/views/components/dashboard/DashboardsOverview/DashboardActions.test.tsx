@@ -37,10 +37,7 @@ describe('DashboardActions', () => {
   const simpleDashboard = simpleView();
 
   const clickDashboardAction = async (action: string) => {
-    const actionsButton = await screen.findByRole('button', { name: /more actions/i });
-    userEvent.click(actionsButton);
-
-    userEvent.click(await screen.findByRole('menuitem', { name: action }));
+    userEvent.click(await screen.findByRole('button', { name: action }));
   };
 
   beforeEach(() => {
