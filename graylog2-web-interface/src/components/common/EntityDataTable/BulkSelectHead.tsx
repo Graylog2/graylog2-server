@@ -19,6 +19,7 @@ import { useMemo, useEffect, useRef } from 'react';
 import { uniq } from 'lodash';
 
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
+import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 type CheckboxStatus = 'CHECKED' | 'UNCHECKED' | 'PARTIAL';
 
@@ -26,13 +27,13 @@ const useCheckboxStatus = <Entity extends { id: string }>(data: Array<Entity>, s
   const checkboxRef = useRef<HTMLInputElement>();
 
   const checkboxStatus: CheckboxStatus = useMemo(() => {
-    const selectedEntites = data.filter(({ id }) => selectedEntityIds.includes(id));
+    const selectedEntities = data.filter(({ id }) => selectedEntityIds.includes(id));
 
-    if (selectedEntites.length === 0) {
+    if (selectedEntities.length === 0) {
       return 'UNCHECKED';
     }
 
-    if (selectedEntites.length === data.length) {
+    if (selectedEntities.length === data.length) {
       return 'CHECKED';
     }
 
@@ -63,7 +64,7 @@ type Props<Entity extends { id: string }> = {
   setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>
 }
 
-const BulkActionsHead = <Entity extends { id: string }>({
+const BulkSelectHead = <Entity extends { id: string }>({
   data,
   setSelectedEntities,
   selectedEntities,
@@ -84,7 +85,7 @@ const BulkActionsHead = <Entity extends { id: string }>({
   };
 
   return (
-    <td>
+    <td style={{ width: `${BULK_SELECT_COLUMN_WIDTH}px` }}>
       <RowCheckbox inputRef={(ref) => { checkboxRef.current = ref; }}
                    onChange={onBulkSelect}
                    checked={checkboxStatus === 'CHECKED'}
@@ -94,4 +95,4 @@ const BulkActionsHead = <Entity extends { id: string }>({
   );
 };
 
-export default BulkActionsHead;
+export default BulkSelectHead;

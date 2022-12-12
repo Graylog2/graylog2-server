@@ -17,17 +17,14 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 import { useMemo } from 'react';
-import { merge } from 'lodash';
 
 import SortIcon from 'components/streams/StreamsOverview/SortIcon';
 
-import BulkActionsHead from './BulkActionsHead';
-import type { Column, Sort, ColumnRenderers, ColumnRenderer } from './types';
-import DefaultColumnRenderers from './DefaultColumnRenderers';
+import BulkSelectHead from './BulkSelectHead';
+import type { Column, Sort, ColumnRenderer, ColumnRenderers } from './types';
 
-const Th = styled.th<{ $width: string | undefined, $maxWidth: string| undefined }>(({ $width, $maxWidth }) => css`
-  width: ${$width ?? 'auto'};
-  max-width: ${$maxWidth ?? 'none'};
+const Th = styled.th<{ $width: number | undefined }>(({ $width }) => css`
+  width: ${$width ? `${$width}px` : 'auto'};
 `);
 
 const TableHeader = <Entity extends { id: string }>({
@@ -35,11 +32,13 @@ const TableHeader = <Entity extends { id: string }>({
   column,
   columnRenderer,
   onSortChange,
+  colWidth,
 }: {
   activeSort: Sort,
   column: Column
-  columnRenderer: ColumnRenderer<Entity>
+  columnRenderer: ColumnRenderer<Entity> | undefined
   onSortChange: (newSort: Sort) => void,
+  colWidth: number
 }) => {
   const content = useMemo(
     () => (typeof columnRenderer?.renderHeader === 'function' ? columnRenderer.renderHeader(column) : column.title),
@@ -47,7 +46,7 @@ const TableHeader = <Entity extends { id: string }>({
   );
 
   return (
-    <Th $width={columnRenderer?.width} $maxWidth={columnRenderer?.maxWidth}>
+    <Th $width={colWidth}>
       {content}
 
       {column.sortable && (
@@ -59,50 +58,56 @@ const TableHeader = <Entity extends { id: string }>({
   );
 };
 
-const ActionsHead = styled.th`
+const ActionsHead = styled.th<{ $width: number | undefined }>(({ $width }) => css`
   text-align: right;
-`;
+  width: ${$width ? `${$width}px` : 'auto'};
+`);
 
 const TableHead = <Entity extends { id: string }>({
+  actionsColWidth,
   activeSort,
   columns,
-  customColumnRenderers,
+  columnRenderers,
+  columnsWidths,
   data,
   displayActionsCol,
-  displayBulkActionsCol,
+  displayBulkSelectCol,
   onSortChange,
   selectedEntities,
   setSelectedEntities,
 }: {
+  actionsColWidth: number | undefined,
   activeSort: Sort,
   columns: Array<Column>,
-  customColumnRenderers: ColumnRenderers<Entity> | undefined,
+  columnsWidths: { [columnId: string]: number },
+  columnRenderers: ColumnRenderers<Entity>,
   data: Array<Entity>
   displayActionsCol: boolean
-  displayBulkActionsCol: boolean,
+  displayBulkSelectCol: boolean,
   onSortChange: (newSort: Sort) => void,
   selectedEntities: Array<string>,
   setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>
 }) => (
   <thead>
     <tr>
-      {displayBulkActionsCol && (
-        <BulkActionsHead data={data}
-                         selectedEntities={selectedEntities}
-                         setSelectedEntities={setSelectedEntities} />
+      {displayBulkSelectCol && (
+        <BulkSelectHead data={data}
+                        selectedEntities={selectedEntities}
+                        setSelectedEntities={setSelectedEntities} />
       )}
       {columns.map((column) => {
-        const columnRenderer = merge(DefaultColumnRenderers[column.id] ?? {}, customColumnRenderers?.[column.id] ?? {});
+        const columnRenderer = columnRenderers[column.id];
 
         return (
           <TableHeader<Entity> columnRenderer={columnRenderer}
                                column={column}
+                               colWidth={columnsWidths[column.id]}
                                onSortChange={onSortChange}
                                activeSort={activeSort}
                                key={column.title} />
         );
       })}
-      {displayActionsCol ? <ActionsHead>Actions</ActionsHead> : null}
+      {displayActionsCol ? <ActionsHead $width={actionsColWidth}>Actions</ActionsHead> : null}
     </tr>
   </thead>
   );

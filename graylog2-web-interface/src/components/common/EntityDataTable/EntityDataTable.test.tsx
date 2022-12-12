@@ -53,9 +53,9 @@ describe('<EntityDataTable />', () => {
   it('should render selected columns and table headers', async () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
                             data={data}
+                            onColumnsChange={() => {}}
                             onSortChange={() => {}}
-                            columnDefinitions={columnDefinitions}
-                            total={1} />);
+                            columnDefinitions={columnDefinitions} />);
 
     await screen.findByRole('columnheader', { name: /title/i });
     await screen.findByRole('columnheader', { name: /status/i });
@@ -71,8 +71,8 @@ describe('<EntityDataTable />', () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
                             data={data}
                             onSortChange={() => {}}
-                            columnDefinitions={columnDefinitions}
-                            total={1} />);
+                            onColumnsChange={() => {}}
+                            columnDefinitions={columnDefinitions} />);
 
     await screen.findByRole('columnheader', { name: /description/i });
     await screen.findByText('Row description');
@@ -82,14 +82,14 @@ describe('<EntityDataTable />', () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
                             data={data}
                             onSortChange={() => {}}
+                            onColumnsChange={() => {}}
                             columnRenderers={{
                               title: {
                                 renderCell: (listItem) => `The title: ${listItem.title}`,
                                 renderHeader: (column) => `Custom ${column.title} Header`,
                               },
                             }}
-                            columnDefinitions={columnDefinitions}
-                            total={1} />);
+                            columnDefinitions={columnDefinitions} />);
 
     await screen.findByRole('columnheader', { name: /custom title header/i });
     await screen.findByText('The title: Row title');
@@ -99,9 +99,9 @@ describe('<EntityDataTable />', () => {
     render(<EntityDataTable<{ id: string, title: string }> visibleColumns={visibleColumns}
                                                            data={data}
                                                            onSortChange={() => {}}
+                                                           onColumnsChange={() => {}}
                                                            rowActions={(row) => `Custom actions for ${row.title}`}
-                                                           columnDefinitions={columnDefinitions}
-                                                           total={1} />);
+                                                           columnDefinitions={columnDefinitions} />);
 
     await screen.findByText('Custom actions for Row title');
   });
@@ -112,8 +112,8 @@ describe('<EntityDataTable />', () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
                             data={data}
                             onSortChange={() => {}}
-                            columnDefinitions={columnDefinitions}
-                            total={1} />);
+                            onColumnsChange={() => {}}
+                            columnDefinitions={columnDefinitions} />);
 
     expect(screen.queryByRole('columnheader', { name: /status/i })).not.toBeInTheDocument();
     expect(screen.queryByText('enabled')).not.toBeInTheDocument();
@@ -123,12 +123,12 @@ describe('<EntityDataTable />', () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
                             data={data}
                             onSortChange={() => {}}
+                            onColumnsChange={() => {}}
                             activeSort={{
                               columnId: 'description',
                               order: 'asc',
                             }}
-                            columnDefinitions={columnDefinitions}
-                            total={1} />);
+                            columnDefinitions={columnDefinitions} />);
 
     await screen.findByTitle(/sort description descending/i);
   });
@@ -139,8 +139,8 @@ describe('<EntityDataTable />', () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
                             data={data}
                             onSortChange={onSortChange}
-                            columnDefinitions={columnDefinitions}
-                            total={1} />);
+                            onColumnsChange={() => {}}
+                            columnDefinitions={columnDefinitions} />);
 
     userEvent.click(await screen.findByTitle(/sort description ascending/i));
 
@@ -155,9 +155,9 @@ describe('<EntityDataTable />', () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
                             data={data}
                             onSortChange={() => {}}
+                            onColumnsChange={() => {}}
                             bulkActions={renderBulkActions}
-                            columnDefinitions={columnDefinitions}
-                            total={1} />);
+                            columnDefinitions={columnDefinitions} />);
 
     const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select entity/i });
     userEvent.click(rowCheckboxes[0]);
@@ -177,9 +177,9 @@ describe('<EntityDataTable />', () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
                             data={data}
                             onSortChange={() => {}}
+                            onColumnsChange={() => {}}
                             bulkActions={renderBulkActions}
-                            columnDefinitions={columnDefinitions}
-                            total={1} />);
+                            columnDefinitions={columnDefinitions} />);
 
     const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select entity/i });
     userEvent.click(rowCheckboxes[0]);
@@ -199,9 +199,9 @@ describe('<EntityDataTable />', () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
                             data={data}
                             onSortChange={() => {}}
+                            onColumnsChange={() => {}}
                             bulkActions={() => <div />}
-                            columnDefinitions={columnDefinitions}
-                            total={1} />);
+                            columnDefinitions={columnDefinitions} />);
 
     const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select entity/i });
 
@@ -217,5 +217,21 @@ describe('<EntityDataTable />', () => {
     userEvent.click(selectAllCheckbox);
 
     expect(rowCheckboxes[0]).not.toBeChecked();
+  });
+
+  it('should call onColumnsChange when changing column visibility', async () => {
+    const onColumnsChange = jest.fn();
+
+    render(<EntityDataTable visibleColumns={['description', 'status']}
+                            data={data}
+                            onSortChange={() => {}}
+                            onColumnsChange={onColumnsChange}
+                            bulkActions={() => <div />}
+                            columnDefinitions={columnDefinitions} />);
+
+    userEvent.click(screen.getByRole('button', { name: /select columns to display/i }));
+    userEvent.click(screen.getByRole('menuitem', { name: /show title/i }));
+
+    expect(onColumnsChange).toHaveBeenCalledWith(['title', 'description', 'status']);
   });
 });

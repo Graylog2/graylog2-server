@@ -24,6 +24,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { ESBuildMinifyPlugin } = require('esbuild-loader');
 
 const UniqueChunkIdPlugin = require('./webpack/UniqueChunkIdPlugin');
+const supportedBrowsers = require('./supportedBrowsers');
 
 const ROOT_PATH = path.resolve(__dirname);
 const APP_PATH = path.resolve(ROOT_PATH, 'src');
@@ -75,8 +76,6 @@ const chunksSortMode = (c1, c2) => {
   return 0;
 };
 
-const target = 'chrome105,edge105,firefox91,safari15'.split(',');
-
 const webpackConfig = {
   name: 'app',
   dependencies: ['vendor'],
@@ -96,7 +95,7 @@ const webpackConfig = {
           loader: 'esbuild-loader',
           options: {
             loader: 'tsx',
-            target,
+            target: supportedBrowsers,
           },
         },
         exclude: /node_modules\/(?!graylog-web-plugin)|\.node_cache/,
@@ -251,7 +250,7 @@ if (TARGET.startsWith('build')) {
     optimization: {
       moduleIds: 'deterministic',
       minimizer: [new ESBuildMinifyPlugin({
-        target,
+        target: supportedBrowsers,
       })],
     },
     plugins: [

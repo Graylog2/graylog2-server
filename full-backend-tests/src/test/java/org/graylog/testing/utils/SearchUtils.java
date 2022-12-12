@@ -21,8 +21,12 @@ import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog.testing.backenddriver.SearchDriver;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public final class SearchUtils {
 
@@ -56,11 +60,16 @@ public final class SearchUtils {
         return false;
     }
 
-    public static MappedFieldTypeDTO waitForFieldTypeDefinition(RequestSpecification requestSpecification, String fieldName) {
-        return WaitUtils.waitForObject(() -> SearchDriver.getFieldTypes(requestSpecification)
-                        .stream()
-                        .filter(t -> t.name().equals(fieldName))
-                        .findFirst()
-                , "Timed out waiting for field definition");
+    public static Set<MappedFieldTypeDTO> waitForFieldTypeDefinitions(RequestSpecification requestSpecification, String... fieldName) {
+        final Set<String> expectedFields = Arrays.stream(fieldName).collect(Collectors.toSet());
+        return WaitUtils.waitForObject(() -> {
+            final List<MappedFieldTypeDTO> knownTypes = SearchDriver.getFieldTypes(requestSpecification);
+            final Set<MappedFieldTypeDTO> filtered = knownTypes.stream().filter(t -> expectedFields.contains(t.name())).collect(Collectors.toSet());
+            if (filtered.size() == expectedFields.size()) {
+                return Optional.of(filtered);
+            } else {
+                return Optional.empty();
+            }
+        }, "Timed out waiting for field definition");
     }
 }
