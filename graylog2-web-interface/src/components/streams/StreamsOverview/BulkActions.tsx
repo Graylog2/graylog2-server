@@ -19,8 +19,8 @@ import { uniq } from 'lodash';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { Formik, Form } from 'formik';
-import { Streams } from '@graylog/server-api';
 
+import { Streams } from '@graylog/server-api';
 import { Button, Modal } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -122,9 +122,9 @@ const BulkActions = ({ selectedStreamIds, refetchStreams, setSelectedStreamIds, 
       Promise.allSettled(deleteCalls).then((result) => {
         const fulfilledRequests = result.filter((response) => response.status === 'fulfilled') as Array<{ status: 'fulfilled', value: string }>;
         const deletedStreamIds = fulfilledRequests.map(({ value }) => value);
+        const notDeletedStreamIds = selectedStreamIds?.filter((streamId) => !deletedStreamIds.includes(streamId));
 
-        if (deletedStreamIds?.length !== selectedStreamIds.length) {
-          const notDeletedStreamIds = selectedStreamIds.filter((streamId) => !deletedStreamIds.includes(streamId));
+        if (notDeletedStreamIds.length) {
           const rejectedRequests = result.filter((response) => response.status === 'rejected') as Array<{ status: 'rejected', reason: FetchError }>;
           const errorMessages = uniq(rejectedRequests.map((request) => request.reason.responseMessage));
 
@@ -132,14 +132,13 @@ const BulkActions = ({ selectedStreamIds, refetchStreams, setSelectedStreamIds, 
             queryClient.invalidateQueries(['streams', 'overview']);
           }
 
-          setSelectedStreamIds(notDeletedStreamIds);
-
           UserNotification.error(`${notDeletedStreamIds.length} out of ${selectedItemsAmount} selected ${descriptor} could not be deleted. Status: ${errorMessages.join()}`);
 
           return;
         }
 
         queryClient.invalidateQueries(['streams', 'overview']);
+        setSelectedStreamIds(notDeletedStreamIds);
         UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`, 'Success');
       });
     }
