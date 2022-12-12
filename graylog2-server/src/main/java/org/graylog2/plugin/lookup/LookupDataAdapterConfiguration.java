@@ -65,4 +65,9 @@ public interface LookupDataAdapterConfiguration {
     default Optional<Multimap<String, String>> validate(LookupDataAdapterValidationContext validationContext) {
         return validate();
     }
+
+    @JsonIgnore
+    default boolean isCloudCompatible() {
+        return true;
+    }
 }
