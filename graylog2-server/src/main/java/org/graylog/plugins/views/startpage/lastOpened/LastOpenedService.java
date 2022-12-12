@@ -33,7 +33,7 @@ import java.util.Optional;
 /*
  * TODO: remove entity, if a user is deleted?
  */
-public class LastOpenedService extends PaginatedDbService<LastOpenedItemsDTO> {
+public class LastOpenedService extends PaginatedDbService<LastOpenedForUserDTO> {
     private static final String COLLECTION_NAME = "last_opened_items";
 
     private final EntityOwnershipService entityOwnerShipService;
@@ -42,18 +42,18 @@ public class LastOpenedService extends PaginatedDbService<LastOpenedItemsDTO> {
     protected LastOpenedService(MongoConnection mongoConnection,
                                  MongoJackObjectMapperProvider mapper,
                                 final EntityOwnershipService entityOwnerShipService) {
-        super(mongoConnection, mapper, LastOpenedItemsDTO.class, COLLECTION_NAME);
+        super(mongoConnection, mapper, LastOpenedForUserDTO.class, COLLECTION_NAME);
         this.entityOwnerShipService = entityOwnerShipService;
     }
 
-    public Optional<LastOpenedItemsDTO> findForUser(final SearchUser searchUser) {
-        return streamQuery(DBQuery.is(LastOpenedItemsDTO.FIELD_USER_ID, searchUser.getUser().getId())).findAny();
+    public Optional<LastOpenedForUserDTO> findForUser(final SearchUser searchUser) {
+        return streamQuery(DBQuery.is(LastOpenedForUserDTO.FIELD_USER_ID, searchUser.getUser().getId())).findAny();
     }
 
-    public Optional<LastOpenedItemsDTO> create(final LastOpenedItemsDTO lastOpenedItems, final SearchUser searchUser) {
+    public Optional<LastOpenedForUserDTO> create(final LastOpenedForUserDTO lastOpenedItems, final SearchUser searchUser) {
         try {
-            final WriteResult<LastOpenedItemsDTO, ObjectId> result = db.insert(lastOpenedItems);
-            final LastOpenedItemsDTO savedObject = result.getSavedObject();
+            final WriteResult<LastOpenedForUserDTO, ObjectId> result = db.insert(lastOpenedItems);
+            final LastOpenedForUserDTO savedObject = result.getSavedObject();
             if (savedObject != null) {
                 entityOwnerShipService.registerNewEntity(savedObject.id(), searchUser.getUser(), GRNTypes.LAST_OPENED);
             }

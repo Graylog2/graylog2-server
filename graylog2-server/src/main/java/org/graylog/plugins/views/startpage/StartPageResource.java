@@ -23,7 +23,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.startpage.favorites.Favorite;
-import org.graylog.plugins.views.startpage.lastOpened.LastOpenedItem;
+import org.graylog.plugins.views.startpage.lastOpened.LastOpened;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivity;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -62,15 +62,15 @@ public class StartPageResource extends RestResource implements PluginRestResourc
     @GET
     @Path("/lastOpened")
     @ApiOperation("Get the Last Opened Items for the Start Page for the user")
-    public PaginatedResponse<LastOpenedItem> getLastOpened(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                           @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
-                                                           @Context SearchUser searchUser) {
+    public PaginatedResponse<LastOpened> getLastOpened(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                       @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
+                                                       @Context SearchUser searchUser) {
         return service.findLastOpenedFor(searchUser, page, perPage);
     }
 
     @GET
-    @Path("/favoriteItems")
-    @ApiOperation("Get the Favorite Items for the Start Page for the user")
+    @Path("/favorites")
+    @ApiOperation("Get the Favorites for the Start Page for the user")
     public PaginatedResponse<Favorite> getFavoriteItems(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                         @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
                                                         @ApiParam(name = "type") @QueryParam("type") Optional<String> type,

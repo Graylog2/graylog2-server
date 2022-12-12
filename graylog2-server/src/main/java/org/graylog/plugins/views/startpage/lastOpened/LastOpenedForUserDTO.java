@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.plugins.views.startpage.favorites.FavoriteDTO;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -28,51 +29,34 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-@AutoValue
-@JsonDeserialize(builder = LastOpenedItemsDTO.Builder.class)
-@WithBeanGetter
-public abstract class LastOpenedItemsDTO {
+public record LastOpenedForUserDTO(
+        @ObjectId
+        @Id
+        @Nullable
+        @JsonProperty(FIELD_ID)
+        String id,
+        @JsonProperty(FIELD_USER_ID)
+        String userId,
+        @Nullable
+        @JsonProperty(FIELD_ITEMS)
+        List<LastOpenedDTO> items
+) {
     public static final String FIELD_ID = "id";
     public static final String FIELD_USER_ID = "user_id";
     public static final String FIELD_ITEMS = "items";
 
-    @ObjectId
-    @Id
-    @Nullable
-    @JsonProperty(FIELD_ID)
-    public abstract String id();
-
-    @JsonProperty(FIELD_USER_ID)
-    public abstract String userId();
-
-    @JsonProperty(FIELD_ITEMS)
-    public abstract List<Item> items();
-
-    public static LastOpenedItemsDTO.Builder builder() {
-        return LastOpenedItemsDTO.Builder.create();
+    public LastOpenedForUserDTO {
+        /*
+         * always have at least an empty list, avoid null
+         * @Nullable is necessary to reduce problems if someone manually edits in MongoDB
+         */
+        if(items == null) {
+            items = new ArrayList<>();
+        }
     }
 
-    public abstract LastOpenedItemsDTO.Builder toBuilder();
-
-    @AutoValue.Builder
-    public static abstract class Builder {
-        @ObjectId
-        @Id
-        @JsonProperty(FIELD_ID)
-        public abstract LastOpenedItemsDTO.Builder id(String id);
-
-        @JsonProperty(FIELD_USER_ID)
-        public abstract LastOpenedItemsDTO.Builder userId(String userId);
-
-        @JsonProperty(FIELD_ITEMS)
-        public abstract LastOpenedItemsDTO.Builder items(List<Item> items);
-
-        @JsonCreator
-        public static LastOpenedItemsDTO.Builder create() {
-            return new $AutoValue_LastOpenedItemsDTO.Builder()
-                    .items(new ArrayList<>());
-        }
-
-        public abstract LastOpenedItemsDTO build();
+    public LastOpenedForUserDTO(@JsonProperty(FIELD_USER_ID) String userId,
+                               @Nullable @JsonProperty(FIELD_ITEMS) List<LastOpenedDTO> items) {
+        this(null, userId, items);
     }
 }

@@ -23,9 +23,9 @@ import org.graylog.plugins.views.startpage.favorites.Favorite;
 import org.graylog.plugins.views.startpage.favorites.FavoriteDTO;
 import org.graylog.plugins.views.startpage.favorites.FavoritesForUserDTO;
 import org.graylog.plugins.views.startpage.favorites.FavoritesService;
-import org.graylog.plugins.views.startpage.lastOpened.Item;
-import org.graylog.plugins.views.startpage.lastOpened.LastOpenedItem;
-import org.graylog.plugins.views.startpage.lastOpened.LastOpenedItemsDTO;
+import org.graylog.plugins.views.startpage.lastOpened.LastOpenedDTO;
+import org.graylog.plugins.views.startpage.lastOpened.LastOpened;
+import org.graylog.plugins.views.startpage.lastOpened.LastOpenedForUserDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivity;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityDTO;
@@ -77,13 +77,13 @@ public class StartPageService {
         return sourceList.subList(fromIndex, Math.min(fromIndex + pageSize, sourceList.size()));
     }
 
-    public PaginatedResponse<LastOpenedItem> findLastOpenedFor(final SearchUser searchUser, final int page, final int perPage) {
+    public PaginatedResponse<LastOpened> findLastOpenedFor(final SearchUser searchUser, final int page, final int perPage) {
         var items = lastOpenedService
                 .findForUser(searchUser)
-                .orElse(LastOpenedItemsDTO.builder().userId(searchUser.getUser().getId()).build())
+                .orElse(new LastOpenedForUserDTO(searchUser.getUser().getId(), List.of()))
                 .items()
                 .stream()
-                .map(i -> new LastOpenedItem(i.id(), catalog.getType(i.id()), catalog.getTitle(i.id()), i.timestamp()))
+                .map(i -> new LastOpened(i.id(), catalog.getType(i.id()), catalog.getTitle(i.id()), i.timestamp()))
                 .collect(Collectors.toList());
         Collections.reverse(items);
 
@@ -99,7 +99,7 @@ public class StartPageService {
                 .map(i -> new Favorite(i.id(), i.type(), catalog.getTitle(i.id())))
                 .toList();
 
-        return PaginatedResponse.create("favoriteItems", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
+        return PaginatedResponse.create("favorites", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
     }
 
     private String getType(RecentActivityDTO i) {
@@ -125,7 +125,7 @@ public class StartPageService {
 
     public void addLastOpenedFor(final ViewDTO view, final SearchUser searchUser) {
         final var lastOpenedItems = lastOpenedService.findForUser(searchUser);
-        final var item = new Item(view.id(), DateTime.now(DateTimeZone.UTC));
+        final var item = new LastOpenedDTO(view.id(), DateTime.now(DateTimeZone.UTC));
         if(lastOpenedItems.isPresent()) {
             var loi = lastOpenedItems.get();
             var items = loi.items().stream().filter(i -> !i.id().equals(item.id())).limit(MAXIMUM_LAST_OPENED_PER_USER - 1).toList();
@@ -134,19 +134,16 @@ public class StartPageService {
             loi.items().add(item);
             lastOpenedService.save(loi);
         } else {
-            var items = LastOpenedItemsDTO.builder()
-                    .userId(searchUser.getUser().getId())
-                    .items(Collections.singletonList(item))
-                    .build();
+            var items = new LastOpenedForUserDTO(searchUser.getUser().getId(), List.of(item));
             lastOpenedService.create(items, searchUser);
         }
     }
 
     public void addFavoriteItemFor(final String id, final SearchUser searchUser) {
-        final var favoriteItems = favoritesService.findForUser(searchUser);
+        final var favorites = favoritesService.findForUser(searchUser);
         final var item = new FavoriteDTO(id, catalog.getType(id));
-        if(favoriteItems.isPresent()) {
-            var fi = favoriteItems.get();
+        if(favorites.isPresent()) {
+            var fi = favorites.get();
             fi.items().add(item);
             favoritesService.save(fi);
         } else {
@@ -156,9 +153,9 @@ public class StartPageService {
     }
 
     public void removeFavoriteItemFor(final String id, final SearchUser searchUser) {
-        var favoriteItems = favoritesService.findForUser(searchUser);
-        if(favoriteItems.isPresent() && favoriteItems.get().items() != null) {
-            var fi = favoriteItems.get();
+        var favorites = favoritesService.findForUser(searchUser);
+        if(favorites.isPresent() && favorites.get().items() != null) {
+            var fi = favorites.get();
             var items = fi.items().stream().filter(i -> !i.id().equals(id)).toList();
             fi.items().clear();
             fi.items().addAll(items);
