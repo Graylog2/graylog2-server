@@ -136,11 +136,14 @@ const SearchActionsMenu = () => {
   const deleteSavedSearch = (deletedView: View) => {
     return ViewManagementActions.delete(deletedView)
       .then(() => UserNotification.success(`Deleting view "${deletedView.title}" was successful!`, 'Success!'))
-      .then(() => ViewActions.create(View.Type.Search))
       .then(() => {
         if (deletedView.id === view.id) {
-          loadNewSearch();
+          return ViewActions.create(View.Type.Search).then(() => {
+            loadNewSearch();
+          });
         }
+
+        return Promise.resolve();
       })
       .catch((error) => UserNotification.error(`Deleting view failed: ${_extractErrorMessage(error)}`, 'Error!'));
   };

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 
@@ -27,7 +27,6 @@ import QueryHelper from 'components/common/QueryHelper';
 import type { Sort, ColumnRenderers } from 'components/common/EntityDataTable';
 import EntityDataTable from 'components/common/EntityDataTable';
 import type { PaginatedViews } from 'views/stores/ViewManagementStore';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import { SavedSearchesActions } from 'views/stores/SavedSearchesStore';
 import type FetchError from 'logic/errors/FetchError';
 import UserNotification from 'util/UserNotification';
@@ -95,21 +94,25 @@ const customColumnRenderers = (onLoadSavedSearch: () => void, activeSavedSearchI
   },
 });
 
-const onDelete = (e, savedSearch: View, deleteSavedSearch: (search: View) => void) => {
+const onDelete = (e, savedSearch: View, deleteSavedSearch: (search: View) => Promise<View>, activeSavedSearchId: string, refetch: () => void) => {
   e.stopPropagation();
 
   // eslint-disable-next-line no-alert
   if (window.confirm(`You are about to delete saved search: "${savedSearch.title}". Are you sure?`)) {
-    deleteSavedSearch(savedSearch);
+    deleteSavedSearch(savedSearch).then(() => {
+      if (savedSearch.id !== activeSavedSearchId) {
+        refetch();
+      }
+    });
   }
 };
 
 const usePaginatedSavedSearches = (searchParams: SearchParams): {
   data: PaginatedViews | undefined,
   refetch: () => void,
-  isFetching: boolean
+  isLoading: boolean
 } => {
-  const { data, refetch, isFetching } = useQuery(
+  const { data, refetch, isLoading } = useQuery(
     ['saved-searches', 'overview', searchParams],
     () => SavedSearchesActions.search({
       query: searchParams.query,
@@ -130,13 +133,9 @@ const usePaginatedSavedSearches = (searchParams: SearchParams): {
   return ({
     data,
     refetch,
-    isFetching,
+    isLoading,
   });
 };
-
-const _updateListOnSearchDelete = (setSearchParams) => ViewManagementActions.delete.completed.listen(
-  () => setSearchParams((cur) => ({ ...cur, page: DEFAULT_PAGINATION.page })),
-);
 
 type Props = {
   activeSavedSearchId: string,
@@ -160,9 +159,7 @@ const SavedSearchesList = ({
     },
   });
 
-  const { data, isFetching } = usePaginatedSavedSearches(searchParams);
-
-  useEffect(() => _updateListOnSearchDelete(setSearchParams), []);
+  const { data, isLoading, refetch } = usePaginatedSavedSearches(searchParams);
 
   const handleSearch = useCallback(
     (newQuery: string) => setSearchParams((cur) => ({
@@ -190,7 +187,7 @@ const SavedSearchesList = ({
   }, []);
 
   const renderSavedSearchActions = useCallback((search: View) => (
-    <Button onClick={(e) => onDelete(e, search, deleteSavedSearch)}
+    <Button onClick={(e) => onDelete(e, search, deleteSavedSearch, activeSavedSearchId, refetch)}
             role="button"
             bsSize="xsmall"
             bsStyle="danger"
@@ -198,11 +195,11 @@ const SavedSearchesList = ({
             tabIndex={0}>
       Delete
     </Button>
-  ), [deleteSavedSearch]);
+  ), [activeSavedSearchId, deleteSavedSearch, refetch]);
 
   const columnRenderers = customColumnRenderers(onLoadSavedSearch, activeSavedSearchId);
 
-  if (isFetching) {
+  if (isLoading) {
     return <Spinner />;
   }
 
