@@ -22,6 +22,7 @@ import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationReq
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
+import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -42,12 +43,16 @@ public class QueryParamsToFullRequestSpecificationMapper {
                                                                            final Set<String> streams,
                                                                            final String timerangeKeyword,
                                                                            final List<String> fields,
+                                                                           final String sort,
+                                                                           final SortSpec.Direction sortOrder,
                                                                            final int from,
                                                                            final int size) {
 
         return new MessagesRequestSpec(query,
                 streams,
                 timerangeParser.parseTimeRange(timerangeKeyword),
+                sort,
+                sortOrder,
                 from,
                 size,
                 fields);
