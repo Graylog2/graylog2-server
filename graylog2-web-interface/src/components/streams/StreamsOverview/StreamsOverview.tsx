@@ -58,12 +58,12 @@ const DefaultLabel = styled(Label)`
 const COLUMN_DEFINITIONS = [
   { id: 'title', title: 'Title', sortable: true },
   { id: 'description', title: 'Description', sortable: true },
-  { id: 'index_set_id', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },
+  { id: 'index_set_title', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },
   { id: 'throughput', title: 'Throughput' },
   { id: 'disabled', title: 'Status', sortable: true },
 ];
 
-const INITIAL_COLUMNS = ['title', 'description', 'index_set_id', 'throughput', 'disabled'];
+const INITIAL_COLUMNS = ['title', 'description', 'index_set_title', 'throughput', 'disabled'];
 
 const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stream> => ({
   title: {
@@ -74,7 +74,7 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
       </>
     ),
   },
-  index_set_id: {
+  index_set_title: {
     renderCell: (stream) => <IndexSetCell indexSets={indexSets} stream={stream} />,
     width: 0.7,
   },
@@ -177,7 +177,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   }, []);
 
   const onSortChange = useCallback((newSort: Sort) => {
-    setSearchParams((cur) => ({ ...cur, sort: newSort }));
+    setSearchParams((cur) => ({ ...cur, sort: newSort, page: 1 }));
   }, []);
 
   const renderStreamActions = useCallback((listItem: Stream) => (
