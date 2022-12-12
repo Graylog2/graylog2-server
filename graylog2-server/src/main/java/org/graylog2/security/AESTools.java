@@ -17,7 +17,8 @@
 package org.graylog2.security;
 
 import org.apache.shiro.codec.Hex;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.bouncycastle.crypto.paddings.ISO10126d2Padding;
 import org.cryptomator.siv.SivMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ import javax.annotation.Nullable;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
@@ -38,10 +40,8 @@ public class AESTools {
 
     private static final SivMode SIV_MODE = new SivMode();
 
-    // We use the Bouncy Castle provider to ensure the availability of the ISO10126 padding on FIPS enabled JVM
-    // environments. See: https://github.com/Graylog2/graylog2-server/issues/13525
-    private static final BouncyCastleProvider CIPHER_PROVIDER = new BouncyCastleProvider();
-    private static final String CIPHER_TRANSFORMATION = "AES/CBC/ISO10126Padding";
+    private static final String CIPHER_TRANSFORMATION = "AES/CBC/PKCS5Padding";
+    private static final String CIPHER_NO_PADDING_TRANSFORMATION = "AES/CBC/NoPadding";
 
     /**
      * Encrypt the given plain text value with the given encryption key and salt using AES CBC.
@@ -60,10 +60,10 @@ public class AESTools {
         checkNotNull(salt, "Salt must not be null.");
         try {
             @SuppressWarnings("CIPHER_INTEGRITY")
-            Cipher cipher = Cipher.getInstance(CIPHER_TRANSFORMATION, CIPHER_PROVIDER);
+            Cipher cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
             SecretKeySpec key = new SecretKeySpec(adjustToIdealKeyLength(encryptionKey), "AES");
-            cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(salt.getBytes("UTF-8")));
-            return Hex.encodeToString(cipher.doFinal(plainText.getBytes("UTF-8")));
+            cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(salt.getBytes(UTF_8)));
+            return Hex.encodeToString(cipher.doFinal(plainText.getBytes(UTF_8)));
         } catch (Exception e) {
             LOG.error("Could not encrypt value.", e);
         }
@@ -88,14 +88,32 @@ public class AESTools {
         checkNotNull(salt, "Salt must not be null.");
         try {
             @SuppressWarnings("CIPHER_INTEGRITY")
-            Cipher cipher = Cipher.getInstance(CIPHER_TRANSFORMATION, CIPHER_PROVIDER);
+            Cipher cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
             SecretKeySpec key = new SecretKeySpec(adjustToIdealKeyLength(encryptionKey), "AES");
-            cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(salt.getBytes("UTF-8")));
-            return new String(cipher.doFinal(Hex.decode(cipherText)), "UTF-8");
-        } catch (Exception e) {
-            LOG.error("Could not decrypt value.", e);
+            cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(salt.getBytes(UTF_8)));
+            return new String(cipher.doFinal(Hex.decode(cipherText)), UTF_8);
+        } catch (Exception ignored) {
+            // This is likely a BadPaddingException, but try to decrypt legacy secrets in any case
+            try {
+                return decryptLegacy(cipherText, encryptionKey, salt);
+            } catch (Exception ex) {
+                LOG.error("Could not decrypt (legacy) value.", ex);
+                return null;
+            }
         }
-        return null;
+    }
+
+    // Decrypt secrets that were created with ISO10126Padding
+    // First decrypt it with a "no padding" transform and then strip the padding manually.
+    // We do this because the ISO10126Padding has been deprecated and is not present
+    // when running in FIPS mode.
+    private static String decryptLegacy(String cipherText, String encryptionKey, String salt) throws GeneralSecurityException, InvalidCipherTextException {
+        Cipher cipher = Cipher.getInstance(CIPHER_NO_PADDING_TRANSFORMATION);
+        SecretKeySpec key = new SecretKeySpec(adjustToIdealKeyLength(encryptionKey), "AES");
+        cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(salt.getBytes(UTF_8)));
+        byte[] decrypted = cipher.doFinal(Hex.decode(cipherText));
+        final int padCount = new ISO10126d2Padding().padCount(decrypted);
+        return new String(Arrays.copyOf(decrypted, decrypted.length - padCount), UTF_8);
     }
 
     /**
