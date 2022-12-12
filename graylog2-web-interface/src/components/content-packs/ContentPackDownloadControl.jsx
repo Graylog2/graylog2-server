@@ -33,8 +33,9 @@ class ContentPackDownloadControl extends React.Component {
     super(props);
 
     this.state = {
-      showModal: false
-    }
+      showModal: false,
+    };
+
     this._closeModal = this._closeModal.bind(this);
   }
 
@@ -48,6 +49,7 @@ class ContentPackDownloadControl extends React.Component {
     this.setState({ showModal: false });
   }
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   open() {
     this.setState({ showModal: true });
   }
@@ -57,7 +59,7 @@ class ContentPackDownloadControl extends React.Component {
 
     return (
       <BootstrapModalWrapper showModal={this.state.showModal}
-                             onHide={this._closeModal} 
+                             onHide={this._closeModal}
                              bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>Download Content Pack</Modal.Title>

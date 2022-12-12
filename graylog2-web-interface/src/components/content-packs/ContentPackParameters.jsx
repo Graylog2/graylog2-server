@@ -48,10 +48,7 @@ class ContentPackParameters extends React.Component {
 
     this.state = {
       showModal: false,
-      newParameter: ObjectUtils.clone(ContentPackParameters.emptyParameter),
       parameterToDelete: undefined,
-      defaultValueError: undefined,
-      nameError: undefined,
     };
   }
 

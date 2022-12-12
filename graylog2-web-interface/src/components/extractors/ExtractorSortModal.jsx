@@ -80,7 +80,7 @@ class ExtractorSortModal extends React.Component {
     const { input } = this.props;
 
     return (
-      <BootstrapModalWrapper showModal={showModal} 
+      <BootstrapModalWrapper showModal={showModal}
                              onHide={this._cancel}>
         <Modal.Header closeButton>
           <Modal.Title>
