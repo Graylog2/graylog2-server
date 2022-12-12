@@ -14,18 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.utils;
+package org.graylog.testing.completebackend.apis.inputs;
 
-import java.util.Locale;
-import java.util.Map;
+public class PortBoundGelfInputApi {
 
-public record SharingRequest(Entity entity, Map<Entity, String> permissions) {
+    private final GelfInputApi api;
+    private final int mappedPort;
 
-    public static record Entity(String type, String id) {
-
-        public String serialize() {
-            return String.format(Locale.ROOT, "grn::::%s:%s", this.type, this.id);
-        }
+    public PortBoundGelfInputApi(GelfInputApi api, int mappedPort) {
+        this.api = api;
+        this.mappedPort = mappedPort;
     }
 
+    public PortBoundGelfInputApi postMessage(String message) {
+        api.postMessage(mappedPort, message);
+        return this;
+    }
 }

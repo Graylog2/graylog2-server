@@ -14,12 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.utils;
+package org.graylog.testing.completebackend.apis.inputs;
 
 import com.google.common.collect.ImmutableMap;
-import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.completebackend.apis.GraylogRestApi;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
 import org.slf4j.Logger;
@@ -29,14 +29,22 @@ import java.util.ArrayList;
 
 import static io.restassured.RestAssured.given;
 
-public final class GelfInputUtils {
+public final class GelfInputApi implements GraylogRestApi {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GelfInputUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GelfInputApi.class);
+    private final RequestSpecification requestSpecification;
+    private final GraylogBackend backend;
 
-    private GelfInputUtils() {
+    public GelfInputApi(RequestSpecification requestSpecification, GraylogBackend backend) {
+        this.requestSpecification = requestSpecification;
+        this.backend = backend;
     }
 
-    public static void createGelfHttpInput(int mappedPort, int gelfHttpPort, RequestSpecification requestSpecification) {
+    public PortBoundGelfInputApi createGelfHttpInput(int gelfHttpPort) {
+        return createGelfHttpInput(backend.mappedPortFor(gelfHttpPort), gelfHttpPort);
+    }
+
+    public PortBoundGelfInputApi createGelfHttpInput(int mappedPort, int gelfHttpPort) {
 
         final ArrayList<Integer> inputs = given()
                 .spec(requestSpecification)
@@ -63,18 +71,20 @@ public final class GelfInputUtils {
                     .post("/system/inputs");
         }
 
-        waitForGelfInputOnPort(mappedPort, requestSpecification);
+        waitForGelfInputOnPort(mappedPort);
+
+        return new PortBoundGelfInputApi(this, mappedPort);
     }
 
-    private static void waitForGelfInputOnPort(int mappedPort, RequestSpecification requestSpecification) {
-        WaitUtils.waitFor(
-                () -> gelfInputIsListening(mappedPort, requestSpecification),
+    private void waitForGelfInputOnPort(int mappedPort) {
+        waitFor(
+                () -> gelfInputIsListening(mappedPort),
                 "Timed out waiting for GELF input listening on port " + mappedPort);
     }
 
-    private static boolean gelfInputIsListening(int mappedPort, RequestSpecification requestSpecification) {
+    private boolean gelfInputIsListening(int mappedPort) {
         try {
-            gelfEndpoint(mappedPort, requestSpecification)
+            gelfEndpoint(mappedPort)
                     .expect().response().statusCode(200)
                     .when()
                     .options();
@@ -85,17 +95,16 @@ public final class GelfInputUtils {
         }
     }
 
-    private static RequestSpecification gelfEndpoint(int mappedPort, RequestSpecification requestSpecification) {
+    private RequestSpecification gelfEndpoint(int mappedPort) {
         return given()
-                .spec(requestSpecification)
+                .spec(this.requestSpecification)
                 .basePath("/gelf")
                 .port(mappedPort);
     }
 
-    public static void postMessage(int mappedPort,
-                                   @SuppressWarnings("SameParameterValue") String messageJson,
-                                   RequestSpecification requestSpecification) {
-        gelfEndpoint(mappedPort, requestSpecification)
+    public void postMessage(int mappedPort,
+                            @SuppressWarnings("SameParameterValue") String messageJson) {
+        gelfEndpoint(mappedPort)
                 .body(messageJson)
                 .expect().response().statusCode(202)
                 .when()
