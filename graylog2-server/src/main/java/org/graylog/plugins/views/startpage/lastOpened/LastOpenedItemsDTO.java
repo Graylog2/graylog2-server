@@ -70,7 +70,7 @@ public abstract class LastOpenedItemsDTO {
         @JsonCreator
         public static LastOpenedItemsDTO.Builder create() {
             return new $AutoValue_LastOpenedItemsDTO.Builder()
-                    .items(new ArrayList<Item>());
+                    .items(new ArrayList<>());
         }
 
         public abstract LastOpenedItemsDTO build();

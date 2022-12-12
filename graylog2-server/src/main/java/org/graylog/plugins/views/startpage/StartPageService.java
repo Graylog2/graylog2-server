@@ -62,7 +62,7 @@ public class StartPageService {
         eventBus.register(this);
     }
 
-    private <T> List<T> getPage(List<T> sourceList, int page, int pageSize) {
+    protected <T> List<T> getPage(List<T> sourceList, int page, int pageSize) {
         if(pageSize <= 0 || page <= 0) {
             throw new IllegalArgumentException("invalid page size: " + pageSize);
         }
@@ -95,7 +95,7 @@ public class StartPageService {
                 .orElse(FavoriteItemsDTO.builder().userId(searchUser.getUser().getId()).build())
                 .items()
                 .stream()
-                .map(i -> new FavoriteItem(i, catalog.getType(i), catalog.getTitle(i)))
+                .map(i -> new FavoriteItem(i.id(), i.type(), catalog.getTitle(i.id())))
                 .collect(Collectors.toList());
         Collections.reverse(items);
 
@@ -123,15 +123,6 @@ public class StartPageService {
         return PaginatedResponse.create("recentActivity", new PaginatedList<>(mapped, items.pagination().total(), page, perPage));
     }
 
-    // works on the existing list, side-effect
-    private void addItemToCappedList(final List<String> items, String id) {
-        items.remove(id);
-        if(items.size() >= MAXIMUM_ITEMS) {
-            items.remove(0);
-        }
-        items.add(id);
-    }
-
     public void addLastOpenedFor(final ViewDTO view, final SearchUser searchUser) {
         final var lastOpenedItems = lastOpenedService.findForUser(searchUser);
         final var item = new Item(view.id(), DateTime.now(DateTimeZone.UTC));
@@ -152,12 +143,17 @@ public class StartPageService {
     }
 
     public void addFavoriteItemFor(final String id, final SearchUser searchUser) {
-        var favoriteItems = favoriteItemsService.findForUser(searchUser);
+        final var favoriteItems = favoriteItemsService.findForUser(searchUser);
+        final var item = new org.graylog.plugins.views.startpage.favorites.Item(id, catalog.getType(id));
         if(favoriteItems.isPresent()) {
-            addItemToCappedList(favoriteItems.get().items(),id);
-            favoriteItemsService.save(favoriteItems.get());
+            var fi = favoriteItems.get();
+            var items = fi.items().stream().filter(i -> !i.id().equals(item.id())).limit(MAXIMUM_ITEMS - 1).toList();
+            fi.items().clear();
+            fi.items().addAll(items);
+            fi.items().add(item);
+            favoriteItemsService.save(fi);
         } else {
-            var items = FavoriteItemsDTO.builder().userId(searchUser.getUser().getId()).items(Collections.singletonList(id)).build();
+            var items = FavoriteItemsDTO.builder().userId(searchUser.getUser().getId()).items(Collections.singletonList(item)).build();
             favoriteItemsService.create(items, searchUser);
         }
     }

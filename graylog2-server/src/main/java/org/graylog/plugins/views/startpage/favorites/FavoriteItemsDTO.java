@@ -46,7 +46,7 @@ public abstract class FavoriteItemsDTO {
     public abstract String userId();
 
     @JsonProperty(FIELD_ITEMS)
-    public abstract List<String> items();
+    public abstract List<Item> items();
 
     public static FavoriteItemsDTO.Builder builder() {
         return FavoriteItemsDTO.Builder.create();
@@ -65,7 +65,7 @@ public abstract class FavoriteItemsDTO {
         public abstract FavoriteItemsDTO.Builder userId(String userId);
 
         @JsonProperty(FIELD_ITEMS)
-        public abstract FavoriteItemsDTO.Builder items(List<String> items);
+        public abstract FavoriteItemsDTO.Builder items(List<Item> items);
 
         @JsonCreator
         public static FavoriteItemsDTO.Builder create() {
