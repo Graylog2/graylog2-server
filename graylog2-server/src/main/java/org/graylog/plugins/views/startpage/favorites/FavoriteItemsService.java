@@ -33,7 +33,7 @@ import java.util.Optional;
 /*
  * TODO: remove entity, if a user is deleted?
  */
-public class FavoriteItemsService extends PaginatedDbService<FavoriteItemsPerUserDTO> {
+public class FavoriteItemsService extends PaginatedDbService<FavoriteItemsForUserDTO> {
     private static final String COLLECTION_NAME = "favorite_items";
 
     private final EntityOwnershipService entityOwnerShipService;
@@ -42,18 +42,18 @@ public class FavoriteItemsService extends PaginatedDbService<FavoriteItemsPerUse
     protected FavoriteItemsService(final MongoConnection mongoConnection,
                                    final MongoJackObjectMapperProvider mapper,
                                    final EntityOwnershipService entityOwnerShipService) {
-        super(mongoConnection, mapper, FavoriteItemsPerUserDTO.class, COLLECTION_NAME);
+        super(mongoConnection, mapper, FavoriteItemsForUserDTO.class, COLLECTION_NAME);
         this.entityOwnerShipService = entityOwnerShipService;
     }
 
-    public Optional<FavoriteItemsPerUserDTO> findForUser(final SearchUser searchUser) {
-        return streamQuery(DBQuery.is(FavoriteItemsPerUserDTO.FIELD_USER_ID, searchUser.getUser().getId())).findAny();
+    public Optional<FavoriteItemsForUserDTO> findForUser(final SearchUser searchUser) {
+        return streamQuery(DBQuery.is(FavoriteItemsForUserDTO.FIELD_USER_ID, searchUser.getUser().getId())).findAny();
     }
 
-    public Optional<FavoriteItemsPerUserDTO> create(final FavoriteItemsPerUserDTO favoriteItem, final SearchUser searchUser) {
+    public Optional<FavoriteItemsForUserDTO> create(final FavoriteItemsForUserDTO favoriteItem, final SearchUser searchUser) {
         try {
-            final WriteResult<FavoriteItemsPerUserDTO, ObjectId> result = db.insert(favoriteItem);
-            final FavoriteItemsPerUserDTO savedObject = result.getSavedObject();
+            final WriteResult<FavoriteItemsForUserDTO, ObjectId> result = db.insert(favoriteItem);
+            final FavoriteItemsForUserDTO savedObject = result.getSavedObject();
             if (savedObject != null) {
                 entityOwnerShipService.registerNewEntity(savedObject.id(), searchUser.getUser(), GRNTypes.FAVORITE_ITEMS);
             }

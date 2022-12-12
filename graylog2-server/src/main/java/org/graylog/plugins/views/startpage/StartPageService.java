@@ -21,7 +21,7 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.startpage.favorites.FavoriteItem;
 import org.graylog.plugins.views.startpage.favorites.FavoriteItemDTO;
-import org.graylog.plugins.views.startpage.favorites.FavoriteItemsPerUserDTO;
+import org.graylog.plugins.views.startpage.favorites.FavoriteItemsForUserDTO;
 import org.graylog.plugins.views.startpage.favorites.FavoriteItemsService;
 import org.graylog.plugins.views.startpage.lastOpened.Item;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedItem;
@@ -93,7 +93,7 @@ public class StartPageService {
     public PaginatedResponse<FavoriteItem> findFavoriteItemsFor(final SearchUser searchUser, final Optional<String> type, final int page, final int perPage) {
         var items = favoriteItemsService
                 .findForUser(searchUser)
-                .orElse(new FavoriteItemsPerUserDTO(searchUser.getUser().getId(), List.of()))
+                .orElse(new FavoriteItemsForUserDTO(searchUser.getUser().getId(), List.of()))
                 .items()
                 .stream().filter(i -> type.isPresent() ? i.type().equals(type.get()) : true)
                 .map(i -> new FavoriteItem(i.id(), i.type(), catalog.getTitle(i.id())))
@@ -154,7 +154,7 @@ public class StartPageService {
             fi.items().add(item);
             favoriteItemsService.save(fi);
         } else {
-            var items = new FavoriteItemsPerUserDTO(searchUser.getUser().getId(), List.of(item));
+            var items = new FavoriteItemsForUserDTO(searchUser.getUser().getId(), List.of(item));
             favoriteItemsService.create(items, searchUser);
         }
     }
