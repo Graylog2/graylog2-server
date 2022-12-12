@@ -16,12 +16,7 @@
  */
 package org.graylog.plugins.views.startpage.lastOpened;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
-import org.graylog.plugins.views.startpage.favorites.FavoriteDTO;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
