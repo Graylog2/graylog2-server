@@ -377,8 +377,12 @@ ConfigurationForm.propTypes = {
 ConfigurationForm.defaultProps = {
   action: 'edit',
   configuration: {
-    color: '#FFFFFF',
+    id: '',
+    name: '',
+    collector_id: '',
     template: '',
+    color: '#FFFFFF',
+    tags: [],
   },
   configurationSidecars: {},
 };

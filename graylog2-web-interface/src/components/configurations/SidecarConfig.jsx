@@ -56,7 +56,7 @@ const SidecarConfig = createReactClass({
 
   getInitialState() {
     return {
-      showModal: true,
+      showModal: false,
       config: ObjectUtils.clone(this.props.config),
     };
   },

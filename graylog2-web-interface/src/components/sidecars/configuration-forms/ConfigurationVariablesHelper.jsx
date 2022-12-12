@@ -152,7 +152,7 @@ class ConfigurationVariablesHelper extends React.Component {
       return <Spinner />;
     }
 
-    const { variableToDelete, errorModalContent, showModal } = this.state;
+    const { variableToDelete, errorModalContent, showModal, showConfirmModal } = this.state;
 
     return (
       <div>
