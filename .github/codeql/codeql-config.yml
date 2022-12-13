@@ -1,0 +1,8 @@
+# See: https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-a-custom-configuration-file
+
+name: "Graylog CodeQL config"
+
+paths-ignore: 
+  - "**/node_modules"
+  - "graylog2-web-interface/node"
+  - "**/target/generated-sources"
