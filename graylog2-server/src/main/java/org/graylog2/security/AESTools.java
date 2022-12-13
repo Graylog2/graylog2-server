@@ -93,7 +93,7 @@ public class AESTools {
             cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(salt.getBytes(UTF_8)));
             return new String(cipher.doFinal(Hex.decode(cipherText)), UTF_8);
         } catch (Exception ignored) {
-            // This is likely a BadPaddingException, but try to decrypt legacy keys in any case
+            // This is likely a BadPaddingException, but try to decrypt legacy secrets in any case
             try {
                 return decryptLegacy(cipherText, encryptionKey, salt);
             } catch (Exception ex) {
@@ -103,8 +103,8 @@ public class AESTools {
         }
     }
 
-    // Decrypt keys that were created with ISO10126Padding
-    // First decrypt it with a "no padding" transform and then strip the padding manually
+    // Decrypt secrets that were created with ISO10126Padding
+    // First decrypt it with a "no padding" transform and then strip the padding manually.
     // We do this because the ISO10126Padding has been deprecated and is not present
     // when running in FIPS mode.
     private static String decryptLegacy(String cipherText, String encryptionKey, String salt) throws GeneralSecurityException, InvalidCipherTextException {
