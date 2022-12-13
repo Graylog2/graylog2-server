@@ -52,8 +52,7 @@ public class GraylogBackendExtension implements ParameterResolver {
                         ContainerMatrixHierarchicalTestExecutor.graylogBackend.get()
                 );
             } else {
-                System.out.println("Failed to resolve GraylogApis");
-                return null;
+                throw new ParameterResolutionException("Failed to obtain requestSpecification and/or graylogBackend to provide graylog APIs");
             }
         }
         throw new RuntimeException("Unsupported parameter type: " + paramType);
