@@ -64,6 +64,7 @@ import org.graylog2.rest.resources.system.contentpacks.CatalogResource;
 import org.graylog2.rest.resources.system.contentpacks.ContentPackResource;
 import org.graylog2.rest.resources.system.debug.DebugEventsResource;
 import org.graylog2.rest.resources.system.indexer.FailuresResource;
+import org.graylog2.rest.resources.system.indexer.IndexSetDefaultsResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetsResource;
 import org.graylog2.rest.resources.system.indexer.IndexTemplatesResource;
 import org.graylog2.rest.resources.system.indexer.IndexerClusterResource;
@@ -157,6 +158,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(IndexerClusterResource.class);
         addSystemRestResource(IndexerOverviewResource.class);
         addSystemRestResource(IndexSetsResource.class);
+        addSystemRestResource(IndexSetDefaultsResource.class);
         addSystemRestResource(IndexTemplatesResource.class);
         addSystemRestResource(IndicesResource.class);
         addSystemRestResource(IndexRangesResource.class);
