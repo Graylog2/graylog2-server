@@ -135,7 +135,6 @@ const SidecarConfig = createReactClass({
           <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
 
-        {/* eslint-disable-next-line react/no-string-refs */}
         <BootstrapModalForm show={this.state.showModal}
                             title="Update Sidecars System Configuration"
                             onSubmitForm={this._saveConfig}
