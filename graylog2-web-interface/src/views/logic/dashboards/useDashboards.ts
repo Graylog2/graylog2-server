@@ -14,22 +14,43 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
-import type { DashboardsStoreState } from 'views/stores/DashboardsStore';
-import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore';
-import { useStore } from 'stores/connect';
+import { DashboardsActions } from 'views/stores/DashboardsStore';
+import type { Sort } from 'components/common/EntityDataTable';
+import UserNotification from 'util/UserNotification';
+import type View from 'views/logic/views/View';
 
-export type Dashboards = DashboardsStoreState;
+type SearchParams = {
+  page: number,
+  pageSize: number,
+  query: string,
+  sort: Sort
+}
 
-const useDashboards = (searchQuery: string, page: number, pageSize: number): Readonly<Dashboards> => {
-  const dashboards = useStore(DashboardsStore);
+const useDashboards = (searchParams: SearchParams): {
+  data: {
+    list: Readonly<Array<View>>,
+    pagination: { total: number }
+  } | undefined,
+  refetch: () => void
+} => {
+  const { data, refetch } = useQuery(
+    ['dashboards', 'overview', searchParams],
+    () => DashboardsActions.search(searchParams.query, searchParams.page, searchParams.pageSize, searchParams.sort.columnId, searchParams.sort.order),
+    {
+      onError: (errorThrown) => {
+        UserNotification.error(`Loading dashboards failed with status: ${errorThrown}`,
+          'Could not load dashboards');
+      },
+      keepPreviousData: true,
+    },
+  );
 
-  useEffect(() => {
-    DashboardsActions.search(searchQuery, page, pageSize);
-  }, [searchQuery, page, pageSize]);
-
-  return dashboards;
+  return ({
+    data,
+    refetch,
+  });
 };
 
 export default useDashboards;

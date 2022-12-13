@@ -121,7 +121,7 @@ type Props<Entity extends { id: string }> = {
   /** Custom cell and header renderer for a column */
   columnRenderers?: ColumnRenderers<Entity>,
   /** The table data. */
-  data: Array<Entity>,
+  data: Readonly<Array<Entity>>,
   /** Function to handle changes of columns visibility */
   onColumnsChange: (columnIds: Array<string>) => void,
   /** Function to handle sort changes */
