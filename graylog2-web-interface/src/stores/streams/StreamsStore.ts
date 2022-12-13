@@ -28,14 +28,15 @@ import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 export type Stream = {
   id: string,
+  creator_user_id: string,
   outputs: any[],
   matching_type: string,
   description: string,
   created_at: string,
   disabled: boolean,
   rules: StreamRule[],
-  alert_conditions: any[],
-  alert_receivers: {
+  alert_conditions?: any[],
+  alert_receivers?: {
     emails: Array<string>,
     users: Array<string>,
   },

@@ -168,31 +168,29 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
                     queryHelpComponent={<QueryHelper entityName="stream" />} />
       </div>
       <div>
-        {streams?.length === 0
-          ? (
-            <Alert bsStyle="warning">
-              <Icon name="info-circle" />&nbsp;No streams found.
-              <IfPermitted permissions="streams:create">
-                <CreateStreamButton bsSize="small"
-                                    bsStyle="link"
-                                    className="btn-text"
-                                    buttonText="Create one now"
-                                    indexSets={indexSets}
-                                    onCreate={onStreamCreate} />
-              </IfPermitted>
-            </Alert>
-          )
-          : (
-            <EntityDataTable<Stream> data={streams}
-                                     visibleColumns={visibleColumns}
-                                     onColumnsChange={onColumnsChange}
-                                     onSortChange={onSortChange}
-                                     bulkActions={renderBulkActions}
-                                     activeSort={searchParams.sort}
-                                     rowActions={renderStreamActions}
-                                     columnRenderers={columnRenderers}
-                                     columnDefinitions={COLUMN_DEFINITIONS} />
-          )}
+        {streams?.length === 0 ? (
+          <Alert bsStyle="warning">
+            <Icon name="info-circle" />&nbsp;No streams found.
+            <IfPermitted permissions="streams:create">
+              <CreateStreamButton bsSize="small"
+                                  bsStyle="link"
+                                  className="btn-text"
+                                  buttonText="Create one now"
+                                  indexSets={indexSets}
+                                  onCreate={onStreamCreate} />
+            </IfPermitted>
+          </Alert>
+        ) : (
+          <EntityDataTable<Stream> data={streams}
+                                   visibleColumns={visibleColumns}
+                                   onColumnsChange={onColumnsChange}
+                                   onSortChange={onSortChange}
+                                   bulkActions={renderBulkActions}
+                                   activeSort={searchParams.sort}
+                                   rowActions={renderStreamActions}
+                                   columnRenderers={columnRenderers}
+                                   columnDefinitions={COLUMN_DEFINITIONS} />
+        )}
       </div>
     </PaginatedList>
   );
