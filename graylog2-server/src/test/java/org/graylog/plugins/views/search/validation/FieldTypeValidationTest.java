@@ -62,6 +62,9 @@ class FieldTypeValidationTest {
     @Test
     void validateIPFieldValueType() {
         assertThat(fieldTypeValidation.validateFieldValueType(term("123.34.45.56"), "ip")).isNotPresent();
+        assertThat(fieldTypeValidation.validateFieldValueType(term("123.34.45.56/24"), "ip")).isNotPresent();
+        assertThat(fieldTypeValidation.validateFieldValueType(term("123.34.45.56/"), "ip")).isPresent();
+        assertThat(fieldTypeValidation.validateFieldValueType(term("123.34.45.56/299"), "ip")).isPresent();
 
         assertThat(fieldTypeValidation.validateFieldValueType(term("ABC"), "ip")).isPresent();
     }

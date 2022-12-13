@@ -169,6 +169,7 @@
         <zookeeper.version>3.5.7</zookeeper.version>
         <cron-utils.version>9.1.6</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
+        <commons-net.version>3.6</commons-net.version>
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>
