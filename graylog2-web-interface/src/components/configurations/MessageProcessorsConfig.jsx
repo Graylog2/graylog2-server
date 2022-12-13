@@ -186,28 +186,30 @@ const MessageProcessorsConfig = createReactClass({
                             onSubmitForm={this._saveConfig}
                             onCancel={this._closeModal}
                             submitButtonText="Update configuration">
-          <h3>Order</h3>
-          <p>Use drag and drop to change the execution order of the message processors.</p>
-          <SortableList items={this._sortableItems()} onMoveItem={this._updateSorting} displayOverlayInPortal />
+          <>
+            <h3>Order</h3>
+            <p>Use drag and drop to change the execution order of the message processors.</p>
+            <SortableList items={this._sortableItems()} onMoveItem={this._updateSorting} displayOverlayInPortal />
 
-          <h3>Status</h3>
-          <p>Change the checkboxes to change the status of a message processor.</p>
-          <Table striped bordered condensed className="top-margin">
-            <thead>
-              <tr>
-                <th>Processor</th>
-                <th>Enabled</th>
-              </tr>
-            </thead>
-            <tbody>
-              {this._statusForm()}
-            </tbody>
-          </Table>
-          {this._hasNoActiveProcessor() && (
-            <Alert bsStyle="danger">
-              <strong>ERROR:</strong> No active message processor!
-            </Alert>
-          )}
+            <h3>Status</h3>
+            <p>Change the checkboxes to change the status of a message processor.</p>
+            <Table striped bordered condensed className="top-margin">
+              <thead>
+                <tr>
+                  <th>Processor</th>
+                  <th>Enabled</th>
+                </tr>
+              </thead>
+              <tbody>
+                {this._statusForm()}
+              </tbody>
+            </Table>
+            {this._hasNoActiveProcessor() && (
+              <Alert bsStyle="danger">
+                <strong>ERROR:</strong> No active message processor!
+              </Alert>
+            )}
+          </>
         </BootstrapModalForm>
       </div>
     );
