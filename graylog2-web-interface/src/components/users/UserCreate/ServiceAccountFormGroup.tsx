@@ -31,7 +31,7 @@ const ServiceAccountFormGroup = () => {
           const serviceAccountNewValue = getValueFromInput(newValue.target);
 
           if (serviceAccountNewValue) {
-            setShowModal(false);
+            setShowModal(true);
           } else {
             onChange(newValue);
           }
