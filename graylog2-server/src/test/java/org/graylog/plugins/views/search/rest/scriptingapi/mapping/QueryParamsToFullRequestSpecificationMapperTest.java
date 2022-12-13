@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 import org.graylog.plugins.views.search.rest.scriptingapi.parsing.TimerangeParser;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
+import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +33,9 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec.DEFAULT_TIMERANGE;
+import static org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec.DEFAULT_FIELDS;
+import static org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec.DEFAULT_SORT;
+import static org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec.DEFAULT_SORT_ORDER;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 
@@ -105,6 +109,21 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                         DEFAULT_TIMERANGE,
                         List.of(new Grouping("http_method")),
                         List.of(new Metric("count", null))
+
+                )
+        );
+
+        final MessagesRequestSpec messagesRequestSpec = toTest.simpleQueryParamsToFullRequestSpecification(null, null, null, null, null, null, 0, 10);
+        assertThat(messagesRequestSpec).isEqualTo(new MessagesRequestSpec(
+                        "*",
+                        Set.of(),
+                        DEFAULT_TIMERANGE,
+                        DEFAULT_SORT,
+                        DEFAULT_SORT_ORDER,
+                        0,
+                        10,
+                        DEFAULT_FIELDS
+
 
                 )
         );

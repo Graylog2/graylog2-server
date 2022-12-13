@@ -14,28 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import PropTypes from 'prop-types';
+package org.graylog2.rest.resources.streams.responses;
 
-import { Alert } from 'components/bootstrap';
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-type Props = {
-  children: React.ReactNode,
-  className: string | null | undefined,
-};
-
-const EmptyResult = ({ children, className }: Props) => (
-  <Alert className={`${className ?? ''} no-bm`}>{children}</Alert>
-);
-
-EmptyResult.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  className: PropTypes.string,
-};
-
-EmptyResult.defaultProps = {
-  children: 'No data available.',
-  className: undefined,
-};
-
-export default EmptyResult;
+public record StreamCreatedResponse(@JsonProperty("stream_id") String streamId) {
+}

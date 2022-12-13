@@ -638,17 +638,63 @@ public class ScriptingApiResourceIT {
     }
 
     @ContainerMatrixTest
+    void testMessagesWithSorting() {
+        ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("""
+                        {
+                          "fields": ["source", "facility", "level"],
+                          "sort": "level",
+                          "sort_order" : "Descending"
+                        }
+                        """)
+                .post("/search/messages")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200);
+
+        List<List<Object>> rows = validatableResponse.extract().body().jsonPath().getList("datarows");
+        Assertions.assertEquals(rows.size(), 3);
+        assertThat(rows.get(0)).contains(3);
+        assertThat(rows.get(1)).contains(2);
+        assertThat(rows.get(2)).contains(1);
+
+        validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("""
+                        {
+                          "fields": ["source", "facility", "level"],
+                          "sort": "facility",
+                          "sort_order" : "Ascending"
+                        }
+                        """)
+                .post("/search/messages")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200);
+
+        rows = validatableResponse.extract().body().jsonPath().getList("datarows");
+        Assertions.assertEquals(rows.size(), 3);
+        assertThat(rows.get(0)).contains("another-test");
+        assertThat(rows.get(1)).contains("another-test");
+        assertThat(rows.get(2)).contains("test");
+
+    }
+
+    @ContainerMatrixTest
     void testMessagesGetRequestAscii() {
-        final String response = given()
+        final List<String> response = given()
                 .spec(requestSpec)
                 .when()
                 .header(new Header("Accept", MediaType.TEXT_PLAIN))
                 .get("/search/messages?fields=source,facility,level")
                 .then()
                 .log().ifStatusCodeMatches(not(200))
-                .extract().body().asString().trim();
+                .extract().body().asString().strip().lines().toList();
 
-        String expected = """
+        final List<String> expected = """
                 ┌────────────────────────┬────────────────────────┬───────────────────────┐
                 │field: source           │field: facility         │field: level           │
                 ├────────────────────────┼────────────────────────┼───────────────────────┤
@@ -656,9 +702,10 @@ public class ScriptingApiResourceIT {
                 │example.org             │another-test            │2                      │
                 │example.org             │test                    │1                      │
                 └────────────────────────┴────────────────────────┴───────────────────────┘
-                """;
+                """.strip().lines().toList();
 
-        assertThat(response).isEqualTo(expected.trim());
+        assertThat(response.size()).isEqualTo(expected.size());
+        assertThat(expected.containsAll(response)).isTrue();
     }
 
 

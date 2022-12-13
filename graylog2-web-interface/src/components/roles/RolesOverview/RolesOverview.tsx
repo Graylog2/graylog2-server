@@ -22,7 +22,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import type { PaginatedRoles } from 'actions/roles/AuthzRolesActions';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
-import { DataTable, Spinner, PaginatedList, EmptyResult } from 'components/common';
+import { DataTable, Spinner, PaginatedList, NoSearchResult } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
@@ -136,7 +136,7 @@ const RolesOverview = () => {
                        headerCellFormatter={_headerCellFormatter}
                        sortByKey="name"
                        rows={roles.toJS()}
-                       noDataText={<EmptyResult>No roles have been found.</EmptyResult>}
+                       noDataText={<NoSearchResult>No roles have been found.</NoSearchResult>}
                        customFilter={searchFilter}
                        dataRowFormatter={_rolesOverviewItem}
                        filterKeys={[]}
