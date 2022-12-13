@@ -22,7 +22,7 @@ import type { ColumnRenderers, Sort } from 'components/common/EntityDataTable';
 import EntityDataTable from 'components/common/EntityDataTable';
 import type View from 'views/logic/views/View';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
-import useDashboards from 'views/logic/dashboards/useDashboards';
+import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import usePluginEntities from 'hooks/usePluginEntities';
 import DashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
 import { Alert } from 'components/bootstrap';
