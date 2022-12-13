@@ -495,6 +495,10 @@ public class Generator {
                         models.put(itemsSchema.name(), itemsSchema.type());
                     }
                     newGenericTypeSchema.put("additional_properties", Collections.singletonMap("$ref", itemsSchema.name()));
+                } else {
+                    if (itemsSchema.type() != null) {
+                        newGenericTypeSchema.put("additional_properties", itemsSchema.type());
+                    }
                 }
             }
 
