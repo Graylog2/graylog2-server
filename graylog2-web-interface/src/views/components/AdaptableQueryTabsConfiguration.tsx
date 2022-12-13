@@ -145,7 +145,7 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, dashboard
     <BootstrapModalConfirm showModal={show}
                            title="Update Dashboard Pages Configuration"
                            onConfirm={onConfirmPagesConfiguration}
-                           onModalClose={onPagesConfigurationModalClose}
+                           onCancel={onPagesConfigurationModalClose}
                            confirmButtonText="Update configuration">
       <>
         <h3>Order</h3>
