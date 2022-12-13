@@ -109,7 +109,7 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
     public abstract DateTime createdAt();
 
     @JsonProperty(FIELD_FAVORITE)
-    @NeverPersistInMongoDB
+    @MongoIgnore
     public abstract boolean favorite();
 
     public static Builder builder() {
@@ -203,7 +203,7 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
         public abstract Builder state(Map<String, ViewStateDTO> state);
 
         @JsonProperty(FIELD_FAVORITE)
-        @NeverPersistInMongoDB
+        @MongoIgnore
         public abstract Builder favorite(boolean favorite);
 
         @JsonCreator

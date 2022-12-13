@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.SimpleType;
-import org.graylog.plugins.views.search.views.NeverPersistInMongoDB;
+import org.graylog.plugins.views.search.views.MongoIgnore;
 import org.graylog2.indexer.retention.strategies.UnknownRetentionStrategyConfig;
 import org.graylog2.jackson.MongoJodaDateTimeDeserializer;
 import org.graylog2.jackson.MongoJodaDateTimeSerializer;
@@ -56,7 +56,7 @@ public class MongoJackObjectMapperProvider implements Provider<ObjectMapper> {
                 .setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
                     @Override
                     public boolean hasIgnoreMarker(final AnnotatedMember member) {
-                        return super.hasIgnoreMarker(member) || member.hasAnnotation(NeverPersistInMongoDB.class);
+                        return super.hasIgnoreMarker(member) || member.hasAnnotation(MongoIgnore.class);
                     }
                 })
                 .registerModule(new SimpleModule("JSR-310-MongoJack")
