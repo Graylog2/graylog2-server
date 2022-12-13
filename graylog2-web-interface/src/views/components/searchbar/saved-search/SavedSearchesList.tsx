@@ -24,7 +24,7 @@ import { PaginatedList, SearchForm, Spinner } from 'components/common';
 import type View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import QueryHelper from 'components/common/QueryHelper';
-import type { Sort, ColumnRenderers } from 'components/common/EntityDataTable';
+import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import EntityDataTable from 'components/common/EntityDataTable';
 import type { PaginatedViews } from 'views/stores/ViewManagementStore';
 import { SavedSearchesActions } from 'views/stores/SavedSearchesStore';
@@ -32,6 +32,7 @@ import type FetchError from 'logic/errors/FetchError';
 import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
+import type { Sort } from 'stores/PaginationTypes';
 
 type SearchParams = {
   page: number,

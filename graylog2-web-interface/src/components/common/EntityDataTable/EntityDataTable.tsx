@@ -29,10 +29,11 @@ import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultCol
 import { CELL_PADDING, BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import useColumnsWidths from 'components/common/EntityDataTable/hooks/useColumnsWidths';
 import useElementDimensions from 'hooks/useElementDimensions';
+import type { Sort } from 'stores/PaginationTypes';
 
 import TableHead from './TableHead';
 import TableRow from './TableRow';
-import type { ColumnRenderers, Column, Sort, EntityBase } from './types';
+import type { ColumnRenderers, Column, EntityBase } from './types';
 
 const ScrollContainer = styled.div`
   overflow-x: auto;

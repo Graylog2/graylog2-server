@@ -18,8 +18,9 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import type { Sort, Column } from 'components/common/EntityDataTable';
+import type { Column } from 'components/common/EntityDataTable';
 import CommonSortIcon from 'components/common/SortIcon';
+import type { Sort } from 'stores/PaginationTypes';
 
 const StyledCommonSortIcon = styled(CommonSortIcon)`
   display: inline-block;

@@ -42,8 +42,3 @@ export type ColumnRenderer<Entity extends EntityBase> = {
 export type ColumnRenderers<Entity extends EntityBase> = {
   [columnId: string]: ColumnRenderer<Entity>
 }
-
-export type Sort = {
-  columnId: string,
-  order: 'asc' | 'desc'
-};

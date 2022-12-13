@@ -17,16 +17,9 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { DashboardsActions } from 'views/stores/DashboardsStore';
-import type { Sort } from 'components/common/EntityDataTable';
 import UserNotification from 'util/UserNotification';
 import type View from 'views/logic/views/View';
-
-type SearchParams = {
-  page: number,
-  pageSize: number,
-  query: string,
-  sort: Sort
-}
+import type { SearchParams } from 'stores/PaginationTypes';
 
 const useDashboards = (searchParams: SearchParams): {
   data: {

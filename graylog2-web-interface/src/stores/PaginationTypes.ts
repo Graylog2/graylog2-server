@@ -57,3 +57,15 @@ export type PaginatedList<ItemType> = {
   list: Immutable.List<ItemType>,
   pagination: ListPagination,
 };
+
+export type Sort = {
+  columnId: string,
+  order: 'asc' | 'desc'
+};
+
+export type SearchParams = {
+  page: number,
+  pageSize: number,
+  query: string,
+  sort: Sort
+}

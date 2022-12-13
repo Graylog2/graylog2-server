@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback, useMemo } from 'react';
+import type { SearchParams, Sort } from 'src/stores/PaginationTypes';
 
 import { PaginatedList, SearchForm, Spinner } from 'components/common';
 import QueryHelper from 'components/common/QueryHelper';
-import type { ColumnRenderers, Sort } from 'components/common/EntityDataTable';
+import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import EntityDataTable from 'components/common/EntityDataTable';
 import type View from 'views/logic/views/View';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
@@ -28,13 +29,6 @@ import DashboardActions from 'views/components/dashboard/DashboardsOverview/Dash
 import { Alert } from 'components/bootstrap';
 
 import TitleCell from './TitleCell';
-
-type SearchParams = {
-  page: number,
-  pageSize: number,
-  query: string,
-  sort: Sort
-}
 
 const INITIAL_COLUMNS = ['title', 'description', 'summary'];
 

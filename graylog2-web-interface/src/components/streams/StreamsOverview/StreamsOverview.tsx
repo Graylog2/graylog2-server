@@ -32,22 +32,16 @@ import EntityDataTable from 'components/common/EntityDataTable';
 import StreamActions from 'components/streams/StreamsOverview/StreamActions';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import type { ColumnRenderers, Sort } from 'components/common/EntityDataTable';
+import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import UserNotification from 'util/UserNotification';
 import IndexSetCell from 'components/streams/StreamsOverview/IndexSetCell';
 import BulkActions from 'components/streams/StreamsOverview/BulkActions';
 import ThroughputCell from 'components/streams/StreamsOverview/ThroughputCell';
+import type { SearchParams, Sort } from 'stores/PaginationTypes';
 
 import StatusCell from './StatusCell';
 
 import CreateStreamButton from '../CreateStreamButton';
-
-type SearchParams = {
-  page: number,
-  pageSize: number,
-  query: string,
-  sort: Sort
-}
 
 const DefaultLabel = styled(Label)`
   display: inline-flex;
@@ -148,7 +142,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   });
   const { data: streamRuleTypes } = useStreamRuleTypes();
   const { data: paginatedStreams, refetch: refetchStreams } = usePaginatedStreams(searchParams);
-  const columnRenderers = useMemo(() => customColumnRenderers(indexSets), []);
+  const columnRenderers = useMemo(() => customColumnRenderers(indexSets), [indexSets]);
 
   useEffect(() => {
     StreamsStore.onChange(() => refetchStreams());
