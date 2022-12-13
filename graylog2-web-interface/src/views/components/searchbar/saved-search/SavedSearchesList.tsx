@@ -50,8 +50,7 @@ const COLUMN_DEFINITIONS = [
 const DEFAULT_PAGINATION = {
   query: '',
   page: 1,
-  perPage: 10,
-  count: 0,
+  pageSize: 10,
 };
 
 const NoSavedSearches = styled(Alert)`
@@ -150,9 +149,9 @@ const SavedSearchesList = ({
 }: Props) => {
   const [visibleColumns, setVisibleColumns] = useState(INITIAL_COLUMNS);
   const [searchParams, setSearchParams] = useState<SearchParams>({
-    page: 1,
-    pageSize: 10,
-    query: '',
+    page: DEFAULT_PAGINATION.page,
+    pageSize: DEFAULT_PAGINATION.pageSize,
+    query: DEFAULT_PAGINATION.query,
     sort: {
       columnId: 'title',
       order: 'asc',
@@ -170,10 +169,10 @@ const SavedSearchesList = ({
     [],
   );
   const handlePageSizeChange = useCallback(
-    (newPage: number, newPerPage: number) => setSearchParams((cur) => ({
+    (newPage: number, newPageSize: number) => setSearchParams((cur) => ({
       ...cur,
       page: newPage,
-      perPage: newPerPage,
+      pageSize: newPageSize,
     })),
     [],
   );
