@@ -6,3 +6,10 @@ name: "Graylog CodeQL config"
 paths-ignore: 
   - "**/node_modules"
   - "graylog2-web-interface/node"
+
+query-filters:
+  - exclude:
+      id: "java/call-to-object-tostring"
+  - exclude:
+      # Useless with auto-value classes
+      id: "java/class-name-matches-super-class"
