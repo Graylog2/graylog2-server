@@ -29,6 +29,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.GeneralSecurityException;
+import java.security.ProviderException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
@@ -94,7 +95,7 @@ public class AESTools {
             cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(salt.getBytes(UTF_8)));
             return new String(cipher.doFinal(Hex.decode(cipherText)), UTF_8);
         } catch (Exception e) {
-            if (e instanceof BadPaddingException) {
+            if (e instanceof BadPaddingException || e instanceof ProviderException) {
                 try {
                     return decryptLegacy(cipherText, encryptionKey, salt);
                 } catch (Exception ex) {
