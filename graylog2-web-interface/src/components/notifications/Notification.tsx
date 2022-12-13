@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -24,11 +23,12 @@ import DOMPurify from 'dompurify';
 import { Alert, Button } from 'components/bootstrap';
 import { RelativeTime, Icon, Spinner } from 'components/common';
 import NotificationsFactory from 'logic/notifications/NotificationsFactory';
-import { NotificationType, NotificationsActions, NotificationsStore } from 'stores/notifications/NotificationsStore';
+import type { NotificationType } from 'stores/notifications/NotificationsStore';
+import { NotificationsActions, NotificationsStore } from 'stores/notifications/NotificationsStore';
 import { useStore } from 'stores/connect';
 
 type Props = {
-  notification: NotificationType, 
+  notification: NotificationType,
 };
 
 const StyledButton = styled(Button)`
@@ -63,7 +63,7 @@ const _sanitizeDescription = (description) => {
 /* eslint-disable react/no-danger */
 const Notification = ({ notification }: Props) => {
   const { messages } = useStore(NotificationsStore);
-  
+
   useEffect(() => {
     if (notification) {
       NotificationsActions.getHtmlMessage(notification.type, NotificationsFactory.getValuesForNotification(notification));
@@ -80,6 +80,7 @@ const Notification = ({ notification }: Props) => {
   if (!messages || !messages[notification.type]) {
     return <Spinner />;
   }
+
   const message = messages[notification.type];
 
   return (
