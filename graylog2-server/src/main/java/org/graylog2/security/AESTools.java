@@ -114,7 +114,7 @@ public class AESTools {
         Cipher cipher = Cipher.getInstance(CIPHER_NO_PADDING_TRANSFORMATION);
         SecretKeySpec key = new SecretKeySpec(adjustToIdealKeyLength(encryptionKey), "AES");
         cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(salt.getBytes(UTF_8)));
-        var decrypted = cipher.doFinal(Hex.decode(cipherText));
+        byte[] decrypted = cipher.doFinal(Hex.decode(cipherText));
         final int padCount = new ISO10126d2Padding().padCount(decrypted);
         return new String(Arrays.copyOf(decrypted, decrypted.length - padCount), UTF_8);
     }
