@@ -59,8 +59,8 @@ export type PaginatedList<ItemType> = {
 };
 
 export type Sort = {
-  columnId: string,
-  order: 'asc' | 'desc'
+  attributeId: string,
+  direction: 'asc' | 'desc'
 };
 
 export type SearchParams = {

@@ -90,7 +90,7 @@ const usePaginatedStreams = (searchParams: SearchParams): { data: { streams: Arr
       searchParams.page,
       searchParams.pageSize,
       searchParams.query,
-      { sort: searchParams?.sort.columnId, order: searchParams?.sort.order },
+      { sort: searchParams?.sort.attributeId, direction: searchParams?.sort.direction },
     ),
     {
       onError: (errorThrown) => {
@@ -136,8 +136,8 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
     pageSize: paginationQueryParameter.pageSize,
     query: '',
     sort: {
-      columnId: 'title',
-      order: 'asc',
+      attributeId: 'title',
+      direction: 'asc',
     },
   });
   const { data: streamRuleTypes } = useStreamRuleTypes();

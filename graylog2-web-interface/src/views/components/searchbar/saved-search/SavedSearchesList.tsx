@@ -121,8 +121,8 @@ const usePaginatedSavedSearches = (searchParams: SearchParams): {
       query: searchParams.query,
       page: searchParams.page,
       perPage: searchParams.pageSize,
-      sortBy: searchParams.sort.columnId,
-      order: searchParams.sort.order,
+      sortBy: searchParams.sort.attributeId,
+      order: searchParams.sort.direction,
     }),
     {
       onError: (error: FetchError) => {
@@ -157,8 +157,8 @@ const SavedSearchesList = ({
     pageSize: DEFAULT_PAGINATION.pageSize,
     query: DEFAULT_PAGINATION.query,
     sort: {
-      columnId: 'title',
-      order: 'asc',
+      attributeId: 'title',
+      direction: 'asc',
     },
   });
 

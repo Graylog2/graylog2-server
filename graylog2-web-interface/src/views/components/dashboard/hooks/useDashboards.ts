@@ -30,7 +30,7 @@ const useDashboards = (searchParams: SearchParams): {
 } => {
   const { data, refetch } = useQuery(
     ['dashboards', 'overview', searchParams],
-    () => DashboardsActions.search(searchParams.query, searchParams.page, searchParams.pageSize, searchParams.sort.columnId, searchParams.sort.order),
+    () => DashboardsActions.search(searchParams.query, searchParams.page, searchParams.pageSize, searchParams.sort.attributeId, searchParams.sort.direction),
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading dashboards failed with status: ${errorThrown}`,

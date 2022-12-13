@@ -19,9 +19,10 @@ import styled, { css } from 'styled-components';
 import { useMemo } from 'react';
 
 import SortIcon from 'components/streams/StreamsOverview/SortIcon';
+import type { Sort } from 'stores/PaginationTypes';
 
 import BulkSelectHead from './BulkSelectHead';
-import type { Column, Sort, ColumnRenderer, ColumnRenderers, EntityBase } from './types';
+import type { Column, ColumnRenderer, ColumnRenderers, EntityBase } from './types';
 
 const Th = styled.th<{ $width: number | undefined }>(({ $width }) => css`
   width: ${$width ? `${$width}px` : 'auto'};

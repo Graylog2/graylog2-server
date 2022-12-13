@@ -59,8 +59,8 @@ const DashboardsOverview = () => {
     pageSize: paginationQueryParameter.pageSize,
     query: '',
     sort: {
-      columnId: 'title',
-      order: 'asc',
+      attributeId: 'title',
+      direction: 'asc',
     },
   });
   const columnRenderers = useCustomColumnRenderers();
