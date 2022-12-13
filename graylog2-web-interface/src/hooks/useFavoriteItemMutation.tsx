@@ -16,14 +16,12 @@
  */
 
 import { useMutation } from '@tanstack/react-query';
-// import { useQueryClient } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 
-const urlPrefix = '/dynamicstartpage';
-// const FAVORITE_ITEM_MUTATION = 'FAVORITE_ITEM_MUTATION';
+export const urlPrefix = '/startpage';
 
 const putFavoriteItem = async (id: string) => {
   const url = `${urlPrefix}/addToFavorites/${id}`;
@@ -38,13 +36,9 @@ const deleteFavoriteItem = (id: string) => {
 };
 
 const useFavoriteItemMutation = () => {
-  // const queryClient = useQueryClient();
-  const invalidateUserFilters = () => {}; // queryClient.invalidateQueries([FAVORITE_ITEM_MUTATION]);
-
   const putMutation = useMutation(putFavoriteItem, {
     onSuccess: async () => {
       UserNotification.success('Item added to favorite successfully.', 'Success');
-      await invalidateUserFilters();
     },
     onError: (errorThrown) => {
       UserNotification.error(`Adding item to favorites failed with status: ${errorThrown}`,
@@ -55,7 +49,6 @@ const useFavoriteItemMutation = () => {
   const deleteMutation = useMutation(deleteFavoriteItem, {
     onSuccess: async () => {
       UserNotification.success('Item deleted from favorite successfully.', 'Success');
-      await invalidateUserFilters();
     },
     onError: (errorThrown) => {
       UserNotification.error(`Deleting item from favorites failed with status: ${errorThrown}`,
