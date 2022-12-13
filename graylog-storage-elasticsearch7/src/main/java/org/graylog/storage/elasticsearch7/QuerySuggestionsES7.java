@@ -33,7 +33,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.suggest.Sugges
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.suggest.SuggestBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.suggest.term.TermSuggestion;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.suggest.term.TermSuggestionBuilder;
-import org.graylog.storage.elasticsearch7.errors.ResponseError;
+import org.graylog.storage.errors.ResponseError;
 import org.graylog2.plugin.Message;
 
 import javax.inject.Inject;
