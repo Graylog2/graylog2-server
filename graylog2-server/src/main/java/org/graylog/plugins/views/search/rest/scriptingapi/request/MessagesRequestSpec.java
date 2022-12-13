@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Strings;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseEntryDataType;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
+import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.List;
@@ -31,18 +33,28 @@ import java.util.stream.Collectors;
 public record MessagesRequestSpec(@JsonProperty("query") String queryString,
                                   @JsonProperty("streams") Set<String> streams,
                                   @JsonProperty("timerange") TimeRange timerange,
+                                  @JsonProperty("sort") String sort,
+                                  @JsonProperty("sort_order") SortSpec.Direction sortOrder,
                                   @JsonProperty("from") int from,
                                   @JsonProperty("size") int size,
                                   @JsonProperty("fields") List<String> fields) implements SearchRequestSpec {
 
 
     public static final List<String> DEFAULT_FIELDS = List.of("source", "timestamp");
+    public static final String DEFAULT_SORT = Message.FIELD_TIMESTAMP;
+    public static final SortSpec.Direction DEFAULT_SORT_ORDER = SortSpec.Direction.Descending;
     public static final int DEFAULT_SIZE = 10;
     public static final int DEFAULT_FROM = 0;
 
     public MessagesRequestSpec {
         if (Strings.isNullOrEmpty(queryString)) {
             queryString = DEFAULT_QUERY_STRING;
+        }
+        if (Strings.isNullOrEmpty(sort)) {
+            sort = DEFAULT_SORT;
+        }
+        if (sortOrder == null) {
+            sortOrder = DEFAULT_SORT_ORDER;
         }
         if (timerange == null) {
             timerange = DEFAULT_TIMERANGE;

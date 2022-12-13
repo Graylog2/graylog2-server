@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix uncommittedMessages metric for non-empty journal before first commit."
+
+pulls = ["14154"]
