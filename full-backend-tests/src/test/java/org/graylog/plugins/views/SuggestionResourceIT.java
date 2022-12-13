@@ -69,10 +69,12 @@ public class SuggestionResourceIT {
                         "{\"short_message\":\"SuggestionResourceIT#3\", \"host\":\"example.org\", \"facility\":\"test\", \"_target_stream\": \"stream1\"}")
                 .postMessage("{\"short_message\":\"SuggestionResourceIT#4\", \"host\":\"foreign.org\", \"facility\":\"test\", \"_target_stream\": \"stream2\"}");
 
-        api.search().waitForMessage("SuggestionResourceIT#1");
-        api.search().waitForMessage("SuggestionResourceIT#2");
-        api.search().waitForMessage("SuggestionResourceIT#3");
-        api.search().waitForMessage("SuggestionResourceIT#4");
+        api.search().waitForMessages(
+                "SuggestionResourceIT#1",
+                "SuggestionResourceIT#2",
+                "SuggestionResourceIT#3",
+                "SuggestionResourceIT#4"
+        );
     }
 
     @ContainerMatrixTest
