@@ -63,6 +63,7 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
     public static final String FIELD_STATE = "state";
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_OWNER = "owner";
+    public static final String FIELD_FAVORITE = "favorite";
 
     public static final ImmutableSet<String> SORT_FIELDS = ImmutableSet.of(FIELD_ID, FIELD_TITLE, FIELD_CREATED_AT);
 
@@ -106,6 +107,10 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
 
     @JsonProperty(FIELD_CREATED_AT)
     public abstract DateTime createdAt();
+
+    @JsonProperty(FIELD_FAVORITE)
+    @NeverPersistInMongoDB
+    public abstract boolean favorite();
 
     public static Builder builder() {
         return Builder.create();
@@ -197,6 +202,10 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
         @JsonProperty(FIELD_STATE)
         public abstract Builder state(Map<String, ViewStateDTO> state);
 
+        @JsonProperty(FIELD_FAVORITE)
+        @NeverPersistInMongoDB
+        public abstract Builder favorite(boolean favorite);
+
         @JsonCreator
         public static Builder create() {
             return new AutoValue_ViewDTO.Builder()
@@ -205,7 +214,8 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
                     .description("")
                     .properties(ImmutableSet.of())
                     .requires(Collections.emptyMap())
-                    .createdAt(DateTime.now(DateTimeZone.UTC));
+                    .createdAt(DateTime.now(DateTimeZone.UTC))
+                    .favorite(false);
         }
 
         public abstract ViewDTO build();
