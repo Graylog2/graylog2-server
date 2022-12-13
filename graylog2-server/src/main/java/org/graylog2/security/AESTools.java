@@ -24,12 +24,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.GeneralSecurityException;
-import java.security.ProviderException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
@@ -94,17 +92,15 @@ public class AESTools {
             SecretKeySpec key = new SecretKeySpec(adjustToIdealKeyLength(encryptionKey), "AES");
             cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(salt.getBytes(UTF_8)));
             return new String(cipher.doFinal(Hex.decode(cipherText)), UTF_8);
-        } catch (Exception e) {
-            if (e instanceof BadPaddingException || e instanceof ProviderException) {
-                try {
-                    return decryptLegacy(cipherText, encryptionKey, salt);
-                } catch (Exception ex) {
-                    LOG.error("Could not decrypt legacy value.", ex);
-                }
+        } catch (Exception ignored) {
+            // This is likely a BadPaddingException, but try to decrypt legacy keys in any case
+            try {
+                return decryptLegacy(cipherText, encryptionKey, salt);
+            } catch (Exception ex) {
+                LOG.error("Could not decrypt (legacy) value.", ex);
+                return null;
             }
-            LOG.error("Could not decrypt value.", e);
         }
-        return null;
     }
 
     // Decrypt keys that were created with ISO10126Padding
