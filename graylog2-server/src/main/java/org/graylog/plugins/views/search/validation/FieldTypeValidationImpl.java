@@ -18,8 +18,11 @@ package org.graylog.plugins.views.search.validation;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.net.InetAddresses;
+import org.apache.commons.net.util.SubnetUtils;
+import org.apache.commons.validator.routines.InetAddressValidator;
 import org.graylog.plugins.views.search.engine.QueryPosition;
 import org.graylog2.plugin.Tools;
+import org.graylog2.utilities.IpSubnet;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
@@ -60,7 +63,7 @@ public class FieldTypeValidationImpl implements FieldTypeValidation {
         VALIDATION_FUNCTIONS.put("boolean", wrapException(Boolean::parseBoolean));
         VALIDATION_FUNCTIONS.put("binary", ALWAYS_TRUE_PREDICATE);
         VALIDATION_FUNCTIONS.put("geo-point", ALWAYS_TRUE_PREDICATE);
-        VALIDATION_FUNCTIONS.put("ip", InetAddresses::isInetAddress);
+        VALIDATION_FUNCTIONS.put("ip", FieldTypeValidationImpl::isValidIp);
     }
 
     private static Function<String, Object> removeNumericOperandsIfNeeded(Function<String, Object> numericParser) {
@@ -87,6 +90,24 @@ public class FieldTypeValidationImpl implements FieldTypeValidation {
             }
         }
         return false;
+    }
+
+
+    private static boolean isValidIp(final String ip) {
+        try {
+            return InetAddressValidator.getInstance().isValid(ip) || isValidCidrIp(ip);
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    private static boolean isValidCidrIp(String cidrIp) {
+        try {
+            new SubnetUtils(cidrIp);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     @SuppressWarnings("ReturnValueIgnored")

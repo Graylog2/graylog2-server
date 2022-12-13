@@ -333,7 +333,7 @@
                 <groupId>org.apache.zookeeper</groupId>
                 <artifactId>zookeeper</artifactId>
                 <version>${zookeeper.version}</version>
-                <!-- Exclude log4j dependency from Zookeeper -->
+                <!-- Exclud e log4j dependency from Zookeeper -->
                 <exclusions>
                     <exclusion>
                         <groupId>org.slf4j</groupId>
@@ -732,6 +732,13 @@
                 <artifactId>cron-utils</artifactId>
                 <version>${cron-utils.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>${commons-net.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
