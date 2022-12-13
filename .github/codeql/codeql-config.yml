@@ -2,7 +2,7 @@
 
 name: "Graylog CodeQL config"
 
+# This setting is only used for interpreted languages (not Java)
 paths-ignore: 
   - "**/node_modules"
   - "graylog2-web-interface/node"
-  - "**/target/generated-sources"
