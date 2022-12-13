@@ -29,7 +29,7 @@ import java.time.ZonedDateTime;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
 
-public class Indices {
+public class Indices implements GraylogRestApi {
     private final RequestSpecification requestSpecification;
 
     public Indices(RequestSpecification requestSpecification) {

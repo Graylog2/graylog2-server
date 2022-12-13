@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
 
-public class Sharing {
+public class Sharing implements GraylogRestApi {
 
     public static final String ENTITY_STREAM = "stream";
     public static final String ENTITY_USER = "user";

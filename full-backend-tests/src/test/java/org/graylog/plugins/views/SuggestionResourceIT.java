@@ -19,6 +19,8 @@ package org.graylog.plugins.views;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.completebackend.apis.GraylogApis;
+import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
@@ -38,46 +40,39 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = VM, searchVersions = { SearchServer.ES7, SearchServer.OS2 })
+@ContainerMatrixTestsConfiguration(serverLifecycle = VM, searchVersions = {SearchServer.ES7, SearchServer.OS2})
 public class SuggestionResourceIT {
-
-    static final int GELF_HTTP_PORT = 12201;
-
-    private final GraylogBackend sut;
     private final RequestSpecification requestSpec;
+    private final GraylogApis api;
 
     private String stream1Id;
     private String stream2Id;
 
-    public SuggestionResourceIT(GraylogBackend sut, RequestSpecification requestSpec) {
-        this.sut = sut;
+    public SuggestionResourceIT(RequestSpecification requestSpec, GraylogApis api) {
         this.requestSpec = requestSpec;
+        this.api = api;
     }
 
     @BeforeAll
     public void init() {
-        int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
-        final String defaultIndexSetId = IndexSetUtils.defaultIndexSetId(requestSpec);
-        this.stream1Id = StreamUtils.createStream(requestSpec, "Stream #1", defaultIndexSetId, new StreamUtils.StreamRule(StreamRuleType.EXACT.toInteger(), "stream1", "target_stream", false));
-        this.stream2Id = StreamUtils.createStream(requestSpec, "Stream #2", defaultIndexSetId, new StreamUtils.StreamRule(StreamRuleType.EXACT.toInteger(), "stream2", "target_stream", false));
 
-        GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
-        GelfInputUtils.postMessage(mappedPort,
-                "{\"short_message\":\"SuggestionResourceIT#1\", \"host\":\"example.org\", \"facility\":\"junit\", \"_target_stream\": \"stream1\"}",
-                requestSpec);
-        GelfInputUtils.postMessage(mappedPort,
-                "{\"short_message\":\"SuggestionResourceIT#2\", \"host\":\"example.org\", \"facility\":\"test\", \"_target_stream\": \"stream1\"}",
-                requestSpec);
-        GelfInputUtils.postMessage(mappedPort,
-                "{\"short_message\":\"SuggestionResourceIT#3\", \"host\":\"example.org\", \"facility\":\"test\", \"_target_stream\": \"stream1\"}",
-                requestSpec);
-        GelfInputUtils.postMessage(mappedPort,
-                "{\"short_message\":\"SuggestionResourceIT#4\", \"host\":\"foreign.org\", \"facility\":\"test\", \"_target_stream\": \"stream2\"}",
-                requestSpec);
-         SearchUtils.waitForMessage(requestSpec, "SuggestionResourceIT#1");
-         SearchUtils.waitForMessage(requestSpec, "SuggestionResourceIT#2");
-         SearchUtils.waitForMessage(requestSpec, "SuggestionResourceIT#3");
-         SearchUtils.waitForMessage(requestSpec, "SuggestionResourceIT#4");
+        final String defaultIndexSetId = api.indices().defaultIndexSetId();
+        this.stream1Id = api.streams().createStream("Stream #1", defaultIndexSetId, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream1", "target_stream", false));
+        this.stream2Id = api.streams().createStream("Stream #2", defaultIndexSetId, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream2", "target_stream", false));
+
+        api.gelf().createGelfHttpInput()
+                .postMessage(
+                        "{\"short_message\":\"SuggestionResourceIT#1\", \"host\":\"example.org\", \"facility\":\"junit\", \"_target_stream\": \"stream1\"}")
+                .postMessage(
+                        "{\"short_message\":\"SuggestionResourceIT#2\", \"host\":\"example.org\", \"facility\":\"test\", \"_target_stream\": \"stream1\"}")
+                .postMessage(
+                        "{\"short_message\":\"SuggestionResourceIT#3\", \"host\":\"example.org\", \"facility\":\"test\", \"_target_stream\": \"stream1\"}")
+                .postMessage("{\"short_message\":\"SuggestionResourceIT#4\", \"host\":\"foreign.org\", \"facility\":\"test\", \"_target_stream\": \"stream2\"}");
+
+        api.search().waitForMessage("SuggestionResourceIT#1");
+        api.search().waitForMessage("SuggestionResourceIT#2");
+        api.search().waitForMessage("SuggestionResourceIT#3");
+        api.search().waitForMessage("SuggestionResourceIT#4");
     }
 
     @ContainerMatrixTest

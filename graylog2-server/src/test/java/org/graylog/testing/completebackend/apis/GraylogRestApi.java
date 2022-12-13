@@ -26,7 +26,6 @@ public interface GraylogRestApi {
     int TIMEOUT_MS = 10000;
     int SLEEP_MS = 500;
 
-
     default void waitFor(Producer<Boolean> predicate, String timeoutErrorMessage) {
         waitForObject(() -> predicate.call() ? Optional.of(true) : Optional.empty(), timeoutErrorMessage);
     }

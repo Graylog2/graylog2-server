@@ -32,12 +32,18 @@ import static io.restassured.RestAssured.given;
 public final class GelfInputApi implements GraylogRestApi {
 
     private static final Logger LOG = LoggerFactory.getLogger(GelfInputApi.class);
+    private static final int DEFAULT_GELF_HTTP_PORT = 12201;
     private final RequestSpecification requestSpecification;
     private final GraylogBackend backend;
 
     public GelfInputApi(RequestSpecification requestSpecification, GraylogBackend backend) {
         this.requestSpecification = requestSpecification;
         this.backend = backend;
+    }
+
+
+    public PortBoundGelfInputApi createGelfHttpInput() {
+        return createGelfHttpInput(DEFAULT_GELF_HTTP_PORT);
     }
 
     public PortBoundGelfInputApi createGelfHttpInput(int gelfHttpPort) {
