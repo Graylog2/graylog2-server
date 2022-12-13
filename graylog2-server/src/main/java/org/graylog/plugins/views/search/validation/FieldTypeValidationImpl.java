@@ -17,12 +17,10 @@
 package org.graylog.plugins.views.search.validation;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.net.InetAddresses;
 import org.apache.commons.net.util.SubnetUtils;
 import org.apache.commons.validator.routines.InetAddressValidator;
 import org.graylog.plugins.views.search.engine.QueryPosition;
 import org.graylog2.plugin.Tools;
-import org.graylog2.utilities.IpSubnet;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
