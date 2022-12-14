@@ -60,3 +60,17 @@ jobs:
       uses: github/codeql-action/analyze@v2
       with:
         category: "/language:${{matrix.language}}"
+
+    - name: Generate CodeQL Report
+      uses: peter-murray/github-security-report-action@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        outputDir: ${{ github.workspace }}/codeql-report
+
+    - name: Save CodeQL Results
+      uses: actions/upload-artifact@v2
+      with:
+        name: codeql-results
+        path: |
+          ${{ github.workspace }}/../results/*.sarif
+          ${{ github.workspace }}/codeql-report/*
