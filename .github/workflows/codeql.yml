@@ -60,6 +60,7 @@ jobs:
       uses: github/codeql-action/analyze@v2
       with:
         category: "/language:${{matrix.language}}"
+        output: ${{ github.workspace }}/codeql-results
 
     - name: Generate CodeQL Report
       uses: peter-murray/github-security-report-action@v2
@@ -72,5 +73,5 @@ jobs:
       with:
         name: codeql-results
         path: |
-          ${{ github.workspace }}/../results/*.sarif
+          ${{ github.workspace }}/codeql-results/*.sarif
           ${{ github.workspace }}/codeql-report/*
