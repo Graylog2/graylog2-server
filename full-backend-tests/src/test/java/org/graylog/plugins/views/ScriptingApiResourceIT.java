@@ -609,7 +609,7 @@ public class ScriptingApiResourceIT {
                 .statusCode(400)
                 .assertThat()
                 .body("type", Matchers.equalTo("ApiError"))
-                .body("message", Matchers.containsString("Failed to obtain aggregation results"));
+                .body("message", Matchers.containsString("Failed to obtain results"));
     }
 
     @ContainerMatrixTest
