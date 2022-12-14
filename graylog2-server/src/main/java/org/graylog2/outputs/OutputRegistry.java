@@ -32,8 +32,8 @@ import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.outputs.events.OutputChangedEvent;
 import org.graylog2.outputs.events.OutputDeletedEvent;
+import org.graylog2.plugin.outputs.InsufficientLicenseException;
 import org.graylog2.plugin.outputs.MessageOutput;
-import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.system.NodeId;
@@ -91,7 +91,7 @@ public class OutputRegistry {
         this.faultPenaltySeconds = faultPenaltySeconds;
         this.faultCounters = CacheBuilder.newBuilder()
                 .expireAfterWrite(this.faultPenaltySeconds, TimeUnit.SECONDS)
-                .build(new CacheLoader<String, AtomicInteger>() {
+                .build(new CacheLoader<>() {
                     @Override
                     public AtomicInteger load(String key) throws Exception {
                         return new AtomicInteger(0);
@@ -151,7 +151,12 @@ public class OutputRegistry {
         } catch (ExecutionException | UncheckedExecutionException e) {
             if (!(e.getCause() instanceof NotFoundException)) {
                 final int number = faultCount.addAndGet(1);
-                LOG.error("Unable to fetch output " + id + ", fault #" + number, e);
+                if (e.getCause() instanceof InsufficientLicenseException licenseException) {
+                    LOG.error("Unable to fetch output {}, fault #{}: {}", id, number,
+                            licenseException.getLocalizedMessage());
+                } else {
+                    LOG.error("Unable to fetch output " + id + ", fault #" + number, e);
+                }
                 if (number >= faultCountThreshold) {
                     LOG.error("Output {} has crossed threshold of {} faults in {} seconds. Disabling for {} seconds.",
                             id,
@@ -177,7 +182,7 @@ public class OutputRegistry {
     }
 
     public Callable<MessageOutput> loadForIdAndStream(final String id, final Stream stream) {
-        return new Callable<MessageOutput>() {
+        return new Callable<>() {
             @Override
             public MessageOutput call() throws Exception {
                 final Output output = outputService.load(id);
@@ -186,13 +191,15 @@ public class OutputRegistry {
         };
     }
 
-    protected MessageOutput launchOutput(Output output, Stream stream) throws MessageOutputConfigurationException {
+    protected MessageOutput launchOutput(Output output, Stream stream) throws Exception {
         final MessageOutput messageOutput = messageOutputFactory.fromStreamOutput(output, stream,
                 new org.graylog2.plugin.configuration.Configuration(output.getConfiguration()));
 
         if (messageOutput == null) {
             throw new IllegalArgumentException("Failed to instantiate MessageOutput from Output: " + output);
         }
+
+        messageOutput.initialize();
 
         return messageOutput;
     }
