@@ -64,7 +64,7 @@ jobs:
     - name: Generate CodeQL Report
       uses: peter-murray/github-security-report-action@v2
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.CODEQL_REPORT_TOKEN }}
         outputDir: ${{ github.workspace }}/codeql-report
 
     - name: Save CodeQL Results
