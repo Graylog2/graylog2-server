@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Prevent RejectedExecutionException during shutdown with a large number of outputs."
+
+pulls = ["14097"]

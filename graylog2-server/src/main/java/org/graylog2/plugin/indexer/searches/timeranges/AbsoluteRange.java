@@ -54,7 +54,7 @@ public abstract class AbsoluteRange extends TimeRange {
         return builder().from(from).to(to).build();
     }
 
-    public static AbsoluteRange create(final String from, final String to) throws InvalidRangeParametersException {
+    public static AbsoluteRange create(final String from, final String to) {
         return builder().from(from).to(to).build();
     }
 
