@@ -9,6 +9,10 @@ on:
   schedule:
     - cron: '38 16 * * 5'
 
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
 jobs:
   analyze:
     name: Analyze
@@ -66,6 +70,7 @@ jobs:
       uses: peter-murray/github-security-report-action@v2
       with:
         token: ${{ secrets.CODEQL_REPORT_TOKEN }}
+        sarifReportDir: ${{ github.workspace }}/codeql-results
         outputDir: ${{ github.workspace }}/codeql-report
 
     - name: Save CodeQL Results
