@@ -16,12 +16,12 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useFormikContext } from 'formik';
 import styled from 'styled-components';
 
-import { Input, Alert } from 'components/bootstrap';
-import { Select, Icon } from 'components/common';
+import { Alert, Col, Input, Row } from 'components/bootstrap';
+import { Icon, Select } from 'components/common';
 
 const TIME_BASED_ROTATION_STRATEGY = 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy';
 const NOOP_RETENTION_STRATEGY = 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy';
@@ -122,7 +122,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
 
   const _onConfigUpdate = useCallback((newConfig) => {
     const _addConfigType = (selectedStrategy, data) => {
-    // The config object needs to have the "type" field set to the "default_config.type" to make the REST call work.
+      // The config object needs to have the "type" field set to the "default_config.type" to make the REST call work.
       const result = strategies.filter((s) => s.type === selectedStrategy)[0];
       const copy = data;
 
@@ -152,36 +152,56 @@ const IndexMaintenanceStrategiesConfiguration = ({
   const retentionIsNotNoop = retentionStrategyClass !== NOOP_RETENTION_STRATEGY;
   const shouldShowMaxRetentionWarning = maxRetentionPeriod && rotationStrategyClass === TIME_BASED_ROTATION_STRATEGY && retentionIsNotNoop;
 
+  function getDescription() {
+    if (description) {
+      return (
+        <StyledAlert>
+          <Icon name="info-circle" />{' '} {description}
+        </StyledAlert>
+      );
+    }
+
+    return null;
+  }
+
   return (
     <span>
       <StyledH3>{title}</StyledH3>
-      <StyledAlert>
-        <Icon name="info-circle" />{' '} {description}
-      </StyledAlert>
+      {getDescription()}
       {shouldShowMaxRetentionWarning && (
-      <StyledAlert bsStyle="warning">
-        <Icon name="exclamation-triangle" />{' '} The effective retention period value calculated from the <b>Rotation period</b> and the
-        <b> max number of indices</b> should not be greater than the <b>Max retention period</b> of <b>{maxRetentionPeriod}</b> set by the Administrator.
-      </StyledAlert>
+        <StyledAlert bsStyle="warning">
+          <Icon name="exclamation-triangle" />{' '} The effective retention period value calculated from the
+          <b>Rotation period</b> and the <b>max number of indices</b> should not be greater than the
+          <b>Max retention period </b> of <b>{maxRetentionPeriod}</b> set by the Administrator.
+        </StyledAlert>
       )}
-      <Input id="strategy-select"
-             labelClassName="col-sm-3"
-             wrapperClassName="col-sm-9"
-             label={selectPlaceholder}>
-        <StyledSelect placeholder={selectPlaceholder}
-                      options={_availableSelectOptions()}
-                      matchProp="label"
-                      value={_activeSelection()}
-                      onChange={_onSelect} />
-      </Input>
-      {_getConfigurationComponent(_activeSelection(), pluginExports, strategies, strategy, config, _onConfigUpdate)}
+      <Row>
+        <Col md={12}>
+          <Input id="strategy-select"
+                 labelClassName="col-sm-3"
+                 wrapperClassName="col-sm-9"
+                 label={selectPlaceholder}>
+            <StyledSelect placeholder={selectPlaceholder}
+                          options={_availableSelectOptions()}
+                          matchProp="label"
+                          value={_activeSelection()}
+                          onChange={_onSelect}
+                          clearable={false} />
+          </Input>
+        </Col>
+      </Row>
+      <Row>
+        <Col md={12}>
+          {_getConfigurationComponent(_activeSelection(), pluginExports, strategies, strategy, config, _onConfigUpdate)}
+        </Col>
+      </Row>
     </span>
   );
 };
 
 IndexMaintenanceStrategiesConfiguration.propTypes = {
   title: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
+  description: PropTypes.string,
   selectPlaceholder: PropTypes.string.isRequired,
   pluginExports: PropTypes.array.isRequired,
   strategies: PropTypes.array.isRequired,
@@ -193,6 +213,7 @@ IndexMaintenanceStrategiesConfiguration.propTypes = {
 };
 
 IndexMaintenanceStrategiesConfiguration.defaultProps = {
+  description: undefined,
   retentionStrategiesContext: {
     max_index_retention_period: undefined,
   },

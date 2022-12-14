@@ -36,11 +36,7 @@ public final class GelfInputUtils {
     private GelfInputUtils() {
     }
 
-    public static TestGelfInput createGelfHttpInput(GraylogBackend backend, int gelfHttpPort, RequestSpecification requestSpecification) {
-        return createGelfHttpInput(backend.mappedPortFor(gelfHttpPort), gelfHttpPort, requestSpecification);
-    }
-
-    public static TestGelfInput createGelfHttpInput(int mappedPort, int gelfHttpPort, RequestSpecification requestSpecification) {
+    public static void createGelfHttpInput(int mappedPort, int gelfHttpPort, RequestSpecification requestSpecification) {
 
         final ArrayList<Integer> inputs = given()
                 .spec(requestSpecification)
@@ -68,8 +64,6 @@ public final class GelfInputUtils {
         }
 
         waitForGelfInputOnPort(mappedPort, requestSpecification);
-
-        return new TestGelfInput(requestSpecification, mappedPort);
     }
 
     private static void waitForGelfInputOnPort(int mappedPort, RequestSpecification requestSpecification) {
