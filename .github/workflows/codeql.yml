@@ -79,4 +79,10 @@ jobs:
         name: codeql-results
         path: |
           ${{ github.workspace }}/codeql-results/*.sarif
-          ${{ github.workspace }}/codeql-report/*
+
+    - name: Save CodeQL Report
+      uses: actions/upload-artifact@v2
+      with:
+        name: codeql-report
+        path: |
+          ${{ github.workspace }}/codeql-report/*.pdf
