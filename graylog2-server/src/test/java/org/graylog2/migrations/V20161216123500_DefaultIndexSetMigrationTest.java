@@ -96,7 +96,7 @@ public class V20161216123500_DefaultIndexSetMigrationTest {
                 .build();
         final IndexSetConfig savedDefaultConfig = defaultConfig.toBuilder()
                 .indexAnalyzer(elasticsearchConfiguration.getAnalyzer())
-                .indexTemplateName(elasticsearchConfiguration.getTemplateName())
+                .indexTemplateName(elasticsearchConfiguration.getDefaultIndexTemplateName())
                 .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
                 .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
                 .build();
@@ -132,7 +132,7 @@ public class V20161216123500_DefaultIndexSetMigrationTest {
         assertThat(capturedDefaultIndexSetConfig.rotationStrategy()).isEqualTo(rotationStrategyConfig);
         assertThat(capturedDefaultIndexSetConfig.retentionStrategy()).isEqualTo(retentionStrategyConfig);
         assertThat(capturedDefaultIndexSetConfig.indexAnalyzer()).isEqualTo(elasticsearchConfiguration.getAnalyzer());
-        assertThat(capturedDefaultIndexSetConfig.indexTemplateName()).isEqualTo(elasticsearchConfiguration.getTemplateName());
+        assertThat(capturedDefaultIndexSetConfig.indexTemplateName()).isEqualTo(elasticsearchConfiguration.getDefaultIndexTemplateName());
         assertThat(capturedDefaultIndexSetConfig.indexOptimizationMaxNumSegments()).isEqualTo(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments());
         assertThat(capturedDefaultIndexSetConfig.indexOptimizationDisabled()).isEqualTo(elasticsearchConfiguration.isDisableIndexOptimization());
 

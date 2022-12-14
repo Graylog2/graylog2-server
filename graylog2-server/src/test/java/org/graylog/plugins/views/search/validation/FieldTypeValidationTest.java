@@ -61,8 +61,26 @@ class FieldTypeValidationTest {
 
     @Test
     void validateIPFieldValueType() {
+        // IPv4
         assertThat(fieldTypeValidation.validateFieldValueType(term("123.34.45.56"), "ip")).isNotPresent();
+        assertThat(fieldTypeValidation.validateFieldValueType(term("123.999.45.56"), "ip")).isPresent();
 
+        //IPv6
+        assertThat(fieldTypeValidation.validateFieldValueType(term("2001:db8:3333:4444:5555:6666:7777:8888"), "ip")).isNotPresent();
+        assertThat(fieldTypeValidation.validateFieldValueType(term("2001:db8:3333:4444:CCCC:DDDD:EEEE:FFFF"), "ip")).isNotPresent();
+        assertThat(fieldTypeValidation.validateFieldValueType(term("::"), "ip")).isNotPresent();
+        assertThat(fieldTypeValidation.validateFieldValueType(term("2001:db8::"), "ip")).isNotPresent();
+        assertThat(fieldTypeValidation.validateFieldValueType(term("::1234:5678"), "ip")).isNotPresent();
+        assertThat(fieldTypeValidation.validateFieldValueType(term("2001:db8::1234:5678"), "ip")).isNotPresent();
+        assertThat(fieldTypeValidation.validateFieldValueType(term("2001:0db8:0001:0000:0000:0ab9:C0A8:0102"), "ip")).isNotPresent();
+        assertThat(fieldTypeValidation.validateFieldValueType(term("2001:db8:1::ab9:C0A8:102"), "ip")).isNotPresent();
+
+        // CIDR
+        assertThat(fieldTypeValidation.validateFieldValueType(term("123.34.45.56/24"), "ip")).isNotPresent();
+        assertThat(fieldTypeValidation.validateFieldValueType(term("123.34.45.56/"), "ip")).isPresent();
+        assertThat(fieldTypeValidation.validateFieldValueType(term("123.34.45.56/299"), "ip")).isPresent();
+
+        // just wrong
         assertThat(fieldTypeValidation.validateFieldValueType(term("ABC"), "ip")).isPresent();
     }
 
