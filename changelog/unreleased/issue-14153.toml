@@ -1,5 +1,5 @@
 type = "fixed"
-message = "Use PKCS5 instead of ISO10126 padding for secrets encryption"
+message = "Improve JVM security provider compatibility by switching to a widely supported cipher transformation"
 
 issues = ["14153"]
 pulls = ["14193"]
