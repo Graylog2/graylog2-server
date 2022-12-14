@@ -62,7 +62,7 @@ public record MessagesRequestSpec(@JsonProperty("query") String queryString,
         if (streams == null) {
             streams = Set.of();
         }
-        if (from < DEFAULT_FROM) {
+        if (from < 0) {
             from = DEFAULT_FROM;
         }
         if (size <= 0) {

@@ -25,8 +25,11 @@ public class ResultWindowLimitError extends SearchTypeError {
 
     private final int resultWindowLimit;
 
-    ResultWindowLimitError(@Nonnull Query query, @Nonnull String searchTypeId, int resultWindowLimit, Throwable throwable) {
-        super(query, searchTypeId, throwable);
+    private static final String ERROR_DESCRIPTION =
+            "Result window is too large, [from + size] must be less than or equal to: [%d]. This limit can be set by changing the [index.max_result_window] index level setting, but it is recommended to use more advanced methods in order to get distant chunks of results (i.e. scroll or search after)";
+
+    ResultWindowLimitError(@Nonnull Query query, @Nonnull String searchTypeId, int resultWindowLimit) {
+        super(query, searchTypeId, String.format(ERROR_DESCRIPTION, resultWindowLimit));
 
         this.resultWindowLimit = resultWindowLimit;
     }

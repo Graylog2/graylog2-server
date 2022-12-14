@@ -27,9 +27,9 @@ import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
-import org.graylog.plugins.views.search.rest.scriptingapi.mapping.AggregationFailedException;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.AggregationTabularResponseCreator;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.MessagesTabularResponseCreator;
+import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryParamsToFullRequestSpecificationMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchRequestSpecToSearchMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
@@ -66,8 +66,6 @@ import static org.graylog2.shared.utilities.StringUtils.splitByComma;
 @RequiresAuthentication
 public class ScriptingApiResource extends RestResource implements PluginRestResource {
 
-    private final int MAX_RESULT_WINDOW = 10_000; //default "index.max_result_window" for both ES and OS
-
     private final SearchExecutor searchExecutor;
     private final EventBus serverEventBus;
     private final SearchRequestSpecToSearchMapper searchCreator;
@@ -99,9 +97,6 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     public TabularResponse executeQuery(@ApiParam(name = "queryRequestSpec") @Valid MessagesRequestSpec messagesRequestSpec,
                                         @Context SearchUser searchUser) {
 
-        if (messagesRequestSpec.from() + messagesRequestSpec.size() > MAX_RESULT_WINDOW) {
-            throw new BadRequestException("The maximum value of [from + size] exceeds the indexer limit of " + MAX_RESULT_WINDOW);
-        }
 
         try {
             //Step 1: map simple request to more complex search
@@ -114,7 +109,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
             //Step 3: take complex response and try to map it to simpler, tabular form
             return messagesTabularResponseCreator.mapToResponse(messagesRequestSpec, searchJob, searchUser);
 
-        } catch (IllegalArgumentException | ValidationException | AggregationFailedException ex) {
+        } catch (IllegalArgumentException | ValidationException | QueryFailedException ex) {
             throw new BadRequestException(ex.getMessage(), ex);
         }
     }
@@ -166,7 +161,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
 
             //Step 3: take complex response and try to map it to simpler, tabular form
             return aggregationTabularResponseCreator.mapToResponse(aggregationRequestSpec, searchJob);
-        } catch (IllegalArgumentException | ValidationException | AggregationFailedException ex) {
+        } catch (IllegalArgumentException | ValidationException | QueryFailedException ex) {
             throw new BadRequestException(ex.getMessage(), ex);
         }
     }
