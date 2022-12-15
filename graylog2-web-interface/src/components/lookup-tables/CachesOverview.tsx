@@ -84,19 +84,19 @@ const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props)
     resetPage: paginationQueryParameter.resetPage,
   }), [paginationQueryParameter]);
 
-  const onPageChange = (newPage: number, newPerPage: number) => {
+  const onPageChange = React.useCallback((newPage: number, newPerPage: number) => {
     LookupTableCachesActions.searchPaginated(newPage, newPerPage, pagination.query);
-  };
+  }, [pagination.query]);
 
-  const onSearch = (query: string, resetLoadingStateCb: () => void) => {
+  const onSearch = React.useCallback((query: string, resetLoadingStateCb: () => void) => {
     resetPage();
-    LookupTableCachesActions.searchPaginated(1, currentPageSize, query).then(resetLoadingStateCb);
-  };
+    LookupTableCachesActions.searchPaginated(currentPage, currentPageSize, query).then(resetLoadingStateCb);
+  }, [resetPage, currentPage, currentPageSize]);
 
-  const onReset = () => {
+  const onReset = React.useCallback(() => {
     resetPage();
     LookupTableCachesActions.searchPaginated(currentPage, currentPageSize);
-  };
+  }, [resetPage, currentPage, currentPageSize]);
 
   return (
     <Row className="content">

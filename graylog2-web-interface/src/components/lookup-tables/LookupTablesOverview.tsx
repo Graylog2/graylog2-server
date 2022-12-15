@@ -138,19 +138,19 @@ const LookupTablesOverview = ({
     resetPage: paginationQueryParameter.resetPage,
   }), [paginationQueryParameter]);
 
-  const onPageChange = (newPage: number, newPerPage: number) => {
+  const onPageChange = React.useCallback((newPage: number, newPerPage: number) => {
     LookupTablesActions.searchPaginated(newPage, newPerPage, pagination.query);
-  };
+  }, [pagination.query]);
 
-  const onSearch = (query: string, resetLoadingStateCb: () => void) => {
+  const onSearch = React.useCallback((query: string, resetLoadingStateCb: () => void) => {
     resetPage();
-    LookupTablesActions.searchPaginated(1, currentPageSize, query).then(resetLoadingStateCb);
-  };
+    LookupTablesActions.searchPaginated(currentPage, currentPageSize, query).then(resetLoadingStateCb);
+  }, [resetPage, currentPage, currentPageSize]);
 
-  const onReset = () => {
+  const onReset = React.useCallback(() => {
     resetPage();
     LookupTablesActions.searchPaginated(currentPage, currentPageSize);
-  };
+  }, [resetPage, currentPage, currentPageSize]);
 
   return (
     <Row className="content">
@@ -182,7 +182,8 @@ const LookupTablesOverview = ({
               {tables.length === 0
                 ? <Spinner text="Loading caches" />
                 : tables.map((table: LookupTable) => (
-                  <LUTItem table={table}
+                  <LUTItem key={`table-item-${table.id}`}
+                           table={table}
                            caches={caches}
                            dataAdapters={dataAdapters}
                            errorStates={errorStates} />

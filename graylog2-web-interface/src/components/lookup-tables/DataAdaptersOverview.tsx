@@ -89,15 +89,15 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
     LookupTableDataAdaptersActions.searchPaginated(newPage, newPerPage, pagination.query);
   };
 
-  const onSearch = (query: string, resetLoadingStateCb: () => void) => {
+  const onSearch = React.useCallback((query: string, resetLoadingStateCb: () => void) => {
     resetPage();
     LookupTableDataAdaptersActions.searchPaginated(currentPage, currentPageSize, query).then(resetLoadingStateCb);
-  };
+  }, [resetPage, currentPage, currentPageSize]);
 
-  const onReset = () => {
+  const onReset = React.useCallback(() => {
     resetPage();
     LookupTableDataAdaptersActions.searchPaginated(currentPage, currentPageSize);
-  };
+  }, [resetPage, currentPage, currentPageSize]);
 
   return (
     <Row className="content">
