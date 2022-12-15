@@ -16,7 +16,6 @@
  */
 package org.graylog2.plugin.system;
 
-import com.google.common.hash.Hashing;
 import org.apache.commons.io.FileUtils;
 import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
@@ -31,7 +30,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.List;
 
-public class NodeId {
+public class NodeId implements NodeIdentifier {
     private static final Logger LOG = LoggerFactory.getLogger(NodeId.class);
 
     private final String filename;
@@ -81,37 +80,28 @@ public class NodeId {
         return generated;
     }
 
-    protected void persist(String nodeId) throws IOException {
+    private void persist(String nodeId) throws IOException {
         FileUtils.writeStringToFile(new File(filename), nodeId, StandardCharsets.UTF_8);
     }
 
+    @Override
+    public String getNodeId() {
+        return id;
+    }
+
     /**
+     * Please use {@link #getNodeId()} instead of this toString call if you want to obtain the node ID.
      * {@inheritDoc}
      */
     @Override
     public String toString() {
-        return id;
-    }
-
-    public String toEscapedString() {
-        return id.replace("\\", "\\\\").replace("$", "\\u0024").replace(".", "\\u002e");
-    }
-
-    public String toUnescapedString() {
-        return id.replace("\\u002e", ".").replace("\\u0024", "$").replace("\\\\", "\\");
+        return getNodeId();
     }
 
     /**
-     * Generate an "anonymized" node ID for use with external services. Currently it just hashes the actual node ID
-     * using SHA-256.
-     *
-     * @return The anonymized ID derived from hashing the node ID.
+     * Is it used somewhere? Can we safely remove this method?
      */
-    public String anonymize() {
-        return Hashing.sha256().hashString(id, StandardCharsets.UTF_8).toString();
-    }
-
-    public String getShortNodeId() {
-        return id.split("-")[0];
+    public String toUnescapedString() {
+        return id.replace("\\u002e", ".").replace("\\u0024", "$").replace("\\\\", "\\");
     }
 }

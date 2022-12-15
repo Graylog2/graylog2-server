@@ -18,7 +18,7 @@ package org.graylog2.audit;
 
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.NodeIdentifier;
 
 import javax.annotation.Nonnull;
 
@@ -40,7 +40,7 @@ public abstract class AuditActor {
         return new AutoValue_AuditActor(URN_GRAYLOG_USER + username);
     }
 
-    public static AuditActor system(@Nonnull NodeId nodeId) {
-        return new AutoValue_AuditActor(URN_GRAYLOG_NODE + requireNonNull(nodeId, "nodeId must not be null").toString());
+    public static AuditActor system(@Nonnull NodeIdentifier nodeId) {
+        return new AutoValue_AuditActor(URN_GRAYLOG_NODE + requireNonNull(nodeId, "nodeId must not be null").getNodeId());
     }
 }
