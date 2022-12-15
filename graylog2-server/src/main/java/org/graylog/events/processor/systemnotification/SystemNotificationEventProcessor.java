@@ -16,7 +16,6 @@
  */
 package org.graylog.events.processor.systemnotification;
 
-import com.google.common.collect.ImmutableList;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventFactory;
@@ -65,10 +64,7 @@ public class SystemNotificationEventProcessor implements EventProcessor {
         for (Map.Entry<String, Object> entry: eventParameters.notificationDetails().entrySet()) {
             event.setField(entry.getKey(), FieldValue.builder().dataType(FieldValueType.STRING).value(entry.getValue().toString()).build());
         }
-
-        final ImmutableList.Builder<EventWithContext> eventsWithContext = ImmutableList.builder();
-        eventsWithContext.add(EventWithContext.create(event));
-        eventsConsumer.accept(eventsWithContext.build());
+        eventsConsumer.accept(List.of(EventWithContext.create(event)));
     }
 
     @Override
