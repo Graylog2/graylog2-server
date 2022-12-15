@@ -68,7 +68,7 @@
 
                             <execution>
                                 <id>yarn run build</id>
-                                <phase>compile</phase>
+                                <phase>process-classes</phase>
                                 <goals>
                                     <goal>yarn</goal>
                                 </goals>
