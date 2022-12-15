@@ -54,6 +54,7 @@ import {
   SearchButtonAndQuery,
   SearchInputAndValidationContainer,
 } from 'views/components/searchbar/SearchBarLayout';
+import usePluggableCommands from 'views/components/searchbar/queryinput/usePluggableCommands';
 
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
@@ -116,6 +117,8 @@ const DashboardSearchBar = () => {
   const { parameters } = useParameters();
   const initialValues = useInitialFormValues(timerange, queryString);
 
+  const customCommands = usePluggableCommands('global_override_query');
+
   if (!config) {
     return <Spinner />;
   }
@@ -167,7 +170,8 @@ const DashboardSearchBar = () => {
                                               isValidating={isValidating}
                                               validate={validateForm}
                                               warning={warnings.queryString}
-                                              onExecute={handleSubmit as () => void} />
+                                              onExecute={handleSubmit as () => void}
+                                              commands={customCommands} />
                                 )}
                               </FormWarningsContext.Consumer>
                             )}

@@ -56,6 +56,7 @@ import {
   TimeRangeRow,
   SearchQueryRow,
 } from 'views/components/searchbar/SearchBarLayout';
+import usePluggableCommands from 'views/components/searchbar/queryinput/usePluggableCommands';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeInput from './searchbar/TimeRangeInput';
@@ -165,6 +166,7 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
   const validate = (values) => _validateQueryString(values, globalOverride, pluggableSearchBarControls, userTimezone);
   const initialValues = useInitialFormValues(widget);
   const _onSubmit = useCallback((values) => onSubmit(values, pluggableSearchBarControls, widget), [pluggableSearchBarControls, widget]);
+  const customCommands = usePluggableCommands('widget_query');
 
   useBindApplySearchControlsChanges(formRef);
 
@@ -226,7 +228,8 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                                       validate={validateForm}
                                       name={name}
                                       onChange={onChange}
-                                      onExecute={handleSubmit as () => void} />
+                                      onExecute={handleSubmit as () => void}
+                                      commands={customCommands} />
                         )}
                       </FormWarningsContext.Consumer>
                     )}

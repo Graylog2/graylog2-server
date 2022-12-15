@@ -61,6 +61,7 @@ import {
   SearchButtonAndQuery,
   SearchInputAndValidationContainer,
 } from 'views/components/searchbar/SearchBarLayout';
+import usePluggableCommands from 'views/components/searchbar/queryinput/usePluggableCommands';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -139,6 +140,7 @@ const SearchBar = ({
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const initialValues = useInitialFormValues({ queryFilters, currentQuery });
   const _onSubmit = useCallback((values: SearchBarFormValues) => onSubmit(values, pluggableSearchBarControls, currentQuery), [currentQuery, onSubmit, pluggableSearchBarControls]);
+  const customCommands = usePluggableCommands('search_query');
 
   if (!currentQuery || !config) {
     return <Spinner />;
@@ -207,7 +209,8 @@ const SearchBar = ({
                                                 warning={warnings.queryString}
                                                 disableExecution={disableSearchSubmit}
                                                 validate={validateForm}
-                                                onExecute={handleSubmit as () => void} />
+                                                onExecute={handleSubmit as () => void}
+                                                commands={customCommands} />
                                   )}
                                 </FormWarningsContext.Consumer>
                               )}
