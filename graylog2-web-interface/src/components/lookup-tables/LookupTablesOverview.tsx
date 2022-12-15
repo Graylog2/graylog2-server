@@ -196,4 +196,4 @@ const LookupTablesOverview = ({
   );
 };
 
-export default withPaginationQueryParameter(LookupTablesOverview as React.ComponentType<Props>);
+export default withPaginationQueryParameter(LookupTablesOverview);

@@ -143,4 +143,4 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
   );
 };
 
-export default withPaginationQueryParameter(DataAdaptersOverview as React.ComponentType<Props>);
+export default withPaginationQueryParameter(DataAdaptersOverview);

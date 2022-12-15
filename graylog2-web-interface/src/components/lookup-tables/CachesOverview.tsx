@@ -142,4 +142,4 @@ const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props)
   );
 };
 
-export default withPaginationQueryParameter(CachesOverview as React.ComponentType<Props>);
+export default withPaginationQueryParameter(CachesOverview);
