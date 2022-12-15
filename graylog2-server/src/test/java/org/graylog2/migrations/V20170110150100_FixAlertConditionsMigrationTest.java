@@ -60,8 +60,7 @@ public class V20170110150100_FixAlertConditionsMigrationTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    @Mock
-    public NodeId nodeId;
+    private final NodeId nodeId = () -> "node-id";
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);

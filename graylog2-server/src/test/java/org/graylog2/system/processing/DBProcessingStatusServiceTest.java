@@ -54,8 +54,7 @@ public class DBProcessingStatusServiceTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    @Mock
-    private NodeId nodeId = () -> NODE_ID;
+    private final NodeId nodeId = () -> NODE_ID;
 
     @Mock
     private BaseConfiguration baseConfiguration;

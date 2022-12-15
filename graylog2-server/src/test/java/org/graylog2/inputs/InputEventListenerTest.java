@@ -76,7 +76,7 @@ public class InputEventListenerTest {
 
         listener.inputCreated(InputCreated.create(inputId));
 
-        verifyZeroInteractions(inputLauncher, inputRegistry, nodeId);
+        verifyZeroInteractions(inputLauncher, inputRegistry);
     }
 
     @Test
@@ -160,7 +160,7 @@ public class InputEventListenerTest {
 
         listener.inputUpdated(InputUpdated.create(inputId));
 
-        verifyZeroInteractions(inputLauncher, inputRegistry, nodeId);
+        verifyZeroInteractions(inputLauncher, inputRegistry);
     }
 
     @Test
