@@ -29,6 +29,7 @@ const Wrapper = styled.div`
 
   .control-label {
     padding-top: 0;
+    font-weight: normal;
   }
 
   .page-size-select {

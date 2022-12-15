@@ -166,7 +166,8 @@ const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme, $height }) =
       right: 0;
       padding: 0;
       margin-top: 6px;
-      margin-left: 6px;
+      margin-left: 4px;
+      margin-right: 4px;
       transform: none;
       opacity: 1;
       z-index: auto !important;

@@ -21,7 +21,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import numeral from 'numeral';
 import moment from 'moment';
-import {} from 'moment-duration-format';
+import 'moment-duration-format';
 import styled from 'styled-components';
 
 import { Link } from 'components/common/router';

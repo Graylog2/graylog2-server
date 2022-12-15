@@ -1,0 +1,5 @@
+type = "added"
+message = "Allow sorting columns in data table widget."
+
+issues = ["13432"]
+pulls = ["9998"]

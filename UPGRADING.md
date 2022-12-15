@@ -1,177 +1,112 @@
-Upgrading to Graylog 5.0.x
+Upgrading to Graylog 5.1.x
 ==========================
 
-:::(Warning) Warning
-Please make sure to create a MongoDB database backup before starting the upgrade to Graylog 5.0!
-:::
+## New Functionality
+
+### Index Default Configuration
+Support for configuring index defaults has been added:
+1) Adds the ability to specify Index Set initialization default settings in the server configuration file for new Graylog clusters.
+2) Adds the ability to subsequently maintain the current Index Set defaults from the System > Configurations page
+   and through the Graylog API.
+
+#### New Graylog Cluster Index Set Initialization Defaults
+New Graylog server clusters can now initialize the settings for Index Sets with the following server configuration
+values. Please see the sample [graylog.conf](https://github.com/Graylog2/graylog2-server/blob/master/misc/graylog.conf) file for more details and example values.
+
+- `elasticsearch_analyzer`
+- `elasticsearch_shards`
+- `elasticsearch_replicas`
+- `disable_index_optimization`
+- `index_optimization_max_num_segments`
+- `index_field_type_periodical_full_refresh_interval`
+- `rotation_strategy`
+- `elasticsearch_max_docs_per_index`
+- `elasticsearch_max_size_per_index`
+- `elasticsearch_max_time_per_index`
+- `retention_strategy`
+- `elasticsearch_max_number_of_indices`
+
+If you are using a pre-existing version of the `graylog.conf` configuration file, it is recommended that you review the
+aforementioned settings there before upgrading, to ensure the in-database defaults are established as expected with the
+upgrade. Although the `graylog.conf` sample configuration file now ships with all index default example
+properties commented out, you may be using an older version of the file where certain index default values were present
+and not commented-out.
+
+All previously deprecated index set configuration properties in `org.graylog2.configuration.ElasticsearchConfiguration`
+have been un-deprecated, as Graylog intends to maintain them going forward.
+
+Once the first Graylog server instance is started to establish the cluster, the following system indexes will be created
+with the specified defaults.
+
+- Default index set
+- Graylog Events
+- Graylog System Events
+- Graylog Message Failures
+- Restored Archives
+
+#### In-database Cluster Index Set Defaults
+
+The current in-database defaults for new Index Sets can now be edited from the new System > Configuration >
+Index Set defaults configuration area. The default values set here will be used for all new index sets created:
+
+- Those created from the System > Index Sets page.
+- New indexes created through the Graylog Illuminate system.
+
+Once the upgrade is installed, these in-database defaults will be established, and the server configuration option
+values described above will no longer be used.
+
+The in-database Index Set default configuration can also be edited VIA the Graylog API:
+
+```
+curl 'http://graylog-server:8080/api/system/indices/index_set_defaults' \
+  -X 'PUT' \
+  -H 'Content-Type: application/json' \
+  -H 'X-Requested-By: my-api-request' \
+  --data-raw '
+  {
+    "index_analyzer": "standard",
+    "shards": 1,
+    "replicas": 0,
+    "index_optimization_max_num_segments": 1,
+    "index_optimization_disabled": false,
+    "field_type_refresh_interval": 300,
+    "field_type_refresh_interval_unit": "SECONDS",
+    "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy",
+    "rotation_strategy_config": {
+      "type": "org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategyConfig",
+      "max_size": 32212254720
+    },
+    "retention_strategy_class": "org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy",
+    "retention_strategy_config": {
+      "type": "org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig",
+      "max_number_of_indices": 20
+    }
+  }'
+```
+
+#### New Index Default values
+Unless user-specified defaults are specified, the following new defaults will be effective for all new index sets created:
+
+- Shards: 1 (previously 4 in many cases)
+- Rotation Strategy: Index Size - 30GB (previously Index Time [1D] in many cases)
+
+# API Changes
+The following Java Code API changes have been made.
+
+| File/method                                  | Description                                                                                                 |
+|----------------------------------------------|-------------------------------------------------------------------------------------------------------------|
+| `IndexSetValidator#validateRefreshInterval`  | The method argument have changed from `IndexSetConfig` to `Duration`                                        |
+| `IndexSetValidator#validateRetentionPeriod`  | The method argument have changed from `IndexSetConfig` to `RotationStrategyConfig, RetentionStrategyConfig` |
+| `ElasticsearchConfiguration#getIndexPrefix`  | The method name has changed to `getDefaultIndexPrefix`                                                      |
+| `ElasticsearchConfiguration#getTemplateName` | The method name has changed to `getDefaultIndexTemplateName`                                                |
+
+All previously deprecated index set configuration properties in `org.graylog2.configuration.ElasticsearchConfiguration`
+have been un-deprecated, as Graylog intends to maintain them going forward. 
 
 ## Breaking Changes
 
-* Graylog 5 is Java 17 only. We no longer support earlier Java versions.
-* Support for Elasticsearch 6.X has been removed! Please use either Elasticsearch 7.10.2 or, preferably, latest OpenSearch.
-* Graylog 5 needs at least MongoDB 5.0. Our recommended upgrade path is to first bring your MongoDB to 5.0 and then perform the Graylog upgrade.
-  Hint: Graylog 4.3.x does support MongoDB 5.0, which allows for a seamless upgrade path.
-* The `flatten_json` pipeline function now preserves the original type of the extracted values, instead
-of converting them to string. An optional flag is provided so existing rules can
-continue using the legacy behavior.
-
-
-## Disallowing embedding the frontend by default
-
-To prevent [click-jacking](https://developer.mozilla.org/en-US/docs/Web/Security/Types_of_attacks#click-jacking), we are now preventing the frontend to be embedded in `<frame>`/`<iframe>`/etc. elements by sending the `X-Frame-Options`-header with all HTTP responses. The header value depends on the new configuration setting `http_allow_embedding`. The different combinations are:
-
-| `http_allow_embedding` | `X-Frame-Options`-header value |
-|------------------------|--------------------------------|
-| not set                | `DENY`                         |
-| `false`                | `DENY`                         |
-| `true`                 | `SAMEORIGIN`                   |
-
-If you want to be able to embed the Graylog frontend in another HTML page, you most probably want to set `http_allow_embedding` to `true`. Only do this if you are aware of the implications!
-
-For further information about the meanings of the different header values and how they are interpreted by browsers, please read [this](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options).
-
-## New Default Message Processing Order
-
-The new default Message Processing order will run the
-`Message Filter Chain` before the `Pipeline Processor`.
-
-This applies only to new Graylog installations.
-Existing setups keep the former default order for backwards compatibility.
-
-## Stream aware field types
-
-So far, when listing fields for a query, Graylog has been showing fields for all streams.
-For some systems, this list may be extremely long and contain many fields which are not present in the query results.
-It is now possible to change this behavior. When configuration property `stream_aware_field_types` is set to true, Graylog will periodically collect information on stream-field relation from Elasticsearch/Opensearch and use it to provide only those fields which are present in the streams used in the query.
-
-If all of your streams go to dedicated, separate index sets, it is advised to keep the default value of `stream_aware_field_types` property (`false`). It will decrease the load on ES/OS and stream separation across index sets already helps with showing proper fields for a query.
-On the other hand, if multiple streams go to the same index sets, and you want precise field types and suggestions, you should set it to `true`. Consider monitoring your ES/OS load after that change, especially when using huge numbers of fields and streams. 
-
-## API Endpoint Deprecations
-
-The following API endpoints are deprecated beginning with 5.0.
-
-| Endpoint                                    | Description                 |
-| ------------------------------------------- | --------------------------- |
-| `PUT /example/placeholder`                  | TODO placeholder comment    |
-
-## API Endpoint Removals
-
-The following API endpoints have been removed in 5.0.
-
-### Legacy Alert API
-5.0 eliminates all of the previously deprecated legacy alert APIs. 
-Content packs that include legacy alerts can still be installed, but the alerts will be silently ignored.
-
-| Endpoint                                                        | Description                         |
-|-----------------------------------------------------------------|-------------------------------------|
-| `GET /alerts/conditions`                                        | Removed deprecated legacy alert API |
-| `GET /alerts/conditions/types`                                  | Removed deprecated legacy alert API |
-| `GET /streams/{streamId}/alerts/conditions`                     | Removed deprecated legacy alert API |
-| `POST /streams/{streamId}/alerts/conditions`                    | Removed deprecated legacy alert API |
-| `GET /streams/{streamId}/alerts/conditions/{conditionId}`       | Removed deprecated legacy alert API |    
-| `PUT /streams/{streamId}/alerts/conditions/{conditionId}`       | Removed deprecated legacy alert API |    
-| `DELETE /streams/{streamId}/alerts/conditions/{conditionId}`    | Removed deprecated legacy alert API |    
-| `POST /streams/{streamId}/alerts/conditions/test`               | Removed deprecated legacy alert API |    
-| `POST /streams/{streamId}/alerts/conditions/{conditionId}/test` | Removed deprecated legacy alert API |    
-| `GET /streams/{streamId}/alerts`                                | Removed deprecated legacy alert API |
-| `GET /streams/{streamId}/alerts/paginated`                      | Removed deprecated legacy alert API |
-| `GET /streams/{streamId}/alerts/check`                          | Removed deprecated legacy alert API |
-| `POST /streams/{streamId}/alerts/receivers`                     | Removed deprecated legacy alert API |
-| `DELETE /streams/{streamId}/alerts/receivers`                   | Removed deprecated legacy alert API |
-| `POST /streams/{streamId}/alerts/sendDummyAlert`                | Removed deprecated legacy alert API |
-
-
-| Endpoint                                    | Description                 |
-| ------------------------------------------- | --------------------------- |
-| `GET /system/metrics/{metricName}/history`  | Remove unused and dysfunctional endpoint. (part of [#2443](https://github.com/Graylog2/graylog2-server/pull/2443)) |
-
-
-## API Endpoint Changes
-
-| Endpoint                                         | Description                                                                                                                                                                       |
-|--------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `POST & PUT /system/inputs/{inputId}/extractors` | Renamed request body parameter `cut_or_copy` to `cursor_strategy` & changed type of request body parameter `converters` to List<Map<String, Object>> as returned in the GET calls |                                                                                                
-
-## Java Code API Deprecations
-
-The following Java Code API deprecations have been made in 5.0.
-
-- The `org.graylog2.plugin.PluginModule.addNotificationType(name, notificationClass, handlerClass, factoryClass)`
-  method has been deprecated in favor of a new/preferred version, which also properly registers the notification 
-  config content pack entity, so that instances the corresponding content pack entity can can be installed successfully:
-`org.graylog2.plugin.PluginModule.addNotificationType(name, notificationClass, handlerClass, factoryClass, contentPackEntityName, contentPackEntityClass)`. 
-  See <PR link> for more info.
-
-## Java Code API Changes
-
-The following Java Code API changes have been made in 5.0.
-
-| File                                                                                                   | Description                                              |
-|--------------------------------------------------------------------------------------------------------|----------------------------------------------------------|
-| `PaginatedPipelineService.java` | Concrete implementation has been changed to an interface |
-| `PaginatedRuleService.java`     | Concrete implementation has been changed to an interface |
-
-## Configuration File Changes
-
-| Option                                         | Action       | Description                                                               |
-|------------------------------------------------|--------------|---------------------------------------------------------------------------|
-| `mongodb_threads_allowed_to_block_multiplier`  | **removed**  | Configuring this is not supported by the official MongoDB driver anymore. |
-| `outputbuffer_processor_threads_max_pool_size` | **removed**  | This setting has been removed because it was not effective.               |
-| `outputbuffer_processor_keep_alive_time`       | **removed**  | This setting has been removed because it was not effective.               |
-
 ## Behaviour Changes
 
-- The Prometheus metrics for Graylog inputs were previously only exposed for
-  inputs of type `GELFHttpInput`. They are now exposed for all configured inputs
-  and labeled accordingly. To support this, the default prometheus mappings for
-  the following metrics have been changed: 
-  - `input_empty_messages`
-  - `input_incoming_messages`
-  - `input_open_connections`
-  - `input_raw_size`
-  - `input_read_bytes_one_sec`
-  - `input_read_bytes_total`
-  - `input_total_connections`
-  - `input_written_bytes_one_sec`
-  - `input_written_bytes_total`
-- The `system_messages` collection in MongoDB will be created as a 50MB capped collection going forward.
-  This happens at creation, so existing `system_messages` collections remain unconstrained.
-<br>You can manually convert your existing collection to a capped collection by following 
-these [instructions](https://www.mongodb.com/docs/manual/core/capped-collections/#convert-a-collection-to-capped).
-- Introducing new archive config parameter `retentionTime` in days. 
-  Archives exceeding the specified retention time are automatically deleted. 
-  By default the behavior is unchanged: archives are retained indefinitely. 
-- Introducing new input config option `encoding`, enabling users to override the default
-UTF-8 encoding. 
-<br>Note that this encoding is applied to all messages received by the input. A single input
-cannot handle multiple log sources with different encodings.
-- The permissions for which options are populated in the System dropdown menu were updated to more closely match the page that they link to. See [graylog2-server#13188](https://github.com/Graylog2/graylog2-server/pull/13188) for details.
-The Page permissions remain unchanged but this could affect the workflow for users with legacy permissions.
-- Newly created aggregation widgets will now have rollup disabled by default. Existing widgets are unchanged.
-
-### Changed archived default path
-On new Graylog installations, the default archiving configuration will now 
-store archives under the `data_dir` instead of `/tmp/graylog-archives`. 
-(The `data_dir` is configured in graylog.conf and defaults to `/var/lib/graylog-server`)
-
-### Configuring archive retention Time and max value
-It is now possible to configure default archive retention time and a limit via config flags:
-`default_archive_retention_time` & `max_archive_retention_time` using a duration in days. e.g. 365d.
-
-## Microsoft Teams Notification Template Changes
-Microsoft Teams notification template parsing no longer parses each line in the template and tries to form a key-value
-pair using a colon delimiter. This will result in Teams notifications with a templated custom message lacking any
-formatting. Existing custom templates should be updated to use HTML or Markdown in order to display properly. If using
-the old default template, it can be replaced with the one found when creating a new Teams notification. It can also be
-found in this [pull request](https://github.com/Graylog2/graylog-plugin-integrations/pull/1202).
-
-# New Functionality
-
-## Sidecar
-The Sidecar Administration UI now allows the assignment of multiple configurations
-for a single collector.
-Please note that this feature requires a Sidecar with version 1.3 or greater.
-Older versions will only run a single (random) configuration per collector.
-
-
+The `JSON path value from HTTP API` input will now only run on the leader node,
+if the `Global` option has been selected in the input configuration.
+Previously, the input was started on all nodes in the cluster.

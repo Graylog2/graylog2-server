@@ -23,6 +23,7 @@ import SearchFilterBanner from 'views/components/searchbar/SearchFilterBanner';
 import type { SearchBarControl } from 'views/types';
 import Store from 'logic/local-storage/Store';
 import useFeature from 'hooks/useFeature';
+import { SEARCH_BAR_GAP } from 'views/components/searchbar/SearchBarLayout';
 
 export const PLUGGABLE_CONTROLS_HIDDEN_KEY = 'pluggableSearchBarControlsAreHidden';
 
@@ -30,7 +31,7 @@ const Container = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 10px;
+  gap: ${SEARCH_BAR_GAP};
 `;
 
 const usePluggableControls = () => {

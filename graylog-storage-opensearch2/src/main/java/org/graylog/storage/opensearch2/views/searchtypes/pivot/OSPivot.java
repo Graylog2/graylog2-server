@@ -17,7 +17,6 @@
 package org.graylog.storage.opensearch2.views.searchtypes.pivot;
 
 import com.google.common.collect.ImmutableList;
-import one.util.streamex.EntryStream;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
@@ -78,7 +77,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         contextMap.put(pivot.id(), aggTypes);
 
         // add global rollup series if those were requested
-        if (pivot.rollup()) {
+        if (pivot.rollup() || (pivot.rowGroups().isEmpty() && pivot.columnGroups().isEmpty())) {
             seriesStream(pivot, queryContext, "global rollup")
                     .forEach(searchSourceBuilder::aggregation);
         }
@@ -169,8 +168,10 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
     }
 
     private Stream<AggregationBuilder> seriesStream(Pivot pivot, OSGeneratedQueryContext queryContext, String reason) {
-        return EntryStream.of(pivot.series())
-                .mapKeyValue((integer, seriesSpec) -> {
+        return pivot.series()
+                .stream()
+                .distinct()
+                .map((seriesSpec) -> {
                     final String seriesName = queryContext.seriesName(seriesSpec, pivot);
                     LOG.debug("Adding {} series '{}' with name '{}'", reason, seriesSpec.type(), seriesName);
                     final OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> esPivotSeriesSpecHandler = seriesHandlers.get(seriesSpec.type());
