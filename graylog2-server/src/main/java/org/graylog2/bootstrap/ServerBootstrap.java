@@ -47,6 +47,7 @@ import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.system.FilePersistedNodeId;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.FreshInstallDetectionModule;
 import org.graylog2.shared.bindings.GenericBindings;
@@ -209,12 +210,12 @@ public abstract class ServerBootstrap extends CmdLineTool {
     @Override
     protected void startCommand() {
         final AuditEventSender auditEventSender = injector.getInstance(AuditEventSender.class);
-        final NodeId nodeId = injector.getInstance(NodeId.class);
+        final NodeId nodeId = injector.getInstance(FilePersistedNodeId.class);
         final String systemInformation = Tools.getSystemInformation();
         final Map<String, Object> auditEventContext = ImmutableMap.of(
                 "version", version.toString(),
                 "java", systemInformation,
-                "node_id", nodeId.toString()
+                "node_id", nodeId.getNodeId()
         );
         auditEventSender.success(AuditActor.system(nodeId), NODE_STARTUP_INITIATE, auditEventContext);
 

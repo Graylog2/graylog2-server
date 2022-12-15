@@ -159,7 +159,7 @@ public class EmailSender {
         final Set<String> recipientsSet = emailRecipients.getEmailRecipients();
         if (recipientsSet.size() == 0) {
             final Notification notification = notificationService.buildNow()
-                    .addNode(nodeId.toString())
+                    .addNode(nodeId.getNodeId())
                     .addType(Notification.Type.GENERIC)
                     .addSeverity(Notification.Severity.NORMAL)
                     .addDetail("title", "No recipients have been defined!")

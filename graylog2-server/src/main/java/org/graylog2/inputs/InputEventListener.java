@@ -26,7 +26,6 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.plugin.system.NodeIdentifier;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
@@ -44,7 +43,7 @@ public class InputEventListener {
     private final InputLauncher inputLauncher;
     private final InputRegistry inputRegistry;
     private final InputService inputService;
-    private final NodeIdentifier nodeId;
+    private final NodeId nodeId;
     private final LeaderElectionService leaderElectionService;
     private final PersistedInputs persistedInputs;
     private final ServerStatus serverStatus;
@@ -54,7 +53,7 @@ public class InputEventListener {
                               InputLauncher inputLauncher,
                               InputRegistry inputRegistry,
                               InputService inputService,
-                              NodeIdentifier nodeId,
+                              NodeId nodeId,
                               LeaderElectionService leaderElectionService,
                               PersistedInputs persistedInputs,
                               ServerStatus serverStatus) {

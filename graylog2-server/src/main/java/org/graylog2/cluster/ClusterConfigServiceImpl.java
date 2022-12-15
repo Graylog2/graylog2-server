@@ -27,7 +27,6 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.plugin.system.NodeIdentifier;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.utilities.AutoValueUtils;
 import org.joda.time.DateTime;
@@ -53,7 +52,7 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
     static final String COLLECTION_NAME = "cluster_config";
 
     private final JacksonDBCollection<ClusterConfig, String> dbCollection;
-    private final NodeIdentifier nodeId;
+    private final NodeId nodeId;
     private final ObjectMapper objectMapper;
     private final ChainingClassLoader chainingClassLoader;
     private final EventBus clusterEventBus;
@@ -61,7 +60,7 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
     @Inject
     public ClusterConfigServiceImpl(final MongoJackObjectMapperProvider mapperProvider,
                                     final MongoConnection mongoConnection,
-                                    final NodeIdentifier nodeId,
+                                    final NodeId nodeId,
                                     final ChainingClassLoader chainingClassLoader,
                                     final ClusterEventBus clusterEventBus) {
         this(JacksonDBCollection.wrap(prepareCollection(mongoConnection), ClusterConfig.class, String.class, mapperProvider.get()),
@@ -69,7 +68,7 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
     }
 
     private ClusterConfigServiceImpl(final JacksonDBCollection<ClusterConfig, String> dbCollection,
-                                     final NodeIdentifier nodeId,
+                                     final NodeId nodeId,
                                      final ObjectMapper objectMapper,
                                      final ChainingClassLoader chainingClassLoader,
                                      final EventBus clusterEventBus) {

@@ -23,7 +23,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import io.prometheus.client.dropwizard.samplebuilder.MapperConfig;
-import org.graylog2.plugin.system.NodeIdentifier;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.inputs.MessageInputFactory;
 
 import javax.inject.Inject;
@@ -35,11 +35,11 @@ public class InputMetricMapping implements MetricMapping {
     public static final String TYPE = "input_metric";
 
     private final MessageInputFactory messageInputFactory;
-    private final NodeIdentifier nodeId;
+    private final NodeId nodeId;
     private final Config config;
 
     @Inject
-    public InputMetricMapping(MessageInputFactory messageInputFactory, NodeIdentifier nodeId, @Assisted MetricMapping.Config config) {
+    public InputMetricMapping(MessageInputFactory messageInputFactory, NodeId nodeId, @Assisted MetricMapping.Config config) {
         this.messageInputFactory = messageInputFactory;
         this.nodeId = nodeId;
         this.config = (Config) config;

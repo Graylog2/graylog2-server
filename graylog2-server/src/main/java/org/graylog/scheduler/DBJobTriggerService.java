@@ -27,7 +27,7 @@ import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.plugin.system.NodeIdentifier;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.utilities.MongoQueryUtils;
 import org.joda.time.DateTime;
 import org.mongojack.DBCursor;
@@ -88,7 +88,7 @@ public class DBJobTriggerService {
     @Inject
     public DBJobTriggerService(MongoConnection mongoConnection,
                                MongoJackObjectMapperProvider mapper,
-                               NodeIdentifier nodeId,
+                               NodeId nodeId,
                                JobSchedulerClock clock,
                                SchedulerCapabilitiesService schedulerCapabilitiesService,
                                @Named(LOCK_EXPIRATION_DURATION) Duration lockExpirationDuration) {

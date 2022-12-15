@@ -27,7 +27,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.validators.ValidationResult;
 import org.graylog2.plugin.database.validators.Validator;
-import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.FilePersistedNodeId;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,7 +118,7 @@ class MigrationDashboardService {
             }
 
             // Our own NodeID
-            if (x.getValue() instanceof NodeId) {
+            if (x.getValue() instanceof FilePersistedNodeId) {
                 doc.put(x.getKey(), x.getValue().toString());
             }
 

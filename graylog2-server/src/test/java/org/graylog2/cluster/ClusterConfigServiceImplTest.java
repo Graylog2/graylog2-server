@@ -29,7 +29,6 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.plugin.system.NodeIdentifier;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.joda.time.DateTime;
@@ -39,7 +38,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -48,7 +46,6 @@ import java.util.Collections;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 public class ClusterConfigServiceImplTest {
     @Rule
@@ -62,7 +59,7 @@ public class ClusterConfigServiceImplTest {
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-    private final NodeIdentifier nodeId = () -> "ID";
+    private final NodeId nodeId = () -> "ID";
     @Spy
     private ClusterEventBus clusterEventBus;
     private MongoConnection mongoConnection;

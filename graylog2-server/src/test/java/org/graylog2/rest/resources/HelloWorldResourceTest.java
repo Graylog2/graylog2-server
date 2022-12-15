@@ -20,7 +20,6 @@ import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.plugin.system.NodeIdentifier;
 import org.graylog2.rest.models.HelloWorldResponse;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,7 +41,7 @@ public class HelloWorldResourceTest extends RestResourceBaseTest {
 
     @Before
     public void setUp() throws Exception {
-        NodeIdentifier nodeId = () -> CK_NODE_ID;
+        NodeId nodeId = () -> CK_NODE_ID;
         this.clusterConfigService = mock(ClusterConfigService.class);
         this.helloWorldResource = new HelloWorldResource(nodeId, clusterConfigService);
 

@@ -22,7 +22,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.system.NodeIdentifier;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
@@ -54,7 +54,7 @@ public class InputEventListenerTest {
     private InputRegistry inputRegistry;
     @Mock
     private InputService inputService;
-    private final NodeIdentifier nodeId = () -> "node-id";
+    private final NodeId nodeId = () -> "node-id";
     private InputEventListener listener;
     @Mock
     private LeaderElectionService leaderElectionService;

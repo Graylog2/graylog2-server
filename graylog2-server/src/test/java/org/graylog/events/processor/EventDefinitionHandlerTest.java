@@ -37,13 +37,11 @@ import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScope;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.plugin.system.NodeIdentifier;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -68,7 +66,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 public class EventDefinitionHandlerTest {
     public static final Set<EntityScope> ENTITY_SCOPES = Collections.singleton(new DefaultEntityScope());
@@ -82,7 +79,7 @@ public class EventDefinitionHandlerTest {
 
     @Mock
     private DBEventProcessorStateService stateService;
-    private final NodeIdentifier nodeId = () -> "abc-123";
+    private final NodeId nodeId = () -> "abc-123";
 
     @Mock
     private SchedulerCapabilitiesService schedulerCapabilitiesService;

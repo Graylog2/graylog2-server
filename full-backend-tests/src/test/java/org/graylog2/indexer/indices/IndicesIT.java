@@ -49,7 +49,7 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.indexer.searches.IndexRangeStats;
-import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.FilePersistedNodeId;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -125,7 +125,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
                 ImmutableMap.of(MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE, new MessageIndexTemplateProvider()));
         indices = new Indices(
                 indexMappingFactory,
-                mock(NodeId.class),
+                mock(FilePersistedNodeId.class),
                 new NullAuditEventSender(),
                 eventBus,
                 searchServer().adapters().indicesAdapter()
@@ -381,7 +381,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
 
         indices = new Indices(
                 createThrowingIndexMappingFactory(indexSetConfig),
-                mock(NodeId.class),
+                mock(FilePersistedNodeId.class),
                 new NullAuditEventSender(),
                 eventBus,
                 searchServer().adapters().indicesAdapter());
@@ -413,7 +413,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
 
         indices = new Indices(
                 createThrowingIndexMappingFactory(indexSetConfig),
-                mock(NodeId.class),
+                mock(FilePersistedNodeId.class),
                 new NullAuditEventSender(),
                 eventBus,
                 searchServer().adapters().indicesAdapter());

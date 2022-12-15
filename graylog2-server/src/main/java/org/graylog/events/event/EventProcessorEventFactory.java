@@ -22,7 +22,6 @@ import org.graylog.util.HostnameProvider;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.plugin.system.NodeIdentifier;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -44,7 +43,7 @@ public class EventProcessorEventFactory implements EventFactory {
 
     // Used in some tests in another repository.
     @Deprecated
-    public EventProcessorEventFactory(ULID ulid, NodeService nodeService, NodeIdentifier nodeId) {
+    public EventProcessorEventFactory(ULID ulid, NodeService nodeService, NodeId nodeId) {
         this.ulid = ulid;
         try {
             // TODO: This can fail depending on when it's called. Check if we can load it in create() and cache it

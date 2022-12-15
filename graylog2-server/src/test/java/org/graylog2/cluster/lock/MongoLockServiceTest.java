@@ -20,7 +20,6 @@ import com.mongodb.client.ListIndexesIterable;
 import org.bson.Document;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.plugin.system.NodeIdentifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +35,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.graylog2.cluster.lock.Lock.FIELD_UPDATED_AT;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public abstract class MongoLockServiceTest {
 
@@ -44,7 +42,7 @@ public abstract class MongoLockServiceTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
-        final NodeIdentifier nodeId = () -> "some-node-id";
+        final NodeId nodeId = () -> "some-node-id";
         lockService = new MongoLockService(nodeId, mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL);
     }
 
@@ -79,7 +77,7 @@ public abstract class MongoLockServiceTest {
 
     @Test
     void alreadyTaken(MongoDBTestService mongodb) {
-        NodeIdentifier nodeId = () -> "other-node-id";
+        NodeId nodeId = () -> "other-node-id";
         new MongoLockService(nodeId, mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL).lock("test-resource", null)
                 .orElseThrow(() -> new IllegalStateException("Unable to create original lock."));
 
@@ -90,7 +88,7 @@ public abstract class MongoLockServiceTest {
 
     @Test
     void unlock(MongoDBTestService mongodb) {
-        NodeIdentifier nodeId = () -> "other-node-id";
+        NodeId nodeId = () -> "other-node-id";
         final MongoLockService otherNodesLockService =
                 new MongoLockService(nodeId, mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL);
 
@@ -109,7 +107,7 @@ public abstract class MongoLockServiceTest {
 
     @Test
     void unlockWithLock(MongoDBTestService mongodb) {
-        final NodeIdentifier nodeId = () -> "other-node-id";
+        final NodeId nodeId = () -> "other-node-id";
         final MongoLockService otherNodesLockService =
                 new MongoLockService(nodeId, mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL);
 
@@ -133,7 +131,7 @@ public abstract class MongoLockServiceTest {
 
     @Test
     void ensureTTLIndex(MongoDBTestService mongodb) {
-        NodeIdentifier nodeId = () -> "node-id";
+        NodeId nodeId = () -> "node-id";
         new MongoLockService(nodeId, mongodb.mongoConnection(), Duration.ofSeconds(72));
 
         final ListIndexesIterable<Document> indices = mongodb.mongoCollection(MongoLockService.COLLECTION_NAME).listIndexes();

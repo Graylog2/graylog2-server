@@ -111,7 +111,7 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
     public boolean publishIfFirst(Notification notification) {
         // node id should never be empty
         if (notification.getNodeId() == null) {
-            notification.addNode(nodeId.toString());
+            notification.addNode(nodeId.getNodeId());
         }
 
         // also the timestamp should never be empty

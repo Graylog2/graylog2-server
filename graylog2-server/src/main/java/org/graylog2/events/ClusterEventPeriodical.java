@@ -32,7 +32,6 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.plugin.system.NodeIdentifier;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.utilities.AutoValueUtils;
 import org.mongojack.DBCursor;
@@ -54,7 +53,7 @@ public class ClusterEventPeriodical extends Periodical {
     static final String COLLECTION_NAME = "cluster_events";
 
     private final JacksonDBCollection<ClusterEvent, String> dbCollection;
-    private final NodeIdentifier nodeId;
+    private final NodeId nodeId;
     private final ObjectMapper objectMapper;
     private final EventBus serverEventBus;
     private final ChainingClassLoader chainingClassLoader;
@@ -62,7 +61,7 @@ public class ClusterEventPeriodical extends Periodical {
     @Inject
     public ClusterEventPeriodical(final MongoJackObjectMapperProvider mapperProvider,
                                   final MongoConnection mongoConnection,
-                                  final NodeIdentifier nodeId,
+                                  final NodeId nodeId,
                                   final ChainingClassLoader chainingClassLoader,
                                   final EventBus serverEventBus,
                                   final ClusterEventBus clusterEventBus) {
@@ -71,7 +70,7 @@ public class ClusterEventPeriodical extends Periodical {
     }
 
     private ClusterEventPeriodical(final JacksonDBCollection<ClusterEvent, String> dbCollection,
-                           final NodeIdentifier nodeId,
+                           final NodeId nodeId,
                            final ObjectMapper objectMapper,
                            final ChainingClassLoader chainingClassLoader,
                            final EventBus serverEventBus,
@@ -176,7 +175,7 @@ public class ClusterEventPeriodical extends Periodical {
         }
 
         final String className = AutoValueUtils.getCanonicalName(event.getClass());
-        final ClusterEvent clusterEvent = ClusterEvent.create(nodeId.toString(), className, Collections.singleton(nodeId.toString()), event);
+        final ClusterEvent clusterEvent = ClusterEvent.create(nodeId.getNodeId(), className, Collections.singleton(nodeId.getNodeId()), event);
 
         try {
             final String id = dbCollection.save(clusterEvent, WriteConcern.JOURNALED).getSavedId();
@@ -190,7 +189,7 @@ public class ClusterEventPeriodical extends Periodical {
         }
     }
 
-    private DBCursor<ClusterEvent> eventCursor(NodeIdentifier nodeId) {
+    private DBCursor<ClusterEvent> eventCursor(NodeId nodeId) {
         // Resorting to ugly MongoDB Java Client because of https://github.com/devbliss/mongojack/issues/88
         final BasicDBList consumersList = new BasicDBList();
         consumersList.add(nodeId.getNodeId());
@@ -199,7 +198,7 @@ public class ClusterEventPeriodical extends Periodical {
         return dbCollection.find(query).sort(DBSort.asc("timestamp"));
     }
 
-    private void updateConsumers(final String eventId, final NodeIdentifier nodeId) {
+    private void updateConsumers(final String eventId, final NodeId nodeId) {
         dbCollection.updateById(eventId, DBUpdate.addToSet("consumers", nodeId.getNodeId()));
     }
 

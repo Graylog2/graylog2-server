@@ -22,7 +22,6 @@ import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.plugin.system.NodeIdentifier;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,7 +32,6 @@ import org.mockito.junit.MockitoRule;
 import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 public class NodeServiceImplTest {
     @Rule
@@ -48,7 +46,7 @@ public class NodeServiceImplTest {
 
     @Mock
     private Configuration configuration;
-    private final NodeIdentifier nodeId = () -> NODE_ID;
+    private final NodeId nodeId = () -> NODE_ID;
 
     private NodeService nodeService;
 
@@ -64,7 +62,7 @@ public class NodeServiceImplTest {
                 .describedAs("The collection should be empty")
                 .isEmpty();
 
-        nodeService.registerServer(nodeId.toString(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME);
+        nodeService.registerServer(nodeId.getNodeId(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME);
 
         final Node node = nodeService.byNodeId(nodeId);
 
@@ -83,7 +81,7 @@ public class NodeServiceImplTest {
                 .describedAs("There should be one existing node")
                 .isEqualTo(NODE_ID);
 
-        nodeService.registerServer(nodeId.toString(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME);
+        nodeService.registerServer(nodeId.getNodeId(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME);
 
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongodb.mongoConnection().getDatabase().getCollection("nodes");

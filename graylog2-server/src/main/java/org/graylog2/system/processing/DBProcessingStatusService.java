@@ -29,7 +29,6 @@ import org.graylog2.database.MongoDBUpsertRetryer;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.plugin.system.NodeIdentifier;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.DBCursor;
@@ -60,7 +59,7 @@ public class DBProcessingStatusService {
 
     @Inject
     public DBProcessingStatusService(MongoConnection mongoConnection,
-                                     NodeIdentifier nodeId,
+                                     NodeId nodeId,
                                      JobSchedulerClock clock,
                                      @Named(ProcessingStatusConfig.UPDATE_THRESHOLD) Duration updateThreshold,
                                      @Named(ProcessingStatusConfig.JOURNAL_WRITE_RATE_THRESHOLD) int journalWriteRateThreshold,

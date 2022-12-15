@@ -26,7 +26,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import io.prometheus.client.dropwizard.samplebuilder.MapperConfig;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.plugin.system.NodeIdentifier;
 
 import javax.inject.Inject;
 import java.util.Collections;
@@ -38,11 +37,11 @@ import java.util.Set;
 public class MetricMatchMapping implements MetricMapping {
     public static final String TYPE = "metric_match";
 
-    private final NodeIdentifier nodeId;
+    private final NodeId nodeId;
     private final Config config;
 
     @Inject
-    public MetricMatchMapping(NodeIdentifier nodeId, @Assisted MetricMapping.Config config) {
+    public MetricMatchMapping(NodeId nodeId, @Assisted MetricMapping.Config config) {
         this.nodeId = nodeId;
         this.config = (Config) config;
     }

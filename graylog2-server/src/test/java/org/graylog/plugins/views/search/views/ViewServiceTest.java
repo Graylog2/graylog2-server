@@ -26,7 +26,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.FilePersistedNodeId;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.plugins.ChainingClassLoader;
@@ -65,7 +65,7 @@ public class ViewServiceTest {
         this.clusterConfigService = new ClusterConfigServiceImpl(
                 objectMapperProvider,
                 mongodb.mongoConnection(),
-                mock(NodeId.class),
+                mock(FilePersistedNodeId.class),
                 new ChainingClassLoader(getClass().getClassLoader()),
                 new ClusterEventBus()
         );

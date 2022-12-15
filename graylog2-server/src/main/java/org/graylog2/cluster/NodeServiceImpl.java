@@ -26,7 +26,6 @@ import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.plugin.system.NodeIdentifier;
 
 import javax.inject.Inject;
 import java.net.URI;
@@ -81,7 +80,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     }
 
     @Override
-    public Node byNodeId(NodeIdentifier nodeId) throws NodeNotFoundException {
+    public Node byNodeId(NodeId nodeId) throws NodeNotFoundException {
         return byNodeId(nodeId.getNodeId());
     }
 
@@ -147,7 +146,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
         BasicDBObject query = new BasicDBObject();
         query.put("type", Node.Type.SERVER.toString());
         query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp() - pingTimeout));
-        query.put("node_id", new BasicDBObject("$ne", nodeId.toString()));
+        query.put("node_id", new BasicDBObject("$ne", nodeId.getNodeId()));
         query.put("is_leader", true);
 
         return query(NodeImpl.class, query).size() == 0;
