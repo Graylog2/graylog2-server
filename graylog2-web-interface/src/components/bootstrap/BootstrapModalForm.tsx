@@ -32,7 +32,7 @@ type Props = {
   submitButtonText: string,
   onSubmitForm: (event) => void,
   onCancel: () => void,
-  title: string,
+  title: string|React.ReactNode,
   children: React.ReactNode,
 };
 
