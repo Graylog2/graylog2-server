@@ -81,7 +81,7 @@ public class NodeId {
         return generated;
     }
 
-    private void persist(String nodeId) throws IOException {
+    protected void persist(String nodeId) throws IOException {
         FileUtils.writeStringToFile(new File(filename), nodeId, StandardCharsets.UTF_8);
     }
 
