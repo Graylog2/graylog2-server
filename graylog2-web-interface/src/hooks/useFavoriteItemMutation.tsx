@@ -37,22 +37,16 @@ const deleteFavoriteItem = (id: string) => {
 
 const useFavoriteItemMutation = () => {
   const putMutation = useMutation(putFavoriteItem, {
-    onSuccess: async () => {
-      UserNotification.success('Item added to favorite successfully.', 'Success');
-    },
     onError: (errorThrown) => {
       UserNotification.error(`Adding item to favorites failed with status: ${errorThrown}`,
-        'Could not add item to favorite');
+        'Could not add item to favorites');
     },
   });
 
   const deleteMutation = useMutation(deleteFavoriteItem, {
-    onSuccess: async () => {
-      UserNotification.success('Item deleted from favorite successfully.', 'Success');
-    },
     onError: (errorThrown) => {
       UserNotification.error(`Deleting item from favorites failed with status: ${errorThrown}`,
-        'Could not delete item from favorite');
+        'Could not delete item from favorites');
     },
   });
 
