@@ -22,7 +22,7 @@ import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import { SavedSearchesActions } from 'views/stores/SavedSearchesStore';
 
-import SavedSearchList from './SavedSearchList';
+import SavedSearchesModal from './SavedSearchesModal';
 
 const createPaginatedSearches = (count = 1) => {
   const views: Array<View> = [];
@@ -60,15 +60,15 @@ jest.mock('views/stores/SavedSearchesStore', () => ({
   },
 }));
 
-describe('SavedSearchList', () => {
-  describe('render the SavedSearchList', () => {
+describe('SavedSearchesModal', () => {
+  describe('render the SavedSearchesModal', () => {
     it('should render empty', async () => {
       const views = createPaginatedSearches(0);
       asMock(SavedSearchesActions.search).mockReturnValueOnce(views);
 
-      render(<SavedSearchList toggleModal={() => {}}
-                              deleteSavedSearch={() => Promise.resolve(views[0])}
-                              activeSavedSearchId="search-id-0" />);
+      render(<SavedSearchesModal toggleModal={() => {}}
+                                 deleteSavedSearch={() => Promise.resolve(views[0])}
+                                 activeSavedSearchId="search-id-0" />);
 
       await screen.findByText('No saved searches found.');
     });
@@ -77,9 +77,9 @@ describe('SavedSearchList', () => {
       const views = createPaginatedSearches(2);
       asMock(SavedSearchesActions.search).mockReturnValueOnce(views);
 
-      render(<SavedSearchList toggleModal={() => {}}
-                              deleteSavedSearch={() => Promise.resolve(views[0])}
-                              activeSavedSearchId="search-id-0" />);
+      render(<SavedSearchesModal toggleModal={() => {}}
+                                 deleteSavedSearch={() => Promise.resolve(views[0])}
+                                 activeSavedSearchId="search-id-0" />);
 
       await screen.findByText('search-title-0');
       await screen.findByText('search-title-1');
@@ -89,9 +89,9 @@ describe('SavedSearchList', () => {
       const onToggleModal = jest.fn();
       const views = createPaginatedSearches(1);
       asMock(SavedSearchesActions.search).mockReturnValueOnce(views);
-      const { getByText } = render(<SavedSearchList toggleModal={onToggleModal}
-                                                    deleteSavedSearch={() => Promise.resolve(views[0])}
-                                                    activeSavedSearchId="search-id-0" />);
+      const { getByText } = render(<SavedSearchesModal toggleModal={onToggleModal}
+                                                       deleteSavedSearch={() => Promise.resolve(views[0])}
+                                                       activeSavedSearchId="search-id-0" />);
 
       await screen.findByText('search-title-0');
 
@@ -108,9 +108,9 @@ describe('SavedSearchList', () => {
       asMock(SavedSearchesActions.search).mockReturnValueOnce(views);
       const onDelete = jest.fn(() => Promise.resolve(views[0]));
 
-      render(<SavedSearchList toggleModal={() => {}}
-                              deleteSavedSearch={onDelete}
-                              activeSavedSearchId="search-id-0" />);
+      render(<SavedSearchesModal toggleModal={() => {}}
+                                 deleteSavedSearch={onDelete}
+                                 activeSavedSearchId="search-id-0" />);
 
       await screen.findByText('search-title-0');
       const deleteBtn = screen.getByTitle('Delete search search-title-0');
@@ -129,9 +129,9 @@ describe('SavedSearchList', () => {
 
       render(
         <ViewLoaderContext.Provider value={onLoad}>
-          <SavedSearchList toggleModal={() => {}}
-                           deleteSavedSearch={() => Promise.resolve(views[0])}
-                           activeSavedSearchId="search-id-0" />
+          <SavedSearchesModal toggleModal={() => {}}
+                              deleteSavedSearch={() => Promise.resolve(views[0])}
+                              activeSavedSearchId="search-id-0" />
         </ViewLoaderContext.Provider>,
       );
 
