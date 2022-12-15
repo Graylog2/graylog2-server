@@ -37,8 +37,12 @@ const StyledIcon = styled(Icon)`
   margin-left: 6px;
 `;
 
-const buildSearchLink = (timerange, query, streams) => SearchLink.builder()
-  .query(createElasticsearchQueryString(query))
+const buildSearchLink = (
+  timerange: TimeRange,
+  queryString: string,
+  streams: Array<string>,
+) => SearchLink.builder()
+  .query(createElasticsearchQueryString(queryString))
   .timerange(timerange)
   .streams(streams)
   .build()
