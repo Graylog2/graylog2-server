@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useContext } from 'react';
 import styled from 'styled-components';
 
-import { IconButton } from 'components/common';
+import { IconButton, Icon } from 'components/common';
 import SearchLink from 'components/search/SearchLink';
 import type { TimeRange } from 'views/logic/queries/Query';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
@@ -26,12 +26,18 @@ import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import DrilldownContext from '../contexts/DrilldownContext';
 
 const NeutralLink = styled.a`
+  display: inline-flex;
+  align-items: center;
   color: inherit;
   text-decoration: none;
 
   &:visited {
     color: inherit;
   }
+`;
+
+const StyledIcon = styled(Icon)`
+  margin-left: 6px;
 `;
 
 const buildSearchLink = (timerange, query, streams) => SearchLink.builder()
@@ -45,9 +51,10 @@ type Props = {
   query?: string | undefined,
   timerange?: TimeRange | undefined,
   streams?: string[] | undefined,
+  children?: React.ReactNode,
 };
 
-const ReplaySearchButton = ({ query: queryProp, timerange: timerangeProp, streams: streamsProp }: Props) => {
+const ReplaySearchButton = ({ query: queryProp, timerange: timerangeProp, streams: streamsProp, children }: Props) => {
   const { query, timerange, streams } = useContext(DrilldownContext);
   let searchLink;
 
@@ -59,7 +66,9 @@ const ReplaySearchButton = ({ query: queryProp, timerange: timerangeProp, stream
 
   return (
     <NeutralLink href={searchLink} target="_blank" rel="noopener noreferrer" title="Replay search">
-      <IconButton name="play" focusable={false} />
+      {children
+        ? <>{children} <StyledIcon name="play" /></>
+        : <IconButton name="play" focusable={false} />}
     </NeutralLink>
   );
 };
@@ -68,6 +77,7 @@ ReplaySearchButton.defaultProps = {
   query: undefined,
   timerange: undefined,
   streams: undefined,
+  children: undefined,
 };
 
 export default ReplaySearchButton;
