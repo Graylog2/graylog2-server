@@ -17,10 +17,8 @@
 package org.graylog2.plugin.journal;
 
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.system.FilePersistedNodeId;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -32,8 +30,7 @@ public class RawMessageTest {
     @Test
     public void minimalEncodeDecode() throws IOException {
         final RawMessage rawMessage = new RawMessage("testmessage".getBytes(StandardCharsets.UTF_8));
-        final File tempFile = File.createTempFile("node", "test");
-        rawMessage.addSourceNode("inputid", new FilePersistedNodeId(tempFile.getAbsolutePath()));
+        rawMessage.addSourceNode("inputid", () -> "node-id");
         rawMessage.setCodecName("raw");
         rawMessage.setCodecConfig(Configuration.EMPTY_CONFIGURATION);
 

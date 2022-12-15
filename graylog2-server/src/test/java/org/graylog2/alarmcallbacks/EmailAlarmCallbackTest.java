@@ -24,7 +24,6 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.system.FilePersistedNodeId;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.users.UserService;
 import org.junit.Before;
@@ -45,7 +44,7 @@ public class EmailAlarmCallbackTest {
 
     private AlertSender alertSender = mock(AlertSender.class);
     private NotificationService notificationService = mock(NotificationService.class);
-    private NodeId nodeId = mock(FilePersistedNodeId.class);
+    private NodeId nodeId = () -> "node-id";
     private EmailRecipients.Factory emailRecipientsFactory = mock(EmailRecipients.Factory.class);
     private UserService userService = mock(UserService.class);
     private EmailConfiguration emailConfiguration = mock(EmailConfiguration.class);
