@@ -40,6 +40,7 @@ import { WidgetActions } from 'views/stores/WidgetStore';
 import { useStore } from 'stores/connect';
 import type Widget from 'views/logic/widgets/Widget';
 import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
+import DrilldownContext from 'views/components/contexts/DrilldownContext';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -162,6 +163,7 @@ const WidgetActionsMenu = ({
 }: Props) => {
   const widget = useContext(WidgetContext);
   const view = useStore(ViewStore);
+  const { query, timerange, streams } = useContext(DrilldownContext);
   const { setWidgetFocusing, unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const [showCopyToDashboard, setShowCopyToDashboard] = useState(false);
   const [showExport, setShowExport] = useState(false);
@@ -177,7 +179,9 @@ const WidgetActionsMenu = ({
     <Container>
       <IfInteractive>
         <IfDashboard>
-          <ReplaySearchButton />
+          <ReplaySearchButton queryString={query.query_string}
+                              timerange={timerange}
+                              streams={streams} />
         </IfDashboard>
         {isFocused && (
           <IconButton name="compress-arrows-alt"

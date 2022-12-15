@@ -15,15 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 import styled from 'styled-components';
 
 import { IconButton, Icon } from 'components/common';
 import SearchLink from 'components/search/SearchLink';
 import type { TimeRange } from 'views/logic/queries/Query';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
-
-import DrilldownContext from '../contexts/DrilldownContext';
 
 const NeutralLink = styled.a`
   display: inline-flex;
@@ -48,21 +45,14 @@ const buildSearchLink = (timerange, query, streams) => SearchLink.builder()
   .toURL();
 
 type Props = {
-  query?: string | undefined,
+  queryString?: string | undefined,
   timerange?: TimeRange | undefined,
   streams?: string[] | undefined,
   children?: React.ReactNode,
 };
 
-const ReplaySearchButton = ({ query: queryProp, timerange: timerangeProp, streams: streamsProp, children }: Props) => {
-  const { query, timerange, streams } = useContext(DrilldownContext);
-  let searchLink;
-
-  if (queryProp === undefined && timerangeProp === undefined && streamsProp === undefined) {
-    searchLink = buildSearchLink(timerange, query.query_string, streams);
-  } else {
-    searchLink = buildSearchLink(timerangeProp, queryProp, streamsProp);
-  }
+const ReplaySearchButton = ({ queryString, timerange, streams, children }: Props) => {
+  const searchLink = buildSearchLink(timerange, queryString, streams);
 
   return (
     <NeutralLink href={searchLink} target="_blank" rel="noopener noreferrer" title="Replay search">
@@ -74,7 +64,7 @@ const ReplaySearchButton = ({ query: queryProp, timerange: timerangeProp, stream
 };
 
 ReplaySearchButton.defaultProps = {
-  query: undefined,
+  queryString: undefined,
   timerange: undefined,
   streams: undefined,
   children: undefined,

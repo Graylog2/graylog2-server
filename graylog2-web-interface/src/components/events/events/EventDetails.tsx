@@ -88,7 +88,7 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
     }
 
     return (
-      <ReplaySearchButton query={replayInfo.query} timerange={range} streams={streams}>
+      <ReplaySearchButton queryString={replayInfo.query} timerange={range} streams={streams}>
         Replay search
       </ReplaySearchButton>
     );
