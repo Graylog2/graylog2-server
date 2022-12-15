@@ -39,7 +39,7 @@ const FavoriteIcon = ({ isFavorite, id }: Props) => {
       deleteItem(id);
     } else { putItem(id); }
   }, [isFavorite, deleteItem, id, putItem]);
-  const title = isFavorite ? 'Remove from favorite' : 'Add to favorite';
+  const title = isFavorite ? 'Remove from favorites' : 'Add to favorites';
 
   return <StyledIcon onClick={onClick} title={title} $isFavorite={isFavorite} name="star" type={isFavorite ? 'solid' : 'regular'} />;
 };

@@ -34,7 +34,7 @@ describe('FavoriteIcon', () => {
   it('has correct state for favorite', async () => {
     render(<FavoriteIcon isFavorite id="111" />);
 
-    const favIcon = await screen.findByTitle('Remove from favorite');
+    const favIcon = await screen.findByTitle('Remove from favorites');
     fireEvent.click(favIcon);
 
     await expect(deleteItem).toHaveBeenCalledWith('111');
@@ -43,7 +43,7 @@ describe('FavoriteIcon', () => {
   it('has correct state for non-favorite', async () => {
     render(<FavoriteIcon isFavorite={false} id="111" />);
 
-    const favIcon = await screen.findByTitle('Add to favorite');
+    const favIcon = await screen.findByTitle('Add to favorites');
     fireEvent.click(favIcon);
 
     await expect(putItem).toHaveBeenCalledWith('111');
