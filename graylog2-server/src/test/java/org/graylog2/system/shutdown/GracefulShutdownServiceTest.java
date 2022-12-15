@@ -18,6 +18,7 @@ package org.graylog2.system.shutdown;
 
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
@@ -142,6 +143,7 @@ public class GracefulShutdownServiceTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
+    @Disabled("Disabled because it is flaky on Jenkins. Could maybe be fixed by adjusting timeouts.")
     @Test
     @Timeout(1)
     public void registerMany() throws Exception {
