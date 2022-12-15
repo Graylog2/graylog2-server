@@ -31,6 +31,7 @@ import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.NodeIdentifier;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.system.debug.DebugEvent;
@@ -68,8 +69,7 @@ public class ClusterEventPeriodicalTest {
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-    @Mock
-    private NodeId nodeId;
+    private final NodeIdentifier nodeId = () -> "ID";
     @Spy
     private EventBus serverEventBus;
     @Spy
@@ -84,7 +84,6 @@ public class ClusterEventPeriodicalTest {
         this.mongoConnection = mongodb.mongoConnection();
 
         MongoJackObjectMapperProvider provider = new MongoJackObjectMapperProvider(objectMapper);
-        when(nodeId.toString()).thenReturn("ID");
 
         this.clusterEventPeriodical = new ClusterEventPeriodical(
                 provider,

@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.prometheus.client.dropwizard.samplebuilder.MapperConfig;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.NodeIdentifier;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,8 +43,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PrometheusMappingConfigLoaderTest {
-    @Mock
-    NodeId nodeId;
+    NodeIdentifier nodeId = () -> "abc-123";
 
     @Mock
     MessageInputFactory messageInputFactory;
@@ -63,7 +63,6 @@ class PrometheusMappingConfigLoaderTest {
 
     @Test
     void loadBytes() throws Exception {
-        when(nodeId.toString()).thenReturn("abc-123");
 
         final Map<String, ImmutableList<Serializable>> config = Collections.singletonMap("metric_mappings", ImmutableList.of(
                 ImmutableMap.of(
@@ -115,7 +114,6 @@ class PrometheusMappingConfigLoaderTest {
 
     @Test
     void defaultType() throws Exception {
-        when(nodeId.toString()).thenReturn("abc-123");
 
         final Map<String, ImmutableList<Serializable>> config = Collections.singletonMap("metric_mappings",
                 ImmutableList.of(
@@ -130,8 +128,6 @@ class PrometheusMappingConfigLoaderTest {
 
     @Test
     void metricMatchType() throws Exception {
-        when(nodeId.toString()).thenReturn("abc-123");
-
         final Map<String, ImmutableList<Serializable>> config = Collections.singletonMap("metric_mappings",
                 ImmutableList.of(
                         ImmutableMap.of(
@@ -149,7 +145,6 @@ class PrometheusMappingConfigLoaderTest {
 
     @Test
     void inputMetricType() throws Exception {
-        when(nodeId.toString()).thenReturn("abc-123");
         when(messageInputFactory.getAvailableInputs()).thenReturn(
                 ImmutableMap.of("test.input", mock(InputDescription.class)));
 

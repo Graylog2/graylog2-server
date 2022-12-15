@@ -18,6 +18,7 @@ package org.graylog2.cluster;
 
 import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.NodeIdentifier;
 
 import java.net.URI;
 import java.util.Map;
@@ -27,7 +28,7 @@ public interface NodeService extends PersistedService {
 
     Node byNodeId(String nodeId) throws NodeNotFoundException;
 
-    Node byNodeId(NodeId nodeId) throws NodeNotFoundException;
+    Node byNodeId(NodeIdentifier nodeId) throws NodeNotFoundException;
 
     Map<String, Node> allActive(Node.Type type);
 

@@ -20,6 +20,7 @@ import com.mongodb.client.ListIndexesIterable;
 import org.bson.Document;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.NodeIdentifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +44,8 @@ public abstract class MongoLockServiceTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb) {
-        lockService = new MongoLockService(mockNodeId("some-node-id"), mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL);
+        final NodeIdentifier nodeId = () -> "some-node-id";
+        lockService = new MongoLockService(nodeId, mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL);
     }
 
     @Test
@@ -77,7 +79,8 @@ public abstract class MongoLockServiceTest {
 
     @Test
     void alreadyTaken(MongoDBTestService mongodb) {
-        new MongoLockService(mockNodeId("other-node-id"), mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL).lock("test-resource", null)
+        NodeIdentifier nodeId = () -> "other-node-id";
+        new MongoLockService(nodeId, mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL).lock("test-resource", null)
                 .orElseThrow(() -> new IllegalStateException("Unable to create original lock."));
 
         final Optional<Lock> lock = lockService.lock("test-resource", null);
@@ -87,8 +90,9 @@ public abstract class MongoLockServiceTest {
 
     @Test
     void unlock(MongoDBTestService mongodb) {
+        NodeIdentifier nodeId = () -> "other-node-id";
         final MongoLockService otherNodesLockService =
-                new MongoLockService(mockNodeId("other-node-id"), mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL);
+                new MongoLockService(nodeId, mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL);
 
         final Lock orig = otherNodesLockService.lock("test-resource", null)
                 .orElseThrow(() -> new IllegalStateException("Unable to create original lock."));
@@ -105,8 +109,9 @@ public abstract class MongoLockServiceTest {
 
     @Test
     void unlockWithLock(MongoDBTestService mongodb) {
+        final NodeIdentifier nodeId = () -> "other-node-id";
         final MongoLockService otherNodesLockService =
-                new MongoLockService(mockNodeId("other-node-id"), mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL);
+                new MongoLockService(nodeId, mongodb.mongoConnection(), MongoLockService.MIN_LOCK_TTL);
 
         final Lock orig = otherNodesLockService.lock("test-resource", null)
                 .orElseThrow(() -> new IllegalStateException("Unable to create original lock."));
@@ -128,7 +133,8 @@ public abstract class MongoLockServiceTest {
 
     @Test
     void ensureTTLIndex(MongoDBTestService mongodb) {
-        new MongoLockService(mockNodeId("node-id"), mongodb.mongoConnection(), Duration.ofSeconds(72));
+        NodeIdentifier nodeId = () -> "node-id";
+        new MongoLockService(nodeId, mongodb.mongoConnection(), Duration.ofSeconds(72));
 
         final ListIndexesIterable<Document> indices = mongodb.mongoCollection(MongoLockService.COLLECTION_NAME).listIndexes();
         boolean found = false;
@@ -156,11 +162,5 @@ public abstract class MongoLockServiceTest {
 
         Optional<Lock> lockAgain = lockService.lock("test-resource", "1234");
         assertThat(lockAgain).isPresent();
-    }
-
-    private NodeId mockNodeId(String id) {
-        NodeId nodeId = mock(NodeId.class);
-        when(nodeId.toString()).thenReturn(id);
-        return nodeId;
     }
 }

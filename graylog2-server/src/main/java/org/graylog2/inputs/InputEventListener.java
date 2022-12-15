@@ -26,6 +26,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.NodeIdentifier;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
@@ -43,7 +44,7 @@ public class InputEventListener {
     private final InputLauncher inputLauncher;
     private final InputRegistry inputRegistry;
     private final InputService inputService;
-    private final NodeId nodeId;
+    private final NodeIdentifier nodeId;
     private final LeaderElectionService leaderElectionService;
     private final PersistedInputs persistedInputs;
     private final ServerStatus serverStatus;
@@ -53,7 +54,7 @@ public class InputEventListener {
                               InputLauncher inputLauncher,
                               InputRegistry inputRegistry,
                               InputService inputService,
-                              NodeId nodeId,
+                              NodeIdentifier nodeId,
                               LeaderElectionService leaderElectionService,
                               PersistedInputs persistedInputs,
                               ServerStatus serverStatus) {
@@ -84,7 +85,7 @@ public class InputEventListener {
             inputRegistry.remove(inputState);
         }
 
-        if (input.isGlobal() || this.nodeId.toString().equals(input.getNodeId())) {
+        if (input.isGlobal() || this.nodeId.getNodeId().equals(input.getNodeId())) {
             startInput(input);
         }
     }
@@ -110,7 +111,7 @@ public class InputEventListener {
             startInput = false;
         }
 
-        if (startInput && (input.isGlobal() || this.nodeId.toString().equals(input.getNodeId()))) {
+        if (startInput && (input.isGlobal() || this.nodeId.getNodeId().equals(input.getNodeId()))) {
             startInput(input);
         }
     }

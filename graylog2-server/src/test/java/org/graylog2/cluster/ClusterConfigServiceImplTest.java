@@ -29,6 +29,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.NodeIdentifier;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.joda.time.DateTime;
@@ -61,8 +62,7 @@ public class ClusterConfigServiceImplTest {
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-    @Mock
-    private NodeId nodeId;
+    private final NodeIdentifier nodeId = () -> "ID";
     @Spy
     private ClusterEventBus clusterEventBus;
     private MongoConnection mongoConnection;
@@ -75,7 +75,6 @@ public class ClusterConfigServiceImplTest {
         this.mongoConnection = mongodb.mongoConnection();
 
         MongoJackObjectMapperProvider provider = new MongoJackObjectMapperProvider(objectMapper);
-        when(nodeId.toString()).thenReturn("ID");
 
         this.clusterConfigService = new ClusterConfigServiceImpl(
                 provider,

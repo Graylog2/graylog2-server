@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.prometheus.client.dropwizard.samplebuilder.MapperConfig;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.NodeIdentifier;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,8 +43,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PrometheusMappingFilesHandlerTest {
-    @Mock
-    NodeId nodeId;
+
+    private final NodeIdentifier nodeId = () -> "abc-123";
 
     @Mock
     MessageInputFactory messageInputFactory;
@@ -81,7 +82,6 @@ class PrometheusMappingFilesHandlerTest {
 
         @Test
         void getMapperConfigs() {
-            when(nodeId.toString()).thenReturn("abc-123");
 
             final List<MapperConfig> mapperConfigs = handler.getMapperConfigs();
 
@@ -140,8 +140,6 @@ class PrometheusMappingFilesHandlerTest {
 
         @Test
         void getMapperConfigs() throws Exception {
-            when(nodeId.toString()).thenReturn("abc-123");
-
             final List<MapperConfig> mapperConfigs = handler.getMapperConfigs();
 
             assertThat(mapperConfigs).hasSize(1);
@@ -229,8 +227,6 @@ class PrometheusMappingFilesHandlerTest {
 
         @Test
         void getMapperConfigs() throws Exception {
-            when(nodeId.toString()).thenReturn("abc-123");
-
             final List<MapperConfig> mapperConfigs = handler.getMapperConfigs();
 
             assertThat(mapperConfigs.size()).isGreaterThan(1);

@@ -22,6 +22,7 @@ import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.NodeIdentifier;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,15 +48,12 @@ public class NodeServiceImplTest {
 
     @Mock
     private Configuration configuration;
-    @Mock
-    private NodeId nodeId;
+    private final NodeIdentifier nodeId = () -> NODE_ID;
 
     private NodeService nodeService;
 
     @Before
     public void setUp() throws Exception {
-        when(nodeId.toString()).thenReturn(NODE_ID);
-
         this.nodeService = new NodeServiceImpl(mongodb.mongoConnection(), configuration);
     }
 

@@ -26,6 +26,7 @@ import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.NodeIdentifier;
 
 import javax.inject.Inject;
 import java.net.URI;
@@ -80,8 +81,8 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     }
 
     @Override
-    public Node byNodeId(NodeId nodeId) throws NodeNotFoundException {
-        return byNodeId(nodeId.toString());
+    public Node byNodeId(NodeIdentifier nodeId) throws NodeNotFoundException {
+        return byNodeId(nodeId.getNodeId());
     }
 
     @Override

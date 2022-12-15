@@ -24,6 +24,7 @@ import org.graylog2.plugin.Version;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.NodeIdentifier;
 import org.graylog2.rest.models.HelloWorldResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 
@@ -40,13 +41,13 @@ import static java.util.Objects.requireNonNull;
 @Api(value = "Hello World", description = "A friendly hello world message")
 @Path("/")
 public class HelloWorldResource extends RestResource {
-    private final NodeId nodeId;
+    private final NodeIdentifier nodeId;
     private final ClusterConfigService clusterConfigService;
 
     private static final String LOWEST_PRIORITY = ";q=0";
 
     @Inject
-    public HelloWorldResource(NodeId nodeId,
+    public HelloWorldResource(NodeIdentifier nodeId,
                               ClusterConfigService clusterConfigService) {
         this.nodeId = requireNonNull(nodeId);
         this.clusterConfigService = requireNonNull(clusterConfigService);
@@ -60,7 +61,7 @@ public class HelloWorldResource extends RestResource {
         final ClusterId clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create("UNKNOWN"));
         return HelloWorldResponse.create(
             clusterId.clusterId(),
-            nodeId.toString(),
+            nodeId.getNodeId(),
             Version.CURRENT_CLASSPATH.toString(),
             "Manage your logs in the dark and have lasers going and make it look like you're from space!"
         );

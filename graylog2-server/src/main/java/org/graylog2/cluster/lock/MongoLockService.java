@@ -28,7 +28,7 @@ import com.mongodb.client.model.Updates;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.NodeIdentifier;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -64,11 +64,11 @@ public class MongoLockService implements LockService {
     public static final String COLLECTION_NAME = "cluster_locks";
     public static final java.time.Duration MIN_LOCK_TTL = Duration.ofSeconds(60);
 
-    private final NodeId nodeId;
+    private final NodeIdentifier nodeId;
     private final MongoCollection<Document> collection;
 
     @Inject
-    public MongoLockService(NodeId nodeId,
+    public MongoLockService(NodeIdentifier nodeId,
                             MongoConnection mongoConnection,
                             @Named("lock_service_lock_ttl") Duration lockTTL) {
         this.nodeId = nodeId;
@@ -186,9 +186,9 @@ public class MongoLockService implements LockService {
 
     private String getLockedByString(@Nullable String lockContext) {
         if (lockContext == null) {
-            return nodeId.toString();
+            return nodeId.getNodeId();
         }
-        return nodeId.toString() + "-" + lockContext;
+        return nodeId.getNodeId() + "-" + lockContext;
     }
 }
 
