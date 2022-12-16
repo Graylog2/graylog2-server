@@ -42,7 +42,7 @@ import java.util.Optional;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @Api(value = "Favorites", tags = {CLOUD_VISIBLE})
-@Path("/views")
+@Path("/favorites")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class FavoritesResource {
@@ -54,7 +54,6 @@ public class FavoritesResource {
     }
 
     @GET
-    @Path("/favorites")
     @ApiOperation("Get the Favorites for the Start Page for the user")
     public PaginatedResponse<Favorite> getFavoriteItems(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                         @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
@@ -64,7 +63,7 @@ public class FavoritesResource {
     }
 
     @PUT
-    @Path("/favorites/{id}")
+    @Path("/{id}")
     @ApiOperation("Add an item for inclusion on the Start Page for the user")
     @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_ADD_FAVORITE_ITEM)
     public void addItemToFavorites(@ApiParam(name = "id", required = true) @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
@@ -72,7 +71,7 @@ public class FavoritesResource {
     }
 
     @DELETE
-    @Path("/favorites/{id}")
+    @Path("/{id}")
     @ApiOperation("Remove an item from inclusion on the Start Page for the user")
     @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_REMOVE_FAVORITE_ITEM)
     public void removeItemFromFavorites(@ApiParam(name = "id", required = true) @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
