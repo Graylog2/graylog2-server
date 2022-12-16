@@ -38,6 +38,7 @@ import org.graylog2.rest.resources.search.KeywordSearchResource;
 import org.graylog2.rest.resources.search.RelativeSearchResource;
 import org.graylog2.rest.resources.streams.StreamResource;
 import org.graylog2.rest.resources.streams.outputs.StreamOutputResource;
+import org.graylog2.rest.resources.streams.rules.StreamRuleInputsResource;
 import org.graylog2.rest.resources.streams.rules.StreamRuleResource;
 import org.graylog2.rest.resources.system.ClusterConfigResource;
 import org.graylog2.rest.resources.system.ClusterResource;
@@ -203,5 +204,6 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(StreamOutputResource.class);
         addSystemRestResource(StreamRuleResource.class);
         addSystemRestResource(StreamResource.class);
+        addSystemRestResource(StreamRuleInputsResource.class);
     }
 }
