@@ -142,6 +142,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         try {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
             final PaginatedList<ViewDTO> result = dbService.searchPaginated(
+                    searchUser,
                     searchQuery,
                     searchUser::canReadView,
                     order,

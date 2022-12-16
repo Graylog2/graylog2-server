@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import org.bson.Document;
 import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -78,6 +79,10 @@ public abstract class ViewSummaryDTO implements ViewLike {
     @JsonProperty(ViewDTO.FIELD_CREATED_AT)
     public abstract DateTime createdAt();
 
+    @JsonProperty(ViewDTO.FIELD_FAVORITE)
+    @MongoIgnore
+    public abstract boolean favorite();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -128,6 +133,10 @@ public abstract class ViewSummaryDTO implements ViewLike {
         @JsonProperty(ViewDTO.FIELD_CREATED_AT)
         public abstract Builder createdAt(DateTime createdAt);
 
+        @JsonProperty(ViewDTO.FIELD_FAVORITE)
+        @MongoIgnore
+        public abstract Builder favorite(boolean favorite);
+
         @JsonCreator
         public static Builder create() {
             return new AutoValue_ViewSummaryDTO.Builder()
@@ -136,9 +145,27 @@ public abstract class ViewSummaryDTO implements ViewLike {
                     .description("")
                     .properties(ImmutableSet.of())
                     .requires(Collections.emptyMap())
-                    .createdAt(DateTime.now(DateTimeZone.UTC));
+                    .createdAt(DateTime.now(DateTimeZone.UTC))
+                    .favorite(false);
         }
 
         public abstract ViewSummaryDTO build();
+    }
+
+    public static ViewSummaryDTO fromDocument(Document document) {
+        return ViewSummaryDTO.builder()
+                .id(document.getObjectId(ViewDTO.FIELD_ID).toHexString())
+                .title(document.getString(ViewDTO.FIELD_TITLE))
+                .description(document.getString(ViewDTO.FIELD_DESCRIPTION))
+                .summary(document.getString(ViewDTO.FIELD_SUMMARY))
+                .searchId(document.getString(ViewDTO.FIELD_SEARCH_ID))
+                .owner(document.getString(ViewDTO.FIELD_OWNER))
+                .favorite(document.getBoolean(ViewDTO.FIELD_FAVORITE, false))
+                .type(ViewDTO.Type.valueOf(document.getString(ViewDTO.FIELD_TYPE)))
+// TODO: fix object deserialisation
+//                .properties(document.getString(ViewDTO.FIELD_PROPERTIES))
+//                .requires(document.getString(ViewDTO.FIELD_REQUIRES))
+                .createdAt(new DateTime(document.getDate(ViewDTO.FIELD_CREATED_AT).getTime()))
+                .build();
     }
 }

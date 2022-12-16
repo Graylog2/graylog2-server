@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.startpage.favorites;
+package org.graylog.plugins.views.favorites;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.mongojack.Id;

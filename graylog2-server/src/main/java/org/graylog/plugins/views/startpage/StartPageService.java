@@ -19,10 +19,10 @@ package org.graylog.plugins.views.startpage;
 import com.google.common.eventbus.EventBus;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
-import org.graylog.plugins.views.startpage.favorites.Favorite;
-import org.graylog.plugins.views.startpage.favorites.FavoriteDTO;
-import org.graylog.plugins.views.startpage.favorites.FavoritesForUserDTO;
-import org.graylog.plugins.views.startpage.favorites.FavoritesService;
+import org.graylog.plugins.views.favorites.Favorite;
+import org.graylog.plugins.views.favorites.FavoriteDTO;
+import org.graylog.plugins.views.favorites.FavoritesForUserDTO;
+import org.graylog.plugins.views.favorites.FavoritesService;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpened;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedForUserDTO;
@@ -46,20 +46,16 @@ public class StartPageService {
     private final Catalog catalog;
     private final LastOpenedService lastOpenedService;
     private final RecentActivityService recentActivityService;
-    private final FavoritesService favoritesService;
-
     private final long MAXIMUM_LAST_OPENED_PER_USER = 100;
 
     @Inject
     public StartPageService(Catalog catalog,
                             LastOpenedService lastOpenedService,
                             RecentActivityService recentActivityService,
-                            FavoritesService favoritesService,
                             EventBus eventBus) {
         this.catalog = catalog;
         this.lastOpenedService = lastOpenedService;
         this.recentActivityService = recentActivityService;
-        this.favoritesService = favoritesService;
         eventBus.register(this);
     }
 
@@ -88,18 +84,6 @@ public class StartPageService {
         Collections.reverse(items);
 
         return PaginatedResponse.create("lastOpened", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
-    }
-
-    public PaginatedResponse<Favorite> findFavoritesFor(final SearchUser searchUser, final Optional<String> type, final int page, final int perPage) {
-        var items = favoritesService
-                .findForUser(searchUser)
-                .orElse(new FavoritesForUserDTO(searchUser.getUser().getId(), List.of()))
-                .items()
-                .stream().filter(i -> type.isPresent() ? i.type().equals(type.get()) : true)
-                .map(i -> new Favorite(i.id(), i.type(), catalog.getTitle(i.id())))
-                .toList();
-
-        return PaginatedResponse.create("favorites", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
     }
 
     private String getType(RecentActivityDTO i) {
@@ -136,30 +120,6 @@ public class StartPageService {
         } else {
             var items = new LastOpenedForUserDTO(searchUser.getUser().getId(), List.of(item));
             lastOpenedService.create(items, searchUser);
-        }
-    }
-
-    public void addFavoriteItemFor(final String id, final SearchUser searchUser) {
-        final var favorites = favoritesService.findForUser(searchUser);
-        final var item = new FavoriteDTO(id, catalog.getType(id));
-        if(favorites.isPresent()) {
-            var fi = favorites.get();
-            fi.items().add(item);
-            favoritesService.save(fi);
-        } else {
-            var items = new FavoritesForUserDTO(searchUser.getUser().getId(), List.of(item));
-            favoritesService.create(items, searchUser);
-        }
-    }
-
-    public void removeFavoriteItemFor(final String id, final SearchUser searchUser) {
-        var favorites = favoritesService.findForUser(searchUser);
-        if(favorites.isPresent() && favorites.get().items() != null) {
-            var fi = favorites.get();
-            var items = fi.items().stream().filter(i -> !i.id().equals(id)).toList();
-            fi.items().clear();
-            fi.items().addAll(items);
-            favoritesService.save(fi);
         }
     }
 }

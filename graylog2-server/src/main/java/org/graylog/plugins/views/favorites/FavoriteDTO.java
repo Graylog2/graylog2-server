@@ -14,7 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.startpage.favorites;
+package org.graylog.plugins.views.favorites;
 
-public record Favorite(String id, String type, String title) {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record FavoriteDTO(@JsonProperty(FIELD_ID) String id, @JsonProperty(FIELD_TYPE) String type) {
+    public static final String FIELD_ID = "id";
+    public static final String FIELD_TYPE = "type";
 }

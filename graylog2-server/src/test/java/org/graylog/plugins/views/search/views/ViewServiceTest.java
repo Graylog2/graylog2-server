@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -47,6 +48,8 @@ public class ViewServiceTest {
 
     private ViewService dbService;
     private ClusterConfigServiceImpl clusterConfigService;
+
+    private SearchUser searchUser;
 
     class MongoJackObjectMapperProviderForTest extends MongoJackObjectMapperProvider {
         public MongoJackObjectMapperProviderForTest(ObjectMapper objectMapper) {
@@ -149,6 +152,7 @@ public class ViewServiceTest {
         final SearchQueryParser queryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, searchFieldMapping);
 
         final PaginatedList<ViewDTO> result1 = dbService.searchPaginated(
+                searchUser,
                 queryParser.parse("A B D"),
                 view -> true, "desc",
                 "title",
@@ -164,6 +168,7 @@ public class ViewServiceTest {
         assertThat(result1.grandTotal()).hasValue(5L);
 
         final PaginatedList<ViewDTO> result2 = dbService.searchPaginated(
+                searchUser,
                 queryParser.parse("A B D"),
                 view -> view.title().contains("B") || view.title().contains("D"), "desc",
                 "title",

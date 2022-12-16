@@ -16,8 +16,17 @@
  */
 package org.graylog.plugins.views.search.views;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DuplicateKeyException;
+import com.mongodb.client.AggregateIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.Field;
+import com.mongodb.client.model.Variable;
+import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.favorites.FavoritesService;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -27,16 +36,19 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
+import org.mongojack.DBSort;
 import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -49,6 +61,7 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
     private final ViewRequirements.Factory viewRequirementsFactory;
     private final EntityOwnershipService entityOwnerShipService;
     private final ViewSummaryService viewSummaryService;
+    private final MongoCollection<Document> collection;
 
     @Inject
     protected ViewService(MongoConnection mongoConnection,
@@ -62,16 +75,18 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         this.viewRequirementsFactory = viewRequirementsFactory;
         this.entityOwnerShipService = entityOwnerShipService;
         this.viewSummaryService = viewSummaryService;
+        this.collection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
     }
 
-    private PaginatedList<ViewDTO> searchPaginated(DBQuery.Query query,
+    private PaginatedList<ViewDTO> searchPaginated(SearchUser searchUser,
+                                                   SearchQuery query,
                                                    Predicate<ViewDTO> filter,
                                                    String order,
                                                    String sortField,
                                                    DBQuery.Query grandTotalQuery,
                                                    int page,
                                                    int perPage) {
-        final PaginatedList<ViewDTO> viewsList = findPaginatedWithQueryFilterAndSortWithGrandTotal(query, filter, getSortBuilder(order, sortField), grandTotalQuery, page, perPage);
+        final PaginatedList<ViewDTO> viewsList = findPaginatedWithQueryFilterAndSortWithGrandTotal(searchUser, query, filter, getSortBuilder(order, sortField), grandTotalQuery, page, perPage);
         return viewsList.stream()
                 .map(this::requirementsForView)
                 .collect(Collectors.toCollection(() -> viewsList.grandTotal()
@@ -79,13 +94,70 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
                         .orElseGet(() -> new PaginatedList<>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage))));
     }
 
-    public PaginatedList<ViewDTO> searchPaginated(SearchQuery query,
+    protected PaginatedList<ViewDTO> findPaginatedWithQueryFilterAndSortWithGrandTotal(SearchUser searchUser,
+                                                                                       SearchQuery dbQuery,
+                                                                                   Predicate<ViewDTO> filter,
+                                                                                   DBSort.SortBuilder sort,
+                                                                                   DBQuery.Query grandTotalQuery,
+                                                                                   int page,
+                                                                                   int perPage) {
+        var user = searchUser.getUser().getId();
+        var query = dbQuery.toBson();
+        final AggregateIterable<Document> result = collection.aggregate(List.of(
+                        Aggregates.match(query),
+                        Aggregates.lookup(
+                                FavoritesService.COLLECTION_NAME,
+                                List.of(
+                                        new Variable<>("searchId", doc("$toString", "$_id")),
+                                        new Variable<>("userId", user)
+                                ),
+                                List.of(Aggregates.unwind("$items"),
+                                        Aggregates.match(
+                                                doc("$expr", doc("$and", List.of(
+                                                                doc("$eq", List.of("$items.id", "$$searchId")),
+                                                                doc("$eq", List.of("$user_id", "$$userId"))
+                                                        )
+                                                ))),
+                                        Aggregates.project(doc("_id", 1))
+                                ),
+                                "favorites"
+                        ),
+                        Aggregates.set(new Field<>("favorite", doc("$gt", List.of(doc("$size", "$favorites"), 0)))),
+                        // replace with Aggregates.unset after switch to client 4.8
+                        new BasicDBObject("$unset", "favorites"),
+                        Aggregates.sort(sort)
+                )
+        );
+
+        final long grandTotal = db.getCount(grandTotalQuery);
+
+        final List<ViewDTO> views = StreamSupport.stream(result.spliterator(), false)
+                .map(ViewDTO::fromDocument)
+                .filter(filter)
+                .toList();
+
+        final List<ViewDTO> paginatedStreams = perPage > 0
+                ? views.stream()
+                .skip((long) perPage * Math.max(0, page - 1))
+                .limit(perPage)
+                .toList()
+                : views;
+
+        return new PaginatedList<>(paginatedStreams, views.size(), page, perPage, grandTotal);
+    }
+
+    private Document doc(String key, Object value) {
+        return new Document(key, value);
+    }
+
+    public PaginatedList<ViewDTO> searchPaginated(SearchUser searchUser,
+                                                  SearchQuery query,
                                                   Predicate<ViewDTO> filter,
                                                   String order,
                                                   String sortField,
                                                   int page,
                                                   int perPage) {
-        return searchPaginated(query.toDBQuery(), filter, order, sortField, DBQuery.empty(), page, perPage);
+        return searchPaginated(searchUser, query, filter, order, sortField, DBQuery.empty(), page, perPage);
     }
 
     private PaginatedList<ViewDTO> searchPaginatedWithGrandTotal(DBQuery.Query query,
@@ -120,14 +192,15 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         );
     }
 
-    public PaginatedList<ViewSummaryDTO> searchSummariesPaginatedByType(final ViewDTO.Type type,
+    public PaginatedList<ViewSummaryDTO> searchSummariesPaginatedByType(final SearchUser searchUser,
+                                                                        final ViewDTO.Type type,
                                                                         final SearchQuery query,
                                                                         final Predicate<ViewSummaryDTO> filter,
                                                                         final String order,
                                                                         final String sortField,
                                                                         final int page,
                                                                         final int perPage) {
-        return viewSummaryService.searchPaginatedByType(type, query, filter, order, sortField, page, perPage);
+        return viewSummaryService.searchPaginatedByType(searchUser, type, query, filter, order, sortField, page, perPage);
     }
 
     public void saveDefault(ViewDTO dto) {

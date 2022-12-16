@@ -86,6 +86,7 @@ public class DashboardsResource extends RestResource {
         try {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
             final PaginatedList<ViewSummaryDTO> result = dbService.searchSummariesPaginatedByType(
+                    searchUser,
                     ViewDTO.Type.DASHBOARD,
                     searchQuery,
                     searchUser::canReadView,
