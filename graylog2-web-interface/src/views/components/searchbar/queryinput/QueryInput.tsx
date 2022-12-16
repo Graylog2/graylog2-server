@@ -111,6 +111,12 @@ const _onLoadEditor = (editor, isInitialTokenizerUpdate: React.MutableRefObject<
         isInitialTokenizerUpdate.current = false;
       }
     });
+
+    editor.session.on('change', ({ action }) => {
+      if (action === 'remove') {
+        editor.execCommand('startAutocomplete');
+      }
+    });
   }
 };
 
