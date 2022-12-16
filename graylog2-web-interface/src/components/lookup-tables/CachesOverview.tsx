@@ -126,7 +126,7 @@ const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props)
         );
       case caches.length > 0:
         return caches.map((cache: LookupTableCache) => (
-          <CacheTableEntry key={cache.id} cache={cache} />
+          <CacheTableEntry key={`cache-item-${cache.id}`} cache={cache} />
         ));
       default:
         return (

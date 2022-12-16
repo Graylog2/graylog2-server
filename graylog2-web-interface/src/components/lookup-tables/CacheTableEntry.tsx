@@ -80,16 +80,16 @@ const CacheTableEntry = ({ cache }: Props) => {
     return `${NumberUtils.formatNumber(hitRate)}%`;
   };
 
-  const handleEdit = (cacheName: string) => () => {
-    history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cacheName));
+  const handleEdit = () => {
+    history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cache.name));
   };
 
-  const handleDelete = (inCache: LookupTableCache) => {
+  const handleDelete = () => {
     // eslint-disable-next-line no-alert
-    const shouldDelete = window.confirm(`Are you sure you want to delete cache "${inCache.title}"?`);
+    const shouldDelete = window.confirm(`Are you sure you want to delete cache "${cache.title}"?`);
 
     if (shouldDelete) {
-      LookupTableCachesActions.delete(inCache.id).then(() => LookupTableCachesActions.reloadPage());
+      LookupTableCachesActions.delete(cache.id).then(() => LookupTableCachesActions.reloadPage());
     }
   };
 
@@ -116,7 +116,7 @@ const CacheTableEntry = ({ cache }: Props) => {
           {loadingScopePermissions ? <Spinner /> : scopePermissions.is_mutable && (
             <Actions>
               <Button bsSize="xsmall"
-                      onClick={handleEdit(cache.name)}
+                      onClick={handleEdit}
                       role="button"
                       name="edit">
                 Edit
