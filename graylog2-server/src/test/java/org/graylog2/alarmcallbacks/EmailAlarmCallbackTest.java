@@ -44,7 +44,7 @@ public class EmailAlarmCallbackTest {
 
     private AlertSender alertSender = mock(AlertSender.class);
     private NotificationService notificationService = mock(NotificationService.class);
-    private final NodeId nodeId = () -> "node-id";
+    private final NodeId nodeId = () -> "5ca1ab1e-0000-4000-a000-000000000000";
     private EmailRecipients.Factory emailRecipientsFactory = mock(EmailRecipients.Factory.class);
     private UserService userService = mock(UserService.class);
     private EmailConfiguration emailConfiguration = mock(EmailConfiguration.class);

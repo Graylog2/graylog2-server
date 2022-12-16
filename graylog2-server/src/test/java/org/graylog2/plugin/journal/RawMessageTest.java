@@ -30,7 +30,7 @@ public class RawMessageTest {
     @Test
     public void minimalEncodeDecode() throws IOException {
         final RawMessage rawMessage = new RawMessage("testmessage".getBytes(StandardCharsets.UTF_8));
-        rawMessage.addSourceNode("inputid", () -> "node-id");
+        rawMessage.addSourceNode("inputid", () -> "5ca1ab1e-0000-4000-a000-000000000000");
         rawMessage.setCodecName("raw");
         rawMessage.setCodecConfig(Configuration.EMPTY_CONFIGURATION);
 

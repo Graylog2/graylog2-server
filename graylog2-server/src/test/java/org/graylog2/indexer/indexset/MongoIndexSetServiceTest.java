@@ -71,7 +71,7 @@ public class MongoIndexSetServiceTest {
 
     @Mock
     private StreamService streamService;
-    private final NodeId nodeId = () -> "node-id";
+    private final NodeId nodeId = () -> "5ca1ab1e-0000-4000-a000-000000000000";
 
     @Before
     public void setUp() throws Exception {

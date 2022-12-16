@@ -57,7 +57,7 @@ public class V20161215163900_MoveIndexSetDefaultConfigTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
 
-    private final NodeId nodeId = () -> "node-id";
+    private final NodeId nodeId = () -> "5ca1ab1e-0000-4000-a000-000000000000";
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);

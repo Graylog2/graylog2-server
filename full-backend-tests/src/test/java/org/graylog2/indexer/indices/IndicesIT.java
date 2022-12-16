@@ -125,7 +125,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
                 ImmutableMap.of(MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE, new MessageIndexTemplateProvider()));
         indices = new Indices(
                 indexMappingFactory,
-                () -> "node-id",
+                () -> "5ca1ab1e-0000-4000-a000-000000000000",
                 new NullAuditEventSender(),
                 eventBus,
                 searchServer().adapters().indicesAdapter()

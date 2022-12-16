@@ -94,7 +94,7 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
                 new IndexMappingFactory(node, ImmutableMap.of(
                         MESSAGE_TEMPLATE_TYPE, new MessageIndexTemplateProvider()
                 )),
-                () -> "node-id",
+                () -> "5ca1ab1e-0000-4000-a000-000000000000",
                 new NullAuditEventSender(),
                 mock(EventBus.class),
                 createIndicesAdapter()

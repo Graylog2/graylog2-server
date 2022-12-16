@@ -64,7 +64,7 @@ public class ViewServiceTest {
         this.clusterConfigService = new ClusterConfigServiceImpl(
                 objectMapperProvider,
                 mongodb.mongoConnection(),
-                () -> "node-id",
+                () -> "5ca1ab1e-0000-4000-a000-000000000000",
                 new ChainingClassLoader(getClass().getClassLoader()),
                 new ClusterEventBus()
         );

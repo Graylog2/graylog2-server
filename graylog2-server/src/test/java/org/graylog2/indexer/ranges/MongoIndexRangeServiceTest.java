@@ -72,7 +72,7 @@ public class MongoIndexRangeServiceTest {
     @Before
     public void setUp() throws Exception {
         localEventBus = new EventBus("local-event-bus");
-        indexRangeService = new MongoIndexRangeService(mongodb.mongoConnection(), objectMapperProvider, indices, indexSetRegistry, new NullAuditEventSender(), () -> "node-id", localEventBus);
+        indexRangeService = new MongoIndexRangeService(mongodb.mongoConnection(), objectMapperProvider, indices, indexSetRegistry, new NullAuditEventSender(), () -> "5ca1ab1e-0000-4000-a000-000000000000", localEventBus);
     }
 
     @Test
