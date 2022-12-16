@@ -17,11 +17,16 @@
 package org.graylog2.plugin.system;
 
 import com.google.common.hash.Hashing;
+import org.graylog2.plugin.Tools;
 
 import java.nio.charset.StandardCharsets;
 
 public interface NodeId {
 
+    /**
+     * @return The server expects UUID style of node id.
+     * @see Tools#generateServerId()
+     */
     String getNodeId();
 
 
