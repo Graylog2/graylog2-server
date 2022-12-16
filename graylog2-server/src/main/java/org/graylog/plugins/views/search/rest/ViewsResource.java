@@ -169,7 +169,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         // Attempt to resolve the view from optional view resolvers before using the default database lookup.
         // The view resolvers must be used first, because the ID may not be a valid hex ID string.
-        ViewDTO view = resolveView(id);
+        ViewDTO view = resolveView(searchUser, id);
         if (searchUser.canReadView(view)) {
             startPageService.addLastOpenedFor(view, searchUser);
             return view;
@@ -186,7 +186,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
      *           up in the database.
      * @return An optional view.
      */
-    ViewDTO resolveView(String id) {
+    ViewDTO resolveView(SearchUser searchUser, String id) {
         final ViewResolverDecoder decoder = new ViewResolverDecoder(id);
         if (decoder.isResolverViewId()) {
             final ViewResolver viewResolver = viewResolvers.get(decoder.getResolverName());
@@ -197,7 +197,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                 throw new NotFoundException("Failed to find view resolver: " + decoder.getResolverName());
             }
         } else {
-            return loadView(id);
+            return loadViewIncludingFavorite(searchUser, id);
         }
     }
 
@@ -377,6 +377,14 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private ViewDTO loadView(String id) {
         try {
             return dbService.get(id).orElseThrow(() -> viewNotFoundException(id));
+        } catch (IllegalArgumentException ignored) {
+            throw viewNotFoundException(id);
+        }
+    }
+
+    private ViewDTO loadViewIncludingFavorite(SearchUser searchUser, String id) {
+        try {
+            return dbService.get(searchUser, id).orElseThrow(() -> viewNotFoundException(id));
         } catch (IllegalArgumentException ignored) {
             throw viewNotFoundException(id);
         }

@@ -16,14 +16,17 @@
  */
 package org.graylog.plugins.views.search.views;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Field;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Variable;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.favorites.FavoritesService;
@@ -35,6 +38,7 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
+import org.graylog2.search.SearchQueryParser;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.mongojack.WriteResult;
@@ -94,15 +98,10 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
                         .orElseGet(() -> new PaginatedList<>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage))));
     }
 
-    protected PaginatedList<ViewDTO> findPaginatedWithQueryFilterAndSortWithGrandTotal(SearchUser searchUser,
-                                                                                       SearchQuery dbQuery,
-                                                                                   Predicate<ViewDTO> filter,
-                                                                                   DBSort.SortBuilder sort,
-                                                                                   DBQuery.Query grandTotalQuery,
-                                                                                   int page,
-                                                                                   int perPage) {
+    protected Stream<Document> findViews(SearchUser searchUser,
+                                        Bson query,
+                                        DBSort.SortBuilder sort) {
         var user = searchUser.getUser().getId();
-        var query = dbQuery.toBson();
         final AggregateIterable<Document> result = collection.aggregate(List.of(
                         Aggregates.match(query),
                         Aggregates.lookup(
@@ -128,9 +127,24 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
                 )
         );
 
-        final long grandTotal = db.getCount(grandTotalQuery);
 
-        final List<ViewDTO> views = StreamSupport.stream(result.spliterator(), false)
+        return StreamSupport.stream(result.spliterator(), false);
+    }
+
+    public Optional<ViewDTO> get(final SearchUser searchUser, final String id) {
+        return findViews(searchUser, Filters.eq("_id", new ObjectId(id)), getSortBuilder("asc", "_id")).findFirst().map(ViewDTO::fromDocument);
+    }
+
+    protected PaginatedList<ViewDTO> findPaginatedWithQueryFilterAndSortWithGrandTotal(SearchUser searchUser,
+                                                                                       SearchQuery dbQuery,
+                                                                                   Predicate<ViewDTO> filter,
+                                                                                   DBSort.SortBuilder sort,
+                                                                                   DBQuery.Query grandTotalQuery,
+                                                                                   int page,
+                                                                                   int perPage) {
+        var grandTotal = db.getCount(grandTotalQuery);
+
+        var views = findViews(searchUser, dbQuery.toBson(), sort)
                 .map(ViewDTO::fromDocument)
                 .filter(filter)
                 .toList();
