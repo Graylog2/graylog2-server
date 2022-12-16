@@ -1,0 +1,12 @@
+rule "array_add"
+when
+    true
+then
+    set_field("add_number", array_add([1, 2], 3));
+    set_field("add_string", array_add(["one", "two"], "three"));
+    set_field("add_number_again", array_add([1, 2], 2));
+    set_field("add_string_again", array_add(["one", "two"], "two"));
+    set_field("add_number_again_unique", array_add([1, 2], 2, true));
+    set_field("add_string_again_unique", array_add(["one", "two"], "two", true));
+    trigger_test();
+end

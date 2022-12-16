@@ -21,6 +21,9 @@ import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.functions.array.ArrayAdd;
+import org.graylog.plugins.pipelineprocessor.functions.array.ArrayContains;
+import org.graylog.plugins.pipelineprocessor.functions.array.ArrayRemove;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsBoolean;
@@ -197,6 +200,11 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(Replace.NAME, Replace.class);
         addMessageProcessorFunction(Length.NAME, Length.class);
         addMessageProcessorFunction(FirstNonNull.NAME, FirstNonNull.class);
+
+        // arrays
+        addMessageProcessorFunction(ArrayContains.NAME, ArrayContains.class);
+        addMessageProcessorFunction(ArrayAdd.NAME, ArrayAdd.class);
+        addMessageProcessorFunction(ArrayRemove.NAME, ArrayRemove.class);
 
         // json
         addMessageProcessorFunction(JsonParse.NAME, JsonParse.class);

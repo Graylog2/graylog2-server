@@ -28,6 +28,9 @@ import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.functions.array.ArrayAdd;
+import org.graylog.plugins.pipelineprocessor.functions.array.ArrayContains;
+import org.graylog.plugins.pipelineprocessor.functions.array.ArrayRemove;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsBoolean;
@@ -345,6 +348,11 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(IsUrl.NAME, new IsUrl());
         functions.put(Debug.NAME, new Debug(loggerMock));
 
+        // Array functions
+        functions.put(ArrayContains.NAME, new ArrayContains());
+        functions.put(ArrayAdd.NAME, new ArrayAdd());
+        functions.put(ArrayRemove.NAME, new ArrayRemove());
+
         final GrokPatternService grokPatternService = mock(GrokPatternService.class);
         final GrokPattern greedyPattern = GrokPattern.create("GREEDY", ".*");
         Set<GrokPattern> patterns = Sets.newHashSet(
@@ -656,6 +664,46 @@ public class FunctionsSnippetsTest extends BaseParserTest {
                 .asList()
                 .isNotEmpty()
                 .containsExactly("foo", "bar|baz");
+    }
+
+    @Test
+    public void arrayContains() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+        assertThat(actionsTriggered.get()).isTrue();
+        assertThat(message).isNotNull();
+        assertThat(message.getField("contains_number")).isEqualTo(true);
+        assertThat(message.getField("does_not_contain_number")).isEqualTo(false);
+        assertThat(message.getField("contains_string")).isEqualTo(true);
+        assertThat(message.getField("contains_string_case_insensitive")).isEqualTo(true);
+        assertThat(message.getField("contains_string_case_sensitive")).isEqualTo(false);
+    }
+
+    @Test
+    public void arrayAdd() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+        assertThat(actionsTriggered.get()).isTrue();
+        assertThat(message).isNotNull();
+        assertThat(message.getField("add_number")).isEqualTo(Arrays.asList(1L, 2L, 3L));
+        assertThat(message.getField("add_string")).isEqualTo(Arrays.asList("one", "two", "three"));
+        assertThat(message.getField("add_number_again")).isEqualTo(Arrays.asList(1L, 2L, 2L));
+        assertThat(message.getField("add_string_again")).isEqualTo(Arrays.asList("one", "two", "two"));
+        assertThat(message.getField("add_number_again_unique")).isEqualTo(Arrays.asList(1L, 2L));
+        assertThat(message.getField("add_string_again_unique")).isEqualTo(Arrays.asList("one", "two"));
+    }
+
+    @Test
+    public void arrayRemove() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+        assertThat(actionsTriggered.get()).isTrue();
+        assertThat(message).isNotNull();
+        assertThat(message.getField("remove_number" )).isEqualTo(Arrays.asList(1L, 3L));
+        assertThat(message.getField("remove_string" )).isEqualTo(Arrays.asList("one", "three"));
+        assertThat(message.getField("remove_missing" )).isEqualTo(Arrays.asList(1L, 2L, 3L));
+        assertThat(message.getField("remove_only_one")).isEqualTo(Arrays.asList(1L, 2L));
+        assertThat(message.getField("remove_all")).isEqualTo(Arrays.asList(1L));
     }
 
     @Test
