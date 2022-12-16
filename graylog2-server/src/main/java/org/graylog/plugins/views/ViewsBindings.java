@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
+import org.graylog.plugins.views.favorites.FavoritesResource;
 import org.graylog.plugins.views.migrations.V20181220133700_AddViewsAdminRole;
 import org.graylog.plugins.views.migrations.V20190127111728_MigrateWidgetFormatSettings;
 import org.graylog.plugins.views.migrations.V20190304102700_MigrateMessageListStructure;
@@ -138,6 +139,7 @@ public class ViewsBindings extends ViewsModule {
 
         addSystemRestResource(DashboardsResource.class);
         addSystemRestResource(StartPageResource.class);
+        addSystemRestResource(FavoritesResource.class);
         addSystemRestResource(FieldTypesResource.class);
         addSystemRestResource(MessagesResource.class);
         addSystemRestResource(ExportJobsResource.class);
