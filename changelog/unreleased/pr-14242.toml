@@ -1,0 +1,4 @@
+type = "added"
+message = "Add new array-handling pipeline functions: array_add, array_remove, array_contains"
+
+pulls = ["14242"]
