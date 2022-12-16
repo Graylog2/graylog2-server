@@ -104,7 +104,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
     protected Indices indices;
     @SuppressWarnings("UnstableApiUsage")
     private EventBus eventBus;
-    private NodeId nodeId = () -> "5ca1ab1e-0000-4000-a000-000000000000";
+    private final NodeId nodeId = () -> "5ca1ab1e-0000-4000-a000-000000000000";
 
     public IndicesIT(SearchServerInstance elasticsearch) {
         super(elasticsearch);
@@ -127,7 +127,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
                 ImmutableMap.of(MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE, new MessageIndexTemplateProvider()));
         indices = new Indices(
                 indexMappingFactory,
-                () -> "5ca1ab1e-0000-4000-a000-000000000000",
+                nodeId,
                 new NullAuditEventSender(),
                 eventBus,
                 searchServer().adapters().indicesAdapter()

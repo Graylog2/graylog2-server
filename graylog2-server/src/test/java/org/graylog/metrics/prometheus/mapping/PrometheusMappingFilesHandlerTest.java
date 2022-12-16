@@ -42,7 +42,7 @@ import static org.graylog.metrics.prometheus.mapping.PrometheusMappingFilesHandl
 @ExtendWith(MockitoExtension.class)
 class PrometheusMappingFilesHandlerTest {
 
-    private final NodeId nodeId = () -> "abc-123";
+    private final NodeId nodeId = () -> "5ca1ab1e-0000-4000-a000-000000000000";
 
     @Mock
     MessageInputFactory messageInputFactory;
@@ -90,7 +90,7 @@ class PrometheusMappingFilesHandlerTest {
                     "org.apache.logging.log4j.core.Appender.*",
                     "gl_log_appenders",
                     ImmutableMap.of(
-                            "node", "abc-123",
+                            "node", "5ca1ab1e-0000-4000-a000-000000000000",
                             "status", "${0}"
                     )
             ));
@@ -146,7 +146,7 @@ class PrometheusMappingFilesHandlerTest {
                     "test.pattern",
                     "gl_test",
                     ImmutableMap.of(
-                            "node", "abc-123",
+                            "node", "5ca1ab1e-0000-4000-a000-000000000000",
                             "hello", "world"
                     )
             ));
@@ -168,7 +168,7 @@ class PrometheusMappingFilesHandlerTest {
                             "test.pattern",
                             "gl_test",
                             ImmutableMap.of(
-                                    "node", "abc-123",
+                                    "node", "5ca1ab1e-0000-4000-a000-000000000000",
                                     "hello", "world"
                             )
                     ),
@@ -176,7 +176,7 @@ class PrometheusMappingFilesHandlerTest {
                             "test2.pattern",
                             "gl_test2",
                             ImmutableMap.of(
-                                    "node", "abc-123",
+                                    "node", "5ca1ab1e-0000-4000-a000-000000000000",
                                     "hello", "world2"
                             )
                     )
@@ -233,7 +233,7 @@ class PrometheusMappingFilesHandlerTest {
                     "test.pattern",
                     "gl_test",
                     ImmutableMap.of(
-                            "node", "abc-123",
+                            "node", "5ca1ab1e-0000-4000-a000-000000000000",
                             "hello", "world"
                     )
             ));
@@ -255,7 +255,7 @@ class PrometheusMappingFilesHandlerTest {
                             "org.apache.logging.log4j.core.Appender.*",
                             "gl_log_appenders",
                             ImmutableMap.of(
-                                    "node", "abc-123",
+                                    "node", "5ca1ab1e-0000-4000-a000-000000000000",
                                     "status", "${0}"
                             )
                     ),
@@ -263,7 +263,7 @@ class PrometheusMappingFilesHandlerTest {
                             "test.pattern",
                             "gl_test",
                             ImmutableMap.of(
-                                    "node", "abc-123",
+                                    "node", "5ca1ab1e-0000-4000-a000-000000000000",
                                     "hello", "world"
                             )
                     ),
@@ -271,7 +271,7 @@ class PrometheusMappingFilesHandlerTest {
                             "test2.pattern",
                             "gl_test2",
                             ImmutableMap.of(
-                                    "node", "abc-123",
+                                    "node", "5ca1ab1e-0000-4000-a000-000000000000",
                                     "hello", "world2"
                             )
                     )

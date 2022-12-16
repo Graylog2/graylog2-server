@@ -71,15 +71,14 @@ public class DBJobTriggerServiceTest {
     private SchedulerCapabilitiesService schedulerCapabilitiesService;
 
     private DBJobTriggerService dbJobTriggerService;
-    private JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
-    private ObjectMapper objectMapper;
+    private final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
     private MongoJackObjectMapperProvider mapperProvider;
 
     @Before
     public void setUp() throws Exception {
         when(schedulerCapabilitiesService.getNodeCapabilities()).thenReturn(ImmutableSet.of());
 
-        objectMapper = new ObjectMapperProvider().get();
+        ObjectMapper objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(new NamedType(IntervalJobSchedule.class, IntervalJobSchedule.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(OnceJobSchedule.class, OnceJobSchedule.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(TestJobTriggerData.class, TestJobTriggerData.TYPE_NAME));

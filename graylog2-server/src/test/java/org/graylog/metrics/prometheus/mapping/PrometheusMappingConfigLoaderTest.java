@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PrometheusMappingConfigLoaderTest {
-    NodeId nodeId = () -> "abc-123";
+    NodeId nodeId = () -> "5ca1ab1e-0000-4000-a000-000000000000";
 
     @Mock
     MessageInputFactory messageInputFactory;
@@ -87,7 +87,7 @@ class PrometheusMappingConfigLoaderTest {
                         "foo.*.bar",
                         "gl_test1",
                         ImmutableMap.of(
-                                "node", "abc-123",
+                                "node", "5ca1ab1e-0000-4000-a000-000000000000",
                                 "another", "label",
                                 "first", "${0}"
                         )
@@ -96,7 +96,7 @@ class PrometheusMappingConfigLoaderTest {
                         "hello.world",
                         "gl_test2",
                         ImmutableMap.of(
-                                "node", "abc-123",
+                                "node", "5ca1ab1e-0000-4000-a000-000000000000",
                                 "another", "label"
                         )
                 ),
@@ -104,7 +104,7 @@ class PrometheusMappingConfigLoaderTest {
                         "one.*.three",
                         "gl_test3",
                         ImmutableMap.of(
-                                "node", "abc-123",
+                                "node", "5ca1ab1e-0000-4000-a000-000000000000",
                                 "two", "${0}"
                         )
                 )
@@ -122,7 +122,7 @@ class PrometheusMappingConfigLoaderTest {
                 .containsExactlyInAnyOrder(new MapperConfig(
                         "foo.bar",
                         "gl_test1",
-                        ImmutableMap.of("node", "abc-123")));
+                        ImmutableMap.of("node", "5ca1ab1e-0000-4000-a000-000000000000")));
     }
 
     @Test
@@ -139,7 +139,7 @@ class PrometheusMappingConfigLoaderTest {
                 .containsExactlyInAnyOrder(new MapperConfig(
                         "foo.bar",
                         "gl_test1",
-                        ImmutableMap.of("node", "abc-123")));
+                        ImmutableMap.of("node", "5ca1ab1e-0000-4000-a000-000000000000")));
     }
 
     @Test
@@ -160,7 +160,7 @@ class PrometheusMappingConfigLoaderTest {
                         "test.input.*.foo.bar",
                         "gl_test1",
                         ImmutableMap.of(
-                                "node", "abc-123",
+                                "node", "5ca1ab1e-0000-4000-a000-000000000000",
                                 "input_id", "${0}",
                                 "input_type", "test.input"
                         )));
