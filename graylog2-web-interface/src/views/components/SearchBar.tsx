@@ -61,7 +61,7 @@ import {
   SearchButtonAndQuery,
   SearchInputAndValidationContainer,
 } from 'views/components/searchbar/SearchBarLayout';
-import usePluggableCommands from 'views/components/searchbar/queryinput/usePluggableCommands';
+import PluggableCommands from 'views/components/searchbar/queryinput/PluggableCommands';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -140,7 +140,6 @@ const SearchBar = ({
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const initialValues = useInitialFormValues({ queryFilters, currentQuery });
   const _onSubmit = useCallback((values: SearchBarFormValues) => onSubmit(values, pluggableSearchBarControls, currentQuery), [currentQuery, onSubmit, pluggableSearchBarControls]);
-  const customCommands = usePluggableCommands('search_query');
 
   if (!currentQuery || !config) {
     return <Spinner />;
@@ -198,19 +197,23 @@ const SearchBar = ({
                               {({ field: { name, value, onChange }, meta: { error } }) => (
                                 <FormWarningsContext.Consumer>
                                   {({ warnings }) => (
-                                    <QueryInput value={value}
-                                                timeRange={values.timerange}
-                                                streams={values.streams}
-                                                name={name}
-                                                onChange={onChange}
-                                                placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
-                                                error={error}
-                                                isValidating={isValidating}
-                                                warning={warnings.queryString}
-                                                disableExecution={disableSearchSubmit}
-                                                validate={validateForm}
-                                                onExecute={handleSubmit as () => void}
-                                                commands={customCommands} />
+                                    <PluggableCommands usage="search_query">
+                                      {(customCommands) => (
+                                        <QueryInput value={value}
+                                                    timeRange={values.timerange}
+                                                    streams={values.streams}
+                                                    name={name}
+                                                    onChange={onChange}
+                                                    placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
+                                                    error={error}
+                                                    isValidating={isValidating}
+                                                    warning={warnings.queryString}
+                                                    disableExecution={disableSearchSubmit}
+                                                    validate={validateForm}
+                                                    onExecute={handleSubmit as () => void}
+                                                    commands={customCommands} />
+                                      )}
+                                    </PluggableCommands>
                                   )}
                                 </FormWarningsContext.Consumer>
                               )}

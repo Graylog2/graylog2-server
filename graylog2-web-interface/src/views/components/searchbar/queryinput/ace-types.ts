@@ -77,6 +77,8 @@ export type Editor = {
   session: Session,
   renderer: Renderer,
   setFontSize: (newFontSize: number) => void,
+  getValue: () => string,
+  setValue: (newValue: string) => void,
 };
 
 export type CompletionResult = {
