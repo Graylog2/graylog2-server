@@ -37,7 +37,8 @@ class FilePersistedNodeIdProviderTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        tempDir = Files.createTempDirectory("node-id-dir-");
+        String tmpdir = System.getProperty("java.io.tmpdir");
+        tempDir = Files.createTempDirectory(Path.of(tmpdir), "node-id-dir-");
     }
 
     @AfterEach
