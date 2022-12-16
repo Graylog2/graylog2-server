@@ -16,8 +16,16 @@
  */
 import React from 'react';
 
-import { OverlayTrigger, PaginatedList, SearchForm, Spinner, Icon } from 'components/common';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
+import {
+  OverlayTrigger,
+  PaginatedList,
+  SearchForm,
+  Spinner,
+  Icon,
+  NoSearchResult,
+  NoEntitiesExist,
+} from 'components/common';
 import DataAdapterTableEntry from 'components/lookup-tables/DataAdapterTableEntry';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
@@ -79,25 +87,70 @@ type Props = {
 };
 
 const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginationQueryParameter }: Props) => {
-  const { currentPage, currentPageSize, resetPage } = React.useMemo(() => ({
+  const [loading, setLoading] = React.useState(false);
+  const [localPagination, setLocalPagination] = React.useState({
     currentPage: paginationQueryParameter.page || 1,
     currentPageSize: paginationQueryParameter.pageSize || 10,
+    currentQuery: pagination.query,
     resetPage: paginationQueryParameter.resetPage,
-  }), [paginationQueryParameter]);
+    setPageSize: paginationQueryParameter.setPageSize,
+  });
 
-  const onPageChange = (newPage: number, newPerPage: number) => {
-    LookupTableDataAdaptersActions.searchPaginated(newPage, newPerPage, pagination.query);
-  };
+  React.useEffect(() => {
+    const { currentPage, currentPageSize, currentQuery } = localPagination;
 
-  const onSearch = React.useCallback((query: string, resetLoadingStateCb: () => void) => {
-    resetPage();
-    LookupTableDataAdaptersActions.searchPaginated(currentPage, currentPageSize, query).then(resetLoadingStateCb);
-  }, [resetPage, currentPage, currentPageSize]);
+    LookupTableDataAdaptersActions.searchPaginated(currentPage, currentPageSize, currentQuery)
+      .then(() => setLoading(false));
+  }, [localPagination]);
+
+  const onPageChange = React.useCallback((newPage: number, newPerPage: number) => {
+    setLocalPagination({ ...localPagination, currentPage: newPage, currentPageSize: newPerPage });
+  }, [localPagination]);
+
+  const onSearch = React.useCallback((query: string) => {
+    localPagination.resetPage();
+    localPagination.setPageSize(localPagination.currentPageSize);
+    setLocalPagination({ ...localPagination, currentPage: 1, currentQuery: query });
+  }, [localPagination]);
 
   const onReset = React.useCallback(() => {
-    resetPage();
-    LookupTableDataAdaptersActions.searchPaginated(currentPage, currentPageSize);
-  }, [resetPage, currentPage, currentPageSize]);
+    localPagination.resetPage();
+    localPagination.setPageSize(localPagination.currentPageSize);
+    setLocalPagination({ ...localPagination, currentPage: 1, currentQuery: '' });
+  }, [localPagination]);
+
+  const getComponent = () => {
+    switch (true) {
+      case loading:
+        return <Spinner text="Loading data adapters" />;
+      case (dataAdapters.length === 0 && !!localPagination.currentQuery):
+        return (
+          <tbody>
+            <tr>
+              <td colSpan={6}>
+                <NoSearchResult>No data adapters found with title &quot;{localPagination.currentQuery}&quot;</NoSearchResult>
+              </td>
+            </tr>
+          </tbody>
+        );
+      case dataAdapters.length > 0:
+        return dataAdapters.map((dataAdapter: LookupTableAdapter) => (
+          <DataAdapterTableEntry key={dataAdapter.id}
+                                 adapter={dataAdapter}
+                                 error={errorStates.dataAdapters[dataAdapter.name]} />
+        ));
+      default:
+        return (
+          <tbody>
+            <tr>
+              <td colSpan={6}>
+                <NoEntitiesExist>There are no data adapters to list</NoEntitiesExist>
+              </td>
+            </tr>
+          </tbody>
+        );
+    }
+  };
 
   return (
     <Row className="content">
@@ -105,8 +158,8 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
         <h2 style={{ marginBottom: 16 }}>
           Configured lookup Data Adapters <small>{pagination.total} total</small>
         </h2>
-        <PaginatedList activePage={currentPage}
-                       pageSize={currentPageSize}
+        <PaginatedList activePage={localPagination.currentPage}
+                       pageSize={localPagination.currentPageSize}
                        onChange={onPageChange}
                        totalItems={pagination.total}>
           <SearchForm onSearch={onSearch} onReset={onReset}>
@@ -128,13 +181,7 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
                   <th className={Styles.rowActions}>Actions</th>
                 </tr>
               </thead>
-              {dataAdapters.length === 0
-                ? <Spinner text="Loading data adapters" />
-                : dataAdapters.map((dataAdapter: LookupTableAdapter) => (
-                  <DataAdapterTableEntry key={dataAdapter.id}
-                                         adapter={dataAdapter}
-                                         error={errorStates.dataAdapters[dataAdapter.name]} />
-                ))}
+              {getComponent()}
             </Table>
           </div>
         </PaginatedList>

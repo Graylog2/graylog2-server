@@ -17,7 +17,15 @@
 import React from 'react';
 
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
-import { OverlayTrigger, PaginatedList, SearchForm, Icon, Spinner } from 'components/common';
+import {
+  OverlayTrigger,
+  PaginatedList,
+  SearchForm,
+  Icon,
+  Spinner,
+  NoSearchResult,
+  NoEntitiesExist,
+} from 'components/common';
 import LUTTableEntry from 'components/lookup-tables/LUTTableEntry';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
@@ -132,25 +140,72 @@ const LookupTablesOverview = ({
   errorStates,
   paginationQueryParameter,
 }: Props) => {
-  const { currentPage, currentPageSize, resetPage } = React.useMemo(() => ({
+  const [loading, setLoading] = React.useState(false);
+  const [localPagination, setLocalPagination] = React.useState({
     currentPage: paginationQueryParameter.page || 1,
     currentPageSize: paginationQueryParameter.pageSize || 10,
+    currentQuery: pagination.query,
     resetPage: paginationQueryParameter.resetPage,
-  }), [paginationQueryParameter]);
+    setPageSize: paginationQueryParameter.setPageSize,
+  });
+
+  React.useEffect(() => {
+    const { currentPage, currentPageSize, currentQuery } = localPagination;
+
+    LookupTablesActions.searchPaginated(currentPage, currentPageSize, currentQuery)
+      .then(() => setLoading(false));
+  }, [localPagination]);
 
   const onPageChange = React.useCallback((newPage: number, newPerPage: number) => {
-    LookupTablesActions.searchPaginated(newPage, newPerPage, pagination.query);
-  }, [pagination.query]);
+    setLocalPagination({ ...localPagination, currentPage: newPage, currentPageSize: newPerPage });
+  }, [localPagination]);
 
-  const onSearch = React.useCallback((query: string, resetLoadingStateCb: () => void) => {
-    resetPage();
-    LookupTablesActions.searchPaginated(currentPage, currentPageSize, query).then(resetLoadingStateCb);
-  }, [resetPage, currentPage, currentPageSize]);
+  const onSearch = React.useCallback((query: string) => {
+    localPagination.resetPage();
+    localPagination.setPageSize(localPagination.currentPageSize);
+    setLocalPagination({ ...localPagination, currentPage: 1, currentQuery: query });
+  }, [localPagination]);
 
   const onReset = React.useCallback(() => {
-    resetPage();
-    LookupTablesActions.searchPaginated(currentPage, currentPageSize);
-  }, [resetPage, currentPage, currentPageSize]);
+    localPagination.resetPage();
+    localPagination.setPageSize(localPagination.currentPageSize);
+    setLocalPagination({ ...localPagination, currentPage: 1, currentQuery: '' });
+  }, [localPagination]);
+
+  const getComponent = () => {
+    switch (true) {
+      case loading:
+        return <Spinner text="Loading tables" />;
+      case (tables.length === 0 && !!localPagination.currentQuery):
+        return (
+          <tbody>
+            <tr>
+              <td colSpan={6}>
+                <NoSearchResult>No tables found with title &quot;{localPagination.currentQuery}&quot;</NoSearchResult>
+              </td>
+            </tr>
+          </tbody>
+        );
+      case tables.length > 0:
+        return tables.map((table: LookupTable) => (
+          <LUTItem key={`table-item-${table.id}`}
+                   table={table}
+                   caches={caches}
+                   dataAdapters={dataAdapters}
+                   errorStates={errorStates} />
+        ));
+      default:
+        return (
+          <tbody>
+            <tr>
+              <td colSpan={6}>
+                <NoEntitiesExist>There are no tables to list</NoEntitiesExist>
+              </td>
+            </tr>
+          </tbody>
+        );
+    }
+  };
 
   return (
     <Row className="content">
@@ -158,8 +213,8 @@ const LookupTablesOverview = ({
         <h2 style={{ marginBottom: 16 }}>
           Configured lookup tables <small>{pagination.total} total</small>
         </h2>
-        <PaginatedList activePage={currentPage}
-                       pageSize={currentPageSize}
+        <PaginatedList activePage={localPagination.currentPage}
+                       pageSize={localPagination.currentPageSize}
                        onChange={onPageChange}
                        totalItems={pagination.total}>
           <SearchForm onSearch={onSearch} onReset={onReset}>
@@ -179,15 +234,7 @@ const LookupTablesOverview = ({
                   <th className={Styles.rowActions}>Actions</th>
                 </tr>
               </thead>
-              {tables.length === 0
-                ? <Spinner text="Loading caches" />
-                : tables.map((table: LookupTable) => (
-                  <LUTItem key={`table-item-${table.id}`}
-                           table={table}
-                           caches={caches}
-                           dataAdapters={dataAdapters}
-                           errorStates={errorStates} />
-                ))}
+              {getComponent()}
             </Table>
           </div>
         </PaginatedList>

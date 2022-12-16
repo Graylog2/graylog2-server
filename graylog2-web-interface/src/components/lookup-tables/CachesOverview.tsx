@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { OverlayTrigger, PaginatedList, SearchForm, Spinner, Icon } from 'components/common';
+import { OverlayTrigger, PaginatedList, SearchForm, Spinner, Icon, NoSearchResult, NoEntitiesExist } from 'components/common';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
 import CacheTableEntry from 'components/lookup-tables/CacheTableEntry';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
@@ -78,25 +78,68 @@ type Props = {
 };
 
 const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props) => {
-  const { currentPage, currentPageSize, resetPage } = React.useMemo(() => ({
+  const [loading, setLoading] = React.useState(false);
+  const [localPagination, setLocalPagination] = React.useState({
     currentPage: paginationQueryParameter.page || 1,
     currentPageSize: paginationQueryParameter.pageSize || 10,
+    currentQuery: pagination.query,
     resetPage: paginationQueryParameter.resetPage,
-  }), [paginationQueryParameter]);
+    setPageSize: paginationQueryParameter.setPageSize,
+  });
+
+  React.useEffect(() => {
+    const { currentPage, currentPageSize, currentQuery } = localPagination;
+
+    LookupTableCachesActions.searchPaginated(currentPage, currentPageSize, currentQuery)
+      .then(() => setLoading(false));
+  }, [localPagination]);
 
   const onPageChange = React.useCallback((newPage: number, newPerPage: number) => {
-    LookupTableCachesActions.searchPaginated(newPage, newPerPage, pagination.query);
-  }, [pagination.query]);
+    setLocalPagination({ ...localPagination, currentPage: newPage, currentPageSize: newPerPage });
+  }, [localPagination]);
 
-  const onSearch = React.useCallback((query: string, resetLoadingStateCb: () => void) => {
-    resetPage();
-    LookupTableCachesActions.searchPaginated(currentPage, currentPageSize, query).then(resetLoadingStateCb);
-  }, [resetPage, currentPage, currentPageSize]);
+  const onSearch = React.useCallback((query: string) => {
+    localPagination.resetPage();
+    localPagination.setPageSize(localPagination.currentPageSize);
+    setLocalPagination({ ...localPagination, currentPage: 1, currentQuery: query });
+  }, [localPagination]);
 
   const onReset = React.useCallback(() => {
-    resetPage();
-    LookupTableCachesActions.searchPaginated(currentPage, currentPageSize);
-  }, [resetPage, currentPage, currentPageSize]);
+    localPagination.resetPage();
+    localPagination.setPageSize(localPagination.currentPageSize);
+    setLocalPagination({ ...localPagination, currentPage: 1, currentQuery: '' });
+  }, [localPagination]);
+
+  const getComponent = () => {
+    switch (true) {
+      case loading:
+        return <Spinner text="Loading data adapters" />;
+      case (caches.length === 0 && !!localPagination.currentQuery):
+        return (
+          <tbody>
+            <tr>
+              <td colSpan={6}>
+                <NoSearchResult>No caches found with title &quot;{localPagination.currentQuery}&quot;</NoSearchResult>
+              </td>
+            </tr>
+          </tbody>
+        );
+      case caches.length > 0:
+        return caches.map((cache: LookupTableCache) => (
+          <CacheTableEntry key={cache.id} cache={cache} />
+        ));
+      default:
+        return (
+          <tbody>
+            <tr>
+              <td colSpan={6}>
+                <NoEntitiesExist>There are no caches to list</NoEntitiesExist>
+              </td>
+            </tr>
+          </tbody>
+        );
+    }
+  };
 
   return (
     <Row className="content">
@@ -104,8 +147,8 @@ const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props)
         <h2 style={{ marginBottom: 16 }}>
           Configured lookup Caches <small>{pagination.total} total</small>
         </h2>
-        <PaginatedList activePage={currentPage}
-                       pageSize={currentPageSize}
+        <PaginatedList activePage={localPagination.currentPage}
+                       pageSize={localPagination.currentPageSize}
                        onChange={onPageChange}
                        totalItems={pagination.total}>
           <SearchForm onSearch={onSearch} onReset={onReset}>
@@ -129,11 +172,7 @@ const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props)
                   <th className={Styles.rowActions}>Actions</th>
                 </tr>
               </thead>
-              {caches.length === 0
-                ? <Spinner text="Loading caches" />
-                : caches.map((cache: LookupTableCache) => (
-                  <CacheTableEntry key={cache.id} cache={cache} />
-                ))}
+              {getComponent()}
             </Table>
           </div>
         </PaginatedList>
