@@ -50,6 +50,7 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -103,6 +104,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
     protected Indices indices;
     @SuppressWarnings("UnstableApiUsage")
     private EventBus eventBus;
+    private NodeId nodeId = () -> "5ca1ab1e-0000-4000-a000-000000000000";
 
     public IndicesIT(SearchServerInstance elasticsearch) {
         super(elasticsearch);
@@ -381,7 +383,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
 
         indices = new Indices(
                 createThrowingIndexMappingFactory(indexSetConfig),
-                Tools::generateServerId,
+                nodeId,
                 new NullAuditEventSender(),
                 eventBus,
                 searchServer().adapters().indicesAdapter());
@@ -413,7 +415,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
 
         indices = new Indices(
                 createThrowingIndexMappingFactory(indexSetConfig),
-                Tools::generateServerId,
+                nodeId,
                 new NullAuditEventSender(),
                 eventBus,
                 searchServer().adapters().indicesAdapter());
