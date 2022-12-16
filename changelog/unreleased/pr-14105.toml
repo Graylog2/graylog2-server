@@ -1,0 +1,4 @@
+type = "changed"
+message = "Display dashboards overview as a table to improve usability."
+
+pulls = ["14105"]

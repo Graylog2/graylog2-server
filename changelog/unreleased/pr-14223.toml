@@ -1,0 +1,4 @@
+type = "changed"
+message = "Display saved searches overview as a table to improve usability."
+
+pulls = ["14223"]
