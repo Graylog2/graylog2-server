@@ -46,7 +46,7 @@ public class ArrayRemove extends AbstractFunction<List> {
                 .build();
         valueParam = ParameterDescriptor.object("value")
                 .description("The value to remove from the array").build();
-        removeAllParam = ParameterDescriptor.bool("case_sensitive")
+        removeAllParam = ParameterDescriptor.bool("remove_all")
                 .optional()
                 .description("Whether or not to remove all elements, or just a single one").build();
     }

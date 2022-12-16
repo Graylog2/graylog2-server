@@ -46,7 +46,7 @@ public class ArrayAdd extends AbstractFunction<List> {
                 .build();
         valueParam = ParameterDescriptor.object("value")
                 .description("The value to remove from the array").build();
-        onlyUniqueParam = ParameterDescriptor.bool("case_sensitive")
+        onlyUniqueParam = ParameterDescriptor.bool("only_unique")
                 .optional()
                 .description("Only add element if not already present").build();
     }
