@@ -7,7 +7,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 const useCommandsContext = (usage: Usage): CustomCommandContext => {
   const contextProviders = usePluginEntities('views.queryInput.commandContextProviders');
 
-  const context = useMemo(() => Object.fromEntries(contextProviders.map(({ key, provider }) => [key, provider()])), [contextProviders]);
+  const context = Object.fromEntries(contextProviders.map(({ key, provider }) => [key, provider()]));
 
   return { ...context, usage };
 };
