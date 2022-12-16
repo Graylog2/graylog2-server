@@ -42,8 +42,7 @@ import static org.mockito.Mockito.lenient;
 @ExtendWith(MockitoExtension.class)
 class TrafficCounterServiceTest {
 
-    @Mock
-    private NodeId nodeId;
+    private final NodeId nodeId = () -> "node-id";
 
     private TrafficCounterService service;
 

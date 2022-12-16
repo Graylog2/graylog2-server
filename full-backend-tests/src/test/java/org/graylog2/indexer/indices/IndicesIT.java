@@ -49,6 +49,7 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.indexer.searches.IndexRangeStats;
+import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -380,7 +381,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
 
         indices = new Indices(
                 createThrowingIndexMappingFactory(indexSetConfig),
-                () -> "node-id",
+                Tools::generateServerId,
                 new NullAuditEventSender(),
                 eventBus,
                 searchServer().adapters().indicesAdapter());
@@ -412,7 +413,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
 
         indices = new Indices(
                 createThrowingIndexMappingFactory(indexSetConfig),
-                () -> "node-id",
+                Tools::generateServerId,
                 new NullAuditEventSender(),
                 eventBus,
                 searchServer().adapters().indicesAdapter());

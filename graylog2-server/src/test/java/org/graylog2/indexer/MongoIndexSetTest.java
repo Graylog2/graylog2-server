@@ -68,8 +68,7 @@ public class MongoIndexSetTest {
     private Indices indices;
     @Mock
     private AuditEventSender auditEventSender;
-    @Mock
-    private NodeId nodeId;
+    private final NodeId nodeId = () -> "node-id";
     @Mock
     private IndexRangeService indexRangeService;
     @Mock

@@ -49,8 +49,7 @@ public class SizeBasedRotationStrategyTest {
     @Mock
     private Indices indices;
 
-    @Mock
-    private NodeId nodeId;
+    private final NodeId nodeId = () -> "node-id";
 
     @Mock
     private AuditEventSender auditEventSender;

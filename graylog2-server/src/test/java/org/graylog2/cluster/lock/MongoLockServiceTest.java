@@ -34,7 +34,6 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.graylog2.cluster.lock.Lock.FIELD_UPDATED_AT;
-import static org.mockito.Mockito.mock;
 
 public abstract class MongoLockServiceTest {
 

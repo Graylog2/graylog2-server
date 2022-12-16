@@ -52,8 +52,7 @@ class IndicesTest {
     @Mock
     private IndexMappingFactory indexMappingFactory;
 
-    @Mock
-    private NodeId nodeId;
+    private final NodeId nodeId = () -> "node-id";
 
     @Mock
     private AuditEventSender auditEventSender;

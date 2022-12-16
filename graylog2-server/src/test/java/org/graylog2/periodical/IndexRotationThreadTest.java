@@ -57,8 +57,7 @@ public class IndexRotationThreadTest {
     private Indices indices;
     @Mock
     private Cluster cluster;
-    @Mock
-    private NodeId nodeId;
+    private final NodeId nodeId = () -> "node-id";
     @Mock
     private IndexSetRegistry indexSetRegistry;
 
