@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.views.search.views;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
@@ -44,12 +46,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
     private static final String COLLECTION_NAME = "views";
     private final MongoCollection<Document> collection;
+    private final ObjectMapper mapper;
 
     @Inject
     protected ViewSummaryService(MongoConnection mongoConnection,
-                                 MongoJackObjectMapperProvider mapper) {
-        super(mongoConnection, mapper, ViewSummaryDTO.class, COLLECTION_NAME);
+                                 MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+                                 ObjectMapper mapper) {
+        super(mongoConnection, mongoJackObjectMapperProvider, ViewSummaryDTO.class, COLLECTION_NAME);
         this.collection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
+        this.mapper = mapper;
     }
 
     private PaginatedList<ViewSummaryDTO> searchPaginatedWithGrandTotal(SearchUser searchUser,
@@ -108,7 +113,8 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
         final long grandTotal = db.getCount(grandTotalQuery);
 
         final List<ViewSummaryDTO> views = StreamSupport.stream(result.spliterator(), false)
-                .map(ViewSummaryDTO::fromDocument)
+                .map(this::deserialize)
+//                .map(ViewSummaryDTO::fromDocument)
                 .filter(filter)
                 .toList();
 
@@ -120,6 +126,15 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
                 : views;
 
         return new PaginatedList<>(paginatedStreams, views.size(), page, perPage, grandTotal);
+    }
+
+    protected ViewSummaryDTO deserialize(Document document) {
+        try {
+            var json = mapper.writeValueAsString(document);
+            return mapper.readValue(json, ViewSummaryDTO.class);
+        } catch (JsonProcessingException jpe) {
+            throw new RuntimeException("could not deserialize view", jpe);
+        }
     }
 
     private Document doc(String key, Object value) {

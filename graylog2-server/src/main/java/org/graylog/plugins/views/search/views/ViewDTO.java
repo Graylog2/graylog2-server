@@ -248,22 +248,4 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
 
         return viewEntityBuilder;
     }
-
-    public static ViewDTO fromDocument(Document document) {
-        return ViewDTO.builder()
-                .id(document.getObjectId(FIELD_ID).toHexString())
-                .title(document.getString(FIELD_TITLE))
-                .description(document.getString(FIELD_DESCRIPTION))
-                .summary(document.getString(FIELD_SUMMARY))
-                .searchId(document.getString(FIELD_SEARCH_ID))
-                .owner(document.getString(FIELD_OWNER))
-                .favorite(document.getBoolean(FIELD_FAVORITE, false))
-                .type(Type.valueOf(document.getString(FIELD_TYPE)))
-// TODO: fix object deserialisation
-                .state(Map.of())
-//                .properties(document.getString(FIELD_PROPERTIES))
-//                .requires(document.getString(FIELD_REQUIRES))
-                .createdAt(new DateTime(document.getDate(FIELD_CREATED_AT).getTime()))
-                .build();
-    }
 }

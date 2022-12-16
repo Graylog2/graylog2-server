@@ -151,21 +151,4 @@ public abstract class ViewSummaryDTO implements ViewLike {
 
         public abstract ViewSummaryDTO build();
     }
-
-    public static ViewSummaryDTO fromDocument(Document document) {
-        return ViewSummaryDTO.builder()
-                .id(document.getObjectId(ViewDTO.FIELD_ID).toHexString())
-                .title(document.getString(ViewDTO.FIELD_TITLE))
-                .description(document.getString(ViewDTO.FIELD_DESCRIPTION))
-                .summary(document.getString(ViewDTO.FIELD_SUMMARY))
-                .searchId(document.getString(ViewDTO.FIELD_SEARCH_ID))
-                .owner(document.getString(ViewDTO.FIELD_OWNER))
-                .favorite(document.getBoolean(ViewDTO.FIELD_FAVORITE, false))
-                .type(ViewDTO.Type.valueOf(document.getString(ViewDTO.FIELD_TYPE)))
-// TODO: fix object deserialisation
-//                .properties(document.getString(ViewDTO.FIELD_PROPERTIES))
-//                .requires(document.getString(ViewDTO.FIELD_REQUIRES))
-                .createdAt(new DateTime(document.getDate(ViewDTO.FIELD_CREATED_AT).getTime()))
-                .build();
-    }
 }
