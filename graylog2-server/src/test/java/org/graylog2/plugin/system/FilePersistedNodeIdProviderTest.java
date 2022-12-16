@@ -42,7 +42,7 @@ class FilePersistedNodeIdProviderTest {
     }
 
     @AfterEach
-    void tearDown() throws IOException {
+    void tearDown() {
         final File[] filesInDir = Objects.requireNonNull(tempDir.toFile().listFiles());
         Arrays.stream(filesInDir).forEach(FilePersistedNodeIdProviderTest::delete);
         delete(tempDir.toFile());
