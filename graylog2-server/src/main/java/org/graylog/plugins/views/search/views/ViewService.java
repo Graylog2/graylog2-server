@@ -123,8 +123,7 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
                                 "favorites"
                         ),
                         Aggregates.set(new Field<>("favorite", doc("$gt", List.of(doc("$size", "$favorites"), 0)))),
-                        // replace with Aggregates.unset after switch to client 4.8
-                        new BasicDBObject("$unset", "favorites"),
+                        Aggregates.unset("favorites"),
                         Aggregates.sort(sort)
                 )
         );

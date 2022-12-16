@@ -21,6 +21,7 @@ import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Field;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Variable;
 import org.bson.Document;
 import org.graylog.plugins.views.favorites.FavoritesService;
@@ -52,6 +53,7 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
     }
 
     private PaginatedList<ViewSummaryDTO> searchPaginatedWithGrandTotal(SearchUser searchUser,
+                                                                        ViewDTO.Type type,
                                                                         SearchQuery query,
                                                    Predicate<ViewSummaryDTO> filter,
                                                    String order,
@@ -59,18 +61,25 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
                                                    DBQuery.Query grandTotalQuery,
                                                    int page,
                                                    int perPage) {
-        return findPaginatedWithQueryFilterAndSortWithGrandTotal(searchUser, query, filter, getSortBuilder(order, sortField), grandTotalQuery, page, perPage);
+        return findPaginatedWithQueryFilterAndSortWithGrandTotal(searchUser, query, type, filter, getSortBuilder(order, sortField), grandTotalQuery, page, perPage);
     }
 
     protected PaginatedList<ViewSummaryDTO> findPaginatedWithQueryFilterAndSortWithGrandTotal(SearchUser searchUser,
                                                                                        SearchQuery dbQuery,
+                                                                                       ViewDTO.Type type,
                                                                                        Predicate<ViewSummaryDTO> filter,
                                                                                        DBSort.SortBuilder sort,
                                                                                        DBQuery.Query grandTotalQuery,
                                                                                        int page,
                                                                                        int perPage) {
+
+
         var user = searchUser.getUser().getId();
-        var query = dbQuery.toBson();
+        var query = Filters.and(
+                // negation for Filters.exists() not found, so reverting to BasicDBObject for now
+                Filters.or(Filters.eq(ViewDTO.FIELD_TYPE, type), new BasicDBObject(ViewDTO.FIELD_TYPE, new BasicDBObject("$exists", false))),
+                dbQuery.toBson()
+        );
         final AggregateIterable<Document> result = collection.aggregate(List.of(
                         Aggregates.match(query),
                         Aggregates.lookup(
@@ -91,8 +100,7 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
                                 "favorites"
                         ),
                         Aggregates.set(new Field<>("favorite", doc("$gt", List.of(doc("$size", "$favorites"), 0)))),
-                        // replace with Aggregates.unset after switch to client 4.8
-                        new BasicDBObject("$unset", "favorites"),
+                        Aggregates.unset("favorites"),
                         Aggregates.sort(sort)
                 )
         );
@@ -128,12 +136,8 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
                                                         int perPage) {
         checkNotNull(sortField);
         return searchPaginatedWithGrandTotal(searchUser,
+                type,
                 query,
-// TODO: fix type inclusion
-//                DBQuery.and(
-//                        DBQuery.or(DBQuery.is(ViewDTO.FIELD_TYPE, type), DBQuery.notExists(ViewDTO.FIELD_TYPE)),
-//                        query.toDBQuery()
-//                ),
                 filter,
                 order,
                 sortField,
