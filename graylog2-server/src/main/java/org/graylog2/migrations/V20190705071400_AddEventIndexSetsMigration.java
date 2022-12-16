@@ -136,7 +136,7 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
                     streamService.destroy(stream);
                 }
                 final IndexSet indexSet = indexSetRegistry.get(id)
-                        .orElseThrow(() -> new javax.ws.rs.NotFoundException("Index set <" + id + "> not found."));
+                        .orElseThrow(() -> new IllegalStateException("Index set <" + id + "> not found."));
                 indexSetService.delete(id);
                 indexSetCleanupJobFactory.create(indexSet).execute();
             }

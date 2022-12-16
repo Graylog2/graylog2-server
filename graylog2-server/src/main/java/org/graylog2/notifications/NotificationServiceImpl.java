@@ -153,21 +153,7 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
         try {
             save(notification);
             auditEventSender.success(AuditActor.system(nodeId), SYSTEM_NOTIFICATION_CREATE, notification.asMap());
-
-            final EventDefinitionDto systemEventDefinition =
-                    dbEventDefinitionService.getSystemEventDefinitions().stream().findFirst()
-                            .orElseThrow(() -> new IllegalStateException("System notification event definition not found"));
-
-            SystemNotificationRenderService.RenderResponse renderResponse = systemNotificationRenderService.render(notification);
-            notification.addDetail("message_details", renderResponse.description);
-            SystemNotificationEventProcessorParameters parameters =
-                    SystemNotificationEventProcessorParameters.builder()
-                            .notificationType(notification.getType())
-                            .notificationMessage(renderResponse.title)
-                            .notificationDetails(notification.getDetails())
-                            .timestamp(notification.getTimestamp())
-                            .build();
-            eventProcessorEngine.execute(systemEventDefinition.id(), parameters);
+            createSystemEvent(notification);
         } catch (ValidationException e) {
             // We have no validations, but just in case somebody adds some...
             LOG.error("Validating user warning failed.", e);
@@ -179,6 +165,23 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
         }
 
         return true;
+    }
+
+    private void createSystemEvent(Notification notification) throws EventProcessorException {
+        final EventDefinitionDto systemEventDefinition =
+                dbEventDefinitionService.getSystemEventDefinitions().stream().findFirst()
+                        .orElseThrow(() -> new IllegalStateException("System notification event definition not found"));
+
+        SystemNotificationRenderService.RenderResponse renderResponse = systemNotificationRenderService.render(notification);
+        notification.addDetail("message_details", renderResponse.description);
+        SystemNotificationEventProcessorParameters parameters =
+                SystemNotificationEventProcessorParameters.builder()
+                        .notificationType(notification.getType())
+                        .notificationMessage(renderResponse.title)
+                        .notificationDetails(notification.getDetails())
+                        .timestamp(notification.getTimestamp())
+                        .build();
+        eventProcessorEngine.execute(systemEventDefinition.id(), parameters);
     }
 
     @Override
