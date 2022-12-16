@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.utils;
+package org.graylog.testing.completebackend.apis;
 
 import io.restassured.path.json.JsonPath;
 import io.restassured.specification.RequestSpecification;
@@ -25,18 +25,23 @@ import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
 
-public class SharingUtils {
+public class Sharing implements GraylogRestApi {
 
     public static final String ENTITY_STREAM = "stream";
     public static final String ENTITY_USER = "user";
 
     public static final String PERMISSION_OWN = "own";
     public static final String PERMISSION_VIEW = "view";
+    private final RequestSpecification requestSpecification;
+
+    public Sharing(RequestSpecification requestSpecification) {
+        this.requestSpecification = requestSpecification;
+    }
 
 
-    public static JsonPath setSharing(RequestSpecification requestSpec, SharingRequest req) {
+    public JsonPath setSharing(SharingRequest req) {
         return given()
-                .spec(requestSpec)
+                .spec(this.requestSpecification)
                 .when()
                 .body(serialize(req))
                 .post("/authz/shares/entities/" + req.entity().serialize())

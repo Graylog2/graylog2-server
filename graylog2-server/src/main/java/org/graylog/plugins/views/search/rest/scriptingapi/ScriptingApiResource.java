@@ -35,6 +35,7 @@ import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchRequestS
 import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
+import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -119,6 +120,8 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                                         @ApiParam(name = "streams") @QueryParam("streams") Set<String> streams,
                                         @ApiParam(name = "timerange") @QueryParam("timerange") String timerangeKeyword,
                                         @ApiParam(name = "fields") @QueryParam("fields") List<String> fields,
+                                        @ApiParam(name = "sort") @QueryParam("sort") String sort,
+                                        @ApiParam(name = "sort") @QueryParam("sortOrder") SortSpec.Direction sortOrder,
                                         @ApiParam(name = "from") @QueryParam("from") int from,
                                         @ApiParam(name = "size") @QueryParam("size") int size,
                                         @Context SearchUser searchUser) {
@@ -128,6 +131,8 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                     splitByComma(streams),
                     timerangeKeyword,
                     splitByComma(fields),
+                    sort,
+                    sortOrder,
                     from,
                     size);
             return executeQuery(messagesRequestSpec, searchUser);

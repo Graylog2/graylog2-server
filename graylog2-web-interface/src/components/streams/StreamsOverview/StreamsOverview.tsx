@@ -177,7 +177,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   }, []);
 
   const onSortChange = useCallback((newSort: Sort) => {
-    setSearchParams((cur) => ({ ...cur, sort: newSort }));
+    setSearchParams((cur) => ({ ...cur, sort: newSort, page: 1 }));
   }, []);
 
   const renderStreamActions = useCallback((listItem: Stream) => (
@@ -227,15 +227,15 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
             </Alert>
           )
           : (
-            <EntityDataTable data={streams}
-                             visibleColumns={visibleColumns}
-                             onColumnsChange={onColumnsChange}
-                             onSortChange={onSortChange}
-                             bulkActions={renderBulkActions}
-                             activeSort={searchParams.sort}
-                             rowActions={renderStreamActions}
-                             columnRenderers={customColumnRenderers(indexSets)}
-                             columnDefinitions={COLUMN_DEFINITIONS} />
+            <EntityDataTable<Stream> data={streams}
+                                     visibleColumns={visibleColumns}
+                                     onColumnsChange={onColumnsChange}
+                                     onSortChange={onSortChange}
+                                     bulkActions={renderBulkActions}
+                                     activeSort={searchParams.sort}
+                                     rowActions={renderStreamActions}
+                                     columnRenderers={customColumnRenderers(indexSets)}
+                                     columnDefinitions={COLUMN_DEFINITIONS} />
           )}
       </div>
     </PaginatedList>

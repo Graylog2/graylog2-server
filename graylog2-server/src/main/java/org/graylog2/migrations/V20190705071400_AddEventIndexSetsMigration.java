@@ -25,25 +25,19 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetConfigFactory;
 import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
-import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
-import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
-import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Duration;
-import org.joda.time.Period;
 import org.mongojack.DBQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Map;
@@ -61,14 +55,17 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     private final IndexSetService indexSetService;
     private final IndexSetValidator indexSetValidator;
     private final StreamService streamService;
+    private final IndexSetConfigFactory indexSetConfigFactory;
 
     @Inject
     public V20190705071400_AddEventIndexSetsMigration(ElasticsearchConfiguration elasticsearchConfiguration,
+                                                      IndexSetConfigFactory indexSetConfigFactory,
                                                       MongoIndexSet.Factory mongoIndexSetFactory,
                                                       IndexSetService indexSetService,
                                                       IndexSetValidator indexSetValidator,
                                                       StreamService streamService) {
         this.elasticsearchConfiguration = elasticsearchConfiguration;
+        this.indexSetConfigFactory = indexSetConfigFactory;
         this.mongoIndexSetFactory = mongoIndexSetFactory;
         this.indexSetService = indexSetService;
         this.indexSetValidator = indexSetValidator;
@@ -146,25 +143,14 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
             return mongoIndexSetFactory.create(optionalIndexSetConfig.get());
         }
 
-        final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
+        final IndexSetConfig indexSetConfig = indexSetConfigFactory.createDefault()
                 .title(indexSetTitle)
                 .description(indexSetDescription)
                 .indexTemplateType(EVENT_TEMPLATE_TYPE)
                 .isWritable(true)
                 .isRegular(false)
                 .indexPrefix(indexPrefix)
-                .shards(elasticsearchConfiguration.getShards())
-                .replicas(elasticsearchConfiguration.getReplicas())
-                .rotationStrategyClass(TimeBasedRotationStrategy.class.getCanonicalName())
-                .rotationStrategy(TimeBasedRotationStrategyConfig.builder().rotationPeriod(Period.months(1)).build())
-                .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
-                .retentionStrategy(DeletionRetentionStrategyConfig.create(12))
-                .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
-                .indexAnalyzer(elasticsearchConfiguration.getAnalyzer())
-                .indexTemplateName(indexPrefix+ "-template")
-                .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
-                .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
-                .fieldTypeRefreshInterval(Duration.standardMinutes(1))
+                .indexTemplateName(indexPrefix + "-template")
                 .build();
 
         try {

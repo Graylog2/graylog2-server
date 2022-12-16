@@ -23,13 +23,13 @@ import UserNotification from 'util/UserNotification';
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 import type { PaginatedListJSON } from 'stores/PaginationTypes';
 
-import type { PaginatedViews, SortField, SortOrder } from './ViewManagementStore';
+import type { PaginatedViews, SortOrder } from './ViewManagementStore';
 
 import type { ViewJson } from '../logic/views/View';
 import View from '../logic/views/View';
 
 type DashboardsActionsType = RefluxActions<{
-  search: (query?: string, page?: number, perPage?: number, sortBy?: SortField, order?: SortOrder) => Promise<PaginatedViews>,
+  search: (query?: string, page?: number, perPage?: number, sortBy?: string, order?: SortOrder) => Promise<PaginatedViews>,
 }>;
 
 const DashboardsActions: DashboardsActionsType = singletonActions(

@@ -32,6 +32,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.Configuration;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -153,6 +154,7 @@ public class LookupTableResource extends RestResource {
     private final LookupTableService lookupTableService;
     private final LookupDataAdapterValidationContext lookupDataAdapterValidationContext;
     private final Validator validator;
+    private final Configuration configuration;
 
     @Inject
     public LookupTableResource(DBLookupTableService dbTableService, DBDataAdapterService dbDataAdapterService,
@@ -161,7 +163,8 @@ public class LookupTableResource extends RestResource {
                                Map<String, LookupDataAdapter.Factory2> dataAdapterTypes2,
                                LookupTableService lookupTableService,
                                LookupDataAdapterValidationContext lookupDataAdapterValidationContext,
-                               Validator validator) {
+                               Validator validator,
+                               Configuration configuration) {
         this.dbTableService = dbTableService;
         this.dbDataAdapterService = dbDataAdapterService;
         this.dbCacheService = dbCacheService;
@@ -171,6 +174,7 @@ public class LookupTableResource extends RestResource {
         this.lookupTableService = lookupTableService;
         this.lookupDataAdapterValidationContext = lookupDataAdapterValidationContext;
         this.validator = validator;
+        this.configuration = configuration;
         this.lutSearchQueryParser = new SearchQueryParser(LookupTableDto.FIELD_TITLE, LUT_SEARCH_FIELD_MAPPING);
         this.adapterSearchQueryParser = new SearchQueryParser(DataAdapterDto.FIELD_TITLE, ADAPTER_SEARCH_FIELD_MAPPING);
         this.cacheSearchQueryParser = new SearchQueryParser(CacheDto.FIELD_TITLE, CACHE_SEARCH_FIELD_MAPPING);
@@ -482,7 +486,11 @@ public class LookupTableResource extends RestResource {
 
         final Stream<LookupDataAdapter.Descriptor> stream1 = dataAdapterTypes.values().stream().map(LookupDataAdapter.Factory::getDescriptor);
         final Stream<LookupDataAdapter.Descriptor> stream2 = dataAdapterTypes2.values().stream().map(LookupDataAdapter.Factory2::getDescriptor);
-        return Stream.concat(stream1, stream2)
+        Stream<LookupDataAdapter.Descriptor> descriptorStream = Stream.concat(stream1, stream2);
+        if (configuration.isCloud()) {
+            descriptorStream = descriptorStream.filter(descriptor -> descriptor.defaultConfiguration().isCloudCompatible());
+        }
+        return descriptorStream
                 .collect(Collectors.toMap(LookupDataAdapter.Descriptor::getType, Function.identity()));
 
     }
@@ -554,6 +562,10 @@ public class LookupTableResource extends RestResource {
     public DataAdapterApi createAdapter(@Valid @ApiParam DataAdapterApi newAdapter) {
         try {
             DataAdapterDto dto = newAdapter.toDto();
+            if (configuration.isCloud() && !dto.config().isCloudCompatible()) {
+                throw new BadRequestException(String.format(Locale.ENGLISH,
+                        "The data adapter <%s> is not allowed in the cloud environment!", dto.config().type()));
+            }
             DataAdapterDto saved = dbDataAdapterService.saveAndPostEvent(dto);
 
             return DataAdapterApi.fromDto(saved);
