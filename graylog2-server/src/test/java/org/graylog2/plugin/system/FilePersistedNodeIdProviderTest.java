@@ -18,43 +18,20 @@ package org.graylog2.plugin.system;
 
 import org.apache.commons.io.FileUtils;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Objects;
 
 class FilePersistedNodeIdProviderTest {
 
     public static final String NODE_ID_FILENAME = "node.id";
-    private Path tempDir;
 
-    @BeforeEach
-    void setUp() throws IOException {
-        String tmpdir = System.getProperty("java.io.tmpdir");
-        tempDir = Files.createTempDirectory(Path.of(tmpdir), "node-id-dir-");
-    }
-
-    @AfterEach
-    void tearDown() {
-        final File[] filesInDir = Objects.requireNonNull(tempDir.toFile().listFiles());
-        Arrays.stream(filesInDir).forEach(FilePersistedNodeIdProviderTest::delete);
-        delete(tempDir.toFile());
-    }
-
-    private static void delete(File f) {
-        try {
-            Files.deleteIfExists(f.toPath());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    @TempDir
+    static Path tempDir;
 
     @Test
     void testNonexistentFile() throws IOException {
