@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.views;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
@@ -26,6 +27,7 @@ import com.mongodb.client.model.Variable;
 import org.bson.Document;
 import org.graylog.plugins.views.favorites.FavoritesService;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.bindings.providers.NotIgnoringMongoJackObjectMapperProvider;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
@@ -44,12 +46,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
     private static final String COLLECTION_NAME = "views";
     private final MongoCollection<Document> collection;
+    private final NotIgnoringMongoJackObjectMapperProvider mapper;
 
     @Inject
     protected ViewSummaryService(MongoConnection mongoConnection,
-                                 MongoJackObjectMapperProvider mapper) {
-        super(mongoConnection, mapper, ViewSummaryDTO.class, COLLECTION_NAME);
+                                 MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+                                 NotIgnoringMongoJackObjectMapperProvider mapper) {
+        super(mongoConnection, mongoJackObjectMapperProvider, ViewSummaryDTO.class, COLLECTION_NAME);
         this.collection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
+        this.mapper = mapper;
     }
 
     private PaginatedList<ViewSummaryDTO> searchPaginatedWithGrandTotal(SearchUser searchUser,
@@ -108,7 +113,8 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
         final long grandTotal = db.getCount(grandTotalQuery);
 
         final List<ViewSummaryDTO> views = StreamSupport.stream(result.spliterator(), false)
-                .map(ViewSummaryDTO::fromDocument)
+                .map(this::deserialize)
+//                .map(ViewSummaryDTO::fromDocument)
                 .filter(filter)
                 .toList();
 
@@ -120,6 +126,15 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
                 : views;
 
         return new PaginatedList<>(paginatedStreams, views.size(), page, perPage, grandTotal);
+    }
+
+    protected ViewSummaryDTO deserialize(Document document) {
+        try {
+            var json = document.toJson();
+            return mapper.get().readValue(json, ViewSummaryDTO.class);
+        } catch (JsonProcessingException jpe) {
+            throw new RuntimeException("could not deserialize view", jpe);
+        }
     }
 
     private Document doc(String key, Object value) {
