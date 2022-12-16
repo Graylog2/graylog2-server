@@ -44,7 +44,8 @@ public class ArrayRemove extends AbstractFunction<List> {
                 .transform(ArrayRemove::toList)
                 .description("The input array, all must have the same data type, may be null")
                 .build();
-        valueParam = ParameterDescriptor.object("value").description("The value to remove from the array").build();
+        valueParam = ParameterDescriptor.object("value")
+                .description("The value to remove from the array").build();
         removeAllParam = ParameterDescriptor.bool("case_sensitive")
                 .optional()
                 .description("Whether or not to remove all elements, or just a single one").build();

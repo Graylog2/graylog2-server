@@ -43,7 +43,7 @@ public class ArrayContains extends AbstractFunction<Boolean> {
                 .description("The input value").build();
         caseSensitiveParam = ParameterDescriptor.bool("case_sensitive")
                 .optional()
-                .description("Whether or not to ignore case when checking String Arrays").build();
+                .description("Whether or not to ignore case when checking String arrays").build();
     }
 
     @SuppressWarnings("rawtypes")
@@ -85,7 +85,7 @@ public class ArrayContains extends AbstractFunction<Boolean> {
                 .pure(true)
                 .returnType(Boolean.class)
                 .params(ImmutableList.of(elementsParam, valueParam, caseSensitiveParam))
-                .description("Checks if the specified element is contained in the array")
+                .description("Checks if the specified element is contained in the array.")
                 .build();
     }
 }

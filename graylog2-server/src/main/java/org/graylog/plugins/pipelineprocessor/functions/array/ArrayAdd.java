@@ -44,10 +44,11 @@ public class ArrayAdd extends AbstractFunction<List> {
                 .transform(ArrayAdd::toList)
                 .description("The input array, all must have the same data type, may be null")
                 .build();
-        valueParam = ParameterDescriptor.object("value").description("The value to remove from the array").build();
+        valueParam = ParameterDescriptor.object("value")
+                .description("The value to remove from the array").build();
         onlyUniqueParam = ParameterDescriptor.bool("case_sensitive")
                 .optional()
-                .description("Only add element if now already present").build();
+                .description("Only add element if not already present").build();
     }
 
     @SuppressWarnings("rawtypes")
