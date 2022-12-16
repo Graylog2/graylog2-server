@@ -42,14 +42,12 @@ import static org.mockito.Mockito.lenient;
 @ExtendWith(MockitoExtension.class)
 class TrafficCounterServiceTest {
 
-    private final NodeId nodeId = () -> "node-id";
+    private final NodeId nodeId = () -> "node-1";
 
     private TrafficCounterService service;
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb, MongoJackObjectMapperProvider objectMapperProvider) {
-        lenient().when(nodeId.toEscapedString()).thenReturn("node-1");
-
         service = new TrafficCounterService(mongodb.mongoConnection(), objectMapperProvider);
     }
 
