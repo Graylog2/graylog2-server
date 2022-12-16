@@ -1,0 +1,90 @@
+package org.graylog2.plugin.system;
+
+import org.apache.commons.io.FileUtils;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Objects;
+
+class FilePersistedNodeIdProviderTest {
+
+    public static final String NODE_ID_FILENAME = "node.id";
+    private Path tempDir;
+
+    @BeforeEach
+    void setUp() throws IOException {
+        tempDir = Files.createTempDirectory("node-id-dir-");
+    }
+
+    @AfterEach
+    void tearDown() throws IOException {
+        final File[] filesInDir = Objects.requireNonNull(tempDir.toFile().listFiles());
+        Arrays.stream(filesInDir).forEach(FilePersistedNodeIdProviderTest::delete);
+        delete(tempDir.toFile());
+    }
+
+    private static void delete(File f) {
+        try {
+            Files.deleteIfExists(f.toPath());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    void testNonexistentFile() throws IOException {
+
+        final Path nodeIdPath = tempDir.resolve(NODE_ID_FILENAME);
+
+        final String filename = nodeIdPath.toAbsolutePath().toString();
+        final FilePersistedNodeIdProvider provider = new FilePersistedNodeIdProvider(filename);
+
+        // first let the logic generate and persist a new ID
+        final NodeId nodeId = provider.get();
+        final String generatedNodeId = nodeId.getNodeId();
+        Assertions.assertThat(generatedNodeId).isNotBlank();
+
+        // verify that content of the file is the same as the returned ID
+        Assertions.assertThat(Files.readString(Path.of(filename))).isEqualTo(generatedNodeId);
+
+        // now let's start again, but with a file that already contains an ID
+        final FilePersistedNodeIdProvider anotherProvider = new FilePersistedNodeIdProvider(filename);
+        Assertions.assertThat(anotherProvider.get().getNodeId()).isEqualTo(generatedNodeId);
+    }
+
+    @Test
+    void testEmptyFile() throws IOException {
+
+        final Path nodeIdPath = tempDir.resolve(NODE_ID_FILENAME);
+
+        // create the file, write empty string
+        FileUtils.writeStringToFile(nodeIdPath.toFile(), "", StandardCharsets.UTF_8);
+
+        final String filename = nodeIdPath.toAbsolutePath().toString();
+        final FilePersistedNodeIdProvider provider = new FilePersistedNodeIdProvider(filename);
+
+        // first let the logic generate and persist a new ID
+        final NodeId nodeId = provider.get();
+        final String generatedNodeId = nodeId.getNodeId();
+        Assertions.assertThat(generatedNodeId).isNotBlank();
+    }
+
+    @Test
+    void testReadOnlyFile() {
+        final boolean readOnly = tempDir.toFile().setReadOnly();
+        Assertions.assertThat(readOnly).isTrue();
+        final String filename = tempDir.toAbsolutePath().toString();
+        final FilePersistedNodeIdProvider anotherProvider = new FilePersistedNodeIdProvider(filename);
+        Assertions.assertThatThrownBy(anotherProvider::get)
+                .isInstanceOf(NodeIdPersistenceException.class)
+                .hasMessageContaining("Could not read or generate node ID");
+    }
+}

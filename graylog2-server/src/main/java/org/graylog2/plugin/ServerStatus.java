@@ -24,7 +24,7 @@ import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.lifecycles.Lifecycle;
-import org.graylog2.plugin.system.FilePersistedNodeId;
+import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTime;
@@ -77,7 +77,7 @@ public class ServerStatus {
     @Inject
     public ServerStatus(BaseConfiguration configuration, Set<Capability> capabilities, EventBus eventBus, Provider<AuditEventSender> auditEventSenderProvider) {
         this.eventBus = eventBus;
-        this.nodeId = new FilePersistedNodeId(configuration.getNodeIdFile());
+        this.nodeId = new FilePersistedNodeIdProvider(configuration.getNodeIdFile()).get();
         this.auditEventSenderProvider = auditEventSenderProvider;
         this.clusterId = "";
         this.startedAt = Tools.nowUTC();
