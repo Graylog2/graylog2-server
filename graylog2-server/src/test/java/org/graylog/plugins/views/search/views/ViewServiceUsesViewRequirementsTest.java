@@ -83,9 +83,11 @@ public class ViewServiceUsesViewRequirementsTest {
     @Before
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProviderForTest(new ObjectMapper());
+        final ObjectMapper mapper = new ObjectMapper();
         this.viewService = new ViewService(
                 mongodb.mongoConnection(),
                 objectMapperProvider,
+                mapper,
                 clusterConfigService,
                 viewRequirementsFactory,
                 mock(EntityOwnershipService.class),

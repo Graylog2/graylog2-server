@@ -72,9 +72,11 @@ public class ViewServiceTest {
                 new ChainingClassLoader(getClass().getClassLoader()),
                 new ClusterEventBus()
         );
+        final ObjectMapper mapper = new ObjectMapper();
         this.dbService = new ViewService(
                 mongodb.mongoConnection(),
                 objectMapperProvider,
+                mapper,
                 clusterConfigService,
                 view -> new ViewRequirements(Collections.emptySet(), view),
                 mock(EntityOwnershipService.class),

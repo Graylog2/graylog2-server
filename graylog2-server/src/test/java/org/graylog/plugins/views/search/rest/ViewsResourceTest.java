@@ -323,7 +323,7 @@ public class ViewsResourceTest {
         final ViewDTO.Builder originalViewBuilder = mockView(viewType, originalView);
         originalViewBuilder.id(VIEW_ID);
         when(originalView.id()).thenReturn(VIEW_ID);
-        doReturn(originalView).when(viewsResource).resolveView(VIEW_ID);
+        doReturn(originalView).when(viewsResource).resolveView(searchUser, VIEW_ID);
 
         final ViewDTO.Builder builder = mockView(viewType, view);
         builder.id(VIEW_ID);

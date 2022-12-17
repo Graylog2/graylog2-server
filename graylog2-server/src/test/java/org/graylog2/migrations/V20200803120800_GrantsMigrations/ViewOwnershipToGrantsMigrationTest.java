@@ -16,6 +16,7 @@
  */
 package org.graylog2.migrations.V20200803120800_GrantsMigrations;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
@@ -62,6 +63,7 @@ class ViewOwnershipToGrantsMigrationTest {
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
                MongoJackObjectMapperProvider objectMapperProvider,
+               ObjectMapper mapper,
                GRNRegistry grnRegistry,
                @Mock ClusterConfigService clusterConfigService,
                @Mock UserService userService,
@@ -71,7 +73,7 @@ class ViewOwnershipToGrantsMigrationTest {
         this.grantService = new DBGrantService(mongodb.mongoConnection(), objectMapperProvider, grnRegistry);
 
         final EntityOwnershipService entityOwnershipService = new EntityOwnershipService(grantService, grnRegistry);
-        final TestViewService viewService = new TestViewService(mongodb.mongoConnection(), objectMapperProvider, clusterConfigService, entityOwnershipService, viewSummaryService);
+        final TestViewService viewService = new TestViewService(mongodb.mongoConnection(), objectMapperProvider, mapper, clusterConfigService, entityOwnershipService, viewSummaryService);
 
         this.migration = new ViewOwnerShipToGrantsMigration(userService, grantService, "admin", viewService, grnRegistry);
     }
@@ -131,11 +133,12 @@ class ViewOwnershipToGrantsMigrationTest {
 
     public static class TestViewService extends ViewService {
         public TestViewService(MongoConnection mongoConnection,
-                               MongoJackObjectMapperProvider mapper,
+                               MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+                               ObjectMapper mapper,
                                ClusterConfigService clusterConfigService,
                                EntityOwnershipService entityOwnerShipService,
                                ViewSummaryService viewSummaryService) {
-            super(mongoConnection, mapper, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityOwnerShipService, viewSummaryService);
+            super(mongoConnection, mongoJackObjectMapperProvider, mapper, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityOwnerShipService, viewSummaryService);
         }
     }
 }
