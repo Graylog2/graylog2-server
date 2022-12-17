@@ -27,6 +27,7 @@ import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.GRNExtension;
+import org.graylog.testing.ObjectMapperExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
@@ -52,6 +53,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
+@ExtendWith(ObjectMapperExtension.class)
 @ExtendWith(GRNExtension.class)
 @ExtendWith(MockitoExtension.class)
 @MongoDBFixtures("view-ownership.json")
