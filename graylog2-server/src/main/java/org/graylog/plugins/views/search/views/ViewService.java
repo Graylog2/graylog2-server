@@ -28,8 +28,8 @@ import com.mongodb.client.model.Variable;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.favorites.FavoritesService;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -148,7 +148,6 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         var grandTotal = db.getCount(grandTotalQuery);
 
         var views = findViews(searchUser, dbQuery.toBson(), sort)
-//                .map(ViewDTO::fromDocument)
                 .map(this::deserialize)
                 .filter(filter)
                 .toList();
@@ -168,7 +167,7 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
             var json = mapper.writeValueAsString(document);
             return mapper.readValue(json, ViewDTO.class);
         } catch (JsonProcessingException jpe) {
-            throw new RuntimeException("could not deserialize view", jpe);
+            throw new RuntimeException("Could not deserialize view: " + jpe.getMessage(), jpe);
         }
     }
 

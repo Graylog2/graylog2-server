@@ -16,11 +16,10 @@
  */
 package org.graylog.plugins.views.search.views;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -30,6 +29,7 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.junit.After;
 import org.junit.Before;
@@ -51,20 +51,10 @@ public class ViewServiceTest {
 
     private SearchUser searchUser;
 
-    class MongoJackObjectMapperProviderForTest extends MongoJackObjectMapperProvider {
-        public MongoJackObjectMapperProviderForTest(ObjectMapper objectMapper) {
-            super(objectMapper);
-        }
-
-        @Override
-        public ObjectMapper get() {
-            return super.get().registerModule(new Jdk8Module());
-        }
-    }
-
     @Before
     public void setUp() throws Exception {
-        final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProviderForTest(new ObjectMapper());
+        final var mapper = new ObjectMapperProvider();
+        final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(mapper.get());
         this.clusterConfigService = new ClusterConfigServiceImpl(
                 objectMapperProvider,
                 mongodb.mongoConnection(),
@@ -72,16 +62,15 @@ public class ViewServiceTest {
                 new ChainingClassLoader(getClass().getClassLoader()),
                 new ClusterEventBus()
         );
-        final ObjectMapper mapper = new ObjectMapper();
         this.dbService = new ViewService(
                 mongodb.mongoConnection(),
                 objectMapperProvider,
-                mapper,
+                mapper.get(),
                 clusterConfigService,
                 view -> new ViewRequirements(Collections.emptySet(), view),
                 mock(EntityOwnershipService.class),
                 mock(ViewSummaryService.class));
-
+        this.searchUser = TestSearchUser.builder().build();
     }
 
     @After
