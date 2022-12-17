@@ -23,6 +23,7 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 @ContainerMatrixTestsConfiguration
@@ -83,6 +84,7 @@ public class ViewsResourceIT {
                 .body(getClass().getClassLoader().getResourceAsStream("org/graylog/plugins/views/save-search-request-invalid.json"))
                 .post("/views/search")
                 .then()
+                .log().ifStatusCodeMatches(not(201))
                 .statusCode(201);
 
         given()
