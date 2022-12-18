@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export function FontAwesomeIcon({ 'data-testid': dataTestid, icon }) {
+export function FontAwesomeIcon({ 'data-testid': dataTestid, icon, title, onClick }) {
   const classNames = ['svg-inline--fa'];
 
   if (typeof icon === 'string') {
@@ -26,7 +26,7 @@ export function FontAwesomeIcon({ 'data-testid': dataTestid, icon }) {
     classNames.push(`fa-${icon.iconName}`);
   }
 
-  return <svg className={classNames.join(' ')} data-testid={dataTestid} />;
+  return <svg className={classNames.join(' ')} data-testid={dataTestid} title={title} onClick={onClick} />;
 }
 
 FontAwesomeIcon.propTypes = {
@@ -37,10 +37,14 @@ FontAwesomeIcon.propTypes = {
     }),
   ]).isRequired,
   'data-testid': PropTypes.string,
+  title: PropTypes.string,
+  onClick: PropTypes.func,
 };
 
 FontAwesomeIcon.defaultProps = {
   'data-testid': undefined,
+  title: undefined,
+  onClick: undefined,
 };
 
 export default FontAwesomeIcon;

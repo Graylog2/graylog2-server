@@ -14,20 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog.testing.completebackend.apis;
 
-import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
+import java.util.Locale;
+import java.util.Map;
 
-export type PaginationQueryParameterObject = {
-  pageSizes?: number[];
-};
+public record SharingRequest(Entity entity, Map<Entity, String> permissions) {
 
-const withPaginationQueryParameter = <C extends React.ComponentType<React.ComponentProps<C>>>(Component: C, obj?: PaginationQueryParameterObject) => {
-  return function WrappedComponent(props: any) {
-    const result = usePaginationQueryParameter(obj?.pageSizes);
+    public record Entity(String type, String id) {
 
-    return <Component {...props} paginationQueryParameter={result} />;
-  };
-};
+        public String serialize() {
+            return String.format(Locale.ROOT, "grn::::%s:%s", this.type, this.id);
+        }
+    }
 
-export default withPaginationQueryParameter;
+}
