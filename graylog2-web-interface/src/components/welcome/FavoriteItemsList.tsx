@@ -20,7 +20,7 @@ import React, { useCallback, useState } from 'react';
 import { ListGroup } from 'components/bootstrap';
 import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
 import EntityItem from 'components/welcome/EntityListItem';
-import { EmptyResult, PaginatedList, Spinner } from 'components/common';
+import { NoSearchResult, PaginatedList, Spinner } from 'components/common';
 import { useFavoriteItems } from 'components/welcome/hooks';
 
 const FavoriteItemsList = () => {
@@ -34,10 +34,10 @@ const FavoriteItemsList = () => {
 
   if (favoriteItems.length === 0) {
     return (
-      <EmptyResult>
+      <NoSearchResult>
         You do not have any favorite items yet.
         Star any search/dashboard for it to show up here.
-      </EmptyResult>
+      </NoSearchResult>
     );
   }
 

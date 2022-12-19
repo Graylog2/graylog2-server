@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 
 import { Table } from 'components/bootstrap';
 import { DEFAULT_PAGINATION, entityTypeMap } from 'components/welcome/Constants';
-import { EmptyResult, PaginatedList, Spinner } from 'components/common';
+import { NoSearchResult, PaginatedList, Spinner } from 'components/common';
 import { relativeDifference } from 'util/DateTime';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
@@ -69,11 +69,11 @@ const RecentActivityList = () => {
 
   if (recentActivity.length === 0) {
     return (
-      <EmptyResult>
+      <NoSearchResult>
         There is no recent activity yet.
         <p />
         Whenever any other user will update content you have access to, or share new content with you, it will show up here.
-      </EmptyResult>
+      </NoSearchResult>
     );
   }
 
