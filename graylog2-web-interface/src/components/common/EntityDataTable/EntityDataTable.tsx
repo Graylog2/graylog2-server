@@ -183,7 +183,7 @@ const EntityDataTable = <Entity extends EntityBase>({
   const unselectAllItems = useCallback(() => setSelectedEntities([]), []);
 
   return (
-    <ScrollContainer ref={tableRef}>
+    <>
       <ActionsRow>
         <div>
           {(displayBulkSelectCol && !!selectedEntities?.length) && (
@@ -202,36 +202,38 @@ const EntityDataTable = <Entity extends EntityBase>({
                                    onChange={onColumnsChange} />
         </div>
       </ActionsRow>
-      <StyledTable striped condensed hover>
-        <TableHead columns={columns}
-                   columnsOrder={columnsOrder}
-                   actionsColWidth={actionsColWidth}
-                   columnsWidths={columnsWidths}
-                   selectedEntities={selectedEntities}
-                   setSelectedEntities={setSelectedEntities}
-                   data={data}
-                   columnRenderers={columnRenderers}
-                   onSortChange={onSortChange}
-                   displayBulkSelectCol={displayBulkSelectCol}
-                   activeSort={activeSort}
-                   displayActionsCol={displayActionsCol} />
-        <tbody>
-          {data.map((entity, index) => (
-            <TableRow entity={entity}
-                      key={entity.id}
-                      index={index}
-                      actionsRef={actionsRef}
-                      onToggleEntitySelect={onToggleEntitySelect}
-                      columnRenderers={columnRenderers}
-                      isSelected={!!selectedEntities?.includes(entity.id)}
-                      rowActions={rowActions}
-                      displaySelect={displayBulkSelectCol}
-                      displayActions={displayActionsCol}
-                      columns={columns} />
-          ))}
-        </tbody>
-      </StyledTable>
-    </ScrollContainer>
+      <ScrollContainer ref={tableRef}>
+        <StyledTable striped condensed hover>
+          <TableHead columns={columns}
+                     columnsOrder={columnsOrder}
+                     actionsColWidth={actionsColWidth}
+                     columnsWidths={columnsWidths}
+                     selectedEntities={selectedEntities}
+                     setSelectedEntities={setSelectedEntities}
+                     data={data}
+                     columnRenderers={columnRenderers}
+                     onSortChange={onSortChange}
+                     displayBulkSelectCol={displayBulkSelectCol}
+                     activeSort={activeSort}
+                     displayActionsCol={displayActionsCol} />
+          <tbody>
+            {data.map((entity, index) => (
+              <TableRow entity={entity}
+                        key={entity.id}
+                        index={index}
+                        actionsRef={actionsRef}
+                        onToggleEntitySelect={onToggleEntitySelect}
+                        columnRenderers={columnRenderers}
+                        isSelected={!!selectedEntities?.includes(entity.id)}
+                        rowActions={rowActions}
+                        displaySelect={displayBulkSelectCol}
+                        displayActions={displayActionsCol}
+                        columns={columns} />
+            ))}
+          </tbody>
+        </StyledTable>
+      </ScrollContainer>
+    </>
   );
 };
 
