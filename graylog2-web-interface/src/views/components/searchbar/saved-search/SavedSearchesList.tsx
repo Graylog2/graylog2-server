@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useCallback } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 
 import { Alert, Button } from 'components/bootstrap';
@@ -30,6 +30,8 @@ import type { PaginatedViews } from 'views/stores/ViewManagementStore';
 import { SavedSearchesActions } from 'views/stores/SavedSearchesStore';
 import type FetchError from 'logic/errors/FetchError';
 import UserNotification from 'util/UserNotification';
+import Routes from 'routing/Routes';
+import { Link } from 'components/common/router';
 
 type SearchParams = {
   page: number,
@@ -72,22 +74,23 @@ const onLoad = (onLoadSavedSearch: () => void, selectedSavedSearchId: string, lo
   return false;
 };
 
-const TitleLink = styled(Button)(({ $isActive }: { $isActive: boolean }) => css`
-  font-weight: ${$isActive ? 'bold' : 'normal'};
-  padding: 0;
-`);
-
-const customColumnRenderers = (onLoadSavedSearch: () => void, activeSavedSearchId: string): ColumnRenderers<View> => ({
+const customColumnRenderers = (onLoadSavedSearch: () => void): ColumnRenderers<View> => ({
   title: {
     renderCell: (search) => (
       <ViewLoaderContext.Consumer key={search.id}>
-        {(loaderFunc) => (
-          <TitleLink bsStyle="link"
-                     onClick={() => onLoad(onLoadSavedSearch, search.id, loaderFunc)}
-                     $isActive={search.id === activeSavedSearchId}>
-            {search.title}
-          </TitleLink>
-        )}
+        {(loaderFunc) => {
+          const onClick = (e) => {
+            e.preventDefault();
+            onLoad(onLoadSavedSearch, search.id, loaderFunc);
+          };
+
+          return (
+            <Link onClick={onClick}
+                  to={Routes.getPluginRoute('SEARCH_VIEWID')(search.id)}>
+              {search.title}
+            </Link>
+          );
+        }}
       </ViewLoaderContext.Consumer>
     ),
   },
@@ -196,7 +199,7 @@ const SavedSearchesList = ({
     </Button>
   ), [activeSavedSearchId, deleteSavedSearch, refetch]);
 
-  const columnRenderers = customColumnRenderers(onLoadSavedSearch, activeSavedSearchId);
+  const columnRenderers = customColumnRenderers(onLoadSavedSearch);
 
   if (isLoading) {
     return <Spinner />;

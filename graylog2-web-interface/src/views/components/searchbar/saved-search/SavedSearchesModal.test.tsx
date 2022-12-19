@@ -60,6 +60,10 @@ jest.mock('views/stores/SavedSearchesStore', () => ({
   },
 }));
 
+jest.mock('routing/Routes', () => ({
+  getPluginRoute: (x) => () => x,
+}));
+
 describe('SavedSearchesModal', () => {
   describe('render the SavedSearchesModal', () => {
     it('should render empty', async () => {
