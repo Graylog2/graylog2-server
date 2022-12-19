@@ -16,11 +16,10 @@
  */
 import * as React from 'react';
 import { useState, useCallback, useMemo } from 'react';
-import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 
-import { Alert, Button } from 'components/bootstrap';
-import { PaginatedList, SearchForm, Spinner } from 'components/common';
+import { Button } from 'components/bootstrap';
+import { PaginatedList, SearchForm, Spinner, NoEntitiesExist, NoSearchResult } from 'components/common';
 import type View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import QueryHelper from 'components/common/QueryHelper';
@@ -55,13 +54,6 @@ const DEFAULT_PAGINATION = {
   page: 1,
   pageSize: 10,
 };
-
-const NoSavedSearches = styled(Alert)`
-  clear: right;
-  display: flex;
-  align-items: center;
-  margin-top: 15px;
-`;
 
 const onLoad = (onLoadSavedSearch: () => void, selectedSavedSearchId: string, loadFunc: (searchId: string) => void) => {
   if (!selectedSavedSearchId || !loadFunc) {
@@ -217,15 +209,22 @@ const SavedSearchesList = ({
                    totalItems={pagination?.total}
                    pageSize={searchParams.pageSize}
                    useQueryParameter={false}>
-      <SearchForm focusAfterMount
-                  onSearch={handleSearch}
-                  queryHelpComponent={<QueryHelper entityName="search" commonFields={['id', 'title']} />}
-                  topMargin={0}
-                  onReset={onResetSearch} />
-      {pagination?.total === 0 && (
-        <NoSavedSearches>
+      <div style={{ marginBottom: "5px" }}>
+        <SearchForm focusAfterMount
+                    onSearch={handleSearch}
+                    queryHelpComponent={<QueryHelper entityName="search" commonFields={['id', 'title']} />}
+                    topMargin={0}
+                    onReset={onResetSearch} />
+      </div>
+      {pagination?.total === 0 && !searchParams.query && (
+        <NoEntitiesExist>
+          No saved searches have been created yet.
+        </NoEntitiesExist>
+      )}
+      {pagination?.total === 0 && searchParams.query && (
+        <NoSearchResult>
           No saved searches found.
-        </NoSavedSearches>
+        </NoSearchResult>
       )}
       {!!savedSearches?.length && (
         <EntityDataTable<View> data={savedSearches}

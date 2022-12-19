@@ -18,8 +18,8 @@ import PropTypes from 'prop-types';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
-import { Alert, Label } from 'components/bootstrap';
-import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
+import { Label } from 'components/bootstrap';
+import { PaginatedList, SearchForm, NoSearchResult} from 'components/common';
 import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';
 import type { Stream } from 'stores/streams/StreamsStore';
@@ -40,8 +40,6 @@ import useStreams from 'components/streams/hooks/useStreams';
 import useStreamRuleTypes from 'components/streams/hooks/useStreaRuleTypes';
 
 import StatusCell from './StatusCell';
-
-import CreateStreamButton from '../CreateStreamButton';
 
 const DefaultLabel = styled(Label)`
   display: inline-flex;
@@ -81,11 +79,10 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
 });
 
 type Props = {
-  onStreamCreate: (stream: Stream) => Promise<void>,
   indexSets: Array<IndexSet>
 }
 
-const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
+const StreamsOverview = ({ indexSets }: Props) => {
   const [visibleColumns, setVisibleColumns] = useState(INITIAL_COLUMNS);
   const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
   const [searchParams, setSearchParams] = useState<SearchParams>({
@@ -170,17 +167,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
       </div>
       <div>
         {streams?.length === 0 ? (
-          <Alert bsStyle="warning">
-            <Icon name="info-circle" />&nbsp;No streams found.
-            <IfPermitted permissions="streams:create">
-              <CreateStreamButton bsSize="small"
-                                  bsStyle="link"
-                                  className="btn-text"
-                                  buttonText="Create one now"
-                                  indexSets={indexSets}
-                                  onCreate={onStreamCreate} />
-            </IfPermitted>
-          </Alert>
+          <NoSearchResult>No streams have been found</NoSearchResult>
         ) : (
           <EntityDataTable<Stream> data={streams}
                                    visibleColumns={visibleColumns}
@@ -199,7 +186,6 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
 };
 
 StreamsOverview.propTypes = {
-  onStreamCreate: PropTypes.func.isRequired,
   indexSets: PropTypes.array.isRequired,
 };
 
