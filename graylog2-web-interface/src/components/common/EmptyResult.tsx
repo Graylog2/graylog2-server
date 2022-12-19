@@ -29,7 +29,7 @@ const EmptyResult = ({ children, className }: Props) => (
 );
 
 EmptyResult.propTypes = {
-  children: PropTypes.node,
+  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   className: PropTypes.string,
 };
 
