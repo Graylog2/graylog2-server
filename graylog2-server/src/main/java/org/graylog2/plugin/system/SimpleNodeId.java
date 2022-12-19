@@ -16,6 +16,13 @@
  */
 package org.graylog2.plugin.system;
 
+/**
+ * This is a simple record holding the ID only. All logic is provided by the {@link  NodeId} interface.
+ * Notice that the class is package-protected and integrations won't be able to create own instances. This
+ * is most likely not an issue, as typical use case is to let the server inject the NodeId instance.
+ *
+ * @param nodeId This is the actual ID. It's expected to be in the UID format, but it's not enforced anyhow now.
+ */
 record SimpleNodeId(String nodeId) implements NodeId {
 
     @Override
@@ -23,6 +30,12 @@ record SimpleNodeId(String nodeId) implements NodeId {
         return nodeId;
     }
 
+    /**
+     * This method is kept for compatibility reasons. Some integrations may rely on the toString call returning
+     * the actual node ID.
+     *
+     * @return the node ID, same value as the {@link #getNodeId()} call.
+     */
     @Override
     public String toString() {
         return nodeId;
