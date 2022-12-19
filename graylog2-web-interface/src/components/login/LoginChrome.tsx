@@ -114,7 +114,7 @@ const LoginChrome = ({ children }: Props) => (
       <BackgroundText>
         <TextContainer>
           <BrandName>Graylog</BrandName>
-          <Claim><Highlight>Log Management</Highlight> Done Right</Claim>
+          <Claim>Data. <Highlight>Insights.</Highlight> Answers.</Claim>
         </TextContainer>
       </BackgroundText>
       <BackgroundImage alt="background" src={bgImage} />
