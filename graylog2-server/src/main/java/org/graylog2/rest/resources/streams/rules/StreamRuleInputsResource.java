@@ -54,7 +54,7 @@ public class StreamRuleInputsResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get a list of all inputs for stream rules")
     @Produces(MediaType.APPLICATION_JSON)
-    @RequiresPermissions(RestPermissions.STREAMS_READ)
+    @RequiresPermissions(RestPermissions.INPUTS_READ)
     public StreamRuleInputsList list() throws NotFoundException {
         return StreamRuleInputsList.create(streamRuleInputsProviders.stream()
                 .map(StreamRuleInputsProvider::inputs)
