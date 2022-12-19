@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
@@ -85,7 +86,7 @@ public class FormattedEmailAlertSender implements AlertSender {
     public FormattedEmailAlertSender(EmailConfiguration configuration,
                                      NotificationService notificationService,
                                      NodeId nodeId,
-                                     Engine templateEngine) {
+                                     @Named("Email") Engine templateEngine) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.notificationService = requireNonNull(notificationService, "notificationService");
         this.nodeId = requireNonNull(nodeId, "nodeId");

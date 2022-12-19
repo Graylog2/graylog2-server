@@ -26,6 +26,7 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.bindings.providers.JmteEngineProvider;
+import org.graylog2.bindings.providers.EmailJmteEngineProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -243,9 +244,9 @@ public class FormattedEmailAlertSenderTest {
 
     @Test
     public void buildBodyEscapeHtmlOrNot() throws Exception {
-        Engine templateEngine = new JmteEngineProvider(new HashSet<NamedRenderer>()).get();
+        Engine templateEngine = new EmailJmteEngineProvider(new HashSet<NamedRenderer>()).get();
         FormattedEmailAlertSender emailAlertSender = new FormattedEmailAlertSender(new EmailConfiguration(), mockNotificationService, mockNodeId, templateEngine);
-        Configuration pluginConfig = new Configuration(Collections.<String, Object>singletonMap("body", "Test: ${stream.title;htmlsafe}${stream.title}"));
+        Configuration pluginConfig = new Configuration(Collections.<String, Object>singletonMap("body", "Test: ${stream.title}"));
         emailAlertSender.initialize(pluginConfig);
 
         Stream stream = mock(Stream.class);
@@ -255,6 +256,6 @@ public class FormattedEmailAlertSenderTest {
 
         String body = emailAlertSender.buildBody(stream, checkResult, Collections.<Message>emptyList());
 
-        assertThat(body).isEqualTo("Test: &lt;test&gt;<test>");
+        assertThat(body).isEqualTo("Test: &lt;test&gt;");
     }
 }
