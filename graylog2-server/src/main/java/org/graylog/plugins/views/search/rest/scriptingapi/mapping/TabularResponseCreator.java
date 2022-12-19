@@ -24,10 +24,10 @@ import java.util.stream.Collectors;
 
 public interface TabularResponseCreator {
 
-    default void throwErrorIfAnyAvailable(final QueryResult queryResult) throws AggregationFailedException {
+    default void throwErrorIfAnyAvailable(final QueryResult queryResult) throws QueryFailedException {
         if (!CollectionUtils.isEmpty(queryResult.errors())) {
             final String errorText = queryResult.errors().stream().map(SearchError::description).collect(Collectors.joining(", "));
-            throw new AggregationFailedException("Failed to obtain aggregation results. Reason:" + errorText);
+            throw new QueryFailedException("Failed to obtain results. " + errorText);
         }
     }
 

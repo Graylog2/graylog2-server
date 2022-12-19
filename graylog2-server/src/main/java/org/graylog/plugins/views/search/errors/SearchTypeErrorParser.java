@@ -24,11 +24,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SearchTypeErrorParser {
-    public static SearchTypeError parse(Query query, String searchTypeId, ElasticsearchException ex) {
-        final Integer resultWindowLimit = parseResultLimit(ex);
 
-        if (resultWindowLimit != null)
-            return new ResultWindowLimitError(query, searchTypeId, resultWindowLimit, ex);
+    private static final int MAX_DEPTH_OF_EXCEPTION_CAUSE_ANALYSIS = 10;
+
+    public static SearchTypeError parse(Query query, String searchTypeId, ElasticsearchException ex) {
+
+        Throwable possibleResultWindowException = ex;
+        int attempt = 0;
+        while (possibleResultWindowException != null && attempt < MAX_DEPTH_OF_EXCEPTION_CAUSE_ANALYSIS) {
+            final Integer resultWindowLimit = parseResultLimit(possibleResultWindowException);
+            if (resultWindowLimit != null) {
+                return new ResultWindowLimitError(query, searchTypeId, resultWindowLimit);
+            }
+            possibleResultWindowException = possibleResultWindowException.getCause();
+            attempt++;
+        }
 
         return new SearchTypeError(query, searchTypeId, ex);
     }
@@ -40,8 +50,9 @@ public class SearchTypeErrorParser {
     private static Integer parseResultLimit(String description) {
         if (description.toLowerCase(Locale.US).contains("result window is too large")) {
             final Matcher matcher = Pattern.compile("[0-9]+").matcher(description);
-            if (matcher.find())
+            if (matcher.find()) {
                 return Integer.parseInt(matcher.group(0));
+            }
         }
         return null;
     }
