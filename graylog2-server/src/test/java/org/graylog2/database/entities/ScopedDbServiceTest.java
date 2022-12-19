@@ -133,7 +133,7 @@ class ScopedDbServiceTest {
         TestScopedEntity immutablyScopedEntity = createEntity("An immutable entity", IMMUTABLE_SCOPE.getName());
 
         TestScopedEntity savedEntity = dbService.save(immutablyScopedEntity);
-        assertEquals(1, dbService.deleteImmutable(savedEntity.id()));
+        assertEquals(1, dbService.forceDelete(savedEntity.id()));
 
     }
 

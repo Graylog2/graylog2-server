@@ -77,7 +77,7 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
     }
 
     public int deleteUnregisterImmutable(String id) {
-        return doDeleteUnregister(id, () -> super.deleteImmutable(id));
+        return doDeleteUnregister(id, () -> super.forceDelete(id));
     }
 
     private int doDeleteUnregister(String id, Supplier<Integer> deleteSupplier) {

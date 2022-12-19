@@ -112,11 +112,9 @@ public abstract class ScopedDbService<E extends ScopedEntity> extends PaginatedD
     }
 
     /**
-     * Deletes an immutable entity. Do not call this method for API requests for the user interface.
-     * Only call when mutable deletion is appropriate (for example when deleting from content packs service, which
-     * is an appropriate immutable override path for Illuminate).
+     * Deletes an entity without checking for deletability. Do not call this method for API requests for the user interface.
      */
-    public final int deleteImmutable(String id) {
+    public final int forceDelete(String id) {
         // Intentionally omit ensure mutability check.
         return super.delete(id);
     }
