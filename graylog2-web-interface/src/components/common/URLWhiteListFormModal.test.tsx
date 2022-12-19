@@ -86,6 +86,7 @@ describe('<URLWhiteListFormModal>', () => {
       },
       searchesClusterConfig: undefined,
       eventsClusterConfig: undefined,
+      indexSetsDefaultConfig: undefined,
     }));
 
     renderSUT();
@@ -103,6 +104,7 @@ describe('<URLWhiteListFormModal>', () => {
       },
       searchesClusterConfig: undefined,
       eventsClusterConfig: undefined,
+      indexSetsDefaultConfig: undefined,
     }));
 
     renderSUT();

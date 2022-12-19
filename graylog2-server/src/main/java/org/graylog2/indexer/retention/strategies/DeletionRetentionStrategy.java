@@ -38,6 +38,7 @@ import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RETENTION_DELETE;
 
 public class DeletionRetentionStrategy extends AbstractIndexCountBasedRetentionStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(DeletionRetentionStrategy.class);
+    public static final String NAME = "delete";
 
     private final Indices indices;
     private final NodeId nodeId;

@@ -17,27 +17,33 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useCallback } from 'react';
-import { merge } from 'lodash';
 
-import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
+import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
 import TableCell from './TableCell';
 import type { ColumnRenderers, Column } from './types';
 import RowCheckbox from './RowCheckbox';
 
-const ActionsCell = styled.td`
-  > div {
-    display: flex;
-    justify-content: right;
+const ActionsCell = styled.th`
+  text-align: right;
+
+  .btn-toolbar {
+    display: inline-flex;
   }
 `;
 
+const ActionsRef = styled.div`
+  display: inline-flex;
+`;
+
 type Props<Entity extends { id: string }> = {
+  actionsRef: React.RefObject<HTMLDivElement>
   columns: Array<Column>,
-  customColumnRenderers?: ColumnRenderers<Entity> | undefined,
+  columnRenderers: ColumnRenderers<Entity>,
   displaySelect: boolean,
   displayActions: boolean,
   entity: Entity,
+  index: number,
   isSelected: boolean,
   onToggleEntitySelect: (entityId: string) => void,
   rowActions?: (entity: Entity) => React.ReactNode,
@@ -45,30 +51,34 @@ type Props<Entity extends { id: string }> = {
 
 const TableRow = <Entity extends { id: string }>({
   columns,
-  customColumnRenderers,
+  columnRenderers,
   displaySelect,
   displayActions,
   entity,
   isSelected,
   onToggleEntitySelect,
   rowActions,
+  index,
+  actionsRef,
 }: Props<Entity>) => {
   const toggleRowSelect = useCallback(
     () => onToggleEntitySelect(entity.id),
     [entity.id, onToggleEntitySelect],
   );
 
+  const actionButtons = displayActions ? <ButtonToolbar>{rowActions(entity)}</ButtonToolbar> : null;
+
   return (
     <tr key={entity.id}>
       {displaySelect && (
-        <td style={{ width: '20px' }}>
+        <td>
           <RowCheckbox onChange={toggleRowSelect}
                        title={`${isSelected ? 'Deselect' : 'Select'} entity`}
                        checked={isSelected} />
         </td>
       )}
       {columns.map((column) => {
-        const columnRenderer = merge(DefaultColumnRenderers[column.id] ?? {}, customColumnRenderers?.[column.id] ?? {});
+        const columnRenderer = columnRenderers[column.id];
 
         return (
           <TableCell columnRenderer={columnRenderer}
@@ -77,13 +87,16 @@ const TableRow = <Entity extends { id: string }>({
                      key={`${entity.id}-${column.id}`} />
         );
       })}
-      {displayActions ? <ActionsCell>{rowActions(entity)}</ActionsCell> : null}
+      {displayActions ? (
+        <ActionsCell>
+          {index === 0 ? <ActionsRef ref={actionsRef}>{actionButtons}</ActionsRef> : actionButtons}
+        </ActionsCell>
+      ) : null}
     </tr>
   );
 };
 
 TableRow.defaultProps = {
-  customColumnRenderers: undefined,
   rowActions: undefined,
 };
 

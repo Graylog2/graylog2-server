@@ -22,7 +22,7 @@ import chroma from 'chroma-js';
 import { Col, Jumbotron, Row } from 'components/bootstrap';
 
 const H1 = styled.h1(({ theme }) => css`
-  font-size: ${theme.fonts.size.huge};
+  font-size: ${theme.fonts.size.extraLarge};
   margin-bottom: 15px;
 `);
 

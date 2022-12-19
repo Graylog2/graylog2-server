@@ -42,6 +42,13 @@ import StatusCell from './StatusCell';
 
 import CreateStreamButton from '../CreateStreamButton';
 
+type SearchParams = {
+  page: number,
+  pageSize: number,
+  query: string,
+  sort: Sort
+}
+
 const DefaultLabel = styled(Label)`
   display: inline-flex;
   margin-left: 5px;
@@ -51,19 +58,12 @@ const DefaultLabel = styled(Label)`
 const COLUMN_DEFINITIONS = [
   { id: 'title', title: 'Title', sortable: true },
   { id: 'description', title: 'Description', sortable: true },
-  { id: 'index_set_id', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },
+  { id: 'index_set_title', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },
   { id: 'throughput', title: 'Throughput' },
   { id: 'disabled', title: 'Status', sortable: true },
 ];
 
-const INITIAL_COLUMNS = ['title', 'description', 'index_set_id', 'throughput', 'disabled'];
-
-type SearchParams = {
-  page: number,
-  pageSize: number,
-  query: string,
-  sort: Sort
-}
+const INITIAL_COLUMNS = ['title', 'description', 'index_set_title', 'throughput', 'disabled'];
 
 const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stream> => ({
   title: {
@@ -74,15 +74,17 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
       </>
     ),
   },
-  index_set_id: {
+  index_set_title: {
     renderCell: (stream) => <IndexSetCell indexSets={indexSets} stream={stream} />,
+    width: 0.7,
   },
   throughput: {
     renderCell: (stream) => <ThroughputCell stream={stream} />,
+    staticWidth: 120,
   },
   disabled: {
     renderCell: (stream) => <StatusCell stream={stream} />,
-    width: '100px',
+    staticWidth: 100,
   },
 });
 
@@ -175,7 +177,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   }, []);
 
   const onSortChange = useCallback((newSort: Sort) => {
-    setSearchParams((cur) => ({ ...cur, sort: newSort }));
+    setSearchParams((cur) => ({ ...cur, sort: newSort, page: 1 }));
   }, []);
 
   const renderStreamActions = useCallback((listItem: Stream) => (
@@ -188,7 +190,10 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
     selectedStreamIds: Array<string>,
     setSelectedStreamIds: (streamIds: Array<string>) => void,
   ) => (
-    <BulkActions selectedStreamIds={selectedStreamIds} setSelectedStreamIds={setSelectedStreamIds} />
+    <BulkActions selectedStreamIds={selectedStreamIds}
+                 setSelectedStreamIds={setSelectedStreamIds}
+                 refetchStreams={refetchStreams}
+                 indexSets={indexSets} />
   );
 
   if (!paginatedStreams || !streamRuleTypes) {
@@ -222,15 +227,15 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
             </Alert>
           )
           : (
-            <EntityDataTable data={streams}
-                             visibleColumns={visibleColumns}
-                             onColumnsChange={onColumnsChange}
-                             onSortChange={onSortChange}
-                             bulkActions={renderBulkActions}
-                             activeSort={searchParams.sort}
-                             rowActions={renderStreamActions}
-                             columnRenderers={customColumnRenderers(indexSets)}
-                             columnDefinitions={COLUMN_DEFINITIONS} />
+            <EntityDataTable<Stream> data={streams}
+                                     visibleColumns={visibleColumns}
+                                     onColumnsChange={onColumnsChange}
+                                     onSortChange={onSortChange}
+                                     bulkActions={renderBulkActions}
+                                     activeSort={searchParams.sort}
+                                     rowActions={renderStreamActions}
+                                     columnRenderers={customColumnRenderers(indexSets)}
+                                     columnDefinitions={COLUMN_DEFINITIONS} />
           )}
       </div>
     </PaginatedList>
