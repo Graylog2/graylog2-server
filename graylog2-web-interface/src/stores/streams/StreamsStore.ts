@@ -25,6 +25,7 @@ import PaginationURL from 'util/PaginationURL';
 import StreamsActions from 'actions/streams/StreamsActions';
 import { singletonStore } from 'logic/singleton';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import { Attributes } from 'stores/PaginationTypes';
 
 export type Stream = {
   id: string,
@@ -129,6 +130,7 @@ type PaginatedResponse = {
     per_page: number,
   },
   query: string,
+  attributes: Attributes,
   streams: Array<Stream>,
 };
 
@@ -145,6 +147,7 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
         const {
           streams,
           query,
+          attributes,
           pagination: {
             count,
             total,
@@ -155,6 +158,7 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
 
         return {
           streams,
+          attributes,
           pagination: {
             count,
             total,

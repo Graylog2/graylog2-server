@@ -68,6 +68,7 @@ const TableHead = <Entity extends EntityBase>({
   actionsColWidth,
   activeSort,
   columns,
+  columnsOrder,
   columnRenderers,
   columnsWidths,
   data,
@@ -81,6 +82,7 @@ const TableHead = <Entity extends EntityBase>({
   activeSort: Sort,
   columns: Array<Column>,
   columnsWidths: { [columnId: string]: number },
+  columnsOrder: Array<string>,
   columnRenderers: ColumnRenderers<Entity>,
   data: Readonly<Array<Entity>>,
   displayActionsCol: boolean,
@@ -88,29 +90,36 @@ const TableHead = <Entity extends EntityBase>({
   onSortChange: (newSort: Sort) => void,
   selectedEntities: Array<string>,
   setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>
-}) => (
-  <thead>
-    <tr>
-      {displayBulkSelectCol && (
-        <BulkSelectHead data={data}
-                        selectedEntities={selectedEntities}
-                        setSelectedEntities={setSelectedEntities} />
-      )}
-      {columns.map((column) => {
-        const columnRenderer = columnRenderers[column.id];
-
-        return (
-          <TableHeader<Entity> columnRenderer={columnRenderer}
-                               column={column}
-                               colWidth={columnsWidths[column.id]}
-                               onSortChange={onSortChange}
-                               activeSort={activeSort}
-                               key={column.title} />
-        );
-      })}
-      {displayActionsCol ? <ActionsHead $width={actionsColWidth}>Actions</ActionsHead> : null}
-    </tr>
-  </thead>
+}) => {
+  const sortedColumns = useMemo(
+    () => columns.sort((col1, col2) => columnsOrder.indexOf(col1.id) - columnsOrder.indexOf(col2.id)),
+    [columns, columnsOrder],
   );
+
+  return (
+    <thead>
+      <tr>
+        {displayBulkSelectCol && (
+          <BulkSelectHead data={data}
+                          selectedEntities={selectedEntities}
+                          setSelectedEntities={setSelectedEntities} />
+        )}
+        {sortedColumns.map((column) => {
+          const columnRenderer = columnRenderers[column.id];
+
+          return (
+            <TableHeader<Entity> columnRenderer={columnRenderer}
+                                 column={column}
+                                 colWidth={columnsWidths[column.id]}
+                                 onSortChange={onSortChange}
+                                 activeSort={activeSort}
+                                 key={column.title} />
+          );
+        })}
+        {displayActionsCol ? <ActionsHead $width={actionsColWidth}>Actions</ActionsHead> : null}
+      </tr>
+    </thead>
+  );
+};
 
 export default TableHead;

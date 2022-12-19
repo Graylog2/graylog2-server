@@ -69,3 +69,11 @@ export type SearchParams = {
   query: string,
   sort: Sort
 }
+
+export type Attribute = {
+  id: string,
+  title: string,
+  sortable: boolean,
+}
+
+export type Attributes = Array<Attribute>

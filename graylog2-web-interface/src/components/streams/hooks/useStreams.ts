@@ -5,7 +5,14 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import type { Stream } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 
-const useStreams = (searchParams: SearchParams): { data: { streams: Array<Stream>, pagination: { total: number } } | undefined, refetch: () => void } => {
+const useStreams = (searchParams: SearchParams): {
+  data: {
+    streams: Array<Stream>,
+    pagination: { total: number }
+    attributes: Array<{ id: string, title: string, sortable: boolean }>
+  } | undefined,
+  refetch: () => void
+} => {
   const { data, refetch } = useQuery(
     ['streams', 'overview', searchParams],
     () => StreamsStore.searchPaginated(

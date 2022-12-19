@@ -17,12 +17,13 @@
 import styled from 'styled-components';
 import * as React from 'react';
 import { Overlay } from 'react-overlays';
-import { useState, useRef } from 'react';
+import {useState, useRef, useMemo} from 'react';
 
 import { Checkbox, Button, Popover } from 'components/bootstrap';
 import type { Column } from 'components/common/EntityDataTable/types';
 import { Icon, Portal } from 'components/common';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
+import {defaultCompare as naturalSort} from 'logic/DefaultCompare';
 
 const StyledPopover = styled(Popover)`
   margin-right: 5px;
@@ -109,6 +110,11 @@ const ColumnsVisibilitySelect = ({ onChange, selectedColumns, allColumns }: Prop
     setShowSelect((cur) => !cur);
   };
 
+  const sortedColumns = useMemo(
+    () => allColumns.sort((col1, col2) => (naturalSort(col1.title, col2.title))),
+    [allColumns],
+  );
+
   return (
     <>
       <Button onClick={toggleColumnSelect} ref={buttonRef} bsSize="small" title="Select columns to display">
@@ -119,7 +125,7 @@ const ColumnsVisibilitySelect = ({ onChange, selectedColumns, allColumns }: Prop
         <Portal>
           <Overlay target={buttonRef.current} placement="bottom" show onHide={toggleColumnSelect} rootClose>
             <StyledPopover id="columns-visibility-select">
-              {allColumns.map((column) => (
+              {sortedColumns.map((column) => (
                 <ColumnListItem column={column}
                                 onClick={onChange}
                                 key={column.id}

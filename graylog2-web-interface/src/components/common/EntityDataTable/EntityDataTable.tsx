@@ -119,6 +119,8 @@ type Props<Entity extends EntityBase> = {
   columnDefinitions: Array<Column>,
   /** Custom cell and header renderer for a column */
   columnRenderers?: ColumnRenderers<Entity>,
+  /** Define default columns order */
+  columnsOrder?: Array<string>,
   /** The table data. */
   data: Readonly<Array<Entity>>,
   /** Function to handle changes of columns visibility */
@@ -139,6 +141,7 @@ const EntityDataTable = <Entity extends EntityBase>({
   bulkActions,
   columnRenderers: customColumnRenderers,
   columnDefinitions,
+  columnsOrder,
   data,
   onSortChange,
   rowActions,
@@ -201,6 +204,7 @@ const EntityDataTable = <Entity extends EntityBase>({
       </ActionsRow>
       <StyledTable striped condensed hover>
         <TableHead columns={columns}
+                   columnsOrder={columnsOrder}
                    actionsColWidth={actionsColWidth}
                    columnsWidths={columnsWidths}
                    selectedEntities={selectedEntities}
@@ -236,6 +240,7 @@ EntityDataTable.defaultProps = {
   bulkActions: undefined,
   columnRenderers: undefined,
   rowActions: undefined,
+  columnsOrder: [],
 };
 
 export default EntityDataTable;

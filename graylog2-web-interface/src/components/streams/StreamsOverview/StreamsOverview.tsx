@@ -49,16 +49,13 @@ const DefaultLabel = styled(Label)`
   vertical-align: inherit;
 `;
 
-const COLUMN_DEFINITIONS = [
-  { id: 'title', title: 'Title', sortable: true },
-  { id: 'description', title: 'Description', sortable: true },
+const CUSTOM_COLUMN_DEFINITIONS = [
   { id: 'index_set_title', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },
   { id: 'throughput', title: 'Throughput' },
-  { id: 'created_at', title: 'Created At', sortable: true },
-  { id: 'disabled', title: 'Status', sortable: true },
 ];
 
-const INITIAL_COLUMNS = ['title', 'description', 'index_set_title', 'throughput', 'disabled'];
+const INITIAL_COLUMNS = ['title', 'description', 'index_set_title', 'throughput', 'status'];
+const COLUMNS_ORDER = ['title', 'description', 'index_set_title', 'throughput', 'status', 'created_at'];
 
 const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stream> => ({
   title: {
@@ -77,7 +74,7 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
     renderCell: (stream) => <ThroughputCell stream={stream} />,
     staticWidth: 120,
   },
-  disabled: {
+  status: {
     renderCell: (stream) => <StatusCell stream={stream} />,
     staticWidth: 100,
   },
@@ -103,6 +100,10 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   const { data: streamRuleTypes } = useStreamRuleTypes();
   const { data: paginatedStreams, refetch: refetchStreams } = useStreams(searchParams);
   const columnRenderers = useMemo(() => customColumnRenderers(indexSets), [indexSets]);
+  const columnDefinitions = useMemo(
+    () => ([...(paginatedStreams?.attributes ?? []), ...CUSTOM_COLUMN_DEFINITIONS]),
+    [paginatedStreams?.attributes],
+  );
 
   useEffect(() => {
     StreamsStore.onChange(() => refetchStreams());
@@ -183,13 +184,14 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
         ) : (
           <EntityDataTable<Stream> data={streams}
                                    visibleColumns={visibleColumns}
+                                   columnsOrder={COLUMNS_ORDER}
                                    onColumnsChange={onColumnsChange}
                                    onSortChange={onSortChange}
                                    bulkActions={renderBulkActions}
                                    activeSort={searchParams.sort}
                                    rowActions={renderStreamActions}
                                    columnRenderers={columnRenderers}
-                                   columnDefinitions={COLUMN_DEFINITIONS} />
+                                   columnDefinitions={columnDefinitions} />
         )}
       </div>
     </PaginatedList>
