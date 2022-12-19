@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import type { Theme as SelectTheme, InputActionMeta } from 'react-select';
+import type { Theme as SelectTheme, InputActionMeta, } from 'react-select';
 import ReactSelect, { components as Components, createFilter } from 'react-select';
 import { isEqual } from 'lodash';
 import type { DefaultTheme } from 'styled-components';
@@ -212,6 +212,7 @@ const _styles = ({ size, theme }) => ({
 type ComponentsProp = {
   MultiValueLabel?: React.ComponentType<any>,
   SelectContainer?: React.ComponentType<any>,
+  DropdownIndicator?: React.ComponentType<any>,
 };
 
 export type Props<OptionValue> = {
@@ -229,6 +230,7 @@ export type Props<OptionValue> = {
   inputId?: string,
   inputProps?: { [key: string]: any },
   matchProp?: 'any' | 'label' | 'value',
+  onKeyDown?: (event: KeyboardEvent) => void,
   multi?: boolean,
   menuPortalTarget?: HTMLElement,
   name?: string,
@@ -311,6 +313,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
      * Custom attributes for the input (inside the Select).
      */
     inputProps: PropTypes.object,
+    onKeyDown: PropTypes.func,
     /** Indicates which option property to filter on. */
     matchProp: PropTypes.oneOf(['any', 'label', 'value']),
     /** Specifies if multiple values can be selected or not. */
@@ -393,6 +396,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     inputId: undefined,
     onBlur: undefined,
     inputProps: undefined,
+    onKeyDown: undefined,
     matchProp: 'any',
     multi: false,
     name: undefined,

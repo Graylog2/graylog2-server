@@ -40,7 +40,7 @@ export type WizardFormValues = {
   transportSecurity?: 'tls' | 'start_tls' | 'none',
   emailAttributes?: Array<string>,
   userFullNameAttribute?: string,
-  userNameAttribute?: Immutable.Set<string>,
+  userNameAttribute?: string,
   userUniqueIdAttribute?: string,
   userSearchBase?: string,
   userSearchPattern?: string,
