@@ -37,7 +37,7 @@ import BulkActions from 'components/streams/StreamsOverview/BulkActions';
 import ThroughputCell from 'components/streams/StreamsOverview/ThroughputCell';
 import type { SearchParams, Sort } from 'stores/PaginationTypes';
 import useStreams from 'components/streams/hooks/useStreams';
-import useStreamRuleTypes from 'components/streams/hooks/useStreaRuleTypes';
+import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 
 import StatusCell from './StatusCell';
 
