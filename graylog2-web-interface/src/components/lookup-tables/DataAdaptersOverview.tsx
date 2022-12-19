@@ -91,7 +91,7 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
   const [localPagination, setLocalPagination] = React.useState({
     currentPage: paginationQueryParameter.page || 1,
     currentPageSize: paginationQueryParameter.pageSize || 10,
-    currentQuery: pagination.query,
+    currentQuery: pagination.query || '',
     resetPage: paginationQueryParameter.resetPage,
     setPageSize: paginationQueryParameter.setPageSize,
   });
@@ -162,7 +162,7 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
                        pageSize={localPagination.currentPageSize}
                        onChange={onPageChange}
                        totalItems={pagination.total}>
-          <SearchForm onSearch={onSearch} onReset={onReset}>
+          <SearchForm query={localPagination.currentQuery} onSearch={onSearch} onReset={onReset}>
             <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover()}>
               <Button bsStyle="link"
                       className={Styles.searchHelpButton}>
