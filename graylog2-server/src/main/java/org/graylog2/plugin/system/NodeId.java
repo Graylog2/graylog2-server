@@ -35,6 +35,14 @@ public interface NodeId {
     }
 
     /**
+     * Is it used somewhere in integrations? Should we remove it later?
+     */
+    @Deprecated
+    default String toUnescapedString() {
+        return getNodeId().replace("\\u002e", ".").replace("\\u0024", "$").replace("\\\\", "\\");
+    }
+
+    /**
      * Generate an "anonymized" node ID for use with external services. Currently it just hashes the actual node ID
      * using SHA-256.
      *
