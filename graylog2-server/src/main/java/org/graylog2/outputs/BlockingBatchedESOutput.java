@@ -21,7 +21,9 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.shared.journal.Journal;
@@ -33,6 +35,11 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -48,6 +55,8 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
     private final Meter bufferFlushes;
     private final Meter bufferFlushFailures;
     private final Meter bufferFlushesRequested;
+    private final Cluster cluster;
+    private final int shutdownTimeoutMs;
 
     private volatile List<Map.Entry<IndexSet, Message>> buffer;
 
@@ -60,7 +69,8 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
                                    Messages messages,
                                    org.graylog2.Configuration serverConfiguration,
                                    Journal journal,
-                                   MessageQueueAcknowledger acknowledger) {
+                                   MessageQueueAcknowledger acknowledger,
+                                   Cluster cluster) {
         super(metricRegistry, messages, journal, acknowledger);
         this.maxBufferSize = serverConfiguration.getOutputBatchSize();
         outputFlushInterval = serverConfiguration.getOutputFlushInterval();
@@ -69,6 +79,8 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
         this.bufferFlushes = metricRegistry.meter(name(this.getClass(), "bufferFlushes"));
         this.bufferFlushFailures = metricRegistry.meter(name(this.getClass(), "bufferFlushFailures"));
         this.bufferFlushesRequested = metricRegistry.meter(name(this.getClass(), "bufferFlushesRequested"));
+        this.cluster = cluster;
+        this.shutdownTimeoutMs = serverConfiguration.getShutdownTimeout();
 
         buffer = new ArrayList<>(maxBufferSize);
 
@@ -129,8 +141,13 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
         // if we shouldn't flush at all based on the last flush time, no need to synchronize on this.
         if (lastFlushTime.get() != 0 &&
                 outputFlushInterval > NANOSECONDS.toSeconds(System.nanoTime() - lastFlushTime.get())) {
-                    return;
-                }
+            return;
+        }
+
+        forceFlush();
+    }
+
+    private void forceFlush() {
         // flip buffer quickly and initiate flush
         final List<Map.Entry<IndexSet, Message>> flushBatch;
         synchronized (this) {
@@ -141,6 +158,27 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
             bufferFlushesRequested.mark();
             flush(flushBatch);
         }
+    }
+
+    @Override
+    public void stop() {
+        if (cluster.isConnected() && cluster.isDeflectorHealthy()) {
+            // Try to flush current batch. Time-limited to avoid blocking shutdown too long.
+            final ExecutorService executorService = Executors.newSingleThreadExecutor(
+                    new ThreadFactoryBuilder().setNameFormat("es-output-shutdown-flush").build());
+            try {
+                executorService.submit(this::forceFlush).get(shutdownTimeoutMs, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                // OK, we are shutting down anyway
+            } catch (ExecutionException e) {
+                log.warn("Flushing current batch to indexer while stopping failed with message: {}.", e.getMessage());
+            } catch (TimeoutException e) {
+                log.warn("Timed out flushing current batch to indexer while stopping.");
+            } finally {
+                executorService.shutdownNow();
+            }
+        }
+        super.stop();
     }
 
     public interface Factory extends ElasticSearchOutput.Factory {
