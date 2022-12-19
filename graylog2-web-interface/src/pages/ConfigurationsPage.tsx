@@ -26,6 +26,8 @@ import MessageProcessorsConfig from 'components/configurations/MessageProcessors
 import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
 import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
+import HideOnCloud from 'util/conditional/HideOnCloud';
+import IndexSetsDefaultsConfig from 'components/configurations/IndexSetsDefaultsConfig';
 import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import 'components/maps/configurations';
 import type { Store } from 'stores/StoreTypes';
@@ -43,6 +45,7 @@ const SEARCHES_CLUSTER_CONFIG = 'org.graylog2.indexer.searches.SearchesClusterCo
 const MESSAGE_PROCESSORS_CONFIG = 'org.graylog2.messageprocessors.MessageProcessorsConfig';
 const SIDECAR_CONFIG = 'org.graylog.plugins.sidecar.system.SidecarConfiguration';
 const EVENTS_CONFIG = 'org.graylog.events.configuration.EventsConfiguration';
+const INDEX_SETS_DEFAULTS_CONFIG = 'org.graylog2.configuration.IndexSetsDefaultConfiguration';
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
 const PERMISSIONS_CONFIG = 'org.graylog2.users.UserAndTeamsConfig';
 
@@ -55,6 +58,8 @@ const _onUpdate = (configType: string) => {
         return ConfigurationsActions.updateMessageProcessorsConfig(configType, config);
       case URL_WHITELIST_CONFIG:
         return ConfigurationsActions.updateWhitelist(configType, config);
+      case INDEX_SETS_DEFAULTS_CONFIG:
+        return ConfigurationsActions.updateIndexSetDefaults(configType, config);
       default:
         return ConfigurationsActions.update(configType, config);
     }
@@ -72,6 +77,7 @@ const ConfigurationsPage = () => {
       ConfigurationsActions.list(SEARCHES_CLUSTER_CONFIG),
       ConfigurationsActions.listMessageProcessorsConfig(MESSAGE_PROCESSORS_CONFIG),
       ConfigurationsActions.list(SIDECAR_CONFIG),
+      ConfigurationsActions.list(INDEX_SETS_DEFAULTS_CONFIG),
       ConfigurationsActions.list(EVENTS_CONFIG),
       ConfigurationsActions.listPermissionsConfig(PERMISSIONS_CONFIG),
     ];
@@ -98,6 +104,7 @@ const ConfigurationsPage = () => {
     const sidecarConfig = _getConfig(SIDECAR_CONFIG, configuration);
     const eventsConfig = _getConfig(EVENTS_CONFIG, configuration);
     const urlWhiteListConfig = _getConfig(URL_WHITELIST_CONFIG, configuration);
+    const indexSetsDefaultsConfig = _getConfig(INDEX_SETS_DEFAULTS_CONFIG, configuration);
     const permissionsConfig = _getConfig(PERMISSIONS_CONFIG, configuration);
 
     Output = (
@@ -140,6 +147,14 @@ const ConfigurationsPage = () => {
             <PermissionsConfig config={permissionsConfig}
                                updateConfig={_onUpdate(PERMISSIONS_CONFIG)} />
           </ConfigletContainer>
+        )}
+        {indexSetsDefaultsConfig && (
+          <HideOnCloud>
+            <ConfigletContainer title="Index Set Default Configuration">
+              <IndexSetsDefaultsConfig initialConfig={indexSetsDefaultsConfig}
+                                       updateConfig={_onUpdate(INDEX_SETS_DEFAULTS_CONFIG)} />
+            </ConfigletContainer>
+          </HideOnCloud>
         )}
       </>
     );

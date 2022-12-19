@@ -37,7 +37,7 @@ class MessagesRequestSpecTest {
         );
 
         final List<String> specifiedFields = List.of("age", "salary", "position", "nvmd");
-        final List<ResponseSchemaEntry> schema = new MessagesRequestSpec("", Set.of(), null, 0, 1, specifiedFields)
+        final List<ResponseSchemaEntry> schema = new MessagesRequestSpec("", Set.of(), null, "age", null, 0, 1, specifiedFields)
                 .getSchema(fieldTypes);
 
         assertThat(schema).containsAll(

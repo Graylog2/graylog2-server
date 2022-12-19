@@ -66,7 +66,10 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
 
       if (this._isValidPeriod(update[field])) {
         // Only propagate state if the config is valid.
-        updateConfig(update);
+        updateConfig({
+          rotation_period: period,
+          rotate_empty_index_set: this.state.rotate_empty_index_set,
+        });
       }
     };
   };
@@ -79,10 +82,12 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
       const rotateEmptyIndexSet = this.inputs[field].getValue();
 
       update[field] = rotateEmptyIndexSet;
-
       this.setState(update);
 
-      updateConfig(update);
+      updateConfig({
+        rotation_period: this.state.rotation_period,
+        rotate_empty_index_set: rotateEmptyIndexSet,
+      });
     };
   };
 

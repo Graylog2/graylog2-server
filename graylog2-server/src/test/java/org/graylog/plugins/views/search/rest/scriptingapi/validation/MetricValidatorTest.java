@@ -28,7 +28,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertThrows;
 
-class MetricValidatiorTest {
+class MetricValidatorTest {
 
     private MetricValidator toTest;
 

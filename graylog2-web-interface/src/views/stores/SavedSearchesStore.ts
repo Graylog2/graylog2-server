@@ -21,10 +21,22 @@ import { singletonActions, singletonStore } from 'logic/singleton';
 import fetch from 'logic/rest/FetchProvider';
 import type { RefluxActions } from 'stores/StoreTypes';
 
-import type { PaginatedViews, SortField, SortOrder } from './ViewManagementStore';
+import type { PaginatedViews, SortOrder } from './ViewManagementStore';
 
 export type SavedSearchesActionsType = RefluxActions<{
-  search: (query?: string, page?: number, perPage?: number, sortBy?: SortField, order?: SortOrder) => Promise<PaginatedViews>,
+  search: ({
+    query,
+    page,
+    perPage,
+    sortBy,
+    order,
+  }: {
+    query?: string,
+    page?: number,
+    perPage?: number,
+    sortBy?: string,
+    order?: SortOrder
+  }) => Promise<PaginatedViews>,
 }>;
 
 const SavedSearchesActions: SavedSearchesActionsType = singletonActions(
