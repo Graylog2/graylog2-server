@@ -49,7 +49,7 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
 
     public TabularResponse mapToResponse(final MessagesRequestSpec messagesRequestSpec,
                                          final SearchJob searchJob,
-                                         final SearchUser searchUser) throws AggregationFailedException {
+                                         final SearchUser searchUser) throws QueryFailedException {
         final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
         final QueryResult queryResult = searchJobDTO.results().get(SearchRequestSpecToSearchMapper.QUERY_ID);
 
@@ -61,8 +61,8 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
             }
         }
 
-        LOG.warn("Scripting API failed to obtain aggregation for input : " + messagesRequestSpec);
-        throw new AggregationFailedException("Scripting API failed to obtain aggregation for input : " + messagesRequestSpec);
+        LOG.warn("Scripting API failed to obtain messages for input : " + messagesRequestSpec);
+        throw new QueryFailedException("Scripting API failed to obtain messages for input : " + messagesRequestSpec);
     }
 
     private TabularResponse mapToResponse(final MessagesRequestSpec searchRequestSpec,
