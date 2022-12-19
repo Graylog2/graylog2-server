@@ -194,7 +194,7 @@ const SavedSearchesList = ({
 
   const columnRenderers = useMemo(
     () => customColumnRenderers(onLoadSavedSearch),
-    [activeSavedSearchId, onLoadSavedSearch],
+    [onLoadSavedSearch],
   );
 
   if (isLoading) {
@@ -209,7 +209,7 @@ const SavedSearchesList = ({
                    totalItems={pagination?.total}
                    pageSize={searchParams.pageSize}
                    useQueryParameter={false}>
-      <div style={{ marginBottom: "5px" }}>
+      <div style={{ marginBottom: '5px' }}>
         <SearchForm focusAfterMount
                     onSearch={handleSearch}
                     queryHelpComponent={<QueryHelper entityName="search" commonFields={['id', 'title']} />}

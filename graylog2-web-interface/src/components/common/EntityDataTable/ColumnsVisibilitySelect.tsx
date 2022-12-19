@@ -17,13 +17,13 @@
 import styled from 'styled-components';
 import * as React from 'react';
 import { Overlay } from 'react-overlays';
-import {useState, useRef, useMemo} from 'react';
+import { useState, useRef, useMemo } from 'react';
 
 import { Checkbox, Button, Popover } from 'components/bootstrap';
 import type { Column } from 'components/common/EntityDataTable/types';
 import { Icon, Portal } from 'components/common';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
-import {defaultCompare as naturalSort} from 'logic/DefaultCompare';
+import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 
 const StyledPopover = styled(Popover)`
   margin-right: 5px;

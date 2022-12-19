@@ -19,7 +19,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
 import { Label } from 'components/bootstrap';
-import { PaginatedList, SearchForm, NoSearchResult} from 'components/common';
+import { PaginatedList, SearchForm, NoSearchResult } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';
 import type { Stream } from 'stores/streams/StreamsStore';

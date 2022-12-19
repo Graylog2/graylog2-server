@@ -25,7 +25,7 @@ import PaginationURL from 'util/PaginationURL';
 import StreamsActions from 'actions/streams/StreamsActions';
 import { singletonStore } from 'logic/singleton';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
-import { Attributes } from 'stores/PaginationTypes';
+import type { Attributes } from 'stores/PaginationTypes';
 
 export type Stream = {
   id: string,
