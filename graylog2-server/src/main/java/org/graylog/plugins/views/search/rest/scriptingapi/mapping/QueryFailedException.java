@@ -16,8 +16,8 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
-public class AggregationFailedException extends Exception {
-    public AggregationFailedException(String message) {
+public class QueryFailedException extends Exception {
+    public QueryFailedException(final String message) {
         super(message);
     }
 }
