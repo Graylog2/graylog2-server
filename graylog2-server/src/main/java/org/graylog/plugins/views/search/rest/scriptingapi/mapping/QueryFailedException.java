@@ -14,18 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.utils;
+package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
-import java.util.Locale;
-import java.util.Map;
-
-public record SharingRequest(Entity entity, Map<Entity, String> permissions) {
-
-    public static record Entity(String type, String id) {
-
-        public String serialize() {
-            return String.format(Locale.ROOT, "grn::::%s:%s", this.type, this.id);
-        }
+public class QueryFailedException extends Exception {
+    public QueryFailedException(final String message) {
+        super(message);
     }
-
 }

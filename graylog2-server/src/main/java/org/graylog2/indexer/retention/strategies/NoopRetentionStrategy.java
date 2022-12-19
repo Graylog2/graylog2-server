@@ -29,6 +29,7 @@ import java.util.Optional;
 
 public class NoopRetentionStrategy extends AbstractIndexCountBasedRetentionStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(NoopRetentionStrategy.class);
+    public static final String NAME = "none";
 
     @Inject
     public NoopRetentionStrategy(Indices indices, ActivityWriter activityWriter) {

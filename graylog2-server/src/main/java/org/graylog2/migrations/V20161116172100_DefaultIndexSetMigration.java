@@ -84,14 +84,14 @@ public class V20161116172100_DefaultIndexSetMigration extends Migration {
                 .title("Default index set")
                 .description("The Graylog default index set")
                 .isRegular(true)
-                .indexPrefix(elasticsearchConfiguration.getIndexPrefix())
+                .indexPrefix(elasticsearchConfiguration.getDefaultIndexPrefix())
                 .shards(elasticsearchConfiguration.getShards())
                 .replicas(elasticsearchConfiguration.getReplicas())
                 .rotationStrategy(getRotationStrategyConfig(indexManagementConfig))
                 .retentionStrategy(getRetentionStrategyConfig(indexManagementConfig))
                 .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
                 .indexAnalyzer(elasticsearchConfiguration.getAnalyzer())
-                .indexTemplateName(elasticsearchConfiguration.getTemplateName())
+                .indexTemplateName(elasticsearchConfiguration.getDefaultIndexTemplateName())
                 .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
                 .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
                 .build();
@@ -128,7 +128,7 @@ public class V20161116172100_DefaultIndexSetMigration extends Migration {
         final Class<RetentionStrategyConfig> configClass = (Class<RetentionStrategyConfig>) retentionStrategy.configurationClass();
 
         final RetentionStrategyConfig retentionStrategyConfig = clusterConfigService.get(configClass);
-        checkState(retentionStrategyConfig!= null, "Couldn't retrieve retention strategy config for <" + strategyName + ">");
+        checkState(retentionStrategyConfig != null, "Couldn't retrieve retention strategy config for <" + strategyName + ">");
 
         return retentionStrategyConfig;
     }

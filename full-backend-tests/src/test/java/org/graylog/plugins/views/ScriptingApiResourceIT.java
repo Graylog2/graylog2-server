@@ -21,18 +21,15 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiModule;
-import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.completebackend.apis.GraylogApis;
+import org.graylog.testing.completebackend.apis.Sharing;
+import org.graylog.testing.completebackend.apis.SharingRequest;
+import org.graylog.testing.completebackend.apis.Streams;
+import org.graylog.testing.completebackend.apis.Users;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog.testing.utils.GelfInputUtils;
-import org.graylog.testing.utils.IndexSetUtils;
-import org.graylog.testing.utils.SearchUtils;
-import org.graylog.testing.utils.SharingRequest;
-import org.graylog.testing.utils.SharingUtils;
-import org.graylog.testing.utils.StreamUtils;
-import org.graylog.testing.utils.UserUtils;
 import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.rest.MoreMediaTypes;
 import org.hamcrest.Matcher;
@@ -65,23 +62,23 @@ import static org.hamcrest.Matchers.hasEntry;
                                    enabledFeatureFlags = ScriptingApiModule.FEATURE_FLAG)
 public class ScriptingApiResourceIT {
 
-    private final GraylogBackend sut;
     private final RequestSpecification requestSpec;
+    private final GraylogApis api;
 
     private String stream1Id;
     private String stream2Id;
 
-    public ScriptingApiResourceIT(GraylogBackend sut, RequestSpecification requestSpec) {
-        this.sut = sut;
+    public ScriptingApiResourceIT(RequestSpecification requestSpec, GraylogApis apis) {
         this.requestSpec = requestSpec;
+        this.api = apis;
     }
 
     @BeforeAll
     public void beforeAll() {
 
-        final String defaultIndexSetId = IndexSetUtils.defaultIndexSetId(requestSpec);
+        final String defaultIndexSetId = api.indices().defaultIndexSetId();
 
-        final JsonPath user = UserUtils.createUser(requestSpec, new UserUtils.User(
+        final JsonPath user = api.users().createUser(new Users.User(
                 "john.doe",
                 "asdfgh",
                 "John",
@@ -97,16 +94,17 @@ public class ScriptingApiResourceIT {
         final String userId = user.getString("id");
 
 
-        this.stream1Id = StreamUtils.createStream(requestSpec, "Stream #1", defaultIndexSetId, new StreamUtils.StreamRule(StreamRuleType.EXACT.toInteger(), "stream1", "target_stream", false));
-        this.stream2Id = StreamUtils.createStream(requestSpec, "Stream #2", defaultIndexSetId, new StreamUtils.StreamRule(StreamRuleType.EXACT.toInteger(), "stream2", "target_stream", false));
+        this.stream1Id = api.streams().createStream("Stream #1", defaultIndexSetId, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream1", "target_stream", false));
+        this.stream2Id = api.streams().createStream("Stream #2", defaultIndexSetId, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream2", "target_stream", false));
 
-        SharingUtils.setSharing(requestSpec, new SharingRequest(
-                new SharingRequest.Entity(SharingUtils.ENTITY_STREAM, stream2Id),
+        api.sharing().setSharing(new SharingRequest(
+                new SharingRequest.Entity(Sharing.ENTITY_STREAM, stream2Id),
                 ImmutableMap.of(
-                        new SharingRequest.Entity(SharingUtils.ENTITY_USER, userId), SharingUtils.PERMISSION_VIEW
+                        new SharingRequest.Entity(Sharing.ENTITY_USER, userId), Sharing.PERMISSION_VIEW
                 )));
 
-        GelfInputUtils.createGelfHttpInput(sut, 12201, requestSpec)
+        api.gelf()
+                .createGelfHttpInput(12201)
                 .postMessage("""
                         {"short_message":"search-sync-test", "host":"example.org", "facility":"test", "_level":1, "_target_stream": "stream1"}
                         """)
@@ -115,10 +113,10 @@ public class ScriptingApiResourceIT {
                         """)
                 .postMessage("""
                         {"short_message":"search-sync-test-3", "host":"lorem-ipsum.com", "facility":"another-test", "_level":3, "_http_method":"POST", "_target_stream": "stream2"}
-                        """)
-                .waitForAllMessages();
+                        """);
 
-        SearchUtils.waitForFieldTypeDefinitions(requestSpec, "source", "facility", "level");
+        api.search().waitForMessagesCount(3);
+        api.fieldTypes().waitForFieldTypeDefinitions( "source", "facility", "level");
     }
 
     @ContainerMatrixTest
@@ -609,7 +607,7 @@ public class ScriptingApiResourceIT {
                 .statusCode(400)
                 .assertThat()
                 .body("type", Matchers.equalTo("ApiError"))
-                .body("message", Matchers.containsString("Failed to obtain aggregation results"));
+                .body("message", Matchers.containsString("Failed to obtain results"));
     }
 
     @ContainerMatrixTest

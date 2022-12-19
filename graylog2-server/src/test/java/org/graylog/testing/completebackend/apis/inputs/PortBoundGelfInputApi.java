@@ -14,10 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
+package org.graylog.testing.completebackend.apis.inputs;
 
-public class AggregationFailedException extends Exception {
-    public AggregationFailedException(String message) {
-        super(message);
+public class PortBoundGelfInputApi {
+
+    private final GelfInputApi api;
+    private final int mappedPort;
+
+    public PortBoundGelfInputApi(GelfInputApi api, int mappedPort) {
+        this.api = api;
+        this.mappedPort = mappedPort;
+    }
+
+    public PortBoundGelfInputApi postMessage(String message) {
+        api.postMessage(mappedPort, message);
+        return this;
     }
 }
