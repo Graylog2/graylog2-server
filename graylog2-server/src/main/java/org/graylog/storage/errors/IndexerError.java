@@ -14,38 +14,54 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.errors;
+package org.graylog.storage.errors;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
+import java.util.List;
 
 @AutoValue
-@JsonDeserialize(builder = FailedShard.Builder.class)
-public abstract class FailedShard {
-    public abstract int shard();
-    public abstract String index();
-    public abstract String node();
-    public abstract Cause reason();
+@JsonDeserialize(builder = IndexerError.Builder.class)
+public abstract class IndexerError {
+    public abstract List<Cause> rootCause();
+
+    public abstract String type();
+
+    public abstract String reason();
+
+    public abstract String phase();
+
+    public abstract boolean grouped();
+
+    public abstract List<FailedShard> failedShards();
 
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty
-        public abstract Builder shard(final int shard);
+        public abstract Builder rootCause(final List<Cause> rootCause);
         @JsonProperty
-        public abstract Builder index(final String index);
+        public abstract Builder type(final String type);
+
         @JsonProperty
-        public abstract Builder node(final String node);
+        public abstract Builder reason(final String reason);
+
         @JsonProperty
-        public abstract Builder reason(final Cause reason);
+        public abstract Builder phase(final String phrase);
+
         @JsonProperty
-        public abstract FailedShard build();
+        public abstract Builder grouped(final boolean gruped);
+
+        @JsonProperty
+        public abstract Builder failedShards(final List<FailedShard> failedShards);
+
+        public abstract IndexerError build();
 
         @JsonCreator
-        public static FailedShard.Builder builder() {
-            return new AutoValue_FailedShard.Builder();
+        public static IndexerError.Builder builder() {
+            return new AutoValue_IndexerError.Builder();
         }
     }
 }
