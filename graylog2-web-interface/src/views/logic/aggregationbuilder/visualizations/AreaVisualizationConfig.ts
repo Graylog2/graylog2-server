@@ -36,7 +36,7 @@ export type AreaVisualizationConfigJSON = {
 export default class AreaVisualizationConfig extends VisualizationConfig implements XYVisualization {
   private readonly _value: InternalState;
 
-  constructor(interpolation: InternalState['interpolation'], axisType: InternalState['axisType']) {
+  constructor(interpolation: InternalState['interpolation'], axisType: InternalState['axisType'] = DEFAULT_AXIS_TYPE) {
     super();
     this._value = { interpolation, axisType };
   }
@@ -54,12 +54,12 @@ export default class AreaVisualizationConfig extends VisualizationConfig impleme
     return new Builder(Immutable.Map(this._value));
   }
 
-  static create(interpolation: InternalState['interpolation'], axisType: InternalState['axisType']) {
+  static create(interpolation: InternalState['interpolation'], axisType: InternalState['axisType'] = DEFAULT_AXIS_TYPE) {
     return new AreaVisualizationConfig(interpolation, axisType);
   }
 
   static empty() {
-    return new AreaVisualizationConfig('linear', DEFAULT_AXIS_TYPE);
+    return AreaVisualizationConfig.create(DEFAULT_INTERPOLATION);
   }
 
   toJSON() {

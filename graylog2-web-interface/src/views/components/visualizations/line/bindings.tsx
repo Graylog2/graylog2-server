@@ -35,7 +35,7 @@ const lineChart: VisualizationType<typeof LineVisualization.type, LineVisualizat
   displayName: 'Line Chart',
   component: LineVisualization,
   config: {
-    createConfig: () => ({ interpolation: DEFAULT_INTERPOLATION }),
+    createConfig: () => ({ interpolation: DEFAULT_INTERPOLATION, axisType: DEFAULT_AXIS_TYPE }),
     fromConfig: (config: LineVisualizationConfig | undefined) => ({
       interpolation: config?.interpolation ?? DEFAULT_INTERPOLATION,
       axisType: config?.axisType ?? DEFAULT_AXIS_TYPE,

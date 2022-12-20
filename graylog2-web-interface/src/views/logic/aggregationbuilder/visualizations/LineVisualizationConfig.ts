@@ -54,7 +54,7 @@ export default class LineVisualizationConfig extends VisualizationConfig impleme
     return new Builder(Immutable.Map(this._value));
   }
 
-  static create(interpolation: InternalState['interpolation'], axisType: InternalState['axisType']) {
+  static create(interpolation: InternalState['interpolation'], axisType: InternalState['axisType'] = DEFAULT_AXIS_TYPE) {
     return new LineVisualizationConfig(interpolation, axisType);
   }
 

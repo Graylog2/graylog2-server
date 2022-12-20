@@ -118,9 +118,9 @@ const createVisualizationConfig = (legacyInterpolation: LegacyInterpolation, vis
 
   switch (visualization) {
     case 'line':
-      return new LineVisualizationConfig(interpolation);
+      return LineVisualizationConfig.create(interpolation);
     case 'area':
-      return new AreaVisualizationConfig(interpolation);
+      return AreaVisualizationConfig.create(interpolation);
     default:
       return undefined;
   }

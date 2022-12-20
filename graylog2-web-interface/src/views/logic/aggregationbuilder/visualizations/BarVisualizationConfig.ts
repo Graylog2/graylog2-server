@@ -60,12 +60,12 @@ export default class BarVisualizationConfig extends VisualizationConfig implemen
     return new Builder({ barmode, axisType });
   }
 
-  static create(barmode: BarMode, axisType: AxisType) {
+  static create(barmode: BarMode, axisType: AxisType = DEFAULT_AXIS_TYPE) {
     return new BarVisualizationConfig(barmode, axisType);
   }
 
   static empty() {
-    return BarVisualizationConfig.create(DEFAULT_BARMODE, DEFAULT_AXIS_TYPE);
+    return BarVisualizationConfig.create(DEFAULT_BARMODE);
   }
 
   toJSON() {
