@@ -25,6 +25,7 @@ import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.cluster.NodeAdapter;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,7 +56,7 @@ public abstract class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest
         indices = new Indices(
                 new IndexMappingFactory(node,
                         ImmutableMap.of(MESSAGE_TEMPLATE_TYPE, new MessageIndexTemplateProvider())),
-                () -> "5ca1ab1e-0000-4000-a000-000000000000",
+                new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"),
                 new NullAuditEventSender(),
                 new EventBus(),
                 indicesAdapter()

@@ -22,6 +22,7 @@ import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,7 +47,7 @@ public class NodeServiceImplTest {
 
     @Mock
     private Configuration configuration;
-    private final NodeId nodeId = () -> NODE_ID;
+    private final NodeId nodeId = new SimpleNodeId(NODE_ID);
 
     private NodeService nodeService;
 

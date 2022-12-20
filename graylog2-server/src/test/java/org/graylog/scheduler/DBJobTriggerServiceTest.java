@@ -30,6 +30,7 @@ import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -65,7 +66,7 @@ public class DBJobTriggerServiceTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private final NodeId nodeId = () -> NODE_ID;
+    private final NodeId nodeId = new SimpleNodeId(NODE_ID);
 
     @Mock
     private SchedulerCapabilitiesService schedulerCapabilitiesService;

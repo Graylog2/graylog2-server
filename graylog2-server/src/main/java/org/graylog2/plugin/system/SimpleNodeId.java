@@ -23,7 +23,13 @@ package org.graylog2.plugin.system;
  *
  * @param nodeId This is the actual ID. It's expected to be in the UID format, but it's not enforced anyhow now.
  */
-record SimpleNodeId(String nodeId) implements NodeId {
+public class SimpleNodeId extends NodeId {
+
+    private String nodeId;
+
+    public SimpleNodeId(final String nodeId) {
+        this.nodeId = nodeId;
+    }
 
     @Override
     public String getNodeId() {

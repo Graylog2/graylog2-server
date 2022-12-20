@@ -23,6 +23,7 @@ import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
@@ -56,7 +57,7 @@ public class InputEventListenerTest {
     private InputService inputService;
     public static final String THIS_NODE_ID = "5ca1ab1e-0000-4000-a000-000000000000";
     public static final String OTHER_NODE_ID = "c0c0a000-0000-4000-a000-000000000000";
-    private final NodeId nodeId = () -> THIS_NODE_ID;
+    private final NodeId nodeId = new SimpleNodeId(THIS_NODE_ID);
     private InputEventListener listener;
     @Mock
     private LeaderElectionService leaderElectionService;

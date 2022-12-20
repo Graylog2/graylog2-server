@@ -24,6 +24,7 @@ import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.email.EmailFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -48,7 +49,7 @@ public class FormattedEmailAlertSenderTest {
     @Mock
     private NotificationService mockNotificationService;
 
-    private final NodeId nodeId = () -> "5ca1ab1e-0000-4000-a000-000000000000";
+    private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
     @Mock
     private EmailFactory emailFactory;
 

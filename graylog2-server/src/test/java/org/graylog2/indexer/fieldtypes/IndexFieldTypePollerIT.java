@@ -34,6 +34,7 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -94,7 +95,7 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
                 new IndexMappingFactory(node, ImmutableMap.of(
                         MESSAGE_TEMPLATE_TYPE, new MessageIndexTemplateProvider()
                 )),
-                () -> "5ca1ab1e-0000-4000-a000-000000000000",
+                new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"),
                 new NullAuditEventSender(),
                 mock(EventBus.class),
                 createIndicesAdapter()

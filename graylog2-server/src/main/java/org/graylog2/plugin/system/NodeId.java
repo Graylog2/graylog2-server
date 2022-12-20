@@ -21,24 +21,28 @@ import org.graylog2.plugin.Tools;
 
 import java.nio.charset.StandardCharsets;
 
-public interface NodeId {
+/**
+ * This should be an interface. But we need to persist the backwards compatibility with all 5.x releases and keep it a class
+ * Please change to an interface for the 6.0 release.
+ */
+public abstract class NodeId {
 
     /**
      * @return The server expects UUID style of node id.
      * @see Tools#generateServerId()
      */
-    String getNodeId();
+    public abstract String getNodeId();
 
 
-    default String toEscapedString() {
+    public String toEscapedString() {
         return getNodeId().replace("\\", "\\\\").replace("$", "\\u0024").replace(".", "\\u002e");
     }
 
     /**
-     * Is it used somewhere in integrations? Should we remove it later?
+     * Is it used somewhere in integrations? Should we remove it in 6.0?
      */
     @Deprecated
-    default String toUnescapedString() {
+    public String toUnescapedString() {
         return getNodeId().replace("\\u002e", ".").replace("\\u0024", "$").replace("\\\\", "\\");
     }
 
@@ -48,11 +52,11 @@ public interface NodeId {
      *
      * @return The anonymized ID derived from hashing the node ID.
      */
-    default String anonymize() {
+    public String anonymize() {
         return Hashing.sha256().hashString(getNodeId(), StandardCharsets.UTF_8).toString();
     }
 
-    default String getShortNodeId() {
+    public String getShortNodeId() {
         return getNodeId().split("-")[0];
     }
 }

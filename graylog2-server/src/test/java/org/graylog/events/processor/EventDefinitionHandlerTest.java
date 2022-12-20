@@ -42,6 +42,7 @@ import org.graylog2.database.entities.EntityScope;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -79,7 +80,7 @@ public class EventDefinitionHandlerTest {
 
     @Mock
     private DBEventProcessorStateService stateService;
-    private final NodeId nodeId = () -> "5ca1ab1e-0000-4000-a000-000000000000";
+    private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
     @Mock
     private SchedulerCapabilitiesService schedulerCapabilitiesService;

@@ -23,6 +23,7 @@ import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.Duration;
@@ -38,7 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MongoJackExtension.class)
 class TrafficCounterServiceTest {
 
-    private final NodeId nodeId = () -> "node-1";
+    private final NodeId nodeId = new SimpleNodeId("node-1");
 
     private TrafficCounterService service;
 

@@ -20,6 +20,7 @@ import com.mongodb.client.ListIndexesIterable;
 import org.bson.Document;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,8 +39,8 @@ import static org.graylog2.cluster.lock.Lock.FIELD_UPDATED_AT;
 public abstract class MongoLockServiceTest {
 
     public static final String THIS_NODE_ID = "5ca1ab1e-0000-4000-a000-000000000000";
-    public final NodeId thisNodeId = () -> THIS_NODE_ID;
-    public final NodeId otherNodeId = () -> "c0c0a000-0000-4000-a000-000000000000";
+    public final NodeId thisNodeId = new SimpleNodeId(THIS_NODE_ID);
+    public final NodeId otherNodeId = new SimpleNodeId("c0c0a000-0000-4000-a000-000000000000");
     private LockService lockService;
 
     @BeforeEach

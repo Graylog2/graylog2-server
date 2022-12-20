@@ -24,6 +24,7 @@ import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
@@ -71,7 +72,7 @@ public class TimeBasedRotationStrategyTest {
     @Mock
     private Indices indices;
 
-    private final NodeId nodeId = () -> "5ca1ab1e-0000-4000-a000-000000000000";
+    private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
     @Mock
     private AuditEventSender auditEventSender;

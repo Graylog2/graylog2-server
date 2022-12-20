@@ -17,6 +17,7 @@
 package org.graylog2.audit;
 
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,7 +42,7 @@ public class AuditActorTest {
 
     @Test
     public void testSystem() {
-        final NodeId nodeId = () -> "28164cbe-4ad9-4c9c-a76e-088655aa78892";
+        final NodeId nodeId = new SimpleNodeId("28164cbe-4ad9-4c9c-a76e-088655aa78892");
         final AuditActor actor = AuditActor.system(nodeId);
 
         assertThat(actor.urn()).isEqualTo("urn:graylog:node:28164cbe-4ad9-4c9c-a76e-088655aa78892");
