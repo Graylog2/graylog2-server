@@ -31,6 +31,11 @@ jest.mock('views/logic/dashboards/useDashboards');
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
     delete: jest.fn(),
+    update: {
+      completed: {
+        listen: () => jest.fn(),
+      },
+    },
   },
 }));
 
