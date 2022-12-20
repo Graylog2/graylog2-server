@@ -1254,4 +1254,14 @@ public class FunctionsSnippetsTest extends BaseParserTest {
                     .hasMessageContaining("Expected type Boolean but found String");
         }
     }
+
+    @Test
+    public void dateConversion() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        Long utcHour = (Long) message.getField("utcHour");
+        Long manilaHour = (Long) message.getField("manilaHour");
+        assertThat(manilaHour).isEqualTo(utcHour + 8);
+    }
 }

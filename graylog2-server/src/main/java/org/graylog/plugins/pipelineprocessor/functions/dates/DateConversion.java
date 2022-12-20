@@ -17,7 +17,6 @@
 package org.graylog.plugins.pipelineprocessor.functions.dates;
 
 import com.google.common.collect.ImmutableList;
-
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
@@ -39,18 +38,22 @@ public class DateConversion extends TimezoneAwareFunction {
     @Override
     protected DateTime evaluate(FunctionArgs args, EvaluationContext context, DateTimeZone timezone) {
         final Object datish = value.required(args, context);
+        DateTime result = null;
         if (datish instanceof DateTime) {
-            return (DateTime) datish;
+            result = (DateTime) datish;
         }
         if (datish instanceof Date) {
-            return new DateTime(datish);
+            result = new DateTime(datish);
         }
         if (datish instanceof ZonedDateTime) {
             final ZonedDateTime zonedDateTime = (ZonedDateTime) datish;
             final DateTimeZone timeZone = DateTimeZone.forID(zonedDateTime.getZone().getId());
-            return new DateTime(zonedDateTime.toInstant().toEpochMilli(), timeZone);
+            result = new DateTime(zonedDateTime.toInstant().toEpochMilli(), timeZone);
         }
-        return null;
+        if (timezone != null && result != null) {
+            result = result.withZone(timezone);
+        }
+        return result;
     }
 
     @Override
