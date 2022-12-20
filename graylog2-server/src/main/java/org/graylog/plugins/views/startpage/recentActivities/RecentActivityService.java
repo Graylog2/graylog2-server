@@ -109,7 +109,7 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
 
         // filter relevant activities by permissions
         final var principal = grnRegistry.newGRN(GRNTypes.USER, user.getUser().getId());
-        final var grns = permissionAndRoleResolver.resolveGrantees(principal).stream().map(GRN::toString).collect(Collectors.toList());
+        final var grns = permissionAndRoleResolver.resolveGrantees(principal).stream().map(GRN::toString).toList();
         var query = DBQuery.in(RecentActivityDTO.FIELD_GRANTEE, grns);
         return findPaginatedWithQueryAndSort(query, sort, page, perPage);
     }

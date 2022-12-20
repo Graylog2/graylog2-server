@@ -114,7 +114,6 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
 
         final List<ViewSummaryDTO> views = StreamSupport.stream(result.spliterator(), false)
                 .map(this::deserialize)
-//                .map(ViewSummaryDTO::fromDocument)
                 .filter(filter)
                 .toList();
 
@@ -130,6 +129,12 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> {
 
     protected ViewSummaryDTO deserialize(Document document) {
         try {
+            // replace "_id" with "id", because the ViewDTO depends on it
+            if(document.containsKey("_id")) {
+                final var id = document.get("_id");
+                document.remove("_id");
+                document.put("id", id);
+            }
             var json = mapper.writeValueAsString(document);
             return mapper.readValue(json, ViewSummaryDTO.class);
         } catch (JsonProcessingException jpe) {

@@ -54,7 +54,7 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
         DASHBOARD
     }
 
-    public static final String FIELD_ID = "_id";
+    public static final String FIELD_ID = "id";
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_SUMMARY = "summary";

@@ -135,7 +135,6 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
 
     public Optional<ViewDTO> get(final SearchUser searchUser, final String id) {
         return findViews(searchUser, Filters.eq("_id", new ObjectId(id)), getSortBuilder("asc", "_id")).findFirst().map(this::deserialize);
-//        return findViews(searchUser, Filters.eq("_id", new ObjectId(id)), getSortBuilder("asc", "_id")).findFirst().map(ViewDTO::fromDocument);
     }
 
     protected PaginatedList<ViewDTO> findPaginatedWithQueryFilterAndSortWithGrandTotal(SearchUser searchUser,
@@ -162,8 +161,14 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         return new PaginatedList<>(paginatedStreams, views.size(), page, perPage, grandTotal);
     }
 
-    protected ViewDTO deserialize(Document document) {
+    protected ViewDTO deserialize(final Document document) {
         try {
+            // replace "_id" with "id", because the ViewDTO depends on it
+            if(document.containsKey("_id")) {
+                final var id = document.get("_id");
+                document.remove("_id");
+                document.put("id", id);
+            }
             var json = mapper.writeValueAsString(document);
             return mapper.readValue(json, ViewDTO.class);
         } catch (JsonProcessingException jpe) {
