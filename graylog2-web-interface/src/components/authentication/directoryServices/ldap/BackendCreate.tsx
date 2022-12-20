@@ -72,8 +72,8 @@ export const HELP = {
   ),
   emailAttributes: (
     <span>
-      Which LDAP attribute to use for the user`&lsquo;`s email address, e.g. <code>mail</code>.<br />
-      You can specify multiple attributes, separated by <code>,</code>.
+      Which LDAP attribute to use for the user&apos;s email address, e.g. <code>mail</code>.<br />
+      You can specify multiple attributes, type <kbd>Tab</kbd> or <kbd>Enter</kbd> to accept your value.
     </span>
   ),
 };
