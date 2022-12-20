@@ -86,10 +86,10 @@ public class StreamsIT {
 
     @ContainerMatrixTest
     void sortByStatus() {
-        paginatedByFieldWithOrder("sorttest", "status", "asc")
+        paginatedByFieldWithOrder("sorttest", "disabled", "asc")
                 .assertThat()
                 .body("streams*.title", equalTo(List.of("sorttest: aaaaa", "sorttest: ZZZZZZ", "sorttest: 12345")));
-        paginatedByFieldWithOrder("sorttest", "status", "desc")
+        paginatedByFieldWithOrder("sorttest", "disabled", "desc")
                 .assertThat()
                 .body("streams*.title", equalTo(List.of("sorttest: 12345", "sorttest: ZZZZZZ", "sorttest: aaaaa")));
     }
