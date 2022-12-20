@@ -76,7 +76,7 @@ public class BlockingBatchedESOutputTest {
 
             @Override
             public int getShutdownTimeout() {
-                return 10;
+                return "true".equals(System.getenv("CI")) ? 500 : 100; // be more graceful when running on ci infrastructure
             }
         };
 
@@ -123,19 +123,25 @@ public class BlockingBatchedESOutputTest {
         verifyNoInteractions(messages);
     }
 
+    /**
+     * Test that shutdown can proceed even if the index request ends up being blocked.
+     */
     @Test
     @Timeout(1)
     public void stop_withIndexingBlocked() throws Exception {
         when(cluster.isConnected()).thenReturn(true);
         when(cluster.isDeflectorHealthy()).thenReturn(true);
 
-        final AtomicBoolean blocked = new AtomicBoolean(false);
-        final AtomicBoolean completed = new AtomicBoolean(false);
+        final AtomicBoolean interrupted = new AtomicBoolean(false);
 
         when(messages.bulkIndex(any())).thenAnswer(invocation -> {
-            blocked.set(true);
-            new CountDownLatch(1).await();
-            completed.set(true);
+            // this will block until interrupted
+            try {
+                new CountDownLatch(1).await();
+            } catch (InterruptedException e) {
+                interrupted.set(true);
+                throw e;
+            }
             return null;
         });
 
@@ -144,9 +150,7 @@ public class BlockingBatchedESOutputTest {
         output.stop();
 
         verify(messages, times(1)).bulkIndex(eq(messageList));
-
-        assertThat(blocked).isTrue();
-        assertThat(completed).isFalse();
+        assertThat(interrupted).isTrue();
     }
 
     private List<Map.Entry<IndexSet, Message>> buildMessages(final int count) {
