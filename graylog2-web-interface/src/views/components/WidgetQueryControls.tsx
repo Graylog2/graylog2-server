@@ -56,6 +56,7 @@ import {
   TimeRangeRow,
   SearchQueryRow,
 } from 'views/components/searchbar/SearchBarLayout';
+import PluggableCommands from 'views/components/searchbar/queryinput/PluggableCommands';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeInput from './searchbar/TimeRangeInput';
@@ -215,18 +216,23 @@ const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
                     {({ field: { name, value, onChange }, meta: { error } }) => (
                       <FormWarningsContext.Consumer>
                         {({ warnings }) => (
-                          <QueryInput value={value}
-                                      timeRange={!isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange}
-                                      streams={values?.streams}
-                                      placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
-                                      error={error}
-                                      disableExecution={disableSearchSubmit}
-                                      isValidating={isValidatingQuery}
-                                      warning={warnings.queryString}
-                                      validate={validateForm}
-                                      name={name}
-                                      onChange={onChange}
-                                      onExecute={handleSubmit as () => void} />
+                          <PluggableCommands usage="widget_query">
+                            {(customCommands) => (
+                              <QueryInput value={value}
+                                          timeRange={!isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange}
+                                          streams={values?.streams}
+                                          placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
+                                          error={error}
+                                          disableExecution={disableSearchSubmit}
+                                          isValidating={isValidatingQuery}
+                                          warning={warnings.queryString}
+                                          validate={validateForm}
+                                          name={name}
+                                          onChange={onChange}
+                                          onExecute={handleSubmit as () => void}
+                                          commands={customCommands} />
+                            )}
+                          </PluggableCommands>
                         )}
                       </FormWarningsContext.Consumer>
                     )}
