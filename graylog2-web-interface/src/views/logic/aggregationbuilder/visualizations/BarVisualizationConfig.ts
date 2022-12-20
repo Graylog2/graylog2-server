@@ -15,8 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { XYVisualization, AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 
 import VisualizationConfig from './VisualizationConfig';
+
+export const DEFAULT_BARMODE = 'group';
 
 export type BarMode = 'stack' | 'group' | 'overlay' | 'relative';
 
@@ -59,6 +62,10 @@ export default class BarVisualizationConfig extends VisualizationConfig implemen
 
   static create(barmode: BarMode, axisType: AxisType) {
     return new BarVisualizationConfig(barmode, axisType);
+  }
+
+  static empty() {
+    return BarVisualizationConfig.create(DEFAULT_BARMODE, DEFAULT_AXIS_TYPE);
   }
 
   toJSON() {

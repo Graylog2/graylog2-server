@@ -14,17 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { VisualizationType, ArrayElement } from 'views/types';
+import type { VisualizationType } from 'views/types';
 import LineVisualization from 'views/components/visualizations/line/LineVisualization';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
 import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import { DEFAULT_AXIS_TYPE, axisTypes } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
-
-const interpolationTypes = ['linear', 'step-after', 'spline'] as const;
+import type { InterpolationType } from 'views/Constants';
+import { DEFAULT_INTERPOLATION, interpolationTypes } from 'views/Constants';
 
 type LineVisualizationConfigFormValues = {
-  interpolation: ArrayElement<typeof interpolationTypes>;
+  interpolation: InterpolationType;
   axisType: AxisType;
 };
 
@@ -35,9 +35,9 @@ const lineChart: VisualizationType<typeof LineVisualization.type, LineVisualizat
   displayName: 'Line Chart',
   component: LineVisualization,
   config: {
-    createConfig: () => ({ interpolation: LineVisualizationConfig.DEFAULT_INTERPOLATION }),
+    createConfig: () => ({ interpolation: DEFAULT_INTERPOLATION }),
     fromConfig: (config: LineVisualizationConfig | undefined) => ({
-      interpolation: config?.interpolation ?? LineVisualizationConfig.DEFAULT_INTERPOLATION,
+      interpolation: config?.interpolation ?? DEFAULT_INTERPOLATION,
       axisType: config?.axisType ?? DEFAULT_AXIS_TYPE,
     }),
     toConfig: (formValues: LineVisualizationConfigFormValues) => LineVisualizationConfig.create(formValues.interpolation, formValues.axisType),

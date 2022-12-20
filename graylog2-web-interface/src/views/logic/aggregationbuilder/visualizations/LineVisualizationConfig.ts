@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import { DEFAULT_INTERPOLATION } from 'src/views/Constants';
 
+import { DEFAULT_INTERPOLATION } from 'views/Constants';
 import type { XYVisualization, AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 
