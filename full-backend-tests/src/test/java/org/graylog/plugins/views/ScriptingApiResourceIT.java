@@ -37,6 +37,7 @@ import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.Csv;
 import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.CsvParser;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
@@ -62,6 +63,7 @@ import static org.hamcrest.Matchers.hasEntry;
                                    enabledFeatureFlags = ScriptingApiModule.FEATURE_FLAG)
 public class ScriptingApiResourceIT {
 
+    public static final String DEFAULT_STREAM = "000000000000000000000001";
     private final RequestSpecification requestSpec;
     private final GraylogApis api;
 
@@ -117,6 +119,36 @@ public class ScriptingApiResourceIT {
 
         api.search().waitForMessagesCount(3);
         api.fieldTypes().waitForFieldTypeDefinitions( "source", "facility", "level");
+    }
+
+    @ContainerMatrixTest
+    void testAggregationByStream() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("""
+                         {
+                           "group_by": [
+                             {
+                               "field": "streams"
+                             }
+                           ],
+                           "metrics": [
+                             {
+                               "function": "count"
+                             }
+                           ]
+                        }
+                         """)
+                .post("/search/aggregate")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200);
+
+        validatableResponse.assertThat().body("datarows", Matchers.hasSize(3));
+        validateRow(validatableResponse, DEFAULT_STREAM, 3);
+        validateRow(validatableResponse, stream2Id, 2);
+        validateRow(validatableResponse, stream1Id, 1);
     }
 
     @ContainerMatrixTest
