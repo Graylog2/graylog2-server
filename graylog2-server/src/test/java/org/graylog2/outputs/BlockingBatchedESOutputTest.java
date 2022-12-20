@@ -37,9 +37,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -132,25 +130,18 @@ public class BlockingBatchedESOutputTest {
         when(cluster.isConnected()).thenReturn(true);
         when(cluster.isDeflectorHealthy()).thenReturn(true);
 
-        final AtomicBoolean interrupted = new AtomicBoolean(false);
-
         when(messages.bulkIndex(any())).thenAnswer(invocation -> {
             // this will block until interrupted
-            try {
-                new CountDownLatch(1).await();
-            } catch (InterruptedException e) {
-                interrupted.set(true);
-                throw e;
-            }
+            new CountDownLatch(1).await();
             return null;
         });
 
         final List<Map.Entry<IndexSet, Message>> messageList = sendMessages(output, config.getOutputBatchSize() - 1);
 
+        // shutdown timeout is < test timeout
         output.stop();
 
         verify(messages, times(1)).bulkIndex(eq(messageList));
-        assertThat(interrupted).isTrue();
     }
 
     private List<Map.Entry<IndexSet, Message>> buildMessages(final int count) {
