@@ -20,6 +20,7 @@ import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Field;
+import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.Variable;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -63,13 +64,16 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
                 Aggregates.match(dbQuery),
                 Aggregates.lookup(
                         MongoIndexSetService.COLLECTION_NAME,
-                        List.of(new Variable<>("index_set_id", new Document("$toObjectId", "$index_set_id"))),
+                        List.of(new Variable<>("index_set_id", doc("$toObjectId", "$index_set_id"))),
                         List.of(Aggregates.match(doc("$expr", doc("$eq", List.of("$_id", "$$index_set_id"))))),
                         "index_set"
                 ),
-                Aggregates.set(new Field<>("index_set_title", new Document("$first", "$index_set.title"))),
-                Aggregates.project(doc("index_set", 0)),
-                Aggregates.sort(sortBuilder)
+                Aggregates.set(
+                        new Field<>("index_set_title", doc("$first", "$index_set.title")),
+                        new Field<>("lower" + sortField, doc("$toLower", "$" + sortField))
+                ),
+                Aggregates.sort(getSortBuilder(order, "lower" + sortField)),
+                Aggregates.project(Projections.exclude("index_set", "lower" + sortField))
         ));
 
         final List<StreamDTO> streamsList = StreamSupport.stream(result.spliterator(), false)
