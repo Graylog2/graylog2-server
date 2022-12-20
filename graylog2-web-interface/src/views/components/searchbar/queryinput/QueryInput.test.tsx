@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import QueryValidationActions from 'views/actions/QueryValidationActions';
@@ -131,6 +131,30 @@ describe('QueryInput', () => {
       expect(QueryValidationActions.displayValidationErrors).toHaveBeenCalledTimes(1);
 
       expect(onExecute).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('supports custom commands', () => {
+    it('adds custom commands to ace', async () => {
+      const exec = jest.fn();
+      const commands = [{
+        name: 'TestCommand',
+        bindKey: {
+          mac: 'Ctrl+Enter',
+          win: 'Ctrl+Enter',
+        },
+        exec,
+      }];
+
+      render(<SimpleQueryInput commands={commands} />);
+
+      const queryInput = getQueryInput();
+      queryInput.focus();
+      userEvent.type(queryInput, '{ctrl}{enter}');
+
+      await waitFor(() => {
+        expect(exec).toHaveBeenCalled();
+      });
     });
   });
 });
