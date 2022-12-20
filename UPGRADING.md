@@ -105,6 +105,8 @@ have been un-deprecated, as Graylog intends to maintain them going forward.
 
 ## Breaking Changes
 
+## Behaviour Changes
+
 - The `JSON path value from HTTP API` input will now only run on the leader node, if the `Global` option has been selected in the input configuration. Previously, the input was started on all nodes in the cluster.
 - The default connection and read timeouts for email sending have been reduced from 60 seconds to 10 seconds.
 
