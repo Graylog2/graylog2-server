@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.elasticsearch7.errors;
+package org.graylog.storage.errors;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -24,13 +24,15 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 @JsonDeserialize(builder = ResponseError.Builder.class)
 public abstract class ResponseError {
-    public abstract ElasticsearchError error();
+    public abstract IndexerError error();
+
     public abstract int status();
 
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty
-        public abstract Builder error(final ElasticsearchError error);
+        public abstract Builder error(final IndexerError error);
+
         @JsonProperty
         public abstract Builder status(final int status);
         @JsonProperty

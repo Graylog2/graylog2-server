@@ -33,7 +33,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.suggest.SuggestBuild
 import org.graylog.shaded.opensearch2.org.opensearch.search.suggest.SuggestBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.suggest.term.TermSuggestion;
 import org.graylog.shaded.opensearch2.org.opensearch.search.suggest.term.TermSuggestionBuilder;
-import org.graylog.storage.opensearch2.errors.ResponseError;
+import org.graylog.storage.errors.ResponseError;
 import org.graylog2.plugin.Message;
 
 import javax.inject.Inject;
