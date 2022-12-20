@@ -406,6 +406,10 @@ public abstract class MessageInput implements Stoppable {
         this.nodeId = nodeId;
     }
 
+    public boolean isCloudCompatible() {
+        return descriptor.isCloudCompatible();
+    }
+
     public interface Factory<M> {
         M create(Configuration configuration);
 
@@ -450,6 +454,10 @@ public abstract class MessageInput implements Stoppable {
 
         protected Descriptor(String name, boolean exclusive, String linkToDocs) {
             super(name, exclusive, linkToDocs);
+        }
+
+        public boolean isCloudCompatible() {
+            return true;
         }
     }
 

@@ -58,6 +58,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -75,14 +76,14 @@ public class InputsResource extends AbstractInputsResource {
 
     private final InputService inputService;
     private final MessageInputFactory messageInputFactory;
-    private final Configuration configuration;
+    private final Configuration config;
 
     @Inject
-    public InputsResource(InputService inputService, MessageInputFactory messageInputFactory, Configuration configuration) {
+    public InputsResource(InputService inputService, MessageInputFactory messageInputFactory, Configuration config) {
         super(messageInputFactory.getAvailableInputs());
         this.inputService = inputService;
         this.messageInputFactory = messageInputFactory;
-        this.configuration = configuration;
+        this.config = config;
     }
 
     @GET
@@ -132,6 +133,10 @@ public class InputsResource extends AbstractInputsResource {
             throwBadRequestIfNotGlobal(lr);
             // TODO Configuration type values need to be checked. See ConfigurationMapConverter.convertValues()
             final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node());
+            if (config.isCloud() && !messageInput.isCloudCompatible()) {
+                throw new BadRequestException(String.format(Locale.ENGLISH,
+                        "The input type <%s> is not allowed in the cloud environment!", lr.type()));
+            }
 
             messageInput.checkConfiguration();
             final Input input = this.inputService.create(messageInput.asMap());
@@ -203,7 +208,7 @@ public class InputsResource extends AbstractInputsResource {
     }
 
     private void throwBadRequestIfNotGlobal(InputCreateRequest lr) {
-        if (configuration.isCloud() && !lr.global()) {
+        if (config.isCloud() && !lr.global()) {
             throw new BadRequestException("Only global inputs are allowed in the cloud environment!");
         }
     }
