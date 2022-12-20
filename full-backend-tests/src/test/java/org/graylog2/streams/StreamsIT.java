@@ -19,6 +19,7 @@ package org.graylog2.streams;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.Lifecycle;
+import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
@@ -36,43 +37,59 @@ public class StreamsIT {
     private static final String STREAMS_RESOURCE = "/streams";
 
     private final RequestSpecification requestSpec;
+    private final GraylogApis api;
 
-    public StreamsIT(RequestSpecification requestSpec) {
+    public StreamsIT(RequestSpecification requestSpec, GraylogApis api) {
         this.requestSpec = requestSpec;
+        this.api = api;
     }
 
     @BeforeAll
     void beforeAll() {
-        final String defaultIndexSetId = IndexSetUtils.defaultIndexSetId(requestSpec);
-        final String newIndexSetId = IndexSetUtils.createIndexSet(requestSpec, "Test Indices", "Some test indices", "streamstest");
-        final String newIndexSetId2 = IndexSetUtils.createIndexSet(requestSpec, "More Test Indices", "Some more test indices", "moretest");
-        StreamUtils.createStream(requestSpec, "New Stream", newIndexSetId);
-        StreamUtils.createStream(requestSpec, "New Stream 2", defaultIndexSetId);
-        StreamUtils.createStream(requestSpec, "New Stream 3", newIndexSetId2);
+        final String defaultIndexSetId = api.indices().defaultIndexSetId();
+        final String newIndexSetId = api.indices().createIndexSet("Test Indices", "Some test indices", "streamstest");
+        final String newIndexSetId2 = api.indices().createIndexSet("More Test Indices", "Some more test indices", "moretest");
+        api.streams().createStream("New Stream", newIndexSetId);
+        api.streams().createStream("New Stream 2", defaultIndexSetId);
+        api.streams().createStream("New Stream 3", newIndexSetId2);
+
+        api.streams().createStream("sorttest: aaaaa", defaultIndexSetId);
+        api.streams().createStream("sorttest: ZZZZZZ", defaultIndexSetId);
+        api.streams().createStream("sorttest: 12345", defaultIndexSetId);
     }
 
     @ContainerMatrixTest
     void sortByIndexSetTitle() {
-        paginatedByFieldWithOrder("title", "asc")
+        paginatedByFieldWithOrder("New", "title", "asc")
                 .assertThat()
                 .body("streams*.title", equalTo(List.of("New Stream", "New Stream 2", "New Stream 3")));
-        paginatedByFieldWithOrder("title", "desc")
+        paginatedByFieldWithOrder("New", "title", "desc")
                 .assertThat()
                 .body("streams*.title", equalTo(List.of("New Stream 3", "New Stream 2", "New Stream")));
-        paginatedByFieldWithOrder("index_set_title", "asc")
+        paginatedByFieldWithOrder("New", "index_set_title", "asc")
                 .assertThat()
                 .body("streams*.title", equalTo(List.of("New Stream 2", "New Stream 3", "New Stream")));
-        paginatedByFieldWithOrder("index_set_title", "desc")
+        paginatedByFieldWithOrder("New", "index_set_title", "desc")
                 .assertThat()
                 .body("streams*.title", equalTo(List.of("New Stream", "New Stream 3", "New Stream 2")));
     }
 
-    private ValidatableResponse paginatedByFieldWithOrder(String field, String order) {
+    @ContainerMatrixTest
+    void sortByTitleCaseInsensitive() {
+        paginatedByFieldWithOrder("sorttest", "title", "asc")
+                .assertThat()
+                .body("streams*.title", equalTo(List.of("sorttest: 12345", "sorttest: aaaaa", "sorttest: ZZZZZZ")));
+        paginatedByFieldWithOrder("sorttest", "title", "desc")
+                .assertThat()
+                .body("streams*.title", equalTo(List.of("sorttest: ZZZZZZ", "sorttest: aaaaa", "sorttest: 12345")));
+    }
+
+    private ValidatableResponse paginatedByFieldWithOrder(String query, String field, String order) {
         return given()
                 .spec(requestSpec)
                 .log().ifValidationFails()
                 .when()
-                .queryParam("query", "New")
+                .queryParam("query", query)
                 .queryParam("sort", field)
                 .queryParam("order", order)
                 .get(STREAMS_RESOURCE + "/paginated")
