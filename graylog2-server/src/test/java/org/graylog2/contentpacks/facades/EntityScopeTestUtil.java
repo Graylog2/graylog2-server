@@ -41,5 +41,10 @@ public class EntityScopeTestUtil {
         public boolean isMutable() {
             return false;
         }
+
+        @Override
+        public boolean isDeletable() {
+            return true;
+        }
     }
 }
