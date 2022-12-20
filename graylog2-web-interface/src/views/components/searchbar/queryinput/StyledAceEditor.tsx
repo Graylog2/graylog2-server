@@ -15,17 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import styled, { css } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
 
 import { INPUT_BORDER_RADIUS } from 'theme/constants';
 
 import AceEditor from './ace';
 
-const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme, $height }) => ({
+type Props = {
+  $height: number,
+  aceTheme: string,
+  theme: DefaultTheme,
+};
+const StyledAceEditor = styled(AceEditor).attrs(({ aceTheme, theme, $height }: Props) => ({
   // NOTE: After setting the prop we need to swap them back so AceEditor uses the proper styles
   theme: aceTheme, /* stylelint-disable-line */
   $scTheme: theme,
   $height,
-}))(({ $scTheme, $height, disabled, value }) => css`
+}))<{ disabled: boolean }>(({ $scTheme, $height, disabled, value }) => css`
   &.ace-queryinput {
     ${$height ? `height: ${$height}px !important` : ''};
     min-height: 34px;
