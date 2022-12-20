@@ -145,7 +145,9 @@ public class ScriptingApiResourceIT {
                 .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
-        validatableResponse.assertThat().body("datarows", Matchers.hasSize(3));
+        validatableResponse.log().ifValidationFails()
+                .assertThat().body("datarows", Matchers.hasSize(3));
+
         validateRow(validatableResponse, DEFAULT_STREAM, 3);
         validateRow(validatableResponse, stream2Id, 2);
         validateRow(validatableResponse, stream1Id, 1);
