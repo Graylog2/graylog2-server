@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Fixes parsing, so that ES/OS errors without index data are handled properly"
+
+issues = ["13221"]
+pulls = ["14203"]

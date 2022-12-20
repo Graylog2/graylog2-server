@@ -42,11 +42,11 @@ type ChildrenProps = {
   onClick: (e?: any) => void,
   className: string,
   href: string,
+  disabled: boolean,
 };
 type Props = {
   children: React.ReactElement<ChildrenProps, React.ComponentType>,
   onClick?: () => unknown,
-  disabled?: boolean,
   to: string | { pathname: string },
   // if set the child component will receive the active class
   // when the part of the URL path matches the `to` prop.
@@ -59,13 +59,13 @@ const isModifiedEvent = (e: React.MouseEvent) => !!(e.metaKey || e.altKey || e.c
 
 const LinkContainer = ({ children, onClick, to: toProp, relativeActive, ...rest }: Props) => {
   const { pathname } = useLocation();
-  const { props: { onClick: childrenOnClick, className }, type: { displayName } } = React.Children.only(children);
+  const { props: { onClick: childrenOnClick, className, disabled }, type: { displayName } } = React.Children.only(children);
   const to = (typeof toProp === 'object' && 'pathname' in toProp) ? toProp.pathname : toProp;
   const childrenClassName = useMemo(() => _setActiveClassName(pathname, to, className, displayName, relativeActive),
     [pathname, to, className, displayName, relativeActive],
   );
   const _onClick = useCallback((e: React.MouseEvent) => {
-    if (!isLeftClickEvent(e) || isModifiedEvent(e)) {
+    if (!isLeftClickEvent(e) || isModifiedEvent(e) || disabled) {
       return;
     }
 
@@ -80,10 +80,18 @@ const LinkContainer = ({ children, onClick, to: toProp, relativeActive, ...rest 
       onClick();
     }
 
-    history.push(to);
-  }, [childrenOnClick, onClick, to]);
+    if (!disabled) {
+      history.push(to);
+    }
+  }, [childrenOnClick, disabled, onClick, to]);
 
-  return React.cloneElement(React.Children.only(children), { ...rest, className: childrenClassName, onClick: _onClick, href: to });
+  return React.cloneElement(React.Children.only(children), {
+    ...rest,
+    className: childrenClassName,
+    onClick: _onClick,
+    disabled: !!disabled,
+    href: disabled ? undefined : to,
+  });
 };
 
 LinkContainer.defaultProps = {

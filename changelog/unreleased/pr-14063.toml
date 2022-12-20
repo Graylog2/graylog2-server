@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix connectivity check when Elasticsearch/OpenSearch is not available."
+
+pulls = ["14063"]

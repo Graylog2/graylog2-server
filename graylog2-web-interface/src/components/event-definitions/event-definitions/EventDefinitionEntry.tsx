@@ -39,14 +39,7 @@ import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
 import EventDefinitionDescription from './EventDefinitionDescription';
 
-export type EventDefinition = {
-  id: string,
-  config: {
-    type: string,
-  },
-  title: string,
-  _scope: string,
-};
+import type { EventDefinition } from '../event-definitions-types';
 
 type Props = {
   context: {
@@ -81,6 +74,26 @@ const EventDefinitionEntry = ({
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
   const isScheduled = lodash.get(context, `scheduler.${eventDefinition.id}.is_scheduled`, true);
   const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(eventDefinition);
+
+  const isSystemEventDefinition = (): boolean => {
+    return eventDefinition.config.type === 'system-notifications-v1';
+  };
+
+  const titleSuffix = (): JSX.Element | undefined => {
+    if (isSystemEventDefinition()) {
+      return undefined;
+    }
+
+    const plugin = getConditionPlugin(eventDefinition.config.type);
+
+    const suffix = <span>{plugin?.displayName ?? eventDefinition.config.type}</span>;
+
+    if (isScheduled) {
+      return suffix;
+    }
+
+    return <span>{suffix} <Label bsStyle="warning">disabled</Label></span>;
+  };
 
   const showActions = (): boolean => {
     return scopePermissions?.is_mutable;
@@ -119,29 +132,26 @@ const EventDefinitionEntry = ({
           </LinkContainer>
         </IfPermitted>
       )}
+
       <ShareButton entityId={eventDefinition.id} entityType="event_definition" onClick={() => setShowEntityShareModal(true)} />
-      <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
+
+      {!isSystemEventDefinition() && (
         <DropdownButton id="more-dropdown" title="More" pullRight>
           <MenuItem onClick={handleCopy}>Duplicate</MenuItem>
           <MenuItem divider />
+
           {toggle}
+
           {showActions() && (
-            <>
+            <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
               <MenuItem divider />
               <MenuItem onClick={handleDelete} data-testid="delete-button">Delete</MenuItem>
-            </>
+            </IfPermitted>
           )}
         </DropdownButton>
-      </IfPermitted>
+      )}
     </ButtonToolbar>
   );
-
-  const plugin = getConditionPlugin(eventDefinition.config.type);
-  let titleSuffix = <span>{plugin?.displayName ?? eventDefinition.config.type}</span>;
-
-  if (!isScheduled) {
-    titleSuffix = (<span>{titleSuffix} <Label bsStyle="warning">disabled</Label></span>);
-  }
 
   const linkTitle = <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{eventDefinition.title}</Link>;
 
@@ -155,7 +165,7 @@ const EventDefinitionEntry = ({
     <>
       <EntityListItem key={`event-definition-${eventDefinition.id}`}
                       title={linkTitle}
-                      titleSuffix={titleSuffix}
+                      titleSuffix={titleSuffix()}
                       description={renderDescription(eventDefinition, context)}
                       actions={actions} />
       {showEntityShareModal && (

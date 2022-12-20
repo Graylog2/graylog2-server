@@ -131,8 +131,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         "output.logstash:\n" +
                         "   hosts: [\"192.168.1.1:5044\"]\n" +
                         "path:\n" +
-                        "  data: ${sidecar.spoolDir!\"C:\\Program Files\\Graylog\\sidecar\\cache\\winlogbeat\"}\\data\n" +
-                        "  logs: ${sidecar.spoolDir!\"C:\\Program Files\\Graylog\\sidecar\"}\\logs\n" +
+                        "  data: ${sidecar.spoolDir!\"C:\\\\Program Files\\\\Graylog\\\\sidecar\\\\cache\\\\winlogbeat\"}\\data\n" +
+                        "  logs: ${sidecar.spoolDir!\"C:\\\\Program Files\\\\Graylog\\\\sidecar\"}\\logs\n" +
                         "tags:\n" +
                         " - windows\n" +
                         "winlogbeat:\n" +
@@ -217,7 +217,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "C:\\Program Files (x86)\\nxlog\\nxlog.exe",
                 "-c \"%s\"",
                 "-v -f -c \"%s\"",
-                "define ROOT ${sidecar.spoolDir!\"C:\\Program Files (x86)\"}\\nxlog\n" +
+                "define ROOT ${sidecar.spoolDir!\"C:\\\\Program Files (x86)\"}\\nxlog\n" +
                         "\n" +
                         "Moduledir %ROOT%\\modules\n" +
                         "CacheDir %ROOT%\\data\n" +
@@ -302,8 +302,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         "output.logstash:\n" +
                         "   hosts: [\"192.168.1.1:5044\"]\n" +
                         "path:\n" +
-                        "  data: ${sidecar.spoolDir!\"C:\\Program Files\\Graylog\\sidecar\\cache\\filebeat\"}\\data\n" +
-                        "  logs: ${sidecar.spoolDir!\"C:\\Program Files\\Graylog\\sidecar\"}\\logs\n" +
+                        "  data: ${sidecar.spoolDir!\"C:\\\\Program Files\\\\Graylog\\\\sidecar\\\\cache\\\\filebeat\"}\\data\n" +
+                        "  logs: ${sidecar.spoolDir!\"C:\\\\Program Files\\\\Graylog\\\\sidecar\"}\\logs\n" +
                         "tags:\n" +
                         " - windows\n" +
                         "filebeat.inputs:\n" +

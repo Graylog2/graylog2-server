@@ -132,6 +132,7 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
             <Input type="text"
                    id="purge-key"
                    name="purgekey"
+                   placeholder="Insert key which should be purged"
                    label="Key"
                    onChange={handleInputOnChange}
                    help="Key to purge from cache"
@@ -152,6 +153,7 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
             <Input type="text"
                    id="key"
                    name="lookupkey"
+                   placeholder="Insert key that should be looked up"
                    label="Key"
                    required
                    onChange={handleInputOnChange}

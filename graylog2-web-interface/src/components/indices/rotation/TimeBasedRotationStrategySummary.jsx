@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import moment from 'moment';
-import {} from 'moment-duration-format';
+import 'moment-duration-format';
 
 class TimeBasedRotationStrategySummary extends React.Component {
   static propTypes = {
@@ -38,6 +38,8 @@ class TimeBasedRotationStrategySummary extends React.Component {
           <dd>Index Time</dd>
           <dt>Rotation period:</dt>
           <dd>{this.props.config.rotation_period} ({this._humanizedPeriod()})</dd>
+          <dt>Rotate empty index set:</dt>
+          <dd>{this.props.config.rotate_empty_index_set ? 'Yes' : 'No'}</dd>
         </dl>
       </div>
     );

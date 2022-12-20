@@ -78,6 +78,7 @@ public class V20151210140600_ElasticsearchConfigMigration extends Migration {
                     TimeBasedRotationStrategyConfig.builder()
                             .rotationPeriod(elasticsearchConfiguration.getMaxTimePerIndex())
                             .maxRotationPeriod(elasticsearchConfiguration.getMaxWriteIndexAge())
+                            .rotateEmptyIndexSet(elasticsearchConfiguration.isRotateEmptyIndex())
                             .build();
             clusterConfigService.write(timeConfig);
             LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_time_per_index", timeConfig);

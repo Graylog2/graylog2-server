@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-public class ShortTimerangeFormatParser {
+class ShortTimerangeFormatParser {
 
     private static final Pattern SHORT_FORMAT_PATTERN = Pattern.compile("^[0-9]+[a-zA-Z]$");
     private static final Map<String, String> SHORT_TO_LONG_PERIOD_MAPPING = Map.of(
@@ -36,7 +36,7 @@ public class ShortTimerangeFormatParser {
             "y", "years"
     );
 
-    public Optional<TimeRange> parse(final String shortTimerange) {
+    Optional<TimeRange> parse(final String shortTimerange) {
         if (shortTimerange != null && SHORT_FORMAT_PATTERN.matcher(shortTimerange).matches()) {
             final String numberPart = shortTimerange.substring(0, shortTimerange.length() - 1);
             final String periodPart = shortTimerange.substring(shortTimerange.length() - 1);
@@ -53,6 +53,5 @@ public class ShortTimerangeFormatParser {
             }
         }
         return Optional.empty();
-
     }
 }

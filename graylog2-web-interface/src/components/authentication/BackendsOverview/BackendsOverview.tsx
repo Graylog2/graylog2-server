@@ -27,6 +27,7 @@ import { DataTable, PaginatedList, Spinner } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
+import type { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 
 import BackendsFilter from './BackendsFilter';
 import BackendsOverviewItem from './BackendsOverviewItem';
@@ -77,7 +78,7 @@ const _updateListOnBackendActivation = (pagination, setLoading, setPaginatedBack
   callback();
 });
 
-const _backendsOverviewItem = (authBackend: AuthenticationBackend, context: { activeBackend: AuthenticationBackend }, paginatedRoles: PaginatedRoles) => (
+const _backendsOverviewItem = (authBackend: AuthenticationBackend, context: { activeBackend: AuthenticationBackendJSON }, paginatedRoles: PaginatedRoles) => (
   <BackendsOverviewItem authenticationBackend={authBackend} isActive={authBackend.id === context?.activeBackend?.id} roles={paginatedRoles.list} />
 );
 

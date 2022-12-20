@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Triggering field types refetching upon search refresh."
+
+pulls = ["14171"]

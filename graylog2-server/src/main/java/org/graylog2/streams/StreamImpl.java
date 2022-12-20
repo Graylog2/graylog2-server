@@ -47,6 +47,7 @@ import java.util.Set;
  */
 @CollectionName("streams")
 public class StreamImpl extends PersistedImpl implements Stream {
+    public static final String FIELD_ID = "_id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_RULES = "rules";
@@ -175,8 +176,8 @@ public class StreamImpl extends PersistedImpl implements Stream {
     public Map<String, Object> asMap() {
         // We work on the result a bit to allow correct JSON serializing.
         Map<String, Object> result = Maps.newHashMap(fields);
-        result.remove("_id");
-        result.put("id", ((ObjectId) fields.get("_id")).toHexString());
+        result.remove(FIELD_ID);
+        result.put("id", ((ObjectId) fields.get(FIELD_ID)).toHexString());
         result.remove(FIELD_CREATED_AT);
         result.put(FIELD_CREATED_AT, Tools.getISO8601String((DateTime) fields.get(FIELD_CREATED_AT)));
         result.put(FIELD_RULES, streamRules);

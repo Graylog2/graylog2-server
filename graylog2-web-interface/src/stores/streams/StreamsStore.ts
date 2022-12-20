@@ -28,18 +28,37 @@ import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 export type Stream = {
   id: string,
-  title: string,
+  outputs: any[],
+  matching_type: string,
   description: string,
+  created_at: string,
+  disabled: boolean,
+  rules: StreamRule[],
+  alert_conditions: any[],
+  alert_receivers: {
+    emails: Array<string>,
+    users: Array<string>,
+  },
+  title: string,
+  content_pack: any,
   remove_matches_from_default_stream: boolean,
-  isDefaultStream: boolean,
-  creatorUser: string,
-  createdAt: number,
+  index_set_id: string,
+  is_default: boolean,
+  is_editable: boolean,
 };
 
-type StreamRule = {
+export type StreamRuleType = {
+  id: number,
+  short_desc: string,
+  long_desc: string,
+  name: string,
+};
+
+export type StreamRule = {
   id: string,
-  type: string,
+  type: number,
   value: string,
+  field: string,
   inverted: boolean,
   stream_id: string,
   description: string,
@@ -117,8 +136,8 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
 
   callbacks: [],
 
-  searchPaginated(newPage, newPerPage, newQuery) {
-    const url = PaginationURL(ApiRoutes.StreamsApiController.paginated().url, newPage, newPerPage, newQuery);
+  searchPaginated(newPage, newPerPage, newQuery, additional) {
+    const url = PaginationURL(ApiRoutes.StreamsApiController.paginated().url, newPage, newPerPage, newQuery, additional);
 
     const promise = fetch('GET', qualifyUrl(url))
       .then((response: PaginatedResponse) => {
@@ -143,10 +162,6 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
             query,
           },
         };
-      })
-      .catch((errorThrown) => {
-        UserNotification.error(`Loading streams failed with status: ${errorThrown}`,
-          'Could not load streams');
       });
 
     StreamsActions.searchPaginated.promise(promise);
@@ -173,7 +188,7 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
         callback(streams);
       });
   },
-  get(streamId: string, callback: ((stream: Stream) => void)): Promise<StreamResponse> {
+  get(streamId: string, callback: ((stream: Stream) => void)) {
     const failCallback = (errorThrown) => {
       UserNotification.error(`Loading Stream failed with status: ${errorThrown}`,
         'Could not retrieve Stream');
@@ -188,16 +203,10 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
 
     return promise;
   },
-  remove(streamId: string, callback: (() => void)) {
-    const failCallback = (errorThrown) => {
-      UserNotification.error(`Removing Stream failed with status: ${errorThrown}`,
-        'Could not remove Stream');
-    };
-
+  remove(streamId: string) {
     const url = qualifyUrl(ApiRoutes.StreamsApiController.delete(streamId).url);
 
     const promise = fetch('DELETE', url)
-      .then(callback, failCallback)
       .then(() => CurrentUserStore.reload()
         .then(this._emitChange.bind(this)));
 
