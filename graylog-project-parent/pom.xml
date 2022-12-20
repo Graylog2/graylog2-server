@@ -732,6 +732,7 @@
                 <artifactId>cron-utils</artifactId>
                 <version>${cron-utils.version}</version>
             </dependency>
+
         </dependencies>
     </dependencyManagement>
 

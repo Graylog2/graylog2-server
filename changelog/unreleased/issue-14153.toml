@@ -1,0 +1,8 @@
+type = "fixed"
+message = "Improve JVM security provider compatibility by switching to a widely supported cipher transformation"
+
+issues = ["14153"]
+pulls = ["14193"]
+
+contributors = [""]
+

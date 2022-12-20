@@ -65,3 +65,11 @@ export type LookupTable = GenericEntityType & {
 }
 
 export type validationErrorsType = { name?: string, message?: string };
+
+export type PaginationType = {
+  count: number,
+  total: number,
+  page: number,
+  per_page: number,
+  query?: string,
+};

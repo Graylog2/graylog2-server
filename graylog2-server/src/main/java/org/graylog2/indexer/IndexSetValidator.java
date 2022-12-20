@@ -22,6 +22,7 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
+import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.shared.utilities.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -53,19 +54,20 @@ public class IndexSetValidator {
             }
         }
 
-        final Violation refreshIntervalViolation = validateRefreshInterval(newConfig);
+        final Violation refreshIntervalViolation = validateRefreshInterval(newConfig.fieldTypeRefreshInterval());
         if (refreshIntervalViolation != null) {
             return Optional.of(refreshIntervalViolation);
         }
 
-        return Optional.ofNullable(validateRetentionPeriod(newConfig));
+        return Optional.ofNullable(validateRetentionPeriod(newConfig.rotationStrategy(),
+                newConfig.retentionStrategy()));
     }
 
     @Nullable
-    private Violation validateRefreshInterval(IndexSetConfig newConfig) {
+    public Violation validateRefreshInterval(Duration readableDuration) {
         // Ensure fieldTypeRefreshInterval is not shorter than a second, as that may impact performance
-        if (newConfig.fieldTypeRefreshInterval().isShorterThan(MINIMUM_FIELD_TYPE_REFRESH_INTERVAL)) {
-            return Violation.create("Index field_type_refresh_interval \"" + newConfig.fieldTypeRefreshInterval().toString() + "\" is too short. It must be 1 second or longer.");
+        if (readableDuration.isShorterThan(MINIMUM_FIELD_TYPE_REFRESH_INTERVAL)) {
+            return Violation.create("Index field_type_refresh_interval \"" + readableDuration.toString() + "\" is too short. It must be 1 second or longer.");
         }
         return null;
     }
@@ -92,29 +94,29 @@ public class IndexSetValidator {
     }
 
     @Nullable
-    private Violation validateRetentionPeriod(IndexSetConfig config) {
+    public Violation validateRetentionPeriod(RotationStrategyConfig rotationStrategyConfig, RetentionStrategyConfig retentionStrategyConfig) {
         final Period maxRetentionPeriod = elasticsearchConfiguration.getMaxIndexRetentionPeriod();
 
         if (maxRetentionPeriod == null) {
             return null;
         }
 
-        if (!(config.rotationStrategy() instanceof TimeBasedRotationStrategyConfig)) {
+        if (!(rotationStrategyConfig instanceof TimeBasedRotationStrategyConfig)) {
             return null;
         }
 
         final Period rotationPeriod =
-                ((TimeBasedRotationStrategyConfig) config.rotationStrategy()).rotationPeriod().normalizedStandard();
+                ((TimeBasedRotationStrategyConfig) rotationStrategyConfig).rotationPeriod().normalizedStandard();
 
 
         final Period effectiveRetentionPeriod =
-                rotationPeriod.multipliedBy(config.retentionStrategy().maxNumberOfIndices()).normalizedStandard();
+                rotationPeriod.multipliedBy(retentionStrategyConfig.maxNumberOfIndices()).normalizedStandard();
 
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         if (now.plus(effectiveRetentionPeriod).isAfter(now.plus(maxRetentionPeriod))) {
             return Violation.create(
                     StringUtils.f("Index retention setting %s=%d would result in an effective index retention period of %s. This exceeds the configured maximum of %s=%s.",
-                            RetentionStrategyConfig.MAX_NUMBER_OF_INDEXES_FIELD, config.retentionStrategy().maxNumberOfIndices(), effectiveRetentionPeriod,
+                            RetentionStrategyConfig.MAX_NUMBER_OF_INDEXES_FIELD, retentionStrategyConfig.maxNumberOfIndices(), effectiveRetentionPeriod,
                             ElasticsearchConfiguration.MAX_INDEX_RETENTION_PERIOD, maxRetentionPeriod));
         }
 

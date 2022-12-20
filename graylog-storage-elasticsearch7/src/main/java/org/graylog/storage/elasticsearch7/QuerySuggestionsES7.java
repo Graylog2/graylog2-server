@@ -33,7 +33,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.suggest.Sugges
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.suggest.SuggestBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.suggest.term.TermSuggestion;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.suggest.term.TermSuggestionBuilder;
-import org.graylog.storage.elasticsearch7.errors.ResponseError;
+import org.graylog.storage.errors.ResponseError;
 import org.graylog2.plugin.Message;
 
 import javax.inject.Inject;
@@ -58,8 +58,8 @@ public class QuerySuggestionsES7 implements QuerySuggestionsService {
         final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(req.streams(), req.timerange());
         final TermSuggestionBuilder suggestionBuilder = SuggestBuilders.termSuggestion(req.field()).text(req.input()).size(req.size());
         final BoolQueryBuilder query = QueryBuilders.boolQuery()
-                .must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, req.streams()))
-                .must(QueryBuilders.prefixQuery(req.field(), req.input()));
+                .filter(QueryBuilders.termsQuery(Message.FIELD_STREAMS, req.streams()))
+                .filter(QueryBuilders.prefixQuery(req.field(), req.input()));
         final SearchSourceBuilder search = new SearchSourceBuilder()
                 .query(query)
                 .size(0)
