@@ -54,8 +54,8 @@ public class StreamsIT {
         api.streams().createStream("New Stream 3", newIndexSetId2);
 
         api.streams().createStream("sorttest: aaaaa", defaultIndexSetId);
-        api.streams().createStream("sorttest: ZZZZZZ", defaultIndexSetId);
-        api.streams().createStream("sorttest: 12345", defaultIndexSetId);
+        api.streams().createStream("sorttest: ZZZZZZ", defaultIndexSetId, false);
+        api.streams().createStream("sorttest: 12345", defaultIndexSetId, false);
     }
 
     @ContainerMatrixTest
@@ -82,6 +82,16 @@ public class StreamsIT {
         paginatedByFieldWithOrder("sorttest", "title", "desc")
                 .assertThat()
                 .body("streams*.title", equalTo(List.of("sorttest: ZZZZZZ", "sorttest: aaaaa", "sorttest: 12345")));
+    }
+
+    @ContainerMatrixTest
+    void sortByStatus() {
+        paginatedByFieldWithOrder("sorttest", "status", "asc")
+                .assertThat()
+                .body("streams*.title", equalTo(List.of("sorttest: aaaaa", "sorttest: ZZZZZZ", "sorttest: 12345")));
+        paginatedByFieldWithOrder("sorttest", "status", "desc")
+                .assertThat()
+                .body("streams*.title", equalTo(List.of("sorttest: 12345", "sorttest: ZZZZZZ", "sorttest: aaaaa")));
     }
 
     private ValidatableResponse paginatedByFieldWithOrder(String query, String field, String order) {
