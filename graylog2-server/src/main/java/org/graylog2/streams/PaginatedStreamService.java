@@ -58,8 +58,6 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
     public PaginatedList<StreamDTO> findPaginated(SearchQuery searchQuery, Predicate<StreamDTO> filter, int page,
                                                   int perPage, String sortField, String order) {
         final Bson dbQuery = searchQuery.toBson();
-        final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
-
         final AggregateIterable<Document> result = collection.aggregate(List.of(
                 Aggregates.match(dbQuery),
                 Aggregates.lookup(
@@ -68,10 +66,8 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
                         List.of(Aggregates.match(doc("$expr", doc("$eq", List.of("$_id", "$$index_set_id"))))),
                         "index_set"
                 ),
-                Aggregates.set(
-                        new Field<>("index_set_title", doc("$first", "$index_set.title")),
-                        new Field<>("lower" + sortField, doc("$toLower", "$" + sortField))
-                ),
+                Aggregates.set(new Field<>("index_set_title", doc("$first", "$index_set.title"))),
+                Aggregates.set(new Field<>("lower" + sortField, doc("$toLower", "$" + sortField))),
                 Aggregates.sort(getSortBuilder(order, "lower" + sortField)),
                 Aggregates.project(Projections.exclude("index_set", "lower" + sortField))
         ));
