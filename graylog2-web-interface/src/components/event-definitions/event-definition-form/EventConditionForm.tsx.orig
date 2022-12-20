@@ -25,6 +25,9 @@ import { Clearfix, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'componen
 import { HelpPanel } from 'components/event-definitions/common/HelpPanel';
 import type User from 'logic/users/User';
 
+import type { EventDefinition } from 'logic/alerts/types';
+import type { UserJSON } from 'logic/users/User';
+
 import styles from './EventConditionForm.css';
 
 import type { EventDefinition } from '../event-definitions-types';
@@ -32,6 +35,7 @@ import commonStyles from '../common/commonStyles.css';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
 type Props = {
+<<<<<<< Updated upstream
   action: 'create' | 'edit',
   entityTypes: any,
   eventDefinition: EventDefinition,
@@ -42,8 +46,16 @@ type Props = {
     }
   },
   currentUser: User,
-  onChange: (name: string, newConfig: EventDefinition['config']) => void,
+  onChange: (name: string, value: string | number) => void,
 }
+=======
+  eventDefinition: EventDefinition,
+  currentUser: UserJSON,
+  validation: { errors: { [key: string]: Array<string> } },
+  onChange: (name: string, newConfig: EventDefinition['config']) => void,
+  action: string,
+};
+>>>>>>> Stashed changes
 
 const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, currentUser, onChange }: Props) => {
   const getConditionPlugin = (type): any => {
@@ -79,7 +91,11 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
 
   const handleEventDefinitionTypeChange = (nextType: string) => {
     const conditionPlugin = getConditionPlugin(nextType);
+<<<<<<< Updated upstream
+    const defaultConfig = conditionPlugin.defaultConfig || {};
+=======
     const defaultConfig = conditionPlugin?.defaultConfig || {} as EventDefinition['config'];
+>>>>>>> Stashed changes
 
     onChange('config', { ...defaultConfig, type: nextType });
   };
@@ -98,21 +114,27 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
     return <dl>{typeDescriptions}</dl>;
   };
 
-  const disabledSelect = () => {
-    return !formattedEventDefinitionTypes().some((edt) => eventDefinition.config.type === edt.value) && action === 'edit';
-  };
-
   const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
   const isSystemEventDefinition = eventDefinition.config.type === SYSTEM_EVENT_DEFINITION_TYPE;
 
+<<<<<<< Updated upstream
+  const eventDefinitionTypeComponent = eventDefinitionType.formComponent
+    ? React.createElement(eventDefinitionType.formComponent, {
+      action,
+      entityTypes,
+      currentUser,
+      validation,
+      eventDefinition,
+      onChange,
+=======
   const eventDefinitionTypeComponent = eventDefinitionType?.formComponent
     ? React.createElement<React.ComponentProps<any>>(eventDefinitionType.formComponent, {
-      action: action,
-      entityTypes: entityTypes,
+      eventDefinition: eventDefinition,
       currentUser: currentUser,
       validation: validation,
-      eventDefinition: eventDefinition,
       onChange: onChange,
+      action: action,
+>>>>>>> Stashed changes
       key: eventDefinition.id,
     })
     : null;
@@ -139,7 +161,6 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
                       value={eventDefinition.config.type}
                       onChange={handleEventDefinitionTypeChange}
                       clearable={false}
-                      disabled={disabledSelect()}
                       required />
               <HelpBlock>
                 {lodash.get(validation, 'errors.config[0]', 'Choose the type of Condition for this Event.')}
@@ -149,7 +170,7 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
         )}
       </Col>
 
-      {!isSystemEventDefinition && !disabledSelect() && (
+      {!isSystemEventDefinition && (
         <>
           <Col md={5} lg={5} lgOffset={1}>
             <HelpPanel className={styles.conditionTypesInfo}
