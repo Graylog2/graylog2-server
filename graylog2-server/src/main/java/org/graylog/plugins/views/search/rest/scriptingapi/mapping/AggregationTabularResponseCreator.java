@@ -39,7 +39,7 @@ public class AggregationTabularResponseCreator implements TabularResponseCreator
 
     private static final Logger LOG = LoggerFactory.getLogger(AggregationTabularResponseCreator.class);
 
-    public TabularResponse mapToResponse(final AggregationRequestSpec searchRequestSpec, final SearchJob searchJob) throws AggregationFailedException {
+    public TabularResponse mapToResponse(final AggregationRequestSpec searchRequestSpec, final SearchJob searchJob) throws QueryFailedException {
         final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
 
 
@@ -56,7 +56,7 @@ public class AggregationTabularResponseCreator implements TabularResponseCreator
         }
 
         LOG.warn("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
-        throw new AggregationFailedException("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
+        throw new QueryFailedException("Scripting API failed to obtain aggregation for input : " + searchRequestSpec);
     }
 
     private List<SeriesSpec> extractSeriesSpec(QueryResult queryResult) {

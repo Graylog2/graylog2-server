@@ -18,6 +18,8 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useCallback } from 'react';
 
+import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
+
 import TableCell from './TableCell';
 import type { ColumnRenderers, Column } from './types';
 import RowCheckbox from './RowCheckbox';
@@ -64,6 +66,8 @@ const TableRow = <Entity extends { id: string }>({
     [entity.id, onToggleEntitySelect],
   );
 
+  const actionButtons = displayActions ? <ButtonToolbar>{rowActions(entity)}</ButtonToolbar> : null;
+
   return (
     <tr key={entity.id}>
       {displaySelect && (
@@ -85,7 +89,7 @@ const TableRow = <Entity extends { id: string }>({
       })}
       {displayActions ? (
         <ActionsCell>
-          {index === 0 ? <ActionsRef ref={actionsRef}>{rowActions(entity)}</ActionsRef> : rowActions(entity)}
+          {index === 0 ? <ActionsRef ref={actionsRef}>{actionButtons}</ActionsRef> : actionButtons}
         </ActionsCell>
       ) : null}
     </tr>

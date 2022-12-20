@@ -27,14 +27,15 @@ import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
-import org.graylog.plugins.views.search.rest.scriptingapi.mapping.AggregationFailedException;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.AggregationTabularResponseCreator;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.MessagesTabularResponseCreator;
+import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryParamsToFullRequestSpecificationMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.SearchRequestSpecToSearchMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
+import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -95,6 +96,8 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     @NoAuditEvent("Creating audit event manually in method body.")
     public TabularResponse executeQuery(@ApiParam(name = "queryRequestSpec") @Valid MessagesRequestSpec messagesRequestSpec,
                                         @Context SearchUser searchUser) {
+
+
         try {
             //Step 1: map simple request to more complex search
             Search search = searchCreator.mapToSearch(messagesRequestSpec, searchUser);
@@ -106,7 +109,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
             //Step 3: take complex response and try to map it to simpler, tabular form
             return messagesTabularResponseCreator.mapToResponse(messagesRequestSpec, searchJob, searchUser);
 
-        } catch (IllegalArgumentException | ValidationException | AggregationFailedException ex) {
+        } catch (IllegalArgumentException | ValidationException | QueryFailedException ex) {
             throw new BadRequestException(ex.getMessage(), ex);
         }
     }
@@ -119,6 +122,8 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                                         @ApiParam(name = "streams") @QueryParam("streams") Set<String> streams,
                                         @ApiParam(name = "timerange") @QueryParam("timerange") String timerangeKeyword,
                                         @ApiParam(name = "fields") @QueryParam("fields") List<String> fields,
+                                        @ApiParam(name = "sort") @QueryParam("sort") String sort,
+                                        @ApiParam(name = "sort") @QueryParam("sortOrder") SortSpec.Direction sortOrder,
                                         @ApiParam(name = "from") @QueryParam("from") int from,
                                         @ApiParam(name = "size") @QueryParam("size") int size,
                                         @Context SearchUser searchUser) {
@@ -128,6 +133,8 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                     splitByComma(streams),
                     timerangeKeyword,
                     splitByComma(fields),
+                    sort,
+                    sortOrder,
                     from,
                     size);
             return executeQuery(messagesRequestSpec, searchUser);
@@ -154,7 +161,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
 
             //Step 3: take complex response and try to map it to simpler, tabular form
             return aggregationTabularResponseCreator.mapToResponse(aggregationRequestSpec, searchJob);
-        } catch (IllegalArgumentException | ValidationException | AggregationFailedException ex) {
+        } catch (IllegalArgumentException | ValidationException | QueryFailedException ex) {
             throw new BadRequestException(ex.getMessage(), ex);
         }
     }

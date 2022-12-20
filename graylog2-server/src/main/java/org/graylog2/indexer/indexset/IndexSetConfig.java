@@ -271,6 +271,10 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
     public abstract Builder toBuilder();
 
+    /**
+     * For non-UI originating instances, use {@link IndexSetConfigFactory} instead to create an instance with
+     * appropriate defaults.
+     */
     public static Builder builder() {
         return new AutoValue_IndexSetConfig.Builder()
                 // Index sets are writable by default.

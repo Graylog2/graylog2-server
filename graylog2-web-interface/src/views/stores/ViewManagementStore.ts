@@ -29,8 +29,6 @@ import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 export type SortOrder = 'asc' | 'desc';
 
-export type SortField = 'id' | 'title' | 'created_at';
-
 export type PaginatedViews = {
   pagination: {
     total: number,
@@ -56,7 +54,7 @@ type ViewManagementActionsType = RefluxActions<{
   delete: (view: View) => Promise<View>,
   forValue: () => Promise<ViewSummaries>,
   get: (viewId: string) => Promise<ViewJson>,
-  search: (query: string, page?: number, perPage?: number, sortBy?: SortField, sortOrder?: SortOrder) => Promise<PaginatedViews>,
+  search: (query: string, page?: number, perPage?: number, sortBy?: string, sortOrder?: SortOrder) => Promise<PaginatedViews>,
   update: (view: View) => Promise<View>,
 }>;
 

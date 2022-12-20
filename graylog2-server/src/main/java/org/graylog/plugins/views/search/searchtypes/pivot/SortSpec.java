@@ -17,9 +17,11 @@
 package org.graylog.plugins.views.search.searchtypes.pivot;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.apache.commons.lang3.StringUtils;
+import org.graylog.plugins.views.search.searchtypes.Sort;
 
 import java.util.Locale;
 
@@ -30,8 +32,15 @@ import java.util.Locale;
         visible = true)
 public interface SortSpec {
     enum Direction {
-        Ascending,
-        Descending;
+        Ascending(Sort.Order.ASC),
+        Descending(Sort.Order.DESC);
+
+        @JsonIgnore
+        private Sort.Order sortOrder;
+
+        Direction(Sort.Order sortOrder) {
+            this.sortOrder = sortOrder;
+        }
 
         @JsonCreator
         public static Direction deserialize(String value) {
@@ -44,6 +53,11 @@ public interface SortSpec {
                 case "ascending", "asc" -> Ascending;
                 default -> throw new IllegalArgumentException("Failed to parse sort direction:" + value);
             };
+        }
+
+        @JsonIgnore
+        public Sort.Order toSortOrder() {
+            return this.sortOrder;
         }
     }
 

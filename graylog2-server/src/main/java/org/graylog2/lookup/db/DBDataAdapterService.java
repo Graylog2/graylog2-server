@@ -88,7 +88,7 @@ public class DBDataAdapterService extends ScopedDbService<DataAdapterDto> {
 
     public void deleteAndPostEventImmutable(String idOrName) {
         final Optional<DataAdapterDto> dataAdapterDto = get(idOrName);
-        super.deleteImmutable(idOrName);
+        super.forceDelete(idOrName);
         dataAdapterDto.ifPresent(dataAdapter -> clusterEventBus.post(DataAdaptersDeleted.create(dataAdapter.id())));
     }
 

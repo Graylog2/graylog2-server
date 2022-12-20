@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import lodash from 'lodash';
 
@@ -22,43 +23,52 @@ import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Select } from 'components/common';
 import { Clearfix, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { HelpPanel } from 'components/event-definitions/common/HelpPanel';
+import type User from 'logic/users/User';
 
 import styles from './EventConditionForm.css';
 
+import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
+import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
 type Props = {
-  eventDefinition: any,
-  currentUser: any,
-  validation: any,
-  onChange: (name: string, obj: any) => void,
-  action: string,
-};
+  action: 'create' | 'edit',
+  entityTypes: any,
+  eventDefinition: EventDefinition,
+  validation: {
+    errors: {
+      config: any,
+      title: string,
+    }
+  },
+  currentUser: User,
+  onChange: (name: string, value: string | number) => void,
+}
 
-const EventConditionForm = ({ eventDefinition, currentUser, validation, onChange, action }: Props) => {
-  const getConditionPlugin = (type: string | undefined) => {
+const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, currentUser, onChange }: Props) => {
+  const getConditionPlugin = (type): any => {
     if (type === undefined) {
-      return undefined;
+      return {};
     }
 
-    return PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type) || undefined;
+    return PluginStore.exports('eventDefinitionTypes').find((eventDefinitionType) => eventDefinitionType.type === type) || {};
   };
 
-  const sortedEventDefinitionTypes = () => {
-    return PluginStore.exports('eventDefinitionTypes').sort((edt1, edt2) => {
+  const sortedEventDefinitionTypes = (): any => {
+    return (PluginStore.exports('eventDefinitionTypes') as any).sort((eventDefinitionType1, eventDefinitionType2) => {
       // Try to sort by given sort order and displayName if possible, otherwise do it by displayName
-      const edt1Order = edt1.sortOrder;
-      const edt2Order = edt2.sortOrder;
+      const eventDefinitionType1Order = eventDefinitionType1.sortOrder;
+      const eventDefinitionType2Order = eventDefinitionType2.sortOrder;
 
-      if (edt1Order !== undefined || edt2Order !== undefined) {
-        const sort = lodash.defaultTo(edt1Order, Number.MAX_SAFE_INTEGER) - lodash.defaultTo(edt2Order, Number.MAX_SAFE_INTEGER);
+      if (eventDefinitionType1Order !== undefined || eventDefinitionType2Order !== undefined) {
+        const sort = lodash.defaultTo(eventDefinitionType1Order, Number.MAX_SAFE_INTEGER) - lodash.defaultTo(eventDefinitionType2Order, Number.MAX_SAFE_INTEGER);
 
         if (sort !== 0) {
           return sort;
         }
       }
 
-      return naturalSort(edt1.displayName, edt2.displayName);
+      return naturalSort(eventDefinitionType1.displayName, eventDefinitionType2.displayName);
     });
   };
 
@@ -69,7 +79,7 @@ const EventConditionForm = ({ eventDefinition, currentUser, validation, onChange
 
   const handleEventDefinitionTypeChange = (nextType) => {
     const conditionPlugin = getConditionPlugin(nextType);
-    const defaultConfig = conditionPlugin?.defaultConfig || {};
+    const defaultConfig = conditionPlugin.defaultConfig || {};
 
     onChange('config', { ...defaultConfig, type: nextType });
   };
@@ -88,19 +98,17 @@ const EventConditionForm = ({ eventDefinition, currentUser, validation, onChange
     return <dl>{typeDescriptions}</dl>;
   };
 
-  const disabledSelect = () => {
-    return !formattedEventDefinitionTypes().some((edt) => eventDefinition.config.type === edt.value) && action === 'edit';
-  };
-
   const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
+  const isSystemEventDefinition = eventDefinition.config.type === SYSTEM_EVENT_DEFINITION_TYPE;
 
-  const eventDefinitionTypeComponent = eventDefinitionType?.formComponent
+  const eventDefinitionTypeComponent = eventDefinitionType.formComponent
     ? React.createElement(eventDefinitionType.formComponent, {
-      eventDefinition: eventDefinition,
-      currentUser: currentUser,
-      validation: validation,
-      onChange: onChange,
-      action: action,
+      action,
+      entityTypes,
+      currentUser,
+      validation,
+      eventDefinition,
+      onChange,
       key: eventDefinition.id,
     })
     : null;
@@ -110,45 +118,68 @@ const EventConditionForm = ({ eventDefinition, currentUser, validation, onChange
       <Col md={7} lg={6}>
         <h2 className={commonStyles.title}>Event Condition</h2>
 
-        <p>
-          Configure how Graylog should create Events of this kind. You can later use those Events as input on other
-          Conditions, making it possible to build powerful Conditions based on others.
-        </p>
-
-        <FormGroup controlId="event-definition-priority" validationState={validation.errors.config ? 'error' : null}>
-          <ControlLabel>Condition Type</ControlLabel>
-          <Select placeholder="Select a Condition Type"
-                  options={formattedEventDefinitionTypes()}
-                  value={eventDefinition.config.type}
-                  onChange={handleEventDefinitionTypeChange}
-                  clearable={false}
-                  disabled={disabledSelect()}
-                  required />
-          <HelpBlock>
-            {lodash.get(validation, 'errors.config[0]', 'Choose the type of Condition for this Event.')}
-          </HelpBlock>
-        </FormGroup>
+        {isSystemEventDefinition ? (
+          <p>
+            The conditions of system notification event definitions cannot be edited.
+          </p>
+        ) : (
+          <>
+            <p>
+              Configure how Graylog should create Events of this kind. You can later use those Events as input on other
+              Conditions, making it possible to build powerful Conditions based on others.
+            </p>
+            <FormGroup controlId="event-definition-priority" validationState={validation.errors.config ? 'error' : null}>
+              <ControlLabel>Condition Type</ControlLabel>
+              <Select placeholder="Select a Condition Type"
+                      options={formattedEventDefinitionTypes()}
+                      value={eventDefinition.config.type}
+                      onChange={handleEventDefinitionTypeChange}
+                      clearable={false}
+                      required />
+              <HelpBlock>
+                {lodash.get(validation, 'errors.config[0]', 'Choose the type of Condition for this Event.')}
+              </HelpBlock>
+            </FormGroup>
+          </>
+        )}
       </Col>
-      {!disabledSelect() && (
-        <Col md={5} lg={5} lgOffset={1}>
-          <HelpPanel className={styles.conditionTypesInfo}
-                     title="Available Conditions">
-            {renderConditionTypeDescriptions()}
-          </HelpPanel>
-        </Col>
-      )}
-      <Clearfix />
 
-      {eventDefinitionTypeComponent && (
+      {!isSystemEventDefinition && (
         <>
-          <hr className={styles.hr} />
-          <Col md={12}>
-            {eventDefinitionTypeComponent}
+          <Col md={5} lg={5} lgOffset={1}>
+            <HelpPanel className={styles.conditionTypesInfo}
+                       title="Available Conditions">
+              {renderConditionTypeDescriptions()}
+            </HelpPanel>
           </Col>
+          <Clearfix />
+
+          {eventDefinitionTypeComponent && (
+            <>
+              <hr className={styles.hr} />
+              <Col md={12}>
+                {eventDefinitionTypeComponent}
+              </Col>
+            </>
+          )}
         </>
       )}
     </Row>
   );
+};
+
+EventConditionForm.defaultProps = {
+  action: 'create',
+  entityTypes: undefined,
+};
+
+EventConditionForm.propTypes = {
+  action: PropTypes.oneOf(['create', 'edit']),
+  entityTypes: PropTypes.object,
+  eventDefinition: PropTypes.object.isRequired,
+  currentUser: PropTypes.object.isRequired, // Prop is passed down to pluggable entities
+  validation: PropTypes.object.isRequired,
+  onChange: PropTypes.func.isRequired,
 };
 
 export default EventConditionForm;
