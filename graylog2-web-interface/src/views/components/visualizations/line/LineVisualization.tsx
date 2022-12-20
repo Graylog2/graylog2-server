@@ -69,16 +69,12 @@ const LineVisualization = makeVisualization(({
   const { eventChartData, shapes } = useEvents(config, data.events);
 
   const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
-  const defaultLayout = {
-    yaxis: {
-      type: axisType,
-    },
-  };
-  const layout = shapes ? { ...defaultLayout, shapes } : defaultLayout;
+  const layout = shapes ? { shapes } : {};
 
   return (
     <XYPlot config={config}
             plotLayout={layout}
+            axisType={axisType}
             effectiveTimerange={effectiveTimerange}
             getChartColor={getChartColor}
             height={height}

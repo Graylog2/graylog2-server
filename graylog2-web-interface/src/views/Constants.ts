@@ -49,6 +49,8 @@ export const DEFAULT_CUSTOM_HIGHLIGHT_RANGE = chroma.scale(['lightyellow', 'ligh
   .mode('lch')
   .colors(40);
 
+export const DEFAULT_INTERPOLATION = 'linear';
+
 export const TimeUnits = {
   seconds: 'Seconds',
   minutes: 'Minutes',

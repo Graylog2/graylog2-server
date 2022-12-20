@@ -14,20 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { VisualizationType } from 'views/types';
+import type { VisualizationType, ArrayElement } from 'views/types';
 import LineVisualization from 'views/components/visualizations/line/LineVisualization';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
-
-type ArrayElement<ArrayType extends readonly unknown[]> =
-  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import { DEFAULT_AXIS_TYPE, axisTypes } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 
 const interpolationTypes = ['linear', 'step-after', 'spline'] as const;
-const axisTypes = ['linear', 'logarithmic'] as const;
 
 type LineVisualizationConfigFormValues = {
   interpolation: ArrayElement<typeof interpolationTypes>;
-  axisType: ArrayElement<typeof axisTypes>;
+  axisType: AxisType;
 };
 
 const validate = hasAtLeastOneMetric('Line chart');
@@ -38,8 +36,11 @@ const lineChart: VisualizationType<typeof LineVisualization.type, LineVisualizat
   component: LineVisualization,
   config: {
     createConfig: () => ({ interpolation: LineVisualizationConfig.DEFAULT_INTERPOLATION }),
-    fromConfig: (config: LineVisualizationConfig | undefined) => ({ interpolation: config?.interpolation ?? LineVisualizationConfig.DEFAULT_INTERPOLATION }),
-    toConfig: (formValues: LineVisualizationConfigFormValues) => LineVisualizationConfig.create(formValues.interpolation),
+    fromConfig: (config: LineVisualizationConfig | undefined) => ({
+      interpolation: config?.interpolation ?? LineVisualizationConfig.DEFAULT_INTERPOLATION,
+      axisType: config?.axisType ?? DEFAULT_AXIS_TYPE,
+    }),
+    toConfig: (formValues: LineVisualizationConfigFormValues) => LineVisualizationConfig.create(formValues.interpolation, formValues.axisType),
     fields: [{
       name: 'interpolation',
       title: 'Interpolation',

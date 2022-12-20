@@ -16,13 +16,28 @@
  */
 package org.graylog.plugins.views.search.views.widgets.aggregation;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public interface XYVisualizationConfig {
     String FIELD_AXIS_TYPE = "axis_type";
     AxisType DEFAULT_AXIS_TYPE = AxisType.LINEAR;
 
     enum AxisType {
-        LINEAR,
-        LOGARITHMIC
+        LINEAR("linear"),
+        LOGARITHMIC("logarithmic");
+
+        private final String value;
+
+        @JsonValue
+        public String value() {
+            return this.value;
+        }
+
+        @JsonCreator
+        AxisType(String value) {
+            this.value = value;
+        }
     }
 
     AxisType axisType();

@@ -24,6 +24,8 @@ import type { VisualizationComponentProps } from 'views/components/aggregationbu
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
+import type LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
+import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/ScatterVisualizationConfig';
 
 import XYPlot from '../XYPlot';
 
@@ -37,6 +39,7 @@ const ScatterVisualization = makeVisualization(({
   effectiveTimerange,
   height,
 }: VisualizationComponentProps) => {
+  const visualizationConfig = (config.visualizationConfig ?? ScatterVisualizationConfig.empty()) as ScatterVisualizationConfig;
   const rows = useMemo(() => retrieveChartData(data), [data]);
   const _chartDataResult = useChartData(rows, {
     widgetConfig: config,
@@ -50,6 +53,7 @@ const ScatterVisualization = makeVisualization(({
 
   return (
     <XYPlot config={config}
+            axisType={visualizationConfig.axisType}
             chartData={chartDataResult}
             setChartColor={setChartColor}
             plotLayout={layout}

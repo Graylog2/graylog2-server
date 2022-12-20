@@ -15,13 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
+import { DEFAULT_INTERPOLATION } from 'src/views/Constants';
 
-import type {
-  XYVisualization,
-  AxisType,
-  AxisTypeJSON,
-} from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
-import { DEFAULT_AXIS_TYPE, parseAxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import type { XYVisualization, AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 
 import VisualizationConfig from './VisualizationConfig';
 import type { InterpolationMode } from './Interpolation';
@@ -33,15 +30,13 @@ type InternalState = {
 
 export type LineVisualizationConfigJSON = {
   interpolation: InterpolationMode,
-  axis_type?: AxisTypeJSON,
+  axis_type?: AxisType,
 };
 
 export default class LineVisualizationConfig extends VisualizationConfig implements XYVisualization {
   private readonly _value: InternalState;
 
-  static readonly DEFAULT_INTERPOLATION: InterpolationMode = 'linear';
-
-  constructor(interpolation: InternalState['interpolation'], axisType: InternalState['axisType']) {
+  constructor(interpolation: InternalState['interpolation'], axisType: InternalState['axisType'] = DEFAULT_AXIS_TYPE) {
     super();
     this._value = { interpolation, axisType };
   }
@@ -64,19 +59,22 @@ export default class LineVisualizationConfig extends VisualizationConfig impleme
   }
 
   static empty() {
-    return new LineVisualizationConfig(this.DEFAULT_INTERPOLATION, DEFAULT_AXIS_TYPE);
+    return new LineVisualizationConfig(DEFAULT_INTERPOLATION, DEFAULT_AXIS_TYPE);
   }
 
   toJSON() {
-    const { interpolation } = this._value;
+    const { interpolation, axisType } = this._value;
 
-    return { interpolation };
+    return {
+      interpolation,
+      axis_type: axisType,
+    };
   }
 
   static fromJSON(_type: string, value: LineVisualizationConfigJSON) {
     return LineVisualizationConfig.create(
-      value?.interpolation ?? this.DEFAULT_INTERPOLATION,
-      parseAxisType(value?.axis_type),
+      value?.interpolation ?? DEFAULT_INTERPOLATION,
+      value?.axis_type ?? DEFAULT_AXIS_TYPE,
     );
   }
 }
@@ -92,6 +90,10 @@ class Builder {
 
   interpolation(value: InternalState['interpolation']) {
     return new Builder(this.value.set('interpolation', value));
+  }
+
+  axisType(value: InternalState['axisType']) {
+    return new Builder((this.value.set('axisType', value)));
   }
 
   build() {
