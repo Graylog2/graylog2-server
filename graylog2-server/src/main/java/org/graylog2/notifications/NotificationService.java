@@ -20,6 +20,7 @@ import org.graylog2.cluster.Node;
 import org.graylog2.plugin.database.PersistedService;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -36,6 +37,8 @@ public interface NotificationService extends PersistedService {
     boolean isFirst(Notification.Type type);
 
     List<Notification> all();
+
+    Optional<Notification> getByType(Notification.Type type);
 
     boolean publishIfFirst(Notification notification);
 
