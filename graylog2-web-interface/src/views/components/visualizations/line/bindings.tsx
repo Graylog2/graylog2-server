@@ -19,8 +19,15 @@ import LineVisualization from 'views/components/visualizations/line/LineVisualiz
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
 
+type ArrayElement<ArrayType extends readonly unknown[]> =
+  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+
+const interpolationTypes = ['linear', 'step-after', 'spline'] as const;
+const axisTypes = ['linear', 'logarithmic'] as const;
+
 type LineVisualizationConfigFormValues = {
-  interpolation: 'linear' | 'step-after' | 'spline';
+  interpolation: ArrayElement<typeof interpolationTypes>;
+  axisType: ArrayElement<typeof axisTypes>;
 };
 
 const validate = hasAtLeastOneMetric('Line chart');
@@ -37,7 +44,13 @@ const lineChart: VisualizationType<typeof LineVisualization.type, LineVisualizat
       name: 'interpolation',
       title: 'Interpolation',
       type: 'select',
-      options: ['linear', 'step-after', 'spline'],
+      options: interpolationTypes,
+      required: true,
+    }, {
+      name: 'axisType',
+      title: 'Axis Type',
+      type: 'select',
+      options: axisTypes,
       required: true,
     }],
   },
