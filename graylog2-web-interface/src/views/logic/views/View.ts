@@ -54,6 +54,7 @@ type InternalState = {
   createdAt: Date,
   owner: string,
   requires: Requirements,
+  favorite: boolean,
 };
 
 export type ViewJson = {
@@ -68,6 +69,7 @@ export type ViewJson = {
   created_at: string,
   owner: string,
   requires: Requirements,
+  favorite: boolean,
 };
 
 export default class View {
@@ -88,7 +90,9 @@ export default class View {
     state: ViewStateMap,
     createdAt: Date,
     owner: string,
-    requires: Requirements) {
+    requires: Requirements,
+    favorite,
+  ) {
     this._value = {
       id,
       type,
@@ -101,6 +105,7 @@ export default class View {
       createdAt,
       owner,
       requires,
+      favorite,
     };
   }
 
@@ -155,6 +160,10 @@ export default class View {
 
   get requires(): Requirements {
     return this._value.requires || {};
+  }
+
+  get favorite(): boolean {
+    return this._value.favorite || false;
   }
 
   getSearchTypeByWidgetId(widgetId: string): QuerySearchType | undefined | null {
@@ -214,7 +223,7 @@ export default class View {
   }
 
   static fromJSON(value: ViewJson): View {
-    const { id, type, title, summary, description, properties, state, created_at, owner, requires } = value;
+    const { id, type, title, summary, description, properties, state, created_at, owner, requires, favorite } = value;
     const viewState: ViewStateMap = Immutable.Map(state).map(ViewState.fromJSON).toMap();
     const createdAtDate = new Date(created_at);
 
@@ -230,6 +239,7 @@ export default class View {
       .createdAt(createdAtDate)
       .owner(owner)
       .requires(requires)
+      .favorite(favorite)
       .build();
   }
 
@@ -300,9 +310,13 @@ class Builder {
     return new Builder(this.value.set('requires', value));
   }
 
-  build(): View {
-    const { id, type, title, summary, description, search, properties, state, createdAt, owner, requires } = this.value.toObject();
+  favorite(value: boolean): Builder {
+    return new Builder(this.value.set('favorite', value));
+  }
 
-    return new View(id, type, title, summary, description, search, properties, state, createdAt, owner, requires);
+  build(): View {
+    const { id, type, title, summary, description, search, properties, state, createdAt, owner, requires, favorite } = this.value.toObject();
+
+    return new View(id, type, title, summary, description, search, properties, state, createdAt, owner, requires, favorite);
   }
 }

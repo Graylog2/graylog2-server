@@ -32,6 +32,8 @@ import type FetchError from 'logic/errors/FetchError';
 import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
+import FavoriteIcon from 'views/components/FavoriteIcon';
+import { ViewActions } from 'views/stores/ViewStore';
 
 type SearchParams = {
   page: number,
@@ -40,13 +42,14 @@ type SearchParams = {
   sort: Sort
 }
 
-const INITIAL_COLUMNS = ['title', 'description', 'summary'];
+const INITIAL_COLUMNS = ['title', 'description', 'summary', 'favorite'];
 const COLUMN_DEFINITIONS = [
   { id: 'created_at', title: 'Created At', sortable: true },
   { id: 'title', title: 'Title', sortable: true },
   { id: 'description', title: 'Description', sortable: true },
   { id: 'summary', title: 'Summary', sortable: true },
   { id: 'owner', title: 'Owner', sortable: true },
+  { id: 'favorite', title: '', sortable: true },
 ];
 
 const DEFAULT_PAGINATION = {
@@ -93,6 +96,16 @@ const customColumnRenderers = (onLoadSavedSearch: () => void): ColumnRenderers<V
         }}
       </ViewLoaderContext.Consumer>
     ),
+  },
+  isFavorite: {
+    renderCell: (dashboard) => (
+      <FavoriteIcon isFavorite={dashboard.favorite}
+                    id={dashboard.id}
+                    onChange={(newValue) => {
+                      ViewActions.update(dashboard.toBuilder().favorite(newValue).build());
+                    }} />
+    ),
+    staticWidth: 30,
   },
 });
 

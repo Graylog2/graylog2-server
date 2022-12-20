@@ -26,6 +26,8 @@ import useDashboards from 'views/logic/dashboards/useDashboards';
 import usePluginEntities from 'hooks/usePluginEntities';
 import DashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
 import { Alert } from 'components/bootstrap';
+import FavoriteIcon from 'views/components/FavoriteIcon';
+import { ViewActions } from 'views/stores/ViewStore';
 
 import TitleCell from './TitleCell';
 
@@ -36,7 +38,7 @@ type SearchParams = {
   sort: Sort
 }
 
-const INITIAL_COLUMNS = ['title', 'description', 'summary'];
+const INITIAL_COLUMNS = ['title', 'description', 'summary', 'favorite'];
 
 const COLUMN_DEFINITIONS = [
   { id: 'created_at', title: 'Created At', sortable: true },
@@ -44,6 +46,7 @@ const COLUMN_DEFINITIONS = [
   { id: 'description', title: 'Description', sortable: true },
   { id: 'summary', title: 'Summary', sortable: true },
   { id: 'owner', title: 'Owner', sortable: true },
+  { id: 'favorite', title: '', sortable: true },
 ];
 
 const useCustomColumnRenderers = () => {
@@ -51,6 +54,16 @@ const useCustomColumnRenderers = () => {
   const customColumnRenderers: ColumnRenderers<View> = useMemo(() => ({
     title: {
       renderCell: (dashboard) => <TitleCell dashboard={dashboard} requirementsProvided={requirementsProvided} />,
+    },
+    isFavorite: {
+      renderCell: (dashboard) => (
+        <FavoriteIcon isFavorite={dashboard.favorite}
+                      id={dashboard.id}
+                      onChange={(newValue) => {
+                        ViewActions.update(dashboard.toBuilder().favorite(newValue).build());
+                      }} />
+      ),
+      staticWidth: 30,
     },
   }), [requirementsProvided]);
 

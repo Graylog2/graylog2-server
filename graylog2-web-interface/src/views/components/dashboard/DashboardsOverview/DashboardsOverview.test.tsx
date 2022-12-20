@@ -56,6 +56,7 @@ const loadDashboardsResponse = (count = 1) => {
         .createdAt(new Date())
         .requires({})
         .search(Search.builder().id('search.id').build())
+        .favorite(true)
         .build();
       dashboards.push(simpleView());
     }
