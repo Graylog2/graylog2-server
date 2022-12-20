@@ -14,20 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog.storage.errors;
 
-import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
+import org.junit.jupiter.api.Test;
 
-export type PaginationQueryParameterObject = {
-  pageSizes?: number[];
-};
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-const withPaginationQueryParameter = <C extends React.ComponentType<React.ComponentProps<C>>>(Component: C, obj?: PaginationQueryParameterObject) => {
-  return function WrappedComponent(props: any) {
-    const result = usePaginationQueryParameter(obj?.pageSizes);
+class CauseTest {
 
-    return <Component {...props} paginationQueryParameter={result} />;
-  };
-};
+    @Test
+    void acceptsCauseWithoutIndexData() {
+        final Cause childishError = Cause.Builder.builder()
+                .reason("I won't give you data!")
+                .type("Childish error")
+                .build();
 
-export default withPaginationQueryParameter;
+        assertThat(childishError)
+                .satisfies(error -> assertNull(error.index()))
+                .satisfies(error -> assertNull(error.indexUuid()));
+    }
+}

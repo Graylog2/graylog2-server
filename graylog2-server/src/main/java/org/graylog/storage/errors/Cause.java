@@ -14,23 +14,31 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.errors;
+package org.graylog.storage.errors;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
+
 @AutoValue
 @JsonDeserialize(builder = Cause.Builder.class)
 public abstract class Cause {
+
     @JsonProperty
     public abstract String type();
+
     @JsonProperty
     public abstract String reason();
+
     @JsonProperty
+    @Nullable
     public abstract String indexUuid();
+
     @JsonProperty
+    @Nullable
     public abstract String index();
 
     @AutoValue.Builder
@@ -47,7 +55,7 @@ public abstract class Cause {
         public abstract Cause build();
 
         @JsonCreator
-        public static  Cause.Builder builder() {
+        public static Cause.Builder builder() {
             return new AutoValue_Cause.Builder();
         }
     }

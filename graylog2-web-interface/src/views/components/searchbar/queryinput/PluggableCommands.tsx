@@ -14,20 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useMemo } from 'react';
 
-import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
+import usePluggableCommands from 'views/components/searchbar/queryinput/usePluggableCommands';
+import type { Command } from 'views/components/searchbar/queryinput/ace-types';
+import type { Usage } from 'views/components/searchbar/queryinput/types';
 
-export type PaginationQueryParameterObject = {
-  pageSizes?: number[];
+type Props = {
+  children: (commands: Array<Command>) => React.ReactElement,
+  usage: Usage,
+}
+
+const PluggableCommands = ({ children, usage }: Props) => {
+  const customCommands = usePluggableCommands(usage);
+
+  return useMemo(() => children(customCommands), [children, customCommands]);
 };
 
-const withPaginationQueryParameter = <C extends React.ComponentType<React.ComponentProps<C>>>(Component: C, obj?: PaginationQueryParameterObject) => {
-  return function WrappedComponent(props: any) {
-    const result = usePaginationQueryParameter(obj?.pageSizes);
-
-    return <Component {...props} paginationQueryParameter={result} />;
-  };
-};
-
-export default withPaginationQueryParameter;
+export default PluggableCommands;

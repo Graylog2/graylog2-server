@@ -14,31 +14,38 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.errors;
+package org.graylog.storage.errors;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
+
 @AutoValue
-@JsonDeserialize(builder = ResponseError.Builder.class)
-public abstract class ResponseError {
-    public abstract OpenSearchError error();
-    public abstract int status();
+@JsonDeserialize(builder = FailedShard.Builder.class)
+public abstract class FailedShard {
+    public abstract int shard();
+    public abstract String index();
+    public abstract String node();
+    public abstract Cause reason();
 
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty
-        public abstract Builder error(final OpenSearchError error);
+        public abstract Builder shard(final int shard);
         @JsonProperty
-        public abstract Builder status(final int status);
+        public abstract Builder index(final String index);
         @JsonProperty
-        public abstract ResponseError build();
+        public abstract Builder node(final String node);
+        @JsonProperty
+        public abstract Builder reason(final Cause reason);
+        @JsonProperty
+        public abstract FailedShard build();
 
         @JsonCreator
-        public static ResponseError.Builder builder() {
-            return new AutoValue_ResponseError.Builder();
+        public static FailedShard.Builder builder() {
+            return new AutoValue_FailedShard.Builder();
         }
     }
 }

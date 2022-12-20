@@ -14,20 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 
-import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
+export type Usage = 'search_query' | 'widget_query' | 'global_override_query';
 
-export type PaginationQueryParameterObject = {
-  pageSizes?: number[];
-};
+export interface CustomCommandContext {
+  usage: Usage;
+}
 
-const withPaginationQueryParameter = <C extends React.ComponentType<React.ComponentProps<C>>>(Component: C, obj?: PaginationQueryParameterObject) => {
-  return function WrappedComponent(props: any) {
-    const result = usePaginationQueryParameter(obj?.pageSizes);
+export type CustomCommandExec = (editor: Editor, context: CustomCommandContext) => void;
 
-    return <Component {...props} paginationQueryParameter={result} />;
-  };
-};
-
-export default withPaginationQueryParameter;
+export type CustomCommand = {
+  usages: Array<Usage>,
+  name: string,
+  bindKey: {
+    mac: string,
+    win: string,
+  },
+  exec: CustomCommandExec,
+}
