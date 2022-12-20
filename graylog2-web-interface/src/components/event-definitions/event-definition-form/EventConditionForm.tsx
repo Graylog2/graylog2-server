@@ -29,6 +29,7 @@ import styles from './EventConditionForm.css';
 
 import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
+import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
 type Props = {
   action: 'create' | 'edit',
@@ -98,7 +99,7 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
   };
 
   const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
-  const isSystemEventDefinition = eventDefinition.config.type === 'system-notifications-v1';
+  const isSystemEventDefinition = eventDefinition.config.type === SYSTEM_EVENT_DEFINITION_TYPE;
 
   const eventDefinitionTypeComponent = eventDefinitionType.formComponent
     ? React.createElement(eventDefinitionType.formComponent, {

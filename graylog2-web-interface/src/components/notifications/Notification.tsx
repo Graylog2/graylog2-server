@@ -60,7 +60,6 @@ const _sanitizeDescription = (description) => {
   return DOMPurify.sanitize(description);
 };
 
-/* eslint-disable react/no-danger */
 const Notification = ({ notification }: Props) => {
   const { messages } = useStore(NotificationsStore);
 
@@ -83,6 +82,7 @@ const Notification = ({ notification }: Props) => {
 
   const message = messages[notification.type];
 
+  /* eslint-disable react/no-danger */
   return (
     <StyledAlert bsStyle="danger">
       <StyledButton className="delete-notification" bsStyle="link" onClick={_onClose}>

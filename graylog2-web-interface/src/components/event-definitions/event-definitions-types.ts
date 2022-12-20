@@ -23,7 +23,7 @@ type Provider = {
 type FieldSpec = {
   [key: string]: {
     data_type: string,
-    providers: Provider,
+    providers: Array<Provider>,
   }
 };
 

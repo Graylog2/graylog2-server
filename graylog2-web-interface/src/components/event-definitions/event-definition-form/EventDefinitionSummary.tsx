@@ -37,10 +37,11 @@ import styles from './EventDefinitionSummary.css';
 
 import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
+import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
 type Props = {
   eventDefinition: EventDefinition,
-  notifications: any,
+  notifications: Array<any>,
   validation: {
     errors: {
       title: string,
@@ -235,7 +236,7 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
     );
   };
 
-  const isSystemEventDefinition = eventDefinition.config.type === 'system-notifications-v1';
+  const isSystemEventDefinition = eventDefinition.config.type === SYSTEM_EVENT_DEFINITION_TYPE;
 
   return (
     <Row className={styles.eventSummary}>

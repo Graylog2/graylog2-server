@@ -86,13 +86,13 @@ const EventDefinitionEntry = ({
 
     const plugin = getConditionPlugin(eventDefinition.config.type);
 
-    let suffix = <span>{plugin?.displayName ?? eventDefinition.config.type}</span>;
+    const suffix = <span>{plugin?.displayName ?? eventDefinition.config.type}</span>;
 
-    if (!isScheduled) {
-      suffix = (<span>{suffix} <Label bsStyle="warning">disabled</Label></span>);
+    if (isScheduled) {
+      return suffix;
     }
 
-    return suffix;
+    return <span>{suffix} <Label bsStyle="warning">disabled</Label></span>;
   };
 
   const showActions = (): boolean => {
