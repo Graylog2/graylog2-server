@@ -91,7 +91,7 @@ public class StreamsIT {
                 .body("streams*.title", equalTo(List.of("sorttest: aaaaa", "sorttest: ZZZZZZ", "sorttest: 12345")));
         paginatedByFieldWithOrder("sorttest", "disabled", "desc")
                 .assertThat()
-                .body("streams*.title", equalTo(List.of("sorttest: 12345", "sorttest: ZZZZZZ", "sorttest: aaaaa")));
+                .body("streams*.title", equalTo(List.of("sorttest: ZZZZZZ", "sorttest: 12345", "sorttest: aaaaa")));
     }
 
     private ValidatableResponse paginatedByFieldWithOrder(String query, String field, String order) {
