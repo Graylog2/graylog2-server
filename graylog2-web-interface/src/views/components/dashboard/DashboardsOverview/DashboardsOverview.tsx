@@ -55,12 +55,12 @@ const useCustomColumnRenderers = () => {
     title: {
       renderCell: (dashboard) => <TitleCell dashboard={dashboard} requirementsProvided={requirementsProvided} />,
     },
-    isFavorite: {
-      renderCell: (dashboard) => (
-        <FavoriteIcon isFavorite={dashboard.favorite}
-                      id={dashboard.id}
+    favorite: {
+      renderCell: (search) => (
+        <FavoriteIcon isFavorite={search.favorite}
+                      id={search.id}
                       onChange={(newValue) => {
-                        ViewActions.update(dashboard.toBuilder().favorite(newValue).build());
+                        ViewActions.update(search.toBuilder().favorite(newValue).build());
                       }} />
       ),
       staticWidth: 30,

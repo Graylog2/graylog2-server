@@ -97,7 +97,7 @@ const customColumnRenderers = (onLoadSavedSearch: () => void): ColumnRenderers<V
       </ViewLoaderContext.Consumer>
     ),
   },
-  isFavorite: {
+  favorite: {
     renderCell: (dashboard) => (
       <FavoriteIcon isFavorite={dashboard.favorite}
                     id={dashboard.id}
