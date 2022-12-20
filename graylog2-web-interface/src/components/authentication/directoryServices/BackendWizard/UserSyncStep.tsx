@@ -19,6 +19,7 @@ import type * as Immutable from 'immutable';
 import { useContext } from 'react';
 import type { FormikProps } from 'formik';
 import { Formik, Form, Field } from 'formik';
+import styled from 'styled-components';
 
 import type Role from 'logic/roles/Role';
 import { validateField, formHasErrors } from 'util/FormsUtils';
@@ -51,6 +52,9 @@ type Props = {
   submitAllError: React.ReactNode | null | undefined,
   validateOnMount: boolean,
 };
+const StyledInputList = styled(InputList)`
+  margin: auto 15px;
+`;
 
 const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSubmitAll, submitAllError, validateOnMount, roles }: Props) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -67,7 +71,7 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
   };
 
   const getInitalFormValues = (values: WizardFormValues) => {
-    return { ...values, emailAttributes: values.emailAttributes || [] };
+    return { ...values, ...(!excludedFields.emailAttributes && { emailAttributes: values.emailAttributes || [] }) };
   };
 
   return (
@@ -100,6 +104,8 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
                            error={backendValidationErrors?.userNameAttribute}
                            placeholder="Name Attribute"
                            validate={validateField(FORM_VALIDATION.userNameAttribute)} />
+
+          {!excludedFields.emailAttributes && (
           <Field name="emailAttributes" validate={validateField(FORM_VALIDATION.emailAttributes)}>
             {({ field: { name, value, onChange }, meta: { error } }) => (
               <Input bsStyle={error ? 'error' : undefined}
@@ -109,16 +115,16 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
                      label="Email Attributes"
                      labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9">
-                <InputList id="userEmailAttributes"
-                           placeholder="Add email attributes to in LDAP"
-                           name={name}
-                           values={value}
-                           isClearable
-                           onChange={onChange} />
+                <StyledInputList id="userEmailAttributes"
+                                 placeholder="Add email attributes to in LDAP"
+                                 name={name}
+                                 values={value}
+                                 isClearable
+                                 onChange={onChange} />
               </Input>
             )}
           </Field>
-
+          )}
           <FormikFormGroup help={help.userFullNameAttribute}
                            label="Full Name Attribute"
                            name="userFullNameAttribute"

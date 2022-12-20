@@ -45,7 +45,7 @@ export default ({
   systemUserDn,
   transportSecurity,
   userFullNameAttribute,
-  emailAttributes: emailAttributes,
+  emailAttributes,
   userNameAttribute: userNameAttribute,
   userSearchBase,
   userSearchPattern,

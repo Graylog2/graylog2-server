@@ -60,11 +60,6 @@ export const HELP = {
   defaultRoles: (
     <span>The default Graylog roles synchronized user will obtain. All users need the <code>Reader</code> role, to use the Graylog web interface</span>
   ),
-  emailAttributes: (
-    <span>
-      Which LDAP attribute to use for the user`&lsquo;`s email address, e.g. <code>mail</code>. You can specify multiple attributes, separated by <code>,</code>.
-    </span>
-  ),
 };
 
 export const AUTH_BACKEND_META = {
@@ -77,7 +72,6 @@ const INITIAL_VALUES: Partial<WizardFormValues> = {
   serverHost: 'localhost',
   serverPort: 636,
   transportSecurity: 'tls',
-  emailAttributes: ['mail', 'rfc822Mailbox'],
   userSearchPattern: '(&(objectClass=user)(|(sAMAccountName={0})(userPrincipalName={0})))',
   userFullNameAttribute: 'displayName',
   userNameAttribute: 'userPrincipalName',
@@ -93,7 +87,7 @@ const BackendCreate = () => {
   } = enterpriseGroupSyncPlugin?.wizardConfig?.activeDirectory ?? {};
   const help = { ...HELP, ...groupSyncHelp };
   const initialValues = { ...INITIAL_VALUES, ...initialGroupSyncValues };
-  const excludedFields = { ...groupSyncExcludedFields, userUniqueIdAttribute: true };
+  const excludedFields = { ...groupSyncExcludedFields, userUniqueIdAttribute: true, emailAttributes: true };
 
   return (
     <DocumentTitle title="Create Active Directory Authentication Services">
