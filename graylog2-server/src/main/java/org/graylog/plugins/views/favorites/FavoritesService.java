@@ -54,20 +54,6 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
         this.catalog = catalog;
     }
 
-    protected <T> List<T> getPage(List<T> sourceList, int page, int pageSize) {
-        if(pageSize <= 0 || page <= 0) {
-            throw new IllegalArgumentException("invalid page size: " + pageSize);
-        }
-
-        int fromIndex = (page - 1) * pageSize;
-        if(sourceList == null || sourceList.size() <= fromIndex){
-            return Collections.emptyList();
-        }
-
-        // toIndex exclusive
-        return sourceList.subList(fromIndex, Math.min(fromIndex + pageSize, sourceList.size()));
-    }
-
     public PaginatedResponse<Favorite> findFavoritesFor(final SearchUser searchUser, final Optional<String> type, final int page, final int perPage) {
         var items = this.findForUser(searchUser)
                 .orElse(new FavoritesForUserDTO(searchUser.getUser().getId(), List.of()))
