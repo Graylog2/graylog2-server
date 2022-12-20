@@ -31,16 +31,14 @@ import org.graylog2.plugin.PluginModule;
 public class CEFInputModule extends PluginModule {
     @Override
     protected void configure() {
-        if (!isCloud()) {
-            // Register message input.
-            addCodec(CEFCodec.NAME, CEFCodec.class);
+        // Register message input.
+        addCodec(CEFCodec.NAME, CEFCodec.class);
 
-            addMessageInput(CEFUDPInput.class);
-            addMessageInput(CEFTCPInput.class);
+        addMessageInput(CEFUDPInput.class);
+        addMessageInput(CEFTCPInput.class);
 
-            addMessageInput(CEFAmqpInput.class);
-            addMessageInput(CEFKafkaInput.class);
-        }
+        addMessageInput(CEFAmqpInput.class);
+        addMessageInput(CEFKafkaInput.class);
 
         // Register pipeline function.
         addMessageProcessorFunction(CEFParserFunction.NAME, CEFParserFunction.class);

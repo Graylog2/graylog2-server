@@ -33,10 +33,8 @@ public class NetFlowPluginModule extends PluginModule {
 
     @Override
     protected void configure() {
-        if (!isCloud()) {
-            addMessageInput(NetFlowUdpInput.class);
-            addCodec("netflow", NetFlowCodec.class);
-            addTransport("netflow-udp", NetFlowUdpTransport.class);
-        }
+        addMessageInput(NetFlowUdpInput.class);
+        addCodec("netflow", NetFlowCodec.class);
+        addTransport("netflow-udp", NetFlowUdpTransport.class);
     }
 }
