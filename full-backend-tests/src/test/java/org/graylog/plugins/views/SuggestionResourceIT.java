@@ -62,12 +62,37 @@ public class SuggestionResourceIT {
 
         api.gelf().createGelfHttpInput()
                 .postMessage(
-                        "{\"short_message\":\"SuggestionResourceIT#1\", \"host\":\"example.org\", \"facility\":\"junit\", \"_target_stream\": \"stream1\"}")
+                        """
+                                {"short_message":"SuggestionResourceIT#1",
+                                 "host":"example.org",
+                                  "facility":"junit",
+                                  "_target_stream": "stream1",
+                                  "http_response_code": 200
+                                  }""")
                 .postMessage(
-                        "{\"short_message\":\"SuggestionResourceIT#2\", \"host\":\"example.org\", \"facility\":\"test\", \"_target_stream\": \"stream1\"}")
+                        """
+                                {"short_message":"SuggestionResourceIT#2",
+                                 "host":"example.org",
+                                  "facility":"test",
+                                  "_target_stream": "stream1",
+                                  "http_response_code": 200
+                                  }""")
                 .postMessage(
-                        "{\"short_message\":\"SuggestionResourceIT#3\", \"host\":\"example.org\", \"facility\":\"test\", \"_target_stream\": \"stream1\"}")
-                .postMessage("{\"short_message\":\"SuggestionResourceIT#4\", \"host\":\"foreign.org\", \"facility\":\"test\", \"_target_stream\": \"stream2\"}");
+                        """
+                                {"short_message":"SuggestionResourceIT#3",
+                                "host":"example.org",
+                                 "facility":"test",
+                                  "_target_stream": "stream1",
+                                  "http_response_code": 201
+                                  }""")
+                .postMessage(
+                        """
+                                {"short_message":"SuggestionResourceIT#4",
+                                 "host":"foreign.org",
+                                 "facility":"test",
+                                 "_target_stream": "stream2",
+                                 "http_response_code": 404
+                                 }""");
 
         api.search().waitForMessages(
                 "SuggestionResourceIT#1",
@@ -88,6 +113,22 @@ public class SuggestionResourceIT {
                 .statusCode(200);
         validatableResponse.assertThat().body("suggestions.value[0]", equalTo("test"));
         validatableResponse.assertThat().body("suggestions.occurrence[0]", greaterThanOrEqualTo(3));
+    }
+
+    @ContainerMatrixTest
+    void testNumericalValueSuggestion() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body(
+                        """
+                        { "field":"http_response_code", "input":"20"}
+                        """)
+                .post("/search/suggest")
+                .then()
+                .statusCode(200);
+        validatableResponse.assertThat().body("suggestions.value[0]", equalTo("200"));
+        validatableResponse.assertThat().body("suggestions.occurrence[0]", greaterThanOrEqualTo(2));
     }
 
     @ContainerMatrixTest
