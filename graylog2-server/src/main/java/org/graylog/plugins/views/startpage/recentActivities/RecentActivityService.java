@@ -77,7 +77,7 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
     }
 
     public void create(String id, GRNType grn, SearchUser user) {
-        postRecentActivity(new RecentActivityEvent(ActivityType.CREATE, grnRegistry.newGRN(grn, id), user.getUser().getFullName()));
+        create(id, grn, user.getUser());
     }
 
     public void create(String id, GRNType grn, User user) {
@@ -85,7 +85,7 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
     }
 
     public void update(String id, GRNType grn, SearchUser user) {
-        postRecentActivity(new RecentActivityEvent(ActivityType.UPDATE, grnRegistry.newGRN(grn, id), user.getUser().getFullName()));
+        update(id, grn, user.getUser());
     }
 
     public void update(String id, GRNType grn, User user) {
@@ -93,7 +93,7 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
     }
 
     public void delete(String id, GRNType grn, String title, SearchUser user) {
-        postRecentActivity(new RecentActivityEvent(ActivityType.DELETE, grnRegistry.newGRN(grn, id), title, user.getUser().getFullName()));
+        delete(id, grn, title, user.getUser());
     }
 
     public void delete(String id, GRNType grn, String title, User user) {
@@ -101,6 +101,7 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
     }
 
     public PaginatedList<RecentActivityDTO> findRecentActivitiesFor(SearchUser user, int page, int perPage) {
+        // show the most recent activities first
         var sort = getSortBuilder("desc", RecentActivityDTO.FIELD_TIMESTAMP);
         // no permission check for local admin
         if(user.getUser().isLocalAdmin()) {
