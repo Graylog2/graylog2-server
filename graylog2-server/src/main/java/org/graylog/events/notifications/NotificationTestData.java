@@ -53,7 +53,7 @@ public class NotificationTestData {
         final EventDefinitionDto eventDefinitionDto = EventDefinitionDto.builder()
                 .alert(true)
                 .id(TEST_NOTIFICATION_ID)
-                .title("<<Event Definition Test Title>>")
+                .title("Event Definition Test Title")
                 .description("Event Definition Test Description")
                 .config(new EventProcessorConfig() {
                     @Override
