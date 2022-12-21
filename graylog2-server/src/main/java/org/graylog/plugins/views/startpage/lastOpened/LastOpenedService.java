@@ -39,7 +39,7 @@ public class LastOpenedService extends PaginatedDbService<LastOpenedForUserDTO> 
     private final EntityOwnershipService entityOwnerShipService;
 
     @Inject
-    protected LastOpenedService(MongoConnection mongoConnection,
+    public LastOpenedService(MongoConnection mongoConnection,
                                  MongoJackObjectMapperProvider mapper,
                                 final EntityOwnershipService entityOwnerShipService) {
         super(mongoConnection, mapper, LastOpenedForUserDTO.class, COLLECTION_NAME);

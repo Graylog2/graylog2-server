@@ -43,11 +43,11 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
     private static final long MAXIMUM_RECENT_ACTIVITIES = 10000;
 
     @Inject
-    protected RecentActivityService(final MongoConnection mongoConnection,
-                                    final MongoJackObjectMapperProvider mapper,
-                                    final EventBus eventBus,
-                                    final GRNRegistry grnRegistry,
-                                    final  PermissionAndRoleResolver permissionAndRoleResolver) {
+    public RecentActivityService(final MongoConnection mongoConnection,
+                                 final MongoJackObjectMapperProvider mapper,
+                                 final EventBus eventBus,
+                                 final GRNRegistry grnRegistry,
+                                 final PermissionAndRoleResolver permissionAndRoleResolver) {
         this(mongoConnection, mapper, eventBus, grnRegistry, permissionAndRoleResolver, MAXIMUM_RECENT_ACTIVITIES);
     }
 

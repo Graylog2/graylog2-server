@@ -67,8 +67,7 @@ public class StartPageService {
                 .items()
                 .stream()
                 .map(i -> new LastOpened(i.id(), catalog.getType(i.id()), catalog.getTitle(i.id()), i.timestamp()))
-                .collect(Collectors.toList());
-        Collections.reverse(items);
+                .toList();
 
         return PaginatedResponse.create("lastOpened", new PaginatedList<>(PaginatedDbService.getPage(items, page, perPage), items.size(), page, perPage));
     }
@@ -94,15 +93,22 @@ public class StartPageService {
         return PaginatedResponse.create("recentActivity", new PaginatedList<>(mapped, items.pagination().total(), page, perPage));
     }
 
+    /*
+     * filters a given Id from the middle of the list if it exists and removes one item if necessary to stay in the limit if we add another item at the top
+     */
+    protected static List<LastOpenedDTO> filterForExistingIdAndCapAtMaximum(final LastOpenedForUserDTO loi, final String id, final long max) {
+        return loi.items().stream().filter(i -> !i.id().equals(id)).limit(max - 1).toList();
+    }
+
     public void addLastOpenedFor(final ViewDTO view, final SearchUser searchUser) {
         final var lastOpenedItems = lastOpenedService.findForUser(searchUser);
         final var item = new LastOpenedDTO(view.id(), DateTime.now(DateTimeZone.UTC));
         if(lastOpenedItems.isPresent()) {
             var loi = lastOpenedItems.get();
-            var items = loi.items().stream().filter(i -> !i.id().equals(item.id())).limit(MAXIMUM_LAST_OPENED_PER_USER - 1).toList();
+            var items = filterForExistingIdAndCapAtMaximum(loi, item.id(), MAXIMUM_LAST_OPENED_PER_USER);
             loi.items().clear();
-            loi.items().addAll(items);
             loi.items().add(item);
+            loi.items().addAll(items);
             lastOpenedService.save(loi);
         } else {
             var items = new LastOpenedForUserDTO(searchUser.getUser().getId(), List.of(item));

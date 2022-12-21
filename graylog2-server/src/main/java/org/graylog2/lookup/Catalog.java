@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class Catalog {
-    record Entry(String type, String title) {}
+    protected record Entry(String type, String title) {}
 
     private final ContentPackService contentPackService;
     private final LoadingCache<String, Entry> cache;
@@ -42,7 +42,7 @@ public class Catalog {
         this.cache = createCache();
     }
 
-    private LoadingCache<String, Entry> createCache() {
+    protected LoadingCache<String, Entry> createCache() {
         return CacheBuilder
                 .newBuilder()
                 .maximumSize(MAXIMUM_CACHE_SIZE)
