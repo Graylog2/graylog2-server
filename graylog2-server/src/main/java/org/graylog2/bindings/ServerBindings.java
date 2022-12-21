@@ -33,10 +33,9 @@ import org.graylog2.alerts.FormattedEmailAlertSender;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.bindings.providers.DefaultStreamProvider;
+import org.graylog2.bindings.providers.HtmlSafeJmteEngineProvider;
 import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
-import org.graylog2.bindings.providers.JmteEngineProvider;
-import org.graylog2.bindings.providers.EmailJmteEngineProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.leader.FakeLeaderElectionModule;
 import org.graylog2.cluster.leader.LeaderElectionModule;
@@ -179,8 +178,7 @@ public class ServerBindings extends Graylog2Module {
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class).asEagerSingleton();
         bind(GrokPatternRegistry.class).in(Scopes.SINGLETON);
         Multibinder.newSetBinder(binder(), NamedRenderer.class);
-        bind(Engine.class).toProvider(JmteEngineProvider.class).asEagerSingleton();
-        bind(Engine.class).annotatedWith(Names.named("Email")).toProvider(JmteEngineProvider.class).asEagerSingleton();
+        bind(Engine.class).annotatedWith(Names.named("HtmlSafe")).toProvider(HtmlSafeJmteEngineProvider.class).asEagerSingleton();
         bind(ErrorPageGenerator.class).to(GraylogErrorPageGenerator.class).asEagerSingleton();
     }
 

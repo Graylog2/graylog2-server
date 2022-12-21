@@ -17,7 +17,6 @@
 package org.graylog2.alerts;
 
 import com.floreysoft.jmte.Engine;
-import com.floreysoft.jmte.NamedRenderer;
 import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
@@ -26,7 +25,6 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.email.EmailFactory;
-import org.graylog2.bindings.providers.EmailJmteEngineProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -38,7 +36,6 @@ import org.mockito.junit.MockitoRule;
 
 import java.net.URI;
 import java.util.Collections;
-import java.util.HashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -242,22 +239,5 @@ public class FormattedEmailAlertSenderTest {
                 .containsSequence(
                         "Last messages accounting for this alert:\n",
                         message.toString());
-    }
-
-    @Test
-    public void buildBodyEscapeHtmlOrNot() throws Exception {
-        Engine templateEngine = new EmailJmteEngineProvider(new HashSet<NamedRenderer>()).get();
-        FormattedEmailAlertSender emailAlertSender = new FormattedEmailAlertSender(new EmailConfiguration(), mockNotificationService, mockNodeId, templateEngine, emailFactory);
-        Configuration pluginConfig = new Configuration(Collections.<String, Object>singletonMap("body", "Test: ${stream.title}"));
-        emailAlertSender.initialize(pluginConfig);
-
-        Stream stream = mock(Stream.class);
-        when(stream.getTitle()).thenReturn("<test>");
-
-        AlertCondition.CheckResult checkResult = mock(AbstractAlertCondition.CheckResult.class);
-
-        String body = emailAlertSender.buildBody(stream, checkResult, Collections.<Message>emptyList());
-
-        assertThat(body).isEqualTo("Test: &lt;test&gt;");
     }
 }

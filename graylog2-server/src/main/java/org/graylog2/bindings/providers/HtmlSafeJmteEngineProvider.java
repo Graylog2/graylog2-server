@@ -18,33 +18,23 @@ package org.graylog2.bindings.providers;
 
 import com.floreysoft.jmte.Engine;
 import com.floreysoft.jmte.Renderer;
-import com.floreysoft.jmte.NamedRenderer;
-import com.floreysoft.jmte.RenderFormatInfo;
+import com.google.common.html.HtmlEscapers;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
-
-import com.google.common.html.HtmlEscapers;
 
 
 @Singleton
-public class EmailJmteEngineProvider implements Provider<Engine> {
-    private Engine engine = null;
+public class HtmlSafeJmteEngineProvider implements Provider<Engine> {
+    private final Engine engine;
 
     @Inject
-    public EmailJmteEngineProvider(Set<NamedRenderer> renderers) {
+    public HtmlSafeJmteEngineProvider() {
       engine = Engine.createEngine();
-
       engine.registerRenderer(String.class, new HtmlSafeRenderer());
-
-      for (NamedRenderer renderer : renderers) {
-        engine.registerNamedRenderer(renderer);
-      }
     }
 
     @Override
@@ -55,8 +45,7 @@ public class EmailJmteEngineProvider implements Provider<Engine> {
     private static class HtmlSafeRenderer implements Renderer<String> {
       @Override
       public String render(String value, Locale locale, Map<String,Object> model) {
-        String o = HtmlEscapers.htmlEscaper().escape(value);
-        return o;
+          return HtmlEscapers.htmlEscaper().escape(value);
       }
     }
 }
