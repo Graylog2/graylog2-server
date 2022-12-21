@@ -68,13 +68,14 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
                             List.of(Aggregates.match(doc("$expr", doc("$eq", List.of("$_id", "$$index_set_id"))))),
                             "index_set"
                     ))
-                    .add(Aggregates.set(new Field<>("index_set_title", doc("$first", "$index_set.title"))));
+                    .add(Aggregates.set(new Field<>("index_set_title", doc("$first", "$index_set.title"))))
+                    .add(Aggregates.unset("index_set"));
         }
 
         if (isStringField(sortField)) {
             pipelineBuilder.add(Aggregates.set(new Field<>("lower" + sortField, doc("$toLower", "$" + sortField))))
                     .add(Aggregates.sort(getSortBuilder(order, "lower" + sortField)))
-                    .add(Aggregates.project(Projections.exclude("index_set", "lower" + sortField)));
+                    .add(Aggregates.unset("lower" + sortField));
         } else {
             pipelineBuilder.add(Aggregates.sort(getSortBuilder(order, sortField)));
         }
