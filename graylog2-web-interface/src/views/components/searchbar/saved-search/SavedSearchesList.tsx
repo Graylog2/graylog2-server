@@ -108,18 +108,17 @@ const customColumnRenderers = (onLoadSavedSearch: () => void, {
                       queryClient.setQueriesData(['saved-searches', 'overview', searchParams], (cur: {
                         list: Array<View>,
                         pagination: { total: number }
-                      }) => {
-                        return {
-                          ...cur,
-                          list: cur.list.map((view) => {
-                            if (view.id === search.id) {
-                              return ({ ...view, favorite: newValue });
-                            }
+                      }) => ({
+                        ...cur,
+                        list: cur.list.map((view) => {
+                          if (view.id === search.id) {
+                            return ({ ...view, favorite: newValue });
+                          }
 
-                            return view;
-                          }),
-                        };
-                      });
+                          return view;
+                        }),
+                      }
+                      ));
                     }} />
     ),
     staticWidth: 30,

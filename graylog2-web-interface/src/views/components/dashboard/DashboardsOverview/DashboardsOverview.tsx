@@ -64,23 +64,22 @@ const useCustomColumnRenderers = ({ queryClient, searchParams }: { queryClient: 
                         queryClient.setQueriesData(['dashboards', 'overview', searchParams], (cur: {
                           list: Readonly<Array<View>>,
                           pagination: { total: number }
-                        }) => {
-                          return {
-                            ...cur,
-                            list: cur.list.map((view) => {
-                              if (view.id === search.id) {
-                                return view.toBuilder().favorite(newValue).build();
-                              }
+                        }) => ({
+                          ...cur,
+                          list: cur.list.map((view) => {
+                            if (view.id === search.id) {
+                              return view.toBuilder().favorite(newValue).build();
+                            }
 
-                              return view;
-                            }),
-                          };
-                        });
+                            return view;
+                          }),
+                        }
+                        ));
                       }} />
       ),
       staticWidth: 30,
     },
-  }), [requirementsProvided]);
+  }), [queryClient, requirementsProvided, searchParams]);
 
   return customColumnRenderers;
 };
