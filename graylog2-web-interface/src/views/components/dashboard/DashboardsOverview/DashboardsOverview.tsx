@@ -28,8 +28,8 @@ import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import usePluginEntities from 'hooks/usePluginEntities';
 import DashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
-import { Alert } from 'components/bootstrap';
 import FavoriteIcon from 'views/components/FavoriteIcon';
+
 import TitleCell from './TitleCell';
 
 const INITIAL_COLUMNS = ['title', 'description', 'summary', 'favorite'];
@@ -43,7 +43,7 @@ const COLUMN_DEFINITIONS = [
   { id: 'favorite', title: '', sortable: true },
 ];
 
-const useCustomColumnRenderers = ({ queryClient, searchParams }: { queryClient: QueryClient, searchParams: 
+const useCustomColumnRenderers = ({ queryClient, searchParams }: { queryClient: QueryClient, searchParams: SearchParams
 }) => {
   const requirementsProvided = usePluginEntities('views.requires.provided');
   const customColumnRenderers: ColumnRenderers<View> = useMemo(() => ({

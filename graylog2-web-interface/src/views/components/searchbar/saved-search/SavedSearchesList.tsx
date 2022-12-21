@@ -224,7 +224,7 @@ const SavedSearchesList = ({
 
   const columnRenderers = useMemo(
     () => customColumnRenderers(onLoadSavedSearch, { queryClient, searchParams }),
-    [onLoadSavedSearch],
+    [onLoadSavedSearch, queryClient, searchParams],
   );
 
   if (isLoading) {
