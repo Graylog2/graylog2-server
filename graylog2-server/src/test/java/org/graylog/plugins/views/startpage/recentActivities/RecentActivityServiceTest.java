@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.startpage.recentActivities;
 
+import org.apache.shiro.authz.Permission;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
@@ -34,35 +35,33 @@ import org.graylog2.plugin.database.users.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
-import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
 @ExtendWith(GRNExtension.class)
 @ExtendWith(TestUserServiceExtension.class)
-@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class RecentActivityServiceTest {
     // to test the capping of the collection, we want a reasonaböy small maximum
     final static int MAXIMUM = 10;
 
     RecentActivityService recentActivityService;
     TestUserService testUserService;
+    GRNRegistry grnRegistry;
 
-    @Mock
     PermissionAndRoleResolver permissionAndRoleResolver;
 
     User user;
+    User admin;
     SearchUser searchUser;
+    SearchUser searchAdmin;
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
@@ -70,23 +69,41 @@ public class RecentActivityServiceTest {
                GRNRegistry grnRegistry,
                TestUserService testUserService) {
 
+        admin = TestUser.builder().withId("637748db06e1d74da0a54331").withUsername("local:admin").isLocalAdmin(true).build();
+        user = TestUser.builder().withId("637748db06e1d74da0a54330").withUsername("test").isLocalAdmin(false).build();
+        searchUser = TestSearchUser.builder().withUser(user).build();
+        searchAdmin = TestSearchUser.builder().withUser(admin).build();
+
+        permissionAndRoleResolver = new PermissionAndRoleResolver() {
+            @Override
+            public Set<Permission> resolvePermissionsForPrincipal(GRN principal) {
+                return null;
+            }
+
+            @Override
+            public Set<String> resolveRolesForPrincipal(GRN principal) {
+                return null;
+            }
+
+            @Override
+            public Set<GRN> resolveGrantees(GRN principal) {
+                return Set.of(grnRegistry.newGRN(GRNTypes.USER, user.getId()));
+            }
+        };
+
         this.testUserService = testUserService;
+        this.grnRegistry = grnRegistry;
         this.recentActivityService = new RecentActivityService(mongodb.mongoConnection(),
                 mongoJackObjectMapperProvider,
                null,
                 grnRegistry,
                 permissionAndRoleResolver,
                 MAXIMUM);
-
-        user = TestUser.builder().withId("1").withUsername("test").isLocalAdmin(true).build();
-        searchUser = TestSearchUser.builder().withUser(user).build();
-        final var principal = grnRegistry.newGRN(GRNTypes.USER, user.getId());
-//        when(permissionAndRoleResolver.resolveGrantees(any())).thenReturn(Set.of(principal));
-    }
+     }
 
     @Test
     public void testCappedCollection() {
-        var activities = recentActivityService.findRecentActivitiesFor(searchUser, 1, MAXIMUM + 1);
+        var activities = recentActivityService.findRecentActivitiesFor(searchAdmin, 1, MAXIMUM + 1);
         assertThat(activities.pagination().total()).isEqualTo(0);
         assertThat(activities.grandTotal().isEmpty()).isFalse();
         assertThat(activities.grandTotal().get()).isEqualTo(0);
@@ -95,7 +112,7 @@ public class RecentActivityServiceTest {
             var activity = RecentActivityDTO.builder()
                     .activityType(ActivityType.CREATE)
                     .itemGrn("grn:" + i)
-                    .grantee(searchUser.getUser().getId())
+                    .grantee("invalid")
                     .itemId(""+ i)
                     .userName(searchUser.username())
                     .itemTitle("" + i)
@@ -104,7 +121,7 @@ public class RecentActivityServiceTest {
             recentActivityService.save(activity);
         }
 
-        activities = recentActivityService.findRecentActivitiesFor(searchUser, 1, MAXIMUM + 1);
+        activities = recentActivityService.findRecentActivitiesFor(searchAdmin, 1, MAXIMUM + 1);
         assertThat(activities.pagination().total()).isEqualTo(MAXIMUM);
         assertThat(activities.grandTotal().isEmpty()).isFalse();
         assertThat(activities.grandTotal().get()).isEqualTo(MAXIMUM);
@@ -116,5 +133,21 @@ public class RecentActivityServiceTest {
     @Test
     public void testFilteringForGrantees() {
 
+        var activity = RecentActivityDTO.builder()
+                .activityType(ActivityType.CREATE)
+                .itemGrn("grn:1")
+                .grantee(grnRegistry.newGRN(GRNTypes.USER, user.getId()).toString())
+                .itemId("TESTFORUSER")
+                .userName(searchAdmin.username())
+                .itemTitle("1")
+                .itemType("TEST")
+                .build();
+        recentActivityService.save(activity);
+        var activities = recentActivityService.findRecentActivitiesFor(searchUser, 1, MAXIMUM + 1);
+        assertThat(activities.pagination().total()).isEqualTo(1);
+        assertThat(activities.grandTotal().isEmpty()).isFalse();
+        assertThat(activities.grandTotal().get()).isEqualTo(1);
+
+        assertThat(activities.delegate().stream().filter(a -> Objects.equals(activity.itemId(), "TESTFORUSER")).toList().size()).isEqualTo(1);
     }
 }
