@@ -39,16 +39,12 @@ public final class EntityScopeService {
     }
 
     public List<EntityScope> getEntityScopes() {
-
         return Collections.unmodifiableList(new ArrayList<>(entityScopes.values()));
     }
 
     public boolean isMutable(ScopedEntity scopedEntity) {
-
         Objects.requireNonNull(scopedEntity, "Entity must not be null");
-
         String scope = scopedEntity.scope();
-
         if (scope == null || scope.isEmpty()) {
             return true;
         }
@@ -59,15 +55,28 @@ public final class EntityScopeService {
         }
 
         return entityScope.isMutable();
-
     }
-    
+
+
+    public boolean isDeletable(ScopedEntity scopedEntity) {
+        Objects.requireNonNull(scopedEntity, "Entity must not be null");
+        String scope = scopedEntity.scope();
+        if (scope == null || scope.isEmpty()) {
+            return true;
+        }
+
+        EntityScope entityScope = entityScopes.get(scope.toUpperCase(Locale.ROOT));
+        if (entityScope == null) {
+            throw new IllegalArgumentException("Entity Scope does not exist: " + scope);
+        }
+
+        return entityScope.isDeletable();
+    }
+
     public boolean hasValidScope(ScopedEntity scopedEntity) {
         Objects.requireNonNull(scopedEntity, "Entity must not be null");
-
         String scope = scopedEntity.scope();
 
         return scope != null && entityScopes.containsKey(scope);
-
     }
 }

@@ -17,27 +17,20 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import type { QueryClient } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
+import type { SearchParams, Sort } from 'src/stores/PaginationTypes';
 
-import { PaginatedList, SearchForm, Spinner } from 'components/common';
+import { PaginatedList, SearchForm, Spinner, NoSearchResult, NoEntitiesExist } from 'components/common';
 import QueryHelper from 'components/common/QueryHelper';
-import type { ColumnRenderers, Sort } from 'components/common/EntityDataTable';
+import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import EntityDataTable from 'components/common/EntityDataTable';
 import type View from 'views/logic/views/View';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
-import useDashboards from 'views/logic/dashboards/useDashboards';
+import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import usePluginEntities from 'hooks/usePluginEntities';
 import DashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
 import { Alert } from 'components/bootstrap';
 import FavoriteIcon from 'views/components/FavoriteIcon';
-
 import TitleCell from './TitleCell';
-
-type SearchParams = {
-  page: number,
-  pageSize: number,
-  query: string,
-  sort: Sort
-}
 
 const INITIAL_COLUMNS = ['title', 'description', 'summary', 'favorite'];
 
@@ -50,7 +43,8 @@ const COLUMN_DEFINITIONS = [
   { id: 'favorite', title: '', sortable: true },
 ];
 
-const useCustomColumnRenderers = ({ queryClient, searchParams }: { queryClient: QueryClient, searchParams: SearchParams }) => {
+const useCustomColumnRenderers = ({ queryClient, searchParams }: { queryClient: QueryClient, searchParams: 
+}) => {
   const requirementsProvided = usePluginEntities('views.requires.provided');
   const customColumnRenderers: ColumnRenderers<View> = useMemo(() => ({
     title: {
@@ -93,8 +87,8 @@ const DashboardsOverview = () => {
     pageSize: paginationQueryParameter.pageSize,
     query: '',
     sort: {
-      columnId: 'title',
-      order: 'asc',
+      attributeId: 'title',
+      direction: 'asc',
     },
   });
   const columnRenderers = useCustomColumnRenderers({ queryClient, searchParams });
@@ -137,22 +131,19 @@ const DashboardsOverview = () => {
     <PaginatedList onChange={onPageChange}
                    pageSize={searchParams.pageSize}
                    totalItems={pagination.total}>
-      <div style={{ marginBottom: 15 }}>
+      <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
                     queryHelpComponent={<QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />}
                     onReset={onReset}
                     topMargin={0} />
       </div>
-      {!dashboards?.length && (
-        <Alert>
-          {!searchParams.query ? (
-            <>
-              No dashboards have been created yet.
-            </>
-          ) : (
-            'No dashboards have been found.'
-          )}
-        </Alert>
+      {!dashboards?.length && !searchParams.query && (
+        <NoEntitiesExist>
+          No dashboards have been created yet.
+        </NoEntitiesExist>
+      )}
+      {!dashboards?.length && searchParams.query && (
+        <NoSearchResult>No dashboards have been found.</NoSearchResult>
       )}
       {!!dashboards?.length && (
         <EntityDataTable<View> data={dashboards}

@@ -20,7 +20,13 @@ import org.graylog2.cluster.Node;
 import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
 
+import java.util.Map;
+
 public interface Notification extends Persisted {
+    // Some pre-defined detail keys
+    final String KEY_TITLE = "title";
+    final String KEY_DESCRIPTION = "description";
+
     Notification addType(Type type);
 
     Notification addTimestamp(DateTime timestamp);
@@ -40,6 +46,8 @@ public interface Notification extends Persisted {
     Notification addDetail(String key, Object value);
 
     Object getDetail(String key);
+
+    Map<String, Object> getDetails();
 
     Notification addNode(String nodeId);
 
