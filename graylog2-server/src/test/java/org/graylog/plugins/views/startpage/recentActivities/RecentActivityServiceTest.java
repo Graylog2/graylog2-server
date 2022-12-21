@@ -35,8 +35,6 @@ import org.graylog2.plugin.database.users.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 
 import java.util.Objects;
 import java.util.Set;
@@ -47,7 +45,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MongoJackExtension.class)
 @ExtendWith(GRNExtension.class)
 @ExtendWith(TestUserServiceExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 public class RecentActivityServiceTest {
     // to test the capping of the collection, we want a reasonaböy small maximum
     final static int MAXIMUM = 10;
