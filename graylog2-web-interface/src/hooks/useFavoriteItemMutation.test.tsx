@@ -61,7 +61,7 @@ describe('useFavoriteItemMutation', () => {
   });
 
   describe('putItem to favorites', () => {
-    const putUrl = qualifyUrl(`${urlPrefix}/addToFavorites/111`);
+    const putUrl = qualifyUrl(`${urlPrefix}/111`);
 
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));
@@ -91,7 +91,7 @@ describe('useFavoriteItemMutation', () => {
   });
 
   describe('deleteItem from favorites', () => {
-    const deleteUrl = qualifyUrl(`${urlPrefix}/removeFromFavorites/111`);
+    const deleteUrl = qualifyUrl(`${urlPrefix}/111`);
 
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve());

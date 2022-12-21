@@ -81,6 +81,7 @@ describe('ShowViewPage', () => {
     created_at: '2022-01-01 00:00:00',
     owner: 'admin',
     requires: {},
+    favorite: false,
   } as ViewJson;
   const SimpleShowViewPage = (props) => (
     <StreamsContext.Provider value={[{ id: 'stream-id-1' }]}>
