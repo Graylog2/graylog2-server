@@ -43,7 +43,7 @@ jobs:
         continue-on-error: true
         working-directory: graylog2-web-interface
         run: yarn lint --fix -o /tmp/report.json -f json
-      - name: Submit Results
+      - name: Submit ESLint Results
         continue-on-error: true
         working-directory: graylog2-web-interface
         run: |
@@ -73,3 +73,23 @@ jobs:
           committer: Dr. Lint-a-lot <garybot2@graylog.com>
           commit-message: Running lint --fix
           delete-branch: true
+      - name: Run tsc with strict settings / Submit Results
+        continue-on-error: true
+        working-directory: graylog2-web-interface
+        run: |
+          PROBLEM_COUNT=`yarn tsc --pretty -p tsconfig.strict.json | grep -E "Found [0-9]+ errors in [0-9]+ files"|awk '{ print $2; }'`
+          CURRENT_REF=`git rev-parse HEAD`
+          TIMESTAMP=`git show --format=%at $CURRENT_REF|head -1`
+          PAYLOAD=$(cat <<- EOF
+            {
+              "version": "1.1",
+              "host": "developermetrics",
+              "job": "tsc-with-strict-settings",
+              "short_message": "Found ${PROBLEM_COUNT} problems in commit ${CURRENT_REF}",
+              "_problems": ${PROBLEM_COUNT},
+              "_current_ref": "${CURRENT_REF}",
+              "timestamp": ${TIMESTAMP}
+             }
+          EOF
+          )
+          curl -X POST -H 'Content-Type: application/json' -d "$PAYLOAD" ${{ secrets.DEV_METRICS_URL }}
