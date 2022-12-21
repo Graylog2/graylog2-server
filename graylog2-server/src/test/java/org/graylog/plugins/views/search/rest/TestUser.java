@@ -23,6 +23,10 @@ public class TestUser {
 
     private String username;
 
+    private String id;
+
+    private boolean isLocalAdmin = false;
+
     public static TestUser builder() {
         return new TestUser();
     }
@@ -32,9 +36,21 @@ public class TestUser {
         return this;
     }
 
+    public TestUser isLocalAdmin(final boolean isLocalAdmin) {
+        this.isLocalAdmin = isLocalAdmin;
+        return this;
+    }
+
+    public TestUser withId(final String id) {
+        this.id = id;
+        return this;
+    }
+
     public User build() {
         final User user = Mockito.mock(User.class);
         Mockito.when(user.getName()).thenReturn(username);
+        Mockito.when(user.getId()).thenReturn(id);
+        Mockito.when(user.isLocalAdmin()).thenReturn(isLocalAdmin);
         return user;
     }
 }
