@@ -14,8 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import EntityDataTable from './EntityDataTable';
-import type { ColumnRenderers, Column } from './types';
 
-export { ColumnRenderers, Column };
-export default EntityDataTable;
+/* eslint-disable import/prefer-default-export */
+import type { Stream } from 'stores/streams/StreamsStore';
+
+export const stream: Stream = {
+  content_pack: null,
+  created_at: '2020-10-10T10:10:00.000Z',
+  creator_user_id: 'admin',
+  description: 'Lorem ipsum dolor sit amet',
+  disabled: true,
+  id: 'stream-id-1',
+  index_set_id: 'index-set-id-1',
+  is_default: false,
+  is_editable: true,
+  matching_type: 'AND',
+  outputs: [],
+  remove_matches_from_default_stream: false,
+  rules: [],
+  title: 'Example stream',
+};
