@@ -29,7 +29,9 @@ type FormValues = Partial<Pick<Stream, 'title' | 'description' | 'index_set_id' 
 const prepareInitialValues = (initialValues: FormValues, indexSets: Array<IndexSet>) => {
   return {
     index_set_id: initialValues.index_set_id ?? indexSets?.find((indexSet) => indexSet.default)?.id,
-    ...initialValues,
+    description: initialValues.description ?? undefined,
+    title: initialValues.title ?? undefined,
+    remove_matches_from_default_stream: initialValues.remove_matches_from_default_stream ?? undefined,
   };
 };
 

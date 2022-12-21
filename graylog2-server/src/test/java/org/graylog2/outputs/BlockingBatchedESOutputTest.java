@@ -37,9 +37,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -76,7 +74,7 @@ public class BlockingBatchedESOutputTest {
 
             @Override
             public int getShutdownTimeout() {
-                return 10;
+                return "true".equals(System.getenv("CI")) ? 500 : 100; // be more graceful when running on ci infrastructure
             }
         };
 
@@ -123,30 +121,27 @@ public class BlockingBatchedESOutputTest {
         verifyNoInteractions(messages);
     }
 
+    /**
+     * Test that shutdown can proceed even if the index request ends up being blocked.
+     */
     @Test
     @Timeout(1)
     public void stop_withIndexingBlocked() throws Exception {
         when(cluster.isConnected()).thenReturn(true);
         when(cluster.isDeflectorHealthy()).thenReturn(true);
 
-        final AtomicBoolean blocked = new AtomicBoolean(false);
-        final AtomicBoolean completed = new AtomicBoolean(false);
-
         when(messages.bulkIndex(any())).thenAnswer(invocation -> {
-            blocked.set(true);
+            // this will block until interrupted
             new CountDownLatch(1).await();
-            completed.set(true);
             return null;
         });
 
         final List<Map.Entry<IndexSet, Message>> messageList = sendMessages(output, config.getOutputBatchSize() - 1);
 
+        // shutdown timeout is < test timeout
         output.stop();
 
         verify(messages, times(1)).bulkIndex(eq(messageList));
-
-        assertThat(blocked).isTrue();
-        assertThat(completed).isFalse();
     }
 
     private List<Map.Entry<IndexSet, Message>> buildMessages(final int count) {
