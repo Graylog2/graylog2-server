@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback, useMemo } from 'react';
+import type { QueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { PaginatedList, SearchForm, Spinner } from 'components/common';
 import QueryHelper from 'components/common/QueryHelper';
@@ -27,7 +29,6 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import DashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
 import { Alert } from 'components/bootstrap';
 import FavoriteIcon from 'views/components/FavoriteIcon';
-import { ViewActions } from 'views/stores/ViewStore';
 
 import TitleCell from './TitleCell';
 
@@ -49,7 +50,7 @@ const COLUMN_DEFINITIONS = [
   { id: 'favorite', title: '', sortable: true },
 ];
 
-const useCustomColumnRenderers = () => {
+const useCustomColumnRenderers = ({ queryClient, searchParams }: { queryClient: QueryClient, searchParams: SearchParams }) => {
   const requirementsProvided = usePluginEntities('views.requires.provided');
   const customColumnRenderers: ColumnRenderers<View> = useMemo(() => ({
     title: {
@@ -60,7 +61,21 @@ const useCustomColumnRenderers = () => {
         <FavoriteIcon isFavorite={search.favorite}
                       id={search.id}
                       onChange={(newValue) => {
-                        ViewActions.update(search.toBuilder().favorite(newValue).build());
+                        queryClient.setQueriesData(['dashboards', 'overview', searchParams], (cur: {
+                          list: Readonly<Array<View>>,
+                          pagination: { total: number }
+                        }) => {
+                          return {
+                            ...cur,
+                            list: cur.list.map((view) => {
+                              if (view.id === search.id) {
+                                return view.toBuilder().favorite(newValue).build();
+                              }
+
+                              return view;
+                            }),
+                          };
+                        });
                       }} />
       ),
       staticWidth: 30,
@@ -73,6 +88,7 @@ const useCustomColumnRenderers = () => {
 const DashboardsOverview = () => {
   const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
   const [visibleColumns, setVisibleColumns] = useState(INITIAL_COLUMNS);
+  const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useState<SearchParams>({
     page: paginationQueryParameter.page,
     pageSize: paginationQueryParameter.pageSize,
@@ -82,7 +98,7 @@ const DashboardsOverview = () => {
       order: 'asc',
     },
   });
-  const columnRenderers = useCustomColumnRenderers();
+  const columnRenderers = useCustomColumnRenderers({ queryClient, searchParams });
   const { data: paginatedDashboards, refetch } = useDashboards(searchParams);
 
   const onSearch = useCallback((newQuery: string) => {

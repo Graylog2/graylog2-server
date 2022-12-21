@@ -21,7 +21,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 
-export const urlPrefix = '/favorite';
+export const urlPrefix = '/favorites';
 
 const putFavoriteItem = async (id: string) => {
   const url = `${urlPrefix}/${id}`;

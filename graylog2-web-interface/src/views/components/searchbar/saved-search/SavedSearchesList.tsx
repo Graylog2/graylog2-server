@@ -17,7 +17,8 @@
 import * as React from 'react';
 import { useState, useCallback } from 'react';
 import styled from 'styled-components';
-import { useQuery } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { Alert, Button } from 'components/bootstrap';
 import { PaginatedList, SearchForm, Spinner } from 'components/common';
@@ -33,7 +34,6 @@ import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
 import FavoriteIcon from 'views/components/FavoriteIcon';
-import { ViewActions } from 'views/stores/ViewStore';
 
 type SearchParams = {
   page: number,
@@ -77,7 +77,10 @@ const onLoad = (onLoadSavedSearch: () => void, selectedSavedSearchId: string, lo
   return false;
 };
 
-const customColumnRenderers = (onLoadSavedSearch: () => void): ColumnRenderers<View> => ({
+const customColumnRenderers = (onLoadSavedSearch: () => void, {
+  queryClient,
+  searchParams,
+}: { queryClient: QueryClient, searchParams: SearchParams}): ColumnRenderers<View> => ({
   title: {
     renderCell: (search) => (
       <ViewLoaderContext.Consumer key={search.id}>
@@ -98,11 +101,25 @@ const customColumnRenderers = (onLoadSavedSearch: () => void): ColumnRenderers<V
     ),
   },
   favorite: {
-    renderCell: (dashboard) => (
-      <FavoriteIcon isFavorite={dashboard.favorite}
-                    id={dashboard.id}
+    renderCell: (search) => (
+      <FavoriteIcon isFavorite={search.favorite}
+                    id={search.id}
                     onChange={(newValue) => {
-                      ViewActions.update(dashboard.toBuilder().favorite(newValue).build());
+                      queryClient.setQueriesData(['saved-searches', 'overview', searchParams], (cur: {
+                        list: Array<View>,
+                        pagination: { total: number }
+                      }) => {
+                        return {
+                          ...cur,
+                          list: cur.list.map((view) => {
+                            if (view.id === search.id) {
+                              return ({ ...view, favorite: newValue });
+                            }
+
+                            return view;
+                          }),
+                        };
+                      });
                     }} />
     ),
     staticWidth: 30,
@@ -163,6 +180,7 @@ const SavedSearchesList = ({
   deleteSavedSearch,
   onLoadSavedSearch,
 }: Props) => {
+  const queryClient = useQueryClient();
   const [visibleColumns, setVisibleColumns] = useState(INITIAL_COLUMNS);
   const [searchParams, setSearchParams] = useState<SearchParams>({
     page: DEFAULT_PAGINATION.page,
@@ -212,7 +230,7 @@ const SavedSearchesList = ({
     </Button>
   ), [activeSavedSearchId, deleteSavedSearch, refetch]);
 
-  const columnRenderers = customColumnRenderers(onLoadSavedSearch);
+  const columnRenderers = customColumnRenderers(onLoadSavedSearch, { queryClient, searchParams });
 
   if (isLoading) {
     return <Spinner />;
