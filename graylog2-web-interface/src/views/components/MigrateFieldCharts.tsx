@@ -186,7 +186,7 @@ const _migrateWidgets = (legacyCharts: Array<LegacyFieldChart>) => {
       .widgetPositions({ ...existingWidgetPos, ...newWidgetPositions })
       .build();
 
-    return resolve({ newViewState, currentQueryId: currentView.activeQuery });
+    resolve({ newViewState, currentQueryId: currentView.activeQuery });
   });
 };
 
