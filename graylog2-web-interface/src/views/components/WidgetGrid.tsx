@@ -61,7 +61,7 @@ const StyledReactGridContainer = styled(ReactGridContainer)(({ $hasFocusedWidget
   transition: none;
 `);
 
-const _defaultDimensions = (type) => {
+const _defaultDimensions = (type: string) => {
   const widgetDef = widgetDefinition(type);
 
   return new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth);
@@ -94,11 +94,11 @@ const WidgetGridItem = ({
   );
 };
 
-const generatePositions = (widgets: Array<{ id: string, type: string }>, positions: { [widgetId: string]: WidgetPosition }) => widgets
-  .map<[string, WidgetPosition]>(({ id, type }) => [id, positions[id] ?? _defaultDimensions(type)])
-  .reduce((prev, [id, position]) => ({ ...prev, [id]: position }), {});
+const generatePositions = (widgets: Array<{ id: string, type: string }>, positions: { [widgetId: string]: WidgetPosition }) => Object.fromEntries(
+  widgets.map<[string, WidgetPosition]>(({ id, type }) => [id, positions[id] ?? _defaultDimensions(type)]),
+);
 
-const mapWidgetPositions = (states: StoreState<typeof ViewStatesStore>) => states.map((state) => state.widgetPositions).reduce((prev, cur) => ({ ...prev, ...cur }), {});
+const mapWidgetPositions = (states: StoreState<typeof ViewStatesStore>) => Object.fromEntries(states.toArray().flatMap((state) => Object.entries(state.widgetPositions)));
 const mapWidgets = (state: StoreState<typeof WidgetStore>) => state.map(({ id, type }) => ({ id, type })).toArray();
 
 const useWidgetPositions = (): WidgetPositions => {
