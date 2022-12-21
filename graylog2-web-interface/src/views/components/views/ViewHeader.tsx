@@ -74,7 +74,7 @@ font-size: 0.50rem;
 `;
 
 const ViewHeader = () => {
-  const { view, ...rest } = useStore(ViewStore);
+  const { view } = useStore(ViewStore);
   const isSavedView = view?.id && view?.title;
   const [showMetadataEdit, setShowMetadataEdit] = useState<boolean>(false);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), [setShowMetadataEdit]);
@@ -84,7 +84,6 @@ const ViewHeader = () => {
   const onChangeFavorite = useCallback((newValue) => {
     ViewActions.update(view.toBuilder().favorite(newValue).build());
   }, [view]);
-  console.log({ view, rest });
 
   return (
     <Row>

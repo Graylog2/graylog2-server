@@ -93,8 +93,6 @@ export default class View {
     requires: Requirements,
     favorite: boolean,
   ) {
-    console.log({ constructor_favorite: favorite });
-
     this._value = {
       id,
       type,
@@ -189,7 +187,7 @@ export default class View {
   }
 
   toBuilder(): Builder {
-    const { id, title, summary, description, search, properties, state, createdAt, owner, requires, type } = this._value;
+    const { id, title, summary, description, search, properties, state, createdAt, owner, requires, type, favorite } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({
@@ -204,6 +202,7 @@ export default class View {
       owner,
       requires,
       type,
+      favorite,
     }));
   }
 
@@ -228,7 +227,6 @@ export default class View {
     const { id, type, title, summary, description, properties, state, created_at, owner, requires, favorite } = value;
     const viewState: ViewStateMap = Immutable.Map(state).map(ViewState.fromJSON).toMap();
     const createdAtDate = new Date(created_at);
-    console.log({ value, favorite });
 
     return View.create()
       .toBuilder()
@@ -314,14 +312,11 @@ class Builder {
   }
 
   favorite(value: boolean): Builder {
-    console.log({ Builder_favorite: value });
-
     return new Builder(this.value.set('favorite', value));
   }
 
   build(): View {
     const { id, type, title, summary, description, search, properties, state, createdAt, owner, requires, favorite } = this.value.toObject();
-    console.log({ id, favorite });
 
     return new View(id, type, title, summary, description, search, properties, state, createdAt, owner, requires, favorite);
   }
