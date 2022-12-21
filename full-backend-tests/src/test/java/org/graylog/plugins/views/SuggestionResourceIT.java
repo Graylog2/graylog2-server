@@ -104,20 +104,21 @@ public class SuggestionResourceIT {
 
     @ContainerMatrixTest
     void testMinimalRequest() {
-        final ValidatableResponse validatableResponse = given()
+        given()
                 .spec(requestSpec)
                 .when()
                 .body("{\"field\":\"facility\", \"input\":\"\"}")
                 .post("/search/suggest")
                 .then()
-                .statusCode(200);
-        validatableResponse.assertThat().body("suggestions.value[0]", equalTo("test"));
-        validatableResponse.assertThat().body("suggestions.occurrence[0]", greaterThanOrEqualTo(3));
+                .statusCode(200)
+                .assertThat().log().ifValidationFails()
+                .body("suggestions.value[0]", equalTo("test"))
+                .body("suggestions.occurrence[0]", greaterThanOrEqualTo(3));
     }
 
     @ContainerMatrixTest
     void testNumericalValueSuggestion() {
-        final ValidatableResponse validatableResponse = given()
+        given()
                 .spec(requestSpec)
                 .when()
                 .body(
@@ -126,9 +127,10 @@ public class SuggestionResourceIT {
                         """)
                 .post("/search/suggest")
                 .then()
-                .statusCode(200);
-        validatableResponse.assertThat().body("suggestions.value[0]", equalTo("200"));
-        validatableResponse.assertThat().body("suggestions.occurrence[0]", greaterThanOrEqualTo(2));
+                .statusCode(200)
+                .assertThat().log().ifValidationFails()
+                .body("suggestions.value[0]", equalTo("200"))
+                .body("suggestions.occurrence[0]", greaterThanOrEqualTo(2));
     }
 
     @ContainerMatrixTest
@@ -143,9 +145,10 @@ public class SuggestionResourceIT {
                 ))
                 .post("/search/suggest")
                 .then()
-                .statusCode(200);
-        validatableResponse.assertThat().body("suggestions.value[0]", equalTo("example.org"));
-        validatableResponse.assertThat().body("suggestions.occurrence[0]", equalTo(3));
+                .statusCode(200)
+                .assertThat().log().ifValidationFails()
+                .body("suggestions.value[0]", equalTo("example.org"))
+                .body("suggestions.occurrence[0]", equalTo(3));
 
         final ValidatableResponse validatableResponse2 = given()
                 .spec(requestSpec)
@@ -157,49 +160,53 @@ public class SuggestionResourceIT {
                 ))
                 .post("/search/suggest")
                 .then()
-                .statusCode(200);
-        validatableResponse2.assertThat().body("suggestions.value[0]", equalTo("foreign.org"));
-        validatableResponse2.assertThat().body("suggestions.occurrence[0]", equalTo(1));
+                .statusCode(200)
+                .assertThat().log().ifValidationFails()
+                .body("suggestions.value[0]", equalTo("foreign.org"))
+                .body("suggestions.occurrence[0]", equalTo(1));
     }
 
     @ContainerMatrixTest
     void testInvalidField() {
-        final ValidatableResponse validatableResponse = given()
+        given()
                 .spec(requestSpec)
                 .when()
                 .body("{\"field\":\"message\", \"input\":\"foo\"}")
                 .post("/search/suggest")
                 .then()
-                .statusCode(200);
-        // error types and messages are different for each ES version, so let's just check that there is an error in the response
-        validatableResponse.assertThat().body("error", notNullValue());
+                .statusCode(200)
+                .assertThat().log().ifValidationFails()
+                // error types and messages are different for each ES version, so let's just check that there is an error in the response
+                .body("error", notNullValue());
     }
 
     @ContainerMatrixTest
     void testSizeOtherDocsCount() {
-        final ValidatableResponse validatableResponse = given()
+        given()
                 .spec(requestSpec)
                 .when()
                 .body("{\"field\":\"facility\", \"input\":\"\", \"size\":1}")
                 .post("/search/suggest")
                 .then()
-                .statusCode(200);
-        validatableResponse.assertThat().body("suggestions.value[0]", equalTo("test"));
-        validatableResponse.assertThat().body("suggestions.occurrence[0]", greaterThanOrEqualTo(2));
-        validatableResponse.assertThat().body("sum_other_docs_count", greaterThanOrEqualTo(1));
+                .statusCode(200)
+                .assertThat().log().ifValidationFails()
+                .body("suggestions.value[0]", equalTo("test"))
+                .body("suggestions.occurrence[0]", greaterThanOrEqualTo(2))
+                .body("sum_other_docs_count", greaterThanOrEqualTo(1));
     }
 
     @ContainerMatrixTest
     void testTypoCorrection() {
-        final ValidatableResponse validatableResponse = given()
+        given()
                 .spec(requestSpec)
                 .when()
                 .body("{\"field\":\"facility\", \"input\":\"tets\"}")
                 .post("/search/suggest")
                 .then()
-                .statusCode(200);
-        validatableResponse.assertThat().body("suggestions.value[0]", equalTo("test"));
-        validatableResponse.assertThat().body("suggestions.occurrence[0]", greaterThanOrEqualTo(1));
+                .statusCode(200)
+                .assertThat().log().ifValidationFails()
+                .body("suggestions.value[0]", equalTo("test"))
+                .body("suggestions.occurrence[0]", greaterThanOrEqualTo(1));
     }
 
 }
