@@ -126,7 +126,7 @@ const createVisualizationConfig = (legacyInterpolation: LegacyInterpolation, vis
   }
 };
 
-const _updateExistingWidgetPos = (existingPositions, rowOffset) => {
+const _updateExistingWidgetPos = (existingPositions: { [key: string]: WidgetPosition; }, rowOffset: number) => {
   const updatedWidgetPos = { ...existingPositions };
 
   Object.keys(updatedWidgetPos).forEach((widgetId) => {
@@ -138,7 +138,7 @@ const _updateExistingWidgetPos = (existingPositions, rowOffset) => {
   return updatedWidgetPos;
 };
 
-const _migrateWidgets = (legacyCharts) => {
+const _migrateWidgets = (legacyCharts: Array<LegacyFieldChart>) => {
   return new Promise((resolve) => {
     const { defaultHeight } = widgetDefinition(AggregationWidget.type);
     const currentView = CurrentViewStateStore.getInitialState();
@@ -205,7 +205,7 @@ const _onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: (migrat
   });
 };
 
-const _onCancel = (setMigrationFinished) => {
+const _onCancel = (setMigrationFinished: (finished: boolean) => void) => {
   Store.set(FIELD_CHARTS_MIGRATED_KEY, 'discarded');
   setMigrationFinished(true);
 };
