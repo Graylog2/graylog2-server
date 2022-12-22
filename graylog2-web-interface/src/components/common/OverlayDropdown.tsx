@@ -124,7 +124,7 @@ OverlayDropdown.propTypes = {
 OverlayDropdown.defaultProps = {
   menuContainer: document.body,
   placement: 'bottom',
-  renderToggle: () => 'Toggle',
+  renderToggle: undefined,
   toggleChild: 'Toggle',
 };
 
