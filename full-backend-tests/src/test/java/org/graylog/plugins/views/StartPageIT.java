@@ -95,8 +95,8 @@ public class StartPageIT {
         post("/views/search", "org/graylog/plugins/views/startpage-save-search-request.json", 201);
         post("/views", "org/graylog/plugins/views/startpage-views-request.json", 200);
 
-        var validatableResponse = get("/views", 200);
-        var id = validatableResponse.extract().jsonPath().get("views[0]._id");
+        var validatableResponse = get("/views", 200).log().body();
+        var id = validatableResponse.extract().jsonPath().get("views[0].id");
 
         get("/views/" + id, 200);
         validatableResponse = get("/startpage/lastOpened", 200);
