@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
@@ -54,6 +55,7 @@ public class EmailSender {
     private final NodeId nodeId;
     private final ObjectMapperProvider objectMapperProvider;
     private final Engine templateEngine;
+    private final Engine htmlTemplateEngine;
     private final EmailFactory emailFactory;
 
     @Inject
@@ -62,12 +64,14 @@ public class EmailSender {
                        NodeId nodeId,
                        ObjectMapperProvider objectMapperProvider,
                        Engine templateEngine,
+                       @Named("HtmlSafe") Engine htmlTemplateEngine,
                        EmailFactory emailFactory) {
         this.emailRecipientsFactory = requireNonNull(emailRecipientsFactory, "emailRecipientsFactory");
         this.notificationService = requireNonNull(notificationService, "notificationService");
         this.nodeId = requireNonNull(nodeId, "nodeId");
         this.objectMapperProvider = requireNonNull(objectMapperProvider, "objectMapperProvider)");
         this.templateEngine = requireNonNull(templateEngine, "templateEngine");
+        this.htmlTemplateEngine = requireNonNull(htmlTemplateEngine, "htmlTemplateEngine");
         this.emailFactory = requireNonNull(emailFactory, "emailFactory");
     }
 
@@ -92,12 +96,12 @@ public class EmailSender {
             template = config.bodyTemplate();
         }
 
-        return this.templateEngine.transform(template, model);
+        return templateEngine.transform(template, model);
     }
 
     @VisibleForTesting
     private String buildHtmlBody(EmailEventNotificationConfig config, Map<String, Object> model) {
-        return this.templateEngine.transform(config.htmlBodyTemplate(), model);
+        return htmlTemplateEngine.transform(config.htmlBodyTemplate(), model);
     }
 
     private Map<String, Object> getModel(EventNotificationContext ctx, ImmutableList<MessageSummary> backlog, DateTimeZone timeZone) {

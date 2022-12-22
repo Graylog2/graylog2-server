@@ -57,7 +57,7 @@ describe('StreamRuleModal', () => {
     };
   };
 
-  it('should render an empty StreamRuleModal', async () => {
+  it('should render without provided stream rule', async () => {
     render(<SUT />);
 
     await screen.findByRole('textbox', {
@@ -66,7 +66,7 @@ describe('StreamRuleModal', () => {
     });
   });
 
-  it('should render an simple StreamRuleModal', async () => {
+  it('should render with provided stream rule', async () => {
     render(<SUT initialValues={getStreamRule()} />);
 
     const fieldInput = await screen.findByRole('textbox', {

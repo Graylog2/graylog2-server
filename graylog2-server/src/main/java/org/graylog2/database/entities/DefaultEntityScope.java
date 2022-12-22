@@ -29,4 +29,9 @@ public final class DefaultEntityScope extends EntityScope {
     public boolean isMutable() {
         return true;
     }
+
+    @Override
+    public boolean isDeletable() {
+        return true;
+    }
 }

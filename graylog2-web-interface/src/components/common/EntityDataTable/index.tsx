@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import EntityDataTable from './EntityDataTable';
-import type { ColumnRenderers, Column, Sort } from './types';
+import type { ColumnRenderers, Column } from './types';
 
-export { ColumnRenderers, Column, Sort };
+export { ColumnRenderers, Column };
 export default EntityDataTable;
