@@ -37,7 +37,6 @@ import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.Csv;
 import org.junit.jupiter.params.shadow.com.univocity.parsers.csv.CsvParser;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
@@ -46,7 +45,6 @@ import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -80,18 +78,7 @@ public class ScriptingApiResourceIT {
 
         final String defaultIndexSetId = api.indices().defaultIndexSetId();
 
-        final JsonPath user = api.users().createUser(new Users.User(
-                "john.doe",
-                "asdfgh",
-                "John",
-                "Doe",
-                "john.doe@example.com",
-                false,
-                30_000,
-                "Europe/Vienna",
-                Collections.emptyList(),
-                Collections.emptyList()
-        ));
+        final JsonPath user = api.users().createUser(Users.JOHN_DOE);
 
         final String userId = user.getString("id");
 
