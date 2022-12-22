@@ -21,6 +21,8 @@ import { Overlay, Transition } from 'react-overlays';
 
 import { DropdownMenu } from 'components/common/index';
 
+type Placement = 'top' | 'right' | 'bottom' | 'left';
+
 const ToggleDropdown = styled.span`
   cursor: pointer;
 
@@ -40,8 +42,7 @@ const oppositePlacement = {
 
 type _FilterProps = {
   children: React.ReactElement,
-  // eslint-disable-next-line react/require-default-props
-  style?: {}
+  style?: CSSStyleDeclaration
 };
 
 const FilterProps = ({ children, style }: _FilterProps) => (
@@ -50,8 +51,21 @@ const FilterProps = ({ children, style }: _FilterProps) => (
   </>
 );
 
-const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, toggle }) => {
-  const [currentPlacement, setCurrentPlacement] = useState(placement);
+FilterProps.defaultProps = {
+  style: {},
+};
+
+type Props = {
+  children: React.ReactNode,
+  menuContainer?: HTMLElement,
+  onToggle: () => void,
+  placement?: Placement,
+  show: boolean,
+  toggle: React.ReactNode,
+}
+
+const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, toggle }: Props) => {
+  const [currentPlacement, setCurrentPlacement] = useState<Placement>(placement);
   const toggleTarget = React.createRef<HTMLSpanElement>();
 
   const handleOverlayEntering = (dropdownElem) => {
@@ -62,7 +76,7 @@ const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, t
     const trimmedDropdown = (overflowLeft && currentPlacement === 'left') || (overflowRight && currentPlacement === 'right');
 
     if (trimmedDropdown) {
-      setCurrentPlacement(oppositePlacement[currentPlacement]);
+      setCurrentPlacement(oppositePlacement[currentPlacement] as Placement);
     }
   };
 
