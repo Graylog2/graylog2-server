@@ -41,7 +41,7 @@ const Action = ({ type, handlerArgs, menuContainer, element: Element, children }
   return (
     <>
       <OverlayDropdown show={open}
-                       toggle={element}
+                       toggleChild={element}
                        placement="right"
                        onToggle={_onMenuToggle}
                        menuContainer={menuContainer}>

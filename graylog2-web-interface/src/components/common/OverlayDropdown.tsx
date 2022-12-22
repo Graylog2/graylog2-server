@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Overlay, Transition } from 'react-overlays';
@@ -61,12 +61,13 @@ type Props = {
   onToggle: () => void,
   placement?: Placement,
   show: boolean,
-  toggle: React.ReactNode,
+  toggleChild?: React.ReactNode,
+  renderToggle?: (payload: { onToggle: () => void, toggleTarget: React.Ref<HTMLElement> }) => React.ReactNode,
 }
 
-const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, toggle }: Props) => {
+const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, toggleChild, renderToggle }: Props) => {
   const [currentPlacement, setCurrentPlacement] = useState<Placement>(placement);
-  const toggleTarget = React.createRef<HTMLSpanElement>();
+  const toggleTarget = useRef<HTMLElement>();
 
   const handleOverlayEntering = (dropdownElem) => {
     const dropdownOffsetLeft = dropdownElem.offsetLeft;
@@ -82,11 +83,13 @@ const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, t
 
   return (
     <>
-      <ToggleDropdown onClick={onToggle}
-                      ref={toggleTarget}
-                      role="presentation">
-        {toggle}
-      </ToggleDropdown>
+      {typeof renderToggle === 'function' ? renderToggle({ onToggle, toggleTarget }) : (
+        <ToggleDropdown onClick={onToggle}
+                        ref={toggleTarget}
+                        role="presentation">
+          {toggleChild}
+        </ToggleDropdown>
+      )}
       {show && (
         <Overlay show={show}
                  container={menuContainer}
@@ -115,12 +118,14 @@ OverlayDropdown.propTypes = {
   onToggle: PropTypes.func.isRequired,
   placement: PropTypes.string,
   show: PropTypes.bool.isRequired,
-  toggle: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
+  toggleChild: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
 };
 
 OverlayDropdown.defaultProps = {
   menuContainer: document.body,
   placement: 'bottom',
+  renderToggle: () => 'Toggle',
+  toggleChild: 'Toggle',
 };
 
 export default OverlayDropdown;
