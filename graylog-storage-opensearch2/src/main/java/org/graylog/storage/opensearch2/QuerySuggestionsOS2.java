@@ -63,6 +63,7 @@ public class QuerySuggestionsOS2 implements QuerySuggestionsService {
         final TermSuggestionBuilder suggestionBuilder = SuggestBuilders.termSuggestion(req.field()).text(req.input()).size(req.size());
         final BoolQueryBuilder query = QueryBuilders.boolQuery()
                 .filter(QueryBuilders.termsQuery(Message.FIELD_STREAMS, req.streams()))
+                .filter(TimeRangeQueryFactory.create(req.timerange()))
                 .filter(QueryBuilders.existsQuery(req.field()))
                 // .filter(QueryBuilders.prefixQuery(req.field(), req.input()));
                 .filter(getScriptedPrefixQuery(req));
