@@ -36,7 +36,7 @@ type CurrentViewStateActionsType = RefluxActions<{
   formatting: (formatting: FormattingSettings) => Promise<unknown>,
   titles: (titles: Immutable.Map<TitleType, Immutable.Map<string, string>>) => Promise<unknown>,
   updateWidgetPosition: (widgetId: string, newPosition: WidgetPosition) => Promise<unknown>,
-  widgets: (widgets: Immutable.List<Widget>, additionalParams: { positions: Record<string, WidgetPosition>}) => Promise<unknown>,
+  widgets: (widgets: Immutable.List<Widget>, additionalParams?: { positions: Record<string, WidgetPosition>}) => Promise<unknown>,
   widgetPositions: (newPositions: Record<string, WidgetPosition>) => Promise<unknown>,
 }>;
 
