@@ -60,6 +60,10 @@ jest.mock('views/stores/SavedSearchesStore', () => ({
   },
 }));
 
+jest.mock('routing/Routes', () => ({
+  getPluginRoute: (x) => () => x,
+}));
+
 describe('SavedSearchesModal', () => {
   describe('render the SavedSearchesModal', () => {
     it('should render empty', async () => {
@@ -70,7 +74,7 @@ describe('SavedSearchesModal', () => {
                                  deleteSavedSearch={() => Promise.resolve(views[0])}
                                  activeSavedSearchId="search-id-0" />);
 
-      await screen.findByText('No saved searches found.');
+      await screen.findByText('No saved searches have been created yet.');
     });
 
     it('should render with views', async () => {
