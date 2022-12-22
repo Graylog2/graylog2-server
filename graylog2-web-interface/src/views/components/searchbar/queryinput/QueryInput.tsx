@@ -30,7 +30,7 @@ import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
 
-import type { AutoCompleter, Editor } from './ace-types';
+import type { AutoCompleter, Editor, Command } from './ace-types';
 import type { BaseProps } from './BasicQueryInput';
 import BasicQueryInput from './BasicQueryInput';
 
@@ -93,7 +93,7 @@ const handleExecution = ({
 
 // This function takes care of all editor configuration options, which do not rely on external data.
 // It will only run once, on mount, which is important for e.g. the event listeners.
-const _onLoadEditor = (editor, isInitialTokenizerUpdate: React.MutableRefObject<boolean>) => {
+const _onLoadEditor = (editor: Editor, isInitialTokenizerUpdate: React.MutableRefObject<boolean>) => {
   if (editor) {
     editor.commands.removeCommands(['find', 'indent', 'outdent']);
 
@@ -118,15 +118,11 @@ const _onLoadEditor = (editor, isInitialTokenizerUpdate: React.MutableRefObject<
 // This is necessary for configuration options which rely on external data.
 // Unfortunately it is not possible to configure for example the command once
 // with the `onLoad` or `commands` prop, because the reference for the related function will be outdated.
-const _updateEditorConfiguration = (node, completer, onExecute) => {
+const _updateEditorConfiguration = (node: { editor: Editor; }, completer: AutoCompleter, commands: Array<Command>) => {
   const editor = node && node.editor;
 
   if (editor) {
-    editor.commands.addCommand({
-      name: 'Execute',
-      bindKey: { win: 'Enter', mac: 'Enter' },
-      exec: onExecute,
-    });
+    commands.forEach((command) => editor.commands.addCommand(command));
 
     editor.completers = [completer];
   }
@@ -148,6 +144,7 @@ const useCompleter = ({ streams, timeRange, completerFactory, userTimezone }: Pi
 };
 
 type Props = BaseProps & {
+  commands?: Array<Command>,
   completerFactory?: (
     completers: Array<Completer>,
     timeRange: TimeRange | NoTimeRangeOverride | undefined,
@@ -168,6 +165,7 @@ type Props = BaseProps & {
 
 const QueryInput = ({
   className,
+  commands,
   completerFactory = defaultCompleterFactory,
   disableExecution,
   error,
@@ -201,8 +199,13 @@ const QueryInput = ({
     isValidating,
     validate,
   }), [onExecuteProp, value, error, disableExecution, isValidating, validate]);
-  const updateEditorConfiguration = useCallback((node) => _updateEditorConfiguration(node, completer, onExecute), [onExecute, completer]);
-  const _onChange = useCallback((newQuery) => {
+  const _commands = useMemo(() => [...commands, {
+    name: 'Execute',
+    bindKey: { win: 'Enter', mac: 'Enter' },
+    exec: onExecute,
+  }], [commands, onExecute]);
+  const updateEditorConfiguration = useCallback((node: { editor: Editor }) => _updateEditorConfiguration(node, completer, _commands), [_commands, completer]);
+  const _onChange = useCallback((newQuery: string) => {
     onChange({ target: { value: newQuery, name } });
 
     return Promise.resolve(newQuery);
@@ -251,6 +254,7 @@ QueryInput.propTypes = {
 
 QueryInput.defaultProps = {
   className: '',
+  commands: [],
   completerFactory: defaultCompleterFactory,
   disableExecution: false,
   error: undefined,
