@@ -48,7 +48,7 @@ class ValidationRequestTest {
                 .build()
                 .getCombinedQueryWithFilter();
 
-        assertThat(q).isEqualTo("foo:bar AND lorem:ipsum");
+        assertThat(q).isEqualTo("(foo:bar) AND (lorem:ipsum)");
     }
 
     private ValidationRequest.Builder builder() {

@@ -236,7 +236,7 @@ class CommandFactoryTest {
 
         ExportMessagesCommand command = buildFrom(s, ml.id());
 
-        ElasticsearchQueryString combined = ElasticsearchQueryString.of("from-query AND from-messagelist");
+        ElasticsearchQueryString combined = ElasticsearchQueryString.of("(from-query) AND (from-messagelist)");
 
         assertThat(command.queryString())
                 .isEqualTo(combined);
