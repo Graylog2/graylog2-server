@@ -18,8 +18,34 @@ import { useQuery } from '@tanstack/react-query';
 
 import { DashboardsActions } from 'views/stores/DashboardsStore';
 import UserNotification from 'util/UserNotification';
-import type View from 'views/logic/views/View';
-import type { SearchParams } from 'stores/PaginationTypes';
+import type { ViewJson } from 'views/logic/views/View';
+import View from 'views/logic/views/View';
+import type { SearchParams, PaginatedListJSON } from 'stores/PaginationTypes';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
+import PaginationURL from 'util/PaginationURL';
+
+type PaginatedDashboardsResponse = PaginatedListJSON & {
+  views: Array<ViewJson>,
+};
+
+const dashboardsUrl = qualifyUrl('/dashboards');
+
+const fetchDashboards = (searchParams: SearchParams) => {
+  const url = PaginationURL(
+    dashboardsUrl,
+    searchParams.page,
+    searchParams.pageSize,
+    searchParams.query,
+    { sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
+
+  return fetch<PaginatedDashboardsResponse>('GET', qualifyUrl(url)).then(
+    ({ views, total, count, page, per_page: perPage }) => ({
+      list: views.map((item) => View.fromJSON(item)),
+      pagination: { total, count, page, perPage },
+    }),
+  );
+};
 
 const useDashboards = (searchParams: SearchParams): {
   data: {
@@ -30,7 +56,7 @@ const useDashboards = (searchParams: SearchParams): {
 } => {
   const { data, refetch } = useQuery(
     ['dashboards', 'overview', searchParams],
-    () => DashboardsActions.search(searchParams.query, searchParams.page, searchParams.pageSize, searchParams.sort.attributeId, searchParams.sort.direction),
+    () => fetchDashboards(searchParams),
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading dashboards failed with status: ${errorThrown}`,
