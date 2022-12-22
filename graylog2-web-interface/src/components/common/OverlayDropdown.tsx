@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Overlay, Transition } from 'react-overlays';
 
-import { DropdownMenu } from 'components/common';
+import { DropdownMenu } from 'components/common/index';
 
 const ToggleDropdown = styled.span`
   cursor: pointer;
@@ -71,7 +71,7 @@ const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, t
       <ToggleDropdown onClick={onToggle}
                       ref={toggleTarget}
                       role="presentation">
-        {toggle}<span className="caret" />
+        {toggle}
       </ToggleDropdown>
       {show && (
         <Overlay show={show}
