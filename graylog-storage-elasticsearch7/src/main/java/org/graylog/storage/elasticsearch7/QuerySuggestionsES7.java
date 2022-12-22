@@ -64,6 +64,7 @@ public class QuerySuggestionsES7 implements QuerySuggestionsService {
         final TermSuggestionBuilder suggestionBuilder = SuggestBuilders.termSuggestion(req.field()).text(req.input()).size(req.size());
         final BoolQueryBuilder query = QueryBuilders.boolQuery()
                 .filter(QueryBuilders.termsQuery(Message.FIELD_STREAMS, req.streams()))
+                .filter(QueryBuilders.existsQuery(req.field()))
                 // .filter(QueryBuilders.prefixQuery(req.field(), req.input()));
                 .filter(getScriptedPrefixQuery(req));
         final SearchSourceBuilder search = new SearchSourceBuilder()

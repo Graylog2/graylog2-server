@@ -35,12 +35,13 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.restassured.RestAssured.given;
+import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.graylog.testing.completebackend.Lifecycle.VM;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.core.IsEqual.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = VM, searchVersions = {SearchServer.ES7, SearchServer.OS2})
+@ContainerMatrixTestsConfiguration(serverLifecycle = VM, searchVersions = {SearchServer.ES7, SearchServer.OS1, SearchServer.OS2, SearchServer.OS2_LATEST})
 public class SuggestionResourceIT {
     private final RequestSpecification requestSpec;
     private final GraylogApis api;
@@ -92,13 +93,20 @@ public class SuggestionResourceIT {
                                  "facility":"test",
                                  "_target_stream": "stream2",
                                  "http_response_code": 404
+                                 }""")
+                .postMessage(
+                        """
+                                {"short_message":"SuggestionResourceIT#5",
+                                 "host":"something-else.org",
+                                 "foo":"bar",
                                  }""");
 
         api.search().waitForMessages(
                 "SuggestionResourceIT#1",
                 "SuggestionResourceIT#2",
                 "SuggestionResourceIT#3",
-                "SuggestionResourceIT#4"
+                "SuggestionResourceIT#4",
+                "SuggestionResourceIT#5"
         );
     }
 
