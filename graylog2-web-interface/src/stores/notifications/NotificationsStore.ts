@@ -21,31 +21,68 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
+export type NotificationType = {
+  severity: string,
+  type: string,
+  timestamp: string,
+  node_id: string,
+};
+
+export type NotificationMessage = {
+  title: string,
+  description: string,
+};
+
+type NotificationsStoreType = {
+  notifications: Array<NotificationType>,
+  messages:{
+    [key: string]: NotificationMessage,
+  },
+};
+
+type NotificationMessageOptions ={
+  values: {
+    [key: string]: string,
+  }
+}
+type NotificationsActionType = {
+  delete: (type: string) => Promise<unknown>,
+  list: () => Promise<unknown>,
+  getHtmlMessage: (type: string, options: NotificationMessageOptions) => Promise<unknown>,
+}
 export const NotificationsActions = singletonActions(
   'core.Notifications',
-  () => Reflux.createActions({
+  () => Reflux.createActions<NotificationsActionType>({
     delete: { asyncResult: true },
     list: { asyncResult: true },
+    getHtmlMessage: { asyncResult: true },
   }),
 );
 
 export const NotificationsStore = singletonStore(
   'core.Notifications',
-  () => Reflux.createStore({
+  () => Reflux.createStore<NotificationsStoreType>({
     listenables: [NotificationsActions],
     notifications: undefined,
+    message: {},
     promises: {},
 
     init() {
       this.list();
     },
     getInitialState() {
-      if (this.notifications) {
-        return this.notifications;
-      }
-
-      return {};
+      return {
+        notifications: this.notifications,
+        messages: this.messages,
+      };
     },
+    propagateChanges() {
+      this.trigger({
+        notifications: this.notifications,
+        messages: this.messages,
+      });
+    },
+
     list() {
       const url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.list().url);
       const promise = this.promises.list || fetchPeriodically('GET', url)
@@ -56,10 +93,10 @@ export const NotificationsStore = singletonStore(
       NotificationsActions.list.promise(promise);
     },
     listCompleted(response) {
-      this.notifications = response;
-      this.trigger(response);
+      this.notifications = response.notifications;
+      this.propagateChanges();
     },
-    delete(type) {
+    delete(type: string) {
       const url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.delete(type).url);
       const promise = fetch('DELETE', url);
 
@@ -67,6 +104,18 @@ export const NotificationsStore = singletonStore(
     },
     deleteCompleted() {
       this.list();
+      this.propagateChanges();
+    },
+    getHtmlMessage(type: string, options: NotificationMessageOptions = { values: {} }) {
+      const url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.getHtmlMessage(type).url);
+      const promise = fetch('POST', url, options);
+
+      promise.then((response) => {
+        this.messages = { ...this.messages, [type]: response };
+        this.propagateChanges();
+      });
+
+      NotificationsActions.getHtmlMessage.promise(promise);
     },
   }),
 );

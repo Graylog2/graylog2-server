@@ -107,7 +107,7 @@ public class DBLookupTableService extends ScopedDbService<LookupTableDto> {
 
     public void deleteAndPostEventImmutable(String idOrName) {
         final Optional<LookupTableDto> lookupTableDto = get(idOrName);
-        super.deleteImmutable(idOrName);
+        super.forceDelete(idOrName);
         lookupTableDto.ifPresent(lookupTable -> clusterEventBus.post(LookupTablesDeleted.create(lookupTable)));
     }
 
