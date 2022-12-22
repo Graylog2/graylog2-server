@@ -28,8 +28,7 @@ type Props = {
 };
 
 /**
- * Component used to display a simple alert message for a search that returned no matching results.
- * Usage should include utilizing the `children` props to supply the user with a descriptive message.
+ * This component is an alternative to the `DropdownButton` component and displays the dropdown in a portal.
  */
 const OverlayDropdownButton = ({ children, title, bsSize, disabled }: Props) => {
   const [show, setShowDropdown] = useState(false);
