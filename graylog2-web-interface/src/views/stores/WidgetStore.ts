@@ -23,6 +23,7 @@ import type Widget from 'views/logic/widgets/Widget';
 import { singletonActions, singletonStore } from 'logic/singleton';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import generateId from 'logic/generateId';
+import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 
@@ -32,7 +33,7 @@ export type Widgets = Immutable.OrderedMap<string, Widget>;
 
 type WidgetActionsType = RefluxActions<{
   create: (widget: Widget) => Promise<Widget>,
-  duplicate: (widgetId: WidgetId) => Promise<Widget>,
+  duplicate: (widgetId: WidgetId, position: WidgetPosition) => Promise<Widget>,
   filter: (widgetId: WidgetId, filter: string) => Promise<Widgets>,
   timerange: (widgetId: WidgetId, timerange: TimeRange) => Promise<Widgets>,
   query: (widgetId: WidgetId, queryString: QueryString) => Promise<Widgets>,
@@ -103,7 +104,7 @@ export const WidgetStore = singletonStore(
 
       return widget;
     },
-    duplicate(widgetId): Promise<Widget> {
+    duplicate(widgetId, position): Promise<Widget> {
       const widget = this.widgets.get(widgetId);
 
       if (!widget) {
@@ -111,8 +112,13 @@ export const WidgetStore = singletonStore(
       }
 
       const duplicatedWidget = widget.duplicate(generateId());
+
       const newWidgets = this.widgets.set(duplicatedWidget.id, duplicatedWidget);
-      const promise = this._updateWidgets(newWidgets);
+      const promise = this._updateWidgets(newWidgets, {
+        positions: {
+          [duplicatedWidget.id]: position.toBuilder().col(position.col + position.width).build(),
+        },
+      });
 
       WidgetActions.duplicate.promise(promise.then(() => duplicatedWidget));
 
@@ -181,10 +187,10 @@ export const WidgetStore = singletonStore(
 
       return newWidgets;
     },
-    _updateWidgets(newWidgets) {
+    _updateWidgets(newWidgets, additionalParams) {
       const widgets = newWidgets.valueSeq().toList();
 
-      return CurrentViewStateActions.widgets(widgets);
+      return CurrentViewStateActions.widgets(widgets, additionalParams);
     },
     _trigger() {
       this.trigger(this.widgets);

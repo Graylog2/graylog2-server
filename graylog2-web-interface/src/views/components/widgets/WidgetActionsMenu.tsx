@@ -137,10 +137,12 @@ const _onDelete = async (widget: Widget, view: View, title: string) => {
   return result === true ? WidgetActions.remove(widget.id) : Promise.resolve();
 };
 
-const _onDuplicate = (widgetId: string, unsetWidgetFocusing: () => void, title: string) => {
-  WidgetActions.duplicate(widgetId).then((newWidget) => {
-    TitlesActions.set(TitleTypes.Widget, newWidget.id, `${title} (copy)`).then(() => {
+const _onDuplicate = (widgetId: string, unsetWidgetFocusing: () => void, title: string, position) => {
+  return WidgetActions.duplicate(widgetId, position).then((newWidget) => {
+    return TitlesActions.set(TitleTypes.Widget, newWidget.id, `${title} (copy)`).then(() => {
       unsetWidgetFocusing();
+
+      return newWidget.id;
     });
   });
 };
@@ -166,8 +168,7 @@ const WidgetActionsMenu = ({
   const [showCopyToDashboard, setShowCopyToDashboard] = useState(false);
   const [showExport, setShowExport] = useState(false);
   const [showMoveWidgetToTab, setShowMoveWidgetToTab] = useState(false);
-
-  const onDuplicate = useCallback(() => _onDuplicate(widget.id, unsetWidgetFocusing, title), [unsetWidgetFocusing, title, widget.id]);
+  const onDuplicate = useCallback(() => _onDuplicate(widget.id, unsetWidgetFocusing, title, position), [unsetWidgetFocusing, title, widget.id, position]);
   const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId), [view]);
   const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToTab(view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [view]);
   const onDelete = useCallback(() => _onDelete(widget, view?.view, title), [title, view?.view, widget]);

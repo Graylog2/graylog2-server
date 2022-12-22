@@ -36,7 +36,7 @@ type CurrentViewStateActionsType = RefluxActions<{
   formatting: (formatting: FormattingSettings) => Promise<unknown>,
   titles: (titles: Immutable.Map<TitleType, Immutable.Map<string, string>>) => Promise<unknown>,
   updateWidgetPosition: (widgetId: string, newPosition: WidgetPosition) => Promise<unknown>,
-  widgets: (widgets: Immutable.List<Widget>) => Promise<unknown>,
+  widgets: (widgets: Immutable.List<Widget>, additionalParams: { positions: Record<string, WidgetPosition>}) => Promise<unknown>,
   widgetPositions: (newPositions: Record<string, WidgetPosition>) => Promise<unknown>,
 }>;
 
@@ -110,8 +110,10 @@ export const CurrentViewStateStore = singletonStore(
       CurrentViewStateActions.titles.promise(promise);
     },
 
-    widgets(nextWidgets) {
-      const positionsMap = Immutable.Map<string, WidgetPosition>(this._activeState().widgetPositions);
+    widgets(nextWidgets, additionalParams) {
+      const { widgetPositions } = this._activeState();
+      const additionalPositions = additionalParams?.positions ?? {};
+      const positionsMap = Immutable.Map<string, WidgetPosition>({ ...widgetPositions, ...additionalPositions });
       const nextWidgetIds = nextWidgets.map(({ id }) => id);
       const cleanedPositionsMap = positionsMap.filter((_, widgetId) => nextWidgetIds.includes(widgetId)).toMap();
       const newPositionMap = GenerateNextPosition(cleanedPositionsMap, nextWidgets);
