@@ -16,9 +16,15 @@
  */
 package org.graylog.testing.completebackend.apis;
 
+import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.apis.inputs.GelfInputApi;
+
+import java.io.InputStream;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.not;
 
 public class GraylogApis {
     private final RequestSpecification requestSpecification;
@@ -79,4 +85,47 @@ public class GraylogApis {
         return this.fieldTypes;
     }
 
+    public ValidatableResponse postWithResource(final String url, final String resource, final int expectedResult) {
+        return given()
+                .spec(requestSpecification)
+                .auth().basic("admin", "admin")
+                .when()
+                .body(getClass().getClassLoader().getResourceAsStream(resource))
+                .post(url)
+                .then()
+                .log().ifStatusCodeMatches(not(expectedResult))
+                .statusCode(expectedResult);
+    }
+
+    public ValidatableResponse post(final String url, final String body, final int expectedResult) {
+        var response =  given()
+                .spec(requestSpecification)
+                .auth().basic("admin", "admin")
+                .when();
+
+        if(body != null) {
+            response = response.body(body);
+        }
+
+        return response
+                .post(url)
+                .then()
+                .log().ifStatusCodeMatches(not(expectedResult))
+                .statusCode(expectedResult);
+    }
+
+    public ValidatableResponse get(final String url, final String username, final String password, final int expectedResult) {
+        return given()
+                .spec(requestSpecification)
+                .auth().basic(username, password)
+                .when()
+                .get(url)
+                .then()
+                .log().ifStatusCodeMatches(not(expectedResult))
+                .statusCode(expectedResult);
+    }
+
+    public ValidatableResponse get(final String url, final int expectedResult) {
+        return get(url, "admin", "admin", expectedResult);
+    }
 }

@@ -123,10 +123,8 @@ public class ScriptingApiResourceIT {
 
     @ContainerMatrixTest
     void testAggregationByStream() {
-        final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
-                .when()
-                .body("""
+        final ValidatableResponse validatableResponse =
+                api.post("/search/aggregate","""
                          {
                            "group_by": [
                              {
@@ -139,11 +137,7 @@ public class ScriptingApiResourceIT {
                              }
                            ]
                         }
-                         """)
-                .post("/search/aggregate")
-                .then()
-                .log().ifStatusCodeMatches(not(200))
-                .statusCode(200);
+                         """, 200);
 
         validatableResponse.log().ifValidationFails()
                 .assertThat().body("datarows", Matchers.hasSize(3));
