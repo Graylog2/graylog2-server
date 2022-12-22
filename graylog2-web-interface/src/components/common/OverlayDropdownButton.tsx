@@ -19,7 +19,6 @@ import { useState } from 'react';
 
 import Button from 'components/bootstrap/Button';
 import OverlayDropdown from 'components/common/OverlayDropdown';
-import Icon from 'components/common/Icon';
 
 type Props = {
   children: React.ReactNode,
@@ -38,12 +37,15 @@ const OverlayDropdownButton = ({ children, title, bsSize, disabled }: Props) => 
   return (
     <OverlayDropdown show={show}
                      renderToggle={({ onToggle, toggleTarget }) => (
-                       <Button bsSize={bsSize}
-                               ref={toggleTarget}
-                               disabled={disabled}
-                               onClick={onToggle}>
-                         {title} <span className="caret" />
-                       </Button>
+                       <div className={`dropdown btn-group ${show ? 'open' : ''}`}>
+                         <Button bsSize={bsSize}
+                                 className="dropdown-toggle"
+                                 ref={toggleTarget}
+                                 disabled={disabled}
+                                 onClick={onToggle}>
+                           {title} <span className="caret" />
+                         </Button>
+                       </div>
                      )}
                      placement="bottom"
                      onToggle={() => setShowDropdown((cur) => !cur)}>
