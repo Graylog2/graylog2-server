@@ -16,90 +16,57 @@
  */
 package org.graylog.plugins.views;
 
-import io.restassured.path.json.JsonPath;
-import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.completebackend.apis.Users;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.plugin.streams.StreamRuleType;
+import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 @ContainerMatrixTestsConfiguration
 public class StartPageIT {
-    private final RequestSpecification requestSpec;
     private final GraylogApis api;
 
-    private static final String username = "john.doe2";
-    private static final String password = "asdfgh";
+    private static final Users.User user = new Users.User(
+            "john.doe2",
+            "asdfgh",
+            "John",
+            "Doe",
+            "john.doe2@example.com",
+            false,
+            30_000,
+            "Europe/Vienna",
+            Collections.emptyList(),
+            List.of(RestPermissions.DASHBOARDS_CREATE)
+    );
 
-    public StartPageIT(RequestSpecification requestSpec, GraylogApis apis) {
-        this.requestSpec = requestSpec;
-        this.api = apis;
+    public StartPageIT(GraylogApis api) {
+        this.api = api;
     }
 
     @BeforeAll
     public void init() {
-        final JsonPath user = api.users().createUser(new Users.User(
-                this.username,
-                this.password,
-                "John",
-                "Doe",
-                "john.doe2@example.com",
-                false,
-                30_000,
-                "Europe/Vienna",
-                List.of("Admin"),
-                Collections.emptyList()
-        ));
-    }
-
-    private ValidatableResponse post(final String url, final String resource, final int expectedResult) {
-        return given()
-                .spec(requestSpec)
-                .auth().basic(username, password)
-                .when()
-                .body(getClass().getClassLoader().getResourceAsStream(resource))
-                .post(url)
-                .then()
-                .log().ifStatusCodeMatches(not(expectedResult))
-                .statusCode(expectedResult);
-    }
-
-    private ValidatableResponse get(final String url, final String username, final String password, final int expectedResult) {
-        return given()
-                .spec(requestSpec)
-                .auth().basic(username, password)
-                .when()
-                .get(url)
-                .then()
-                .log().ifStatusCodeMatches(not(expectedResult))
-                .statusCode(expectedResult);
-    }
-
-    private ValidatableResponse get(final String url, final int expectedResult) {
-        return get(url, this.username, this.password, expectedResult);
+        api.users().createUser(this.user);
     }
 
     @ContainerMatrixTest
     void testCreateLastOpenedItem() {
-        post("/views/search", "org/graylog/plugins/views/startpage-save-search-request.json", 201);
-        post("/views", "org/graylog/plugins/views/startpage-views-request.json", 200);
+        api.postWithResource("/views/search", user,"org/graylog/plugins/views/startpage-save-search-request.json", 201);
+        api.postWithResource("/views", user,"org/graylog/plugins/views/startpage-views-request.json", 200);
 
-        var validatableResponse = get("/views", 200).log().body();
+        var validatableResponse = api.get("/views", user, Map.of(), 200);
         var id = validatableResponse.extract().jsonPath().get("views[0].id");
 
-        get("/views/" + id, 200);
-        validatableResponse = get("/startpage/lastOpened", 200);
+        api.get("/views/" + id, user, Map.of(), 200);
+        validatableResponse = api.get("/startpage/lastOpened", user, Map.of(), 200);
         validatableResponse.assertThat().body("lastOpened[0].id", equalTo(id));
     }
 
@@ -109,7 +76,7 @@ public class StartPageIT {
         final String defaultIndexSetId = api.indices().defaultIndexSetId();
         var stream1Id = api.streams().createStream("Stream #1", defaultIndexSetId, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream1", "target_stream", false));
 
-        var validatableResponse = get("/startpage/recentActivity", "admin", "admin", 200).log().body();
+        var validatableResponse = api.get("/startpage/recentActivity", Users.LOCAL_ADMIN, Map.of(), 200).log().body();
         validatableResponse.assertThat().body("recentActivity[0].item_id", equalTo(stream1Id));
     }
 }
