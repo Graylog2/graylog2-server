@@ -36,7 +36,7 @@ import ElementDimensions from 'components/common/ElementDimensions';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import { findGaps } from 'views/components/GridGaps';
 import generateId from 'logic/generateId';
-import { Icon } from 'components/common';
+import NewWidgetPlaceholder from 'views/components/NewWidgetPlaceholder';
 
 import WidgetContainer from './WidgetContainer';
 import WidgetComponent from './WidgetComponent';
@@ -159,45 +159,6 @@ const onPositionsChange = (newPositions: Array<BackendWidgetPosition>) => {
   CurrentViewStateActions.widgetPositions(widgetPositions);
 };
 
-const PlaceholderBox = styled.div(({ theme }) => css`
-  opacity: 0;
-  transition: visibility 0s, opacity 0.2s linear;
-  
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;  
-  
-  background-color: ${theme.colors.global.contentBackground};
-  border: 1px dashed ${theme.colors.variant.lighter.default};
-  margin-bottom: ${theme.spacings.xs};
-  border-radius: 4px;
-  font-size: ${theme.fonts.size.huge};
-  
-  :hover {
-    opacity: 1;
-  }
-`);
-
-type WidgetPlaceholderProps = {
-  style: React.CSSProperties,
-}
-
-const WidgetPlaceholder = React.forwardRef<HTMLDivElement, WidgetPlaceholderProps>(({ style }, ref) => {
-  const containerStyle = {
-    ...style,
-    transition: 'none',
-  };
-
-  return (
-    <div style={containerStyle} ref={ref}>
-      <PlaceholderBox>
-        <Icon name="circle-plus" />
-      </PlaceholderBox>
-    </div>
-  );
-});
-
 const WidgetGrid = () => {
   const isInteractive = useContext(InteractiveContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
@@ -227,6 +188,7 @@ const WidgetGrid = () => {
       );
     }).filter((x) => (x !== null));
     const items = widgets.map((widget) => positions[widget.id])
+      .filter((position) => !!position)
       .map((p) => ({ start: { x: p.col, y: p.row }, end: { x: p.col + p.width, y: p.row + p.height } }));
     const gaps = findGaps(items);
     const _positions = { ...positions };
@@ -234,15 +196,17 @@ const WidgetGrid = () => {
     const gapItems = gaps.map((gap) => {
       const id = generateId();
 
-      _positions[id] = WidgetPosition.builder()
+      const gapPosition = WidgetPosition.builder()
         .col(gap.start.x)
         .row(gap.start.y)
         .height(gap.end.y - gap.start.y)
         .width(gap.end.x - gap.start.x)
         .build();
 
+      _positions[id] = gapPosition;
+
       return (
-        <WidgetPlaceholder key={id} />
+        <NewWidgetPlaceholder key={id} position={gapPosition} />
       );
     });
 
