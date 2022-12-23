@@ -159,6 +159,34 @@ const onPositionsChange = (newPositions: Array<BackendWidgetPosition>) => {
   CurrentViewStateActions.widgetPositions(widgetPositions);
 };
 
+const renderGaps = (widgets: { id: string, type: string}[], positions: WidgetPositions) => {
+  const items = widgets.map((widget) => positions[widget.id])
+    .filter((position) => !!position)
+    .map((p) => ({ start: { x: p.col, y: p.row }, end: { x: p.col + p.width, y: p.row + p.height } }));
+  const gaps = findGaps(items);
+  const _positions = { ...positions };
+  console.log({ gaps });
+
+  const gapsItems = gaps.map((gap) => {
+    const id = generateId();
+
+    const gapPosition = WidgetPosition.builder()
+      .col(gap.start.x)
+      .row(gap.start.y)
+      .height(gap.end.y - gap.start.y)
+      .width(gap.end.x - gap.start.x)
+      .build();
+
+    _positions[id] = gapPosition;
+
+    return (
+      <NewWidgetPlaceholder key={id} position={gapPosition} />
+    );
+  });
+
+  return [gapsItems, _positions] as const;
+};
+
 const WidgetGrid = () => {
   const isInteractive = useContext(InteractiveContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
@@ -170,14 +198,9 @@ const WidgetGrid = () => {
   const fields = useQueryFieldTypes();
 
   const [children, newPositions] = useMemo(() => {
-    const widgetItems = widgets.map(({ id: widgetId }) => {
-      const position = positions[widgetId];
-
-      if (!position) {
-        return null;
-      }
-
-      return (
+    const widgetItems = widgets
+      .filter((widget) => !!positions[widget.id])
+      .map(({ id: widgetId }) => (
         <WidgetContainer key={widgetId} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
           <WidgetGridItem fields={fields}
                           positions={positions}
@@ -185,38 +208,15 @@ const WidgetGrid = () => {
                           focusedWidget={focusedWidget}
                           onPositionsChange={onPositionChange} />
         </WidgetContainer>
-      );
-    }).filter((x) => (x !== null));
-    const items = widgets.map((widget) => positions[widget.id])
-      .filter((position) => !!position)
-      .map((p) => ({ start: { x: p.col, y: p.row }, end: { x: p.col + p.width, y: p.row + p.height } }));
-    const gaps = findGaps(items);
-    const _positions = { ...positions };
-    console.log({ gaps });
-    const gapItems = gaps.map((gap) => {
-      const id = generateId();
+      ));
 
-      const gapPosition = WidgetPosition.builder()
-        .col(gap.start.x)
-        .row(gap.start.y)
-        .height(gap.end.y - gap.start.y)
-        .width(gap.end.x - gap.start.x)
-        .build();
-
-      _positions[id] = gapPosition;
-
-      return (
-        <NewWidgetPlaceholder key={id} position={gapPosition} />
-      );
-    });
+    const [gapItems, _positions] = renderGaps(widgets, positions);
 
     return [[...widgetItems, ...gapItems], _positions];
   }, [fields, focusedWidget, positions, widgets]);
 
   // Measuring the width is required to update the widget grid
   // when its content height results in a scrollbar
-  console.log({ newPositions });
-
   return (
     <DashboardWrap>
       {({ width }) => (

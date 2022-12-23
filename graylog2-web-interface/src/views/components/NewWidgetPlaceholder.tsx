@@ -5,6 +5,13 @@ import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import AddMessageCountActionHandler from 'views/logic/fieldactions/AddMessageCountActionHandler';
 import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import { Icon } from 'components/common';
+import Series from 'views/logic/aggregationbuilder/Series';
+import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
+import { WidgetActions } from 'views/stores/WidgetStore';
+import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import NumberVisualization from 'views/components/visualizations/number/NumberVisualization';
+import generateId from 'logic/generateId';
 
 const PlaceholderBox = styled.div(({ theme }) => css`
   opacity: 0;
@@ -12,18 +19,22 @@ const PlaceholderBox = styled.div(({ theme }) => css`
   
   height: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;  
   
   background-color: ${theme.colors.global.contentBackground};
-  border: 1px dashed ${theme.colors.variant.lighter.default};
+  color: ${theme.colors.gray[30]};
   margin-bottom: ${theme.spacings.xs};
-  border-radius: 4px;
-  font-size: ${theme.fonts.size.huge};
   
   :hover {
     opacity: 1;
   }
+`);
+
+const HugeIcon = styled(Icon)(({ theme }) => css`
+  font-size: ${theme.fonts.size.huge};
+  margin-bottom: 10px;
 `);
 
 type Props = {
@@ -38,15 +49,27 @@ const NewWidgetPlaceholder = React.forwardRef<HTMLDivElement, Props>(({ style, p
   };
 
   const onClick = async () => {
-    const newWidget = await AddMessageCountActionHandler({});
+    const newId = generateId();
+    await CurrentViewStateActions.updateWidgetPosition(newId, position);
+    const series = Series.forFunction('count()')
+      .toBuilder()
+      .config(new SeriesConfig('Message Count'))
+      .build();
 
-    return CurrentViewStateActions.updateWidgetPosition(newWidget.id, position);
+    return WidgetActions.create(AggregationWidget.builder()
+      .id(newId)
+      .config(AggregationWidgetConfig.builder()
+        .series([series])
+        .visualization(NumberVisualization.type)
+        .build())
+      .build());
   };
 
   return (
     <div style={containerStyle} ref={ref}>
       <PlaceholderBox onClick={onClick}>
-        <Icon name="circle-plus" />
+        <HugeIcon name="circle-plus" />
+        Create a new widget here
       </PlaceholderBox>
     </div>
   );
