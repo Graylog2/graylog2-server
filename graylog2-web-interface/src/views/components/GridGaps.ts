@@ -15,7 +15,7 @@ function isRightToItem(item: Item, i: Item) {
   return item.start.x <= i.start.x;
 }
 
-const neighborsToRight = (item: Item, rowItems: Item[][]) => {
+const neighborsToRight = (item: Item, rowItems: { [row: string]: Item[] }) => {
   const rows = range(item.start.y, item.end.y);
   const neighbors = rows.flatMap((row) => rowItems[row].filter((i) => i !== item).filter((i) => isRightToItem(item, i))[0])
     .filter((i) => i !== undefined);
@@ -24,19 +24,28 @@ const neighborsToRight = (item: Item, rowItems: Item[][]) => {
 };
 
 const gapBetween = (item: Item, neighbor: Item): Item => ({
-  start: { x: item.end.x + 1, y: Math.min(item.start.y, neighbor.start.y) },
-  end: { x: neighbor.start.x - 1, y: Math.min(item.end.y, neighbor.end.y) },
+  start: { x: item.end.x, y: Math.min(item.start.y, neighbor.start.y) },
+  end: { x: neighbor.start.x, y: Math.min(item.end.y, neighbor.end.y) },
 });
 
 const isFirstItemInRow = (items: Item[], item: Item) => {
 
 };
 
-export const findGaps = (items: Item[]): Item[] => {
-  if (items.length === 0) {
+const normalizeInfinity = ({ start, end }: Item, maxWidth: number): Item => ({
+  start,
+  end: {
+    x: Number.isFinite(end.x) ? end.x : maxWidth,
+    y: end.y,
+  },
+});
+
+export const findGaps = (_items: Item[], maxWidth: number = 12): Item[] => {
+  if (_items.length === 0) {
     return [];
   }
 
+  const items = _items.map((item) => normalizeInfinity(item, maxWidth));
   const minX = Math.min(...items.map(({ start: { x } }) => x));
   const maxX = Math.max(...items.map(({ end: { x } }) => x));
   const minY = Math.min(...items.map(({ start: { y } }) => y));
@@ -44,7 +53,7 @@ export const findGaps = (items: Item[]): Item[] => {
 
   const rows = range(minY, maxY);
 
-  const rowItems = rows.map((row) => itemsInRow(items, row));
+  const rowItems = Object.fromEntries(rows.map((row) => [row, itemsInRow(items, row)]));
 
   const initialGaps = items.filter((item) => isFirstItemInRow(items, item));
   const gaps = items.flatMap((item) => {
