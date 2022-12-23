@@ -51,8 +51,8 @@ const MessageProcessorsConfig = createReactClass({
       config: {
         disabled_processors: config.disabled_processors,
         processor_order: config.processor_order,
-        showModal: false,
       },
+      showModal: false,
     };
   },
 
