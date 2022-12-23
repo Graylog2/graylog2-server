@@ -16,7 +16,6 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { DashboardsActions } from 'views/stores/DashboardsStore';
 import UserNotification from 'util/UserNotification';
 import type { ViewJson } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
@@ -28,6 +27,10 @@ import PaginationURL from 'util/PaginationURL';
 type PaginatedDashboardsResponse = PaginatedListJSON & {
   views: Array<ViewJson>,
 };
+
+type Options = {
+  enabled: boolean,
+}
 
 const dashboardsUrl = qualifyUrl('/dashboards');
 
@@ -47,14 +50,15 @@ const fetchDashboards = (searchParams: SearchParams) => {
   );
 };
 
-const useDashboards = (searchParams: SearchParams): {
+const useDashboards = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
   data: {
     list: Readonly<Array<View>>,
     pagination: { total: number }
   } | undefined,
-  refetch: () => void
+  refetch: () => void,
+  isFetching: boolean,
 } => {
-  const { data, refetch } = useQuery(
+  const { data, refetch, isFetching } = useQuery(
     ['dashboards', 'overview', searchParams],
     () => fetchDashboards(searchParams),
     {
@@ -63,12 +67,14 @@ const useDashboards = (searchParams: SearchParams): {
           'Could not load dashboards');
       },
       keepPreviousData: true,
+      enabled,
     },
   );
 
   return ({
     data,
     refetch,
+    isFetching,
   });
 };
 
