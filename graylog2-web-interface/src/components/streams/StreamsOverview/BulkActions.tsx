@@ -19,8 +19,8 @@ import { uniq } from 'lodash';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { Formik, Form } from 'formik';
-
 import { Streams } from '@graylog/server-api';
+
 import { Button, Modal } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
 import fetch from 'logic/rest/FetchProvider';

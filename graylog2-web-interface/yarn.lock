@@ -6275,7 +6275,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.2"
     eslint-plugin-compat "4.0.2"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-c7175c65-2e95-4491-9ec4-703a0747a211-1671537953967/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-142ba65a-66f9-4daa-9cd8-17d8b5adea79-1671624338077/node_modules/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.1.7"
     eslint-plugin-jest-dom "4.0.3"
@@ -7533,13 +7533,13 @@ grapheme-splitter@^1.0.4:
     "@types/create-react-class" "15.6.3"
     "@types/jquery" "3.5.14"
     "@types/react" "18.0.26"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.1.0-SNAPSHOT-aaad4556-f5fc-4952-96da-68483969c8b7-1671537953768/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.1.0-SNAPSHOT-c7e4c9d2-4d63-4fc9-9a56-d3f7b0fb3ee6-1671624337811/node_modules/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.1.0-SNAPSHOT-aaad4556-f5fc-4952-96da-68483969c8b7-1671537953768/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.1.0-SNAPSHOT-c7e4c9d2-4d63-4fc9-9a56-d3f7b0fb3ee6-1671624337811/node_modules/eslint-config-graylog"
     formik "2.2.9"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.1.0-SNAPSHOT-aaad4556-f5fc-4952-96da-68483969c8b7-1671537953768/node_modules/jest-preset-graylog"
-    jquery "3.6.2"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-5.1.0-SNAPSHOT-c7e4c9d2-4d63-4fc9-9a56-d3f7b0fb3ee6-1671624337811/node_modules/jest-preset-graylog"
+    jquery "3.6.3"
     moment "2.29.4"
     moment-timezone "0.5.40"
     prop-types "15.8.1"
@@ -9093,10 +9093,10 @@ joycon@^3.0.1:
   resolved "https://registry.yarnpkg.com/joycon/-/joycon-3.1.1.tgz#bce8596d6ae808f8b68168f5fc69280996894f03"
   integrity sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==
 
-jquery@3.6.2:
-  version "3.6.2"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.6.2.tgz#8302bbc9160646f507bdf59d136a478b312783c4"
-  integrity sha512-/e7ulNIEEYk1Z/l4X0vpxGt+B/dNsV8ghOPAWZaJs8pkGvsSC0tm33aMGylXcj/U7y4IcvwtMXPMyBFZn/gK9A==
+jquery@3.6.3:
+  version "3.6.3"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.6.3.tgz#23ed2ffed8a19e048814f13391a19afcdba160e6"
+  integrity sha512-bZ5Sy3YzKo9Fyc8wH2iIQK4JImJ6R0GWI9kL1/k7Z91ZBNgkRXE6U0JfHIizZbort8ZunhSI3jw9I6253ahKfg==
 
 jquery@>=1.12.0, jquery@>=1.7:
   version "3.5.1"
