@@ -34,6 +34,9 @@ import type { StoreState } from 'stores/StoreTypes';
 import { ViewStatesStore } from 'views/stores/ViewStatesStore';
 import ElementDimensions from 'components/common/ElementDimensions';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import { findGaps } from 'views/components/GridGaps';
+import generateId from 'logic/generateId';
+import { Icon } from 'components/common';
 
 import WidgetContainer from './WidgetContainer';
 import WidgetComponent from './WidgetComponent';
@@ -156,6 +159,45 @@ const onPositionsChange = (newPositions: Array<BackendWidgetPosition>) => {
   CurrentViewStateActions.widgetPositions(widgetPositions);
 };
 
+const PlaceholderBox = styled.div(({ theme }) => css`
+  opacity: 0;
+  transition: visibility 0s, opacity 0.2s linear;
+  
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;  
+  
+  background-color: ${theme.colors.global.contentBackground};
+  border: 1px dashed ${theme.colors.variant.lighter.default};
+  margin-bottom: ${theme.spacings.xs};
+  border-radius: 4px;
+  font-size: ${theme.fonts.size.huge};
+  
+  :hover {
+    opacity: 1;
+  }
+`);
+
+type WidgetPlaceholderProps = {
+  style: React.CSSProperties,
+}
+
+const WidgetPlaceholder = React.forwardRef<HTMLDivElement, WidgetPlaceholderProps>(({ style }, ref) => {
+  const containerStyle = {
+    ...style,
+    transition: 'none',
+  };
+
+  return (
+    <div style={containerStyle} ref={ref}>
+      <PlaceholderBox>
+        <Icon name="circle-plus" />
+      </PlaceholderBox>
+    </div>
+  );
+});
+
 const WidgetGrid = () => {
   const isInteractive = useContext(InteractiveContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
@@ -166,31 +208,56 @@ const WidgetGrid = () => {
 
   const fields = useQueryFieldTypes();
 
-  const children = useMemo(() => widgets.map(({ id: widgetId }) => {
-    const position = positions[widgetId];
+  const [children, newPositions] = useMemo(() => {
+    const widgetItems = widgets.map(({ id: widgetId }) => {
+      const position = positions[widgetId];
 
-    if (!position) {
-      return null;
-    }
+      if (!position) {
+        return null;
+      }
 
-    return (
-      <WidgetContainer key={widgetId} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
-        <WidgetGridItem fields={fields}
-                        positions={positions}
-                        widgetId={widgetId}
-                        focusedWidget={focusedWidget}
-                        onPositionsChange={onPositionChange} />
-      </WidgetContainer>
-    );
-  }).filter((x) => (x !== null)), [fields, focusedWidget, positions, widgets]);
+      return (
+        <WidgetContainer key={widgetId} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
+          <WidgetGridItem fields={fields}
+                          positions={positions}
+                          widgetId={widgetId}
+                          focusedWidget={focusedWidget}
+                          onPositionsChange={onPositionChange} />
+        </WidgetContainer>
+      );
+    }).filter((x) => (x !== null));
+    const items = widgets.map((widget) => positions[widget.id])
+      .map((p) => ({ start: { x: p.col, y: p.row }, end: { x: p.col + p.width, y: p.row + p.height } }));
+    const gaps = findGaps(items);
+    const _positions = { ...positions };
+    console.log({ gaps });
+    const gapItems = gaps.map((gap) => {
+      const id = generateId();
+
+      _positions[id] = WidgetPosition.builder()
+        .col(gap.start.x)
+        .row(gap.start.y)
+        .height(gap.end.y - gap.start.y)
+        .width(gap.end.x - gap.start.x)
+        .build();
+
+      return (
+        <WidgetPlaceholder key={id} />
+      );
+    });
+
+    return [[...widgetItems, ...gapItems], _positions];
+  }, [fields, focusedWidget, positions, widgets]);
 
   // Measuring the width is required to update the widget grid
   // when its content height results in a scrollbar
+  console.log({ newPositions });
+
   return (
     <DashboardWrap>
       {({ width }) => (
         <Grid locked={!isInteractive}
-              positions={positions}
+              positions={newPositions}
               onPositionsChange={onPositionsChange}
               width={width}>
           {children}
