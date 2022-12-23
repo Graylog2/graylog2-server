@@ -25,14 +25,14 @@ import { useFavoriteItems } from 'components/welcome/hooks';
 
 const FavoriteItemsList = () => {
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
-  const { data: { favoriteItems, total }, isFetching } = useFavoriteItems(pagination);
+  const { data: { favorites, total }, isFetching } = useFavoriteItems(pagination);
   const onPageChange = useCallback((newPage) => {
     setPagination((cur) => ({ ...cur, page: newPage }));
   }, [setPagination]);
 
   if (isFetching) return <Spinner />;
 
-  if (favoriteItems.length === 0) {
+  if (favorites.length === 0) {
     return (
       <NoSearchResult>
         You do not have any favorite items yet.
@@ -44,7 +44,7 @@ const FavoriteItemsList = () => {
   return (
     <PaginatedList onChange={onPageChange} useQueryParameter={false} activePage={pagination.page} totalItems={total} pageSize={pagination.per_page} showPageSizeSelect={false} hideFirstAndLastPageLinks>
       <ListGroup>
-        {favoriteItems.map(({ type, id, title }) => <EntityItem key={id} type={type} id={id} title={title} />)}
+        {favorites.map(({ type, id, title }) => <EntityItem key={id} type={type} id={id} title={title} />)}
       </ListGroup>
     </PaginatedList>
   );

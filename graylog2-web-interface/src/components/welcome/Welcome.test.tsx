@@ -44,7 +44,7 @@ jest.mock('components/welcome/hooks', () => ({
   })),
   useFavoriteItems: jest.fn(() => ({
     data: {
-      favoriteItems: [{ id: '4', title: 'Title 4', type: 'dashboard' }, {
+      favorites: [{ id: '4', title: 'Title 4', type: 'dashboard' }, {
         id: '3',
         title: 'Title 3',
         type: 'dashboard',
@@ -120,7 +120,7 @@ describe('Welcome', () => {
     });
 
     it('Show no items', async () => {
-      asMock(useFavoriteItems).mockImplementation(() => ({ data: { favoriteItems: [], page: 1, count: 0, total: 0, per_page: 5 }, isFetching: false }));
+      asMock(useFavoriteItems).mockImplementation(() => ({ data: { favorites: [], page: 1, count: 0, total: 0, per_page: 5 }, isFetching: false }));
       render(<Welcome />);
       await screen.findByText(/You do not have any favorite items yet./i);
     });

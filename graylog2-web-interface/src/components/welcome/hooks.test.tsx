@@ -27,7 +27,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import { urlPrefix, useLastOpened, useFavoriteItems, useRecentActivity } from 'components/welcome/hooks';
 import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
 
-const getUrl = (url: string) => qualifyUrl(`${urlPrefix}/${url}?page=1&per_page=5`);
+const getUrl = (url: string, prefix: string = urlPrefix) => qualifyUrl(`${prefix}/${url}?page=1&per_page=5`);
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -52,7 +52,7 @@ const mockLastOpened = {
 };
 
 const mockFavoriteItems = {
-  favoriteItems: [{
+  favorites: [{
     type: 'search',
     id: '1',
     title: 'Title 1',
@@ -134,7 +134,7 @@ describe('Hooks for welcome page', () => {
       await waitFor(() => result.current.isFetching);
       await waitFor(() => !result.current.isFetching);
 
-      expect(fetch).toHaveBeenCalledWith('GET', getUrl('favoriteItems'));
+      expect(fetch).toHaveBeenCalledWith('GET', getUrl('favorites', ''));
       expect(result.current.data).toEqual(mockFavoriteItems);
     });
 

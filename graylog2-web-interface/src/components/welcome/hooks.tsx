@@ -42,7 +42,7 @@ const fetchLastOpen = async ({ page }: RequestQuery): Promise<PaginatedLastOpene
 };
 
 const fetchFavoriteItems = async ({ page }: RequestQuery): Promise<PaginatedFavoriteItems> => {
-  const url = PaginationURL(`${urlPrefix}/favoriteItems`, page, 5, '');
+  const url = PaginationURL('/favorites', page, 5, '');
 
   return fetch('GET', qualifyUrl(url));
 };
@@ -91,7 +91,7 @@ export const useFavoriteItems = (pagination: RequestQuery): {data: PaginatedFavo
     },
     retry: 0,
     initialData: {
-      favoriteItems: [],
+      favorites: [],
       ...DEFAULT_PAGINATION,
     },
   });

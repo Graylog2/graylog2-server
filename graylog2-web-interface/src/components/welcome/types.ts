@@ -82,7 +82,7 @@ export type PaginatedLastOpened = {
 }
 
 export type PaginatedFavoriteItems = {
-  favoriteItems: Array<FavoriteItem>,
+  favorites: Array<FavoriteItem>,
   page: number,
   per_page: number,
   count: number,
