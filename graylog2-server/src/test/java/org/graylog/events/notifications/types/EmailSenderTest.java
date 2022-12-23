@@ -17,6 +17,7 @@
 package org.graylog.events.notifications.types;
 
 import com.floreysoft.jmte.Engine;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.graylog2.alerts.EmailRecipients;
@@ -66,9 +67,9 @@ class EmailSenderTest {
 
     @Test
     void testEmailHtmlEscaping() throws EmailException {
-        Map<String, Object> model = Map.of(
+        Map<String, Object> model = ImmutableMap.of(
                 "event_definition_title", "<<Test Event Title>>",
-                "event", Map.of("message", "Event Message & Whatnot")
+                "event", ImmutableMap.of("message", "Event Message & Whatnot")
         );
         final EmailEventNotificationConfig config = EmailEventNotificationConfig.builder()
                 .htmlBodyTemplate(
