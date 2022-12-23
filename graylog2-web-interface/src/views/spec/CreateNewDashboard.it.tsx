@@ -51,6 +51,13 @@ jest.mock('views/stores/SearchMetadataStore', () => ({
   SearchMetadataStore: MockStore(),
 }));
 
+jest.mock('views/components/dashboard/hooks/useDashboards', () => () => ({
+  data: {
+    list: [],
+    pagination: { total: 0 },
+  },
+}));
+
 declare global {
   namespace NodeJS {
     interface Global {
