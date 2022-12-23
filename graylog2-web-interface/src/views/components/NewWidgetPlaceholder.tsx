@@ -2,7 +2,6 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import AddMessageCountActionHandler from 'views/logic/fieldactions/AddMessageCountActionHandler';
 import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import { Icon } from 'components/common';
 import Series from 'views/logic/aggregationbuilder/Series';
