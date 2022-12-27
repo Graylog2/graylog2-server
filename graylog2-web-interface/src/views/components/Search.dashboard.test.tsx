@@ -23,7 +23,6 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import { WidgetStore } from 'views/stores/WidgetStore';
-import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { SearchConfigActions } from 'views/stores/SearchConfigStore';
 import { ViewStore } from 'views/stores/ViewStore';
@@ -79,7 +78,6 @@ const mockWidgetEditing = () => {
 describe('Dashboard Search', () => {
   beforeEach(() => {
     WidgetStore.listen = jest.fn(() => jest.fn());
-    QueryFiltersStore.listen = jest.fn(() => jest.fn());
     SearchActions.execute = mockAction(jest.fn(() => Promise.resolve({} as SearchExecutionResult)));
     StreamsActions.refresh = mockAction();
     SearchConfigActions.refresh = mockAction();

@@ -23,7 +23,6 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import { WidgetStore } from 'views/stores/WidgetStore';
-import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchConfigActions } from 'views/stores/SearchConfigStore';
@@ -104,7 +103,6 @@ describe('Search', () => {
   beforeEach(() => {
     asMock(usePluginEntities).mockReturnValue([]);
     WidgetStore.listen = jest.fn(() => jest.fn());
-    QueryFiltersStore.listen = jest.fn(() => jest.fn());
     SearchActions.execute = mockAction(jest.fn(async () => ({} as SearchExecutionResult)));
     StreamsActions.refresh = mockAction();
     SearchConfigActions.refresh = mockAction();
@@ -122,6 +120,7 @@ describe('Search', () => {
     SearchMetadataStore.listen = jest.fn(() => jest.fn());
     SearchActions.refresh = mockAction();
 
+    // eslint-disable-next-line react/jsx-no-useless-fragment
     asMock(CurrentViewTypeProvider as React.FunctionComponent).mockImplementation(({ children }) => <>{children}</>);
     asMock(useViewType).mockReturnValue(View.Type.Dashboard);
 
@@ -145,23 +144,6 @@ describe('Search', () => {
     render(<Search />);
 
     await waitFor(() => expect(SearchConfigActions.refresh).toHaveBeenCalled());
-  });
-
-  it('does not register to QueryFiltersStore upon mount', async () => {
-    render(<Search />);
-
-    await waitFor(() => expect(QueryFiltersStore.listen).not.toHaveBeenCalled());
-  });
-
-  it('does not unregister from Query Filter store upon unmount', () => {
-    const unsubscribe = jest.fn();
-
-    QueryFiltersStore.listen = jest.fn(() => unsubscribe);
-    const { unmount } = render(<Search />);
-
-    unmount();
-
-    expect(unsubscribe).not.toHaveBeenCalled();
   });
 
   it('registers to SearchActions.refresh upon mount', async () => {
