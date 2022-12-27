@@ -47,15 +47,6 @@ jest.mock('util/History');
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 
-jest.mock('views/stores/ViewMetadataStore', () => ({
-  ViewMetadataStore: MockStore(
-    'get',
-    ['getInitialState', () => ({
-      activeQuery: 'beef-dead',
-    })],
-  ),
-}));
-
 jest.mock('views/stores/SearchStore', () => ({
   SearchActions: {
     execute: jest.fn(() => Promise.resolve()),
