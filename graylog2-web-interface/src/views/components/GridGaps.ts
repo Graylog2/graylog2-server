@@ -60,19 +60,19 @@ const findFinalGaps = (rows: Array<number>, rowItems: RowItems, maxWidth: number
   .filter(([, endX]) => endX < maxWidth)
   .reduce((gaps, [row, endX]) => {
     if (gaps.length === 0) {
-      return [{ start: { x: endX, y: row }, end: { x: maxWidth + 1, y: row + 1 } }] as Item[];
+      return [{ start: { x: endX, y: row }, end: { x: maxWidth, y: row + 1 } }] as Item[];
     }
 
     const [gap, ...rest] = gaps.reverse();
 
     if (gap.start.x !== endX) {
-      return [...rest, gap, { start: { x: endX, y: row }, end: { x: maxWidth + 1, y: row + 1 } }];
+      return [...rest, gap, { start: { x: endX, y: row }, end: { x: maxWidth, y: row + 1 } }];
     }
 
-    return [...rest, { start: gap.start, end: { x: maxWidth + 1, y: row + 1 } }];
+    return [...rest, { start: gap.start, end: { x: maxWidth, y: row + 1 } }];
   }, [] as Item[]);
 
-export const findGaps = (_items: Item[], minWidth: number = 1, maxWidth: number = 12): Item[] => {
+export const findGaps = (_items: Item[], minWidth: number = 1, maxWidth: number = 13): Item[] => {
   if (_items.length === 0) {
     return [];
   }
