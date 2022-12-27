@@ -165,7 +165,6 @@ const renderGaps = (widgets: { id: string, type: string}[], positions: WidgetPos
     .map((p) => ({ start: { x: p.col, y: p.row }, end: { x: p.col + p.width, y: p.row + p.height } }));
   const gaps = findGaps(items);
   const _positions = { ...positions };
-  console.log({ gaps });
 
   const gapsItems = gaps.map((gap) => {
     const id = generateId();
