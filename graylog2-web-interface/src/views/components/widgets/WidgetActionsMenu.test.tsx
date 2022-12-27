@@ -73,10 +73,6 @@ jest.mock('views/stores/WidgetStore', () => ({
   },
 }));
 
-jest.mock('views/stores/CurrentQueryStore', () => ({
-  CurrentQueryStore: MockStore(),
-}));
-
 jest.mock('views/stores/CurrentViewStateStore', () => ({ CurrentViewStateStore: MockStore(['getInitialState', () => ({})]) }));
 
 jest.mock('views/hooks/useViewType');

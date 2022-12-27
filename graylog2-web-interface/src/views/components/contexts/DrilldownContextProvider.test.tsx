@@ -25,21 +25,18 @@ import type { TimeRange, ElasticsearchQueryString } from 'views/logic/queries/Qu
 import Query, { createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
 import { GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import useViewType from 'views/hooks/useViewType';
+import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 
 import DrilldownContextProvider from './DrilldownContextProvider';
 import DrilldownContext from './DrilldownContext';
-
-jest.mock('views/stores/CurrentQueryStore', () => ({
-  CurrentQueryStore: mockStore(['getInitialState', jest.fn(() => null)]),
-}));
 
 jest.mock('views/stores/GlobalOverrideStore', () => ({
   GlobalOverrideStore: mockStore(),
 }));
 
 jest.mock('views/hooks/useViewType');
+jest.mock('views/logic/queries/useCurrentQuery');
 
 describe('DrilldownContextProvider', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -119,7 +116,7 @@ describe('DrilldownContextProvider', () => {
         .timerange({ type: 'keyword', keyword: 'last year' })
         .build();
 
-      asMock(CurrentQueryStore.getInitialState).mockReturnValueOnce(query);
+      asMock(useCurrentQuery).mockReturnValueOnce(query);
       asMock(useViewType).mockReturnValue(View.Type.Search);
       const wrapper = mount(<SUT />);
 

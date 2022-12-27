@@ -21,10 +21,10 @@ import type Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
 import type Query from 'views/logic/queries/Query';
 import { createElasticsearchQueryString, filtersToStreamSet } from 'views/logic/queries/Query';
-import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import { GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import useViewType from 'views/hooks/useViewType';
+import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 
 import DrilldownContext from './DrilldownContext';
 import type { Drilldown } from './DrilldownContext';
@@ -56,10 +56,10 @@ type Props = {
   children: React.ReactElement,
   widget: Widget,
   globalOverride: GlobalOverride | undefined,
-  currentQuery: Query,
 };
 
-const DrilldownContextProvider = ({ children, widget, globalOverride, currentQuery }: Props) => {
+const DrilldownContextProvider = ({ children, widget, globalOverride }: Props) => {
+  const currentQuery = useCurrentQuery();
   const drillDownContextValue = useDrillDownContextValue(widget, globalOverride, currentQuery);
 
   if (drillDownContextValue) {
@@ -72,7 +72,6 @@ const DrilldownContextProvider = ({ children, widget, globalOverride, currentQue
 export default connect(
   DrilldownContextProvider,
   {
-    currentQuery: CurrentQueryStore,
     globalOverride: GlobalOverrideStore,
   },
 );
