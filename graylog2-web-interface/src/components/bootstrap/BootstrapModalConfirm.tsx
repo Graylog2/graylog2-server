@@ -72,7 +72,7 @@ const BootstrapModalConfirm = ({
 };
 
 BootstrapModalConfirm.propTypes = {
-  /** Indicates whether the modal should be shown by default or not. */
+  /** Control whether the modal is shown or not. Prop updates should trigger opening (if show changes from false to true), respectively closing the modal (if show changes from false to true). */
   showModal: PropTypes.bool.isRequired,
   /** Title to use in the modal. */
   title: PropTypes.oneOfType([
