@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useCallback, useContext } from 'react';
 import PropTypes from 'prop-types';
 import type * as Immutable from 'immutable';
-import * as ImmutablePropTypes from 'react-immutable-proptypes';
 import { List } from 'immutable';
 
 import connect, { useStore } from 'stores/connect';
@@ -26,7 +25,6 @@ import { TitlesActions } from 'views/stores/TitlesStore';
 import { ViewActions } from 'views/stores/ViewStore';
 import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
 import { QueriesActions } from 'views/stores/QueriesStore';
-import { QueryTitlesStore } from 'views/stores/QueryTitlesStore';
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { ViewStatesActions, ViewStatesStore } from 'views/stores/ViewStatesStore';
@@ -34,6 +32,7 @@ import DashboardPageContext from 'views/components/contexts/DashboardPageContext
 import FindNewActiveQueryId from 'views/logic/views/FindNewActiveQuery';
 import ConfirmDeletingDashboardPage from 'views/logic/views/ConfirmDeletingDashboardPage';
 import useQueryIds from 'views/hooks/useQueryIds';
+import useQueryTitles from 'views/hooks/useQueryTitles';
 
 import QueryTabs from './QueryTabs';
 
@@ -61,14 +60,14 @@ const onCloseTab = async (dashboardId: string, queryId: string, activeQueryId: s
 };
 
 type Props = {
-  queryTitles: Immutable.Map<string, string>,
   viewMetadata: ViewMetaData,
 };
 
 const useWidgetIds = () => useStore(ViewStatesStore, (states) => states.map((viewState) => viewState.widgets.map((widget) => widget.id).toList()).toMap());
 
-const QueryBar = ({ queryTitles, viewMetadata }: Props) => {
+const QueryBar = ({ viewMetadata }: Props) => {
   const queries = useQueryIds();
+  const queryTitles = useQueryTitles();
   const { activeQuery: activeQueryId, id: dashboardId } = viewMetadata;
   const { setDashboardPage } = useContext(DashboardPageContext);
   const widgetIds = useWidgetIds();
@@ -102,7 +101,6 @@ const QueryBar = ({ queryTitles, viewMetadata }: Props) => {
 };
 
 QueryBar.propTypes = {
-  queryTitles: ImmutablePropTypes.mapOf(PropTypes.string, PropTypes.string).isRequired,
   viewMetadata: PropTypes.exact({
     id: PropTypes.string,
     title: PropTypes.string,
@@ -113,6 +111,5 @@ QueryBar.propTypes = {
 };
 
 export default connect(QueryBar, {
-  queryTitles: QueryTitlesStore,
   viewMetadata: ViewMetadataStore,
 });
