@@ -15,14 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 import PropTypes from 'prop-types';
 
 import type QueryResult from 'views/logic/QueryResult';
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import { Icon } from 'components/common';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
+import useViewType from 'views/hooks/useViewType';
 
 import SearchResultOverview from './SearchResultOverview';
 
@@ -36,7 +35,7 @@ type Props = {
 
 const ViewDescription = ({ results, viewMetadata }: Props) => {
   const isAdHocSearch = !viewMetadata.id;
-  const viewType = useContext(ViewTypeContext);
+  const viewType = useViewType();
   const viewTypeLabel = viewType ? ViewTypeLabel({ type: viewType }) : '';
   const resultsSection = (
     <>

@@ -32,12 +32,12 @@ import { SearchMetadataActions, SearchMetadataStore } from 'views/stores/SearchM
 import View from 'views/logic/views/View';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import Query, { filtersForQuery } from 'views/logic/queries/Query';
 import usePluginEntities from 'hooks/usePluginEntities';
+import useViewType from 'views/hooks/useViewType';
 
 import Search from './Search';
 
@@ -107,6 +107,7 @@ jest.mock('routing/withLocation', () => (Component) => (props) => (
 jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
 jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('hooks/usePluginEntities');
+jest.mock('views/hooks/useViewType');
 
 describe('Search', () => {
   beforeEach(() => {
@@ -130,7 +131,8 @@ describe('Search', () => {
     SearchMetadataStore.listen = jest.fn(() => jest.fn());
     SearchActions.refresh = mockAction();
 
-    asMock(CurrentViewTypeProvider as React.FunctionComponent).mockImplementation(({ children }) => <ViewTypeContext.Provider value={View.Type.Dashboard}>{children}</ViewTypeContext.Provider>);
+    asMock(CurrentViewTypeProvider as React.FunctionComponent).mockImplementation(({ children }) => <>{children}</>);
+    asMock(useViewType).mockReturnValue(View.Type.Dashboard);
 
     const query = Query.builder().id('foobar').filter(filtersForQuery([])).build();
     asMock(useCurrentQuery).mockReturnValue(query);

@@ -20,8 +20,8 @@ import styled, { css } from 'styled-components';
 import type { SearchPreferencesLayout } from 'views/components/contexts/SearchPagePreferencesContext';
 import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import { IconButton } from 'components/common';
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import viewTitle from 'views/logic/views/ViewTitle';
+import useViewType from 'views/hooks/useViewType';
 
 type Props = {
   children: React.ReactNode,
@@ -153,40 +153,35 @@ const toggleSidebarPinning = (searchPageLayout) => {
 
 const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout, viewMetadata }: Props) => {
   const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned;
+  const viewType = useViewType();
+
+  const title = viewTitle(viewMetadata?.title, viewType);
 
   return (
-    <ViewTypeContext.Consumer>
-      {(viewType) => {
-        const title = viewTitle(viewMetadata?.title, viewType);
+    <Container sidebarIsPinned={sidebarIsPinned}>
 
-        return (
-          <Container sidebarIsPinned={sidebarIsPinned}>
-
-            <ContentGrid>
-              <Header>
-                <SearchTitle title={title}>
-                  <CenterVertical>
-                    <Title onClick={closeSidebar}>{title}</Title>
-                  </CenterVertical>
-                  <CenterVertical>
-                    <OverlayToggle sidebarIsPinned={sidebarIsPinned}>
-                      <IconButton onClick={() => toggleSidebarPinning(searchPageLayout)}
-                                  title={`Display sidebar ${sidebarIsPinned ? 'as overlay' : 'inline'}`}
-                                  name="thumbtack" />
-                    </OverlayToggle>
-                  </CenterVertical>
-                </SearchTitle>
-                <HorizontalRule />
-                <SectionTitle>{sectionTitle}</SectionTitle>
-              </Header>
-              <SectionContent>
-                {children}
-              </SectionContent>
-            </ContentGrid>
-          </Container>
-        );
-      }}
-    </ViewTypeContext.Consumer>
+      <ContentGrid>
+        <Header>
+          <SearchTitle title={title}>
+            <CenterVertical>
+              <Title onClick={closeSidebar}>{title}</Title>
+            </CenterVertical>
+            <CenterVertical>
+              <OverlayToggle sidebarIsPinned={sidebarIsPinned}>
+                <IconButton onClick={() => toggleSidebarPinning(searchPageLayout)}
+                            title={`Display sidebar ${sidebarIsPinned ? 'as overlay' : 'inline'}`}
+                            name="thumbtack" />
+              </OverlayToggle>
+            </CenterVertical>
+          </SearchTitle>
+          <HorizontalRule />
+          <SectionTitle>{sectionTitle}</SectionTitle>
+        </Header>
+        <SectionContent>
+          {children}
+        </SectionContent>
+      </ContentGrid>
+    </Container>
   );
 };
 

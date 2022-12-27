@@ -17,10 +17,11 @@
 import * as React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import View from 'views/logic/views/View';
 import QueryResult from 'views/logic/QueryResult';
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
+import { asMock } from 'helpers/mocking';
+import useViewType from 'views/hooks/useViewType';
 
 import Sidebar from './Sidebar';
 
@@ -29,6 +30,8 @@ jest.mock('util/AppConfig', () => ({
   rootTimeZone: jest.fn(() => 'America/Chicago'),
   gl2ServerUrl: jest.fn(() => undefined),
 }));
+
+jest.mock('views/hooks/useViewType');
 
 describe('<Sidebar />', () => {
   const viewMetaData = {
@@ -93,15 +96,15 @@ describe('<Sidebar />', () => {
   } as ViewMetaData;
 
   it('should render with a specific default title in the context of a new search', async () => {
-    render(
-      <ViewTypeContext.Provider value={View.Type.Search}>
-        <Sidebar viewMetadata={emptyViewMetaData}
-                 queryId={query.id}
-                 results={queryResult}>
-          <TestComponent />
-        </Sidebar>,
-      </ViewTypeContext.Provider>,
-    );
+    asMock(useViewType).mockReturnValue(View.Type.Search);
+
+    render((
+      <Sidebar viewMetadata={emptyViewMetaData}
+               queryId={query.id}
+               results={queryResult}>
+        <TestComponent />
+      </Sidebar>
+    ));
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
@@ -109,15 +112,15 @@ describe('<Sidebar />', () => {
   });
 
   it('should render with a specific default title in the context of a new dashboard', async () => {
-    render(
-      <ViewTypeContext.Provider value={View.Type.Dashboard}>
-        <Sidebar viewMetadata={emptyViewMetaData}
-                 queryId={query.id}
-                 results={queryResult}>
-          <TestComponent />
-        </Sidebar>
-      </ViewTypeContext.Provider>,
-    );
+    asMock(useViewType).mockReturnValue(View.Type.Dashboard);
+
+    render((
+      <Sidebar viewMetadata={emptyViewMetaData}
+               queryId={query.id}
+               results={queryResult}>
+        <TestComponent />
+      </Sidebar>
+    ));
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
@@ -125,15 +128,15 @@ describe('<Sidebar />', () => {
   });
 
   it('should render summary and description of a view', async () => {
-    render(
-      <ViewTypeContext.Provider value={View.Type.Dashboard}>
-        <Sidebar viewMetadata={viewMetaData}
-                 queryId={query.id}
-                 results={queryResult}>
-          <TestComponent />
-        </Sidebar>
-      </ViewTypeContext.Provider>,
-    );
+    asMock(useViewType).mockReturnValue(View.Type.Dashboard);
+
+    render((
+      <Sidebar viewMetadata={viewMetaData}
+               queryId={query.id}
+               results={queryResult}>
+        <TestComponent />
+      </Sidebar>
+    ));
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
@@ -142,15 +145,15 @@ describe('<Sidebar />', () => {
   });
 
   it('should render placeholder if dashboard has no summary or description', async () => {
-    render(
-      <ViewTypeContext.Provider value={View.Type.Dashboard}>
-        <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
-                 queryId={query.id}
-                 results={queryResult}>
-          <TestComponent />
-        </Sidebar>
-      </ViewTypeContext.Provider>,
-    );
+    asMock(useViewType).mockReturnValue(View.Type.Dashboard);
+
+    render((
+      <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
+               queryId={query.id}
+               results={queryResult}>
+        <TestComponent />
+      </Sidebar>
+    ));
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
@@ -159,15 +162,15 @@ describe('<Sidebar />', () => {
   });
 
   it('should render placeholder if saved search has no summary or description', async () => {
-    render(
-      <ViewTypeContext.Provider value={View.Type.Search}>
-        <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
-                 queryId={query.id}
-                 results={queryResult}>
-          <TestComponent />
-        </Sidebar>
-      </ViewTypeContext.Provider>,
-    );
+    asMock(useViewType).mockReturnValue(View.Type.Search);
+
+    render((
+      <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
+               queryId={query.id}
+               results={queryResult}>
+        <TestComponent />
+      </Sidebar>
+    ));
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
@@ -176,15 +179,15 @@ describe('<Sidebar />', () => {
   });
 
   it('should render a summary and description, for a saved search', async () => {
-    render(
-      <ViewTypeContext.Provider value={View.Type.Search}>
-        <Sidebar viewMetadata={viewMetaData}
-                 queryId={query.id}
-                 results={queryResult}>
-          <TestComponent />
-        </Sidebar>
-      </ViewTypeContext.Provider>,
-    );
+    asMock(useViewType).mockReturnValue(View.Type.Search);
+
+    render((
+      <Sidebar viewMetadata={viewMetaData}
+               queryId={query.id}
+               results={queryResult}>
+        <TestComponent />
+      </Sidebar>
+    ));
 
     fireEvent.click(await screen.findByTitle(/open sidebar/i));
 
@@ -238,15 +241,15 @@ describe('<Sidebar />', () => {
   });
 
   it('should close a section when clicking on its title', async () => {
-    render(
-      <ViewTypeContext.Provider value={View.Type.Search}>
-        <Sidebar viewMetadata={viewMetaData}
-                 queryId={query.id}
-                 results={queryResult}>
-          <TestComponent />
-        </Sidebar>
-      </ViewTypeContext.Provider>,
-    );
+    asMock(useViewType).mockReturnValue(View.Type.Search);
+
+    render((
+      <Sidebar viewMetadata={viewMetaData}
+               queryId={query.id}
+               results={queryResult}>
+        <TestComponent />
+      </Sidebar>
+    ));
 
     fireEvent.click(await screen.findByLabelText('Description'));
 

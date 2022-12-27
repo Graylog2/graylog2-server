@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
 
 import connect from 'stores/connect';
 import type Widget from 'views/logic/widgets/Widget';
@@ -25,13 +24,13 @@ import { createElasticsearchQueryString, filtersToStreamSet } from 'views/logic/
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import { GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
+import useViewType from 'views/hooks/useViewType';
 
 import DrilldownContext from './DrilldownContext';
-import ViewTypeContext from './ViewTypeContext';
 import type { Drilldown } from './DrilldownContext';
 
 const useDrillDownContextValue = (widget: Widget, globalOverride: GlobalOverride | undefined, currentQuery: Query): Drilldown => {
-  const viewType = useContext(ViewTypeContext);
+  const viewType = useViewType();
 
   if (viewType === View.Type.Dashboard) {
     const { streams, timerange, query } = widget;

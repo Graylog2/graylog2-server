@@ -29,13 +29,13 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import { axisTypes, DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import assertUnreachable from 'logic/assertUnreachable';
+import useViewType from 'views/hooks/useViewType';
 
 import GenericPlot from './GenericPlot';
 import type { ChartColor, ChartConfig } from './GenericPlot';
 import OnZoom from './OnZoom';
 
 import CustomPropTypes from '../CustomPropTypes';
-import ViewTypeContext from '../contexts/ViewTypeContext';
 
 export type Props = {
   axisType?: AxisType,
@@ -105,7 +105,7 @@ const XYPlot = ({
   }
 
   const layout = { ...defaultLayout, ...plotLayout };
-  const viewType = useContext(ViewTypeContext);
+  const viewType = useViewType();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(config.isTimeline
     ? (from: string, to: string) => onZoom(currentQuery, from, to, viewType, userTimezone)

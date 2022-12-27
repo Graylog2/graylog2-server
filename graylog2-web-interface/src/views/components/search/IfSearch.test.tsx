@@ -15,51 +15,61 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
-import 'helpers/mocking/react-dom_mock';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import View from 'views/logic/views/View';
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import { asMock } from 'helpers/mocking';
+import useViewType from 'views/hooks/useViewType';
 
 import IfSearch from './IfSearch';
 
+jest.mock('views/hooks/useViewType');
+
 describe('IfSearch', () => {
-  it('should render children with search context', () => {
-    const wrapper = mount(
-      <ViewTypeContext.Provider value={View.Type.Search}>
+  beforeEach(() => {
+    asMock(useViewType).mockReturnValue(undefined);
+  });
+
+  it('should render children with search context', async () => {
+    asMock(useViewType).mockReturnValue(View.Type.Search);
+
+    render((
+      <>
         <span>I must not fear.</span>
         <IfSearch>
           <span>Fear is the mind-killer.</span>
         </IfSearch>
-      </ViewTypeContext.Provider>,
-    );
+      </>
+    ));
 
-    expect(wrapper).toMatchSnapshot();
+    await screen.findByText(/Fear is the mind-killer/i);
   });
 
   it('should not render children without context', () => {
-    const wrapper = mount(
-      <div>
+    render((
+      <>
         <span>I must not fear.</span>
         <IfSearch>
           <span>Fear is the mind-killer.</span>
         </IfSearch>
-      </div>,
-    );
+      </>
+    ));
 
-    expect(wrapper).toMatchSnapshot();
+    expect(screen.queryByText(/Fear is the mind-killer/i)).toBeNull();
   });
 
   it('should not render children without search context', () => {
-    const wrapper = mount(
-      <ViewTypeContext.Provider value={View.Type.Dashboard}>
+    asMock(useViewType).mockReturnValue(View.Type.Dashboard);
+
+    render((
+      <>
         <span>I must not fear.</span>
         <IfSearch>
           <span>Fear is the mind-killer.</span>
         </IfSearch>
-      </ViewTypeContext.Provider>,
-    );
+      </>
+    ));
 
-    expect(wrapper).toMatchSnapshot();
+    expect(screen.queryByText(/Fear is the mind-killer/i)).toBeNull();
   });
 });
