@@ -17,32 +17,24 @@
 import * as Immutable from 'immutable';
 
 import type { AxisType, XYVisualization } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
-import { DEFAULT_INTERPOLATION } from 'views/Constants';
-
-import VisualizationConfig from './VisualizationConfig';
-import type { InterpolationMode } from './Interpolation';
+import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 
 type InternalState = {
-  interpolation: InterpolationMode,
   axisType: AxisType,
 };
 
-export type AreaVisualizationConfigJSON = {
-  interpolation: InterpolationMode,
+export type ScatterVisualizationConfigJson = {
   axis_type?: AxisType,
 };
 
-export default class AreaVisualizationConfig extends VisualizationConfig implements XYVisualization {
+export default class ScatterVisualizationConfig extends VisualizationConfig implements XYVisualization {
   private readonly _value: InternalState;
 
-  constructor(interpolation: InternalState['interpolation'], axisType: InternalState['axisType'] = DEFAULT_AXIS_TYPE) {
+  constructor(axisType: InternalState['axisType'] = DEFAULT_AXIS_TYPE) {
     super();
-    this._value = { interpolation, axisType };
-  }
-
-  get interpolation() {
-    return this._value.interpolation;
+    this._value = { axisType };
   }
 
   get axisType() {
@@ -54,26 +46,24 @@ export default class AreaVisualizationConfig extends VisualizationConfig impleme
     return new Builder(Immutable.Map(this._value));
   }
 
-  static create(interpolation: InternalState['interpolation'], axisType: InternalState['axisType'] = DEFAULT_AXIS_TYPE) {
-    return new AreaVisualizationConfig(interpolation, axisType);
+  static create(axisType: InternalState['axisType']) {
+    return new ScatterVisualizationConfig(axisType);
   }
 
   static empty() {
-    return AreaVisualizationConfig.create(DEFAULT_INTERPOLATION);
+    return new ScatterVisualizationConfig(DEFAULT_AXIS_TYPE);
   }
 
   toJSON() {
-    const { interpolation, axisType } = this._value;
+    const { axisType } = this._value;
 
     return {
-      interpolation,
       axis_type: axisType,
     };
   }
 
-  static fromJSON(_type: string, value: AreaVisualizationConfigJSON) {
-    return AreaVisualizationConfig.create(
-      value?.interpolation ?? DEFAULT_INTERPOLATION,
+  static fromJSON(_type: string, value: ScatterVisualizationConfigJson) {
+    return ScatterVisualizationConfig.create(
       value?.axis_type ?? DEFAULT_AXIS_TYPE,
     );
   }
@@ -88,13 +78,13 @@ class Builder {
     this.value = value;
   }
 
-  interpolation(value: InternalState['interpolation']) {
-    return new Builder(this.value.set('interpolation', value));
+  axisType(value: InternalState['axisType']) {
+    return new Builder((this.value.set('axisType', value)));
   }
 
   build() {
     const { interpolation, axisType } = this.value.toObject();
 
-    return new AreaVisualizationConfig(interpolation, axisType);
+    return new LineVisualizationConfig(interpolation, axisType);
   }
 }

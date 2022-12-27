@@ -17,13 +17,32 @@
 import type { VisualizationType } from 'views/types';
 import ScatterVisualization from 'views/components/visualizations/scatter/ScatterVisualization';
 import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
+import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import { DEFAULT_AXIS_TYPE, axisTypes } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/ScatterVisualizationConfig';
+
+type ScatterVisualizationConfigFormValues = {
+  axisType: AxisType,
+};
 
 const validate = hasAtLeastOneMetric('Scatter plot');
 
-const scatterChart: VisualizationType<typeof ScatterVisualization.type> = {
+const scatterChart: VisualizationType<typeof ScatterVisualization.type, ScatterVisualizationConfig, ScatterVisualizationConfigFormValues> = {
   type: ScatterVisualization.type,
   displayName: 'Scatter Plot',
   component: ScatterVisualization,
+  config: {
+    createConfig: () => ({ axisType: DEFAULT_AXIS_TYPE }),
+    fromConfig: (config) => ({ axisType: config?.axisType ?? DEFAULT_AXIS_TYPE }),
+    toConfig: (formValues) => ScatterVisualizationConfig.create(formValues.axisType),
+    fields: [{
+      name: 'axisType',
+      title: 'Axis Type',
+      type: 'select',
+      options: axisTypes,
+      required: true,
+    }],
+  },
   capabilities: ['event-annotations'],
   validate,
 };

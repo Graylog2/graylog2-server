@@ -23,33 +23,26 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-@JsonTypeName(AreaVisualizationConfigDTO.NAME)
-@JsonDeserialize(builder = AreaVisualizationConfigDTO.Builder.class)
-public abstract class AreaVisualizationConfigDTO implements VisualizationConfigDTO, XYVisualizationConfig {
-    public static final String NAME = "area";
-    private static final String FIELD_INTERPOLATION = "interpolation";
-
-    @JsonProperty(FIELD_INTERPOLATION)
-    public abstract Interpolation interpolation();
+@JsonTypeName(ScatterVisualizationConfigDTO.NAME)
+@JsonDeserialize(builder = ScatterVisualizationConfigDTO.Builder.class)
+public abstract class ScatterVisualizationConfigDTO implements VisualizationConfigDTO, XYVisualizationConfig{
+    public static final String NAME = "scatter";
 
     @JsonProperty(FIELD_AXIS_TYPE)
-    public abstract AxisType axisType();
+    public abstract XYVisualizationConfig.AxisType axisType();
 
     @AutoValue.Builder
     public abstract static class Builder {
-        @JsonProperty(FIELD_INTERPOLATION)
-        public abstract Builder interpolation(Interpolation interpolation);
-
         @JsonProperty(FIELD_AXIS_TYPE)
         public abstract Builder axisType(AxisType axisType);
 
-        public abstract AreaVisualizationConfigDTO build();
+        public abstract ScatterVisualizationConfigDTO build();
 
         @JsonCreator
         public static Builder builder() {
-            return new AutoValue_AreaVisualizationConfigDTO.Builder()
-                    .interpolation(Interpolation.defaultValue())
+            return new AutoValue_ScatterVisualizationConfigDTO.Builder()
                     .axisType(DEFAULT_AXIS_TYPE);
         }
+
     }
 }
