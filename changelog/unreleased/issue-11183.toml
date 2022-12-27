@@ -1,0 +1,8 @@
+type = "fixed"
+message = "Properly escape event content for HTML email notifications"
+
+issues = ["11183"]
+pulls = ["14286"]
+
+contributors = ["zhu"]
+

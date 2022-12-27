@@ -25,7 +25,10 @@ import Query from 'views/logic/queries/Query';
 import type { ViewType } from 'views/logic/views/View';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import PlotLegend from 'views/components/visualizations/PlotLegend';
-import UserDateTimeContext from 'contexts/UserDateTimeContext';
+import useUserDateTime from 'hooks/useUserDateTime';
+import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import { axisTypes, DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import assertUnreachable from 'logic/assertUnreachable';
 
 import GenericPlot from './GenericPlot';
 import type { ChartColor, ChartConfig } from './GenericPlot';
@@ -35,6 +38,7 @@ import CustomPropTypes from '../CustomPropTypes';
 import ViewTypeContext from '../contexts/ViewTypeContext';
 
 export type Props = {
+  axisType?: AxisType,
   config: AggregationWidgetConfig,
   chartData: any,
   currentQuery: Query,
@@ -68,7 +72,16 @@ type Layout = {
   hovermode: 'x',
 };
 
+const mapAxisType = (axisType: AxisType): 'linear' | 'log' => {
+  switch (axisType) {
+    case 'linear': return 'linear';
+    case 'logarithmic': return 'log';
+    default: return assertUnreachable(axisType, 'Unable to parse axis type: ');
+  }
+};
+
 const XYPlot = ({
+  axisType,
   config,
   chartData,
   currentQuery,
@@ -79,8 +92,8 @@ const XYPlot = ({
   plotLayout = {},
   onZoom = OnZoom,
 }: Props) => {
-  const { formatTime, userTimezone } = useContext(UserDateTimeContext);
-  const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',~r' };
+  const { formatTime, userTimezone } = useUserDateTime();
+  const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: mapAxisType(axisType) };
   const defaultLayout: Layout = {
     yaxis,
     showlegend: false,
@@ -126,6 +139,7 @@ const XYPlot = ({
 };
 
 XYPlot.propTypes = {
+  axisType: PropTypes.oneOf(axisTypes),
   chartData: PropTypes.array.isRequired,
   config: CustomPropTypes.instanceOf(AggregationWidgetConfig).isRequired,
   currentQuery: CustomPropTypes.instanceOf(Query).isRequired,
@@ -142,11 +156,13 @@ XYPlot.propTypes = {
 };
 
 XYPlot.defaultProps = {
+  axisType: DEFAULT_AXIS_TYPE,
   plotLayout: {},
   getChartColor: undefined,
   setChartColor: undefined,
   effectiveTimerange: undefined,
   onZoom: OnZoom,
+  height: undefined,
 };
 
 export default connect(XYPlot, { currentQuery: CurrentQueryStore }, ({ currentQuery }) => ({ currentQuery }));
