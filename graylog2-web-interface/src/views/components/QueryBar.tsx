@@ -16,23 +16,21 @@
  */
 import * as React from 'react';
 import { useCallback, useContext } from 'react';
-import PropTypes from 'prop-types';
 import type * as Immutable from 'immutable';
 import { List } from 'immutable';
 
-import connect, { useStore } from 'stores/connect';
+import { useStore } from 'stores/connect';
 import { TitlesActions } from 'views/stores/TitlesStore';
 import { ViewActions } from 'views/stores/ViewStore';
 import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
 import { QueriesActions } from 'views/stores/QueriesStore';
-import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { ViewStatesActions, ViewStatesStore } from 'views/stores/ViewStatesStore';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 import FindNewActiveQueryId from 'views/logic/views/FindNewActiveQuery';
 import ConfirmDeletingDashboardPage from 'views/logic/views/ConfirmDeletingDashboardPage';
 import useQueryIds from 'views/hooks/useQueryIds';
 import useQueryTitles from 'views/hooks/useQueryTitles';
+import useViewMetadata from 'views/hooks/useViewMetadata';
 
 import QueryTabs from './QueryTabs';
 
@@ -59,16 +57,12 @@ const onCloseTab = async (dashboardId: string, queryId: string, activeQueryId: s
   return Promise.resolve();
 };
 
-type Props = {
-  viewMetadata: ViewMetaData,
-};
-
 const useWidgetIds = () => useStore(ViewStatesStore, (states) => states.map((viewState) => viewState.widgets.map((widget) => widget.id).toList()).toMap());
 
-const QueryBar = ({ viewMetadata }: Props) => {
+const QueryBar = () => {
   const queries = useQueryIds();
   const queryTitles = useQueryTitles();
-  const { activeQuery: activeQueryId, id: dashboardId } = viewMetadata;
+  const { activeQuery: activeQueryId, id: dashboardId } = useViewMetadata();
   const { setDashboardPage } = useContext(DashboardPageContext);
   const widgetIds = useWidgetIds();
 
@@ -100,16 +94,4 @@ const QueryBar = ({ viewMetadata }: Props) => {
   );
 };
 
-QueryBar.propTypes = {
-  viewMetadata: PropTypes.exact({
-    id: PropTypes.string,
-    title: PropTypes.string,
-    description: PropTypes.string,
-    summary: PropTypes.string,
-    activeQuery: PropTypes.string.isRequired,
-  }).isRequired,
-};
-
-export default connect(QueryBar, {
-  viewMetadata: ViewMetadataStore,
-});
+export default QueryBar;

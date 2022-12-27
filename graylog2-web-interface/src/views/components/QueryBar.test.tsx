@@ -25,6 +25,7 @@ import { ViewActions } from 'views/stores/ViewStore';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 import useQueryIds from 'views/hooks/useQueryIds';
 import useQueryTitles from 'views/hooks/useQueryTitles';
+import useViewMetadata from 'views/hooks/useViewMetadata';
 
 jest.mock('hooks/useElementDimensions', () => () => ({ width: 1024, height: 768 }));
 
@@ -60,6 +61,7 @@ const viewMetadata = {
 
 jest.mock('views/hooks/useQueryIds');
 jest.mock('views/hooks/useQueryTitles');
+jest.mock('views/hooks/useViewMetadata');
 
 describe('QueryBar', () => {
   let oldWindowConfirm;
@@ -70,6 +72,7 @@ describe('QueryBar', () => {
 
     asMock(useQueryIds).mockReturnValue(queries);
     asMock(useQueryTitles).mockReturnValue(queryTitles);
+    asMock(useViewMetadata).mockReturnValue(viewMetadata);
   });
 
   afterEach(() => {
@@ -77,7 +80,7 @@ describe('QueryBar', () => {
   });
 
   it('renders existing tabs', async () => {
-    render(<QueryBar viewMetadata={viewMetadata} />);
+    render(<QueryBar />);
 
     await screen.findByRole('button', { name: 'First Query' });
     await screen.findByRole('button', { name: 'Second Query' });
@@ -85,7 +88,7 @@ describe('QueryBar', () => {
   });
 
   it('allows changing tab', async () => {
-    render(<QueryBar viewMetadata={viewMetadata} />);
+    render(<QueryBar />);
 
     const nextTab = await screen.findByRole('button', { name: 'Third Query' });
 
@@ -103,7 +106,7 @@ describe('QueryBar', () => {
         unsetDashboardPage: jest.fn(),
         dashboardPage: undefined,
       }}>
-        <QueryBar viewMetadata={viewMetadata} />
+        <QueryBar />
       </DashboardPageContext.Provider>,
     );
 

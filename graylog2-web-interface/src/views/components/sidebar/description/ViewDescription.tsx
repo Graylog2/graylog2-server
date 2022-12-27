@@ -18,10 +18,10 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import type QueryResult from 'views/logic/QueryResult';
-import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 import { Icon } from 'components/common';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import useViewType from 'views/hooks/useViewType';
+import useViewMetadata from 'views/hooks/useViewMetadata';
 
 import SearchResultOverview from './SearchResultOverview';
 
@@ -30,10 +30,10 @@ import SectionSubheadline from '../SectionSubheadline';
 
 type Props = {
   results: QueryResult,
-  viewMetadata: ViewMetaData,
 };
 
-const ViewDescription = ({ results, viewMetadata }: Props) => {
+const ViewDescription = ({ results }: Props) => {
+  const viewMetadata = useViewMetadata();
   const isAdHocSearch = !viewMetadata.id;
   const viewType = useViewType();
   const viewTypeLabel = viewType ? ViewTypeLabel({ type: viewType }) : '';
@@ -81,13 +81,6 @@ const ViewDescription = ({ results, viewMetadata }: Props) => {
 
 ViewDescription.propTypes = {
   results: PropTypes.object.isRequired,
-  viewMetadata: PropTypes.shape({
-    activeQuery: PropTypes.string,
-    description: PropTypes.string,
-    id: PropTypes.string,
-    summary: PropTypes.string,
-    title: PropTypes.string,
-  }).isRequired,
 };
 
 export default ViewDescription;

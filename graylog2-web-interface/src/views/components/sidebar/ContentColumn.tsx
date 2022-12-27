@@ -18,17 +18,14 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import type { SearchPreferencesLayout } from 'views/components/contexts/SearchPagePreferencesContext';
-import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import { IconButton } from 'components/common';
-import viewTitle from 'views/logic/views/ViewTitle';
-import useViewType from 'views/hooks/useViewType';
+import useViewTitle from 'views/hooks/useViewTitle';
 
 type Props = {
   children: React.ReactNode,
   closeSidebar: () => void,
   searchPageLayout: SearchPreferencesLayout | undefined | null,
   sectionTitle: string,
-  viewMetadata: ViewMetadata,
 };
 
 export const Container = styled.div<{ sidebarIsPinned: boolean }>(({ theme, sidebarIsPinned }) => css`
@@ -151,11 +148,9 @@ const toggleSidebarPinning = (searchPageLayout) => {
   togglePinning();
 };
 
-const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout, viewMetadata }: Props) => {
+const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout }: Props) => {
   const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned;
-  const viewType = useViewType();
-
-  const title = viewTitle(viewMetadata?.title, viewType);
+  const title = useViewTitle();
 
   return (
     <Container sidebarIsPinned={sidebarIsPinned}>

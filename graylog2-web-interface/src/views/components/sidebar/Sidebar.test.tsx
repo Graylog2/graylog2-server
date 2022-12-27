@@ -19,9 +19,11 @@ import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 
 import View from 'views/logic/views/View';
 import QueryResult from 'views/logic/QueryResult';
-import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 import { asMock } from 'helpers/mocking';
 import useViewType from 'views/hooks/useViewType';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import useViewTitle from 'views/hooks/useViewTitle';
+import useViewMetadata from 'views/hooks/useViewMetadata';
 
 import Sidebar from './Sidebar';
 
@@ -32,10 +34,14 @@ jest.mock('util/AppConfig', () => ({
 }));
 
 jest.mock('views/hooks/useViewType');
+jest.mock('views/hooks/useActiveQueryId');
+jest.mock('views/hooks/useViewTitle');
+jest.mock('views/hooks/useViewMetadata');
 
 describe('<Sidebar />', () => {
+  const queryId = '34efae1e-e78e-48ab-ab3f-e83c8611a683';
   const viewMetaData = {
-    activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
+    activeQuery: queryId,
     description: 'A description',
     id: '5b34f4c44880a54df9616380',
     summary: 'query summary',
@@ -50,7 +56,7 @@ describe('<Sidebar />', () => {
   const timestamp = '2018-08-28T14:39:26.127Z';
   const query = {
     filter: { type: 'or', filters: [] },
-    id: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
+    id: queryId,
     query: { type: 'elasticsearch', query_string: '*' },
     search_types: [],
     timerange: { type: 'relative', from: 300 },
@@ -62,11 +68,16 @@ describe('<Sidebar />', () => {
 
   const TestComponent = () => <div id="martian">Marc Watney</div>;
 
+  beforeEach(() => {
+    asMock(useActiveQueryId).mockReturnValue(queryId);
+    asMock(useViewMetadata).mockReturnValue(viewMetaData);
+  });
+
   it('should render and open when clicking on header', async () => {
+    asMock(useViewTitle).mockReturnValue(viewMetaData.title);
+
     render(
-      <Sidebar viewMetadata={viewMetaData}
-               queryId={query.id}
-               results={queryResult}>
+      <Sidebar results={queryResult}>
         <TestComponent />
       </Sidebar>,
     );
@@ -78,9 +89,7 @@ describe('<Sidebar />', () => {
 
   it('should render with a description about the query results', async () => {
     render(
-      <Sidebar viewMetadata={viewMetaData}
-               queryId={query.id}
-               results={queryResult}>
+      <Sidebar results={queryResult}>
         <TestComponent />
       </Sidebar>,
     );
@@ -90,50 +99,11 @@ describe('<Sidebar />', () => {
     await screen.findAllByText((_content, node) => (node.textContent === 'Query executed in 64ms at 2018-08-28 16:39:26.'));
   });
 
-  const emptyViewMetaData = {
-    activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
-    id: '5b34f4c44880a54df9616380',
-  } as ViewMetaData;
-
-  it('should render with a specific default title in the context of a new search', async () => {
-    asMock(useViewType).mockReturnValue(View.Type.Search);
-
-    render((
-      <Sidebar viewMetadata={emptyViewMetaData}
-               queryId={query.id}
-               results={queryResult}>
-        <TestComponent />
-      </Sidebar>
-    ));
-
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
-
-    await screen.findByText('Unsaved Search');
-  });
-
-  it('should render with a specific default title in the context of a new dashboard', async () => {
-    asMock(useViewType).mockReturnValue(View.Type.Dashboard);
-
-    render((
-      <Sidebar viewMetadata={emptyViewMetaData}
-               queryId={query.id}
-               results={queryResult}>
-        <TestComponent />
-      </Sidebar>
-    ));
-
-    fireEvent.click(await screen.findByTitle(/open sidebar/i));
-
-    await screen.findByText('Unsaved Dashboard');
-  });
-
   it('should render summary and description of a view', async () => {
     asMock(useViewType).mockReturnValue(View.Type.Dashboard);
 
     render((
-      <Sidebar viewMetadata={viewMetaData}
-               queryId={query.id}
-               results={queryResult}>
+      <Sidebar results={queryResult}>
         <TestComponent />
       </Sidebar>
     ));
@@ -146,11 +116,10 @@ describe('<Sidebar />', () => {
 
   it('should render placeholder if dashboard has no summary or description', async () => {
     asMock(useViewType).mockReturnValue(View.Type.Dashboard);
+    asMock(useViewMetadata).mockReturnValue({ ...viewMetaData, description: undefined, summary: undefined });
 
     render((
-      <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
-               queryId={query.id}
-               results={queryResult}>
+      <Sidebar results={queryResult}>
         <TestComponent />
       </Sidebar>
     ));
@@ -163,11 +132,10 @@ describe('<Sidebar />', () => {
 
   it('should render placeholder if saved search has no summary or description', async () => {
     asMock(useViewType).mockReturnValue(View.Type.Search);
+    asMock(useViewMetadata).mockReturnValue({ ...viewMetaData, description: undefined, summary: undefined });
 
     render((
-      <Sidebar viewMetadata={{ ...viewMetaData, description: undefined, summary: undefined }}
-               queryId={query.id}
-               results={queryResult}>
+      <Sidebar results={queryResult}>
         <TestComponent />
       </Sidebar>
     ));
@@ -182,9 +150,7 @@ describe('<Sidebar />', () => {
     asMock(useViewType).mockReturnValue(View.Type.Search);
 
     render((
-      <Sidebar viewMetadata={viewMetaData}
-               queryId={query.id}
-               results={queryResult}>
+      <Sidebar results={queryResult}>
         <TestComponent />
       </Sidebar>
     ));
@@ -196,10 +162,10 @@ describe('<Sidebar />', () => {
   });
 
   it('should not render a summary and description, if the view is an ad hoc search', async () => {
+    asMock(useViewMetadata).mockReturnValue({ ...viewMetaData, id: undefined });
+
     render(
-      <Sidebar viewMetadata={{ ...viewMetaData, id: undefined }}
-               queryId={query.id}
-               results={queryResult}>
+      <Sidebar results={queryResult}>
         <TestComponent />
       </Sidebar>,
     );
@@ -214,9 +180,7 @@ describe('<Sidebar />', () => {
 
   it('should render widget create options', async () => {
     render(
-      <Sidebar viewMetadata={viewMetaData}
-               queryId={query.id}
-               results={queryResult}>
+      <Sidebar results={queryResult}>
         <TestComponent />
       </Sidebar>,
     );
@@ -228,9 +192,7 @@ describe('<Sidebar />', () => {
 
   it('should render passed children', async () => {
     render(
-      <Sidebar viewMetadata={viewMetaData}
-               queryId={query.id}
-               results={queryResult}>
+      <Sidebar results={queryResult}>
         <TestComponent />
       </Sidebar>,
     );
@@ -244,9 +206,7 @@ describe('<Sidebar />', () => {
     asMock(useViewType).mockReturnValue(View.Type.Search);
 
     render((
-      <Sidebar viewMetadata={viewMetaData}
-               queryId={query.id}
-               results={queryResult}>
+      <Sidebar results={queryResult}>
         <TestComponent />
       </Sidebar>
     ));
@@ -262,9 +222,7 @@ describe('<Sidebar />', () => {
 
   it('should close an active section when clicking on its navigation item', async () => {
     render(
-      <Sidebar viewMetadata={viewMetaData}
-               queryId={query.id}
-               results={queryResult}>
+      <Sidebar results={queryResult}>
         <TestComponent />
       </Sidebar>,
     );
