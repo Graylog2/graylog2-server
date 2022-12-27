@@ -116,7 +116,7 @@ const UserSyncStep = ({ help = {}, excludedFields = {}, formRef, onSubmit, onSub
                      labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9">
                 <StyledInputList id="userEmailAttributes"
-                                 placeholder="Add email attributes to in LDAP"
+                                 placeholder="Email Attributes"
                                  name={name}
                                  values={value}
                                  isClearable
