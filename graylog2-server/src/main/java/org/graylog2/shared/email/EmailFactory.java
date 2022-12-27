@@ -17,6 +17,7 @@
 package org.graylog2.shared.email;
 
 import com.google.common.base.Strings;
+import com.google.common.primitives.Ints;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailConstants;
@@ -118,6 +119,9 @@ public class EmailFactory {
         if (!isNullOrEmpty(configuration.getFromEmail())) {
             email.setFrom(configuration.getFromEmail());
         }
+
+        email.setSocketConnectionTimeout(Ints.saturatedCast(configuration.getSocketConnectionTimeout().toMillis()));
+        email.setSocketTimeout(Ints.saturatedCast(configuration.getSocketTimeout().toMillis()));
 
         return email;
     }
