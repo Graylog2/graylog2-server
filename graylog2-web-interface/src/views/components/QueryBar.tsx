@@ -26,15 +26,14 @@ import { TitlesActions } from 'views/stores/TitlesStore';
 import { ViewActions } from 'views/stores/ViewStore';
 import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
 import { QueriesActions } from 'views/stores/QueriesStore';
-import { QueryIdsStore } from 'views/stores/QueryIdsStore';
 import { QueryTitlesStore } from 'views/stores/QueryTitlesStore';
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { ViewStatesActions, ViewStatesStore } from 'views/stores/ViewStatesStore';
-import type { QueryId } from 'views/logic/queries/Query';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 import FindNewActiveQueryId from 'views/logic/views/FindNewActiveQuery';
 import ConfirmDeletingDashboardPage from 'views/logic/views/ConfirmDeletingDashboardPage';
+import useQueryIds from 'views/hooks/useQueryIds';
 
 import QueryTabs from './QueryTabs';
 
@@ -62,14 +61,14 @@ const onCloseTab = async (dashboardId: string, queryId: string, activeQueryId: s
 };
 
 type Props = {
-  queries: Immutable.OrderedSet<QueryId>,
   queryTitles: Immutable.Map<string, string>,
   viewMetadata: ViewMetaData,
 };
 
 const useWidgetIds = () => useStore(ViewStatesStore, (states) => states.map((viewState) => viewState.widgets.map((widget) => widget.id).toList()).toMap());
 
-const QueryBar = ({ queries, queryTitles, viewMetadata }: Props) => {
+const QueryBar = ({ queryTitles, viewMetadata }: Props) => {
+  const queries = useQueryIds();
   const { activeQuery: activeQueryId, id: dashboardId } = viewMetadata;
   const { setDashboardPage } = useContext(DashboardPageContext);
   const widgetIds = useWidgetIds();
@@ -103,7 +102,6 @@ const QueryBar = ({ queries, queryTitles, viewMetadata }: Props) => {
 };
 
 QueryBar.propTypes = {
-  queries: ImmutablePropTypes.orderedSetOf(PropTypes.string).isRequired,
   queryTitles: ImmutablePropTypes.mapOf(PropTypes.string, PropTypes.string).isRequired,
   viewMetadata: PropTypes.exact({
     id: PropTypes.string,
@@ -115,7 +113,6 @@ QueryBar.propTypes = {
 };
 
 export default connect(QueryBar, {
-  queries: QueryIdsStore,
   queryTitles: QueryTitlesStore,
   viewMetadata: ViewMetadataStore,
 });

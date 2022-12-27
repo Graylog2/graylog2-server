@@ -19,10 +19,11 @@ import * as Immutable from 'immutable';
 import { Map as MockMap } from 'immutable';
 import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
 
-import { MockStore } from 'helpers/mocking';
+import { MockStore, asMock } from 'helpers/mocking';
 import QueryBar from 'views/components/QueryBar';
 import { ViewActions } from 'views/stores/ViewStore';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
+import useQueryIds from 'views/hooks/useQueryIds';
 
 jest.mock('hooks/useElementDimensions', () => () => ({ width: 1024, height: 768 }));
 
@@ -56,12 +57,16 @@ const viewMetadata = {
   activeQuery: 'bar',
 };
 
+jest.mock('views/hooks/useQueryIds');
+
 describe('QueryBar', () => {
   let oldWindowConfirm;
 
   beforeEach(() => {
     oldWindowConfirm = window.confirm;
     window.confirm = jest.fn(() => true);
+
+    asMock(useQueryIds).mockReturnValue(queries);
   });
 
   afterEach(() => {
@@ -69,7 +74,7 @@ describe('QueryBar', () => {
   });
 
   it('renders existing tabs', async () => {
-    render(<QueryBar queries={queries} queryTitles={queryTitles} viewMetadata={viewMetadata} />);
+    render(<QueryBar queryTitles={queryTitles} viewMetadata={viewMetadata} />);
 
     await screen.findByRole('button', { name: 'First Query' });
     await screen.findByRole('button', { name: 'Second Query' });
@@ -77,7 +82,7 @@ describe('QueryBar', () => {
   });
 
   it('allows changing tab', async () => {
-    render(<QueryBar queries={queries} queryTitles={queryTitles} viewMetadata={viewMetadata} />);
+    render(<QueryBar queryTitles={queryTitles} viewMetadata={viewMetadata} />);
 
     const nextTab = await screen.findByRole('button', { name: 'Third Query' });
 
@@ -95,7 +100,7 @@ describe('QueryBar', () => {
         unsetDashboardPage: jest.fn(),
         dashboardPage: undefined,
       }}>
-        <QueryBar queries={queries} queryTitles={queryTitles} viewMetadata={viewMetadata} />
+        <QueryBar queryTitles={queryTitles} viewMetadata={viewMetadata} />
       </DashboardPageContext.Provider>,
     );
 

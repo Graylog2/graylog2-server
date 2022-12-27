@@ -22,8 +22,8 @@ import Input from 'components/bootstrap/Input';
 import { useStore } from 'stores/connect';
 import QueryTitle from 'views/logic/queries/QueryTitle';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
-import { QueryIdsStore } from 'views/stores/QueryIdsStore';
 import type View from 'views/logic/views/View';
+import useQueryIds from 'views/hooks/useQueryIds';
 
 type Props = {
   view: View,
@@ -46,7 +46,7 @@ const MoveWidgetToTabModal = ({ view, onCancel, onSubmit, widgetId }: Props) => 
   const [selectedTab, setSelectedTab] = useState(null);
   const [keepCopy, setKeepCopy] = useState(false);
   const { id: activeQuery } = useStore(CurrentQueryStore);
-  const queryIds = useStore(QueryIdsStore);
+  const queryIds = useQueryIds();
   const onKeepCopy = useCallback((e) => setKeepCopy(e.target.checked), [setKeepCopy]);
   const submit = useCallback(() => onSubmit(widgetId, selectedTab, keepCopy),
     [onSubmit, widgetId, selectedTab, keepCopy]);
