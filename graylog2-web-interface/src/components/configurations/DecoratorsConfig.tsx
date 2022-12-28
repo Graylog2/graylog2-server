@@ -37,14 +37,14 @@ const DecoratorsConfig = () => {
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [decorators, setDecorators] = useState<Array<Decorator> | undefined>();
   const [types, setTypes] = useState();
-  const [show, setShow] = useState(false);
+  const [showConfigModal, setShowConfigModal] = useState(false);
 
   useEffect(() => { StreamsActions.listStreams().then(setStreams); }, [setStreams]);
   useEffect(() => { DecoratorsActions.available().then(setTypes); }, [setTypes]);
   useEffect(() => { DecoratorsActions.list().then(setDecorators); }, [setDecorators]);
 
-  const openModal = () => setShow(true);
-  const closeModal = () => setShow(false);
+  const openModal = () => setShowConfigModal(true);
+  const closeModal = () => setShowConfigModal(false);
 
   if (!streams || !decorators || !types) {
     return <Spinner />;
@@ -77,7 +77,7 @@ const DecoratorsConfig = () => {
       <IfPermitted permissions="decorators:edit">
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>Edit configuration</Button>
       </IfPermitted>
-      <DecoratorsConfigUpdate show={show}
+      <DecoratorsConfigUpdate show={showConfigModal}
                               streams={streams}
                               decorators={decorators}
                               onCancel={closeModal}
