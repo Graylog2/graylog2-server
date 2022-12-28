@@ -289,6 +289,7 @@ public class UnboundLDAPConnector {
         final String username = ldapEntry.nonBlankAttribute(config.userNameAttribute());
         final String emailValue = config.emailAttributes().stream()
                 .filter(attr -> ldapEntry.firstAttributeValue(attr).isPresent())
+                .map(attr -> ldapEntry.nonBlankAttribute(attr))
                 .findFirst().orElse("unknown@unknown.invalid");
         return LDAPUser.builder()
                 .base64UniqueId(ldapEntry.base64UniqueId())
