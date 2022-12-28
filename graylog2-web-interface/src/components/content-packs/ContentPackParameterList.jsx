@@ -131,6 +131,7 @@ class ContentPackParameterList extends React.Component {
     let editParameter;
 
     const { contentPack, onAddParameter } = this.props;
+    const { showModal} = this.state;
 
     const closeModal = () => {
       this.setState({ showModal: false });
@@ -149,7 +150,7 @@ class ContentPackParameterList extends React.Component {
     const triggerButtonName = parameter ? 'Edit' : 'Create parameter';
 
     const modal = (
-      <BootstrapModalWrapper showModal={this.state.showModal}
+      <BootstrapModalWrapper showModal={showModal}
                              onHide={closeModal}
                              bsSize="large">
         <Modal.Header closeButton>
