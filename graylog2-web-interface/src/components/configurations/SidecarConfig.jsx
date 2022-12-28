@@ -56,7 +56,7 @@ const SidecarConfig = createReactClass({
 
   getInitialState() {
     return {
-      showModal: false,
+      showConfigModal: false,
       config: ObjectUtils.clone(this.props.config),
     };
   },
@@ -66,7 +66,7 @@ const SidecarConfig = createReactClass({
   },
 
   _openModal() {
-    this.setState({ showModal: true });
+    this.setState({ showConfigModal: true });
   },
 
   _closeModal() {
@@ -135,7 +135,7 @@ const SidecarConfig = createReactClass({
           <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
 
-        <BootstrapModalForm show={this.state.showModal}
+        <BootstrapModalForm show={this.state.showConfigModal}
                             title="Update Sidecars System Configuration"
                             onSubmitForm={this._saveConfig}
                             onCancel={this._closeModal}
