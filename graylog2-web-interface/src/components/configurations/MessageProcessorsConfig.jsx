@@ -52,14 +52,14 @@ const MessageProcessorsConfig = createReactClass({
         disabled_processors: config.disabled_processors,
         processor_order: config.processor_order,
       },
-      showModal: false,
+      showConfigModal: false,
     };
   },
 
   inputs: {},
 
   _openModal() {
-    this.setState({ showModal: true });
+    this.setState({ showConfigModal: true });
   },
 
   _closeModal() {
@@ -181,7 +181,7 @@ const MessageProcessorsConfig = createReactClass({
           <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
 
-        <BootstrapModalForm show={this.state.showModal}
+        <BootstrapModalForm show={this.state.showConfigModal}
                             title="Update Message Processors Configuration"
                             onSubmitForm={this._saveConfig}
                             onCancel={this._closeModal}
