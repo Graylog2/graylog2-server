@@ -33,7 +33,7 @@ class ContentPackDownloadControl extends React.Component {
     super(props);
 
     this.state = {
-      showModal: false,
+      showDownloadModal: false,
     };
 
     this._closeModal = this._closeModal.bind(this);
@@ -46,19 +46,19 @@ class ContentPackDownloadControl extends React.Component {
   }
 
   _closeModal() {
-    this.setState({ showModal: false });
+    this.setState({ showDownloadModal: false });
   }
 
   // eslint-disable-next-line react/no-unused-class-component-methods
   open() {
-    this.setState({ showModal: true });
+    this.setState({ showDownloadModal: true });
   }
 
   render() {
     const infoText = 'Please right click the download link below and choose "Save Link As..." to download the JSON file.';
 
     return (
-      <BootstrapModalWrapper showModal={this.state.showModal}
+      <BootstrapModalWrapper showModal={this.state.showDownloadModal}
                              onHide={this._closeModal}
                              bsSize="large">
         <Modal.Header closeButton>
