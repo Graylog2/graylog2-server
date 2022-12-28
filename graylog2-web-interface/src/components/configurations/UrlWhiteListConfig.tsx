@@ -26,7 +26,7 @@ import type { WhiteListConfig } from 'stores/configurations/ConfigurationsStore'
 type State = {
   config: WhiteListConfig,
   isValid: boolean,
-  showModal: boolean,
+  showConfigModal: boolean,
 };
 
 type Props = {
@@ -47,7 +47,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
     this.state = {
       config,
       isValid: false,
-      showModal: false,
+      showConfigModal: false,
     };
   }
 
@@ -68,12 +68,12 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
   };
 
   _openModal = () => {
-    this.setState({ showModal: true });
+    this.setState({ showConfigModal: true });
   };
 
   _closeModal = () => {
     const { config } = this.props;
-    const updatedState = { ...this.state, config, showModal: false };
+    const updatedState = { ...this.state, config, showConfigModal: false };
 
     this.setState(updatedState);
   };
@@ -97,7 +97,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
 
   render() {
     const { config: { entries, disabled } } = this.props;
-    const { isValid, showModal } = this.state;
+    const { isValid, showConfigModal } = this.state;
 
     return (
       <div>
@@ -123,7 +123,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
         <IfPermitted permissions="urlwhitelist:write">
           <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
-        <BootstrapModalForm show={showModal}
+        <BootstrapModalForm show={showConfigModal}
                             bsSize="lg"
                             title="Update Whitelist Configuration"
                             onSubmitForm={this._saveConfig}
