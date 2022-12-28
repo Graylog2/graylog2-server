@@ -47,7 +47,7 @@ class ContentPackParameters extends React.Component {
     super(props);
 
     this.state = {
-      showModal: false,
+      showParameterModal: false,
       parameterToDelete: undefined,
     };
   }
@@ -113,7 +113,7 @@ class ContentPackParameters extends React.Component {
 
   _confirmationModal = () => {
     return (
-      <BootstrapModalConfirm showModal={this.state.showModal}
+      <BootstrapModalConfirm showModal={this.state.showParameterModal}
                              title="Confirm deletion"
                              onConfirm={() => { this._deleteParameter(this.state.parameterToDelete); }}
                              onCancel={this._closeConfirmModal}>
@@ -123,11 +123,11 @@ class ContentPackParameters extends React.Component {
   };
 
   _openConfirmModal = (parameter) => {
-    this.setState({ showModal: true, parameterToDelete: parameter });
+    this.setState({ showParameterModal: true, parameterToDelete: parameter });
   };
 
   _closeConfirmModal = () => {
-    this.setState({ showModal: false, parameterToDelete: undefined });
+    this.setState({ showParameterModal: false, parameterToDelete: undefined });
   };
 
   render() {
