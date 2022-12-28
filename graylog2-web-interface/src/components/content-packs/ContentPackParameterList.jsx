@@ -131,7 +131,7 @@ class ContentPackParameterList extends React.Component {
     let editParameter;
 
     const { contentPack, onAddParameter } = this.props;
-    const { showModal} = this.state;
+    const { showModal } = this.state;
 
     const closeModal = () => {
       this.setState({ showModal: false });
