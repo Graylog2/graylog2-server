@@ -167,7 +167,7 @@ const renderGaps = (widgets: { id: string, type: string}[], positions: WidgetPos
   const _positions = { ...positions };
 
   const gapsItems = gaps.map((gap) => {
-    const id = generateId();
+    const id = `gap-${generateId()}`;
 
     const gapPosition = WidgetPosition.builder()
       .col(gap.start.x)

@@ -158,6 +158,18 @@ const computeLayout = (positions: WidgetPositions = {}) => {
 
 type Layout = { i: string, x: number, y: number, h: number, w: number }[];
 
+const removeGaps = (_layout: Layout) => {
+  const gapIndices = [];
+
+  _layout.forEach((item, idx) => {
+    if (item.i.startsWith('gap')) {
+      gapIndices.push(idx);
+    }
+  });
+
+  gapIndices.reverse().forEach((idx) => _layout.splice(idx, 1));
+};
+
 /**
  * Component that renders a draggable and resizable grid. You can control
  * the grid elements' positioning, as well as if they should be resizable
@@ -200,7 +212,9 @@ const ReactGridContainer = ({
       // Do not allow dragging from elements inside a `.actions` css class. This is
       // meant to avoid calling `onDragStop` callbacks when clicking on an action button.
                                    draggableCancel=".actions"
+                                   onDragStart={removeGaps}
                                    onDragStop={onLayoutChange}
+                                   onResizeStart={removeGaps}
                                    onResizeStop={onLayoutChange}
       // While CSS transform improves the paint performance,
       // it currently results in bug when using `react-sticky-el` inside a grid item.
