@@ -24,6 +24,8 @@ public abstract class EntityScope {
 
     public abstract boolean isMutable();
 
+    public abstract boolean isDeletable();
+
     @Override
     public int hashCode() {
         int hash = 5;
@@ -45,6 +47,9 @@ public abstract class EntityScope {
         }
         final DefaultEntityScope other = (DefaultEntityScope) object;
         if (this.isMutable() != other.isMutable()) {
+            return false;
+        }
+        if (this.isDeletable() != other.isDeletable()) {
             return false;
         }
         return Objects.equals(this.getName(), other.getName());
