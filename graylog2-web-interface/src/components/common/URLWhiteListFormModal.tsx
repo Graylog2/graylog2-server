@@ -42,7 +42,7 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
   const [config, setConfig] = useState<WhiteListConfig>({ entries: [], disabled: false });
   const [isValid, setIsValid] = useState<boolean>(false);
   const [newUrlEntryId, setNewUrlEntryId] = useState<string | undefined>();
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
 
   const { configuration } = useStore<ConfigurationsStoreState>(ConfigurationsStore);
   const urlWhiteListConfig = configuration[URL_WHITELIST_CONFIG];
@@ -83,11 +83,11 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
   }, [setDefaultWhiteListState, urlWhiteListConfig, config, newUrlEntry, urlType]);
 
   const openModal = () => {
-    setShowModal(true);
+    setShowConfigModal(true);
   };
 
   const closeModal = () => {
-    setShowModal(false);
+    setShowConfigModal(false);
     setDefaultWhiteListState(urlWhiteListConfig);
   };
 
@@ -118,7 +118,7 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
         <IfPermitted permissions="urlwhitelist:write">
           <Button bsStyle="info" bsSize="xs" onClick={openModal}>Add to URL Whitelist</Button>
         </IfPermitted>
-        <BootstrapModalForm show={showModal}
+        <BootstrapModalForm show={showConfigModal}
                             bsSize="lg"
                             title="Update Whitelist Configuration"
                             onCancel={closeModal}
