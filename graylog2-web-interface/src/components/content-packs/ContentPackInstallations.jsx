@@ -37,7 +37,7 @@ class ContentPackInstallations extends React.Component {
     super(props);
 
     this.state = {
-      showModal: false,
+      showInstallModal: false,
     };
   }
 
@@ -45,15 +45,15 @@ class ContentPackInstallations extends React.Component {
     const { onUninstall } = this.props;
 
     const closeShowModal = () => {
-      this.setState({ showModal: false });
+      this.setState({ showInstallModal: false });
     };
 
     const openShowModal = () => {
-      this.setState({ showModal: true });
+      this.setState({ showInstallModal: true });
     };
 
-    const showModal = (
-      <BootstrapModalWrapper showModal={this.state.showModal}
+    const showInstallModal = (
+      <BootstrapModalWrapper showModal={this.state.showInstallModal}
                              onHide={closeShowModal}
                              bsSize="large">
         <Modal.Header closeButton>
@@ -87,7 +87,7 @@ class ContentPackInstallations extends React.Component {
                       onClick={openShowModal}>
                 View
               </Button>
-              {showModal}
+              {showInstallModal}
             </ButtonToolbar>
           </div>
         </td>
