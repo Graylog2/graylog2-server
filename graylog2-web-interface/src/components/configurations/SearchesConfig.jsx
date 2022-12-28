@@ -67,7 +67,7 @@ class SearchesConfig extends React.Component {
     const analysisDisabledFields = config?.analysis_disabled_fields;
 
     this.state = {
-      showModal: false,
+      showConfigModal: false,
       config: {
         query_time_range_limit: queryTimeRangeLimit,
         relative_timerange_options: relativeTimerangeOptions,
@@ -167,7 +167,7 @@ class SearchesConfig extends React.Component {
   };
 
   _openModal = () => {
-    this.setState({ showModal: true });
+    this.setState({ showConfigModal: true });
   };
 
   _closeModal = () => {
@@ -183,7 +183,7 @@ class SearchesConfig extends React.Component {
     };
 
     const {
-      showModal,
+      showConfigModal,
       config,
       limitEnabled,
       surroundingTimeRangeOptionsUpdate,
@@ -250,7 +250,7 @@ class SearchesConfig extends React.Component {
           <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
 
-        <BootstrapModalForm show={showModal}
+        <BootstrapModalForm show={showConfigModal}
                             title="Update Search Configuration"
                             onSubmitForm={this._saveConfig}
                             onCancel={this._closeModal}
