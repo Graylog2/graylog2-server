@@ -21,6 +21,8 @@ const PlaceholderBox = styled.div(({ theme }) => css`
   flex-direction: column;
   justify-content: center;
   align-items: center;  
+  text-align: center;
+  padding: 10px;
   
   background-color: ${theme.colors.global.contentBackground};
   color: ${theme.colors.gray[30]};
