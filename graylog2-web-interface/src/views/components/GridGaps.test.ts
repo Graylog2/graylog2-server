@@ -13,10 +13,10 @@ describe('GridGaps', () => {
       },
     ];
 
-    expect(findGaps(items)).toEqual([{
+    expect(findGaps(items)).toContainEqual({
       start: { x: 1, y: 0 },
       end: { x: 3, y: 1 },
-    }]);
+    });
   });
 
   it('does not find gaps for two items below each other occupying max width', () => {
@@ -68,7 +68,7 @@ describe('GridGaps', () => {
       },
     ];
 
-    expect(findGaps(items)).toEqual([
+    expect(findGaps(items)).toContainEqual(
       {
         start: {
           x: 4,
@@ -78,22 +78,50 @@ describe('GridGaps', () => {
           x: 7,
           y: 5,
         },
-      },
-    ]);
+      });
   });
 
   it('finds initial gap', () => {
     const items = [
       {
-        start: { x: 3, y: 0 },
-        end: { x: 3, y: 1 },
+        start: { x: 3, y: 1 },
+        end: { x: 12, y: 2 },
+      },
+    ];
+
+    expect(findGaps(items)).toContainEqual({
+      start: { x: 1, y: 1 },
+      end: { x: 3, y: 2 },
+    });
+  });
+
+  it('calculates initial gap correctly', () => {
+    const items = [
+      {
+        start: {
+          x: 5,
+          y: 1,
+        },
+        end: {
+          x: 13,
+          y: 5,
+        },
+      },
+      {
+        start: {
+          x: 1,
+          y: 6,
+        },
+        end: {
+          x: 13,
+          y: 11,
+        },
       },
     ];
 
     expect(findGaps(items)).toEqual([{
-      start: { x: 0, y: 0 },
-      end: { x: 2, y: 1 },
-    },
-    ]);
+      start: { x: 1, y: 1 },
+      end: { x: 5, y: 5 },
+    }]);
   });
 });
