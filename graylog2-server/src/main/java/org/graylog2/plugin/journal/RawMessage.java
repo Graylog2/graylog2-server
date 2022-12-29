@@ -117,7 +117,7 @@ public class RawMessage implements Serializable {
     public void addSourceNode(String sourceInputId, NodeId nodeId) {
         msgBuilder.addSourceNodesBuilder()
                   .setInputId(sourceInputId)
-                  .setId(nodeId.toString())
+                  .setId(nodeId.getNodeId())
                   .setType(JournalMessages.SourceNode.Type.SERVER)
                   .build();
     }

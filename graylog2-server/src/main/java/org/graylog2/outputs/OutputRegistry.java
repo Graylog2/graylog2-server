@@ -156,7 +156,7 @@ public class OutputRegistry {
                     final Notification notification = notificationService.buildNow()
                             .addType(Notification.Type.OUTPUT_DISABLED)
                             .addSeverity(Notification.Severity.NORMAL)
-                            .addNode(nodeId.toString())
+                            .addNode(nodeId.getNodeId())
                             .addDetail("outputId", id)
                             .addDetail("streamId", stream.getId())
                             .addDetail("streamTitle", stream.getTitle())
