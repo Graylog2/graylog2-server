@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useMemo } from 'react';
+import styled, { css } from 'styled-components';
 
 import { Modal, Button } from 'components/bootstrap';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
@@ -12,6 +13,27 @@ import { ViewStore } from 'views/stores/ViewStore';
 
 const modalTitle = 'Create new widget';
 
+const WidgetList = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+`;
+
+const CreateWidgetButton = styled(Button)`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;  
+  text-align: center;
+  padding: 10px;
+  width: 8rem;
+  white-space: normal;
+`;
+
+const HugeIcon = styled.div(({ theme }) => css`
+  font-size: ${theme.fonts.size.huge};
+`);
+
 type Props = {
   onCancel: () => void,
   position: WidgetPosition,
@@ -21,7 +43,7 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
   const creators = usePluginEntities('widgetCreators');
   const view = useStore(ViewStore, (store) => store?.view);
 
-  const widgetButtons = useMemo(() => creators.map(({ title, func }) => {
+  const widgetButtons = useMemo(() => creators.map(({ title, func, icon: WidgetIcon }) => {
     const onClick = async () => {
       const newId = generateId();
       await CurrentViewStateActions.updateWidgetPosition(newId, position);
@@ -31,7 +53,7 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
     };
 
     return (
-      <Button type="button" onClick={onClick}>{title}</Button>
+      <CreateWidgetButton type="button" onClick={onClick}><HugeIcon><WidgetIcon /></HugeIcon>{title}</CreateWidgetButton>
     );
   }), [creators, position, view]);
 
@@ -43,7 +65,9 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
         <Modal.Title>{modalTitle}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {widgetButtons}
+        <WidgetList>
+          {widgetButtons}
+        </WidgetList>
       </Modal.Body>
       <Modal.Footer>
         <Button type="button" onClick={onCancel}>

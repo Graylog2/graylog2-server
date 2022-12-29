@@ -87,6 +87,7 @@ import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visuali
 import ViewHeader from 'views/components/views/ViewHeader';
 import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/ScatterVisualizationConfig';
 import ScatterVisualization from 'views/components/visualizations/scatter/ScatterVisualization';
+import Icon from 'components/common/Icon';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -327,12 +328,15 @@ const exports: PluginExports = {
   widgetCreators: [{
     title: 'Message Count',
     func: CreateMessageCount,
+    icon: () => <Icon name="hashtag" />,
   }, {
     title: 'Message Table',
     func: CreateMessagesWidget,
+    icon: () => <Icon name="list" />,
   }, {
     title: 'Custom Aggregation',
     func: CreateCustomAggregation,
+    icon: () => <Icon name="chart-column" />,
   }],
   creators: [
     {

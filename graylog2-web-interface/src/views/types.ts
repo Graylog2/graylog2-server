@@ -298,6 +298,7 @@ export interface WidgetCreatorArgs {
 export interface WidgetCreator {
   title: string;
   func: (args: WidgetCreatorArgs) => Widget;
+  icon: React.ComponentType<{}>,
 }
 
 declare module 'graylog-web-plugin/plugin' {
