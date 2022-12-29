@@ -129,6 +129,7 @@ public class LDAPAuthServiceBackend implements AuthServiceBackend {
                 .userUniqueIdAttribute(config.userUniqueIdAttribute())
                 .userNameAttribute(config.userNameAttribute())
                 .userFullNameAttribute(config.userFullNameAttribute())
+                .emailAttributes(config.emailAttributes())
                 .build();
 
         return ldapConnector.searchUserByPrincipal(connection, searchConfig, authCredentials.username());
