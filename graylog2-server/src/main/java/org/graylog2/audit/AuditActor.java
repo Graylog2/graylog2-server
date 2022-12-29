@@ -41,6 +41,6 @@ public abstract class AuditActor {
     }
 
     public static AuditActor system(@Nonnull NodeId nodeId) {
-        return new AutoValue_AuditActor(URN_GRAYLOG_NODE + requireNonNull(nodeId, "nodeId must not be null").toString());
+        return new AutoValue_AuditActor(URN_GRAYLOG_NODE + requireNonNull(nodeId, "nodeId must not be null").getNodeId());
     }
 }
