@@ -53,7 +53,7 @@ export type CreatorProps = {
   view: View,
 };
 type CreatorType = 'preset' | 'generic';
-type CreatorFunction = (CreatorProps) => React.ReactNode | undefined | null | void;
+type CreatorFunction = (creatorProps: CreatorProps) => React.ReactNode | undefined | null | void;
 
 type FunctionalCreator = {
   func: CreatorFunction,
