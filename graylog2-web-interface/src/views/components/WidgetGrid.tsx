@@ -210,10 +210,14 @@ const WidgetGrid = () => {
         </WidgetContainer>
       ));
 
-    const [gapItems, _positions] = renderGaps(widgets, positions);
+    if (isInteractive) {
+      const [gapItems, _positions] = renderGaps(widgets, positions);
 
-    return [[...widgetItems, ...gapItems], _positions];
-  }, [fields, focusedWidget, positions, widgets]);
+      return [[...widgetItems, ...gapItems], _positions];
+    }
+
+    return [widgetItems, positions];
+  }, [fields, focusedWidget, isInteractive, positions, widgets]);
 
   // Measuring the width is required to update the widget grid
   // when its content height results in a scrollbar
