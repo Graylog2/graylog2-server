@@ -275,9 +275,9 @@ public class AWSService {
                                                                                 AWSInput.TYPE,
                                                                                 false,
                                                                                 configuration,
-                                                                                nodeId.toString());
+                                                                                nodeId.getNodeId());
         try {
-            final MessageInput messageInput = messageInputFactory.create(inputCreateRequest, user.getName(), nodeId.toString());
+            final MessageInput messageInput = messageInputFactory.create(inputCreateRequest, user.getName(), nodeId.getNodeId());
             messageInput.checkConfiguration();
             final Input input = this.inputService.create(messageInput.asMap());
             final String newInputId = inputService.save(input);

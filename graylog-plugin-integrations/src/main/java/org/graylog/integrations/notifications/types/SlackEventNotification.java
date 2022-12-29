@@ -86,7 +86,7 @@ public class SlackEventNotification implements EventNotification {
             String errorMessage = String.format(Locale.ENGLISH, "Error serializing Slack message object while sending the SlackEventNotification :: %s", ex.getMessage());
             LOG.error(errorMessage, ex);
             final Notification systemNotification = notificationService.buildNow()
-                    .addNode(nodeId.toString())
+                    .addNode(nodeId.getNodeId())
                     .addType(Notification.Type.GENERIC)
                     .addSeverity(Notification.Severity.URGENT)
                     .addDetail("title", "SlackEventNotification Failed")
@@ -100,7 +100,7 @@ public class SlackEventNotification implements EventNotification {
         } catch (PermanentEventNotificationException exp) {
             String errorMessage = String.format(Locale.ENGLISH, "Error sending the SlackEventNotification :: %s", exp.getMessage());
             final Notification systemNotification = notificationService.buildNow()
-                    .addNode(nodeId.toString())
+                    .addNode(nodeId.getNodeId())
                     .addType(Notification.Type.GENERIC)
                     .addSeverity(Notification.Severity.URGENT)
                     .addDetail("title", "SlackEventNotification Failed")

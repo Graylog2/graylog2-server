@@ -88,7 +88,7 @@ public class TeamsEventNotification implements EventNotification {
         } catch (PermanentEventNotificationException exp) {
             String errorMessage = String.format("Error sending the TeamsEventNotification :: %s", exp.getMessage());
             final Notification systemNotification = notificationService.buildNow()
-                    .addNode(nodeId.toString())
+                    .addNode(nodeId.getNodeId())
                     .addType(Notification.Type.GENERIC)
                     .addSeverity(Notification.Severity.URGENT)
                     .addDetail("title", "TeamsEventNotification Failed")

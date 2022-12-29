@@ -30,6 +30,7 @@ import org.graylog2.inputs.InputServiceImpl;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.MessageInputFactory;
@@ -67,8 +68,7 @@ public class AWSServiceTest {
     @Mock
     private User user;
 
-    @Mock
-    private NodeId nodeId;
+    private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
     @Mock
     private MessageInput messageInput;
@@ -84,8 +84,6 @@ public class AWSServiceTest {
 
     @Test
     public void testSaveInput() throws Exception {
-
-        when(nodeId.toString()).thenReturn("node-id");
         when(inputService.create(isA(HashMap.class))).thenCallRealMethod();
         when(inputService.save(isA(Input.class))).thenReturn("input-id");
         when(user.getName()).thenReturn("a-user-name");
@@ -107,7 +105,7 @@ public class AWSServiceTest {
 
         // Verify that inputService received a valid input to save.
         final ArgumentCaptor<InputCreateRequest> argumentCaptor = ArgumentCaptor.forClass(InputCreateRequest.class);
-        verify(messageInputFactory, times(1)).create(argumentCaptor.capture(), eq("a-user-name"), eq("node-id"));
+        verify(messageInputFactory, times(1)).create(argumentCaptor.capture(), eq("a-user-name"), eq("5ca1ab1e-0000-4000-a000-000000000000"));
 
         // Just verify that the input create request was prepared correctly. This verifies the important argument
         // transposition logic.

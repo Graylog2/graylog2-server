@@ -82,7 +82,7 @@ public class PagerDutyNotification implements EventNotification
         } catch (PagerDutyClient.PermanentPagerDutyClientException e) {
             String errorMessage = String.format("Error enqueueing the PagerDuty event :: %s", e.getMessage());
             Notification systemNotification = notificationService.buildNow()
-                    .addNode(nodeId.toString())
+                    .addNode(nodeId.getNodeId())
                     .addType(Notification.Type.GENERIC)
                     .addSeverity(Notification.Severity.URGENT)
                     .addDetail("title", "PagerDuty Notification Failed")
