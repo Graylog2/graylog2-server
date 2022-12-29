@@ -37,6 +37,7 @@ import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import { findGaps } from 'views/components/GridGaps';
 import generateId from 'logic/generateId';
 import NewWidgetPlaceholder from 'views/components/NewWidgetPlaceholder';
+import CreateNewWidgetModal from 'views/components/CreateNewWidgetModal';
 
 import WidgetContainer from './WidgetContainer';
 import WidgetComponent from './WidgetComponent';
@@ -179,7 +180,7 @@ const renderGaps = (widgets: { id: string, type: string}[], positions: WidgetPos
     _positions[id] = gapPosition;
 
     return (
-      <NewWidgetPlaceholder key={id} position={gapPosition} />
+      <NewWidgetPlaceholder key={id} position={gapPosition} component={CreateNewWidgetModal} />
     );
   });
 

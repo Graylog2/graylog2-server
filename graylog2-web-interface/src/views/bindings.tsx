@@ -49,11 +49,11 @@ import ExcludeFromQueryHandler from 'views/logic/valueactions/ExcludeFromQueryHa
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
 import EditMessageList from 'views/components/widgets/EditMessageList';
 import { DashboardsPage, ShowViewPage, NewSearchPage, NewDashboardPage, StreamSearchPage } from 'views/pages';
-import AddMessageCountActionHandler from 'views/logic/fieldactions/AddMessageCountActionHandler';
-import AddMessageTableActionHandler from 'views/logic/fieldactions/AddMessageTableActionHandler';
+import AddMessageCountActionHandler, { CreateMessageCount } from 'views/logic/fieldactions/AddMessageCountActionHandler';
+import AddMessageTableActionHandler, { CreateMessagesWidget } from 'views/logic/fieldactions/AddMessageTableActionHandler';
 import RemoveFromTableActionHandler from 'views/logic/fieldactions/RemoveFromTableActionHandler';
 import RemoveFromAllTablesActionHandler from 'views/logic/fieldactions/RemoveFromAllTablesActionHandler';
-import CreateCustomAggregation from 'views/logic/creatoractions/CreateCustomAggregation';
+import AddCustomAggregation, { CreateCustomAggregation } from 'views/logic/creatoractions/AddCustomAggregation';
 import SelectExtractorType from 'views/logic/valueactions/SelectExtractorType';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
@@ -324,6 +324,16 @@ const exports: PluginExports = {
     },
   ], ['create-extractor']),
   visualizationTypes: visualizationBindings,
+  widgetCreators: [{
+    title: 'Message Count',
+    func: CreateMessageCount,
+  }, {
+    title: 'Message Table',
+    func: CreateMessagesWidget,
+  }, {
+    title: 'Custom Aggregation',
+    func: CreateCustomAggregation,
+  }],
   creators: [
     {
       type: 'preset',
@@ -338,7 +348,7 @@ const exports: PluginExports = {
     {
       type: 'generic',
       title: 'Aggregation',
-      func: CreateCustomAggregation,
+      func: AddCustomAggregation,
     },
   ],
   'views.completers': [

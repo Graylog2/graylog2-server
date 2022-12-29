@@ -1,16 +1,9 @@
 import * as React from 'react';
+import { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import { Icon } from 'components/common';
-import Series from 'views/logic/aggregationbuilder/Series';
-import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
-import { WidgetActions } from 'views/stores/WidgetStore';
-import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import NumberVisualization from 'views/components/visualizations/number/NumberVisualization';
-import generateId from 'logic/generateId';
 
 const PlaceholderBox = styled.div(({ theme }) => css`
   opacity: 0;
@@ -38,32 +31,25 @@ const HugeIcon = styled(Icon)(({ theme }) => css`
   margin-bottom: 10px;
 `);
 
-type Props = {
-  style?: React.CSSProperties,
+type ChildProps = {
+  onCancel: () => void,
   position: WidgetPosition,
 }
 
-const NewWidgetPlaceholder = React.forwardRef<HTMLDivElement, Props>(({ style, position }, ref) => {
+type Props = {
+  style?: React.CSSProperties,
+  position: WidgetPosition,
+  component: React.ComponentType<ChildProps>,
+}
+
+const NewWidgetPlaceholder = React.forwardRef<HTMLDivElement, Props>(({ style, position, component: Component }, ref) => {
+  const [show, setShow] = useState(false);
+  const onCancel = useCallback(() => setShow(false), []);
+  const onClick = useCallback(() => setShow(true), []);
+
   const containerStyle = {
     ...style,
     transition: 'none',
-  };
-
-  const onClick = async () => {
-    const newId = generateId();
-    await CurrentViewStateActions.updateWidgetPosition(newId, position);
-    const series = Series.forFunction('count()')
-      .toBuilder()
-      .config(new SeriesConfig('Message Count'))
-      .build();
-
-    return WidgetActions.create(AggregationWidget.builder()
-      .id(newId)
-      .config(AggregationWidgetConfig.builder()
-        .series([series])
-        .visualization(NumberVisualization.type)
-        .build())
-      .build());
   };
 
   return (
@@ -72,6 +58,7 @@ const NewWidgetPlaceholder = React.forwardRef<HTMLDivElement, Props>(({ style, p
         <HugeIcon name="circle-plus" />
         Create a new widget here
       </PlaceholderBox>
+      {show && <Component onCancel={onCancel} position={position} />}
     </div>
   );
 });

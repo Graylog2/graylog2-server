@@ -75,7 +75,7 @@ type ComponentCreator = {
 
 export type Creator = ComponentCreator | FunctionalCreator;
 
-const isCreatorFunc = (creator: Creator): creator is FunctionalCreator => ('func' in creator);
+export const isCreatorFunc = (creator: Creator): creator is FunctionalCreator => ('func' in creator);
 
 class AddWidgetButton extends React.Component<Props, State> {
   constructor(props: Props) {
