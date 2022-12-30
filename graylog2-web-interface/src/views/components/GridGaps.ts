@@ -78,7 +78,6 @@ export const findGaps = (_items: Item[], minWidth: number = 1, maxWidth: number 
   }
 
   const items = _items.map((item) => normalizeInfinity(item, maxWidth));
-  console.log({ items });
   const minY = Math.min(...items.map(({ start: { y } }) => y));
   const maxY = Math.max(...items.map(({ end: { y } }) => y - 1));
 
