@@ -1,4 +1,4 @@
-import { findGaps } from './GridGaps';
+import findGaps from './GridGaps';
 
 describe('GridGaps', () => {
   it('finds single gap between two items', () => {
