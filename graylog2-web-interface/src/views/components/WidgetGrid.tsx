@@ -34,7 +34,7 @@ import type { StoreState } from 'stores/StoreTypes';
 import { ViewStatesStore } from 'views/stores/ViewStatesStore';
 import ElementDimensions from 'components/common/ElementDimensions';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
-import { findGaps } from 'views/components/GridGaps';
+import findGaps from 'views/components/GridGaps';
 import generateId from 'logic/generateId';
 import NewWidgetPlaceholder from 'views/components/NewWidgetPlaceholder';
 import CreateNewWidgetModal from 'views/components/CreateNewWidgetModal';

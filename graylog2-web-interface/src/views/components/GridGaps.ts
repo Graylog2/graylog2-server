@@ -72,7 +72,7 @@ const findFinalGaps = (rows: Array<number>, rowItems: RowItems, maxWidth: number
     return [...rest, { start: gap.start, end: { x: maxWidth, y: row + 1 } }];
   }, [] as Item[]);
 
-export const findGaps = (_items: Item[], minWidth: number = 1, maxWidth: number = 13): Item[] => {
+const findGaps = (_items: Item[], minWidth: number = 1, maxWidth: number = 13): Item[] => {
   if (_items.length === 0) {
     return [];
   }
@@ -98,3 +98,5 @@ export const findGaps = (_items: Item[], minWidth: number = 1, maxWidth: number 
 
   return uniq([...gaps, ...initialGaps, ...finalGaps]);
 };
+
+export default findGaps;
