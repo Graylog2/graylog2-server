@@ -15,9 +15,11 @@ function isRightToItem(item: Item, i: Item) {
   return item.start.x <= i.start.x;
 }
 
+const sortByStartXAsc = (item1: Item, item2: Item) => item1.start.x - item2.start.x;
+
 const neighborsToRight = (item: Item, rowItems: { [row: string]: Item[] }) => {
   const rows = range(item.start.y, item.end.y - 1);
-  const neighbors = rows.flatMap((row) => rowItems[row].filter((i) => i !== item).filter((i) => isRightToItem(item, i))[0])
+  const neighbors = rows.flatMap((row) => rowItems[row].filter((i) => i !== item).filter((i) => isRightToItem(item, i)).sort(sortByStartXAsc)[0])
     .filter((i) => i !== undefined);
 
   return uniq(neighbors);

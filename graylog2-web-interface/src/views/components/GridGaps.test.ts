@@ -201,4 +201,44 @@ describe('GridGaps', () => {
       });
     });
   });
+
+  it('avoid overflowing into next row', () => {
+    const items = [
+      {
+        start: {
+          x: 11,
+          y: 1,
+        },
+        end: {
+          x: 13,
+          y: 7,
+        },
+      },
+      {
+        start: {
+          x: 7,
+          y: 1,
+        },
+        end: {
+          x: 11,
+          y: 7,
+        },
+      },
+      {
+        start: {
+          x: 1,
+          y: 1,
+        },
+        end: {
+          x: 4,
+          y: 7,
+        },
+      },
+    ];
+
+    expect(findGaps(items)).toEqual([{
+      start: { x: 4, y: 1 },
+      end: { x: 7, y: 7 },
+    }]);
+  });
 });
