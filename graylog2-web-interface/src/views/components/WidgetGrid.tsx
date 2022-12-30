@@ -236,7 +236,4 @@ const WidgetGrid = () => {
 };
 
 WidgetGrid.displayName = 'WidgetGrid';
-
-const MemoizedWidgetGrid = React.memo(WidgetGrid);
-
-export default MemoizedWidgetGrid;
+export default WidgetGrid;
