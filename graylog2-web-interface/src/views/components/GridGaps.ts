@@ -90,8 +90,6 @@ export const findGaps = (_items: Item[], minWidth: number = 1, maxWidth: number 
 
   const finalGaps = findFinalGaps(rows, rowItems, maxWidth);
 
-  console.log({ initialGaps, finalGaps });
-
   const gaps = items.flatMap((item) => {
     const neighbors = neighborsToRight(item, rowItems);
 
