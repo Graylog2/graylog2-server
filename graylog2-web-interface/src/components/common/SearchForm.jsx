@@ -200,8 +200,7 @@ class SearchForm extends React.Component {
 
     if (useLoadingState) {
       this._setLoadingState().then(() => {
-        onSearch(query);
-        this._resetLoadingState();
+        onSearch(query, this._resetLoadingState);
       });
     } else {
       onSearch(query);
