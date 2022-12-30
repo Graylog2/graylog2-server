@@ -9,14 +9,14 @@ const range = (start: number, end: number): Array<number> => [
   ...Array((end + 1) - start).keys(),
 ].map((i) => i + start);
 
-const itemsInRow = (items: Item[], row: number): Item[] => items.filter(({ start, end }) => start.y <= row && end.y >= row);
+const itemsInRow = (items: Item[], row: number): Item[] => items.filter(({ start, end }) => start.y <= row && end.y > row);
 
 function isRightToItem(item: Item, i: Item) {
   return item.start.x <= i.start.x;
 }
 
 const neighborsToRight = (item: Item, rowItems: { [row: string]: Item[] }) => {
-  const rows = range(item.start.y, item.end.y);
+  const rows = range(item.start.y, item.end.y - 1);
   const neighbors = rows.flatMap((row) => rowItems[row].filter((i) => i !== item).filter((i) => isRightToItem(item, i))[0])
     .filter((i) => i !== undefined);
 
@@ -43,16 +43,16 @@ const findInitialGaps = (rows: Array<number>, rowItems: RowItems, minWidth: numb
   .filter(([, startX]) => startX > minWidth)
   .reduce((gaps, [row, startX]) => {
     if (gaps.length === 0) {
-      return [{ start: { x: minWidth, y: row }, end: { x: startX, y: row } }] as Item[];
+      return [{ start: { x: minWidth, y: row }, end: { x: startX, y: row + 1 } }] as Item[];
     }
 
     const [gap, ...rest] = gaps.reverse();
 
     if (gap.end.x !== startX) {
-      return [...rest, gap, { start: { x: minWidth, y: row }, end: { x: startX, y: row } }];
+      return [...rest, gap, { start: { x: minWidth, y: row }, end: { x: startX, y: row + 1 } }];
     }
 
-    return [...rest, { start: gap.start, end: { x: startX, y: row } }];
+    return [...rest, { start: gap.start, end: { x: startX, y: row + 1 } }];
   }, [] as Item[]);
 
 const findFinalGaps = (rows: Array<number>, rowItems: RowItems, maxWidth: number) => rows
@@ -80,7 +80,7 @@ export const findGaps = (_items: Item[], minWidth: number = 1, maxWidth: number 
   const items = _items.map((item) => normalizeInfinity(item, maxWidth));
   console.log({ items });
   const minY = Math.min(...items.map(({ start: { y } }) => y));
-  const maxY = Math.max(...items.map(({ end: { y } }) => y));
+  const maxY = Math.max(...items.map(({ end: { y } }) => y - 1));
 
   const rows = range(minY, maxY);
 

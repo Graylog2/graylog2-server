@@ -26,7 +26,7 @@ describe('GridGaps', () => {
         end: { x: Infinity, y: 3 },
       },
       {
-        start: { x: 1, y: 4 },
+        start: { x: 1, y: 3 },
         end: { x: Infinity, y: 10 },
       },
     ];
@@ -110,7 +110,7 @@ describe('GridGaps', () => {
       {
         start: {
           x: 1,
-          y: 6,
+          y: 5,
         },
         end: {
           x: 13,
@@ -123,5 +123,82 @@ describe('GridGaps', () => {
       start: { x: 1, y: 1 },
       end: { x: 5, y: 5 },
     }]);
+  });
+
+  describe('calculates overlapping gaps correctly', () => {
+    const items = [
+      {
+        start: {
+          x: 5,
+          y: 2,
+        },
+        end: {
+          x: 9,
+          y: 6,
+        },
+      },
+      {
+        start: {
+          x: 4,
+          y: 6,
+        },
+        end: {
+          x: 8,
+          y: 10,
+        },
+      },
+    ];
+
+    it('leading gaps', () => {
+      const result = findGaps(items);
+
+      expect(result).toContainEqual({
+        start: {
+          x: 1,
+          y: 2,
+        },
+        end: {
+          x: 5,
+          y: 6,
+        },
+      });
+
+      expect(result).toContainEqual({
+        start: {
+          x: 1,
+          y: 6,
+        },
+        end: {
+          x: 4,
+          y: 10,
+        },
+      });
+    });
+
+    it('trailing gaps', () => {
+      const result = findGaps(items);
+
+      expect(result).toContainEqual({
+        start: {
+          x: 9,
+          y: 2,
+        },
+        end: {
+          x: 13,
+          y: 6,
+        },
+      });
+
+      expect(result).toContainEqual({
+        start: {
+          x: 8,
+          y: 6,
+        },
+        end: {
+          x: 13,
+          y: 10,
+        },
+      });
+    });
   });
 });
