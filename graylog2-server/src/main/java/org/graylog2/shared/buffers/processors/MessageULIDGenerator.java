@@ -16,8 +16,6 @@
  */
 package org.graylog2.shared.buffers.processors;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.annotations.VisibleForTesting;
 import de.huxhorn.sulky.ulid.ULID;
 import org.graylog2.plugin.Message;
@@ -26,27 +24,13 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Objects;
 
-import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_NODE;
-
-// Fill the first 16 bits of the ULIDs random section (16_bit_uint_random) with
+// Fill the first 32 bits of the ULIDs random section with
 // a sequence number that reflects the order in which messages were received by an input.
-//
-// The sequence numbers on messages are ints and don't fit into 16 bits.
-// We remember a messages' first sequence number (subtrahend) in a size limited cache per nodeId, input and timestamp.
-// The sequence number will then be subtracted with this subtrahend.
-// Thus will the first received message (for a certain input and timestamp) start with a sequence of 0 (see [1]).
-//
-// [1]
-// Since our message processing is multithreaded, messages can pass each other during processing.
-// This means that the first recorded sequence number can be higher than the one of later messages.
-// To account for this, we simply add a constant (REORDERING_GAP) to prevent negative messageSequenceNrs.
-// Therefor the first sequence does not start with 0, but with REORDERING_GAP.
 /*
     The ULID binary layout for reference
 
-        0                   1                   2                   3
+     0                   1                   2                   3
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
     |                      32_bit_uint_time_high                    |
@@ -57,31 +41,33 @@ import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_NODE;
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
     |                       32_bit_uint_random                      |
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+    The modified ULID binary layout
+
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                      32_bit_uint_time_high                    |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |     16_bit_uint_time_low      |       16_bit_uint_seq_msb     |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |     16_bit_uint_seq_lsb       |       16_bit_uint_random      |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                       32_bit_uint_random                      |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 @Singleton
 public class MessageULIDGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(MessageULIDGenerator.class);
-
-    private final Cache<String, Integer> sequenceNrCache;
     private final ULID ulid;
-    static final long ULID_RANDOM_MSB_MASK = 0xFFFFL;
-
-    static final int REORDERING_GAP = 5000;
-
     @Inject
     public MessageULIDGenerator(ULID ulid) {
         this.ulid = ulid;
-
-        sequenceNrCache = Caffeine.newBuilder()
-                .maximumSize(2000)
-                .initialCapacity(2000)
-                .build();
     }
 
     public String createULID(Message message) {
         try {
-            return createULID(Objects.toString(message.getField(FIELD_GL2_SOURCE_NODE)),
-                    message.getSourceInputId(), message.getTimestamp().getMillis(), message.getSequenceNr());
+            return createULID(message.getTimestamp().getMillis(), message.getSequenceNr());
         } catch (Exception e) {
             LOG.error("Exception while creating ULID.", e);
             return ulid.nextULID(message.getTimestamp().getMillis());
@@ -89,37 +75,15 @@ public class MessageULIDGenerator {
     }
 
     @VisibleForTesting
-    String createULID(String sourceNodeId, String inputId, long timestamp, int sequenceNr) {
-        final String cacheKey = sourceNodeId + "|" + inputId + "|" + timestamp;
-        final int subtrahend = sequenceNrCache.get(cacheKey, k -> sequenceNr);
+    String createULID(long timestamp, int sequenceNr) {
+        final ULID.Value nextULID = ulid.nextValue(timestamp);
 
-        if (sequenceNr == subtrahend) {
-            LOG.trace("Added new timestamp <{}> for input <{}> to cache. Seq <{}>", timestamp, inputId, sequenceNr);
-        }
+        final long msbSeq = sequenceNr >>> 16;
+        final long lsbSeq = sequenceNr & 0xFFFF;
+        final long msbWithZeroedRandom = nextULID.getMostSignificantBits() & 0xFFFF_FFFF_FFFF_0000L;
+        final long lsbWithZeroedRandom = nextULID.getLeastSignificantBits() & 0x0000_FFFF_FFFF_FFFFL;
 
-        final ULID.Value nextUlid = ulid.nextValue(timestamp);
-        final long leastSignificantBits = nextUlid.getLeastSignificantBits();
-
-        final long msbWithZeroedRandom = timestamp << 16;
-        long messageSequenceNr = sequenceNr - subtrahend + REORDERING_GAP;
-
-        // If our multithreaded message processing reorders the messages by more than REORDERING_GAP,
-        // the messageSequenceNr can become negative.
-        // This can also happen if the sequenceNr counter in a MessageInput wraps.
-        // We handle this by updating the sequenceNrCache and setting the messageSequenceNr accordingly.
-        if (messageSequenceNr < 0) {
-            LOG.warn("Got negative message sequence number ({} -> {}). Sort order might be wrong for equal timestamps.", subtrahend, sequenceNr);
-            messageSequenceNr = REORDERING_GAP;
-            sequenceNrCache.put(cacheKey, sequenceNr);
-        // If we receive more than 60535 messages with the same timestamp and input, they will exhaust the 16 bit of space in the ULID.
-        // We handle this by updating the sequenceNrCache and setting the messageSequenceNr accordingly.
-        } else if (messageSequenceNr >= ULID_RANDOM_MSB_MASK) {
-            LOG.warn("Message sequence number <{}> input <{}> timestamp <{}> does not fit into ULID ({} >= 65535). Sort order might be wrong for equal timestamps.",
-                    sequenceNr, inputId, timestamp, messageSequenceNr);
-            messageSequenceNr = REORDERING_GAP;
-            sequenceNrCache.put(cacheKey, sequenceNr);
-        }
-        final ULID.Value sequencedUlid = new ULID.Value(msbWithZeroedRandom | messageSequenceNr, leastSignificantBits);
-        return sequencedUlid.toString();
+        final ULID.Value sequencedULID = new ULID.Value(msbWithZeroedRandom | msbSeq, lsbWithZeroedRandom | (lsbSeq << 48));
+        return sequencedULID.toString();
     }
 }

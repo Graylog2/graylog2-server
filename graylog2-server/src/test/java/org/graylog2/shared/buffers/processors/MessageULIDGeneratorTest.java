@@ -19,14 +19,12 @@ package org.graylog2.shared.buffers.processors;
 import de.huxhorn.sulky.ulid.ULID;
 import org.graylog2.plugin.Tools;
 import org.junit.Test;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.shared.buffers.processors.MessageULIDGenerator.REORDERING_GAP;
-import static org.graylog2.shared.buffers.processors.MessageULIDGenerator.ULID_RANDOM_MSB_MASK;
 
 public class MessageULIDGeneratorTest {
 
@@ -36,18 +34,48 @@ public class MessageULIDGeneratorTest {
 
         final long ts = Tools.nowUTC().getMillis();
 
-        // first seen sequence (gets subtracted with itself)
-        ULID.Value parsedULID = ULID.parseULID(generator.createULID("node", "input", ts, 123));
-        //noinspection PointlessArithmeticExpression
-        assertThat(extractSequenceNr(parsedULID)).isEqualTo(123 - 123 + REORDERING_GAP);
+        ULID.Value parsedULID = ULID.parseULID(generator.createULID(ts, 123));
 
-        // second sequence (gets subtracted with first seen sequence)
-        parsedULID = ULID.parseULID(generator.createULID("node", "input", ts, 128));
-        assertThat(extractSequenceNr(parsedULID)).isEqualTo(128 - 123 + REORDERING_GAP);
+        assertThat(extractSequenceNr(parsedULID)).isEqualTo(123);
+    }
 
-        // third sequence (gets subtracted with first seen sequence)
-        parsedULID = ULID.parseULID(generator.createULID("node", "input", ts, 125));
-        assertThat(extractSequenceNr(parsedULID)).isEqualTo(125 - 123 + REORDERING_GAP);
+    @Test
+    public void intMaxGenerate() {
+        final MessageULIDGenerator generator = new MessageULIDGenerator(new ULID());
+
+        final long ts = Tools.nowUTC().getMillis();
+
+        ULID.Value parsedULID = ULID.parseULID(generator.createULID(ts, Integer.MAX_VALUE));
+
+        assertThat(extractSequenceNr(parsedULID)).isEqualTo(Integer.MAX_VALUE);
+    }
+
+    @Test
+    public void uintMaxGenerate() {
+        final MessageULIDGenerator generator = new MessageULIDGenerator(new ULID());
+
+        final long ts = Tools.nowUTC().getMillis();
+
+        final int uIntMaxValue = ~0;
+        ULID.Value parsedULID = ULID.parseULID(generator.createULID(ts, uIntMaxValue));
+
+        assertThat(extractSequenceNr(parsedULID)).isEqualTo(uIntMaxValue);
+    }
+
+    @Test
+    public void testUlidSorting() {
+        final MessageULIDGenerator generator = new MessageULIDGenerator(new ULID());
+        final long ts = Tools.nowUTC().getMillis();
+
+        final long[] wrappedLongs = new long[]{0, 1, Integer.MAX_VALUE, 0xFFFF_FFFEL, 0xFFFF_FFFFL};
+
+        final ArrayList<String> ulids = new ArrayList<>();
+        for (long seq: wrappedLongs) {
+            ulids.add(generator.createULID(ts, (int) seq));
+        }
+        final List<String> sortedUlids = ulids.stream().sorted().collect(Collectors.toList());
+
+        assertThat(ulids).isEqualTo(sortedUlids);
     }
 
     @Test
@@ -55,59 +83,14 @@ public class MessageULIDGeneratorTest {
         final MessageULIDGenerator generator = new MessageULIDGenerator(new ULID());
 
         final long ts = Tools.nowUTC().getMillis();
-        final String ulid = generator.createULID("node", "input", ts, 123);
+        final String ulid = generator.createULID(ts, 123);
         ULID.Value parsedULID = ULID.parseULID(ulid);
 
         assertThat(parsedULID.timestamp()).isEqualTo(ts);
     }
 
-    @Test
-    public void generateWithTooLargeSequenceNr() {
-        final MessageULIDGenerator generator = new MessageULIDGenerator(new ULID());
-        // prime the subtrahend cache with an initial seq nr
-        final int firstSeqNr = 42;
-        generator.createULID("node", "input", 0, firstSeqNr);
-
-        // Next simulate maxing out the sequence number space in the ULID (16 bit -> 65535) the result should wrap to REORDERING_GAP
-        ULID.Value parsedULID = ULID.parseULID(generator.createULID("node", "input", 0, (int) (firstSeqNr + ULID_RANDOM_MSB_MASK - REORDERING_GAP)));
-        assertThat(extractSequenceNr(parsedULID)).isEqualTo(REORDERING_GAP);
-
-        // Once we wrap, we reset the cache to the last wrapped number. The sequence will start from the beginning
-        parsedULID = ULID.parseULID(generator.createULID("node", "input", 0, (int) (firstSeqNr + ULID_RANDOM_MSB_MASK - REORDERING_GAP + 1)));
-        assertThat(extractSequenceNr(parsedULID)).isEqualTo(REORDERING_GAP + 1);
-
-        // messages with a different timestamp start with a new subtrahend and should get a seqNr with OFFSET_GAP
-        parsedULID = ULID.parseULID(generator.createULID("node", "input", 23, (int) (firstSeqNr + ULID_RANDOM_MSB_MASK - REORDERING_GAP)));
-        //noinspection PointlessArithmeticExpression
-        assertThat(extractSequenceNr(parsedULID)).isEqualTo(0 + REORDERING_GAP);
-    }
-
-    @Test
-    public void sortedInput() {
-        final MessageULIDGenerator generator = new MessageULIDGenerator(new ULID());
-        final long ts = Tools.nowUTC().getMillis();
-
-        for (int seq : ImmutableList.of(1, 2, 3, 4)) {
-            ULID.Value parsedULID = ULID.parseULID(generator.createULID("node", "input", ts, seq));
-            assertThat(parsedULID.timestamp()).isEqualTo(ts);
-            assertThat(parsedULID.getMostSignificantBits() & 0xFFFFL).isEqualTo(REORDERING_GAP + seq -1);
-        }
-    }
-
-    @Test
-    public void unorderedInput() {
-        final MessageULIDGenerator generator = new MessageULIDGenerator(new ULID());
-        final long ts = Tools.nowUTC().getMillis();
-
-        final ImmutableList<Integer> messageSeqences = ImmutableList.of(5, 4, 1, 2);
-        final List<String> ulidsSorted = messageSeqences.stream().map((seq) -> generator.createULID("node", "input", ts, seq)).sorted().toList();
-
-        final List<Long> seqNrsFromUlid = ulidsSorted.stream().map(((ulid) -> ULID.parseULID(ulid).getMostSignificantBits() & 0xFFFFL)).collect(Collectors.toList());
-        assertThat(seqNrsFromUlid).isEqualTo(messageSeqences.stream().sorted().map(s -> REORDERING_GAP + s - 5L).collect(Collectors.toList()));
-    }
-
-    private long extractSequenceNr(ULID.Value ulid) {
-        return ulid.getMostSignificantBits() & MessageULIDGenerator.ULID_RANDOM_MSB_MASK;
+    private int extractSequenceNr(ULID.Value ulid) {
+        int msb = (int) (ulid.getMostSignificantBits() & 0x000000000000FFFFL) << 16;
+        return (int) (msb | ulid.getLeastSignificantBits() >>> 48);
     }
 }
-
