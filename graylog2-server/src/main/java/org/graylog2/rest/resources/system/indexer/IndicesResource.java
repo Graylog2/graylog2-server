@@ -30,10 +30,12 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.NodeInfoCache;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
+import org.graylog2.indexer.indices.util.NumberBasedIndexNameComparator;
 import org.graylog2.rest.models.system.indexer.requests.IndicesReadRequest;
 import org.graylog2.rest.models.system.indexer.responses.AllIndices;
 import org.graylog2.rest.models.system.indexer.responses.ClosedIndices;
@@ -58,7 +60,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -304,13 +307,17 @@ public class IndicesResource extends RestResource {
     }
 
     private OpenIndicesInfo getOpenIndicesInfo(Set<IndexStatistics> indicesStatistics) {
-        final Map<String, IndexInfo> indexInfos = new HashMap<>();
+        final Map<String, IndexInfo> indexInfos = new LinkedHashMap<>();
         final Set<String> indices = indicesStatistics.stream()
                 .map(IndexStatistics::index)
                 .collect(Collectors.toSet());
         final Map<String, Boolean> areReopened = this.indices.areReopened(indices);
 
-        for (IndexStatistics indexStatistics : indicesStatistics) {
+        final List<IndexStatistics> sortedIndexStatistics = indicesStatistics.stream()
+                .sorted(Comparator.comparing(IndexStatistics::index, new NumberBasedIndexNameComparator(MongoIndexSet.SEPARATOR)))
+                .toList();
+
+        for (IndexStatistics indexStatistics : sortedIndexStatistics) {
             final IndexInfo indexInfo = IndexInfo.create(
                     indexStatistics.primaryShards(),
                     indexStatistics.allShards(),
@@ -332,7 +339,7 @@ public class IndicesResource extends RestResource {
                 ).collect(Collectors.toList());
     }
 
-    private IndexInfo toIndexInfo(IndexStatistics indexStatistics) {
+    private IndexInfo toIndexInfo(final IndexStatistics indexStatistics) {
         return IndexInfo.create(
                 indexStatistics.primaryShards(),
                 indexStatistics.allShards(),
@@ -341,12 +348,12 @@ public class IndicesResource extends RestResource {
         );
     }
 
-    private Map<String, IndexInfo> toIndexInfos(Collection<IndexStatistics> indexStatistics) {
+    private Map<String, IndexInfo> toIndexInfos(final Collection<IndexStatistics> indexStatistics) {
         final Set<String> indexNames = indexStatistics.stream().map(IndexStatistics::index).collect(Collectors.toSet());
         final Map<String, Boolean> reopenedStatus = indices.areReopened(indexNames);
 
         final ImmutableMap.Builder<String, IndexInfo> indexInfos = ImmutableMap.builder();
-        for(IndexStatistics indexStats : indexStatistics) {
+        for (IndexStatistics indexStats : indexStatistics) {
             final IndexInfo indexInfo = IndexInfo.create(
                     indexStats.primaryShards(),
                     indexStats.allShards(),

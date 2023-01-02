@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Sorting of indices inside an index set is based on their numbers, descending."
+
+issues = ["14280"]
+pulls = [""]
