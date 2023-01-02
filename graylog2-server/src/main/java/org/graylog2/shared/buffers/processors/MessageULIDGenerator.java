@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.security.SecureRandom;
 
 // Fill the first 32 bits of the ULIDs random section with
 // a sequence number that reflects the order in which messages were received by an input.
@@ -60,9 +61,12 @@ import javax.inject.Singleton;
 public class MessageULIDGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(MessageULIDGenerator.class);
     private final ULID ulid;
+    private final SecureRandom random;
+
     @Inject
     public MessageULIDGenerator(ULID ulid) {
         this.ulid = ulid;
+        random = new SecureRandom();
     }
 
     public String createULID(Message message) {
@@ -76,14 +80,14 @@ public class MessageULIDGenerator {
 
     @VisibleForTesting
     String createULID(long timestamp, int sequenceNr) {
-        final ULID.Value nextULID = ulid.nextValue(timestamp);
-
         final long msbSeq = sequenceNr >>> 16;
         final long lsbSeq = sequenceNr & 0xFFFF;
-        final long msbWithZeroedRandom = nextULID.getMostSignificantBits() & 0xFFFF_FFFF_FFFF_0000L;
-        final long lsbWithZeroedRandom = nextULID.getLeastSignificantBits() & 0x0000_FFFF_FFFF_FFFFL;
 
-        final ULID.Value sequencedULID = new ULID.Value(msbWithZeroedRandom | msbSeq, lsbWithZeroedRandom | (lsbSeq << 48));
+        final long msbWithoutRandom = timestamp << 16;
+        final long lsbWithoutRandom = lsbSeq << 48;
+        final long nextRandom = random.nextLong();
+
+        final ULID.Value sequencedULID = new ULID.Value(msbWithoutRandom | msbSeq, lsbWithoutRandom | (nextRandom >>> 16));
         return sequencedULID.toString();
     }
 }
