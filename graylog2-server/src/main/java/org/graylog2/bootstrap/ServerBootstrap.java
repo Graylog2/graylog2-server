@@ -214,7 +214,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         final Map<String, Object> auditEventContext = ImmutableMap.of(
                 "version", version.toString(),
                 "java", systemInformation,
-                "node_id", nodeId.toString()
+                "node_id", nodeId.getNodeId()
         );
         auditEventSender.success(AuditActor.system(nodeId), NODE_STARTUP_INITIATE, auditEventContext);
 
