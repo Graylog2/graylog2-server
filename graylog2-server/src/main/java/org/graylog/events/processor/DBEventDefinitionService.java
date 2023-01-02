@@ -18,6 +18,7 @@ package org.graylog.events.processor;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.events.notifications.EventNotificationConfig;
+import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -67,14 +68,16 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
     }
 
     public int deleteUnregister(String id) {
-        // Must ensure mutability before deleting, so that de-registration is only performed if entity exists
+        // Must ensure deletability and mutability before deleting, so that de-registration is only performed if entity exists
         // and is not mutable.
-        ensureMutability(get(id).orElseThrow(() -> new IllegalArgumentException("Event Definition not found.")));
+        final EventDefinitionDto dto = get(id).orElseThrow(() -> new IllegalArgumentException("Event Definition not found."));
+        ensureDeletability(dto);
+        ensureMutability(dto);
         return doDeleteUnregister(id, () -> super.delete(id));
     }
 
     public int deleteUnregisterImmutable(String id) {
-        return doDeleteUnregister(id, () -> super.deleteImmutable(id));
+        return doDeleteUnregister(id, () -> super.forceDelete(id));
     }
 
     private int doDeleteUnregister(String id, Supplier<Integer> deleteSupplier) {
@@ -96,8 +99,17 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
      */
     public List<EventDefinitionDto> getByNotificationId(String notificationId) {
         final String field = String.format(Locale.US, "%s.%s",
-            EventDefinitionDto.FIELD_NOTIFICATIONS,
-            EventNotificationConfig.FIELD_NOTIFICATION_ID);
+                EventDefinitionDto.FIELD_NOTIFICATIONS,
+                EventNotificationConfig.FIELD_NOTIFICATION_ID);
         return ImmutableList.copyOf((db.find(DBQuery.is(field, notificationId)).iterator()));
+    }
+
+    /**
+     * Returns the list of system event definitions
+     *
+     * @return the matching event definitions
+     */
+    public List<EventDefinitionDto> getSystemEventDefinitions() {
+        return ImmutableList.copyOf((db.find(DBQuery.is(EventDefinitionDto.FIELD_SCOPE, SystemNotificationEventEntityScope.NAME)).iterator()));
     }
 }

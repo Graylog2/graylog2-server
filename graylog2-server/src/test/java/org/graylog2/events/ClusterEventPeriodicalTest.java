@@ -31,6 +31,7 @@ import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.system.debug.DebugEvent;
@@ -41,7 +42,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -56,7 +56,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class ClusterEventPeriodicalTest {
     @Rule
@@ -68,8 +67,7 @@ public class ClusterEventPeriodicalTest {
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-    @Mock
-    private NodeId nodeId;
+    private final NodeId nodeId = new SimpleNodeId("ID");
     @Spy
     private EventBus serverEventBus;
     @Spy
@@ -84,7 +82,6 @@ public class ClusterEventPeriodicalTest {
         this.mongoConnection = mongodb.mongoConnection();
 
         MongoJackObjectMapperProvider provider = new MongoJackObjectMapperProvider(objectMapper);
-        when(nodeId.toString()).thenReturn("ID");
 
         this.clusterEventPeriodical = new ClusterEventPeriodical(
                 provider,
@@ -128,7 +125,7 @@ public class ClusterEventPeriodicalTest {
 
         @SuppressWarnings("unchecked")
         final List<String> consumers = (List<String>) collection.findOne().get("consumers");
-        assertThat(consumers).containsExactly(nodeId.toString());
+        assertThat(consumers).containsExactly(nodeId.getNodeId());
 
         verify(serverEventBus, never()).post(any());
         verify(clusterEventBus, never()).post(any());
@@ -160,7 +157,7 @@ public class ClusterEventPeriodicalTest {
 
         @SuppressWarnings("unchecked")
         final List<String> consumers = (List<String>) collection.findOne().get("consumers");
-        assertThat(consumers).containsExactly(nodeId.toString());
+        assertThat(consumers).containsExactly(nodeId.getNodeId());
 
         verify(serverEventBus, times(1)).post(any(SimpleEvent.class));
         verify(clusterEventBus, never()).post(any());
@@ -188,7 +185,7 @@ public class ClusterEventPeriodicalTest {
 
         @SuppressWarnings("unchecked")
         final List<String> consumers = (List<String>) collection.findOne().get("consumers");
-        assertThat(consumers).containsExactly(nodeId.toString());
+        assertThat(consumers).containsExactly(nodeId.getNodeId());
 
         verify(serverEventBus, times(1)).post(event);
         verify(clusterEventBus, never()).post(event);
@@ -215,7 +212,7 @@ public class ClusterEventPeriodicalTest {
 
         @SuppressWarnings("unchecked")
         final List<String> consumers = (List<String>) collection.findOne().get("consumers");
-        assertThat(consumers).containsExactly(nodeId.toString());
+        assertThat(consumers).containsExactly(nodeId.getNodeId());
 
         verify(serverEventBus, times(1)).post(new SimpleEvent("test"));
         verify(clusterEventBus, never()).post(event);
@@ -236,7 +233,7 @@ public class ClusterEventPeriodicalTest {
 
         DBObject dbObject = collection.findOne();
 
-        assertThat((String) dbObject.get("producer")).isEqualTo(nodeId.toString());
+        assertThat((String) dbObject.get("producer")).isEqualTo(nodeId.getNodeId());
         assertThat((String) dbObject.get("event_class")).isEqualTo(SimpleEvent.class.getCanonicalName());
 
         @SuppressWarnings("unchecked")
@@ -259,7 +256,7 @@ public class ClusterEventPeriodicalTest {
 
         DBObject dbObject = collection.findOne();
 
-        assertThat((String) dbObject.get("producer")).isEqualTo(nodeId.toString());
+        assertThat((String) dbObject.get("producer")).isEqualTo(nodeId.getNodeId());
         assertThat((String) dbObject.get("event_class")).isEqualTo(DebugEvent.class.getCanonicalName());
     }
 
@@ -314,7 +311,7 @@ public class ClusterEventPeriodicalTest {
 
         DBObject dbObject = collection.findOne();
 
-        assertThat(((BasicDBList)dbObject.get("consumers")).toArray()).isEqualTo(new String[] { nodeId.toString() });
+        assertThat(((BasicDBList)dbObject.get("consumers")).toArray()).isEqualTo(new String[] { nodeId.getNodeId() });
     }
 
     @Test
@@ -331,7 +328,7 @@ public class ClusterEventPeriodicalTest {
         DBObject event = new BasicDBObjectBuilder()
                 .add("timestamp", TIME.getMillis())
                 .add("producer", "TEST-PRODUCER")
-                .add("consumers", Collections.singletonList(nodeId.toString()))
+                .add("consumers", Collections.singletonList(nodeId.getNodeId()))
                 .add("event_class", SimpleEvent.class.getCanonicalName())
                 .add("payload", ImmutableMap.of("payload", "test"))
                 .get();

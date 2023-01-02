@@ -20,6 +20,12 @@ import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
+import org.graylog.events.processor.DBEventDefinitionService;
+import org.graylog.events.processor.EventDefinitionDto;
+import org.graylog.events.processor.EventProcessorEngine;
+import org.graylog.events.processor.EventProcessorException;
+import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorParameters;
+import org.graylog.events.processor.systemnotification.SystemNotificationRenderService;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.cluster.Node;
@@ -35,6 +41,7 @@ import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.graylog2.audit.AuditEventTypes.SYSTEM_NOTIFICATION_CREATE;
@@ -45,12 +52,21 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
 
     private final NodeId nodeId;
     private final AuditEventSender auditEventSender;
+    private final EventProcessorEngine eventProcessorEngine;
+    private final DBEventDefinitionService dbEventDefinitionService;
+    private final SystemNotificationRenderService systemNotificationRenderService;
 
     @Inject
-    public NotificationServiceImpl(NodeId nodeId, MongoConnection mongoConnection, AuditEventSender auditEventSender) {
+    public NotificationServiceImpl(
+            NodeId nodeId, MongoConnection mongoConnection, AuditEventSender auditEventSender,
+            EventProcessorEngine eventProcessorEngine, DBEventDefinitionService dbEventDefinitionService,
+            SystemNotificationRenderService systemNotificationRenderService) {
         super(mongoConnection);
         this.nodeId = checkNotNull(nodeId);
         this.auditEventSender = auditEventSender;
+        this.eventProcessorEngine = eventProcessorEngine;
+        this.dbEventDefinitionService = dbEventDefinitionService;
+        this.systemNotificationRenderService = systemNotificationRenderService;
         collection(NotificationImpl.class).createIndex(NotificationImpl.FIELD_TYPE);
     }
 
@@ -68,12 +84,12 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
     }
 
     @Override
-    public boolean fixed(NotificationImpl.Type type) {
+    public boolean fixed(Notification.Type type) {
         return fixed(type, null);
     }
 
     @Override
-    public boolean fixed(NotificationImpl.Type type, Node node) {
+    public boolean fixed(Notification.Type type, Node node) {
         BasicDBObject qry = new BasicDBObject();
         qry.put(NotificationImpl.FIELD_TYPE, type.toString().toLowerCase(Locale.ENGLISH));
         if (node != null) {
@@ -88,7 +104,7 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
     }
 
     @Override
-    public boolean isFirst(NotificationImpl.Type type) {
+    public boolean isFirst(Notification.Type type) {
         return findOne(NotificationImpl.class, new BasicDBObject(NotificationImpl.FIELD_TYPE, type.toString().toLowerCase(Locale.ENGLISH))) == null;
     }
 
@@ -108,10 +124,21 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
     }
 
     @Override
+    public Optional<Notification> getByType(Notification.Type type) {
+        DBObject dbObject = findOne(NotificationImpl.class,
+                new BasicDBObject(NotificationImpl.FIELD_TYPE, type.toString().toLowerCase(Locale.ENGLISH)));
+        if (dbObject != null) {
+            return Optional.of(new NotificationImpl(new ObjectId(dbObject.get("_id").toString()), dbObject.toMap()));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public boolean publishIfFirst(Notification notification) {
         // node id should never be empty
         if (notification.getNodeId() == null) {
-            notification.addNode(nodeId.toString());
+            notification.addNode(nodeId.getNodeId());
         }
 
         // also the timestamp should never be empty
@@ -126,14 +153,35 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
         try {
             save(notification);
             auditEventSender.success(AuditActor.system(nodeId), SYSTEM_NOTIFICATION_CREATE, notification.asMap());
-        } catch(ValidationException e) {
+            createSystemEvent(notification);
+        } catch (ValidationException e) {
             // We have no validations, but just in case somebody adds some...
             LOG.error("Validating user warning failed.", e);
             auditEventSender.failure(AuditActor.system(nodeId), SYSTEM_NOTIFICATION_CREATE, notification.asMap());
             return false;
+        } catch (EventProcessorException processorException) {
+            LOG.error("Failed to create event for system notification {}", notification.getType().toString(), processorException);
+            return false;
         }
 
         return true;
+    }
+
+    private void createSystemEvent(Notification notification) throws EventProcessorException {
+        final EventDefinitionDto systemEventDefinition =
+                dbEventDefinitionService.getSystemEventDefinitions().stream().findFirst()
+                        .orElseThrow(() -> new IllegalStateException("System notification event definition not found"));
+
+        SystemNotificationRenderService.RenderResponse renderResponse = systemNotificationRenderService.render(notification);
+        notification.addDetail("message_details", renderResponse.description);
+        SystemNotificationEventProcessorParameters parameters =
+                SystemNotificationEventProcessorParameters.builder()
+                        .notificationType(notification.getType())
+                        .notificationMessage(renderResponse.title)
+                        .notificationDetails(notification.getDetails())
+                        .timestamp(notification.getTimestamp())
+                        .build();
+        eventProcessorEngine.execute(systemEventDefinition.id(), parameters);
     }
 
     @Override

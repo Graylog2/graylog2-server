@@ -43,6 +43,10 @@ public final class Streams implements GraylogRestApi {
                                @JsonProperty("index_set_id") String indexSetId) {}
 
     public String createStream(String title, String indexSetId, StreamRule... streamRules) {
+        return createStream(title, indexSetId, true, streamRules);
+    }
+
+    public String createStream(String title, String indexSetId, boolean started, StreamRule... streamRules) {
         final CreateStreamRequest body = new CreateStreamRequest(title, List.of(streamRules), indexSetId);
         final String streamId = given()
                 .spec(this.requestSpecification)
@@ -55,13 +59,15 @@ public final class Streams implements GraylogRestApi {
                 .assertThat().body("stream_id", notNullValue())
                 .extract().body().jsonPath().getString("stream_id");
 
-        given()
-                .spec(this.requestSpecification)
-                .when()
-                .post("/streams/" + streamId + "/resume")
-                .then()
-                .log().ifError()
-                .statusCode(204);
+        if (started) {
+            given()
+                    .spec(this.requestSpecification)
+                    .when()
+                    .post("/streams/" + streamId + "/resume")
+                    .then()
+                    .log().ifError()
+                    .statusCode(204);
+        }
 
         return streamId;
     }

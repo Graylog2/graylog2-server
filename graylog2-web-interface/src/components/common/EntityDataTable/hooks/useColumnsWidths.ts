@@ -22,6 +22,8 @@ import {
   DEFAULT_COL_WIDTH,
 } from 'components/common/EntityDataTable/Constants';
 
+import type { EntityBase } from '../types';
+
 const assignableTableWidth = ({
   tableWidth,
   actionsColWidth,
@@ -69,7 +71,7 @@ const columnsWidth = ({
   }));
 };
 
-const useColumnsWidths = <Entity extends { id: string }>({
+const useColumnsWidths = <Entity extends EntityBase>({
   actionsColWidth,
   bulkSelectColWidth,
   columnRenderers,

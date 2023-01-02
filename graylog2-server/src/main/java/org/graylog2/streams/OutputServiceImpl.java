@@ -28,7 +28,6 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.outputs.events.OutputChangedEvent;
-import org.graylog2.outputs.events.OutputDeletedEvent;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
@@ -104,9 +103,10 @@ public class OutputServiceImpl implements OutputService {
     @Override
     public void destroy(Output model) throws NotFoundException {
         coll.removeById(model.getId());
-        streamService.removeOutputFromAllStreams(model);
 
-        this.clusterEventBus.post(OutputDeletedEvent.create(model.getId()));
+        // Removing the output from all streams will emit a StreamsChangedEvent for affected streams.
+        // The OutputRegistry will handle this event and stop the output.
+        streamService.removeOutputFromAllStreams(model);
     }
 
     @Override
