@@ -95,9 +95,13 @@ const BackendsOverview = () => {
   useEffect(() => _updateListOnBackendDelete({ query, page, perPage }, setLoading, setPaginatedBackends, resetPage), [query, page, perPage, resetPage]);
   useEffect(() => _updateListOnBackendActivation({ query, page, perPage }, setLoading, setPaginatedBackends, resetPage), [query, page, perPage, resetPage]);
 
-  const onSearch = (newQuery: string) => {
+  const onSearch = (newQuery: string, resetLoadingStateCb: () => void) => {
     resetPage();
     setQuery(newQuery);
+
+    if (!loading && resetLoadingStateCb) {
+      resetLoadingStateCb();
+    }
   };
 
   if (!paginatedBackends || !paginatedRoles) {

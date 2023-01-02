@@ -51,6 +51,7 @@ public abstract class LDAPAuthServiceBackendConfig implements AuthServiceBackend
     private static final String FIELD_USER_UNIQUE_ID_ATTRIBUTE = "user_unique_id_attribute";
     private static final String FIELD_USER_NAME_ATTRIBUTE = "user_name_attribute";
     private static final String FIELD_USER_FULL_NAME_ATTRIBUTE = "user_full_name_attribute";
+    private static final String FIELD_EMAIL_ATTRIBUTES = "email_attributes";
 
     @JsonProperty(FIELD_SERVERS)
     public abstract ImmutableList<HostAndPort> servers();
@@ -81,6 +82,9 @@ public abstract class LDAPAuthServiceBackendConfig implements AuthServiceBackend
 
     @JsonProperty(FIELD_USER_FULL_NAME_ATTRIBUTE)
     public abstract String userFullNameAttribute();
+
+    @JsonProperty(FIELD_EMAIL_ATTRIBUTES)
+    public abstract ImmutableList<String> emailAttributes();
 
     @Override
     public void validate(ValidationResult result) {
@@ -138,7 +142,8 @@ public abstract class LDAPAuthServiceBackendConfig implements AuthServiceBackend
                     .verifyCertificates(true)
                     .systemUserDn("")
                     .systemUserPassword(EncryptedValue.createUnset())
-                    .userUniqueIdAttribute("entryUUID");
+                    .userUniqueIdAttribute("entryUUID")
+                    .emailAttributes(ImmutableList.of("mail", "rfc822Mailbox"));
         }
 
         @JsonProperty(FIELD_SERVERS)
@@ -170,6 +175,9 @@ public abstract class LDAPAuthServiceBackendConfig implements AuthServiceBackend
 
         @JsonProperty(FIELD_USER_FULL_NAME_ATTRIBUTE)
         public abstract Builder userFullNameAttribute(String userFullNameAttribute);
+
+        @JsonProperty(FIELD_EMAIL_ATTRIBUTES)
+        public abstract Builder emailAttributes(List<String> emailAttributes);
 
         public abstract LDAPAuthServiceBackendConfig build();
     }
