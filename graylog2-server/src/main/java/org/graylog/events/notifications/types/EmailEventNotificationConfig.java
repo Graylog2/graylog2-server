@@ -73,6 +73,7 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
             "\n";
 
     private static final String FIELD_SENDER = "sender";
+    private static final String FIELD_REPLY_TO = "reply_to";
     private static final String FIELD_SUBJECT = "subject";
     private static final String FIELD_BODY_TEMPLATE = "body_template";
     private static final String FIELD_HTML_BODY_TEMPLATE = "html_body_template";
@@ -82,6 +83,9 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
 
     @JsonProperty(FIELD_SENDER)
     public abstract String sender();
+
+    @JsonProperty(FIELD_REPLY_TO)
+    public abstract String replyTo();
 
     @JsonProperty(FIELD_SUBJECT)
     @NotBlank
@@ -137,6 +141,7 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
             return new AutoValue_EmailEventNotificationConfig.Builder()
                     .type(TYPE_NAME)
                     .sender(DEFAULT_SENDER)
+                    .replyTo(DEFAULT_SENDER)
                     .subject(DEFAULT_SUBJECT)
                     .emailRecipients(ImmutableSet.of())
                     .userRecipients(ImmutableSet.of())
@@ -147,6 +152,9 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
 
         @JsonProperty(FIELD_SENDER)
         public abstract Builder sender(String sender);
+
+        @JsonProperty(FIELD_REPLY_TO)
+        public abstract Builder replyTo(String sender);
 
         @JsonProperty(FIELD_SUBJECT)
         public abstract Builder subject(String subject);
