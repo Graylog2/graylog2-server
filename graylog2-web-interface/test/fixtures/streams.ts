@@ -14,19 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.outputs.events;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+/* eslint-disable import/prefer-default-export */
+import type { Stream } from 'stores/streams/StreamsStore';
 
-@AutoValue
-public abstract class OutputDeletedEvent {
-    @JsonProperty("output_id")
-    public abstract String outputId();
-
-    @JsonCreator
-    public static OutputDeletedEvent create(@JsonProperty("output_id") String outputId) {
-        return new AutoValue_OutputDeletedEvent(outputId);
-    }
-}
+export const stream: Stream = {
+  content_pack: null,
+  created_at: '2020-10-10T10:10:00.000Z',
+  creator_user_id: 'admin',
+  description: 'Lorem ipsum dolor sit amet',
+  disabled: true,
+  id: 'stream-id-1',
+  index_set_id: 'index-set-id-1',
+  is_default: false,
+  is_editable: true,
+  matching_type: 'AND',
+  outputs: [],
+  remove_matches_from_default_stream: false,
+  rules: [],
+  title: 'Example stream',
+};

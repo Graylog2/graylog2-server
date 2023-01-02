@@ -43,18 +43,21 @@ const AssignIndexSetModal = ({
   toggleShowModal,
   indexSets,
   refetchStreams,
+  setSelectedStreamIds,
   descriptor,
 }: {
-  selectedStreamIds: Array<string>,
-  toggleShowModal: () => void,
+  descriptor: string,
   indexSets: Array<IndexSet>,
   refetchStreams: () => void,
-  descriptor: string,
+  setSelectedStreamIds: (streamIds: Array<string>) => void
+  selectedStreamIds: Array<string>,
+  toggleShowModal: () => void,
 }) => {
   const modalTitle = `Assign Index Set To ${selectedStreamIds.length} ${StringUtils.capitalizeFirstLetter(descriptor)}`;
   const onSubmit = ({ index_set_id: indexSetId }: AssignIndexSetFormValues) => Streams.assignToIndexSet(indexSetId, selectedStreamIds).then(() => {
     refetchStreams();
     UserNotification.success(`Index set was assigned to ${selectedStreamIds.length} ${descriptor} successfully.`, 'Success');
+    setSelectedStreamIds([]);
     toggleShowModal();
   }).catch((error: FetchError) => {
     UserNotification.error(`Assigning index set failed with status: ${error}`, 'Error');
@@ -122,9 +125,9 @@ const BulkActions = ({ selectedStreamIds, refetchStreams, setSelectedStreamIds, 
       Promise.allSettled(deleteCalls).then((result) => {
         const fulfilledRequests = result.filter((response) => response.status === 'fulfilled') as Array<{ status: 'fulfilled', value: string }>;
         const deletedStreamIds = fulfilledRequests.map(({ value }) => value);
+        const notDeletedStreamIds = selectedStreamIds?.filter((streamId) => !deletedStreamIds.includes(streamId));
 
-        if (deletedStreamIds?.length !== selectedStreamIds.length) {
-          const notDeletedStreamIds = selectedStreamIds.filter((streamId) => !deletedStreamIds.includes(streamId));
+        if (notDeletedStreamIds.length) {
           const rejectedRequests = result.filter((response) => response.status === 'rejected') as Array<{ status: 'rejected', reason: FetchError }>;
           const errorMessages = uniq(rejectedRequests.map((request) => request.reason.responseMessage));
 
@@ -132,14 +135,13 @@ const BulkActions = ({ selectedStreamIds, refetchStreams, setSelectedStreamIds, 
             queryClient.invalidateQueries(['streams', 'overview']);
           }
 
-          setSelectedStreamIds(notDeletedStreamIds);
-
           UserNotification.error(`${notDeletedStreamIds.length} out of ${selectedItemsAmount} selected ${descriptor} could not be deleted. Status: ${errorMessages.join()}`);
 
           return;
         }
 
         queryClient.invalidateQueries(['streams', 'overview']);
+        setSelectedStreamIds(notDeletedStreamIds);
         UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`, 'Success');
       });
     }
@@ -157,6 +159,7 @@ const BulkActions = ({ selectedStreamIds, refetchStreams, setSelectedStreamIds, 
       <Button bsSize="xsmall" bsStyle="danger" onClick={onDelete}>Delete</Button>
       {showIndexSetModal && (
         <AssignIndexSetModal selectedStreamIds={selectedStreamIds}
+                             setSelectedStreamIds={setSelectedStreamIds}
                              toggleShowModal={toggleAssignIndexSetModal}
                              indexSets={indexSets}
                              descriptor={descriptor}

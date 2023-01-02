@@ -92,7 +92,7 @@ public class DBJobTriggerService {
                                JobSchedulerClock clock,
                                SchedulerCapabilitiesService schedulerCapabilitiesService,
                                @Named(LOCK_EXPIRATION_DURATION) Duration lockExpirationDuration) {
-        this.nodeId = nodeId.toString();
+        this.nodeId = nodeId.getNodeId();
         this.clock = clock;
         this.schedulerCapabilitiesService = schedulerCapabilitiesService;
         this.lockExpirationDuration = lockExpirationDuration;
