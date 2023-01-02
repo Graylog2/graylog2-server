@@ -14,19 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.outputs.events;
+import type { ArrayElement } from 'views/types';
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+export const axisTypes = ['linear', 'logarithmic'] as const;
 
-@AutoValue
-public abstract class OutputDeletedEvent {
-    @JsonProperty("output_id")
-    public abstract String outputId();
+export type AxisType = ArrayElement<typeof axisTypes>;
 
-    @JsonCreator
-    public static OutputDeletedEvent create(@JsonProperty("output_id") String outputId) {
-        return new AutoValue_OutputDeletedEvent(outputId);
-    }
+export interface XYVisualization {
+  axisType: AxisType;
 }
+
+export const DEFAULT_AXIS_TYPE: AxisType = 'linear';

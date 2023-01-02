@@ -21,15 +21,20 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import type { Stream } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 
-const useStreams = (searchParams: SearchParams): {
+type Options = {
+  enabled: boolean,
+}
+
+const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
   data: {
     streams: Array<Stream>,
     pagination: { total: number }
     attributes: Array<{ id: string, title: string, sortable: boolean }>
   } | undefined,
-  refetch: () => void
+  refetch: () => void,
+  isFetching: boolean,
 } => {
-  const { data, refetch } = useQuery(
+  const { data, refetch, isFetching } = useQuery(
     ['streams', 'overview', searchParams],
     () => StreamsStore.searchPaginated(
       searchParams.page,
@@ -43,12 +48,14 @@ const useStreams = (searchParams: SearchParams): {
           'Could not load streams');
       },
       keepPreviousData: true,
+      enabled,
     },
   );
 
   return ({
     data,
     refetch,
+    isFetching,
   });
 };
 

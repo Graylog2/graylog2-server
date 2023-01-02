@@ -111,6 +111,7 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.DataTableVisua
 import org.graylog.plugins.views.search.views.widgets.aggregation.HeatmapVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.LineVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.NumberVisualizationConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.ScatterVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeUnitIntervalDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.ValueConfigDTO;
@@ -285,6 +286,7 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(AreaVisualizationConfigDTO.class);
         registerJacksonSubtype(HeatmapVisualizationConfigDTO.class);
         registerJacksonSubtype(DataTableVisualizationConfigDTO.class);
+        registerJacksonSubtype(ScatterVisualizationConfigDTO.class);
     }
 
     private void registerParameterSubtypes() {
