@@ -56,7 +56,7 @@ public class InputMetricMapping implements MetricMapping {
                 .map(type -> {
                     final String match = type + ".*." + config.inputMetricName();
                     final Map<String, String> labels = ImmutableMap.of(
-                            "node", nodeId.toString(),
+                            "node", nodeId.getNodeId(),
                             "input_id", "${0}",
                             "input_type", type
                     );
