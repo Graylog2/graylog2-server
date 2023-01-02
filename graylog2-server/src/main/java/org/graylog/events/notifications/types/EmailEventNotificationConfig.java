@@ -181,6 +181,7 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     public EventNotificationConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
         return EmailEventNotificationConfigEntity.builder()
                 .sender(ValueReference.of(sender()))
+                .replyTo(ValueReference.of(replyTo()))
                 .subject(ValueReference.of(subject()))
                 .bodyTemplate(ValueReference.of(bodyTemplate()))
                 .htmlBodyTemplate(ValueReference.of(htmlBodyTemplate()))
