@@ -28,9 +28,9 @@ import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
+import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
-import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.timeranges.TimeRanges;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -53,8 +53,8 @@ import java.util.stream.Collectors;
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
+import static org.graylog.events.processor.systemnotification.SystemNotificationEventIndexTemplateProvider.SYSTEM_EVENT_TEMPLATE_TYPE;
 import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
-import static org.graylog2.indexer.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 
 @Singleton
 public class Searches {
@@ -105,7 +105,7 @@ public class Searches {
     }
 
     @Deprecated
-    public ScrollResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter, int batchSize) {
+    public ChunkedResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter, int batchSize) {
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
         final Set<String> indexWildcards = indexSetRegistry.getForIndices(affectedIndices).stream()
                 .map(IndexSet::getIndexWildcard)
@@ -113,7 +113,7 @@ public class Searches {
 
         final Sorting sorting = new Sorting("_doc", Sorting.Direction.ASC);
 
-        ScrollCommand.Builder scrollCommandBuilder = ScrollCommand.builder()
+        ChunkCommand.Builder scrollCommandBuilder = ChunkCommand.builder()
                 .query(query)
                 .range(range)
                 .offset(offset)
@@ -124,9 +124,9 @@ public class Searches {
 
         // limit > 0 instead of ScrollCommand.NO_LIMIT is a fix for #9817, the caller of this method are only in the legacy-API
         scrollCommandBuilder = limit > 0 ? scrollCommandBuilder.limit(limit) : scrollCommandBuilder;
-        scrollCommandBuilder = batchSize != ScrollCommand.NO_BATCHSIZE ? scrollCommandBuilder.batchSize(batchSize) : scrollCommandBuilder;
+        scrollCommandBuilder = batchSize != ChunkCommand.NO_BATCHSIZE ? scrollCommandBuilder.batchSize(batchSize) : scrollCommandBuilder;
 
-        final ScrollResult result = searchesAdapter.scroll(scrollCommandBuilder.build());
+        final ChunkedResult result = searchesAdapter.scroll(scrollCommandBuilder.build());
 
         recordEsMetrics(result.tookMs(), range);
 
@@ -253,7 +253,7 @@ public class Searches {
         final SortedSet<IndexRange> indexRanges = indexRangeService.find(range.getFrom(), range.getTo());
         final Set<String> affectedIndexNames = indexRanges.stream().map(IndexRange::indexName).collect(Collectors.toSet());
         final Set<IndexSet> eventIndexSets = indexSetRegistry.getForIndices(affectedIndexNames).stream()
-                .filter(indexSet1 -> EVENT_TEMPLATE_TYPE.equals(indexSet1.getConfig().indexTemplateType().orElse(MESSAGE_TEMPLATE_TYPE)))
+                .filter(indexSet1 -> isEventIndexType(indexSet1.getConfig().indexTemplateType()))
                 .collect(Collectors.toSet());
         for (IndexRange indexRange : indexRanges) {
             // if we aren't in a stream search, we look at all the ranges matching the time range.
@@ -282,5 +282,9 @@ public class Searches {
         }
 
         return indices.build();
+    }
+
+    private boolean isEventIndexType(Optional<String> indexType) {
+        return indexType.filter(s -> (s.equals(EVENT_TEMPLATE_TYPE) || s.equals(SYSTEM_EVENT_TEMPLATE_TYPE))).isPresent();
     }
 }

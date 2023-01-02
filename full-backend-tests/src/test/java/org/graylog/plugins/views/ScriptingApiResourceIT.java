@@ -21,17 +21,15 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiModule;
-import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.completebackend.apis.GraylogApis;
+import org.graylog.testing.completebackend.apis.Sharing;
+import org.graylog.testing.completebackend.apis.SharingRequest;
+import org.graylog.testing.completebackend.apis.Streams;
+import org.graylog.testing.completebackend.apis.Users;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog.testing.utils.GelfInputUtils;
-import org.graylog.testing.utils.IndexSetUtils;
-import org.graylog.testing.utils.SharingRequest;
-import org.graylog.testing.utils.SharingUtils;
-import org.graylog.testing.utils.StreamUtils;
-import org.graylog.testing.utils.UserUtils;
 import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.rest.MoreMediaTypes;
 import org.hamcrest.Matcher;
@@ -47,14 +45,12 @@ import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.withPrecision;
 import static org.assertj.core.api.Java6Assertions.within;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.CoreMatchers.not;
@@ -65,48 +61,39 @@ import static org.hamcrest.Matchers.hasEntry;
                                    enabledFeatureFlags = ScriptingApiModule.FEATURE_FLAG)
 public class ScriptingApiResourceIT {
 
-    private final GraylogBackend sut;
+    public static final String DEFAULT_STREAM = "000000000000000000000001";
     private final RequestSpecification requestSpec;
+    private final GraylogApis api;
 
     private String stream1Id;
     private String stream2Id;
 
-    public ScriptingApiResourceIT(GraylogBackend sut, RequestSpecification requestSpec) {
-        this.sut = sut;
+    public ScriptingApiResourceIT(RequestSpecification requestSpec, GraylogApis apis) {
         this.requestSpec = requestSpec;
+        this.api = apis;
     }
 
     @BeforeAll
     public void beforeAll() {
 
-        final String defaultIndexSetId = IndexSetUtils.defaultIndexSetId(requestSpec);
+        final String defaultIndexSetId = api.indices().defaultIndexSetId();
 
-        final JsonPath user = UserUtils.createUser(requestSpec, new UserUtils.User(
-                "john.doe",
-                "asdfgh",
-                "John",
-                "Doe",
-                "john.doe@example.com",
-                false,
-                30_000,
-                "Europe/Vienna",
-                Collections.emptyList(),
-                Collections.emptyList()
-        ));
+        final JsonPath user = api.users().createUser(Users.JOHN_DOE);
 
         final String userId = user.getString("id");
 
 
-        this.stream1Id = StreamUtils.createStream(requestSpec, "Stream #1", defaultIndexSetId, new StreamUtils.StreamRule(StreamRuleType.EXACT.toInteger(), "stream1", "target_stream", false));
-        this.stream2Id = StreamUtils.createStream(requestSpec, "Stream #2", defaultIndexSetId, new StreamUtils.StreamRule(StreamRuleType.EXACT.toInteger(), "stream2", "target_stream", false));
+        this.stream1Id = api.streams().createStream("Stream #1", defaultIndexSetId, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream1", "target_stream", false));
+        this.stream2Id = api.streams().createStream("Stream #2", defaultIndexSetId, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream2", "target_stream", false));
 
-        SharingUtils.setSharing(requestSpec, new SharingRequest(
-                new SharingRequest.Entity(SharingUtils.ENTITY_STREAM, stream2Id),
+        api.sharing().setSharing(new SharingRequest(
+                new SharingRequest.Entity(Sharing.ENTITY_STREAM, stream2Id),
                 ImmutableMap.of(
-                        new SharingRequest.Entity(SharingUtils.ENTITY_USER, userId), SharingUtils.PERMISSION_VIEW
+                        new SharingRequest.Entity(Sharing.ENTITY_USER, userId), Sharing.PERMISSION_VIEW
                 )));
 
-        GelfInputUtils.createGelfHttpInput(sut, 12201, requestSpec)
+        api.gelf()
+                .createGelfHttpInput(12201)
                 .postMessage("""
                         {"short_message":"search-sync-test", "host":"example.org", "facility":"test", "_level":1, "_target_stream": "stream1"}
                         """)
@@ -115,8 +102,36 @@ public class ScriptingApiResourceIT {
                         """)
                 .postMessage("""
                         {"short_message":"search-sync-test-3", "host":"lorem-ipsum.com", "facility":"another-test", "_level":3, "_http_method":"POST", "_target_stream": "stream2"}
-                        """)
-                .waitForAllMessages();
+                        """);
+
+        api.search().waitForMessagesCount(3);
+        api.fieldTypes().waitForFieldTypeDefinitions( "source", "facility", "level");
+    }
+
+    @ContainerMatrixTest
+    void testAggregationByStream() {
+        final ValidatableResponse validatableResponse =
+                api.post("/search/aggregate","""
+                         {
+                           "group_by": [
+                             {
+                               "field": "streams"
+                             }
+                           ],
+                           "metrics": [
+                             {
+                               "function": "count"
+                             }
+                           ]
+                        }
+                         """, 200);
+
+        validatableResponse.log().ifValidationFails()
+                .assertThat().body("datarows", Matchers.hasSize(3));
+
+        validateRow(validatableResponse, DEFAULT_STREAM, 3);
+        validateRow(validatableResponse, stream2Id, 2);
+        validateRow(validatableResponse, stream1Id, 1);
     }
 
     @ContainerMatrixTest
@@ -580,6 +595,130 @@ public class ScriptingApiResourceIT {
         final DateTime toDateTime = DateTime.parse(to);
         final float diff = toDateTime.getMillis() - fromDateTime.getMillis();
         assertThat(diff).isCloseTo(300_000, within(10_000f));
+    }
+
+    @ContainerMatrixTest
+    void testErrorHandling() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("""
+                        {
+                          "group_by": [
+                            {
+                              "field": "facility"
+                            }
+                          ],
+                          "metrics": [
+                            {
+                              "function": "max",
+                              "field": "facility"
+                            }
+                          ]
+                        }
+                        """)
+                .post("/search/aggregate")
+                .then()
+                .statusCode(400)
+                .assertThat()
+                .body("type", Matchers.equalTo("ApiError"))
+                .body("message", Matchers.containsString("Failed to obtain results"));
+    }
+
+    @ContainerMatrixTest
+    void testMessages() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("""
+                        {
+                          "fields": ["source", "facility", "level"]
+                        }
+                        """)
+                .post("/search/messages")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200);
+
+        validateSchema(validatableResponse, "field: source", "string", "source");
+        validateSchema(validatableResponse, "field: facility", "string", "facility");
+        validateSchema(validatableResponse, "field: level", "numeric", "level");
+
+        validateRow(validatableResponse, "lorem-ipsum.com", "another-test", 3);
+        validateRow(validatableResponse, "example.org", "another-test", 2);
+        validateRow(validatableResponse, "example.org", "test", 1);
+
+    }
+
+    @ContainerMatrixTest
+    void testMessagesWithSorting() {
+        ValidatableResponse validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("""
+                        {
+                          "fields": ["source", "facility", "level"],
+                          "sort": "level",
+                          "sort_order" : "Descending"
+                        }
+                        """)
+                .post("/search/messages")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200);
+
+        List<List<Object>> rows = validatableResponse.extract().body().jsonPath().getList("datarows");
+        Assertions.assertEquals(rows.size(), 3);
+        assertThat(rows.get(0)).contains(3);
+        assertThat(rows.get(1)).contains(2);
+        assertThat(rows.get(2)).contains(1);
+
+        validatableResponse = given()
+                .spec(requestSpec)
+                .when()
+                .body("""
+                        {
+                          "fields": ["source", "facility", "level"],
+                          "sort": "facility",
+                          "sort_order" : "Ascending"
+                        }
+                        """)
+                .post("/search/messages")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200);
+
+        rows = validatableResponse.extract().body().jsonPath().getList("datarows");
+        Assertions.assertEquals(rows.size(), 3);
+        assertThat(rows.get(0)).contains("another-test");
+        assertThat(rows.get(1)).contains("another-test");
+        assertThat(rows.get(2)).contains("test");
+
+    }
+
+    @ContainerMatrixTest
+    void testMessagesGetRequestAscii() {
+        final List<String> response = given()
+                .spec(requestSpec)
+                .when()
+                .header(new Header("Accept", MediaType.TEXT_PLAIN))
+                .get("/search/messages?fields=source,facility,level")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .extract().body().asString().strip().lines().toList();
+
+        final List<String> expected = """
+                ┌────────────────────────┬────────────────────────┬───────────────────────┐
+                │field: source           │field: facility         │field: level           │
+                ├────────────────────────┼────────────────────────┼───────────────────────┤
+                │lorem-ipsum.com         │another-test            │3                      │
+                │example.org             │another-test            │2                      │
+                │example.org             │test                    │1                      │
+                └────────────────────────┴────────────────────────┴───────────────────────┘
+                """.strip().lines().toList();
+
+        assertThat(response.size()).isEqualTo(expected.size());
+        assertThat(expected.containsAll(response)).isTrue();
     }
 
 

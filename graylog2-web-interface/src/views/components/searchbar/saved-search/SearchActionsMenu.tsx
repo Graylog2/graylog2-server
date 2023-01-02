@@ -34,7 +34,7 @@ import EntityShareModal from 'components/permissions/EntityShareModal';
 import useCurrentUser from 'hooks/useCurrentUser';
 import * as ViewsPermissions from 'views/Permissions';
 import type User from 'logic/users/User';
-import ViewPropertiesModal from 'views/components/views/DashboardPropertiesModal';
+import ViewPropertiesModal from 'views/components/dashboard/DashboardPropertiesModal';
 import { loadAsDashboard, loadNewSearch } from 'views/logic/views/Actions';
 import IfPermitted from 'components/common/IfPermitted';
 import {
@@ -43,7 +43,7 @@ import {
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 
 import SavedSearchForm from './SavedSearchForm';
-import SavedSearchList from './SavedSearchList';
+import SavedSearchesModal from './SavedSearchesModal';
 
 const Container = styled(ButtonGroup)`
   display: flex;
@@ -136,11 +136,14 @@ const SearchActionsMenu = () => {
   const deleteSavedSearch = (deletedView: View) => {
     return ViewManagementActions.delete(deletedView)
       .then(() => UserNotification.success(`Deleting view "${deletedView.title}" was successful!`, 'Success!'))
-      .then(() => ViewActions.create(View.Type.Search))
       .then(() => {
         if (deletedView.id === view.id) {
-          loadNewSearch();
+          return ViewActions.create(View.Type.Search).then(() => {
+            loadNewSearch();
+          });
         }
+
+        return Promise.resolve();
       })
       .catch((error) => UserNotification.error(`Deleting view failed: ${_extractErrorMessage(error)}`, 'Error!'));
   };
@@ -169,9 +172,9 @@ const SearchActionsMenu = () => {
         <Icon name="folder" type="regular" /> Load
       </Button>
       {showList && (
-        <SavedSearchList deleteSavedSearch={deleteSavedSearch}
-                         toggleModal={toggleListModal}
-                         activeSavedSearchId={view.id} />
+        <SavedSearchesModal deleteSavedSearch={deleteSavedSearch}
+                            toggleModal={toggleListModal}
+                            activeSavedSearchId={view.id} />
       )}
       <ShareButton entityType="search"
                    entityId={view.id}

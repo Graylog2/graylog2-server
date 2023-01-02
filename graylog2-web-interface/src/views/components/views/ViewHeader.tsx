@@ -23,7 +23,7 @@ import { useStore } from 'stores/connect';
 import { ViewStore } from 'views/stores/ViewStore';
 import { Icon } from 'components/common';
 import { Row } from 'components/bootstrap';
-import ViewPropertiesModal from 'views/components/views/DashboardPropertiesModal';
+import ViewPropertiesModal from 'views/components/dashboard/DashboardPropertiesModal';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
 import View from 'views/logic/views/View';
 import Routes from 'routing/Routes';

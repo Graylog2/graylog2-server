@@ -31,7 +31,6 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.outputs.events.OutputChangedEvent;
-import org.graylog2.outputs.events.OutputDeletedEvent;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.streams.Output;
@@ -91,7 +90,7 @@ public class OutputRegistry {
         this.faultPenaltySeconds = faultPenaltySeconds;
         this.faultCounters = CacheBuilder.newBuilder()
                 .expireAfterWrite(this.faultPenaltySeconds, TimeUnit.SECONDS)
-                .build(new CacheLoader<String, AtomicInteger>() {
+                .build(new CacheLoader<>() {
                     @Override
                     public AtomicInteger load(String key) throws Exception {
                         return new AtomicInteger(0);
@@ -129,11 +128,6 @@ public class OutputRegistry {
         Sets.difference(currentlyRunningOutputs, expectedRunningOutputs).forEach(this::removeOutput);
     }
 
-    @Subscribe
-    public void handleOutputDeleted(OutputDeletedEvent outputDeletedEvent) {
-        removeOutput(outputDeletedEvent.outputId());
-    }
-
     @Nullable
     public MessageOutput getOutputForIdAndStream(String id, Stream stream) {
         final AtomicInteger faultCount;
@@ -162,7 +156,7 @@ public class OutputRegistry {
                     final Notification notification = notificationService.buildNow()
                             .addType(Notification.Type.OUTPUT_DISABLED)
                             .addSeverity(Notification.Severity.NORMAL)
-                            .addNode(nodeId.toString())
+                            .addNode(nodeId.getNodeId())
                             .addDetail("outputId", id)
                             .addDetail("streamId", stream.getId())
                             .addDetail("streamTitle", stream.getTitle())
@@ -177,7 +171,7 @@ public class OutputRegistry {
     }
 
     public Callable<MessageOutput> loadForIdAndStream(final String id, final Stream stream) {
-        return new Callable<MessageOutput>() {
+        return new Callable<>() {
             @Override
             public MessageOutput call() throws Exception {
                 final Output output = outputService.load(id);

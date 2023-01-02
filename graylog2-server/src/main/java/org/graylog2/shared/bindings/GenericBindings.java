@@ -26,6 +26,7 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.name.Names;
 import okhttp3.OkHttpClient;
+import org.graylog.events.processor.systemnotification.SystemNotificationEventIndexTemplateProvider;
 import org.graylog.failure.DefaultFailureHandler;
 import org.graylog.failure.DefaultFailureHandlingConfiguration;
 import org.graylog.failure.FailureHandler;
@@ -50,6 +51,7 @@ import org.graylog2.shared.buffers.InputBufferImpl;
 import org.graylog2.shared.buffers.NoopInputBuffer;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.processors.DecodingProcessor;
+import org.graylog2.shared.buffers.processors.MessageULIDGenerator;
 import org.graylog2.shared.inputs.InputRegistry;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -80,6 +82,7 @@ public class GenericBindings extends Graylog2Module {
         if (!isMigrationCommand) {
             bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
         }
+        bind(MessageULIDGenerator.class).asEagerSingleton();
 
         bind(ThroughputCounter.class);
 
@@ -112,6 +115,8 @@ public class GenericBindings extends Graylog2Module {
         indexTemplateProviderBinder.addBinding(MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE)
                 .to(MessageIndexTemplateProvider.class);
         indexTemplateProviderBinder.addBinding(EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE)
+                .to(EventIndexTemplateProvider.class);
+        indexTemplateProviderBinder.addBinding(SystemNotificationEventIndexTemplateProvider.SYSTEM_EVENT_TEMPLATE_TYPE)
                 .to(EventIndexTemplateProvider.class);
 
         serviceBinder().addBinding().to(FailureHandlingService.class).in(Scopes.SINGLETON);

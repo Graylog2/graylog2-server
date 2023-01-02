@@ -24,6 +24,7 @@ import com.github.rholder.retry.WaitStrategies;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.utils.GelfInputUtils;
@@ -49,25 +50,21 @@ public class SearchSyncIT {
 
     private final GraylogBackend sut;
     private final RequestSpecification requestSpec;
+    private final GraylogApis api;
 
-    public SearchSyncIT(GraylogBackend sut, RequestSpecification requestSpec) {
+    public SearchSyncIT(GraylogBackend sut, RequestSpecification requestSpec, GraylogApis api) {
         this.sut = sut;
         this.requestSpec = requestSpec;
+        this.api = api;
     }
 
     @BeforeAll
     public void importMongoFixtures() {
         this.sut.importMongoDBFixture("mongodb-stored-searches-for-execution-endpoint.json", SearchSyncIT.class);
 
-        int mappedPort = sut.mappedPortFor(GELF_HTTP_PORT);
-        GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, requestSpec);
-        GelfInputUtils.postMessage(mappedPort,
-                "{\"short_message\":\"search-sync-test\", \"host\":\"example.org\", \"facility\":\"test\"}",
-                requestSpec);
-
-        // mainly because of the waiting logic
-        final boolean isMessagePresent = SearchUtils.waitForMessage(requestSpec, "search-sync-test");
-        assertThat(isMessagePresent).isTrue();
+        api.gelf().createGelfHttpInput(GELF_HTTP_PORT)
+                .postMessage("{\"short_message\":\"search-sync-test\", \"host\":\"example.org\", \"facility\":\"test\"}");
+        api.search().waitForMessage("search-sync-test");
     }
 
     @ContainerMatrixTest

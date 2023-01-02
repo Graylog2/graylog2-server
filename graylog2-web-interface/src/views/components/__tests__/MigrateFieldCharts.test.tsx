@@ -197,7 +197,7 @@ describe('MigrateFieldCharts', () => {
     });
 
     it('create area visualization config, if field chart visualization is area', async () => {
-      const expVisualizationConfg = new AreaVisualizationConfig('linear');
+      const expVisualizationConfg = AreaVisualizationConfig.create('linear');
 
       Store.get.mockImplementation(mockStoreGet({ renderer: 'area' }));
       renderAndMigrate();

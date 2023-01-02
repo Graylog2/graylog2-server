@@ -31,7 +31,6 @@ import Query from 'views/logic/queries/Query';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
-import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
 
 jest.mock('views/stores/CurrentViewStateStore', () => ({
   CurrentViewStateStore: MockStore(
@@ -75,15 +74,13 @@ describe('XYPlot', () => {
     onZoom?: $PropertyType<XYPlotProps, 'onZoom'>,
   };
 
-  const SimpleXYPlot = ({ tz = 'UTC', ...props }: SimpleXYPlotProps) => (
-    <UserDateTimeProvider tz={tz}>
-      <XYPlot chartData={chartData}
-              config={config}
-              getChartColor={getChartColor}
-              setChartColor={setChartColor}
-              currentQuery={currentQuery}
-              {...props} />
-    </UserDateTimeProvider>
+  const SimpleXYPlot = (props: SimpleXYPlotProps) => (
+    <XYPlot chartData={chartData}
+            config={config}
+            getChartColor={getChartColor}
+            setChartColor={setChartColor}
+            currentQuery={currentQuery}
+            {...props} />
   );
 
   SimpleXYPlot.defaultProps = {
@@ -110,7 +107,7 @@ describe('XYPlot', () => {
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', {
-      yaxis: { fixedrange: true, rangemode: 'tozero', tickformat: ',~r' },
+      yaxis: { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: 'linear' },
       xaxis: { fixedrange: true },
       showlegend: false,
       hovermode: 'x',
@@ -129,7 +126,7 @@ describe('XYPlot', () => {
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', expect.objectContaining({
-      xaxis: { range: ['2018-10-11T22:04:21.723-04:00', '2018-10-12T06:04:21.723-04:00'], type: 'date' },
+      xaxis: { range: ['2018-10-12T04:04:21.723+02:00', '2018-10-12T12:04:21.723+02:00'], type: 'date' },
     }));
 
     genericPlot.get(0).props.onZoom('2018-10-12T04:04:21.723Z', '2018-10-12T08:04:21.723Z');
@@ -153,7 +150,7 @@ describe('XYPlot', () => {
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', expect.objectContaining({
-      xaxis: { range: ['2018-10-12T02:04:21.723+00:00', '2018-10-12T10:04:21.723+00:00'], type: 'date' },
+      xaxis: { range: ['2018-10-12T04:04:21.723+02:00', '2018-10-12T12:04:21.723+02:00'], type: 'date' },
     }));
   });
 

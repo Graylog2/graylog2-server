@@ -46,6 +46,10 @@ import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import type Query from 'views/logic/queries/Query';
+import type { CustomCommand, CustomCommandContext } from 'views/components/searchbar/queryinput/types';
+
+export type ArrayElement<ArrayType extends readonly unknown[]> =
+  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 
 export type BackendWidgetPosition = {
   id: string,
@@ -283,6 +287,11 @@ export type SaveViewControls = {
   onDashboardDuplication?: (view: View, userPermissions: Immutable.List<string>) => Promise<View>,
 }
 
+export type CustomCommandContextProvider<T extends keyof CustomCommandContext> = {
+  key: T,
+  provider: () => CustomCommandContext[T],
+}
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -314,6 +323,8 @@ declare module 'graylog-web-plugin/plugin' {
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
     'views.widgets.actions'?: Array<WidgetActionType>;
     'views.requires.provided'?: Array<string>;
+    'views.queryInput.commands'?: Array<CustomCommand>;
+    'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any>>,
     visualizationTypes?: Array<VisualizationType<any>>;
   }
 }

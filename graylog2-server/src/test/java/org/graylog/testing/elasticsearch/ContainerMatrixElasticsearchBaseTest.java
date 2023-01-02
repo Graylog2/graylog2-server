@@ -90,8 +90,4 @@ public abstract class ContainerMatrixElasticsearchBaseTest {
     protected void importFixture(String resourcePath) {
         searchServer().importFixtureResource(resourcePath, getClass());
     }
-
-    protected SearchVersion elasticsearchVersion() {
-        return searchServer().version();
-    }
 }

@@ -54,6 +54,7 @@ import {
   SearchButtonAndQuery,
   SearchInputAndValidationContainer,
 } from 'views/components/searchbar/SearchBarLayout';
+import PluggableCommands from 'views/components/searchbar/queryinput/PluggableCommands';
 
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
@@ -157,17 +158,22 @@ const DashboardSearchBar = () => {
                             {({ field: { name, value, onChange }, meta: { error } }) => (
                               <FormWarningsContext.Consumer>
                                 {({ warnings }) => (
-                                  <QueryInput value={value}
-                                              timeRange={values?.timerange}
-                                              placeholder="Apply filter to all widgets"
-                                              name={name}
-                                              onChange={onChange}
-                                              disableExecution={disableSearchSubmit}
-                                              error={error}
-                                              isValidating={isValidating}
-                                              validate={validateForm}
-                                              warning={warnings.queryString}
-                                              onExecute={handleSubmit as () => void} />
+                                  <PluggableCommands usage="global_override_query">
+                                    {(customCommands) => (
+                                      <QueryInput value={value}
+                                                  timeRange={values?.timerange}
+                                                  placeholder="Apply filter to all widgets"
+                                                  name={name}
+                                                  onChange={onChange}
+                                                  disableExecution={disableSearchSubmit}
+                                                  error={error}
+                                                  isValidating={isValidating}
+                                                  validate={validateForm}
+                                                  warning={warnings.queryString}
+                                                  onExecute={handleSubmit as () => void}
+                                                  commands={customCommands} />
+                                    )}
+                                  </PluggableCommands>
                                 )}
                               </FormWarningsContext.Consumer>
                             )}

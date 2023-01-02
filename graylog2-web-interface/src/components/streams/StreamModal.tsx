@@ -17,18 +17,21 @@
 
 import React, { useMemo, useCallback } from 'react';
 import type { Stream } from 'src/stores/streams/StreamsStore';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form } from 'formik';
 
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import { FormikInput, ModalSubmit, Select, InputOptionalInfo } from 'components/common';
-import { Modal, Input } from 'components/bootstrap';
+import { FormikInput, ModalSubmit, InputOptionalInfo } from 'components/common';
+import { Modal } from 'components/bootstrap';
+import IndexSetSelect from 'components/streams/IndexSetSelect';
 
 type FormValues = Partial<Pick<Stream, 'title' | 'description' | 'index_set_id' | 'remove_matches_from_default_stream'>>
 
 const prepareInitialValues = (initialValues: FormValues, indexSets: Array<IndexSet>) => {
   return {
     index_set_id: initialValues.index_set_id ?? indexSets?.find((indexSet) => indexSet.default)?.id,
-    ...initialValues,
+    description: initialValues.description ?? undefined,
+    title: initialValues.title ?? undefined,
+    remove_matches_from_default_stream: initialValues.remove_matches_from_default_stream ?? undefined,
   };
 };
 
@@ -70,16 +73,6 @@ const StreamModal = ({
     [indexSets, initialValues],
   );
 
-  const indexSetOptions = useMemo(
-    () => indexSets
-      .filter((indexSet) => indexSet.can_be_default)
-      .map(({ id, title }) => ({
-        value: id,
-        label: title,
-      })),
-    [indexSets],
-  );
-
   const _onSubmit = useCallback(
     (values: FormValues) => onSubmit(values).then(() => onClose()),
     [onClose, onSubmit],
@@ -107,23 +100,7 @@ const StreamModal = ({
                            id="description"
                            help="What kind of messages are routed into this stream?" />
 
-              <Field name="index_set_id">
-                {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
-                  <Input label="Index Set"
-                         help="Messages that match this stream will be written to the configured index set."
-                         error={(error && touched) ? error : undefined}>
-                    <Select onBlur={onBlur}
-                            onChange={(newValue: number) => onChange({
-                              target: { value: newValue, name },
-                            })}
-                            options={indexSetOptions}
-                            inputId={name}
-                            placeholder="Select an index set"
-                            inputProps={{ 'aria-label': 'Select an index set' }}
-                            value={value} />
-                  </Input>
-                )}
-              </Field>
+              <IndexSetSelect indexSets={indexSets} />
 
               <FormikInput label={<>Remove matches from &lsquo;Default Stream&rsquo;</>}
                            help={<span>Don&apos;t assign messages that match this stream to the &lsquo;Default Stream&rsquo;.</span>}

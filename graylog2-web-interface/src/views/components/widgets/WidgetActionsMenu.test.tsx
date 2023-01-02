@@ -28,7 +28,6 @@ import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import WidgetModel from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
-import { DashboardsStore } from 'views/stores/DashboardsStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import SearchActions from 'views/actions/SearchActions';
@@ -41,6 +40,8 @@ import { loadDashboard } from 'views/logic/views/Actions';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { ViewStore } from 'views/stores/ViewStore';
+import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
 
@@ -48,7 +49,7 @@ import WidgetContext from '../contexts/WidgetContext';
 import type { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
 
-jest.mock('views/components/search/IfSearch', () => jest.fn(({ children }) => children));
+jest.mock('views/components/dashboard/hooks/useDashboards');
 
 jest.mock('views/logic/views/CopyWidgetToDashboard', () => jest.fn());
 
@@ -118,15 +119,6 @@ describe('<WidgetActionsMenu />', () => {
   const dashboard2 = View.builder().type(View.Type.Dashboard).id('view-2').title('view 2')
     .build();
   const dashboardList = [dashboard1, dashboard2];
-  const dashboardState = {
-    list: dashboardList,
-    pagination: {
-      total: 2,
-      page: 1,
-      per_page: 10,
-      count: 2,
-    },
-  };
 
   type DummyWidgetProps = {
     widget?: WidgetModel,
@@ -239,8 +231,15 @@ describe('<WidgetActionsMenu />', () => {
 
   describe('copy widget to dashboard', () => {
     beforeEach(() => {
-      // @ts-ignore
-      DashboardsStore.getInitialState = jest.fn(() => dashboardState);
+      asMock(useDashboards).mockReturnValue({
+        data: {
+          list: dashboardList,
+          pagination: { total: 2 },
+        },
+        isFetching: false,
+        refetch: () => {},
+      });
+
       ViewManagementActions.get = mockAction(jest.fn((async () => Promise.resolve(dashboard1.toJSON()))));
       ViewManagementActions.update = mockAction(jest.fn((view) => Promise.resolve(view)));
       SearchActions.get = mockAction(jest.fn(() => Promise.resolve(searchDB1.toJSON())));
@@ -253,7 +252,11 @@ describe('<WidgetActionsMenu />', () => {
     });
 
     const renderAndClick = async () => {
-      render(<DummyWidget />);
+      render((
+        <ViewTypeContext.Provider value={View.Type.Search}>
+          <DummyWidget />
+        </ViewTypeContext.Provider>
+      ));
 
       await openActionDropdown();
 

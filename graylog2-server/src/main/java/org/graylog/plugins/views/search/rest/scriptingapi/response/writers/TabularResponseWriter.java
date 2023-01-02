@@ -85,7 +85,6 @@ public class TabularResponseWriter implements MessageBodyWriter<TabularResponse>
             response.datarows().stream()
                     .map(row -> row.stream().map(String::valueOf).toArray(String[]::new))
                     .forEach(csvWriter::writeNext);
-
         }
     }
 

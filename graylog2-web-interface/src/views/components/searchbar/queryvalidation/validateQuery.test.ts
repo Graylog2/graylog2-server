@@ -86,6 +86,6 @@ describe('validateQuery', () => {
     }, userTimezone);
 
     expect(UserNotification.error).toHaveBeenCalledWith('Validating search query failed with status: Error: Unexpected error');
-    expect(result).toEqual({ status: 'OK' });
+    expect(result).toEqual({ status: 'OK', explanations: [] });
   });
 });

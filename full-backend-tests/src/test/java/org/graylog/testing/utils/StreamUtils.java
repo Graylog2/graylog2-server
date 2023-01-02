@@ -17,12 +17,14 @@
 package org.graylog.testing.utils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 
 import java.util.Collection;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 public final class StreamUtils {
@@ -58,5 +60,16 @@ public final class StreamUtils {
                 .statusCode(204);
 
         return streamId;
+    }
+
+    public static ValidatableResponse getStream(RequestSpecification requestSpec, String streamId) {
+        return given()
+                .spec(requestSpec)
+                .when()
+                .get("/streams/" + streamId)
+                .then()
+                .log().ifError()
+                .statusCode(200)
+                .assertThat().body("id", equalTo(streamId));
     }
 }
