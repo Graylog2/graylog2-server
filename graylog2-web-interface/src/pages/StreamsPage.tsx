@@ -67,8 +67,7 @@ const StreamsPage = () => {
 
       <Row className="content">
         <Col md={12}>
-          <StreamsOverview onStreamCreate={onSave}
-                           indexSets={indexSets} />
+          <StreamsOverview indexSets={indexSets} />
         </Col>
       </Row>
     </DocumentTitle>
