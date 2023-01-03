@@ -50,7 +50,9 @@ describe('CopyToDashboardForm', () => {
 
   const SUT = (props: Partial<React.ComponentProps<typeof CopyToDashboardForm>>) => (
     <CopyToDashboardForm onCancel={() => {}}
-                         onSubmit={() => {}}
+                         onSubmit={() => Promise.resolve()}
+                         submitButtonText="Submit"
+                         submittingText="Submitting..."
                          {...props} />
   );
 

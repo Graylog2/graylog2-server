@@ -19,6 +19,7 @@ import { useState, useContext, useCallback } from 'react';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import UserNotification from 'util/UserNotification';
 import type { BackendWidgetPosition } from 'views/types';
 import ExportModal from 'views/components/export/ExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
@@ -65,34 +66,33 @@ const _updateDashboardWithNewSearch = (dashboard: View, dashboardId: string, new
   ViewManagementActions.update(newDashboard).then(() => loadDashboard(dashboardId));
 };
 
-const _onCopyToDashboard = (
-  view: ViewStoreState,
-  setShowCopyToDashboard: (show: boolean) => void,
-  widgetId: string,
-  dashboardId: string | undefined | null,
-): void => {
-  const { view: activeView } = view;
+const addWidgetToDashboard = (targetDashboard: View, activeView: View, widgetId: string) => (searchJson: SearchJson) => {
+  const search = Search.fromJSON(searchJson);
+  const newDashboard = CopyWidgetToDashboard(widgetId, activeView, targetDashboard.toBuilder().search(search).build());
 
-  if (!dashboardId) {
-    return;
+  if (!newDashboard || !newDashboard.search) {
+    throw Error('Copying the dashboard page failed.');
   }
 
-  const addWidgetToDashboard = (dashboard: View) => (searchJson: SearchJson) => {
-    const search = Search.fromJSON(searchJson);
-    const newDashboard = CopyWidgetToDashboard(widgetId, activeView, dashboard.toBuilder().search(search).build());
+  return SearchActions.create(newDashboard.search).then(({ search: newSearch }) => _updateDashboardWithNewSearch(newDashboard, newDashboard.id, newSearch));
+};
 
-    if (newDashboard && newDashboard.search) {
-      SearchActions.create(newDashboard.search).then(({ search: newSearch }) => _updateDashboardWithNewSearch(newDashboard, dashboardId, newSearch));
-    }
-  };
+const _onCopyToDashboard = (
+  view: ViewStoreState,
+  widgetId: string,
+  dashboardId: string | undefined | null,
+) => {
+  const { view: activeView } = view;
 
-  ViewManagementActions.get(dashboardId).then((dashboardJson) => {
-    const dashboard = View.fromJSON(dashboardJson);
+  return ViewManagementActions.get(dashboardId).then((dashboardJson) => {
+    const targetDashboard = View.fromJSON(dashboardJson);
 
-    SearchActions.get(dashboardJson.search_id).then(addWidgetToDashboard(dashboard));
+    return SearchActions.get(dashboardJson.search_id).then(
+      addWidgetToDashboard(targetDashboard, activeView, widgetId),
+    ).catch((error) => {
+      UserNotification.error(`Copying dashboard page failed with error ${error}`);
+    });
   });
-
-  setShowCopyToDashboard(false);
 };
 
 const _onMoveWidgetToPage = (
@@ -168,7 +168,7 @@ const WidgetActionsMenu = ({
   const [showMoveWidgetToTab, setShowMoveWidgetToTab] = useState(false);
 
   const onDuplicate = useCallback(() => _onDuplicate(widget.id, unsetWidgetFocusing, title), [unsetWidgetFocusing, title, widget.id]);
-  const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId), [view]);
+  const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, widgetId, dashboardId), [view]);
   const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToPage(view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [view]);
   const onDelete = useCallback(() => _onDelete(widget, view?.view, title), [title, view?.view, widget]);
   const focusWidget = useCallback(() => setWidgetFocusing(widget.id), [setWidgetFocusing, widget.id]);
@@ -225,6 +225,7 @@ const WidgetActionsMenu = ({
         {showCopyToDashboard && (
           <CopyToDashboard onSubmit={(dashboardId) => onCopyToDashboard(widget.id, dashboardId)}
                            onCancel={() => setShowCopyToDashboard(false)}
+                           submittingText="Copying page"
                            submitButtonText="Copy page" />
         )}
 

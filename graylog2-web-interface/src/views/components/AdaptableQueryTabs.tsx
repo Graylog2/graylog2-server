@@ -33,6 +33,7 @@ import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabs
 import CopyToDashboard from 'views/components/widgets/CopyToDashboardForm';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
+import type { SearchJson } from 'views/logic/search/Search';
 import Search from 'views/logic/search/Search';
 import SearchActions from 'views/actions/SearchActions';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
@@ -187,31 +188,30 @@ const _updateDashboardWithNewSearch = (dashboard: View, dashboardId: string, new
   ViewManagementActions.update(newDashboard).then(() => loadDashboard(dashboardId));
 };
 
+const addPageToDashboard = (targetDashboard: View, activeView: View, queryId: string) => (searchJson: SearchJson) => {
+  const search = Search.fromJSON(searchJson);
+  const newDashboard = CopyPageToDashboard(queryId, activeView, targetDashboard.toBuilder().search(search).build());
+
+  if (!newDashboard || !newDashboard.search) {
+    throw Error('Copying the dashboard page failed.');
+  }
+
+  return SearchActions.create(newDashboard.search).then(
+    ({ search: newSearch }) => _updateDashboardWithNewSearch(newDashboard, newDashboard.id, newSearch),
+  );
+};
+
 const _onCopyToDashboard = (
   view: ViewStoreState,
-  setShowCopyToDashboard: (show: boolean) => void,
   queryId: string,
   selectedDashboardId: string | undefined | null,
-): Promise<void> => {
+) => {
   const { view: activeView } = view;
 
   return ViewManagementActions.get(selectedDashboardId).then((dashboardJson) => {
-    const dashboard = View.fromJSON(dashboardJson);
+    const targetDashboard = View.fromJSON(dashboardJson);
 
-    return SearchActions.get(dashboardJson.search_id).then((searchJson) => {
-      const search = Search.fromJSON(searchJson);
-      const newDashboard = CopyPageToDashboard(queryId, activeView, dashboard.toBuilder().search(search).build());
-
-      if (!newDashboard || !newDashboard.search) {
-        throw Error('Copying the dashboard page failed.');
-      }
-
-      return SearchActions.create(newDashboard.search).then(
-        ({ search: newSearch }) => _updateDashboardWithNewSearch(newDashboard, newDashboard.id, newSearch),
-      ).then(() => {
-        setShowCopyToDashboard(false);
-      });
-    }).catch((error) => {
+    return SearchActions.get(dashboardJson.search_id).then(addPageToDashboard(targetDashboard, activeView, queryId)).catch((error) => {
       UserNotification.error(`Copying dashboard page failed with error ${error}`);
     });
   });
@@ -228,7 +228,7 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, activeQueryId, onRemove
     setShowCopyToDashboardModal((cur) => !cur);
   }, []);
 
-  const onCopyToDashboard = useCallback((selectedDashboardId: string) => _onCopyToDashboard(view, toggleCopyToDashboardModal, activeQueryId, selectedDashboardId), [activeQueryId, view, toggleCopyToDashboardModal]);
+  const onCopyToDashboard = useCallback((selectedDashboardId: string) => _onCopyToDashboard(view, activeQueryId, selectedDashboardId), [activeQueryId, view]);
 
   const openTitleEditModal = useCallback((activeQueryTitle: string) => {
     if (queryTitleEditModal) {
