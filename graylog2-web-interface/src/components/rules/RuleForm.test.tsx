@@ -16,30 +16,52 @@
  */
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import RuleForm from './RuleForm';
-import { PipelineRulesProvider } from './RuleContext';
+import { PipelineRulesContext } from './RuleContext';
 
 describe('RuleForm', () => {
-  it('should show the previous Description value in the field', () => {
+  it('should save and update the correct description value', () => {
     const ruleToUpdate = {
-      source: 'source1',
+      source: `rule "function howto"
+      when
+        has_field("transaction_date")
+      then
+        let new_date = parse_date(to_string($message.transaction_date), "yyyy-MM-dd HH:mm:ss");
+        set_field("transaction_year", new_date.year);
+      end`,
       description: 'description1',
       title: 'title1',
       created_at: 'created_at1',
       modified_at: 'modified_at1',
     };
 
-    const { getByLabelText } = render(
-      <PipelineRulesProvider usedInPipelines={[]} rule={ruleToUpdate}>
+    const handleDescription = jest.fn();
+
+    const { getByLabelText, getByTitle } = render(
+      <PipelineRulesContext.Provider value={{
+        description: '',
+        handleDescription: handleDescription,
+        ruleSource: ruleToUpdate.source,
+        handleSavePipelineRule: () => {},
+        ruleSourceRef: {},
+        usedInPipelines: [],
+        onAceLoaded: () => {},
+        onChangeSource: () => {},
+      }}>
         <RuleForm create={false} />
-      </PipelineRulesProvider>,
+      </PipelineRulesContext.Provider>,
     );
 
     const descriptionInput = getByLabelText('Description');
 
-    expect(descriptionInput).toBeInTheDocument();
+    expect(descriptionInput).toHaveValue('');
 
-    expect(descriptionInput).toHaveValue(ruleToUpdate.description);
+    userEvent.paste(descriptionInput, ruleToUpdate.description);
+    const createRuleButton = getByTitle('Update rule & close');
+    userEvent.click(createRuleButton);
+
+    expect(handleDescription).toHaveBeenCalledWith(ruleToUpdate.description);
   });
 });
