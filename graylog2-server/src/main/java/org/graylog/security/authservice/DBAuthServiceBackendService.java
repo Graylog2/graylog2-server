@@ -16,6 +16,8 @@
  */
 package org.graylog.security.authservice;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import org.graylog.security.events.AuthServiceBackendDeletedEvent;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -23,12 +25,15 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.PaginationParameters;
+import org.graylog2.search.SearchQuery;
+import org.graylog2.search.SearchQueryParser;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
 import javax.inject.Inject;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -39,6 +44,9 @@ public class DBAuthServiceBackendService extends PaginatedDbService<AuthServiceB
     private final Map<String, AuthServiceBackend.Factory<? extends AuthServiceBackend>> backendFactories;
     private final EventBus eventBus;
 
+    private static final Set<String> ALLOWED_FIELDS = ImmutableSet.of(AuthServiceBackendDTO.FIELD_TITLE, AuthServiceBackendDTO.FIELD_DESCRIPTION);
+    private final SearchQueryParser searchQueryParser;
+
     @Inject
     protected DBAuthServiceBackendService(MongoConnection mongoConnection,
                                           MongoJackObjectMapperProvider mapper,
@@ -47,6 +55,7 @@ public class DBAuthServiceBackendService extends PaginatedDbService<AuthServiceB
         super(mongoConnection, mapper, AuthServiceBackendDTO.class, "auth_service_backends");
         this.backendFactories = backendFactories;
         this.eventBus = eventBus;
+        this.searchQueryParser = new SearchQueryParser(AuthServiceBackendDTO.FIELD_TITLE, ALLOWED_FIELDS);
     }
 
     @Override
@@ -89,6 +98,13 @@ public class DBAuthServiceBackendService extends PaginatedDbService<AuthServiceB
         final String sortBy = defaultIfBlank(params.getSortBy(), "title");
         final DBSort.SortBuilder sortBuilder = getSortBuilder(params.getOrder(), sortBy);
 
-        return findPaginatedWithQueryFilterAndSort(DBQuery.empty(), filter, sortBuilder, params.getPage(), params.getPerPage());
+        DBQuery.Query dbQuery = DBQuery.empty();
+        final String query = params.getQuery();
+        if (!Strings.isNullOrEmpty(query)) {
+            final SearchQuery searchQuery = searchQueryParser.parse(query);
+            dbQuery = searchQuery.toDBQuery();
+        }
+
+        return findPaginatedWithQueryFilterAndSort(dbQuery, filter, sortBuilder, params.getPage(), params.getPerPage());
     }
 }
