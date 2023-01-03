@@ -29,13 +29,11 @@ import org.graylog.events.processor.systemnotification.SystemNotificationEventPr
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfigFactory;
 import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
@@ -54,10 +52,7 @@ import java.util.Optional;
 
 import static java.util.Locale.US;
 import static java.util.Objects.requireNonNull;
-import static org.graylog.events.processor.systemnotification.SystemNotificationEventIndexTemplateProvider.SYSTEM_EVENT_TEMPLATE_TYPE;
-import static org.graylog2.configuration.ElasticsearchConfiguration.DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX;
 import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
-import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID;
 
 public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20190705071400_AddEventIndexSetsMigration.class);
@@ -69,8 +64,6 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     private final StreamService streamService;
     private final IndexSetConfigFactory indexSetConfigFactory;
     private final DBEventDefinitionService dbService;
-    private final IndexSetRegistry indexSetRegistry;
-    private final IndexSetCleanupJob.Factory indexSetCleanupJobFactory;
 
     @Inject
     public V20190705071400_AddEventIndexSetsMigration(ElasticsearchConfiguration elasticsearchConfiguration,
@@ -79,9 +72,7 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
                                                       IndexSetService indexSetService,
                                                       IndexSetValidator indexSetValidator,
                                                       StreamService streamService,
-                                                      DBEventDefinitionService dbService,
-                                                      IndexSetRegistry indexSetRegistry,
-                                                      IndexSetCleanupJob.Factory indexSetCleanupJobFactory) {
+                                                      DBEventDefinitionService dbService) {
         this.elasticsearchConfiguration = elasticsearchConfiguration;
         this.indexSetConfigFactory = indexSetConfigFactory;
         this.mongoIndexSetFactory = mongoIndexSetFactory;
@@ -89,8 +80,6 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
         this.indexSetValidator = indexSetValidator;
         this.streamService = streamService;
         this.dbService = dbService;
-        this.indexSetRegistry = indexSetRegistry;
-        this.indexSetCleanupJobFactory = indexSetCleanupJobFactory;
     }
 
     @Override
@@ -105,58 +94,32 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
                 "Stores Graylog events.",
                 elasticsearchConfiguration.getDefaultEventsIndexPrefix(),
                 ElasticsearchConfiguration.DEFAULT_EVENTS_INDEX_PREFIX,
-                EVENT_TEMPLATE_TYPE,
                 Stream.DEFAULT_EVENTS_STREAM_ID,
                 "All events",
                 "Stream containing all events created by Graylog"
         );
-
-        deleteObsoleteStreamAndIndexSet();
         ensureEventsStreamAndIndexSet(
                 "Graylog System Events",
                 "Stores Graylog system events.",
                 elasticsearchConfiguration.getDefaultSystemEventsIndexPrefix(),
-                DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX,
-                SYSTEM_EVENT_TEMPLATE_TYPE,
-                DEFAULT_SYSTEM_EVENTS_STREAM_ID,
+                ElasticsearchConfiguration.DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX,
+                Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID,
                 "All system events",
                 "Stream containing all system events created by Graylog"
         );
         ensureSystemNotificationEventsDefinition();
     }
 
-    // Delete previously created System Events which use Event template instead of System Events template
-    private void deleteObsoleteStreamAndIndexSet() {
-        Optional<IndexSetConfig> optSystemEventConfig =
-                getEventsIndexSetConfig(elasticsearchConfiguration.getDefaultSystemEventsIndexPrefix(), EVENT_TEMPLATE_TYPE);
-        if (optSystemEventConfig.isPresent()) {
-            String id = optSystemEventConfig.get().id();
-            try {
-                for (Stream stream: streamService.loadAllWithIndexSet(id)) {
-                    streamService.destroy(stream);
-                }
-                final IndexSet indexSet = indexSetRegistry.get(id)
-                        .orElseThrow(() -> new IllegalStateException("Index set <" + id + "> not found."));
-                indexSetService.delete(id);
-                indexSetCleanupJobFactory.create(indexSet).execute();
-            }
-            catch (Exception e) {
-                LOG.debug("Ignored exception while deleting obsolete system event stream and index set", e);
-            }
-        }
-    }
-
     private void ensureEventsStreamAndIndexSet(String indexSetTitle,
                                                String indexSetDescription,
                                                String indexPrefix,
                                                String indexPrefixConfigKey,
-                                               String indexTemplate,
                                                String streamId,
                                                String streamTitle,
                                                String streamDescription) {
-        checkIndexPrefixConflicts(indexPrefix, indexPrefixConfigKey, indexTemplate);
+        checkIndexPrefixConflicts(indexPrefix, indexPrefixConfigKey);
 
-        final IndexSet eventsIndexSet = setupEventsIndexSet(indexSetTitle, indexSetDescription, indexPrefix, indexTemplate);
+        final IndexSet eventsIndexSet = setupEventsIndexSet(indexSetTitle, indexSetDescription, indexPrefix);
         try {
             streamService.load(streamId);
         } catch (NotFoundException ignored) {
@@ -164,9 +127,9 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
         }
     }
 
-    private void checkIndexPrefixConflicts(String indexPrefix, String configKey, String templateType) {
+    private void checkIndexPrefixConflicts(String indexPrefix, String configKey) {
         final DBQuery.Query query = DBQuery.and(
-                DBQuery.notEquals(IndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE, Optional.of(templateType)),
+                DBQuery.notEquals(IndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
                 DBQuery.is(IndexSetConfig.FIELD_INDEX_PREFIX, indexPrefix)
         );
 
@@ -177,16 +140,16 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
         }
     }
 
-    private Optional<IndexSetConfig> getEventsIndexSetConfig(String indexPrefix, String templateType) {
+    private Optional<IndexSetConfig> getEventsIndexSetConfig(String indexPrefix) {
         final DBQuery.Query query = DBQuery.and(
-                DBQuery.is(IndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE, Optional.of(templateType)),
+                DBQuery.is(IndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE, Optional.of(EVENT_TEMPLATE_TYPE)),
                 DBQuery.is(IndexSetConfig.FIELD_INDEX_PREFIX, indexPrefix)
         );
         return indexSetService.findOne(query);
     }
 
-    private IndexSet setupEventsIndexSet(String indexSetTitle, String indexSetDescription, String indexPrefix, String indexTemplateType) {
-        final Optional<IndexSetConfig> optionalIndexSetConfig = getEventsIndexSetConfig(indexPrefix, indexTemplateType);
+    private IndexSet setupEventsIndexSet(String indexSetTitle, String indexSetDescription, String indexPrefix) {
+        final Optional<IndexSetConfig> optionalIndexSetConfig = getEventsIndexSetConfig(indexPrefix);
         if (optionalIndexSetConfig.isPresent()) {
             return mongoIndexSetFactory.create(optionalIndexSetConfig.get());
         }
@@ -194,7 +157,7 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
         final IndexSetConfig indexSetConfig = indexSetConfigFactory.createDefault()
                 .title(indexSetTitle)
                 .description(indexSetDescription)
-                .indexTemplateType(indexTemplateType)
+                .indexTemplateType(EVENT_TEMPLATE_TYPE)
                 .isWritable(true)
                 .isRegular(false)
                 .indexPrefix(indexPrefix)
