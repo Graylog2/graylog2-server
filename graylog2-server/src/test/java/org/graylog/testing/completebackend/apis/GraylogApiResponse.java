@@ -17,6 +17,7 @@
 package org.graylog.testing.completebackend.apis;
 
 import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.ReadContext;
 import io.restassured.response.ValidatableResponse;
 
 public class GraylogApiResponse {
@@ -33,7 +34,7 @@ public class GraylogApiResponse {
     /**
      * @return the actual JSONPath implementation, not the groovy-style version that restassured provides by default
      */
-    public DocumentContext properJSONPath() {
+    public ReadContext properJSONPath() {
         return com.jayway.jsonpath.JsonPath.parse(validatableResponse.extract().body().asString());
     }
 
