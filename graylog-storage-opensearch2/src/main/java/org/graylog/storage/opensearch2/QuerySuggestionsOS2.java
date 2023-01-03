@@ -21,11 +21,13 @@ import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionEntry;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionError;
+import org.graylog.plugins.views.search.engine.suggestions.SuggestionFieldType;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.ScriptQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.script.Script;
@@ -65,8 +67,7 @@ public class QuerySuggestionsOS2 implements QuerySuggestionsService {
                 .filter(QueryBuilders.termsQuery(Message.FIELD_STREAMS, req.streams()))
                 .filter(TimeRangeQueryFactory.create(req.timerange()))
                 .filter(QueryBuilders.existsQuery(req.field()))
-                // .filter(QueryBuilders.prefixQuery(req.field(), req.input()));
-                .filter(getScriptedPrefixQuery(req));
+                .filter(getPrefixQuery(req));
         final SearchSourceBuilder search = new SearchSourceBuilder()
                 .query(query)
                 .size(0)
@@ -92,6 +93,13 @@ public class QuerySuggestionsOS2 implements QuerySuggestionsService {
                     .orElseGet(() -> parseException(exception));
             return SuggestionResponse.forError(req.field(), req.input(), err);
         }
+    }
+
+    private QueryBuilder getPrefixQuery(SuggestionRequest req) {
+        return switch (req.fieldType()) {
+            case TEXTUAL -> QueryBuilders.prefixQuery(req.field(), req.input());
+            default -> getScriptedPrefixQuery(req);
+        };
     }
 
     /**
