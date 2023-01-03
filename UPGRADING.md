@@ -86,3 +86,7 @@ We now persist the desired input state: manually stopped inputs remain stopped, 
 - Introducing new archive config parameter retentionTime in days. 
   Archives exceeding the specified retentionTime are automatically deleted. 
   By default the behavior is unchanged: archives are retained indefinitely. 
+
+- The `JSON path value from HTTP API` input will now only run on the leader node,
+  if the `Global` option has been selected in the input configuration.
+  Previously, the input was started on all nodes in the cluster.
