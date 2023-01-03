@@ -494,7 +494,7 @@ public class AggregationEventProcessorTest {
         );
         sourceMessagesWithAggregation(groupByFields, 1);
 
-        String expectedQueryString = "aQueryString AND group_field_one:\"one\" AND group_field_two:\"two\"";
+        String expectedQueryString = "(aQueryString) AND ((group_field_one:\"one\") AND (group_field_two:\"two\"))";
         verify(moreSearch).scrollQuery(eq(expectedQueryString), any(), any(), any(), eq(1), any());
     }
 
@@ -506,7 +506,7 @@ public class AggregationEventProcessorTest {
         );
         sourceMessagesWithAggregation(groupByFields, 1);
 
-        String expectedQueryString = "aQueryString AND group_field_one:\"\\\" \\\" \\* \\& \\? \\- \\\\\" AND group_field_two:\"\\/ \\/ \\~ \\| \\[\\]\\{\\}\"";
+        String expectedQueryString = "(aQueryString) AND ((group_field_one:\"\\\" \\\" \\* \\& \\? \\- \\\\\") AND (group_field_two:\"\\/ \\/ \\~ \\| \\[\\]\\{\\}\"))";
         verify(moreSearch).scrollQuery(eq(expectedQueryString), any(), any(), any(), eq(1), any());
     }
 
@@ -517,7 +517,7 @@ public class AggregationEventProcessorTest {
         );
         sourceMessagesWithAggregation(groupByFields, 5);
 
-        String expectedQueryString = "aQueryString AND group_field_one:\"group_value_one\"";
+        String expectedQueryString = "(aQueryString) AND (group_field_one:\"group_value_one\")";
         verify(moreSearch).scrollQuery(eq(expectedQueryString), any(), any(), any(), eq(5), any());
     }
 
