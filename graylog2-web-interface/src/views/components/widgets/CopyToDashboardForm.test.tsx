@@ -48,6 +48,12 @@ describe('CopyToDashboardForm', () => {
     });
   });
 
+  const SUT = (props: Partial<React.ComponentProps<typeof CopyToDashboardForm>>) => (
+    <CopyToDashboardForm onCancel={() => {}}
+                         onSubmit={() => {}}
+                         {...props} />
+  );
+
   const submitModal = () => {
     const submitButton = screen.getByRole('button', { name: /copy widget/i, hidden: true });
     fireEvent.click(submitButton);
@@ -63,26 +69,20 @@ describe('CopyToDashboardForm', () => {
       refetch: () => {},
     });
 
-    const { baseElement } = render(<CopyToDashboardForm widgetId="widget-id"
-                                                        onCancel={() => {}}
-                                                        onSubmit={() => {}} />);
+    const { baseElement } = render(<SUT />);
 
     expect(baseElement).not.toBeNull();
   });
 
   it('should render the modal with entries', () => {
-    const { baseElement } = render(<CopyToDashboardForm widgetId="widget-id"
-                                                        onCancel={() => {}}
-                                                        onSubmit={() => {}} />);
+    const { baseElement } = render(<SUT />);
 
     expect(baseElement).not.toBeNull();
   });
 
   it('should handle onCancel', () => {
     const onCancel = jest.fn();
-    const { getByText } = render(<CopyToDashboardForm widgetId="widget-id"
-                                                      onCancel={onCancel}
-                                                      onSubmit={() => {}} />);
+    const { getByText } = render(<SUT />);
     const cancelButton = getByText('Cancel');
 
     fireEvent.click(cancelButton);
@@ -93,9 +93,7 @@ describe('CopyToDashboardForm', () => {
   it('should not handle onSubmit without selection', () => {
     const onSubmit = jest.fn();
 
-    render(<CopyToDashboardForm widgetId="widget-id"
-                                onCancel={() => {}}
-                                onSubmit={onSubmit} />);
+    render(<SUT />);
 
     submitModal();
 
@@ -104,9 +102,7 @@ describe('CopyToDashboardForm', () => {
 
   it('should handle onSubmit with a previous selection', () => {
     const onSubmit = jest.fn();
-    const { getByText } = render(<CopyToDashboardForm widgetId="widget-id"
-                                                      onCancel={() => {}}
-                                                      onSubmit={onSubmit} />);
+    const { getByText } = render(<SUT onSubmit={onSubmit} />);
     const firstView = getByText('view 1');
 
     fireEvent.click(firstView);
@@ -117,11 +113,7 @@ describe('CopyToDashboardForm', () => {
   });
 
   it('should query for all dashboards & specific dashboards', () => {
-    const { getByPlaceholderText, getByText } = render(
-      <CopyToDashboardForm widgetId="widget-id"
-                           onCancel={() => {}}
-                           onSubmit={() => {}} />,
-    );
+    const { getByPlaceholderText, getByText } = render(<SUT />);
 
     expect(useDashboards).toHaveBeenCalledTimes(1);
 

@@ -95,7 +95,7 @@ const _onCopyToDashboard = (
   setShowCopyToDashboard(false);
 };
 
-const _onMoveWidgetToTab = (
+const _onMoveWidgetToPage = (
   view: ViewStoreState,
   setShowMoveWidgetToTab: (show: boolean) => void,
   widgetId: string,
@@ -169,7 +169,7 @@ const WidgetActionsMenu = ({
 
   const onDuplicate = useCallback(() => _onDuplicate(widget.id, unsetWidgetFocusing, title), [unsetWidgetFocusing, title, widget.id]);
   const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId), [view]);
-  const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToTab(view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [view]);
+  const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToPage(view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [view]);
   const onDelete = useCallback(() => _onDelete(widget, view?.view, title), [title, view?.view, widget]);
   const focusWidget = useCallback(() => setWidgetFocusing(widget.id), [setWidgetFocusing, widget.id]);
 
@@ -223,9 +223,9 @@ const WidgetActionsMenu = ({
         </WidgetActionDropdown>
 
         {showCopyToDashboard && (
-          <CopyToDashboard widgetId={widget.id}
-                           onSubmit={onCopyToDashboard}
-                           onCancel={() => setShowCopyToDashboard(false)} />
+          <CopyToDashboard onSubmit={(dashboardId) => onCopyToDashboard(widget.id, dashboardId)}
+                           onCancel={() => setShowCopyToDashboard(false)}
+                           submitButtonText="Copy page" />
         )}
 
         {showExport && (

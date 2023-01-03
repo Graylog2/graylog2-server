@@ -23,11 +23,13 @@ import type { SearchParams } from 'stores/PaginationTypes';
 
 type Props = {
   onCancel: () => void,
-  onSubmit: (widgetId: string, selectedDashboard: string | undefined | null) => void,
-  widgetId: string,
+  onSubmit: (selectedDashboardId: string | undefined | null) => Promise<void>,
+  submitButtonText: string,
+  submittingText: string,
 };
 
-const CopyToDashboardForm = ({ widgetId, onCancel, onSubmit }: Props) => {
+const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submittingText }: Props) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDashboard, setSelectedDashboard] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useState<SearchParams>({
     page: 1,
@@ -53,6 +55,14 @@ const CopyToDashboardForm = ({ widgetId, onCancel, onSubmit }: Props) => {
     (cur) => ({ ...cur, page: newPage, pageSize: newPageSize })),
   [],
   );
+
+  const handleSubmit = () => {
+    setIsSubmitting(true);
+
+    onSubmit(selectedDashboard).finally(() => {
+      setIsSubmitting(false);
+    });
+  };
 
   return (
     <Modal show>
@@ -80,10 +90,13 @@ const CopyToDashboardForm = ({ widgetId, onCancel, onSubmit }: Props) => {
         </PaginatedList>
       </Modal.Body>
       <Modal.Footer>
-        <ModalSubmit submitButtonText="Copy widget"
-                     disabledSubmit={selectedDashboard === null}
+        <ModalSubmit submitButtonText={submitButtonText}
+                     submitLoadingText={submittingText}
+                     isAsyncSubmit
+                     isSubmitting={isSubmitting}
+                     disabledSubmit={!selectedDashboard}
                      submitButtonType="button"
-                     onSubmit={() => onSubmit(widgetId, selectedDashboard)}
+                     onSubmit={handleSubmit}
                      onCancel={onCancel} />
       </Modal.Footer>
     </Modal>

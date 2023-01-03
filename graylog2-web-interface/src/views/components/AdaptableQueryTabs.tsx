@@ -17,11 +17,12 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import type { ReactNode } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { OrderedSet } from 'immutable';
 
+import UserNotification from 'util/UserNotification';
 import { ModifiedNavDropdown as NavDropdown } from 'components/bootstrap/NavDropdown';
 import type { QueryId } from 'views/logic/queries/Query';
 import type QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
@@ -29,6 +30,16 @@ import { Nav, NavItem, MenuItem } from 'components/bootstrap';
 import { Icon, IconButton } from 'components/common';
 import QueryTitle from 'views/components/queries/QueryTitle';
 import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabsConfiguration';
+import CopyToDashboard from 'views/components/widgets/CopyToDashboardForm';
+import type { ViewStoreState } from 'views/stores/ViewStore';
+import View from 'views/logic/views/View';
+import Search from 'views/logic/search/Search';
+import SearchActions from 'views/actions/SearchActions';
+import { ViewManagementActions } from 'views/stores/ViewManagementStore';
+import CopyPageToDashboard from 'views/logic/views/CopyPageToDashboard';
+import { useStore } from 'stores/connect';
+import { ViewStore } from 'views/stores/ViewStore';
+import { loadDashboard } from 'views/logic/views/Actions';
 
 import type { QueryTabsProps } from './QueryTabs';
 
@@ -170,10 +181,61 @@ const adjustTabsVisibility = (maxWidth, lockedTab, setLockedTab) => {
   }
 };
 
+const _updateDashboardWithNewSearch = (dashboard: View, dashboardId: string, newSearch: Search) => {
+  const newDashboard = dashboard.toBuilder().search(newSearch).build();
+
+  ViewManagementActions.update(newDashboard).then(() => loadDashboard(dashboardId));
+};
+
+const _onCopyToDashboard = (
+  view: ViewStoreState,
+  setShowCopyToDashboard: (show: boolean) => void,
+  queryId: string,
+  selectedDashboardId: string | undefined | null,
+): Promise<void> => {
+  const { view: activeView } = view;
+
+  return ViewManagementActions.get(selectedDashboardId).then((dashboardJson) => {
+    const dashboard = View.fromJSON(dashboardJson);
+
+    return SearchActions.get(dashboardJson.search_id).then((searchJson) => {
+      const search = Search.fromJSON(searchJson);
+      const newDashboard = CopyPageToDashboard(queryId, activeView, dashboard.toBuilder().search(search).build());
+
+      if (!newDashboard || !newDashboard.search) {
+        throw Error('Copying the dashboard page failed.');
+      }
+
+      return SearchActions.create(newDashboard.search).then(
+        ({ search: newSearch }) => _updateDashboardWithNewSearch(newDashboard, newDashboard.id, newSearch),
+      ).then(() => {
+        setShowCopyToDashboard(false);
+      });
+    }).catch((error) => {
+      UserNotification.error(`Copying dashboard page failed with error ${error}`);
+    });
+  });
+};
+
 const AdaptableQueryTabs = ({ maxWidth, queries, titles, activeQueryId, onRemove, onSelect, queryTitleEditModal, dashboardId }: Props) => {
+  const view = useStore(ViewStore);
   const [openedMore, setOpenedMore] = useState<boolean>(false);
   const [lockedTab, setLockedTab] = useState<QueryId>();
   const [showConfigurationModal, setShowConfigurationModal] = useState<boolean>(false);
+  const [showCopyToDashboardModal, setShowCopyToDashboardModal] = useState<boolean>(false);
+
+  const toggleCopyToDashboardModal = useCallback(() => {
+    setShowCopyToDashboardModal((cur) => !cur);
+  }, []);
+
+  const onCopyToDashboard = useCallback((selectedDashboardId: string) => _onCopyToDashboard(view, toggleCopyToDashboardModal, activeQueryId, selectedDashboardId), [activeQueryId, view, toggleCopyToDashboardModal]);
+
+  const openTitleEditModal = useCallback((activeQueryTitle: string) => {
+    if (queryTitleEditModal) {
+      queryTitleEditModal.current.open(activeQueryTitle);
+    }
+  }, [queryTitleEditModal]);
+
   const currentTabs = useMemo((): TabsTypes => {
     let navItems = OrderedSet();
     let menuItems = OrderedSet();
@@ -181,18 +243,13 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, activeQueryId, onRemove
     let queriesList = OrderedSet<{ id: string, title: string }>();
 
     queries.keySeq().forEach((id, idx) => {
-      const openTitleEditModal = (activeQueryTitle: string) => {
-        if (queryTitleEditModal) {
-          queryTitleEditModal.current.open(activeQueryTitle);
-        }
-      };
-
       const title = titles.get(id, `Page#${idx + 1}`);
       const tabTitle = (
         <QueryTitle active={id === activeQueryId}
                     id={id}
                     onClose={() => onRemove(id)}
                     openEditModal={openTitleEditModal}
+                    openCopyToDashboardModal={toggleCopyToDashboardModal}
                     allowsClosing={queries.size > 1}
                     title={title} />
       );
@@ -235,7 +292,7 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, activeQueryId, onRemove
     });
 
     return { navItems, menuItems, lockedItems, queriesList };
-  }, [lockedTab, onRemove, onSelect, queries, queryTitleEditModal, activeQueryId, titles]);
+  }, [queries, titles, activeQueryId, openTitleEditModal, toggleCopyToDashboardModal, lockedTab, onRemove, onSelect]);
 
   useEffect(() => {
     adjustTabsVisibility(maxWidth, lockedTab, setLockedTab);
@@ -276,6 +333,12 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, activeQueryId, onRemove
                                          queriesList={currentTabs.queriesList}
                                          activeQueryId={activeQueryId}
                                          dashboardId={dashboardId} />
+      )}
+      {showCopyToDashboardModal && (
+        <CopyToDashboard onSubmit={(selectedDashboardId) => onCopyToDashboard(selectedDashboardId)}
+                         onCancel={toggleCopyToDashboardModal}
+                         submitButtonText="Copy page"
+                         submittingText="Copying page..." />
       )}
     </Container>
   );
