@@ -267,17 +267,17 @@ public class UserServiceImplTest {
 
         @Override
         public UserImpl create(Map<String, Object> fields) {
-            return new UserImpl(passwordAlgorithmFactory, permissions, fields);
+            return new UserImpl(passwordAlgorithmFactory, permissions, fields, null);
         }
 
         @Override
         public UserImpl create(ObjectId id, Map<String, Object> fields) {
-            return new UserImpl(passwordAlgorithmFactory, permissions, id, fields);
+            return new UserImpl(passwordAlgorithmFactory, permissions, id, fields, null);
         }
 
         @Override
         public UserImpl.LocalAdminUser createLocalAdminUser(String adminRoleObjectId) {
-            return new UserImpl.LocalAdminUser(passwordAlgorithmFactory, configuration, adminRoleObjectId);
+            return new UserImpl.LocalAdminUser(passwordAlgorithmFactory, configuration, adminRoleObjectId, null);
         }
     }
 

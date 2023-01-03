@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -71,6 +72,7 @@ public class UserImpl extends PersistedImpl implements User {
 
     private final PasswordAlgorithmFactory passwordAlgorithmFactory;
     private final Permissions permissions;
+    protected final long globalSessionTimeoutMs;
 
     public interface Factory {
         UserImpl create(final Map<String, Object> fields);
@@ -101,6 +103,7 @@ public class UserImpl extends PersistedImpl implements User {
     public static final String TIMEZONE = "timezone";
     public static final String EXTERNAL_USER = "external_user";
     public static final String SESSION_TIMEOUT = "session_timeout_ms";
+    public static final String GLOBAL_SESSION_TIMEOUT = "global_session_timeout_interval";
     public static final String STARTPAGE = "startpage";
     public static final String ROLES = "roles";
     public static final String ACCOUNT_STATUS = "account_status";
@@ -116,20 +119,26 @@ public class UserImpl extends PersistedImpl implements User {
     @AssistedInject
     public UserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
                     Permissions permissions,
-                    @Assisted final Map<String, Object> fields) {
+                    @Assisted final Map<String, Object> fields,
+                    @Named(GLOBAL_SESSION_TIMEOUT) java.time.Duration globalSessionTimeoutInterval) {
         super(fields);
         this.passwordAlgorithmFactory = passwordAlgorithmFactory;
         this.permissions = permissions;
+        this.globalSessionTimeoutMs =
+                globalSessionTimeoutInterval != null ? globalSessionTimeoutInterval.toMillis() : 0;
     }
 
     @AssistedInject
     public UserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
                     Permissions permissions,
                     @Assisted final ObjectId id,
-                    @Assisted final Map<String, Object> fields) {
+                    @Assisted final Map<String, Object> fields,
+                    @Named(GLOBAL_SESSION_TIMEOUT) java.time.Duration globalSessionTimeoutInterval) {
         super(id, fields);
         this.passwordAlgorithmFactory = passwordAlgorithmFactory;
         this.permissions = permissions;
+        this.globalSessionTimeoutMs =
+                globalSessionTimeoutInterval != null ? globalSessionTimeoutInterval.toMillis() : 0;
     }
 
     @Override
@@ -287,6 +296,10 @@ public class UserImpl extends PersistedImpl implements User {
 
     @Override
     public long getSessionTimeoutMs() {
+        if (globalSessionTimeoutMs > 0) {
+            return globalSessionTimeoutMs;
+        }
+
         final Object o = fields.get(SESSION_TIMEOUT);
         if (o != null && o instanceof Long) {
             return (Long) o;
@@ -458,8 +471,9 @@ public class UserImpl extends PersistedImpl implements User {
         @AssistedInject
         LocalAdminUser(PasswordAlgorithmFactory passwordAlgorithmFactory,
                        Configuration configuration,
-                       @Assisted String adminRoleObjectId) {
-            super(passwordAlgorithmFactory, null, null, Collections.<String, Object>emptyMap());
+                       @Assisted String adminRoleObjectId,
+                       @Named(GLOBAL_SESSION_TIMEOUT) java.time.Duration globalSessionTimeoutInterval) {
+            super(passwordAlgorithmFactory, null, null, Collections.<String, Object>emptyMap(), globalSessionTimeoutInterval);
             this.configuration = configuration;
             this.roles = ImmutableSet.of(adminRoleObjectId);
         }
@@ -511,6 +525,9 @@ public class UserImpl extends PersistedImpl implements User {
 
         @Override
         public long getSessionTimeoutMs() {
+            if (globalSessionTimeoutMs > 0) {
+                return globalSessionTimeoutMs;
+            }
             return DEFAULT_SESSION_TIMEOUT_MS;
         }
 

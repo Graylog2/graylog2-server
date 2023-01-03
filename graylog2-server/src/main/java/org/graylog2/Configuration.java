@@ -34,6 +34,7 @@ import org.graylog2.cluster.lock.MongoLockService;
 import org.graylog2.configuration.converters.JavaDurationConverter;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.security.realm.RootAccountRealm;
+import org.graylog2.users.UserImpl;
 import org.graylog2.utilities.IPSubnetConverter;
 import org.graylog2.utilities.IpSubnet;
 import org.joda.time.DateTimeZone;
@@ -209,6 +210,9 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "lock_service_lock_ttl", converter = JavaDurationConverter.class)
     private java.time.Duration lockServiceLockTTL = MongoLockService.MIN_LOCK_TTL;
+
+    @Parameter(value = UserImpl.GLOBAL_SESSION_TIMEOUT, converter = JavaDurationConverter.class)
+    private java.time.Duration globalSessionTimeoutInterval = java.time.Duration.ofHours(0);
 
     public boolean maintainsStreamAwareFieldTypes() {
         return streamAwareFieldTypes;

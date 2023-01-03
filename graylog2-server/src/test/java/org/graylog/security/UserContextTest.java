@@ -68,7 +68,7 @@ class UserContextTest {
         subjectDAO.setSessionStorageEvaluator(sessionStorageEvaluator);
         sm.setSubjectDAO(subjectDAO);
 
-        final User user = new UserImpl(mock(PasswordAlgorithmFactory.class), mock(Permissions.class), ImmutableMap.of());
+        final User user = new UserImpl(mock(PasswordAlgorithmFactory.class), mock(Permissions.class), ImmutableMap.of(), null);
         when(userService.load(anyString())).thenReturn(user);
         when(userService.loadById(anyString())).thenReturn(user);
 

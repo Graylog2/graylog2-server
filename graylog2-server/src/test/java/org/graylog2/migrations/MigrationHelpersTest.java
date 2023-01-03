@@ -255,6 +255,6 @@ public class MigrationHelpersTest {
         final BCryptPasswordAlgorithm passwordAlgorithm = new BCryptPasswordAlgorithm(10);
         final PasswordAlgorithmFactory passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.emptyMap(), passwordAlgorithm);
 
-        return new UserImpl(passwordAlgorithmFactory, permissions, ImmutableMap.of());
+        return new UserImpl(passwordAlgorithmFactory, permissions, ImmutableMap.of(), null);
     }
 }

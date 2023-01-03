@@ -1,0 +1,13 @@
+type = "added"
+message = "Add global session timeout configuration."
+
+issues = ["11379"]
+pulls = [""]
+
+details.user = """
+A new parameter `global_session_timeout_interval` has been added to `server.conf`.
+When this is present, you can no longer configure a timeout per user; and it overrides
+any previously configured user-specific timeout value!
+
+Re-enable individual session timeouts by deleting the global setting from `server.conf`.
+"""

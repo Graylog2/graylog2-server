@@ -54,7 +54,7 @@ public class UserImplTest {
 
     @Test
     public void testFirstLastFullNames() {
-        user = new UserImpl(null, null, null);
+        user = new UserImpl(null, null, null, null);
         user.setFirstLastFullNames("First", "Last");
         assertTrue(user.getFirstName().isPresent());
         assertTrue(user.getLastName().isPresent());
@@ -65,7 +65,7 @@ public class UserImplTest {
 
     @Test
     public void testSetFullName() {
-        user = new UserImpl(null, null, null);
+        user = new UserImpl(null, null, null, null);
         user.setFullName("Full Name");
         assertEquals("Full Name", user.getFullName());
         assertFalse(user.getFirstName().isPresent());
@@ -74,13 +74,13 @@ public class UserImplTest {
 
     @Test
     public void testNoFullNameEmptyString() {
-        user = new UserImpl(null, null, null);
+        user = new UserImpl(null, null, null, null);
         assertEquals("", user.getFullName());
     }
 
     @Test
     public void testFirstLastRequired() {
-        user = new UserImpl(null, null, null);
+        user = new UserImpl(null, null, null, null);
         assertThatThrownBy(() -> user.setFirstLastFullNames(null, "Last"))
                 .isExactlyInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("A firstName value is required");
@@ -92,7 +92,7 @@ public class UserImplTest {
 
     @Test
     public void testFirstNameLengthValidation() {
-        user = new UserImpl(null, null, null);
+        user = new UserImpl(null, null, null, null);
         ValidationResult result = user.getValidations().get(UserImpl.FIRST_NAME)
                                             .validate(StringUtils.repeat("*", 10));
         assertTrue(result.passed());
@@ -103,7 +103,7 @@ public class UserImplTest {
 
     @Test
     public void testLastNameLengthValidation() {
-        user = new UserImpl(null, null, null);
+        user = new UserImpl(null, null, null, null);
         ValidationResult result = user.getValidations().get(UserImpl.LAST_NAME)
                                       .validate(StringUtils.repeat("*", 10));
         assertTrue(result.passed());
@@ -116,7 +116,7 @@ public class UserImplTest {
     public void getPermissionsWorksWithEmptyPermissions() throws Exception {
         final Permissions permissions = new Permissions(Collections.emptySet());
         final Map<String, Object> fields = Collections.singletonMap(UserImpl.USERNAME, "foobar");
-        user = new UserImpl(passwordAlgorithmFactory, permissions, fields);
+        user = new UserImpl(passwordAlgorithmFactory, permissions, fields, null);
         assertThat(user.getPermissions()).containsAll(permissions.userSelfEditPermissions("foobar"));
     }
 
@@ -127,7 +127,7 @@ public class UserImplTest {
         final Map<String, Object> fields = ImmutableMap.of(
             UserImpl.USERNAME, "foobar",
             UserImpl.PERMISSIONS, customPermissions);
-        user = new UserImpl(passwordAlgorithmFactory, permissions, fields);
+        user = new UserImpl(passwordAlgorithmFactory, permissions, fields, null);
         assertThat(user.getPermissions())
             .containsAll(permissions.userSelfEditPermissions("foobar"))
             .contains("subject:action");
@@ -137,7 +137,7 @@ public class UserImplTest {
     public void permissionsArentModified() {
         final Permissions permissions = new Permissions(Collections.emptySet());
         final Map<String, Object> fields = Collections.singletonMap(UserImpl.USERNAME, "foobar");
-        user = new UserImpl(passwordAlgorithmFactory, permissions, fields);
+        user = new UserImpl(passwordAlgorithmFactory, permissions, fields, null);
 
         final List<String> newPermissions = ImmutableList.<String>builder()
                 .addAll(user.getPermissions())
@@ -153,7 +153,7 @@ public class UserImplTest {
         final Map<String, Object> fields = ImmutableMap.of(
                 UserImpl.USERNAME, "foobar",
                 UserImpl.PERMISSIONS, customPermissions);
-        user = new UserImpl(passwordAlgorithmFactory, permissions, fields);
+        user = new UserImpl(passwordAlgorithmFactory, permissions, fields, null);
 
         final Set<Permission> userSelfEditPermissions = permissions.userSelfEditPermissions("foobar").stream().map(CaseSensitiveWildcardPermission::new).collect(Collectors.toSet());
         assertThat(user.getObjectPermissions())
