@@ -21,7 +21,7 @@ import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import mockComponent from 'helpers/mocking/MockComponent';
-import { processHooks } from 'views/logic/views/ViewLoader';
+import processHooks from 'views/logic/views/processHooks';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import Search from 'views/logic/search/Search';
 import SearchComponent from 'views/components/Search';

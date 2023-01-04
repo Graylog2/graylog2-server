@@ -20,7 +20,7 @@ import { act } from 'react-dom/test-utils';
 
 import useLocation from 'routing/useLocation';
 import asMock from 'helpers/mocking/AsMock';
-import { processHooks } from 'views/logic/views/ViewLoader';
+import processHooks from 'views/logic/views/processHooks';
 import { ViewActions } from 'views/stores/ViewStore';
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
