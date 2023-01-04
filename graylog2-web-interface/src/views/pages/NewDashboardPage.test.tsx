@@ -18,18 +18,20 @@ import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 
+import useLocation from 'routing/useLocation';
 import asMock from 'helpers/mocking/AsMock';
 import { processHooks } from 'views/logic/views/ViewLoader';
 import { ViewActions } from 'views/stores/ViewStore';
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
+import useQuery from 'routing/useQuery';
 
 import NewDashboardPage from './NewDashboardPage';
 
 jest.mock('views/pages/SearchPage', () => () => <div>Extended search page</div>);
 
 jest.mock('components/common', () => ({
-  IfPermitted: jest.fn(({ children }) => <>{children}</>),
+  IfPermitted: jest.fn(({ children }) => children),
 }));
 
 jest.mock('views/stores/ViewStore', () => ({
@@ -43,13 +45,20 @@ jest.mock('views/logic/views/ViewLoader', () => ({
   processHooks: jest.fn((_promise, _loadHooks, _executeHooks, _query, onSuccess) => Promise.resolve().then(onSuccess)),
 }));
 
-jest.mock('routing/withLocation', () => (x) => x);
+jest.mock('routing/useLocation');
+jest.mock('routing/useQuery');
 
 describe('NewDashboardPage', () => {
-  const SimpleNewDashboardPage = (props) => <NewDashboardPage location={{}} {...props} />;
+  const mockLocation = {
+    pathname: '',
+    search: '',
+    state: {},
+    hash: '',
+  };
 
   beforeAll(() => {
     jest.useFakeTimers();
+    asMock(useLocation).mockReturnValue(mockLocation);
   });
 
   afterEach(() => {
@@ -58,7 +67,7 @@ describe('NewDashboardPage', () => {
   });
 
   it('shows loading spinner before rendering page', async () => {
-    const { findByText } = render(<SimpleNewDashboardPage />);
+    const { findByText } = render(<NewDashboardPage />);
 
     act(() => { jest.advanceTimersByTime(200); });
 
@@ -68,7 +77,7 @@ describe('NewDashboardPage', () => {
   });
 
   it('should create new view with type dashboard on mount', async () => {
-    render(<SimpleNewDashboardPage />);
+    render(<NewDashboardPage />);
 
     await waitFor(() => expect(ViewActions.create).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Dashboard));
@@ -80,9 +89,9 @@ describe('NewDashboardPage', () => {
       .createdAt(new Date('2019-10-16T14:38:44.681Z'))
       .build();
 
-    const { findByText } = render((
-      <SimpleNewDashboardPage location={{ state: { view } }} />
-    ));
+    asMock(useLocation).mockReturnValue({ ...mockLocation, state: { view } });
+
+    const { findByText } = render(<NewDashboardPage />);
 
     await findByText('Extended search page');
 
@@ -96,15 +105,16 @@ describe('NewDashboardPage', () => {
       .createdAt(new Date('2019-10-16T14:38:44.681Z'))
       .build();
 
+    asMock(useLocation).mockReturnValue({ ...mockLocation, state: { view } });
+
+    asMock(useQuery).mockReturnValue({
+      q: '',
+      rangetype: 'relative',
+      relative: '300',
+    });
+
     const { findByText } = render((
-      <SimpleNewDashboardPage location={{
-        state: { view },
-        query: {
-          q: '',
-          rangetype: 'relative',
-          relative: '300',
-        },
-      }} />
+      <NewDashboardPage />
     ));
 
     await findByText('Extended search page');
@@ -124,8 +134,9 @@ describe('NewDashboardPage', () => {
       .build()
       .toJSON();
 
+    asMock(useLocation).mockReturnValue({ ...mockLocation, state: { view } });
     const { findByText } = render((
-      <SimpleNewDashboardPage location={{ state: { view } }} />
+      <NewDashboardPage />
     ));
 
     await findByText('Extended search page');
