@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.views;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;
 import org.graylog.security.entities.EntityOwnershipService;
@@ -62,6 +63,11 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         this.viewRequirementsFactory = viewRequirementsFactory;
         this.entityOwnerShipService = entityOwnerShipService;
         this.viewSummaryService = viewSummaryService;
+        for (String sortField : ViewDTO.SORT_FIELDS) {
+            if (!sortField.equals(ViewDTO.FIELD_ID)) { //id has index by default
+                this.db.createIndex(new BasicDBObject(sortField, 1), new BasicDBObject("unique", false));
+            }
+        }
     }
 
     private PaginatedList<ViewDTO> searchPaginated(DBQuery.Query query,
