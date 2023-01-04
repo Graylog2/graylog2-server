@@ -29,6 +29,8 @@ import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import Search from 'views/logic/search/Search';
 import SearchComponent from 'views/components/Search';
 import { loadNewViewForStream, loadView } from 'views/logic/views/Actions';
+import useParams from 'routing/useParams';
+import useQuery from 'routing/useQuery';
 
 import StreamSearchPage from './StreamSearchPage';
 
@@ -55,9 +57,6 @@ jest.mock('views/stores/ViewStore', () => ({
   ViewStore: MockStore(['getInitialState', () => ({ view: mockView })]),
 }));
 
-jest.mock('routing/withLocation', () => (x) => x);
-jest.mock('routing/withParams', () => (x) => x);
-
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
     get: jest.fn(() => Promise.resolve()),
@@ -72,34 +71,32 @@ jest.mock('views/hooks/SyncWithQueryParameters');
 
 jest.mock('views/logic/views/Actions');
 
+jest.mock('routing/useQuery');
+jest.mock('routing/useParams');
+
 describe('StreamSearchPage', () => {
+  const mockQuery = {
+    q: '',
+    rangetype: 'relative',
+    relative: '300',
+  };
+  const streamId = 'stream-id-1';
+  const SimpleStreamSearchPage = (props) => (
+    <StreamsContext.Provider value={[{ id: streamId }]}>
+      <StreamSearchPage {...props} />
+    </StreamsContext.Provider>
+  );
+
   beforeAll(() => {
     jest.useFakeTimers();
   });
 
-  const mockRouter = {
-    getCurrentLocation: jest.fn(() => ({ pathname: '/search', search: '?q=&rangetype=relative&relative=300' })),
-  };
-  const mockLocation = {
-    pathname: '/search',
-    query: {
-      q: '',
-      rangetype: 'relative',
-      relative: '300',
-    },
-  };
-  const SimpleStreamSearchPage = (props) => (
-    <StreamsContext.Provider value={[{ id: 'stream-id-1' }]}>
-      <StreamSearchPage location={{ query: {} }}
-                        params={{ streamId: 'stream-id-1' }}
-                        router={mockRouter}
-                        {...props} />
-    </StreamsContext.Provider>
-  );
+  beforeEach(() => {
+    asMock(useQuery).mockReturnValue({});
+    asMock(useParams).mockReturnValue({ streamId });
+  });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-    jest.resetModules();
+  afterAll(() => {
     jest.useRealTimers();
   });
 
@@ -122,7 +119,9 @@ describe('StreamSearchPage', () => {
 
     await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-1', undefined, undefined));
 
-    rerender(<SimpleStreamSearchPage params={{ streamId: 'stream-id-2' }} />);
+    asMock(useParams).mockReturnValue({ streamId: 'stream-id-2' });
+
+    rerender(<SimpleStreamSearchPage />);
 
     await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-2', undefined, undefined));
   });
@@ -171,7 +170,8 @@ describe('StreamSearchPage', () => {
 
     it('should process hooks with empty query', async () => {
       const processHooksAction = asMock(processHooks);
-      const { findByText } = render(<SimpleStreamSearchPage location={mockLocation} />);
+      asMock(useQuery).mockReturnValue(mockQuery);
+      const { findByText } = render(<SimpleStreamSearchPage />);
       const viewCreateButton = await findByText('Load new view');
 
       fireEvent.click(viewCreateButton);
