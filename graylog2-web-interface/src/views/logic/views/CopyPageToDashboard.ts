@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { PluginStore } from 'graylog-web-plugin/plugin';
+
 import View from 'views/logic/views/View';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
 
@@ -21,6 +23,8 @@ const CopyPageToDashboard = (queryId: string, sourceDashboard: View, targetDashb
   if (targetDashboard.type !== View.Type.Dashboard) {
     return undefined;
   }
+
+  const copyHooks = PluginStore.exports('views.hooks.copyWidgetToDashboard');
 
   const selectedViewState = sourceDashboard.state.get(queryId);
   const selectedQuery = sourceDashboard.search.queries.find((query) => query.id === queryId);
@@ -34,7 +38,7 @@ const CopyPageToDashboard = (queryId: string, sourceDashboard: View, targetDashb
     .search(newSearch)
     .build());
 
-  return [].reduce((previousDashboard, copyHook) => copyHook(sourceDashboard, previousDashboard), updatedDashboard);
+  return copyHooks.reduce((previousDashboard, copyHook) => copyHook(sourceDashboard, previousDashboard), updatedDashboard);
 };
 
 export default CopyPageToDashboard;
