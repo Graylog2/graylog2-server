@@ -16,7 +16,6 @@
  */
 import { useMemo } from 'react';
 
-import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';
 import ViewGenerator from 'views/logic/views/ViewGenerator';
@@ -27,7 +26,7 @@ const useCreateSavedSearch = (
   queryString?: ElasticsearchQueryString,
 ) => {
   return useMemo(
-    () => ViewGenerator(View.Type.Search, streamId, timeRange, queryString).then((view) => ViewActions.loadNew(view)).then(({ view }) => view),
+    () => ViewGenerator(View.Type.Search, streamId, timeRange, queryString),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [streamId],
   );
