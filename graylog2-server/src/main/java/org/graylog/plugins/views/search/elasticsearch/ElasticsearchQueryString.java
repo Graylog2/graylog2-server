@@ -73,15 +73,11 @@ public abstract class ElasticsearchQueryString implements BackendQuery {
         final String thisQueryString = Strings.nullToEmpty(this.queryString()).trim();
         final String otherQueryString = Strings.nullToEmpty(other.queryString()).trim();
 
-        final StringBuilder finalStringBuilder = new StringBuilder(thisQueryString);
         if (!thisQueryString.isEmpty() && !otherQueryString.isEmpty()) {
-            finalStringBuilder.append(" AND ");
-        }
-        if (!otherQueryString.isEmpty()) {
-            finalStringBuilder.append(otherQueryString);
+            return ElasticsearchQueryString.of("(" + thisQueryString + ") AND (" + otherQueryString + ")");
         }
 
-        return new AutoValue_ElasticsearchQueryString(NAME, finalStringBuilder.toString());
+        return this.queryString().isEmpty() ? other : this;
     }
 
     @Override
