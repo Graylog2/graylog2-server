@@ -63,16 +63,11 @@ public class SavedSearchesResource extends RestResource {
     private static final String DEFAULT_SORT_FIELD = ViewDTO.FIELD_TITLE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
-            EntityAttribute.builder().id(ViewDTO.FIELD_ID).title("Id").build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_TITLE).title("Title").build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_CREATED_AT).title("Created").type("date").build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_DESCRIPTION).title("Description").build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_SUMMARY).title("Summary").build(),
-            EntityAttribute.builder().id(ViewDTO.FIELD_OWNER).title("Owner").build(),
-            EntityAttribute.builder().id(ViewDTO.FIELD_TYPE).title("Type").sortable(false).build(),
-            EntityAttribute.builder().id(ViewDTO.FIELD_PROPERTIES).title("Properties").sortable(false).build(),
-            EntityAttribute.builder().id(ViewDTO.FIELD_SEARCH_ID).title("Search Id").sortable(false).build()
-
+            EntityAttribute.builder().id(ViewDTO.FIELD_OWNER).title("Owner").build()
     );
 
     private static final EntityDefaults settings = EntityDefaults.builder()
