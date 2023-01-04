@@ -16,21 +16,16 @@
  */
 import * as React from 'react';
 
-import withLocation from 'routing/withLocation';
-import type { Location } from 'routing/withLocation';
 import { Spinner } from 'components/common';
 import useLoadView from 'views/logic/views/UseLoadView';
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
-import type { RawQuery } from 'views/logic/NormalizeSearchURLQueryParams';
 import normalizeSearchURLQueryParams from 'views/logic/NormalizeSearchURLQueryParams';
+import useQuery from 'routing/useQuery';
 
 import SearchPage from './SearchPage';
 
-type Props = {
-  location: Location<RawQuery>,
-};
-
-const NewSearchPage = ({ location: { query } }: Props) => {
+const NewSearchPage = () => {
+  const query = useQuery();
   const { timeRange, queryString } = normalizeSearchURLQueryParams(query);
   const view = useCreateSavedSearch(undefined, timeRange, queryString);
   const [loaded, HookComponent] = useLoadView(view, query);
@@ -46,6 +41,4 @@ const NewSearchPage = ({ location: { query } }: Props) => {
   return <SearchPage />;
 };
 
-NewSearchPage.propTypes = {};
-
-export default withLocation(NewSearchPage);
+export default NewSearchPage;
