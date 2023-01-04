@@ -16,7 +16,6 @@
  */
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
-import { get } from 'lodash';
 
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
@@ -74,6 +73,23 @@ export const ViewActions: ViewActionsType = singletonActions(
 
 type ViewStoreType = Store<ViewStoreState>;
 
+const _updateSearch = (view: View, oldView: View): [View, boolean] => {
+  if (!view.search) {
+    return [view, false];
+  }
+
+  const oldWidgets = oldView?.state?.map((s) => s.widgets);
+  const newWidgets = view?.state?.map((s) => s.widgets);
+
+  if (!isEqualForSearch(oldWidgets, newWidgets)) {
+    const newView = UpdateSearchForWidgets(view);
+
+    return [newView, true];
+  }
+
+  return [view, false];
+};
+
 const _selectedQuery = (queries: QuerySet = Immutable.Set(), activeQuery: string, queryId: string): QueryId => {
   const selectedQuery = queryId ?? activeQuery;
 
@@ -114,10 +130,10 @@ export const ViewStore: ViewStoreType = singletonStore(
     ) {
       return ViewGenerator(type, streamId, timeRange, queryString)
         .then((newView) => {
-          const [view] = this._updateSearch(newView);
+          const [view] = _updateSearch(newView, this.view);
 
           this.view = view;
-          const queries: QuerySet = get(view, 'search.queries', Immutable.Set());
+          const queries: QuerySet = view?.search?.queries ?? Immutable.Set();
 
           this.activeQuery = queries.first().id;
 
@@ -148,10 +164,10 @@ export const ViewStore: ViewStoreType = singletonStore(
       const newState = this.view.state.set(query.id, viewState);
 
       this.dirty = true;
-      const [view, isModified] = this._updateSearch(this.view.toBuilder()
+      const [view, isModified] = _updateSearch(this.view.toBuilder()
         .state(newState)
         .search(newSearch)
-        .build());
+        .build(), this.view);
 
       this.view = view;
       this.activeQuery = query.id;
@@ -223,7 +239,7 @@ export const ViewStore: ViewStoreType = singletonStore(
     },
     state(newState: ViewState) {
       this.dirty = true;
-      const [view, isModified] = this._updateSearch(this.view.toBuilder().state(newState).build());
+      const [view, isModified] = _updateSearch(this.view.toBuilder().state(newState).build(), this.view);
 
       this.view = view;
       const promise = (isModified ? ViewActions.search(view.search) : Promise.resolve(view)).then(() => this._trigger());
@@ -231,22 +247,6 @@ export const ViewStore: ViewStoreType = singletonStore(
       ViewActions.state.promise(promise);
 
       return promise;
-    },
-    _updateSearch(view: View): [View, boolean] {
-      if (!view.search) {
-        return [view, false];
-      }
-
-      const oldWidgets = get(this.view, 'state') && this.view.state.map((s) => s.widgets);
-      const newWidgets = get(view, 'state') && view.state.map((s) => s.widgets);
-
-      if (!isEqualForSearch(oldWidgets, newWidgets)) {
-        const newView = UpdateSearchForWidgets(view);
-
-        return [newView, true];
-      }
-
-      return [view, false];
     },
     _state(): ViewStoreState {
       return {
