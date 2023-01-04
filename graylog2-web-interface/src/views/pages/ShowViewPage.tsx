@@ -21,21 +21,21 @@ import useViewLoader from 'views/logic/views/UseViewLoader';
 import Spinner from 'components/common/Spinner';
 import type { ViewLoaderFn } from 'views/logic/views/ViewLoader';
 import ViewLoader from 'views/logic/views/ViewLoader';
-import withLocation from 'routing/withLocation';
 import withParams from 'routing/withParams';
-import type { Location } from 'routing/withLocation';
+import useQuery from 'routing/useQuery';
 
 import SearchPage from './SearchPage';
 
 type Props = {
-  location: Location,
   params: {
     viewId?: string,
   },
   viewLoader?: ViewLoaderFn,
 };
 
-const ShowViewPage = ({ params: { viewId }, location: { query }, viewLoader }: Props) => {
+const ShowViewPage = ({ params: { viewId }, viewLoader }: Props) => {
+  const query = useQuery();
+
   if (!viewId) {
     throw new Error('No view id specified!');
   }
@@ -64,4 +64,4 @@ ShowViewPage.defaultProps = {
   viewLoader: ViewLoader,
 };
 
-export default withParams(withLocation(ShowViewPage));
+export default withParams(ShowViewPage);
