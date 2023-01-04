@@ -61,7 +61,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -307,7 +307,7 @@ public class IndicesResource extends RestResource {
     }
 
     private OpenIndicesInfo getOpenIndicesInfo(Set<IndexStatistics> indicesStatistics) {
-        final Map<String, IndexInfo> indexInfos = new LinkedHashMap<>();
+        final List<IndexInfo> indexInfos = new LinkedList<>();
         final Set<String> indices = indicesStatistics.stream()
                 .map(IndexStatistics::index)
                 .collect(Collectors.toSet());
@@ -319,12 +319,13 @@ public class IndicesResource extends RestResource {
 
         for (IndexStatistics indexStatistics : sortedIndexStatistics) {
             final IndexInfo indexInfo = IndexInfo.create(
+                    indexStatistics.index(),
                     indexStatistics.primaryShards(),
                     indexStatistics.allShards(),
                     fillShardRoutings(indexStatistics.routing()),
                     areReopened.get(indexStatistics.index()));
 
-            indexInfos.put(indexStatistics.index(), indexInfo);
+            indexInfos.add(indexInfo);
         }
 
         return OpenIndicesInfo.create(indexInfos);
@@ -341,6 +342,7 @@ public class IndicesResource extends RestResource {
 
     private IndexInfo toIndexInfo(final IndexStatistics indexStatistics) {
         return IndexInfo.create(
+                indexStatistics.index(),
                 indexStatistics.primaryShards(),
                 indexStatistics.allShards(),
                 fillShardRoutings(indexStatistics.routing()),
@@ -355,6 +357,7 @@ public class IndicesResource extends RestResource {
         final ImmutableMap.Builder<String, IndexInfo> indexInfos = ImmutableMap.builder();
         for (IndexStatistics indexStats : indexStatistics) {
             final IndexInfo indexInfo = IndexInfo.create(
+                    indexStats.index(),
                     indexStats.primaryShards(),
                     indexStats.allShards(),
                     fillShardRoutings(indexStats.routing()),
