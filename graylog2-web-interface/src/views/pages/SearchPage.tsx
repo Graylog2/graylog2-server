@@ -29,7 +29,7 @@ import { ViewStore } from 'views/stores/ViewStore';
 
 type Props = {
   loadNewView?: () => unknown,
-  loadView?: (string) => unknown,
+  loadView?: (viewId: string) => unknown,
 };
 
 const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
