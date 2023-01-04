@@ -51,7 +51,7 @@ jest.mock('bson-objectid', () => jest.fn(() => ({
 
 jest.mock('views/stores/ViewStore', () => ({
   ViewActions: {
-    create: mockAction(),
+    loadNew: mockAction(),
     load: mockAction(),
   },
   ViewStore: MockStore(),
