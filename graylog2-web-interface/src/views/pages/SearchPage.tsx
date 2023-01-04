@@ -27,7 +27,7 @@ import { DocumentTitle, Spinner } from 'components/common';
 import viewTitle from 'views/logic/views/ViewTitle';
 import { ViewStore } from 'views/stores/ViewStore';
 import type View from 'views/logic/views/View';
-import useLoadView from 'views/pages/useLoadView';
+import useLoadView from 'views/hooks/useLoadView';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import useQuery from 'routing/useQuery';
 
@@ -49,7 +49,7 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
 
 const SearchPage = ({ view, loadNewView = defaultLoadNewView, loadView = defaultLoadView }: Props) => {
   const query = useQuery();
-  useLoadView(view);
+  useLoadView(view, query?.page as string);
   const [loaded, HookComponent] = useProcessHooksForView(view, query);
 
   if (HookComponent) {

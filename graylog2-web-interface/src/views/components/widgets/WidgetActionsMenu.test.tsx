@@ -62,7 +62,7 @@ jest.mock('views/logic/views/Actions');
 jest.mock('views/stores/ViewStore', () => ({
   ViewStore: MockStore(),
   ViewActions: {
-    create: mockAction(),
+    loadNew: mockAction(),
     load: mockAction(),
   },
 }));
