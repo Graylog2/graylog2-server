@@ -29,10 +29,10 @@ import Search from 'views/logic/search/Search';
 import type { ViewJson } from 'views/logic/views/View';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { SearchExecutionStateActions } from 'views/stores/SearchExecutionStateStore';
+import useQuery from 'routing/useQuery';
 
 import ShowViewPage from './ShowViewPage';
 
-jest.mock('stores/connect', () => (x) => x);
 jest.mock('views/logic/views/ViewDeserializer', () => jest.fn((x) => Promise.resolve(x)));
 
 jest.mock('views/stores/ViewManagementStore', () => ({
@@ -62,10 +62,9 @@ jest.mock('actions/errors/ErrorsActions', () => ({
 }));
 
 jest.mock('views/components/Search', () => 'extended-search-page');
-jest.mock('routing/withLocation', () => (x) => x);
 jest.mock('routing/withParams', () => (x) => x);
 
-jest.mock('components/common/Spinner', () => () => <span>Spinner</span>);
+jest.mock('routing/useQuery');
 
 describe('ShowViewPage', () => {
   const viewJson = {
@@ -84,8 +83,7 @@ describe('ShowViewPage', () => {
   } as ViewJson;
   const SimpleShowViewPage = (props) => (
     <StreamsContext.Provider value={[{ id: 'stream-id-1' }]}>
-      <ShowViewPage location={{ query: {} }}
-                    params={{ viewId: 'foo' }}
+      <ShowViewPage params={{ viewId: 'foo' }}
                     {...props} />
     </StreamsContext.Provider>
   );
@@ -93,6 +91,7 @@ describe('ShowViewPage', () => {
   beforeEach(() => {
     jest.resetAllMocks();
     jest.resetModules();
+    asMock(useQuery).mockReturnValue({});
   });
 
   it('renders Spinner while loading', async () => {
@@ -104,7 +103,7 @@ describe('ShowViewPage', () => {
 
     render(<SimpleShowViewPage />);
 
-    await screen.findByText('Spinner');
+    await screen.findByText('Loading...');
   });
 
   it('loads view with id passed from props', () => {
