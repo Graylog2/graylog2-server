@@ -15,22 +15,34 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
+import { useMemo } from 'react';
+import type { ParsedQs } from 'qs';
 
 import useParams from 'routing/useParams';
-import useViewLoader from 'views/logic/views/UseViewLoader';
 import Spinner from 'components/common/Spinner';
-import type { ViewLoaderFn } from 'views/logic/views/ViewLoader';
-import ViewLoader from 'views/logic/views/ViewLoader';
 import useQuery from 'routing/useQuery';
+import ErrorsActions from 'actions/errors/ErrorsActions';
+import { ViewManagementActions } from 'views/stores/ViewManagementStore';
+import ViewDeserializer from 'views/logic/views/ViewDeserializer';
+import { createFromFetchError } from 'logic/errors/ReportedErrors';
+import useLoadView from 'views/pages/useLoadView';
+import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 
 import SearchPage from './SearchPage';
 
-type Props = {
-  viewLoader?: ViewLoaderFn,
+const useFetchView = (viewId: string, query: ParsedQs) => {
+  const viewJsonPromise = useMemo(() => ViewManagementActions.get(viewId), [viewId]);
+
+  return useMemo(() => viewJsonPromise.then((viewJson) => ViewDeserializer(viewJson, query), (error) => {
+    if (error.status === 404) {
+      ErrorsActions.report(createFromFetchError(error));
+    }
+
+    throw error;
+  }), [query, viewJsonPromise]);
 };
 
-const ShowViewPage = ({ viewLoader }: Props) => {
+const ShowViewPage = () => {
   const query = useQuery();
   const { viewId } = useParams<{ viewId?: string }>();
 
@@ -38,7 +50,10 @@ const ShowViewPage = ({ viewLoader }: Props) => {
     throw new Error('No view id specified!');
   }
 
-  const [loaded, HookComponent] = useViewLoader(viewId, query, viewLoader);
+  const view = useFetchView(viewId, query);
+
+  useLoadView(view);
+  const [loaded, HookComponent] = useProcessHooksForView(view, query);
 
   if (HookComponent) {
     return HookComponent;
@@ -49,14 +64,6 @@ const ShowViewPage = ({ viewLoader }: Props) => {
   }
 
   return <SearchPage />;
-};
-
-ShowViewPage.propTypes = {
-  viewLoader: PropTypes.func,
-};
-
-ShowViewPage.defaultProps = {
-  viewLoader: ViewLoader,
 };
 
 export default ShowViewPage;
