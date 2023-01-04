@@ -17,14 +17,11 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 
-import Spinner from 'components/common/Spinner';
-import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 import { loadNewViewForStream } from 'views/logic/views/Actions';
 import normalizeSearchURLQueryParams from 'views/logic/NormalizeSearchURLQueryParams';
 import useQuery from 'routing/useQuery';
 import useParams from 'routing/useParams';
-import useLoadView from 'views/pages/useLoadView';
 
 import SearchPage from './SearchPage';
 
@@ -38,20 +35,10 @@ const StreamSearchPage = () => {
 
   const { timeRange, queryString } = normalizeSearchURLQueryParams(query);
   const newView = useCreateSavedSearch(streamId, timeRange, queryString);
-  useLoadView(newView);
-  const [loaded, HookComponent] = useProcessHooksForView(newView, query);
 
   const _loadNewView = useCallback(() => loadNewViewForStream(streamId), [streamId]);
 
-  if (HookComponent) {
-    return HookComponent;
-  }
-
-  if (!loaded) {
-    return <Spinner />;
-  }
-
-  return <SearchPage loadNewView={_loadNewView} />;
+  return <SearchPage loadNewView={_loadNewView} view={newView} />;
 };
 
 export default StreamSearchPage;

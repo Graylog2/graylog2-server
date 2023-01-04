@@ -23,11 +23,16 @@ import { loadNewView as defaultLoadNewView, loadView as defaultLoadView } from '
 import IfUserHasAccessToAnyStream from 'views/components/IfUserHasAccessToAnyStream';
 import DashboardPageContextProvider from 'views/components/contexts/DashboardPageContextProvider';
 import { useStore } from 'stores/connect';
-import { DocumentTitle } from 'components/common';
+import { DocumentTitle, Spinner } from 'components/common';
 import viewTitle from 'views/logic/views/ViewTitle';
 import { ViewStore } from 'views/stores/ViewStore';
+import type View from 'views/logic/views/View';
+import useLoadView from 'views/pages/useLoadView';
+import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
+import useQuery from 'routing/useQuery';
 
 type Props = {
+  view: Promise<View>,
   loadNewView?: () => unknown,
   loadView?: (viewId: string) => unknown,
 };
@@ -42,19 +47,31 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const SearchPage = ({ loadNewView = defaultLoadNewView, loadView = defaultLoadView }: Props) => (
-  <SearchPageTitle>
-    <DashboardPageContextProvider>
-      <NewViewLoaderContext.Provider value={loadNewView}>
-        <ViewLoaderContext.Provider value={loadView}>
-          <IfUserHasAccessToAnyStream>
-            <Search />
-          </IfUserHasAccessToAnyStream>
-        </ViewLoaderContext.Provider>
-      </NewViewLoaderContext.Provider>
-    </DashboardPageContextProvider>
-  </SearchPageTitle>
-);
+const SearchPage = ({ view, loadNewView = defaultLoadNewView, loadView = defaultLoadView }: Props) => {
+  const query = useQuery();
+  useLoadView(view);
+  const [loaded, HookComponent] = useProcessHooksForView(view, query);
+
+  if (HookComponent) {
+    return HookComponent;
+  }
+
+  return loaded
+    ? (
+      <SearchPageTitle>
+        <DashboardPageContextProvider>
+          <NewViewLoaderContext.Provider value={loadNewView}>
+            <ViewLoaderContext.Provider value={loadView}>
+              <IfUserHasAccessToAnyStream>
+                <Search />
+              </IfUserHasAccessToAnyStream>
+            </ViewLoaderContext.Provider>
+          </NewViewLoaderContext.Provider>
+        </DashboardPageContextProvider>
+      </SearchPageTitle>
+    )
+    : <Spinner />;
+};
 
 SearchPage.defaultProps = {
   loadNewView: defaultLoadNewView,

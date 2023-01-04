@@ -19,14 +19,11 @@ import { useMemo } from 'react';
 import type { ParsedQs } from 'qs';
 
 import useParams from 'routing/useParams';
-import Spinner from 'components/common/Spinner';
 import useQuery from 'routing/useQuery';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import ViewDeserializer from 'views/logic/views/ViewDeserializer';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
-import useLoadView from 'views/pages/useLoadView';
-import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 
 import SearchPage from './SearchPage';
 
@@ -52,18 +49,7 @@ const ShowViewPage = () => {
 
   const view = useFetchView(viewId, query);
 
-  useLoadView(view);
-  const [loaded, HookComponent] = useProcessHooksForView(view, query);
-
-  if (HookComponent) {
-    return HookComponent;
-  }
-
-  if (!loaded) {
-    return <Spinner />;
-  }
-
-  return <SearchPage />;
+  return <SearchPage view={view} />;
 };
 
 export default ShowViewPage;
