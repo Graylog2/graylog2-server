@@ -29,7 +29,6 @@ const _chainHooks = (hooks: Array<ViewHook>, args: ViewHookArguments) => {
 
 type Query = { [key: string]: any };
 type OnSuccess = () => void;
-type OnError = (e: Error) => void;
 
 const _processViewHooks = (viewHooks: Array<ViewHook>, view: View, query: Query, onSuccess: OnSuccess) => {
   let promise;
@@ -81,6 +80,3 @@ const ViewLoader = (viewId: string,
   return processHooks(promise, loadingViewHooks, executingViewHooks, query, onSuccess)
     .catch(onError);
 };
-
-export type ViewLoaderFn = typeof ViewLoader;
-export default ViewLoader;
