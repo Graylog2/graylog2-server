@@ -31,7 +31,7 @@ describe('NewWidgetPlaceholder', () => {
     .build();
 
   it('shows helpful text when rendered', async () => {
-    render(<NewWidgetPlaceholder position={widgetPosition} component={() => <></>} />);
+    render(<NewWidgetPlaceholder position={widgetPosition} component={() => null} />);
     await screen.findByText('Create a new widget here');
   });
 
@@ -56,7 +56,7 @@ describe('NewWidgetPlaceholder', () => {
   });
 
   it('unmounts custom component after calling `onCancel`', async () => {
-    const component = ({ onCancel }) => <button onClick={onCancel}>Close</button>;
+    const component = ({ onCancel }) => <button type="button" onClick={onCancel}>Close</button>;
     render(<NewWidgetPlaceholder position={widgetPosition} component={component} />);
     const text = await screen.findByText('Create a new widget here');
     userEvent.click(text);
