@@ -22,7 +22,6 @@ import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import mockComponent from 'helpers/mocking/MockComponent';
 import { processHooks } from 'views/logic/views/ViewLoader';
-import { ViewActions } from 'views/stores/ViewStore';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import Search from 'views/logic/search/Search';
 import SearchComponent from 'views/components/Search';
@@ -31,6 +30,7 @@ import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import StreamsContext from 'contexts/StreamsContext';
 import { loadNewView, loadView } from 'views/logic/views/Actions';
 import useQuery from 'routing/useQuery';
+import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 
 import NewSearchPage from './NewSearchPage';
 
@@ -66,6 +66,7 @@ jest.mock('views/logic/views/ViewLoader', () => ({
 }));
 
 jest.mock('views/logic/views/Actions');
+jest.mock('views/logic/views/UseCreateSavedSearch');
 
 describe('NewSearchPage', () => {
   const mockRouter = {
@@ -84,6 +85,7 @@ describe('NewSearchPage', () => {
 
   beforeEach(() => {
     asMock(useQuery).mockReturnValue(query);
+    asMock(useCreateSavedSearch).mockReturnValue(Promise.resolve(mockView));
   });
 
   afterEach(() => {
@@ -115,9 +117,7 @@ describe('NewSearchPage', () => {
       asMock(useQuery).mockReturnValue({});
       render(<SimpleNewSearchPage />);
 
-      await waitFor(() => expect(ViewActions.create).toHaveBeenCalledTimes(1));
-
-      expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, undefined, undefined, undefined);
+      await waitFor(() => expect(useCreateSavedSearch).toHaveBeenCalledWith(undefined, undefined, undefined));
     });
 
     it('should process hooks with provided location query', async () => {

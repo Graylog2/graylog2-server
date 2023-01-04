@@ -22,7 +22,6 @@ import asMock from 'helpers/mocking/AsMock';
 import { MockStore } from 'helpers/mocking';
 import StreamsContext from 'contexts/StreamsContext';
 import { processHooks } from 'views/logic/views/ViewLoader';
-import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
@@ -31,6 +30,7 @@ import SearchComponent from 'views/components/Search';
 import { loadNewViewForStream, loadView } from 'views/logic/views/Actions';
 import useParams from 'routing/useParams';
 import useQuery from 'routing/useQuery';
+import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 
 import StreamSearchPage from './StreamSearchPage';
 
@@ -51,9 +51,6 @@ jest.mock('views/stores/ViewStatesStore', () => ({
 }));
 
 jest.mock('views/stores/ViewStore', () => ({
-  ViewActions: {
-    create: jest.fn(() => Promise.resolve({ view: mockView })),
-  },
   ViewStore: MockStore(['getInitialState', () => ({ view: mockView })]),
 }));
 
@@ -73,6 +70,7 @@ jest.mock('views/logic/views/Actions');
 
 jest.mock('routing/useQuery');
 jest.mock('routing/useParams');
+jest.mock('views/logic/views/UseCreateSavedSearch');
 
 describe('StreamSearchPage', () => {
   const mockQuery = {
@@ -87,20 +85,19 @@ describe('StreamSearchPage', () => {
     </StreamsContext.Provider>
   );
 
-  beforeAll(() => {
-    jest.useFakeTimers();
-  });
-
   beforeEach(() => {
     asMock(useQuery).mockReturnValue({});
     asMock(useParams).mockReturnValue({ streamId });
+    asMock(useCreateSavedSearch).mockReturnValue(Promise.resolve(mockView));
   });
 
-  afterAll(() => {
+  afterEach(() => {
     jest.useRealTimers();
   });
 
   it('shows loading spinner before rendering page', async () => {
+    jest.useFakeTimers();
+
     const { findByText } = render(<SimpleStreamSearchPage />);
     act(() => { jest.advanceTimersByTime(200); });
 
@@ -111,19 +108,19 @@ describe('StreamSearchPage', () => {
 
   it('should create view with streamId passed from props', async () => {
     render(<SimpleStreamSearchPage />);
-    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-1', undefined, undefined));
+    await waitFor(() => expect(useCreateSavedSearch).toHaveBeenCalledWith(streamId, undefined, undefined));
   });
 
   it('should recreate view when streamId passed from props changes', async () => {
     const { rerender } = render(<SimpleStreamSearchPage />);
 
-    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-1', undefined, undefined));
+    await waitFor(() => expect(useCreateSavedSearch).toHaveBeenCalledWith(streamId, undefined, undefined));
 
     asMock(useParams).mockReturnValue({ streamId: 'stream-id-2' });
 
     rerender(<SimpleStreamSearchPage />);
 
-    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search, 'stream-id-2', undefined, undefined));
+    await waitFor(() => expect(useCreateSavedSearch).toHaveBeenLastCalledWith('stream-id-2', undefined, undefined));
   });
 
   describe('loading another view', () => {
