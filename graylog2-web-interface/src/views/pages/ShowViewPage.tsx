@@ -15,39 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
-import type { ParsedQs } from 'qs';
 
 import useParams from 'routing/useParams';
-import useQuery from 'routing/useQuery';
-import ErrorsActions from 'actions/errors/ErrorsActions';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import ViewDeserializer from 'views/logic/views/ViewDeserializer';
-import { createFromFetchError } from 'logic/errors/ReportedErrors';
 
 import SearchPage from './SearchPage';
 
-const useFetchView = (viewId: string, query: ParsedQs) => {
-  const viewJsonPromise = useMemo(() => ViewManagementActions.get(viewId), [viewId]);
-
-  return useMemo(() => viewJsonPromise.then((viewJson) => ViewDeserializer(viewJson, query), (error) => {
-    if (error.status === 404) {
-      ErrorsActions.report(createFromFetchError(error));
-    }
-
-    throw error;
-  }), [query, viewJsonPromise]);
-};
+import useFetchView from '../hooks/useFetchView';
 
 const ShowViewPage = () => {
-  const query = useQuery();
   const { viewId } = useParams<{ viewId?: string }>();
 
   if (!viewId) {
     throw new Error('No view id specified!');
   }
 
-  const view = useFetchView(viewId, query);
+  const view = useFetchView(viewId);
 
   return <SearchPage view={view} />;
 };
