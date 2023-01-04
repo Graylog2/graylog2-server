@@ -17,7 +17,7 @@
 import View from 'views/logic/views/View';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
 
-const CopyPageToDashboard = (queryId: string, sourceDashboard: View, targetDashboard: View): View | undefined | null => {
+const CopyPageToDashboard = (queryId: string, sourceDashboard: View, targetDashboard: View): View => {
   if (targetDashboard.type !== View.Type.Dashboard) {
     return undefined;
   }

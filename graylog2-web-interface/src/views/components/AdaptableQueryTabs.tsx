@@ -182,10 +182,10 @@ const adjustTabsVisibility = (maxWidth, lockedTab, setLockedTab) => {
   }
 };
 
-const _updateDashboardWithNewSearch = (dashboard: View, dashboardId: string, newSearch: Search) => {
+const _updateDashboardWithNewSearch = (dashboard: View, dashboardId: string, newSearch: Search, queryParams: { page: string }) => {
   const newDashboard = dashboard.toBuilder().search(newSearch).build();
 
-  ViewManagementActions.update(newDashboard).then(() => loadDashboard(dashboardId));
+  ViewManagementActions.update(newDashboard).then(() => loadDashboard(dashboardId, queryParams));
 };
 
 const addPageToDashboard = (targetDashboard: View, activeView: View, queryId: string) => (searchJson: SearchJson) => {
@@ -196,8 +196,10 @@ const addPageToDashboard = (targetDashboard: View, activeView: View, queryId: st
     throw Error('Copying the dashboard page failed.');
   }
 
+  const newQueryId = newDashboard.search.queries.last().id;
+
   return SearchActions.create(newDashboard.search).then(
-    ({ search: newSearch }) => _updateDashboardWithNewSearch(newDashboard, newDashboard.id, newSearch),
+    ({ search: newSearch }) => _updateDashboardWithNewSearch(newDashboard, newDashboard.id, newSearch, { page: newQueryId }),
   );
 };
 
