@@ -34,7 +34,7 @@ const SidecarStatus = createReactClass({
   },
 
   getInitialState() {
-    return { collectorName: '', collectorVerbose: '' };
+    return { collectorName: '', collectorVerbose: '', showVerboseModal: false };
   },
 
   formatNodeDetails(details) {
@@ -136,8 +136,11 @@ const SidecarStatus = createReactClass({
   },
 
   _onShowVerbose(name, verbose) {
-    this.setState({ collectorName: name, collectorVerbose: verbose });
-    this.modal.open();
+    this.setState({ collectorName: name, collectorVerbose: verbose, showVerboseModal: true });
+  },
+
+  _onHideVerbose() {
+    this.setState({ showVerboseModal: false });
   },
 
   render() {
@@ -170,7 +173,8 @@ const SidecarStatus = createReactClass({
             </div>
           </Col>
         </Row>
-        <VerboseMessageModal ref={(c) => { this.modal = c; }}
+        <VerboseMessageModal showModal={this.state.showVerboseModal}
+                             onHide={this._onHideVerbose}
                              collectorName={this.state.collectorName}
                              collectorVerbose={this.state.collectorVerbose} />
       </div>

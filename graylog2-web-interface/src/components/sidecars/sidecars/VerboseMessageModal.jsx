@@ -20,50 +20,33 @@ import React from 'react';
 import { Modal, Button } from 'components/bootstrap';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
-class VerboseMessageModal extends React.Component {
-  static propTypes = {
-    collectorName: PropTypes.string.isRequired,
-    collectorVerbose: PropTypes.string.isRequired,
-  };
+const VerboseMessageModal = ({ showModal, onHide, collectorName, collectorVerbose }) => {
+  return (
+    <BootstrapModalWrapper showModal={showModal}
+                           onHide={onHide}
+                           bsSize="large">
+      <Modal.Header closeButton>
+        <Modal.Title><span>Error Details for <em>{collectorName}</em></span></Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <div className="configuration">
+          <pre>
+            {collectorVerbose || '<no messages>'}
+          </pre>
+        </div>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button type="button" onClick={onHide}>Close</Button>
+      </Modal.Footer>
+    </BootstrapModalWrapper>
+  );
+};
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      showModal: false,
-    };
-  }
-
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  open = () => {
-    this.setState({ showModal: true });
-  };
-
-  hide = () => {
-    this.setState({ showModal: false });
-  };
-
-  render() {
-    return (
-      <BootstrapModalWrapper showModal={this.state.showModal}
-                             onHide={this.hide}
-                             bsSize="large">
-        <Modal.Header closeButton>
-          <Modal.Title><span>Error Details for <em>{this.props.collectorName}</em></span></Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div className="configuration">
-            <pre>
-              {this.props.collectorVerbose || '<no messages>'}
-            </pre>
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button type="button" onClick={this.hide}>Close</Button>
-        </Modal.Footer>
-      </BootstrapModalWrapper>
-    );
-  }
-}
+VerboseMessageModal.propTypes = {
+  showModal: PropTypes.bool.isRequired,
+  onHide: PropTypes.func.isRequired,
+  collectorName: PropTypes.string.isRequired,
+  collectorVerbose: PropTypes.string.isRequired,
+};
 
 export default VerboseMessageModal;
