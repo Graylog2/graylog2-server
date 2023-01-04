@@ -25,6 +25,7 @@ import View from 'views/logic/views/View';
 import { IfPermitted } from 'components/common';
 import useLoadView from 'views/logic/views/UseLoadView';
 import useQuery from 'routing/useQuery';
+import ViewGenerator from 'views/logic/views/ViewGenerator';
 
 import SearchPage from './SearchPage';
 
@@ -44,7 +45,7 @@ const NewDashboardPage = () => {
       return ViewActions.load(dashboardView, true).then(() => dashboardView);
     }
 
-    return ViewActions.create(View.Type.Dashboard).then(({ view }) => view);
+    return ViewGenerator(View.Type.Dashboard, undefined).then((view) => ViewActions.loadNew(view).then(({ view: v }) => v));
     // This should be run only once upon mount on purpose.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
