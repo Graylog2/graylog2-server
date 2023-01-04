@@ -36,7 +36,7 @@ jest.mock('components/common', () => ({
 
 jest.mock('views/stores/ViewStore', () => ({
   ViewActions: {
-    create: jest.fn(() => Promise.resolve({ view: undefined })),
+    loadNew: jest.fn(() => Promise.resolve({ view: undefined })),
     load: jest.fn(() => Promise.resolve()),
   },
 }));
@@ -79,8 +79,8 @@ describe('NewDashboardPage', () => {
   it('should create new view with type dashboard on mount', async () => {
     render(<NewDashboardPage />);
 
-    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Dashboard));
+    await waitFor(() => expect(ViewActions.loadNew).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(ViewActions.loadNew).toHaveBeenCalledWith(expect.objectContaining({ type: View.Type.Dashboard })));
   });
 
   it('should render transform search view to dashboard view, if view is defined in location state', async () => {

@@ -23,6 +23,7 @@ import SearchActions from 'views/actions/SearchActions';
 import Search from 'views/logic/search/Search';
 import Query from 'views/logic/queries/Query';
 import View from 'views/logic/views/View';
+import ViewGenerator from 'views/logic/views/ViewGenerator';
 
 import { ViewActions, ViewStore } from './ViewStore';
 
@@ -35,7 +36,6 @@ jest.mock('views/logic/Widgets', () => ({
     searchTypes: () => [],
   }),
   resultHistogram: () => ({}),
-  allMessagesTable: () => ({}),
 }));
 
 jest.mock('stores/users/CurrentUserStore', () => ({ CurrentUserStore: MockStore() }));
@@ -134,14 +134,20 @@ describe('ViewStore', () => {
         });
     });
 
-    it('sets dirty flag to false when creating a view', () => {
-      return ViewActions.create(View.Type.Dashboard)
-        .then(({ dirty }) => expect(dirty).toBeFalsy());
+    it('sets dirty flag to false when creating a view', async () => {
+      const view = await ViewGenerator(View.Type.Dashboard, undefined);
+
+      const { dirty } = await ViewActions.loadNew(view);
+
+      expect(dirty).toBe(false);
     });
 
-    it('sets isNew flag to true when creating a view', () => {
-      return ViewActions.create(View.Type.Dashboard)
-        .then(({ isNew }) => expect(isNew).toBeTruthy());
+    it('sets isNew flag to true when creating a view', async () => {
+      const view = await ViewGenerator(View.Type.Dashboard, undefined);
+
+      const { isNew } = await ViewActions.loadNew(view);
+
+      expect(isNew).toBe(true);
     });
   });
 
@@ -166,8 +172,13 @@ describe('ViewStore', () => {
       return ViewActions.load(view);
     });
 
-    it('should create search when view is created', () => ViewActions.create(View.Type.Dashboard)
-      .then(() => expect(SearchActions.create).toHaveBeenCalled()));
+    it('should create search when view is created', async () => {
+      const newView = await ViewGenerator(View.Type.Dashboard, undefined);
+
+      await ViewActions.loadNew(newView);
+
+      expect(SearchActions.create).toHaveBeenCalled();
+    });
 
     it('should create search when state is updated', () => {
       const newState = Immutable.fromJS({

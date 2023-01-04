@@ -19,9 +19,8 @@ import * as Immutable from 'immutable';
 
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
-import ViewGenerator from 'views/logic/views/ViewGenerator';
 import { QueriesActions } from 'views/actions/QueriesActions';
-import type { Properties, ViewType, ViewStateMap } from 'views/logic/views/View';
+import type { Properties, ViewStateMap } from 'views/logic/views/View';
 import type View from 'views/logic/views/View';
 import type { QuerySet } from 'views/logic/search/Search';
 import type Search from 'views/logic/search/Search';
@@ -29,7 +28,7 @@ import type ViewState from 'views/logic/views/ViewState';
 import type Query from 'views/logic/queries/Query';
 import SearchActions from 'views/actions/SearchActions';
 import { singletonActions, singletonStore } from 'logic/singleton';
-import type { QueryId, TimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
+import type { QueryId } from 'views/logic/queries/Query';
 
 import { ViewManagementActions } from './ViewManagementStore';
 import isEqualForSearch from './isEqualForSearch';
@@ -42,12 +41,7 @@ export type ViewStoreState = {
 };
 
 type ViewActionsType = RefluxActions<{
-  create: (
-    type: ViewType,
-    streamId?: string,
-    timeRange?: TimeRange,
-    queryString?: ElasticsearchQueryString,
-  ) => Promise<ViewStoreState>,
+  loadNew: (view: View) => Promise<ViewStoreState>,
   load: (view: View, isNew?: boolean, queryId?: string) => Promise<ViewStoreState>,
   properties: (properties: Properties) => Promise<void>,
   search: (search: Search) => Promise<View>,
@@ -59,9 +53,9 @@ type ViewActionsType = RefluxActions<{
 export const ViewActions: ViewActionsType = singletonActions(
   'views.View',
   () => Reflux.createActions({
-    create: { asyncResult: true },
     dashboardState: { asyncResult: true },
     load: { asyncResult: true },
+    loadNew: { asyncResult: true },
     properties: { asyncResult: true },
     search: { asyncResult: true },
     selectQuery: { asyncResult: true },
@@ -122,34 +116,24 @@ export const ViewStore: ViewStoreType = singletonStore(
       return this._state();
     },
 
-    create(
-      type: ViewType,
-      streamId: string = null,
-      timeRange?: TimeRange,
-      queryString?: ElasticsearchQueryString,
-    ) {
-      return ViewGenerator(type, streamId, timeRange, queryString)
-        .then((newView) => {
-          const [view] = _updateSearch(newView, this.view);
+    loadNew(newView: View) {
+      const [view] = _updateSearch(newView, this.view);
 
-          this.view = view;
-          const queries: QuerySet = view?.search?.queries ?? Immutable.Set();
+      this.view = view;
+      const queries: QuerySet = view?.search?.queries ?? Immutable.Set();
 
-          this.activeQuery = queries.first().id;
+      this.activeQuery = queries.first().id;
 
-          return view;
-        }).then((view) => {
-          const promise = ViewActions.search(view.search)
-            .then(() => {
-              this.dirty = false;
-              this.isNew = true;
-            })
-            .then(() => this._trigger());
+      const promise = ViewActions.search(view.search)
+        .then(() => {
+          this.dirty = false;
+          this.isNew = true;
+        })
+        .then(() => this._trigger());
 
-          ViewActions.create.promise(promise.then(() => this._state()));
+      ViewActions.loadNew.promise(promise.then(() => this._state()));
 
-          return promise;
-        });
+      return promise;
     },
     createQuery(query: Query, viewState: ViewState) {
       if (query.id === undefined) {
