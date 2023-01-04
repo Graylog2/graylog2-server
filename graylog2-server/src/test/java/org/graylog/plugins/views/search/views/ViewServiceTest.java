@@ -36,6 +36,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -177,6 +178,62 @@ public class ViewServiceTest {
                 .containsExactly("View D", "View B");
 
         assertThat(result2.grandTotal()).hasValue(5L);
+    }
+
+    @Test
+    public void searchPaginatedWithCustomSort() {
+        final ImmutableMap<String, SearchQueryField> searchFieldMapping = ImmutableMap.<String, SearchQueryField>builder()
+                .put("id", SearchQueryField.create(ViewDTO.FIELD_ID))
+                .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
+                .put("summary", SearchQueryField.create(ViewDTO.FIELD_DESCRIPTION))
+                .put("owner", SearchQueryField.create(ViewDTO.FIELD_OWNER))
+                .build();
+
+        dbService.save(ViewDTO.builder().title("View A").searchId("abc123").state(Collections.emptyMap()).owner("franz").build());
+        dbService.save(ViewDTO.builder().title("View B").searchId("abc123").state(Collections.emptyMap()).owner("gotfryd").build());
+        dbService.save(ViewDTO.builder().title("View C").searchId("abc123").state(Collections.emptyMap()).owner("roderick").build());
+        dbService.save(ViewDTO.builder().title("View D").searchId("abc123").state(Collections.emptyMap()).owner("abelard").build());
+        dbService.save(ViewDTO.builder().title("View E").searchId("abc123").state(Collections.emptyMap()).owner("baldwin").build());
+
+        final SearchQueryParser queryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, searchFieldMapping);
+
+        PaginatedList<ViewDTO> result = dbService.searchPaginated(
+                queryParser.parse(""),
+                view -> true,
+                "desc",
+                "owner",
+                1,
+                3
+        );
+
+        assertThat(result)
+                .hasSize(3)
+                .extracting("owner")
+                .containsExactly(
+                        Optional.of("roderick"),
+                        Optional.of("gotfryd"),
+                        Optional.of("franz"));
+
+        assertThat(result.grandTotal()).hasValue(5L);
+
+        result = dbService.searchPaginated(
+                queryParser.parse(""),
+                view -> true,
+                "asc",
+                "owner",
+                1,
+                3
+        );
+
+        assertThat(result)
+                .hasSize(3)
+                .extracting("owner")
+                .containsExactly(
+                        Optional.of("abelard"),
+                        Optional.of("baldwin"),
+                        Optional.of("franz"));
+
+        assertThat(result.grandTotal()).hasValue(5L);
     }
 
     @Test
