@@ -17,10 +17,11 @@
 import * as React from 'react';
 
 import { Spinner } from 'components/common';
-import useLoadView from 'views/logic/views/UseLoadView';
+import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 import normalizeSearchURLQueryParams from 'views/logic/NormalizeSearchURLQueryParams';
 import useQuery from 'routing/useQuery';
+import useLoadView from 'views/pages/useLoadView';
 
 import SearchPage from './SearchPage';
 
@@ -28,7 +29,8 @@ const NewSearchPage = () => {
   const query = useQuery();
   const { timeRange, queryString } = normalizeSearchURLQueryParams(query);
   const view = useCreateSavedSearch(undefined, timeRange, queryString);
-  const [loaded, HookComponent] = useLoadView(view, query);
+  useLoadView(view);
+  const [loaded, HookComponent] = useProcessHooksForView(view, query);
 
   if (HookComponent) {
     return HookComponent;
