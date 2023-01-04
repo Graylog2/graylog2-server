@@ -30,6 +30,7 @@ import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import StreamsContext from 'contexts/StreamsContext';
 import { loadNewView, loadView } from 'views/logic/views/Actions';
+import useQuery from 'routing/useQuery';
 
 import NewSearchPage from './NewSearchPage';
 
@@ -39,10 +40,10 @@ const mockView = View.create()
   .search(Search.builder().build())
   .build();
 
-jest.mock('routing/withLocation', () => (x) => x);
 jest.mock('views/components/Search', () => jest.fn(() => <div>Extended search page</div>));
 jest.mock('components/common/PublicNotifications', () => mockComponent('PublicNotifications'));
 jest.mock('views/stores/SearchStore');
+jest.mock('routing/useQuery');
 
 jest.mock('views/stores/ViewStatesStore', () => ({
   ViewStatesStore: {
@@ -70,19 +71,20 @@ describe('NewSearchPage', () => {
   const mockRouter = {
     getCurrentLocation: jest.fn(() => ({ pathname: '/search', search: '?q=&rangetype=relative&relative=300' })),
   };
-  const mockLocation = {
-    pathname: '/search',
-    query: {
-      q: '',
-      rangetype: 'relative',
-      relative: '300',
-    },
+  const query = {
+    q: '',
+    rangetype: 'relative',
+    relative: '300',
   };
   const SimpleNewSearchPage = (props) => (
     <StreamsContext.Provider value={[{}]}>
-      <NewSearchPage router={mockRouter} location={{ pathname: '/foo', query: {} }} {...props} />
+      <NewSearchPage router={mockRouter} {...props} />
     </StreamsContext.Provider>
   );
+
+  beforeEach(() => {
+    asMock(useQuery).mockReturnValue(query);
+  });
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -110,6 +112,7 @@ describe('NewSearchPage', () => {
 
   describe('mounting', () => {
     it('should create new view with type search', async () => {
+      asMock(useQuery).mockReturnValue({});
       render(<SimpleNewSearchPage />);
 
       await waitFor(() => expect(ViewActions.create).toHaveBeenCalledTimes(1));
@@ -120,7 +123,7 @@ describe('NewSearchPage', () => {
     it('should process hooks with provided location query', async () => {
       const processHooksAction = asMock(processHooks);
 
-      render(<SimpleNewSearchPage location={mockLocation} />);
+      render(<SimpleNewSearchPage />);
 
       await waitFor(() => expect(processHooksAction).toHaveBeenCalledTimes(1));
 
@@ -134,7 +137,7 @@ describe('NewSearchPage', () => {
     it('should display errors which occur when processing hooks', async () => {
       asMock(processHooks).mockImplementationOnce(() => Promise.reject(new Error('The Error')));
 
-      render(<SimpleNewSearchPage location={mockLocation} />);
+      render(<SimpleNewSearchPage />);
 
       await screen.findByText(/An unknown error has occurred./);
       await screen.findByText(/The Error/);
@@ -182,17 +185,11 @@ describe('NewSearchPage', () => {
 
     it('should process hooks with query', async () => {
       const processHooksAction = asMock(processHooks);
-      const { findByText } = render(<SimpleNewSearchPage location={mockLocation} />);
+      const { findByText } = render(<SimpleNewSearchPage />);
       const viewCreateButton = await findByText('Load new view');
       fireEvent.click(viewCreateButton);
 
       await waitFor(() => expect(processHooksAction).toHaveBeenCalled());
-
-      const query = {
-        q: '',
-        rangetype: 'relative',
-        relative: '300',
-      };
 
       expect(processHooksAction).toHaveBeenCalledWith(expect.anything(), expect.anything(), expect.anything(), query, expect.anything());
     });
