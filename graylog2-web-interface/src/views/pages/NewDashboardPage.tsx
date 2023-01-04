@@ -18,14 +18,10 @@ import * as React from 'react';
 import { useMemo } from 'react';
 
 import useLocation from 'routing/useLocation';
-import Spinner from 'components/common/Spinner';
 import viewTransformer from 'views/logic/views/ViewTransformer';
 import View from 'views/logic/views/View';
 import { IfPermitted } from 'components/common';
-import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
-import useQuery from 'routing/useQuery';
 import ViewGenerator from 'views/logic/views/ViewGenerator';
-import useLoadView from 'views/pages/useLoadView';
 
 import SearchPage from './SearchPage';
 
@@ -37,23 +33,14 @@ const NewDashboardPage = () => {
   const location = useLocation<LocationState>();
   const searchView = location?.state?.view;
 
-  const query = useQuery();
-  const loadedView = useMemo(() => (searchView?.search
+  const view = useMemo(() => (searchView?.search
     ? Promise.resolve(viewTransformer(searchView))
     : ViewGenerator(View.Type.Dashboard, undefined)),
   // This should be run only once upon mount on purpose.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   []);
-  useLoadView(loadedView);
-  const [loaded, HookComponent] = useProcessHooksForView(loadedView, query);
 
-  if (HookComponent) {
-    return HookComponent;
-  }
-
-  return loaded
-    ? <IfPermitted permissions="dashboards:create"><SearchPage /></IfPermitted>
-    : <Spinner />;
+  return <IfPermitted permissions="dashboards:create"><SearchPage view={view} /></IfPermitted>;
 };
 
 export default NewDashboardPage;
