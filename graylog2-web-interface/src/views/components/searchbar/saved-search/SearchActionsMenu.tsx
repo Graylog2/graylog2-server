@@ -24,7 +24,7 @@ import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootst
 import { Icon, ShareButton } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
-import { ViewStore, ViewActions } from 'views/stores/ViewStore';
+import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
@@ -138,9 +138,7 @@ const SearchActionsMenu = () => {
       .then(() => UserNotification.success(`Deleting view "${deletedView.title}" was successful!`, 'Success!'))
       .then(() => {
         if (deletedView.id === view.id) {
-          return ViewActions.create(View.Type.Search).then(() => {
-            loadNewSearch();
-          });
+          loadNewSearch();
         }
 
         return Promise.resolve();
