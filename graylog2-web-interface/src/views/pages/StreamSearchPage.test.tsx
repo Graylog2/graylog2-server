@@ -21,7 +21,7 @@ import { act } from 'react-dom/test-utils';
 import asMock from 'helpers/mocking/AsMock';
 import { MockStore } from 'helpers/mocking';
 import StreamsContext from 'contexts/StreamsContext';
-import { processHooks } from 'views/logic/views/ViewLoader';
+import processHooks from 'views/logic/views/processHooks';
 import View from 'views/logic/views/View';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
