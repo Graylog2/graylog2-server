@@ -41,7 +41,7 @@ export type ViewStoreState = {
 };
 
 type ViewActionsType = RefluxActions<{
-  loadNew: (view: View) => Promise<ViewStoreState>,
+  loadNew: (view: View, queryId?: string) => Promise<ViewStoreState>,
   load: (view: View, isNew?: boolean, queryId?: string) => Promise<ViewStoreState>,
   properties: (properties: Properties) => Promise<void>,
   search: (search: Search) => Promise<View>,
@@ -116,13 +116,13 @@ export const ViewStore: ViewStoreType = singletonStore(
       return this._state();
     },
 
-    loadNew(newView: View) {
+    loadNew(newView: View, queryId?: string) {
       const [view] = _updateSearch(newView, this.view);
 
       this.view = view;
       const queries: QuerySet = view?.search?.queries ?? Immutable.Set();
 
-      this.activeQuery = queries.first().id;
+      this.activeQuery = _selectedQuery(queries, this.activeQuery, queryId);
 
       const promise = ViewActions.search(view.search)
         .then(() => {

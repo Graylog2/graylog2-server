@@ -60,10 +60,6 @@ jest.mock('views/stores/ViewManagementStore', () => ({
   },
 }));
 
-jest.mock('views/logic/views/ViewLoader', () => ({
-  processHooks: jest.fn((_promise, _loadHooks, _executeHooks, _query, onSuccess) => Promise.resolve().then(onSuccess)),
-}));
-
 jest.mock('views/hooks/SyncWithQueryParameters');
 
 jest.mock('views/logic/views/Actions');
@@ -71,6 +67,8 @@ jest.mock('views/logic/views/Actions');
 jest.mock('routing/useQuery');
 jest.mock('routing/useParams');
 jest.mock('views/logic/views/UseCreateSavedSearch');
+jest.mock('views/hooks/useLoadView');
+jest.mock('views/logic/views/processHooks');
 
 describe('StreamSearchPage', () => {
   const mockQuery = {
@@ -79,9 +77,9 @@ describe('StreamSearchPage', () => {
     relative: '300',
   };
   const streamId = 'stream-id-1';
-  const SimpleStreamSearchPage = (props) => (
+  const SimpleStreamSearchPage = () => (
     <StreamsContext.Provider value={[{ id: streamId }]}>
-      <StreamSearchPage {...props} />
+      <StreamSearchPage />
     </StreamsContext.Provider>
   );
 
@@ -89,6 +87,7 @@ describe('StreamSearchPage', () => {
     asMock(useQuery).mockReturnValue({});
     asMock(useParams).mockReturnValue({ streamId });
     asMock(useCreateSavedSearch).mockReturnValue(Promise.resolve(mockView));
+    asMock(processHooks).mockImplementation((viewPromise, _loadingViewHooks, _executingViewHook, _query, onSuccess) => viewPromise.then(onSuccess));
   });
 
   afterEach(() => {
