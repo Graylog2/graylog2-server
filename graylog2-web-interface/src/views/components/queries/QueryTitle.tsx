@@ -62,8 +62,8 @@ const QueryTitle = ({ active, allowsClosing, id, onClose, openEditModal, openCop
 
       {active && (
         <QueryActionDropdown>
-          <MenuItem onSelect={() => _onDuplicate()}>Duplicate</MenuItem>
           <MenuItem onSelect={() => openEditModal(titleValue)}>Edit Title</MenuItem>
+          <MenuItem onSelect={() => _onDuplicate()}>Duplicate</MenuItem>
           <MenuItem onSelect={() => openCopyToDashboardModal(true)}>
             Copy to Dashboard
           </MenuItem>
