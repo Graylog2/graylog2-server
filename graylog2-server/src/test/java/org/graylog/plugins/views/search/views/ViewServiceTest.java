@@ -208,11 +208,9 @@ public class ViewServiceTest {
 
         assertThat(result)
                 .hasSize(3)
-                .extracting("owner")
-                .containsExactly(
-                        Optional.of("roderick"),
-                        Optional.of("gotfryd"),
-                        Optional.of("franz"));
+                .extracting(ViewDTO::owner)
+                .extracting(Optional::get)
+                .containsExactly("roderick", "gotfryd", "franz");
 
         assertThat(result.grandTotal()).hasValue(5L);
 
@@ -227,11 +225,9 @@ public class ViewServiceTest {
 
         assertThat(result)
                 .hasSize(3)
-                .extracting("owner")
-                .containsExactly(
-                        Optional.of("abelard"),
-                        Optional.of("baldwin"),
-                        Optional.of("franz"));
+                .extracting(ViewDTO::owner)
+                .extracting(Optional::get)
+                .containsExactly("abelard", "baldwin", "franz");
 
         assertThat(result.grandTotal()).hasValue(5L);
     }
