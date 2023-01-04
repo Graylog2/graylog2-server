@@ -18,6 +18,7 @@ import * as React from 'react';
 import { List } from 'immutable';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
+import useParams from 'routing/useParams';
 import mockAction from 'helpers/mocking/MockAction';
 import asMock from 'helpers/mocking/AsMock';
 import StreamsContext from 'contexts/StreamsContext';
@@ -62,7 +63,7 @@ jest.mock('actions/errors/ErrorsActions', () => ({
 }));
 
 jest.mock('views/components/Search', () => 'extended-search-page');
-jest.mock('routing/withParams', () => (x) => x);
+jest.mock('routing/useParams');
 
 jest.mock('routing/useQuery');
 
@@ -90,8 +91,8 @@ describe('ShowViewPage', () => {
 
   beforeEach(() => {
     jest.resetAllMocks();
-    jest.resetModules();
     asMock(useQuery).mockReturnValue({});
+    asMock(useParams).mockReturnValue({ viewId: 'foo' });
   });
 
   it('renders Spinner while loading', async () => {
@@ -164,7 +165,9 @@ describe('ShowViewPage', () => {
 
     expect(viewLoader).toHaveBeenCalledWith('foo', [], [], {}, expect.anything(), expect.anything());
 
-    rerender(<SimpleShowViewPage viewLoader={viewLoader} params={{ viewId: 'bar' }} />);
+    asMock(useParams).mockReturnValue({ viewId: 'bar' });
+
+    rerender(<SimpleShowViewPage viewLoader={viewLoader} />);
 
     expect(viewLoader).toHaveBeenCalledWith('bar', [], [], {}, expect.anything(), expect.anything());
   });
@@ -177,7 +180,7 @@ describe('ShowViewPage', () => {
 
     viewLoader.mockClear();
 
-    rerender(<SimpleShowViewPage viewLoader={viewLoader} params={{ viewId: 'foo' }} />);
+    rerender(<SimpleShowViewPage viewLoader={viewLoader} />);
 
     expect(viewLoader).not.toHaveBeenCalled();
   });
