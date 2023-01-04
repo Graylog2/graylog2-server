@@ -30,7 +30,7 @@ import { Nav, NavItem, MenuItem } from 'components/bootstrap';
 import { Icon, IconButton } from 'components/common';
 import QueryTitle from 'views/components/queries/QueryTitle';
 import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabsConfiguration';
-import CopyToDashboard from 'views/components/widgets/CopyToDashboardForm';
+import CopyToDashboardForm from 'views/components/widgets/CopyToDashboardForm';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import type { SearchJson } from 'views/logic/search/Search';
@@ -337,10 +337,11 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, activeQueryId, onRemove
                                          dashboardId={dashboardId} />
       )}
       {showCopyToDashboardModal && (
-        <CopyToDashboard onSubmit={(selectedDashboardId) => onCopyToDashboard(selectedDashboardId)}
-                         onCancel={toggleCopyToDashboardModal}
-                         submitButtonText="Copy page"
-                         submittingText="Copying page..." />
+        <CopyToDashboardForm onSubmit={(selectedDashboardId) => onCopyToDashboard(selectedDashboardId)}
+                             onCancel={toggleCopyToDashboardModal}
+                             activeDashboardId={dashboardId}
+                             submitButtonText="Copy page"
+                             submittingText="Copying page..." />
       )}
     </Container>
   );

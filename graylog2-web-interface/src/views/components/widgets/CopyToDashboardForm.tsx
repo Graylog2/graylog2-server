@@ -22,13 +22,14 @@ import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import type { SearchParams } from 'stores/PaginationTypes';
 
 type Props = {
+  activeDashboardId?: string,
   onCancel: () => void,
   onSubmit: (selectedDashboardId: string | undefined | null) => Promise<void>,
   submitButtonText: string,
   submittingText: string,
 };
 
-const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submittingText }: Props) => {
+const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submittingText, activeDashboardId }: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDashboard, setSelectedDashboard] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useState<SearchParams>({
@@ -77,14 +78,19 @@ const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submittingT
                        useQueryParameter={false}>
           {paginatedDashboards?.list && paginatedDashboards.list.length > 0 ? (
             <ListGroup>
-              {paginatedDashboards.list.map((dashboard) => (
-                <ListGroupItem active={selectedDashboard === dashboard.id}
-                               onClick={() => setSelectedDashboard(dashboard.id)}
-                               header={dashboard.title}
-                               key={dashboard.id}>
-                  {dashboard.summary}
-                </ListGroupItem>
-              ))}
+              {paginatedDashboards.list.map((dashboard) => {
+                const isActiveDashboard = activeDashboardId === dashboard.id;
+
+                return (
+                  <ListGroupItem active={selectedDashboard === dashboard.id}
+                                 onClick={isActiveDashboard ? undefined : () => setSelectedDashboard(dashboard.id)}
+                                 header={dashboard.title}
+                                 disabled={isActiveDashboard}
+                                 key={dashboard.id}>
+                    {dashboard.summary}
+                  </ListGroupItem>
+                );
+              })}
             </ListGroup>
           ) : <span>No dashboards found</span>}
         </PaginatedList>
@@ -101,6 +107,10 @@ const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submittingT
       </Modal.Footer>
     </Modal>
   );
+};
+
+CopyToDashboardForm.defaultProps = {
+  activeDashboardId: undefined,
 };
 
 export default CopyToDashboardForm;
