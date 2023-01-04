@@ -16,6 +16,10 @@
  */
 import { createBrowserHistory } from 'history';
 
+declare global {
+  interface Window { graylogHistory: ReturnType<typeof createBrowserHistory>; }
+}
+
 if (!window.graylogHistory) {
   window.graylogHistory = createBrowserHistory();
 }
