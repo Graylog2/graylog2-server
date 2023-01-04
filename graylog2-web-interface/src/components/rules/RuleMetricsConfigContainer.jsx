@@ -49,8 +49,7 @@ class RuleMetricsConfigContainer extends React.Component {
     }
 
     return (
-      <RuleMetricsConfig ref={(component) => { this.configComponent = component; }}
-                         config={metricsConfig}
+      <RuleMetricsConfig config={metricsConfig}
                          onChange={this.handleChange}
                          onClose={onClose} />
     );
