@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
@@ -28,6 +29,7 @@ import SidecarStatusFileList from './SidecarStatusFileList';
 import VerboseMessageModal from './VerboseMessageModal';
 
 const SidecarStatus = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     sidecar: PropTypes.object.isRequired,
     collectors: PropTypes.array.isRequired,
@@ -37,6 +39,7 @@ const SidecarStatus = createReactClass({
     return { collectorName: '', collectorVerbose: '', showVerboseModal: false };
   },
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   formatNodeDetails(details) {
     if (!details) {
       return <p>Node details are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to the server.</p>;
@@ -62,6 +65,7 @@ const SidecarStatus = createReactClass({
     );
   },
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   formatCollectorStatus(details, collectors) {
     if (!details || !collectors) {
       return <p>Collectors status are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to the server.</p>;

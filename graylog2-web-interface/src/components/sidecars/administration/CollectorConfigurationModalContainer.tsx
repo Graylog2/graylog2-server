@@ -155,7 +155,7 @@ const CollectorConfigurationModalContainer = ({
   const renderConfigurationSummary = () => {
     const sidecarsSummary = selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name).join(', ');
     const numberOfSidecarsSummary = `${selectedSidecarCollectorPairs.length} sidecars`;
-    const summary = selectedSidecarCollectorPairs.length <= 5 ? sidecarsSummary : numberOfSidecarsSummary
+    const summary = selectedSidecarCollectorPairs.length <= 5 ? sidecarsSummary : numberOfSidecarsSummary;
 
     return (
       <BootstrapModalConfirm showModal={showConfirmModal}
