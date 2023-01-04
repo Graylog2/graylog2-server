@@ -17,24 +17,22 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
+import useParams from 'routing/useParams';
 import useViewLoader from 'views/logic/views/UseViewLoader';
 import Spinner from 'components/common/Spinner';
 import type { ViewLoaderFn } from 'views/logic/views/ViewLoader';
 import ViewLoader from 'views/logic/views/ViewLoader';
-import withParams from 'routing/withParams';
 import useQuery from 'routing/useQuery';
 
 import SearchPage from './SearchPage';
 
 type Props = {
-  params: {
-    viewId?: string,
-  },
   viewLoader?: ViewLoaderFn,
 };
 
-const ShowViewPage = ({ params: { viewId }, viewLoader }: Props) => {
+const ShowViewPage = ({ viewLoader }: Props) => {
   const query = useQuery();
+  const { viewId } = useParams<{ viewId?: string }>();
 
   if (!viewId) {
     throw new Error('No view id specified!');
@@ -54,9 +52,6 @@ const ShowViewPage = ({ params: { viewId }, viewLoader }: Props) => {
 };
 
 ShowViewPage.propTypes = {
-  params: PropTypes.shape({
-    viewId: PropTypes.string.isRequired,
-  }).isRequired,
   viewLoader: PropTypes.func,
 };
 
@@ -64,4 +59,4 @@ ShowViewPage.defaultProps = {
   viewLoader: ViewLoader,
 };
 
-export default withParams(ShowViewPage);
+export default ShowViewPage;
