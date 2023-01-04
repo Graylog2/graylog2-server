@@ -68,14 +68,16 @@ const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submittingT
   return (
     <Modal show>
       <Modal.Body>
-        <SearchForm onSearch={handleSearch}
-                    onReset={handleSearchReset} />
         <PaginatedList onChange={handlePageChange}
                        activePage={searchParams.page}
                        totalItems={paginatedDashboards?.pagination?.total ?? 0}
                        pageSize={searchParams.pageSize}
                        pageSizes={[5, 10, 15]}
                        useQueryParameter={false}>
+          <div style={{ marginBottom: '5px' }}>
+            <SearchForm onSearch={handleSearch}
+                        onReset={handleSearchReset} />
+          </div>
           {paginatedDashboards?.list && paginatedDashboards.list.length > 0 ? (
             <ListGroup>
               {paginatedDashboards.list.map((dashboard) => {
