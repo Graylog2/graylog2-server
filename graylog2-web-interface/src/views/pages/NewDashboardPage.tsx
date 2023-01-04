@@ -20,12 +20,12 @@ import { useMemo } from 'react';
 import useLocation from 'routing/useLocation';
 import Spinner from 'components/common/Spinner';
 import viewTransformer from 'views/logic/views/ViewTransformer';
-import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import { IfPermitted } from 'components/common';
-import useLoadView from 'views/logic/views/UseLoadView';
+import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import useQuery from 'routing/useQuery';
 import ViewGenerator from 'views/logic/views/ViewGenerator';
+import useLoadView from 'views/pages/useLoadView';
 
 import SearchPage from './SearchPage';
 
@@ -38,19 +38,14 @@ const NewDashboardPage = () => {
   const searchView = location?.state?.view;
 
   const query = useQuery();
-  const loadedView = useMemo(() => {
-    if (searchView?.search) {
-      const dashboardView = viewTransformer(searchView);
-
-      return ViewActions.load(dashboardView, true).then(() => dashboardView);
-    }
-
-    return ViewGenerator(View.Type.Dashboard, undefined).then((view) => ViewActions.loadNew(view).then(({ view: v }) => v));
-    // This should be run only once upon mount on purpose.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const [loaded, HookComponent] = useLoadView(loadedView, query);
+  const loadedView = useMemo(() => (searchView?.search
+    ? Promise.resolve(viewTransformer(searchView))
+    : ViewGenerator(View.Type.Dashboard, undefined)),
+  // This should be run only once upon mount on purpose.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  []);
+  useLoadView(loadedView);
+  const [loaded, HookComponent] = useProcessHooksForView(loadedView, query);
 
   if (HookComponent) {
     return HookComponent;
