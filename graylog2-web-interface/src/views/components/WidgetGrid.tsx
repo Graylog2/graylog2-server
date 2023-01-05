@@ -30,10 +30,10 @@ import { WidgetStore } from 'views/stores/WidgetStore';
 import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import type { StoreState } from 'stores/StoreTypes';
 import { ViewStatesStore } from 'views/stores/ViewStatesStore';
 import ElementDimensions from 'components/common/ElementDimensions';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import WidgetContainer from './WidgetContainer';
 import WidgetComponent from './WidgetComponent';
@@ -136,7 +136,7 @@ const Grid = ({ children, locked, onPositionsChange, positions, width }: GridPro
 
 const useQueryFieldTypes = () => {
   const fieldTypes = useContext(FieldTypesContext);
-  const queryId = useStore(ViewMetadataStore, (viewMetadataStore) => viewMetadataStore.activeQuery);
+  const queryId = useActiveQueryId();
 
   return useMemo(() => fieldTypes.queryFields.get(queryId, fieldTypes.all), [fieldTypes.all, fieldTypes.queryFields, queryId]);
 };
