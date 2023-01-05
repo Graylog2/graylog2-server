@@ -17,72 +17,62 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Col, Row } from 'components/bootstrap';
 import { ClosedIndexDetails, IndexDetails, IndexSummary } from 'components/indices';
 
-class IndicesOverview extends React.Component {
-  static propTypes = {
-    closedIndices: PropTypes.array.isRequired,
-    deflector: PropTypes.object.isRequired,
-    indexDetails: PropTypes.object.isRequired,
-    indices: PropTypes.object.isRequired,
-    indexSetId: PropTypes.string.isRequired,
-  };
+const Index = ({ index, indexDetails, indexSetId }) => {
+  const indexRange = index && index.range ? index.range : null;
 
-  _formatIndex = (indexName, index) => {
-    const indexSummary = this.props.indices[indexName];
-    const indexRange = indexSummary && indexSummary.range ? indexSummary.range : null;
+  return (
+    <Row key={`index-summary-${index.index_name}`} className="content index-description">
+      <Col md={12}>
+        <IndexSummary index={index}
+                      name={index.index_name}
+                      count={index.size}
+                      indexRange={indexRange}
+                      isDeflector={index.is_deflector}>
+          <span>
+            <IndexDetails index={indexDetails[index.index_name]}
+                          indexName={index.index_name}
+                          indexRange={indexRange}
+                          indexSetId={indexSetId}
+                          isDeflector={index.is_deflector} />
+          </span>
+        </IndexSummary>
+      </Col>
+    </Row>
+  );
+};
 
-    return (
-      <Row key={`index-summary-${indexName}`} className="content index-description">
-        <Col md={12}>
-          <IndexSummary index={index}
-                        name={indexName}
-                        count={indexSummary.size}
-                        indexRange={indexRange}
-                        isDeflector={indexSummary.is_deflector}>
-            <span>
-              <IndexDetails index={this.props.indexDetails[indexName]}
-                            indexName={indexName}
-                            indexRange={indexRange}
-                            indexSetId={this.props.indexSetId}
-                            isDeflector={indexSummary.is_deflector} />
-            </span>
-          </IndexSummary>
-        </Col>
-      </Row>
-    );
-  };
+const ClosedIndex = ({ index }) => {
+  const indexRange = index.range;
 
-  _formatClosedIndex = (indexName, index) => {
-    const indexRange = index.range;
+  return (
+    <Row key={`index-summary-${index.index_name}`} className="content index-description">
+      <Col md={12}>
+        <IndexSummary index={index} name={index.index_name} indexRange={indexRange} isDeflector={index.is_deflector}>
+          <span>
+            <ClosedIndexDetails indexName={index.index_name} indexRange={indexRange} />
+          </span>
+        </IndexSummary>
+      </Col>
+    </Row>
+  );
+};
 
-    return (
-      <Row key={`index-summary-${indexName}`} className="content index-description">
-        <Col md={12}>
-          <IndexSummary index={index} name={indexName} indexRange={indexRange} isDeflector={index.is_deflector}>
-            <span>
-              <ClosedIndexDetails indexName={indexName} indexRange={indexRange} />
-            </span>
-          </IndexSummary>
-        </Col>
-      </Row>
-    );
-  };
+const IndicesOverview = ({ indexDetails, indices, indexSetId }) => (
+  <span>
+    {indices.map((index) => (!index.is_closed
+      ? <Index index={index} indexDetails={indexDetails} indexSetId={indexSetId} />
+      : <ClosedIndex index={index} />),
+    )}
+  </span>
+);
 
-  render() {
-    const indices = Object.keys(this.props.indices).map((indexName) => {
-      return !this.props.indices[indexName].is_closed
-        ? this._formatIndex(indexName, this.props.indices[indexName]) : this._formatClosedIndex(indexName, this.props.indices[indexName]);
-    });
-
-    return (
-      <span>
-        {indices.sort((index1, index2) => naturalSort(index2.key, index1.key))}
-      </span>
-    );
-  }
-}
+IndicesOverview.propTypes = {
+  indexDetails: PropTypes.object.isRequired,
+  indices: PropTypes.object.isRequired,
+  indexSetId: PropTypes.string.isRequired,
+};
 
 export default IndicesOverview;
