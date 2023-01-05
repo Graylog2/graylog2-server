@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import type View from 'views/logic/views/View';
 import type { ViewState } from 'views/types';
+import type { QueryId } from 'views/logic/queries/Query';
 
 export const viewSlice = createSlice({
   name: 'view',
@@ -12,14 +13,18 @@ export const viewSlice = createSlice({
     isNew: false,
   },
   reducers: {
-    load: (state: ViewState, action: PayloadAction<View>) => {
+    load: (_state: ViewState, action: PayloadAction<View>) => {
       return {
         view: action.payload,
         isDirty: false,
         isNew: true,
       };
     },
+    selectQuery: (state: ViewState, action: PayloadAction<QueryId>) => ({
+      ...state,
+      activeQuery: action.payload,
+    }),
   },
 });
-export const { load } = viewSlice.actions;
+export const { load, selectQuery } = viewSlice.actions;
 export default viewSlice.reducer;
