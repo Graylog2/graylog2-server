@@ -15,16 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useCallback } from 'react';
-import styled from 'styled-components';
+import { useState, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-import { Alert, Button } from 'components/bootstrap';
-import { PaginatedList, SearchForm, Spinner } from 'components/common';
+import { Button } from 'components/bootstrap';
+import { PaginatedList, SearchForm, Spinner, NoEntitiesExist, NoSearchResult } from 'components/common';
 import type View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import QueryHelper from 'components/common/QueryHelper';
-import type { Sort, ColumnRenderers } from 'components/common/EntityDataTable';
+import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import EntityDataTable from 'components/common/EntityDataTable';
 import type { PaginatedViews } from 'views/stores/ViewManagementStore';
 import { SavedSearchesActions } from 'views/stores/SavedSearchesStore';
@@ -32,6 +31,7 @@ import type FetchError from 'logic/errors/FetchError';
 import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
+import type { Sort } from 'stores/PaginationTypes';
 
 type SearchParams = {
   page: number,
@@ -54,13 +54,6 @@ const DEFAULT_PAGINATION = {
   page: 1,
   pageSize: 10,
 };
-
-const NoSavedSearches = styled(Alert)`
-  clear: right;
-  display: flex;
-  align-items: center;
-  margin-top: 15px;
-`;
 
 const onLoad = (onLoadSavedSearch: () => void, selectedSavedSearchId: string, loadFunc: (searchId: string) => void) => {
   if (!selectedSavedSearchId || !loadFunc) {
@@ -120,8 +113,8 @@ const usePaginatedSavedSearches = (searchParams: SearchParams): {
       query: searchParams.query,
       page: searchParams.page,
       perPage: searchParams.pageSize,
-      sortBy: searchParams.sort.columnId,
-      order: searchParams.sort.order,
+      sortBy: searchParams.sort.attributeId,
+      order: searchParams.sort.direction,
     }),
     {
       onError: (error: FetchError) => {
@@ -156,8 +149,8 @@ const SavedSearchesList = ({
     pageSize: DEFAULT_PAGINATION.pageSize,
     query: DEFAULT_PAGINATION.query,
     sort: {
-      columnId: 'title',
-      order: 'asc',
+      attributeId: 'title',
+      direction: 'asc',
     },
   });
 
@@ -199,7 +192,10 @@ const SavedSearchesList = ({
     </Button>
   ), [activeSavedSearchId, deleteSavedSearch, refetch]);
 
-  const columnRenderers = customColumnRenderers(onLoadSavedSearch);
+  const columnRenderers = useMemo(
+    () => customColumnRenderers(onLoadSavedSearch),
+    [onLoadSavedSearch],
+  );
 
   if (isLoading) {
     return <Spinner />;
@@ -213,15 +209,22 @@ const SavedSearchesList = ({
                    totalItems={pagination?.total}
                    pageSize={searchParams.pageSize}
                    useQueryParameter={false}>
-      <SearchForm focusAfterMount
-                  onSearch={handleSearch}
-                  queryHelpComponent={<QueryHelper entityName="search" commonFields={['id', 'title']} />}
-                  topMargin={0}
-                  onReset={onResetSearch} />
-      {pagination?.total === 0 && (
-        <NoSavedSearches>
+      <div style={{ marginBottom: '5px' }}>
+        <SearchForm focusAfterMount
+                    onSearch={handleSearch}
+                    queryHelpComponent={<QueryHelper entityName="search" commonFields={['id', 'title']} />}
+                    topMargin={0}
+                    onReset={onResetSearch} />
+      </div>
+      {pagination?.total === 0 && !searchParams.query && (
+        <NoEntitiesExist>
+          No saved searches have been created yet.
+        </NoEntitiesExist>
+      )}
+      {pagination?.total === 0 && searchParams.query && (
+        <NoSearchResult>
           No saved searches found.
-        </NoSavedSearches>
+        </NoSearchResult>
       )}
       {!!savedSearches?.length && (
         <EntityDataTable<View> data={savedSearches}

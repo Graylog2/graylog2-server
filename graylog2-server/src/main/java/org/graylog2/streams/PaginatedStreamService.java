@@ -16,6 +16,7 @@
  */
 package org.graylog2.streams;
 
+import com.google.common.collect.ImmutableList;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Aggregates;
@@ -30,16 +31,15 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
 
 import javax.inject.Inject;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
     private static final String COLLECTION_NAME = "streams";
+    private static final List<String> STRING_FIELDS = List.of("title", "description", "index_set_title");
     private final MongoCollection<Document> collection;
 
     @Inject
@@ -57,20 +57,29 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
     public PaginatedList<StreamDTO> findPaginated(SearchQuery searchQuery, Predicate<StreamDTO> filter, int page,
                                                   int perPage, String sortField, String order) {
         final Bson dbQuery = searchQuery.toBson();
-        final DBSort.SortBuilder sortBuilder = getSortBuilder(order, sortField);
+        var pipelineBuilder = ImmutableList.<Bson>builder()
+                .add(Aggregates.match(dbQuery));
 
-        final AggregateIterable<Document> result = collection.aggregate(List.of(
-                Aggregates.match(dbQuery),
-                Aggregates.lookup(
-                        MongoIndexSetService.COLLECTION_NAME,
-                        List.of(new Variable<>("index_set_id", new Document("$toObjectId", "$index_set_id"))),
-                        List.of(Aggregates.match(doc("$expr", doc("$eq", List.of("$_id", "$$index_set_id"))))),
-                        "index_set"
-                ),
-                Aggregates.set(new Field<>("index_set_title", new Document("$first", "$index_set.title"))),
-                Aggregates.project(doc("index_set", 0)),
-                Aggregates.sort(sortBuilder)
-        ));
+        if (sortField.equals("index_set_title")) {
+            pipelineBuilder.add(Aggregates.lookup(
+                            MongoIndexSetService.COLLECTION_NAME,
+                            List.of(new Variable<>("index_set_id", doc("$toObjectId", "$index_set_id"))),
+                            List.of(Aggregates.match(doc("$expr", doc("$eq", List.of("$_id", "$$index_set_id"))))),
+                            "index_set"
+                    ))
+                    .add(Aggregates.set(new Field<>("index_set_title", doc("$first", "$index_set.title"))))
+                    .add(Aggregates.unset("index_set"));
+        }
+
+        if (isStringField(sortField)) {
+            pipelineBuilder.add(Aggregates.set(new Field<>("lower" + sortField, doc("$toLower", "$" + sortField))))
+                    .add(Aggregates.sort(getSortBuilder(order, "lower" + sortField)))
+                    .add(Aggregates.unset("lower" + sortField));
+        } else {
+            pipelineBuilder.add(Aggregates.sort(getSortBuilder(order, sortField)));
+        }
+
+        final AggregateIterable<Document> result = collection.aggregate(pipelineBuilder.build());
 
         final List<StreamDTO> streamsList = StreamSupport.stream(result.spliterator(), false)
                 .map(StreamDTO::fromDocument)
@@ -90,6 +99,10 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
                 : streamsList;
 
         return new PaginatedList<>(paginatedStreams, streamsList.size(), page, perPage, grandTotal);
+    }
+
+    private boolean isStringField(String sortField) {
+        return STRING_FIELDS.contains(sortField);
     }
 
     private Document doc(String key, Object value) {

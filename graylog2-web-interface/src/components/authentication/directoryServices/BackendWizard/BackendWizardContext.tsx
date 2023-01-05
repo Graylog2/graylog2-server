@@ -38,6 +38,7 @@ export type WizardFormValues = {
   teamSelectionType?: 'all' | 'include' | 'exclude',
   teamSelection?: Immutable.Set<string>,
   transportSecurity?: 'tls' | 'start_tls' | 'none',
+  emailAttributes?: Array<string>,
   userFullNameAttribute?: string,
   userNameAttribute?: string,
   userUniqueIdAttribute?: string,

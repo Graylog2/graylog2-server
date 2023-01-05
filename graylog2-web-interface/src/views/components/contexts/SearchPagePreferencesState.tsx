@@ -19,13 +19,13 @@ import { useContext, useState, useCallback } from 'react';
 
 import type { ViewType } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import type { UserPreferences } from 'contexts/UserPreferencesContext';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import useCurrentUser from 'hooks/useCurrentUser';
 import Store from 'logic/local-storage/Store';
 import { PreferencesActions } from 'stores/users/PreferencesStore';
 import type User from 'logic/users/User';
+import useViewType from 'views/hooks/useViewType';
 
 type Props = {
   children: (preferencesConsumer: {
@@ -77,7 +77,7 @@ const _updateUserSidebarPinningPref = (currentUser: User, userPreferences: UserP
 const SearchPagePreferencesState = ({ children }: Props) => {
   const currentUser = useCurrentUser();
   const userPreferences = useContext(UserPreferencesContext);
-  const viewType = useContext(ViewTypeContext);
+  const viewType = useViewType();
   const [state, setState] = useState({
     sidebarIsPinned: _userSidebarPinningPref(currentUser, userPreferences, viewType),
   });

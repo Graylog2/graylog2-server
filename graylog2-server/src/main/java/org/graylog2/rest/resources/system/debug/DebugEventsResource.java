@@ -66,7 +66,7 @@ public class DebugEventsResource extends RestResource {
     @ApiOperation(value = "Create and send a cluster debug event.")
     @NoAuditEvent("only used to create a debug event")
     public void generateClusterDebugEvent(@ApiParam(name = "text", defaultValue = "Cluster Test") @Nullable String text) {
-        clusterEventBus.post(DebugEvent.create(nodeId.toString(), isNullOrEmpty(text) ? "Cluster Test" : text));
+        clusterEventBus.post(DebugEvent.create(nodeId.getNodeId(), isNullOrEmpty(text) ? "Cluster Test" : text));
     }
 
     @Timed
@@ -76,7 +76,7 @@ public class DebugEventsResource extends RestResource {
     @ApiOperation(value = "Create and send a local debug event.")
     @NoAuditEvent("only used to create a debug event")
     public void generateDebugEvent(@ApiParam(name = "text", defaultValue = "Local Test") @Nullable String text) {
-        serverEventBus.post(DebugEvent.create(nodeId.toString(), isNullOrEmpty(text) ? "Local Test" : text));
+        serverEventBus.post(DebugEvent.create(nodeId.getNodeId(), isNullOrEmpty(text) ? "Local Test" : text));
     }
 
     @Timed

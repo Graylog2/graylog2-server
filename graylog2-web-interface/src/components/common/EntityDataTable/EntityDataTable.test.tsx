@@ -125,8 +125,8 @@ describe('<EntityDataTable />', () => {
                             onSortChange={() => {}}
                             onColumnsChange={() => {}}
                             activeSort={{
-                              columnId: 'description',
-                              order: 'asc',
+                              attributeId: 'description',
+                              direction: 'asc',
                             }}
                             columnDefinitions={columnDefinitions} />);
 
@@ -146,7 +146,7 @@ describe('<EntityDataTable />', () => {
 
     await waitFor(() => expect(onSortChange).toHaveBeenCalledTimes(1));
 
-    expect(onSortChange).toHaveBeenCalledWith({ columnId: 'description', order: 'asc' });
+    expect(onSortChange).toHaveBeenCalledWith({ attributeId: 'description', direction: 'asc' });
   });
 
   it('should provide selected item ids for bulk actions', async () => {
@@ -232,6 +232,6 @@ describe('<EntityDataTable />', () => {
     userEvent.click(screen.getByRole('button', { name: /select columns to display/i }));
     userEvent.click(screen.getByRole('menuitem', { name: /show title/i }));
 
-    expect(onColumnsChange).toHaveBeenCalledWith(['title', 'description', 'status']);
+    expect(onColumnsChange).toHaveBeenCalledWith(['description', 'status', 'title']);
   });
 });
