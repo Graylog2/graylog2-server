@@ -67,7 +67,7 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
               <dt>Actions</dt>
               <dd>
                 <ReplaySearchButton queryString={event.replay_info.query}
-                                    timerange={event.replay_info.timeRange}
+                                    timerange={event.replay_info.time_range}
                                     streams={event.replay_info.streams}>
                   Replay search
                 </ReplaySearchButton>

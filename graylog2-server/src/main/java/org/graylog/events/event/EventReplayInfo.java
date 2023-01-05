@@ -31,7 +31,7 @@ import java.util.Set;
 @AutoValue
 @JsonDeserialize(builder = EventReplayInfo.Builder.class)
 public abstract class EventReplayInfo {
-    public static final String FIELD_TIME_RANGE = "timeRange";
+    public static final String FIELD_TIME_RANGE = "time_range";
     public static final String FIELD_QUERY = "query";
     public static final String FIELD_STREAMS = "streams";
 

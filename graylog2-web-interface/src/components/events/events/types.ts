@@ -17,7 +17,7 @@
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 
 export type EventReplayInfo = {
-  timeRange: AbsoluteTimeRange,
+  time_range: AbsoluteTimeRange,
   query: string,
   streams: string[],
 };
