@@ -19,21 +19,19 @@ import { useCallback } from 'react';
 
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 import { loadNewViewForStream } from 'views/logic/views/Actions';
-import normalizeSearchURLQueryParams from 'views/logic/NormalizeSearchURLQueryParams';
-import useQuery from 'routing/useQuery';
+import { useSearchURLQueryParams } from 'views/logic/NormalizeSearchURLQueryParams';
 import useParams from 'routing/useParams';
 
 import SearchPage from './SearchPage';
 
 const StreamSearchPage = () => {
-  const query = useQuery();
   const { streamId } = useParams<{ streamId?: string }>();
 
   if (!streamId) {
     throw new Error('No stream id specified!');
   }
 
-  const { timeRange, queryString } = normalizeSearchURLQueryParams(query);
+  const { timeRange, queryString } = useSearchURLQueryParams();
   const newView = useCreateSavedSearch(streamId, timeRange, queryString);
 
   const _loadNewView = useCallback(() => loadNewViewForStream(streamId), [streamId]);
