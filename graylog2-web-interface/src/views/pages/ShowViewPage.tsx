@@ -17,10 +17,9 @@
 import * as React from 'react';
 
 import useParams from 'routing/useParams';
+import useFetchView from 'views/hooks/useFetchView';
 
 import SearchPage from './SearchPage';
-
-import useFetchView from '../hooks/useFetchView';
 
 const ShowViewPage = () => {
   const { viewId } = useParams<{ viewId?: string }>();
