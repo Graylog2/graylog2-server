@@ -341,7 +341,7 @@ const AdaptableQueryTabs = ({ maxWidth, queries, titles, activeQueryId, onRemove
                              onCancel={toggleCopyToDashboardModal}
                              activeDashboardId={dashboardId}
                              submitButtonText="Copy page"
-                             submittingText="Copying page..." />
+                             submitLoadingText="Copying page..." />
       )}
     </Container>
   );

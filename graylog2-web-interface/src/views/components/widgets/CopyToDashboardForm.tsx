@@ -26,10 +26,10 @@ type Props = {
   onCancel: () => void,
   onSubmit: (selectedDashboardId: string | undefined | null) => Promise<void>,
   submitButtonText: string,
-  submittingText: string,
+  submitLoadingText: string,
 };
 
-const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submittingText, activeDashboardId }: Props) => {
+const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submitLoadingText, activeDashboardId }: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDashboard, setSelectedDashboard] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useState<SearchParams>({
@@ -60,7 +60,7 @@ const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submittingT
   const handleSubmit = () => {
     setIsSubmitting(true);
 
-    onSubmit(selectedDashboard).finally(() => {
+    onSubmit(selectedDashboard).then(() => {
       setIsSubmitting(false);
     });
   };
@@ -99,7 +99,7 @@ const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submittingT
       </Modal.Body>
       <Modal.Footer>
         <ModalSubmit submitButtonText={submitButtonText}
-                     submitLoadingText={submittingText}
+                     submitLoadingText={submitLoadingText}
                      isAsyncSubmit
                      isSubmitting={isSubmitting}
                      disabledSubmit={!selectedDashboard}

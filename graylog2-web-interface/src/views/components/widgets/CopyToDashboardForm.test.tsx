@@ -52,7 +52,7 @@ describe('CopyToDashboardForm', () => {
     <CopyToDashboardForm onCancel={() => {}}
                          onSubmit={() => Promise.resolve()}
                          submitButtonText="Submit"
-                         submittingText="Submitting..."
+                         submitLoadingText="Submitting..."
                          {...props} />
   );
 
@@ -102,13 +102,15 @@ describe('CopyToDashboardForm', () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  it('should handle onSubmit with a previous selection', () => {
+  it('should handle onSubmit with a previous selection', async () => {
     const onSubmit = jest.fn(() => Promise.resolve());
     const { getByText } = render(<SUT onSubmit={onSubmit} />);
     const firstView = getByText('view 1');
 
     fireEvent.click(firstView);
     submitModal();
+
+    await screen.findByRole('button', { name: /submit/i, hidden: true });
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(onSubmit).toHaveBeenCalledWith('view-1');
