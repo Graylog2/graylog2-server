@@ -17,6 +17,8 @@
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import PluggableStoreProvider from '../components/PluggableStoreProvider';
+
 export default (props) => {
   const components = PluginStore.exports('pages')
     .map((c) => c.search || {})
@@ -24,5 +26,9 @@ export default (props) => {
     .filter((c) => c) || [];
   const Component = components[0];
 
-  return <Component {...props} />;
+  return (
+    <PluggableStoreProvider>
+      <Component {...props} />
+    </PluggableStoreProvider>
+  );
 };

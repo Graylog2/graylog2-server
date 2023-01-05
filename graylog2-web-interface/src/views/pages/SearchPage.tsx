@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
@@ -22,10 +24,9 @@ import Search from 'views/components/Search';
 import { loadNewView as defaultLoadNewView, loadView as defaultLoadView } from 'views/logic/views/Actions';
 import IfUserHasAccessToAnyStream from 'views/components/IfUserHasAccessToAnyStream';
 import DashboardPageContextProvider from 'views/components/contexts/DashboardPageContextProvider';
-import { useStore } from 'stores/connect';
 import { DocumentTitle, Spinner } from 'components/common';
-import viewTitle from 'views/logic/views/ViewTitle';
-import { ViewStore } from 'views/stores/ViewStore';
+import type { RootState } from 'views/types';
+import { load } from 'views/logic/slices/viewSlice';
 import type View from 'views/logic/views/View';
 import useLoadView from 'views/hooks/useLoadView';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
@@ -39,7 +40,7 @@ type Props = {
 };
 
 const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
-  const title = useStore(ViewStore, ({ view }) => viewTitle(view?.title, view?.type));
+  const title = useSelector((state: RootState) => state.view.view?.title ?? `Unsaved ${state.view.view?.type}`);
 
   return (
     <DocumentTitle title={title}>
@@ -52,6 +53,11 @@ const SearchPage = ({ isNew, view, loadNewView = defaultLoadNewView, loadView = 
   const query = useQuery();
   useLoadView(view, query?.page as string, isNew);
   const [loaded, HookComponent] = useProcessHooksForView(view, query);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    view.then(load).then(dispatch);
+  }, [dispatch, view]);
 
   if (HookComponent) {
     return HookComponent;

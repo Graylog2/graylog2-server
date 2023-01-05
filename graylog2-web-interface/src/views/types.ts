@@ -17,6 +17,7 @@
 import type React from 'react';
 import type * as Immutable from 'immutable';
 import type { FormikErrors } from 'formik';
+import type { Reducer, AnyAction } from '@reduxjs/toolkit';
 
 import type Widget from 'views/logic/widgets/Widget';
 import type { ActionDefinition } from 'views/components/actions/ActionHandler';
@@ -292,6 +293,21 @@ export type CustomCommandContextProvider<T extends keyof CustomCommandContext> =
   provider: () => CustomCommandContext[T],
 }
 
+export interface ViewState {
+  view: View;
+  isDirty: boolean;
+  isNew: boolean;
+}
+
+export interface RootState {
+  view: ViewState;
+}
+
+export type ViewsReducer = {
+  key: string,
+  reducer: Reducer<RootState, AnyAction>,
+}
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -322,6 +338,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.hooks.removingWidget'?: Array<RemovingWidgetHook>;
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
     'views.widgets.actions'?: Array<WidgetActionType>;
+    'views.reducers'?: Array<ViewsReducer>;
     'views.requires.provided'?: Array<string>;
     'views.queryInput.commands'?: Array<CustomCommand>;
     'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any>>,

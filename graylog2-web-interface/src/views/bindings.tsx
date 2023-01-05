@@ -87,6 +87,7 @@ import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visuali
 import ViewHeader from 'views/components/views/ViewHeader';
 import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/ScatterVisualizationConfig';
 import ScatterVisualization from 'views/components/visualizations/scatter/ScatterVisualization';
+import viewSliceReducer from 'views/logic/slices/viewSlice';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -377,6 +378,10 @@ const exports: PluginExports = {
       sort: 1,
     },
   ],
+  'views.reducers': [{
+    key: 'view',
+    reducer: viewSliceReducer,
+  }],
 };
 
 export default exports;
