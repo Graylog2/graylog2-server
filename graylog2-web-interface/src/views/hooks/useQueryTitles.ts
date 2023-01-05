@@ -14,20 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import * as Immutable from 'immutable';
 
-import View from 'views/logic/views/View';
-import useViewType from 'views/hooks/useViewType';
+import { useStore } from 'stores/connect';
+import type { ViewStoreState } from 'views/stores/ViewStore';
+import { ViewStore } from 'views/stores/ViewStore';
 
-type Props = {
-  children: React.ReactNode,
+const queryTitlesMapper = ({ view }: ViewStoreState) => {
+  const viewState = view?.state ?? Immutable.Map();
+
+  return viewState.map((state) => state.titles.getIn(['tab', 'title']) as string).filter((v) => v !== undefined).toMap();
 };
 
-const IfSearch = ({ children }: Props) => {
-  const viewType = useViewType();
+const useQueryTitles = () => useStore(ViewStore, queryTitlesMapper);
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
-  return viewType === View.Type.Search ? <>{children}</> : null;
-};
-
-export default IfSearch;
+export default useQueryTitles;

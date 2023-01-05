@@ -23,12 +23,11 @@ import { defaultCompare } from 'logic/DefaultCompare';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
-import { useStore } from 'stores/connect';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import type { Property } from 'views/logic/fieldtypes/FieldType';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypeIcon from 'views/components/sidebar/fields/FieldTypeIcon';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 type Props = {
   ariaLabel?: string,
@@ -70,7 +69,7 @@ const OptionRenderer = ({ label, qualified, type }: OptionRendererProps) => {
 };
 
 const FieldSelect = ({ name, id, error, clearable, value, onChange, label, ariaLabel, selectRef, properties }: Props) => {
-  const { activeQuery } = useStore(ViewMetadataStore);
+  const activeQuery = useActiveQueryId();
   const fieldTypes = useContext(FieldTypesContext);
   const fieldTypeOptions = useMemo(() => fieldTypes.queryFields
     .get(activeQuery, Immutable.List())

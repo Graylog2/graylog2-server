@@ -14,20 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import useViewMetadata from 'views/hooks/useViewMetadata';
 
-import View from 'views/logic/views/View';
-import useViewType from 'views/hooks/useViewType';
+const useActiveQueryId = () => {
+  const { activeQuery } = useViewMetadata();
 
-type Props = {
-  children: React.ReactNode,
+  return activeQuery;
 };
 
-const IfSearch = ({ children }: Props) => {
-  const viewType = useViewType();
-
-  // eslint-disable-next-line react/jsx-no-useless-fragment
-  return viewType === View.Type.Search ? <>{children}</> : null;
-};
-
-export default IfSearch;
+export default useActiveQueryId;

@@ -14,20 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useContext } from 'react';
 
-import View from 'views/logic/views/View';
-import useViewType from 'views/hooks/useViewType';
+import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
-type Props = {
-  children: React.ReactNode,
-};
+const useViewType = () => useContext(ViewTypeContext);
 
-const IfSearch = ({ children }: Props) => {
-  const viewType = useViewType();
-
-  // eslint-disable-next-line react/jsx-no-useless-fragment
-  return viewType === View.Type.Search ? <>{children}</> : null;
-};
-
-export default IfSearch;
+export default useViewType;

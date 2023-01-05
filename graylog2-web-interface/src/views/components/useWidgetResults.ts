@@ -19,11 +19,14 @@ import * as Immutable from 'immutable';
 
 import { widgetDefinition } from 'views/logic/Widgets';
 import { useStore } from 'stores/connect';
+import type { SearchStoreState } from 'views/stores/SearchStore';
 import { SearchStore } from 'views/stores/SearchStore';
+import type { WidgetStoreState } from 'views/stores/WidgetStore';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import type Widget from 'views/logic/widgets/Widget';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type QueryResult from 'views/logic/QueryResult';
+import type { ViewStoreState } from 'views/stores/ViewStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import type SearchError from 'views/logic/SearchError';
 
@@ -58,15 +61,15 @@ type WidgetResults = {
   error: SearchError[],
 };
 
-const viewStoreMapper = ({ activeQuery }) => activeQuery;
+const viewStoreMapper = ({ activeQuery }: ViewStoreState) => activeQuery;
 
 const useWidgetResults = (widgetId: string) => {
   const currentQueryId = useStore(ViewStore, viewStoreMapper);
 
-  const widgetStoreMapper = useCallback((widgets) => widgets.get(widgetId), [widgetId]);
+  const widgetStoreMapper = useCallback((widgets: WidgetStoreState) => widgets.get(widgetId), [widgetId]);
   const widget = useStore(WidgetStore, widgetStoreMapper);
 
-  const searchStoreMapper = useCallback(({ result, widgetMapping }) => {
+  const searchStoreMapper = useCallback(({ result, widgetMapping }: SearchStoreState) => {
     const currentQueryResults = result?.forId(currentQueryId);
 
     return (currentQueryResults
