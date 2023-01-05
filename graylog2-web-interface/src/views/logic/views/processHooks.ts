@@ -24,7 +24,7 @@ const _chainHooks = (hooks: Array<ViewHook>, args: ViewHookArguments) => {
 };
 
 type Query = { [key: string]: any };
-type OnSuccess = () => void;
+type OnSuccess = (view: View) => void;
 
 const _processViewHooks = (viewHooks: Array<ViewHook>, view: View, query: Query, onSuccess: OnSuccess) => {
   let promise;

@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useCallback, useEffect, useContext, useMemo } from 'react';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
+import { useSelector } from 'react-redux';
 
 import PageContentLayout from 'components/layout/PageContentLayout';
 import { useStore } from 'stores/connect';
@@ -54,6 +55,7 @@ import type { RefluxActions } from 'stores/StoreTypes';
 import useCurrentUser from 'hooks/useCurrentUser';
 import SynchronizeUrl from 'views/components/SynchronizeUrl';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import type { RootState } from 'views/types';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -103,7 +105,8 @@ const _refreshSearch = (executionState: SearchExecutionState) => {
 };
 
 const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const { view } = useStore(ViewStore);
+  // const { view } = useStore(ViewStore);
+  const view = useSelector((state: RootState) => state.view?.view);
   const { searchesClusterConfig } = useStore(SearchConfigStore) ?? {};
   const currentUser = useCurrentUser();
   const contextValue = useMemo(() => ({

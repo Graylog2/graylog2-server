@@ -15,8 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
@@ -26,11 +25,11 @@ import IfUserHasAccessToAnyStream from 'views/components/IfUserHasAccessToAnyStr
 import DashboardPageContextProvider from 'views/components/contexts/DashboardPageContextProvider';
 import { DocumentTitle, Spinner } from 'components/common';
 import type { RootState } from 'views/types';
-import { load } from 'views/logic/slices/viewSlice';
 import type View from 'views/logic/views/View';
 import useLoadView from 'views/hooks/useLoadView';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import useQuery from 'routing/useQuery';
+import PluggableStoreProvider from 'components/PluggableStoreProvider';
 
 type Props = {
   isNew: boolean,
@@ -49,33 +48,30 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const SearchPage = ({ isNew, view, loadNewView = defaultLoadNewView, loadView = defaultLoadView }: Props) => {
+const SearchPage = ({ isNew, view: viewPromise, loadNewView = defaultLoadNewView, loadView = defaultLoadView }: Props) => {
   const query = useQuery();
-  useLoadView(view, query?.page as string, isNew);
-  const [loaded, HookComponent] = useProcessHooksForView(view, query);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    view.then(load).then(dispatch);
-  }, [dispatch, view]);
+  useLoadView(viewPromise, query?.page as string, isNew);
+  const [view, HookComponent] = useProcessHooksForView(viewPromise, query);
 
   if (HookComponent) {
     return HookComponent;
   }
 
-  return (loaded)
+  return view
     ? (
-      <SearchPageTitle>
-        <DashboardPageContextProvider>
-          <NewViewLoaderContext.Provider value={loadNewView}>
-            <ViewLoaderContext.Provider value={loadView}>
-              <IfUserHasAccessToAnyStream>
-                <Search />
-              </IfUserHasAccessToAnyStream>
-            </ViewLoaderContext.Provider>
-          </NewViewLoaderContext.Provider>
-        </DashboardPageContextProvider>
-      </SearchPageTitle>
+      <PluggableStoreProvider view={view} isNew={isNew}>
+        <SearchPageTitle>
+          <DashboardPageContextProvider>
+            <NewViewLoaderContext.Provider value={loadNewView}>
+              <ViewLoaderContext.Provider value={loadView}>
+                <IfUserHasAccessToAnyStream>
+                  <Search />
+                </IfUserHasAccessToAnyStream>
+              </ViewLoaderContext.Provider>
+            </NewViewLoaderContext.Provider>
+          </DashboardPageContextProvider>
+        </SearchPageTitle>
+      </PluggableStoreProvider>
     )
     : <Spinner />;
 };

@@ -34,12 +34,16 @@ const LoadViewError = ({ error }: { error: Error }) => (
 
 type HookComponent = JSX.Element;
 
-const useProcessHooksForView = (view: Promise<View>, query: { [key: string]: any }): [boolean, HookComponent] => {
+type Loading = [undefined, undefined];
+type Loaded = [View, undefined];
+type Interrupted = [undefined, HookComponent];
+type ResultType = Loading | Loaded | Interrupted;
+
+const useProcessHooksForView = (view: Promise<View>, query: { [key: string]: any }): ResultType => {
   const loadingViewHooks = usePluginEntities('views.hooks.loadingView');
   const executingViewHooks = usePluginEntities('views.hooks.executingView');
 
-  const [loaded, setLoaded] = useState(false);
-  const [hookComponent, setHookComponent] = useState<HookComponent>(undefined);
+  const [result, setResult] = useState<ResultType>([undefined, undefined]);
 
   useEffect(() => {
     processHooks(
@@ -47,24 +51,23 @@ const useProcessHooksForView = (view: Promise<View>, query: { [key: string]: any
       loadingViewHooks,
       executingViewHooks,
       query,
-      () => {
-        setLoaded(true);
-        setHookComponent(undefined);
+      (v) => {
+        setResult([v, undefined]);
       },
     ).catch((e) => {
       if (e instanceof Error) {
-        setHookComponent(<LoadViewError error={e} />);
+        setResult([undefined, <LoadViewError error={e} />]);
 
         return;
       }
 
-      setHookComponent(e);
+      setResult([undefined, e]);
     });
   },
   // eslint-disable-next-line react-hooks/exhaustive-deps
   [executingViewHooks, loadingViewHooks, view]);
 
-  return [loaded, hookComponent];
+  return result;
 };
 
 export default useProcessHooksForView;
