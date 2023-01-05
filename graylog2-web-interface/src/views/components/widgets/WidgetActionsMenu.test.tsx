@@ -40,7 +40,7 @@ import { loadDashboard } from 'views/logic/views/Actions';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { ViewStore } from 'views/stores/ViewStore';
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import useViewType from 'views/hooks/useViewType';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
@@ -73,11 +73,9 @@ jest.mock('views/stores/WidgetStore', () => ({
   },
 }));
 
-jest.mock('views/stores/CurrentQueryStore', () => ({
-  CurrentQueryStore: MockStore(),
-}));
-
 jest.mock('views/stores/CurrentViewStateStore', () => ({ CurrentViewStateStore: MockStore(['getInitialState', () => ({})]) }));
+
+jest.mock('views/hooks/useViewType');
 
 const openActionDropdown = async () => {
   const actionToggle = await screen.findByTestId('widgetActionDropDown');
@@ -252,11 +250,9 @@ describe('<WidgetActionsMenu />', () => {
     });
 
     const renderAndClick = async () => {
-      render((
-        <ViewTypeContext.Provider value={View.Type.Search}>
-          <DummyWidget />
-        </ViewTypeContext.Provider>
-      ));
+      asMock(useViewType).mockReturnValue(View.Type.Search);
+
+      render(<DummyWidget />);
 
       await openActionDropdown();
 
