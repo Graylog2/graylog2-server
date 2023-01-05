@@ -38,7 +38,7 @@ const mockView = View.create()
   .search(Search.builder().build())
   .build();
 
-jest.mock('views/components/Search', () => jest.fn(() => <div>Extended search page</div>));
+jest.mock('views/components/Search');
 jest.mock('components/common/PublicNotifications', () => mockComponent('PublicNotifications'));
 jest.mock('views/stores/SearchStore');
 jest.mock('routing/useQuery');
@@ -67,12 +67,13 @@ describe('NewSearchPage', () => {
     asMock(useQuery).mockReturnValue(query);
     asMock(useCreateSavedSearch).mockReturnValue(Promise.resolve(mockView));
     asMock(useProcessHooksForView).mockReturnValue([true, undefined]);
+    asMock(SearchComponent).mockImplementation(() => <span>Extended Search Page</span>);
   });
 
   it('should render minimal', async () => {
     const { findByText } = render(<SimpleNewSearchPage />);
 
-    await findByText('Extended search page');
+    await findByText('Extended Search Page');
   });
 
   it('should show spinner while loading view', async () => {
@@ -112,7 +113,7 @@ describe('NewSearchPage', () => {
 
   describe('loading another view', () => {
     it('should be possible with specific view id', async () => {
-      asMock(SearchComponent as React.FunctionComponent).mockImplementationOnce(() => (
+      asMock(SearchComponent as React.FunctionComponent).mockImplementation(() => (
         <ViewLoaderContext.Consumer>
           {(_loadView) => (
             <button type="button" onClick={() => _loadView && _loadView('special-view-id')}>Load
@@ -134,7 +135,7 @@ describe('NewSearchPage', () => {
 
   describe('loading new empty view', () => {
     beforeEach(() => {
-      asMock(SearchComponent as React.FunctionComponent).mockImplementationOnce(() => (
+      asMock(SearchComponent as React.FunctionComponent).mockImplementation(() => (
         <NewViewLoaderContext.Consumer>
           {(_loadNewView) => <button type="button" onClick={() => _loadNewView()}>Load new view</button>}
         </NewViewLoaderContext.Consumer>
