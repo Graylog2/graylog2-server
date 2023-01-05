@@ -69,6 +69,10 @@ export type PermissionsConfigType = {
   allow_sharing_with_everyone: boolean,
   allow_sharing_with_users: boolean,
 }
+export type UserConfigType = {
+  enable_global_session_timeout: boolean,
+  global_session_timeout_interval: string,
+}
 export type ConfigurationsStoreState = {
   configuration: Record<string, any>,
   searchesClusterConfig: SearchesConfig,
