@@ -98,7 +98,7 @@ const ListBasedOnQueryParams = ({
   pageSizes,
   ...props
 }: Required<Props> & { pageSize: number }) => {
-  const { page: currentPage, pageSize: currentPageSize, setPagination } = usePaginationQueryParameter(pageSizes, props.pageSize); // should we be able to provide the active page here?
+  const { page: currentPage, pageSize: currentPageSize, setPagination } = usePaginationQueryParameter(pageSizes, props.pageSize);
 
   return <ListBase {...props} currentPage={currentPage} currentPageSize={currentPageSize} setPagination={setPagination} pageSizes={pageSizes} />;
 };
