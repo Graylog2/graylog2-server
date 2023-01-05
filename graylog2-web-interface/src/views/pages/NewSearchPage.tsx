@@ -25,7 +25,7 @@ const NewSearchPage = () => {
   const { timeRange, queryString } = useSearchURLQueryParams();
   const view = useCreateSavedSearch(undefined, timeRange, queryString);
 
-  return <SearchPage view={view} />;
+  return <SearchPage view={view} isNew />;
 };
 
 export default NewSearchPage;

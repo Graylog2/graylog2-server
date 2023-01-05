@@ -36,7 +36,7 @@ const StreamSearchPage = () => {
 
   const _loadNewView = useCallback(() => loadNewViewForStream(streamId), [streamId]);
 
-  return <SearchPage loadNewView={_loadNewView} view={newView} />;
+  return <SearchPage loadNewView={_loadNewView} view={newView} isNew />;
 };
 
 export default StreamSearchPage;
