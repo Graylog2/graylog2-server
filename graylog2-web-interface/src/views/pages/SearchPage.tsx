@@ -30,7 +30,6 @@ import type View from 'views/logic/views/View';
 import useLoadView from 'views/hooks/useLoadView';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import useQuery from 'routing/useQuery';
-import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 
 type Props = {
   view: Promise<View>,
@@ -52,13 +51,12 @@ const SearchPage = ({ view, loadNewView = defaultLoadNewView, loadView = default
   const query = useQuery();
   useLoadView(view, query?.page as string);
   const [loaded, HookComponent] = useProcessHooksForView(view, query);
-  const currentQuery = useCurrentQuery();
 
   if (HookComponent) {
     return HookComponent;
   }
 
-  return (loaded && currentQuery)
+  return (loaded)
     ? (
       <SearchPageTitle>
         <DashboardPageContextProvider>
