@@ -24,7 +24,6 @@ import { MockStore } from 'helpers/mocking';
 import CurrentUserPreferencesProvider from 'contexts/CurrentUserPreferencesProvider';
 import Store from 'logic/local-storage/Store';
 import View from 'views/logic/views/View';
-import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
 import type { PreferencesMap } from 'stores/users/PreferencesStore';
 import { PreferencesActions } from 'stores/users/PreferencesStore';
 import type User from 'logic/users/User';
@@ -62,13 +61,11 @@ describe('SearchPagePreferencesProvider', () => {
 
   const SimpleProvider = ({ children }: { children: any }) => (
     <CurrentUserPreferencesProvider>
-      <CurrentViewTypeProvider type={View.Type.Search}>
-        <SearchPagePreferencesProvider>
-          <SearchPagePreferencesContext.Consumer>
-            {children}
-          </SearchPagePreferencesContext.Consumer>
-        </SearchPagePreferencesProvider>
-      </CurrentViewTypeProvider>
+      <SearchPagePreferencesProvider>
+        <SearchPagePreferencesContext.Consumer>
+          {children}
+        </SearchPagePreferencesContext.Consumer>
+      </SearchPagePreferencesProvider>
     </CurrentUserPreferencesProvider>
   );
 

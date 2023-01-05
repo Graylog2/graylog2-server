@@ -14,12 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useStore } from 'stores/connect';
-import type { ViewStoreState } from 'views/stores/ViewStore';
-import { ViewStore } from 'views/stores/ViewStore';
 import viewTitle from 'views/logic/views/ViewTitle';
+import useAppSelector from 'stores/useAppSelector';
 
-const viewTitleMapper = (storeState: ViewStoreState) => viewTitle(storeState?.view?.title, storeState?.view?.type);
-const useViewTitle = () => useStore(ViewStore, viewTitleMapper);
+const useViewTitle = () => useAppSelector((state) => viewTitle(state?.view?.view?.title, state?.view?.view?.type));
 
 export default useViewTitle;

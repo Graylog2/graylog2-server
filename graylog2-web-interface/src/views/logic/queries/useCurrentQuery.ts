@@ -14,14 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useStore } from 'stores/connect';
-import type { ViewStoreState } from 'views/stores/ViewStore';
-import { ViewStore } from 'views/stores/ViewStore';
+import useAppSelector from 'stores/useAppSelector';
 
-const currentQueryMapper = (viewStore: ViewStoreState) => (viewStore?.activeQuery
-  ? viewStore?.view?.search?.queries?.find((query) => query.id === viewStore?.activeQuery)
-  : undefined);
+const useCurrentQuery = () => useAppSelector((state) => {
+  const { activeQuery } = state?.view ?? {};
 
-const useCurrentQuery = () => useStore(ViewStore, currentQueryMapper);
+  return activeQuery ? state?.view?.view?.search?.queries?.find((query) => query.id === activeQuery) : undefined;
+});
 
 export default useCurrentQuery;

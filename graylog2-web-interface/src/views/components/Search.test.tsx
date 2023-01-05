@@ -30,7 +30,6 @@ import { ViewActions, ViewStore } from 'views/stores/ViewStore';
 import { SearchMetadataActions, SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import View from 'views/logic/views/View';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
-import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
 import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
@@ -120,8 +119,6 @@ describe('Search', () => {
     SearchMetadataStore.listen = jest.fn(() => jest.fn());
     SearchActions.refresh = mockAction();
 
-    // eslint-disable-next-line react/jsx-no-useless-fragment
-    asMock(CurrentViewTypeProvider as React.FunctionComponent).mockImplementation(({ children }) => <>{children}</>);
     asMock(useViewType).mockReturnValue(View.Type.Dashboard);
 
     const query = Query.builder().id('foobar').filter(filtersForQuery([])).build();

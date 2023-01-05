@@ -14,11 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useStore } from 'stores/connect';
-import type { ViewStoreState } from 'views/stores/ViewStore';
-import { ViewStore } from 'views/stores/ViewStore';
+import useAppSelector from 'stores/useAppSelector';
 
-const queryIdsMapper = (view: ViewStoreState) => view?.view?.search?.queries?.map((q) => q.id).toOrderedSet();
-const useQueryIds = () => useStore(ViewStore, queryIdsMapper);
+const useQueryIds = () => useAppSelector((state) => state.view?.view?.search?.queries?.map((q) => q.id).toOrderedSet());
 
 export default useQueryIds;

@@ -38,7 +38,6 @@ import QueryBar from 'views/components/QueryBar';
 import { FieldsOverview } from 'views/components/sidebar';
 import DashboardSearchBar from 'views/components/DashboardSearchBar';
 import SearchBar from 'views/components/SearchBar';
-import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
 import IfSearch from 'views/components/search/IfSearch';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 import HighlightMessageInQuery from 'views/components/messagelist/HighlightMessageInQuery';
@@ -162,7 +161,7 @@ const Search = () => {
               editing: false,
             },
           }) => (
-            <CurrentViewTypeProvider>
+            <>
               <IfInteractive>
                 <IfDashboard>
                   <WindowLeaveMessage />
@@ -209,7 +208,7 @@ const Search = () => {
                   </SearchPagePreferencesProvider>
                 )}
               </InteractiveContext.Consumer>
-            </CurrentViewTypeProvider>
+            </>
           )}
         </WidgetFocusContext.Consumer>
       </WidgetFocusProvider>

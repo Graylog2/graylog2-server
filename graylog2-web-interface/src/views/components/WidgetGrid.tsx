@@ -25,15 +25,12 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
-import { useStore } from 'stores/connect';
-import { WidgetStore } from 'views/stores/WidgetStore';
 import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
-import type { StoreState } from 'stores/StoreTypes';
-import { ViewStatesStore } from 'views/stores/ViewStatesStore';
 import ElementDimensions from 'components/common/ElementDimensions';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import useAppSelector from 'stores/useAppSelector';
 
 import WidgetContainer from './WidgetContainer';
 import WidgetComponent from './WidgetComponent';
@@ -98,14 +95,21 @@ const generatePositions = (widgets: Array<{ id: string, type: string }>, positio
   .map<[string, WidgetPosition]>(({ id, type }) => [id, positions[id] ?? _defaultDimensions(type)])
   .reduce((prev, [id, position]) => ({ ...prev, [id]: position }), {});
 
-const mapWidgetPositions = (states: StoreState<typeof ViewStatesStore>) => states.map((state) => state.widgetPositions).reduce((prev, cur) => ({ ...prev, ...cur }), {});
-const mapWidgets = (state: StoreState<typeof WidgetStore>) => state.map(({ id, type }) => ({ id, type })).toArray();
+const useWidgets = () => useAppSelector((state) => {
+  const { activeQuery } = state.view ?? {};
+  const query = state.view?.view?.state?.get(activeQuery);
 
-const useWidgetPositions = (): WidgetPositions => {
-  const initialPositions = useStore(ViewStatesStore, mapWidgetPositions);
-  const widgets = useStore(WidgetStore, mapWidgets);
+  return query?.widgets?.map(({ id, type }) => ({ id, type })).toArray();
+});
 
-  return useMemo(() => generatePositions(widgets, initialPositions), [widgets, initialPositions]);
+const useWidgetsAndPositions = (): [ReturnType<typeof useWidgets>, WidgetPositions] => {
+  // const initialPositions = useStore(ViewStatesStore, mapWidgetPositions);
+  const initialPositions = useAppSelector((state) => state.view?.view?.state?.map(({ widgetPositions }) => widgetPositions).reduce((prev, cur) => ({ ...prev, ...cur }), {}));
+  const widgets = useWidgets();
+
+  const positions = useMemo(() => generatePositions(widgets, initialPositions), [widgets, initialPositions]);
+
+  return [widgets, positions];
 };
 
 type GridProps = {
@@ -160,9 +164,7 @@ const WidgetGrid = () => {
   const isInteractive = useContext(InteractiveContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
 
-  const widgets = useStore(WidgetStore, (state) => state.map(({ id, type }) => ({ id, type })).toArray().reverse());
-
-  const positions = useWidgetPositions();
+  const [widgets, positions] = useWidgetsAndPositions();
 
   const fields = useQueryFieldTypes();
 
