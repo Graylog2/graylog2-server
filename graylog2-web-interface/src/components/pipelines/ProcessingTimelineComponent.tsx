@@ -61,7 +61,9 @@ const PipelineStage = styled.div<{ $idle?: boolean }>(({ $idle, theme }) => css`
   padding: 20px;
   text-align: center;
   width: 120px;
-  background-color: ${$idle ? theme.utils.colorLevel(theme.colors.global.contentBackground, 10) : theme.colors.global.contentBackground};
+  background-color: ${$idle
+    ? theme.utils.colorLevel(theme.colors.global.contentBackground, 10)
+    : theme.colors.global.contentBackground};
 `);
 
 const PipelineNameTD = styled.td`

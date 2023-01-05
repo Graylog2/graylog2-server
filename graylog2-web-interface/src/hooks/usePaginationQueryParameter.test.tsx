@@ -64,7 +64,7 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     act(() => setPagination({ page: nextPage }));
 
-    expect(mockHistoryReplace).toHaveBeenCalledWith(`?page=${nextPage}`);
+    expect(mockHistoryReplace).toHaveBeenCalledWith(`?page=${nextPage}&pageSize=10`);
   });
 
   it('should set <pageSize> query parameter with the value sent in setPagination and initialize the <page> query parameter', () => {
