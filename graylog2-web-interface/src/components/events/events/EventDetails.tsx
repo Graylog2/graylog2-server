@@ -14,19 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import lodash from 'lodash';
 
-import useCurrentUser from 'hooks/useCurrentUser';
 import usePluginEntities from 'hooks/usePluginEntities';
-import { isPermitted } from 'util/PermissionsMixin';
-import { Link } from 'components/common/router';
 import { Col, Row } from 'components/bootstrap';
 import { Timestamp } from 'components/common';
-import Routes from 'routing/Routes';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type { Event, EventDefinitionContext } from 'components/events/events/types';
 import ReplaySearchButton from 'views/components/widgets/ReplaySearchButton';
+import EventFields from 'components/events/events/EventFields';
+import EventDefinitionLink from 'components/event-definitions/event-definitions/EventDefinitionLink';
 
 type Props = {
   event: Event,
@@ -36,63 +34,13 @@ type Props = {
 const EventDetails = ({ event, eventDefinitionContext }: Props) => {
   const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
 
-  const getConditionPlugin = (type: string): EventDefinitionType => {
-    if (type === undefined) {
+  const plugin = useMemo(() => {
+    if (event.event_definition_type === undefined) {
       return null;
     }
 
-    return eventDefinitionTypes.find((edt) => edt.type === type);
-  };
-
-  const renderEventFields = (eventFields: Object[]) => {
-    const fieldNames = Object.keys(eventFields);
-
-    return (
-      <ul>
-        {fieldNames.map((fieldName) => {
-          return (
-            <React.Fragment key={fieldName}>
-              <li><b>{fieldName}</b> {eventFields[fieldName]}</li>
-            </React.Fragment>
-          );
-        })}
-      </ul>
-    );
-  };
-
-  const currentUser = useCurrentUser();
-  const plugin = getConditionPlugin(event.event_definition_type);
-
-  const renderLinkToEventDefinition = () => {
-    if (!eventDefinitionContext) {
-      return <em>{event.event_definition_id}</em>;
-    }
-
-    return isPermitted(currentUser.permissions,
-      `eventdefinitions:edit:${eventDefinitionContext.id}`)
-      ? <Link to={Routes.ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>{eventDefinitionContext.title}</Link>
-      : eventDefinitionContext.title;
-  };
-
-  const renderReplaySearchLink = () => {
-    const replayInfo = event.replay_info;
-    let range;
-    let streams;
-
-    if (replayInfo.timerange_start && replayInfo.timerange_end) {
-      range = { type: 'absolute', from: `${replayInfo.timerange_start}`, to: `${replayInfo.timerange_end}` };
-    }
-
-    if (replayInfo.streams) {
-      streams = replayInfo.streams;
-    }
-
-    return (
-      <ReplaySearchButton queryString={replayInfo.query} timerange={range} streams={streams}>
-        Replay search
-      </ReplaySearchButton>
-    );
-  };
+    return eventDefinitionTypes.find((edt) => edt.type === event.event_definition_type);
+  }, [event, eventDefinitionTypes]);
 
   return (
     <Row>
@@ -110,14 +58,20 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
           </dd>
           <dt>Event Definition</dt>
           <dd>
-            {renderLinkToEventDefinition()}
+            <EventDefinitionLink event={event} eventDefinitionContext={eventDefinitionContext} />
             &emsp;
             ({(plugin && plugin.displayName) || event.event_definition_type})
           </dd>
           {event.replay_info && (
             <>
               <dt>Actions</dt>
-              <dd>{renderReplaySearchLink()}</dd>
+              <dd>
+                <ReplaySearchButton queryString={event.replay_info.query}
+                                    timerange={event.replay_info.timeRange}
+                                    streams={event.replay_info.streams}>
+                  Replay search
+                </ReplaySearchButton>
+              </dd>
             </>
           )}
         </dl>
@@ -139,11 +93,11 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
           <dt>Additional Fields</dt>
           {lodash.isEmpty(event.fields)
             ? <dd>No additional Fields added to this Event.</dd>
-            : renderEventFields(event.fields)}
+            : <EventFields fields={event.fields} />}
           <dt>Group-By Fields</dt>
           {lodash.isEmpty(event.group_by_fields)
             ? <dd>No group-by fields on this Event.</dd>
-            : renderEventFields(event.group_by_fields)}
+            : <EventFields fields={event.group_by_fields} />}
         </dl>
       </Col>
     </Row>

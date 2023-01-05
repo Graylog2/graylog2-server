@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.joda.time.DateTime;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 
 import java.util.Set;
 
@@ -31,16 +31,13 @@ import java.util.Set;
 @AutoValue
 @JsonDeserialize(builder = EventReplayInfo.Builder.class)
 public abstract class EventReplayInfo {
-    public static final String FIELD_TIMERANGE_START = "timerange_start";
-    public static final String FIELD_TIMERANGE_END = "timerange_end";
+    public static final String FIELD_TIME_RANGE = "timeRange";
     public static final String FIELD_QUERY = "query";
     public static final String FIELD_STREAMS = "streams";
 
-    @JsonProperty(FIELD_TIMERANGE_START)
-    public abstract DateTime timerangeStart();
 
-    @JsonProperty(FIELD_TIMERANGE_END)
-    public abstract DateTime timerangeEnd();
+    @JsonProperty(FIELD_TIME_RANGE)
+    public abstract AbsoluteRange timeRange();
 
     @JsonProperty(FIELD_QUERY)
     public abstract String query();
@@ -56,11 +53,8 @@ public abstract class EventReplayInfo {
 
     @AutoValue.Builder
     public static abstract class Builder {
-        @JsonProperty(FIELD_TIMERANGE_START)
-        public abstract Builder timerangeStart(DateTime timeRangeStart);
-
-        @JsonProperty(FIELD_TIMERANGE_END)
-        public abstract Builder timerangeEnd(DateTime timeRangeEnd);
+        @JsonProperty(FIELD_TIME_RANGE)
+        public abstract Builder timeRange(AbsoluteRange timeRange);
 
         @JsonProperty(FIELD_QUERY)
         public abstract Builder query(String query);

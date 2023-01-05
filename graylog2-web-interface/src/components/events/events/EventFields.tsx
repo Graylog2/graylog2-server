@@ -14,30 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
+import React from 'react';
 
-export type EventReplayInfo = {
-  timeRange: AbsoluteTimeRange,
-  query: string,
-  streams: string[],
-};
-
-export type Event = {
-  id: string,
-  event_definition_id: string,
-  event_definition_type: string,
-  priority: string,
-  timestamp: string,
-  timerange_start: string,
-  timerange_end: string,
-  key: string,
+type Props = {
   fields: Object[],
-  group_by_fields: Object[],
-  source_streams: string[],
-  replay_info: EventReplayInfo | undefined,
 };
 
-export type EventDefinitionContext = {
-  id: string,
-  title: string,
+const EventFields = ({ fields }: Props) => {
+  const fieldNames = Object.keys(fields);
+
+  return (
+    <ul>
+      {fieldNames.map((fieldName) => {
+        return (
+          <li key={fieldName}><b>{fieldName}</b> {fields[fieldName]}</li>
+        );
+      })}
+    </ul>
+  );
 };
+
+export default EventFields;
