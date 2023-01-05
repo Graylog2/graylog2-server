@@ -45,8 +45,10 @@ const CreateWidgetButton = styled(Button)`
   padding: 10px;
   width: 8rem;
   white-space: normal;
-  background: transparent !important;
-  border-radius: 4px !important;
+  && {
+    background: transparent;
+    border-radius: 4px;
+  }
 `;
 
 const HugeIcon = styled.div(({ theme }) => css`
