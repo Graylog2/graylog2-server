@@ -40,6 +40,8 @@ const PlaceholderBox = styled.div(({ theme }) => css`
   :hover {
     opacity: 1;
   }
+
+  cursor: pointer;
 `);
 
 const HugeIcon = styled(Icon)(({ theme }) => css`

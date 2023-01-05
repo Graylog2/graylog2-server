@@ -32,7 +32,8 @@ const modalTitle = 'Create new widget';
 const WidgetList = styled.div`
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-evenly;
+  justify-content: center;
+  gap: 12px;
 `;
 
 const CreateWidgetButton = styled(Button)`
@@ -44,6 +45,8 @@ const CreateWidgetButton = styled(Button)`
   padding: 10px;
   width: 8rem;
   white-space: normal;
+  background: transparent !important;
+  border-radius: 4px !important;
 `;
 
 const HugeIcon = styled.div(({ theme }) => css`
@@ -69,13 +72,14 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
     };
 
     return (
-      <CreateWidgetButton type="button" onClick={onClick}><HugeIcon><WidgetIcon /></HugeIcon>{title}</CreateWidgetButton>
+      <CreateWidgetButton type="button" title={`Create ${title} Widget`} onClick={onClick}>
+        <HugeIcon><WidgetIcon /></HugeIcon>{title}
+      </CreateWidgetButton>
     );
   }), [creators, position, view]);
 
   return (
-    <Modal title={modalTitle}
-           onHide={onCancel}
+    <Modal onHide={onCancel}
            show>
       <Modal.Header closeButton>
         <Modal.Title>{modalTitle}</Modal.Title>
