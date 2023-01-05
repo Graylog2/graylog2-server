@@ -23,15 +23,11 @@ import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
@@ -46,64 +42,63 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 class IndexLookupTest {
-
-    @Mock
-    private IndexRangeService indexRangeService;
-    @Mock
-    private StreamService streamService;
-    @Mock
-    private IndexRangeContainsOneOfStreams indexRangeContainsOneOfStreams;
-    private IndexLookup sut;
 
     private final TimeRange timeRangeWithNoIndexRanges = KeywordRange.create("42 years ago", TimeZone.getDefault().getID());
     private final TimeRange timeRangeWithMatchingIndexRange = KeywordRange.create("1 years ago", TimeZone.getDefault().getID());
     private final Set<String> streamIds = Set.of("s-1", "s-2");
-    private Set<Stream> streams;
-
-    @BeforeEach
-    void setUp() {
-        sut = new IndexLookup(indexRangeService, streamService, indexRangeContainsOneOfStreams);
-
-        streams = streamIds.stream()
-                .map(id -> mock(Stream.class))
-                .collect(Collectors.toSet());
-    }
 
     @Test
     void findsIndicesBelongingToStreamsInTimeRange() {
-        when(streamService.loadByIds(streamIds)).thenReturn(streams);
+        final IndexRange indexRange1 = mockIndexRange("index1");
+        final IndexRange indexRange2 = mockIndexRange("index2");
+        final SortedSet<IndexRange> indexRanges = sortedSetOf(indexRange1, indexRange2);
 
-        List<IndexRange> indexRanges = mockSomeIndexRanges();
-        IndexRange matchingIndexRange = indexRanges.get(0);
-        doReturn(true).when(indexRangeContainsOneOfStreams).test(eq(matchingIndexRange), any());
+        final IndexLookup sut = new IndexLookup(
+                mockIndexRangeService(indexRanges, timeRangeWithMatchingIndexRange),
+                mockStreamService(streamIds),
+                mockIndexRangeContains(indexRange1));
+
         Set<String> result = sut.indexNamesForStreamsInTimeRange(streamIds, timeRangeWithMatchingIndexRange);
-
-        assertThat(result).containsExactly(matchingIndexRange.indexName());
+        assertThat(result).containsExactly(indexRange1.indexName());
     }
 
     @Test
     void returnsEmptySetForEmptyStreamIds() {
+        final IndexLookup sut = new IndexLookup(mock(IndexRangeService.class), mockStreamService(Collections.emptySet()), mock(IndexRangeContainsOneOfStreams.class));
         Set<String> result = sut.indexNamesForStreamsInTimeRange(emptySet(), timeRangeWithNoIndexRanges);
         assertThat(result).isEmpty();
     }
 
     @Test
     void returnsEmptySetIfNoIndicesFound() {
-        when(streamService.loadByIds(streamIds)).thenReturn(streams);
+        final IndexLookup sut = new IndexLookup(mock(IndexRangeService.class), mockStreamService(streamIds), mock(IndexRangeContainsOneOfStreams.class));
         Set<String> result = sut.indexNamesForStreamsInTimeRange(streamIds, timeRangeWithNoIndexRanges);
         assertThat(result).isEmpty();
     }
 
-    private List<IndexRange> mockSomeIndexRanges() {
-        final IndexRange indexRange1 = mockIndexRange("index1");
-        final IndexRange indexRange2 = mockIndexRange("index2");
-
-        final SortedSet<IndexRange> indexRanges = sortedSetOf(indexRange1, indexRange2);
+    private IndexRangeService mockIndexRangeService(SortedSet<IndexRange> indexRanges, TimeRange timeRangeWithMatchingIndexRange) {
+        final IndexRangeService indexRangeService = mock(IndexRangeService.class);
         when(indexRangeService.find(timeRangeWithMatchingIndexRange.getFrom(), timeRangeWithMatchingIndexRange.getTo())).thenReturn(indexRanges);
+        return indexRangeService;
+    }
 
-        return new ArrayList<>(indexRanges);
+    private static IndexRangeContainsOneOfStreams mockIndexRangeContains(IndexRange matchingIndexRange) {
+        IndexRangeContainsOneOfStreams indexRangeContainsOneOfStreams = mock(IndexRangeContainsOneOfStreams.class);
+        doReturn(true).when(indexRangeContainsOneOfStreams).test(eq(matchingIndexRange), any());
+        return indexRangeContainsOneOfStreams;
+    }
+
+    private StreamService mockStreamService(Set<String> streamIds) {
+        final Set<Stream> streams = streamIds.stream()
+                .map(id -> mock(Stream.class))
+                .collect(Collectors.toSet());
+
+        final StreamService streamService = mock(StreamService.class);
+        if (!streamIds.isEmpty()) {
+            when(streamService.loadByIds(streamIds)).thenReturn(streams);
+        }
+        return streamService;
     }
 
     private IndexRange mockIndexRange(final String name) {
@@ -114,11 +109,8 @@ class IndexLookupTest {
 
     SortedSet<IndexRange> sortedSetOf(IndexRange... indexRanges) {
         final Comparator<IndexRange> indexRangeComparator = Comparator.comparing(IndexRange::indexName);
-
         final TreeSet<IndexRange> indexRangeSets = new TreeSet<>(indexRangeComparator);
-
-        indexRangeSets.addAll(java.util.Arrays.asList(indexRanges));
-
+        indexRangeSets.addAll(Arrays.asList(indexRanges));
         return indexRangeSets;
     }
 }
