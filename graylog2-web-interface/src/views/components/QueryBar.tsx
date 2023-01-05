@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useContext } from 'react';
-import * as Immutable from 'immutable';
+import type * as Immutable from 'immutable';
 import { List } from 'immutable';
 
 import { useStore } from 'stores/connect';
