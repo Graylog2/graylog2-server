@@ -84,7 +84,8 @@ const _updateSearch = (view: View, oldView: View): [View, boolean] => {
   return [view, false];
 };
 
-const _selectedQuery = (queries: QuerySet = Immutable.Set(), activeQuery: string, queryId: string): QueryId => {
+const _selectedQuery = (_queries: QuerySet, activeQuery: string, queryId: string): QueryId => {
+  const queries = _queries ?? Immutable.Set();
   const selectedQuery = queryId ?? activeQuery;
 
   if (selectedQuery && queries.find(({ id }) => (id === selectedQuery))) {
