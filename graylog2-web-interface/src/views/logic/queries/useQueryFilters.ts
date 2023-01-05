@@ -14,20 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useStore } from 'stores/connect';
+import { QueriesStore } from 'views/stores/QueriesStore';
+import type { StoreState } from 'stores/StoreTypes';
 
-import View from 'views/logic/views/View';
-import useViewType from 'views/hooks/useViewType';
+const queriesStoreMapper = (newQueries: StoreState<typeof QueriesStore>) => newQueries.map((q) => q.filter).toMap();
 
-type Props = {
-  children: React.ReactNode,
-};
+const useQueryFilters = () => useStore(QueriesStore, queriesStoreMapper);
 
-const IfSearch = ({ children }: Props) => {
-  const viewType = useViewType();
-
-  // eslint-disable-next-line react/jsx-no-useless-fragment
-  return viewType === View.Type.Search ? <>{children}</> : null;
-};
-
-export default IfSearch;
+export default useQueryFilters;

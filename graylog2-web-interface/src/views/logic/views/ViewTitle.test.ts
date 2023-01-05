@@ -14,20 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-
 import View from 'views/logic/views/View';
-import useViewType from 'views/hooks/useViewType';
 
-type Props = {
-  children: React.ReactNode,
-};
+import ViewTitle from './ViewTitle';
 
-const IfSearch = ({ children }: Props) => {
-  const viewType = useViewType();
+describe('ViewTitle', () => {
+  it('returns default title for unsaved search', () => {
+    expect(ViewTitle(undefined, View.Type.Search)).toBe('Unsaved Search');
+  });
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
-  return viewType === View.Type.Search ? <>{children}</> : null;
-};
+  it('returns default title for unsaved dashboard', () => {
+    expect(ViewTitle(undefined, View.Type.Dashboard)).toBe('Unsaved Dashboard');
+  });
 
-export default IfSearch;
+  it('returns actual title if present', () => {
+    expect(ViewTitle('My title', undefined)).toBe('My title');
+  });
+});
