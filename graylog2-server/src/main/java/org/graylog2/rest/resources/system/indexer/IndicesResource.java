@@ -17,7 +17,7 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -111,15 +111,16 @@ public class IndicesResource extends RestResource {
     @ApiOperation(value = "Get information of all specified indices and their shards.")
     @Produces(MediaType.APPLICATION_JSON)
     @NoAuditEvent("only used to request index information")
-    public Map<String, IndexInfo> multiple(@ApiParam(name = "Requested indices", required = true)
-                                           @Valid @NotNull IndicesReadRequest request) {
-        final Set<String> requestedIndices = request.indices().stream()
+    public List<IndexInfo> multiple(@ApiParam(name = "Requested indices", required = true)
+                                    @Valid @NotNull IndicesReadRequest request) {
+        final List<String> requestedIndices = request.indices().stream()
                 .filter(index -> isPermitted(RestPermissions.INDICES_READ, index))
-                .collect(Collectors.toSet());
+                .distinct()
+                .collect(Collectors.toList());
         final Map<String, Boolean> managedStatus = indexSetRegistry.isManagedIndex(requestedIndices);
-        final Set<String> managedIndices = requestedIndices.stream()
+        final List<String> managedIndices = requestedIndices.stream()
                 .filter(index -> managedStatus.getOrDefault(index, false))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
         return toIndexInfos(indices.getIndicesStats(managedIndices));
     }
@@ -350,11 +351,11 @@ public class IndicesResource extends RestResource {
         );
     }
 
-    private Map<String, IndexInfo> toIndexInfos(final Collection<IndexStatistics> indexStatistics) {
+    private List<IndexInfo> toIndexInfos(final Collection<IndexStatistics> indexStatistics) {
         final Set<String> indexNames = indexStatistics.stream().map(IndexStatistics::index).collect(Collectors.toSet());
         final Map<String, Boolean> reopenedStatus = indices.areReopened(indexNames);
 
-        final ImmutableMap.Builder<String, IndexInfo> indexInfos = ImmutableMap.builder();
+        final ImmutableList.Builder<IndexInfo> indexInfos = ImmutableList.builder();
         for (IndexStatistics indexStats : indexStatistics) {
             final IndexInfo indexInfo = IndexInfo.create(
                     indexStats.index(),
@@ -362,7 +363,7 @@ public class IndicesResource extends RestResource {
                     indexStats.allShards(),
                     fillShardRoutings(indexStats.routing()),
                     reopenedStatus.getOrDefault(indexStats.index(), false));
-            indexInfos.put(indexStats.index(), indexInfo);
+            indexInfos.add(indexInfo);
         }
 
         return indexInfos.build();
