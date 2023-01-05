@@ -40,7 +40,7 @@ const NewDashboardPage = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   []);
 
-  return <IfPermitted permissions="dashboards:create"><SearchPage view={view} /></IfPermitted>;
+  return <IfPermitted permissions="dashboards:create"><SearchPage view={view} isNew /></IfPermitted>;
 };
 
 export default NewDashboardPage;

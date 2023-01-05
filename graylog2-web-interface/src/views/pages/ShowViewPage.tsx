@@ -30,7 +30,7 @@ const ShowViewPage = () => {
 
   const view = useFetchView(viewId);
 
-  return <SearchPage view={view} />;
+  return <SearchPage view={view} isNew={false} />;
 };
 
 export default ShowViewPage;
