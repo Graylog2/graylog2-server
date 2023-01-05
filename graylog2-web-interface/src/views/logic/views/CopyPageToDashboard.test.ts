@@ -27,6 +27,10 @@ import copyPageToDashboard from './CopyPageToDashboard';
 import ValueParameter from '../parameters/ValueParameter';
 import Parameter from '../parameters/Parameter';
 
+jest.useFakeTimers()
+  // @ts-expect-error
+  .setSystemTime(1577836800000); // 2020-01-01 00:00:00.000
+
 jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
 
 jest.mock('bson-objectid', () => jest.fn(() => ({
@@ -65,7 +69,7 @@ describe('copyPageToDashboard', () => {
     Parameter.registerSubtype(ValueParameter.type, ValueParameter);
   });
 
-  it('should copy a widget to a dashboard', () => {
+  it('should copy a page to a dashboard', () => {
     const dashboardViewFixture = View.fromJSON(readFixture('./CopyPageToDashboard.Dashboard-View.fixture.json'));
     const dashboardSearchFixture = Search.fromJSON(readFixture('./CopyPageToDashboard.Dashboard-Search.fixture.json'));
     const sourceDashboard = dashboardViewFixture.toBuilder()

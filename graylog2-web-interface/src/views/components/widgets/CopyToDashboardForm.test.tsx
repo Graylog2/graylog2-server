@@ -57,7 +57,7 @@ describe('CopyToDashboardForm', () => {
   );
 
   const submitModal = () => {
-    const submitButton = screen.getByRole('button', { name: /copy widget/i, hidden: true });
+    const submitButton = screen.getByRole('button', { name: /submit/i, hidden: true });
     fireEvent.click(submitButton);
   };
 
@@ -84,7 +84,7 @@ describe('CopyToDashboardForm', () => {
 
   it('should handle onCancel', () => {
     const onCancel = jest.fn();
-    const { getByText } = render(<SUT />);
+    const { getByText } = render(<SUT onCancel={onCancel} />);
     const cancelButton = getByText('Cancel');
 
     fireEvent.click(cancelButton);
@@ -93,7 +93,7 @@ describe('CopyToDashboardForm', () => {
   });
 
   it('should not handle onSubmit without selection', () => {
-    const onSubmit = jest.fn();
+    const onSubmit = jest.fn(() => Promise.resolve());
 
     render(<SUT />);
 
@@ -103,7 +103,7 @@ describe('CopyToDashboardForm', () => {
   });
 
   it('should handle onSubmit with a previous selection', () => {
-    const onSubmit = jest.fn();
+    const onSubmit = jest.fn(() => Promise.resolve());
     const { getByText } = render(<SUT onSubmit={onSubmit} />);
     const firstView = getByText('view 1');
 
@@ -111,7 +111,7 @@ describe('CopyToDashboardForm', () => {
     submitModal();
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
-    expect(onSubmit).toHaveBeenCalledWith('widget-id', 'view-1');
+    expect(onSubmit).toHaveBeenCalledWith('view-1');
   });
 
   it('should query for all dashboards & specific dashboards', () => {
