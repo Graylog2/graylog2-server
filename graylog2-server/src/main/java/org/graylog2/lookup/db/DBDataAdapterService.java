@@ -70,6 +70,10 @@ public class DBDataAdapterService extends ScopedDbService<DataAdapterDto> {
         return savedDataAdapter;
     }
 
+    public void postBulkUpdate(Set<String> updatedAdapterIds) {
+        clusterEventBus.post(DataAdaptersUpdated.create(updatedAdapterIds));
+    }
+
     public PaginatedList<DataAdapterDto> findPaginated(DBQuery.Query query, DBSort.SortBuilder sort, int page, int perPage) {
         try (DBCursor<DataAdapterDto> cursor = db.find(query)
                 .sort(sort)
