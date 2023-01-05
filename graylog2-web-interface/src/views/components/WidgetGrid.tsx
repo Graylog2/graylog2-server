@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useMemo } from 'react';
+import { useCallback, useContext, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { WidgetPositions, BackendWidgetPosition } from 'views/types';
@@ -155,9 +155,10 @@ const onPositionChange = (newPosition: BackendWidgetPosition) => {
   CurrentViewStateActions.updateWidgetPosition(id, widgetPosition);
 };
 
-const onPositionsChange = (newPositions: Array<BackendWidgetPosition>) => {
+const _onPositionsChange = (newPositions: Array<BackendWidgetPosition>, setLastUpdate: (newValue: string) => void) => {
   const widgetPositions = Object.fromEntries(newPositions.map((newPosition) => [newPosition.id, convertPosition(newPosition)]));
   CurrentViewStateActions.widgetPositions(widgetPositions);
+  setLastUpdate(generateId());
 };
 
 const renderGaps = (widgets: { id: string, type: string}[], positions: WidgetPositions) => {
@@ -190,6 +191,8 @@ const renderGaps = (widgets: { id: string, type: string}[], positions: WidgetPos
 const WidgetGrid = () => {
   const isInteractive = useContext(InteractiveContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
+  const [lastUpdate, setLastUpdate] = useState<string>(undefined);
+  const onPositionsChange = useCallback((newPositions: Array<BackendWidgetPosition>) => _onPositionsChange(newPositions, setLastUpdate), []);
 
   const widgets = useStore(WidgetStore, (state) => state.map(({ id, type }) => ({ id, type })).toArray().reverse());
 
@@ -217,7 +220,7 @@ const WidgetGrid = () => {
     }
 
     return [widgetItems, positions];
-  }, [fields, focusedWidget, isInteractive, positions, widgets]);
+  }, [fields, focusedWidget, isInteractive, lastUpdate, positions, widgets]);
 
   // Measuring the width is required to update the widget grid
   // when its content height results in a scrollbar
