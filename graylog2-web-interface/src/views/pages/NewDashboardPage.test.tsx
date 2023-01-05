@@ -57,7 +57,6 @@ describe('NewDashboardPage', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    jest.useRealTimers();
   });
 
   it('shows loading spinner before rendering page', async () => {
