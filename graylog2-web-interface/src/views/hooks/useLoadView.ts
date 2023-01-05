@@ -19,9 +19,9 @@ import { useEffect } from 'react';
 import type View from 'views/logic/views/View';
 import { ViewActions } from 'views/stores/ViewStore';
 
-const useLoadView = (viewPromise: Promise<View>, queryId?: string) => {
+const useLoadView = (viewPromise: Promise<View>, queryId: string, isNew: boolean) => {
   useEffect(() => {
-    viewPromise.then((view) => ViewActions.loadNew(view, queryId));
+    viewPromise.then((view) => (isNew ? ViewActions.loadNew(view, queryId) : ViewActions.load(view, false, queryId)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewPromise]);
 };
