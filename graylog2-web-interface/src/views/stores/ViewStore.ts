@@ -117,26 +117,6 @@ export const ViewStore: ViewStoreType = singletonStore(
       return this._state();
     },
 
-    loadNew(newView: View, queryId?: string) {
-      const [view] = _updateSearch(newView, this.view);
-
-      this.view = view;
-      const queries: QuerySet = view?.search?.queries ?? Immutable.Set();
-
-      this.activeQuery = _selectedQuery(queries, this.activeQuery, queryId);
-      this._trigger();
-
-      const promise = ViewActions.search(view.search)
-        .then(() => {
-          this.dirty = false;
-          this.isNew = true;
-        })
-        .then(() => this._trigger());
-
-      ViewActions.loadNew.promise(promise.then(() => this._state()));
-
-      return promise;
-    },
     createQuery(query: Query, viewState: ViewState) {
       if (query.id === undefined) {
         throw new Error('Unable to add query without id to view.');
@@ -193,6 +173,27 @@ export const ViewStore: ViewStoreType = singletonStore(
       const promise = Promise.resolve(this._state());
 
       ViewActions.load.promise(promise);
+
+      return promise;
+    },
+    loadNew(newView: View, queryId?: string) {
+      const [view] = _updateSearch(newView, this.view);
+
+      this.view = view;
+
+      const queries: QuerySet = view?.search?.queries ?? Immutable.Set();
+      this.activeQuery = _selectedQuery(queries, this.activeQuery, queryId);
+
+      this._trigger();
+
+      const promise = ViewActions.search(view.search)
+        .then(() => {
+          this.dirty = false;
+          this.isNew = true;
+        })
+        .then(() => this._trigger());
+
+      ViewActions.loadNew.promise(promise.then(() => this._state()));
 
       return promise;
     },

@@ -32,6 +32,7 @@ import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import useQuery from 'routing/useQuery';
 
 type Props = {
+  isNew: boolean,
   view: Promise<View>,
   loadNewView?: () => unknown,
   loadView?: (viewId: string) => unknown,
@@ -47,9 +48,9 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const SearchPage = ({ view, loadNewView = defaultLoadNewView, loadView = defaultLoadView }: Props) => {
+const SearchPage = ({ isNew, view, loadNewView = defaultLoadNewView, loadView = defaultLoadView }: Props) => {
   const query = useQuery();
-  useLoadView(view, query?.page as string);
+  useLoadView(view, query?.page as string, isNew);
   const [loaded, HookComponent] = useProcessHooksForView(view, query);
 
   if (HookComponent) {
