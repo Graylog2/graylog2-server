@@ -48,6 +48,9 @@ import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig'
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import type Query from 'views/logic/queries/Query';
 import type { CustomCommand, CustomCommandContext } from 'views/components/searchbar/queryinput/types';
+import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type GlobalOverride from 'views/logic/search/GlobalOverride';
+import type SearchResult from 'views/logic/SearchResult';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -300,13 +303,21 @@ export interface ViewState {
   isNew: boolean;
 }
 
+export interface SearchExecution {
+  executionState: SearchExecutionState;
+  globalOverride: GlobalOverride;
+  result: SearchResult;
+  isLoading: boolean;
+}
+
 export interface RootState {
   view: ViewState;
+  searchExecution: SearchExecution;
 }
 
 export type ViewsReducer = {
-  key: string,
-  reducer: Reducer<RootState, AnyAction>,
+  key: keyof RootState,
+  reducer: Reducer<RootState[keyof RootState], AnyAction>,
 }
 
 declare module 'graylog-web-plugin/plugin' {

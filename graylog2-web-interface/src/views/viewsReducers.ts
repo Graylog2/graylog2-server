@@ -16,11 +16,15 @@
  */
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-import viewSliceReducer from 'views/logic/slices/viewSlice';
+import { viewSliceReducer } from 'views/logic/slices/viewSlice';
+import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionSlice';
 
 const viewsReducers: PluginExports['views.reducers'] = [{
-  key: 'view',
+  key: 'view' as const,
   reducer: viewSliceReducer,
+}, {
+  key: 'searchExecution' as const,
+  reducer: searchExecutionSliceReducer,
 }];
 
 export default viewsReducers;
