@@ -22,9 +22,10 @@ import { ClosedIndexDetails, IndexDetails, IndexSummary } from 'components/indic
 
 const Index = ({ index, indexDetails, indexSetId }) => {
   const indexRange = index && index.range ? index.range : null;
+  const details = indexDetails.find(({ index_name }) => index_name === index.index_name);
 
   return (
-    <Row key={`index-summary-${index.index_name}`} className="content index-description">
+    <Row className="content index-description">
       <Col md={12}>
         <IndexSummary index={index}
                       name={index.index_name}
@@ -32,7 +33,7 @@ const Index = ({ index, indexDetails, indexSetId }) => {
                       indexRange={indexRange}
                       isDeflector={index.is_deflector}>
           <span>
-            <IndexDetails index={indexDetails[index.index_name]}
+            <IndexDetails index={details}
                           indexName={index.index_name}
                           indexRange={indexRange}
                           indexSetId={indexSetId}
@@ -48,7 +49,7 @@ const ClosedIndex = ({ index }) => {
   const indexRange = index.range;
 
   return (
-    <Row key={`index-summary-${index.index_name}`} className="content index-description">
+    <Row className="content index-description">
       <Col md={12}>
         <IndexSummary index={index} name={index.index_name} indexRange={indexRange} isDeflector={index.is_deflector}>
           <span>
@@ -63,15 +64,15 @@ const ClosedIndex = ({ index }) => {
 const IndicesOverview = ({ indexDetails, indices, indexSetId }) => (
   <span>
     {indices.map((index) => (!index.is_closed
-      ? <Index index={index} indexDetails={indexDetails} indexSetId={indexSetId} />
-      : <ClosedIndex index={index} />),
+      ? <Index index={index} indexDetails={indexDetails} indexSetId={indexSetId} key={`index-summary-${index.index_name}`} />
+      : <ClosedIndex index={index} key={`index-summary-${index.index_name}`} />),
     )}
   </span>
 );
 
 IndicesOverview.propTypes = {
-  indexDetails: PropTypes.object.isRequired,
-  indices: PropTypes.object.isRequired,
+  indexDetails: PropTypes.array.isRequired,
+  indices: PropTypes.array.isRequired,
   indexSetId: PropTypes.string.isRequired,
 };
 

@@ -74,9 +74,8 @@ export type IndexInfo = {
   reopened: boolean,
 };
 
-export type Indices = {
-  [key: string]: IndexInfo,
-};
+export type Indices = Array<IndexInfo>
+
 type IndicesListResponse = {
   all: {
     indices: IndexInfo,
@@ -157,7 +156,7 @@ export const IndicesStore = singletonStore(
       const urlList = qualifyUrl(ApiRoutes.IndicesApiController.multiple().url);
       const request = { indices: indexNames };
       const promise = fetch('POST', urlList, request).then((response: Indices) => {
-        this.indices = { ...this.indices, ...response };
+        this.indices = [...this.indices, ...response];
         this.trigger({ indices: this.indices, closedIndices: this.closedIndices });
 
         return { indices: this.indices, closedIndices: this.closedIndices };
