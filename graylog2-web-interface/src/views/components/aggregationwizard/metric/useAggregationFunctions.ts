@@ -14,45 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Reflux from 'reflux';
+import { useQuery } from '@tanstack/react-query';
 
 import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import { singletonStore } from 'logic/singleton';
-import type { Store } from 'stores/StoreTypes';
 
 const functionsUrl = URLUtils.qualifyUrl('/views/functions');
 
 type AggregationFunction = { type: string, description: string };
 
-type AggregationFunctionsStoreState = {
+type AggregationFunctions = {
   [functionName: string]: AggregationFunction | undefined,
 }
 
-const AggregationFunctionsStore: Store<AggregationFunctionsStoreState> = singletonStore(
-  'views.AggregationFunctions',
-  () => Reflux.createStore({
-    init() {
-      this.refresh();
-    },
+const fetchAggregationFunctions = (): Promise<AggregationFunctions> => fetch('GET', functionsUrl);
+const useAggregationFunctions = () => useQuery(['aggregationFunctions'], fetchAggregationFunctions);
 
-    getInitialState() {
-      return this._state();
-    },
-
-    refresh() {
-      fetch('GET', functionsUrl).then((response) => {
-        this.functions = response;
-        this._trigger();
-      });
-    },
-    _state() {
-      return this.functions;
-    },
-    _trigger() {
-      this.trigger(this._state());
-    },
-  }),
-);
-
-export default AggregationFunctionsStore;
+export default useAggregationFunctions;

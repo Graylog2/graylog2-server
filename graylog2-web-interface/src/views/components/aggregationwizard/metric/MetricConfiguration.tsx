@@ -21,11 +21,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { defaultCompare } from 'logic/DefaultCompare';
 import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
-import { useStore } from 'stores/connect';
-import AggregationFunctionsStore from 'views/stores/AggregationFunctionsStore';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { InputOptionalInfo as Opt, FormikInput } from 'components/common';
 import { Properties } from 'views/logic/fieldtypes/FieldType';
+import useAggregationFunctions from 'views/components/aggregationwizard/metric/useAggregationFunctions';
 
 import FieldSelect from '../FieldSelect';
 
@@ -39,7 +38,7 @@ const percentileOptions = [25.0, 50.0, 75.0, 90.0, 95.0, 99.0].map((value) => ({
 
 const Metric = ({ index }: Props) => {
   const metricFieldSelectRef = useRef(null);
-  const functions = useStore(AggregationFunctionsStore);
+  const functions = useAggregationFunctions();
   const functionOptions = Object.values(functions)
     .map(({ type, description }) => ({ label: description, value: type }))
     .sort(sortByLabel);
