@@ -115,8 +115,6 @@ const ListWithOwnState = ({
   });
 
   useEffect(() => {
-    console.log({ activePage, currentPage });
-
     if (activePage > 0 && activePage !== currentPage) {
       setPagination((cur) => ({ ...cur, page: activePage }));
     }
