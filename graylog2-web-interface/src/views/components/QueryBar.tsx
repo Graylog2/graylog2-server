@@ -31,6 +31,7 @@ import useQueryTitles from 'views/hooks/useQueryTitles';
 import useViewMetadata from 'views/hooks/useViewMetadata';
 import useAppDispatch from 'stores/useAppDispatch';
 import { selectQuery, createQuery } from 'views/logic/slices/viewSlice';
+import useWidgetIds from 'views/components/useWidgetIds';
 
 import QueryTabs from './QueryTabs';
 
@@ -56,8 +57,6 @@ const onCloseTab = async (dashboardId: string, queryId: string, activeQueryId: s
 
   return Promise.resolve();
 };
-
-const useWidgetIds = () => useStore(ViewStatesStore, (states) => states.map((viewState) => viewState.widgets.map((widget) => widget.id).toList()).toMap());
 
 const QueryBar = () => {
   const queries = useQueryIds();

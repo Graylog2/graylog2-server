@@ -31,6 +31,7 @@ import { useStore } from 'stores/connect';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 import FindNewActiveQueryId from 'views/logic/views/FindNewActiveQuery';
 import ConfirmDeletingDashboardPage from 'views/logic/views/ConfirmDeletingDashboardPage';
+import useWidgetIds from 'views/components/useWidgetIds';
 
 type PageListItem = {
   id: string,
@@ -64,8 +65,6 @@ const ListItem = ({
     </ListItemContainer>
   );
 };
-
-const useWidgetIds = () => useStore(ViewStatesStore, (states) => states.map((viewState) => viewState.widgets.map((widget) => widget.id).toList()).toMap());
 
 type Props = {
   show: boolean,
