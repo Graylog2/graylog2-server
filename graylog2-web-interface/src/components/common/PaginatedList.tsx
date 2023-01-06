@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 import usePaginationQueryParameter, { DEFAULT_PAGE_SIZES } from 'hooks/usePaginationQueryParameter';
@@ -52,11 +53,11 @@ const ListBase = ({
   currentPage: number;
   setPagination: (newPagination: { page: number, pageSize: number }) => void
 }) => {
-  const numberPages = React.useMemo(() => (
+  const numberPages = useMemo(() => (
     currentPageSize > 0 ? Math.ceil(totalItems / currentPageSize) : 0
   ), [currentPageSize, totalItems]);
 
-  const _onChangePageSize = React.useCallback((event: React.ChangeEvent<HTMLOptionElement>) => {
+  const _onChangePageSize = useCallback((event: React.ChangeEvent<HTMLOptionElement>) => {
     event.preventDefault();
     const newPageSize = Number(event.target.value);
 
@@ -64,12 +65,12 @@ const ListBase = ({
     if (onChange) onChange(INITIAL_PAGE, newPageSize);
   }, [onChange, setPagination]);
 
-  const _onChangePage = React.useCallback((pageNum: number) => {
+  const _onChangePage = useCallback((pageNum: number) => {
     setPagination({ page: pageNum, pageSize: currentPageSize });
     if (onChange) onChange(pageNum, currentPageSize);
   }, [setPagination, currentPageSize, onChange]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (numberPages > 0 && currentPage > numberPages) _onChangePage(numberPages);
   }, [currentPage, numberPages, _onChangePage]);
 
@@ -113,7 +114,20 @@ const ListWithOwnState = ({
     pageSize: propPageSize,
   });
 
-  return <ListBase {...props} currentPage={currentPage} currentPageSize={currentPageSize} setPagination={setPagination} />;
+  useEffect(() => {
+    console.log({ activePage, currentPage });
+
+    if (activePage > 0 && activePage !== currentPage) {
+      setPagination((cur) => ({ ...cur, page: activePage }));
+    }
+  }, [activePage, currentPage]);
+
+  return (
+    <ListBase {...props}
+              currentPage={currentPage}
+              currentPageSize={currentPageSize}
+              setPagination={setPagination} />
+  );
 };
 
 /**
