@@ -18,20 +18,45 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 
-import connect from 'stores/connect';
-import { ChartColorRulesStore, ChartColorRulesActions } from 'views/stores/ChartColorRulesStore';
+import { ChartColorRulesActions } from 'views/stores/ChartColorRulesStore';
 import type { ColorRule } from 'views/stores/ChartColorRulesStore';
 import ColorMapper from 'views/components/visualizations/ColorMapper';
+import useWidgets from 'views/hooks/useWidgets';
+import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetFormattingSettings';
 
 import ChartColorContext from '../visualizations/ChartColorContext';
 
 type Props = {
   children: React.ReactNode,
-  colorRules: Array<ColorRule>,
   id: string,
 };
 
-const WidgetColorContext = ({ children, colorRules, id }: Props) => {
+const isAggregationWidgetConfig = (config: WidgetConfig): config is AggregationWidgetConfig => config && 'formattingSettings' in config;
+
+const useColorRules = () => {
+  const widgets = useWidgets();
+
+  return widgets.valueSeq()
+    .toArray()
+    .flatMap((widget) => {
+      const { config } = widget;
+      const widgetId = widget.id;
+
+      if (isAggregationWidgetConfig(config)) {
+        const { chartColors = {} } = config.formattingSettings ?? WidgetFormattingSettings.empty();
+
+        return Object.entries(chartColors).map(([key, value]) => ({ widgetId, name: key, color: value } as ColorRule));
+      }
+
+      return [];
+    })
+    .filter((entry) => entry !== null);
+};
+
+const WidgetColorContext = ({ children, id }: Props) => {
+  const colorRules = useColorRules();
   const colorMapperBuilder = ColorMapper.builder();
   const colorRulesForWidgetBuilder = colorRules.filter(({ widgetId }) => (widgetId === id))
     .reduce((prev, { name, color }) => (prev.set(name, color)), colorMapperBuilder);
@@ -62,4 +87,4 @@ WidgetColorContext.propTypes = {
   id: PropTypes.string.isRequired,
 };
 
-export default connect(WidgetColorContext, { colorRules: ChartColorRulesStore });
+export default WidgetColorContext;

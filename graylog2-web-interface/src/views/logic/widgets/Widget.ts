@@ -22,6 +22,7 @@ import { singleton } from 'logic/singleton';
 import generateId from 'logic/generateId';
 import isDeepEqual from 'stores/isDeepEqual';
 import type { FiltersType, SearchFilter } from 'views/types';
+import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 
 export type WidgetState = {
   id: string;
@@ -58,7 +59,7 @@ class Widget {
     return this._value.type;
   }
 
-  get config() {
+  get config(): WidgetConfig {
     return this._value.config;
   }
 
