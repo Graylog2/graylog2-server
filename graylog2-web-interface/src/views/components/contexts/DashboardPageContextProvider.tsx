@@ -22,8 +22,7 @@ import URI from 'urijs';
 import useQuery from 'routing/useQuery';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 import { ViewActions } from 'views/stores/ViewStore';
-import { ViewStatesStore } from 'views/stores/ViewStatesStore';
-import { useStore } from 'stores/connect';
+import useAppSelector from 'stores/useAppSelector';
 
 const _clearURI = (query) => new URI(query)
   .removeSearch('page');
@@ -41,7 +40,9 @@ const _updateQueryParams = (
   return baseUri.toString();
 };
 
-const useSyncStateWithQueryParams = ({ dashboardPage, uriParams, setDashboardPage, states }) => {
+const useSyncStateWithQueryParams = ({ dashboardPage, uriParams, setDashboardPage }) => {
+  const states = useAppSelector((state) => state?.view?.view?.state);
+
   useEffect(() => {
     const nextPage = uriParams.page;
 
@@ -65,7 +66,6 @@ const useCleanupQueryParams = ({ uriParams, query, history }) => {
 };
 
 const DashboardPageContextProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
-  const states = useStore(ViewStatesStore);
   const { search, pathname } = useLocation();
   const query = pathname + search;
   const history = useHistory();
@@ -75,7 +75,7 @@ const DashboardPageContextProvider = ({ children }: { children: React.ReactNode 
     page: params.page,
   }), [params]);
 
-  useSyncStateWithQueryParams({ dashboardPage, uriParams, setDashboardPage, states });
+  useSyncStateWithQueryParams({ dashboardPage, uriParams, setDashboardPage });
   useCleanupQueryParams({ uriParams, query, history });
 
   const dashboardPageContextValue = useMemo(() => {

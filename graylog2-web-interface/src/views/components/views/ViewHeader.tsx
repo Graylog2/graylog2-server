@@ -19,8 +19,6 @@ import React, { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Link } from 'components/common/router';
-import { useStore } from 'stores/connect';
-import { ViewStore } from 'views/stores/ViewStore';
 import { Icon } from 'components/common';
 import { Row } from 'components/bootstrap';
 import ViewPropertiesModal from 'views/components/dashboard/DashboardPropertiesModal';
@@ -28,6 +26,7 @@ import onSaveView from 'views/logic/views/OnSaveViewAction';
 import View from 'views/logic/views/View';
 import Routes from 'routing/Routes';
 import useViewTitle from 'views/hooks/useViewTitle';
+import useView from 'views/hooks/useView';
 
 const links = {
   [View.Type.Dashboard]: {
@@ -73,7 +72,7 @@ font-size: 0.50rem;
 `;
 
 const ViewHeader = () => {
-  const { view } = useStore(ViewStore);
+  const view = useView();
   const isSavedView = view?.id && view?.title;
   const [showMetadataEdit, setShowMetadataEdit] = useState<boolean>(false);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), [setShowMetadataEdit]);

@@ -21,12 +21,10 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import type { BackendWidgetPosition, WidgetResults } from 'views/types';
-import { useStore } from 'stores/connect';
 import { widgetDefinition } from 'views/logic/Widgets';
 import type { Widgets } from 'views/stores/WidgetStore';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { TitlesActions } from 'views/stores/TitlesStore';
-import { ViewStore } from 'views/stores/ViewStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import WidgetModel from 'views/logic/widgets/Widget';
@@ -39,6 +37,7 @@ import IfDashboard from 'views/components/dashboard/IfDashboard';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useWidgetResults from 'views/components/useWidgetResults';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -177,7 +176,7 @@ const Widget = ({ id, editing, widget, fields, title, position, onPositionsChang
   }, [id, oldWidget, onToggleEdit]);
   const onRenameWidget = useCallback((newTitle: string) => TitlesActions.set('widget', id, newTitle), [id]);
   const onWidgetConfigChange = useCallback((newWidgetConfig: WidgetConfig) => WidgetActions.updateConfig(id, newWidgetConfig), [id]);
-  const activeQuery = useStore(ViewStore, ({ activeQuery: currentQuery }) => currentQuery);
+  const activeQuery = useActiveQueryId();
 
   const { config } = widget;
   const isFocused = focusedWidget?.id === id;

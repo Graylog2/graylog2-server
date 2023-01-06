@@ -103,7 +103,6 @@ const useWidgets = () => useAppSelector((state) => {
 });
 
 const useWidgetsAndPositions = (): [ReturnType<typeof useWidgets>, WidgetPositions] => {
-  // const initialPositions = useStore(ViewStatesStore, mapWidgetPositions);
   const initialPositions = useAppSelector((state) => state.view?.view?.state?.map(({ widgetPositions }) => widgetPositions).reduce((prev, cur) => ({ ...prev, ...cur }), {}));
   const widgets = useWidgets();
 
