@@ -79,10 +79,10 @@ export type Indices = Array<IndexInfo>
 
 type IndicesListResponse = {
   all: {
-    indices: IndexInfo,
+    indices: Indices,
   },
   closed: {
-    indices: IndexInfo,
+    indices: Indices,
   },
 };
 
@@ -150,7 +150,7 @@ export const IndicesStore = singletonStore(
     multiple() {
       const indexNames = Object.keys(this.registrations);
 
-      if (indexNames.length <= 0) {
+      if (!indexNames.length) {
         return;
       }
 
