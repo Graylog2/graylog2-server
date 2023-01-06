@@ -14,9 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { createSelector } from '@reduxjs/toolkit';
+
 import viewTitle from 'views/logic/views/ViewTitle';
 import useAppSelector from 'stores/useAppSelector';
+import { selectView, selectViewType } from 'views/logic/slices/viewSlice';
 
-const useViewTitle = () => useAppSelector((state) => viewTitle(state?.view?.view?.title, state?.view?.view?.type));
+const selectViewTitle = createSelector(
+  selectView,
+  selectViewType,
+  (view, viewType) => viewTitle(view?.title, viewType),
+);
+const useViewTitle = () => useAppSelector(selectViewTitle);
 
 export default useViewTitle;

@@ -14,14 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as Immutable from 'immutable';
+import { createSelector } from '@reduxjs/toolkit';
 
 import useAppSelector from 'stores/useAppSelector';
+import { selectViewStates } from 'views/logic/slices/viewSlice';
 
-const useQueryTitles = () => useAppSelector((state) => {
-  const viewStates = state.view?.view?.state ?? Immutable.Map();
+const selectQueryTitles = createSelector(
+  selectViewStates,
+  (viewStates) => viewStates.map((viewState) => viewState.titles.getIn(['tab', 'title']) as string).filter((v) => v !== undefined).toMap(),
+);
 
-  return viewStates.map((viewState) => viewState.titles.getIn(['tab', 'title']) as string).filter((v) => v !== undefined).toMap();
-});
+const useQueryTitles = () => useAppSelector(selectQueryTitles);
 
 export default useQueryTitles;

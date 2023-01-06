@@ -91,6 +91,8 @@ export const viewSliceReducer = viewSlice.reducer;
 export const selectRootView = (state: RootState) => state.view;
 export const selectView = createSelector(selectRootView, (state) => state.view);
 export const selectActiveQuery = createSelector(selectRootView, (state) => state.activeQuery);
+export const selectIsDirty = createSelector(selectRootView, (state) => state.isDirty);
+export const selectViewType = createSelector(selectView, (view) => view.type);
 export const selectViewStates = createSelector(selectView, (state) => state.state);
 export const selectActiveViewState = createSelector(
   selectActiveQuery,
@@ -106,3 +108,4 @@ export const selectCurrentQuery = createSelector(
 );
 
 export const selectWidgets = createSelector(selectActiveViewState, (viewState) => viewState.widgets);
+export const selectTitles = createSelector(selectActiveViewState, (viewState) => viewState.titles);

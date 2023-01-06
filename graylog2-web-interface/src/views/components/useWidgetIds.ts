@@ -14,8 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useAppSelector from 'stores/useAppSelector';
+import { createSelector } from '@reduxjs/toolkit';
 
-const useWidgetIds = () => useAppSelector((state) => state?.view?.view?.state?.map((viewState) => viewState.widgets.map((widget) => widget.id).toList()).toMap());
+import useAppSelector from 'stores/useAppSelector';
+import { selectViewStates } from 'views/logic/slices/viewSlice';
+
+const selectWidgetIdsByQuery = createSelector(selectViewStates, (viewState) => viewState.map((state) => state.widgets.map((widget) => widget.id).toList()).toMap());
+const useWidgetIds = () => useAppSelector(selectWidgetIdsByQuery);
 
 export default useWidgetIds;

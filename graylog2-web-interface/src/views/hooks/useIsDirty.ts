@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import useAppSelector from 'stores/useAppSelector';
+import { selectIsDirty } from 'views/logic/slices/viewSlice';
 
-const useIsDirty = () => useAppSelector((state) => state.view?.isDirty);
+const useIsDirty = () => useAppSelector(selectIsDirty);
 
 export default useIsDirty;
