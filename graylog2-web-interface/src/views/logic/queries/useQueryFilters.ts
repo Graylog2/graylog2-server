@@ -14,12 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useStore } from 'stores/connect';
-import { QueriesStore } from 'views/stores/QueriesStore';
-import type { StoreState } from 'stores/StoreTypes';
+import * as Immutable from 'immutable';
 
-const queriesStoreMapper = (newQueries: StoreState<typeof QueriesStore>) => newQueries.map((q) => q.filter).toMap();
+import useAppSelector from 'stores/useAppSelector';
+import type { QueryId } from 'views/logic/queries/Query';
+import type Query from 'views/logic/queries/Query';
 
-const useQueryFilters = () => useStore(QueriesStore, queriesStoreMapper);
+const useQueries = () => useAppSelector((state) => Immutable.OrderedMap<QueryId, Query>(state?.view?.view?.search?.queries.map((q) => [q.id, q])));
+
+const useQueryFilters = () => {
+  const queries = useQueries();
+
+  return queries.map((q) => q.filter).toMap();
+};
 
 export default useQueryFilters;

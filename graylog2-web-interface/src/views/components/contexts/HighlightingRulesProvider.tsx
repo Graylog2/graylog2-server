@@ -17,13 +17,22 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import { useStore } from 'stores/connect';
-import { HighlightingRulesStore } from 'views/stores/HighlightingRulesStore';
+import useActiveViewState from 'views/hooks/useActiveViewState';
+import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
 
 import HighlightingRulesContext from './HighlightingRulesContext';
 
+const useHighlightingRules = () => {
+  const viewState = useActiveViewState();
+  const formatting = viewState?.formatting ?? FormattingSettings.empty();
+
+  const { highlighting } = formatting;
+
+  return highlighting;
+};
+
 const HighlightingRulesProvider = ({ children }: { children: React.ReactElement }): React.ReactElement => {
-  const highlightingRules = useStore(HighlightingRulesStore);
+  const highlightingRules = useHighlightingRules();
 
   return highlightingRules
     ? (
