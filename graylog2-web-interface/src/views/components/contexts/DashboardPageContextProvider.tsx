@@ -23,6 +23,7 @@ import useQuery from 'routing/useQuery';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 import { ViewActions } from 'views/stores/ViewStore';
 import useAppSelector from 'stores/useAppSelector';
+import { selectViewStates } from 'views/logic/slices/viewSlice';
 
 const _clearURI = (query) => new URI(query)
   .removeSearch('page');
@@ -41,7 +42,7 @@ const _updateQueryParams = (
 };
 
 const useSyncStateWithQueryParams = ({ dashboardPage, uriParams, setDashboardPage }) => {
-  const states = useAppSelector((state) => state?.view?.view?.state);
+  const states = useAppSelector(selectViewStates);
 
   useEffect(() => {
     const nextPage = uriParams.page;

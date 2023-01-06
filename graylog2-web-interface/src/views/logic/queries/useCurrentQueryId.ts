@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import useAppSelector from 'stores/useAppSelector';
+import { selectActiveQuery } from 'views/logic/slices/viewSlice';
 
-const useCurrentQueryId = () => useAppSelector((state) => state.view?.activeQuery);
+const useCurrentQueryId = () => useAppSelector(selectActiveQuery);
 
 export default useCurrentQueryId;

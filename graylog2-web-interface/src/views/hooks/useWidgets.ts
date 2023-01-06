@@ -15,12 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import useAppSelector from 'stores/useAppSelector';
-import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
+import { selectWidgets } from 'views/logic/slices/viewSlice';
 
-const useWidgets = () => {
-  const activeQuery = useCurrentQueryId();
-
-  return useAppSelector((state) => state?.view?.view?.state?.get(activeQuery).widgets);
-};
+const useWidgets = () => useAppSelector(selectWidgets);
 
 export default useWidgets;

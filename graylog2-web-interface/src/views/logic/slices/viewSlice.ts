@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createSelector } from '@reduxjs/toolkit';
 import type { AppDispatch } from 'src/stores/useAppDispatch';
 
-import type { ViewState } from 'views/types';
+import type { ViewState, RootState } from 'views/types';
 import type { QueryId } from 'views/logic/queries/Query';
 import type ViewStateType from 'views/logic/views/ViewState';
 import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
@@ -87,3 +87,22 @@ export const createQuery = () => async (dispatch: AppDispatch) => {
 
 export const { selectQuery, removeQuery } = viewSlice.actions;
 export const viewSliceReducer = viewSlice.reducer;
+
+export const selectRootView = (state: RootState) => state.view;
+export const selectView = createSelector(selectRootView, (state) => state.view);
+export const selectActiveQuery = createSelector(selectRootView, (state) => state.activeQuery);
+export const selectViewStates = createSelector(selectView, (state) => state.state);
+export const selectActiveViewState = createSelector(
+  selectActiveQuery,
+  selectViewStates,
+  (activeQuery, states) => states.get(activeQuery),
+);
+export const selectSearch = createSelector(selectView, (view) => view.search);
+export const selectSearchQueries = createSelector(selectSearch, (search) => search.queries);
+export const selectCurrentQuery = createSelector(
+  selectActiveQuery,
+  selectSearchQueries,
+  (activeQuery, queries) => queries.find((query) => query.id === activeQuery),
+);
+
+export const selectWidgets = createSelector(selectActiveViewState, (viewState) => viewState.widgets);

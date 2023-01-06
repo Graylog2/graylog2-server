@@ -17,6 +17,8 @@
 import * as React from 'react';
 import { useContext, useMemo } from 'react';
 import styled, { css } from 'styled-components';
+import { createSelector } from '@reduxjs/toolkit';
+import type * as Immutable from 'immutable';
 
 import type { WidgetPositions, BackendWidgetPosition } from 'views/types';
 import ReactGridContainer from 'components/common/ReactGridContainer';
@@ -31,9 +33,13 @@ import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import ElementDimensions from 'components/common/ElementDimensions';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useAppSelector from 'stores/useAppSelector';
+import { selectViewStates } from 'views/logic/slices/viewSlice';
+import type Widget from 'views/logic/widgets/Widget';
 
 import WidgetContainer from './WidgetContainer';
 import WidgetComponent from './WidgetComponent';
+
+import useWidgets from '../hooks/useWidgets';
 
 const COLUMNS = {
   xxl: 12,
@@ -91,19 +97,14 @@ const WidgetGridItem = ({
   );
 };
 
-const generatePositions = (widgets: Array<{ id: string, type: string }>, positions: { [widgetId: string]: WidgetPosition }) => widgets
-  .map<[string, WidgetPosition]>(({ id, type }) => [id, positions[id] ?? _defaultDimensions(type)])
-  .reduce((prev, [id, position]) => ({ ...prev, [id]: position }), {});
+const generatePositions = (widgets: Immutable.List<Widget>, positions: { [widgetId: string]: WidgetPosition }) => Object.fromEntries(widgets
+  .toArray()
+  .map<[string, WidgetPosition]>(({ id, type }) => [id, positions[id] ?? _defaultDimensions(type)]));
 
-const useWidgets = () => useAppSelector((state) => {
-  const { activeQuery } = state.view ?? {};
-  const query = state.view?.view?.state?.get(activeQuery);
-
-  return query?.widgets?.map(({ id, type }) => ({ id, type })).toArray();
-});
+const selectWidgetPositions = createSelector(selectViewStates, (viewStates) => Object.fromEntries(viewStates.toArray().flatMap(({ widgetPositions }) => Object.entries(widgetPositions))));
 
 const useWidgetsAndPositions = (): [ReturnType<typeof useWidgets>, WidgetPositions] => {
-  const initialPositions = useAppSelector((state) => state.view?.view?.state?.map(({ widgetPositions }) => widgetPositions).reduce((prev, cur) => ({ ...prev, ...cur }), {}));
+  const initialPositions = useAppSelector(selectWidgetPositions);
   const widgets = useWidgets();
 
   const positions = useMemo(() => generatePositions(widgets, initialPositions), [widgets, initialPositions]);

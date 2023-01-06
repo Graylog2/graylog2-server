@@ -53,8 +53,7 @@ import type { RefluxActions } from 'stores/StoreTypes';
 import useCurrentUser from 'hooks/useCurrentUser';
 import SynchronizeUrl from 'views/components/SynchronizeUrl';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
-import type { RootState } from 'views/types';
-import useAppSelector from 'stores/useAppSelector';
+import useView from 'views/hooks/useView';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -104,7 +103,7 @@ const _refreshSearch = (executionState: SearchExecutionState) => {
 };
 
 const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const view = useAppSelector((state: RootState) => state.view?.view);
+  const view = useView();
   const { searchesClusterConfig } = useStore(SearchConfigStore) ?? {};
   const currentUser = useCurrentUser();
   const contextValue = useMemo(() => ({
