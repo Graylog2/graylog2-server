@@ -19,8 +19,9 @@ import React from 'react';
 
 import { Col, Row } from 'components/bootstrap';
 import { ClosedIndexDetails, IndexDetails, IndexSummary } from 'components/indices';
+import type { IndexInfo } from 'stores/indices/IndicesStore';
 
-const Index = ({ index, indexDetails, indexSetId }) => {
+const Index = ({ index, indexDetails, indexSetId }: { index: IndexSummary, indexDetails: Array<IndexInfo>, indexSetId: string }) => {
   const indexRange = index && index.range ? index.range : null;
   const details = indexDetails.find(({ index_name }) => index_name === index.index_name);
 
@@ -45,7 +46,7 @@ const Index = ({ index, indexDetails, indexSetId }) => {
   );
 };
 
-const ClosedIndex = ({ index }) => {
+const ClosedIndex = ({ index }: { index: IndexSummary }) => {
   const indexRange = index.range;
 
   return (
@@ -61,7 +62,13 @@ const ClosedIndex = ({ index }) => {
   );
 };
 
-const IndicesOverview = ({ indexDetails, indices, indexSetId }) => (
+type Props = {
+  indexDetails: Array<IndexInfo>,
+  indices: Array<IndexSummary>
+  indexSetId: string,
+}
+
+const IndicesOverview = ({ indexDetails, indices, indexSetId }: Props) => (
   <span>
     {indices.map((index) => (!index.is_closed
       ? <Index index={index} indexDetails={indexDetails} indexSetId={indexSetId} key={`index-summary-${index.index_name}`} />

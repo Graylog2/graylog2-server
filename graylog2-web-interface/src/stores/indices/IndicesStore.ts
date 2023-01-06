@@ -38,6 +38,7 @@ export type IndexShardRouting = {
 };
 
 export type IndexInfo = {
+  index_name: string,
   primary_shards: {
     flush: IndexTimeAndTotalStats,
     get: IndexTimeAndTotalStats,
