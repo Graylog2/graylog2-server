@@ -34,9 +34,10 @@ import * as ViewsPermissions from 'views/Permissions';
 import history from 'util/History';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import { ViewStore } from 'views/stores/ViewStore';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useCurrentUser from 'hooks/useCurrentUser';
+import useView from 'views/hooks/useView';
+import useIsDirty from 'views/hooks/useIsDirty';
 
 import SearchActionsMenu from './SearchActionsMenu';
 
@@ -63,23 +64,21 @@ jest.mock('views/stores/ViewManagementStore', () => ({
   },
 }));
 
-describe('SearchActionsMenu', () => {
-  const createViewStoreState = (dirty = true, id = undefined) => ({
-    activeQuery: '',
-    view: View.builder()
-      .id(id)
-      .title('title')
-      .type(View.Type.Search)
-      .description('description')
-      .state(Immutable.Map())
-      .search(Search.create().toBuilder().id('id-beef').build())
-      .owner('owningUser')
-      .build(),
-    dirty,
-    isNew: false,
-  });
+jest.mock('views/hooks/useView');
+jest.mock('views/hooks/useIsDirty');
 
-  const defaultViewStoreState = createViewStoreState();
+describe('SearchActionsMenu', () => {
+  const createView = (id: string = undefined) => View.builder()
+    .id(id)
+    .title('title')
+    .type(View.Type.Search)
+    .description('description')
+    .state(Immutable.Map())
+    .search(Search.create().toBuilder().id('id-beef').build())
+    .owner('owningUser')
+    .build();
+
+  const defaultView = createView();
 
   const fieldTypes = {
     all: Immutable.List<FieldTypeMapping>(),
@@ -115,9 +114,10 @@ describe('SearchActionsMenu', () => {
   };
 
   beforeEach(() => {
-    asMock(ViewStore.getInitialState).mockReturnValue(defaultViewStoreState);
     asMock(useSaveViewFormControls).mockReturnValue([]);
     asMock(useCurrentUser).mockReturnValue(defaultUser);
+    asMock(useView).mockReturnValue(defaultView);
+    asMock(useIsDirty).mockReturnValue(false);
   });
 
   describe('Button handling', () => {
@@ -137,7 +137,7 @@ describe('SearchActionsMenu', () => {
 
       expect(history.push).toHaveBeenCalledWith({
         pathname: 'DASHBOARDS_NEW',
-        state: { view: defaultViewStoreState.view },
+        state: { view: defaultView },
       });
     });
 
@@ -171,7 +171,7 @@ describe('SearchActionsMenu', () => {
           .build(),
       );
 
-      asMock(ViewStore.getInitialState).mockReturnValue(createViewStoreState(false, 'some-id'));
+      asMock(useView).mockReturnValue(createView('some-id'));
       render(<SimpleSearchActionsMenu />);
       const exportMenuItem = await screen.findByText('Edit metadata');
       userEvent.click(exportMenuItem);
@@ -180,20 +180,20 @@ describe('SearchActionsMenu', () => {
     });
 
     it('should clear a view', async () => {
+      asMock(useIsDirty).mockReturnValue(true);
       const loadNewView = jest.fn(() => Promise.resolve());
 
       render(<SimpleSearchActionsMenu loadNewView={loadNewView} />);
 
       const resetSearch = await screen.findByText('Reset search');
+
       userEvent.click(resetSearch);
 
-      expect(loadNewView).toHaveBeenCalledTimes(1);
+      await waitFor(() => { expect(loadNewView).toHaveBeenCalledTimes(1); });
     });
 
     it('should loadView after create', async () => {
-      ViewManagementActions.create = mockAction(jest.fn((view) => Promise.resolve(view)));
       const onLoadView = jest.fn((view) => Promise.resolve(view));
-      asMock(ViewStore.getInitialState).mockReturnValue(createViewStoreState(false));
 
       render(<SimpleSearchActionsMenu onLoadView={onLoadView} />);
 
@@ -205,21 +205,21 @@ describe('SearchActionsMenu', () => {
     });
 
     it('should duplicate a saved search', async () => {
+      asMock(useView).mockReturnValue(defaultView.toBuilder().id('some-id-1').build());
+
       asMock(useCurrentUser).mockReturnValue(
         adminUser.toBuilder()
           .permissions(Immutable.List([]))
           .build(),
       );
 
-      const viewStoreState = createViewStoreState(false, 'some-id');
-      asMock(ViewStore.getInitialState).mockReturnValue(viewStoreState);
       render(<SimpleSearchActionsMenu />);
 
       userEvent.click(await screen.findByTitle('Saved search'));
       userEvent.type(await findTitleInput(), ' and further title');
       userEvent.click(await findCreateNewButton());
 
-      const updatedView = viewStoreState.view.toBuilder()
+      const updatedView = defaultView.toBuilder()
         .title('title and further title')
         .id('new-search-id')
         .build();
@@ -228,6 +228,8 @@ describe('SearchActionsMenu', () => {
     });
 
     it('should extend a saved search with plugin data on duplication', async () => {
+      asMock(useView).mockReturnValue(defaultView.toBuilder().id('some-id-1').build());
+
       asMock(useCurrentUser).mockReturnValue(
         adminUser.toBuilder()
           .permissions(Immutable.List([]))
@@ -240,15 +242,13 @@ describe('SearchActionsMenu', () => {
         onSearchDuplication: (view: View) => Promise.resolve(view.toBuilder().summary('This search has been extended by a plugin').build()),
       }]);
 
-      const viewStoreState = createViewStoreState(false, 'some-id');
-      asMock(ViewStore.getInitialState).mockReturnValue(viewStoreState);
       render(<SimpleSearchActionsMenu />);
 
       userEvent.click(await screen.findByTitle('Saved search'));
       userEvent.type(await findTitleInput(), ' and further title');
       userEvent.click(await findCreateNewButton());
 
-      const updatedView = viewStoreState.view.toBuilder()
+      const updatedView = defaultView.toBuilder()
         .title('title and further title')
         .summary('This search has been extended by a plugin')
         .id('new-search-id')
@@ -258,8 +258,11 @@ describe('SearchActionsMenu', () => {
     });
 
     describe('has "Share" option', () => {
+      beforeEach(() => {
+        asMock(useView).mockReturnValue(defaultView.toBuilder().id(adminUser.id).build());
+      });
+
       it('includes the option to share the current search', async () => {
-        asMock(ViewStore.getInitialState).mockReturnValue(createViewStoreState(false, 'some-id'));
         render(<SimpleSearchActionsMenu />);
 
         await expectShareButton();
@@ -272,8 +275,6 @@ describe('SearchActionsMenu', () => {
             .permissions(Immutable.List())
             .build(),
         );
-
-        asMock(ViewStore.getInitialState).mockReturnValue(createViewStoreState(false, 'some-id'));
 
         render(<SimpleSearchActionsMenu />);
 
@@ -290,8 +291,6 @@ describe('SearchActionsMenu', () => {
             .build(),
         );
 
-        asMock(ViewStore.getInitialState).mockReturnValue(createViewStoreState(false, adminUser.id));
-
         render(<SimpleSearchActionsMenu />);
 
         const shareButton = await findShareButton();
@@ -307,8 +306,6 @@ describe('SearchActionsMenu', () => {
             .build(),
         );
 
-        asMock(ViewStore.getInitialState).mockReturnValue(createViewStoreState(false, adminUser.id));
-
         render(<SimpleSearchActionsMenu />);
 
         const shareButton = await findShareButton();
@@ -318,7 +315,6 @@ describe('SearchActionsMenu', () => {
 
       it('which should be enabled if current user is admin', async () => {
         asMock(useCurrentUser).mockReturnValue(adminUser);
-        asMock(ViewStore.getInitialState).mockReturnValue(createViewStoreState(false, adminUser.id));
 
         render(<SimpleSearchActionsMenu />);
 
@@ -328,6 +324,8 @@ describe('SearchActionsMenu', () => {
       });
 
       it('which should be disabled if search is unsaved', async () => {
+        asMock(useView).mockReturnValue(defaultView);
+
         render(<SimpleSearchActionsMenu />);
 
         expect(await findShareButton()).toBeDisabled();
@@ -337,46 +335,40 @@ describe('SearchActionsMenu', () => {
 
   describe('render the SearchActionsMenu', () => {
     it('should render not dirty with unsaved view', async () => {
-      asMock(ViewStore.getInitialState).mockReturnValue(createViewStoreState(false));
+      asMock(useView).mockReturnValue(defaultView.toBuilder().id(undefined).build());
+
       render(<SimpleSearchActionsMenu />);
 
       await screen.findByRole('button', { name: 'Save search' });
     });
 
     it('should render not dirty', async () => {
-      const viewStoreState = {
-        activeQuery: '',
-        view: View.builder()
-          .title('title')
-          .description('description')
-          .type(View.Type.Search)
-          .search(Search.create().toBuilder().id('id-beef').build())
-          .id('id-beef')
-          .build(),
-        dirty: false,
-        isNew: true,
-      };
-      asMock(ViewStore.getInitialState).mockReturnValue(viewStoreState);
+      asMock(useView).mockReturnValue(View.builder()
+        .title('title')
+        .description('description')
+        .type(View.Type.Search)
+        .search(Search.create().toBuilder().id('id-beef').build())
+        .id('id-beef')
+        .build());
+
+      asMock(useIsDirty).mockReturnValue(false);
+
       render(<SimpleSearchActionsMenu />);
 
       await screen.findByRole('button', { name: 'Saved search' });
     });
 
     it('should render dirty', async () => {
-      const view = View.builder()
+      asMock(useView).mockReturnValue(View.builder()
         .title('title')
         .type(View.Type.Search)
         .description('description')
         .search(Search.create().toBuilder().id('id-beef').build())
         .id('id-beef')
-        .build();
-      const viewStoreState = {
-        activeQuery: '',
-        view: view,
-        dirty: true,
-        isNew: false,
-      };
-      asMock(ViewStore.getInitialState).mockReturnValue(viewStoreState);
+        .build());
+
+      asMock(useIsDirty).mockReturnValue(true);
+
       render(<SimpleSearchActionsMenu />);
 
       await screen.findByRole('button', { name: 'Unsaved changes' });

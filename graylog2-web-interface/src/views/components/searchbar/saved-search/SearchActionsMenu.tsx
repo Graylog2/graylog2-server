@@ -18,13 +18,11 @@ import * as React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useState, useContext, useRef } from 'react';
 
-import { useStore } from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import { Icon, ShareButton } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
-import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
@@ -41,6 +39,8 @@ import {
   executePluggableSearchDuplicationHandler as executePluggableDuplicationHandler,
 } from 'views/logic/views/pluggableSaveViewFormHandler';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
+import useIsDirty from 'views/hooks/useIsDirty';
+import useView from 'views/hooks/useView';
 
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchesModal from './SavedSearchesModal';
@@ -57,7 +57,8 @@ const _isAllowedToEdit = (view: View, currentUser: User | undefined | null) => (
 
 const SearchActionsMenu = () => {
   const theme = useTheme();
-  const { view, dirty } = useStore(ViewStore);
+  const dirty = useIsDirty();
+  const view = useView();
   const viewLoaderFunc = useContext(ViewLoaderContext);
   const currentUser = useCurrentUser();
   const loadNewView = useContext(NewViewLoaderContext);
@@ -70,7 +71,7 @@ const SearchActionsMenu = () => {
   const [showShareSearch, setShowShareSearch] = useState(false);
   const [newTitle, setNewTitle] = useState((view && view.title) || '');
 
-  const loaded = (view && view.id);
+  const loaded = !!view.id;
   const savedSearchColor = dirty ? theme.colors.variant.warning : theme.colors.variant.info;
   const disableReset = !(dirty || loaded);
   const savedViewTitle = loaded ? 'Saved search' : 'Save search';
@@ -191,7 +192,7 @@ const SearchActionsMenu = () => {
           <MenuItem onSelect={_loadAsDashboard} icon="tachometer-alt">Export to dashboard</MenuItem>
         </IfPermitted>
         <MenuItem onSelect={toggleExport} icon="cloud-download-alt">Export</MenuItem>
-        <MenuItem disabled={disableReset} onSelect={() => loadNewView()} icon="eraser">
+        <MenuItem disabled={disableReset} onSelect={loadNewView} icon="eraser">
           Reset search
         </MenuItem>
         <MenuItem divider />
