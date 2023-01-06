@@ -24,7 +24,6 @@ import PropTypes from 'prop-types';
 import type { WidgetComponentProps, MessageResult } from 'views/types';
 import { useStore } from 'stores/connect';
 import { Messages } from 'views/Constants';
-import { ViewStore } from 'views/stores/ViewStore';
 import { SearchActions, SearchStore } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
@@ -37,6 +36,7 @@ import type { BackendMessage } from 'views/components/messagelist/Types';
 import type Widget from 'views/logic/widgets/Widget';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
 import { InputsActions } from 'stores/inputs/InputsStore';
+import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
 
@@ -118,7 +118,7 @@ const MessageList = ({
   pageSize,
   setLoadingState,
 }: Props) => {
-  const { activeQuery: activeQueryId } = useStore(ViewStore);
+  const activeQueryId = useCurrentQueryId();
   const [{ currentPage, pageErrors }, setPagination] = useState<Pagination>({
     pageErrors: [],
     currentPage: 1,

@@ -21,14 +21,12 @@ import { widgetDefinition } from 'views/logic/Widgets';
 import { useStore } from 'stores/connect';
 import type { SearchStoreState } from 'views/stores/SearchStore';
 import { SearchStore } from 'views/stores/SearchStore';
-import type { WidgetStoreState } from 'views/stores/WidgetStore';
-import { WidgetStore } from 'views/stores/WidgetStore';
 import type Widget from 'views/logic/widgets/Widget';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type QueryResult from 'views/logic/QueryResult';
-import type { ViewStoreState } from 'views/stores/ViewStore';
-import { ViewStore } from 'views/stores/ViewStore';
 import type SearchError from 'views/logic/SearchError';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import useAppSelector from 'stores/useAppSelector';
 
 const _getDataAndErrors = (widget: Widget, widgetMapping: WidgetMapping, results: QueryResult) => {
   const { searchTypes } = results;
@@ -61,13 +59,16 @@ type WidgetResults = {
   error: SearchError[],
 };
 
-const viewStoreMapper = ({ activeQuery }: ViewStoreState) => activeQuery;
+const useWidget = (widgetId: string) => useAppSelector((state) => {
+  const widgets = state?.view?.view?.state.toArray().flatMap((viewState) => viewState.widgets.toArray());
+
+  return widgets.find((widget) => widget.id === widgetId);
+});
 
 const useWidgetResults = (widgetId: string) => {
-  const currentQueryId = useStore(ViewStore, viewStoreMapper);
+  const currentQueryId = useActiveQueryId();
 
-  const widgetStoreMapper = useCallback((widgets: WidgetStoreState) => widgets.get(widgetId), [widgetId]);
-  const widget = useStore(WidgetStore, widgetStoreMapper);
+  const widget = useWidget(widgetId);
 
   const searchStoreMapper = useCallback(({ result, widgetMapping }: SearchStoreState) => {
     const currentQueryResults = result?.forId(currentQueryId);

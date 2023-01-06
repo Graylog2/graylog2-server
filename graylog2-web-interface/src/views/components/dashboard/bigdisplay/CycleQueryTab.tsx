@@ -18,7 +18,8 @@ import { useEffect } from 'react';
 
 import type View from 'views/logic/views/View';
 import type { QueryId } from 'views/logic/queries/Query';
-import { ViewActions } from 'views/stores/ViewStore';
+import useAppDispatch from 'stores/useAppDispatch';
+import { selectQuery } from 'views/logic/slices/viewSlice';
 
 type Props = {
   interval: number,
@@ -28,6 +29,8 @@ type Props = {
 };
 
 const CycleQueryTab = ({ interval, view, activeQuery, tabs }: Props) => {
+  const dispatch = useAppDispatch();
+
   useEffect(() => {
     const cycleInterval = setInterval(() => {
       if (!view || !activeQuery) {
@@ -41,7 +44,7 @@ const CycleQueryTab = ({ interval, view, activeQuery, tabs }: Props) => {
       const nextQueryId = view.search.queries.toIndexedSeq().get(nextQueryIndex).id;
 
       if (nextQueryId !== activeQuery) {
-        ViewActions.selectQuery(nextQueryId);
+        dispatch(selectQuery(nextQueryId));
       }
     }, interval * 1000);
 
@@ -49,6 +52,10 @@ const CycleQueryTab = ({ interval, view, activeQuery, tabs }: Props) => {
   }, [interval, view, activeQuery, tabs]);
 
   return null;
+};
+
+CycleQueryTab.defaultProps = {
+  tabs: undefined,
 };
 
 export default CycleQueryTab;
