@@ -26,13 +26,12 @@ import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type TFieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import ExportSettingsContextProvider from 'views/components/ExportSettingsContextProvider';
 import View from 'views/logic/views/View';
-import { useStore } from 'stores/connect';
-import { TitlesStore } from 'views/stores/TitlesStore';
 import defaultTitle from 'views/components/defaultTitle';
-import { WidgetStore } from 'views/stores/WidgetStore';
 import TitleTypes from 'views/stores/TitleTypes';
 import useViewType from 'views/hooks/useViewType';
 import type WidgetType from 'views/logic/widgets/Widget';
+import useWidget from 'views/hooks/useWidget';
+import useActiveViewState from 'views/hooks/useActiveViewState';
 
 import { Position } from './widgets/WidgetPropTypes';
 import Widget from './widgets/Widget';
@@ -47,8 +46,11 @@ type Props = {
   widgetId: string,
 };
 
-const useWidget = (widgetId: string) => useStore(WidgetStore, (state) => state.get(widgetId));
-const useTitle = (widget: WidgetType) => useStore(TitlesStore, (titles) => titles?.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget)) as string);
+const useTitle = (widget: WidgetType) => {
+  const activeViewState = useActiveViewState();
+
+  return activeViewState?.titles?.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget)) as string;
+};
 
 const WidgetComponent = ({
   editing,

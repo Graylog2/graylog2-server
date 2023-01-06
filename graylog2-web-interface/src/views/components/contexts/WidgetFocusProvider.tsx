@@ -21,11 +21,10 @@ import { useLocation, useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import URI from 'urijs';
 
-import { useStore } from 'stores/connect';
 import useQuery from 'routing/useQuery';
-import { WidgetStore } from 'views/stores/WidgetStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import useWidgets from 'views/hooks/useWidgets';
 
 import type { FocusContextState } from './WidgetFocusContext';
 import WidgetFocusContext from './WidgetFocusContext';
@@ -109,7 +108,7 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
   const query = pathname + search;
   const history = useHistory();
   const [focusedWidget, setFocusedWidget] = useState<FocusContextState | undefined>();
-  const widgets = useStore(WidgetStore);
+  const widgets = useWidgets();
   const activeQuery = useActiveQueryId();
   const params = useQuery();
   const focusUriParams = useMemo(() => ({

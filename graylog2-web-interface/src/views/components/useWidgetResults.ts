@@ -26,7 +26,7 @@ import type { WidgetMapping } from 'views/logic/views/types';
 import type QueryResult from 'views/logic/QueryResult';
 import type SearchError from 'views/logic/SearchError';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
-import useAppSelector from 'stores/useAppSelector';
+import useWidget from 'views/hooks/useWidget';
 
 const _getDataAndErrors = (widget: Widget, widgetMapping: WidgetMapping, results: QueryResult) => {
   const { searchTypes } = results;
@@ -58,12 +58,6 @@ type WidgetResults = {
   widgetData: unknown | undefined,
   error: SearchError[],
 };
-
-const useWidget = (widgetId: string) => useAppSelector((state) => {
-  const widgets = state?.view?.view?.state.toArray().flatMap((viewState) => viewState.widgets.toArray());
-
-  return widgets.find((widget) => widget.id === widgetId);
-});
 
 const useWidgetResults = (widgetId: string) => {
   const currentQueryId = useActiveQueryId();
