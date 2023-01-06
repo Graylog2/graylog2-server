@@ -8,6 +8,7 @@ import type { QueryId } from 'views/logic/queries/Query';
 import type ViewStateType from 'views/logic/views/ViewState';
 import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
 import type Query from 'views/logic/queries/Query';
+import FindNewActiveQueryId from 'views/logic/views/FindNewActiveQuery';
 
 export const viewSlice = createSlice({
   name: 'view',
@@ -47,6 +48,26 @@ export const viewSlice = createSlice({
         activeQuery: query.id,
       };
     },
+    removeQuery: (state: ViewState, action: PayloadAction<string>) => {
+      const queryId = action.payload;
+      const { view, activeQuery } = state ?? {};
+      const { search } = view;
+      const newQueries = search.queries.filter((query) => query.id !== queryId).toOrderedSet();
+      const newViewState = view.state.remove(queryId);
+      const newView = view.toBuilder()
+        .search(search.toBuilder().queries(newQueries).build())
+        .state(newViewState)
+        .build();
+
+      const indexedQueryIds = search.queries.map((query) => query.id).toList();
+      const newActiveQuery = FindNewActiveQueryId(indexedQueryIds, activeQuery);
+
+      return {
+        ...state,
+        view: newView,
+        activeQuery: newActiveQuery,
+      };
+    },
   },
 });
 
@@ -55,5 +76,5 @@ export const createQuery = () => async (dispatch: AppDispatch) => {
   dispatch(viewSlice.actions.addQuery([query, state]));
 };
 
-export const { load, selectQuery } = viewSlice.actions;
+export const { load, selectQuery, removeQuery } = viewSlice.actions;
 export default viewSlice.reducer;

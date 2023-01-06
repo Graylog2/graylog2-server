@@ -17,27 +17,23 @@
 import * as React from 'react';
 import { useCallback, useContext } from 'react';
 import type * as Immutable from 'immutable';
-import { List } from 'immutable';
 
-import { useStore } from 'stores/connect';
 import { TitlesActions } from 'views/stores/TitlesStore';
-import { QueriesActions } from 'views/stores/QueriesStore';
-import { ViewStatesActions, ViewStatesStore } from 'views/stores/ViewStatesStore';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
-import FindNewActiveQueryId from 'views/logic/views/FindNewActiveQuery';
 import ConfirmDeletingDashboardPage from 'views/logic/views/ConfirmDeletingDashboardPage';
 import useQueryIds from 'views/hooks/useQueryIds';
 import useQueryTitles from 'views/hooks/useQueryTitles';
 import useViewMetadata from 'views/hooks/useViewMetadata';
+import type { AppDispatch } from 'stores/useAppDispatch';
 import useAppDispatch from 'stores/useAppDispatch';
-import { selectQuery, createQuery } from 'views/logic/slices/viewSlice';
+import { selectQuery, createQuery, removeQuery } from 'views/logic/slices/viewSlice';
 import useWidgetIds from 'views/components/useWidgetIds';
 
 import QueryTabs from './QueryTabs';
 
 const onTitleChange = (_queryId: string, newTitle: string) => TitlesActions.set('tab', 'title', newTitle);
 
-const onCloseTab = async (dashboardId: string, queryId: string, activeQueryId: string, queries: Immutable.OrderedSet<string>, widgetIds: Immutable.Map<string, Immutable.List<string>>, setDashboardPage: (page: string) => void) => {
+const onCloseTab = async (dashboardId: string, queryId: string, activeQueryId: string, queries: Immutable.OrderedSet<string>, widgetIds: Immutable.Map<string, Immutable.List<string>>, dispatch: AppDispatch) => {
   if (queries.size === 1) {
     return Promise.resolve();
   }
@@ -45,14 +41,7 @@ const onCloseTab = async (dashboardId: string, queryId: string, activeQueryId: s
   const result = await ConfirmDeletingDashboardPage(dashboardId, activeQueryId, widgetIds);
 
   if (result === true) {
-    if (queryId === activeQueryId) {
-      const indexedQueryIds = queries.toIndexedSeq();
-      const newActiveQueryId = FindNewActiveQueryId(List(indexedQueryIds), activeQueryId);
-
-      setDashboardPage(newActiveQueryId);
-    }
-
-    return QueriesActions.remove(queryId).then(() => ViewStatesActions.remove(queryId));
+    dispatch(removeQuery(queryId));
   }
 
   return Promise.resolve();
@@ -75,8 +64,8 @@ const QueryBar = () => {
     }
   }, [dispatch, setDashboardPage]);
 
-  const onRemove = useCallback((queryId: string) => onCloseTab(dashboardId, queryId, activeQueryId, queries, widgetIds, setDashboardPage),
-    [activeQueryId, dashboardId, queries, widgetIds, setDashboardPage]);
+  const onRemove = useCallback((queryId: string) => onCloseTab(dashboardId, queryId, activeQueryId, queries, widgetIds, dispatch),
+    [dashboardId, activeQueryId, queries, widgetIds, dispatch]);
 
   return (
     <QueryTabs queries={queries}
