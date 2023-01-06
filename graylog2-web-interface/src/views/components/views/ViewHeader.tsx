@@ -27,7 +27,7 @@ import ViewPropertiesModal from 'views/components/dashboard/DashboardPropertiesM
 import onSaveView from 'views/logic/views/OnSaveViewAction';
 import View from 'views/logic/views/View';
 import Routes from 'routing/Routes';
-import viewTitle from 'views/logic/views/ViewTitle';
+import useViewTitle from 'views/hooks/useViewTitle';
 
 const links = {
   [View.Type.Dashboard]: {
@@ -78,8 +78,8 @@ const ViewHeader = () => {
   const [showMetadataEdit, setShowMetadataEdit] = useState<boolean>(false);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), [setShowMetadataEdit]);
 
-  const typeText = view.type.toLocaleLowerCase();
-  const title = viewTitle(view.title, view.type);
+  const typeText = view?.type?.toLocaleLowerCase();
+  const title = useViewTitle();
 
   return (
     <Row>

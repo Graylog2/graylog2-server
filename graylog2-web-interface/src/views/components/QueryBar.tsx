@@ -21,7 +21,6 @@ import { List } from 'immutable';
 
 import { useStore } from 'stores/connect';
 import { TitlesActions } from 'views/stores/TitlesStore';
-import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { ViewStatesActions, ViewStatesStore } from 'views/stores/ViewStatesStore';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
@@ -31,7 +30,7 @@ import useQueryIds from 'views/hooks/useQueryIds';
 import useQueryTitles from 'views/hooks/useQueryTitles';
 import useViewMetadata from 'views/hooks/useViewMetadata';
 import useAppDispatch from 'stores/useAppDispatch';
-import { selectQuery } from 'views/logic/slices/viewSlice';
+import { selectQuery, createQuery } from 'views/logic/slices/viewSlice';
 
 import QueryTabs from './QueryTabs';
 
@@ -70,15 +69,11 @@ const QueryBar = () => {
 
   const onSelectPage = useCallback((pageId) => {
     if (pageId === 'new') {
-      NewQueryActionHandler().then((newPage) => {
-        setDashboardPage(newPage.id);
-        dispatch(selectQuery(newPage.id));
-      });
+      dispatch(createQuery());
+    } else {
+      setDashboardPage(pageId);
+      dispatch(selectQuery(pageId));
     }
-
-    setDashboardPage(pageId);
-
-    dispatch(selectQuery(pageId));
   }, [dispatch, setDashboardPage]);
 
   const onRemove = useCallback((queryId: string) => onCloseTab(dashboardId, queryId, activeQueryId, queries, widgetIds, setDashboardPage),
