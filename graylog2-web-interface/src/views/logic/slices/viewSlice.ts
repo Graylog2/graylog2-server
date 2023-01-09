@@ -109,4 +109,5 @@ export const selectCurrentQuery = createSelector(
 );
 
 export const selectWidgets = createSelector(selectActiveViewState, (viewState) => viewState.widgets);
+export const selectWidget = (widgetId: string) => createSelector(selectWidgets, (widgets) => widgets.find((widget) => widget.id === widgetId));
 export const selectTitles = createSelector(selectActiveViewState, (viewState) => viewState.titles);

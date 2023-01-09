@@ -14,12 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useWidgets from 'views/hooks/useWidgets';
+import useAppSelector from 'stores/useAppSelector';
+import { selectWidget } from 'views/logic/slices/viewSlice';
 
-const useWidget = (widgetId: string) => {
-  const widgets = useWidgets();
-
-  return widgets.find((widget) => widget.id === widgetId);
-};
+const useWidget = (widgetId: string) => useAppSelector(selectWidget(widgetId));
 
 export default useWidget;

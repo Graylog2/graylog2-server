@@ -14,18 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
 import * as Immutable from 'immutable';
+import { createSelector } from '@reduxjs/toolkit';
 
 import { widgetDefinition } from 'views/logic/Widgets';
 import type Widget from 'views/logic/widgets/Widget';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type QueryResult from 'views/logic/QueryResult';
 import type SearchError from 'views/logic/SearchError';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
-import useWidget from 'views/hooks/useWidget';
 import useAppSelector from 'stores/useAppSelector';
 import { selectSearchExecutionResult } from 'views/logic/slices/searchExecutionSlice';
+import { selectActiveQuery, selectWidget } from 'views/logic/slices/viewSlice';
 
 const _getDataAndErrors = (widget: Widget, widgetMapping: WidgetMapping, results: QueryResult) => {
   const { searchTypes } = results;
@@ -58,23 +57,22 @@ type WidgetResults = {
   error: SearchError[],
 };
 
-const useWidgetResults = (widgetId: string) => {
-  const currentQueryId = useActiveQueryId();
-
-  const widget = useWidget(widgetId);
-
-  const searchExecutionResult = useAppSelector(selectSearchExecutionResult);
-
-  const widgetResults = useMemo(() => {
+const selectWidgetResults = (widgetId: string) => createSelector(
+  selectSearchExecutionResult,
+  selectActiveQuery,
+  selectWidget(widgetId),
+  (searchExecutionResult, currentQueryId, widget) => {
     const { result, widgetMapping } = searchExecutionResult ?? {};
     const currentQueryResults = result?.results?.[currentQueryId];
 
     return (currentQueryResults
       ? _getDataAndErrors(widget, widgetMapping, currentQueryResults)
-      : { widgetData: undefined, error: [] });
-  }, [currentQueryId, searchExecutionResult, widget]);
+      : { widgetData: undefined, error: [] }) as WidgetResults;
+  },
+);
 
-  return widgetResults as WidgetResults;
+const useWidgetResults = (widgetId: string) => {
+  return useAppSelector(selectWidgetResults(widgetId));
 };
 
 export default useWidgetResults;
