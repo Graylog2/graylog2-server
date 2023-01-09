@@ -306,9 +306,9 @@ export interface ViewState {
 
 export interface SearchExecution {
   executionState: SearchExecutionState;
-  globalOverride: GlobalOverride;
   result: SearchResult;
   isLoading: boolean;
+  widgetsToSearch: Array<string>,
 }
 
 export interface SearchMetadataState {

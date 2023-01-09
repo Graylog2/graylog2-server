@@ -56,6 +56,7 @@ import useView from 'views/hooks/useView';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import { parseSearch } from 'views/logic/slices/searchMetadataSlice';
 import useAppDispatch from 'stores/useAppDispatch';
+import { execute } from 'views/logic/slices/searchExecutionSlice';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -96,14 +97,6 @@ const ConnectedSidebar = (props: Omit<React.ComponentProps<typeof Sidebar>, 'res
   return <Sidebar results={results} {...props} />;
 };
 
-const _refreshSearch = (executionState: SearchExecutionState, dispatch: AppDispatch) => {
-  const { view } = ViewStore.getInitialState();
-
-  return dispatch(parseSearch(view.search)).then(() => {
-    return SearchActions.execute(executionState).then(() => {});
-  });
-};
-
 const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode }) => {
   const view = useView();
   const { searchesClusterConfig } = useStore(SearchConfigStore) ?? {};
@@ -140,7 +133,7 @@ const useRefreshSearchOn = (_actions: Array<RefluxActions<any>>, refresh: () => 
 
 const Search = () => {
   const dispatch = useAppDispatch();
-  const refreshSearch = useCallback(() => _refreshSearch(SearchExecutionStateStore.getInitialState(), dispatch), [dispatch]);
+  const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
   const { sidebar: { isShown: showSidebar } } = useSearchPageLayout();
 
   useRefreshSearchOn([SearchActions.refresh, ViewActions.search], refreshSearch);
