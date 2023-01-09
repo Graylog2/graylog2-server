@@ -16,23 +16,29 @@
  */
 package org.graylog.plugins.views.search.engine.suggestions;
 
+import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
+
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Predicate;
 
 public enum SuggestionFieldType {
-    TEXTUAL("string"),
-    NUMERICAL("long", "int", "short", "byte", "double", "float"),
-    OTHER("date", "binary", "geo-point", "ip");
+    TEXTUAL(props -> props.contains(FieldTypeMapper.PROP_FULL_TEXT_SEARCH)),
+    NUMERICAL(props -> props.contains(FieldTypeMapper.PROP_NUMERIC)),
+    OTHER(props -> false);
 
-    private final HashSet<String> fieldTypes;
+    private final Predicate<Set<String>> matchesFieldProperty;
 
-    SuggestionFieldType(String... fieldTypes) {
-        this.fieldTypes = new HashSet<>(Arrays.asList(fieldTypes));
+    SuggestionFieldType(Predicate<Set<String>> matchesFieldProperty) {
+        this.matchesFieldProperty = matchesFieldProperty;
     }
 
-    public static SuggestionFieldType fromFieldType(String fieldType) {
+    /**
+     * @see FieldTypeMapper
+     */
+    public static SuggestionFieldType fromFieldProperties(Set<String> fieldProperties) {
         return Arrays.stream(values())
-                .filter(it -> it.fieldTypes.contains(fieldType))
+                .filter(it -> it.matchesFieldProperty.test(fieldProperties))
                 .findFirst()
                 .orElse(OTHER);
     }

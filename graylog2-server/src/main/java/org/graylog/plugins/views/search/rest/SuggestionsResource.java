@@ -122,9 +122,9 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
     private SuggestionFieldType getFieldType(Set<String> streams, TimeRange timerange, final String fieldName) {
         final Set<MappedFieldTypeDTO> fieldTypes = mappedFieldTypesService.fieldTypesByStreamIds(streams, timerange);
         return fieldTypes.stream().filter(f -> f.name().equals(fieldName))
-                .map(field -> field.type().type())
+                .map(field -> field.type().properties())
                 .findFirst()
-                .map(SuggestionFieldType::fromFieldType)
+                .map(SuggestionFieldType::fromFieldProperties)
                 .orElse(SuggestionFieldType.OTHER);
     }
 }

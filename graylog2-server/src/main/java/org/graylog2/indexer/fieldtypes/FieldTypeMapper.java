@@ -34,8 +34,8 @@ import static org.graylog2.indexer.fieldtypes.FieldTypes.Type.createType;
 @Singleton
 public class FieldTypeMapper {
     private static final String PROP_ENUMERABLE = "enumerable";
-    private static final String PROP_FULL_TEXT_SEARCH = "full-text-search";
-    private static final String PROP_NUMERIC = "numeric";
+    public static final String PROP_FULL_TEXT_SEARCH = "full-text-search";
+    public static final String PROP_NUMERIC = "numeric";
 
     private static final FieldTypes.Type STRING_TYPE = createType("string", of(PROP_ENUMERABLE));
     private static final FieldTypes.Type STRING_FTS_TYPE = createType("string", of(PROP_FULL_TEXT_SEARCH));
