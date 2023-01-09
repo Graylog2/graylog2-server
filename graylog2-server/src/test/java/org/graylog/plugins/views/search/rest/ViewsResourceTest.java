@@ -305,44 +305,6 @@ public class ViewsResourceTest {
                 .hasMessageContaining("Widget positions don't correspond to widgets, missing widget positions [W-123]; widget IDs: [W-123]; widget positions: [W-111]");
     }
 
-    private void prepareUpdate(final ViewDTO.Type viewType) {
-        this.viewsResource = spy(new ViewsTestResource(viewService, clusterEventBus, userService, searchDomain, referencedSearchFiltersHelper));
-
-        ViewDTO originalView = mock(ViewDTO.class);
-        final ViewDTO.Builder originalViewBuilder = mockView(viewType, originalView);
-        originalViewBuilder.id(VIEW_ID);
-        when(originalView.id()).thenReturn(VIEW_ID);
-        doReturn(originalView).when(viewsResource).resolveView(VIEW_ID);
-
-        final ViewDTO.Builder builder = mockView(viewType, view);
-        builder.id(VIEW_ID);
-        when(view.id()).thenReturn(VIEW_ID);
-        mockUser();
-    }
-
-    private UserContext mockUser() {
-        final UserImpl testUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
-                mock(ClusterConfigService.class), ImmutableMap.of("username", "testuser"));
-
-        final UserContext userContext = mock(UserContext.class);
-        when(userContext.getUser()).thenReturn(testUser);
-        when(searchUser.username()).thenReturn("testuser");
-        when(searchUser.canUpdateView(any())).thenReturn(true);
-        return userContext;
-    }
-
-    private ViewDTO.Builder mockView(final ViewDTO.Type type, final ViewDTO view) {
-        final ViewDTO.Builder builder = mock(ViewDTO.Builder.class);
-
-        when(view.toBuilder()).thenReturn(builder);
-        when(view.type()).thenReturn(type);
-        when(view.searchId()).thenReturn(SEARCH_ID);
-        when(builder.owner(any())).thenReturn(builder);
-        when(builder.id(any())).thenReturn(builder);
-        when(builder.build()).thenReturn(view);
-        return builder;
-    }
-
     @Test
     public void shouldNotCreateADashboardWithoutPermission() {
         final ViewsResource viewsResource = createViewsResource(
@@ -465,7 +427,8 @@ public class ViewsResourceTest {
 
 
     private UserContext mockUserContext() {
-        final UserImpl testUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()), ImmutableMap.of("username", "testuser"));
+        final UserImpl testUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
+                mock(ClusterConfigService.class), ImmutableMap.of("username", "testuser"));
         final UserContext userContext = mock(UserContext.class);
         when(userContext.getUser()).thenReturn(testUser);
         return userContext;
