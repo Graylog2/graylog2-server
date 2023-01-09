@@ -144,6 +144,14 @@ class EmailNotificationForm extends React.Component {
                value={config.subject || ''}
                onChange={this.handleChange}
                required />
+        <Input id="notification-replyto"
+               name="reply_to"
+               label="Reply-To"
+               type="text"
+               bsStyle={validation.errors.replyto ? 'error' : null}
+               help={lodash.get(validation, 'errors.reply_to[0]', 'The Reply-To email address that should be used for reply.')}
+               value={config.reply_to || ''}
+               onChange={this.handleChange} />
         <HideOnCloud>
           <Input id="notification-sender"
                  name="sender"
@@ -179,14 +187,6 @@ class EmailNotificationForm extends React.Component {
             {lodash.get(validation, 'errors.recipients[0]', 'Add email addresses that will receive this Notification.')}
           </HelpBlock>
         </FormGroup>
-        <Input id="notification-replyto"
-               name="reply_to"
-               label="Reply-To"
-               type="text"
-               bsStyle={validation.errors.replyto ? 'error' : null}
-               help={lodash.get(validation, 'errors.reply_to[0]', 'The Reply-To email address that should be used for reply.')}
-               value={config.reply_to || ''}
-               onChange={this.handleChange} />
         <Input id="notification-time-zone"
                help="Time zone used for timestamps in the email body."
                label={<>Time zone for date/time values <small className="text-muted">(Optional)</small></>}>

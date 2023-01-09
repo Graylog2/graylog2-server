@@ -48,6 +48,10 @@ class EmailNotificationSummary extends React.Component {
             <td>{notification.config.subject}</td>
           </tr>
           <tr>
+            <td>Reply-To</td>
+            <td>{notification.config.reply_to}</td>
+          </tr>
+          <tr>
             <td>User recipients</td>
             <td>{notification.config.user_recipients.join(', ') || 'No users will receive this notification.'}</td>
           </tr>
