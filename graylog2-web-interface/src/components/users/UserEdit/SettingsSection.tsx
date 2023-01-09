@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useEffect } from 'react';
 import { Formik, Form } from 'formik';
 import type { $PropertyType } from 'utility-types';
 
@@ -28,10 +27,7 @@ import TimezoneFormGroup from '../UserCreate/TimezoneFormGroup';
 import TimeoutFormGroup from '../UserCreate/TimeoutFormGroup';
 import ServiceAccountFormGroup from '../UserCreate/ServiceAccountFormGroup';
 import StartpageFormGroup from '../StartpageFormGroup';
-import type { UserConfigType } from '../../../stores/configurations/ConfigurationsStore';
-import { ConfigurationsActions } from '../../../stores/configurations/ConfigurationsStore';
-
-const USER_CONFIG = 'org.graylog2.users.UserConfiguration';
+import useIsGlobalTimeoutEnabled from '../../../hooks/useIsGlobalTimeoutEnabled';
 
 type Props = {
   user: User,
@@ -49,15 +45,7 @@ const SettingsSection = ({
   },
   onSubmit,
 }: Props) => {
-  const [isGlobalTimeoutEnabled, setIsGlobalTimeoutEnabled] = useState<boolean>(false);
-
-  useEffect(() => {
-    ConfigurationsActions.list(USER_CONFIG).then((data: UserConfigType) => {
-      setIsGlobalTimeoutEnabled(data.enable_global_session_timeout);
-    });
-
-    return () => {};
-  }, []);
+  const isGlobalTimeoutEnabled = useIsGlobalTimeoutEnabled();
 
   return (
     <SectionComponent title="Settings">
