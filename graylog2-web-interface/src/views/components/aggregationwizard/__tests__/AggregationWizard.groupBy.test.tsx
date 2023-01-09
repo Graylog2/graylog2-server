@@ -22,6 +22,7 @@ import userEvent from '@testing-library/user-event';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
+import type { Map } from 'immutable';
 
 import { asMock } from 'helpers/mocking';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -33,6 +34,7 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import dataTable from 'views/components/datatable/bindings';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 
 import AggregationWizard from '../AggregationWizard';
 
@@ -77,8 +79,15 @@ const submitWidgetConfigForm = async () => {
 };
 
 describe('AggregationWizard', () => {
-  const renderSUT = (props = {}) => render(
-    <FieldTypesContext.Provider value={fieldTypes}>
+  type Props = Partial<React.ComponentProps<typeof AggregationWizard>> & {
+    fieldTypesList?: {
+      all: FieldTypeMappingsList
+      queryFields: Map<string, FieldTypeMappingsList>,
+    }
+  }
+
+  const renderSUT = ({ fieldTypesList = fieldTypes, ...props }: Props = {}) => render(
+    <FieldTypesContext.Provider value={fieldTypesList}>
       <AggregationWizard config={widgetConfig}
                          editing
                          id="widget-id"
@@ -126,6 +135,46 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
 
     expect(onChange).toHaveBeenCalledWith(updatedConfig);
+  });
+
+  it('should update config, even when field only exists for current query', async () => {
+    const onChange = jest.fn();
+    const queryFieldTypeMapping = new FieldTypeMapping('status_code', fieldType);
+    const queryFields = Immutable.List([queryFieldTypeMapping]);
+    renderSUT({ onChange, fieldTypesList: { all: fields, queryFields: Immutable.Map({ queryId: queryFields }) } });
+
+    await addElement('Grouping');
+    await selectField('status_code');
+    await submitWidgetConfigForm();
+
+    const pivot = Pivot.create('status_code', 'values');
+    const updatedConfig = widgetConfig
+      .toBuilder()
+      .rowLimit(15)
+      .rowPivots([pivot])
+      .build();
+
+    await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+
+    expect(onChange).toHaveBeenCalledWith(updatedConfig);
+  });
+
+  it('should not throw an error when field in config no longer exists in field types list.', async () => {
+    const onChange = jest.fn();
+    const pivot = Pivot.create('status_code', 'values');
+    const initialConfig = widgetConfig
+      .toBuilder()
+      .rowLimit(15)
+      .rowPivots([pivot])
+      .build();
+
+    renderSUT({
+      onChange,
+      fieldTypesList: { all: Immutable.List([]), queryFields: Immutable.Map({ queryId: Immutable.List([]) }) },
+      config: initialConfig,
+    });
+
+    await screen.findByRole('button', { name: /update preview/i });
   });
 
   it('should add multiple pivots to widget', async () => {
