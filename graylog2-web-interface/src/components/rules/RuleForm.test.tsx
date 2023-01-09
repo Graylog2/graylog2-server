@@ -39,7 +39,7 @@ describe('RuleForm', () => {
 
     const handleDescription = jest.fn();
 
-    const { getByLabelText, getByTitle } = render(
+    const { getByLabelText, getByRole } = render(
       <PipelineRulesContext.Provider value={{
         description: '',
         handleDescription: handleDescription,
@@ -59,7 +59,7 @@ describe('RuleForm', () => {
     expect(descriptionInput).toHaveValue('');
 
     userEvent.paste(descriptionInput, ruleToUpdate.description);
-    const createRuleButton = getByTitle('Update rule & close');
+    const createRuleButton = getByRole('button', { name: 'Update rule & close' });
     userEvent.click(createRuleButton);
 
     expect(handleDescription).toHaveBeenCalledWith(ruleToUpdate.description);
