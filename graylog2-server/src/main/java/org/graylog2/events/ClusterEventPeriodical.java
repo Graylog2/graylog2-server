@@ -42,7 +42,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-
 import java.util.Collections;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -176,7 +175,7 @@ public class ClusterEventPeriodical extends Periodical {
         }
 
         final String className = AutoValueUtils.getCanonicalName(event.getClass());
-        final ClusterEvent clusterEvent = ClusterEvent.create(nodeId.toString(), className, Collections.singleton(nodeId.toString()), event);
+        final ClusterEvent clusterEvent = ClusterEvent.create(nodeId.getNodeId(), className, Collections.singleton(nodeId.getNodeId()), event);
 
         try {
             final String id = dbCollection.save(clusterEvent, WriteConcern.JOURNALED).getSavedId();
@@ -193,14 +192,14 @@ public class ClusterEventPeriodical extends Periodical {
     private DBCursor<ClusterEvent> eventCursor(NodeId nodeId) {
         // Resorting to ugly MongoDB Java Client because of https://github.com/devbliss/mongojack/issues/88
         final BasicDBList consumersList = new BasicDBList();
-        consumersList.add(nodeId.toString());
+        consumersList.add(nodeId.getNodeId());
         final DBObject query = new BasicDBObject("consumers", new BasicDBObject("$nin", consumersList));
 
         return dbCollection.find(query).sort(DBSort.asc("timestamp"));
     }
 
     private void updateConsumers(final String eventId, final NodeId nodeId) {
-        dbCollection.updateById(eventId, DBUpdate.addToSet("consumers", nodeId.toString()));
+        dbCollection.updateById(eventId, DBUpdate.addToSet("consumers", nodeId.getNodeId()));
     }
 
     private Object extractPayload(Object payload, String eventClass) {

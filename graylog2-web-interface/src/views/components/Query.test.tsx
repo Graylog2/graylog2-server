@@ -19,10 +19,9 @@ import { render, screen } from 'wrappedTestingLibrary';
 import Immutable, { Map as MockMap } from 'immutable';
 
 import { MockStore, asMock } from 'helpers/mocking';
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
-import type { ViewType } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import { WidgetStore } from 'views/stores/WidgetStore';
+import useViewType from 'views/hooks/useViewType';
 
 import Query from './Query';
 
@@ -35,21 +34,22 @@ jest.mock('views/stores/WidgetStore', () => ({
   WidgetStore: MockStore(['getInitialState', jest.fn(() => MockMap())]),
 }));
 
+jest.mock('views/hooks/useViewType');
+
 describe('Query', () => {
-  const SimpleQuery = ({ type }: { type: ViewType }) => (
-    <ViewTypeContext.Provider value={type}>
-      <Query />
-    </ViewTypeContext.Provider>
-  );
+  beforeEach(() => {
+    asMock(useViewType).mockReturnValue(View.Type.Search);
+  });
 
   it('renders dashboard widget creation explanation on the dashboard page, if no widget is defined', async () => {
-    render(<SimpleQuery type={View.Type.Dashboard} />);
+    asMock(useViewType).mockReturnValue(View.Type.Dashboard);
+    render(<Query />);
 
     await screen.findByText('This dashboard has no widgets yet');
   });
 
   it('renders search widget creation explanation on the search page, if no widget is defined', async () => {
-    render(<SimpleQuery type={View.Type.Search} />);
+    render(<Query />);
 
     await screen.findByText('There are no widgets defined to visualize the search result');
   });
@@ -66,7 +66,7 @@ describe('Query', () => {
     const widgets = Immutable.Map({ widget1, widget2 });
     asMock(WidgetStore.getInitialState).mockReturnValue(widgets);
 
-    render(<SimpleQuery type={View.Type.Search} />);
+    render(<Query />);
 
     await screen.findByText('This is the widget grid');
   });

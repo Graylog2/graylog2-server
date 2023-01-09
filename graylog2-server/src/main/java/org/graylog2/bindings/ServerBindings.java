@@ -33,6 +33,7 @@ import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.bindings.providers.DefaultStreamProvider;
 import org.graylog2.bindings.providers.HtmlSafeJmteEngineProvider;
+import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
@@ -146,6 +147,7 @@ public class ServerBindings extends Graylog2Module {
 
     private void bindProviders() {
         bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
+        bind(freemarker.template.Configuration.class).toProvider(SecureFreemarkerConfigProvider.class);
     }
 
     private void bindFactoryModules() {

@@ -18,7 +18,6 @@ import * as React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import selectEvent from 'react-select-event';
-import type { Optional } from 'utility-types';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -34,7 +33,6 @@ import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import {
   messagesWidget,
   stateWithOneWidget, viewWithMultipleWidgets,
@@ -43,6 +41,7 @@ import {
 } from 'views/components/export/Fixtures';
 import { createWidget } from 'views/logic/WidgetTestHelpers';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import useViewType from 'views/hooks/useViewType';
 
 import type { Props as ExportModalProps } from './ExportModal';
 import ExportModal from './ExportModal';
@@ -60,6 +59,8 @@ jest.mock('views/stores/SearchExecutionStateStore', () => ({
     listen: () => jest.fn(),
   },
 }));
+
+jest.mock('views/hooks/useViewType');
 
 const pluginExports: PluginRegistration = {
   exports: {
@@ -99,19 +100,18 @@ describe('ExportModal', () => {
     PluginStore.unregister(pluginExports);
   });
 
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks();
+    asMock(useViewType).mockReturnValue(View.Type.Search);
   });
 
   type SimpleExportModalProps = {
     viewType?: ViewType,
-  } & Optional<ExportModalProps>;
+  } & Partial<ExportModalProps>;
 
   const SimpleExportModal = ({ viewType = View.Type.Search, ...props }: SimpleExportModalProps) => (
     <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
-      <ViewTypeContext.Provider value={viewType}>
-        <ExportModal view={viewWithoutWidget(viewType)} {...props as ExportModalProps} />
-      </ViewTypeContext.Provider>
+      <ExportModal view={viewWithoutWidget(viewType)} {...props as ExportModalProps} />
     </FieldTypesContext.Provider>
   );
 
@@ -245,7 +245,7 @@ describe('ExportModal', () => {
   });
 
   describe('on search page', () => {
-    const SearchExportModal = (props) => (
+    const SearchExportModal = (props: Partial<ExportModalProps>) => (
       <SimpleExportModal viewType={View.Type.Search} {...props} />
     );
 
@@ -349,6 +349,10 @@ describe('ExportModal', () => {
   });
 
   describe('on dashboard', () => {
+    beforeEach(() => {
+      asMock(useViewType).mockReturnValue(View.Type.Dashboard);
+    });
+
     const DashboardExportModal = (props) => (
       <SimpleExportModal viewType={View.Type.Dashboard} view={viewWithoutWidget(View.Type.Dashboard)} {...props} />
     );
