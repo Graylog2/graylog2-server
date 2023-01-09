@@ -35,6 +35,7 @@ export type NotificationMessage = {
 
 type NotificationsStoreType = {
   notifications: Array<NotificationType>,
+  total: number,
   messages:{
     [key: string]: NotificationMessage,
   },
@@ -64,6 +65,7 @@ export const NotificationsStore = singletonStore(
   () => Reflux.createStore<NotificationsStoreType>({
     listenables: [NotificationsActions],
     notifications: undefined,
+    total: undefined,
     message: {},
     promises: {},
 
@@ -73,12 +75,14 @@ export const NotificationsStore = singletonStore(
     getInitialState() {
       return {
         notifications: this.notifications,
+        total: this.total,
         messages: this.messages,
       };
     },
     propagateChanges() {
       this.trigger({
         notifications: this.notifications,
+        total: this.total,
         messages: this.messages,
       });
     },
@@ -94,6 +98,7 @@ export const NotificationsStore = singletonStore(
     },
     listCompleted(response) {
       this.notifications = response.notifications;
+      this.total = response.total;
       this.propagateChanges();
     },
     delete(type: string) {

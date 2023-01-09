@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Support filter queries when listing authentication backends. We were ignoring them."
+
+issues = ["13023"]
+pulls = ["14270"]

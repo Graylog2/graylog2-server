@@ -30,22 +30,6 @@ import StreamsContext from 'contexts/StreamsContext';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import { SearchMetadataActions, SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 
-jest.mock('views/stores/DashboardsStore', () => ({
-  DashboardsActions: {
-    search: jest.fn(() => Promise.resolve()),
-  },
-  DashboardsStore: MockStore(
-    ['getInitialState', () => ({
-      listen: [],
-      pagination: {
-        total: 100,
-        page: 1,
-        perPage: 20,
-      },
-    })],
-  ),
-}));
-
 jest.mock('stores/users/CurrentUserStore', () => ({
   CurrentUserStore: MockStore(
     'get',
@@ -65,6 +49,13 @@ jest.mock('views/stores/SearchMetadataStore', () => ({
     parseSearch: jest.fn(),
   },
   SearchMetadataStore: MockStore(),
+}));
+
+jest.mock('views/components/dashboard/hooks/useDashboards', () => () => ({
+  data: {
+    list: [],
+    pagination: { total: 0 },
+  },
 }));
 
 declare global {

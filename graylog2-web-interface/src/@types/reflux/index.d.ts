@@ -35,4 +35,5 @@ declare module 'reflux' {
   export function createActions<R>(definitions: ActionsDefinition): RefluxActions<R>;
   export function createActions<R>(definitions: R): RefluxActions<{ [key in ElementType<typeof definitions>]: () => Promise<unknown> }>;
   export function connect(store: Store, key?: string): void;
+  export function setPromiseFactory(...factory: ConstructorParameters<typeof Promise>): void;
 }

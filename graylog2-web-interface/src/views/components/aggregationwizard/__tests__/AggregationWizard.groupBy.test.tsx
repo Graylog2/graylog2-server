@@ -23,7 +23,7 @@ import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
-import { MockStore } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import DataTable from 'views/components/datatable/DataTable';
 import FieldType, { FieldTypes } from 'views/logic/fieldtypes/FieldType';
@@ -32,14 +32,13 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import dataTable from 'views/components/datatable/bindings';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import AggregationWizard from '../AggregationWizard';
 
 const extendedTimeout = applyTimeoutMultiplier(15000);
 
-jest.mock('views/stores/ViewMetadataStore', () => ({
-  ViewMetadataStore: MockStore(['getInitialState', () => ({ activeQuery: 'queryId' })]),
-}));
+jest.mock('views/hooks/useActiveQueryId');
 
 const widgetConfig = AggregationWidgetConfig
   .builder()
@@ -97,6 +96,10 @@ describe('AggregationWizard', () => {
   beforeAll(() => PluginStore.register(plugin));
 
   afterAll(() => PluginStore.unregister(plugin));
+
+  beforeEach(() => {
+    asMock(useActiveQueryId).mockReturnValue('queryId');
+  });
 
   it('should require group by function when adding a group by element', async () => {
     renderSUT();

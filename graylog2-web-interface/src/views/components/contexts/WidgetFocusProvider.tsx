@@ -25,7 +25,7 @@ import { useStore } from 'stores/connect';
 import useQuery from 'routing/useQuery';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { SearchActions } from 'views/stores/SearchStore';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import type { FocusContextState } from './WidgetFocusContext';
 import WidgetFocusContext from './WidgetFocusContext';
@@ -110,7 +110,7 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
   const history = useHistory();
   const [focusedWidget, setFocusedWidget] = useState<FocusContextState | undefined>();
   const widgets = useStore(WidgetStore);
-  const { activeQuery } = useStore(ViewMetadataStore);
+  const activeQuery = useActiveQueryId();
   const params = useQuery();
   const focusUriParams = useMemo(() => ({
     editing: params.editing === 'true',
