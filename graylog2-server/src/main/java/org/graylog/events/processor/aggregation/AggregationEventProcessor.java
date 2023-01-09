@@ -219,12 +219,9 @@ public class AggregationEventProcessor implements EventProcessor {
                 eventStreamService.buildEventSourceStreams(getStreams(parameters), ImmutableSet.copyOf(msg.getStreamIds()))
                         .forEach(event::addSourceStream);
 
-                AbsoluteRange timeRange = AbsoluteRange.builder()
-                        .from(parameters.timerange().getFrom())
-                        .to(parameters.timerange().getTo())
-                        .build();
                 event.setReplayInfo(EventReplayInfo.builder()
-                        .timeRange(timeRange)
+                        .timerangeStart(parameters.timerange().getFrom())
+                        .timerangeEnd(parameters.timerange().getTo())
                         .query(config.query())
                         .streams(event.getSourceStreams())
                         .build());
@@ -295,12 +292,9 @@ public class AggregationEventProcessor implements EventProcessor {
             event.setTimerangeStart(keyResult.timestamp().map(t -> t.minus(config.searchWithinMs())).orElse(parameters.timerange().getFrom()));
             event.setTimerangeEnd(keyResult.timestamp().orElse(parameters.timerange().getTo()));
 
-            AbsoluteRange timeRange = AbsoluteRange.builder()
-                    .from(parameters.timerange().getFrom())
-                    .to(parameters.timerange().getTo())
-                    .build();
             event.setReplayInfo(EventReplayInfo.builder()
-                    .timeRange(timeRange)
+                    .timerangeStart(event.getTimerangeStart())
+                    .timerangeEnd(event.getTimerangeEnd())
                     .query(config.query())
                     .streams(sourceStreams)
                     .build());

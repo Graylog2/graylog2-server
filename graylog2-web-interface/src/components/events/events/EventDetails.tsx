@@ -25,6 +25,7 @@ import type { Event, EventDefinitionContext } from 'components/events/events/typ
 import ReplaySearchButton from 'views/components/widgets/ReplaySearchButton';
 import EventFields from 'components/events/events/EventFields';
 import EventDefinitionLink from 'components/event-definitions/event-definitions/EventDefinitionLink';
+import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 
 type Props = {
   event: Event,
@@ -33,6 +34,7 @@ type Props = {
 
 const EventDetails = ({ event, eventDefinitionContext }: Props) => {
   const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
+  const timeRange: AbsoluteTimeRange = event.replay_info && { type: 'absolute', from: `${event.replay_info.timerange_start}`, to: `${event.replay_info.timerange_end}` };
 
   const plugin = useMemo(() => {
     if (event.event_definition_type === undefined) {
@@ -67,7 +69,7 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
               <dt>Actions</dt>
               <dd>
                 <ReplaySearchButton queryString={event.replay_info.query}
-                                    timerange={event.replay_info.time_range}
+                                    timerange={timeRange}
                                     streams={event.replay_info.streams}>
                   Replay search
                 </ReplaySearchButton>

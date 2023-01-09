@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 
 export type EventReplayInfo = {
-  time_range: AbsoluteTimeRange,
+  timerange_start: string,
+  timerange_end: string,
   query: string,
   streams: string[],
 };
