@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.prometheus.client.dropwizard.samplebuilder.MapperConfig;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,8 +43,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PrometheusMappingConfigLoaderTest {
-    @Mock
-    NodeId nodeId;
+    NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
     @Mock
     MessageInputFactory messageInputFactory;
@@ -63,7 +63,6 @@ class PrometheusMappingConfigLoaderTest {
 
     @Test
     void loadBytes() throws Exception {
-        when(nodeId.toString()).thenReturn("abc-123");
 
         final Map<String, ImmutableList<Serializable>> config = Collections.singletonMap("metric_mappings", ImmutableList.of(
                 ImmutableMap.of(
@@ -89,7 +88,7 @@ class PrometheusMappingConfigLoaderTest {
                         "foo.*.bar",
                         "gl_test1",
                         ImmutableMap.of(
-                                "node", "abc-123",
+                                "node", "5ca1ab1e-0000-4000-a000-000000000000",
                                 "another", "label",
                                 "first", "${0}"
                         )
@@ -98,7 +97,7 @@ class PrometheusMappingConfigLoaderTest {
                         "hello.world",
                         "gl_test2",
                         ImmutableMap.of(
-                                "node", "abc-123",
+                                "node", "5ca1ab1e-0000-4000-a000-000000000000",
                                 "another", "label"
                         )
                 ),
@@ -106,7 +105,7 @@ class PrometheusMappingConfigLoaderTest {
                         "one.*.three",
                         "gl_test3",
                         ImmutableMap.of(
-                                "node", "abc-123",
+                                "node", "5ca1ab1e-0000-4000-a000-000000000000",
                                 "two", "${0}"
                         )
                 )
@@ -115,7 +114,6 @@ class PrometheusMappingConfigLoaderTest {
 
     @Test
     void defaultType() throws Exception {
-        when(nodeId.toString()).thenReturn("abc-123");
 
         final Map<String, ImmutableList<Serializable>> config = Collections.singletonMap("metric_mappings",
                 ImmutableList.of(
@@ -125,13 +123,11 @@ class PrometheusMappingConfigLoaderTest {
                 .containsExactlyInAnyOrder(new MapperConfig(
                         "foo.bar",
                         "gl_test1",
-                        ImmutableMap.of("node", "abc-123")));
+                        ImmutableMap.of("node", "5ca1ab1e-0000-4000-a000-000000000000")));
     }
 
     @Test
     void metricMatchType() throws Exception {
-        when(nodeId.toString()).thenReturn("abc-123");
-
         final Map<String, ImmutableList<Serializable>> config = Collections.singletonMap("metric_mappings",
                 ImmutableList.of(
                         ImmutableMap.of(
@@ -144,12 +140,11 @@ class PrometheusMappingConfigLoaderTest {
                 .containsExactlyInAnyOrder(new MapperConfig(
                         "foo.bar",
                         "gl_test1",
-                        ImmutableMap.of("node", "abc-123")));
+                        ImmutableMap.of("node", "5ca1ab1e-0000-4000-a000-000000000000")));
     }
 
     @Test
     void inputMetricType() throws Exception {
-        when(nodeId.toString()).thenReturn("abc-123");
         when(messageInputFactory.getAvailableInputs()).thenReturn(
                 ImmutableMap.of("test.input", mock(InputDescription.class)));
 
@@ -166,7 +161,7 @@ class PrometheusMappingConfigLoaderTest {
                         "test.input.*.foo.bar",
                         "gl_test1",
                         ImmutableMap.of(
-                                "node", "abc-123",
+                                "node", "5ca1ab1e-0000-4000-a000-000000000000",
                                 "input_id", "${0}",
                                 "input_type", "test.input"
                         )));
