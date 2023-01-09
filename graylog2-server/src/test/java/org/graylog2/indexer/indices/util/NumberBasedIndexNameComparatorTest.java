@@ -19,7 +19,7 @@ package org.graylog2.indexer.indices.util;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class NumberBasedIndexNameComparatorTest {
 
@@ -31,32 +31,40 @@ class NumberBasedIndexNameComparatorTest {
     }
 
     @Test
-    void comparesDescByNumberAfterLastSeparatorOccurrence() {
-        assertEquals(-1, comparator.compare("lalala_5", "lalala_3"));
-        assertEquals(1, comparator.compare("lalala_3", "lalala_5"));
+    void indexPrefixIsMoreImportantThanNumberWhileSorting() {
+        assertTrue(comparator.compare("abc_5", "bcd_3") < 0);
+        assertTrue(comparator.compare("abc", "bcd_3") < 0);
+        assertTrue(comparator.compare("zzz_1", "aaa") > 0);
+        assertTrue(comparator.compare("zzz", "aaa") > 0);
+    }
 
-        assertEquals(-1, comparator.compare("lalala_1_5", "lalala_3"));
-        assertEquals(-1, comparator.compare("lalala_1_5", "lalala_0"));
+    @Test
+    void comparesDescByNumberAfterLastSeparatorOccurrence() {
+        assertTrue(comparator.compare("lalala_5", "lalala_3") < 0);
+        assertTrue(comparator.compare("lalala_3", "lalala_5") > 0);
+
+        assertTrue(comparator.compare("lalala_1_5", "lalala_1_3") < 0);
+        assertTrue(comparator.compare("lalala_1_5", "lalala_1_0") < 0);
     }
 
     @Test
     void indexNameWithNoSeparatorGoesLast() {
-        assertEquals(1, comparator.compare("lalala", "lalala_3"));
-        assertEquals(-1, comparator.compare("lalala_3", "lalala"));
-        assertEquals(1, comparator.compare("lalala", "lalala_42"));
-        assertEquals(-1, comparator.compare("lalala_42", "lalala"));
+        assertTrue(comparator.compare("lalala", "lalala_3") > 0);
+        assertTrue(comparator.compare("lalala_3", "lalala") < 0);
+        assertTrue(comparator.compare("lalala", "lalala_42") > 0);
+        assertTrue(comparator.compare("lalala_42", "lalala") < 0);
     }
 
     @Test
     void isImmuneToWrongNumbersWhichGoLast() {
-        assertEquals(1, comparator.compare("lalala_1!1", "lalala_3"));
-        assertEquals(-1, comparator.compare("lalala_3", "lalala_1!1"));
+        assertTrue(comparator.compare("lalala_1!1", "lalala_3") > 0);
+        assertTrue(comparator.compare("lalala_3", "lalala_1!1") < 0);
     }
 
     @Test
     void isImmuneToMissingNumbersWhichGoLast() {
-        assertEquals(1, comparator.compare("lalala_", "lalala_3"));
-        assertEquals(-1, comparator.compare("lalala_3", "lalala_"));
+        assertTrue(comparator.compare("lalala_", "lalala_3") > 0);
+        assertTrue(comparator.compare("lalala_3", "lalala_") < 0);
     }
 
 }

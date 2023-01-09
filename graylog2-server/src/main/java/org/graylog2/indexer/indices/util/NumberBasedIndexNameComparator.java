@@ -18,6 +18,10 @@ package org.graylog2.indexer.indices.util;
 
 import java.util.Comparator;
 
+/**
+ * Compares Strings in format [index_prefix][separator][number], i.e. graylog_12.
+ * Tries to compare by index_prefix first (ascending), if prefixes are the same, uses number to compare(descending).
+ */
 public class NumberBasedIndexNameComparator implements Comparator<String> {
 
     private final String separator;
@@ -30,6 +34,7 @@ public class NumberBasedIndexNameComparator implements Comparator<String> {
     public int compare(String indexName1, String indexName2) {
         int separatorPosition = indexName1.lastIndexOf(separator);
         int index1Number;
+        final String indexPrefix1 = separatorPosition != -1 ? indexName1.substring(0, separatorPosition) : indexName1;
         try {
             index1Number = Integer.parseInt(indexName1.substring(separatorPosition + 1));
         } catch (Exception e) {
@@ -38,11 +43,18 @@ public class NumberBasedIndexNameComparator implements Comparator<String> {
 
         separatorPosition = indexName2.lastIndexOf(separator);
         int index2Number;
+        final String indexPrefix2 = separatorPosition != -1 ? indexName2.substring(0, separatorPosition) : indexName2;
         try {
             index2Number = Integer.parseInt(indexName2.substring(separatorPosition + 1));
         } catch (NumberFormatException e) {
             index2Number = Integer.MIN_VALUE; //wrongly formatted index names go last
         }
-        return -Integer.compare(index1Number, index2Number);
+
+        final int prefixComparisonResult = indexPrefix1.compareTo(indexPrefix2);
+        if (prefixComparisonResult == 0) {
+            return -Integer.compare(index1Number, index2Number);
+        } else {
+            return prefixComparisonResult;
+        }
     }
 }
