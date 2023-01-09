@@ -15,13 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 
-import connect from 'stores/connect';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
-import Query from 'views/logic/queries/Query';
+import type Query from 'views/logic/queries/Query';
 import type { ViewType } from 'views/logic/views/View';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import PlotLegend from 'views/components/visualizations/PlotLegend';
@@ -29,19 +27,19 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import { axisTypes, DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import assertUnreachable from 'logic/assertUnreachable';
+import useViewType from 'views/hooks/useViewType';
+import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 
 import GenericPlot from './GenericPlot';
 import type { ChartColor, ChartConfig } from './GenericPlot';
 import OnZoom from './OnZoom';
 
 import CustomPropTypes from '../CustomPropTypes';
-import ViewTypeContext from '../contexts/ViewTypeContext';
 
 export type Props = {
   axisType?: AxisType,
   config: AggregationWidgetConfig,
   chartData: any,
-  currentQuery: Query,
   effectiveTimerange?: {
     from: string,
     to: string,
@@ -84,7 +82,6 @@ const XYPlot = ({
   axisType,
   config,
   chartData,
-  currentQuery,
   effectiveTimerange,
   getChartColor,
   setChartColor,
@@ -93,6 +90,7 @@ const XYPlot = ({
   onZoom = OnZoom,
 }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
+  const currentQuery = useCurrentQuery();
   const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: mapAxisType(axisType) };
   const defaultLayout: Layout = {
     yaxis,
@@ -105,7 +103,7 @@ const XYPlot = ({
   }
 
   const layout = { ...defaultLayout, ...plotLayout };
-  const viewType = useContext(ViewTypeContext);
+  const viewType = useViewType();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(config.isTimeline
     ? (from: string, to: string) => onZoom(currentQuery, from, to, viewType, userTimezone)
@@ -142,7 +140,6 @@ XYPlot.propTypes = {
   axisType: PropTypes.oneOf(axisTypes),
   chartData: PropTypes.array.isRequired,
   config: CustomPropTypes.instanceOf(AggregationWidgetConfig).isRequired,
-  currentQuery: CustomPropTypes.instanceOf(Query).isRequired,
   effectiveTimerange: PropTypes.exact({
     // eslint-disable-next-line react/no-unused-prop-types
     type: PropTypes.string.isRequired,
@@ -165,4 +162,4 @@ XYPlot.defaultProps = {
   height: undefined,
 };
 
-export default connect(XYPlot, { currentQuery: CurrentQueryStore }, ({ currentQuery }) => ({ currentQuery }));
+export default XYPlot;

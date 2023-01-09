@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Remove single-quotes from jvm.memory metric names"
+
+issues = ["graylog-plugin-enterprise#4394"]
+pulls = ["14370"]
