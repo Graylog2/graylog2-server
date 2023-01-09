@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import Routes from 'routing/Routes';
@@ -24,16 +24,13 @@ import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
 
 import { MS_DAY, MS_HOUR, MS_MINUTE, MS_SECOND } from './timeoutConstants';
 
-import type { UserConfigType } from '../../stores/configurations/ConfigurationsStore';
-import { ConfigurationsActions } from '../../stores/configurations/ConfigurationsStore';
 import { Link } from '../common/router';
 
 type Props = {
   value: number,
   onChange: (value: number) => void;
+  isGlobalTimeoutEnabled: boolean;
 };
-
-const USER_CONFIG = 'org.graylog2.users.UserConfiguration';
 
 const _estimateUnit = (value) => {
   if (value === 0) {
@@ -55,22 +52,10 @@ const _estimateUnit = (value) => {
   return MS_SECOND;
 };
 
-const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
+const TimeoutInput = ({ value: propsValue, onChange, isGlobalTimeoutEnabled }: Props) => {
   const [sessionTimeoutNever, setSessionTimeoutNever] = useState(propsValue === -1);
   const [unit, setUnit] = useState(_estimateUnit(propsValue));
   const [value, setValue] = useState(propsValue ? Math.floor(propsValue / Number(unit)) : 0);
-  const [globalSessionTimeout, setGlobalSessionTimeout] = useState<UserConfigType|null>(null);
-
-  useEffect(() => {
-    if (!globalSessionTimeout) {
-      ConfigurationsActions.list(USER_CONFIG).then((data: UserConfigType) => {
-        setGlobalSessionTimeout(data);
-      });
-    }
-
-    return () => {
-    };
-  }, [globalSessionTimeout]);
 
   const _onClick = (evt) => {
     setSessionTimeoutNever(evt.target.checked);
@@ -95,8 +80,6 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
       onChange(value * Number(newUnit));
     }
   };
-
-  const isGlobalTimeoutEnabled = globalSessionTimeout?.enable_global_session_timeout;
 
   return (
     <Input id="timeout-controls"
@@ -153,11 +136,13 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
 TimeoutInput.propTypes = {
   value: PropTypes.number,
   onChange: PropTypes.func,
+  isGlobalTimeoutEnabled: PropTypes.bool,
 };
 
 TimeoutInput.defaultProps = {
   value: MS_HOUR,
   onChange: () => {},
+  isGlobalTimeoutEnabled: false,
 };
 
 export default TimeoutInput;

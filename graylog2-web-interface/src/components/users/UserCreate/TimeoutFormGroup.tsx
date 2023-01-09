@@ -15,17 +15,31 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import { Field } from 'formik';
 
 import TimeoutInput from 'components/users/TimeoutInput';
 
-const TimeoutFormGroup = () => (
+type Props = {
+  isGlobalTimeoutEnabled: boolean;
+};
+
+const TimeoutFormGroup = ({ isGlobalTimeoutEnabled }: Props) => (
   <Field name="session_timeout_ms">
     {({ field: { name, value, onChange } }) => (
       <TimeoutInput value={value}
-                    onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
+                    onChange={(newValue) => onChange({ target: { name, value: newValue } })}
+                    isGlobalTimeoutEnabled={isGlobalTimeoutEnabled} />
     )}
   </Field>
 );
+
+TimeoutFormGroup.propTypes = {
+  isGlobalTimeoutEnabled: PropTypes.bool,
+};
+
+TimeoutFormGroup.defaultProps = {
+  isGlobalTimeoutEnabled: false,
+};
 
 export default TimeoutFormGroup;

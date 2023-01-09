@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as Immutable from 'immutable';
 import { Formik, Form } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -43,10 +43,14 @@ import UsernameFormGroup from './UsernameFormGroup';
 import ServiceAccountFormGroup from './ServiceAccountFormGroup';
 
 import { Headline } from '../../common/Section/SectionComponent';
+import type { UserConfigType } from '../../../stores/configurations/ConfigurationsStore';
+import { ConfigurationsActions } from '../../../stores/configurations/ConfigurationsStore';
 
 const isCloud = AppConfig.isCloud();
 
 const oktaUserForm = isCloud ? PluginStore.exports('cloud')[0].oktaUserForm : null;
+
+const USER_CONFIG = 'org.graylog2.users.UserConfiguration';
 
 const _onSubmit = (formData, roles, setSubmitError) => {
   let data = { ...formData, roles: roles.toJS(), permissions: [] };
@@ -142,6 +146,15 @@ const UserCreate = () => {
   const [user, setUser] = useState(User.empty().toBuilder().roles(Immutable.Set([initialRole.name])).build());
   const [submitError, setSubmitError] = useState<RequestError | undefined>();
   const [selectedRoles, setSelectedRoles] = useState<Immutable.Set<DescriptiveItem>>(Immutable.Set([initialRole]));
+  const [isGlobalTimeoutEnabled, setIsGlobalTimeoutEnabled] = useState<boolean>(false);
+
+  useEffect(() => {
+    ConfigurationsActions.list(USER_CONFIG).then((data: UserConfigType) => {
+      setIsGlobalTimeoutEnabled(data.enable_global_session_timeout);
+    });
+
+    return () => {};
+  }, []);
 
   const _onAssignRole = (roles: Immutable.Set<DescriptiveItem>) => {
     setSelectedRoles(selectedRoles.union(roles));
@@ -187,7 +200,7 @@ const UserCreate = () => {
               </div>
               <div>
                 <Headline>Settings</Headline>
-                <TimeoutFormGroup />
+                <TimeoutFormGroup isGlobalTimeoutEnabled={isGlobalTimeoutEnabled} />
                 <TimezoneFormGroup />
                 <ServiceAccountFormGroup />
               </div>

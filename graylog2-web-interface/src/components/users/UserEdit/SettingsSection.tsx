@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { Formik, Form } from 'formik';
 import type { $PropertyType } from 'utility-types';
 
@@ -27,6 +28,10 @@ import TimezoneFormGroup from '../UserCreate/TimezoneFormGroup';
 import TimeoutFormGroup from '../UserCreate/TimeoutFormGroup';
 import ServiceAccountFormGroup from '../UserCreate/ServiceAccountFormGroup';
 import StartpageFormGroup from '../StartpageFormGroup';
+import type { UserConfigType } from '../../../stores/configurations/ConfigurationsStore';
+import { ConfigurationsActions } from '../../../stores/configurations/ConfigurationsStore';
+
+const USER_CONFIG = 'org.graylog2.users.UserConfiguration';
 
 type Props = {
   user: User,
@@ -43,37 +48,49 @@ const SettingsSection = ({
     serviceAccount,
   },
   onSubmit,
-}: Props) => (
-  <SectionComponent title="Settings">
-    <Formik onSubmit={onSubmit}
-            initialValues={{ timezone, session_timeout_ms: sessionTimeoutMs, startpage, service_account: serviceAccount }}>
-      {({ isSubmitting, isValid }) => (
-        <Form className="form form-horizontal">
-          <IfPermitted permissions="*">
-            <TimeoutFormGroup />
-          </IfPermitted>
-          <TimezoneFormGroup />
-          <IfPermitted permissions="user:edit">
-            <ServiceAccountFormGroup />
-          </IfPermitted>
-          <StartpageFormGroup userId={id} permissions={permissions} />
+}: Props) => {
+  const [isGlobalTimeoutEnabled, setIsGlobalTimeoutEnabled] = useState<boolean>(false);
 
-          <Row className="no-bm">
-            <Col xs={12}>
-              <div className="pull-right">
-                <Button bsStyle="success"
-                        disabled={isSubmitting || !isValid}
-                        title="Update Settings"
-                        type="submit">
-                  Update Settings
-                </Button>
-              </div>
-            </Col>
-          </Row>
-        </Form>
-      )}
-    </Formik>
-  </SectionComponent>
-);
+  useEffect(() => {
+    ConfigurationsActions.list(USER_CONFIG).then((data: UserConfigType) => {
+      setIsGlobalTimeoutEnabled(data.enable_global_session_timeout);
+    });
+
+    return () => {};
+  }, []);
+
+  return (
+    <SectionComponent title="Settings">
+      <Formik onSubmit={onSubmit}
+              initialValues={{ timezone, session_timeout_ms: sessionTimeoutMs, startpage, service_account: serviceAccount }}>
+        {({ isSubmitting, isValid }) => (
+          <Form className="form form-horizontal">
+            <IfPermitted permissions="*">
+              <TimeoutFormGroup isGlobalTimeoutEnabled={isGlobalTimeoutEnabled} />
+            </IfPermitted>
+            <TimezoneFormGroup />
+            <IfPermitted permissions="user:edit">
+              <ServiceAccountFormGroup />
+            </IfPermitted>
+            <StartpageFormGroup userId={id} permissions={permissions} />
+
+            <Row className="no-bm">
+              <Col xs={12}>
+                <div className="pull-right">
+                  <Button bsStyle="success"
+                          disabled={isSubmitting || !isValid}
+                          title="Update Settings"
+                          type="submit">
+                    Update Settings
+                  </Button>
+                </div>
+              </Col>
+            </Row>
+          </Form>
+        )}
+      </Formik>
+    </SectionComponent>
+  );
+};
 
 export default SettingsSection;
