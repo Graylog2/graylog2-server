@@ -50,7 +50,7 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
 const SearchPage = ({ isNew, view: viewPromise, loadNewView = defaultLoadNewView, loadView = defaultLoadView }: Props) => {
   const query = useQuery();
   const initialQuery = query?.page as string;
-  useLoadView(viewPromise, initialQuery, isNew);
+  useLoadView(viewPromise, isNew);
   const [view, HookComponent] = useProcessHooksForView(viewPromise, query);
 
   if (HookComponent) {

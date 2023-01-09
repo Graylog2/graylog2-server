@@ -49,9 +49,9 @@ import type { QueryValidationState } from 'views/components/searchbar/queryvalid
 import type Query from 'views/logic/queries/Query';
 import type { CustomCommand, CustomCommandContext } from 'views/components/searchbar/queryinput/types';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import type GlobalOverride from 'views/logic/search/GlobalOverride';
-import type SearchResult from 'views/logic/SearchResult';
 import type SearchMetadata from 'views/logic/search/SearchMetadata';
+import type { SearchJobType } from 'views/stores/SearchJobs';
+import type { SearchExecutionResult } from 'views/actions/SearchActions';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -306,7 +306,7 @@ export interface ViewState {
 
 export interface SearchExecution {
   executionState: SearchExecutionState;
-  result: SearchResult;
+  result: SearchExecutionResult;
   isLoading: boolean;
   widgetsToSearch: Array<string>,
 }

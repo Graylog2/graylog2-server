@@ -1,23 +1,22 @@
-import * as Bluebird from 'bluebird';
+import Bluebird from 'bluebird';
 
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import SearchResult from 'views/logic/SearchResult';
-import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
+import type { SearchJobType } from 'views/stores/SearchJobs';
 import { runSearchJob, searchJobStatus } from 'views/stores/SearchJobs';
-import type Search from 'views/logic/search/Search';
-import type { SearchJobResult } from 'views/stores/SearchStore';
 import type View from 'views/logic/views/View';
+import type { SearchExecutionResult } from 'views/actions/SearchActions';
+import SearchResult from 'views/logic/SearchResult';
 
-const trackJobStatus = (job: SearchJobResult, search: Search) => {
+const trackJobStatus = (job: SearchJobType): Promise<SearchJobType> => {
   return new Bluebird((resolve) => {
-    if (job && job.execution.done) {
-      return resolve(new SearchResult(job));
+    if (job?.execution?.done) {
+      return resolve(job);
     }
 
     return resolve(Bluebird.delay(250)
       .then(() => searchJobStatus(job.id))
-      .then((jobStatus) => trackJobStatus(jobStatus, search)));
+      .then((jobStatus) => trackJobStatus(jobStatus)));
   });
 };
 
@@ -40,7 +39,9 @@ const executeSearch = (
 
   const executionState = executionStateBuilder.build();
 
-  return runSearchJob(search, executionState).then((job) => trackJobStatus(job, search));
+  return runSearchJob(search, executionState)
+    .then((job) => trackJobStatus(job))
+    .then((result) => ({ widgetMapping, result: new SearchResult(result) }));
 };
 
 export default executeSearch;

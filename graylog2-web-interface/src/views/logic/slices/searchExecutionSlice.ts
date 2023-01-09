@@ -37,6 +37,7 @@ export const selectSearchExecutionRoot = (state: RootState) => state.searchExecu
 
 export const selectSearchExecutionState = createSelector(selectSearchExecutionRoot, (state) => state.executionState);
 export const selectWidgetsToSearch = createSelector(selectSearchExecutionRoot, (state) => state.widgetsToSearch);
+export const selectSearchExecutionResult = createSelector(selectSearchExecutionRoot, (state) => state.result);
 
 export const execute = () => (dispatch: AppDispatch, getState: () => RootState) => {
   const state = getState();
@@ -47,6 +48,6 @@ export const execute = () => (dispatch: AppDispatch, getState: () => RootState) 
   return dispatch(parseSearch(view.search)).then(() => {
     dispatch(loading());
 
-    return executeSearch(view, widgetsToSearch, executionState).then((result) => dispatch(finishedLoading(result.result)));
+    return executeSearch(view, widgetsToSearch, executionState).then((result) => dispatch(finishedLoading(result)));
   });
 };
