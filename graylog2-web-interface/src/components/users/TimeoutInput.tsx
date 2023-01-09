@@ -67,6 +67,10 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
         setGlobalSessionTimeout(data);
       });
     }
+
+    return () => {
+      setGlobalSessionTimeout(null);
+    };
   }, [globalSessionTimeout]);
 
   const _onClick = (evt) => {
