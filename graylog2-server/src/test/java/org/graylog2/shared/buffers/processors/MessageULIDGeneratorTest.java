@@ -17,7 +17,9 @@
 package org.graylog2.shared.buffers.processors;
 
 import de.huxhorn.sulky.ulid.ULID;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.joda.time.DateTime;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class MessageULIDGeneratorTest {
 
@@ -87,6 +90,17 @@ public class MessageULIDGeneratorTest {
         ULID.Value parsedULID = ULID.parseULID(ulid);
 
         assertThat(parsedULID.timestamp()).isEqualTo(ts);
+    }
+
+    @Test
+    public void doesNotAcceptTooLargeTimestamp() {
+        final MessageULIDGenerator generator = new MessageULIDGenerator(new ULID());
+        final DateTime largeDate = DateTime.parse("+10889-08-02T05:31:50.656Z");
+        final Message message = new Message("foo", "source", largeDate);
+
+        assertThatThrownBy(() -> {
+            generator.createULID(message);
+        }).isInstanceOf(IllegalArgumentException.class);
     }
 
     private int extractSequenceNr(ULID.Value ulid) {

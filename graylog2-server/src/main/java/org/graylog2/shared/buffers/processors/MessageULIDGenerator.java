@@ -70,6 +70,7 @@ public class MessageULIDGenerator {
     }
 
     public String createULID(Message message) {
+        checkTimestamp(message.getTimestamp().getMillis());
         try {
             return createULID(message.getTimestamp().getMillis(), message.getSequenceNr());
         } catch (Exception e) {
@@ -89,5 +90,13 @@ public class MessageULIDGenerator {
 
         final ULID.Value sequencedULID = new ULID.Value(msbWithoutRandom | msbSeq, lsbWithoutRandom | (nextRandom >>> 16));
         return sequencedULID.toString();
+    }
+
+    private void checkTimestamp(long timestamp) {
+        // Check extracted from de.huxhorn.sulky.ulid.ULID
+        final long TIMESTAMP_OVERFLOW_MASK = 0xFFFF_0000_0000_0000L;
+        if ((timestamp & TIMESTAMP_OVERFLOW_MASK) != 0) {
+            throw new IllegalArgumentException("ULID does not support timestamps after +10889-08-02T05:31:50.655Z!");
+        }
     }
 }
