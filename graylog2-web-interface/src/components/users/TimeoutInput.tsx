@@ -69,7 +69,6 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
     }
 
     return () => {
-      setGlobalSessionTimeout(null);
     };
   }, [globalSessionTimeout]);
 
