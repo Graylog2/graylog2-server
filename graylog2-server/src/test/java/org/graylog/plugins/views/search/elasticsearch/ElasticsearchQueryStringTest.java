@@ -44,7 +44,7 @@ class ElasticsearchQueryStringTest {
 
     @Test
     void concatenatingTwoNonEmptyStringsReturnsAppendedQueryString() {
-        assertThat(create("nf_bytes>200").concatenate(create("_exists_:nf_version")).queryString()).isEqualTo("nf_bytes>200 AND _exists_:nf_version");
+        assertThat(create("nf_bytes>200").concatenate(create("_exists_:nf_version")).queryString()).isEqualTo("(nf_bytes>200) AND (_exists_:nf_version)");
     }
 
     @ParameterizedTest
