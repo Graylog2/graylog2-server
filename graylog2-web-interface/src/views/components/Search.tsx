@@ -26,7 +26,6 @@ import SearchResult from 'views/components/SearchResult';
 import { SearchStore, SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchConfigActions, SearchConfigStore } from 'views/stores/SearchConfigStore';
-import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
 import HeaderElements from 'views/components/HeaderElements';
@@ -54,6 +53,9 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import SynchronizeUrl from 'views/components/SynchronizeUrl';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useView from 'views/hooks/useView';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import { parseSearch } from 'views/logic/slices/searchMetadataSlice';
+import useAppDispatch from 'stores/useAppDispatch';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -94,10 +96,10 @@ const ConnectedSidebar = (props: Omit<React.ComponentProps<typeof Sidebar>, 'res
   return <Sidebar results={results} {...props} />;
 };
 
-const _refreshSearch = (executionState: SearchExecutionState) => {
+const _refreshSearch = (executionState: SearchExecutionState, dispatch: AppDispatch) => {
   const { view } = ViewStore.getInitialState();
 
-  return SearchMetadataActions.parseSearch(view.search).then(() => {
+  return dispatch(parseSearch(view.search)).then(() => {
     return SearchActions.execute(executionState).then(() => {});
   });
 };
@@ -137,7 +139,8 @@ const useRefreshSearchOn = (_actions: Array<RefluxActions<any>>, refresh: () => 
 };
 
 const Search = () => {
-  const refreshSearch = useCallback(() => _refreshSearch(SearchExecutionStateStore.getInitialState()), []);
+  const dispatch = useAppDispatch();
+  const refreshSearch = useCallback(() => _refreshSearch(SearchExecutionStateStore.getInitialState(), dispatch), [dispatch]);
   const { sidebar: { isShown: showSidebar } } = useSearchPageLayout();
 
   useRefreshSearchOn([SearchActions.refresh, ViewActions.search], refreshSearch);

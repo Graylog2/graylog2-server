@@ -15,10 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback } from 'react';
-import PropTypes from 'prop-types';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 
-import connect from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
 import AppConfig from 'util/AppConfig';
 import { DropdownButton, MenuItem, Button, ButtonGroup } from 'components/bootstrap';
@@ -27,9 +24,6 @@ import ExportModal from 'views/components/export/ExportModal';
 import DebugOverlay from 'views/components/DebugOverlay';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
 import onSaveNewDashboard from 'views/logic/views/OnSaveNewDashboard';
-import { ViewStore } from 'views/stores/ViewStore';
-import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
-import type SearchMetadata from 'views/logic/search/SearchMetadata';
 import * as ViewPermissions from 'views/Permissions';
 import useSearchPageLayout from 'hooks/useSearchPageLayout';
 import View from 'views/logic/views/View';
@@ -40,6 +34,9 @@ import {
   executePluggableDashboardDuplicationHandler as executePluggableDuplicationHandler,
 } from 'views/logic/views/pluggableSaveViewFormHandler';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
+import useView from 'views/hooks/useView';
+import useIsNew from 'views/hooks/useIsNew';
+import useHasUndeclaredParameters from 'views/logic/parameters/useHasUndeclaredParameters';
 
 import DashboardPropertiesModal from './dashboard/DashboardPropertiesModal';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
@@ -47,10 +44,11 @@ import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration
 const _isAllowedToEdit = (view: View, currentUser: User | undefined | null) => isPermitted(currentUser?.permissions, [ViewPermissions.View.Edit(view.id)])
   || (view.type === View.Type.Dashboard && isPermitted(currentUser?.permissions, [`dashboards:edit:${view.id}`]));
 
-const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetadata.undeclared.size > 0;
-
-const DashboardActionsMenu = ({ view, isNewView, metadata }) => {
+const DashboardActionsMenu = () => {
+  const view = useView();
+  const isNewView = useIsNew();
   const currentUser = useCurrentUser();
+  const hasUndeclaredParameters = useHasUndeclaredParameters();
   const {
     viewActions: {
       save: {
@@ -70,7 +68,6 @@ const DashboardActionsMenu = ({ view, isNewView, metadata }) => {
   const [saveNewDashboardOpen, setSaveNewDashboardOpen] = useState(false);
   const [editDashboardOpen, setEditDashboardOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
-  const hasUndeclaredParameters = _hasUndeclaredParameters(metadata);
   const allowedToEdit = _isAllowedToEdit(view, currentUser);
   const debugOverlay = AppConfig.gl2DevMode() && (
     <>
@@ -157,16 +154,4 @@ const DashboardActionsMenu = ({ view, isNewView, metadata }) => {
   );
 };
 
-DashboardActionsMenu.propTypes = {
-  metadata: PropTypes.shape({
-    undeclared: ImmutablePropTypes.setOf(PropTypes.string),
-  }).isRequired,
-  view: PropTypes.object.isRequired,
-  isNewView: PropTypes.bool.isRequired,
-};
-
-export default connect(
-  DashboardActionsMenu,
-  { metadata: SearchMetadataStore, view: ViewStore },
-  ({ view: { view, isNew }, ...rest }) => ({ view, isNewView: isNew, ...rest }),
-);
+export default DashboardActionsMenu;

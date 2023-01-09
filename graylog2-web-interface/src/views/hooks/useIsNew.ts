@@ -14,21 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { PluginExports } from 'graylog-web-plugin/plugin';
+import useAppSelector from 'stores/useAppSelector';
+import { selectIsNew } from 'views/logic/slices/viewSlice';
 
-import { viewSliceReducer } from 'views/logic/slices/viewSlice';
-import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionSlice';
-import { searchMetadataSliceReducer } from 'views/logic/slices/searchMetadataSlice';
+const useIsNew = () => useAppSelector(selectIsNew);
 
-const viewsReducers: PluginExports['views.reducers'] = [{
-  key: 'view' as const,
-  reducer: viewSliceReducer,
-}, {
-  key: 'searchExecution' as const,
-  reducer: searchExecutionSliceReducer,
-}, {
-  key: 'searchMetadata',
-  reducer: searchMetadataSliceReducer,
-}];
-
-export default viewsReducers;
+export default useIsNew;

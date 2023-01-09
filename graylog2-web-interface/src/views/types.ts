@@ -51,6 +51,7 @@ import type { CustomCommand, CustomCommandContext } from 'views/components/searc
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import type SearchResult from 'views/logic/SearchResult';
+import type SearchMetadata from 'views/logic/search/SearchMetadata';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -310,9 +311,15 @@ export interface SearchExecution {
   isLoading: boolean;
 }
 
+export interface SearchMetadataState {
+  isLoading: boolean;
+  metadata: SearchMetadata;
+}
+
 export interface RootState {
   view: ViewState;
   searchExecution: SearchExecution;
+  searchMetadata: SearchMetadataState;
 }
 
 export type ViewsReducer = {
