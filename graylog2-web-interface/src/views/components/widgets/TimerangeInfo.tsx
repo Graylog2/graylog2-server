@@ -21,11 +21,11 @@ import { TextOverflowEllipsis } from 'components/common';
 import type Widget from 'views/logic/widgets/Widget';
 import timerangeToString from 'views/logic/queries/TimeRangeToString';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
-import { useStore } from 'stores/connect';
-import { SearchStore } from 'views/stores/SearchStore';
-import { GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type { DateTime } from 'util/DateTime';
+import useAppSelector from 'stores/useAppSelector';
+import { selectSearchExecutionResult } from 'views/logic/slices/searchExecutionSlice';
+import useGlobalOverride from 'views/hooks/useGlobalOverride';
 
 type Props = {
   className?: string,
@@ -44,8 +44,8 @@ const getEffectiveWidgetTimerange = (result, activeQuery, searchTypeId) => resul
 
 const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
   const { formatTime } = useUserDateTime();
-  const { result, widgetMapping } = useStore(SearchStore);
-  const globalOverride = useStore(GlobalOverrideStore);
+  const { result, widgetMapping } = useAppSelector(selectSearchExecutionResult);
+  const globalOverride = useGlobalOverride();
 
   const toLocalTimeWithMS = (dateTime: DateTime) => formatTime(dateTime, 'complete');
   const toInternalTime = (dateTime: DateTime) => formatTime(dateTime, 'internal');

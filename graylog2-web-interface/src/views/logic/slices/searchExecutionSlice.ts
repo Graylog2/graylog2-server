@@ -38,6 +38,7 @@ export const selectSearchExecutionRoot = (state: RootState) => state.searchExecu
 export const selectSearchExecutionState = createSelector(selectSearchExecutionRoot, (state) => state.executionState);
 export const selectWidgetsToSearch = createSelector(selectSearchExecutionRoot, (state) => state.widgetsToSearch);
 export const selectSearchExecutionResult = createSelector(selectSearchExecutionRoot, (state) => state.result);
+export const selectGlobalOverride = createSelector(selectSearchExecutionState, (executionState) => executionState.globalOverride);
 
 export const execute = () => (dispatch: AppDispatch, getState: () => RootState) => {
   const state = getState();

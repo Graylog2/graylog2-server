@@ -33,7 +33,7 @@ import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import WidgetContext from 'views/components/contexts/WidgetContext';
-import { GlobalOverrideStore, GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
+import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { PropagateDisableSubmissionState } from 'views/components/aggregationwizard';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
@@ -57,6 +57,7 @@ import {
   SearchQueryRow,
 } from 'views/components/searchbar/SearchBarLayout';
 import PluggableCommands from 'views/components/searchbar/queryinput/PluggableCommands';
+import useGlobalOverride from 'views/hooks/useGlobalOverride';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeInput from './searchbar/TimeRangeInput';
@@ -80,7 +81,6 @@ const SearchInputAndValidation = styled.div`
 
 type Props = {
   availableStreams: Array<{ key: string, value: string }>,
-  globalOverride: GlobalOverride | undefined | null,
 };
 
 export const updateWidgetSearchControls = (widget, { timerange, streams, queryString }) => {
@@ -152,7 +152,8 @@ const _validateQueryString = (values: SearchBarFormValues, globalOverride: Globa
   return debouncedValidateQuery(request, userTimezone);
 };
 
-const WidgetQueryControls = ({ availableStreams, globalOverride }: Props) => {
+const WidgetQueryControls = ({ availableStreams }: Props) => {
+  const globalOverride = useGlobalOverride();
   const widget = useContext(WidgetContext);
   const { userTimezone } = useUserDateTime();
   const config = useStore(SearchConfigStore, ({ searchesClusterConfig }) => searchesClusterConfig);
@@ -261,7 +262,6 @@ export default connect(
   WidgetQueryControls,
   {
     availableStreams: StreamsStore,
-    globalOverride: GlobalOverrideStore,
   },
   ({ availableStreams: { streams = [] }, ...rest }) => ({
     ...rest,
