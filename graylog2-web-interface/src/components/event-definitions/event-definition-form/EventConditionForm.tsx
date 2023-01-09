@@ -27,11 +27,14 @@ import styles from './EventConditionForm.css';
 
 import commonStyles from '../common/commonStyles.css';
 
+import type { EventDefinition } from 'logic/alerts/types';
+import type { UserJSON } from 'logic/users/User';
+
 type Props = {
-  eventDefinition: any,
-  currentUser: any,
-  validation: any,
-  onChange: (name: string, obj: any) => void,
+  eventDefinition: EventDefinition,
+  currentUser: UserJSON,
+  validation: { errors: { [key: string]: Array<string> } },
+  onChange: (name: string, newConfig: EventDefinition['config']) => void,
   action: string,
 };
 
@@ -67,9 +70,9 @@ const EventConditionForm = ({ eventDefinition, currentUser, validation, onChange
       .map((type) => ({ label: type.displayName, value: type.type }));
   };
 
-  const handleEventDefinitionTypeChange = (nextType) => {
+  const handleEventDefinitionTypeChange = (nextType: string) => {
     const conditionPlugin = getConditionPlugin(nextType);
-    const defaultConfig = conditionPlugin?.defaultConfig || {};
+    const defaultConfig = conditionPlugin?.defaultConfig || {} as EventDefinition['config'];
 
     onChange('config', { ...defaultConfig, type: nextType });
   };
@@ -95,7 +98,7 @@ const EventConditionForm = ({ eventDefinition, currentUser, validation, onChange
   const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
 
   const eventDefinitionTypeComponent = eventDefinitionType?.formComponent
-    ? React.createElement(eventDefinitionType.formComponent, {
+    ? React.createElement<React.ComponentProps<any>>(eventDefinitionType.formComponent, {
       eventDefinition: eventDefinition,
       currentUser: currentUser,
       validation: validation,
