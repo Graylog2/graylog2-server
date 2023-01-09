@@ -19,7 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
-import { MockStore, asMock } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 
 import DashboardsOverview from './DashboardsOverview';
@@ -37,13 +37,6 @@ jest.mock('views/stores/ViewManagementStore', () => ({
       },
     },
   },
-}));
-
-jest.mock('views/stores/DashboardsStore', () => ({
-  DashboardsActions: {
-    search: () => Promise.resolve(),
-  },
-  DashboardsStore: MockStore(),
 }));
 
 const loadDashboardsResponse = (count = 1) => {
@@ -78,6 +71,7 @@ const loadDashboardsResponse = (count = 1) => {
       list: dashboards,
     },
     refetch: () => {},
+    isFetching: false,
   };
 };
 

@@ -71,6 +71,10 @@ public class DBLookupTableService extends ScopedDbService<LookupTableDto> {
         return savedLookupTable;
     }
 
+    public void postBulkUpdate(Collection<LookupTableDto> tables) {
+        clusterEventBus.post(LookupTablesUpdated.create(tables));
+    }
+
     public Collection<LookupTableDto> findAll() {
         return asImmutableList(db.find());
     }

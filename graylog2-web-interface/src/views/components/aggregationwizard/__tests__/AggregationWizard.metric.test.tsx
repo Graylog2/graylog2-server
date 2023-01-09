@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { MockStore } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
@@ -32,6 +32,7 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import dataTable from 'views/components/datatable/bindings';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import AggregationWizard from '../AggregationWizard';
 
@@ -57,9 +58,7 @@ jest.mock('views/stores/AggregationFunctionsStore', () => ({
   listen: jest.fn(),
 }));
 
-jest.mock('views/stores/ViewMetadataStore', () => ({
-  ViewMetadataStore: MockStore(['getInitialState', () => ({ activeQuery: 'queryId' })]),
-}));
+jest.mock('views/hooks/useActiveQueryId');
 
 const selectEventConfig = { container: document.body };
 
@@ -108,6 +107,10 @@ describe('AggregationWizard', () => {
   beforeAll(() => PluginStore.register(plugin));
 
   afterAll(() => PluginStore.unregister(plugin));
+
+  beforeEach(() => {
+    asMock(useActiveQueryId).mockReturnValue('queryId');
+  });
 
   it('should require metric function when adding a metric element', async () => {
     renderSUT();

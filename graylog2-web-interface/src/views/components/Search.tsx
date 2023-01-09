@@ -20,7 +20,7 @@ import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
 import PageContentLayout from 'components/layout/PageContentLayout';
-import connect, { useStore } from 'stores/connect';
+import { useStore } from 'stores/connect';
 import Sidebar from 'views/components/sidebar/Sidebar';
 import SearchResult from 'views/components/SearchResult';
 import { SearchStore, SearchActions } from 'views/stores/SearchStore';
@@ -41,7 +41,6 @@ import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvi
 import IfSearch from 'views/components/search/IfSearch';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 import HighlightMessageInQuery from 'views/components/messagelist/HighlightMessageInQuery';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import DefaultFieldTypesProvider from 'views/components/contexts/DefaultFieldTypesProvider';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
@@ -54,6 +53,7 @@ import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { RefluxActions } from 'stores/StoreTypes';
 import useCurrentUser from 'hooks/useCurrentUser';
 import SynchronizeUrl from 'views/components/SynchronizeUrl';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -87,15 +87,12 @@ const SearchArea = styled(PageContentLayout)(() => {
   `;
 });
 
-const ConnectedSidebar = connect(
-  Sidebar,
-  { viewMetadata: ViewMetadataStore, searches: SearchStore },
-  ({ viewMetadata, searches }) => ({
-    viewMetadata,
-    queryId: viewMetadata.activeQuery,
-    results: searches?.result?.forId(viewMetadata.activeQuery),
-  }),
-);
+const ConnectedSidebar = (props: Omit<React.ComponentProps<typeof Sidebar>, 'results'>) => {
+  const activeQuery = useActiveQueryId();
+  const results = useStore(SearchStore, (searches) => searches?.result?.forId(activeQuery));
+
+  return <Sidebar results={results} {...props} />;
+};
 
 const _refreshSearch = (executionState: SearchExecutionState) => {
   const { view } = ViewStore.getInitialState();

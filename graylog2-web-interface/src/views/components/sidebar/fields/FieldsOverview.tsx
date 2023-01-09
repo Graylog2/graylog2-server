@@ -16,16 +16,13 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import type { List as ImmutableList } from 'immutable';
 
-import connect from 'stores/connect';
-import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { Button } from 'components/bootstrap';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import List from './List';
 import FieldGroup from './FieldGroup';
@@ -33,7 +30,6 @@ import FieldGroup from './FieldGroup';
 type Props = {
   activeQueryFields: ImmutableList<FieldTypeMapping>,
   allFields: ImmutableList<FieldTypeMapping>,
-  viewMetadata: ViewMetadata,
 };
 
 const Container = styled.div`
@@ -78,7 +74,7 @@ const FieldGroups = styled.div`
   margin-bottom: 0;
 `;
 
-const FieldsOverview = ({ allFields, activeQueryFields, viewMetadata }: Props) => {
+const FieldsOverview = ({ allFields, activeQueryFields }: Props) => {
   const [currentGroup, setCurrentGroup] = useState('current');
   const [filter, setFilter] = useState(undefined);
   const handleSearch = (e) => setFilter(e.target.value);
@@ -127,8 +123,7 @@ const FieldsOverview = ({ allFields, activeQueryFields, viewMetadata }: Props) =
         </FieldGroups>
         <hr />
       </div>
-      <List viewMetadata={viewMetadata}
-            filter={filter}
+      <List filter={filter}
             activeQueryFields={activeQueryFields}
             allFields={allFields}
             currentGroup={currentGroup} />
@@ -136,21 +131,20 @@ const FieldsOverview = ({ allFields, activeQueryFields, viewMetadata }: Props) =
   );
 };
 
-const FieldsOverviewWithContext = (props) => (
-  <FieldTypesContext.Consumer>
-    {(fieldTypes) => {
-      const { viewMetadata: { activeQuery } } = props;
-      const allFields = fieldTypes?.all;
-      const queryFields = fieldTypes?.queryFields;
-      const activeQueryFields = queryFields?.get(activeQuery, allFields);
+const FieldsOverviewWithContext = (props) => {
+  const activeQuery = useActiveQueryId();
 
-      return <FieldsOverview {...props} allFields={allFields} activeQueryFields={activeQueryFields} />;
-    }}
-  </FieldTypesContext.Consumer>
-);
+  return (
+    <FieldTypesContext.Consumer>
+      {(fieldTypes) => {
+        const allFields = fieldTypes?.all;
+        const queryFields = fieldTypes?.queryFields;
+        const activeQueryFields = queryFields?.get(activeQuery, allFields);
 
-FieldsOverviewWithContext.propTypes = {
-  viewMetadata: PropTypes.object.isRequired,
+        return <FieldsOverview {...props} allFields={allFields} activeQueryFields={activeQueryFields} />;
+      }}
+    </FieldTypesContext.Consumer>
+  );
 };
 
-export default connect(FieldsOverviewWithContext, { viewMetadata: ViewMetadataStore });
+export default FieldsOverviewWithContext;
