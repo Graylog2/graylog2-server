@@ -69,6 +69,10 @@ public class DBCacheService extends ScopedDbService<CacheDto> {
         return savedCache;
     }
 
+    public void postBulkUpdate(Set<String> updatedCacheIds) {
+        clusterEventBus.post(CachesUpdated.create(updatedCacheIds));
+    }
+
     public PaginatedList<CacheDto> findPaginated(DBQuery.Query query, DBSort.SortBuilder sort, int page, int perPage) {
         try (DBCursor<CacheDto> cursor = db.find(query)
                 .sort(sort)
