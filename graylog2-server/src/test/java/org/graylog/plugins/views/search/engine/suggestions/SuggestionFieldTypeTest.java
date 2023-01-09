@@ -17,18 +17,27 @@
 package org.graylog.plugins.views.search.engine.suggestions;
 
 import org.assertj.core.api.Assertions;
+import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableSet;
 
 class SuggestionFieldTypeTest {
 
     @Test
     void testFieldPropertyMatching() {
-        Assertions.assertThat(SuggestionFieldType.fromFieldProperties(ImmutableSet.of("full-text-search", "enumerable"))).isEqualTo(SuggestionFieldType.TEXTUAL);
-        Assertions.assertThat(SuggestionFieldType.fromFieldProperties(ImmutableSet.of("full-text-search"))).isEqualTo(SuggestionFieldType.TEXTUAL);
-        Assertions.assertThat(SuggestionFieldType.fromFieldProperties(ImmutableSet.of("numeric", "enumerable"))).isEqualTo(SuggestionFieldType.NUMERICAL);
-        Assertions.assertThat(SuggestionFieldType.fromFieldProperties(ImmutableSet.of("numeric"))).isEqualTo(SuggestionFieldType.NUMERICAL);
-        Assertions.assertThat(SuggestionFieldType.fromFieldProperties(ImmutableSet.of("enumerable"))).isEqualTo(SuggestionFieldType.OTHER);
-        Assertions.assertThat(SuggestionFieldType.fromFieldProperties(ImmutableSet.of())).isEqualTo(SuggestionFieldType.OTHER);
+        Assertions.assertThat(SuggestionFieldType.fromFieldType(FieldTypeMapper.STRING_TYPE)).isEqualTo(SuggestionFieldType.TEXTUAL);
+        Assertions.assertThat(SuggestionFieldType.fromFieldType(FieldTypeMapper.STRING_FTS_TYPE)).isEqualTo(SuggestionFieldType.TEXTUAL);
+
+        Assertions.assertThat(SuggestionFieldType.fromFieldType(FieldTypeMapper.INT_TYPE)).isEqualTo(SuggestionFieldType.NUMERICAL);
+        Assertions.assertThat(SuggestionFieldType.fromFieldType(FieldTypeMapper.LONG_TYPE)).isEqualTo(SuggestionFieldType.NUMERICAL);
+        Assertions.assertThat(SuggestionFieldType.fromFieldType(FieldTypeMapper.FLOAT_TYPE)).isEqualTo(SuggestionFieldType.NUMERICAL);
+        Assertions.assertThat(SuggestionFieldType.fromFieldType(FieldTypeMapper.DOUBLE_TYPE)).isEqualTo(SuggestionFieldType.NUMERICAL);
+        Assertions.assertThat(SuggestionFieldType.fromFieldType(FieldTypeMapper.SHORT_TYPE)).isEqualTo(SuggestionFieldType.NUMERICAL);
+        Assertions.assertThat(SuggestionFieldType.fromFieldType(FieldTypeMapper.BYTE_TYPE)).isEqualTo(SuggestionFieldType.NUMERICAL);
+
+        Assertions.assertThat(SuggestionFieldType.fromFieldType(FieldTypeMapper.DATE_TYPE)).isEqualTo(SuggestionFieldType.OTHER);
+        Assertions.assertThat(SuggestionFieldType.fromFieldType(FieldTypeMapper.BINARY_TYPE)).isEqualTo(SuggestionFieldType.OTHER);
+        Assertions.assertThat(SuggestionFieldType.fromFieldType(FieldTypeMapper.BOOLEAN_TYPE)).isEqualTo(SuggestionFieldType.OTHER);
+        Assertions.assertThat(SuggestionFieldType.fromFieldType(FieldTypeMapper.GEO_POINT_TYPE)).isEqualTo(SuggestionFieldType.OTHER);
+        Assertions.assertThat(SuggestionFieldType.fromFieldType(FieldTypeMapper.IP_TYPE)).isEqualTo(SuggestionFieldType.OTHER);
     }
 }
