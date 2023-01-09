@@ -25,7 +25,11 @@ import history from 'util/History';
 import { PipelineRulesContext } from './RuleContext';
 import PipelinesUsingRule from './PipelinesUsingRule';
 
-const RuleForm = ({ create }) => {
+type Props = {
+  create: boolean,
+};
+
+const RuleForm = ({ create }: Props) => {
   const {
     description,
     handleDescription,
@@ -46,7 +50,7 @@ const RuleForm = ({ create }) => {
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     handleSavePipelineRule(() => {
@@ -64,12 +68,12 @@ const RuleForm = ({ create }) => {
     }, handleError);
   };
 
-  const handleDescriptionChange = (event) => {
+  const handleDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsDirty(true);
     handleDescription(event.target.value);
   };
 
-  const handleSourceChange = (newSource) => {
+  const handleSourceChange = (newSource: string) => {
     setErrorMessage('');
     setIsDirty(true);
     onChangeSource(newSource);
@@ -102,6 +106,8 @@ const RuleForm = ({ create }) => {
         <PipelinesUsingRule create={create} />
 
         <Input id="rule-source-editor" label="Rule source" help="Rule source, see quick reference for more information." error={errorMessage}>
+          {/* TODO: Figure out issue with props */}
+          {/* @ts-ignore */}
           <SourceCodeEditor id={`source${create ? '-create' : '-edit'}`}
                             mode="pipeline"
                             onLoad={onAceLoaded}
