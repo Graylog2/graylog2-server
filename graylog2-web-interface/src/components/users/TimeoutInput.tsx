@@ -59,39 +59,41 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
   const [sessionTimeoutNever, setSessionTimeoutNever] = useState(propsValue === -1);
   const [unit, setUnit] = useState(_estimateUnit(propsValue));
   const [value, setValue] = useState(propsValue ? Math.floor(propsValue / Number(unit)) : 0);
-  const [globalSessionTimeout, setGlobalSessionTimeout] = useState<UserConfigType>({ enable_global_session_timeout: false, global_session_timeout_interval: '' });
+  const [globalSessionTimeout, setGlobalSessionTimeout] = useState<UserConfigType|null>(null);
 
   useEffect(() => {
-    ConfigurationsActions.list(USER_CONFIG).then((data: UserConfigType) => {
-      setGlobalSessionTimeout(data);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (typeof onChange === 'function') {
-      const getValue = () => {
-        if (sessionTimeoutNever) {
-          return -1;
-        }
-
-        return (value * Number(unit));
-      };
-
-      onChange(getValue());
+    if (!globalSessionTimeout) {
+      ConfigurationsActions.list(USER_CONFIG).then((data: UserConfigType) => {
+        setGlobalSessionTimeout(data);
+      });
     }
-  }, [value, unit, sessionTimeoutNever, onChange]);
+  }, [globalSessionTimeout]);
 
   const _onClick = (evt) => {
     setSessionTimeoutNever(evt.target.checked);
+
+    if (onChange && evt.target.checked) {
+      onChange(-1);
+    }
   };
 
   const _onChangeValue = (evt) => {
     setValue(evt.target.value);
+
+    if (onChange) {
+      onChange(evt.target.value * Number(unit));
+    }
   };
 
   const _onChangeUnit = (newUnit: string) => {
     setUnit(newUnit);
+
+    if (onChange) {
+      onChange(value * Number(newUnit));
+    }
   };
+
+  const isGlobalTimeoutEnabled = globalSessionTimeout?.enable_global_session_timeout;
 
   return (
     <Input id="timeout-controls"
@@ -107,7 +109,7 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
                formGroupClassName="no-bm"
                onChange={_onClick}
                checked={sessionTimeoutNever}
-               disabled={globalSessionTimeout.enable_global_session_timeout} />
+               disabled={isGlobalTimeoutEnabled} />
 
         <div className="clearfix">
           <Col xs={2}>
@@ -117,18 +119,18 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
                    name="timeout"
                    min={1}
                    formGroupClassName="form-group no-bm"
-                   disabled={sessionTimeoutNever || globalSessionTimeout.enable_global_session_timeout}
+                   disabled={sessionTimeoutNever || isGlobalTimeoutEnabled}
                    value={value}
                    onChange={_onChangeValue} />
           </Col>
           <Col xs={4}>
-            <TimeoutUnitSelect disabled={sessionTimeoutNever || globalSessionTimeout.enable_global_session_timeout}
+            <TimeoutUnitSelect disabled={sessionTimeoutNever || isGlobalTimeoutEnabled}
                                value={`${unit}`}
                                onChange={_onChangeUnit} />
           </Col>
           <Row className="no-bm">
             <Col xs={12}>
-              {globalSessionTimeout.enable_global_session_timeout ? (
+              {isGlobalTimeoutEnabled ? (
                 <HelpBlock>
                   User session timeout is not editable because the <Link to={Routes.SYSTEM.CONFIGURATIONS}>global session timeout</Link> is enabled.
                 </HelpBlock>
