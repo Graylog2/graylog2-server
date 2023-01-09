@@ -84,7 +84,7 @@ public class IndexBlockCheck extends Periodical {
 
     private void indicesBlockedProblemNotification(final String title, final String description, final IndicesBlockStatus indicesBlockStatus) {
         final Notification notification = notificationService.buildNow()
-                .addNode(nodeId.toString())
+                .addNode(nodeId.getNodeId())
                 .addType(Notification.Type.ES_INDEX_BLOCKED)
                 .addSeverity(Notification.Severity.URGENT)
                 .addDetail("title", title)

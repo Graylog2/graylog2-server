@@ -186,9 +186,9 @@ public class MongoLockService implements LockService {
 
     private String getLockedByString(@Nullable String lockContext) {
         if (lockContext == null) {
-            return nodeId.toString();
+            return nodeId.getNodeId();
         }
-        return nodeId.toString() + "-" + lockContext;
+        return nodeId.getNodeId() + "-" + lockContext;
     }
 }
 

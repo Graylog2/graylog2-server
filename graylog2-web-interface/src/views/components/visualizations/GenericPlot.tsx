@@ -90,6 +90,10 @@ const nonInteractiveLayout = {
   hovermode: false,
 };
 
+const style = { height: '100%', width: '100%' };
+
+const config = { displayModeBar: false, doubleClick: false as const, responsive: true };
+
 class GenericPlot extends React.Component<GenericPlotProps, State> {
   static propTypes = {
     chartData: PropTypes.array.isRequired,
@@ -198,10 +202,6 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
       },
     };
     const plotLayout = merge({}, defaultLayout, layout);
-
-    const style = { height: '100%', width: '100%' };
-
-    const config = { displayModeBar: false, doubleClick: false as const, responsive: true };
 
     const { legendConfig } = this.state;
 

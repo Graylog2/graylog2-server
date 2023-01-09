@@ -14,12 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Overlay, Transition } from 'react-overlays';
 
-import { DropdownMenu } from 'components/common';
+import { DropdownMenu } from 'components/common/index';
+
+type Placement = 'top' | 'right' | 'bottom' | 'left';
 
 const ToggleDropdown = styled.span`
   cursor: pointer;
@@ -40,8 +42,7 @@ const oppositePlacement = {
 
 type _FilterProps = {
   children: React.ReactElement,
-  // eslint-disable-next-line react/require-default-props
-  style?: {}
+  style?: CSSStyleDeclaration
 };
 
 const FilterProps = ({ children, style }: _FilterProps) => (
@@ -50,9 +51,23 @@ const FilterProps = ({ children, style }: _FilterProps) => (
   </>
 );
 
-const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, toggle }) => {
-  const [currentPlacement, setCurrentPlacement] = useState(placement);
-  const toggleTarget = React.createRef<HTMLSpanElement>();
+FilterProps.defaultProps = {
+  style: {},
+};
+
+type Props = {
+  children: React.ReactNode,
+  menuContainer?: HTMLElement,
+  onToggle: () => void,
+  placement?: Placement,
+  show: boolean,
+  toggleChild?: React.ReactNode,
+  renderToggle?: (payload: { onToggle: () => void, toggleTarget: React.Ref<HTMLElement> }) => React.ReactNode,
+}
+
+const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, toggleChild, renderToggle }: Props) => {
+  const [currentPlacement, setCurrentPlacement] = useState<Placement>(placement);
+  const toggleTarget = useRef<HTMLElement>();
 
   const handleOverlayEntering = (dropdownElem) => {
     const dropdownOffsetLeft = dropdownElem.offsetLeft;
@@ -62,17 +77,19 @@ const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, t
     const trimmedDropdown = (overflowLeft && currentPlacement === 'left') || (overflowRight && currentPlacement === 'right');
 
     if (trimmedDropdown) {
-      setCurrentPlacement(oppositePlacement[currentPlacement]);
+      setCurrentPlacement(oppositePlacement[currentPlacement] as Placement);
     }
   };
 
   return (
     <>
-      <ToggleDropdown onClick={onToggle}
-                      ref={toggleTarget}
-                      role="presentation">
-        {toggle}<span className="caret" />
-      </ToggleDropdown>
+      {typeof renderToggle === 'function' ? renderToggle({ onToggle, toggleTarget }) : (
+        <ToggleDropdown onClick={onToggle}
+                        ref={toggleTarget}
+                        role="presentation">
+          {toggleChild}
+        </ToggleDropdown>
+      )}
       {show && (
         <Overlay show={show}
                  container={menuContainer}
@@ -101,12 +118,14 @@ OverlayDropdown.propTypes = {
   onToggle: PropTypes.func.isRequired,
   placement: PropTypes.string,
   show: PropTypes.bool.isRequired,
-  toggle: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
+  toggleChild: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
 };
 
 OverlayDropdown.defaultProps = {
   menuContainer: document.body,
   placement: 'bottom',
+  renderToggle: undefined,
+  toggleChild: 'Toggle',
 };
 
 export default OverlayDropdown;

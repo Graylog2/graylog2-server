@@ -14,19 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.outputs.events;
+import { useStore } from 'stores/connect';
+import { QueriesStore } from 'views/stores/QueriesStore';
+import type { StoreState } from 'stores/StoreTypes';
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+const queriesStoreMapper = (newQueries: StoreState<typeof QueriesStore>) => newQueries.map((q) => q.filter).toMap();
 
-@AutoValue
-public abstract class OutputDeletedEvent {
-    @JsonProperty("output_id")
-    public abstract String outputId();
+const useQueryFilters = () => useStore(QueriesStore, queriesStoreMapper);
 
-    @JsonCreator
-    public static OutputDeletedEvent create(@JsonProperty("output_id") String outputId) {
-        return new AutoValue_OutputDeletedEvent(outputId);
-    }
-}
+export default useQueryFilters;

@@ -65,7 +65,7 @@ public class DBProcessingStatusService {
                                      @Named(ProcessingStatusConfig.JOURNAL_WRITE_RATE_THRESHOLD) int journalWriteRateThreshold,
                                      MongoJackObjectMapperProvider mapper,
                                      BaseConfiguration baseConfiguration) {
-        this.nodeId = nodeId.toString();
+        this.nodeId = nodeId.getNodeId();
         this.clock = clock;
         this.updateThreshold = updateThreshold;
         this.baseConfiguration = baseConfiguration;

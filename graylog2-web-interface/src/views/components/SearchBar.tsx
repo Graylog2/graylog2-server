@@ -32,9 +32,7 @@ import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import { QueriesActions } from 'views/stores/QueriesStore';
-import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import { StreamsStore } from 'views/stores/StreamsStore';
-import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import type { FilterType, QueryId } from 'views/logic/queries/Query';
 import type Query from 'views/logic/queries/Query';
@@ -62,6 +60,8 @@ import {
   SearchInputAndValidationContainer,
 } from 'views/components/searchbar/SearchBarLayout';
 import PluggableCommands from 'views/components/searchbar/queryinput/PluggableCommands';
+import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
+import useQueryFilters from 'views/logic/queries/useQueryFilters';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -123,20 +123,18 @@ const _validateQueryString = (values: SearchBarFormValues, pluggableSearchBarCon
 
 type Props = {
   availableStreams: Array<{ key: string, value: string }>,
-  currentQuery: Query,
   onSubmit?: (update: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, query: Query) => Promise<any>
-  queryFilters: Immutable.Map<QueryId, FilterType>,
 };
 
 const SearchBar = ({
   availableStreams,
-  currentQuery,
-  queryFilters,
   onSubmit = defaultProps.onSubmit,
 }: Props) => {
   const { searchesClusterConfig: config } = useStore(SearchConfigStore);
   const { userTimezone } = useUserDateTime();
   const { parameters } = useParameters();
+  const currentQuery = useCurrentQuery();
+  const queryFilters = useQueryFilters();
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const initialValues = useInitialFormValues({ queryFilters, currentQuery });
   const _onSubmit = useCallback((values: SearchBarFormValues) => onSubmit(values, pluggableSearchBarControls, currentQuery), [currentQuery, onSubmit, pluggableSearchBarControls]);
@@ -246,12 +244,9 @@ SearchBar.defaultProps = defaultProps;
 export default connect(
   SearchBar,
   {
-    currentQuery: CurrentQueryStore,
     availableStreams: StreamsStore,
-    queryFilters: QueryFiltersStore,
   },
-  ({ availableStreams: { streams }, ...rest }) => ({
-    ...rest,
+  ({ availableStreams: { streams } }) => ({
     availableStreams: streams.map((stream) => ({ key: stream.title, value: stream.id })),
   }),
 );

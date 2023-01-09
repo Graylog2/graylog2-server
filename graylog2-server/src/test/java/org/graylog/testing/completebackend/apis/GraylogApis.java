@@ -16,9 +16,18 @@
  */
 package org.graylog.testing.completebackend.apis;
 
+import io.restassured.response.Response;
+import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.apis.inputs.GelfInputApi;
+
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.not;
 
 public class GraylogApis {
     private final RequestSpecification requestSpecification;
@@ -79,4 +88,91 @@ public class GraylogApis {
         return this.fieldTypes;
     }
 
+    protected RequestSpecification prefix(final Users.User user) {
+        return given()
+                .config(backend.withGraylogBackendFailureConfig())
+                .spec(requestSpecification)
+                .auth().basic(user.username(), user.password())
+                .when();
+    }
+
+    public ValidatableResponse postWithResource(final String url, final String resource, final int expectedResult) {
+        return postWithResource(url, Users.LOCAL_ADMIN, resource, expectedResult);
+    }
+
+    public ValidatableResponse postWithResource(final String url, final Users.User user, final String resource, final int expectedResult) {
+        return prefix(user)
+                .body(getClass().getClassLoader().getResourceAsStream(resource))
+                .post(url)
+                .then()
+                .log().ifStatusCodeMatches(not(expectedResult))
+                .statusCode(expectedResult);
+    }
+
+    public ValidatableResponse post(final String url, final String body, final int expectedResult) {
+        return post(url, Users.LOCAL_ADMIN, body, expectedResult);
+    }
+
+    public ValidatableResponse post(final String url, final Users.User user, final String body, final int expectedResult) {
+        var response = prefix(user);
+
+        if(body != null) {
+            response = response.body(body);
+        }
+
+        return response
+                .post(url)
+                .then()
+                .log().ifStatusCodeMatches(not(expectedResult))
+                .statusCode(expectedResult);
+    }
+
+    public ValidatableResponse put(final String url, final String body, final int expectedResult) {
+        return put(url, Users.LOCAL_ADMIN, body, expectedResult);
+    }
+
+    public ValidatableResponse put(final String url, final Users.User user, final String body, final int expectedResult) {
+        var response = prefix(user);
+
+        if(body != null) {
+            response = response.body(body);
+        }
+
+        return response
+                .put(url)
+                .then()
+                .log().ifStatusCodeMatches(not(expectedResult))
+                .statusCode(expectedResult);
+    }
+
+    public ValidatableResponse get(final String url, final int expectedResult) {
+        return get(url, Users.LOCAL_ADMIN, Map.of(), expectedResult);
+    }
+
+    public ValidatableResponse get(final String url, final Map<String, Object> queryParms, final int expectedResult) {
+        return get(url, Users.LOCAL_ADMIN, queryParms, expectedResult);
+    }
+
+    public ValidatableResponse get(final String url, final Users.User user, final Map<String, Object> queryParms, final int expectedResult) {
+        var request = prefix(user);
+        for (var param: queryParms.entrySet()) {
+            request = request.queryParam(param.getKey(), List.of(param.getValue()));
+        }
+        return request.get(url)
+                .then()
+                .log().ifStatusCodeMatches(not(expectedResult))
+                .statusCode(expectedResult);
+    }
+
+    public ValidatableResponse delete(final String url, final int expectedResult) {
+        return delete(url, Users.LOCAL_ADMIN, expectedResult);
+    }
+
+    public ValidatableResponse delete(final String url, final Users.User user, final int expectedResult) {
+        return prefix(user)
+                .delete(url)
+                .then()
+                .log().ifStatusCodeMatches(not(expectedResult))
+                .statusCode(expectedResult);
+    }
 }

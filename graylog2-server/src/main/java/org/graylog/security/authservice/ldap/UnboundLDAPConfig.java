@@ -19,6 +19,8 @@ package org.graylog.security.authservice.ldap;
 
 import com.google.auto.value.AutoValue;
 
+import java.util.List;
+
 @AutoValue
 public abstract class UnboundLDAPConfig {
     public abstract String userSearchBase();
@@ -30,6 +32,8 @@ public abstract class UnboundLDAPConfig {
     public abstract String userNameAttribute();
 
     public abstract String userFullNameAttribute();
+
+    public abstract List<String> emailAttributes();
 
     public abstract Builder toBuilder();
 
@@ -52,6 +56,8 @@ public abstract class UnboundLDAPConfig {
         public abstract Builder userNameAttribute(String userNameAttribute);
 
         public abstract Builder userFullNameAttribute(String userFullNameAttribute);
+
+        public abstract Builder emailAttributes(List<String> emailAttributes);
 
         public abstract UnboundLDAPConfig build();
     }

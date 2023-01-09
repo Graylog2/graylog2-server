@@ -291,8 +291,8 @@ public class PersistedServiceImpl implements PersistedService {
             }
 
             // Our own NodeID
-            if (x.getValue() instanceof NodeId) {
-                doc.put(x.getKey(), x.getValue().toString());
+            if (x.getValue() instanceof NodeId nodeId) {
+                doc.put(x.getKey(), nodeId.getNodeId());
             }
 
         }
