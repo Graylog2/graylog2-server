@@ -18,23 +18,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import moment from 'moment';
+import styled, { css } from 'styled-components';
 
-import { ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/bootstrap';
+import { ControlLabel, FormControl, FormGroup, InputGroup } from 'components/bootstrap';
 import { TimeUnitInput } from 'components/common';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import * as FormsUtils from 'util/FormsUtils';
 
-import commonStyles from '../common/commonStyles.css';
-
 const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 
-class NotificationSettingsForm extends React.Component {
-  static propTypes = {
-    eventDefinition: PropTypes.object.isRequired,
-    defaults: PropTypes.object.isRequired,
-    onSettingsChange: PropTypes.func.isRequired,
-  };
+const Container = styled.div(({ theme }) => css`
+  padding-top: ${theme.spacings.lg};
+`);
 
+class NotificationSettingsForm extends React.Component {
   constructor(props) {
     super(props);
 
@@ -91,46 +88,49 @@ class NotificationSettingsForm extends React.Component {
     }
 
     return (
-      <>
-        <h3 className={commonStyles.title}>Notification Settings</h3>
-        <fieldset>
-          <FormGroup controlId="grace-period">
-            <TimeUnitInput label="Grace Period"
-                           update={this.handleGracePeriodChange}
-                           defaultEnabled={gracePeriodDuration !== 0}
-                           value={gracePeriodDuration}
-                           unit={gracePeriodUnit}
-                           units={TIME_UNITS}
-                           clearable />
-            <HelpBlock>
-              Graylog sends Notifications for Alerts every time they occur. Set a Grace Period to control how long
-              Graylog should wait before sending Notifications again. Note that Events with keys will have a Grace
-              Period for each different key value.
-            </HelpBlock>
-          </FormGroup>
+      <Container>
+        <FormGroup controlId="grace-period">
+          <TimeUnitInput label="Grace Period"
+                         update={this.handleGracePeriodChange}
+                         defaultEnabled={gracePeriodDuration !== 0}
+                         value={gracePeriodDuration}
+                         unit={gracePeriodUnit}
+                         units={TIME_UNITS}
+                         clearable />
+          <p>
+            Graylog sends Notifications for Alerts every time they occur. Set a Grace Period to control how long
+            Graylog should wait before sending Notifications again. Note that Events with keys will have a Grace
+            Period for each different key value.
+          </p>
+        </FormGroup>
 
-          <FormGroup>
-            <ControlLabel>Message Backlog</ControlLabel>
-            <InputGroup>
-              <InputGroup.Addon>
-                <input id="toggle_backlog_size"
-                       type="checkbox"
-                       checked={isBacklogSizeEnabled}
-                       onChange={this.toggleBacklogSize} />
-              </InputGroup.Addon>
-              <FormControl type="number"
-                           id="backlog_size"
-                           name="backlog_size"
-                           onChange={this.handleBacklogSizeChange}
-                           value={backlogSize}
-                           disabled={!isBacklogSizeEnabled} />
-            </InputGroup>
-            <HelpBlock>Number of messages to be included in Notifications.</HelpBlock>
-          </FormGroup>
-        </fieldset>
-      </>
+        <FormGroup>
+          <ControlLabel>Message Backlog</ControlLabel>
+          <InputGroup>
+            <InputGroup.Addon>
+              <input id="toggle_backlog_size"
+                     type="checkbox"
+                     checked={isBacklogSizeEnabled}
+                     onChange={this.toggleBacklogSize} />
+            </InputGroup.Addon>
+            <FormControl type="number"
+                         id="backlog_size"
+                         name="backlog_size"
+                         onChange={this.handleBacklogSizeChange}
+                         value={backlogSize}
+                         disabled={!isBacklogSizeEnabled} />
+          </InputGroup>
+          <p>Number of messages to be included in Notifications.</p>
+        </FormGroup>
+      </Container>
     );
   }
 }
+
+NotificationSettingsForm.propTypes = {
+  eventDefinition: PropTypes.object.isRequired,
+  defaults: PropTypes.object.isRequired,
+  onSettingsChange: PropTypes.func.isRequired,
+};
 
 export default NotificationSettingsForm;

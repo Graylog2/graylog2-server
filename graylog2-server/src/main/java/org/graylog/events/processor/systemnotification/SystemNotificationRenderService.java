@@ -35,6 +35,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import static org.apache.commons.lang.CharEncoding.UTF_8;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class SystemNotificationRenderService {
     public enum Format {HTML, PLAINTEXT}
@@ -70,7 +71,7 @@ public class SystemNotificationRenderService {
 
     public RenderResponse render(Notification.Type type, Format format, Map<String, Object> values) {
         Notification notification = notificationService.getByType(type)
-                .orElseThrow(() -> new IllegalArgumentException("Event type is not currently active"));
+                .orElseThrow(() -> new IllegalArgumentException(f("Event type <%s> is not currently active", type)));
         return render(notification, format, values);
     }
 
