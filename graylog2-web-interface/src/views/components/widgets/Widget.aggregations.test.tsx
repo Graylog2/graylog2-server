@@ -32,14 +32,13 @@ import WidgetModel from 'views/logic/widgets/Widget';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import View from 'views/logic/views/View';
-import { ViewStore } from 'views/stores/ViewStore';
-import type { ViewStoreState } from 'views/stores/ViewStore';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import viewsBindings from 'views/bindings';
 import DataTable from 'views/components/datatable/DataTable';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import { asMock } from 'helpers/mocking';
 import useViewType from 'views/hooks/useViewType';
+import PluggableStoreProvider from 'components/PluggableStoreProvider';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -64,11 +63,8 @@ jest.mock('views/stores/WidgetStore', () => ({
   },
 }));
 
-jest.mock('views/stores/AggregationFunctionsStore', () => ({
-  getInitialState: jest.fn(() => ({
-    count: { type: 'count', description: 'Count' },
-  })),
-  listen: jest.fn(),
+jest.mock('views/components/aggregationwizard/metric/useAggregationFunctions', () => () => ({
+  count: { type: 'count', description: 'Count' },
 }));
 
 jest.mock('views/stores/StreamsStore', () => ({
@@ -77,13 +73,6 @@ jest.mock('views/stores/StreamsStore', () => ({
       { title: 'Stream 1', id: 'stream-id-1' },
     ],
   })]),
-}));
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchStore: MockStore(['getInitialState', () => ({ search: { parameters: [] } })]),
-  SearchActions: {
-    execute: mockAction(),
-  },
 }));
 
 jest.mock('views/hooks/useViewType');
@@ -108,19 +97,12 @@ describe('Aggregation Widget', () => {
     .timerange({ type: 'relative', from: 300 })
     .build();
 
-  const viewStoreState: ViewStoreState = {
-    activeQuery: 'query-id-1',
-    view: createSearch({ queryId: 'query-id-1' }),
-    isNew: false,
-    dirty: false,
-  };
+  const view = createSearch({ queryId: 'query-id-1' });
 
   beforeEach(() => {
     jest.useFakeTimers()
       // @ts-expect-error
       .setSystemTime(mockedUnixTime);
-
-    ViewStore.getInitialState = jest.fn(() => viewStoreState);
   });
 
   afterEach(() => {
@@ -142,8 +124,7 @@ describe('Aggregation Widget', () => {
     widget: propsWidget = dataTableWidget,
     ...props
   }: AggregationWidgetProps) => (
-    <>
-      {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
+    <PluggableStoreProvider view={view} isNew={false} initialQuery="query-id-1">
       <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
         <WidgetFocusContext.Provider value={widgetFocusContextState}>
           <WidgetContext.Provider value={propsWidget}>
@@ -157,7 +138,7 @@ describe('Aggregation Widget', () => {
           </WidgetContext.Provider>
         </WidgetFocusContext.Provider>
       </FieldTypesContext.Provider>
-    </>
+    </PluggableStoreProvider>
   );
 
   const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: /update preview/i });
@@ -175,6 +156,7 @@ describe('Aggregation Widget', () => {
     it('should apply not submitted widget search controls and aggregation elements changes when clicking on "Update widget"', async () => {
       const newSeries = Series.create('count').toBuilder().config(SeriesConfig.empty().toBuilder().name('Metric name').build()).build();
       const updatedConfig = dataTableWidget.config
+        // @ts-expect-error
         .toBuilder()
         .series([newSeries])
         .build();
@@ -256,6 +238,7 @@ describe('Aggregation Widget', () => {
     it('should apply not submitted aggregation elements changes when clicking on "Update widget"', async () => {
       const newSeries = Series.create('count').toBuilder().config(SeriesConfig.empty().toBuilder().name('Metric name').build()).build();
       const updatedConfig = dataTableWidget.config
+        // @ts-expect-error
         .toBuilder()
         .series([newSeries])
         .build();
