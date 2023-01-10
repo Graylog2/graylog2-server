@@ -18,8 +18,6 @@ import * as React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
-import mockAction from 'helpers/mocking/MockAction';
-import { SearchActions } from 'views/stores/SearchStore';
 import MockQuery from 'views/logic/queries/Query';
 import type { WidgetEditingState, WidgetFocusingState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
@@ -29,17 +27,9 @@ import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
+import useAppDispatch from 'stores/useAppDispatch';
 
 import OriginalSearchBar from './SearchBar';
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchStore: MockStore(
-    ['getInitialState', () => ({ search: { parameters: [] } })],
-  ),
-  SearchActions: {
-    refresh: jest.fn(),
-  },
-}));
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 
@@ -66,6 +56,7 @@ jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest
 
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 jest.mock('views/logic/queries/useCurrentQuery');
+jest.mock('stores/useAppDispatch');
 
 const query = MockQuery.builder()
   .timerange({ type: 'relative', from: 300 })
@@ -85,7 +76,6 @@ describe('SearchBar', () => {
   afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
-    SearchActions.refresh = mockAction();
     SearchConfigStore.getInitialState = jest.fn(() => ({ searchesClusterConfig: mockSearchesClusterConfig }));
 
     asMock(useCurrentQuery).mockReturnValue(query);
@@ -103,15 +93,20 @@ describe('SearchBar', () => {
   });
 
   it('should refresh search, when search is performed and there are no changes.', async () => {
+    const dispatch = jest.fn();
+    asMock(useAppDispatch).mockReturnValue(dispatch);
+
     render(<SearchBar />);
 
     const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
     await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
 
+    asMock(dispatch).mockClear();
+
     fireEvent.click(searchButton);
 
-    await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(dispatch).toHaveBeenCalled());
   });
 
   it('date exceeding limitDuration should render with error Icon & search button disabled', async () => {

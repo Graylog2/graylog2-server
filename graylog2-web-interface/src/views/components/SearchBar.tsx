@@ -22,7 +22,7 @@ import { Field } from 'formik';
 import styled from 'styled-components';
 import moment from 'moment';
 
-import connect, { useStore } from 'stores/connect';
+import { useStore } from 'stores/connect';
 import { Spinner } from 'components/common';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import SearchActionsMenu from 'views/components/searchbar/saved-search/SearchActionsMenu';
@@ -31,7 +31,6 @@ import QueryInput from 'views/components/searchbar/queryinput/AsyncQueryInput';
 import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
 import ScrollToHint from 'views/components/common/ScrollToHint';
-import { QueriesActions } from 'views/stores/QueriesStore';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import type { FilterType, QueryId } from 'views/logic/queries/Query';
@@ -43,7 +42,6 @@ import FormWarningsContext from 'contexts/FormWarningsContext';
 import FormWarningsProvider from 'contexts/FormWarningsProvider';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
-import { SearchActions } from 'views/stores/SearchStore';
 import usePluginEntities from 'hooks/usePluginEntities';
 import PluggableSearchBarControls from 'views/components/searchbar/PluggableSearchBarControls';
 import useParameters from 'views/hooks/useParameters';
@@ -62,6 +60,10 @@ import {
 import PluggableCommands from 'views/components/searchbar/queryinput/PluggableCommands';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import useQueryFilters from 'views/logic/queries/useQueryFilters';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import useAppDispatch from 'stores/useAppDispatch';
+import { execute } from 'views/logic/slices/searchExecutionSlice';
+import { updateQuery } from 'views/logic/slices/viewSlice';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -77,7 +79,7 @@ const StreamsAndRefresh = styled.div`
   flex: 1.5;
 `;
 
-const defaultOnSubmit = async (values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, currentQuery: Query) => {
+const defaultOnSubmit = async (dispatch: AppDispatch, values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, currentQuery: Query) => {
   const { timerange, streams, queryString } = values;
 
   const queryWithPluginData = await executePluggableSubmitHandler(values, pluggableSearchBarControls, currentQuery);
@@ -89,10 +91,10 @@ const defaultOnSubmit = async (values: SearchBarFormValues, pluggableSearchBarCo
     .build();
 
   if (!currentQuery.equals(newQuery)) {
-    return QueriesActions.forceUpdate(newQuery.id, newQuery);
+    return dispatch(updateQuery([newQuery.id, newQuery]));
   }
 
-  return SearchActions.refresh();
+  return dispatch(execute());
 };
 
 const defaultProps = {
@@ -122,14 +124,11 @@ const _validateQueryString = (values: SearchBarFormValues, pluggableSearchBarCon
 };
 
 type Props = {
-  availableStreams: Array<{ key: string, value: string }>,
-  onSubmit?: (update: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, query: Query) => Promise<any>
+  onSubmit?: (dispatch: AppDispatch, update: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, query: Query) => Promise<any>
 };
 
-const SearchBar = ({
-  availableStreams,
-  onSubmit = defaultProps.onSubmit,
-}: Props) => {
+const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
+  const availableStreams = useStore(StreamsStore, ({ streams }) => streams.map((stream) => ({ key: stream.title, value: stream.id })));
   const { searchesClusterConfig: config } = useStore(SearchConfigStore);
   const { userTimezone } = useUserDateTime();
   const { parameters } = useParameters();
@@ -137,7 +136,9 @@ const SearchBar = ({
   const queryFilters = useQueryFilters();
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const initialValues = useInitialFormValues({ queryFilters, currentQuery });
-  const _onSubmit = useCallback((values: SearchBarFormValues) => onSubmit(values, pluggableSearchBarControls, currentQuery), [currentQuery, onSubmit, pluggableSearchBarControls]);
+  const dispatch = useAppDispatch();
+  const _onSubmit = useCallback((values: SearchBarFormValues) => onSubmit(dispatch, values, pluggableSearchBarControls, currentQuery),
+    [currentQuery, dispatch, onSubmit, pluggableSearchBarControls]);
 
   if (!currentQuery || !config) {
     return <Spinner />;
@@ -241,12 +242,4 @@ SearchBar.propTypes = {
 
 SearchBar.defaultProps = defaultProps;
 
-export default connect(
-  SearchBar,
-  {
-    availableStreams: StreamsStore,
-  },
-  ({ availableStreams: { streams } }) => ({
-    availableStreams: streams.map((stream) => ({ key: stream.title, value: stream.id })),
-  }),
-);
+export default SearchBar;

@@ -57,6 +57,23 @@ const viewSlice = createSlice({
         activeQuery: query.id,
       };
     },
+    updateQuery: (state: ViewState, action: PayloadAction<[string, Query]>) => {
+      const { view } = state;
+      const { queries } = view.search;
+      const [queryId, query] = action.payload;
+      const newQueries = queries.map((q) => (q.id === queryId ? query : q)).toOrderedSet();
+      const newSearch = view.search.toBuilder()
+        .queries(newQueries)
+        .build();
+      const newView = view.toBuilder()
+        .search(newSearch)
+        .build();
+
+      return {
+        ...state,
+        view: newView,
+      };
+    },
     removeQuery: (state: ViewState, action: PayloadAction<string>) => {
       const queryId = action.payload;
       const { view, activeQuery } = state ?? {};
@@ -80,7 +97,7 @@ const viewSlice = createSlice({
   },
 });
 
-export const { selectQuery, removeQuery } = viewSlice.actions;
+export const { selectQuery, removeQuery, updateQuery } = viewSlice.actions;
 export const viewSliceReducer = viewSlice.reducer;
 
 export const selectRootView = (state: RootState) => state.view;
