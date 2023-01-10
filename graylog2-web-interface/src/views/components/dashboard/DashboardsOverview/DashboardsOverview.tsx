@@ -33,15 +33,7 @@ import FavoriteIcon from 'views/components/FavoriteIcon';
 import TitleCell from './TitleCell';
 
 const INITIAL_COLUMNS = ['title', 'description', 'summary', 'favorite'];
-
-const COLUMN_DEFINITIONS = [
-  { id: 'created_at', title: 'Created At', sortable: true },
-  { id: 'title', title: 'Title', sortable: true },
-  { id: 'description', title: 'Description', sortable: true },
-  { id: 'summary', title: 'Summary', sortable: true },
-  { id: 'owner', title: 'Owner', sortable: true },
-  { id: 'favorite', title: 'Favorite' },
-];
+const COLUMNS_ORDER = ['title', 'summary', 'description', 'owner', 'created_at', 'favorite'];
 
 const useCustomColumnRenderers = ({ queryClient, searchParams }: { queryClient: QueryClient, searchParams: SearchParams
 }) => {
@@ -124,7 +116,7 @@ const DashboardsOverview = () => {
     return <Spinner />;
   }
 
-  const { list: dashboards, pagination } = paginatedDashboards;
+  const { list: dashboards, pagination, attributes } = paginatedDashboards;
 
   return (
     <PaginatedList onChange={onPageChange}
@@ -152,7 +144,8 @@ const DashboardsOverview = () => {
                                activeSort={searchParams.sort}
                                rowActions={renderDashboardActions}
                                columnRenderers={columnRenderers}
-                               columnDefinitions={COLUMN_DEFINITIONS} />
+                               columnsOrder={COLUMNS_ORDER}
+                               columnDefinitions={attributes} />
       )}
     </PaginatedList>
   );
