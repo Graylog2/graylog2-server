@@ -26,10 +26,11 @@ import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigu
 class ImportsViewModal extends React.Component {
   static propTypes = {
     onApply: PropTypes.func.isRequired,
+    showModal: PropTypes.bool.isRequired,
+    onHide: PropTypes.func.isRequired,
   };
 
   static initialState = {
-    showModal: false,
     uploads: undefined,
     totalUploads: 0,
     pagination: {
@@ -44,15 +45,11 @@ class ImportsViewModal extends React.Component {
     this.state = ImportsViewModal.initialState;
   }
 
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  open = () => {
-    this._loadUploads(this.state.pagination.page);
-    this.setState({ showModal: true });
-  };
-
-  hide = () => {
-    this.setState({ showModal: false });
-  };
+  componentDidUpdate(prevProps) {
+    if (this.props.showModal) {
+      this._loadUploads(this.state.pagination.page);
+    }
+  }
 
   _isLoading = () => {
     return !this.state.uploads;
@@ -143,8 +140,8 @@ class ImportsViewModal extends React.Component {
 
   render() {
     return (
-      <BootstrapModalWrapper showModal={this.state.showModal}
-                             onHide={this.hide}
+      <BootstrapModalWrapper showModal={this.props.showModal}
+                             onHide={this.props.onHide}
                              bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title><span>Imports from the old Collector system</span></Modal.Title>
@@ -154,7 +151,7 @@ class ImportsViewModal extends React.Component {
           {this._formatModalBody()}
         </Modal.Body>
         <Modal.Footer>
-          <Button type="button" onClick={this.hide}>Close</Button>
+          <Button type="button" onClick={this.props.onHide}>Close</Button>
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
