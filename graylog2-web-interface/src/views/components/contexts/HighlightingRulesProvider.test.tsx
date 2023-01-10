@@ -19,8 +19,10 @@ import { render } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import { HighlightingRulesStore } from 'views/stores/HighlightingRulesStore';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import useActiveViewState from 'views/hooks/useActiveViewState';
+import ViewState from 'views/logic/views/ViewState';
+import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
 
 import HighlightingRulesContext from './HighlightingRulesContext';
 import HighlightingRulesProvider from './HighlightingRulesProvider';
@@ -31,6 +33,8 @@ jest.mock('views/stores/HighlightingRulesStore', () => ({
     getInitialState: jest.fn(() => {}),
   },
 }));
+
+jest.mock('views/hooks/useActiveViewState');
 
 describe('HighlightingRulesProvider', () => {
   const renderSUT = () => {
@@ -47,10 +51,14 @@ describe('HighlightingRulesProvider', () => {
     return consume;
   };
 
+  beforeEach(() => {
+    asMock(useActiveViewState).mockReturnValue(ViewState.create());
+  });
+
   it('provides no data when highlighting rules store is empty', () => {
     const consume = renderSUT();
 
-    expect(consume).toHaveBeenCalledWith(undefined);
+    expect(consume).toHaveBeenCalledWith([]);
   });
 
   it('provides highlighting rules', () => {
@@ -59,8 +67,10 @@ describe('HighlightingRulesProvider', () => {
       .value(String(42))
       .color(StaticColor.create('#bc98fd'))
       .build();
-
-    asMock(HighlightingRulesStore.getInitialState).mockReturnValue([rule]);
+    const viewState = ViewState.builder()
+      .formatting(FormattingSettings.create([rule]))
+      .build();
+    asMock(useActiveViewState).mockReturnValue(viewState);
 
     const consume = renderSUT();
 
