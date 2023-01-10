@@ -49,7 +49,7 @@ const CycleQueryTab = ({ interval, view, activeQuery, tabs }: Props) => {
     }, interval * 1000);
 
     return () => clearInterval(cycleInterval);
-  }, [interval, view, activeQuery, tabs]);
+  }, [interval, view, activeQuery, tabs, dispatch]);
 
   return null;
 };
