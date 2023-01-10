@@ -28,8 +28,7 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import type View from 'views/logic/views/View';
-import { createSearch } from 'fixtures/searches';
-import type { WidgetPositions } from 'views/types';
+import { createViewWithWidgets } from 'fixtures/searches';
 
 import WidgetGrid from './WidgetGrid';
 
@@ -63,20 +62,6 @@ const SimpleWidgetGrid = ({ view }: { view?: View }) => (
 
 SimpleWidgetGrid.defaultProps = {
   view: undefined,
-};
-
-const createViewWithWidgets = (widgets: Array<_Widget>, positions: WidgetPositions) => {
-  const view = createSearch();
-  const newViewState = view.state.get('query-id-1')
-    .toBuilder()
-    .widgets(widgets)
-    .widgetPositions(positions)
-    .build();
-
-  return view
-    .toBuilder()
-    .state(Immutable.Map({ 'query-id-1': newViewState }))
-    .build();
 };
 
 describe('<WidgetGrid />', () => {
