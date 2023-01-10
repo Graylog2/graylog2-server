@@ -231,8 +231,8 @@ public class StreamRouterEngine {
                 } else {
                     // A previously executed message processor (or Illuminate) has likely already removed the
                     // default stream from the message. Now, the message has matched a stream in the Graylog
-                    // MessageFilterChain during stream matching, which is also set to remove the default stream.
-                    // This is generally not a problem.
+                    // MessageFilterChain, and the matching stream is also set to remove the default stream.
+                    // This is usually from user-defined stream rules, and is generally not a problem.
                     cannotRemoveDefaultMeter.inc();
                     if (LOG.isTraceEnabled()) {
                         LOG.trace("Couldn't remove default stream <{}> from message <{}>", defaultStream.getId(), message.getId());
