@@ -33,6 +33,8 @@ import java.util.List;
 @WithBeanGetter
 public abstract class PageListResponse<T> {
 
+    public static final String ELEMENTS_FIELD_NAME = "elements";
+
     @Nullable
     @JsonProperty("query")
     public abstract String query();
@@ -51,7 +53,7 @@ public abstract class PageListResponse<T> {
     @JsonProperty("order")
     public abstract String order();
 
-    @JsonProperty("elements")
+    @JsonProperty(ELEMENTS_FIELD_NAME)
     public abstract List<T> elements();
 
     @JsonProperty
@@ -67,7 +69,7 @@ public abstract class PageListResponse<T> {
             @JsonProperty("total") long total,
             @JsonProperty("sort") @Nullable String sort,
             @JsonProperty("order") @Nullable String order,
-            @JsonProperty("elements") List<T> elements,
+            @JsonProperty(ELEMENTS_FIELD_NAME) List<T> elements,
             @JsonProperty("attributes") List<EntityAttribute> attributes,
             @JsonProperty("defaults") EntityDefaults defaults) {
         return new AutoValue_PageListResponse<>(query, paginationInfo, total, sort, order, elements, attributes, defaults);
