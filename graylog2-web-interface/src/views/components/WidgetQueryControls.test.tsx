@@ -17,13 +17,19 @@
 import * as React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import WrappingContainer from 'WrappingContainer';
+import * as mockImmutable from 'immutable';
 
+import mockAction from 'helpers/mocking/MockAction';
 import MockStore from 'helpers/mocking/StoreMock';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import { SearchActions } from 'views/stores/SearchStore';
-import type GlobalOverride from 'views/logic/search/GlobalOverride';
+import GlobalOverride from 'views/logic/search/GlobalOverride';
 import Widget from 'views/logic/widgets/Widget';
 import mockComponent from 'helpers/mocking/MockComponent';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { asMock } from 'helpers/mocking';
+import useGlobalOverride from 'views/hooks/useGlobalOverride';
 
 import WidgetQueryControls from './WidgetQueryControls';
 import WidgetContext from './contexts/WidgetContext';
@@ -32,12 +38,14 @@ jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mo
 jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 
 jest.mock('views/stores/WidgetStore', () => ({
+  WidgetStore: MockStore(['getInitialState', () => mockImmutable.Map()]),
   WidgetActions: {
     update: jest.fn(),
   },
 }));
 
 jest.mock('views/stores/GlobalOverrideStore', () => ({
+  GlobalOverrideStore: MockStore(),
   GlobalOverrideActions: {
     resetTimeRange: jest.fn(() => Promise.resolve()),
     resetQuery: jest.fn(() => Promise.resolve()),
@@ -49,19 +57,10 @@ jest.mock('views/stores/SearchStore', () => ({
     ['getInitialState', () => ({ search: { parameters: [] } })],
   ),
   SearchActions: {
+    execute: mockAction(),
     refresh: jest.fn(() => Promise.resolve()),
   },
 }));
-
-jest.mock('stores/connect', () => {
-  const originalModule = jest.requireActual('stores/connect');
-
-  return {
-    __esModule: true,
-    ...originalModule,
-    default: (x) => x,
-  };
-});
 
 jest.mock('moment', () => {
   const mockMoment = jest.requireActual('moment');
@@ -85,8 +84,17 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   })]),
 }));
 
+jest.mock('views/hooks/useGlobalOverride');
+
 describe('WidgetQueryControls', () => {
-  beforeEach(() => { jest.clearAllMocks(); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    asMock(useGlobalOverride).mockReturnValue(GlobalOverride.empty());
+  });
+
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
 
   const config = {
     relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
@@ -98,10 +106,13 @@ describe('WidgetQueryControls', () => {
     config,
   };
 
-  const emptyGlobalOverride = {};
-  const globalOverrideWithQuery = { query: { type: 'elasticsearch', query_string: 'source:foo' } };
-  const globalOverrideWithTimeRange = { timerange: { type: 'absolute', from: '2020-01-01T10:00:00.850Z', to: '2020-01-02T10:00:00.000Z' } };
-  const globalOverrideWithQueryAndTimeRange = { ...globalOverrideWithQuery, ...globalOverrideWithTimeRange };
+  const emptyGlobalOverride = GlobalOverride.empty();
+  const globalOverrideWithQuery = GlobalOverride.create(undefined, { type: 'elasticsearch', query_string: 'source:foo' });
+  const globalOverrideWithTimeRange = GlobalOverride.create({ type: 'absolute', from: '2020-01-01T10:00:00.850Z', to: '2020-01-02T10:00:00.000Z' });
+  const globalOverrideWithQueryAndTimeRange = GlobalOverride.create(
+    { type: 'absolute', from: '2020-01-01T10:00:00.850Z', to: '2020-01-02T10:00:00.000Z' },
+    { type: 'elasticsearch', query_string: 'source:foo' },
+  );
   const widget = Widget.builder()
     .id('deadbeef')
     .type('dummy')
@@ -109,11 +120,13 @@ describe('WidgetQueryControls', () => {
     .build();
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    <WrappingContainer>
-      <WidgetContext.Provider value={widget}>
-        {children}
-      </WidgetContext.Provider>
-    </WrappingContainer>
+    <TestStoreProvider>
+      <WrappingContainer>
+        <WidgetContext.Provider value={widget}>
+          {children}
+        </WidgetContext.Provider>
+      </WrappingContainer>
+    </TestStoreProvider>
   );
 
   const renderSUT = (props = {}) => render(
@@ -136,28 +149,35 @@ describe('WidgetQueryControls', () => {
     const queryOverrideInfo = globalOverrideWithQuery.query.query_string;
 
     it('shows preview of global override time range', async () => {
-      renderSUT({ globalOverride: globalOverrideWithTimeRange });
+      asMock(useGlobalOverride).mockReturnValue(globalOverrideWithTimeRange);
+
+      renderSUT();
 
       await screen.findByRole('button', { name: resetTimeRangeButtonTitle });
       await screen.findByText(timeRangeOverrideInfo);
     });
 
     it('shows preview of global override query', async () => {
-      renderSUT({ globalOverride: globalOverrideWithQuery });
+      asMock(useGlobalOverride).mockReturnValue(globalOverrideWithQuery);
+
+      renderSUT();
 
       await screen.findByRole('button', { name: resetQueryButtonTitle });
       await screen.findByText(queryOverrideInfo);
     });
 
     it('does not show any indicator if global override is not set', async () => {
-      renderSUT({ globalOverride: emptyGlobalOverride });
+      renderSUT();
 
       expect(screen.queryByRole('button', { name: resetTimeRangeButtonTitle })).toBeNull();
       expect(screen.queryByRole('button', { name: resetTimeRangeButtonTitle })).toBeNull();
     });
 
     it('triggers resetting global override when reset time range override button is clicked', async () => {
-      renderSUT({ globalOverride: globalOverrideWithTimeRange });
+      asMock(useGlobalOverride).mockReturnValue(globalOverrideWithTimeRange);
+
+      renderSUT();
+
       const resetTimeRangeOverrideButton = await screen.findByRole('button', { name: resetTimeRangeButtonTitle });
       fireEvent.click(resetTimeRangeOverrideButton);
 
@@ -165,7 +185,10 @@ describe('WidgetQueryControls', () => {
     });
 
     it('triggers resetting global override and query validation when reset query filter button is clicked', async () => {
-      renderSUT({ globalOverride: globalOverrideWithQuery });
+      asMock(useGlobalOverride).mockReturnValue(globalOverrideWithQuery);
+
+      renderSUT();
+
       const resetQueryFilterButton = await screen.findByRole('button', { name: resetQueryButtonTitle });
       fireEvent.click(resetQueryFilterButton);
 
@@ -173,28 +196,38 @@ describe('WidgetQueryControls', () => {
     });
 
     it('executes search when reset time range override button is clicked', async () => {
-      renderSUT({ globalOverride: globalOverrideWithTimeRange });
+      asMock(useGlobalOverride).mockReturnValue(globalOverrideWithTimeRange);
+
+      renderSUT();
+
       const resetTimeRangeOverrideButton = await screen.findByRole('button', { name: resetTimeRangeButtonTitle });
       fireEvent.click(resetTimeRangeOverrideButton);
       await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalled());
     });
 
     it('executes search when reset query filter button is clicked', async () => {
-      renderSUT({ globalOverride: globalOverrideWithQuery });
+      asMock(useGlobalOverride).mockReturnValue(globalOverrideWithQuery);
+
+      renderSUT();
+
       const resetQueryFilterButton = await screen.findByRole('button', { name: resetQueryButtonTitle });
       fireEvent.click(resetQueryFilterButton);
       await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalled());
     });
 
     it('emptying `globalOverride` prop removes notifications', async () => {
-      const { rerender } = renderSUT({ globalOverride: globalOverrideWithQueryAndTimeRange });
+      asMock(useGlobalOverride).mockReturnValue(globalOverrideWithQueryAndTimeRange);
+
+      const { rerender } = renderSUT();
 
       await screen.findByText(queryOverrideInfo);
       await screen.findByText(timeRangeOverrideInfo);
 
+      asMock(useGlobalOverride).mockReturnValue(emptyGlobalOverride);
+
       rerender(
         <Wrapper>
-          <WidgetQueryControls {...defaultProps} globalOverride={emptyGlobalOverride as GlobalOverride} />
+          <WidgetQueryControls {...defaultProps} />
         </Wrapper>,
       );
 
