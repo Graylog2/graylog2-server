@@ -27,8 +27,10 @@ import validateQuery from 'views/components/searchbar/queryvalidation/validateQu
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import TestStoreProvider from 'views/test/TestStoreProvider';
 
-import SearchBar from './SearchBar';
+import OriginalSearchBar from './SearchBar';
 
 jest.mock('views/stores/SearchStore', () => ({
   SearchStore: MockStore(
@@ -71,7 +73,17 @@ const query = MockQuery.builder()
   .id('34efae1e-e78e-48ab-ab3f-e83c8611a683')
   .build();
 
+const SearchBar = () => (
+  <TestStoreProvider>
+    <OriginalSearchBar />
+  </TestStoreProvider>
+);
+
 describe('SearchBar', () => {
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   beforeEach(() => {
     SearchActions.refresh = mockAction();
     SearchConfigStore.getInitialState = jest.fn(() => ({ searchesClusterConfig: mockSearchesClusterConfig }));
@@ -82,19 +94,12 @@ describe('SearchBar', () => {
   it('should render the SearchBar', async () => {
     render(<SearchBar />);
 
-    const timeRangeButton = await screen.findByLabelText('Open Time Range Selector');
-    const timeRangeDisplay = await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
-    const streamsFilter = await screen.findByTestId('streams-filter');
-    const liveUpdate = await screen.findByLabelText('Refresh Search Controls');
-    const searchButton = await screen.findByRole('button', { name: /perform search/i });
-    const metaButtons = await screen.findByText('Saved Search Controls');
-
-    expect(timeRangeButton).not.toBeNull();
-    expect(timeRangeDisplay).not.toBeNull();
-    expect(streamsFilter).not.toBeNull();
-    expect(liveUpdate).not.toBeNull();
-    expect(searchButton).not.toBeNull();
-    expect(metaButtons).not.toBeNull();
+    await screen.findByLabelText('Open Time Range Selector');
+    await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
+    await screen.findByTestId('streams-filter');
+    await screen.findByLabelText('Refresh Search Controls');
+    await screen.findByRole('button', { name: /perform search/i });
+    await screen.findByText('Saved Search Controls');
   });
 
   it('should refresh search, when search is performed and there are no changes.', async () => {
