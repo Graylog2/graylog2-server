@@ -98,7 +98,7 @@ export const selectViewStates = createSelector(selectView, (state) => state.stat
 export const selectActiveViewState = createSelector(
   selectActiveQuery,
   selectViewStates,
-  (activeQuery, states) => states.get(activeQuery),
+  (activeQuery, states) => states?.get(activeQuery),
 );
 export const selectSearch = createSelector(selectView, (view) => view.search);
 export const selectSearchQueries = createSelector(selectSearch, (search) => search.queries);

@@ -49,9 +49,7 @@ const fieldTypes: FieldTypes = {
 
 const selectEventConfig = { container: document.body };
 
-jest.mock('views/components/aggregationwizard/metric/useAggregationFunctions', () => () => ({
-  count: { type: 'count', description: 'Count' },
-}));
+jest.mock('views/hooks/useAggregationFunctions');
 
 const view = createSearch();
 

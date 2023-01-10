@@ -24,7 +24,7 @@ import Select from 'components/common/Select';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { InputOptionalInfo as Opt, FormikInput } from 'components/common';
 import { Properties } from 'views/logic/fieldtypes/FieldType';
-import useAggregationFunctions from 'views/components/aggregationwizard/metric/useAggregationFunctions';
+import useAggregationFunctions from 'views/hooks/useAggregationFunctions';
 
 import FieldSelect from '../FieldSelect';
 

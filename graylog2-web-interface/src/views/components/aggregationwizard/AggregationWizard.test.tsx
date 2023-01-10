@@ -34,10 +34,7 @@ const widgetConfig = AggregationWidgetConfig
   .visualization(DataTable.type)
   .build();
 
-jest.mock('views/stores/AggregationFunctionsStore', () => ({
-  getInitialState: jest.fn(() => ({ count: { type: 'count' }, min: { type: 'min' }, max: { type: 'max' }, percentile: { type: 'percentile' } })),
-  listen: jest.fn(),
-}));
+jest.mock('views/hooks/useAggregationFunctions');
 
 const fieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('queryId') };
 

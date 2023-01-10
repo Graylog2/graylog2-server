@@ -48,15 +48,7 @@ const fieldTypeMapping2 = new FieldTypeMapping('http_method', fieldType);
 const fields = Immutable.List([fieldTypeMapping1, fieldTypeMapping2]);
 const fieldTypes = { all: fields, queryFields: Immutable.Map({ queryId: fields }) };
 
-jest.mock('views/stores/AggregationFunctionsStore', () => ({
-  getInitialState: jest.fn(() => ({
-    count: { type: 'count', description: 'Count' },
-    min: { type: 'min', description: 'Minimum' },
-    max: { type: 'max', description: 'Maximum' },
-    percentile: { type: 'percentile', description: 'Percentile' },
-  })),
-  listen: jest.fn(),
-}));
+jest.mock('views/hooks/useAggregationFunctions');
 
 jest.mock('views/hooks/useActiveQueryId');
 
