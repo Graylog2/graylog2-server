@@ -23,6 +23,8 @@ import type { AppDispatch } from 'stores/useAppDispatch';
 import { selectView } from 'views/logic/slices/viewSlice';
 import { parseSearch } from 'views/logic/slices/searchMetadataSlice';
 import executeSearch from 'views/logic/slices/executeSearch';
+import type View from 'views/logic/views/View';
+import type { SearchExecutionResult } from 'views/actions/SearchActions';
 
 const searchExecutionSlice = createSlice({
   name: 'searchExecution',
@@ -55,6 +57,18 @@ export const selectSearchExecutionState = createSelector(selectSearchExecutionRo
 export const selectWidgetsToSearch = createSelector(selectSearchExecutionRoot, (state) => state.widgetsToSearch);
 export const selectSearchExecutionResult = createSelector(selectSearchExecutionRoot, (state) => state.result);
 export const selectGlobalOverride = createSelector(selectSearchExecutionState, (executionState) => executionState.globalOverride);
+export const selectParameterBindings = createSelector(selectSearchExecutionState, (executionState) => executionState.parameterBindings);
+
+export const executeWithExecutionState = (
+  view: View, widgetsToSearch: Array<string>, executionState: SearchExecutionState, resultMapper: (newResult: SearchExecutionResult) => SearchExecutionResult,
+) => (dispatch: AppDispatch) => dispatch(parseSearch(view.search))
+  .then(() => {
+    dispatch(loading());
+
+    return executeSearch(view, widgetsToSearch, executionState)
+      .then(resultMapper)
+      .then((result) => dispatch(finishedLoading(result)));
+  });
 
 export const execute = () => (dispatch: AppDispatch, getState: () => RootState) => {
   const state = getState();
@@ -62,9 +76,5 @@ export const execute = () => (dispatch: AppDispatch, getState: () => RootState) 
   const executionState = selectSearchExecutionState(state);
   const widgetsToSearch = selectWidgetsToSearch(state);
 
-  return dispatch(parseSearch(view.search)).then(() => {
-    dispatch(loading());
-
-    return executeSearch(view, widgetsToSearch, executionState).then((result) => dispatch(finishedLoading(result)));
-  });
+  return dispatch(executeWithExecutionState(view, widgetsToSearch, executionState, (result) => result));
 };

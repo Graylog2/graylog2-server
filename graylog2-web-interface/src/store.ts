@@ -30,7 +30,12 @@ const createStore = (reducers: PluggableReducer[], initialState: Partial<RootSta
         // Ignore these field paths in all actions
         ignoredActionPaths: ['payload'],
         // Ignore these paths in the state
-        ignoredPaths: ['view.view', 'searchExecution.executionState', 'searchMetadata.metadata'],
+        ignoredPaths: [
+          'view.view',
+          'searchExecution.executionState',
+          'searchExecution.result.result',
+          'searchMetadata.metadata',
+        ],
       },
     }),
   });
