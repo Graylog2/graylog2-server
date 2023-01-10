@@ -20,7 +20,7 @@ import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
-import { StoreMock as MockStore, asMock } from 'helpers/mocking';
+import { StoreMock as MockStore } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
 import { SearchActions } from 'views/stores/SearchStore';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
@@ -28,22 +28,15 @@ import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import FormikInput from 'components/common/FormikInput';
 import Query from 'views/logic/queries/Query';
-import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
+import viewsReducers from 'views/viewsReducers';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { createSearch } from 'fixtures/searches';
 
-import SearchBar from './SearchBar';
+import OriginalSearchBar from './SearchBar';
 
 const testTimeout = applyTimeoutMultiplier(30000);
 
 jest.mock('hooks/useFeature', () => (key: string) => key === 'search_filter');
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchStore: MockStore(
-    ['getInitialState', () => ({ search: { parameters: [] } })],
-  ),
-  SearchActions: {
-    refresh: jest.fn(),
-  },
-}));
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 
@@ -75,7 +68,21 @@ jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest
 })));
 
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
-jest.mock('views/logic/queries/useCurrentQuery');
+
+const SearchBar = () => {
+  const view = createSearch();
+  const { search } = view;
+  const viewWithQuery = createSearch()
+    .toBuilder()
+    .search(search.toBuilder().queries([mockCurrentQuery]).build())
+    .build();
+
+  return (
+    <TestStoreProvider view={viewWithQuery} initialQuery={mockCurrentQuery.id}>
+      <OriginalSearchBar />
+    </TestStoreProvider>
+  );
+};
 
 describe('SearchBar pluggable controls', () => {
   const PluggableSearchBarControl = () => {
@@ -117,13 +124,13 @@ describe('SearchBar pluggable controls', () => {
           placement: 'right',
         }),
       ],
+      'views.reducers': viewsReducers,
     }));
   });
 
   beforeEach(() => {
     SearchActions.refresh = mockAction();
     SearchConfigStore.getInitialState = jest.fn(() => ({ searchesClusterConfig: mockSearchesClusterConfig }));
-    asMock(useCurrentQuery).mockReturnValue(mockCurrentQuery);
   });
 
   it('should render and have initial values', async () => {
