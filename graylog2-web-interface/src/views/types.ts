@@ -50,7 +50,6 @@ import type Query from 'views/logic/queries/Query';
 import type { CustomCommand, CustomCommandContext } from 'views/components/searchbar/queryinput/types';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type SearchMetadata from 'views/logic/search/SearchMetadata';
-import type { SearchJobType } from 'views/stores/SearchJobs';
 import type { SearchExecutionResult } from 'views/actions/SearchActions';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
