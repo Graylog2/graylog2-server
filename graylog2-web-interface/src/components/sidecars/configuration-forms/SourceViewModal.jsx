@@ -48,6 +48,7 @@ class SourceViewModal extends React.Component {
     if (!lodash.isEqual(this.state, SourceViewModal.initialState) && !lodash.isEqual(prevProps, this.props)) {
       this.resetState();
     }
+
     if (this.props.showModal) {
       this._loadConfiguration();
     }

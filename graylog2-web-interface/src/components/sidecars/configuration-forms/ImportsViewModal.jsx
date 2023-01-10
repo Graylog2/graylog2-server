@@ -45,7 +45,7 @@ class ImportsViewModal extends React.Component {
     this.state = ImportsViewModal.initialState;
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate() {
     if (this.props.showModal) {
       this._loadUploads(this.state.pagination.page);
     }
