@@ -31,8 +31,11 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import PluggableStoreProvider from 'components/PluggableStoreProvider';
+import { createSearch } from 'fixtures/searches';
+import viewsReducers from 'views/viewsReducers';
 
-const plugin: PluginRegistration = { exports: { visualizationTypes: bindings } };
+const plugin: PluginRegistration = { exports: { visualizationTypes: bindings, 'views.reducers': viewsReducers } };
 
 const widgetConfig = AggregationWidgetConfig
   .builder()
@@ -46,10 +49,28 @@ const fieldTypes: FieldTypes = {
 
 const selectEventConfig = { container: document.body };
 
-const SimpleAggregationWizard = (props) => (
-  <FieldTypesContext.Provider value={fieldTypes}>
-    <AggregationWizard config={widgetConfig} editing id="widget-id" type="AGGREGATION" fields={Immutable.List([])} onChange={() => {}} {...props} />
-  </FieldTypesContext.Provider>
+jest.mock('views/components/aggregationwizard/metric/useAggregationFunctions', () => () => ({
+  count: { type: 'count', description: 'Count' },
+}));
+
+const view = createSearch();
+
+const SimpleAggregationWizard = (props: Partial<React.ComponentProps<typeof AggregationWizard>>) => (
+  <PluggableStoreProvider view={view} isNew initialQuery="query-id-1">
+    <FieldTypesContext.Provider value={fieldTypes}>
+      <AggregationWizard config={widgetConfig}
+                         editing
+                         id="widget-id"
+                         type="AGGREGATION"
+                         fields={Immutable.List([])}
+                         onCancel={() => {}}
+                         onChange={() => {}}
+                         onSubmit={() => {}}
+                         {...props}>
+        <span>The visualization</span>
+      </AggregationWizard>
+    </FieldTypesContext.Provider>
+  </PluggableStoreProvider>
 );
 
 const submitButton = async () => screen.findByRole('button', { name: /update preview/i });
