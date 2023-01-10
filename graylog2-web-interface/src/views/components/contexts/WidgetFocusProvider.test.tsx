@@ -15,15 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Map } from 'immutable';
 import { render } from 'wrappedTestingLibrary';
 import { useLocation } from 'react-router-dom';
 
 import { asMock } from 'helpers/mocking';
-import { WidgetStore } from 'views/stores/WidgetStore';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
+import type { WidgetFocusContextType } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import SearchActions from 'views/actions/SearchActions';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import TestStoreProvider from 'views/test/TestStoreProvider';
 
 const mockHistoryReplace = jest.fn();
 
@@ -38,13 +39,6 @@ jest.mock('react-router-dom', () => ({
   })),
 }));
 
-jest.mock('views/stores/WidgetStore', () => ({
-  WidgetStore: {
-    getInitialState: jest.fn(() => ({ has: jest.fn((widgetId) => widgetId === 'widget-id') })),
-    listen: jest.fn(),
-  },
-}));
-
 jest.mock('views/actions/SearchActions');
 
 const emptyLocation = {
@@ -55,22 +49,28 @@ const emptyLocation = {
 };
 
 describe('WidgetFocusProvider', () => {
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   beforeEach(() => {
     asMock(useLocation).mockReturnValue(emptyLocation);
   });
 
   const renderSUT = (consume) => render(
-    <WidgetFocusProvider>
-      <WidgetFocusContext.Consumer>
-        {consume}
-      </WidgetFocusContext.Consumer>
-    </WidgetFocusProvider>,
+    <TestStoreProvider>
+      <WidgetFocusProvider>
+        <WidgetFocusContext.Consumer>
+          {consume}
+        </WidgetFocusContext.Consumer>
+      </WidgetFocusProvider>
+    </TestStoreProvider>,
   );
 
   it('should update url on widget focus', () => {
     let contextValue;
 
-    const consume = (value) => {
+    const consume = (value: WidgetFocusContextType) => {
       contextValue = value;
     };
 
@@ -89,7 +89,7 @@ describe('WidgetFocusProvider', () => {
 
     let contextValue;
 
-    const consume = (value) => {
+    const consume = (value: WidgetFocusContextType) => {
       contextValue = value;
     };
 
@@ -108,7 +108,7 @@ describe('WidgetFocusProvider', () => {
 
     let contextValue;
 
-    const consume = (value) => {
+    const consume = (value: WidgetFocusContextType) => {
       contextValue = value;
     };
 
@@ -120,7 +120,7 @@ describe('WidgetFocusProvider', () => {
   it('should update url on widget edit', () => {
     let contextValue;
 
-    const consume = (value) => {
+    const consume = (value: WidgetFocusContextType) => {
       contextValue = value;
     };
 
@@ -139,7 +139,7 @@ describe('WidgetFocusProvider', () => {
 
     let contextValue;
 
-    const consume = (value) => {
+    const consume = (value: WidgetFocusContextType) => {
       contextValue = value;
     };
 
@@ -158,7 +158,7 @@ describe('WidgetFocusProvider', () => {
 
     let contextValue;
 
-    const consume = (value) => {
+    const consume = (value: WidgetFocusContextType) => {
       contextValue = value;
     };
 
@@ -175,7 +175,7 @@ describe('WidgetFocusProvider', () => {
 
     let contextValue;
 
-    const consume = (value) => {
+    const consume = (value: WidgetFocusContextType) => {
       contextValue = value;
     };
 
@@ -191,8 +191,6 @@ describe('WidgetFocusProvider', () => {
   });
 
   it('should not set focused widget from url and cleanup url if the widget does not exist', () => {
-    asMock(WidgetStore.getInitialState).mockReturnValue(Map());
-
     asMock(useLocation).mockReturnValue({
       ...emptyLocation,
       search: '?focusedId=not-existing-widget-id',
@@ -200,7 +198,7 @@ describe('WidgetFocusProvider', () => {
 
     let contextValue;
 
-    const consume = (value) => {
+    const consume = (value: WidgetFocusContextType) => {
       contextValue = value;
     };
 

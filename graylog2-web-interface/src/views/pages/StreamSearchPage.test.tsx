@@ -16,59 +16,33 @@
  */
 import * as React from 'react';
 import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
-import { act } from 'react-dom/test-utils';
 
 import asMock from 'helpers/mocking/AsMock';
-import { MockStore } from 'helpers/mocking';
 import StreamsContext from 'contexts/StreamsContext';
-import processHooks from 'views/logic/views/processHooks';
-import View from 'views/logic/views/View';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
-import Search from 'views/logic/search/Search';
 import SearchComponent from 'views/components/Search';
 import { loadNewViewForStream, loadView } from 'views/logic/views/Actions';
 import useParams from 'routing/useParams';
 import useQuery from 'routing/useQuery';
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
+import { createSearch } from 'fixtures/searches';
 
 import StreamSearchPage from './StreamSearchPage';
 
-const mockView = View.create()
-  .toBuilder()
-  .type(View.Type.Search)
-  .search(Search.builder().build())
-  .build();
+const mockView = createSearch();
 
 jest.mock('views/components/Search', () => jest.fn(() => <div>Extended search page</div>));
-jest.mock('views/stores/SearchStore', () => ({ SearchActions: {} }));
-
-jest.mock('views/stores/ViewStatesStore', () => ({
-  ViewStatesStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(() => ({ has: jest.fn(() => false) })),
-  },
-}));
-
-jest.mock('views/stores/ViewStore', () => ({
-  ViewStore: MockStore(['getInitialState', () => ({ view: mockView })]),
-}));
-
-jest.mock('views/stores/ViewManagementStore', () => ({
-  ViewManagementActions: {
-    get: jest.fn(() => Promise.resolve()),
-  },
-}));
-
-jest.mock('views/hooks/SyncWithQueryParameters');
-
-jest.mock('views/logic/views/Actions');
 
 jest.mock('routing/useQuery');
 jest.mock('routing/useParams');
+
+jest.mock('views/logic/views/Actions');
 jest.mock('views/logic/views/UseCreateSavedSearch');
+jest.mock('views/logic/views/UseProcessHooksForView');
 jest.mock('views/hooks/useLoadView');
-jest.mock('views/logic/views/processHooks');
 
 describe('StreamSearchPage', () => {
   const mockQuery = {
@@ -83,26 +57,23 @@ describe('StreamSearchPage', () => {
     </StreamsContext.Provider>
   );
 
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   beforeEach(() => {
     asMock(useQuery).mockReturnValue({});
     asMock(useParams).mockReturnValue({ streamId });
     asMock(useCreateSavedSearch).mockReturnValue(Promise.resolve(mockView));
-    asMock(processHooks).mockImplementation((viewPromise, _loadingViewHooks, _executingViewHook, _query, onSuccess) => viewPromise.then(onSuccess));
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
+    asMock(useProcessHooksForView).mockReturnValue([mockView, undefined]);
   });
 
   it('shows loading spinner before rendering page', async () => {
-    jest.useFakeTimers();
+    asMock(useProcessHooksForView).mockReturnValue([undefined, undefined]);
 
     const { findByText } = render(<SimpleStreamSearchPage />);
-    act(() => { jest.advanceTimersByTime(200); });
 
     expect(await findByText('Loading...')).toBeInTheDocument();
-
-    await findByText('Extended search page');
   });
 
   it('should create view with streamId passed from props', async () => {
@@ -165,22 +136,19 @@ describe('StreamSearchPage', () => {
     });
 
     it('should process hooks with empty query', async () => {
-      const processHooksAction = asMock(processHooks);
       asMock(useQuery).mockReturnValue(mockQuery);
       const { findByText } = render(<SimpleStreamSearchPage />);
       const viewCreateButton = await findByText('Load new view');
 
       fireEvent.click(viewCreateButton);
 
-      await waitFor(() => expect(processHooksAction).toHaveBeenCalled());
+      await waitFor(() => expect(useProcessHooksForView).toHaveBeenCalled());
 
-      const query = {
+      expect(useProcessHooksForView).toHaveBeenCalledWith(expect.anything(), {
         q: '',
         rangetype: 'relative',
         relative: '300',
-      };
-
-      expect(processHooksAction).toHaveBeenCalledWith(expect.anything(), expect.anything(), expect.anything(), query, expect.anything());
+      });
     });
   });
 });

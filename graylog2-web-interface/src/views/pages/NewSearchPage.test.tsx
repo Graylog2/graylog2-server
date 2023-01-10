@@ -58,7 +58,6 @@ describe('NewSearchPage', () => {
   afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
-    jest.clearAllMocks();
     asMock(useQuery).mockReturnValue(query);
     asMock(useCreateSavedSearch).mockReturnValue(Promise.resolve(mockView));
     asMock(useProcessHooksForView).mockReturnValue([mockView, undefined]);
