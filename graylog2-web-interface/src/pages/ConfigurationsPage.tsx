@@ -160,12 +160,10 @@ const ConfigurationsPage = () => {
             </ConfigletContainer>
           </HideOnCloud>
         )}
-        {userConfig && (
-          <ConfigletContainer title="User Configuration">
-            <UserConfig config={userConfig}
-                        updateConfig={_onUpdate(USER_CONFIG)} />
-          </ConfigletContainer>
-        )}
+        <ConfigletContainer title="User Configuration">
+          <UserConfig config={userConfig}
+                      updateConfig={_onUpdate(USER_CONFIG)} />
+        </ConfigletContainer>
       </>
     );
   }
