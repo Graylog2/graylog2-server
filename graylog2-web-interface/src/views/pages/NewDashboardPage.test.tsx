@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import useLocation from 'routing/useLocation';
 import asMock from 'helpers/mocking/AsMock';
@@ -26,14 +25,14 @@ import useQuery from 'routing/useQuery';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import StreamsContext from 'contexts/StreamsContext';
 import useLoadView from 'views/hooks/useLoadView';
-import viewsReducers from 'views/viewsReducers';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
 import NewDashboardPage from './NewDashboardPage';
 
 jest.mock('views/components/Search', () => () => <span>Extended search page</span>);
 
-jest.mock('routing/useLocation');
 jest.mock('routing/useQuery');
+jest.mock('routing/useLocation');
 jest.mock('views/logic/views/UseProcessHooksForView');
 jest.mock('views/hooks/useLoadView');
 
@@ -50,11 +49,10 @@ describe('NewDashboardPage', () => {
     state: {},
     hash: '',
   };
-  const manifest = new PluginManifest({}, { 'views.reducers': viewsReducers });
 
-  beforeAll(() => {
-    PluginStore.register(manifest);
-  });
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
     asMock(useLocation).mockReturnValue(mockLocation);
@@ -64,10 +62,9 @@ describe('NewDashboardPage', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    PluginStore.unregister(manifest);
   });
 
-  it.skip('shows loading spinner before rendering page', async () => {
+  it('shows loading spinner before rendering page', async () => {
     asMock(useProcessHooksForView).mockReturnValue([undefined, undefined]);
 
     const { findByText } = render(<SimpleNewDashboardPage />);

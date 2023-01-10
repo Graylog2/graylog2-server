@@ -47,7 +47,7 @@ const useSyncStateWithQueryParams = ({ dashboardPage, uriParams, setDashboardPag
   useEffect(() => {
     const nextPage = uriParams.page;
 
-    if (!states.has(nextPage)) {
+    if (!states?.has(nextPage)) {
       setDashboardPage(undefined);
     } else if (nextPage !== dashboardPage) {
       setDashboardPage(nextPage);
