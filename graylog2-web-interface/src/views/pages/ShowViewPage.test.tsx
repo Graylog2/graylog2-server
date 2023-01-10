@@ -19,7 +19,6 @@ import { List } from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import useParams from 'routing/useParams';
-import mockAction from 'helpers/mocking/MockAction';
 import asMock from 'helpers/mocking/AsMock';
 import StreamsContext from 'contexts/StreamsContext';
 import useQuery from 'routing/useQuery';
@@ -27,19 +26,9 @@ import useFetchView from 'views/hooks/useFetchView';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
 import ShowViewPage from './ShowViewPage';
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchActions: {
-    execute: mockAction(),
-  },
-}));
-
-jest.mock('views/stores/SearchExecutionStateStore', () => ({
-  SearchExecutionStateActions: {},
-  SearchExecutionStateStore: { listen: jest.fn() },
-}));
 
 jest.mock('actions/errors/ErrorsActions', () => ({
   report: jest.fn(),
@@ -75,15 +64,19 @@ describe('ShowViewPage', () => {
     </StreamsContext.Provider>
   );
 
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   beforeEach(() => {
     asMock(useQuery).mockReturnValue({});
     asMock(useParams).mockReturnValue({ viewId: 'foo' });
-    asMock(useProcessHooksForView).mockReturnValue([true, undefined]);
+    asMock(useProcessHooksForView).mockReturnValue([view, undefined]);
     asMock(useFetchView).mockResolvedValue(view);
   });
 
   it('renders Spinner while loading', async () => {
-    asMock(useProcessHooksForView).mockReturnValue([false, undefined]);
+    asMock(useProcessHooksForView).mockReturnValue([undefined, undefined]);
 
     render(<SimpleShowViewPage />);
 

@@ -24,7 +24,6 @@ import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import MockStore from 'helpers/mocking/StoreMock';
 import mockAction from 'helpers/mocking/MockAction';
-import { createSearch } from 'fixtures/searches';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -38,7 +37,7 @@ import DataTable from 'views/components/datatable/DataTable';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import { asMock } from 'helpers/mocking';
 import useViewType from 'views/hooks/useViewType';
-import PluggableStoreProvider from 'components/PluggableStoreProvider';
+import TestStoreProvider from 'views/test/TestStoreProvider';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -95,8 +94,6 @@ describe('Aggregation Widget', () => {
     .timerange({ type: 'relative', from: 300 })
     .build();
 
-  const view = createSearch({ queryId: 'query-id-1' });
-
   beforeEach(() => {
     jest.useFakeTimers()
       // @ts-expect-error
@@ -122,7 +119,7 @@ describe('Aggregation Widget', () => {
     widget: propsWidget = dataTableWidget,
     ...props
   }: AggregationWidgetProps) => (
-    <PluggableStoreProvider view={view} isNew={false} initialQuery="query-id-1">
+    <TestStoreProvider>
       <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
         <WidgetFocusContext.Provider value={widgetFocusContextState}>
           <WidgetContext.Provider value={propsWidget}>
@@ -136,7 +133,7 @@ describe('Aggregation Widget', () => {
           </WidgetContext.Provider>
         </WidgetFocusContext.Provider>
       </FieldTypesContext.Provider>
-    </PluggableStoreProvider>
+    </TestStoreProvider>
   );
 
   const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: /update preview/i });
@@ -154,7 +151,6 @@ describe('Aggregation Widget', () => {
     it('should apply not submitted widget search controls and aggregation elements changes when clicking on "Update widget"', async () => {
       const newSeries = Series.create('count').toBuilder().config(SeriesConfig.empty().toBuilder().name('Metric name').build()).build();
       const updatedConfig = dataTableWidget.config
-        // @ts-expect-error
         .toBuilder()
         .series([newSeries])
         .build();
@@ -236,7 +232,6 @@ describe('Aggregation Widget', () => {
     it('should apply not submitted aggregation elements changes when clicking on "Update widget"', async () => {
       const newSeries = Series.create('count').toBuilder().config(SeriesConfig.empty().toBuilder().name('Metric name').build()).build();
       const updatedConfig = dataTableWidget.config
-        // @ts-expect-error
         .toBuilder()
         .series([newSeries])
         .build();

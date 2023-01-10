@@ -26,6 +26,8 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import DataTable from 'views/components/datatable/DataTable';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import dataTable from 'views/components/datatable/bindings';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import viewsReducers from 'views/viewsReducers';
 
 import AggregationWizard from './AggregationWizard';
 
@@ -38,24 +40,26 @@ jest.mock('views/hooks/useAggregationFunctions');
 
 const fieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('queryId') };
 
-const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
+const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable], 'views.reducers': viewsReducers } };
 
 describe('AggregationWizard', () => {
-  const renderSUT = (props = {}) => render(
-    <FieldTypesContext.Provider value={fieldTypes}>
-      <AggregationWizard onChange={() => {}}
-                         onSubmit={() => {}}
-                         onCancel={() => {}}
-                         config={widgetConfig}
-                         editing
-                         id="widget-id"
-                         type="AGGREGATION"
-                         fields={Immutable.List([])}
-                         {...props}>
-        <div>The Visualization</div>
-      </AggregationWizard>
-    </FieldTypesContext.Provider>,
-  );
+  const renderSUT = (props: Partial<React.ComponentProps<typeof AggregationWizard>> = {}) => render((
+    <TestStoreProvider>
+      <FieldTypesContext.Provider value={fieldTypes}>
+        <AggregationWizard onChange={() => {}}
+                           onSubmit={() => {}}
+                           onCancel={() => {}}
+                           config={widgetConfig}
+                           editing
+                           id="widget-id"
+                           type="AGGREGATION"
+                           fields={Immutable.List([])}
+                           {...props}>
+          <div>The Visualization</div>
+        </AggregationWizard>
+      </FieldTypesContext.Provider>
+    </TestStoreProvider>
+  ));
 
   beforeAll(() => PluginStore.register(plugin));
 

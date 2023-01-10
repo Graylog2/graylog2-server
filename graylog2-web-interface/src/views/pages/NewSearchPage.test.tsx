@@ -18,32 +18,23 @@ import * as React from 'react';
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
-import mockComponent from 'helpers/mocking/MockComponent';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
-import Search from 'views/logic/search/Search';
 import SearchComponent from 'views/components/Search';
-import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import StreamsContext from 'contexts/StreamsContext';
 import { loadNewView, loadView } from 'views/logic/views/Actions';
 import useQuery from 'routing/useQuery';
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
+import { createSearch } from 'fixtures/searches';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
 import NewSearchPage from './NewSearchPage';
 
-const mockView = View.create()
-  .toBuilder()
-  .type(View.Type.Search)
-  .search(Search.builder().build())
-  .build();
+const mockView = createSearch();
 
 jest.mock('views/components/Search');
-jest.mock('components/common/PublicNotifications', () => mockComponent('PublicNotifications'));
-jest.mock('views/stores/SearchStore');
 jest.mock('routing/useQuery');
-
-jest.mock('views/hooks/SyncWithQueryParameters');
 
 jest.mock('views/logic/views/Actions');
 jest.mock('views/logic/views/UseCreateSavedSearch');
@@ -62,11 +53,15 @@ describe('NewSearchPage', () => {
     </StreamsContext.Provider>
   );
 
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(useQuery).mockReturnValue(query);
     asMock(useCreateSavedSearch).mockReturnValue(Promise.resolve(mockView));
-    asMock(useProcessHooksForView).mockReturnValue([true, undefined]);
+    asMock(useProcessHooksForView).mockReturnValue([mockView, undefined]);
     asMock(SearchComponent).mockImplementation(() => <span>Extended Search Page</span>);
   });
 
@@ -77,7 +72,7 @@ describe('NewSearchPage', () => {
   });
 
   it('should show spinner while loading view', async () => {
-    asMock(useProcessHooksForView).mockReturnValue([false, undefined]);
+    asMock(useProcessHooksForView).mockReturnValue([undefined, undefined]);
 
     const { findByText } = render(<SimpleNewSearchPage />);
 
@@ -103,7 +98,7 @@ describe('NewSearchPage', () => {
     });
 
     it('should display errors which occur when processing hooks', async () => {
-      asMock(useProcessHooksForView).mockImplementation(() => [true, <span>An unknown error has occurred.</span>]);
+      asMock(useProcessHooksForView).mockImplementation(() => [undefined, <span>An unknown error has occurred.</span>]);
 
       render(<SimpleNewSearchPage />);
 

@@ -24,10 +24,9 @@ import { useStore } from 'stores/connect';
 import Sidebar from 'views/components/sidebar/Sidebar';
 import SearchResult from 'views/components/SearchResult';
 import { SearchStore, SearchActions } from 'views/stores/SearchStore';
-import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchConfigActions, SearchConfigStore } from 'views/stores/SearchConfigStore';
 import { StreamsActions } from 'views/stores/StreamsStore';
-import { ViewActions, ViewStore } from 'views/stores/ViewStore';
+import { ViewActions } from 'views/stores/ViewStore';
 import HeaderElements from 'views/components/HeaderElements';
 import QueryBarElements from 'views/components/QueryBarElements';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
@@ -47,14 +46,11 @@ import HighlightingRulesProvider from 'views/components/contexts/HighlightingRul
 import SearchPagePreferencesProvider from 'views/components/contexts/SearchPagePreferencesProvider';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { RefluxActions } from 'stores/StoreTypes';
 import useCurrentUser from 'hooks/useCurrentUser';
 import SynchronizeUrl from 'views/components/SynchronizeUrl';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useView from 'views/hooks/useView';
-import type { AppDispatch } from 'stores/useAppDispatch';
-import { parseSearch } from 'views/logic/slices/searchMetadataSlice';
 import useAppDispatch from 'stores/useAppDispatch';
 import { execute } from 'views/logic/slices/searchExecutionSlice';
 
