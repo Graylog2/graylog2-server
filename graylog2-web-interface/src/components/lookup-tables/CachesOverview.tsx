@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { OverlayTrigger, PaginatedList, SearchForm, Spinner, Icon } from 'components/common';
+import { OverlayTrigger, PaginatedList, SearchForm, Spinner, Icon, NoEntitiesExist, NoSearchResult } from 'components/common';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
 import CacheTableEntry from 'components/lookup-tables/CacheTableEntry';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
@@ -98,6 +98,10 @@ const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props)
     LookupTableCachesActions.searchPaginated(currentPage, currentPageSize);
   }, [resetPage, currentPage, currentPageSize]);
 
+  const emptyListComponent = pagination.query === ''
+    ? (<NoEntitiesExist>No Cache exist.</NoEntitiesExist>)
+    : (<NoSearchResult>No Cache found.</NoSearchResult>);
+
   return (
     <Row className="content">
       <Col md={12}>
@@ -117,24 +121,26 @@ const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props)
             </OverlayTrigger>
           </SearchForm>
           <div style={{ overflowX: 'auto' }}>
-            <Table condensed hover className={Styles.overviewTable}>
-              <thead>
-                <tr>
-                  <th className={Styles.rowTitle}>Title</th>
-                  <th className={Styles.rowDescription}>Description</th>
-                  <th className={Styles.rowName}>Name</th>
-                  <th>Entries</th>
-                  <th>Hit rate</th>
-                  <th>Throughput</th>
-                  <th className={Styles.rowActions}>Actions</th>
-                </tr>
-              </thead>
-              {caches.length === 0
-                ? <Spinner text="Loading caches" />
-                : caches.map((cache: LookupTableCache) => (
-                  <CacheTableEntry key={cache.id} cache={cache} />
-                ))}
-            </Table>
+            {caches.length === 0
+              ? (emptyListComponent)
+              : (
+                <Table condensed hover className={Styles.overviewTable}>
+                  <thead>
+                    <tr>
+                      <th className={Styles.rowTitle}>Title</th>
+                      <th className={Styles.rowDescription}>Description</th>
+                      <th className={Styles.rowName}>Name</th>
+                      <th>Entries</th>
+                      <th>Hit rate</th>
+                      <th>Throughput</th>
+                      <th className={Styles.rowActions}>Actions</th>
+                    </tr>
+                  </thead>
+                  {caches.map((cache: LookupTableCache) => (
+                    <CacheTableEntry key={cache.id} cache={cache} />
+                  ))}
+                </Table>
+              )}
           </div>
         </PaginatedList>
       </Col>

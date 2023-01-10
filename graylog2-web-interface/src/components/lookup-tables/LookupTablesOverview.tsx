@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
-import { OverlayTrigger, PaginatedList, SearchForm, Icon, Spinner } from 'components/common';
+import { OverlayTrigger, PaginatedList, SearchForm, Icon, Spinner, NoEntitiesExist, NoSearchResult } from 'components/common';
 import LUTTableEntry from 'components/lookup-tables/LUTTableEntry';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
@@ -152,6 +152,10 @@ const LookupTablesOverview = ({
     LookupTablesActions.searchPaginated(currentPage, currentPageSize);
   }, [resetPage, currentPage, currentPageSize]);
 
+  const emptyListComponent = pagination.query === ''
+    ? (<NoEntitiesExist>No lookup table exist.</NoEntitiesExist>)
+    : (<NoSearchResult>No Lookup table found.</NoSearchResult>);
+
   return (
     <Row className="content">
       <Col md={12}>
@@ -168,27 +172,29 @@ const LookupTablesOverview = ({
             </OverlayTrigger>
           </SearchForm>
           <div style={{ overflowX: 'auto' }}>
-            <Table condensed hover className={Styles.overviewTable}>
-              <thead>
-                <tr>
-                  <th className={Styles.rowTitle}>Title</th>
-                  <th className={Styles.rowDescription}>Description</th>
-                  <th className={Styles.rowName}>Name</th>
-                  <th className={Styles.rowCache}>Cache</th>
-                  <th className={Styles.rowAdapter}>Data Adapter</th>
-                  <th className={Styles.rowActions}>Actions</th>
-                </tr>
-              </thead>
-              {tables.length === 0
-                ? <Spinner text="Loading caches" />
-                : tables.map((table: LookupTable) => (
-                  <LUTItem key={`table-item-${table.id}`}
-                           table={table}
-                           caches={caches}
-                           dataAdapters={dataAdapters}
-                           errorStates={errorStates} />
-                ))}
-            </Table>
+            {tables.length === 0
+              ? (emptyListComponent)
+              : (
+                <Table condensed hover className={Styles.overviewTable}>
+                  <thead>
+                    <tr>
+                      <th className={Styles.rowTitle}>Title</th>
+                      <th className={Styles.rowDescription}>Description</th>
+                      <th className={Styles.rowName}>Name</th>
+                      <th className={Styles.rowCache}>Cache</th>
+                      <th className={Styles.rowAdapter}>Data Adapter</th>
+                      <th className={Styles.rowActions}>Actions</th>
+                    </tr>
+                  </thead>
+                  {tables.map((table: LookupTable) => (
+                    <LUTItem key={`table-item-${table.id}`}
+                             table={table}
+                             caches={caches}
+                             dataAdapters={dataAdapters}
+                             errorStates={errorStates} />
+                  ))}
+                </Table>
+              )}
           </div>
         </PaginatedList>
       </Col>

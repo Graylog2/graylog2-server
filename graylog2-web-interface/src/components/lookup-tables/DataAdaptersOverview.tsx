@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { OverlayTrigger, PaginatedList, SearchForm, Spinner, Icon } from 'components/common';
+import { OverlayTrigger, PaginatedList, SearchForm, Spinner, Icon, NoEntitiesExist, NoSearchResult } from 'components/common';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
 import DataAdapterTableEntry from 'components/lookup-tables/DataAdapterTableEntry';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
@@ -99,6 +99,10 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
     LookupTableDataAdaptersActions.searchPaginated(currentPage, currentPageSize);
   }, [resetPage, currentPage, currentPageSize]);
 
+  const emptyListComponent = pagination.query === ''
+    ? (<NoEntitiesExist>No Data adapter exist.</NoEntitiesExist>)
+    : (<NoSearchResult>No Data adapter found.</NoSearchResult>);
+
   return (
     <Row className="content">
       <Col md={12}>
@@ -118,24 +122,26 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
             </OverlayTrigger>
           </SearchForm>
           <div style={{ overflowX: 'auto' }}>
-            <Table condensed hover className={Styles.overviewTable}>
-              <thead>
-                <tr>
-                  <th className={Styles.rowTitle}>Title</th>
-                  <th className={Styles.rowDescription}>Description</th>
-                  <th className={Styles.rowName}>Name</th>
-                  <th>Throughput</th>
-                  <th className={Styles.rowActions}>Actions</th>
-                </tr>
-              </thead>
-              {dataAdapters.length === 0
-                ? <Spinner text="Loading data adapters" />
-                : dataAdapters.map((dataAdapter: LookupTableAdapter) => (
-                  <DataAdapterTableEntry key={dataAdapter.id}
-                                         adapter={dataAdapter}
-                                         error={errorStates.dataAdapters[dataAdapter.name]} />
-                ))}
-            </Table>
+            {dataAdapters.length === 0
+              ? (emptyListComponent)
+              : (
+                <Table condensed hover className={Styles.overviewTable}>
+                  <thead>
+                    <tr>
+                      <th className={Styles.rowTitle}>Title</th>
+                      <th className={Styles.rowDescription}>Description</th>
+                      <th className={Styles.rowName}>Name</th>
+                      <th>Throughput</th>
+                      <th className={Styles.rowActions}>Actions</th>
+                    </tr>
+                  </thead>
+                  {dataAdapters.map((dataAdapter: LookupTableAdapter) => (
+                    <DataAdapterTableEntry key={dataAdapter.id}
+                                           adapter={dataAdapter}
+                                           error={errorStates.dataAdapters[dataAdapter.name]} />
+                  ))}
+                </Table>
+              )}
           </div>
         </PaginatedList>
       </Col>
