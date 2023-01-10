@@ -32,17 +32,13 @@ import styles from './NotificationsForm.css';
 import commonStyles from '../common/commonStyles.css';
 
 class NotificationsForm extends React.Component {
-  static propTypes = {
-    eventDefinition: PropTypes.object.isRequired,
-    notifications: PropTypes.array.isRequired,
-    defaults: PropTypes.object.isRequired,
-    currentUser: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired,
-  };
+  constructor() {
+    super();
 
-  state = {
-    showAddNotificationForm: false,
-  };
+    this.state = {
+      showAddNotificationForm: false,
+    };
+  }
 
   toggleAddNotificationForm = () => {
     const { showAddNotificationForm } = this.state;
@@ -127,8 +123,6 @@ class NotificationsForm extends React.Component {
                             notifications={notifications}
                             onAddNotificationClick={this.toggleAddNotificationForm}
                             onRemoveNotificationClick={this.handleRemoveNotification} />
-        </Col>
-        <Col md={4} lg={3} mdOffset={1} className={styles.notificationSettings}>
           <NotificationSettingsForm eventDefinition={eventDefinition}
                                     defaults={defaults}
                                     onSettingsChange={onChange} />
@@ -137,5 +131,13 @@ class NotificationsForm extends React.Component {
     );
   }
 }
+
+NotificationsForm.propTypes = {
+  eventDefinition: PropTypes.object.isRequired,
+  notifications: PropTypes.array.isRequired,
+  defaults: PropTypes.object.isRequired,
+  currentUser: PropTypes.object.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
 
 export default NotificationsForm;
