@@ -24,7 +24,7 @@ metric_mappings:
       - "stream_rule"
 
   - metric_name: "stream_router_cannot_remove_default"
-    match_pattern: "org.graylog2.streams.StreamRouterEngine.cannotRemoveDefaultStream"
+    match_pattern: "org.graylog2.streams.StreamRouterEngine.cannotRemoveDefault"
 
   - metric_name: "enterprise_forwarder_journal_written_bytes"
     match_pattern: "org.graylog.enterprise.integrations.outputs.forwarder.buffer.ForwarderJournallingMessageHandler.*.writtenBytes"
