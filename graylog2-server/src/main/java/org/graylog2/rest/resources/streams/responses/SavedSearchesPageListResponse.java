@@ -14,45 +14,46 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.models.tools.responses;
+package org.graylog2.rest.resources.streams.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.List;
 
 @JsonAutoDetect
 @AutoValue
 @WithBeanGetter
-public abstract class PageListResponse<T> {
-
+public abstract class SavedSearchesPageListResponse {
     @Nullable
-    @JsonProperty("query")
+    @JsonProperty
     public abstract String query();
 
     @JsonProperty("pagination")
     public abstract PaginatedList.PaginationInfo paginationInfo();
 
-    @JsonProperty("total")
+    @JsonProperty
     public abstract long total();
 
     @Nullable
-    @JsonProperty("sort")
+    @JsonProperty
     public abstract String sort();
 
     @Nullable
-    @JsonProperty("order")
+    @JsonProperty
     public abstract String order();
 
-    @JsonProperty("elements")
-    public abstract List<T> elements();
+    @JsonProperty
+    public abstract Collection<ViewSummaryDTO> views();
 
     @JsonProperty
     public abstract List<EntityAttribute> attributes();
@@ -61,26 +62,15 @@ public abstract class PageListResponse<T> {
     public abstract EntityDefaults defaults();
 
     @JsonCreator
-    public static <T> PageListResponse<T> create(
+    public static SavedSearchesPageListResponse create(
             @JsonProperty("query") @Nullable String query,
             @JsonProperty("pagination") PaginatedList.PaginationInfo paginationInfo,
             @JsonProperty("total") long total,
             @JsonProperty("sort") @Nullable String sort,
             @JsonProperty("order") @Nullable String order,
-            @JsonProperty("elements") List<T> elements,
+            @JsonProperty("views") Collection<ViewSummaryDTO> views,
             @JsonProperty("attributes") List<EntityAttribute> attributes,
             @JsonProperty("defaults") EntityDefaults defaults) {
-        return new AutoValue_PageListResponse<>(query, paginationInfo, total, sort, order, elements, attributes, defaults);
+        return new AutoValue_SavedSearchesPageListResponse(query, paginationInfo, total, sort, order, views, attributes, defaults);
     }
-
-    public static <T> PageListResponse<T> create(
-            @Nullable String query,
-            final PaginatedList<T> paginatedList,
-            @Nullable String sort,
-            @Nullable String order,
-            List<EntityAttribute> attributes,
-            EntityDefaults defaults) {
-        return new AutoValue_PageListResponse<>(query, paginatedList.pagination(), paginatedList.pagination().total(), sort, order, paginatedList, attributes, defaults);
-    }
-
 }
