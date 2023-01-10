@@ -50,7 +50,7 @@ export const searchMetadataSliceReducer = searchMetadataSlice.reducer;
 
 export const selectSearchMetadataState = (state: RootState) => state.searchMetadata;
 export const selectSearchMetadata = createSelector(selectSearchMetadataState, (state) => state.metadata);
-export const selectHasUndeclaredParameters = createSelector(selectSearchMetadata, (searchMetadata: SearchMetadata) => searchMetadata.undeclared.size > 0);
+export const selectHasUndeclaredParameters = createSelector(selectSearchMetadata, (searchMetadata: SearchMetadata) => searchMetadata?.undeclared?.size > 0);
 
 const parseSearchUrl = URLUtils.qualifyUrl('/views/search/metadata');
 

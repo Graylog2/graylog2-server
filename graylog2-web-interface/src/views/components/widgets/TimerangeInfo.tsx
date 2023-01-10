@@ -44,7 +44,7 @@ const getEffectiveWidgetTimerange = (result, activeQuery, searchTypeId) => resul
 
 const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
   const { formatTime } = useUserDateTime();
-  const { result, widgetMapping } = useAppSelector(selectSearchExecutionResult);
+  const { result, widgetMapping } = useAppSelector(selectSearchExecutionResult) ?? {};
   const globalOverride = useGlobalOverride();
 
   const toLocalTimeWithMS = (dateTime: DateTime) => formatTime(dateTime, 'complete');
