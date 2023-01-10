@@ -17,7 +17,6 @@
 import React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent, screen, within } from 'wrappedTestingLibrary';
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
@@ -32,12 +31,12 @@ import { WidgetActions } from 'views/stores/WidgetStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import View from 'views/logic/views/View';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
-import viewsBindings from 'views/bindings';
 import DataTable from 'views/components/datatable/DataTable';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import { asMock } from 'helpers/mocking';
 import useViewType from 'views/hooks/useViewType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -74,18 +73,12 @@ jest.mock('views/stores/StreamsStore', () => ({
 
 jest.mock('views/hooks/useViewType');
 
-const viewsPlugin = new PluginManifest({}, viewsBindings);
-
 const selectEventConfig = { container: document.body };
 
 describe('Aggregation Widget', () => {
-  beforeAll(() => {
-    PluginStore.register(viewsPlugin);
-  });
+  beforeAll(loadViewsPlugin);
 
-  afterAll(() => {
-    PluginStore.unregister(viewsPlugin);
-  });
+  afterAll(unloadViewsPlugin);
 
   const dataTableWidget = WidgetModel.builder().newId()
     .type('AGGREGATION')
