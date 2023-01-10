@@ -23,7 +23,6 @@ import asMock from 'helpers/mocking/AsMock';
 import { MockStore } from 'helpers/mocking';
 import CurrentUserPreferencesProvider from 'contexts/CurrentUserPreferencesProvider';
 import Store from 'logic/local-storage/Store';
-import View from 'views/logic/views/View';
 import type { PreferencesMap } from 'stores/users/PreferencesStore';
 import { PreferencesActions } from 'stores/users/PreferencesStore';
 import type User from 'logic/users/User';
