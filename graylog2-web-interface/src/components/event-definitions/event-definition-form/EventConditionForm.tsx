@@ -23,10 +23,10 @@ import { Select } from 'components/common';
 import { Clearfix, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { HelpPanel } from 'components/event-definitions/common/HelpPanel';
 import type User from 'logic/users/User';
+import type { EventDefinition } from 'logic/alerts/types';
 
 import styles from './EventConditionForm.css';
 
-import type { EventDefinition } from 'logic/alerts/types';
 import commonStyles from '../common/commonStyles.css';
 
 type Props = {
