@@ -17,27 +17,16 @@
 
 import { render, screen } from 'wrappedTestingLibrary';
 import React from 'react';
-import Immutable, { OrderedSet, Map as MockMap } from 'immutable';
+import Immutable, { OrderedSet } from 'immutable';
 import userEvent from '@testing-library/user-event';
 
-import { MockStore } from 'helpers/mocking';
 import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabsConfiguration';
 import mockAction from 'helpers/mocking/MockAction';
 import { QueriesActions } from 'views/actions/QueriesActions';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
 import ViewState from 'views/logic/views/ViewState';
-
-jest.mock('views/stores/QueriesStore', () => ({ QueriesActions: {} }));
-jest.mock('views/stores/ViewStatesStore', () => ({ ViewStatesActions: {} }));
-
-jest.mock('views/stores/ViewStatesStore', () => ({
-  ViewStatesActions: {
-    patchQueriesTitle: jest.fn(() => Promise.resolve()),
-  },
-  ViewStatesStore: MockStore(['getInitialState', () => MockMap()]),
-}));
-
-const setShow = jest.fn();
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
 describe('AdaptableQueryTabsConfiguration', () => {
   let oldConfirm;
@@ -52,16 +41,23 @@ describe('AdaptableQueryTabsConfiguration', () => {
     window.confirm = oldConfirm;
   });
 
-  const renderConfiguration = () => render(
-    <AdaptableQueryTabsConfiguration show
-                                     setShow={setShow}
-                                     activeQueryId="queryId-1"
-                                     dashboardId="dashboard-id"
-                                     queriesList={OrderedSet(
-                                       [
-                                         { id: 'queryId-1', title: 'Query Title 1' },
-                                         { id: 'queryId-2', title: 'Query Title 2' },
-                                       ])} />);
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
+  const renderConfiguration = () => render((
+    <TestStoreProvider>
+      <AdaptableQueryTabsConfiguration show
+                                       setShow={() => {}}
+                                       activeQueryId="queryId-1"
+                                       dashboardId="dashboard-id"
+                                       queriesList={OrderedSet(
+                                         [
+                                           { id: 'queryId-1', title: 'Query Title 1' },
+                                           { id: 'queryId-2', title: 'Query Title 2' },
+                                         ])} />
+    </TestStoreProvider>
+  ));
 
   beforeEach(() => {
     QueriesActions.setOrder = mockAction(jest.fn(() => Promise.resolve(Immutable.OrderedMap())));
