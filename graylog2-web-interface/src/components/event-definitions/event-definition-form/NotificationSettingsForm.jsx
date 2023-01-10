@@ -28,7 +28,7 @@ import * as FormsUtils from 'util/FormsUtils';
 const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 
 const Container = styled.div(({ theme }) => css`
-  padding: ${theme.spacings.sm};
+  padding-top: ${theme.spacings.lg};
 `);
 
 class NotificationSettingsForm extends React.Component {
