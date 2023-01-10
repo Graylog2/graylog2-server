@@ -20,12 +20,11 @@ import styled, { css } from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
 import Query from 'views/components/Query';
-import { useStore } from 'stores/connect';
-import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import LoadingIndicator from 'components/common/LoadingIndicator';
 import { Row, Col } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import useAppSelector from 'stores/useAppSelector';
 
 const StyledRow = styled(Row)(({ $hasFocusedWidget }: { $hasFocusedWidget: boolean }) => css`
   height: ${$hasFocusedWidget ? '100%' : 'auto'};
@@ -38,7 +37,7 @@ const StyledCol = styled(Col)`
 `;
 
 const SearchLoadingIndicator = () => {
-  const searchLoadingState = useStore(SearchLoadingStateStore);
+  const searchLoadingState = useAppSelector((state) => state.searchExecution);
 
   return (searchLoadingState.isLoading && <LoadingIndicator text="Updating search results..." />);
 };
