@@ -14,22 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-interface EventDefinitionType {
-  type: string,
-  displayName: string,
-  sortOrder: number,
-  description: string,
-  defaultConfig: EventDefinition['config'],
-  formComponent: React.ComponentType<React.ComponentProps<{
-    eventDefinition: EventDefinition,
-    currentUser: UserJSON,
-    validation: { errors: { [key: string]: Array<string> } },
-    onChange: (name: string, newConfig: EventDefinition['config']) => void,
-    action: string,
-  }>>
-}
-declare module 'graylog-web-plugin/plugin' {
-  interface PluginExports {
-    'eventDefinitionTypes'?: Array<EventDefinitionType>;
-  }
+package org.graylog2.plugin.outputs;
+
+public class InsufficientLicenseException extends Exception {
+
+    public InsufficientLicenseException(String message) {
+        super(message);
+    }
 }
