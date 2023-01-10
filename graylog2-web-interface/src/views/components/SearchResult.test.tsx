@@ -42,16 +42,6 @@ jest.mock('views/stores/SearchStore', () => ({
   },
 }));
 
-jest.mock('views/stores/ViewMetadataStore', () => ({
-  ViewMetadataStore: {
-    getInitialState: () => ({
-      activeQuery: 'aQueryId',
-      id: 'aViewId',
-    }),
-    listen: () => jest.fn(),
-  },
-}));
-
 jest.mock('views/stores/SearchLoadingStateStore', () => ({
   SearchLoadingStateStore: {
     getInitialState: jest.fn(() => ({ isLoading: false })),

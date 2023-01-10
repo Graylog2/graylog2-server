@@ -208,6 +208,22 @@ class CommandFactoryTest {
     }
 
     @Test
+    void takesCombinedQueryStringFromQueryAndMessageList() {
+        MessageList ml = MessageList.builder().id("ml-id")
+                .query(ElasticsearchQueryString.of("qux OR quux"))
+                .build();
+        Query q = validQueryBuilderWith(ml)
+                .query(ElasticsearchQueryString.of("foo OR bar"))
+                .build();
+
+        Search s = searchWithQueries(q);
+
+        ExportMessagesCommand command = buildFrom(s, ml.id());
+
+        assertThat(command.queryString()).isEqualTo(ElasticsearchQueryString.of("(foo OR bar) AND (qux OR quux)"));
+    }
+
+    @Test
     void combinesQueryStringIfSpecifiedOnMessageListAndQuery() {
         MessageList ml = MessageList.builder().id("ml-id")
                 .query(ElasticsearchQueryString.of("from-messagelist"))
@@ -220,7 +236,7 @@ class CommandFactoryTest {
 
         ExportMessagesCommand command = buildFrom(s, ml.id());
 
-        ElasticsearchQueryString combined = ElasticsearchQueryString.of("from-query AND from-messagelist");
+        ElasticsearchQueryString combined = ElasticsearchQueryString.of("(from-query) AND (from-messagelist)");
 
         assertThat(command.queryString())
                 .isEqualTo(combined);

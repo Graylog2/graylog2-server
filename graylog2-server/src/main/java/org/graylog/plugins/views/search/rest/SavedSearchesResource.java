@@ -26,7 +26,10 @@ import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.rest.resources.entities.EntityAttribute;
+import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.rest.resources.entities.Sorting;
+import org.graylog2.rest.resources.streams.responses.SavedSearchesPageListResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -41,6 +44,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
+import java.util.Locale;
 
 import static java.util.Locale.ENGLISH;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -55,6 +60,20 @@ public class SavedSearchesResource extends RestResource {
             .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
             .build();
 
+    private static final String DEFAULT_SORT_FIELD = ViewDTO.FIELD_TITLE;
+    private static final String DEFAULT_SORT_DIRECTION = "asc";
+    private static final List<EntityAttribute> attributes = List.of(
+            EntityAttribute.builder().id(ViewDTO.FIELD_TITLE).title("Title").build(),
+            EntityAttribute.builder().id(ViewDTO.FIELD_CREATED_AT).title("Created").type("date").build(),
+            EntityAttribute.builder().id(ViewDTO.FIELD_DESCRIPTION).title("Description").build(),
+            EntityAttribute.builder().id(ViewDTO.FIELD_SUMMARY).title("Summary").build(),
+            EntityAttribute.builder().id(ViewDTO.FIELD_OWNER).title("Owner").build()
+    );
+
+    private static final EntityDefaults settings = EntityDefaults.builder()
+            .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
+            .build();
+
     private final ViewService dbService;
     private final SearchQueryParser searchQueryParser;
 
@@ -66,15 +85,15 @@ public class SavedSearchesResource extends RestResource {
 
     @GET
     @ApiOperation("Get a list of all searches")
-    public PaginatedResponse<ViewSummaryDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                   @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                   @ApiParam(name = "sort",
-                                                      value = "The field to sort the result on",
-                                                      required = true,
-                                                      allowableValues = "id,title,created_at") @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sortField,
-                                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") String order,
-                                                   @ApiParam(name = "query") @QueryParam("query") String query,
-                                                   @Context SearchUser searchUser) {
+    public SavedSearchesPageListResponse views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                               @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                               @ApiParam(name = "sort",
+                                                         value = "The field to sort the result on",
+                                                         required = true,
+                                                         allowableValues = "id,title,created_at,description,summary,owner") @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
+                                               @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") String order,
+                                               @ApiParam(name = "query") @QueryParam("query") String query,
+                                               @Context SearchUser searchUser) {
 
         if (!ViewDTO.SORT_FIELDS.contains(sortField.toLowerCase(ENGLISH))) {
             sortField = ViewDTO.FIELD_TITLE;
@@ -91,7 +110,7 @@ public class SavedSearchesResource extends RestResource {
                     page,
                     perPage);
 
-            return PaginatedResponse.create("views", result, query);
+            return SavedSearchesPageListResponse.create(query, result.pagination(), result.pagination().total(), sortField, order, result, attributes, settings);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), e);
         }

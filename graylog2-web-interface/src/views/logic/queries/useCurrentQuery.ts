@@ -15,8 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useStore } from 'stores/connect';
-import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
-import type Query from 'views/logic/queries/Query';
+import type { ViewStoreState } from 'views/stores/ViewStore';
+import { ViewStore } from 'views/stores/ViewStore';
 
-const useCurrentQuery = (): Query => useStore(CurrentQueryStore);
+const currentQueryMapper = (viewStore: ViewStoreState) => (viewStore?.activeQuery
+  ? viewStore?.view?.search?.queries?.find((query) => query.id === viewStore?.activeQuery)
+  : undefined);
+
+const useCurrentQuery = () => useStore(ViewStore, currentQueryMapper);
+
 export default useCurrentQuery;
