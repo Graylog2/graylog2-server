@@ -16,7 +16,7 @@
  */
 package org.graylog2.streams;
 
-import com.codahale.metrics.Meter;
+import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableList;
@@ -68,7 +68,7 @@ public class StreamRouterEngine {
     private final Provider<Stream> defaultStreamProvider;
 
     private final List<Rule> rulesList;
-    private final Meter cannotRemoveDefaultMeter;
+    private final Counter cannotRemoveDefaultMeter;
 
     public interface Factory {
         StreamRouterEngine create(List<Stream> streams, ExecutorService executorService);
@@ -88,7 +88,7 @@ public class StreamRouterEngine {
         this.streamProcessingTimeout = streamFaultManager.getStreamProcessingTimeout();
         this.fingerprint = new StreamListFingerprint(streams).getFingerprint();
         this.defaultStreamProvider = defaultStreamProvider;
-        this.cannotRemoveDefaultMeter = metricRegistry.meter(name(this.getClass(), METER_NAME_CANNOT_REMOVE_DEFAULT));
+        this.cannotRemoveDefaultMeter = metricRegistry.counter(name(this.getClass(), METER_NAME_CANNOT_REMOVE_DEFAULT));
 
         final List<Rule> alwaysMatchRules = Lists.newArrayList();
         final List<Rule> presenceRules = Lists.newArrayList();
@@ -229,7 +229,7 @@ public class StreamRouterEngine {
                         LOG.trace("Successfully removed default stream <{}> from message <{}>", defaultStream.getId(), message.getId());
                     }
                 } else {
-                    cannotRemoveDefaultMeter.mark();
+                    cannotRemoveDefaultMeter.inc();
                     if (LOG.isTraceEnabled()) {
                         // A previously executed message processor (or Illuminate) has likely already removed the
                         // default stream from the message. Now, the message has matched a stream in the Graylog
