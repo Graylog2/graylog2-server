@@ -17,17 +17,15 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
-import connect from 'stores/connect';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
-import { ViewStore } from 'views/stores/ViewStore';
 import BigDisplayModeHeader from 'views/components/dashboard/BigDisplayModeHeader';
 import CycleQueryTab from 'views/components/dashboard/bigdisplay/CycleQueryTab';
-import type { QueryId } from 'views/logic/queries/Query';
-import type View from 'views/logic/views/View';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import type { UntypedBigDisplayModeQuery } from 'views/components/dashboard/BigDisplayModeConfiguration';
 import type { Location } from 'routing/withLocation';
 import withLocation from 'routing/withLocation';
+import useView from 'views/hooks/useView';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import ShowViewPage from './ShowViewPage';
 
@@ -39,10 +37,6 @@ type BigDisplayModeQuery = {
 
 type Props = {
   location: Location,
-  view: {
-    view?: View,
-    activeQuery?: QueryId,
-  },
 };
 
 const castQueryWithDefaults = ({ tabs, interval, refresh }: UntypedBigDisplayModeQuery): BigDisplayModeQuery => ({
@@ -58,7 +52,9 @@ const BodyPositioningWrapper = styled.div`
   padding: 10px;
 `;
 
-const ShowDashboardInBigDisplayMode = ({ location, view: { view, activeQuery } = {} }: Props) => {
+const ShowDashboardInBigDisplayMode = ({ location }: Props) => {
+  const view = useView();
+  const activeQuery = useActiveQueryId();
   const { query } = location;
   const configuration = castQueryWithDefaults(query);
 
@@ -82,4 +78,4 @@ const ShowDashboardInBigDisplayMode = ({ location, view: { view, activeQuery } =
   );
 };
 
-export default withLocation(connect(ShowDashboardInBigDisplayMode, { view: ViewStore }));
+export default withLocation(ShowDashboardInBigDisplayMode);

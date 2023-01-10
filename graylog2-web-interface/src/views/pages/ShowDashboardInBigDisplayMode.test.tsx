@@ -17,10 +17,11 @@
 import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import View from 'views/logic/views/View';
-import _ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
+import OriginalShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
 const mockView = View.builder()
   .type(View.Type.Dashboard)
@@ -36,18 +37,6 @@ jest.mock('views/stores/RefreshStore', () => ({
   },
 }));
 
-jest.mock('views/stores/ViewStore', () => ({
-  ViewStore: MockStore(
-    ['getInitialState', () => ({ activeQuery: 'somequery', view: mockView })],
-  ),
-}));
-
-jest.mock('views/stores/SearchExecutionStateStore', () => ({
-  SearchExecutionStateStore: MockStore(
-    ['getInitialState', () => ({ activeQuery: 'somequery', view: mockView })],
-  ),
-}));
-
 jest.mock('views/pages/ShowViewPage', () => () => null);
 jest.mock('routing/withLocation', () => (x) => x);
 jest.mock('routing/withParams', () => (x) => x);
@@ -59,69 +48,65 @@ const mockLocation = {
 };
 
 type SUTProps = {
-  params: { viewId: string };
   location: typeof mockLocation;
 };
 
-const ShowDashboardInBigDisplayMode = _ShowDashboardInBigDisplayMode as React.ComponentType<SUTProps>;
+const ShowDashboardInBigDisplayMode = (props: SUTProps) => (
+  <TestStoreProvider view={mockView} initialQuery="somequery">
+    <OriginalShowDashboardInBigDisplayMode {...props} />
+  </TestStoreProvider>
+);
 
 describe('ShowDashboardInBigDisplayMode', () => {
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   beforeEach(() => {
+    jest.clearAllMocks();
     RefreshActions.disable = jest.fn();
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('set refresh interval correctly based on location query', async () => {
-    render(<ShowDashboardInBigDisplayMode params={{ viewId: mockView.id }}
-                                          location={mockLocation} />);
+    render(<ShowDashboardInBigDisplayMode location={mockLocation} />);
 
     await waitFor(() => expect(RefreshActions.setInterval).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(RefreshActions.setInterval).toHaveBeenCalledWith(10000));
   });
 
   it('enable refresh actions', async () => {
-    render(<ShowDashboardInBigDisplayMode params={{ viewId: mockView.id }}
-                                          location={mockLocation} />);
+    render(<ShowDashboardInBigDisplayMode location={mockLocation} />);
 
     await waitFor(() => expect(RefreshActions.enable).toHaveBeenCalledTimes(1));
   });
 
   it('set new refresh interval when location query refresh param changes', async () => {
-    const { rerender } = render(<ShowDashboardInBigDisplayMode params={{ viewId: mockView.id }}
-                                                               location={mockLocation} />);
+    const { rerender } = render(<ShowDashboardInBigDisplayMode location={mockLocation} />);
 
-    rerender(<ShowDashboardInBigDisplayMode params={{ viewId: mockView.id }}
-                                            location={{ query: { ...mockLocation.query, refresh: '20' } }} />);
+    rerender(<ShowDashboardInBigDisplayMode location={{ query: { ...mockLocation.query, refresh: '20' } }} />);
 
     await waitFor(() => expect(RefreshActions.setInterval).toHaveBeenCalledTimes(2));
     await waitFor(() => expect(RefreshActions.setInterval).toHaveBeenCalledWith(20000));
   });
 
   it('not change RefreshActions when query refresh param did not changed', async () => {
-    const { rerender } = render(<ShowDashboardInBigDisplayMode params={{ viewId: mockView.id }}
-                                                               location={mockLocation} />);
+    const { rerender } = render(<ShowDashboardInBigDisplayMode location={mockLocation} />);
 
-    rerender(<ShowDashboardInBigDisplayMode params={{ viewId: mockView.id }}
-                                            location={mockLocation} />);
+    rerender(<ShowDashboardInBigDisplayMode location={mockLocation} />);
 
     await waitFor(() => expect(RefreshActions.setInterval).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(RefreshActions.enable).toHaveBeenCalledTimes(1));
   });
 
   it('disable refresh actions on unmount', async () => {
-    const { unmount } = render(<ShowDashboardInBigDisplayMode params={{ viewId: mockView.id }}
-                                                              location={mockLocation} />);
+    const { unmount } = render(<ShowDashboardInBigDisplayMode location={mockLocation} />);
 
     unmount();
     await waitFor(() => expect(RefreshActions.disable).toHaveBeenCalledTimes(1));
   });
 
   it('should display view title', async () => {
-    const { findByText } = render(<ShowDashboardInBigDisplayMode params={{ viewId: mockView.id }}
-                                                                 location={mockLocation} />);
+    const { findByText } = render(<ShowDashboardInBigDisplayMode location={mockLocation} />);
 
     await findByText('view title');
   });
