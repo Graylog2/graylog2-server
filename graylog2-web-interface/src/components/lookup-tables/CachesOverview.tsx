@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { OverlayTrigger, PaginatedList, SearchForm, Spinner, Icon, NoEntitiesExist, NoSearchResult } from 'components/common';
+import { OverlayTrigger, PaginatedList, SearchForm, Icon, NoEntitiesExist, NoSearchResult } from 'components/common';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
 import CacheTableEntry from 'components/lookup-tables/CacheTableEntry';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';

@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
-import { OverlayTrigger, PaginatedList, SearchForm, Icon, Spinner, NoEntitiesExist, NoSearchResult } from 'components/common';
+import { OverlayTrigger, PaginatedList, SearchForm, Icon, NoEntitiesExist, NoSearchResult } from 'components/common';
 import LUTTableEntry from 'components/lookup-tables/LUTTableEntry';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
