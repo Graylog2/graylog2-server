@@ -48,6 +48,9 @@ import type { QueryValidationState } from 'views/components/searchbar/queryvalid
 import type Query from 'views/logic/queries/Query';
 import type { CustomCommand, CustomCommandContext } from 'views/components/searchbar/queryinput/types';
 
+export type ArrayElement<ArrayType extends readonly unknown[]> =
+  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+
 export type BackendWidgetPosition = {
   id: string,
   col: number,

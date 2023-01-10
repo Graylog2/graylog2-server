@@ -19,7 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import DashboardsPage from './DashboardsPage';
 
-jest.mock('views/logic/dashboards/useDashboards', () => () => ({
+jest.mock('views/components/dashboard/hooks/useDashboards', () => () => ({
   data: {
     pagination: {
       total: 0,

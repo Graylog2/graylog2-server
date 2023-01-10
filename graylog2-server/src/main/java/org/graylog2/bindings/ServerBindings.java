@@ -21,6 +21,7 @@ import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
+import com.google.inject.name.Names;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.graylog.scheduler.capabilities.ServerNodeCapabilitiesModule;
@@ -31,6 +32,8 @@ import org.graylog2.alerts.FormattedEmailAlertSender;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.bindings.providers.DefaultStreamProvider;
+import org.graylog2.bindings.providers.HtmlSafeJmteEngineProvider;
+import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
@@ -144,6 +147,7 @@ public class ServerBindings extends Graylog2Module {
 
     private void bindProviders() {
         bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
+        bind(freemarker.template.Configuration.class).toProvider(SecureFreemarkerConfigProvider.class);
     }
 
     private void bindFactoryModules() {
@@ -175,6 +179,7 @@ public class ServerBindings extends Graylog2Module {
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class).asEagerSingleton();
         bind(GrokPatternRegistry.class).in(Scopes.SINGLETON);
         bind(Engine.class).toInstance(Engine.createEngine());
+        bind(Engine.class).annotatedWith(Names.named("HtmlSafe")).toProvider(HtmlSafeJmteEngineProvider.class).asEagerSingleton();
         bind(ErrorPageGenerator.class).to(GraylogErrorPageGenerator.class).asEagerSingleton();
     }
 

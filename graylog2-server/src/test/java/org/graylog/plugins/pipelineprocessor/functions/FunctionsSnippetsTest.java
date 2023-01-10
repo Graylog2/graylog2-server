@@ -1258,10 +1258,12 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     @Test
     public void dateConversion() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
-        final Message message = evaluateRule(rule);
+        Message message = new Message("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
+        evaluateRule(rule, message);
 
         Long utcHour = (Long) message.getField("utcHour");
         Long manilaHour = (Long) message.getField("manilaHour");
-        assertThat(manilaHour).isEqualTo(utcHour + 8);
+        assertThat(utcHour).isEqualTo(10);
+        assertThat(manilaHour).isEqualTo(18);
     }
 }

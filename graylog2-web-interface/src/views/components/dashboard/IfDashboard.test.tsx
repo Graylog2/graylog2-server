@@ -15,51 +15,61 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
-import 'helpers/mocking/react-dom_mock';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import View from 'views/logic/views/View';
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import { asMock } from 'helpers/mocking';
+import useViewType from 'views/hooks/useViewType';
 
 import IfDashboard from './IfDashboard';
 
+jest.mock('views/hooks/useViewType');
+
 describe('IfDashboard', () => {
-  it('should render children with dashboard context', () => {
-    const wrapper = mount(
-      <ViewTypeContext.Provider value={View.Type.Dashboard}>
+  beforeEach(() => {
+    asMock(useViewType).mockReturnValue(undefined);
+  });
+
+  it('should render children with dashboard context', async () => {
+    asMock(useViewType).mockReturnValue(View.Type.Dashboard);
+
+    render((
+      <>
         <span>I must not fear.</span>
         <IfDashboard>
-          <span>Fear is the mind-killer.</span>
+          Fear is the mind-killer.
         </IfDashboard>
-      </ViewTypeContext.Provider>,
-    );
+      </>
+    ));
 
-    expect(wrapper).toMatchSnapshot();
+    await screen.findByText(/Fear is the mind-killer/i);
   });
 
   it('should not render children without dashboard context', () => {
-    const wrapper = mount(
-      <ViewTypeContext.Provider value={View.Type.Search}>
+    asMock(useViewType).mockReturnValue(View.Type.Search);
+
+    render((
+      <>
         <span>I must not fear.</span>
         <IfDashboard>
           <span>Fear is the mind-killer.</span>
         </IfDashboard>
-      </ViewTypeContext.Provider>,
-    );
+      </>
+    ));
 
-    expect(wrapper).toMatchSnapshot();
+    expect(screen.queryByText(/Fear is the mind-killer/i)).toBeNull();
   });
 
   it('should not render children without context', () => {
-    const wrapper = mount(
-      <div>
+    render((
+      <>
         <span>I must not fear.</span>
         <IfDashboard>
           <span>Fear is the mind-killer.</span>
         </IfDashboard>
-      </div>,
-    );
+      </>
+    ));
 
-    expect(wrapper).toMatchSnapshot();
+    expect(screen.queryByText(/Fear is the mind-killer/i)).toBeNull();
   });
 });

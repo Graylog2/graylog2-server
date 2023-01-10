@@ -26,6 +26,7 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
+import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 
 import SearchBar from './SearchBar';
 
@@ -56,25 +57,26 @@ jest.mock('views/components/searchbar/saved-search/SearchActionsMenu', () => jes
   <div>Saved Search Controls</div>
 )));
 
-jest.mock('views/stores/CurrentQueryStore', () => ({
-  CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder()
-    .timerange({ type: 'relative', from: 300 })
-    .query({ type: 'elasticsearch', query_string: '*' })
-    .id('34efae1e-e78e-48ab-ab3f-e83c8611a683')
-    .build()]),
-}));
-
 jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest.fn(() => Promise.resolve({
   status: 'OK',
   explanations: [],
 })));
 
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
+jest.mock('views/logic/queries/useCurrentQuery');
+
+const query = MockQuery.builder()
+  .timerange({ type: 'relative', from: 300 })
+  .query({ type: 'elasticsearch', query_string: '*' })
+  .id('34efae1e-e78e-48ab-ab3f-e83c8611a683')
+  .build();
 
 describe('SearchBar', () => {
   beforeEach(() => {
     SearchActions.refresh = mockAction();
     SearchConfigStore.getInitialState = jest.fn(() => ({ searchesClusterConfig: mockSearchesClusterConfig }));
+
+    asMock(useCurrentQuery).mockReturnValue(query);
   });
 
   it('should render the SearchBar', async () => {

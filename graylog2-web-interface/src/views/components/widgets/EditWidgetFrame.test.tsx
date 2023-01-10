@@ -23,10 +23,12 @@ import { WidgetActions } from 'views/stores/WidgetStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import Widget from 'views/logic/widgets/Widget';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
+import { asMock } from 'helpers/mocking';
+import useViewType from 'views/hooks/useViewType';
+import View from 'views/logic/views/View';
 
 import EditWidgetFrame from './EditWidgetFrame';
 
-import ViewTypeContext from '../contexts/ViewTypeContext';
 import WidgetContext from '../contexts/WidgetContext';
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
@@ -71,6 +73,8 @@ jest.mock('moment', () => {
   return Object.assign(() => mockMoment('2019-10-10T12:26:31.146Z'), mockMoment);
 });
 
+jest.mock('views/hooks/useViewType');
+
 describe('EditWidgetFrame', () => {
   describe('on a dashboard', () => {
     const widget = Widget.builder()
@@ -81,15 +85,17 @@ describe('EditWidgetFrame', () => {
       .config({})
       .build();
     const renderSUT = (props?: Partial<React.ComponentProps<typeof EditWidgetFrame>>) => render((
-      <ViewTypeContext.Provider value="DASHBOARD">
-        <WidgetContext.Provider value={widget}>
-          <EditWidgetFrame onSubmit={() => {}} onCancel={() => {}} {...props}>
-            Hello World!
-            These are some buttons!
-          </EditWidgetFrame>
-        </WidgetContext.Provider>
-      </ViewTypeContext.Provider>
+      <WidgetContext.Provider value={widget}>
+        <EditWidgetFrame onSubmit={() => {}} onCancel={() => {}} {...props}>
+          Hello World!
+          These are some buttons!
+        </EditWidgetFrame>
+      </WidgetContext.Provider>
     ));
+
+    beforeEach(() => {
+      asMock(useViewType).mockReturnValue(View.Type.Dashboard);
+    });
 
     it('refreshes search after clicking on search button, when there are no changes', async () => {
       renderSUT();

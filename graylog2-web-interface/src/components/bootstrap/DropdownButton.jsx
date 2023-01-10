@@ -20,6 +20,9 @@ import styled, { css } from 'styled-components';
 
 import menuItemStyles from './styles/menuItem';
 
+/**
+ * This is the default dropdown button component. If you need to display the dropdown in a portal, please use the `OverlayDropdownButton`.
+ */
 const DropdownButton = styled(BootstrapDropdownButton)(({ theme }) => css`
   ${theme.components.button}
   & ~ {

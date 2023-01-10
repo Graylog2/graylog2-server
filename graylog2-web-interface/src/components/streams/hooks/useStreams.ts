@@ -16,41 +16,47 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { DashboardsActions } from 'views/stores/DashboardsStore';
-import type { Sort } from 'components/common/EntityDataTable';
 import UserNotification from 'util/UserNotification';
-import type View from 'views/logic/views/View';
+import type { SearchParams } from 'stores/PaginationTypes';
+import type { Stream } from 'stores/streams/StreamsStore';
+import StreamsStore from 'stores/streams/StreamsStore';
 
-type SearchParams = {
-  page: number,
-  pageSize: number,
-  query: string,
-  sort: Sort
+type Options = {
+  enabled: boolean,
 }
 
-const useDashboards = (searchParams: SearchParams): {
+const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
   data: {
-    list: Readonly<Array<View>>,
+    streams: Array<Stream>,
     pagination: { total: number }
+    attributes: Array<{ id: string, title: string, sortable: boolean }>
   } | undefined,
-  refetch: () => void
+  refetch: () => void,
+  isFetching: boolean,
 } => {
-  const { data, refetch } = useQuery(
-    ['dashboards', 'overview', searchParams],
-    () => DashboardsActions.search(searchParams.query, searchParams.page, searchParams.pageSize, searchParams.sort.columnId, searchParams.sort.order),
+  const { data, refetch, isFetching } = useQuery(
+    ['streams', 'overview', searchParams],
+    () => StreamsStore.searchPaginated(
+      searchParams.page,
+      searchParams.pageSize,
+      searchParams.query,
+      { sort: searchParams?.sort.attributeId, direction: searchParams?.sort.direction },
+    ),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading dashboards failed with status: ${errorThrown}`,
-          'Could not load dashboards');
+        UserNotification.error(`Loading streams failed with status: ${errorThrown}`,
+          'Could not load streams');
       },
       keepPreviousData: true,
+      enabled,
     },
   );
 
   return ({
     data,
     refetch,
+    isFetching,
   });
 };
 
-export default useDashboards;
+export default useStreams;

@@ -23,34 +23,28 @@ import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
-@ExtendWith(MockitoExtension.class)
 class TrafficCounterServiceTest {
 
-    @Mock
-    private NodeId nodeId;
+    private final NodeId nodeId = new SimpleNodeId("node-1");
 
     private TrafficCounterService service;
 
     @BeforeEach
     void setUp(MongoDBTestService mongodb, MongoJackObjectMapperProvider objectMapperProvider) {
-        lenient().when(nodeId.toEscapedString()).thenReturn("node-1");
-
         service = new TrafficCounterService(mongodb.mongoConnection(), objectMapperProvider);
     }
 
