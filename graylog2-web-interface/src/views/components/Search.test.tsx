@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import * as Immutable from 'immutable';
+import { render, waitFor } from 'wrappedTestingLibrary';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
-import asMock from 'helpers/mocking/AsMock';
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
 import { StreamsActions } from 'views/stores/StreamsStore';
@@ -32,36 +32,18 @@ import View from 'views/logic/views/View';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
-import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
-import Query, { filtersForQuery } from 'views/logic/queries/Query';
-import usePluginEntities from 'hooks/usePluginEntities';
-import useViewType from 'views/hooks/useViewType';
+import PluggableStoreProvider from 'components/PluggableStoreProvider';
+import viewsReducers from 'views/viewsReducers';
+import ViewState from 'views/logic/views/ViewState';
+import SearchModel from 'views/logic/search/Search';
 
-import Search from './Search';
+import OriginalSearch from './Search';
 
 import { useSyncWithQueryParameters } from '../hooks/SyncWithQueryParameters';
 
 jest.mock('util/History');
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchActions: {
-    execute: jest.fn(() => Promise.resolve()),
-    setWidgetsToSearch: jest.fn(),
-    executeWithCurrentState: jest.fn(),
-  },
-  SearchStore: MockStore(
-    'get',
-    ['getInitialState', () => ({
-      result: {
-        forId: jest.fn(() => {
-          return {};
-        }),
-      },
-    })],
-  ),
-}));
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: {
@@ -85,8 +67,6 @@ jest.mock('views/components/DashboardSearchBar', () => () => (
   <button type="button" onClick={mockRefreshSearch}>Execute Query</button>
 ));
 
-jest.mock('views/stores/SearchMetadataStore');
-jest.mock('views/components/views/CurrentViewTypeProvider', () => jest.fn());
 jest.mock('views/hooks/SyncWithQueryParameters');
 
 jest.mock('routing/withLocation', () => (Component) => (props) => (
@@ -94,13 +74,35 @@ jest.mock('routing/withLocation', () => (Component) => (props) => (
 ));
 
 jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
-jest.mock('views/logic/queries/useCurrentQuery');
-jest.mock('hooks/usePluginEntities');
-jest.mock('views/hooks/useViewType');
+
+const view = View.create()
+  .toBuilder()
+  .type(View.Type.Dashboard)
+  .state(Immutable.Map({ foobar: ViewState.create() }))
+  .search(SearchModel.create())
+  .build();
+
+const Search = () => (
+  <PluggableStoreProvider view={view} initialQuery="foobar" isNew>
+    <OriginalSearch />
+  </PluggableStoreProvider>
+);
+
+const plugin = {
+  exports: {
+    'views.reducers': viewsReducers,
+  },
+  metadata: {
+    name: 'Dummy Plugin for Tests',
+  },
+};
 
 describe('Search', () => {
+  beforeAll(() => PluginStore.register(plugin));
+
+  afterAll(() => PluginStore.unregister(plugin));
+
   beforeEach(() => {
-    asMock(usePluginEntities).mockReturnValue([]);
     WidgetStore.listen = jest.fn(() => jest.fn());
     SearchActions.execute = mockAction(jest.fn(async () => ({} as SearchExecutionResult)));
     StreamsActions.refresh = mockAction();
@@ -118,11 +120,6 @@ describe('Search', () => {
     SearchMetadataActions.parseSearch = mockAction(jest.fn(() => Promise.resolve(SearchMetadata.empty())));
     SearchMetadataStore.listen = jest.fn(() => jest.fn());
     SearchActions.refresh = mockAction();
-
-    asMock(useViewType).mockReturnValue(View.Type.Dashboard);
-
-    const query = Query.builder().id('foobar').filter(filtersForQuery([])).build();
-    asMock(useCurrentQuery).mockReturnValue(query);
   });
 
   it('register a WindowLeaveMessage', async () => {
@@ -131,43 +128,10 @@ describe('Search', () => {
     await waitFor(() => expect(WindowLeaveMessage).toHaveBeenCalled());
   });
 
-  it('executes search upon mount', async () => {
-    render(<Search />);
-
-    await waitFor(() => expect(SearchActions.execute).toHaveBeenCalled());
-  });
-
   it('refreshes search config upon mount', async () => {
     render(<Search />);
 
     await waitFor(() => expect(SearchConfigActions.refresh).toHaveBeenCalled());
-  });
-
-  it('registers to SearchActions.refresh upon mount', async () => {
-    render(<Search />);
-
-    await waitFor(() => expect(SearchActions.refresh.listen).toHaveBeenCalled());
-  });
-
-  it('registers to ViewActions.search.completed upon mount', async () => {
-    render(<Search />);
-
-    await waitFor(() => expect(ViewActions.search.completed.listen).toHaveBeenCalled());
-  });
-
-  it('unregisters from ViewActions.search.completed upon unmount', async () => {
-    const unsubscribe = jest.fn();
-
-    ViewActions.search.completed.listen = jest.fn(() => unsubscribe);
-    const { unmount } = render(<Search />);
-
-    await waitFor(() => expect(ViewActions.search.completed.listen).toHaveBeenCalled());
-
-    expect(unsubscribe).not.toHaveBeenCalled();
-
-    unmount();
-
-    await waitFor(() => expect(unsubscribe).toHaveBeenCalled());
   });
 
   it('refreshes Streams upon mount', async () => {
@@ -180,29 +144,5 @@ describe('Search', () => {
     render(<Search />);
 
     await waitFor(() => expect(useSyncWithQueryParameters).toHaveBeenCalled());
-  });
-
-  it('updating search in view triggers search execution', async () => {
-    render(<Search />);
-
-    asMock(SearchActions.execute).mockClear();
-
-    expect(SearchActions.execute).not.toHaveBeenCalled();
-
-    ViewActions.search({} as View['search']);
-
-    await waitFor(() => expect(SearchActions.execute).toHaveBeenCalled());
-  });
-
-  it('refreshing after query change parses search metadata first', async () => {
-    render(<Search />);
-
-    const executeQuery = await screen.findByRole('button', { name: 'Execute Query' });
-
-    fireEvent.click(executeQuery);
-
-    await waitFor(() => expect(SearchMetadataActions.parseSearch).toHaveBeenCalled());
-
-    expect(SearchActions.execute).toHaveBeenCalled();
   });
 });

@@ -19,40 +19,15 @@ import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import { ChartColorRulesActions } from 'views/stores/ChartColorRulesStore';
-import type { ColorRule } from 'views/stores/ChartColorRulesStore';
 import ColorMapper from 'views/components/visualizations/ColorMapper';
-import useWidgets from 'views/hooks/useWidgets';
-import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
-import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetFormattingSettings';
+
+import useColorRules from './useColorRules';
 
 import ChartColorContext from '../visualizations/ChartColorContext';
 
 type Props = {
   children: React.ReactNode,
   id: string,
-};
-
-const isAggregationWidgetConfig = (config: WidgetConfig): config is AggregationWidgetConfig => config && 'formattingSettings' in config;
-
-const useColorRules = () => {
-  const widgets = useWidgets();
-
-  return widgets.valueSeq()
-    .toArray()
-    .flatMap((widget) => {
-      const { config } = widget;
-      const widgetId = widget.id;
-
-      if (isAggregationWidgetConfig(config)) {
-        const { chartColors = {} } = config.formattingSettings ?? WidgetFormattingSettings.empty();
-
-        return Object.entries(chartColors).map(([key, value]) => ({ widgetId, name: key, color: value } as ColorRule));
-      }
-
-      return [];
-    })
-    .filter((entry) => entry !== null);
 };
 
 const WidgetColorContext = ({ children, id }: Props) => {
