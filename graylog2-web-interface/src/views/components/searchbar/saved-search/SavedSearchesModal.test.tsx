@@ -20,7 +20,7 @@ import { render, fireEvent, screen, waitFor } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
-import { SavedSearchesActions } from 'views/stores/SavedSearchesStore';
+import useSavedSearches from 'views/hooks/useSavedSearches';
 
 import SavedSearchesModal from './SavedSearchesModal';
 
@@ -40,7 +40,7 @@ const createPaginatedSearches = (count = 1) => {
     }
   }
 
-  return Promise.resolve({
+  return ({
     pagination: {
       total: count,
       page: count > 0 ? count : 0,
@@ -63,38 +63,51 @@ const createPaginatedSearches = (count = 1) => {
   });
 };
 
-jest.mock('views/stores/SavedSearchesStore', () => ({
-  SavedSearchesStore: {
-    listen: jest.fn(),
-  },
-  SavedSearchesActions: {
-    search: jest.fn(),
-  },
-}));
+jest.mock('views/hooks/useSavedSearches');
 
 jest.mock('routing/Routes', () => ({
   getPluginRoute: (x) => () => x,
 }));
 
 describe('SavedSearchesModal', () => {
+  const defaultPaginatedSearches = createPaginatedSearches();
+
+  beforeEach(() => {
+    asMock(useSavedSearches).mockReturnValue({
+      data: defaultPaginatedSearches,
+      refetch: () => {},
+      isLoading: false,
+    });
+  });
+
   describe('render the SavedSearchesModal', () => {
     it('should render empty', async () => {
-      const views = createPaginatedSearches(0);
-      asMock(SavedSearchesActions.search).mockReturnValueOnce(views);
+      const paginatedSavedSearches = createPaginatedSearches(0);
+
+      asMock(useSavedSearches).mockReturnValue({
+        data: paginatedSavedSearches,
+        refetch: () => {},
+        isLoading: false,
+      });
 
       render(<SavedSearchesModal toggleModal={() => {}}
-                                 deleteSavedSearch={() => Promise.resolve(views[0])}
+                                 deleteSavedSearch={() => Promise.resolve(paginatedSavedSearches.list[0])}
                                  activeSavedSearchId="search-id-0" />);
 
       await screen.findByText('No saved searches have been created yet.');
     });
 
     it('should render with views', async () => {
-      const views = createPaginatedSearches(2);
-      asMock(SavedSearchesActions.search).mockReturnValueOnce(views);
+      const paginatedSavedSearches = createPaginatedSearches(2);
+
+      asMock(useSavedSearches).mockReturnValue({
+        data: paginatedSavedSearches,
+        refetch: () => {},
+        isLoading: false,
+      });
 
       render(<SavedSearchesModal toggleModal={() => {}}
-                                 deleteSavedSearch={() => Promise.resolve(views[0])}
+                                 deleteSavedSearch={() => Promise.resolve(paginatedSavedSearches.list[0])}
                                  activeSavedSearchId="search-id-0" />);
 
       await screen.findByText('search-title-0');
@@ -103,10 +116,8 @@ describe('SavedSearchesModal', () => {
 
     it('should handle toggle modal', async () => {
       const onToggleModal = jest.fn();
-      const views = createPaginatedSearches(1);
-      asMock(SavedSearchesActions.search).mockReturnValueOnce(views);
       const { getByText } = render(<SavedSearchesModal toggleModal={onToggleModal}
-                                                       deleteSavedSearch={() => Promise.resolve(views[0])}
+                                                       deleteSavedSearch={() => Promise.resolve(defaultPaginatedSearches.list[0])}
                                                        activeSavedSearchId="search-id-0" />);
 
       await screen.findByText('search-title-0');
@@ -120,9 +131,7 @@ describe('SavedSearchesModal', () => {
 
     it('should call `onDelete` if saved search is deleted', async () => {
       window.confirm = jest.fn(() => true);
-      const views = createPaginatedSearches(1);
-      asMock(SavedSearchesActions.search).mockReturnValueOnce(views);
-      const onDelete = jest.fn(() => Promise.resolve(views[0]));
+      const onDelete = jest.fn(() => Promise.resolve(defaultPaginatedSearches.list[0]));
 
       render(<SavedSearchesModal toggleModal={() => {}}
                                  deleteSavedSearch={onDelete}
@@ -140,13 +149,11 @@ describe('SavedSearchesModal', () => {
 
     it('should call load function from context', async () => {
       const onLoad = jest.fn(() => new Promise(() => {}));
-      const views = createPaginatedSearches(1);
-      asMock(SavedSearchesActions.search).mockReturnValueOnce(views);
 
       render(
         <ViewLoaderContext.Provider value={onLoad}>
           <SavedSearchesModal toggleModal={() => {}}
-                              deleteSavedSearch={() => Promise.resolve(views[0])}
+                              deleteSavedSearch={() => Promise.resolve(defaultPaginatedSearches.list[0])}
                               activeSavedSearchId="search-id-0" />
         </ViewLoaderContext.Provider>,
       );
