@@ -21,39 +21,23 @@ import { mount } from 'wrappedEnzyme';
 import mockComponent from 'helpers/mocking/MockComponent';
 import { alice as currentUser } from 'fixtures/users';
 import asMock from 'helpers/mocking/AsMock';
-import { StoreMock as MockStore } from 'helpers/mocking';
 import type { Props as XYPlotProps } from 'views/components/visualizations/XYPlot';
 import XYPlot from 'views/components/visualizations/XYPlot';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Query from 'views/logic/queries/Query';
 import { QueriesActions } from 'views/stores/QueriesStore';
-import { SearchActions } from 'views/stores/SearchStore';
 import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
-
-jest.mock('views/stores/CurrentViewStateStore', () => ({
-  CurrentViewStateStore: MockStore(
-    ['getInitialState', () => {
-      return {
-        activeQuery: 'active-query-id',
-      };
-    },
-    ],
-  ),
-}));
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchStore: {},
-  // eslint-disable-next-line global-require
-  SearchActions: {
-    executeWithCurrentState: jest.fn(),
-  },
-}));
+import useViewType from 'views/hooks/useViewType';
+import View from 'views/logic/views/View';
+import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
 
 jest.mock('../GenericPlot', () => mockComponent('GenericPlot'));
 jest.mock('views/stores/QueriesStore');
 jest.mock('views/logic/queries/useCurrentQuery');
+jest.mock('views/logic/queries/useCurrentQueryId');
+jest.mock('views/hooks/useViewType');
 
 describe('XYPlot', () => {
   const currentQuery = Query.fromJSON({ id: 'dummyquery', query: {}, timerange: {}, search_types: {} });
@@ -62,19 +46,8 @@ describe('XYPlot', () => {
   const getChartColor = () => undefined;
   const setChartColor = () => ({});
   const chartData = [{ y: [23, 42], name: 'count()' }];
-  type SimpleXYPlotProps = {
-    config?: XYPlotProps['chartData'],
-    chartData?: XYPlotProps['chartData'],
-    effectiveTimerange?: XYPlotProps['effectiveTimerange'],
-    getChartColor?: XYPlotProps['getChartColor'],
-    height?: XYPlotProps['height'],
-    setChartColor?: XYPlotProps['setChartColor'],
-    tz?: string,
-    plotLayout?: XYPlotProps['plotLayout'],
-    onZoom?: XYPlotProps['onZoom'],
-  };
 
-  const SimpleXYPlot = (props: SimpleXYPlotProps) => (
+  const SimpleXYPlot = (props: Partial<XYPlotProps>) => (
     <XYPlot chartData={chartData}
             config={config}
             getChartColor={getChartColor}
@@ -87,17 +60,15 @@ describe('XYPlot', () => {
     config: config,
     chartData: chartData,
     currentQuery: currentQuery,
-    effectiveTimerange: undefined,
     getChartColor: getChartColor,
-    height: undefined,
     setChartColor: setChartColor,
-    plotLayout: undefined,
-    onZoom: undefined,
   };
 
   beforeEach(() => {
     asMock(QueriesActions.timerange).mockReturnValueOnce(Promise.resolve(Immutable.OrderedMap()));
     asMock(useCurrentQuery).mockReturnValue(currentQuery);
+    asMock(useCurrentQueryId).mockReturnValue(currentQuery.id);
+    asMock(useViewType).mockReturnValue(View.Type.Search);
   });
 
   it('renders generic X/Y-Plot when no timeline config is passed', () => {
@@ -122,7 +93,7 @@ describe('XYPlot', () => {
 
   it('adds zoom handler for timeline plot', () => {
     const timerange = { from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z', type: 'absolute' };
-    const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} tz="America/New_York" />);
+    const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} />);
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', expect.objectContaining({
@@ -130,8 +101,6 @@ describe('XYPlot', () => {
     }));
 
     genericPlot.get(0).props.onZoom('2018-10-12T04:04:21.723Z', '2018-10-12T08:04:21.723Z');
-
-    expect(SearchActions.executeWithCurrentState).not.toHaveBeenCalled();
 
     expect(QueriesActions.timerange).toHaveBeenCalledWith('dummyquery', {
       type: 'absolute',
