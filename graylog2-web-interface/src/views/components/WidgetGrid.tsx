@@ -220,6 +220,8 @@ const WidgetGrid = () => {
     }
 
     return [widgetItems, positions];
+    // We need to include lastUpdate explicitly to be able to force recalculation
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fields, focusedWidget, isInteractive, lastUpdate, positions, widgets]);
 
   // Measuring the width is required to update the widget grid
