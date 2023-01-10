@@ -47,6 +47,18 @@ const createPaginatedSearches = (count = 1) => {
       perPage: 5,
       count,
     },
+    attributes: [
+      {
+        id: 'title',
+        title: 'Title',
+        sortable: true,
+      },
+      {
+        id: 'description',
+        title: 'Description',
+        sortable: true,
+      },
+    ],
     list: views,
   });
 };
