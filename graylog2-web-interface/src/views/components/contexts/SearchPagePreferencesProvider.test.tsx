@@ -20,6 +20,7 @@ import { defaultUser } from 'defaultMockValues';
 
 import { adminUser, alice } from 'fixtures/users';
 import asMock from 'helpers/mocking/AsMock';
+import MockAction from 'helpers/mocking/MockAction';
 import { MockStore } from 'helpers/mocking';
 import CurrentUserPreferencesProvider from 'contexts/CurrentUserPreferencesProvider';
 import Store from 'logic/local-storage/Store';
@@ -27,7 +28,12 @@ import type { PreferencesMap } from 'stores/users/PreferencesStore';
 import { PreferencesActions } from 'stores/users/PreferencesStore';
 import type User from 'logic/users/User';
 import useCurrentUser from 'hooks/useCurrentUser';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import { createSearch } from 'fixtures/searches';
+import View from 'views/logic/views/View';
 
+import type { SearchPreferencesLayout } from './SearchPagePreferencesContext';
 import SearchPagePreferencesContext from './SearchPagePreferencesContext';
 import SearchPagePreferencesProvider from './SearchPagePreferencesProvider';
 
@@ -36,7 +42,7 @@ jest.mock('hooks/useCurrentUser');
 jest.mock('stores/users/PreferencesStore', () => ({
   PreferencesActions: {
     list: jest.fn(),
-    saveUserPreferences: jest.fn(),
+    saveUserPreferences: MockAction(jest.fn()),
   },
   PreferencesStore: MockStore(),
 }));
@@ -46,26 +52,27 @@ jest.mock('logic/local-storage/Store', () => ({
   set: jest.fn(),
 }));
 
-jest.mock('views/stores/ViewStore', () => ({
-  ViewStore: {
-    listen: jest.fn(() => () => {}),
-    getInitialState: jest.fn(() => ({})),
-  },
-}));
-
 describe('SearchPagePreferencesProvider', () => {
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
   });
 
-  const SimpleProvider = ({ children }: { children: any }) => (
-    <CurrentUserPreferencesProvider>
-      <SearchPagePreferencesProvider>
-        <SearchPagePreferencesContext.Consumer>
-          {children}
-        </SearchPagePreferencesContext.Consumer>
-      </SearchPagePreferencesProvider>
-    </CurrentUserPreferencesProvider>
+  const view = createSearch().toBuilder().type(View.Type.Search).build();
+
+  const SimpleProvider = ({ children }: { children: (value: SearchPreferencesLayout) => React.ReactNode}) => (
+    <TestStoreProvider view={view}>
+      <CurrentUserPreferencesProvider>
+        <SearchPagePreferencesProvider>
+          <SearchPagePreferencesContext.Consumer>
+            {children}
+          </SearchPagePreferencesContext.Consumer>
+        </SearchPagePreferencesProvider>
+      </CurrentUserPreferencesProvider>
+    </TestStoreProvider>
   );
 
   const ProviderWithToggleButton = () => (
