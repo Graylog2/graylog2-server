@@ -80,11 +80,6 @@ const viewSlice = createSlice({
   },
 });
 
-export const createQuery = () => async (dispatch: AppDispatch) => {
-  const [query, state] = await NewQueryActionHandler();
-  dispatch(viewSlice.actions.addQuery([query, state]));
-};
-
 export const { selectQuery, removeQuery } = viewSlice.actions;
 export const viewSliceReducer = viewSlice.reducer;
 
@@ -111,3 +106,9 @@ export const selectCurrentQuery = createSelector(
 export const selectWidgets = createSelector(selectActiveViewState, (viewState) => viewState.widgets);
 export const selectWidget = (widgetId: string) => createSelector(selectWidgets, (widgets) => widgets.find((widget) => widget.id === widgetId));
 export const selectTitles = createSelector(selectActiveViewState, (viewState) => viewState.titles);
+
+export const createQuery = () => async (dispatch: AppDispatch, getState: () => RootState) => {
+  const viewType = selectViewType(getState());
+  const [query, state] = await NewQueryActionHandler(viewType);
+  dispatch(viewSlice.actions.addQuery([query, state]));
+};

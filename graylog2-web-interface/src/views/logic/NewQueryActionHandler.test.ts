@@ -14,33 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import asMock from 'helpers/mocking/AsMock';
-import { QueriesActions } from 'views/stores/QueriesStore';
-import type { ViewStoreState } from 'views/stores/ViewStore';
-import { ViewStore } from 'views/stores/ViewStore';
+import View from 'views/logic/views/View';
 
 import NewQueryActionHandler from './NewQueryActionHandler';
-import View from './views/View';
 
-jest.mock('views/stores/ViewStore', () => ({
-  ViewStore: {
-    getInitialState: jest.fn(),
-  },
-}));
-
-jest.mock('views/stores/QueriesStore', () => ({
-  QueriesActions: {
-    create: jest.fn(() => Promise.resolve()),
+jest.mock('stores/decorators/DecoratorsStore', () => ({
+  DecoratorsActions: {
+    list: () => Promise.resolve([]),
   },
 }));
 
 describe('NewQueryActionHandler', () => {
-  beforeEach(() => {
-    asMock(ViewStore.getInitialState).mockReturnValue({
-      view: View.create().toBuilder().type(View.Type.Dashboard).build(),
-    } as ViewStoreState);
-  });
+  it('does not add widgets for dashboard', () => NewQueryActionHandler(View.Type.Dashboard)
+    .then(([_query, state]) => expect(state.widgets.size).toBe(0)));
 
-  it('creates a new query', () => NewQueryActionHandler()
-    .then(() => expect(QueriesActions.create).toHaveBeenCalled()));
+  it('adds widgets for search', () => NewQueryActionHandler(View.Type.Search)
+    .then(([_query, state]) => expect(state.widgets.size).toBe(2)));
 });
