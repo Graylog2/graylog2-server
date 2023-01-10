@@ -82,7 +82,7 @@ const ConfigurationsPage = () => {
       ConfigurationsActions.list(INDEX_SETS_DEFAULTS_CONFIG),
       ConfigurationsActions.list(EVENTS_CONFIG),
       ConfigurationsActions.listPermissionsConfig(PERMISSIONS_CONFIG),
-      ConfigurationsActions.list(USER_CONFIG),
+      ConfigurationsActions.listUserConfig(USER_CONFIG),
     ];
 
     if (isPermitted(currentUser.permissions, ['urlwhitelist:read'])) {
