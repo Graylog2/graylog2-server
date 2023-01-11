@@ -14,11 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { createSlice, createSelector } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
 import SearchMetadata from 'views/logic/search/SearchMetadata';
-import type { RootState } from 'views/types';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type Search from 'views/logic/search/Search';
 import fetch from 'logic/rest/FetchProvider';
@@ -47,10 +46,6 @@ const searchMetadataSlice = createSlice({
 const { finishedLoading, loading } = searchMetadataSlice.actions;
 
 export const searchMetadataSliceReducer = searchMetadataSlice.reducer;
-
-export const selectSearchMetadataState = (state: RootState) => state.searchMetadata;
-export const selectSearchMetadata = createSelector(selectSearchMetadataState, (state) => state.metadata);
-export const selectHasUndeclaredParameters = createSelector(selectSearchMetadata, (searchMetadata: SearchMetadata) => searchMetadata?.undeclared?.size > 0);
 
 const parseSearchUrl = URLUtils.qualifyUrl('/views/search/metadata');
 

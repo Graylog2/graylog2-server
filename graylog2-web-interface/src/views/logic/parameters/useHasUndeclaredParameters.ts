@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import useAppSelector from 'stores/useAppSelector';
-import { selectHasUndeclaredParameters } from 'views/logic/slices/searchMetadataSlice';
+import { selectHasUndeclaredParameters } from 'views/logic/slices/searchMetadataSelectors';
 
 const useHasUndeclaredParameters = () => useAppSelector(selectHasUndeclaredParameters);
 
