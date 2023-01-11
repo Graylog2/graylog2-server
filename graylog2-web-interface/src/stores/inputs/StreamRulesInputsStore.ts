@@ -15,17 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import Reflux from 'reflux';
+
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
-import PaginationURL from 'util/PaginationURL';
-
-import Reflux from 'reflux';
-import type { Pagination } from 'store/PaginationTypes';
-
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import type { Input } from 'components/messageloaders/Types';
-
 
 export type PaginatedStreamRulesInputs = {
   list: Array<Input>,
