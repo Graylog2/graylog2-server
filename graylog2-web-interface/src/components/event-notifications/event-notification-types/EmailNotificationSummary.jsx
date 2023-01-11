@@ -22,22 +22,9 @@ import { Well } from 'components/bootstrap';
 import CommonNotificationSummary from './CommonNotificationSummary';
 import styles from './EmailNotificationSummary.css';
 
-class EmailNotificationSummary extends React.Component {
-  static propTypes = {
-    type: PropTypes.string.isRequired,
-    notification: PropTypes.object,
-    definitionNotification: PropTypes.object.isRequired,
-  };
-
-  static defaultProps = {
-    notification: {},
-  };
-
-  render() {
-    const { notification } = this.props;
-
+const EmailNotificationSummary = ({ notification, ...otherProps }) => {
     return (
-      <CommonNotificationSummary {...this.props}>
+      <CommonNotificationSummary notification={notification} {...otherProps}>
         <>
           <tr>
             <td>Sender</td>
@@ -80,7 +67,17 @@ class EmailNotificationSummary extends React.Component {
         </>
       </CommonNotificationSummary>
     );
-  }
-}
+  
+};
+
+EmailNotificationSummary.propTypes = {
+  type: PropTypes.string.isRequired,
+  notification: PropTypes.object,
+  definitionNotification: PropTypes.object.isRequired,
+};
+
+EmailNotificationSummary.defaultProps = {
+  notification: {},
+};
 
 export default EmailNotificationSummary;
