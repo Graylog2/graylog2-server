@@ -17,6 +17,7 @@
 package org.graylog.events.rest;
 
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -180,8 +181,9 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                            @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
         checkEventDefinitionPermissions(dto, "update");
-        dbService.get(definitionId)
+        EventDefinitionDto oldDto = dbService.get(definitionId)
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
+        checkProcessorConfig(oldDto, dto);
 
         final ValidationResult result = dto.validate();
         if (!definitionId.equals(dto.id())) {
@@ -274,6 +276,21 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         if (!missingPermissions.isEmpty()) {
             LOG.info("Not authorized to {} event definition. User <{}> is missing permissions: {}", action, getSubject().getPrincipal(), missingPermissions);
             throw new ForbiddenException("Not authorized");
+        }
+    }
+
+    /**
+     * Check that if this Event Definitions Processor Config is being modified, it is allowed to be.
+     * @param oldEventDefinition - The Existing Event Definition
+     * @param updatedEventDefinition - The Event Definition with pending updates
+     */
+    @VisibleForTesting
+    void checkProcessorConfig(EventDefinitionDto oldEventDefinition, EventDefinitionDto updatedEventDefinition) {
+        if (!oldEventDefinition.config().isUserPresentable()
+                && !oldEventDefinition.config().type().equals(updatedEventDefinition.config().type())) {
+            LOG.error("Not allowed to change event definition condition type from <{}> to <{}>.",
+                    oldEventDefinition.config().type(), updatedEventDefinition.config().type());
+            throw new ForbiddenException("Condition type not changeable");
         }
     }
 }

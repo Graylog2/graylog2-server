@@ -67,7 +67,7 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
     public static final String FIELD_OWNER = "owner";
     public static final String FIELD_FAVORITE = "favorite";
 
-    public static final ImmutableSet<String> SORT_FIELDS = ImmutableSet.of(FIELD_ID, FIELD_TITLE, FIELD_CREATED_AT);
+    public static final ImmutableSet<String> SORT_FIELDS = ImmutableSet.of(FIELD_ID, FIELD_TITLE, FIELD_CREATED_AT, FIELD_OWNER, FIELD_DESCRIPTION, FIELD_SUMMARY);
 
     @Override
     @ObjectId

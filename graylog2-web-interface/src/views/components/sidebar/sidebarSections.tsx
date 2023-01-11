@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 
-import type { ViewMetaData as ViewMetadata } from 'views/stores/ViewMetadataStore';
 import type { IconName } from 'components/common/Icon';
 
 import ViewDescription from './description/ViewDescription';
@@ -29,8 +28,7 @@ export type SidebarSectionProps = {
   sidebarIsPinned: boolean,
   queryId: string,
   results: any,
-  toggleSidebar: () => void,
-  viewMetadata: ViewMetadata,
+  toggleSidebar: () => void
 };
 /* eslint-enable react/no-unused-prop-types */
 
@@ -46,7 +44,7 @@ const sidebarSections: Array<SidebarSection> = [
     key: 'viewDescription',
     title: 'Description',
     icon: 'info',
-    content: ({ results, viewMetadata }: SidebarSectionProps) => <ViewDescription results={results} viewMetadata={viewMetadata} />,
+    content: ({ results }: SidebarSectionProps) => <ViewDescription results={results} />,
   },
   {
     key: 'create',

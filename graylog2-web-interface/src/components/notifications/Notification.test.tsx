@@ -71,6 +71,7 @@ describe('<Notification>', () => {
 
     asMock(NotificationsStore.getInitialState).mockReturnValue({
       messages: { no_input_running: notificationMessageFixture },
+      total: 1,
       notifications: [notificationFixture],
     });
 

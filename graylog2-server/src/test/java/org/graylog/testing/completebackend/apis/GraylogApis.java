@@ -37,6 +37,7 @@ public class GraylogApis {
     private final Search search;
     private final Indices indices;
     private final FieldTypes fieldTypes;
+    private final Views views;
 
     public GraylogApis(RequestSpecification requestSpecification, GraylogBackend backend) {
         this.requestSpecification = requestSpecification;
@@ -48,6 +49,7 @@ public class GraylogApis {
         this.search = new Search(this.requestSpecification);
         this.indices = new Indices(this.requestSpecification);
         this.fieldTypes = new FieldTypes(this.requestSpecification);
+        this.views = new Views(this.requestSpecification);
     }
 
     public RequestSpecification requestSpecification() {
@@ -84,6 +86,10 @@ public class GraylogApis {
 
     public FieldTypes fieldTypes() {
         return this.fieldTypes;
+    }
+
+    public Views views() {
+        return views;
     }
 
     protected RequestSpecification prefix(final Users.User user) {

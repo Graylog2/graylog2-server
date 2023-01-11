@@ -115,6 +115,13 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Api(value = "Streams", description = "Manage streams", tags = {CLOUD_VISIBLE})
 @Path("/streams")
 public class StreamResource extends RestResource {
+    protected static final Map<String, SearchQueryField> SEARCH_FIELD_MAPPING = Map.of(
+            "id", SearchQueryField.create(StreamDTO.FIELD_ID, SearchQueryField.Type.OBJECT_ID),
+            StreamDTO.FIELD_TITLE, SearchQueryField.create(StreamDTO.FIELD_TITLE),
+            StreamDTO.FIELD_DESCRIPTION, SearchQueryField.create(StreamDTO.FIELD_DESCRIPTION),
+            StreamDTO.FIELD_CREATED_AT, SearchQueryField.create(StreamDTO.FIELD_CREATED_AT),
+            "status", SearchQueryField.create(StreamDTO.FIELD_DISABLED)
+    );
     private static final String DEFAULT_SORT_FIELD = StreamDTO.FIELD_TITLE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
@@ -126,19 +133,9 @@ public class StreamResource extends RestResource {
                     FilterOption.create("running", "Running")
             )).build()
     );
-
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
             .build();
-
-    protected static final Map<String, SearchQueryField> SEARCH_FIELD_MAPPING = Map.of(
-            "id", SearchQueryField.create(StreamDTO.FIELD_ID, SearchQueryField.Type.OBJECT_ID),
-            StreamDTO.FIELD_TITLE, SearchQueryField.create(StreamDTO.FIELD_TITLE),
-            StreamDTO.FIELD_DESCRIPTION, SearchQueryField.create(StreamDTO.FIELD_DESCRIPTION),
-            StreamDTO.FIELD_CREATED_AT, SearchQueryField.create(StreamDTO.FIELD_CREATED_AT),
-            "status", SearchQueryField.create(StreamDTO.FIELD_DISABLED)
-    );
-
     private final PaginatedStreamService paginatedStreamService;
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
@@ -256,7 +253,7 @@ public class StreamResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get a list of all enabled streams")
     @Produces(MediaType.APPLICATION_JSON)
-    public StreamListResponse getEnabled() throws NotFoundException {
+    public StreamListResponse getEnabled() {
         final List<Stream> streams = streamService.loadAllEnabled()
                 .stream()
                 .filter(stream -> isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
@@ -303,7 +300,7 @@ public class StreamResource extends RestResource {
         final Stream stream = streamService.load(streamId);
 
         if (!Strings.isNullOrEmpty(cr.title())) {
-            stream.setTitle(cr.title());
+            stream.setTitle(cr.title().strip());
         }
 
         if (!Strings.isNullOrEmpty(cr.description())) {
@@ -470,14 +467,14 @@ public class StreamResource extends RestResource {
                 .collect(Collectors.toSet());
 
         final Map<String, Object> streamData = Map.of(
-            StreamImpl.FIELD_TITLE, cr.title(),
-            StreamImpl.FIELD_DESCRIPTION, cr.description(),
-            StreamImpl.FIELD_CREATOR_USER_ID, creatorUser,
-            StreamImpl.FIELD_CREATED_AT, Tools.nowUTC(),
-            StreamImpl.FIELD_MATCHING_TYPE, sourceStream.getMatchingType().toString(),
-            StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, cr.removeMatchesFromDefaultStream(),
-            StreamImpl.FIELD_DISABLED, true,
-            StreamImpl.FIELD_INDEX_SET_ID, cr.indexSetId()
+                StreamImpl.FIELD_TITLE, cr.title().strip(),
+                StreamImpl.FIELD_DESCRIPTION, cr.description(),
+                StreamImpl.FIELD_CREATOR_USER_ID, creatorUser,
+                StreamImpl.FIELD_CREATED_AT, Tools.nowUTC(),
+                StreamImpl.FIELD_MATCHING_TYPE, sourceStream.getMatchingType().toString(),
+                StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, cr.removeMatchesFromDefaultStream(),
+                StreamImpl.FIELD_DISABLED, true,
+                StreamImpl.FIELD_INDEX_SET_ID, cr.indexSetId()
         );
 
         final Stream stream = streamService.create(streamData);

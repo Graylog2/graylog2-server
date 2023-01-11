@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.rest;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
+import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
@@ -26,6 +27,7 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.searchfilters.ReferencedSearchFiltersHelper;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityCheckStatus;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFilterVisibilityChecker;
+import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.views.Position;
 import org.graylog.plugins.views.search.views.UnknownWidgetConfigDTO;
@@ -40,211 +42,201 @@ import org.graylog.plugins.views.startpage.recentActivities.RecentActivityServic
 import org.graylog.security.UserContext;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.security.Permissions;
-import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserImpl;
-import org.junit.Assert;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 
-import javax.annotation.Nullable;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith({MockitoExtension.class})
-@MockitoSettings(strictness = Strictness.WARN)
 public class ViewsResourceTest {
-    public static final String VIEW_ID = "test-view";
-    public static final String SEARCH_ID = "6141d457d3a6b9d73c8ac55a";
+    private static final String VIEW_ID = "test-view";
+    private static final String SEARCH_ID = "6141d457d3a6b9d73c8ac55a";
+    private static final Map<String, ViewResolver> EMPTY_VIEW_RESOLVERS = Collections.emptyMap();
+    private static final SearchFilterVisibilityChecker EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER = searchFilterVisibilityChecker(Collections.emptyList());
 
-    @Mock
-    private Subject subject;
+    private static final SearchUser SEARCH_USER = TestSearchUser.builder()
+            .withUser(testUser -> testUser.withUsername("testuser"))
+            .allowView(VIEW_ID)
+            .allowEditView(VIEW_ID)
+            .allowDeleteView(VIEW_ID)
+            .allowDeleteView("foobar")
+            .canCreateDashboards(true)
+            .build();
 
-    @Mock
-    private User currentUser;
+    private static final ViewDTO TEST_DASHBOARD_VIEW = ViewDTO.builder()
+            .id(VIEW_ID)
+            .title("test-dashboard")
+            .searchId(SEARCH_ID)
+            .state(Collections.emptyMap())
+            .type(ViewDTO.Type.DASHBOARD)
+            .build();
 
-    @Mock
-    private SearchUser searchUser;
+    private static final ViewDTO TEST_SEARCH_VIEW = ViewDTO.builder()
+            .id(VIEW_ID)
+            .title("test-dashboard")
+            .searchId(SEARCH_ID)
+            .state(Collections.emptyMap())
+            .type(ViewDTO.Type.SEARCH)
+            .build();
 
-    @Mock
-    private ViewService viewService;
+    private static final Search SEARCH = Search.builder()
+            .id(SEARCH_ID)
+            .queries(ImmutableSet.of())
+            .build();
 
-    @Mock
-    private ViewDTO view;
+    @Test
+    public void creatingViewAddsCurrentUserAsOwner() throws ValidationException {
+        final ViewService viewService = mock(ViewService.class);
 
-    @Mock
-    private ClusterEventBus clusterEventBus;
+        final ViewsResource viewsResource = createViewsResource(
+                viewService,
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
+                EMPTY_VIEW_RESOLVERS,
+                SEARCH
+        );
 
-    @Mock
-    private UserService userService;
+        viewsResource.create(TEST_DASHBOARD_VIEW, mockUserContext(), SEARCH_USER);
 
-    @Mock
-    private SearchDomain searchDomain;
+        final ArgumentCaptor<ViewDTO> viewCaptor = ArgumentCaptor.forClass(ViewDTO.class);
+        final ArgumentCaptor<User> ownerCaptor = ArgumentCaptor.forClass(User.class);
 
-    private Search search;
+        verify(viewService, times(1)).saveWithOwner(viewCaptor.capture(), ownerCaptor.capture());
 
-    @Mock
-    private SearchFilterVisibilityChecker searchFilterVisibilityChecker;
-
-    @Mock
-    private ReferencedSearchFiltersHelper referencedSearchFiltersHelper;
-
-    @Mock
-    private ViewsResource viewsResource;
-
-    @Mock
-    private StartPageService startPageService;
-    @Mock
-    private RecentActivityService recentActivityService;
-
-    @BeforeEach
-    public void setUp() {
-        this.viewsResource = new ViewsTestResource(viewService, startPageService, recentActivityService, clusterEventBus, userService, searchDomain, referencedSearchFiltersHelper);
-        when(searchUser.canCreateDashboards()).thenReturn(true);
-        this.search = mock(Search.class, RETURNS_DEEP_STUBS);
-        doReturn(SEARCH_ID).when(search).id();
-        when(search.queries()).thenReturn(ImmutableSet.of());
-        when(searchDomain.getForUser(eq(SEARCH_ID), eq(searchUser))).thenReturn(Optional.of(search));
-        when(viewService.get(VIEW_ID)).thenReturn(Optional.of(view));
-        when(searchFilterVisibilityChecker.checkSearchFilterVisibility(any(), any())).thenReturn(new SearchFilterVisibilityCheckStatus());
-        final var dto = ViewDTO.builder().searchId("1").title("2").state(new HashMap<>()).build();
-        when(viewService.saveWithOwner(any(), any())).thenReturn(dto);
-        when(viewService.update(any())).thenReturn(dto);
-    }
-
-    class ViewsTestResource extends ViewsResource {
-        ViewsTestResource(ViewService viewService, StartPageService startPageService, RecentActivityService recentActivityService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain, ReferencedSearchFiltersHelper referencedSearchFiltersHelper) {
-            this(viewService, startPageService, recentActivityService, clusterEventBus, userService, searchDomain, new HashMap<>(), referencedSearchFiltersHelper);
-        }
-
-        ViewsTestResource(ViewService viewService, StartPageService startPageService, RecentActivityService recentActivityService, ClusterEventBus clusterEventBus, UserService userService, SearchDomain searchDomain, Map<String, ViewResolver> viewResolvers, ReferencedSearchFiltersHelper referencedSearchFiltersHelper) {
-            super(viewService, startPageService, recentActivityService, clusterEventBus, searchDomain, viewResolvers, searchFilterVisibilityChecker, referencedSearchFiltersHelper);
-            this.userService = userService;
-        }
-
-        @Override
-        protected Subject getSubject() {
-            return subject;
-        }
-
-        @Nullable
-        @Override
-        protected User getCurrentUser() {
-            return currentUser;
-        }
+        assertThat(viewCaptor.getValue().owner()).hasValue("testuser");
+        assertThat(ownerCaptor.getValue().getName()).isEqualTo("testuser");
     }
 
     @Test
-    public void creatingViewAddsCurrentUserAsOwner() throws Exception {
-        final ViewDTO.Builder builder = mockView(ViewDTO.Type.DASHBOARD, view);
-        final UserContext userContext = mockUser();
-        this.viewsResource.create(view, userContext, searchUser);
+    public void throwsExceptionWhenCreatingSearchWithFilterThatUserIsNotAllowedToSee() {
+        final ViewsResource viewsResource = createViewsResource(
+                mock(ViewService.class),
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                searchFilterVisibilityChecker( Collections.singletonList("<<You cannot see this filter>>")),
+                EMPTY_VIEW_RESOLVERS,
+                SEARCH
+        );
 
-        final ArgumentCaptor<String> ownerCaptor = ArgumentCaptor.forClass(String.class);
-        verify(builder, times(1)).owner(ownerCaptor.capture());
-        assertThat(ownerCaptor.getValue()).isEqualTo("testuser");
+        Assertions.assertThatThrownBy(() -> viewsResource.create(TEST_DASHBOARD_VIEW, mock(UserContext.class), SEARCH_USER))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("View cannot be saved, as it contains Search Filters which you are not privileged to view : [<<You cannot see this filter>>]");
     }
 
     @Test
-    public void throwsExceptionWhenCreatingSearchWithFilterThatUserIsNotAllowedToSee() throws Exception {
-        mockView(ViewDTO.Type.SEARCH, view);
-        final UserContext userContext = mockUser();
-        doReturn(new SearchFilterVisibilityCheckStatus(Collections.singletonList("<<You cannot see this filter>>")))
-                .when(searchFilterVisibilityChecker)
-                .checkSearchFilterVisibility(any(), any());
+    public void throwsExceptionWhenCreatingDashboardWithFilterThatUserIsNotAllowedToSee() {
+        final ViewsResource viewsResource = createViewsResource(
+                mockViewService(TEST_DASHBOARD_VIEW),
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                searchFilterVisibilityChecker(Collections.singletonList("<<You cannot see this filter>>")),
+                EMPTY_VIEW_RESOLVERS,
+                SEARCH
+        );
 
-        Assert.assertThrows(BadRequestException.class, () -> this.viewsResource.create(view, userContext, searchUser));
+        Assertions.assertThatThrownBy(() -> viewsResource.create(TEST_DASHBOARD_VIEW, mock(UserContext.class), SEARCH_USER))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("View cannot be saved, as it contains Search Filters which you are not privileged to view : [<<You cannot see this filter>>]");
     }
 
     @Test
-    public void throwsExceptionWhenCreatingDashboardWithFilterThatUserIsNotAllowedToSee() throws Exception {
-        mockView(ViewDTO.Type.DASHBOARD, view);
-        final UserContext userContext = mockUser();
-        doReturn(new SearchFilterVisibilityCheckStatus(Collections.singletonList("<<You cannot see this filter>>")))
-                .when(searchFilterVisibilityChecker)
-                .checkSearchFilterVisibility(any(), any());
+    public void throwsExceptionWhenUpdatingSearchWithFilterThatUserIsNotAllowedToSee() {
+        final ViewsResource viewsResource = createViewsResource(
+                mockViewService(TEST_DASHBOARD_VIEW),
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                searchFilterVisibilityChecker(Collections.singletonList("<<You cannot see this filter>>")),
+                EMPTY_VIEW_RESOLVERS,
+                SEARCH
+        );
 
-        Assert.assertThrows(BadRequestException.class, () -> this.viewsResource.create(view, userContext, searchUser));
+        Assertions.assertThatThrownBy(() -> viewsResource.update(VIEW_ID, TEST_DASHBOARD_VIEW, SEARCH_USER))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("View cannot be saved, as it contains Search Filters which you are not privileged to view : [<<You cannot see this filter>>]");
     }
 
     @Test
-    public void throwsExceptionWhenUpdatingSearchWithFilterThatUserIsNotAllowedToSee() throws Exception {
-        prepareUpdate(ViewDTO.Type.SEARCH);
-        doReturn(new SearchFilterVisibilityCheckStatus(Collections.singletonList("<<You cannot see this filter>>")))
-                .when(searchFilterVisibilityChecker)
-                .checkSearchFilterVisibility(any(), any());
+    public void updatesSearchSuccessfullyIfInvisibleFilterWasPresentBefore() {
+        final ViewService viewService = mockViewService(TEST_SEARCH_VIEW);
 
-        Assert.assertThrows(BadRequestException.class, () -> this.viewsResource.update(VIEW_ID, view, searchUser));
+        final ViewsResource viewsResource = createViewsResource(
+                viewService,
+                mock(ClusterEventBus.class),
+                referencedFiltersHelperWithIDs(Collections.singleton("<<Hidden filter, but not added by this update>>")),
+                searchFilterVisibilityChecker(Collections.singletonList("<<Hidden filter, but not added by this update>>")),
+                EMPTY_VIEW_RESOLVERS,
+                SEARCH
+        );
+
+        viewsResource.update(VIEW_ID, TEST_SEARCH_VIEW, SEARCH_USER);
+        verify(viewService).update(TEST_SEARCH_VIEW);
     }
 
     @Test
-    public void updatesSearchSuccessfullyIfInvisibleFilterWasPresentBefore() throws Exception {
-        prepareUpdate(ViewDTO.Type.SEARCH);
-        doReturn(Collections.singleton("<<Hidden filter, but not added by this update>>")).when(referencedSearchFiltersHelper).getReferencedSearchFiltersIds(any());
-        doReturn(new SearchFilterVisibilityCheckStatus(Collections.singletonList("<<Hidden filter, but not added by this update>>")))
-                .when(searchFilterVisibilityChecker)
-                .checkSearchFilterVisibility(any(), any());
+    public void throwsExceptionWhenUpdatingDashboardWithFilterThatUserIsNotAllowedToSee() {
+        final ViewsResource viewsResource = createViewsResource(
+                mockViewService(TEST_DASHBOARD_VIEW),
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                searchFilterVisibilityChecker(Collections.singletonList("<<You cannot see this filter>>")),
+                EMPTY_VIEW_RESOLVERS,
+                SEARCH
+        );
 
-        this.viewsResource.update(VIEW_ID, view, searchUser);
-        verify(viewService).update(view);
+        Assertions.assertThatThrownBy(() -> viewsResource.update(VIEW_ID, TEST_DASHBOARD_VIEW, SEARCH_USER))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("View cannot be saved, as it contains Search Filters which you are not privileged to view : [<<You cannot see this filter>>]");
     }
 
     @Test
-    public void throwsExceptionWhenUpdatingDashboardWithFilterThatUserIsNotAllowedToSee() throws Exception {
-        prepareUpdate(ViewDTO.Type.DASHBOARD);
-        doReturn(Collections.emptySet()).when(referencedSearchFiltersHelper).getReferencedSearchFiltersIds(any());
-        doReturn(new SearchFilterVisibilityCheckStatus(Collections.singletonList("<<You cannot see this filter>>")))
-                .when(searchFilterVisibilityChecker)
-                .checkSearchFilterVisibility(any(), any());
+    public void updatesDashboardSuccessfullyIfInvisibleFilterWasPresentBefore() {
+        final ViewService viewService = mockViewService(TEST_DASHBOARD_VIEW);
 
-        Assert.assertThrows(BadRequestException.class, () -> this.viewsResource.update(VIEW_ID, view, searchUser));
-    }
-
-    @Test
-    public void updatesDashboardSuccessfullyIfInvisibleFilterWasPresentBefore() throws Exception {
-        prepareUpdate(ViewDTO.Type.DASHBOARD);
-        doReturn(Collections.singleton("<<Hidden filter, but not added by this update>>")).when(referencedSearchFiltersHelper).getReferencedSearchFiltersIds(any());
-        doReturn(new SearchFilterVisibilityCheckStatus(Collections.singletonList("<<Hidden filter, but not added by this update>>")))
-                .when(searchFilterVisibilityChecker)
-                .checkSearchFilterVisibility(any(), any());
-
-        this.viewsResource.update(VIEW_ID, view, searchUser);
-        verify(viewService).update(view);
+        final ViewsResource viewsResource = createViewsResource(
+                viewService,
+                mock(ClusterEventBus.class),
+                referencedFiltersHelperWithIDs(Collections.singleton("<<Hidden filter, but not added by this update>>")),
+                searchFilterVisibilityChecker(Collections.singletonList("<<Hidden filter, but not added by this update>>")),
+                EMPTY_VIEW_RESOLVERS,
+                SEARCH
+        );
+        viewsResource.update(VIEW_ID, TEST_DASHBOARD_VIEW, SEARCH_USER);
+        verify(viewService).update(TEST_DASHBOARD_VIEW);
     }
 
     @Test
     void testVerifyIntegrity() {
+        final ViewsResource viewsResource = createViewsResource(
+                mock(ViewService.class),
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
+                EMPTY_VIEW_RESOLVERS
+        );
+
         final ViewDTO view = ViewDTO.builder()
                 .searchId("123")
                 .title("my-search")
@@ -256,7 +248,8 @@ public class ViewsResourceTest {
                 .build();
 
         // empty search, nothing to validate, should succeed
-        assertDoesNotThrow(() -> viewsResource.validateSearchProperties(view, search));
+        Assertions.assertThatCode(() -> viewsResource.validateSearchProperties(view, search))
+                .doesNotThrowAnyException();
 
         final Search searchWithQuery = search.toBuilder().queries(ImmutableSet.of(Query.builder().id("Q-111").build())).build();
         final ViewDTO viewWithQuery = view.toBuilder().state(Collections.singletonMap("Q-123", ViewStateDTO.builder()
@@ -293,92 +286,83 @@ public class ViewsResourceTest {
 
         final ViewDTO viewWithWidgetPositions = view.toBuilder()
                 .state(Collections.singletonMap("Q-111", ViewStateDTO.builder()
-                                .widgets(Collections.singleton(WidgetDTO.builder()
-                                        .id("W-123")
-                                                .type("my-type")
-                                                .config(UnknownWidgetConfigDTO.create(Collections.emptyMap()))
+                        .widgets(Collections.singleton(WidgetDTO.builder()
+                                .id("W-123")
+                                .type("my-type")
+                                .config(UnknownWidgetConfigDTO.create(Collections.emptyMap()))
+                                .build()))
+                        .widgetPositions(Collections.singletonMap("W-111",
+                                WidgetPositionDTO.Builder.create()
+                                        .col(Position.fromInt(1))
+                                        .row(Position.fromInt(1))
+                                        .height(Position.fromInt(100))
+                                        .width(Position.fromInt(100))
                                         .build()))
-                                .widgetPositions(Collections.singletonMap("W-111",
-                                        WidgetPositionDTO.Builder.create()
-                                                .col(Position.fromInt(1))
-                                                .row(Position.fromInt(1))
-                                                .height(Position.fromInt(100))
-                                                .width(Position.fromInt(100))
-                                                .build()))
                         .widgetMapping(Collections.singletonMap("W-123", Collections.singleton("T-123")))
                         .build())).build();
 
         assertThatThrownBy(() -> viewsResource.validateSearchProperties(viewWithWidgetPositions, searchWithValidTypes))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("Widget positions don't correspond to widgets, missing widget positions [W-123]; widget IDs: [W-123]; widget positions: [W-111]");
-
-
-
-    }
-
-    private void prepareUpdate(final ViewDTO.Type viewType) {
-        this.viewsResource = spy(new ViewsTestResource(viewService, startPageService, recentActivityService, clusterEventBus, userService, searchDomain, referencedSearchFiltersHelper));
-
-        ViewDTO originalView = mock(ViewDTO.class);
-        final ViewDTO.Builder originalViewBuilder = mockView(viewType, originalView);
-        originalViewBuilder.id(VIEW_ID);
-        when(originalView.id()).thenReturn(VIEW_ID);
-        doReturn(originalView).when(viewsResource).resolveView(searchUser, VIEW_ID);
-
-        final ViewDTO.Builder builder = mockView(viewType, view);
-        builder.id(VIEW_ID);
-        when(view.id()).thenReturn(VIEW_ID);
-        mockUser();
-    }
-
-    private UserContext mockUser() {
-        final UserImpl testUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()), ImmutableMap.of("username", "testuser"));
-
-        final UserContext userContext = mock(UserContext.class);
-        when(userContext.getUser()).thenReturn(testUser);
-        when(searchUser.username()).thenReturn("testuser");
-        when(searchUser.canUpdateView(any())).thenReturn(true);
-        return userContext;
-    }
-
-    private ViewDTO.Builder mockView(final ViewDTO.Type type, final ViewDTO view) {
-        final ViewDTO.Builder builder = mock(ViewDTO.Builder.class);
-
-        when(view.toBuilder()).thenReturn(builder);
-        when(view.type()).thenReturn(type);
-        when(view.searchId()).thenReturn(SEARCH_ID);
-        when(builder.owner(any())).thenReturn(builder);
-        when(builder.id(any())).thenReturn(builder);
-        when(builder.build()).thenReturn(view);
-        return builder;
     }
 
     @Test
     public void shouldNotCreateADashboardWithoutPermission() {
-        when(view.type()).thenReturn(ViewDTO.Type.DASHBOARD);
+        final ViewsResource viewsResource = createViewsResource(
+                mock(ViewService.class),
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
+                EMPTY_VIEW_RESOLVERS
+        );
 
-        when(searchUser.canCreateDashboards()).thenReturn(false);
+        final SearchUser user = TestSearchUser.builder()
+                .canCreateDashboards(false)
+                .build();
 
-        assertThatThrownBy(() -> this.viewsResource.create(view, null, searchUser))
+        assertThatThrownBy(() -> viewsResource.create(TEST_DASHBOARD_VIEW, mock(UserContext.class), user))
                 .isInstanceOf(ForbiddenException.class);
     }
 
     @Test
     public void invalidObjectIdReturnsViewNotFoundException() {
-        assertThatThrownBy(() -> this.viewsResource.get("invalid", searchUser))
+        final ViewsResource viewsResource = createViewsResource(
+                mock(ViewService.class),
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
+                EMPTY_VIEW_RESOLVERS
+        );
+
+        assertThatThrownBy(() -> viewsResource.get("invalid", SEARCH_USER))
                 .isInstanceOf(NotFoundException.class);
     }
 
     @Test
     public void deletingDashboardTriggersEvent() {
-        final String viewId = "foobar";
-        when(searchUser.canDeleteView(view)).thenReturn(true);
-        when(view.type()).thenReturn(ViewDTO.Type.DASHBOARD);
-        when(view.id()).thenReturn(viewId);
-        when(viewService.get(viewId)).thenReturn(Optional.of(view));
-        when(userService.loadAll()).thenReturn(Collections.emptyList());
+        final ViewService viewService = mock(ViewService.class);
+        final ClusterEventBus clusterEventBus = mock(ClusterEventBus.class);
 
-        this.viewsResource.delete(viewId, searchUser);
+        final ViewDTO view = ViewDTO.builder()
+                .id("foobar")
+                .type(ViewDTO.Type.DASHBOARD)
+                .searchId(SEARCH_ID)
+                .title("my-dashboard")
+                .state(Collections.emptyMap())
+                .build();
+
+        when(viewService.get("foobar")).thenReturn(Optional.of(view));
+
+
+        final ViewsResource viewsResource = createViewsResource(
+                viewService,
+                clusterEventBus,
+                new ReferencedSearchFiltersHelper(),
+                EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
+                EMPTY_VIEW_RESOLVERS
+        );
+
+        viewsResource.delete("foobar", SEARCH_USER);
 
         final ArgumentCaptor<DashboardDeletedEvent> eventCaptor = ArgumentCaptor.forClass(DashboardDeletedEvent.class);
         verify(clusterEventBus, times(1)).post(eventCaptor.capture());
@@ -390,44 +374,81 @@ public class ViewsResourceTest {
     @Test
     public void testViewResolver() {
         // Setup
-        when(view.id()).thenReturn(VIEW_ID);
         final String resolverName = "test-resolver";
         final Map<String, ViewResolver> viewResolvers = new HashMap<>();
-        viewResolvers.put(resolverName, new TestViewResolver());
-        final ViewsResource testResource = new ViewsTestResource(viewService, startPageService, recentActivityService, clusterEventBus, userService, searchDomain, viewResolvers, referencedSearchFiltersHelper);
+        viewResolvers.put(resolverName, new TestableFixedViewResolver(TEST_DASHBOARD_VIEW));
+
+        final ViewsResource testResource = createViewsResource(
+                mock(ViewService.class),
+                mock(ClusterEventBus.class),
+                new ReferencedSearchFiltersHelper(),
+                EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
+                viewResolvers
+        );
 
         // Verify that view for valid id is found.
-        when(searchUser.canReadView(any())).thenReturn(true);
-        assertEquals(VIEW_ID, testResource.get(resolverName + ":" + VIEW_ID, searchUser).id());
+        Assertions.assertThat(testResource.get(resolverName + ":" + VIEW_ID, SEARCH_USER).id()).isEqualTo(VIEW_ID);
 
 
         // Verify error paths for invalid resolver names and view ids.
-        assertThrows(NotFoundException.class,
-                () -> testResource.get("invalid-resolver-name:" + VIEW_ID, searchUser));
-        assertThrows(NotFoundException.class,
-                () -> testResource.get(resolverName + ":invalid-view-id", searchUser));
+        Assertions.assertThatThrownBy(() -> testResource.get("invalid-resolver-name:" + VIEW_ID, SEARCH_USER))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("Failed to find view resolver: invalid-resolver-name");
+
+        Assertions.assertThatThrownBy(() -> testResource.get(resolverName + ":invalid-view-id", SEARCH_USER))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("Failed to resolve view:test-resolver:invalid-view-id");
     }
 
-    class TestViewResolver implements ViewResolver {
-        @Override
-        public Optional<ViewDTO> get(String id) {
-            return id.equals(VIEW_ID) ? Optional.of(view) : Optional.empty();
+    private ViewsResource createViewsResource(final ViewService viewService, final ClusterEventBus clusterEventBus, ReferencedSearchFiltersHelper referencedSearchFiltersHelper, SearchFilterVisibilityChecker searchFilterVisibilityChecker, final Map<String, ViewResolver> viewResolvers, Search... existingSearches) {
+
+        final SearchDomain searchDomain = mock(SearchDomain.class);
+        for (Search search : existingSearches) {
+            when(searchDomain.getForUser(eq(search.id()), eq(SEARCH_USER))).thenReturn(Optional.of(search));
         }
 
-        @Override
-        public Set<String> getSearchIds() {
-            return null;
-        }
+        return new ViewsResource(viewService, clusterEventBus, searchDomain, viewResolvers, searchFilterVisibilityChecker, referencedSearchFiltersHelper) {
+            @Override
+            protected Subject getSubject() {
+                return mock(Subject.class);
+            }
 
-        @Override
-        public Set<ViewDTO> getBySearchId(String searchId) {
-            return Collections.emptySet();
-        }
+            @Override
+            protected User getCurrentUser() {
+                return mock(User.class);
+            }
+        };
+    }
 
-        @Override
-        public boolean canReadView(String viewId, Predicate<String> permissionTester, BiPredicate<String, String> entityPermissionsTester) {
-            // Not used in this test.
-            return false;
-        }
+    private static ViewService mockViewService(ViewDTO existingView) {
+        final ViewService viewService = mock(ViewService.class);
+        when(viewService.get(existingView.id())).thenReturn(Optional.of(existingView));
+        return viewService;
+    }
+
+
+    private UserContext mockUserContext() {
+        final UserImpl testUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()), ImmutableMap.of("username", "testuser"));
+        final UserContext userContext = mock(UserContext.class);
+        when(userContext.getUser()).thenReturn(testUser);
+        return userContext;
+    }
+
+    private static ReferencedSearchFiltersHelper referencedFiltersHelperWithIDs(final Set<String> ids) {
+        return new ReferencedSearchFiltersHelper() {
+            @Override
+            public Set<String> getReferencedSearchFiltersIds(Collection<UsesSearchFilters> searchFiltersOwners) {
+                return ids;
+            }
+        };
+    }
+
+    private static SearchFilterVisibilityChecker searchFilterVisibilityChecker(List<String> hiddenSearchFilterIds) {
+        return new SearchFilterVisibilityChecker() {
+            @Override
+            public SearchFilterVisibilityCheckStatus checkSearchFilterVisibility(Predicate<String> readPermissionPredicate, Collection<String> referencedSearchFiltersIds) {
+                return new SearchFilterVisibilityCheckStatus(hiddenSearchFilterIds);
+            }
+        };
     }
 }

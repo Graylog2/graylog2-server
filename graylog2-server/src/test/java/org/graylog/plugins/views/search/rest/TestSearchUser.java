@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.security.RestPermissions;
 import org.mockito.Mockito;
 
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import java.util.function.Consumer;
 
 import static org.graylog2.shared.security.RestPermissions.DASHBOARDS_READ;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
+import static org.mockito.Mockito.when;
 
 public class TestSearchUser {
 
@@ -85,6 +87,17 @@ public class TestSearchUser {
 
     public TestSearchUser denyEditView(String id) {
         this.permissions.put(ViewsRestPermissions.VIEW_EDIT + ":" + id, false);
+        return this;
+    }
+
+
+    public TestSearchUser allowDeleteView(String viewId) {
+        this.permissions.put(ViewsRestPermissions.VIEW_DELETE  + ":" + viewId, true);
+        return this;
+    }
+
+    public TestSearchUser canCreateDashboards(boolean canCreateDashboards) {
+        this.permissions.put(RestPermissions.DASHBOARDS_CREATE, canCreateDashboards);
         return this;
     }
 

@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.views;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.BasicDBObject;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -74,6 +75,11 @@ public class ViewService extends PaginatedDbService<ViewDTO> implements ViewUtil
         this.viewSummaryService = viewSummaryService;
         this.collection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
         this.mapper = mapper;
+        for (String sortField : ViewDTO.SORT_FIELDS) {
+            if (!sortField.equals(ViewDTO.FIELD_ID)) { //id has index by default
+                this.db.createIndex(new BasicDBObject(sortField, 1), new BasicDBObject("unique", false));
+            }
+        }
     }
 
     private PaginatedList<ViewDTO> searchPaginated(SearchUser searchUser,

@@ -27,6 +27,10 @@ import org.mongojack.JacksonDBCollection;
 import javax.inject.Inject;
 import java.util.stream.Stream;
 
+/**
+ * @deprecated Needed only by migrations.
+ */
+@Deprecated
 public class SavedSearchService {
     private static final String COLLECTION_NAME = "saved_searches";
     private final JacksonDBCollection<SavedSearch, ObjectId> db;

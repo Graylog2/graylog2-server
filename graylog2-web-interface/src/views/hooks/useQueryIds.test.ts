@@ -15,16 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
+import { act, renderHook } from '@testing-library/react-hooks';
 
 import { asMock, MockStore } from 'helpers/mocking';
 import { ViewStore } from 'views/stores/ViewStore';
 import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
+import useQueryIds from 'views/hooks/useQueryIds';
 
-import { QueryIdsStore } from './QueryIdsStore';
-
-jest.mock('./ViewStore', () => ({
+jest.mock('views/stores/ViewStore', () => ({
   ViewStore: MockStore(),
 }));
 
@@ -39,28 +39,32 @@ const createViewStoreState = (queryIds: Array<string>) => ({
   isNew: false,
 });
 
-describe('QueryIdsStore', () => {
+describe('useQueryIds', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('tracks `ViewStore` updates', async () => {
+    const { result } = renderHook(() => useQueryIds());
+
     const cb = asMock(ViewStore.listen).mock.calls[0][0] as Parameters<typeof ViewStore.listen>[0];
 
-    const result = await new Promise((resolve) => {
-      QueryIdsStore.listen((queryIds) => resolve(queryIds));
-
+    act(() => {
       cb(createViewStoreState(['foo']));
     });
 
-    expect(result).toEqual(Immutable.OrderedSet(['foo']));
+    expect(result.current).toEqual(Immutable.OrderedSet(['foo']));
   });
 
   it('keeps order of query ids', async () => {
+    const { result } = renderHook(() => useQueryIds());
+
     const cb = asMock(ViewStore.listen).mock.calls[0][0] as Parameters<typeof ViewStore.listen>[0];
 
-    const result = await new Promise((resolve) => {
-      QueryIdsStore.listen((queryIds) => resolve(queryIds));
-
+    act(() => {
       cb(createViewStoreState(['foo', 'bar', 'baz']));
     });
 
-    expect(result).toEqual(Immutable.OrderedSet(['foo', 'bar', 'baz']));
+    expect(result.current).toEqual(Immutable.OrderedSet(['foo', 'bar', 'baz']));
   });
 });
