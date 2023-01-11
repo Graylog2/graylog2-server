@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { Props } from 'react-select';
 import InfiniteLoader from 'react-window-infinite-loader';
 import styled from 'styled-components';
 
@@ -37,11 +36,18 @@ const getNoOptionMessgage = () => {
   );
 };
 
-const AsyncCustomMenuList = ({ children, selectProps: { loadOptions, total } }: Props.MenuList) => {
-  const items = children?.length ? children : [getNoOptionMessgage()];
+const AsyncCustomMenuList = ({
+  children,
+  selectProps: { loadOptions, total },
+}: {
+  children: Array<React.ReactNode>,
+  selectProps: { loadOptions: () => void, total: number }
+}) => {
+  const childrenCount = React.Children.count(children);
+  const items = childrenCount ? children : [getNoOptionMessgage()];
 
   return (
-    <InfiniteLoader isItemLoaded={(index: number) => index < children.length}
+    <InfiniteLoader isItemLoaded={(index: number) => index < childrenCount}
                     itemCount={total}
                     threshold={30}
                     minimumBatchSize={50}

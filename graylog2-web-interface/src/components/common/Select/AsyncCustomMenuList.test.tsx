@@ -37,9 +37,7 @@ describe('CustomMenuList', () => {
 
   it('Should render AsyncCustomMenuList', () => {
     render(
-      <AsyncCustomMenuList getStyles={() => {}}
-                           selectProps={mockSelectProps}
-                           cx={() => ({})}>
+      <AsyncCustomMenuList selectProps={mockSelectProps}>
         {getChildrenList(50)}
       </AsyncCustomMenuList>,
     );
@@ -51,9 +49,7 @@ describe('CustomMenuList', () => {
 
   it('Should load more items on scrool', async () => {
     render(
-      <AsyncCustomMenuList getStyles={() => {}}
-                           selectProps={mockSelectProps}
-                           cx={() => ({})}>
+      <AsyncCustomMenuList selectProps={mockSelectProps}>
         {getChildrenList(5)}
       </AsyncCustomMenuList>,
     );

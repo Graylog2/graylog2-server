@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import CreatableSelect from 'react-select/creatable';
-import type { Props as CreatableProps } from 'react-select/creatable';
 
 import { InputDescription } from 'components/common';
 import { FormGroup, ControlLabel } from 'components/bootstrap';
@@ -35,18 +34,39 @@ const createOption = (value: string | number) => ({
   value,
 });
 
-type Props = CreatableProps & {
-  name: string,
-  values: (string | number)[],
-  onChange: (newValue: React.ChangeEvent<GenericTarget<(string | number)[]>>) => void,
-  label?: string | React.ReactHTMLElement<HTMLElement> | null,
-  size?: 'small' | 'normal',
+type Props = {
   bsStyle?: 'success' | 'warning' | 'error' | null,
+  components?: {
+    Input?: React.ComponentType<any>,
+    MultiValueRemove?: React.ComponentType<any>,
+    ClearIndicator?: React.ComponentType<any>,
+  },
   error?: string | React.ReactHTMLElement<HTMLElement> | null,
   help?: string | React.ReactHTMLElement<HTMLElement> | null,
+  id: string,
+  isClearable?: boolean,
+  label?: React.ReactNode,
+  name: string,
+  onChange: (newValue: React.ChangeEvent<GenericTarget<(string | number)[]>>) => void,
+  placeholder?: string,
+  size?: 'small' | 'normal',
+  values: (string | number)[],
 };
 
-const InputList = ({ name, values, onChange, label, size, bsStyle, error, help, ...rest }: Props) => {
+const InputList = ({
+  name,
+  values,
+  onChange,
+  label,
+  size,
+  bsStyle,
+  error,
+  help,
+  id,
+  isClearable,
+  components,
+  placeholder,
+}: Props) => {
   const { inputListTheme, styles } = useInputListStyles(size);
   const inputRef = React.useRef(null);
   const [inputValue, setInputValue] = React.useState<string>('');
@@ -83,20 +103,21 @@ const InputList = ({ name, values, onChange, label, size, bsStyle, error, help, 
   };
 
   return (
-    <FormGroup controlId={rest.id ? rest.id : name} validationState={error ? 'error' : bsStyle}>
+    <FormGroup controlId={id ?? name} validationState={error ? 'error' : bsStyle}>
       {label && <ControlLabel>{label}</ControlLabel>}
       <CreatableSelect ref={inputRef}
-                       components={{ DropdownIndicator: null }}
+                       components={{ DropdownIndicator: null, ...(components ?? {}) }}
                        inputValue={inputValue}
                        isMulti
+                       isClearable={isClearable}
+                       placeholder={placeholder}
                        menuIsOpen={false}
                        onChange={handleOnChange}
                        onInputChange={(newValue: string) => setInputValue(newValue)}
                        onKeyDown={handleKeyDown}
                        value={value}
                        styles={styles(!error)}
-                       theme={inputListTheme}
-                       {...rest} />
+                       theme={(theme) => ({ ...theme, ...inputListTheme })} />
       <InputDescription error={error} help={help} />
     </FormGroup>
   );
@@ -108,6 +129,9 @@ InputList.defaultProps = {
   bsStyle: null,
   error: null,
   help: null,
+  placeholder: undefined,
+  isClearable: false,
+  components: undefined,
 };
 
 export default InputList;

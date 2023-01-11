@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useRef, useCallback, useEffect } from 'react';
+import type { MenuListProps } from 'react-select';
 import { components as Components } from 'react-select';
-import type { Props } from 'react-select/creatable';
 import { VariableSizeList as List } from 'react-window';
 import styled from 'styled-components';
 
@@ -30,7 +30,7 @@ const Container = styled.div<{ height: number}>`
 `;
 
 type RowProps = {
-  data: Array<object>,
+  data: Array<React.ReactNode>,
   index: number,
   setSize: (index: number, size: number) => void,
   containerWidth: number
@@ -51,7 +51,11 @@ const Row = ({ data, index, setSize, style, containerWidth }: RowProps) => {
   );
 };
 
-export const WindowList = ({ children, listRef, ...rest }: Props.MenuList & { listRef?: any}) => {
+export const WindowList = ({ children, listRef, ...rest }: Partial<MenuListProps> & {
+  listRef?: React.RefObject<HTMLElement>,
+  onItemsRendered?: () => void,
+  children: Array<React.ReactNode>,
+}) => {
   const containerRef = useRef(null);
   const vListRef = useRef(null);
   const sizeMap = useRef({});
@@ -74,15 +78,17 @@ export const WindowList = ({ children, listRef, ...rest }: Props.MenuList & { li
 
   const getSize = useCallback((index: number) => sizeMap.current[index] || 36, [sizeMap]);
 
+  const itemCount = React.Children.count(children);
+
   return (
     <Container ref={containerRef} height={totalHeight} data-testid="infinite-loader-container">
-      <List ref={listRef || vListRef}
-            height={totalHeight || 300}
-            itemCount={children.length}
-            itemSize={getSize}
-            itemData={children}
-            width={width}
-            {...rest}>
+      <List<Array<React.ReactNode>> ref={listRef?.current || vListRef?.current}
+                                    height={totalHeight || 300}
+                                    itemCount={itemCount}
+                                    itemSize={getSize}
+                                    itemData={children}
+                                    width={width}
+                                    {...rest}>
         {({ data, index, style }) => (
           <Row data={data}
                style={style}
@@ -97,14 +103,23 @@ export const WindowList = ({ children, listRef, ...rest }: Props.MenuList & { li
 
 WindowList.defaultProps = {
   listRef: undefined,
+  onItemsRendered: undefined,
 };
 
-const CustomMenuList = ({ children, innerProps, ...rest }: Props.MenuList) => {
-  if (!children?.length || (children.length < REACT_SELECT_MAX_OPTIONS_LENGTH)) {
+type Props = {
+  children: Array<React.ReactNode>,
+  innerProps?: object,
+}
+
+const CustomMenuList = ({ children, innerProps, ...rest }: Props) => {
+  const childrenCount = React.Children.count(children);
+
+  if (!childrenCount || (childrenCount < REACT_SELECT_MAX_OPTIONS_LENGTH)) {
     return (
       <Components.MenuList {...rest}
                            innerProps={{
                              ...innerProps,
+                             // @ts-ignore
                              'data-testid': 'react-select-list',
                            }}>
         {children}

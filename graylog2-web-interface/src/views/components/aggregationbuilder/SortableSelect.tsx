@@ -20,6 +20,7 @@ import PropTypes from 'prop-types';
 import { components as Components } from 'react-select';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { findIndex } from 'lodash';
+import type { MultiValueProps } from 'react-select';
 
 import Select from 'components/common/Select';
 
@@ -56,12 +57,12 @@ type Props = {
   valueComponent: React.ComponentType<any>,
   valueTransformer?: (value: Array<{ field: string }>) => Array<{ value: any, label: string }>,
 }
-const SortableMultiValue = SortableElement<{ innerProps: { title: string }}>(Components.MultiValue);
+const SortableMultiValue = SortableElement<MultiValueProps>(Components.MultiValue);
 
 const SortableSelect = ({ onChange, value, valueComponent, valueTransformer, inputId, allowOptionCreation, options }: Props) => {
   const values = valueTransformer(value);
 
-  const Item = useCallback((itemProps: { data: { value: string }}) => {
+  const Item = useCallback((itemProps: MultiValueProps & { data: { value: string }}) => {
     // eslint-disable-next-line react/prop-types
     const { data: { value: itemValue } } = itemProps;
     const index = findIndex(value, (v) => v.field === itemValue);

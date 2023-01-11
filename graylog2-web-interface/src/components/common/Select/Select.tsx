@@ -223,8 +223,8 @@ export type Props<OptionValue> = {
   delimiter?: string,
   disabled?: boolean,
   displayKey: string,
-  forwardedRef?: React.Ref<React.ComponentType>,
   id?: string,
+  forwardedRef?: React.Ref<any>,
   ignoreAccents?: boolean,
   inputId?: string,
   inputProps?: { [key: string]: any },
@@ -564,10 +564,15 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       valueRenderer, // Do not pass down prop
       menuPortalTarget,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       async,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       total,
-      onInputChange,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      ref,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       loadOptions,
+      onInputChange,
       ...rest
     } = this.props;
 
@@ -580,21 +585,19 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       ...customComponents,
     };
 
-    const selectProps: React.ComponentProps<typeof ReactSelect> | React.ComponentProps<typeof CreatableSelect> = {
+    const selectProps: (React.ComponentProps<typeof ReactSelect> | React.ComponentProps<typeof CreatableSelect>) & { total: number | undefined} = {
       ...rest,
       onChange: onReactSelectChange || this._onChange,
       onInputChange,
-      async,
       isMulti,
       isDisabled,
       isClearable,
-      loadOptions,
-      getOptionLabel: (option) => option[displayKey] || option.label,
+      getOptionLabel: (option: { label?: string }) => option[displayKey] || option.label,
       getOptionValue: (option) => option[valueKey],
       filterOption: customFilter,
       components: mergedComponents,
       menuPortalTarget: menuPortalTarget,
-      isOptionDisabled: (option) => !!option.disabled,
+      isOptionDisabled: (option: { disabled?: boolean }) => !!option.disabled,
       styles: _styles({ size, theme }),
       theme: this._selectTheme,
       total,
