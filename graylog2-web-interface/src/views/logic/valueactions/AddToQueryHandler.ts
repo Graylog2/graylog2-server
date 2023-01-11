@@ -15,26 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import moment from 'moment-timezone';
-import { createSelector } from '@reduxjs/toolkit';
 
 import { DATE_TIME_FORMATS } from 'util/DateTime';
 import { MISSING_BUCKET_NAME } from 'views/Constants';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
-import { selectSearch, selectViewType, setQueryString } from 'views/logic/slices/viewSlice';
-import View from 'views/logic/views/View';
+import { updateQueryString, selectCurrentQueryString } from 'views/logic/slices/viewSlice';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { RootState } from 'views/types';
-import { setGlobalOverrideQuery, selectGlobalOverride } from 'views/logic/slices/searchExecutionSlice';
-import type { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 
-const formatTimestampForES = (value: string) => {
+const formatTimestampForES = (value: string | number) => {
   const utc = moment(value).tz('UTC');
 
   return `"${utc.format(DATE_TIME_FORMATS.internalIndexer)}"`;
 };
 
-const formatNewQuery = (oldQuery: string, field: string, value: string, type: FieldType) => {
+const formatNewQuery = (oldQuery: string, field: string, value: string | number, type: FieldType) => {
   const predicateValue = type.type === 'date'
     ? formatTimestampForES(value)
     : escape(value);
@@ -45,25 +41,18 @@ const formatNewQuery = (oldQuery: string, field: string, value: string, type: Fi
   return addToQuery(oldQuery, fieldPredicate);
 };
 
-const selectCurrentQueryString = (queryId: string) => createSelector(
-  selectViewType,
-  selectGlobalOverride,
-  selectSearch,
-  (viewType, globalOverride, search) => (viewType === View.Type.Search
-    ? search.queries.find((q) => q.id === queryId).query.query_string
-    : globalOverride.query.query_string),
-);
+type Arguments = {
+  queryId: string,
+  field: string,
+  value?: string | number,
+  type: FieldType,
+};
 
-const AddToQueryHandler = ({ queryId, field, value = '', type }: ActionHandlerArguments<{}>) => (dispatch: AppDispatch, getState: () => RootState) => {
+const AddToQueryHandler = ({ queryId, field, value = '', type }: Arguments) => (dispatch: AppDispatch, getState: () => RootState) => {
   const oldQuery = selectCurrentQueryString(queryId)(getState());
-  const viewType = selectViewType(getState());
   const newQuery = formatNewQuery(oldQuery, field, value, type);
 
-  if (viewType === View.Type.Search) {
-    return dispatch(setQueryString(queryId, newQuery));
-  }
-
-  return dispatch(setGlobalOverrideQuery(newQuery));
+  return dispatch(updateQueryString(queryId, newQuery));
 };
 
 export default AddToQueryHandler;

@@ -24,6 +24,8 @@ import type ViewStateType from 'views/logic/views/ViewState';
 import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
 import type Query from 'views/logic/queries/Query';
 import FindNewActiveQueryId from 'views/logic/views/FindNewActiveQuery';
+import View from 'views/logic/views/View';
+import { setGlobalOverrideQuery, selectGlobalOverride } from 'views/logic/slices/searchExecutionSlice';
 
 const viewSlice = createSlice({
   name: 'view',
@@ -127,6 +129,14 @@ export const selectQueryById = (queryId: string) => createSelector(
 export const selectWidgets = createSelector(selectActiveViewState, (viewState) => viewState.widgets);
 export const selectWidget = (widgetId: string) => createSelector(selectWidgets, (widgets) => widgets.find((widget) => widget.id === widgetId));
 export const selectTitles = createSelector(selectActiveViewState, (viewState) => viewState.titles);
+export const selectCurrentQueryString = (queryId: string) => createSelector(
+  selectViewType,
+  selectGlobalOverride,
+  selectSearch,
+  (viewType, globalOverride, search) => (viewType === View.Type.Search
+    ? search.queries.find((q) => q.id === queryId).query.query_string
+    : globalOverride.query.query_string),
+);
 
 export const createQuery = () => async (dispatch: AppDispatch, getState: () => RootState) => {
   const viewType = selectViewType(getState());
@@ -141,4 +151,14 @@ export const setQueryString = (queryId: QueryId, newQueryString: string) => (dis
     .build();
 
   return dispatch(updateQuery([queryId, newQuery]));
+};
+
+export const updateQueryString = (queryId: string, newQueryString: string) => (dispatch: AppDispatch, getState: () => RootState) => {
+  const viewType = selectViewType(getState());
+
+  if (viewType === View.Type.Search) {
+    return dispatch(setQueryString(queryId, newQueryString));
+  }
+
+  return dispatch(setGlobalOverrideQuery(newQueryString));
 };

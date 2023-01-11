@@ -284,7 +284,7 @@ const exports: PluginExports = {
     {
       type: 'exclude',
       title: 'Exclude from results',
-      handler: new ExcludeFromQueryHandler().handle,
+      thunk: ExcludeFromQueryHandler,
       isEnabled: ({ field, type }: ActionHandlerArguments) => (!isFunction(field) && !type.isDecorated()),
       resetFocus: false,
     },

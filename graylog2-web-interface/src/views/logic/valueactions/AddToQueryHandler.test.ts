@@ -65,7 +65,6 @@ describe('AddToQueryHandler', () => {
       field: 'timestamp',
       value: '2019-01-17T11:00:09.025Z',
       type: new FieldType('date', [], []),
-      contexts: { view },
     }));
 
     expect(dispatch).toHaveBeenCalledWith(
@@ -84,7 +83,6 @@ describe('AddToQueryHandler', () => {
       field: 'bar',
       value: 42,
       type: new FieldType('keyword', [], []),
-      contexts: { view },
     }));
 
     expect(dispatch).toHaveBeenCalledWith(
@@ -103,7 +101,6 @@ describe('AddToQueryHandler', () => {
       field: 'bar',
       value: MISSING_BUCKET_NAME,
       type: new FieldType('keyword', [], []),
-      contexts: { view },
     }));
 
     expect(dispatch).toHaveBeenCalledWith(
@@ -118,7 +115,10 @@ describe('AddToQueryHandler', () => {
       const state = {
         view: { view },
         searchExecution: {
-          executionState: SearchExecutionState.create(Immutable.Map(), GlobalOverride.create(undefined, { type: 'elasticsearch', query_string: 'something' })),
+          executionState: SearchExecutionState.create(
+            Immutable.Map(),
+            GlobalOverride.create(undefined, { type: 'elasticsearch', query_string: 'something' }),
+          ),
         },
       } as RootState;
       const dispatch = mockDispatch(state);
@@ -128,7 +128,6 @@ describe('AddToQueryHandler', () => {
         field: 'bar',
         value: 42,
         type: new FieldType('keyword', [], []),
-        contexts: { view },
       }));
 
       expect(dispatch).toHaveBeenCalledWith(
