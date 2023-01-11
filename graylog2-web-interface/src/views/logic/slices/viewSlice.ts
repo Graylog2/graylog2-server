@@ -60,13 +60,13 @@ const createSearchUrl = qualifyUrl('/views/search');
 const createSearch = (search: Search) => fetch('POST', createSearchUrl, JSON.stringify(search))
   .then((response) => Search.fromJSON(response));
 
-const loadView = (newView: View) => async (dispatch: AppDispatch, getState: () => RootState) => {
+const loadView = (newView: View, recreateSearch: boolean = false) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const oldView = selectView(getState());
 
   const oldWidgets = oldView?.state?.map((s) => s.widgets);
   const newWidgets = newView?.state?.map((s) => s.widgets);
 
-  if (!isEqualForSearch(oldWidgets, newWidgets)) {
+  if (recreateSearch || !isEqualForSearch(oldWidgets, newWidgets)) {
     const updatedView = UpdateSearchForWidgets(newView);
     const updatedSearch = await createSearch(updatedView.search);
     const updatedViewWithSearch = updatedView.toBuilder().search(updatedSearch).build();
@@ -92,8 +92,7 @@ export const addQuery = (payload: [Query, ViewStateType]) => async (dispatch: Ap
     .state(newViewStates)
     .build();
 
-  dispatch(loadView(newView));
-  dispatch(selectQuery(query.id));
+  return dispatch(loadView(newView, true)).then(() => dispatch(selectQuery(query.id)));
 };
 
 export const updateQuery = (payload: [string, Query]) => async (dispatch: AppDispatch, getState: () => RootState) => {
@@ -109,7 +108,7 @@ export const updateQuery = (payload: [string, Query]) => async (dispatch: AppDis
     .search(newSearch)
     .build();
 
-  return dispatch(loadView(newView));
+  return dispatch(loadView(newView, true));
 };
 
 export const removeQuery = (queryId: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
@@ -127,7 +126,7 @@ export const removeQuery = (queryId: string) => async (dispatch: AppDispatch, ge
   const indexedQueryIds = search.queries.map((query) => query.id).toList();
   const newActiveQuery = FindNewActiveQueryId(indexedQueryIds, activeQuery);
 
-  dispatch(loadView(newView));
+  dispatch(loadView(newView, true));
   dispatch(selectQuery(newActiveQuery));
 };
 
