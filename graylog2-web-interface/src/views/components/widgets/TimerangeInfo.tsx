@@ -24,7 +24,7 @@ import { DEFAULT_TIMERANGE } from 'views/Constants';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type { DateTime } from 'util/DateTime';
 import useAppSelector from 'stores/useAppSelector';
-import { selectSearchExecutionResult } from 'views/logic/slices/searchExecutionSlice';
+import { selectSearchExecutionResult } from 'views/logic/slices/searchExecutionSelectors';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
 
 type Props = {

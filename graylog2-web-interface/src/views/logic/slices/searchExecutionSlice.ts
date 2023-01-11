@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { createSlice, createSelector } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
@@ -26,6 +26,11 @@ import type View from 'views/logic/views/View';
 import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import { selectView } from 'views/logic/slices/viewSelectors';
+import {
+  selectGlobalOverride,
+  selectWidgetsToSearch,
+  selectSearchExecutionState,
+} from 'views/logic/slices/searchExecutionSelectors';
 
 const searchExecutionSlice = createSlice({
   name: 'searchExecution',
@@ -55,14 +60,6 @@ const searchExecutionSlice = createSlice({
 export const { loading, finishedLoading, updateGlobalOverride } = searchExecutionSlice.actions;
 
 export const searchExecutionSliceReducer = searchExecutionSlice.reducer;
-
-export const selectSearchExecutionRoot = (state: RootState) => state.searchExecution;
-
-export const selectSearchExecutionState = createSelector(selectSearchExecutionRoot, (state) => state.executionState);
-export const selectWidgetsToSearch = createSelector(selectSearchExecutionRoot, (state) => state.widgetsToSearch);
-export const selectSearchExecutionResult = createSelector(selectSearchExecutionRoot, (state) => state.result);
-export const selectGlobalOverride = createSelector(selectSearchExecutionState, (executionState) => executionState.globalOverride);
-export const selectParameterBindings = createSelector(selectSearchExecutionState, (executionState) => executionState.parameterBindings);
 
 export const executeWithExecutionState = (
   view: View, widgetsToSearch: Array<string>, executionState: SearchExecutionState, resultMapper: (newResult: SearchExecutionResult) => SearchExecutionResult,

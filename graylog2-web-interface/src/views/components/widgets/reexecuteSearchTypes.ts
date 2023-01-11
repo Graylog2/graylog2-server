@@ -25,8 +25,9 @@ import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import {
   selectGlobalOverride,
   selectParameterBindings,
-  selectSearchExecutionResult, executeWithExecutionState,
-} from 'views/logic/slices/searchExecutionSlice';
+  selectSearchExecutionResult,
+} from 'views/logic/slices/searchExecutionSelectors';
+import { executeWithExecutionState } from 'views/logic/slices/searchExecutionSlice';
 
 const reexecuteSearchTypes = (
   searchTypes: SearchTypeOptions,

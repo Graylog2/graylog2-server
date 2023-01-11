@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import useAppSelector from 'stores/useAppSelector';
-import { selectGlobalOverride } from 'views/logic/slices/searchExecutionSlice';
+import { selectGlobalOverride } from 'views/logic/slices/searchExecutionSelectors';
 
 const useGlobalOverride = () => useAppSelector(selectGlobalOverride);
 

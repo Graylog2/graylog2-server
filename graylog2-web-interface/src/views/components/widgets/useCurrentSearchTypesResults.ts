@@ -16,7 +16,7 @@
  */
 import { createSelector } from '@reduxjs/toolkit';
 
-import { selectSearchExecutionResult } from 'views/logic/slices/searchExecutionSlice';
+import { selectSearchExecutionResult } from 'views/logic/slices/searchExecutionSelectors';
 import { selectActiveQuery } from 'views/logic/slices/viewSelectors';
 import useAppSelector from 'stores/useAppSelector';
 

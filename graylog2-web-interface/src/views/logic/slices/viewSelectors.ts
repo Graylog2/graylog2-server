@@ -1,7 +1,7 @@
 import { createSelector } from '@reduxjs/toolkit';
 
 import type { RootState } from 'views/types';
-import { selectGlobalOverride } from 'views/logic/slices/searchExecutionSlice';
+import { selectGlobalOverride } from 'views/logic/slices/searchExecutionSelectors';
 import View from 'views/logic/views/View';
 
 export const selectRootView = (state: RootState) => state.view;
