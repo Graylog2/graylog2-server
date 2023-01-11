@@ -17,7 +17,7 @@
 import { createSelector } from '@reduxjs/toolkit';
 
 import useAppSelector from 'stores/useAppSelector';
-import { selectViewStates } from 'views/logic/slices/viewSlice';
+import { selectViewStates } from 'views/logic/slices/viewSelectors';
 
 const selectQueryTitles = createSelector(
   selectViewStates,

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import useAppSelector from 'stores/useAppSelector';
-import { selectIsNew } from 'views/logic/slices/viewSlice';
+import { selectIsNew } from 'views/logic/slices/viewSelectors';
 
 const useIsNew = () => useAppSelector(selectIsNew);
 

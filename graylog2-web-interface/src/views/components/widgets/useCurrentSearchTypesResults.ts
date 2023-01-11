@@ -17,7 +17,7 @@
 import { createSelector } from '@reduxjs/toolkit';
 
 import { selectSearchExecutionResult } from 'views/logic/slices/searchExecutionSlice';
-import { selectActiveQuery } from 'views/logic/slices/viewSlice';
+import { selectActiveQuery } from 'views/logic/slices/viewSelectors';
 import useAppSelector from 'stores/useAppSelector';
 
 const selectCurrentSearchTypeResults = createSelector(selectSearchExecutionResult, selectActiveQuery, (state, activeQuery) => state.result.forId(activeQuery).searchTypes);

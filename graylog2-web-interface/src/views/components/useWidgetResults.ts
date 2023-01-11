@@ -24,7 +24,7 @@ import type QueryResult from 'views/logic/QueryResult';
 import type SearchError from 'views/logic/SearchError';
 import useAppSelector from 'stores/useAppSelector';
 import { selectSearchExecutionResult } from 'views/logic/slices/searchExecutionSlice';
-import { selectActiveQuery, selectWidget } from 'views/logic/slices/viewSlice';
+import { selectActiveQuery, selectWidget } from 'views/logic/slices/viewSelectors';
 
 const _getDataAndErrors = (widget: Widget, widgetMapping: WidgetMapping, results: QueryResult) => {
   const { searchTypes } = results;

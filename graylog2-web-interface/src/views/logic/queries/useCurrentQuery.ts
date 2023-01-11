@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import useAppSelector from 'stores/useAppSelector';
-import { selectCurrentQuery } from 'views/logic/slices/viewSlice';
+import { selectCurrentQuery } from 'views/logic/slices/viewSelectors';
 
 const useCurrentQuery = () => useAppSelector(selectCurrentQuery);
 

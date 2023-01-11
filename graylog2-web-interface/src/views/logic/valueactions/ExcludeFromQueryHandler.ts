@@ -18,7 +18,8 @@ import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
 import { MISSING_BUCKET_NAME } from 'views/Constants';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { RootState } from 'views/types';
-import { selectCurrentQueryString, updateQueryString } from 'views/logic/slices/viewSlice';
+import { updateQueryString } from 'views/logic/slices/viewSlice';
+import { selectCurrentQueryString } from 'views/logic/slices/viewSelectors';
 
 const formatNewQuery = (oldQuery: string, field: string, value: any) => {
   const fieldPredicate = value === MISSING_BUCKET_NAME

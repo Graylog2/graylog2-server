@@ -20,7 +20,8 @@ import { DATE_TIME_FORMATS } from 'util/DateTime';
 import { MISSING_BUCKET_NAME } from 'views/Constants';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
-import { updateQueryString, selectCurrentQueryString } from 'views/logic/slices/viewSlice';
+import { updateQueryString } from 'views/logic/slices/viewSlice';
+import { selectCurrentQueryString } from 'views/logic/slices/viewSelectors';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { RootState } from 'views/types';
 

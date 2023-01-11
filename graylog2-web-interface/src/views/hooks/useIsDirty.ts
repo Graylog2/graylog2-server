@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import useAppSelector from 'stores/useAppSelector';
-import { selectIsDirty } from 'views/logic/slices/viewSlice';
+import { selectIsDirty } from 'views/logic/slices/viewSelectors';
 
 const useIsDirty = () => useAppSelector(selectIsDirty);
 

@@ -22,7 +22,7 @@ import { useSyncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters'
 import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { RootState } from 'views/types';
-import { selectView } from 'views/logic/slices/viewSlice';
+import { selectView } from 'views/logic/slices/viewSelectors';
 import useAppDispatch from 'stores/useAppDispatch';
 
 const bindSearchParamsFromQueryThunk = (query) => (_dispatch: AppDispatch, getState: () => RootState) => {

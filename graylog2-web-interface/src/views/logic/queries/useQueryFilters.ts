@@ -21,7 +21,7 @@ import { useMemo } from 'react';
 import useAppSelector from 'stores/useAppSelector';
 import type { QueryId } from 'views/logic/queries/Query';
 import type Query from 'views/logic/queries/Query';
-import { selectSearchQueries } from 'views/logic/slices/viewSlice';
+import { selectSearchQueries } from 'views/logic/slices/viewSelectors';
 
 const selectQueriesAsMap = createSelector(selectSearchQueries, (queries) => Immutable.OrderedMap<QueryId, Query>(queries.map((q) => [q.id, q])));
 

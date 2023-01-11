@@ -18,7 +18,7 @@ import { createSelector } from '@reduxjs/toolkit';
 
 import viewTitle from 'views/logic/views/ViewTitle';
 import useAppSelector from 'stores/useAppSelector';
-import { selectView, selectViewType } from 'views/logic/slices/viewSlice';
+import { selectView, selectViewType } from 'views/logic/slices/viewSelectors';
 
 const selectViewTitle = createSelector(
   selectView,

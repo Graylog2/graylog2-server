@@ -33,7 +33,7 @@ import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import ElementDimensions from 'components/common/ElementDimensions';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useAppSelector from 'stores/useAppSelector';
-import { selectViewStates } from 'views/logic/slices/viewSlice';
+import { selectViewStates } from 'views/logic/slices/viewSelectors';
 import type Widget from 'views/logic/widgets/Widget';
 
 import WidgetContainer from './WidgetContainer';

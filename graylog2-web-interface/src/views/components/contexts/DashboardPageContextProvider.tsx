@@ -23,7 +23,7 @@ import useQuery from 'routing/useQuery';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 import { ViewActions } from 'views/stores/ViewStore';
 import useAppSelector from 'stores/useAppSelector';
-import { selectViewStates } from 'views/logic/slices/viewSlice';
+import { selectViewStates } from 'views/logic/slices/viewSelectors';
 
 const _clearURI = (query) => new URI(query)
   .removeSearch('page');

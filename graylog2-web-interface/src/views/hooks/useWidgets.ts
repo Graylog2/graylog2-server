@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import useAppSelector from 'stores/useAppSelector';
-import { selectWidgets } from 'views/logic/slices/viewSlice';
+import { selectWidgets } from 'views/logic/slices/viewSelectors';
 
 const useWidgets = () => useAppSelector(selectWidgets);
 

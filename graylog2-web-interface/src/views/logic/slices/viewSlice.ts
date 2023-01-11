@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { createSlice, createSelector } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import type { AppDispatch } from 'src/stores/useAppDispatch';
 
 import type { ViewState, RootState } from 'views/types';
@@ -25,12 +25,13 @@ import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
 import type Query from 'views/logic/queries/Query';
 import FindNewActiveQueryId from 'views/logic/views/FindNewActiveQuery';
 import View from 'views/logic/views/View';
-import { setGlobalOverrideQuery, selectGlobalOverride, execute } from 'views/logic/slices/searchExecutionSlice';
+import { setGlobalOverrideQuery, execute } from 'views/logic/slices/searchExecutionSlice';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
 import Search from 'views/logic/search/Search';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import { selectActiveQuery, selectView, selectViewType, selectQueryById } from 'views/logic/slices/viewSelectors';
 
 const viewSlice = createSlice({
   name: 'view',
@@ -53,7 +54,7 @@ const viewSlice = createSlice({
     },
   },
 });
-
+export const viewSliceReducer = viewSlice.reducer;
 export const { setView, selectQuery } = viewSlice.actions;
 
 const createSearchUrl = qualifyUrl('/views/search');
@@ -129,44 +130,6 @@ export const removeQuery = (queryId: string) => async (dispatch: AppDispatch, ge
   dispatch(loadView(newView, true));
   dispatch(selectQuery(newActiveQuery));
 };
-
-export const viewSliceReducer = viewSlice.reducer;
-
-export const selectRootView = (state: RootState) => state.view;
-export const selectView = createSelector(selectRootView, (state) => state.view);
-export const selectActiveQuery = createSelector(selectRootView, (state) => state.activeQuery);
-export const selectIsDirty = createSelector(selectRootView, (state) => state.isDirty);
-export const selectIsNew = createSelector(selectRootView, (state) => state.isNew);
-export const selectViewType = createSelector(selectView, (view) => view.type);
-export const selectViewStates = createSelector(selectView, (state) => state.state);
-export const selectActiveViewState = createSelector(
-  selectActiveQuery,
-  selectViewStates,
-  (activeQuery, states) => states?.get(activeQuery),
-);
-export const selectSearch = createSelector(selectView, (view) => view.search);
-export const selectSearchQueries = createSelector(selectSearch, (search) => search.queries);
-export const selectCurrentQuery = createSelector(
-  selectActiveQuery,
-  selectSearchQueries,
-  (activeQuery, queries) => queries.find((query) => query.id === activeQuery),
-);
-export const selectQueryById = (queryId: string) => createSelector(
-  selectSearchQueries,
-  (queries) => queries.find((query) => query.id === queryId),
-);
-
-export const selectWidgets = createSelector(selectActiveViewState, (viewState) => viewState.widgets);
-export const selectWidget = (widgetId: string) => createSelector(selectWidgets, (widgets) => widgets.find((widget) => widget.id === widgetId));
-export const selectTitles = createSelector(selectActiveViewState, (viewState) => viewState.titles);
-export const selectCurrentQueryString = (queryId: string) => createSelector(
-  selectViewType,
-  selectGlobalOverride,
-  selectSearch,
-  (viewType, globalOverride, search) => (viewType === View.Type.Search
-    ? search.queries.find((q) => q.id === queryId).query.query_string
-    : globalOverride.query.query_string),
-);
 
 export const createQuery = () => async (dispatch: AppDispatch, getState: () => RootState) => {
   const viewType = selectViewType(getState());

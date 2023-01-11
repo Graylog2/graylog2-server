@@ -20,12 +20,12 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { SearchExecution, RootState } from 'views/types';
 import type { AppDispatch } from 'stores/useAppDispatch';
-import { selectView } from 'views/logic/slices/viewSlice';
 import { parseSearch } from 'views/logic/slices/searchMetadataSlice';
 import executeSearch from 'views/logic/slices/executeSearch';
 import type View from 'views/logic/views/View';
 import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
+import { selectView } from 'views/logic/slices/viewSelectors';
 
 const searchExecutionSlice = createSlice({
   name: 'searchExecution',
