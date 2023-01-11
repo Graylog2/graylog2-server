@@ -112,6 +112,8 @@ public class ViewsResourceTest {
 
         final ViewsResource viewsResource = createViewsResource(
                 viewService,
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
                 mock(ClusterEventBus.class),
                 new ReferencedSearchFiltersHelper(),
                 EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
@@ -134,6 +136,8 @@ public class ViewsResourceTest {
     public void throwsExceptionWhenCreatingSearchWithFilterThatUserIsNotAllowedToSee() {
         final ViewsResource viewsResource = createViewsResource(
                 mock(ViewService.class),
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
                 mock(ClusterEventBus.class),
                 new ReferencedSearchFiltersHelper(),
                 searchFilterVisibilityChecker( Collections.singletonList("<<You cannot see this filter>>")),
@@ -150,6 +154,8 @@ public class ViewsResourceTest {
     public void throwsExceptionWhenCreatingDashboardWithFilterThatUserIsNotAllowedToSee() {
         final ViewsResource viewsResource = createViewsResource(
                 mockViewService(TEST_DASHBOARD_VIEW),
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
                 mock(ClusterEventBus.class),
                 new ReferencedSearchFiltersHelper(),
                 searchFilterVisibilityChecker(Collections.singletonList("<<You cannot see this filter>>")),
@@ -166,6 +172,8 @@ public class ViewsResourceTest {
     public void throwsExceptionWhenUpdatingSearchWithFilterThatUserIsNotAllowedToSee() {
         final ViewsResource viewsResource = createViewsResource(
                 mockViewService(TEST_DASHBOARD_VIEW),
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
                 mock(ClusterEventBus.class),
                 new ReferencedSearchFiltersHelper(),
                 searchFilterVisibilityChecker(Collections.singletonList("<<You cannot see this filter>>")),
@@ -184,6 +192,8 @@ public class ViewsResourceTest {
 
         final ViewsResource viewsResource = createViewsResource(
                 viewService,
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
                 mock(ClusterEventBus.class),
                 referencedFiltersHelperWithIDs(Collections.singleton("<<Hidden filter, but not added by this update>>")),
                 searchFilterVisibilityChecker(Collections.singletonList("<<Hidden filter, but not added by this update>>")),
@@ -199,6 +209,8 @@ public class ViewsResourceTest {
     public void throwsExceptionWhenUpdatingDashboardWithFilterThatUserIsNotAllowedToSee() {
         final ViewsResource viewsResource = createViewsResource(
                 mockViewService(TEST_DASHBOARD_VIEW),
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
                 mock(ClusterEventBus.class),
                 new ReferencedSearchFiltersHelper(),
                 searchFilterVisibilityChecker(Collections.singletonList("<<You cannot see this filter>>")),
@@ -217,6 +229,8 @@ public class ViewsResourceTest {
 
         final ViewsResource viewsResource = createViewsResource(
                 viewService,
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
                 mock(ClusterEventBus.class),
                 referencedFiltersHelperWithIDs(Collections.singleton("<<Hidden filter, but not added by this update>>")),
                 searchFilterVisibilityChecker(Collections.singletonList("<<Hidden filter, but not added by this update>>")),
@@ -231,6 +245,8 @@ public class ViewsResourceTest {
     void testVerifyIntegrity() {
         final ViewsResource viewsResource = createViewsResource(
                 mock(ViewService.class),
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
                 mock(ClusterEventBus.class),
                 new ReferencedSearchFiltersHelper(),
                 EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
@@ -310,6 +326,8 @@ public class ViewsResourceTest {
     public void shouldNotCreateADashboardWithoutPermission() {
         final ViewsResource viewsResource = createViewsResource(
                 mock(ViewService.class),
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
                 mock(ClusterEventBus.class),
                 new ReferencedSearchFiltersHelper(),
                 EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
@@ -328,6 +346,8 @@ public class ViewsResourceTest {
     public void invalidObjectIdReturnsViewNotFoundException() {
         final ViewsResource viewsResource = createViewsResource(
                 mock(ViewService.class),
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
                 mock(ClusterEventBus.class),
                 new ReferencedSearchFiltersHelper(),
                 EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
@@ -356,6 +376,8 @@ public class ViewsResourceTest {
 
         final ViewsResource viewsResource = createViewsResource(
                 viewService,
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
                 clusterEventBus,
                 new ReferencedSearchFiltersHelper(),
                 EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
@@ -380,6 +402,8 @@ public class ViewsResourceTest {
 
         final ViewsResource testResource = createViewsResource(
                 mock(ViewService.class),
+                mock(StartPageService.class),
+                mock(RecentActivityService.class),
                 mock(ClusterEventBus.class),
                 new ReferencedSearchFiltersHelper(),
                 EMPTY_SEARCH_FILTER_VISIBILITY_CHECKER,
@@ -400,14 +424,14 @@ public class ViewsResourceTest {
                 .hasMessageContaining("Failed to resolve view:test-resolver:invalid-view-id");
     }
 
-    private ViewsResource createViewsResource(final ViewService viewService, final ClusterEventBus clusterEventBus, ReferencedSearchFiltersHelper referencedSearchFiltersHelper, SearchFilterVisibilityChecker searchFilterVisibilityChecker, final Map<String, ViewResolver> viewResolvers, Search... existingSearches) {
+    private ViewsResource createViewsResource(final ViewService viewService, final StartPageService startPageService, final RecentActivityService recentActivityService, final ClusterEventBus clusterEventBus, ReferencedSearchFiltersHelper referencedSearchFiltersHelper, SearchFilterVisibilityChecker searchFilterVisibilityChecker, final Map<String, ViewResolver> viewResolvers, Search... existingSearches) {
 
         final SearchDomain searchDomain = mock(SearchDomain.class);
         for (Search search : existingSearches) {
             when(searchDomain.getForUser(eq(search.id()), eq(SEARCH_USER))).thenReturn(Optional.of(search));
         }
 
-        return new ViewsResource(viewService, clusterEventBus, searchDomain, viewResolvers, searchFilterVisibilityChecker, referencedSearchFiltersHelper) {
+        return new ViewsResource(viewService, startPageService, recentActivityService, clusterEventBus, searchDomain, viewResolvers, searchFilterVisibilityChecker, referencedSearchFiltersHelper) {
             @Override
             protected Subject getSubject() {
                 return mock(Subject.class);

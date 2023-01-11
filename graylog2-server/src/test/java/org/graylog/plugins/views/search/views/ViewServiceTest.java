@@ -194,6 +194,7 @@ public class ViewServiceTest {
         final SearchQueryParser queryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, searchFieldMapping);
 
         PaginatedList<ViewDTO> result = dbService.searchPaginated(
+                searchUser,
                 queryParser.parse(""),
                 view -> true,
                 "desc",
@@ -211,6 +212,7 @@ public class ViewServiceTest {
         assertThat(result.grandTotal()).hasValue(5L);
 
         result = dbService.searchPaginated(
+                searchUser,
                 queryParser.parse(""),
                 view -> true,
                 "asc",
