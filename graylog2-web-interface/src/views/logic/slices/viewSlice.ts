@@ -25,7 +25,12 @@ import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
 import type Query from 'views/logic/queries/Query';
 import FindNewActiveQueryId from 'views/logic/views/FindNewActiveQuery';
 import View from 'views/logic/views/View';
-import { setGlobalOverrideQuery, selectGlobalOverride } from 'views/logic/slices/searchExecutionSlice';
+import { setGlobalOverrideQuery, selectGlobalOverride, execute } from 'views/logic/slices/searchExecutionSlice';
+import isEqualForSearch from 'views/stores/isEqualForSearch';
+import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
+import Search from 'views/logic/search/Search';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
 
 const viewSlice = createSlice({
   name: 'view',
@@ -40,66 +45,92 @@ const viewSlice = createSlice({
       ...state,
       activeQuery: action.payload,
     }),
-    addQuery: (state: ViewState, action: PayloadAction<[Query, ViewStateType]>) => {
-      const [query, viewState] = action.payload;
-      const { view } = state ?? {};
-      const { search } = view;
-      const newQueries = search.queries.add(query);
-      const newViewStates = view.state.set(query.id, viewState);
-      const newView = view.toBuilder()
-        .search(search.toBuilder()
-          .queries(newQueries)
-          .build())
-        .state(newViewStates)
-        .build();
-
-      return {
+    setView: (state: ViewState, action: PayloadAction<View>) => {
+      return ({
         ...state,
-        view: newView,
-        activeQuery: query.id,
-      };
-    },
-    updateQuery: (state: ViewState, action: PayloadAction<[string, Query]>) => {
-      const { view } = state;
-      const { queries } = view.search;
-      const [queryId, query] = action.payload;
-      const newQueries = queries.map((q) => (q.id === queryId ? query : q)).toOrderedSet();
-      const newSearch = view.search.toBuilder()
-        .queries(newQueries)
-        .build();
-      const newView = view.toBuilder()
-        .search(newSearch)
-        .build();
-
-      return {
-        ...state,
-        view: newView,
-      };
-    },
-    removeQuery: (state: ViewState, action: PayloadAction<string>) => {
-      const queryId = action.payload;
-      const { view, activeQuery } = state ?? {};
-      const { search } = view;
-      const newQueries = search.queries.filter((query) => query.id !== queryId).toOrderedSet();
-      const newViewState = view.state.remove(queryId);
-      const newView = view.toBuilder()
-        .search(search.toBuilder().queries(newQueries).build())
-        .state(newViewState)
-        .build();
-
-      const indexedQueryIds = search.queries.map((query) => query.id).toList();
-      const newActiveQuery = FindNewActiveQueryId(indexedQueryIds, activeQuery);
-
-      return {
-        ...state,
-        view: newView,
-        activeQuery: newActiveQuery,
-      };
+        view: action.payload,
+      });
     },
   },
 });
 
-export const { selectQuery, removeQuery, updateQuery } = viewSlice.actions;
+export const { setView, selectQuery } = viewSlice.actions;
+
+const createSearchUrl = qualifyUrl('/views/search');
+const createSearch = (search: Search) => fetch('POST', createSearchUrl, JSON.stringify(search))
+  .then((response) => Search.fromJSON(response));
+
+const loadView = (newView: View) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  const oldView = selectView(getState());
+
+  const oldWidgets = oldView?.state?.map((s) => s.widgets);
+  const newWidgets = newView?.state?.map((s) => s.widgets);
+
+  if (!isEqualForSearch(oldWidgets, newWidgets)) {
+    const updatedView = UpdateSearchForWidgets(newView);
+    const updatedSearch = await createSearch(updatedView.search);
+    const updatedViewWithSearch = updatedView.toBuilder().search(updatedSearch).build();
+
+    dispatch(setView(updatedViewWithSearch));
+    dispatch(execute());
+  }
+
+  return dispatch(setView(newView));
+};
+
+export const addQuery = (payload: [Query, ViewStateType]) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  const [query, viewState] = payload;
+  const state = getState();
+  const view = selectView(state);
+  const { search } = view;
+  const newQueries = search.queries.add(query);
+  const newViewStates = view.state.set(query.id, viewState);
+  const newView = view.toBuilder()
+    .search(search.toBuilder()
+      .queries(newQueries)
+      .build())
+    .state(newViewStates)
+    .build();
+
+  dispatch(loadView(newView));
+  dispatch(selectQuery(query.id));
+};
+
+export const updateQuery = (payload: [string, Query]) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  const state = getState();
+  const view = selectView(state);
+  const { queries } = view.search;
+  const [queryId, query] = payload;
+  const newQueries = queries.map((q) => (q.id === queryId ? query : q)).toOrderedSet();
+  const newSearch = view.search.toBuilder()
+    .queries(newQueries)
+    .build();
+  const newView = view.toBuilder()
+    .search(newSearch)
+    .build();
+
+  return dispatch(loadView(newView));
+};
+
+export const removeQuery = (queryId: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  const state = getState();
+  const view = selectView(state);
+  const activeQuery = selectActiveQuery(state);
+  const { search } = view;
+  const newQueries = search.queries.filter((query) => query.id !== queryId).toOrderedSet();
+  const newViewState = view.state.remove(queryId);
+  const newView = view.toBuilder()
+    .search(search.toBuilder().queries(newQueries).build())
+    .state(newViewState)
+    .build();
+
+  const indexedQueryIds = search.queries.map((query) => query.id).toList();
+  const newActiveQuery = FindNewActiveQueryId(indexedQueryIds, activeQuery);
+
+  dispatch(loadView(newView));
+  dispatch(selectQuery(newActiveQuery));
+};
+
 export const viewSliceReducer = viewSlice.reducer;
 
 export const selectRootView = (state: RootState) => state.view;
@@ -141,7 +172,7 @@ export const selectCurrentQueryString = (queryId: string) => createSelector(
 export const createQuery = () => async (dispatch: AppDispatch, getState: () => RootState) => {
   const viewType = selectViewType(getState());
   const [query, state] = await NewQueryActionHandler(viewType);
-  dispatch(viewSlice.actions.addQuery([query, state]));
+  dispatch(addQuery([query, state]));
 };
 
 export const setQueryString = (queryId: QueryId, newQueryString: string) => (dispatch: AppDispatch, getState: () => RootState) => {
