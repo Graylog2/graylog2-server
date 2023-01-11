@@ -25,20 +25,14 @@ import type { Pagination } from 'store/PaginationTypes';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import type { Input } from 'components/messageloaders/Types';
-import { ListPagination, PaginatedListJSON } from '../PaginationTypes';
+
 
 export type PaginatedStreamRulesInputs = {
   list: Array<Input>,
-  pagination: ListPagination,
-};
-
-export type PaginatedUsersResponse = PaginatedListJSON & {
-
 };
 
 type StreamRulesInputsActionsType = {
   list: () => Promise<{ inputs: Array<Input>, total: number }>,
-  listPaginated: (pagination: Pagination) => Promise<PaginatedStreamRulesInputs>,
 }
 
 type StreamRulesInputsStoreState = {
@@ -49,7 +43,6 @@ export const StreamRulesInputsActions = singletonActions(
   'core.StreamRulesInputs',
   () => Reflux.createActions<StreamRulesInputsActionsType>({
     list: { asyncResult: true },
-    listPaginated: { asyncResult: true },
   }),
 );
 
@@ -83,31 +76,6 @@ export const StreamRulesInputsStore = singletonStore(
 
             return this.inputs;
           },
-          (error) => {
-            UserNotification.error(`Fetching Stream Rule Inputs List failed with status: ${error}`,
-              'Could not retrieve Stream Rule Inputs');
-          },
-        );
-
-      StreamRulesInputsActions.list.promise(promise);
-    },
-
-    listPaginated({ page, perPage, query }: Pagination) {
-      const url = PaginationURL(qualifyUrl(this.sourceUrl), page, perPage, query);
-      const promise = fetch('GET', url);
-
-      promise
-        .then(
-          (response) => ({
-            list: response.list,
-            pagination: {
-              page: response.page,
-              perPage: response.per_page,
-              query: response.query,
-              count: response.count,
-              total: response.total,
-            },
-          }),
           (error) => {
             UserNotification.error(`Fetching Stream Rule Inputs List failed with status: ${error}`,
               'Could not retrieve Stream Rule Inputs');
