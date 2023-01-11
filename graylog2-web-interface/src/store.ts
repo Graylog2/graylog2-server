@@ -33,7 +33,7 @@ const createStore = (reducers: PluggableReducer[], initialState: Partial<RootSta
         ignoredPaths: [
           'view.view',
           'searchExecution.executionState',
-          'searchExecution.result.result',
+          'searchExecution.result',
           'searchMetadata.metadata',
         ],
       },
