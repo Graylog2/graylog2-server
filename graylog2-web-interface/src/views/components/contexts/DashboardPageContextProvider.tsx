@@ -21,9 +21,10 @@ import URI from 'urijs';
 
 import useQuery from 'routing/useQuery';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
-import { ViewActions } from 'views/stores/ViewStore';
 import useAppSelector from 'stores/useAppSelector';
 import { selectViewStates } from 'views/logic/slices/viewSelectors';
+import useAppDispatch from 'stores/useAppDispatch';
+import { selectQuery } from 'views/logic/slices/viewSlice';
 
 const _clearURI = (query) => new URI(query)
   .removeSearch('page');
@@ -43,6 +44,7 @@ const _updateQueryParams = (
 
 const useSyncStateWithQueryParams = ({ dashboardPage, uriParams, setDashboardPage }) => {
   const states = useAppSelector(selectViewStates);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const nextPage = uriParams.page;
@@ -51,9 +53,9 @@ const useSyncStateWithQueryParams = ({ dashboardPage, uriParams, setDashboardPag
       setDashboardPage(undefined);
     } else if (nextPage !== dashboardPage) {
       setDashboardPage(nextPage);
-      ViewActions.selectQuery(nextPage);
+      dispatch(selectQuery(nextPage));
     }
-  }, [uriParams.page, dashboardPage, setDashboardPage, states]);
+  }, [uriParams.page, dashboardPage, setDashboardPage, states, dispatch]);
 };
 
 const useCleanupQueryParams = ({ uriParams, query, history }) => {
