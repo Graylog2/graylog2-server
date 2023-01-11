@@ -47,9 +47,6 @@ import { makeVisualization, retrieveChartData } from '../aggregationbuilder/Aggr
 
 type Props = VisualizationComponentProps & {
   config: AggregationWidgetConfig,
-  currentView: {
-    activeQuery: string,
-  },
   data: { [key: string]: Rows } & { events?: Events },
   fields: FieldTypeMappingsList,
   striped?: boolean,
@@ -127,7 +124,6 @@ const _extractColumnPivotValues = (rows): Array<Array<string>> => {
 
 const DataTable = ({
   config,
-  currentView,
   data,
   fields,
   striped,
@@ -249,7 +245,6 @@ const DataTable = ({
                       fields={effectiveFields}
                       item={reducedItem}
                       valuePath={valuePath}
-                      currentView={currentView}
                       columnPivots={columnFieldNames}
                       columnPivotValues={actualColumnPivotFields}
                       types={fields}
@@ -268,8 +263,7 @@ const DataTable = ({
                        stickyHeader={stickyHeader}
                        condensed={condensed}>
           <THead stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
-            <Headers activeQuery={currentView.activeQuery}
-                     actualColumnPivotFields={actualColumnPivotFields}
+            <Headers actualColumnPivotFields={actualColumnPivotFields}
                      columnPivots={columnPivots}
                      fields={fields}
                      rollup={rollup}

@@ -29,8 +29,8 @@ import type Series from 'views/logic/aggregationbuilder/Series';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
-import type { CurrentViewType } from '../CustomPropTypes';
 import CustomHighlighting from '../messagelist/CustomHighlighting';
 import DecoratedValue from '../messagelist/decoration/DecoratedValue';
 
@@ -46,7 +46,6 @@ type Field = {
 type Props = {
   columnPivots: Array<string>,
   columnPivotValues: Array<Array<string>>,
-  currentView: CurrentViewType,
   fields: Immutable.Set<Field>,
   item: { [key: string]: any },
   series: Array<Series>,
@@ -91,9 +90,9 @@ const columnNameToField = (column, series = []) => {
   return currentSeries ? currentSeries.function : column;
 };
 
-const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivotValues, valuePath, item, types }: Props) => {
+const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, valuePath, item, types }: Props) => {
   const classes = 'message-group';
-  const { activeQuery } = currentView;
+  const activeQuery = useActiveQueryId();
 
   const fieldColumns = fields.toSeq().toJS().map(({ field: fieldName, source }, i) => _c(
     fieldName,

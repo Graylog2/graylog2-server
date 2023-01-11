@@ -33,6 +33,7 @@ import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import type { Widgets } from 'views/stores/WidgetStore';
 import { Icon } from 'components/common';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import styles from './DataTable.css';
 
@@ -190,7 +191,6 @@ ColumnPivotFieldsHeaders.defaultProps = {
 };
 
 type Props = {
-  activeQuery: string,
   columnPivots: Array<Pivot>,
   rowPivots: Array<Pivot>,
   series: Array<Series>,
@@ -204,7 +204,8 @@ type Props = {
   togglePin: (field: string) => void
 };
 
-const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup, actualColumnPivotFields, onSortChange, sortConfigMap, onSetColumnsWidth, pinnedColumns, togglePin }: Props) => {
+const Headers = ({ columnPivots, fields, rowPivots, series, rollup, actualColumnPivotFields, onSortChange, sortConfigMap, onSetColumnsWidth, pinnedColumns, togglePin }: Props) => {
+  const activeQuery = useActiveQueryId();
   const rowFieldNames = rowPivots.map((pivot) => pivot.field);
   const columnFieldNames = columnPivots.map((pivot) => pivot.field);
 

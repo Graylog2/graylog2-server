@@ -32,6 +32,7 @@ import Search from 'views/logic/search/Search';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import { selectActiveQuery, selectView, selectViewType, selectQueryById } from 'views/logic/slices/viewSelectors';
+import createSearch from 'views/logic/slices/createSearch';
 
 const viewSlice = createSlice({
   name: 'view',
@@ -56,10 +57,6 @@ const viewSlice = createSlice({
 });
 export const viewSliceReducer = viewSlice.reducer;
 export const { setView, selectQuery } = viewSlice.actions;
-
-const createSearchUrl = qualifyUrl('/views/search');
-const createSearch = (search: Search) => fetch('POST', createSearchUrl, JSON.stringify(search))
-  .then((response) => Search.fromJSON(response));
 
 const loadView = (newView: View, recreateSearch: boolean = false) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const oldView = selectView(getState());

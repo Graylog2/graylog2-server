@@ -27,19 +27,18 @@ import { IconButton } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
-import { ViewActions, ViewStore } from 'views/stores/ViewStore';
-import type { ViewStoreState } from 'views/stores/ViewStore';
+import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import SearchActions from 'views/actions/SearchActions';
-import type { SearchJson } from 'views/logic/search/Search';
 import Search from 'views/logic/search/Search';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import { MenuItem } from 'components/bootstrap';
 import { WidgetActions } from 'views/stores/WidgetStore';
-import { useStore } from 'stores/connect';
 import type Widget from 'views/logic/widgets/Widget';
 import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
+import useView from 'views/hooks/useView';
+import createSearch from 'views/logic/slices/createSearch';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -59,56 +58,44 @@ const Container = styled.div`
   }
 `;
 
-const _updateDashboardWithNewSearch = (dashboard: View, dashboardId: string, newSearch: Search) => {
-  const newDashboard = dashboard.toBuilder().search(newSearch).build();
-
-  ViewManagementActions.update(newDashboard).then(() => loadDashboard(dashboardId));
-};
-
-const _onCopyToDashboard = (
-  view: ViewStoreState,
+const _onCopyToDashboard = async (
+  view: View,
   setShowCopyToDashboard: (show: boolean) => void,
   widgetId: string,
   dashboardId: string | undefined | null,
-): void => {
-  const { view: activeView } = view;
-
+) => {
   if (!dashboardId) {
     return;
   }
 
-  const addWidgetToDashboard = (dashboard: View) => (searchJson: SearchJson) => {
-    const search = Search.fromJSON(searchJson);
-    const newDashboard = CopyWidgetToDashboard(widgetId, activeView, dashboard.toBuilder().search(search).build());
+  const dashboardJson = await ViewManagementActions.get(dashboardId);
+  const dashboard = View.fromJSON(dashboardJson);
+  const search = await SearchActions.get(dashboardJson.search_id).then((searchJson) => Search.fromJSON(searchJson));
+  const newDashboard = CopyWidgetToDashboard(widgetId, view, dashboard.toBuilder().search(search).build());
 
-    if (newDashboard && newDashboard.search) {
-      SearchActions.create(newDashboard.search).then(({ search: newSearch }) => _updateDashboardWithNewSearch(newDashboard, dashboardId, newSearch));
-    }
-  };
+  if (newDashboard && newDashboard.search) {
+    const newSearch = await createSearch(newDashboard.search);
+    const newDashboardWithSearch = newDashboard.toBuilder().search(newSearch).build();
+    await ViewManagementActions.update(newDashboardWithSearch);
 
-  ViewManagementActions.get(dashboardId).then((dashboardJson) => {
-    const dashboard = View.fromJSON(dashboardJson);
-
-    SearchActions.get(dashboardJson.search_id).then(addWidgetToDashboard(dashboard));
-  });
+    loadDashboard(newDashboardWithSearch.id);
+  }
 
   setShowCopyToDashboard(false);
 };
 
 const _onMoveWidgetToTab = (
-  view: ViewStoreState,
+  view: View,
   setShowMoveWidgetToTab: (show: boolean) => void,
   widgetId: string,
   queryId: string,
   keepCopy: boolean,
 ) => {
-  const { view: activeView } = view;
-
   if (!queryId) {
     return;
   }
 
-  const newDashboard = MoveWidgetToTab(widgetId, queryId, activeView, keepCopy);
+  const newDashboard = MoveWidgetToTab(widgetId, queryId, view, keepCopy);
 
   if (newDashboard) {
     SearchActions.create(newDashboard.search)
@@ -161,7 +148,7 @@ const WidgetActionsMenu = ({
   toggleEdit,
 }: Props) => {
   const widget = useContext(WidgetContext);
-  const view = useStore(ViewStore);
+  const view = useView();
   const { setWidgetFocusing, unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const [showCopyToDashboard, setShowCopyToDashboard] = useState(false);
   const [showExport, setShowExport] = useState(false);
@@ -170,7 +157,7 @@ const WidgetActionsMenu = ({
   const onDuplicate = useCallback(() => _onDuplicate(widget.id, unsetWidgetFocusing, title), [unsetWidgetFocusing, title, widget.id]);
   const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId), [view]);
   const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToTab(view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [view]);
-  const onDelete = useCallback(() => _onDelete(widget, view?.view, title), [title, view?.view, widget]);
+  const onDelete = useCallback(() => _onDelete(widget, view, title), [title, view, widget]);
   const focusWidget = useCallback(() => setWidgetFocusing(widget.id), [setWidgetFocusing, widget.id]);
 
   return (
@@ -229,13 +216,13 @@ const WidgetActionsMenu = ({
         )}
 
         {showExport && (
-          <ExportModal view={view.view}
+          <ExportModal view={view}
                        directExportWidgetId={widget.id}
                        closeModal={() => setShowExport(false)} />
         )}
 
         {showMoveWidgetToTab && (
-          <MoveWidgetToTabModal view={view.view}
+          <MoveWidgetToTabModal view={view}
                                 widgetId={widget.id}
                                 onCancel={() => setShowMoveWidgetToTab(false)}
                                 onSubmit={onMoveWidgetToTab} />
