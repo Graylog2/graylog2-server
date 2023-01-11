@@ -106,6 +106,7 @@ const InputList = ({
     <FormGroup controlId={id ?? name} validationState={error ? 'error' : bsStyle}>
       {label && <ControlLabel>{label}</ControlLabel>}
       <CreatableSelect ref={inputRef}
+                       id={id}
                        components={{ DropdownIndicator: null, ...(components ?? {}) }}
                        inputValue={inputValue}
                        isMulti
