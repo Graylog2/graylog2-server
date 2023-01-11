@@ -64,6 +64,7 @@ import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -109,6 +110,8 @@ public class ViewsResourceTest {
     @Test
     public void creatingViewAddsCurrentUserAsOwner() throws ValidationException {
         final ViewService viewService = mock(ViewService.class);
+        final var dto = ViewDTO.builder().searchId("1").title("2").state(new HashMap<>()).build();
+        when(viewService.saveWithOwner(any(), any())).thenReturn(dto);
 
         final ViewsResource viewsResource = createViewsResource(
                 viewService,
@@ -120,6 +123,7 @@ public class ViewsResourceTest {
                 EMPTY_VIEW_RESOLVERS,
                 SEARCH
         );
+
 
         viewsResource.create(TEST_DASHBOARD_VIEW, mockUserContext(), SEARCH_USER);
 
@@ -189,6 +193,8 @@ public class ViewsResourceTest {
     @Test
     public void updatesSearchSuccessfullyIfInvisibleFilterWasPresentBefore() {
         final ViewService viewService = mockViewService(TEST_SEARCH_VIEW);
+        final var dto = ViewDTO.builder().searchId("1").title("2").state(new HashMap<>()).build();
+        when(viewService.update(any())).thenReturn(dto);
 
         final ViewsResource viewsResource = createViewsResource(
                 viewService,
@@ -226,6 +232,8 @@ public class ViewsResourceTest {
     @Test
     public void updatesDashboardSuccessfullyIfInvisibleFilterWasPresentBefore() {
         final ViewService viewService = mockViewService(TEST_DASHBOARD_VIEW);
+        final var dto = ViewDTO.builder().searchId("1").title("2").state(new HashMap<>()).build();
+        when(viewService.update(any())).thenReturn(dto);
 
         final ViewsResource viewsResource = createViewsResource(
                 viewService,
