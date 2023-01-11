@@ -126,9 +126,9 @@ public class StreamResource extends RestResource {
             EntityAttribute.builder().id("title").title("Title").build(),
             EntityAttribute.builder().id("description").title("Description").build(),
             EntityAttribute.builder().id("created_at").title("Created").type("date").build(),
-            EntityAttribute.builder().id("status").title("Status").type("boolean").filterable(true).filterOptions(Set.of(
-                    FilterOption.create("paused", "Paused"),
-                    FilterOption.create("running", "Running")
+            EntityAttribute.builder().id("disabled").title("Status").type("boolean").filterable(true).filterOptions(Set.of(
+                    FilterOption.create("true", "Paused"),
+                    FilterOption.create("false", "Running")
             )).build()
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
