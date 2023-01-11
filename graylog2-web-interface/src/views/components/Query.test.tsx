@@ -17,9 +17,7 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import { asMock } from 'helpers/mocking';
 import View from 'views/logic/views/View';
-import useViewType from 'views/hooks/useViewType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import { createViewWithWidgets, createSearch } from 'fixtures/searches';
