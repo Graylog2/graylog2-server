@@ -21,7 +21,7 @@ import Spinner from 'components/common/Spinner';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { MenuItem } from 'components/bootstrap';
 import ActionMenuItem from 'views/components/actions/ActionMenuItem';
-import type { ActionDefinition, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
+import type { ActionDefinition, ActionHandlerArguments, ActionComponents } from 'views/components/actions/ActionHandler';
 
 const DropdownHeader = styled.span`
   padding-left: 10px;
@@ -81,8 +81,8 @@ type Props = {
   children: React.ReactNode,
   type: 'field' | 'value',
   handlerArgs: ActionHandlerArguments,
-  setOverflowingComponents: (components: React.ReactNode) => void,
-  overflowingComponents: React.ReactNode,
+  setOverflowingComponents: (components: ActionComponents) => void,
+  overflowingComponents: ActionComponents,
   onMenuToggle: () => void,
 };
 

@@ -119,6 +119,10 @@ export const selectCurrentQuery = createSelector(
   selectSearchQueries,
   (activeQuery, queries) => queries.find((query) => query.id === activeQuery),
 );
+export const selectQueryById = (queryId: string) => createSelector(
+  selectSearchQueries,
+  (queries) => queries.find((query) => query.id === queryId),
+);
 
 export const selectWidgets = createSelector(selectActiveViewState, (viewState) => viewState.widgets);
 export const selectWidget = (widgetId: string) => createSelector(selectWidgets, (widgets) => widgets.find((widget) => widget.id === widgetId));
@@ -128,4 +132,13 @@ export const createQuery = () => async (dispatch: AppDispatch, getState: () => R
   const viewType = selectViewType(getState());
   const [query, state] = await NewQueryActionHandler(viewType);
   dispatch(viewSlice.actions.addQuery([query, state]));
+};
+
+export const setQueryString = (queryId: QueryId, newQueryString: string) => (dispatch: AppDispatch, getState: () => RootState) => {
+  const query = selectQueryById(queryId)(getState());
+  const newQuery = query.toBuilder()
+    .query({ type: 'elasticsearch', query_string: newQueryString })
+    .build();
+
+  return dispatch(updateQuery([queryId, newQuery]));
 };

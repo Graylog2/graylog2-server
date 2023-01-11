@@ -16,144 +16,126 @@
  */
 import * as Immutable from 'immutable';
 
-import mockAction from 'helpers/mocking/MockAction';
-import asMock from 'helpers/mocking/AsMock';
-import { QueriesActions, QueriesStore } from 'views/stores/QueriesStore';
-import { ViewStore } from 'views/stores/ViewStore';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import Query from 'views/logic/queries/Query';
-import type { GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
-import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
-import SearchActions from 'views/actions/SearchActions';
-import type { QueriesList } from 'views/actions/QueriesActions';
 import { MISSING_BUCKET_NAME } from 'views/Constants';
+import { createSearch } from 'fixtures/searches';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import { updateGlobalOverride } from 'views/logic/slices/searchExecutionSlice';
+import mockDispatch from 'views/test/mockDispatch';
+import { updateQuery } from 'views/logic/slices/viewSlice';
+import type { RootState } from 'views/types';
 
 import AddToQueryHandler from './AddToQueryHandler';
 
+import type { ViewType } from '../views/View';
 import View from '../views/View';
 import GlobalOverride from '../search/GlobalOverride';
 
-jest.mock('views/stores/QueriesStore', () => ({ QueriesStore: {}, QueriesActions: {} }));
-jest.mock('views/stores/ViewStore', () => ({ ViewStore: {} }));
-jest.mock('views/stores/GlobalOverrideStore', () => ({ GlobalOverrideStore: {}, GlobalOverrideActions: {} }));
-jest.mock('views/actions/SearchActions', () => ({}));
+const createQuery = (id: string, queryString: string = '') => Query.builder()
+  .id(id)
+  .query({ type: 'elasticsearch', query_string: queryString })
+  .build();
 
 describe('AddToQueryHandler', () => {
-  const view = View.create().toBuilder().type(View.Type.Search).build();
-  let queriesStoreListen;
-  let queries;
+  const defaultView = createSearch();
 
-  beforeEach(() => {
-    QueriesStore.listen = jest.fn((cb) => {
-      queriesStoreListen = cb;
+  const createViewWithQuery = (query: Query, type: ViewType = View.Type.Search) => {
+    const { search } = defaultView;
 
-      return () => {};
-    });
+    return defaultView
+      .toBuilder()
+      .type(type)
+      .search(search.toBuilder().queries([query]).build())
+      .build();
+  };
 
-    QueriesStore.getInitialState = jest.fn(() => queries);
-    QueriesActions.query = mockAction(jest.fn(async () => Immutable.OrderedMap() as QueriesList));
-    ViewStore.listen = jest.fn(() => () => {});
-
-    ViewStore.getInitialState = jest.fn(() => ({
-      view,
-      activeQuery: 'queryId',
-      dirty: false,
-      isNew: false,
-    }));
-
-    GlobalOverrideStore.listen = jest.fn(() => () => {});
-    GlobalOverrideStore.getInitialState = jest.fn(() => undefined);
-  });
+  const mockRootState = {
+    searchExecution: { executionState: SearchExecutionState.empty() },
+  };
 
   it('formats date field for ES', () => {
-    const query = Query.builder()
-      .query({ type: 'elasticsearch', query_string: '' })
-      .build();
+    const query = createQuery('queryId');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
 
-    queries = Immutable.OrderedMap({ queryId: query });
-
-    const addToQueryHandler = new AddToQueryHandler();
-
-    return addToQueryHandler.handle({
+    dispatch(AddToQueryHandler({
       queryId: 'queryId',
       field: 'timestamp',
       value: '2019-01-17T11:00:09.025Z',
       type: new FieldType('date', [], []),
       contexts: { view },
-    })
-      .then(() => {
-        expect(QueriesActions.query).toHaveBeenCalledWith('queryId', 'timestamp:"2019-01-17T11:00:09.025Z"');
-      });
+    }));
+
+    expect(dispatch).toHaveBeenCalledWith(
+      updateQuery(['queryId', query.toBuilder().query({ type: 'elasticsearch', query_string: 'timestamp:"2019-01-17T11:00:09.025Z"' }).build()]),
+    );
   });
 
   it('updates query string before adding predicate', () => {
-    const query = Query.builder()
-      .query({ type: 'elasticsearch', query_string: '' })
-      .build();
+    const query = createQuery('anotherQueryId', 'foo:23');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
 
-    queries = Immutable.OrderedMap({ queryId: query });
+    dispatch(AddToQueryHandler({
+      queryId: 'anotherQueryId',
+      field: 'bar',
+      value: 42,
+      type: new FieldType('keyword', [], []),
+      contexts: { view },
+    }));
 
-    const addToQueryHandler = new AddToQueryHandler();
-
-    const newQuery = Query.builder()
-      .query({ type: 'elasticsearch', query_string: 'foo:23' })
-      .build();
-
-    queriesStoreListen(Immutable.OrderedMap({ anotherQueryId: newQuery }));
-
-    return addToQueryHandler.handle({ queryId: 'anotherQueryId', field: 'bar', value: 42, type: new FieldType('keyword', [], []), contexts: { view } })
-      .then(() => {
-        expect(QueriesActions.query).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND bar:42');
-      });
+    expect(dispatch).toHaveBeenCalledWith(
+      updateQuery(['anotherQueryId', query.toBuilder().query({ type: 'elasticsearch', query_string: 'foo:23 AND bar:42' }).build()]),
+    );
   });
 
   it('appends NOT _exists_ fragment for proper field in case of missing bucket in input', () => {
-    const query = Query.builder()
-      .query({ type: 'elasticsearch', query_string: '' })
-      .build();
+    const query = createQuery('anotherQueryId', 'foo:23');
+    const view = createViewWithQuery(query);
+    const state = { ...mockRootState, view: { view } } as RootState;
+    const dispatch = mockDispatch(state);
 
-    queries = Immutable.OrderedMap({ queryId: query });
+    dispatch(AddToQueryHandler({
+      queryId: 'anotherQueryId',
+      field: 'bar',
+      value: MISSING_BUCKET_NAME,
+      type: new FieldType('keyword', [], []),
+      contexts: { view },
+    }));
 
-    const addToQueryHandler = new AddToQueryHandler();
-
-    const newQuery = Query.builder()
-      .query({ type: 'elasticsearch', query_string: 'foo:23' })
-      .build();
-
-    queriesStoreListen(Immutable.OrderedMap({ anotherQueryId: newQuery }));
-
-    return addToQueryHandler.handle({ queryId: 'anotherQueryId', field: 'bar', value: MISSING_BUCKET_NAME, type: new FieldType('keyword', [], []), contexts: { view } })
-      .then(() => {
-        expect(QueriesActions.query).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND NOT _exists_:bar');
-      });
+    expect(dispatch).toHaveBeenCalledWith(
+      updateQuery(['anotherQueryId', query.toBuilder().query({ type: 'elasticsearch', query_string: 'foo:23 AND NOT _exists_:bar' }).build()]),
+    );
   });
 
   describe('for dashboards', () => {
-    beforeEach(() => {
-      asMock(ViewStore.getInitialState).mockReturnValue({
-        view: View.builder().type(View.Type.Dashboard).build(),
-        activeQuery: 'queryId',
-        dirty: false,
-        isNew: false,
-      });
-
-      asMock(GlobalOverrideStore.getInitialState).mockReturnValue(GlobalOverride.empty()
-        .toBuilder()
-        .query({ type: 'elasticsearch', query_string: 'something' })
-        .build());
-
-      GlobalOverrideActions.query = mockAction(jest.fn(() => Promise.resolve(undefined as GlobalOverrideStoreState)));
-      SearchActions.refresh = mockAction();
-    });
-
     it('retrieves query string from global override', () => {
-      const addToQueryHandler = new AddToQueryHandler();
+      const query = createQuery('queryId');
+      const view = createViewWithQuery(query, View.Type.Dashboard);
+      const state = {
+        view: { view },
+        searchExecution: {
+          executionState: SearchExecutionState.create(Immutable.Map(), GlobalOverride.create(undefined, { type: 'elasticsearch', query_string: 'something' })),
+        },
+      } as RootState;
+      const dispatch = mockDispatch(state);
 
-      return addToQueryHandler.handle({ queryId: 'queryId', field: 'bar', value: 42, type: new FieldType('keyword', [], []), contexts: { view } })
-        .then(() => {
-          expect(GlobalOverrideActions.query).toHaveBeenCalledWith('something AND bar:42');
-          expect(SearchActions.refresh).toHaveBeenCalled();
-        });
+      dispatch(AddToQueryHandler({
+        queryId: 'queryId',
+        field: 'bar',
+        value: 42,
+        type: new FieldType('keyword', [], []),
+        contexts: { view },
+      }));
+
+      expect(dispatch).toHaveBeenCalledWith(
+        updateGlobalOverride(
+          GlobalOverride.create(undefined, { type: 'elasticsearch', query_string: 'something AND bar:42' }),
+        ),
+      );
     });
   });
 });

@@ -63,7 +63,7 @@ describe('ActionMenuItem', () => {
     render(<ActionMenuItem action={action}
                            handlerArgs={handlerArgs}
                            onMenuToggle={() => {}}
-                           overflowingComponents={<></>}
+                           overflowingComponents={{ foo: <></> }}
                            setOverflowingComponents={() => {}}
                            type="value" />);
 
@@ -80,7 +80,7 @@ describe('ActionMenuItem', () => {
     render(<ActionMenuItem action={action}
                            handlerArgs={handlerArgs}
                            onMenuToggle={() => {}}
-                           overflowingComponents={<></>}
+                           overflowingComponents={{ foo: <></> }}
                            setOverflowingComponents={() => {}}
                            type="value" />);
 

@@ -291,7 +291,7 @@ const exports: PluginExports = {
     {
       type: 'add-to-query',
       title: 'Add to query',
-      handler: new AddToQueryHandler().handle,
+      thunk: AddToQueryHandler,
       isEnabled: ({ field, type }: ActionHandlerArguments) => (!isFunction(field) && !type.isDecorated()),
       resetFocus: false,
     },

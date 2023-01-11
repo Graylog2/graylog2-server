@@ -16,11 +16,12 @@
  */
 import * as React from 'react';
 
-import type { ActionContexts } from 'views/types';
+import type { ActionContexts, RootState } from 'views/types';
 import type { FieldName, FieldValue } from 'views/logic/fieldtypes/FieldType';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import type { QueryId } from 'views/logic/queries/Query';
 import generateId from 'logic/generateId';
+import type { AppDispatch } from 'stores/useAppDispatch';
 
 export type ActionComponentProps = {
   onClose: () => void,
@@ -60,15 +61,20 @@ type ActionDefinitionBase<Contexts> = {
   condition?: () => boolean,
 };
 
+export type ThunkActionHandler<T> = (args: ActionHandlerArguments<T>) => (dispatch: AppDispatch, getState: () => RootState) => unknown | Promise<unknown>;
+
 type FunctionHandlerAction<Contexts> = {
   handler: ActionHandler<Contexts>,
 };
+type ThunkHandlerAction<Contexts> = {
+  thunk: ThunkActionHandler<Contexts>,
+}
 type ComponentsHandlerAction = {
   component: ActionComponentType,
 };
 
 export type HandlerAction<Contexts> =
-  (FunctionHandlerAction<Contexts> | ComponentsHandlerAction)
+  (FunctionHandlerAction<Contexts> | ComponentsHandlerAction | ThunkHandlerAction<Contexts>)
   & ActionDefinitionBase<Contexts>;
 
 export type ExternalLinkAction<Contexts> = {
@@ -83,9 +89,13 @@ export function isExternalLinkAction<T>(action: ActionDefinition<T>): action is 
   return 'linkTarget' in action;
 }
 
-export function createHandlerFor<T>(action: ActionDefinitionBase<T> & HandlerAction<T>, setActionComponents: SetActionComponents): ActionHandler<T> {
+export function createHandlerFor<T>(dispatch: AppDispatch, action: ActionDefinitionBase<T> & HandlerAction<T>, setActionComponents: SetActionComponents): ActionHandler<T> {
   if ('handler' in action) {
     return action.handler;
+  }
+
+  if ('thunk' in action) {
+    return async (args: ActionHandlerArguments<T>) => dispatch(action.thunk(args));
   }
 
   if (action.component) {
