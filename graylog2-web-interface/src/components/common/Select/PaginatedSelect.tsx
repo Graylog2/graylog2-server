@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useRef } from 'react';
 
-import Select from './Select';
+import Select from 'components/common/Select';
 
 type Props = React.ComponentProps<typeof Select>;
 

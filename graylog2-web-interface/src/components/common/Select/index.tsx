@@ -16,8 +16,6 @@
  */
 
 import Select from './Select';
-import PaginatedSelect from './PaginatedSelect';
 
 export { CONTROL_CLASS } from './Select';
-export { PaginatedSelect };
 export default Select;
