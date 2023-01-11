@@ -27,7 +27,6 @@ import { IconButton } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
-import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import SearchActions from 'views/actions/SearchActions';
 import Search from 'views/logic/search/Search';
@@ -39,6 +38,10 @@ import type Widget from 'views/logic/widgets/Widget';
 import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 import useView from 'views/hooks/useView';
 import createSearch from 'views/logic/slices/createSearch';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import useAppDispatch from 'stores/useAppDispatch';
+import { selectQuery, loadView } from 'views/logic/slices/viewSlice';
+import { execute } from 'views/logic/slices/searchExecutionSlice';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -84,7 +87,8 @@ const _onCopyToDashboard = async (
   setShowCopyToDashboard(false);
 };
 
-const _onMoveWidgetToTab = (
+const _onMoveWidgetToTab = async (
+  dispatch: AppDispatch,
   view: View,
   setShowMoveWidgetToTab: (show: boolean) => void,
   widgetId: string,
@@ -98,18 +102,12 @@ const _onMoveWidgetToTab = (
   const newDashboard = MoveWidgetToTab(widgetId, queryId, view, keepCopy);
 
   if (newDashboard) {
-    SearchActions.create(newDashboard.search)
-      .then((searchResponse) => {
-        const updatedDashboard = newDashboard.toBuilder().search(searchResponse.search).build();
-
-        return ViewActions.update(updatedDashboard);
-      })
-      .then(() => {
-        setShowMoveWidgetToTab(false);
-
-        return ViewActions.selectQuery(queryId);
-      })
-      .then(() => SearchActions.executeWithCurrentState());
+    const searchResponse = await createSearch(newDashboard.search);
+    const updatedDashboard = newDashboard.toBuilder().search(searchResponse).build();
+    await dispatch(loadView(updatedDashboard));
+    setShowMoveWidgetToTab(false);
+    await dispatch(selectQuery(queryId));
+    await dispatch(execute());
   }
 };
 
@@ -153,10 +151,11 @@ const WidgetActionsMenu = ({
   const [showCopyToDashboard, setShowCopyToDashboard] = useState(false);
   const [showExport, setShowExport] = useState(false);
   const [showMoveWidgetToTab, setShowMoveWidgetToTab] = useState(false);
+  const dispatch = useAppDispatch();
 
   const onDuplicate = useCallback(() => _onDuplicate(widget.id, unsetWidgetFocusing, title), [unsetWidgetFocusing, title, widget.id]);
   const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId), [view]);
-  const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToTab(view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [view]);
+  const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToTab(dispatch, view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [dispatch, view]);
   const onDelete = useCallback(() => _onDelete(widget, view, title), [title, view, widget]);
   const focusWidget = useCallback(() => setWidgetFocusing(widget.id), [setWidgetFocusing, widget.id]);
 

@@ -28,9 +28,6 @@ import View from 'views/logic/views/View';
 import { setGlobalOverrideQuery, execute } from 'views/logic/slices/searchExecutionSlice';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
-import Search from 'views/logic/search/Search';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 import { selectActiveQuery, selectView, selectViewType, selectQueryById } from 'views/logic/slices/viewSelectors';
 import createSearch from 'views/logic/slices/createSearch';
 
@@ -58,7 +55,7 @@ const viewSlice = createSlice({
 export const viewSliceReducer = viewSlice.reducer;
 export const { setView, selectQuery } = viewSlice.actions;
 
-const loadView = (newView: View, recreateSearch: boolean = false) => async (dispatch: AppDispatch, getState: () => RootState) => {
+export const loadView = (newView: View, recreateSearch: boolean = false) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const oldView = selectView(getState());
 
   const oldWidgets = oldView?.state?.map((s) => s.widgets);
