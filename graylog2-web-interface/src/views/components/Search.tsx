@@ -16,17 +16,15 @@
  */
 import * as React from 'react';
 import { useCallback, useEffect, useContext, useMemo } from 'react';
-import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
+import { createSelector } from '@reduxjs/toolkit';
 
 import PageContentLayout from 'components/layout/PageContentLayout';
 import { useStore } from 'stores/connect';
 import Sidebar from 'views/components/sidebar/Sidebar';
 import SearchResult from 'views/components/SearchResult';
-import { SearchStore, SearchActions } from 'views/stores/SearchStore';
 import { SearchConfigActions, SearchConfigStore } from 'views/stores/SearchConfigStore';
 import { StreamsActions } from 'views/stores/StreamsStore';
-import { ViewActions } from 'views/stores/ViewStore';
 import HeaderElements from 'views/components/HeaderElements';
 import QueryBarElements from 'views/components/QueryBarElements';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
@@ -46,13 +44,14 @@ import HighlightingRulesProvider from 'views/components/contexts/HighlightingRul
 import SearchPagePreferencesProvider from 'views/components/contexts/SearchPagePreferencesProvider';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import type { RefluxActions } from 'stores/StoreTypes';
 import useCurrentUser from 'hooks/useCurrentUser';
 import SynchronizeUrl from 'views/components/SynchronizeUrl';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useView from 'views/hooks/useView';
 import useAppDispatch from 'stores/useAppDispatch';
 import { execute } from 'views/logic/slices/searchExecutionSlice';
+import { selectSearchExecutionResult } from 'views/logic/slices/searchExecutionSelectors';
+import useAppSelector from 'stores/useAppSelector';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -86,9 +85,11 @@ const SearchArea = styled(PageContentLayout)(() => {
   `;
 });
 
+const selectCurrentQueryResults = (queryId: string) => createSelector(selectSearchExecutionResult, (state) => state?.result?.forId(queryId));
+
 const ConnectedSidebar = (props: Omit<React.ComponentProps<typeof Sidebar>, 'results'>) => {
   const activeQuery = useActiveQueryId();
-  const results = useStore(SearchStore, (searches) => searches?.result?.forId(activeQuery));
+  const results = useAppSelector(selectCurrentQueryResults(activeQuery));
 
   return <Sidebar results={results} {...props} />;
 };
@@ -112,27 +113,14 @@ const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
-const useRefreshSearchOn = (_actions: Array<RefluxActions<any>>, refresh: () => Promise<any>) => {
-  useEffect(() => {
-    let storeListenersUnsubscribes = Immutable.List<() => void>();
-
-    refresh().finally(() => {
-      storeListenersUnsubscribes = storeListenersUnsubscribes
-        .push(SearchActions.refresh.listen(refresh))
-        .push(ViewActions.search.completed.listen(refresh));
-    });
-
-    // Returning cleanup function used when unmounting
-    return () => { storeListenersUnsubscribes.forEach((unsubscribeFunc) => unsubscribeFunc()); };
-  }, [refresh]);
-};
-
 const Search = () => {
   const dispatch = useAppDispatch();
   const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
   const { sidebar: { isShown: showSidebar } } = useSearchPageLayout();
 
-  useRefreshSearchOn([SearchActions.refresh, ViewActions.search], refreshSearch);
+  useEffect(() => {
+    refreshSearch();
+  }, [refreshSearch]);
 
   useEffect(() => {
     SearchConfigActions.refresh();
