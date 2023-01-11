@@ -37,11 +37,12 @@ type Props = {
   allowsClosing?: boolean,
   id: QueryId,
   onClose: () => Promise<void | ViewState>,
-  openEditModal: (string) => void,
+  openEditModal: (title: string) => void,
+  openCopyToDashboardModal: (isOpen: boolean) => void,
   title: string,
 };
 
-const QueryTitle = ({ active, allowsClosing, id, onClose, openEditModal, title }: Props) => {
+const QueryTitle = ({ active, allowsClosing, id, onClose, openEditModal, openCopyToDashboardModal, title }: Props) => {
   const [titleValue, setTitleValue] = useState(title);
   const { setDashboardPage } = useContext(DashboardPageContext);
 
@@ -61,8 +62,11 @@ const QueryTitle = ({ active, allowsClosing, id, onClose, openEditModal, title }
 
       {active && (
         <QueryActionDropdown>
-          <MenuItem onSelect={() => _onDuplicate()}>Duplicate</MenuItem>
           <MenuItem onSelect={() => openEditModal(titleValue)}>Edit Title</MenuItem>
+          <MenuItem onSelect={() => _onDuplicate()}>Duplicate</MenuItem>
+          <MenuItem onSelect={() => openCopyToDashboardModal(true)}>
+            Copy to Dashboard
+          </MenuItem>
           <MenuItem divider />
           <MenuItem onSelect={onClose} disabled={!allowsClosing}>Delete</MenuItem>
         </QueryActionDropdown>

@@ -19,6 +19,7 @@ import { useState, useContext, useCallback } from 'react';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import UserNotification from 'util/UserNotification';
 import type { BackendWidgetPosition } from 'views/types';
 import ExportModal from 'views/components/export/ExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
@@ -66,37 +67,36 @@ const _updateDashboardWithNewSearch = (dashboard: View, dashboardId: string, new
   ViewManagementActions.update(newDashboard).then(() => loadDashboard(dashboardId));
 };
 
-const _onCopyToDashboard = (
-  view: ViewStoreState,
-  setShowCopyToDashboard: (show: boolean) => void,
-  widgetId: string,
-  dashboardId: string | undefined | null,
-): void => {
-  const { view: activeView } = view;
+const addWidgetToDashboard = (targetDashboard: View, activeView: View, widgetId: string) => (searchJson: SearchJson) => {
+  const search = Search.fromJSON(searchJson);
+  const newDashboard = CopyWidgetToDashboard(widgetId, activeView, targetDashboard.toBuilder().search(search).build());
 
-  if (!dashboardId) {
-    return;
+  if (!newDashboard || !newDashboard.search) {
+    throw Error('Copying the dashboard page failed.');
   }
 
-  const addWidgetToDashboard = (dashboard: View) => (searchJson: SearchJson) => {
-    const search = Search.fromJSON(searchJson);
-    const newDashboard = CopyWidgetToDashboard(widgetId, activeView, dashboard.toBuilder().search(search).build());
-
-    if (newDashboard && newDashboard.search) {
-      SearchActions.create(newDashboard.search).then(({ search: newSearch }) => _updateDashboardWithNewSearch(newDashboard, dashboardId, newSearch));
-    }
-  };
-
-  ViewManagementActions.get(dashboardId).then((dashboardJson) => {
-    const dashboard = View.fromJSON(dashboardJson);
-
-    SearchActions.get(dashboardJson.search_id).then(addWidgetToDashboard(dashboard));
-  });
-
-  setShowCopyToDashboard(false);
+  return SearchActions.create(newDashboard.search).then(({ search: newSearch }) => _updateDashboardWithNewSearch(newDashboard, newDashboard.id, newSearch));
 };
 
-const _onMoveWidgetToTab = (
+const _onCopyToDashboard = (
+  view: ViewStoreState,
+  widgetId: string,
+  dashboardId: string | undefined | null,
+) => {
+  const { view: activeView } = view;
+
+  return ViewManagementActions.get(dashboardId).then((dashboardJson) => {
+    const targetDashboard = View.fromJSON(dashboardJson);
+
+    return SearchActions.get(dashboardJson.search_id).then(
+      addWidgetToDashboard(targetDashboard, activeView, widgetId),
+    ).catch((error) => {
+      UserNotification.error(`Copying dashboard page failed with error ${error}`);
+    });
+  });
+};
+
+const _onMoveWidgetToPage = (
   view: ViewStoreState,
   setShowMoveWidgetToTab: (show: boolean) => void,
   widgetId: string,
@@ -170,8 +170,8 @@ const WidgetActionsMenu = ({
   const [showMoveWidgetToTab, setShowMoveWidgetToTab] = useState(false);
 
   const onDuplicate = useCallback(() => _onDuplicate(widget.id, unsetWidgetFocusing, title), [unsetWidgetFocusing, title, widget.id]);
-  const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId), [view]);
-  const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToTab(view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [view]);
+  const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, widgetId, dashboardId), [view]);
+  const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToPage(view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [view]);
   const onDelete = useCallback(() => _onDelete(widget, view?.view, title), [title, view?.view, widget]);
   const focusWidget = useCallback(() => setWidgetFocusing(widget.id), [setWidgetFocusing, widget.id]);
 
@@ -227,9 +227,10 @@ const WidgetActionsMenu = ({
         </WidgetActionDropdown>
 
         {showCopyToDashboard && (
-          <CopyToDashboard widgetId={widget.id}
-                           onSubmit={onCopyToDashboard}
-                           onCancel={() => setShowCopyToDashboard(false)} />
+          <CopyToDashboard onSubmit={(dashboardId) => onCopyToDashboard(widget.id, dashboardId)}
+                           onCancel={() => setShowCopyToDashboard(false)}
+                           submitLoadingText="Copying widget..."
+                           submitButtonText="Copy widget" />
         )}
 
         {showExport && (

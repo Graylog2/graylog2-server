@@ -22,12 +22,15 @@ import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import type { SearchParams } from 'stores/PaginationTypes';
 
 type Props = {
+  activeDashboardId?: string,
   onCancel: () => void,
-  onSubmit: (widgetId: string, selectedDashboard: string | undefined | null) => void,
-  widgetId: string,
+  onSubmit: (selectedDashboardId: string | undefined | null) => Promise<void>,
+  submitButtonText: string,
+  submitLoadingText: string,
 };
 
-const CopyToDashboardForm = ({ widgetId, onCancel, onSubmit }: Props) => {
+const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submitLoadingText, activeDashboardId }: Props) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDashboard, setSelectedDashboard] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useState<SearchParams>({
     page: 1,
@@ -54,40 +57,62 @@ const CopyToDashboardForm = ({ widgetId, onCancel, onSubmit }: Props) => {
   [],
   );
 
+  const handleSubmit = () => {
+    setIsSubmitting(true);
+
+    onSubmit(selectedDashboard).then(() => {
+      setIsSubmitting(false);
+    });
+  };
+
   return (
     <Modal show>
       <Modal.Body>
-        <SearchForm onSearch={handleSearch}
-                    onReset={handleSearchReset} />
         <PaginatedList onChange={handlePageChange}
                        activePage={searchParams.page}
                        totalItems={paginatedDashboards?.pagination?.total ?? 0}
                        pageSize={searchParams.pageSize}
                        pageSizes={[5, 10, 15]}
                        useQueryParameter={false}>
+          <div style={{ marginBottom: '5px' }}>
+            <SearchForm onSearch={handleSearch}
+                        onReset={handleSearchReset} />
+          </div>
           {paginatedDashboards?.list && paginatedDashboards.list.length > 0 ? (
             <ListGroup>
-              {paginatedDashboards.list.map((dashboard) => (
-                <ListGroupItem active={selectedDashboard === dashboard.id}
-                               onClick={() => setSelectedDashboard(dashboard.id)}
-                               header={dashboard.title}
-                               key={dashboard.id}>
-                  {dashboard.summary}
-                </ListGroupItem>
-              ))}
+              {paginatedDashboards.list.map((dashboard) => {
+                const isActiveDashboard = activeDashboardId === dashboard.id;
+
+                return (
+                  <ListGroupItem active={selectedDashboard === dashboard.id}
+                                 onClick={isActiveDashboard ? undefined : () => setSelectedDashboard(dashboard.id)}
+                                 header={dashboard.title}
+                                 disabled={isActiveDashboard}
+                                 key={dashboard.id}>
+                    {dashboard.summary}
+                  </ListGroupItem>
+                );
+              })}
             </ListGroup>
           ) : <span>No dashboards found</span>}
         </PaginatedList>
       </Modal.Body>
       <Modal.Footer>
-        <ModalSubmit submitButtonText="Copy widget"
-                     disabledSubmit={selectedDashboard === null}
+        <ModalSubmit submitButtonText={submitButtonText}
+                     submitLoadingText={submitLoadingText}
+                     isAsyncSubmit
+                     isSubmitting={isSubmitting}
+                     disabledSubmit={!selectedDashboard}
                      submitButtonType="button"
-                     onSubmit={() => onSubmit(widgetId, selectedDashboard)}
+                     onSubmit={handleSubmit}
                      onCancel={onCancel} />
       </Modal.Footer>
     </Modal>
   );
+};
+
+CopyToDashboardForm.defaultProps = {
+  activeDashboardId: undefined,
 };
 
 export default CopyToDashboardForm;

@@ -25,6 +25,19 @@ import type { TitlesMap } from 'views/stores/TitleTypes';
 import AdaptableQueryTabs from './AdaptableQueryTabs';
 import type QueryTitleEditModal from './queries/QueryTitleEditModal';
 
+jest.mock('views/components/dashboard/hooks/useDashboards', () => () => ({
+  data: {
+    pagination: {
+      total: 0,
+      page: 1,
+      perPage: 5,
+      count: 0,
+    },
+    list: [],
+  },
+  refetch: () => {},
+}));
+
 Object.defineProperties(window.HTMLElement.prototype, {
   offsetWidth: {
     get() {
@@ -232,5 +245,17 @@ describe('AdaptableQueryTabs', () => {
     await expect(onSelectStub).toHaveBeenCalledTimes(1);
 
     expect(onSelectStub).toHaveBeenCalledWith('new');
+  });
+
+  it('should show copy page to dashboard modal', async () => {
+    render(<AdaptableQueryTabs {...DEFAULT_PROPS} activeQueryId="query-id-1" />);
+
+    userEvent.click((await screen.findAllByTitle(/page actions/i))[0]);
+    userEvent.click(await screen.findByRole('menuitem', { name: /copy to dashboard/i }));
+
+    await screen.findByRole('button', {
+      name: /copy page/i,
+      hidden: true,
+    });
   });
 });

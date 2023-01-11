@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { stringify } from 'qs';
+
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import type View from 'views/logic/views/View';
@@ -26,7 +28,10 @@ export const loadNewViewForStream = (streamId: string) => history.push(`${Routes
 
 export const loadView = (viewId: string) => history.push(`${Routes.SEARCH}/${viewId}`);
 
-export const loadDashboard = (dashboardId: string) => history.push(Routes.pluginRoute('DASHBOARDS_VIEWID')(dashboardId));
+export const loadDashboard = (dashboardId: string, queryParams?: { page: string }) => history.push({
+  pathname: Routes.pluginRoute('DASHBOARDS_VIEWID')(dashboardId),
+  search: stringify(queryParams),
+});
 
 export const loadAsDashboard = (view: View) => history.push({
   pathname: Routes.pluginRoute('DASHBOARDS_NEW'),
