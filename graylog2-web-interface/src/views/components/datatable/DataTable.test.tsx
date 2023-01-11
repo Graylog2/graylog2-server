@@ -46,9 +46,9 @@ jest.mock('views/stores/WidgetStore', () => ({
   },
 }));
 
-describe('DataTable', () => {
-  const currentView = { activeQuery: 'deadbeef-23' };
+jest.mock('views/hooks/useActiveQueryId', () => () => 'foobar');
 
+describe('DataTable', () => {
   const rows = [{
     key: ['2018-10-04T09:43:50.000Z'],
     source: 'leaf',
@@ -115,7 +115,6 @@ describe('DataTable', () => {
     <Formik initialValues={{}} onSubmit={() => {}}>
       <Form>
         <DataTable config={AggregationWidgetConfig.builder().build()}
-                   currentView={currentView}
                    data={{}}
                    fields={Immutable.List([])}
                    effectiveTimerange={{

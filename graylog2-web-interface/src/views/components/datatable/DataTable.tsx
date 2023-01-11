@@ -22,12 +22,8 @@ import type { OrderedMap } from 'immutable';
 import { FormikContext } from 'formik';
 import styled, { css } from 'styled-components';
 
-import connect from 'stores/connect';
 import expandRows from 'views/logic/ExpandRows';
 import { defaultCompare } from 'logic/DefaultCompare';
-import { ViewStore } from 'views/stores/ViewStore';
-import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import type { Leaf, Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { Events } from 'views/logic/searchtypes/events/EventHandler';
 import { WidgetActions } from 'views/stores/WidgetStore';
@@ -46,9 +42,7 @@ import type { VisualizationComponentProps } from '../aggregationbuilder/Aggregat
 import { makeVisualization, retrieveChartData } from '../aggregationbuilder/AggregationBuilder';
 
 type Props = VisualizationComponentProps & {
-  config: AggregationWidgetConfig,
   data: { [key: string]: Rows } & { events?: Events },
-  fields: FieldTypeMappingsList,
   striped?: boolean,
   bordered?: boolean,
   borderedHeader?: boolean,
@@ -292,6 +286,6 @@ DataTable.defaultProps = {
   borderedHeader: true,
 };
 
-const ConnectedDataTable = makeVisualization(connect(DataTable, { currentView: ViewStore }), 'table');
+const ConnectedDataTable = makeVisualization(DataTable, 'table');
 
 export default ConnectedDataTable;
