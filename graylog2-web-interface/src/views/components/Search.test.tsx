@@ -22,15 +22,9 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
 import { StreamsActions } from 'views/stores/StreamsStore';
-import { WidgetStore } from 'views/stores/WidgetStore';
 import { SearchActions } from 'views/stores/SearchStore';
-import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchConfigActions } from 'views/stores/SearchConfigStore';
-import { ViewActions, ViewStore } from 'views/stores/ViewStore';
-import { SearchMetadataActions, SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import View from 'views/logic/views/View';
-import SearchMetadata from 'views/logic/search/SearchMetadata';
-import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import PluggableStoreProvider from 'components/PluggableStoreProvider';
 import viewsReducers from 'views/viewsReducers';
@@ -103,23 +97,8 @@ describe('Search', () => {
   afterAll(() => PluginStore.unregister(plugin));
 
   beforeEach(() => {
-    WidgetStore.listen = jest.fn(() => jest.fn());
-    SearchActions.execute = mockAction(jest.fn(async () => ({} as SearchExecutionResult)));
     StreamsActions.refresh = mockAction();
     SearchConfigActions.refresh = mockAction();
-    SearchExecutionStateStore.listen = jest.fn(() => jest.fn());
-    ViewActions.search.completed.listen = jest.fn(() => jest.fn());
-
-    ViewStore.getInitialState = jest.fn(() => ({
-      view: View.create().toBuilder().type(View.Type.Dashboard).build(),
-      dirty: false,
-      isNew: true,
-      activeQuery: 'foobar',
-    }));
-
-    SearchMetadataActions.parseSearch = mockAction(jest.fn(() => Promise.resolve(SearchMetadata.empty())));
-    SearchMetadataStore.listen = jest.fn(() => jest.fn());
-    SearchActions.refresh = mockAction();
   });
 
   it('register a WindowLeaveMessage', async () => {
