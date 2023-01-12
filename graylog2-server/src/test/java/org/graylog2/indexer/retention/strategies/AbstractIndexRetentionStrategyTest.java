@@ -35,7 +35,6 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collections;
@@ -71,6 +70,8 @@ public class AbstractIndexRetentionStrategyTest {
 
     private IndexSetConfig indexSetConfigCountBased;
 
+    private DateTime NOW = DateTime.now();
+
     @Before
     public void setUp() throws Exception {
         indexMap = new HashMap<>();
@@ -81,13 +82,12 @@ public class AbstractIndexRetentionStrategyTest {
         indexMap.put("index5", Collections.emptySet());
         indexMap.put("index6", Collections.emptySet());
 
-        DateTime baseTime = DateTime.now().minusDays(10);
-        when(indices.indexCreationDate(eq("index1"))).thenReturn(Optional.of(baseTime.plusDays(1)));
-        when(indices.indexCreationDate(eq("index2"))).thenReturn(Optional.of(baseTime.plusDays(3)));
-        when(indices.indexCreationDate(eq("index3"))).thenReturn(Optional.of(baseTime.plusDays(9)));
-        when(indices.indexCreationDate(eq("index4"))).thenReturn(Optional.of(baseTime.plusDays(10)));
-        when(indices.indexCreationDate(eq("index5"))).thenReturn(Optional.of(baseTime.plusDays(11)));
-        when(indices.indexCreationDate(eq("index6"))).thenReturn(Optional.of(baseTime.plusDays(15)));
+        when(indices.indexCreationDate("index1")).thenReturn(Optional.of(NOW.minusDays(1)));
+        when(indices.indexCreationDate("index2")).thenReturn(Optional.of(NOW.minusDays(3)));
+        when(indices.indexCreationDate("index3")).thenReturn(Optional.of(NOW.minusDays(9)));
+        when(indices.indexCreationDate("index4")).thenReturn(Optional.of(NOW.minusDays(10)));
+        when(indices.indexCreationDate("index5")).thenReturn(Optional.of(NOW.minusDays(11)));
+        when(indices.indexCreationDate("index6")).thenReturn(Optional.of(NOW.minusDays(15)));
 
         indexSetConfigCountBased = createCountBased();
 
@@ -197,7 +197,7 @@ public class AbstractIndexRetentionStrategyTest {
 
         final ArgumentCaptor<List> retainedIndexName = ArgumentCaptor.forClass(List.class);
         verify(retentionStrategy, times(1)).retain(retainedIndexName.capture(), eq(indexSet));
-        assertThat(retainedIndexName.getValue()).containsExactly("index2");
+        assertThat(retainedIndexName.getValue()).containsExactly("index1", "index2", "index3");
     }
 
     private Optional<Integer> extractIndexNumber(InvocationOnMock invocation) {
@@ -228,8 +228,8 @@ public class AbstractIndexRetentionStrategyTest {
                 1, 0,
                 SmartRotationStrategyConfig.class.getCanonicalName(),
                 SmartRotationStrategyConfig.builder()
-                        .indexLifetimeSoft(Period.ofDays(minDays))
-                        .indexLifetimeHard(Period.ofDays(maxDays))
+                        .indexLifetimeSoft(java.time.Duration.ofDays(minDays))
+                        .indexLifetimeHard(java.time.Duration.ofDays(maxDays))
                         .build(),
                 DeletionRetentionStrategy.class.getCanonicalName(),
                 DeletionRetentionStrategyConfig.createDefault(),

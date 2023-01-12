@@ -70,7 +70,7 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
 
     private void retainTimeBased(IndexSet indexSet, SmartRotationStrategyConfig smartConfig) {
         final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
-        final DateTime cutOff = DateTime.now().minus(smartConfig.indexLifetimeSoft());
+        final DateTime cutOff = DateTime.now().minus(smartConfig.indexLifetimeSoft().toMillis());
         int removeCount = 0;
         for (String index: deflectorIndices.keySet()) {
             if (indices.isReopened(index)) {
