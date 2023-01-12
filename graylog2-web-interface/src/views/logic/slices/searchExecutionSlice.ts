@@ -31,6 +31,7 @@ import {
   selectWidgetsToSearch,
   selectSearchExecutionState,
 } from 'views/logic/slices/searchExecutionSelectors';
+import type { TimeRange } from 'views/logic/queries/Query';
 
 const searchExecutionSlice = createSlice({
   name: 'searchExecution',
@@ -84,6 +85,16 @@ export const execute = () => (dispatch: AppDispatch, getState: () => RootState) 
 export const setGlobalOverrideQuery = (queryString: string) => (dispatch: AppDispatch, getState: () => RootState) => {
   const globalOverride = selectGlobalOverride(getState()) ?? GlobalOverride.empty();
   const newGlobalOverride = globalOverride.toBuilder().query({ type: 'elasticsearch', query_string: queryString }).build();
+
+  return dispatch(searchExecutionSlice.actions.updateGlobalOverride(newGlobalOverride));
+};
+
+export const setGlobalOverride = (queryString: string, timerange: TimeRange) => (dispatch: AppDispatch, getState: () => RootState) => {
+  const globalOverride = selectGlobalOverride(getState()) ?? GlobalOverride.empty();
+  const newGlobalOverride = globalOverride.toBuilder()
+    .query({ type: 'elasticsearch', query_string: queryString })
+    .timerange(timerange)
+    .build();
 
   return dispatch(searchExecutionSlice.actions.updateGlobalOverride(newGlobalOverride));
 };

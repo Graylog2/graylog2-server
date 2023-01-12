@@ -27,7 +27,6 @@ import ScrollToHint from 'views/components/common/ScrollToHint';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import QueryInput from 'views/components/searchbar/queryinput/AsyncQueryInput';
 import DashboardActionsMenu from 'views/components/DashboardActionsMenu';
-import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import FormWarningsContext from 'contexts/FormWarningsContext';
@@ -37,7 +36,6 @@ import debounceWithPromise from 'views/logic/debounceWithPromise';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
-import { SearchActions } from 'views/stores/SearchStore';
 import {
   executeSearchSubmitHandler as executePluggableSubmitHandler,
   useInitialSearchValues as usePluggableInitialValues,
@@ -55,6 +53,9 @@ import {
   SearchInputAndValidationContainer,
 } from 'views/components/searchbar/SearchBarLayout';
 import PluggableCommands from 'views/components/searchbar/queryinput/PluggableCommands';
+import useAppDispatch from 'stores/useAppDispatch';
+import { setGlobalOverride, execute } from 'views/logic/slices/searchExecutionSlice';
+import useGlobalOverride from 'views/hooks/useGlobalOverride';
 
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
@@ -104,15 +105,17 @@ const useInitialFormValues = (timerange, queryString) => {
 const DashboardSearchBar = () => {
   const { userTimezone } = useUserDateTime();
   const { searchesClusterConfig: config } = useStore(SearchConfigStore);
-  const { timerange, query: { query_string: queryString = '' } = {} } = useStore(GlobalOverrideStore) ?? {};
+  const { timerange, query: { query_string: queryString = '' } = {} } = useGlobalOverride() ?? {};
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
+  const dispatch = useAppDispatch();
 
   const submitForm = useCallback(async (values) => {
     const { timerange: newTimerange, queryString: newQueryString } = values;
     await executePluggableSubmitHandler(values, pluggableSearchBarControls);
 
-    return GlobalOverrideActions.set(newTimerange, newQueryString).then(() => SearchActions.refresh());
-  }, [pluggableSearchBarControls]);
+    dispatch(setGlobalOverride(newQueryString, newTimerange));
+    dispatch(execute());
+  }, [dispatch, pluggableSearchBarControls]);
 
   const { parameters } = useParameters();
   const initialValues = useInitialFormValues(timerange, queryString);
