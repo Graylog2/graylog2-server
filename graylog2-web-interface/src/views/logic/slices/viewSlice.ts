@@ -50,10 +50,18 @@ const viewSlice = createSlice({
         view: action.payload,
       });
     },
+    setIsNew: (state: ViewState, action: PayloadAction<boolean>) => ({
+      ...state,
+      isNew: action.payload,
+    }),
+    setIsDirty: (state: ViewState, action: PayloadAction<boolean>) => ({
+      ...state,
+      isDirty: action.payload,
+    }),
   },
 });
 export const viewSliceReducer = viewSlice.reducer;
-export const { setView, selectQuery } = viewSlice.actions;
+export const { setView, selectQuery, setIsDirty, setIsNew } = viewSlice.actions;
 
 export const loadView = (newView: View, recreateSearch: boolean = false) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const oldView = selectView(getState());

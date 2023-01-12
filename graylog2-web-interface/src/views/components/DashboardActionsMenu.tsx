@@ -91,11 +91,12 @@ const DashboardActionsMenu = () => {
 
     return dispatch(onSaveNewDashboard(newDashboard));
   }, [currentUser.permissions, dispatch, pluggableSaveViewControls, view.id]);
+  const _onSaveView = useCallback(() => dispatch(onSaveView(view)), [dispatch, view]);
 
   return (
     <ButtonGroup>
       {showSaveButton && (
-        <Button onClick={() => onSaveView(view)}
+        <Button onClick={_onSaveView}
                 disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}
                 title="Save dashboard">
           <Icon name="save" /> Save
@@ -141,7 +142,7 @@ const DashboardActionsMenu = () => {
                                   title="Editing dashboard"
                                   submitButtonText="Update dashboard"
                                   onClose={() => setEditDashboardOpen(false)}
-                                  onSave={onSaveView} />
+                                  onSave={_onSaveView} />
       )}
 
       {shareDashboardOpen && (

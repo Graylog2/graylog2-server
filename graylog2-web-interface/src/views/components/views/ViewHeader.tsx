@@ -27,6 +27,7 @@ import View from 'views/logic/views/View';
 import Routes from 'routing/Routes';
 import useViewTitle from 'views/hooks/useViewTitle';
 import useView from 'views/hooks/useView';
+import useAppDispatch from 'stores/useAppDispatch';
 
 const links = {
   [View.Type.Dashboard]: {
@@ -76,6 +77,8 @@ const ViewHeader = () => {
   const isSavedView = view?.id && view?.title;
   const [showMetadataEdit, setShowMetadataEdit] = useState<boolean>(false);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), [setShowMetadataEdit]);
+  const dispatch = useAppDispatch();
+  const _onSaveView = useCallback(() => dispatch(onSaveView(view)), [dispatch, view]);
 
   const typeText = view?.type?.toLocaleLowerCase();
   const title = useViewTitle();
@@ -103,7 +106,7 @@ const ViewHeader = () => {
                              view={view}
                              title={`Editing saved ${typeText}`}
                              onClose={toggleMetadataEdit}
-                             onSave={onSaveView}
+                             onSave={_onSaveView}
                              submitButtonText={`Save ${typeText}`} />
         )}
       </Content>

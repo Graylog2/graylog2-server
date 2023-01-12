@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled, { useTheme } from 'styled-components';
-import { useState, useContext, useRef } from 'react';
+import { useCallback, useState, useContext, useRef } from 'react';
 
 import { isPermitted } from 'util/PermissionsMixin';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
@@ -41,6 +41,7 @@ import {
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useIsDirty from 'views/hooks/useIsDirty';
 import useView from 'views/hooks/useView';
+import useAppDispatch from 'stores/useAppDispatch';
 
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchesModal from './SavedSearchesModal';
@@ -70,6 +71,8 @@ const SearchActionsMenu = () => {
   const [showMetadataEdit, setShowMetadataEdit] = useState(false);
   const [showShareSearch, setShowShareSearch] = useState(false);
   const [newTitle, setNewTitle] = useState((view && view.title) || '');
+  const dispatch = useAppDispatch();
+  const _onSaveView = useCallback(() => dispatch(onSaveView(view)), [dispatch, view]);
 
   const loaded = !!view.id;
   const savedSearchColor = dirty ? theme.colors.variant.warning : theme.colors.variant.info;
@@ -204,7 +207,7 @@ const SearchActionsMenu = () => {
                              title="Editing saved search"
                              submitButtonText="Update search"
                              onClose={toggleMetadataEdit}
-                             onSave={onSaveView} />
+                             onSave={_onSaveView} />
       )}
       {showShareSearch && (
         <EntityShareModal entityId={view.id}
