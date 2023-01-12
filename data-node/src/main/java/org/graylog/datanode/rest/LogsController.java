@@ -16,25 +16,32 @@
  */
 package org.graylog.datanode.rest;
 
-import org.graylog.datanode.management.ManagedOpenSearch;
+import org.graylog.datanode.process.OpensearchLogs;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-public class StatusController {
+import java.util.List;
 
-    @Value("${datanode.version}")
-    private String dataNodeVersion;
+@RestController
+@RequestMapping("/logs")
+public class LogsController {
+
+    private final OpensearchLogs opensearchLogs;
 
     @Autowired
-    private ManagedOpenSearch openSearch;
+    public LogsController(OpensearchLogs opensearchLogs) {
+        this.opensearchLogs = opensearchLogs;
+    }
 
-    @GetMapping("/")
-    public StatusResponse index() {
-        return openSearch.getDataNode()
-                .map(os -> new StatusResponse(dataNodeVersion, os.getOpensearchVersion(), os.getProcess().pid(), os.getProcess().isAlive()))
-                .orElse(new StatusResponse(dataNodeVersion, "unknown", -1, false));
+    @GetMapping("/stdout")
+    public List<String> getOpensearchStdout() {
+        return opensearchLogs.getStdout();
+    }
+
+    @GetMapping("/stderr")
+    public List<String> getOpensearchStderr() {
+        return opensearchLogs.getStderr();
     }
 }

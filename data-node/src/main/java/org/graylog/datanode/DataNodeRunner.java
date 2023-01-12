@@ -23,8 +23,11 @@ import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
+import org.graylog.datanode.process.OpensearchLogs;
+import org.graylog.datanode.process.StreamConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedWriter;
@@ -44,6 +47,9 @@ import java.util.concurrent.TimeUnit;
 public class DataNodeRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(DataNodeRunner.class);
+
+    @Autowired
+    private OpensearchLogs opensearchLogs;
 
     public DataNodeRunner() {
     }
@@ -80,9 +86,14 @@ public class DataNodeRunner {
         final Path binPath = targetLocation.resolve(Paths.get("bin", "opensearch"));
         LOG.info("Running opensearch from " + binPath.toAbsolutePath());
         ProcessBuilder builder = new ProcessBuilder(binPath.toAbsolutePath().toString());
-        builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-        builder.redirectError(ProcessBuilder.Redirect.INHERIT);
+
         Process process = builder.start();
+
+        StreamConsumer outputConsumer = new StreamConsumer(process.getInputStream(), opensearchLogs::stdOut);
+        StreamConsumer errorConsumer = new StreamConsumer(process.getErrorStream(), opensearchLogs::stdErr);
+
+        new Thread(outputConsumer).start();
+        new Thread(errorConsumer).start();
 
         awaitHttpApi();
 

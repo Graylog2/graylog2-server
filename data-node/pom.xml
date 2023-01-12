@@ -99,6 +99,24 @@
             <artifactId>joda-time</artifactId>
             <version>${joda-time.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.opensearch.client</groupId>
+            <artifactId>opensearch-rest-high-level-client</artifactId>
+            <version>${opensearch.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.2</version>
+        </dependency>
+
     </dependencies>
 
     <build>
