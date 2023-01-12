@@ -52,7 +52,7 @@ class ContentPackInstallations extends React.Component {
       this.setState({ showInstallModal: true });
     };
 
-    const InstallModal = (
+    const installModal = (
       <BootstrapModalWrapper showModal={this.state.showInstallModal}
                              onHide={closeShowModal}
                              bsSize="large">
