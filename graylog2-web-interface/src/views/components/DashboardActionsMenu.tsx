@@ -37,6 +37,7 @@ import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useView from 'views/hooks/useView';
 import useIsNew from 'views/hooks/useIsNew';
 import useHasUndeclaredParameters from 'views/logic/parameters/useHasUndeclaredParameters';
+import useAppDispatch from 'stores/useAppDispatch';
 
 import DashboardPropertiesModal from './dashboard/DashboardPropertiesModal';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
@@ -77,6 +78,7 @@ const DashboardActionsMenu = () => {
       </MenuItem>
     </>
   );
+  const dispatch = useAppDispatch();
 
   const _onSaveNewDashboard = useCallback(async (newDashboard: View) => {
     const isViewDuplication = !!view.id;
@@ -84,11 +86,11 @@ const DashboardActionsMenu = () => {
     if (isViewDuplication) {
       const dashboardWithPluginData = await executePluggableDuplicationHandler(newDashboard, currentUser.permissions, pluggableSaveViewControls);
 
-      return onSaveNewDashboard(dashboardWithPluginData);
+      return dispatch(onSaveNewDashboard(dashboardWithPluginData));
     }
 
-    return onSaveNewDashboard(newDashboard);
-  }, [currentUser.permissions, pluggableSaveViewControls, view.id]);
+    return dispatch(onSaveNewDashboard(newDashboard));
+  }, [currentUser.permissions, dispatch, pluggableSaveViewControls, view.id]);
 
   return (
     <ButtonGroup>
