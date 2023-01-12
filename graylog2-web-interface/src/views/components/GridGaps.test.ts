@@ -257,4 +257,171 @@ describe('GridGaps', () => {
       end: { x: 7, y: 7 },
     }]);
   });
+
+  it('avoid occupying empty row(s)', () => {
+    const items = [
+      {
+        start: {
+          x: 1,
+          y: 1,
+        },
+        end: {
+          x: 4,
+          y: 4,
+        },
+      },
+      {
+        start: {
+          x: 1,
+          y: 10,
+        },
+        end: {
+          x: 13,
+          y: 15,
+        },
+      },
+    ];
+
+    expect(findGaps(items)).toEqual([{
+      start: { x: 4, y: 1 },
+      end: { x: 13, y: 4 },
+    }]);
+  });
+
+  it('should not generate gaps for overlapping widgets', () => {
+    const items = [
+      {
+        start: {
+          x: 1,
+          y: 1,
+        },
+        end: {
+          x: 5,
+          y: 5,
+        },
+      },
+      {
+        start: {
+          x: 1,
+          y: 1,
+        },
+        end: {
+          x: Infinity,
+          y: 3,
+        },
+      },
+    ];
+
+    expect(findGaps(items)).toEqual([]);
+  });
+
+  it('should not overlap initial placeholders with other widgets', () => {
+    const items = [{
+      start: {
+        x: 5,
+        y: 1,
+      },
+      end: {
+        x: 13,
+        y: 5,
+      },
+    },
+
+    {
+      start: {
+        x: 1,
+        y: 5,
+      },
+      end: {
+        x: 13,
+        y: 7,
+      },
+    },
+    {
+      start: {
+        x: 5,
+        y: 7,
+      },
+      end: {
+        x: 13,
+        y: 11,
+      },
+    },
+    ];
+
+    expect(findGaps(items)).toEqual([{
+      start: {
+        x: 1,
+        y: 1,
+      },
+      end: {
+        x: 5,
+        y: 5,
+      },
+    }, {
+      start: {
+        x: 1,
+        y: 7,
+      },
+      end: {
+        x: 5,
+        y: 11,
+      },
+    }]);
+  });
+
+  it('should not overlap final placeholders with other widgets', () => {
+    const items = [
+      {
+        start: {
+          x: 1,
+          y: 1,
+        },
+        end: {
+          x: 5,
+          y: 5,
+        },
+      },
+      {
+        start: {
+          x: 1,
+          y: 5,
+        },
+        end: {
+          x: 13,
+          y: 7,
+        },
+      },
+      {
+        start: {
+          x: 1,
+          y: 7,
+        },
+        end: {
+          x: 5,
+          y: 11,
+        },
+      },
+    ];
+
+    expect(findGaps(items)).toEqual([{
+      start: {
+        x: 5,
+        y: 1,
+      },
+      end: {
+        x: 13,
+        y: 5,
+      },
+    }, {
+      start: {
+        x: 5,
+        y: 7,
+      },
+      end: {
+        x: 13,
+        y: 11,
+      },
+    }]);
+  });
 });

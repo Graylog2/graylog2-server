@@ -57,6 +57,7 @@ const normalizeInfinity = ({ start, end }: Item, maxWidth: number): Item => ({
 type RowItems = { [row: string]: Item[] };
 
 const findInitialGaps = (rows: Array<number>, rowItems: RowItems, minWidth: number) => rows
+  .filter((row) => rowItems[row].length > 0)
   .map((row) => [row, Math.min(...rowItems[row].map((item) => item.start.x))])
   .filter(([, startX]) => startX > minWidth)
   .reduce((gaps, [row, startX]) => {
@@ -66,7 +67,7 @@ const findInitialGaps = (rows: Array<number>, rowItems: RowItems, minWidth: numb
 
     const [gap, ...rest] = gaps.reverse();
 
-    if (gap.end.x !== startX) {
+    if (gap.end.x !== startX || gap.end.y < row) {
       return [...rest, gap, { start: { x: minWidth, y: row }, end: { x: startX, y: row + 1 } }];
     }
 
@@ -74,6 +75,7 @@ const findInitialGaps = (rows: Array<number>, rowItems: RowItems, minWidth: numb
   }, [] as Item[]);
 
 const findFinalGaps = (rows: Array<number>, rowItems: RowItems, maxWidth: number) => rows
+  .filter((row) => rowItems[row].length > 0)
   .map((row) => [row, Math.max(...rowItems[row].map((item) => item.end.x))])
   .filter(([, endX]) => endX < maxWidth)
   .reduce((gaps, [row, endX]) => {
@@ -83,19 +85,59 @@ const findFinalGaps = (rows: Array<number>, rowItems: RowItems, maxWidth: number
 
     const [gap, ...rest] = gaps.reverse();
 
-    if (gap.start.x !== endX) {
+    if (gap.start.x !== endX || gap.end.y < row) {
       return [...rest, gap, { start: { x: endX, y: row }, end: { x: maxWidth, y: row + 1 } }];
     }
 
     return [...rest, { start: gap.start, end: { x: maxWidth, y: row + 1 } }];
   }, [] as Item[]);
 
+const itemsOverlap = (items: Item[]) => {
+  if (items.length === 0) {
+    return false;
+  }
+
+  const minY = Math.min(...items.map(({ start: { y } }) => y));
+  const maxY = Math.max(...items.map(({ end: { y } }) => y - 1));
+
+  const spaces = [];
+
+  for (let row = minY; row <= maxY; row++) {
+    spaces[row] = [];
+  }
+
+  for (const item of items) {
+    const { start, end } = item;
+
+    for (let { x } = start; x < end.x; x++) {
+      for (let { y } = start; y < end.y; y++) {
+        if (spaces[y][x] !== undefined) {
+          return true;
+        }
+
+        spaces[y][x] = true;
+      }
+    }
+  }
+
+  return false;
+};
+
 const findGaps = (_items: Item[], minWidth: number = 1, maxWidth: number = 13): Item[] => {
   if (_items.length === 0) {
+    console.log('no items');
+
     return [];
   }
 
   const items = _items.map((item) => normalizeInfinity(item, maxWidth));
+
+  if (itemsOverlap(items)) {
+    console.log('items overlapping');
+
+    return [];
+  }
+
   const minY = Math.min(...items.map(({ start: { y } }) => y));
   const maxY = Math.max(...items.map(({ end: { y } }) => y - 1));
 
@@ -114,7 +156,10 @@ const findGaps = (_items: Item[], minWidth: number = 1, maxWidth: number = 13): 
       .map((neighbor) => gapBetween(item, neighbor));
   });
 
-  return uniq([...gaps, ...initialGaps, ...finalGaps]);
+  const result = uniq([...gaps, ...initialGaps, ...finalGaps]);
+  console.log('Returning ', { result });
+
+  return result;
 };
 
 export default findGaps;
