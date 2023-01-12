@@ -29,6 +29,7 @@ import org.graylog.events.conditions.BooleanNumberConditionsVisitor;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventFactory;
 import org.graylog.events.event.EventOriginContext;
+import org.graylog.events.event.EventReplayInfo;
 import org.graylog.events.event.EventWithContext;
 import org.graylog.events.processor.DBEventProcessorStateService;
 import org.graylog.events.processor.EventConsumer;
@@ -218,6 +219,13 @@ public class AggregationEventProcessor implements EventProcessor {
                 eventStreamService.buildEventSourceStreams(getStreams(parameters), ImmutableSet.copyOf(msg.getStreamIds()))
                         .forEach(event::addSourceStream);
 
+                event.setReplayInfo(EventReplayInfo.builder()
+                        .timerangeStart(parameters.timerange().getFrom())
+                        .timerangeEnd(parameters.timerange().getTo())
+                        .query(config.query())
+                        .streams(event.getSourceStreams())
+                        .build());
+
                 eventsWithContext.add(EventWithContext.create(event, msg));
             }
 
@@ -284,6 +292,12 @@ public class AggregationEventProcessor implements EventProcessor {
             event.setTimerangeStart(keyResult.timestamp().map(t -> t.minus(config.searchWithinMs())).orElse(parameters.timerange().getFrom()));
             event.setTimerangeEnd(keyResult.timestamp().orElse(parameters.timerange().getTo()));
 
+            event.setReplayInfo(EventReplayInfo.builder()
+                    .timerangeStart(event.getTimerangeStart())
+                    .timerangeEnd(event.getTimerangeEnd())
+                    .query(config.query())
+                    .streams(sourceStreams)
+                    .build());
             sourceStreams.forEach(event::addSourceStream);
 
             final Map<String, Object> fields = new HashMap<>();
