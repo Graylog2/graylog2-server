@@ -14,24 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import PropTypes from 'prop-types';
 
-import { Icon } from 'components/common';
-import ActionDropdown from 'views/components/common/ActionDropdown';
-
-type Props = {
-  children: React.ReactElement | React.ReactElement[],
+export type EventReplayInfo = {
+  timerange_start: string,
+  timerange_end: string,
+  query: string,
+  streams: string[],
 };
 
-const QueryActionDropdown = ({ children }: Props) => (
-  <ActionDropdown element={<Icon name="chevron-down" data-testid="query-action-dropdown" title="Page Actions" />}>
-    {children}
-  </ActionDropdown>
-);
-
-QueryActionDropdown.propTypes = {
-  children: PropTypes.node.isRequired,
+export type Event = {
+  id: string,
+  event_definition_id: string,
+  event_definition_type: string,
+  priority: string,
+  timestamp: string,
+  timerange_start: string,
+  timerange_end: string,
+  key: string,
+  fields: Object[],
+  group_by_fields: Object[],
+  source_streams: string[],
+  replay_info: EventReplayInfo | undefined,
 };
 
-export default QueryActionDropdown;
+export type EventDefinitionContext = {
+  id: string,
+  title: string,
+};

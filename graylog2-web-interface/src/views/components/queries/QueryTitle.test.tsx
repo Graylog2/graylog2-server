@@ -44,15 +44,19 @@ describe('QueryTitle', () => {
     userEvent.click(menuItem);
   };
 
+  const SUT = (props: Partial<React.ComponentProps<typeof QueryTitle>>) => (
+    <QueryTitle active
+                id="deadbeef"
+                openEditModal={() => {}}
+                onClose={() => Promise.resolve()}
+                title="Foo"
+                openCopyToDashboardModal={() => {}}
+                {...props} />
+  );
+
   describe('duplicate action', () => {
     it('triggers duplication of query', async () => {
-      render(
-        <QueryTitle active
-                    id="deadbeef"
-                    openEditModal={() => {}}
-                    onClose={() => Promise.resolve()}
-                    title="Foo" />,
-      );
+      render(<SUT />);
 
       await clickQueryAction('Duplicate');
 
@@ -61,13 +65,7 @@ describe('QueryTitle', () => {
 
     it('does not explicitly select new query after duplicating it', async () => {
       // Selecting the new query after duplication has become unnecessary, as `ViewStore#createQuery` does it already
-      render(
-        <QueryTitle active
-                    id="deadbeef"
-                    openEditModal={() => {}}
-                    onClose={() => Promise.resolve()}
-                    title="Foo" />,
-      );
+      render(<SUT />);
 
       await clickQueryAction('Duplicate');
 
@@ -79,13 +77,7 @@ describe('QueryTitle', () => {
     it('opens edit modal', async () => {
       const openEditModalFn = jest.fn();
 
-      render(
-        <QueryTitle active
-                    id="deadbeef"
-                    openEditModal={openEditModalFn}
-                    onClose={() => Promise.resolve()}
-                    title="Foo" />,
-      );
+      render(<SUT openEditModal={openEditModalFn} />);
 
       await clickQueryAction('Edit Title');
 
