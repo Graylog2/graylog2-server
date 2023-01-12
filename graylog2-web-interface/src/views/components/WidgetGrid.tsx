@@ -38,6 +38,7 @@ import findGaps from 'views/components/GridGaps';
 import generateId from 'logic/generateId';
 import NewWidgetPlaceholder from 'views/components/NewWidgetPlaceholder';
 import CreateNewWidgetModal from 'views/components/CreateNewWidgetModal';
+import isDeepEqual from 'stores/isDeepEqual';
 
 import WidgetContainer from './WidgetContainer';
 import WidgetComponent from './WidgetComponent';
@@ -116,11 +117,12 @@ type GridProps = {
   children: React.ReactNode,
   locked: boolean,
   onPositionsChange: (newPositions: Array<BackendWidgetPosition>) => void,
+  onSyncLayout?: (newPositions: Array<BackendWidgetPosition>) => void,
   positions: WidgetPositions,
   width: number,
 };
 
-const Grid = ({ children, locked, onPositionsChange, positions, width }: GridProps) => {
+const Grid = ({ children, locked, onPositionsChange, onSyncLayout, positions, width }: GridProps) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
   return (
@@ -131,11 +133,16 @@ const Grid = ({ children, locked, onPositionsChange, positions, width }: GridPro
                               positions={positions}
                               measureBeforeMount
                               onPositionsChange={onPositionsChange}
+                              onSyncLayout={onSyncLayout}
                               width={width}
                               draggableHandle=".widget-drag-handle">
       {children}
     </StyledReactGridContainer>
   );
+};
+
+Grid.defaultProps = {
+  onSyncLayout: () => {},
 };
 
 const useQueryFieldTypes = () => {
@@ -159,6 +166,14 @@ const _onPositionsChange = (newPositions: Array<BackendWidgetPosition>, setLastU
   const widgetPositions = Object.fromEntries(newPositions.map((newPosition) => [newPosition.id, convertPosition(newPosition)]));
   CurrentViewStateActions.widgetPositions(widgetPositions);
   setLastUpdate(generateId());
+};
+
+const _onSyncLayout = (positions: WidgetPositions, newPositions: Array<BackendWidgetPosition>) => {
+  const widgetPositions = Object.fromEntries(newPositions.map((newPosition) => [newPosition.id, convertPosition(newPosition)]));
+
+  if (!isDeepEqual(positions, widgetPositions)) {
+    CurrentViewStateActions.widgetPositions(widgetPositions);
+  }
 };
 
 const renderGaps = (widgets: { id: string, type: string}[], positions: WidgetPositions) => {
@@ -192,11 +207,12 @@ const WidgetGrid = () => {
   const isInteractive = useContext(InteractiveContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
   const [lastUpdate, setLastUpdate] = useState<string>(undefined);
-  const onPositionsChange = useCallback((newPositions: Array<BackendWidgetPosition>) => _onPositionsChange(newPositions, setLastUpdate), []);
 
   const widgets = useStore(WidgetStore, (state) => state.map(({ id, type }) => ({ id, type })).toArray().reverse());
-
   const positions = useWidgetPositions();
+
+  const onPositionsChange = useCallback((newPositions: Array<BackendWidgetPosition>) => _onPositionsChange(newPositions, setLastUpdate), []);
+  const onSyncLayout = useCallback((newPositions: Array<BackendWidgetPosition>) => _onSyncLayout(positions, newPositions), [positions]);
 
   const fields = useQueryFieldTypes();
 
@@ -232,6 +248,7 @@ const WidgetGrid = () => {
         <Grid locked={!isInteractive}
               positions={newPositions}
               onPositionsChange={onPositionsChange}
+              onSyncLayout={onSyncLayout}
               width={width}>
           {children}
         </Grid>

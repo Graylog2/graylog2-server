@@ -127,6 +127,7 @@ export const CurrentViewStateStore = singletonStore(
 
     widgetPositions(newPositions) {
       const newActiveState = this._activeState().toBuilder().widgetPositions(newPositions).build();
+      console.log({ newPositions, newActiveState });
       const promise = ViewStatesActions.update(this.activeQuery, newActiveState);
 
       CurrentViewStateActions.widgetPositions.promise(promise);

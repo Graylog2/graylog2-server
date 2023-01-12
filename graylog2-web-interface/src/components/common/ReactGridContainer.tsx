@@ -107,15 +107,17 @@ type Position = {
 const _onLayoutChange = (newLayout: Layout, onPositionsChange: (newPositions: Position[]) => void) => {
   const newPositions: Position[] = [];
 
-  newLayout.forEach((widget) => {
-    newPositions.push({
-      id: widget.i,
-      col: widget.x + 1,
-      row: widget.y + 1,
-      height: widget.h,
-      width: widget.w,
+  newLayout
+    .filter(({ i }) => !i.startsWith('gap'))
+    .forEach((widget) => {
+      newPositions.push({
+        id: widget.i,
+        col: widget.x + 1,
+        row: widget.y + 1,
+        height: widget.h,
+        width: widget.w,
+      });
     });
-  });
 
   onPositionsChange(newPositions);
 };
@@ -136,6 +138,7 @@ type Props = {
   locked?: boolean,
   measureBeforeMount?: boolean,
   onPositionsChange: (newPositions: Array<WidgetPositionJSON>) => void,
+  onSyncLayout: (newPositions: Array<WidgetPositionJSON>) => void,
   positions: { [widgetId: string]: WidgetPosition },
   rowHeight?: number,
   theme: DefaultTheme,
@@ -185,6 +188,7 @@ const ReactGridContainer = ({
   locked,
   measureBeforeMount,
   onPositionsChange,
+  onSyncLayout: _onSyncLayout,
   positions,
   rowHeight,
   theme,
@@ -192,6 +196,7 @@ const ReactGridContainer = ({
 }: Props) => {
   const cellMargin = theme.spacings.px.xs;
   const onLayoutChange = useCallback((layout: Layout) => _onLayoutChange(layout, onPositionsChange), [onPositionsChange]);
+  const onSyncLayout = useCallback((layout: Layout) => _onLayoutChange(layout, _onSyncLayout), [_onSyncLayout]);
   const gridClass = _gridClass(locked, isResizable, draggableHandle, className);
   const layout = useMemo(() => computeLayout(positions), [positions]);
 
@@ -216,6 +221,7 @@ const ReactGridContainer = ({
                                    onDragStop={onLayoutChange}
                                    onResizeStart={removeGaps}
                                    onResizeStop={onLayoutChange}
+                                   onLayoutChange={onSyncLayout}
       // While CSS transform improves the paint performance,
       // it currently results in bug when using `react-sticky-el` inside a grid item.
                                    useCSSTransforms={false}
