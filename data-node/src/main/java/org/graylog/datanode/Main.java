@@ -16,44 +16,28 @@
  */
 package org.graylog.datanode;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.Properties;
+import com.github.rvesse.airline.Cli;
+import com.github.rvesse.airline.builder.CliBuilder;
+import com.google.common.collect.ImmutableSet;
+import org.graylog2.bootstrap.CliCommand;
+import org.graylog2.bootstrap.commands.CliCommandHelp;
+import org.graylog2.bootstrap.commands.ShowVersion;
 
 public class Main {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Main.class);
-
     public static void main(String[] args) throws InterruptedException {
 
-        final Path opensearchLocation = Path.of(getOpensearchLocation());
+        final CliBuilder<CliCommand> builder = Cli.<CliCommand>builder("data-node")
+                .withDescription("Open source, centralized log management")
+                .withDefaultCommand(CliCommandHelp.class)
+                .withCommands(ImmutableSet.of(
+                        ShowVersion.class,
+                        CliCommandHelp.class,
+                        DataNodeCommand.class));
 
-        final LinkedHashMap<String, String> config = new LinkedHashMap<>();
-        config.put("discovery.type", "single-node");
-        config.put("plugins.security.ssl.http.enabled", "false");
-        config.put("plugins.security.disabled", "true");
+        final Cli<CliCommand> cli = builder.build();
+        final Runnable command = cli.parse(args);
 
-        final DataNodeRunner runner = new DataNodeRunner(opensearchLocation, config);
-        final RunningProcess dataNode = runner.start();
-
-        LOG.info("Data node up and running");
-
-        dataNode.getProcess().waitFor();
-    }
-
-    private static String getOpensearchLocation() {
-        try (InputStream resourceAsStream = Main.class.getResourceAsStream("/configuration.properties")) {
-            Properties prop = new Properties();
-            prop.load(resourceAsStream);
-            return prop.getProperty("opensearch.location");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+        command.run();
     }
 }
