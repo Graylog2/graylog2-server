@@ -292,6 +292,15 @@ export type CustomCommandContextProvider<T extends keyof CustomCommandContext> =
   provider: () => CustomCommandContext[T],
 }
 
+export interface WidgetCreatorArgs {
+  view: View;
+}
+export interface WidgetCreator {
+  title: string;
+  func: (args: WidgetCreatorArgs) => Widget;
+  icon: React.ComponentType<{}>,
+}
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -327,6 +336,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.queryInput.commands'?: Array<CustomCommand>;
     'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any>>,
     visualizationTypes?: Array<VisualizationType<any>>;
+    widgetCreators?: Array<WidgetCreator>;
   }
 }
 export interface ViewActions {

@@ -53,7 +53,7 @@ export type CreatorProps = {
   view: View,
 };
 type CreatorType = 'preset' | 'generic';
-type CreatorFunction = (CreatorProps) => React.ReactNode | undefined | null | void;
+type CreatorFunction = (creatorProps: CreatorProps) => React.ReactNode | undefined | null | void;
 
 type FunctionalCreator = {
   func: CreatorFunction,
@@ -75,7 +75,7 @@ type ComponentCreator = {
 
 export type Creator = ComponentCreator | FunctionalCreator;
 
-const isCreatorFunc = (creator: Creator): creator is FunctionalCreator => ('func' in creator);
+export const isCreatorFunc = (creator: Creator): creator is FunctionalCreator => ('func' in creator);
 
 class AddWidgetButton extends React.Component<Props, State> {
   constructor(props: Props) {
