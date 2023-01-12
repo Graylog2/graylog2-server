@@ -24,20 +24,20 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 
+import java.time.Period;
+
 @JsonAutoDetect
 @AutoValue
 @WithBeanGetter
 @JsonDeserialize(builder = SmartRotationStrategyConfig.Builder.class)
 public abstract class SmartRotationStrategyConfig implements RotationStrategyConfig {
-    private static final int DEFAULT_MIN_DAYS = 30;
-    private static final int DEFAULT_MAX_DAYS = 40;
+    private static final Period DEFAULT_LIFETIME_SOFT = Period.ofDays(30);
+    private static final Period DEFAULT_LIFETIME_HARD = Period.ofDays(40);
+    @JsonProperty("index_lifetime_soft")
+    public abstract Period indexLifetimeSoft();
 
-    // TODO this is just a draft. Maybe use Period instead of multiples of days?
-    @JsonProperty("max_rotation_days")
-    public abstract int maxRotationDays();
-
-    @JsonProperty("min_rotation_days")
-    public abstract int minRotationDays();
+    @JsonProperty("index_lifetime_hard")
+    public abstract Period indexLifetimeHard();
 
     public static Builder builder() {
         return Builder.create();
@@ -49,8 +49,8 @@ public abstract class SmartRotationStrategyConfig implements RotationStrategyCon
         public static Builder create() {
             return new AutoValue_SmartRotationStrategyConfig.Builder()
                     .type(SmartRotationStrategyConfig.class.getCanonicalName())
-                    .minRotationDays(DEFAULT_MIN_DAYS)
-                    .maxRotationDays(DEFAULT_MAX_DAYS);
+                    .indexLifetimeSoft(DEFAULT_LIFETIME_SOFT)
+                    .indexLifetimeHard(DEFAULT_LIFETIME_HARD);
         }
 
         @JsonProperty(TYPE_FIELD)
@@ -58,10 +58,10 @@ public abstract class SmartRotationStrategyConfig implements RotationStrategyCon
 
 
         @JsonProperty("max_rotation_days")
-        public abstract Builder maxRotationDays(int days);
+        public abstract Builder indexLifetimeSoft(Period softLimit);
 
         @JsonProperty("min_rotation_days")
-        public abstract Builder minRotationDays(int days);
+        public abstract Builder indexLifetimeHard(Period hardLimit);
 
         public abstract SmartRotationStrategyConfig build();
     }
