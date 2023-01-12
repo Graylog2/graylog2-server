@@ -16,7 +16,7 @@
  */
 import * as Immutable from 'immutable';
 
-import type { CompletionResult, Token } from '../queryinput/ace-types';
+import type { CompletionResult, Token, Line } from '../queryinput/ace-types';
 import type { Completer, CompleterContext } from '../SearchBarAutocompletions';
 
 type Suggestion = Readonly<{
@@ -94,6 +94,24 @@ class FieldNameCompletion implements Completer {
       .map((result) => ({ ...result, meta: `${result.meta} (not in streams)` }));
 
     return [...currentQuery, ...allFields];
+  };
+
+  // eslint-disable-next-line class-methods-use-this
+  shouldShowCompletions = (currentLine: number, lines: Array<Array<Line>>) => {
+    const currentLineTokens = lines[currentLine - 1];
+    const currentTokenIndex = currentLineTokens.findIndex((token) => token?.start !== undefined);
+    const currentToken = currentLineTokens[currentTokenIndex];
+
+    if (!currentToken) {
+      return false;
+    }
+
+    const previousToken = currentLineTokens[currentTokenIndex - 1];
+    const currentTokenIsFieldName = currentToken?.type === 'keyword' && currentToken?.value.endsWith(':');
+    const currentTokenIsTerm = currentToken?.type === 'term';
+    const prevTokenIsKeyword = previousToken?.type === 'keyword';
+
+    return currentTokenIsFieldName || (currentTokenIsTerm && !prevTokenIsKeyword);
   };
 }
 
