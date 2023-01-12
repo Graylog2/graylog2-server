@@ -50,6 +50,11 @@ import org.graylog2.rest.bulk.SequentialBulkExecutor;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.rest.models.tools.responses.PageListResponse;
+import org.graylog2.rest.resources.entities.EntityAttribute;
+import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.rest.resources.entities.FilterOption;
+import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -79,6 +84,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -98,6 +105,20 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put("title", SearchQueryField.create(EventDefinitionDto.FIELD_TITLE))
             .put("description", SearchQueryField.create(EventDefinitionDto.FIELD_DESCRIPTION))
+            .build();
+    private static final String DEFAULT_SORT_FIELD = "title";
+    private static final String DEFAULT_SORT_DIRECTION = "asc";
+    private static final List<EntityAttribute> attributes = List.of(
+            EntityAttribute.builder().id("title").title("Title").build(),
+            EntityAttribute.builder().id("description").title("Description").build(),
+            EntityAttribute.builder().id("priority").title("Priority").type("number").build(),
+            EntityAttribute.builder().id("alert").title("Status").type("boolean").filterable(true).filterOptions(Set.of(
+                    FilterOption.create("true", "enabled"),
+                    FilterOption.create("false", "disabled")
+            )).build()
+    );
+    private static final EntityDefaults settings = EntityDefaults.builder()
+            .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
             .build();
 
     private final DBEventDefinitionService dbService;
@@ -126,8 +147,42 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         this.bulkExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
     }
 
+
+    @GET
+    @Timed
+    @Path("/paginated")
+    @ApiOperation(value = "Get a paginated list of streams")
+    @Produces(MediaType.APPLICATION_JSON)
+    public PageListResponse<EventDefinitionDto> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                        @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                        @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                        @ApiParam(name = "sort",
+                                                                  value = "The field to sort the result on",
+                                                                  required = true,
+                                                                  allowableValues = "title,description,created_at,updated_at,status")
+                                                        @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
+                                                        @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                        @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order) {
+
+        SearchQuery searchQuery;
+        try {
+            searchQuery = searchQueryParser.parse(query);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
+        }
+        final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(searchQuery, event -> {
+            return isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
+        }, sort, order, page, perPage);
+        PaginatedList<EventDefinitionDto> definitionDtos = new PaginatedList<>(
+                result.delegate(), result.pagination().total(), result.pagination().page(), result.pagination().perPage()
+        );
+        return PageListResponse.create(query, definitionDtos.pagination(),
+                result.grandTotal().orElse(0L), sort, order, result.delegate(), attributes, settings);
+    }
+
     @GET
     @ApiOperation("List event definitions")
+    @Deprecated
     public PaginatedResponse<EventDefinitionDto> list(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                       @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                       @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query) {
@@ -139,7 +194,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         }
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(searchQuery, event -> {
             return isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
-        }, "title", page, perPage);
+        }, "title", "asc", page, perPage);
         final ImmutableMap<String, Object> context = contextService.contextFor(result.delegate());
         return PaginatedResponse.create("event_definitions", result, query, context);
     }

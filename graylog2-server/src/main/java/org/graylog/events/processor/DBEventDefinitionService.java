@@ -56,9 +56,9 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
     }
 
     public PaginatedList<EventDefinitionDto> searchPaginated(SearchQuery query, Predicate<EventDefinitionDto> filter,
-                                                             String sortByField, int page, int perPage) {
+                                                             String sortByField, String sortOrder, int page, int perPage) {
         return findPaginatedWithQueryFilterAndSort(query.toDBQuery(), filter,
-                getSortBuilder("asc", sortByField), page, perPage);
+                getSortBuilder(sortOrder, sortByField), page, perPage);
     }
 
     public EventDefinitionDto saveWithOwnership(EventDefinitionDto eventDefinitionDto, User user) {
