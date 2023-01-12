@@ -74,8 +74,8 @@ class EntityAttributesAnnotationParserTest {
                 sortable = false,
                 filterable = true,
                 filterOptions = {
-                        @FilterOptionDescription(id = "1", title = "One"),
-                        @FilterOptionDescription(id = "2", title = "Two")
+                        @FilterOptionDescription(value = "1", title = "One"),
+                        @FilterOptionDescription(value = "2", title = "Two")
                 }
         )
         String id();

@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.ANNOTATION_TYPE, ElementType.FIELD})
 public @interface FilterOptionDescription {
 
-    String id();
+    String value();
 
     String title();
 }

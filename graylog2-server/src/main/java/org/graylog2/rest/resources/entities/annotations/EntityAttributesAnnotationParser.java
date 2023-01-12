@@ -40,7 +40,7 @@ public class EntityAttributesAnnotationParser {
                         .filterable(annotation.filterable())
                         .type(getType(annotation))
                         .filterOptions(Arrays.stream(annotation.filterOptions())
-                                .map(f -> FilterOption.create(f.id(), f.title()))
+                                .map(f -> FilterOption.create(f.value(), f.title()))
                                 .collect(Collectors.toSet()))
                         .build())
                 .collect(Collectors.toList());
