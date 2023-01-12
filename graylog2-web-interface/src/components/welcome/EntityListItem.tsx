@@ -31,7 +31,7 @@ const StyledListGroupItem = styled(ListGroupItem)`
 
 export const StyledLabel = styled(Label)`
   cursor: default;
-  width: 95px;
+  width: 110px;
   display: block;
 `;
 

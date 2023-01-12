@@ -46,7 +46,9 @@ const ActionItem = ({ itemType, itemId, activityType, itemTitle, userName }: Pro
   return (
     <div>
       {`The ${typeTitle} `}
-      <ActionItemLink target="_blank" to={entityLink}>{itemTitle}</ActionItemLink>
+      {activityType === 'delete'
+        ? <i>{itemTitle || itemId}</i>
+        : <ActionItemLink target="_blank" to={entityLink}>{itemTitle || itemId}</ActionItemLink>}
       {' was '}
       {`${activityType}d`}
       {userName ? ` by ${userName}` : ''}
