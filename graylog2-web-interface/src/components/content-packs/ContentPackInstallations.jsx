@@ -87,7 +87,7 @@ class ContentPackInstallations extends React.Component {
                       onClick={openShowModal}>
                 View
               </Button>
-              {InstallModal}
+              {installModal}
             </ButtonToolbar>
           </div>
         </td>
