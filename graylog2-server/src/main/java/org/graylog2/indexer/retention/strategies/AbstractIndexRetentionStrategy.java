@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.NotFoundException;
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -71,7 +70,7 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
 
     private void retainTimeBased(IndexSet indexSet, SmartRotationStrategyConfig smartConfig) {
         final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
-
+        final DateTime cutOff = DateTime.now().minus(smartConfig.indexLifetimeSoft());
         int removeCount = 0;
         for (String index: deflectorIndices.keySet()) {
             if (indices.isReopened(index)) {
@@ -79,8 +78,7 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
             }
             DateTime creationDate = indices.indexCreationDate(index)
                     .orElseThrow(() -> new NotFoundException(f("Index %s has no creation date - retention failed", index)));
-            Period age = Period.between(toLocalDate(creationDate), LocalDate.now());
-            if (compareTo(age, smartConfig.indexLifetimeSoft()) > 0) {
+            if (creationDate.isBefore(cutOff)) {
                 removeCount++;
             }
         }
@@ -91,11 +89,12 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
         DateTime dateTimeUtc = dateTime.withZone(DateTimeZone.UTC);
         return LocalDate.of(dateTimeUtc.getYear(), dateTimeUtc.getMonthOfYear(), dateTimeUtc.getDayOfMonth());
     }
-
-    private static int compareTo(final Period first, final Period second)
-    {
-        return LocalDate.MIN.plus(first).compareTo(LocalDate.MIN.plus(second));
-    }
+//
+//    private static final LocalDate BASE_DATE = LocalDate.of(1900, 1, 1);
+//    private static int compareTo(final Period first, final Period second)
+//    {
+//        return BASE_DATE.plus(first).compareTo(BASE_DATE.plus(second));
+//    }
 
     private void retainCountBased(IndexSet indexSet) {
         final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
