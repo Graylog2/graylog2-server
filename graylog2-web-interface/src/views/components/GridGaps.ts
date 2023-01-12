@@ -102,15 +102,16 @@ const itemsOverlap = (items: Item[]) => {
 
   const spaces = [];
 
-  for (let row = minY; row <= maxY; row++) {
+  for (let row = minY; row <= maxY; row += 1) {
     spaces[row] = [];
   }
 
+  // eslint-disable-next-line no-restricted-syntax
   for (const item of items) {
     const { start, end } = item;
 
-    for (let { x } = start; x < end.x; x++) {
-      for (let { y } = start; y < end.y; y++) {
+    for (let { x } = start; x < end.x; x += 1) {
+      for (let { y } = start; y < end.y; y += 1) {
         if (spaces[y][x] !== undefined) {
           return true;
         }
@@ -125,16 +126,12 @@ const itemsOverlap = (items: Item[]) => {
 
 const findGaps = (_items: Item[], minWidth: number = 1, maxWidth: number = 13): Item[] => {
   if (_items.length === 0) {
-    console.log('no items');
-
     return [];
   }
 
   const items = _items.map((item) => normalizeInfinity(item, maxWidth));
 
   if (itemsOverlap(items)) {
-    console.log('items overlapping');
-
     return [];
   }
 
@@ -156,10 +153,7 @@ const findGaps = (_items: Item[], minWidth: number = 1, maxWidth: number = 13): 
       .map((neighbor) => gapBetween(item, neighbor));
   });
 
-  const result = uniq([...gaps, ...initialGaps, ...finalGaps]);
-  console.log('Returning ', { result });
-
-  return result;
+  return uniq([...gaps, ...initialGaps, ...finalGaps]);
 };
 
 export default findGaps;
