@@ -97,8 +97,8 @@ public abstract class StreamDTO {
             type = "boolean",
             filterable = true,
             filterOptions = {
-                    @FilterOptionDescription(id = "true", title = "Paused"),
-                    @FilterOptionDescription(id = "false", title = "Running")
+                    @FilterOptionDescription(value = "true", title = "Paused"),
+                    @FilterOptionDescription(value = "false", title = "Running")
             }
     )
     public abstract boolean disabled();
