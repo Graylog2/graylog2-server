@@ -147,9 +147,9 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         AggregationBuilder leaf = null;
         AggregationBuilder root = null;
         final List<AggregationBuilder> metrics = new ArrayList<>();
-        for (Tuple2<String, List<BucketSpec>> group : groupByConsecutiveType(pivots)) {
-            final OSPivotBucketSpecHandler<? extends BucketSpec> bucketHandler = bucketHandlers.get(group.v1());
-            final BucketSpecHandler.CreatedAggregations<AggregationBuilder> bucketAggregations = bucketHandler.createAggregation(direction, AGG_NAME, pivot, group.v2(), queryContext, query);
+        for (BucketSpec bucketSpec : pivots) {
+            final OSPivotBucketSpecHandler<? extends BucketSpec> bucketHandler = bucketHandlers.get(bucketSpec.type());
+            final BucketSpecHandler.CreatedAggregations<AggregationBuilder> bucketAggregations = bucketHandler.createAggregation(direction, AGG_NAME, pivot, bucketSpec, queryContext, query);
             final AggregationBuilder aggregationRoot = bucketAggregations.root();
             final AggregationBuilder aggregationLeaf = bucketAggregations.leaf();
             final List<AggregationBuilder> aggregationMetrics = bucketAggregations.metrics();

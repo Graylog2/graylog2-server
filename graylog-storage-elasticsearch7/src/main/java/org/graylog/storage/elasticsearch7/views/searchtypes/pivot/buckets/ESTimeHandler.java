@@ -41,15 +41,15 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time> {
 
     @Nonnull
     @Override
-    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, List<Time> bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Time timeSpec, ESGeneratedQueryContext queryContext, Query query) {
         AggregationBuilder root = null;
         AggregationBuilder leaf = null;
 
-        for (Time timeSpec : bucketSpec) {
+        for (String timeField : timeSpec.fields()) {
             final DateHistogramInterval dateHistogramInterval = new DateHistogramInterval(timeSpec.interval().toDateInterval(query.effectiveTimeRange(pivot)).toString());
             final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
             final DateHistogramAggregationBuilder builder = AggregationBuilders.dateHistogram(name)
-                    .field(timeSpec.field())
+                    .field(timeField)
                     .order(ordering)
                     .format("date_time");
 

@@ -23,6 +23,7 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.ValuesBucketOrdering;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
@@ -68,14 +69,18 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
 
     @Nonnull
     @Override
-    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, List<Values> bucketSpecs, OSGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Values bucketSpecs, OSGeneratedQueryContext queryContext, Query query) {
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
         final int limit = extractLimit(direction, pivot).orElse(Values.DEFAULT_LIMIT);
-        final List<Values> orderedBuckets = ValuesBucketOrdering.orderBuckets(bucketSpecs, pivot.sort());
+        final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpecs.fields(), pivot.sort());
         final AggregationBuilder termsAggregation = createTerms(orderedBuckets, ordering, limit);
         final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets)
                 .subAggregation(termsAggregation);
         return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
+    }
+
+    private List<String> orderBuckets(Values bucketSpecs, List<SortSpec> sort) {
+        return null;
     }
 
     private Optional<Integer> extractLimit(Direction direction, Pivot pivot) {
@@ -85,17 +90,16 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
         };
     }
 
-    private FiltersAggregationBuilder createFilter(String name, List<Values> bucketSpecs) {
+    private FiltersAggregationBuilder createFilter(String name, List<String> bucketSpecs) {
         final BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
         bucketSpecs.stream()
-                .map(Values::field)
                 .map(QueryBuilders::existsQuery)
                 .forEach(queryBuilder::filter);
         return AggregationBuilders.filters(name, queryBuilder)
                 .otherBucket(true);
     }
 
-    private AggregationBuilder createTerms(List<Values> valueBuckets, List<BucketOrder> ordering, int limit) {
+    private AggregationBuilder createTerms(List<String> valueBuckets, List<BucketOrder> ordering, int limit) {
         return valueBuckets.size() > 1
                 ? supportsMultiTerms
                     ? createMultiTerms(valueBuckets, ordering, limit)
@@ -103,36 +107,36 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
                 : createSimpleTerms(valueBuckets.get(0), ordering, limit);
     }
 
-    private AggregationBuilder createSimpleTerms(Values values, List<BucketOrder> ordering, int limit) {
+    private AggregationBuilder createSimpleTerms(String field, List<BucketOrder> ordering, int limit) {
         return AggregationBuilders.terms(AGG_NAME)
-                .field(values.field())
+                .field(field)
                 .order(ordering)
                 .size(limit);
     }
 
-    private AggregationBuilder createMultiTerms(List<Values> valueBuckets, List<BucketOrder> ordering, int limit) {
+    private AggregationBuilder createMultiTerms(List<String> valueBuckets, List<BucketOrder> ordering, int limit) {
         return AggregationBuilders.multiTerms(AGG_NAME)
                 .terms(valueBuckets.stream()
                         .map(value -> new MultiTermsValuesSourceConfig.Builder()
-                                .setFieldName(value.field())
+                                .setFieldName(value)
                                 .build())
                         .collect(Collectors.toList()))
                 .order(ordering)
                 .size(limit);
     }
 
-    private TermsAggregationBuilder createScriptedTerms(List<? extends BucketSpec> buckets, List<BucketOrder> ordering, int limit) {
+    private TermsAggregationBuilder createScriptedTerms(List<String> buckets, List<BucketOrder> ordering, int limit) {
         return AggregationBuilders.terms(AGG_NAME)
                 .script(scriptForPivots(buckets))
                 .size(limit)
                 .order(ordering.isEmpty() ? List.of(BucketOrder.count(false)) : ordering);
     }
 
-    private Script scriptForPivots(Collection<? extends BucketSpec> pivots) {
+    private Script scriptForPivots(Collection<String> pivots) {
         final String scriptSource = Joiner.on(KEY_SEPARATOR_PHRASE).join(pivots.stream()
                 .map(bucket -> """
                         String.valueOf((doc.containsKey('%1$s') && doc['%1$s'].size() > 0) ? doc['%1$s'].value : "%2$s")
-                        """.formatted(bucket.field(), MissingBucketConstants.MISSING_BUCKET_NAME))
+                        """.formatted(bucket, MissingBucketConstants.MISSING_BUCKET_NAME))
                 .collect(Collectors.toList()));
         return new Script(scriptSource);
     }

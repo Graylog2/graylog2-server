@@ -61,7 +61,7 @@ class ESTimeHandlerTest {
     public void setUp() throws Exception {
         this.esTimeHandler = new ESTimeHandler();
         when(time.interval()).thenReturn(interval);
-        when(time.field()).thenReturn("foobar");
+        when(time.fields()).thenReturn(Collections.singletonList("foobar"));
         final AggTypes aggTypes = mock(AggTypes.class);
         when(queryContext.contextMap().get(any())).thenReturn(aggTypes);
         when(query.effectiveTimeRange(any())).thenCallRealMethod();
@@ -73,7 +73,7 @@ class ESTimeHandlerTest {
         when(interval.toDateInterval(timeRangeCaptor.capture())).thenReturn(DateInterval.days(1));
         when(pivot.timerange()).thenReturn(Optional.of(DerivedTimeRange.of(RelativeRange.create(4242))));
 
-        this.esTimeHandler.doCreateAggregation(BucketSpecHandler.Direction.Row, "foobar", pivot, Collections.singletonList(time), queryContext, query);
+        this.esTimeHandler.doCreateAggregation(BucketSpecHandler.Direction.Row, "foobar", pivot, time, queryContext, query);
 
         final TimeRange argumentTimeRange = timeRangeCaptor.getValue();
         assertThat(argumentTimeRange).isEqualTo(RelativeRange.create(4242));
@@ -86,8 +86,8 @@ class ESTimeHandlerTest {
         when(pivot.timerange()).thenReturn(Optional.empty());
         when(query.timerange()).thenReturn(RelativeRange.create(2323));
 
-        this.esTimeHandler.doCreateAggregation(BucketSpecHandler.Direction.Row, "foobar", pivot, Collections.singletonList(time), queryContext, query);
 
+        this.esTimeHandler.doCreateAggregation(BucketSpecHandler.Direction.Row, "foobar", pivot, time, queryContext, query);
         final TimeRange argumentTimeRange = timeRangeCaptor.getValue();
         assertThat(argumentTimeRange).isEqualTo(RelativeRange.create(2323));
     }
@@ -100,6 +100,6 @@ class ESTimeHandlerTest {
         when(query.timerange()).thenReturn(RelativeRange.create(2323));
         when(interval.toDateInterval(any(TimeRange.class)).toString()).thenReturn(intervalString);
 
-        this.esTimeHandler.doCreateAggregation(BucketSpecHandler.Direction.Row, "foobar", pivot, Collections.singletonList(time), queryContext, query);
+        this.esTimeHandler.doCreateAggregation(BucketSpecHandler.Direction.Row, "foobar", pivot, time, queryContext, query);
     }
 }
