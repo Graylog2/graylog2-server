@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.rest.resources.entities.EntityAttribute;
+import org.graylog2.rest.resources.entities.EntityDefaults;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -30,6 +32,8 @@ import java.util.List;
 @AutoValue
 @WithBeanGetter
 public abstract class PageListResponse<T> {
+
+    public static final String ELEMENTS_FIELD_NAME = "elements";
 
     @Nullable
     @JsonProperty("query")
@@ -49,8 +53,14 @@ public abstract class PageListResponse<T> {
     @JsonProperty("order")
     public abstract String order();
 
-    @JsonProperty("elements")
+    @JsonProperty(ELEMENTS_FIELD_NAME)
     public abstract List<T> elements();
+
+    @JsonProperty
+    public abstract List<EntityAttribute> attributes();
+
+    @JsonProperty
+    public abstract EntityDefaults defaults();
 
     @JsonCreator
     public static <T> PageListResponse<T> create(
@@ -59,16 +69,20 @@ public abstract class PageListResponse<T> {
             @JsonProperty("total") long total,
             @JsonProperty("sort") @Nullable String sort,
             @JsonProperty("order") @Nullable String order,
-            @JsonProperty("elements") List<T> elements) {
-        return new AutoValue_PageListResponse<>(query, paginationInfo, total, sort, order, elements);
+            @JsonProperty(ELEMENTS_FIELD_NAME) List<T> elements,
+            @JsonProperty("attributes") List<EntityAttribute> attributes,
+            @JsonProperty("defaults") EntityDefaults defaults) {
+        return new AutoValue_PageListResponse<>(query, paginationInfo, total, sort, order, elements, attributes, defaults);
     }
 
     public static <T> PageListResponse<T> create(
             @Nullable String query,
             final PaginatedList<T> paginatedList,
             @Nullable String sort,
-            @Nullable String order) {
-        return new AutoValue_PageListResponse<>(query, paginatedList.pagination(), paginatedList.pagination().total(), sort, order, paginatedList);
+            @Nullable String order,
+            List<EntityAttribute> attributes,
+            EntityDefaults defaults) {
+        return new AutoValue_PageListResponse<>(query, paginatedList.pagination(), paginatedList.pagination().total(), sort, order, paginatedList, attributes, defaults);
     }
 
 }

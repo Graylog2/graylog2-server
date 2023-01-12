@@ -14,24 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import PropTypes from 'prop-types';
-
-import { Icon } from 'components/common';
-import ActionDropdown from 'views/components/common/ActionDropdown';
+import React from 'react';
 
 type Props = {
-  children: React.ReactElement | React.ReactElement[],
+  fields: Object[],
 };
 
-const QueryActionDropdown = ({ children }: Props) => (
-  <ActionDropdown element={<Icon name="chevron-down" data-testid="query-action-dropdown" title="Page Actions" />}>
-    {children}
-  </ActionDropdown>
-);
+const EventFields = ({ fields }: Props) => {
+  const fieldNames = Object.keys(fields);
 
-QueryActionDropdown.propTypes = {
-  children: PropTypes.node.isRequired,
+  return (
+    <ul>
+      {fieldNames.map((fieldName) => {
+        return (
+          <li key={fieldName}><b>{fieldName}</b> {fields[fieldName]}</li>
+        );
+      })}
+    </ul>
+  );
 };
 
-export default QueryActionDropdown;
+export default EventFields;
