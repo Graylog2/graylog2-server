@@ -20,6 +20,7 @@ import PropTypes from 'prop-types';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css, withTheme } from 'styled-components';
 import { Responsive, WidthProvider } from 'react-grid-layout';
+import type { ItemCallback } from 'react-grid-layout';
 
 import { themePropTypes } from 'theme';
 import 'react-grid-layout/css/styles.css';
@@ -104,7 +105,7 @@ type Position = {
   width: number
 };
 
-const _onLayoutChange = (newLayout: Layout, onPositionsChange: (newPositions: Position[]) => void) => {
+const _onLayoutChange = (newLayout: Layout, callback: (newPositions: Position[]) => void) => {
   const newPositions: Position[] = [];
 
   newLayout
@@ -119,7 +120,7 @@ const _onLayoutChange = (newLayout: Layout, onPositionsChange: (newPositions: Po
       });
     });
 
-  onPositionsChange(newPositions);
+  return callback(newPositions);
 };
 
 type Props = {
@@ -195,7 +196,7 @@ const ReactGridContainer = ({
   width,
 }: Props) => {
   const cellMargin = theme.spacings.px.xs;
-  const onLayoutChange = useCallback((layout: Layout) => _onLayoutChange(layout, onPositionsChange), [onPositionsChange]);
+  const onLayoutChange = useCallback<ItemCallback>((layout) => _onLayoutChange(layout, onPositionsChange), [onPositionsChange]);
   const onSyncLayout = useCallback((layout: Layout) => _onLayoutChange(layout, _onSyncLayout), [_onSyncLayout]);
   const gridClass = _gridClass(locked, isResizable, draggableHandle, className);
   const layout = useMemo(() => computeLayout(positions), [positions]);

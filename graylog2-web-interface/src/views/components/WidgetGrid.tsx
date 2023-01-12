@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useMemo, useState } from 'react';
+import { useCallback, useContext, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { WidgetPositions, BackendWidgetPosition } from 'views/types';
@@ -39,6 +39,7 @@ import generateId from 'logic/generateId';
 import NewWidgetPlaceholder from 'views/components/NewWidgetPlaceholder';
 import CreateNewWidgetModal from 'views/components/CreateNewWidgetModal';
 import isDeepEqual from 'stores/isDeepEqual';
+import { ViewActions, ViewStore } from 'views/stores/ViewStore';
 
 import WidgetContainer from './WidgetContainer';
 import WidgetComponent from './WidgetComponent';
@@ -169,10 +170,12 @@ const _onPositionsChange = (newPositions: Array<BackendWidgetPosition>, setLastU
 };
 
 const _onSyncLayout = (positions: WidgetPositions, newPositions: Array<BackendWidgetPosition>) => {
+  const { dirty: isDirty } = ViewStore.getInitialState();
   const widgetPositions = Object.fromEntries(newPositions.map((newPosition) => [newPosition.id, convertPosition(newPosition)]));
 
   if (!isDeepEqual(positions, widgetPositions)) {
-    CurrentViewStateActions.widgetPositions(widgetPositions);
+    CurrentViewStateActions.widgetPositions(widgetPositions)
+      .then(() => ViewActions.setDirty(isDirty));
   }
 };
 
@@ -207,12 +210,21 @@ const WidgetGrid = () => {
   const isInteractive = useContext(InteractiveContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
   const [lastUpdate, setLastUpdate] = useState<string>(undefined);
+  const preventDoubleUpdate = useRef<BackendWidgetPosition[]>();
 
   const widgets = useStore(WidgetStore, (state) => state.map(({ id, type }) => ({ id, type })).toArray().reverse());
   const positions = useWidgetPositions();
 
-  const onPositionsChange = useCallback((newPositions: Array<BackendWidgetPosition>) => _onPositionsChange(newPositions, setLastUpdate), []);
-  const onSyncLayout = useCallback((newPositions: Array<BackendWidgetPosition>) => _onSyncLayout(positions, newPositions), [positions]);
+  const onPositionsChange = useCallback((newPositions: Array<BackendWidgetPosition>) => {
+    preventDoubleUpdate.current = newPositions;
+
+    return _onPositionsChange(newPositions, setLastUpdate);
+  }, []);
+  const onSyncLayout = useCallback((newPositions: Array<BackendWidgetPosition>) => {
+    if (!isDeepEqual(preventDoubleUpdate.current, newPositions)) {
+      _onSyncLayout(positions, newPositions);
+    }
+  }, [positions]);
 
   const fields = useQueryFieldTypes();
 
