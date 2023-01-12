@@ -150,7 +150,7 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, dashboard
       <>
         <h3>Order</h3>
         <p>
-          Use drag and drop to change the execution order of the dashboard pages.
+          Use drag and drop to change the order of the dashboard pages.
           Double-click on a dashboard title to change it.
         </p>
         <SortableList<PageListItem> items={orderedQueriesList.toArray()}

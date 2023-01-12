@@ -1,0 +1,10 @@
+type = "added"
+message = "Added ability to replay the search that triggered an Event."
+
+issues = ["9438"]
+pulls = ["13931"]
+
+details.user = """
+On each expanded Event/Alert description, there is now a Replay Search option that will open a search page showing the
+results of the query that triggered the event.
+"""

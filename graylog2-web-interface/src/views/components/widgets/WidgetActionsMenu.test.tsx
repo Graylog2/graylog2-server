@@ -158,6 +158,10 @@ describe('<WidgetActionsMenu />', () => {
     </FieldTypesContext.Provider>
   );
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('is updating widget focus context on focus', () => {
     const mockSetWidgetFocusing = jest.fn();
     render(<DummyWidget title="Dummy Widget" setWidgetFocusing={mockSetWidgetFocusing} />);
@@ -305,7 +309,7 @@ describe('<WidgetActionsMenu />', () => {
       await renderAndClick();
       await waitFor(() => expect(loadDashboard).toHaveBeenCalled());
 
-      expect(loadDashboard).toHaveBeenCalledWith('view-1');
+      expect(loadDashboard).toHaveBeenCalledWith('new-id');
     });
   });
 
