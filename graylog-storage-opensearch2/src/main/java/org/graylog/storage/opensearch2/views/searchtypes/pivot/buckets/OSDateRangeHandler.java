@@ -39,11 +39,11 @@ public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket
     private static final String AGG_NAME = "agg";
     @Nonnull
     @Override
-    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, List<DateRangeBucket> bucketSpecs, OSGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, DateRangeBucket dateRangeBucket, OSGeneratedQueryContext queryContext, Query query) {
         AggregationBuilder root = null;
         AggregationBuilder leaf = null;
-        for (DateRangeBucket dateRangeBucket : bucketSpecs) {
-            final DateRangeAggregationBuilder builder = AggregationBuilders.dateRange(name).field(dateRangeBucket.field());
+        for (String field : dateRangeBucket.fields()) {
+            final DateRangeAggregationBuilder builder = AggregationBuilders.dateRange(name).field(field);
             dateRangeBucket.ranges().forEach(r -> {
                 final String from = r.from().map(AbstractDateTime::toString).orElse(null);
                 final String to = r.to().map(AbstractDateTime::toString).orElse(null);

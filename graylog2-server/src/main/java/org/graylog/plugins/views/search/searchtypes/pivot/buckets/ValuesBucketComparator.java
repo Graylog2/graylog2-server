@@ -33,8 +33,8 @@ public class ValuesBucketComparator<T extends BucketSpec> implements Comparator<
         if (sortFields.isEmpty()) {
             return 0;
         }
-        int s1Index = sortFields.indexOf(s1.field());
-        int s2Index = sortFields.indexOf(s2.field());
+        int s1Index = sortFields.indexOf(s1.fields());
+        int s2Index = sortFields.indexOf(s2.fields());
         if (s1Index == s2Index) {
             return 0;
         }

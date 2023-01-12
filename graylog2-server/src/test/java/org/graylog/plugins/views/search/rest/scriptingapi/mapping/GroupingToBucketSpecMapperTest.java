@@ -48,7 +48,7 @@ class GroupingToBucketSpecMapperTest {
         assertThat(bucketSpec)
                 .isNotNull()
                 .isInstanceOf(Values.class)
-                .satisfies(b -> assertEquals("source", b.field()))
+                .satisfies(b -> assertEquals("source", b.fields()))
                 .satisfies(b -> assertEquals(Values.NAME, b.type()))
                 .satisfies(b -> assertEquals(3, ((Values) b).limit()));
     }
@@ -61,7 +61,7 @@ class GroupingToBucketSpecMapperTest {
         assertThat(bucketSpec)
                 .isNotNull()
                 .isInstanceOf(Values.class)
-                .satisfies(b -> assertEquals("source", b.field()))
+                .satisfies(b -> assertEquals("source", b.fields()))
                 .satisfies(b -> assertEquals(Values.NAME, b.type()))
                 .satisfies(b -> assertEquals(Values.DEFAULT_LIMIT, ((Values) b).limit()));
     }

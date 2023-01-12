@@ -40,6 +40,10 @@ public class ValuesBucketOrdering {
         return bucketSpec.size() >= 2 && !sorts.isEmpty() && hasGroupingSort(sorts);
     }
 
+    private static boolean needsReorderingFields(List<String> fields, List<SortSpec> sorts) {
+        return fields.size() >= 2 && !sorts.isEmpty() && hasGroupingSort(sorts);
+    }
+
     @VisibleForTesting
     public static <T extends BucketSpec> List<T> orderBuckets(List<T> bucketSpec, List<SortSpec> sorts) {
         if (!needsReordering(bucketSpec, sorts)) {
@@ -53,6 +57,21 @@ public class ValuesBucketOrdering {
 
         return bucketSpec.stream()
                 .sorted(new ValuesBucketComparator<>(sortFields))
+                .collect(Collectors.toList());
+    }
+
+    public static List<String> orderFields(List<String> fields, List<SortSpec> sorts) {
+        if (!needsReorderingFields(fields, sorts)) {
+            return fields;
+        }
+
+        final List<String> sortFields = sorts.stream()
+                .filter(ValuesBucketOrdering::isGroupingSort)
+                .map(SortSpec::field)
+                .collect(Collectors.toList());
+
+        return fields.stream()
+                .sorted(new FieldsSortingComparator(sortFields))
                 .collect(Collectors.toList());
     }
 

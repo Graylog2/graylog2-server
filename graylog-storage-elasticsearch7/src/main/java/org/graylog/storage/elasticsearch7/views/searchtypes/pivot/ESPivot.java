@@ -147,9 +147,9 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         AggregationBuilder leaf = null;
         AggregationBuilder root = null;
         final List<AggregationBuilder> metrics = new ArrayList<>();
-        for (Tuple2<String, List<BucketSpec>> group : groupByConsecutiveType(pivots)) {
-            final ESPivotBucketSpecHandler<? extends BucketSpec> bucketHandler = bucketHandlers.get(group.v1());
-            final BucketSpecHandler.CreatedAggregations<AggregationBuilder> bucketAggregations = bucketHandler.createAggregation(direction, AGG_NAME, pivot, group.v2(), queryContext, query);
+        for (BucketSpec bucketSpec : pivots) {
+            final ESPivotBucketSpecHandler<? extends BucketSpec> bucketHandler = bucketHandlers.get(bucketSpec.type());
+            final BucketSpecHandler.CreatedAggregations<AggregationBuilder> bucketAggregations = bucketHandler.createAggregation(direction, AGG_NAME, pivot, bucketSpec, queryContext, query);
             final AggregationBuilder aggregationRoot = bucketAggregations.root();
             final AggregationBuilder aggregationLeaf = bucketAggregations.leaf();
             final List<AggregationBuilder> aggregationMetrics = bucketAggregations.metrics();
@@ -232,11 +232,11 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     private Stream<PivotBucket> retrieveBuckets(Pivot pivot, List<BucketSpec> pivots, MultiBucketsAggregation.Bucket initialBucket) {
         Stream<PivotBucket> result = Stream.of(PivotBucket.create(ImmutableList.of(), initialBucket));
 
-        for (Tuple2<String, List<BucketSpec>> group : groupByConsecutiveType(pivots)) {
+        for (BucketSpec bucketSpec : pivots) {
             result = result.flatMap((tuple) -> {
-                final ESPivotBucketSpecHandler<? extends BucketSpec> bucketHandler = bucketHandlers.get(group.v1());
+                final ESPivotBucketSpecHandler<? extends BucketSpec> bucketHandler = bucketHandlers.get(bucketSpec.type());
 
-                return bucketHandler.extractBuckets(pivot, group.v2(), tuple);
+                return bucketHandler.extractBuckets(pivot, pivots, tuple);
             });
         }
 
