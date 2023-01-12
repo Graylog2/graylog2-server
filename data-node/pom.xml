@@ -93,6 +93,13 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <groupId>com.googlecode.maven-download-plugin</groupId>
@@ -106,13 +113,28 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <url>https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-x64.tar.gz</url>
-                            <outputFileName>opensearch-${opensearch.version}.tar.gz</outputFileName>
-                            <!-- default target location, just to demonstrate the parameter -->
-                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <url>
+                                https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-x64.tar.gz
+                            </url>
+                            <outputFileName>opensearch-${opensearch.version}.tar.gz
+                            </outputFileName><!-- default target location, just to demonstrate the parameter -->
+                            <outputDirectory>${project.basedir}/bin</outputDirectory>
+                            <unpack>true</unpack>
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <mainClass>org.graylog.datanode.Main</mainClass>
+                    <arguments>
+                        <argument>${project.basedir}/bin/opensearch-${opensearch.version}</argument>
+                    </arguments>
+                </configuration>
             </plugin>
 
             <plugin>

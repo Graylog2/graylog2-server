@@ -23,7 +23,6 @@ import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
-import org.codehaus.plexus.archiver.tar.TarGZipUnArchiver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,12 +32,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -46,22 +43,16 @@ public class DataNodeRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(DataNodeRunner.class);
 
-    private final String opensearchVersion;
+    private final Path opensearchLocation;
     private final Map<String, String> opensearchConfiguration;
 
-    public DataNodeRunner(final String opensearchVersion, Map<String, String> opensearchConfiguration) {
-        this.opensearchVersion = opensearchVersion;
+    public DataNodeRunner(Path opensearchLocation, Map<String, String> opensearchConfiguration) {
+        this.opensearchLocation = opensearchLocation;
         this.opensearchConfiguration = opensearchConfiguration;
     }
 
     public RunningProcess start() {
         try {
-            final Path targetLocation = Paths.get("target", "opensearch-" + opensearchVersion);
-            final String distributionUrl = "https://artifacts.opensearch.org/releases/bundle/opensearch/" + opensearchVersion + "/opensearch-" + opensearchVersion + "-linux-x64.tar.gz";
-
-            final Path archivePath = download(distributionUrl, Path.of("target", "opensearch-" + opensearchVersion + "-linux-x64.tar.gz"));
-            final Path opensearchLocation = extractArchive(archivePath, Path.of("target"), targetLocation);
-
             setConfiguration(opensearchLocation, opensearchConfiguration);
             return run(opensearchLocation);
         } catch (IOException | InterruptedException | ExecutionException | RetryException e) {
@@ -69,46 +60,11 @@ public class DataNodeRunner {
         }
     }
 
-    private static Path download(String url, Path target) throws IOException {
-        if (!Files.exists(target)) {
-            LOG.info("Downloading from url " + url);
-            return new ArchiveDownloader(new URL(url), target)
-                    .onProgress(progress -> LOG.info(String.format(Locale.ROOT, "Downloaded %.1f %%", progress)))
-                    .download();
-        } else {
-            LOG.info("File already downloaded, skipping");
-            return target;
-        }
-    }
-
-    private Path extractArchive(Path archivePath, Path destinationDirectory, Path expectedExtractedDir) throws IOException {
-
-        if (Files.exists(expectedExtractedDir)) {
-            LOG.info("Opensearch already extracted, skipping");
-            return expectedExtractedDir;
-        }
-        LOG.info("Extracting opensearch, this may take a while");
-        final TarGZipUnArchiver ua = new TarGZipUnArchiver();
-        ua.setSourceFile(archivePath.toFile());
-        final File dest = destinationDirectory.toFile();
-        dest.mkdirs();
-        ua.setDestDirectory(dest);
-        ua.extract();
-
-        // verify that the extraction created our expected directory
-        if (Files.exists(expectedExtractedDir)) {
-            return expectedExtractedDir;
-        } else {
-            throw new IOException("Failed to extract expected opensearch " + expectedExtractedDir);
-        }
-
-    }
-
     private void setConfiguration(Path targetLocation, Map<String, String> opensearchOptions) throws IOException {
         final Path configPath = targetLocation.resolve(Path.of("config", "opensearch.yml"));
         File file = configPath.toFile();
         try (
-                FileWriter fr = new FileWriter(file);
+                FileWriter fr = new FileWriter(file, StandardCharsets.UTF_8);
                 BufferedWriter br = new BufferedWriter(fr);
         ) {
             for (Map.Entry<String, String> option : opensearchOptions.entrySet()) {
