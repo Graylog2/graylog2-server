@@ -48,10 +48,10 @@ public class DataNodeRunner {
     public DataNodeRunner() {
     }
 
-    public RunningProcess start(Path opensearchLocation, Map<String, String> opensearchConfiguration) {
+    public RunningProcess start(Path opensearchLocation, String opensearchVersion, Map<String, String> opensearchConfiguration) {
         try {
             setConfiguration(opensearchLocation, opensearchConfiguration);
-            return run(opensearchLocation);
+            return run(opensearchVersion, opensearchLocation);
         } catch (IOException | InterruptedException | ExecutionException | RetryException e) {
             throw new RuntimeException(e);
         }
@@ -76,7 +76,7 @@ public class DataNodeRunner {
         return option.getKey() + ": " + option.getValue();
     }
 
-    private RunningProcess run(Path targetLocation) throws IOException, InterruptedException, ExecutionException, RetryException {
+    private RunningProcess run(String opensearchVersion, Path targetLocation) throws IOException, InterruptedException, ExecutionException, RetryException {
         final Path binPath = targetLocation.resolve(Paths.get("bin", "opensearch"));
         LOG.info("Running opensearch from " + binPath.toAbsolutePath());
         ProcessBuilder builder = new ProcessBuilder(binPath.toAbsolutePath().toString());
@@ -86,7 +86,7 @@ public class DataNodeRunner {
 
         awaitHttpApi();
 
-        return new RunningProcess(process);
+        return new RunningProcess(opensearchVersion, targetLocation, process);
 
     }
 

@@ -14,6 +14,8 @@ import java.util.Optional;
 @Service
 public class ManagedOpenSearch {
 
+    @Value("${opensearch.version}")
+    private String opensearchVersion;
     @Value("${opensearch.location}")
     private String openseachLocation;
 
@@ -27,12 +29,13 @@ public class ManagedOpenSearch {
         config.put("plugins.security.disabled", "true");
 
         final DataNodeRunner runner = new DataNodeRunner();
-        final RunningProcess dataNode = runner.start(Path.of(openseachLocation), config);
+        final RunningProcess dataNode = runner.start(Path.of(openseachLocation), opensearchVersion, config);
 
         System.out.println("Data node up and running");
 
         this.dataNode = dataNode;
     }
+
 
     public Optional<RunningProcess> getDataNode() {
         return Optional.ofNullable(dataNode);
