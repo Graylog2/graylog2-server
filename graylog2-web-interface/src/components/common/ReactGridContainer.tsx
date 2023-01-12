@@ -139,7 +139,7 @@ type Props = {
   locked?: boolean,
   measureBeforeMount?: boolean,
   onPositionsChange: (newPositions: Array<WidgetPositionJSON>) => void,
-  onSyncLayout: (newPositions: Array<WidgetPositionJSON>) => void,
+  onSyncLayout?: (newPositions: Array<WidgetPositionJSON>) => void,
   positions: { [widgetId: string]: WidgetPosition },
   rowHeight?: number,
   theme: DefaultTheme,
@@ -330,6 +330,7 @@ ReactGridContainer.defaultProps = {
   rowHeight: ROW_HEIGHT,
   draggableHandle: undefined,
   width: undefined,
+  onSyncLayout: () => {},
 };
 
 export default withTheme(ReactGridContainer);
