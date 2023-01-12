@@ -25,6 +25,7 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -39,19 +40,15 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+@Component
 public class DataNodeRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(DataNodeRunner.class);
 
-    private final Path opensearchLocation;
-    private final Map<String, String> opensearchConfiguration;
-
-    public DataNodeRunner(Path opensearchLocation, Map<String, String> opensearchConfiguration) {
-        this.opensearchLocation = opensearchLocation;
-        this.opensearchConfiguration = opensearchConfiguration;
+    public DataNodeRunner() {
     }
 
-    public RunningProcess start() {
+    public RunningProcess start(Path opensearchLocation, Map<String, String> opensearchConfiguration) {
         try {
             setConfiguration(opensearchLocation, opensearchConfiguration);
             return run(opensearchLocation);

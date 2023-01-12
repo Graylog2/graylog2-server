@@ -26,6 +26,7 @@
         <version>5.1.0-SNAPSHOT</version>
         <relativePath>../graylog-project-parent</relativePath>
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>data-node</artifactId>
@@ -35,6 +36,7 @@
     <description>Graylog management tool for Opensearch</description>
 
     <properties>
+        <spring.boot.version>3.0.1</spring.boot.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -42,42 +44,25 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-server</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
-
-        <!-- Logging dependencies -->
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>log4j-over-slf4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-dependencies</artifactId>
+            <version>${spring.boot.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
         </dependency>
 
         <dependency>
-            <groupId>com.google.auto.value</groupId>
-            <artifactId>auto-value</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring.boot.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+            <version>${spring.boot.version}</version>
         </dependency>
 
         <dependency>
@@ -86,9 +71,28 @@
         </dependency>
 
         <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-archiver</artifactId>
-            <version>4.6.1</version>
+            <groupId>com.google.auto.value</groupId>
+            <artifactId>auto-value</artifactId>
+        </dependency>
+
+        <!-- TODO: just to avoid spring boot complaining, we need to adapt logging -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>${joda-time.version}</version>
         </dependency>
     </dependencies>
 
@@ -101,6 +105,11 @@
         </resources>
 
         <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
             <plugin>
                 <groupId>com.googlecode.maven-download-plugin</groupId>
                 <artifactId>download-maven-plugin</artifactId>
@@ -126,18 +135,6 @@
             </plugin>
 
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.0.0</version>
-                <configuration>
-                    <mainClass>org.graylog.datanode.Main</mainClass>
-                    <arguments>
-                        <argument>${project.basedir}/bin/opensearch-${opensearch.version}</argument>
-                    </arguments>
-                </configuration>
-            </plugin>
-
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
@@ -153,7 +150,7 @@
                             </descriptorRefs>
                             <archive>
                                 <manifest>
-                                    <mainClass>org.graylog.datanode.Main</mainClass>
+                                    <mainClass>org.graylog.datanode.DataNodeApplication</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>
