@@ -18,13 +18,19 @@ package org.graylog2.indexer.retention.strategies;
 
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.rotation.strategies.SmartRotationStrategyConfig;
 import org.graylog2.periodical.IndexRetentionThread;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.NotFoundException;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -36,15 +42,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
-public abstract class AbstractIndexCountBasedRetentionStrategy implements RetentionStrategy {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractIndexCountBasedRetentionStrategy.class);
+public abstract class AbstractIndexRetentionStrategy implements RetentionStrategy {
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractIndexRetentionStrategy.class);
 
     private final Indices indices;
     private final ActivityWriter activityWriter;
 
-    public AbstractIndexCountBasedRetentionStrategy(Indices indices,
-                                                    ActivityWriter activityWriter) {
+    public AbstractIndexRetentionStrategy(Indices indices,
+                                          ActivityWriter activityWriter) {
         this.indices = requireNonNull(indices);
         this.activityWriter = requireNonNull(activityWriter);
     }
@@ -54,11 +61,48 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
 
     @Override
     public void retain(IndexSet indexSet) {
+        if (indexSet.getConfig().rotationStrategy() instanceof SmartRotationStrategyConfig smartConfig) {
+            retainTimeBased(indexSet, smartConfig);
+        }
+        else {
+            retainCountBased(indexSet);
+        }
+    }
+
+    private void retainTimeBased(IndexSet indexSet, SmartRotationStrategyConfig smartConfig) {
+        final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
+
+        int removeCount = 0;
+        for (String index: deflectorIndices.keySet()) {
+            if (indices.isReopened(index)) {
+                continue;
+            }
+            DateTime creationDate = indices.indexCreationDate(index)
+                    .orElseThrow(() -> new NotFoundException(f("Index %s has no creation date - retention failed", index)));
+            Period age = Period.between(toLocalDate(creationDate), LocalDate.now());
+            if (compareTo(age, smartConfig.indexLifetimeSoft()) > 0) {
+                removeCount++;
+            }
+        }
+        runRetention(indexSet, deflectorIndices, removeCount);
+    }
+
+    private LocalDate toLocalDate(DateTime dateTime) {
+        DateTime dateTimeUtc = dateTime.withZone(DateTimeZone.UTC);
+        return LocalDate.of(dateTimeUtc.getYear(), dateTimeUtc.getMonthOfYear(), dateTimeUtc.getDayOfMonth());
+    }
+
+    private static int compareTo(final Period first, final Period second)
+    {
+        return LocalDate.MIN.plus(first).compareTo(LocalDate.MIN.plus(second));
+    }
+
+    private void retainCountBased(IndexSet indexSet) {
         final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
         final int indexCount = (int)deflectorIndices.keySet()
-            .stream()
-            .filter(indexName -> !indices.isReopened(indexName))
-            .count();
+                .stream()
+                .filter(indexName -> !indices.isReopened(indexName))
+                .count();
 
         final Optional<Integer> maxIndices = getMaxNumberOfIndices(indexSet);
 

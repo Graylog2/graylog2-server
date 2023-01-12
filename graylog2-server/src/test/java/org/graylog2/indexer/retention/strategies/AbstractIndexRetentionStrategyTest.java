@@ -17,10 +17,13 @@
 package org.graylog2.indexer.retention.strategies;
 
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
+import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,6 +33,8 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -47,11 +52,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class AbstractIndexCountBasedRetentionStrategyTest {
+public class AbstractIndexRetentionStrategyTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private AbstractIndexCountBasedRetentionStrategy retentionStrategy;
+    private AbstractIndexRetentionStrategy retentionStrategy;
     @Mock
     private Indices indices;
     @Mock
@@ -60,6 +65,8 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
     private IndexSet indexSet;
 
     private Map<String, Set<String>> indexMap;
+
+    private IndexSetConfig indexSetConfig;
 
     @Before
     public void setUp() throws Exception {
@@ -71,11 +78,27 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
         indexMap.put("index5", Collections.emptySet());
         indexMap.put("index6", Collections.emptySet());
 
+        indexSetConfig = IndexSetConfig.create(
+                "id", "title", "description",
+                true,
+                true, "prefix", null, null,
+                1, 0,
+                MessageCountRotationStrategyConfig.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(3),
+                DeletionRetentionStrategy.class.getCanonicalName(),
+                DeletionRetentionStrategyConfig.createDefault(),
+                ZonedDateTime.now(ZoneId.systemDefault()),
+                null, null, null,
+                1, true,
+                Duration.standardSeconds(5)
+        );
+
         when(indexSet.getAllIndexAliases()).thenReturn(indexMap);
         when(indexSet.getManagedIndices()).thenReturn(indexMap.keySet().stream().toArray(String[]::new));
         when(indexSet.extractIndexNumber(anyString())).then(this::extractIndexNumber);
+        when(indexSet.getConfig()).thenReturn(indexSetConfig);
 
-        retentionStrategy = spy(new AbstractIndexCountBasedRetentionStrategy(indices, activityWriter) {
+        retentionStrategy = spy(new AbstractIndexRetentionStrategy(indices, activityWriter) {
             @Override
             protected Optional<Integer> getMaxNumberOfIndices(IndexSet indexSet) {
                 return null;
@@ -169,6 +192,6 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
     }
 
     private Optional<Integer> extractIndexNumber(InvocationOnMock invocation) {
-        return Optional.of(Integer.parseInt(((String)invocation.getArgument(0)).replace("index", "")));
+        return Optional.of(Integer.parseInt(((String) invocation.getArgument(0)).replace("index", "")));
     }
 }
