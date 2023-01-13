@@ -14,13 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import history from 'util/History';
-import AppConfig from 'util/AppConfig';
-import { appPrefixed } from 'util/URLUtils';
-
 import React from 'react';
 import { Redirect, Router, Route, Switch } from 'react-router-dom';
 import type { PluginRoute } from 'graylog-web-plugin';
+
 import {
   AuthenticationCreatePage,
   AuthenticationBackendCreatePage,
@@ -101,7 +98,9 @@ import {
   ViewEventDefinitionPage,
   SidecarFailureTrackingPage,
 } from 'pages';
-
+import history from 'util/History';
+import AppConfig from 'util/AppConfig';
+import { appPrefixed } from 'util/URLUtils';
 import App from 'routing/App';
 import PageContentLayout from 'components/layout/PageContentLayout';
 import Routes from 'routing/Routes';
