@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { TimeUnits } from 'views/Constants';
+import { DEFAULT_LIMIT } from 'views/Constants';
 
 export type AutoTimeConfig = {
   type: 'auto',
@@ -31,7 +32,9 @@ export type TimeConfigType = {
   interval: AutoTimeConfig | TimeUnitConfig,
 };
 
-export type ValuesConfigType = {};
+export type ValuesConfigType = {
+  limit: number,
+};
 
 export type PivotConfigType = TimeConfigType | ValuesConfigType;
 
@@ -53,7 +56,7 @@ type InternalState = {
 export default class Pivot {
   _value: InternalState;
 
-  constructor(field: string, type: string, config: PivotConfigType = { }) {
+  constructor(field: string, type: string, config: PivotConfigType = { limit: DEFAULT_LIMIT }) {
     this._value = { field, type, config };
   }
 
@@ -69,12 +72,12 @@ export default class Pivot {
     return this._value.config;
   }
 
-  static create(field: string, type: string, config: PivotConfigType = {}) {
+  static create(field: string, type: string, config: PivotConfigType = { limit: DEFAULT_LIMIT }) {
     return new Pivot(field, type, config);
   }
 
   static fromJSON(value: PivotJson) {
-    const { field, type, config = { } } = value;
+    const { field, type, config = { limit: DEFAULT_LIMIT } } = value;
 
     return new Pivot(field, type, config);
   }
