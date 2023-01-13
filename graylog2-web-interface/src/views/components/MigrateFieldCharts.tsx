@@ -28,6 +28,7 @@ import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget'
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { PivotConfigType } from 'views/logic/aggregationbuilder/Pivot';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import type { TimeUnits } from 'views/Constants';
 import Series from 'views/logic/aggregationbuilder/Series';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
@@ -89,12 +90,12 @@ const mapVisualization = (legacyVisualization: LegacyVisualization) => {
   }
 };
 
-const mapTime = (legacyTime: string) => {
+const mapTime = (legacyTime: string): { value: number, unit: keyof typeof TimeUnits } => {
   switch (legacyTime) {
     case 'quarter':
       return { unit: 'months', value: 3 };
     default:
-      return { unit: `${legacyTime}s`, value: 1 };
+      return { unit: `${legacyTime}s` as keyof typeof TimeUnits, value: 1 };
   }
 };
 
@@ -151,7 +152,7 @@ const _migrateWidgets = (legacyCharts) => {
       const series = new Series(mapSeries(chart.valuetype, field));
       // Because all field charts show the results for the defined timerange,
       // the new row pivot always contains the timestamp field.
-      const rowPivotConfig = { interval: { type: 'timeunit', ...mapTime(chart.interval) } } as PivotConfigType;
+      const rowPivotConfig = { interval: { type: 'timeunit' as const, ...mapTime(chart.interval) } } as PivotConfigType;
       const rowPivot = new Pivot(TIMESTAMP_FIELD, 'time', rowPivotConfig);
       const visualization = mapVisualization(chart.renderer);
       const visualizationConfig = createVisualizationConfig(chart.interpolation, visualization);

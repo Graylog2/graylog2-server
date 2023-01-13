@@ -18,10 +18,11 @@ import { isEmpty } from 'lodash';
 
 import type { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import type { TimeConfigType } from 'views/logic/aggregationbuilder/Pivot';
+import type { TimeConfigType, ValuesConfigType } from 'views/logic/aggregationbuilder/Pivot';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import generateId from 'logic/generateId';
 import parseNumber from 'views/components/aggregationwizard/grouping/parseNumber';
+import { DEFAULT_LIMIT } from 'views/Constants';
 
 import GroupingsConfiguration from './GroupingsConfiguration';
 
@@ -38,6 +39,7 @@ import type {
 type GroupByError = {
   field?: string,
   interval?: string,
+  limit?: string,
 };
 
 const validateDateGrouping = (grouping: DateGrouping): GroupByError => {
@@ -77,6 +79,16 @@ const validateValuesGrouping = (grouping: ValuesGrouping): GroupByError => {
     groupByError.field = 'Field is required.';
   }
 
+  const parsedLimit = parseNumber(grouping.limit);
+
+  if (parsedLimit === undefined) {
+    groupByError.limit = 'Limit is required.';
+  }
+
+  if (grouping.limit <= 0) {
+    groupByError.limit = 'Must be greater than 0.';
+  }
+
   return groupByError;
 };
 
@@ -92,8 +104,6 @@ const validateGrouping = (grouping: GroupByFormValues): GroupByError => {
   return validateValuesGrouping(grouping);
 };
 
-const DEFAULT_PIVOT_LIMIT = '15';
-
 const validateGroupings = (values: WidgetConfigFormValues): WidgetConfigValidationErrors => {
   const emptyErrors = {};
 
@@ -101,36 +111,10 @@ const validateGroupings = (values: WidgetConfigFormValues): WidgetConfigValidati
     return emptyErrors;
   }
 
-  const errors = {};
-
-  const groupByErrors: WidgetConfigValidationErrors['groupBy'] = {};
-  const hasValuesRowPivots = values.groupBy?.groupings?.filter((grouping) => (grouping.direction === 'row' && grouping.field?.type === 'values')).length > 0;
-  const hasValuesColumnPivots = values.groupBy?.groupings?.filter((grouping) => (grouping.direction === 'column' && grouping.field?.type === 'values')).length > 0;
-
-  if (hasValuesRowPivots) {
-    const parsedLimit = parseNumber(values.groupBy.rowLimit);
-
-    if (parsedLimit === undefined) {
-      groupByErrors.rowLimit = 'Row limit is required.';
-    } else if (parsedLimit <= 0) {
-      groupByErrors.rowLimit = 'Must be greater than 0.';
-    }
-  }
-
-  if (hasValuesColumnPivots) {
-    const parsedLimit = parseNumber(values.groupBy.columnLimit);
-
-    if (parsedLimit === undefined) {
-      groupByErrors.columnLimit = 'Column limit is required.';
-    } else if (parsedLimit <= 0) {
-      groupByErrors.columnLimit = 'Must be greater than 0.';
-    }
-  }
-
   const { groupings } = values.groupBy;
   const groupingErrors = groupings.map(validateGrouping);
 
-  return (hasErrors(groupingErrors) || Object.keys(groupByErrors).length > 0) ? { ...errors, groupBy: { ...groupByErrors, groupings: groupingErrors } } : emptyErrors;
+  return hasErrors(groupingErrors) ? { groupBy: { groupings: groupingErrors } } : emptyErrors;
 };
 
 const addRandomId = <GroupingType extends BaseGrouping>(baseGrouping: Omit<GroupingType, 'id'>) => ({
@@ -151,11 +135,13 @@ const datePivotToGrouping = (pivot: Pivot, direction: GroupingDirection): DateGr
 };
 
 const valuesPivotToGrouping = (pivot: Pivot, direction: GroupingDirection): ValuesGrouping => {
-  const { field } = pivot;
+  const { field, config } = pivot;
+  const { limit } = config as ValuesConfigType;
 
   return addRandomId<ValuesGrouping>({
     direction,
     field: { field, type: 'values' },
+    limit,
   });
 };
 
@@ -179,7 +165,7 @@ const pivotsToGrouping = (config: AggregationWidgetConfig) => {
 };
 
 const groupingToPivot = (grouping: GroupByFormValues) => {
-  const pivotConfig = 'interval' in grouping ? { interval: grouping.interval } : {};
+  const pivotConfig = 'interval' in grouping ? { interval: grouping.interval } : { limit: grouping.limit };
 
   return new Pivot(grouping.field.field, grouping.field.type, pivotConfig);
 };
@@ -188,15 +174,11 @@ const groupByToConfig = (groupBy: WidgetConfigFormValues['groupBy'], config: Agg
   const rowPivots = groupBy.groupings.filter((grouping) => grouping.direction === 'row').map(groupingToPivot);
   const columnPivots = groupBy.groupings.filter((grouping) => grouping.direction === 'column').map(groupingToPivot);
   const { columnRollup } = groupBy;
-  const rowLimit = rowPivots.length > 0 ? parseNumber(groupBy.rowLimit) : undefined;
-  const columnLimit = columnPivots.length > 0 ? parseNumber(groupBy.columnLimit) : undefined;
 
   return config
     .rowPivots(rowPivots)
     .columnPivots(columnPivots)
-    .rollup(columnRollup)
-    .rowLimit(rowLimit)
-    .columnLimit(columnLimit);
+    .rollup(columnRollup);
 };
 
 export const createEmptyGrouping = () => addRandomId<ValuesGrouping>({
@@ -205,6 +187,7 @@ export const createEmptyGrouping = () => addRandomId<ValuesGrouping>({
     field: undefined,
     type: 'values',
   },
+  limit: DEFAULT_LIMIT,
 });
 
 const GroupByElement: AggregationElement<'groupBy'> = {
@@ -221,8 +204,6 @@ const GroupByElement: AggregationElement<'groupBy'> = {
         ...(formValues.groupBy?.groupings ?? []),
         createEmptyGrouping(),
       ],
-      rowLimit: formValues.groupBy?.rowLimit ?? DEFAULT_PIVOT_LIMIT,
-      columnLimit: formValues.groupBy?.columnLimit ?? DEFAULT_PIVOT_LIMIT,
     },
   }),
   onRemove: ((index, formValues) => {
@@ -234,8 +215,6 @@ const GroupByElement: AggregationElement<'groupBy'> = {
       groupBy: {
         columnRollup: newFormValues.groupBy.columnRollup ?? false,
         groupings: newGroupings,
-        rowLimit: newFormValues.groupBy.rowLimit,
-        columnLimit: newFormValues.groupBy.columnLimit,
       },
     });
   }),
@@ -250,8 +229,6 @@ const GroupByElement: AggregationElement<'groupBy'> = {
       groupBy: {
         columnRollup: config.rollup,
         groupings,
-        rowLimit: config.rowLimit ?? DEFAULT_PIVOT_LIMIT,
-        columnLimit: config.columnLimit ?? DEFAULT_PIVOT_LIMIT,
       },
     };
   },

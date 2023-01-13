@@ -46,6 +46,8 @@ const FieldComponent = ({ index, fieldType }: Props) => {
 
     if (fieldType !== newFieldType) {
       if (newFieldType === 'time') {
+        setFieldValue(`groupBy.groupings.${index}.limit`, undefined, false);
+
         setFieldValue(`groupBy.groupings.${index}.interval`, {
           type: 'auto',
           scaling: 1.0,
@@ -55,12 +57,8 @@ const FieldComponent = ({ index, fieldType }: Props) => {
       if (newFieldType === 'values') {
         setFieldValue(`groupBy.groupings.${index}.interval`, undefined, false);
 
-        if (grouping.direction === 'row' && numberNotSet(values.groupBy.rowLimit)) {
-          setFieldValue('groupBy.rowLimit', defaultLimit);
-        }
-
-        if (grouping.direction === 'column' && numberNotSet(values.groupBy.columnLimit)) {
-          setFieldValue('groupBy.columnLimit', defaultLimit);
+        if (!('limit' in grouping) || ('limit' in grouping && numberNotSet(grouping.limit))) {
+          setFieldValue(`groupBy.groupings.${index}.limit`, defaultLimit);
         }
       }
     }
