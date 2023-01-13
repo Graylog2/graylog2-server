@@ -21,6 +21,7 @@ import { useContext } from 'react';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import parseNumber from 'views/components/aggregationwizard/grouping/parseNumber';
+import { DEFAULT_LIMIT } from 'views/Constants';
 
 import FieldSelect from '../../FieldSelect';
 
@@ -31,7 +32,7 @@ type Props = {
 
 const numberNotSet = (value: string | number | undefined) => parseNumber(value) === undefined;
 
-const defaultLimit = 15;
+const defaultLimit = DEFAULT_LIMIT;
 
 const FieldComponent = ({ index, fieldType }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);

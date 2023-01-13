@@ -30,6 +30,7 @@ export const TIMESTAMP_FIELD = 'timestamp';
 export const MESSAGE_FIELD = 'message';
 export const SOURCE_FIELD = 'source';
 export const MISSING_BUCKET_NAME = '(Empty Value)';
+export const DEFAULT_LIMIT = 15;
 
 export const DEFAULT_MESSAGE_FIELDS = [TIMESTAMP_FIELD, SOURCE_FIELD];
 
