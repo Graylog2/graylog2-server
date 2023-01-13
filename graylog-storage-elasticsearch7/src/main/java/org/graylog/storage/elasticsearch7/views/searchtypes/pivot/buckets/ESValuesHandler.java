@@ -116,7 +116,7 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
     }
 
     @Override
-    public Stream<PivotBucket> extractBuckets(Pivot pivot, List<BucketSpec> bucketSpecs, PivotBucket initialBucket) {
+    public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpec, PivotBucket initialBucket) {
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
         final Aggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
@@ -127,7 +127,8 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
         final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
         final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
 
-        final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderKeysFunction(bucketSpecs, pivot.sort());
+        //final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderKeysFunction(bucketSpec, pivot.sort());
+        final Function<List<String>, List<String>> reorderKeys = (keys) -> keys;
         final Stream<PivotBucket> bucketStream = termsAggregation.getBuckets()
                 .stream()
                 .map(bucket -> {
@@ -136,11 +137,11 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
                             .addAll(reorderKeys.apply(splitKeys(bucket.getKeyAsString())))
                             .build();
 
-                    return PivotBucket.create(keys, bucket);
+                    return PivotBucket.create(keys, bucket, false);
                 });
 
         return otherBucket.getDocCount() > 0
-                ? Stream.concat(bucketStream, Stream.of(PivotBucket.create(MISSING_BUCKET_KEYS, otherBucket)))
+                ? Stream.concat(bucketStream, Stream.of(PivotBucket.create(MISSING_BUCKET_KEYS, otherBucket, true)))
                 : bucketStream;
     }
 
