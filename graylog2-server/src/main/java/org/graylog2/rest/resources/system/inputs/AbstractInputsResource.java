@@ -73,7 +73,10 @@ public class AbstractInputsResource extends RestResource {
                         HashMap::new,
                         (map, entry) -> {
                             final ConfigurationField field = configurationRequest.getField(entry.getKey());
-                            if (field instanceof TextField && !Strings.isNullOrEmpty((String) entry.getValue())) {
+                            if (field != null
+                                    && entry.getValue() instanceof String value // Only String values supported atm
+                                    && !Strings.isNullOrEmpty(value)) {
+
                                 if (isPassword(field)) {
                                     map.put(entry.getKey(), "<password set>");
                                     return;
@@ -90,10 +93,11 @@ public class AbstractInputsResource extends RestResource {
     }
 
     private static boolean isPassword(ConfigurationField field) {
-        return field.getAttributes().contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase(Locale.ENGLISH));
+        return field instanceof TextField && field.getAttributes().contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase(Locale.ENGLISH));
     }
 
     private static boolean isSensitive(ConfigurationField field) {
-        return field.getAttributes().contains(TextField.Attribute.IS_SENSITIVE.toString().toLowerCase(Locale.ENGLISH));
+        return field.isSensitive() ||
+                (field instanceof TextField && field.getAttributes().contains(TextField.Attribute.IS_SENSITIVE.toString().toLowerCase(Locale.ENGLISH)));
     }
 }

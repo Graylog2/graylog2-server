@@ -27,7 +27,10 @@ public class TextField extends AbstractConfigurationField {
     public enum Attribute {
         IS_PASSWORD,
         TEXTAREA,
-        IS_SENSITIVE
+        /**
+         * @deprecated Use {@link ConfigurationField#isSensitive()} instead.
+         **/
+        @Deprecated IS_SENSITIVE
     }
 
     private String defaultValue;
@@ -43,18 +46,19 @@ public class TextField extends AbstractConfigurationField {
     }
 
     public TextField(String name, String humanName, String defaultValue, String description, Optional isOptional, Attribute... attrs) {
-        super(FIELD_TYPE, name, humanName, description, isOptional);
-        this.defaultValue = defaultValue;
-
-        this.attributes = Lists.newArrayList();
-        if (attrs != null) {
-            for (Attribute attribute : attrs) {
-                this.attributes.add(attribute.toString().toLowerCase(Locale.ENGLISH));
-            }
-        }
+        this(name, humanName, defaultValue, description, isOptional, DEFAULT_POSITION, attrs);
     }
+
     public TextField(String name, String humanName, String defaultValue, String description, Optional isOptional, int position, Attribute... attrs) {
-        super(FIELD_TYPE, name, humanName, description, isOptional, position);
+        this(name, humanName, defaultValue, description, isOptional, DEFAULT_IS_SENSITIVE, position, attrs);
+    }
+
+    public TextField(String name, String humanName, String defaultValue, String description, Optional isOptional, boolean isSensitive, Attribute... attrs) {
+        this(name, humanName, defaultValue, description, isOptional, isSensitive, DEFAULT_POSITION, attrs);
+    }
+
+    public TextField(String name, String humanName, String defaultValue, String description, Optional isOptional, boolean isSensitive, int position, Attribute... attrs) {
+        super(FIELD_TYPE, name, humanName, description, isOptional, position, isSensitive);
         this.defaultValue = defaultValue;
         this.attributes = Lists.newArrayList();
         if (attrs != null) {
