@@ -5,20 +5,21 @@ import { Button } from 'components/bootstrap';
 const BootstrapModalConfirmExample = createReactClass({
   getInitialState() {
     return {
+      showModal: false,
       confirmed: undefined,
     };
   },
 
   openConfirmation() {
-    this.modal.open();
+    this.setState({ showModal: true });
   },
 
   onCancel() {
-    this.setState({ confirmed: false });
+    this.setState({ confirmed: false, showModal: false });
   },
 
   onConfirm(callback) {
-    this.setState({ confirmed: true });
+    this.setState({ confirmed: true, showModal: false });
     callback();
   },
 
@@ -30,7 +31,7 @@ const BootstrapModalConfirmExample = createReactClass({
           {confirmed === undefined ? 'You did not open the confirmation yet' : confirmed ? 'You confirmed the action' : 'You did not confirm the action' }
         </p>
         <Button onClick={this.openConfirmation}>Open confirmation</Button>
-        <BootstrapModalConfirm ref={(c) => { this.modal = c; }}
+        <BootstrapModalConfirm showModal={showModal}
                                title="Confirm this"
                                onConfirm={this.onConfirm}
                                onCancel={this.onCancel}>
