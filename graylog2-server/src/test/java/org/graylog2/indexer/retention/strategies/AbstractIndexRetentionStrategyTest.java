@@ -25,6 +25,7 @@ import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Rule;
@@ -70,7 +71,7 @@ public class AbstractIndexRetentionStrategyTest {
 
     private IndexSetConfig indexSetConfigCountBased;
 
-    private DateTime NOW = DateTime.now();
+    private DateTime NOW = DateTime.now(DateTimeZone.UTC);
 
     @Before
     public void setUp() throws Exception {
