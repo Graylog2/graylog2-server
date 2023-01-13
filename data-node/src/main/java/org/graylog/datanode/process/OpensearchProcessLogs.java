@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.process;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ public class OpensearchProcessLogs implements Closeable {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessLogs.class);
 
-    private final ExecutorService executor = Executors.newFixedThreadPool(2);
+    private final ExecutorService executor;
     private final long pid;
     private final CircularFifoQueue<String> stdOut;
     private final CircularFifoQueue<String> stdErr;
@@ -42,6 +43,8 @@ public class OpensearchProcessLogs implements Closeable {
 
         this.stdOut = new CircularFifoQueue<>(logsBufferSize);
         this.stdErr = new CircularFifoQueue<>(logsBufferSize);
+
+        this.executor = Executors.newFixedThreadPool(2, new ThreadFactoryBuilder().setNameFormat("pid-" + pid + "-output-logging-%d").build());
 
         StreamConsumer outputConsumer = new StreamConsumer(stdout, line -> {
             stdOut.offer(line);
