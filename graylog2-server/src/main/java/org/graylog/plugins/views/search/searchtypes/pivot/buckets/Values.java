@@ -45,8 +45,7 @@ public abstract class Values implements BucketSpec {
     @JsonProperty
     public abstract List<String> fields();
 
-    @JsonIgnore
-    @Nullable
+    @JsonProperty
     public abstract Integer limit();
 
     public static Values.Builder builder() {
@@ -61,7 +60,7 @@ public abstract class Values implements BucketSpec {
 
         @JsonCreator
         public static Builder create() {
-            return Values.builder();
+            return Values.builder().limit(DEFAULT_LIMIT);
         }
 
         @JsonProperty
@@ -73,7 +72,7 @@ public abstract class Values implements BucketSpec {
         public abstract Builder fields(List<String> fields);
 
         @JsonProperty
-        public abstract Builder limit(@Nullable Integer limit);
+        public abstract Builder limit(Integer limit);
 
     }
 

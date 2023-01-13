@@ -44,7 +44,6 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.PivotBucket;
 import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -60,20 +59,13 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
     @Override
     public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Values bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
-        final int limit = extractLimit(direction, pivot).orElse(Values.DEFAULT_LIMIT);
+        final int limit = bucketSpec.limit();
         final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
         final AggregationBuilder termsAggregation = createTerms(orderedBuckets, ordering, limit);
         final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets)
                 .subAggregation(termsAggregation);
 
         return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
-    }
-
-    private Optional<Integer> extractLimit(Direction direction, Pivot pivot) {
-        return switch (direction) {
-            case Row -> pivot.rowLimit();
-            case Column -> pivot.columnLimit();
-        };
     }
 
     private FiltersAggregationBuilder createFilter(String name, List<String> fields) {
