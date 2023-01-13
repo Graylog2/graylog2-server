@@ -392,7 +392,7 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
-    void testTwoRowPivots() {
+    void testTwoNestedRowPivots() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
                 .rowGroups(
@@ -438,12 +438,94 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
-    void testTwoRowPivotsWithSorting() {
+    void testTwoTupleRowPivots() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .rowGroups(
+                        Values.builder().fields(List.of("http_method", "http_response_code")).limit(15).build()
+                )
+                .series(Count.builder().build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000))
+                .body("rows", hasSize(11));
+
+        final String searchTypeResultPath = PIVOT_PATH + ".rows";
+
+        validatableResponse
+                .rootPath(searchTypeResultPath)
+                .body(pathToMetricResult(List.of("GET", "200"), List.of("count()")), equalTo(847))
+                .body(pathToMetricResult(List.of("GET", "500"), List.of("count()")), equalTo(11))
+                .body(pathToMetricResult(List.of("GET", "504"), List.of("count()")), equalTo(2));
+
+        validatableResponse
+                .rootPath(searchTypeResultPath)
+                .body(pathToMetricResult(List.of("DELETE", "204"), List.of("count()")), equalTo(51))
+                .body(pathToMetricResult(List.of("DELETE", "500"), List.of("count()")), equalTo(1));
+
+        validatableResponse
+                .rootPath(searchTypeResultPath)
+                .body(pathToMetricResult(List.of("POST", "201"), List.of("count()")), equalTo(43))
+                .body(pathToMetricResult(List.of("POST", "500"), List.of("count()")), equalTo(1))
+                .body(pathToMetricResult(List.of("POST", "504"), List.of("count()")), equalTo(1));
+
+        validatableResponse
+                .rootPath(searchTypeResultPath)
+                .body(pathToMetricResult(List.of("PUT", "200"), List.of("count()")), equalTo(42))
+                .body(pathToMetricResult(List.of("PUT", "504"), List.of("count()")), equalTo(1));
+
+        validatableResponse
+                .rootPath(searchTypeResultPath)
+                .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
+    }
+
+    @ContainerMatrixTest
+    void testTwoNestedRowPivotsWithSorting() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
                 .rowGroups(
                         Values.builder().field("http_method").limit(15).build(),
                         Values.builder().field("http_response_code").limit(15).build()
+                )
+                .sort(PivotSort.create("http_response_code", SortSpec.Direction.Ascending))
+                .series(Count.builder().build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000))
+                .body("rows", hasSize(10));
+
+        final String searchTypeResultPath = PIVOT_PATH + ".rows";
+
+        final List<List<String>> rows = validatableResponse
+                .extract()
+                .jsonPath().getList(searchTypeResultPath + "*.key");
+
+        assertThat(rows).containsExactly(
+                List.of("GET", "200"),
+                List.of("PUT", "200"),
+                List.of("POST", "201"),
+                List.of("DELETE", "204"),
+                List.of("DELETE", "500"),
+                List.of("GET", "500"),
+                List.of("POST", "500"),
+                List.of("GET", "504"),
+                List.of("POST", "504"),
+                List.of("PUT", "504")
+        );
+    }
+
+    @ContainerMatrixTest
+    void testTwoTupleRowPivotsWithSorting() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(false)
+                .rowGroups(
+                        Values.builder().fields(List.of("http_method", "http_response_code")).limit(15).build()
                 )
                 .sort(PivotSort.create("http_response_code", SortSpec.Direction.Ascending))
                 .series(Count.builder().build())
