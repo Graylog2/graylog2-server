@@ -16,17 +16,21 @@
  */
 package org.graylog.datanode;
 
+import org.graylog.datanode.process.OpensearchProcessLogs;
+
 import java.nio.file.Path;
 
-public class RunningProcess {
+public class OpensearchProcess {
     private String opensearchVersion;
     private Path targetLocation;
     private final Process process;
+    private OpensearchProcessLogs processLogs;
 
-    public RunningProcess(String opensearchVersion, Path targetLocation, Process opensearchProcess) {
+    protected OpensearchProcess(String opensearchVersion, Path targetLocation, Process opensearchProcess, OpensearchProcessLogs processLogs) {
         this.opensearchVersion = opensearchVersion;
         this.targetLocation = targetLocation;
         this.process = opensearchProcess;
+        this.processLogs = processLogs;
     }
 
     public Process getProcess() {
@@ -40,4 +44,9 @@ public class RunningProcess {
     public Path getTargetLocation() {
         return targetLocation;
     }
+
+    public OpensearchProcessLogs getProcessLogs() {
+        return processLogs;
+    }
 }
+

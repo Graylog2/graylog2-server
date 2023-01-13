@@ -18,7 +18,7 @@ package org.graylog.datanode.management;
 
 import org.apache.http.HttpHost;
 import org.graylog.datanode.DataNodeRunner;
-import org.graylog.datanode.RunningProcess;
+import org.graylog.datanode.OpensearchProcess;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.RestClientBuilder;
 import org.opensearch.client.RestHighLevelClient;
@@ -43,7 +43,7 @@ public class ManagedOpenSearch {
     @Autowired
     private DataNodeRunner dataNodeRunner;
 
-    private RunningProcess dataNode;
+    private OpensearchProcess dataNode;
     private RestHighLevelClient restClient;
 
     @EventListener(ApplicationReadyEvent.class)
@@ -53,7 +53,7 @@ public class ManagedOpenSearch {
         config.put("plugins.security.ssl.http.enabled", "false");
         config.put("plugins.security.disabled", "true");
 
-        final RunningProcess dataNode = dataNodeRunner.start(Path.of(openseachLocation), opensearchVersion, config);
+        final OpensearchProcess dataNode = dataNodeRunner.start(Path.of(openseachLocation), opensearchVersion, config);
 
         System.out.println("Data node up and running");
         this.dataNode = dataNode;
@@ -64,7 +64,7 @@ public class ManagedOpenSearch {
     }
 
 
-    public Optional<RunningProcess> getDataNode() {
+    public Optional<OpensearchProcess> getDataNode() {
         return Optional.ofNullable(dataNode);
     }
 

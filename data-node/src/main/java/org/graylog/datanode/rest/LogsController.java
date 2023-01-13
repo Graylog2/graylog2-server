@@ -16,32 +16,37 @@
  */
 package org.graylog.datanode.rest;
 
-import org.graylog.datanode.process.OpensearchLogs;
+import org.graylog.datanode.management.ManagedOpenSearch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
 @RequestMapping("/logs")
 public class LogsController {
 
-    private final OpensearchLogs opensearchLogs;
+    private final ManagedOpenSearch managedOpensearch;
 
     @Autowired
-    public LogsController(OpensearchLogs opensearchLogs) {
-        this.opensearchLogs = opensearchLogs;
+    public LogsController(ManagedOpenSearch managedOpenSearch) {
+        this.managedOpensearch = managedOpenSearch;
     }
 
     @GetMapping("/stdout")
     public List<String> getOpensearchStdout() {
-        return opensearchLogs.getStdout();
+        return managedOpensearch.getDataNode()
+                .map(node -> node.getProcessLogs().getStdOut())
+                .orElse(Collections.emptyList());
     }
 
     @GetMapping("/stderr")
     public List<String> getOpensearchStderr() {
-        return opensearchLogs.getStderr();
+        return managedOpensearch.getDataNode()
+                .map(node -> node.getProcessLogs().getStdErr())
+                .orElse(Collections.emptyList());
     }
 }
