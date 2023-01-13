@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.NotFoundException;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -68,14 +69,16 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
 
     private void retainTimeBased(IndexSet indexSet, SmartRotationStrategyConfig smartConfig) {
         final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
-        final DateTime cutOff = DateTime.now().minus(smartConfig.indexLifetimeSoft().toMillis());
+
+        // Account for DST and time zones in determining age
+        final long cutoff = Instant.now().minus(smartConfig.indexLifetimeSoft()).toEpochMilli();
         final int removeCount = (int)deflectorIndices.keySet()
                 .stream()
                 .filter(indexName -> !indices.isReopened(indexName))
                 .filter(indexName -> {
                     DateTime creationDate = indices.indexCreationDate(indexName)
                             .orElseThrow(() -> new NotFoundException(f("Index %s has no creation date - retention failed", indexName)));
-                    return creationDate.isBefore(cutOff);
+                    return creationDate.isBefore(cutoff);
                 })
                 .count();
 

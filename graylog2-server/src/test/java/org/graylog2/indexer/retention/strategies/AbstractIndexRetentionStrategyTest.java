@@ -206,7 +206,6 @@ public class AbstractIndexRetentionStrategyTest {
 
         retentionStrategy.retain(indexSet);
 
-        final ArgumentCaptor<List> retainedIndexName = ArgumentCaptor.forClass(List.class);
         verify(retentionStrategy, times(0)).retain(any(), any());
     }
 
@@ -238,8 +237,8 @@ public class AbstractIndexRetentionStrategyTest {
                 1, 0,
                 SmartRotationStrategyConfig.class.getCanonicalName(),
                 SmartRotationStrategyConfig.builder()
-                        .indexLifetimeSoft(java.time.Duration.ofDays(minDays))
-                        .indexLifetimeHard(java.time.Duration.ofDays(maxDays))
+                        .indexLifetimeSoft(java.time.Period.ofDays(minDays))
+                        .indexLifetimeHard(java.time.Period.ofDays(maxDays))
                         .build(),
                 DeletionRetentionStrategy.class.getCanonicalName(),
                 DeletionRetentionStrategyConfig.createDefault(),
