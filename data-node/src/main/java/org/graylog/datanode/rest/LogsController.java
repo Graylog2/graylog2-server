@@ -16,9 +16,10 @@
  */
 package org.graylog.datanode.rest;
 
-import org.graylog.datanode.management.ManagedOpenSearch;
+import org.graylog.datanode.management.ManagedNodes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,24 +30,30 @@ import java.util.List;
 @RequestMapping("/logs")
 public class LogsController {
 
-    private final ManagedOpenSearch managedOpensearch;
+    private final ManagedNodes managedOpensearch;
 
     @Autowired
-    public LogsController(ManagedOpenSearch managedOpenSearch) {
+    public LogsController(ManagedNodes managedOpenSearch) {
         this.managedOpensearch = managedOpenSearch;
     }
 
-    @GetMapping("/stdout")
-    public List<String> getOpensearchStdout() {
-        return managedOpensearch.getDataNode()
+    @GetMapping("/{processId}/stdout")
+    public List<String> getOpensearchStdout(@PathVariable int processId) {
+        return managedOpensearch.getProcesses()
+                .stream()
+                .filter(p -> p.getProcess().pid() == processId)
+                .findFirst()
                 .map(node -> node.getProcessLogs().getStdOut())
-                .orElse(Collections.emptyList());
+                .orElseThrow(() -> new IllegalArgumentException("Process not found: " + processId));
     }
 
-    @GetMapping("/stderr")
-    public List<String> getOpensearchStderr() {
-        return managedOpensearch.getDataNode()
+    @GetMapping("/{processId}/stderr")
+    public List<String> getOpensearchStderr(@PathVariable int processId) {
+        return managedOpensearch.getProcesses()
+                .stream()
+                .filter(p -> p.getProcess().pid() == processId)
+                .findFirst()
                 .map(node -> node.getProcessLogs().getStdErr())
-                .orElse(Collections.emptyList());
+                .orElseThrow(() -> new IllegalArgumentException("Process not found: " + processId));
     }
 }

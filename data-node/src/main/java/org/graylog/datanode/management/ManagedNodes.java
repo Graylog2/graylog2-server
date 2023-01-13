@@ -16,24 +16,25 @@
  */
 package org.graylog.datanode.management;
 
-import org.apache.http.HttpHost;
 import org.graylog.datanode.DataNodeRunner;
-import org.graylog.datanode.OpensearchProcess;
-import org.opensearch.client.RestClient;
-import org.opensearch.client.RestClientBuilder;
-import org.opensearch.client.RestHighLevelClient;
+import org.graylog.datanode.process.OpensearchProcess;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Scope;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
-import java.util.Optional;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Service
-public class ManagedOpenSearch {
+@Scope("singleton")
+public class ManagedNodes {
+
+    private final Set<OpensearchProcess> processes = new LinkedHashSet<>();
 
     @Value("${opensearch.version}")
     private String opensearchVersion;
@@ -43,32 +44,20 @@ public class ManagedOpenSearch {
     @Autowired
     private DataNodeRunner dataNodeRunner;
 
-    private OpensearchProcess dataNode;
-    private RestHighLevelClient restClient;
-
     @EventListener(ApplicationReadyEvent.class)
-    public void init() {
+    public void startOpensearchProcesses() {
+
+        // TODO: obtain configuration from outside, one for each node
+
         final LinkedHashMap<String, String> config = new LinkedHashMap<>();
         config.put("discovery.type", "single-node");
         config.put("plugins.security.ssl.http.enabled", "false");
         config.put("plugins.security.disabled", "true");
 
-        final OpensearchProcess dataNode = dataNodeRunner.start(Path.of(openseachLocation), opensearchVersion, config);
-
-        System.out.println("Data node up and running");
-        this.dataNode = dataNode;
-
-
-        RestClientBuilder builder = RestClient.builder(new HttpHost("localhost", 9200, "http"));
-        this.restClient = new RestHighLevelClient(builder);
+        this.processes.add(dataNodeRunner.start(Path.of(openseachLocation), opensearchVersion, config));
     }
 
-
-    public Optional<OpensearchProcess> getDataNode() {
-        return Optional.ofNullable(dataNode);
-    }
-
-    public Optional<RestHighLevelClient> getRestClient() {
-        return Optional.ofNullable(restClient);
+    public Set<OpensearchProcess> getProcesses() {
+        return processes;
     }
 }

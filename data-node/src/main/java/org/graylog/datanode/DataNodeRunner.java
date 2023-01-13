@@ -23,7 +23,9 @@ import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
+import org.graylog.datanode.process.OpensearchProcess;
 import org.graylog.datanode.process.OpensearchProcessLogs;
+import org.graylog.datanode.process.ProcessStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +42,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -88,50 +92,6 @@ public class DataNodeRunner {
 
         final Process process = builder.start();
         final OpensearchProcessLogs logs = OpensearchProcessLogs.createFor(process, logsSize);
-
-        awaitHttpApi();
-
         return new OpensearchProcess(opensearchVersion, targetLocation, process, logs);
-
-    }
-
-    private void awaitHttpApi() throws ExecutionException, RetryException {
-
-        final Retryer<Void> retryer = RetryerBuilder.<Void>newBuilder()
-                .retryIfExceptionOfType(RuntimeException.class)
-                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
-                .withStopStrategy(StopStrategies.stopAfterDelay(10, TimeUnit.MINUTES))
-                .withRetryListener(new RetryListener() {
-                    @Override
-                    public <V> void onRetry(Attempt<V> attempt) {
-                        if (attempt.hasException()) {
-                            LOG.warn("Waiting for opensearch instance, retry {}", attempt.getAttemptNumber());
-                        }
-                    }
-                })
-                .build();
-
-        retryer.call(() -> {
-            checkOpensearchStatus();
-            return null;
-        });
-
-        LOG.info("Opensearch available on port 9200");
-    }
-
-    private void checkOpensearchStatus() throws RuntimeException {
-        try {
-            final URL url = new URL("http://localhost:9200");
-            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            try {
-                if (connection.getResponseCode() != 200) {
-                    throw new RuntimeException("Failed to obtain OS status");
-                }
-            } finally {
-                connection.disconnect();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }

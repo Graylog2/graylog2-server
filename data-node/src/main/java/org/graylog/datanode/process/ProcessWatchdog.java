@@ -14,37 +14,55 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.management;
+package org.graylog.datanode.process;
 
+import org.graylog.datanode.management.ManagedNodes;
 import org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.opensearch.client.RequestOptions;
+import org.opensearch.cluster.health.ClusterHealthStatus;
+import org.opensearch.rest.RestStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
-@Component
-public class OpensearchHeartbeat {
+@Service
+public class ProcessWatchdog {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OpensearchHeartbeat.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ProcessWatchdog.class);
 
     @Autowired
-    private ManagedOpenSearch managedOpenSearch;
+    private ManagedNodes managedOpenSearch;
+
+    @Scheduled(fixedRate = 1000)
+    public void monitorProcess() {
+        managedOpenSearch.getProcesses()
+                .forEach(this::updateStatus);
+    }
 
     @Scheduled(fixedRate = 10_000)
     public void heartbeat() {
-        managedOpenSearch.getRestClient()
-                .ifPresentOrElse(client -> {
+        managedOpenSearch.getProcesses()
+                .stream().filter(p -> p.getStatus() == ProcessStatus.STARTED)
+                .forEach(process -> {
                     try {
-                        final ClusterHealthResponse health = client.cluster().health(new ClusterHealthRequest(), RequestOptions.DEFAULT);
-                        LOG.info("Opensearch cluster status: {}", health.getStatus());
+                        final ClusterHealthResponse health = process.getRestClient().cluster().health(new ClusterHealthRequest(), RequestOptions.DEFAULT);
+                        if (health.getStatus() == ClusterHealthStatus.GREEN) {
+                            process.setStatus(ProcessStatus.RUNNING);
+                        }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                }, () -> LOG.warn("Opensearch not available"));
+                });
+    }
+
+    private void updateStatus(OpensearchProcess process) {
+        if (!process.getProcess().isAlive()) {
+            process.setStatus(ProcessStatus.TERMINATED);
+        }
     }
 }
