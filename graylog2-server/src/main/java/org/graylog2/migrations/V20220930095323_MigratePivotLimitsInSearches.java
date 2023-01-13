@@ -43,13 +43,8 @@ import java.util.stream.Collectors;
 public class V20220930095323_MigratePivotLimitsInSearches extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20220930095323_MigratePivotLimitsInSearches.class);
 
-    private final ClusterConfigService clusterConfigService;
-    private final MongoCollection<Document> searches;
-
     @Inject
-    public V20220930095323_MigratePivotLimitsInSearches(MongoConnection mongoConnection, ClusterConfigService clusterConfigService) {
-        this.clusterConfigService = clusterConfigService;
-        this.searches = mongoConnection.getMongoDatabase().getCollection("searches");
+    public V20220930095323_MigratePivotLimitsInSearches() {
     }
 
     @Override
@@ -59,86 +54,8 @@ public class V20220930095323_MigratePivotLimitsInSearches extends Migration {
 
     @Override
     public void upgrade() {
-        if (clusterConfigService.get(MigrationCompleted.class) != null) {
-            LOG.debug("Migration already completed!");
-            return;
-        }
-
-        final List<SearchPivotLimitMigration> pivotLimitMigrations = new ArrayList<>();
-        for (Document document : this.searches.find()) {
-            final String searchId = document.get("_id", ObjectId.class).toHexString();
-            final List<Document> queries = document.get("queries", Collections.emptyList());
-            EntryStream.of(queries)
-                    .forEach(entry -> {
-                        final Integer queryIndex = entry.getKey();
-                        final List<Document> searchTypes = entry.getValue().get("search_types", Collections.emptyList());
-                        EntryStream.of(searchTypes)
-                                .filter(searchType -> "pivot".equals(searchType.getValue().getString("type")))
-                                .forEach(searchTypeEntry -> {
-                                    final Document searchType = searchTypeEntry.getValue();
-                                    final Integer searchTypeIndex = searchTypeEntry.getKey();
-                                    final List<Document> rowPivots = searchType.get("row_groups", Collections.emptyList());
-                                    final Optional<Integer> maxRowPivotLimit = extractMaxLimit(rowPivots);
-                                    final List<Document> columnPivots = searchType.get("column_groups", Collections.emptyList());
-                                    final Optional<Integer> maxColumnPivotLimit = extractMaxLimit(columnPivots);
-
-                                    if (searchTypeIndex != null && (maxRowPivotLimit.isPresent() || maxColumnPivotLimit.isPresent())) {
-                                        pivotLimitMigrations.add(new SearchPivotLimitMigration(searchId, queryIndex, searchTypeIndex, maxRowPivotLimit, maxColumnPivotLimit));
-                                    }
-                                });
-                    });
-        }
-
-        final List<WriteModel<Document>> operations = pivotLimitMigrations.stream()
-                .flatMap(pivotMigration -> {
-                    final ImmutableList.Builder<WriteModel<Document>> builder = ImmutableList.builder();
-                    pivotMigration.rowLimit().ifPresent(rowLimit -> {
-                        builder.add(updateSearch(pivotMigration.searchId(),
-                                new Document("$set", new Document(pivotPath(pivotMigration) + ".row_limit", rowLimit))
-                        ));
-                        builder.add(updateSearch(pivotMigration.searchId(),
-                                new Document("$unset", new Document(pivotPath(pivotMigration) + ".row_groups.$[].limit", 1))
-                        ));
-                    });
-                    pivotMigration.columnLimit().ifPresent(columnLimit -> {
-                        builder.add(updateSearch(pivotMigration.searchId(),
-                                new Document("$set", new Document(pivotPath(pivotMigration) + ".column_limit", columnLimit))
-                        ));
-                        builder.add(updateSearch(pivotMigration.searchId(),
-                                new Document("$unset", new Document(pivotPath(pivotMigration) + ".column_groups.$[].limit", 1))
-                        ));
-                    });
-                    return builder.build().stream();
-                })
-                .collect(Collectors.toList());
-
-        if (!operations.isEmpty()) {
-            searches.bulkWrite(operations);
-        }
-
-        clusterConfigService.write(new MigrationCompleted(pivotLimitMigrations.size()));
+        LOG.debug("Migration is not needed anymore.");
     }
-    private String pivotPath(SearchPivotLimitMigration pivotMigration) {
-        return "queries." + pivotMigration.queryIndex() + ".search_types." + pivotMigration.searchTypeIndex();
-    }
-
-    private WriteModel<Document> updateSearch(String searchId, Document update) {
-        return new UpdateOneModel<>(
-                new Document("_id", new ObjectId(searchId)),
-                update,
-                new UpdateOptions().upsert(false)
-        );
-    }
-
-    private Optional<Integer> extractMaxLimit(List<Document> groups) {
-        return groups.stream()
-                .filter(group -> "values".equals(group.get("type")))
-                .map(group -> group.getInteger("limit"))
-                .filter(Objects::nonNull)
-                .max(Integer::compare);
-    }
-
-    public record SearchPivotLimitMigration(String searchId, Integer queryIndex, Integer searchTypeIndex, Optional<Integer> rowLimit, Optional<Integer> columnLimit) {}
 
     public record MigrationCompleted(@JsonProperty("migrated_search_types") Integer migratedSearchTypes) {}
 }
