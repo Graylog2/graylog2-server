@@ -24,20 +24,20 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 
-import java.time.Duration;
+import java.time.Period;
 
 @JsonAutoDetect
 @AutoValue
 @WithBeanGetter
 @JsonDeserialize(builder = SmartRotationStrategyConfig.Builder.class)
 public abstract class SmartRotationStrategyConfig implements RotationStrategyConfig {
-    private static final Duration DEFAULT_LIFETIME_SOFT = Duration.ofDays(30);
-    private static final Duration DEFAULT_LIFETIME_HARD = Duration.ofDays(40);
+    private static final Period DEFAULT_LIFETIME_SOFT = Period.ofDays(30);
+    private static final Period DEFAULT_LIFETIME_HARD = Period.ofDays(40);
     @JsonProperty("index_lifetime_soft")
-    public abstract Duration indexLifetimeSoft();
+    public abstract Period indexLifetimeSoft();
 
     @JsonProperty("index_lifetime_hard")
-    public abstract Duration indexLifetimeHard();
+    public abstract Period indexLifetimeHard();
 
     public static Builder builder() {
         return Builder.create();
@@ -58,10 +58,10 @@ public abstract class SmartRotationStrategyConfig implements RotationStrategyCon
 
 
         @JsonProperty("max_rotation_days")
-        public abstract Builder indexLifetimeSoft(Duration softLimit);
+        public abstract Builder indexLifetimeSoft(Period softLimit);
 
         @JsonProperty("min_rotation_days")
-        public abstract Builder indexLifetimeHard(Duration hardLimit);
+        public abstract Builder indexLifetimeHard(Period hardLimit);
 
         public abstract SmartRotationStrategyConfig build();
     }
