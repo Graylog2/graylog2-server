@@ -122,7 +122,7 @@ public class V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViews extends 
             this.views.bulkWrite(operations);
         }
 
-        clusterConfigService.write(new V20220929145442_MigratePivotLimitsInViews.MigrationCompleted(widgetLimitMigrations.size()));
+        clusterConfigService.write(new MigrationCompleted(widgetLimitMigrations.size()));
     }
 
     private String widgetConfigPath(ViewWidgetLimitMigration widgetMigration) {
