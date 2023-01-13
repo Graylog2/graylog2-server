@@ -168,10 +168,9 @@ public class SearchAggregationsIT {
     void testFindTopPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
-                .rowGroups(Values.builder().field("http_method").build())
+                .rowGroups(Values.builder().field("http_method").limit(1).build())
                 .sort(SeriesSort.create(SeriesSort.Type, "max(took_ms)", SortSpec.Direction.Descending))
                 .series(Max.builder().field("took_ms").build())
-                .optionalRowLimit(1)
                 .build();
 
         final ValidatableResponse validatableResponse = execute(pivot);
@@ -189,10 +188,9 @@ public class SearchAggregationsIT {
     void testFindBottomPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
-                .rowGroups(Values.builder().field("http_method").build())
+                .rowGroups(Values.builder().field("http_method").limit(1).build())
                 .sort(SeriesSort.create(SeriesSort.Type, "max(took_ms)", SortSpec.Direction.Ascending))
                 .series(Max.builder().field("took_ms").build())
-                .optionalRowLimit(1)
                 .build();
 
         final ValidatableResponse validatableResponse = execute(pivot);
