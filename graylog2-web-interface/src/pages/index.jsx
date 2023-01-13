@@ -78,6 +78,7 @@ const SidecarEditCollectorPage = loadAsync(() => import('pages/SidecarEditCollec
 const SidecarEditConfigurationPage = loadAsync(() => import('pages/SidecarEditConfigurationPage'));
 const SidecarNewCollectorPage = loadAsync(() => import('pages/SidecarNewCollectorPage'));
 const SidecarNewConfigurationPage = loadAsync(() => import('pages/SidecarNewConfigurationPage'));
+const SidecarFailureTrackingPage = loadAsync(() => import('pages/SidecarFailureTrackingPage'));
 const SidecarsPage = loadAsync(() => import('pages/SidecarsPage'));
 const SidecarStatusPage = loadAsync(() => import('pages/SidecarStatusPage'));
 const SimulatorPage = loadAsync(() => import('./SimulatorPage'));
@@ -160,6 +161,7 @@ export {
   SidecarEditConfigurationPage,
   SidecarNewCollectorPage,
   SidecarNewConfigurationPage,
+  SidecarFailureTrackingPage,
   SidecarsPage,
   SidecarStatusPage,
   SimulatorPage,

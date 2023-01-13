@@ -168,6 +168,7 @@ const Routes = {
       STATUS: (sidecarId: string) => `/system/sidecars/${sidecarId}/status`,
       ADMINISTRATION: '/system/sidecars/administration',
       CONFIGURATION: '/system/sidecars/configuration',
+      FAILURE_TRACKING: '/system/sidecars/failuretracking',
       NEW_CONFIGURATION: '/system/sidecars/configuration/new',
       EDIT_CONFIGURATION: (configurationId: string) => `/system/sidecars/configuration/edit/${configurationId}`,
       NEW_COLLECTOR: '/system/sidecars/collector/new',
