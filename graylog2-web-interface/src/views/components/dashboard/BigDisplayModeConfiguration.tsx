@@ -63,7 +63,7 @@ const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalP
 
   return (
     <BootstrapModalForm bsSize="large"
-                        onModalClose={onClose}
+                        onCancel={onClose}
                         onSubmitForm={_onSave}
                         submitButtonText="Start full screen view"
                         title="Configuring Full Screen"

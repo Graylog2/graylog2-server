@@ -56,6 +56,7 @@ const SidecarConfig = createReactClass({
 
   getInitialState() {
     return {
+      showConfigModal: false,
       config: ObjectUtils.clone(this.props.config),
     };
   },
@@ -65,16 +66,10 @@ const SidecarConfig = createReactClass({
   },
 
   _openModal() {
-    // eslint-disable-next-line react/no-string-refs
-    this.refs.configModal.open();
+    this.setState({ showConfigModal: true });
   },
 
   _closeModal() {
-    // eslint-disable-next-line react/no-string-refs
-    this.refs.configModal.close();
-  },
-
-  _resetConfig() {
     // Reset to initial state when the modal is closed without saving.
     this.setState(this.getInitialState());
   },
@@ -140,11 +135,10 @@ const SidecarConfig = createReactClass({
           <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
 
-        {/* eslint-disable-next-line react/no-string-refs */}
-        <BootstrapModalForm ref="configModal"
+        <BootstrapModalForm show={this.state.showConfigModal}
                             title="Update Sidecars System Configuration"
                             onSubmitForm={this._saveConfig}
-                            onModalClose={this._resetConfig}
+                            onCancel={this._closeModal}
                             submitButtonText="Update configuration">
           <fieldset>
             <ISODurationInput id="inactive-threshold-field"
