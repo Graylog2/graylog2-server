@@ -200,6 +200,16 @@ public class AbstractIndexRetentionStrategyTest {
         assertThat(retainedIndexName.getValue()).containsExactly("index1", "index2", "index3");
     }
 
+    @Test
+    public void retainTimeBasedNothing() {
+        when(indexSet.getConfig()).thenReturn(createTimeBased(20, 30));
+
+        retentionStrategy.retain(indexSet);
+
+        final ArgumentCaptor<List> retainedIndexName = ArgumentCaptor.forClass(List.class);
+        verify(retentionStrategy, times(0)).retain(any(), any());
+    }
+
     private Optional<Integer> extractIndexNumber(InvocationOnMock invocation) {
         return Optional.of(Integer.parseInt(((String) invocation.getArgument(0)).replace("index", "")));
     }

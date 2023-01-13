@@ -24,12 +24,10 @@ import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.NotFoundException;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -71,30 +69,24 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
     private void retainTimeBased(IndexSet indexSet, SmartRotationStrategyConfig smartConfig) {
         final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
         final DateTime cutOff = DateTime.now().minus(smartConfig.indexLifetimeSoft().toMillis());
-        int removeCount = 0;
-        for (String index: deflectorIndices.keySet()) {
-            if (indices.isReopened(index)) {
-                continue;
-            }
-            DateTime creationDate = indices.indexCreationDate(index)
-                    .orElseThrow(() -> new NotFoundException(f("Index %s has no creation date - retention failed", index)));
-            if (creationDate.isBefore(cutOff)) {
-                removeCount++;
-            }
-        }
-        runRetention(indexSet, deflectorIndices, removeCount);
-    }
+        final int removeCount = (int)deflectorIndices.keySet()
+                .stream()
+                .filter(indexName -> !indices.isReopened(indexName))
+                .filter(indexName -> {
+                    DateTime creationDate = indices.indexCreationDate(indexName)
+                            .orElseThrow(() -> new NotFoundException(f("Index %s has no creation date - retention failed", indexName)));
+                    return creationDate.isBefore(cutOff);
+                })
+                .count();
 
-    private LocalDate toLocalDate(DateTime dateTime) {
-        DateTime dateTimeUtc = dateTime.withZone(DateTimeZone.UTC);
-        return LocalDate.of(dateTimeUtc.getYear(), dateTimeUtc.getMonthOfYear(), dateTimeUtc.getDayOfMonth());
+        if (removeCount > 0) {
+            final String msg = "Running retention for " + removeCount + " aged-out indices.";
+            LOG.info(msg);
+            activityWriter.write(new Activity(msg, IndexRetentionThread.class));
+
+            runRetention(indexSet, deflectorIndices, removeCount);
+        }
     }
-//
-//    private static final LocalDate BASE_DATE = LocalDate.of(1900, 1, 1);
-//    private static int compareTo(final Period first, final Period second)
-//    {
-//        return BASE_DATE.plus(first).compareTo(BASE_DATE.plus(second));
-//    }
 
     private void retainCountBased(IndexSet indexSet) {
         final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
