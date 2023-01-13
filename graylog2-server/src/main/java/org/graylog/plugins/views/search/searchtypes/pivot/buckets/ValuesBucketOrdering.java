@@ -90,4 +90,20 @@ public class ValuesBucketOrdering {
                 .map(i -> keys.get(mapping.get(i)))
                 .collect(Collectors.toList());
     }
+
+    public static Function<List<String>, List<String>> reorderFieldsFunction(List<String> fields, List<SortSpec> sorts) {
+        if (!needsReorderingFields(fields, sorts)) {
+            return Function.identity();
+        }
+
+        final List<String> orderedBuckets = orderFields(fields, sorts);
+        final Map<Integer, Integer> mapping = IntStream.range(0, fields.size())
+                .boxed()
+                .collect(Collectors.toMap(Function.identity(), i -> orderedBuckets.indexOf(fields.get(i))));
+
+        return (keys) -> IntStream.range(0, fields.size())
+                .boxed()
+                .map(i -> keys.get(mapping.get(i)))
+                .collect(Collectors.toList());
+    }
 }
