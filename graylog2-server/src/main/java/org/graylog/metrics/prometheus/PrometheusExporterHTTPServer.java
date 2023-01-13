@@ -23,6 +23,7 @@ import com.sun.net.httpserver.HttpServer;
 import io.prometheus.client.Collector;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.HTTPServer;
+import io.prometheus.client.hotspot.DefaultExports;
 import org.graylog2.shared.SuppressForbidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,10 +46,6 @@ public class PrometheusExporterHTTPServer {
 
     private HTTPServer server;
 
-    public interface Factory {
-        PrometheusExporterHTTPServer create(HostAndPort bindAddress);
-    }
-
     @Inject
     public PrometheusExporterHTTPServer(@Assisted HostAndPort bindAddress) {
         this.bindAddress = bindAddress;
@@ -62,6 +59,7 @@ public class PrometheusExporterHTTPServer {
         final CollectorRegistry newRegistry = newCollectorRegistry();
         newRegistry.register(collector);
 
+        DefaultExports.register(newRegistry);
         registryRef.set(newRegistry);
     }
 
@@ -90,5 +88,9 @@ public class PrometheusExporterHTTPServer {
     @VisibleForTesting
     Optional<Integer> getPort() {
         return Optional.ofNullable(server).map(HTTPServer::getPort);
+    }
+
+    public interface Factory {
+        PrometheusExporterHTTPServer create(HostAndPort bindAddress);
     }
 }
