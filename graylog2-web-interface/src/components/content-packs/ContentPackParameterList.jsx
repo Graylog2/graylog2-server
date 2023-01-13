@@ -47,6 +47,7 @@ class ContentPackParameterList extends React.Component {
     super(props);
 
     this.state = {
+      showModal: false,
       filteredParameters: props.contentPack.parameters || [],
       filter: undefined,
     };
@@ -127,17 +128,17 @@ class ContentPackParameterList extends React.Component {
   };
 
   _parameterModal(parameter) {
-    let modalRef;
     let editParameter;
 
     const { contentPack, onAddParameter } = this.props;
+    const { showModal } = this.state;
 
     const closeModal = () => {
-      modalRef.close();
+      this.setState({ showModal: false });
     };
 
     const openModal = () => {
-      modalRef.open();
+      this.setState({ showModal: true });
     };
 
     const addParameter = () => {
@@ -149,7 +150,9 @@ class ContentPackParameterList extends React.Component {
     const triggerButtonName = parameter ? 'Edit' : 'Create parameter';
 
     const modal = (
-      <BootstrapModalWrapper ref={(node) => { modalRef = node; }} bsSize="large">
+      <BootstrapModalWrapper showModal={showModal}
+                             onHide={closeModal}
+                             bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>Parameter</Modal.Title>
         </Modal.Header>

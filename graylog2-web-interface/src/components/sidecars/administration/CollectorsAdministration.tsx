@@ -29,7 +29,6 @@ import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon'
 import SidecarSearchForm from 'components/sidecars/common/SidecarSearchForm';
 import StatusIndicator from 'components/sidecars/common/StatusIndicator';
 import commonStyle from 'components/sidecars/common/CommonSidecarStyles.css';
-import type { Pagination } from 'views/stores/DashboardsStore';
 
 import CollectorsAdministrationActions from './CollectorsAdministrationActions';
 import CollectorsAdministrationFilters from './CollectorsAdministrationFilters';
@@ -102,7 +101,12 @@ type Props = {
   sidecarCollectorPairs: SidecarCollectorPairType[],
   query: string,
   filters: { [_key: string]: string },
-  pagination: Pagination,
+  pagination: {
+    total: number;
+    count: number;
+    page: number;
+    perPage: number;
+  },
   onPageChange: (currentPage: number, pageSize: number) => void,
   onFilter: (collectorIds?: string[], callback?: () => void) => void,
   onQueryChange: (query?: string, callback?: () => void) => void,

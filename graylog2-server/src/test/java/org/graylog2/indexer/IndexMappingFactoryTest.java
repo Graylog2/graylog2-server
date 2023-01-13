@@ -17,7 +17,6 @@
 package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableMap;
-import org.graylog.events.processor.systemnotification.SystemNotificationEventIndexTemplateProvider;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.storage.SearchVersion;
@@ -29,7 +28,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.graylog.events.processor.systemnotification.SystemNotificationEventIndexTemplateProvider.SYSTEM_EVENT_TEMPLATE_TYPE;
 import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.graylog2.indexer.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 import static org.mockito.Mockito.mock;
@@ -39,8 +37,7 @@ public class IndexMappingFactoryTest {
 
     public static final ImmutableMap<String, IndexTemplateProvider> TEMPLATE_PROVIDERS = ImmutableMap.of(
             MESSAGE_TEMPLATE_TYPE, new MessageIndexTemplateProvider(),
-            EVENT_TEMPLATE_TYPE, new EventIndexTemplateProvider(),
-            SYSTEM_EVENT_TEMPLATE_TYPE, new SystemNotificationEventIndexTemplateProvider()
+            EVENT_TEMPLATE_TYPE, new EventIndexTemplateProvider()
     );
 
     @ParameterizedTest

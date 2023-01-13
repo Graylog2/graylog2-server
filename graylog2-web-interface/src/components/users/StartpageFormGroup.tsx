@@ -26,8 +26,8 @@ import type SharedEntity from 'logic/permissions/SharedEntity';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import Spinner from 'components/common/Spinner';
 import Select from 'components/common/Select';
-import { DashboardsActions } from 'views/stores/DashboardsStore';
-import { StreamsActions } from 'stores/streams/StreamsStore';
+import useDashboards from 'views/components/dashboard/hooks/useDashboards';
+import useStreams from 'components/streams/hooks/useStreams';
 
 const Container = styled.div`
   display: flex;
@@ -69,28 +69,46 @@ const typeOptions = [
 
 const ADMIN_PERMISSION = '*';
 
-const StartpageFormGroup = ({ userId, permissions }: Props) => {
-  const [dashboards, setDashboards] = useState<Option[] | undefined>();
-  const [streams, setStreams] = useState<Option[] | undefined>();
+const useStartPageEntities = (userId, permissions) => {
+  const selectedUserIsAdmin = permissions.includes(ADMIN_PERMISSION);
+  const [userDashboards, setUserDashboards] = useState<Option[]>([]);
+  const [userStreams, setUserStreams] = useState<Option[]>([]);
+  const [isLoadingUserEntities, setIsLoadingUserEntities] = useState(false);
+
+  const { data: allDashboards, isFetching: isLoadingAllDashboards } = useDashboards({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
+  const { data: allStreams, isFetching: isLoadingAllStreams } = useStreams({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
+  const allDashboardsOptions = (allDashboards?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));
+  const allStreamsOptions = (allStreams?.elements ?? []).map(({ id, title }) => ({ value: id, label: title }));
 
   useEffect(() => {
-    if (permissions.includes(ADMIN_PERMISSION)) {
-      DashboardsActions.search('', 1, 0).then(({ list }) => setDashboards(list.map(({ id, title }) => ({ value: id, label: title }))));
+    if (!selectedUserIsAdmin) {
+      setIsLoadingUserEntities(true);
 
-      StreamsActions.searchPaginated(1, 0, '').then(({ streams: streamsList }) => setStreams(streamsList.map(({ id, title }) => ({ value: id, label: title }))));
-    } else {
       EntityShareDomain.loadUserSharesPaginated(userId, {
         ...UNLIMITED_ENTITY_SHARE_REQ,
         additionalQueries: { entity_type: 'dashboard' },
-      }).then(({ list }) => setDashboards(list.map(_grnOptionFormatter).toArray()))
+      }).then(({ list }) => setUserDashboards(list.map(_grnOptionFormatter).toArray()))
         .then(() => EntityShareDomain.loadUserSharesPaginated(userId, {
           ...UNLIMITED_ENTITY_SHARE_REQ,
           additionalQueries: { entity_type: 'stream' },
-        }).then(({ list }) => setStreams(list.map(_grnOptionFormatter).toArray())));
+        }).then(({ list }) => {
+          setIsLoadingUserEntities(false);
+          setUserStreams(list.map(_grnOptionFormatter).toArray());
+        }));
     }
-  }, [permissions, userId]);
+  }, [selectedUserIsAdmin, userId]);
 
-  if (!streams || !dashboards) {
+  return {
+    dashboards: [...userDashboards, ...allDashboardsOptions],
+    streams: [...userStreams, ...allStreamsOptions],
+    isLoading: isLoadingUserEntities || isLoadingAllDashboards || isLoadingAllStreams,
+  };
+};
+
+const StartpageFormGroup = ({ userId, permissions }: Props) => {
+  const { streams, dashboards, isLoading } = useStartPageEntities(userId, permissions);
+
+  if (isLoading) {
     return <Spinner />;
   }
 

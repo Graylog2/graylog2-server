@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React, { createRef } from 'react';
+import React from 'react';
 
 import CloneMenuItem from '../common/CloneMenuItem';
 
@@ -29,9 +29,8 @@ class CopyConfigurationModal extends React.Component {
   constructor(props) {
     super(props);
 
-    this.modalRef = createRef();
-
     this.state = {
+      showModal: false,
       id: props.configuration.id,
       name: '',
       errorMessage: undefined,
@@ -39,7 +38,7 @@ class CopyConfigurationModal extends React.Component {
   }
 
   openModal = () => {
-    this.modalRef.current.open();
+    this.setState({ showModal: true });
   };
 
   _getId = (prefixIdName) => {
@@ -49,7 +48,7 @@ class CopyConfigurationModal extends React.Component {
   };
 
   _closeModal = () => {
-    this.modalRef.current.close();
+    this.setState({ showModal: false });
   };
 
   _saved = () => {
@@ -80,16 +79,17 @@ class CopyConfigurationModal extends React.Component {
   };
 
   render() {
-    const { errorMessage, name } = this.state;
+    const { errorMessage, name, showModal } = this.state;
 
     return (
       <CloneMenuItem onSelect={this.openModal}
+                     onClose={this._closeModal}
                      onSave={this._save}
                      id={this._getId('configuration-name')}
                      onChange={this._changeName}
                      error={errorMessage}
                      name={name}
-                     modalRef={this.modalRef} />
+                     showModal={showModal} />
     );
   }
 }
