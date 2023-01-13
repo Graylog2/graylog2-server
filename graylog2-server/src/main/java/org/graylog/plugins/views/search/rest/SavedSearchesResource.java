@@ -30,6 +30,7 @@ import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
+import org.graylog2.rest.resources.entities.annotations.EntityAttributesAnnotationParser;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -62,13 +63,7 @@ public class SavedSearchesResource extends RestResource {
 
     private static final String DEFAULT_SORT_FIELD = ViewDTO.FIELD_TITLE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
-    private static final List<EntityAttribute> attributes = List.of(
-            EntityAttribute.builder().id(ViewDTO.FIELD_TITLE).title("Title").build(),
-            EntityAttribute.builder().id(ViewDTO.FIELD_CREATED_AT).title("Created").type("date").build(),
-            EntityAttribute.builder().id(ViewDTO.FIELD_DESCRIPTION).title("Description").build(),
-            EntityAttribute.builder().id(ViewDTO.FIELD_SUMMARY).title("Summary").build(),
-            EntityAttribute.builder().id(ViewDTO.FIELD_OWNER).title("Owner").build()
-    );
+    private final List<EntityAttribute> viewSummaryDtoAttributes;
 
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
@@ -78,9 +73,11 @@ public class SavedSearchesResource extends RestResource {
     private final SearchQueryParser searchQueryParser;
 
     @Inject
-    public SavedSearchesResource(ViewService dbService) {
+    public SavedSearchesResource(final ViewService dbService,
+                                 final EntityAttributesAnnotationParser entityAttributesAnnotationParser) {
         this.dbService = dbService;
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
+        this.viewSummaryDtoAttributes = entityAttributesAnnotationParser.parse(ViewSummaryDTO.class);
     }
 
     @GET
@@ -110,7 +107,7 @@ public class SavedSearchesResource extends RestResource {
                     page,
                     perPage);
 
-            return PageListResponse.create(query, result.pagination(), result.pagination().total(), sortField, order, result, attributes, settings);
+            return PageListResponse.create(query, result.pagination(), result.pagination().total(), sortField, order, result, viewSummaryDtoAttributes, settings);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), e);
         }

@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.rest.resources.entities.annotations.FrontendAttributeDescription;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
@@ -42,25 +43,39 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @WithBeanGetter
 public abstract class ViewSummaryDTO implements ViewLike {
+    @Override
     @ObjectId
     @Id
     @Nullable
     @JsonProperty(ViewDTO.FIELD_ID)
     public abstract String id();
 
+    @Override
     @JsonProperty(ViewDTO.FIELD_TYPE)
     public abstract ViewDTO.Type type();
 
     @JsonProperty(ViewDTO.FIELD_TITLE)
     @NotBlank
+    @FrontendAttributeDescription(
+            id = ViewDTO.FIELD_TITLE,
+            title = "Title"
+    )
     public abstract String title();
 
     // A short, one sentence description of the view
     @JsonProperty(ViewDTO.FIELD_SUMMARY)
+    @FrontendAttributeDescription(
+            id = ViewDTO.FIELD_SUMMARY,
+            title = "Summary"
+    )
     public abstract String summary();
 
     // A longer description of the view, probably including markup text
     @JsonProperty(ViewDTO.FIELD_DESCRIPTION)
+    @FrontendAttributeDescription(
+            id = ViewDTO.FIELD_DESCRIPTION,
+            title = "Description"
+    )
     public abstract String description();
 
     @JsonProperty(ViewDTO.FIELD_SEARCH_ID)
@@ -73,9 +88,18 @@ public abstract class ViewSummaryDTO implements ViewLike {
     public abstract Map<String, PluginMetadataSummary> requires();
 
     @JsonProperty(ViewDTO.FIELD_OWNER)
+    @FrontendAttributeDescription(
+            id = ViewDTO.FIELD_OWNER,
+            title = "Owner"
+    )
     public abstract Optional<String> owner();
 
     @JsonProperty(ViewDTO.FIELD_CREATED_AT)
+    @FrontendAttributeDescription(
+            id = ViewDTO.FIELD_CREATED_AT,
+            title = "Created",
+            type = "date"
+    )
     public abstract DateTime createdAt();
 
     public static Builder builder() {
