@@ -80,5 +80,5 @@ public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
         return ordering.isEmpty() ? List.of(defaultOrder) : ordering;
     }
 
-    public abstract Stream<PivotBucket> extractBuckets(Pivot pivot, List<BucketSpec> bucketSpecs, PivotBucket previousBucket);
+    public abstract Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket previousBucket);
 }

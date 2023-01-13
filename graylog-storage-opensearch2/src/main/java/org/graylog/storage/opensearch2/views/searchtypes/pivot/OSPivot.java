@@ -231,10 +231,10 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
     private Stream<PivotBucket> retrieveBuckets(Pivot pivot, List<BucketSpec> pivots, MultiBucketsAggregation.Bucket initialBucket) {
         Stream<PivotBucket> result = Stream.of(PivotBucket.create(ImmutableList.of(), initialBucket));
 
-        for (Tuple2<String, List<BucketSpec>> group : groupByConsecutiveType(pivots)) {
+        for (BucketSpec bucketSpec : pivots) {
             result = result.flatMap((tuple) -> {
-                final OSPivotBucketSpecHandler<? extends BucketSpec> bucketHandler = bucketHandlers.get(group.v1());
-                return bucketHandler.extractBuckets(pivot, group.v2(), tuple);
+                final OSPivotBucketSpecHandler<? extends BucketSpec> bucketHandler = bucketHandlers.get(bucketSpec.type());
+                return bucketHandler.extractBuckets(pivot, bucketSpec, tuple);
             });
         }
 

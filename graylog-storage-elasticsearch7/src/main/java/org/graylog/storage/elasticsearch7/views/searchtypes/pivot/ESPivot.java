@@ -230,13 +230,13 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     }
 
     private Stream<PivotBucket> retrieveBuckets(Pivot pivot, List<BucketSpec> pivots, MultiBucketsAggregation.Bucket initialBucket) {
-        Stream<PivotBucket> result = Stream.of(PivotBucket.create(ImmutableList.of(), initialBucket));
+        Stream<PivotBucket> result = Stream.of(PivotBucket.create(ImmutableList.of(), initialBucket, false));
 
         for (BucketSpec bucketSpec : pivots) {
             result = result.flatMap((tuple) -> {
                 final ESPivotBucketSpecHandler<? extends BucketSpec> bucketHandler = bucketHandlers.get(bucketSpec.type());
 
-                return bucketHandler.extractBuckets(pivot, pivots, tuple);
+                return bucketHandler.extractBuckets(pivot, bucketSpec, tuple);
             });
         }
 

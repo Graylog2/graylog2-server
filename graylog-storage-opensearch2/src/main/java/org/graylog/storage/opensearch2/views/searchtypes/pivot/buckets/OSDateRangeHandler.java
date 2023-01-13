@@ -32,7 +32,6 @@ import org.graylog.storage.opensearch2.views.searchtypes.pivot.PivotBucket;
 import org.joda.time.base.AbstractDateTime;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 import java.util.stream.Stream;
 
 public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket> {
@@ -73,14 +72,11 @@ public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket
     }
 
     @Override
-    public Stream<PivotBucket> extractBuckets(Pivot pivot, List<BucketSpec> bucketSpecs, PivotBucket initialBucket) {
-        if (bucketSpecs.isEmpty()) {
-            return Stream.empty();
-        }
+    public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket initialBucket) {
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
         final ParsedDateRange aggregation = previousBucket.getAggregations().get(AGG_NAME);
-        final DateRangeBucket dateRangeBucket = (DateRangeBucket) bucketSpecs.get(0);
+        final DateRangeBucket dateRangeBucket = (DateRangeBucket) bucketSpecs;
 
         return aggregation.getBuckets().stream()
                 .flatMap(bucket -> {
@@ -92,11 +88,7 @@ public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket
                             .add(bucketKey)
                             .build();
 
-                    if (bucketSpecs.size() == 1) {
-                        return Stream.of(PivotBucket.create(keys, bucket));
-                    }
-
-                    return extractBuckets(pivot, bucketSpecs.subList(0, bucketSpecs.size()), PivotBucket.create(keys, bucket));
+                    return Stream.of(PivotBucket.create(keys, bucket));
                 });
     }
 }

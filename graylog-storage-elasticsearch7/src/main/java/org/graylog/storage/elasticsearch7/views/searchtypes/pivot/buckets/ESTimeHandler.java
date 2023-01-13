@@ -76,10 +76,7 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time> {
     }
 
     @Override
-    public Stream<PivotBucket> extractBuckets(Pivot pivot, List<BucketSpec> bucketSpecs, PivotBucket initialBucket) {
-        if (bucketSpecs.isEmpty()) {
-            return Stream.empty();
-        }
+    public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpec, PivotBucket initialBucket) {
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
         final MultiBucketsAggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
@@ -90,11 +87,7 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time> {
                             .add(bucket.getKeyAsString())
                             .build();
 
-                    if (bucketSpecs.size() == 1) {
-                        return Stream.of(PivotBucket.create(keys, bucket));
-                    }
-
-                    return extractBuckets(pivot, bucketSpecs.subList(0, bucketSpecs.size()), PivotBucket.create(keys, bucket));
+                    return Stream.of(PivotBucket.create(keys, bucket, false));
                 });
     }
 }
