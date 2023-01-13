@@ -47,7 +47,7 @@ class V20220929145442_MigratePivotLimitsInViewsTest {
     public V20220929145442_MigratePivotLimitsInViewsTest(MongoDBTestService mongoDBTestService, @Mock ClusterConfigService clusterConfigService) {
         final MongoConnection mongoConnection = mongoDBTestService.mongoConnection();
         collection = mongoConnection.getMongoDatabase().getCollection("views");
-        migration = new V20220929145442_MigratePivotLimitsInViews(mongoConnection, clusterConfigService);
+        migration = new V20220929145442_MigratePivotLimitsInViews();
         this.clusterConfigService = clusterConfigService;
     }
 

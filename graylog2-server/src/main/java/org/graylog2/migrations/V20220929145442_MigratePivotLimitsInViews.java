@@ -43,13 +43,8 @@ import java.util.stream.Collectors;
 public class V20220929145442_MigratePivotLimitsInViews extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20220929145442_MigratePivotLimitsInViews.class);
 
-    private final ClusterConfigService clusterConfigService;
-    private final MongoCollection<Document> views;
-
     @Inject
-    public V20220929145442_MigratePivotLimitsInViews(MongoConnection mongoConnection, ClusterConfigService clusterConfigService) {
-        this.clusterConfigService = clusterConfigService;
-        this.views = mongoConnection.getMongoDatabase().getCollection("views");
+    public V20220929145442_MigratePivotLimitsInViews() {
     }
 
     @Override
@@ -59,91 +54,8 @@ public class V20220929145442_MigratePivotLimitsInViews extends Migration {
 
     @Override
     public void upgrade() {
-        if (clusterConfigService.get(MigrationCompleted.class) != null) {
-            LOG.debug("Migration already completed!");
-            return;
-        }
-
-        final List<ViewWidgetLimitMigration> widgetLimitMigrations = new ArrayList<>();
-        for (Document document : this.views.find()) {
-            final String viewId = document.get("_id", ObjectId.class).toHexString();
-            final Map<String, Document> state = document.get("state", Collections.emptyMap());
-            state.entrySet().stream()
-                    .forEach(entry -> {
-                        final String queryId = entry.getKey();
-                        final List<Document> widgets = entry.getValue().get("widgets", Collections.emptyList());
-                        EntryStream.of(widgets)
-                                .filter(widget -> "aggregation".equals(widget.getValue().getString("type")))
-                                .forEach(widgetEntry -> {
-                                    final Document widget = widgetEntry.getValue();
-                                    final Integer widgetIndex = widgetEntry.getKey();
-                                    final Optional<Document> optionalConfig = Optional.ofNullable(widget.get("config", Document.class));
-                                    optionalConfig.ifPresent(config -> {
-                                        final List<Document> rowPivots = config.get("row_pivots", Collections.emptyList());
-                                        final Optional<Integer> maxRowPivotLimit = extractMaxLimit(rowPivots);
-                                        final List<Document> columnPivots = config.get("column_pivots", Collections.emptyList());
-                                        final Optional<Integer> maxColumnPivotLimit = extractMaxLimit(columnPivots);
-
-                                        if (widgetIndex != null && (maxRowPivotLimit.isPresent() || maxColumnPivotLimit.isPresent())) {
-                                            widgetLimitMigrations.add(new ViewWidgetLimitMigration(viewId, queryId, widgetIndex, maxRowPivotLimit, maxColumnPivotLimit));
-                                        }
-                                    });
-                                });
-                    });
-        }
-
-        final List<WriteModel<Document>> operations = widgetLimitMigrations.stream()
-                .flatMap(widgetMigration -> {
-                    final ImmutableList.Builder<WriteModel<Document>> builder = ImmutableList.builder();
-                    widgetMigration.rowLimit().ifPresent(rowLimit -> {
-                        builder.add(updateView(widgetMigration.viewId,
-                                new Document("$set", new Document(widgetConfigPath(widgetMigration) + ".row_limit", rowLimit))
-                        ));
-                        builder.add(updateView(widgetMigration.viewId,
-                                new Document("$unset", new Document(widgetConfigPath(widgetMigration) + ".row_pivots.$[].config.limit", 1))
-                        ));
-                    });
-                    widgetMigration.columnLimit().ifPresent(columnLimit -> {
-                        builder.add(updateView(widgetMigration.viewId,
-                                new Document("$set", new Document(widgetConfigPath(widgetMigration) + ".column_limit", columnLimit))
-                        ));
-                        builder.add(updateView(widgetMigration.viewId,
-                                new Document("$unset", new Document(widgetConfigPath(widgetMigration) + ".column_pivots.$[].config.limit", 1))
-                        ));
-                    });
-                    return builder.build().stream();
-                })
-                .collect(Collectors.toList());
-
-        if (!operations.isEmpty()) {
-            this.views.bulkWrite(operations);
-        }
-
-        clusterConfigService.write(new MigrationCompleted(widgetLimitMigrations.size()));
+        LOG.debug("Migration is not needed anymore.");
     }
-
-    private String widgetConfigPath(ViewWidgetLimitMigration widgetMigration) {
-        return "state." + widgetMigration.queryId() + ".widgets." + widgetMigration.widgetIndex() + ".config";
-    }
-
-    private WriteModel<Document> updateView(String viewId, Document update) {
-        return new UpdateOneModel<>(
-                new Document("_id", new ObjectId(viewId)),
-                update,
-                new UpdateOptions().upsert(false)
-        );
-    }
-
-    private Optional<Integer> extractMaxLimit(List<Document> pivots) {
-        return pivots.stream()
-                .filter(pivot -> "values".equals(pivot.get("type")))
-                .map(pivot -> pivot.get("config", Document.class))
-                .map(pivotConfig -> pivotConfig != null ? pivotConfig.getInteger("limit") : null)
-                .filter(Objects::nonNull)
-                .max(Integer::compare);
-    }
-
-    public record ViewWidgetLimitMigration(String viewId, String queryId, Integer widgetIndex, Optional<Integer> rowLimit, Optional<Integer> columnLimit) {}
 
     public record MigrationCompleted(@JsonProperty("migrated_widgets") Integer migratedViews) {}
 }
