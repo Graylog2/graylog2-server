@@ -23,7 +23,6 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
-import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.ValuesBucketOrdering;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
@@ -49,7 +48,6 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -69,25 +67,14 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
 
     @Nonnull
     @Override
-    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Values bucketSpecs, OSGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Values bucketSpec, OSGeneratedQueryContext queryContext, Query query) {
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
-        final int limit = extractLimit(direction, pivot).orElse(Values.DEFAULT_LIMIT);
-        final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpecs.fields(), pivot.sort());
+        final int limit = bucketSpec.limit();
+        final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
         final AggregationBuilder termsAggregation = createTerms(orderedBuckets, ordering, limit);
         final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets)
                 .subAggregation(termsAggregation);
         return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
-    }
-
-    private List<String> orderBuckets(Values bucketSpecs, List<SortSpec> sort) {
-        return null;
-    }
-
-    private Optional<Integer> extractLimit(Direction direction, Pivot pivot) {
-        return switch (direction) {
-            case Row -> pivot.rowLimit();
-            case Column -> pivot.columnLimit();
-        };
     }
 
     private FiltersAggregationBuilder createFilter(String name, List<String> bucketSpecs) {
