@@ -48,15 +48,12 @@ describe('SortElement', () => {
         sort: [{ field: 'action', direction: 'Ascending', id: 'foob' }],
         groupBy: {
           columnRollup: false,
-          groupings:
-            [{
-              id: 'foob',
-              direction: 'row',
-              field: { field: 'time', type: 'time' },
-              interval: { type: 'timeunit', value: 3, unit: 'seconds' },
-            }],
-          rowLimit: undefined,
-          columnLimit: undefined,
+          groupings: [{
+            id: 'foob',
+            direction: 'row',
+            field: { field: 'time', type: 'time' },
+            interval: { type: 'timeunit', value: 3, unit: 'seconds' },
+          }],
         },
         visualization: { type: 'chart' },
       };

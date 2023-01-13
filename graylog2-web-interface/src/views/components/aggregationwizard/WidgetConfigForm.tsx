@@ -60,6 +60,7 @@ export type DateGrouping = BaseGrouping & {
 
 export type ValuesGrouping = BaseGrouping & {
   field: GroupingField<'values'>,
+  limit: number,
 };
 
 export type GroupByFormValues = DateGrouping | ValuesGrouping;
@@ -96,8 +97,6 @@ export interface WidgetConfigFormValues {
   groupBy?: {
     columnRollup: boolean,
     groupings: Array<Required<GroupByFormValues, 'id'>>,
-    rowLimit: string | number | undefined,
-    columnLimit: string | number | undefined,
   },
   visualization?: VisualizationFormValues,
   sort?: Array<SortFormValues>,
@@ -109,8 +108,6 @@ export interface WidgetConfigValidationErrors {
   metrics?: Array<{ [key: string]: string }>,
   groupBy?: {
     groupings?: Array<{ [key: string]: string }>,
-    rowLimit?: string,
-    columnLimit?: string,
   },
   visualization?: { [key: string]: string | any },
   sort?: Array<{ [key: string]: string }>,
