@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Sidecar Failure Tracking View"
+
+issues = ["collector-sidecar#433"]
+pulls = ["14435"]
