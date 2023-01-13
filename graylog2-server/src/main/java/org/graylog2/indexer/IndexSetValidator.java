@@ -20,10 +20,10 @@ import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.rotation.strategies.SmartRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
-import org.graylog2.shared.utilities.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
@@ -31,10 +31,13 @@ import org.joda.time.Period;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import java.time.Instant;
 import java.util.Optional;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 public class IndexSetValidator {
-    private final static Duration MINIMUM_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(1L);
+    private static final Duration MINIMUM_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(1L);
     private final IndexSetRegistry indexSetRegistry;
     private final ElasticsearchConfiguration elasticsearchConfiguration;
 
@@ -57,6 +60,11 @@ public class IndexSetValidator {
         final Violation refreshIntervalViolation = validateRefreshInterval(newConfig.fieldTypeRefreshInterval());
         if (refreshIntervalViolation != null) {
             return Optional.of(refreshIntervalViolation);
+        }
+
+        final Violation  rotationViolation = validateRotation(newConfig.rotationStrategy());
+        if (rotationViolation != null) {
+            return Optional.of(rotationViolation);
         }
 
         return Optional.ofNullable(validateRetentionPeriod(newConfig.rotationStrategy(),
@@ -94,6 +102,35 @@ public class IndexSetValidator {
     }
 
     @Nullable
+    public Violation validateRotation(RotationStrategyConfig rotationStrategyConfig) {
+        if ((rotationStrategyConfig instanceof SmartRotationStrategyConfig smartConfig)) {
+            final java.time.Period leeway = smartConfig.indexLifetimeHard().minus(smartConfig.indexLifetimeSoft());
+            if (leeway.isNegative()) {
+                return Violation.create("Maximum and minimum lifetime periods are reversed or use different units");
+            }
+
+            final Period maxRetentionPeriod = elasticsearchConfiguration.getMaxIndexRetentionPeriod();
+            if (maxRetentionPeriod != null
+                && isGreater(smartConfig.indexLifetimeHard(), jodaToJavaPeriod(maxRetentionPeriod))) {
+                f("Lifetime setting %s exceeds the configured maximum of %s=%s.",
+                        SmartRotationStrategyConfig.INDEX_LIFETIME_HARD,
+                        ElasticsearchConfiguration.MAX_INDEX_RETENTION_PERIOD, maxRetentionPeriod);
+            }
+        }
+        return null;
+    }
+
+    private static java.time.Period jodaToJavaPeriod (Period jodaPeriod) {
+        return java.time.Period.of(jodaPeriod.getYears(), jodaPeriod.getMonths(), jodaPeriod.getDays());
+    }
+
+    // Note that periods are generally NOT comparable (e.g. is 1 month > 30 days?).
+    private static boolean isGreater(java.time.Period p1, java.time.Period p2) {
+        final Instant NOW = Instant.now();
+        return (NOW.plus(p1).isAfter(NOW.plus(p2)));
+    }
+
+    @Nullable
     public Violation validateRetentionPeriod(RotationStrategyConfig rotationStrategyConfig, RetentionStrategyConfig retentionStrategyConfig) {
         final Period maxRetentionPeriod = elasticsearchConfiguration.getMaxIndexRetentionPeriod();
 
@@ -108,14 +145,13 @@ public class IndexSetValidator {
         final Period rotationPeriod =
                 ((TimeBasedRotationStrategyConfig) rotationStrategyConfig).rotationPeriod().normalizedStandard();
 
-
         final Period effectiveRetentionPeriod =
                 rotationPeriod.multipliedBy(retentionStrategyConfig.maxNumberOfIndices()).normalizedStandard();
 
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         if (now.plus(effectiveRetentionPeriod).isAfter(now.plus(maxRetentionPeriod))) {
             return Violation.create(
-                    StringUtils.f("Index retention setting %s=%d would result in an effective index retention period of %s. This exceeds the configured maximum of %s=%s.",
+                    f("Index retention setting %s=%d would result in an effective index retention period of %s. This exceeds the configured maximum of %s=%s.",
                             RetentionStrategyConfig.MAX_NUMBER_OF_INDEXES_FIELD, retentionStrategyConfig.maxNumberOfIndices(), effectiveRetentionPeriod,
                             ElasticsearchConfiguration.MAX_INDEX_RETENTION_PERIOD, maxRetentionPeriod));
         }
@@ -124,7 +160,7 @@ public class IndexSetValidator {
     }
 
     @AutoValue
-    public static abstract class Violation {
+    public abstract static class Violation {
         public abstract String message();
 
         public static Violation create(String message) {

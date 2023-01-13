@@ -31,12 +31,15 @@ import java.time.Period;
 @WithBeanGetter
 @JsonDeserialize(builder = SmartRotationStrategyConfig.Builder.class)
 public abstract class SmartRotationStrategyConfig implements RotationStrategyConfig {
+    public static final String INDEX_LIFETIME_SOFT = "index_lifetime_soft";
+    public static final String INDEX_LIFETIME_HARD = "index_lifetime_hard";
+
     private static final Period DEFAULT_LIFETIME_SOFT = Period.ofDays(30);
     private static final Period DEFAULT_LIFETIME_HARD = Period.ofDays(40);
-    @JsonProperty("index_lifetime_soft")
+    @JsonProperty(INDEX_LIFETIME_SOFT)
     public abstract Period indexLifetimeSoft();
 
-    @JsonProperty("index_lifetime_hard")
+    @JsonProperty(INDEX_LIFETIME_HARD)
     public abstract Period indexLifetimeHard();
 
     public static Builder builder() {
@@ -56,11 +59,10 @@ public abstract class SmartRotationStrategyConfig implements RotationStrategyCon
         @JsonProperty(TYPE_FIELD)
         public abstract Builder type(String type);
 
-
-        @JsonProperty("max_rotation_days")
+        @JsonProperty(INDEX_LIFETIME_SOFT)
         public abstract Builder indexLifetimeSoft(Period softLimit);
 
-        @JsonProperty("min_rotation_days")
+        @JsonProperty(INDEX_LIFETIME_HARD)
         public abstract Builder indexLifetimeHard(Period hardLimit);
 
         public abstract SmartRotationStrategyConfig build();
