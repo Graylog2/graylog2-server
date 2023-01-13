@@ -151,7 +151,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @GET
     @Timed
     @Path("/paginated")
-    @ApiOperation(value = "Get a paginated list of streams")
+    @ApiOperation(value = "Get a paginated list of event definitions")
     @Produces(MediaType.APPLICATION_JSON)
     public PageListResponse<EventDefinitionDto> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                         @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
@@ -159,7 +159,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                                         @ApiParam(name = "sort",
                                                                   value = "The field to sort the result on",
                                                                   required = true,
-                                                                  allowableValues = "title,description,created_at,updated_at,status")
+                                                                  allowableValues = "title,description,alert")
                                                         @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
                                                         @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                         @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order) {
