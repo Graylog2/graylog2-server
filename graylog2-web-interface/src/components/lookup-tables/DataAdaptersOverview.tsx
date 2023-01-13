@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
 import { OverlayTrigger, PaginatedList, SearchForm, Icon, NoEntitiesExist, NoSearchResult } from 'components/common';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
@@ -25,6 +26,10 @@ import type { LookupTableAdapter, PaginationType } from 'logic/lookup-tables/typ
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 
 import Styles from './Overview.css';
+
+const ScrollContainer = styled.div`
+  overflow-x: auto;
+`;
 
 const buildHelpPopover = () => {
   return (
@@ -121,7 +126,7 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
               </Button>
             </OverlayTrigger>
           </SearchForm>
-          <div style={{ overflowX: 'auto' }}>
+          <ScrollContainer>
             {dataAdapters.length === 0
               ? (emptyListComponent)
               : (
@@ -142,7 +147,7 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
                   ))}
                 </Table>
               )}
-          </div>
+          </ScrollContainer>
         </PaginatedList>
       </Col>
     </Row>
