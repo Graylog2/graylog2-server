@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import styled from 'styled-components';
@@ -49,7 +49,7 @@ const CollectorConfigurationModalContainer = ({
 }: Props) => {
   const [nextAssignedConfigurations, setNextAssignedConfigurations] = useState<string[]>([]);
   const [nextPartiallyAssignedConfigurations, setNextPartiallyAssignedConfigurations] = useState<string[]>([]);
-  const modalConfirm = useRef(null);
+  const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
 
   const getSelectedLogCollector = () => {
     return (lodash.uniq<Collector>(selectedSidecarCollectorPairs.map(({ collector }) => collector)))[0];
@@ -87,7 +87,13 @@ const CollectorConfigurationModalContainer = ({
   const onSave = (fullyAssignedConfigs: string[], partiallyAssignedConfigs: string[]) => {
     setNextAssignedConfigurations(fullyAssignedConfigs);
     setNextPartiallyAssignedConfigurations(partiallyAssignedConfigs);
-    modalConfirm.current.open();
+    setShowConfirmModal(true);
+  };
+
+  const cancelConfigurationChange = () => {
+    setNextAssignedConfigurations([]);
+    setNextPartiallyAssignedConfigurations([]);
+    setShowConfirmModal(false);
   };
 
   const confirmConfigurationChange = (doneCallback: () => void) => {
@@ -107,11 +113,8 @@ const CollectorConfigurationModalContainer = ({
       onConfigurationSelectionChange([sidecarCollectorPair], configs, doneCallback);
     });
 
+    cancelConfigurationChange();
     onCancel();
-  };
-
-  const cancelConfigurationChange = () => {
-    setNextAssignedConfigurations([]);
   };
 
   const getConfiguration = (configName: string) => {
@@ -155,7 +158,7 @@ const CollectorConfigurationModalContainer = ({
     const summary = selectedSidecarCollectorPairs.length <= 5 ? sidecarsSummary : numberOfSidecarsSummary;
 
     return (
-      <BootstrapModalConfirm ref={modalConfirm}
+      <BootstrapModalConfirm showModal={showConfirmModal}
                              title="Configuration summary"
                              onConfirm={confirmConfigurationChange}
                              onCancel={cancelConfigurationChange}>

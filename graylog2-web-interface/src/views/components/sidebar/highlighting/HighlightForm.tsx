@@ -142,7 +142,7 @@ const HighlightForm = ({ onClose, rule }: Props) => {
 
         return (
           <BootstrapModalWrapper showModal
-                                 onClose={onClose}>
+                                 onHide={onClose}>
             <Form className="form">
               <Modal.Header>
                 <Modal.Title>{headerPrefix} Highlighting Rule</Modal.Title>

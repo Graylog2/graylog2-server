@@ -63,6 +63,7 @@ const EventsConfig = createReactClass({
 
     return {
       config: config,
+      showConfigModal: false,
     };
   },
 
@@ -71,14 +72,10 @@ const EventsConfig = createReactClass({
   },
 
   _openModal() {
-    this.modal.open();
+    this.setState({ showConfigModal: true });
   },
 
   _closeModal() {
-    this.modal.close();
-  },
-
-  _resetConfig() {
     // Reset to initial state when the modal is closed without saving.
     this.setState(this.getInitialState());
   },
@@ -154,7 +151,7 @@ const EventsConfig = createReactClass({
   },
 
   render() {
-    const { config } = this.state;
+    const { config, showConfigModal } = this.state;
     const eventsSearchTimeout = extractDurationAndUnit(config.events_search_timeout, TIME_UNITS);
     const eventsNotificationRetryPeriod = extractDurationAndUnit(config.events_notification_retry_period, TIME_UNITS);
     const eventsCatchupWindow = extractDurationAndUnit(config.events_catchup_window, TIME_UNITS);
@@ -182,10 +179,10 @@ const EventsConfig = createReactClass({
           <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
 
-        <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
+        <BootstrapModalForm show={showConfigModal}
                             title="Update Events System Configuration"
                             onSubmitForm={this._saveConfig}
-                            onModalClose={this._resetConfig}
+                            onCancel={this._closeModal}
                             submitButtonText="Update configuration">
           <fieldset>
             <FormGroup controlId="search-timeout-field">
