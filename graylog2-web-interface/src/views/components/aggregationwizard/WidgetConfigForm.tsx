@@ -41,25 +41,21 @@ export type MetricFormValues = {
   percentile?: number | undefined,
 };
 
-type GroupingField<T extends 'values' | 'time'> = {
-  field: string | undefined
-  type: T;
-}
-
 export type GroupingDirection = 'row' | 'column';
 
 export type BaseGrouping = {
+  fields: Array<string>,
   direction: GroupingDirection,
   id: string,
 };
 
 export type DateGrouping = BaseGrouping & {
-  field: GroupingField<'time'>,
+  type: 'time',
   interval: AutoTimeConfig | TimeUnitConfig,
 };
 
 export type ValuesGrouping = BaseGrouping & {
-  field: GroupingField<'values'>,
+  type: 'values',
   limit: number,
 };
 

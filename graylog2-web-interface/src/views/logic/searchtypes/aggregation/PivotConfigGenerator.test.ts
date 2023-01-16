@@ -24,7 +24,7 @@ import PivotConfigGenerator from './PivotConfigGenerator';
 describe('PivotConfigGenerator', () => {
   const widgetConfigBuilder = AggregationWidgetConfig.builder()
     .rollup(true)
-    .rowPivots([Pivot.create('field', 'type')])
+    .rowPivots([Pivot.create(['field'], 'type')])
     .columnPivots([])
     .series([Series.forFunction('count')]);
 
@@ -91,7 +91,7 @@ describe('PivotConfigGenerator', () => {
 
     const generateConfigForPivotWithTimeUnit = ({ timeUnit, expectedMappedTimeUnit }) => {
       const config = createWidgetConfigWithPivot(Pivot.create(
-        'foo',
+        ['foo'],
         'time',
         { interval: { type: 'timeunit', unit: timeUnit, value: 1 } },
       ));

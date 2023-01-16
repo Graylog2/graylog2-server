@@ -42,7 +42,7 @@ describe('AggregateActionHandler', () => {
     const widget = asMock(WidgetActions.create).mock.calls[0][0];
     const { config } = widget;
 
-    expect(config.rowPivots[0]).toEqual(new Pivot('foo', 'values', { limit: 15 }));
+    expect(config.rowPivots[0]).toEqual(Pivot.create(['foo'], 'values', { limit: 15 }));
   });
 
   it('uses field type when generating widget', () => {

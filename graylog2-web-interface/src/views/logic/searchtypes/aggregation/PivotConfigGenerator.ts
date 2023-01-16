@@ -54,12 +54,12 @@ type FormattedInterval = {
 
 type FormattedPivot = {
   type: string,
-  field: string,
+  fields: Array<string>,
   interval: FormattedInterval,
 };
 
 const formatPivot = (pivot: Pivot): FormattedPivot => {
-  const { type, field, config } = pivot;
+  const { type, fields, config } = pivot;
   const newConfig = { ...config } as unknown;
 
   switch (type) {
@@ -82,7 +82,7 @@ const formatPivot = (pivot: Pivot): FormattedPivot => {
 
   return {
     type,
-    field,
+    fields,
     ...(newConfig as { interval: FormattedInterval }),
   } as FormattedPivot;
 };
