@@ -36,6 +36,7 @@ import { MenuItem } from 'components/bootstrap';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import type Widget from 'views/logic/widgets/Widget';
 import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
+import DrilldownContext from 'views/components/contexts/DrilldownContext';
 import useView from 'views/hooks/useView';
 import createSearch from 'views/logic/slices/createSearch';
 import type { AppDispatch } from 'stores/useAppDispatch';
@@ -87,7 +88,7 @@ const _onCopyToDashboard = async (
   setShowCopyToDashboard(false);
 };
 
-const _onMoveWidgetToTab = async (
+const _onMoveWidgetToPage = async (
   dispatch: AppDispatch,
   view: View,
   setShowMoveWidgetToTab: (show: boolean) => void,
@@ -147,6 +148,7 @@ const WidgetActionsMenu = ({
 }: Props) => {
   const widget = useContext(WidgetContext);
   const view = useView();
+  const { query, timerange, streams } = useContext(DrilldownContext);
   const { setWidgetFocusing, unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const [showCopyToDashboard, setShowCopyToDashboard] = useState(false);
   const [showExport, setShowExport] = useState(false);
@@ -155,7 +157,7 @@ const WidgetActionsMenu = ({
 
   const onDuplicate = useCallback(() => _onDuplicate(widget.id, unsetWidgetFocusing, title), [unsetWidgetFocusing, title, widget.id]);
   const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId), [view]);
-  const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToTab(dispatch, view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [dispatch, view]);
+  const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToPage(dispatch, view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [dispatch, view]);
   const onDelete = useCallback(() => _onDelete(widget, view, title), [title, view, widget]);
   const focusWidget = useCallback(() => setWidgetFocusing(widget.id), [setWidgetFocusing, widget.id]);
 
@@ -163,7 +165,9 @@ const WidgetActionsMenu = ({
     <Container>
       <IfInteractive>
         <IfDashboard>
-          <ReplaySearchButton />
+          <ReplaySearchButton queryString={query.query_string}
+                              timerange={timerange}
+                              streams={streams} />
         </IfDashboard>
         {isFocused && (
           <IconButton name="compress-arrows-alt"
@@ -209,9 +213,10 @@ const WidgetActionsMenu = ({
         </WidgetActionDropdown>
 
         {showCopyToDashboard && (
-          <CopyToDashboard widgetId={widget.id}
-                           onSubmit={onCopyToDashboard}
-                           onCancel={() => setShowCopyToDashboard(false)} />
+          <CopyToDashboard onSubmit={(dashboardId) => onCopyToDashboard(widget.id, dashboardId)}
+                           onCancel={() => setShowCopyToDashboard(false)}
+                           submitLoadingText="Copying widget..."
+                           submitButtonText="Copy widget" />
         )}
 
         {showExport && (

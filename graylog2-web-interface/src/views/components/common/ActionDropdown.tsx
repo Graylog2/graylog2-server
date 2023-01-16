@@ -34,6 +34,7 @@ type ActionToggleProps = {
   onClick: (event: SyntheticEvent) => void,
   // eslint-disable-next-line react/no-unused-prop-types
   bsRole?: string,
+  title: string,
 };
 
 type ActionDropdownState = {
@@ -45,13 +46,7 @@ type FilterPropsProps = {
   style?: { [key: string]: any },
 };
 
-type ActionDropdownProps = {
-  children: React.ReactNode,
-  container?: HTMLElement,
-  element: React.ReactNode,
-};
-
-const ActionToggle = ({ children, onClick }: ActionToggleProps) => {
+const ActionToggle = ({ children, onClick, title }: ActionToggleProps) => {
   const handleClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -69,7 +64,7 @@ const ActionToggle = ({ children, onClick }: ActionToggleProps) => {
   };
 
   return (
-    <span onClick={handleClick} onKeyDown={handleKeyDown} role="presentation">
+    <span onClick={handleClick} onKeyDown={handleKeyDown} role="presentation" title={title}>
       {children}
     </span>
   );
@@ -98,11 +93,19 @@ FilterProps.defaultProps = {
   style: {},
 };
 
-class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdownState> {
+type Props = {
+  children: React.ReactNode,
+  container?: HTMLElement,
+  element: React.ReactNode,
+  title?: string,
+};
+
+class ActionDropdown extends React.Component<Props, ActionDropdownState> {
   target: HTMLElement | undefined | null;
 
   static defaultProps = {
     container: undefined,
+    title: 'Actions',
   };
 
   static propTypes = {
@@ -111,7 +114,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
     element: PropTypes.node.isRequired,
   };
 
-  constructor(props: ActionDropdownProps) {
+  constructor(props: Props) {
     super(props);
 
     this.state = {
@@ -161,13 +164,13 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
   };
 
   render() {
-    const { children, container, element } = this.props;
+    const { children, container, element, title } = this.props;
     const { show } = this.state;
     const mappedChildren = this.closeOnChildrenSelect(children, 0);
 
     return (
       <StopPropagation>
-        <ActionToggle bsRole="toggle" onClick={this._onToggle}>
+        <ActionToggle bsRole="toggle" onClick={this._onToggle} title={title}>
           <span ref={(elem) => { this.target = elem; }}>{element}</span>
         </ActionToggle>
         <Overlay show={show}

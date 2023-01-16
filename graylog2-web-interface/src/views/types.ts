@@ -244,7 +244,7 @@ type MessageDetailContextProviderProps = {
   message: Message,
 }
 
-export type CopyWidgetToDashboardHook = (widgetId: string, search: View, dashboard: View) => View;
+export type CopyParamsToView = (sourceView: View, targetView: View) => View;
 
 type RemovingWidgetHook = (widgetId: string, dashboardId: string) => boolean;
 
@@ -326,6 +326,15 @@ export type ViewsReducer = {
   reducer: Reducer<RootState[keyof RootState], AnyAction>,
 }
 
+export interface WidgetCreatorArgs {
+  view: View;
+}
+export interface WidgetCreator {
+  title: string;
+  func: (args: WidgetCreatorArgs) => Widget;
+  icon: React.ComponentType<{}>,
+}
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -352,7 +361,8 @@ declare module 'graylog-web-plugin/plugin' {
     'views.hooks.confirmDeletingWidget'?: Array<(widget: Widget, view: View, title: string) => Promise<boolean | null>>,
     'views.hooks.executingView'?: Array<ViewHook>;
     'views.hooks.loadingView'?: Array<ViewHook>;
-    'views.hooks.copyWidgetToDashboard'?: Array<CopyWidgetToDashboardHook>;
+    'views.hooks.copyWidgetToDashboard'?: Array<CopyParamsToView>;
+    'views.hooks.copyPageToDashboard'?: Array<CopyParamsToView>;
     'views.hooks.removingWidget'?: Array<RemovingWidgetHook>;
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
     'views.widgets.actions'?: Array<WidgetActionType>;
@@ -361,6 +371,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.queryInput.commands'?: Array<CustomCommand>;
     'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any>>,
     visualizationTypes?: Array<VisualizationType<any>>;
+    widgetCreators?: Array<WidgetCreator>;
   }
 }
 export interface ViewActions {

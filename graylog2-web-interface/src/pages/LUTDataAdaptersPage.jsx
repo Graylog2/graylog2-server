@@ -63,7 +63,10 @@ class LUTDataAdaptersPage extends React.Component {
   }
 
   componentWillUnmount() {
+    const { page, pageSize } = this.props.paginationQueryParameter;
+
     clearInterval(this.errorStatesTimer);
+    LookupTableDataAdaptersActions.searchPaginated(page, pageSize);
   }
 
   _startErrorStatesTimer = () => {
