@@ -40,7 +40,7 @@ const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled
       searchParams.page,
       searchParams.pageSize,
       searchParams.query,
-      { sort: searchParams?.sort.attributeId, direction: searchParams?.sort.direction },
+      { sort: searchParams?.sort.attributeId, order: searchParams?.sort.direction },
     ),
     {
       onError: (errorThrown) => {
