@@ -17,22 +17,23 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
+// eslint-disable-next-line no-restricted-imports
+import { Dropdown } from 'react-bootstrap';
 
 type Props = {
   children: React.ReactNode,
+  zIndex?: number,
   show: boolean,
 };
 
-const StyledDropdownMenu = styled.ul.attrs(() => ({
-  className: 'dropdown-menu', /* stylelint-disable-line property-no-unknown */
-}))<{ show: boolean }>(({ show, theme }) => css`
-  display: ${show ? 'block' : 'none'};
+const StyledDropdownMenu = styled(Dropdown.Menu)<{ $show: boolean, $zIndex: number }>(({ $show, $zIndex, theme }) => css`
+  display: ${$show ? 'block' : 'none'};
   min-width: max-content;
   color: ${theme.colors.variant.dark.default};
   background-color: ${theme.colors.variant.lightest.default};
   box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
   padding: 5px;
-  z-index: 1050;
+  z-index: ${$zIndex};
   
   .dropdown-header {
     color: ${theme.colors.variant.dark.default};
@@ -56,21 +57,21 @@ const StyledDropdownMenu = styled.ul.attrs(() => ({
   }
 `);
 
-const DropdownMenu = ({ show, children, ...restProps }: Props) => {
-  return (
-    <StyledDropdownMenu {...restProps} show={show}>
-      {children}
-    </StyledDropdownMenu>
-  );
-};
+const DropdownMenu = ({ show, children, zIndex, ...restProps }: Props) => (
+  <StyledDropdownMenu {...restProps} $show={show} $zIndex={zIndex}>
+    {children}
+  </StyledDropdownMenu>
+);
 
 DropdownMenu.propTypes = {
   children: PropTypes.node.isRequired,
+  zIndex: PropTypes.number,
   show: PropTypes.bool,
 };
 
 DropdownMenu.defaultProps = {
   show: false,
+  zIndex: 1050,
 };
 
 export default DropdownMenu;
