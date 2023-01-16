@@ -55,10 +55,14 @@ const searchExecutionSlice = createSlice({
       ...state,
       executionState: state.executionState.toBuilder().globalOverride(action.payload).build(),
     }),
+    setWidgetsToSearch: (state, action: PayloadAction<Array<string>>) => ({
+      ...state,
+      widgetsToSearch: action.payload,
+    }),
   },
 });
 
-export const { loading, finishedLoading, updateGlobalOverride } = searchExecutionSlice.actions;
+export const { loading, finishedLoading, updateGlobalOverride, setWidgetsToSearch } = searchExecutionSlice.actions;
 
 export const searchExecutionSliceReducer = searchExecutionSlice.reducer;
 

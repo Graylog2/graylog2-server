@@ -39,6 +39,7 @@ import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import CopyPageToDashboard from 'views/logic/views/CopyPageToDashboard';
 import { loadDashboard } from 'views/logic/views/Actions';
 import useView from 'views/hooks/useView';
+import createSearch from 'views/logic/slices/createSearch';
 
 import type { QueryTabsProps } from './QueryTabs';
 
@@ -183,7 +184,7 @@ const adjustTabsVisibility = (maxWidth, lockedTab, setLockedTab) => {
 const _updateDashboardWithNewSearch = (dashboard: View, dashboardId: string, newSearch: Search, queryParams: { page: string }) => {
   const newDashboard = dashboard.toBuilder().search(newSearch).build();
 
-  ViewManagementActions.update(newDashboard).then(() => loadDashboard(dashboardId, queryParams));
+  return ViewManagementActions.update(newDashboard).then(() => loadDashboard(dashboardId, queryParams));
 };
 
 const addPageToDashboard = (targetDashboard: View, activeView: View, queryId: string) => (searchJson: SearchJson) => {
@@ -196,8 +197,8 @@ const addPageToDashboard = (targetDashboard: View, activeView: View, queryId: st
 
   const newQueryId = newDashboard.search.queries.last().id;
 
-  return SearchActions.create(newDashboard.search).then(
-    ({ search: newSearch }) => _updateDashboardWithNewSearch(newDashboard, newDashboard.id, newSearch, { page: newQueryId }),
+  return createSearch(newDashboard.search).then(
+    (newSearch) => _updateDashboardWithNewSearch(newDashboard, newDashboard.id, newSearch, { page: newQueryId }),
   );
 };
 
