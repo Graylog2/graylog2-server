@@ -31,16 +31,14 @@ import { Icon, IconButton } from 'components/common';
 import QueryTitle from 'views/components/queries/QueryTitle';
 import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabsConfiguration';
 import CopyToDashboardForm from 'views/components/widgets/CopyToDashboardForm';
-import type { ViewStoreState } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import type { SearchJson } from 'views/logic/search/Search';
 import Search from 'views/logic/search/Search';
 import SearchActions from 'views/actions/SearchActions';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import CopyPageToDashboard from 'views/logic/views/CopyPageToDashboard';
-import { useStore } from 'stores/connect';
-import { ViewStore } from 'views/stores/ViewStore';
 import { loadDashboard } from 'views/logic/views/Actions';
+import useView from 'views/hooks/useView';
 
 import type { QueryTabsProps } from './QueryTabs';
 
@@ -204,23 +202,21 @@ const addPageToDashboard = (targetDashboard: View, activeView: View, queryId: st
 };
 
 const _onCopyToDashboard = (
-  view: ViewStoreState,
+  view: View,
   queryId: string,
   selectedDashboardId: string | undefined | null,
 ) => {
-  const { view: activeView } = view;
-
   return ViewManagementActions.get(selectedDashboardId).then((dashboardJson) => {
     const targetDashboard = View.fromJSON(dashboardJson);
 
-    return SearchActions.get(dashboardJson.search_id).then(addPageToDashboard(targetDashboard, activeView, queryId)).catch((error) => {
+    return SearchActions.get(dashboardJson.search_id).then(addPageToDashboard(targetDashboard, view, queryId)).catch((error) => {
       UserNotification.error(`Copying dashboard page failed with error ${error}`);
     });
   });
 };
 
 const AdaptableQueryTabs = ({ maxWidth, queries, titles, activeQueryId, onRemove, onSelect, queryTitleEditModal, dashboardId }: Props) => {
-  const view = useStore(ViewStore);
+  const view = useView();
   const [openedMore, setOpenedMore] = useState<boolean>(false);
   const [lockedTab, setLockedTab] = useState<QueryId>();
   const [showConfigurationModal, setShowConfigurationModal] = useState<boolean>(false);
