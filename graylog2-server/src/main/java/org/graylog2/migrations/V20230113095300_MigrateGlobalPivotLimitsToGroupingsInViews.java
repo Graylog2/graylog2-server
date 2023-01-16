@@ -61,10 +61,6 @@ public class V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViews extends 
 
     @Override
     public void upgrade() {
-        if (clusterConfigService.get(V20220929145442_MigratePivotLimitsInViews.MigrationCompleted.class) == null) {
-            LOG.debug("Previous migration did not run - no need to migrate!");
-            return;
-        }
         if (clusterConfigService.get(MigrationCompleted.class) != null) {
             LOG.debug("Migration already completed!");
         }
