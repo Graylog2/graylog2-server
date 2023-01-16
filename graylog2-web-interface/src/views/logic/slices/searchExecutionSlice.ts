@@ -82,9 +82,16 @@ export const execute = () => (dispatch: AppDispatch, getState: () => RootState) 
   return dispatch(executeWithExecutionState(view, widgetsToSearch, executionState, (result) => result));
 };
 
-export const setGlobalOverrideQuery = (queryString: string) => (dispatch: AppDispatch, getState: () => RootState) => {
+export const setGlobalOverrideQuery = (queryString: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const globalOverride = selectGlobalOverride(getState()) ?? GlobalOverride.empty();
   const newGlobalOverride = globalOverride.toBuilder().query({ type: 'elasticsearch', query_string: queryString }).build();
+
+  return dispatch(searchExecutionSlice.actions.updateGlobalOverride(newGlobalOverride));
+};
+
+export const setGlobalOverrideTimerange = (timerange: TimeRange) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  const globalOverride = selectGlobalOverride(getState()) ?? GlobalOverride.empty();
+  const newGlobalOverride = globalOverride.toBuilder().timerange(timerange).build();
 
   return dispatch(searchExecutionSlice.actions.updateGlobalOverride(newGlobalOverride));
 };

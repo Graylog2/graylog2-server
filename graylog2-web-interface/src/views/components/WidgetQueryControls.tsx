@@ -27,14 +27,11 @@ import { StreamsStore } from 'views/stores/StreamsStore';
 import connect, { useStore } from 'stores/connect';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type Widget from 'views/logic/widgets/Widget';
-import { WidgetActions } from 'views/stores/WidgetStore';
 import type { SearchBarFormValues } from 'views/Constants';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import WidgetContext from 'views/components/contexts/WidgetContext';
-import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
-import { SearchActions } from 'views/stores/SearchStore';
 import { PropagateDisableSubmissionState } from 'views/components/aggregationwizard';
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import FormWarningsContext from 'contexts/FormWarningsContext';
@@ -48,7 +45,7 @@ import {
   useInitialDashboardWidgetValues as usePluggableInitialValues,
   pluggableValidationPayload,
 } from 'views/logic/searchbar/pluggableSearchBarControlsHandler';
-import type { SearchBarControl } from 'views/types';
+import type { CombinedSearchBarFormValues, SearchBarControl } from 'views/types';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
 import {
@@ -58,6 +55,10 @@ import {
 } from 'views/components/searchbar/SearchBarLayout';
 import PluggableCommands from 'views/components/searchbar/queryinput/PluggableCommands';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import { updateWidget } from 'views/logic/slices/widgetActions';
+import { execute, setGlobalOverrideQuery, setGlobalOverrideTimerange } from 'views/logic/slices/searchExecutionSlice';
+import useAppDispatch from 'stores/useAppDispatch';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeInput from './searchbar/TimeRangeInput';
@@ -91,20 +92,22 @@ export const updateWidgetSearchControls = (widget, { timerange, streams, querySt
     .build();
 };
 
-const onSubmit = async (values, pluggableSearchBarControls: Array<() => SearchBarControl>, widget: Widget) => {
+const onSubmit = async (dispatch: AppDispatch, values: CombinedSearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, widget: Widget) => {
   const { timerange, streams, queryString } = values;
   const widgetWithPluginData = await executePluggableSubmitHandler(values, pluggableSearchBarControls, widget);
   const newWidget = updateWidgetSearchControls(widgetWithPluginData, { timerange, streams, queryString });
 
   if (!widget.equals(newWidget)) {
-    return WidgetActions.update(widget.id, newWidget);
+    return dispatch(updateWidget(widget.id, newWidget));
   }
 
-  return SearchActions.refresh();
+  return dispatch(execute());
 };
 
-const _resetTimeRangeOverride = () => GlobalOverrideActions.resetTimeRange().then(SearchActions.refresh);
-const _resetQueryOverride = () => GlobalOverrideActions.resetQuery().then(SearchActions.refresh);
+const resetTimeRangeOverride = (dispatch: AppDispatch) => dispatch(setGlobalOverrideTimerange(undefined))
+  .then(() => dispatch(execute()));
+const resetQueryOverride = (dispatch: AppDispatch) => dispatch(setGlobalOverrideQuery(undefined))
+  .then(() => dispatch(execute()));
 
 const useBindApplySearchControlsChanges = (formRef) => {
   const { bindApplySearchControlsChanges } = useContext(WidgetEditApplyAllChangesContext);
@@ -164,9 +167,12 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
   const hasQueryOverride = globalOverride?.query !== undefined;
   const formRef = useRef(null);
   const { parameters } = useParameters();
-  const validate = (values) => _validateQueryString(values, globalOverride, pluggableSearchBarControls, userTimezone);
+  const validate = useCallback((values: SearchBarFormValues) => _validateQueryString(values, globalOverride, pluggableSearchBarControls, userTimezone), [globalOverride, pluggableSearchBarControls, userTimezone]);
   const initialValues = useInitialFormValues(widget);
-  const _onSubmit = useCallback((values) => onSubmit(values, pluggableSearchBarControls, widget), [pluggableSearchBarControls, widget]);
+  const dispatch = useAppDispatch();
+  const _onSubmit = useCallback((values: CombinedSearchBarFormValues) => onSubmit(dispatch, values, pluggableSearchBarControls, widget), [dispatch, pluggableSearchBarControls, widget]);
+  const _resetTimeRangeOverride = useCallback(() => dispatch(resetTimeRangeOverride), [dispatch]);
+  const _resetQueryOverride = useCallback(() => dispatch(resetQueryOverride), [dispatch]);
 
   useBindApplySearchControlsChanges(formRef);
 
