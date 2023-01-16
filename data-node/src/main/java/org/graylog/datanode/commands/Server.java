@@ -27,9 +27,12 @@ import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bindings.ConfigurationModule;
+import org.graylog.datanode.bindings.ServerBindings;
 import org.graylog.datanode.bootstrap.Main;
 import org.graylog.datanode.bootstrap.ServerBootstrap;
+import org.graylog.datanode.rest.RestBindings;
 import org.graylog.datanode.shutdown.GracefulShutdown;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
@@ -54,7 +57,7 @@ public class Server extends ServerBootstrap {
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
     protected static final Configuration configuration = new Configuration();
- //   private final HttpConfiguration httpConfiguration = new HttpConfiguration();
+    private final HttpConfiguration httpConfiguration = new HttpConfiguration();
     private final MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
  //   private final VersionCheckConfiguration versionCheckConfiguration = new VersionCheckConfiguration();
  //   private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration();
@@ -80,10 +83,11 @@ public class Server extends ServerBootstrap {
         final ImmutableList.Builder<Module> modules = ImmutableList.builder();
         modules.add(
  //               new VersionAwareStorageModule(),
-                new ConfigurationModule(configuration)
+                new ConfigurationModule(configuration),
  //               new MongoDBModule(),
- //               new ServerBindings(configuration, isMigrationCommand()),
- //               new InitializerBindings(),
+                new ServerBindings(configuration, isMigrationCommand()),
+                new RestBindings()
+//               new InitializerBindings(),
  //               new ObjectMapperModule(chainingClassLoader),
  //               new RestApiBindings(),
  //               new PasswordAlgorithmBindings()
@@ -94,7 +98,7 @@ public class Server extends ServerBootstrap {
     @Override
     protected List<Object> getCommandConfigurationBeans() {
         return Arrays.asList(configuration,
-      //          httpConfiguration,
+                httpConfiguration,
                 mongoDbConfiguration,
      ///           versionCheckConfiguration,
       //          nettyTransportConfiguration,
@@ -109,17 +113,17 @@ public class Server extends ServerBootstrap {
         private final ActivityWriter activityWriter;
         private final ServiceManager serviceManager;
         private final GracefulShutdown gracefulShutdown;
-        private final Service leaderElectionService;
+//        private final Service leaderElectionService;
 
         @Inject
         public ShutdownHook(ActivityWriter activityWriter,
                             ServiceManager serviceManager,
-                            GracefulShutdown gracefulShutdown,
-                            @Named("LeaderElectionService") Service leaderElectionService) {
+                            GracefulShutdown gracefulShutdown) {
+ //                           @Named("LeaderElectionService") Service leaderElectionService) {
             this.activityWriter = activityWriter;
             this.serviceManager = serviceManager;
             this.gracefulShutdown = gracefulShutdown;
-            this.leaderElectionService = leaderElectionService;
+ //           this.leaderElectionService = leaderElectionService;
         }
 
         @Override
@@ -131,7 +135,7 @@ public class Server extends ServerBootstrap {
             gracefulShutdown.runWithoutExit();
             serviceManager.stopAsync().awaitStopped();
 
-            leaderElectionService.stopAsync().awaitTerminated();
+//            leaderElectionService.stopAsync().awaitTerminated();
         }
     }
 

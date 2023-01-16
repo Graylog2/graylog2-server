@@ -34,7 +34,7 @@ public class StatusController {
     @Autowired
     private ManagedNodes openSearch;
 
-    @GetMapping("/")
+    @GetMapping("/status")
     public List<StatusResponse> index() {
 
         return openSearch.getProcesses()

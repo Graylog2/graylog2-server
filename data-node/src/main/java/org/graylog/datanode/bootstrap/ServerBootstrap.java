@@ -25,12 +25,11 @@ import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.ProvisionException;
-import com.google.inject.name.Names;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bindings.ConfigurationModule;
+import org.graylog.datanode.bindings.GenericBindings;
 import org.graylog.datanode.bindings.GenericInitializerBindings;
 import org.graylog.datanode.configuration.PathConfiguration;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
@@ -45,7 +44,6 @@ import org.graylog2.shared.bindings.IsDevelopmentBindings;
 import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
-import org.graylog2.shared.system.stats.SystemStatsModule;
 import org.jsoftbiz.utils.OS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -226,7 +224,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         try {
             activityWriter = injector.getInstance(ActivityWriter.class);
             serviceManager = injector.getInstance(ServiceManager.class);
-            leaderElectionService = injector.getInstance(Key.get(Service.class, Names.named("LeaderElectionService")));
+//            leaderElectionService = injector.getInstance(Key.get(Service.class, Names.named("LeaderElectionService")));
         } catch (ProvisionException e) {
             LOG.error("Guice error", e);
             annotateProvisionException(e);
@@ -244,7 +242,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         final ServiceManagerListener serviceManagerListener = injector.getInstance(ServiceManagerListener.class);
         serviceManager.addListener(serviceManagerListener, MoreExecutors.directExecutor());
         try {
-            leaderElectionService.startAsync().awaitRunning();
+//            leaderElectionService.startAsync().awaitRunning();
             serviceManager.startAsync().awaitHealthy();
         } catch (Exception e) {
             try {
@@ -258,7 +256,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         LOG.info("Services started, startup times in ms: {}", serviceManager.startupTimes());
 
         activityWriter.write(new Activity("Started up.", Main.class));
-        LOG.info("Graylog {} up and running.", commandName);
+        LOG.info("Graylog DataNode {} up and running.", commandName);
 
         // Block forever.
         try {
@@ -294,14 +292,14 @@ public abstract class ServerBootstrap extends CmdLineTool {
         final List<Module> result = super.getSharedBindingsModules();
 
         result.add(new FreshInstallDetectionModule(isFreshInstallation()));
-//        result.add(new GenericBindings(isMigrationCommand()));
+        result.add(new GenericBindings(isMigrationCommand()));
 //        result.add(new SecurityBindings());
 //        result.add(new ServerStatusBindings(capabilities()));
 //        result.add(new ValidatorModule());
 //        result.add(new SharedPeriodicalBindings());
 //        result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
-        result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
+//        result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
 
         return result;
     }
