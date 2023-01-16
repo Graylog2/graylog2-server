@@ -52,12 +52,13 @@ const SearchPage = ({ isNew, view, loadNewView = defaultLoadNewView, loadView = 
   const query = useQuery();
   useLoadView(view, query?.page as string, isNew);
   const [loaded, HookComponent] = useProcessHooksForView(view, query);
+  const loadedView = useStore(ViewStore, (state) => state?.view);
 
   if (HookComponent) {
     return HookComponent;
   }
 
-  return (loaded)
+  return (loaded && loadedView)
     ? (
       <SearchPageTitle>
         <DashboardPageContextProvider>
