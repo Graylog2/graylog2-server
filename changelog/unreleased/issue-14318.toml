@@ -1,0 +1,7 @@
+type = "fixed"
+message = "Fix filtering and loader on the Lookup Table pages"
+
+issues = ["14318"]
+pulls = ["14405"]
+
+

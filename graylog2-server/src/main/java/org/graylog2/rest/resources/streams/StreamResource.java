@@ -49,6 +49,7 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
+import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.FilterOption;
@@ -57,7 +58,6 @@ import org.graylog2.rest.resources.streams.requests.CloneStreamRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.rest.resources.streams.responses.StreamCreatedResponse;
 import org.graylog2.rest.resources.streams.responses.StreamListResponse;
-import org.graylog2.rest.resources.streams.responses.StreamPageListResponse;
 import org.graylog2.rest.resources.streams.responses.StreamResponse;
 import org.graylog2.rest.resources.streams.responses.TestMatchResponse;
 import org.graylog2.search.SearchQuery;
@@ -128,9 +128,9 @@ public class StreamResource extends RestResource {
             EntityAttribute.builder().id("title").title("Title").build(),
             EntityAttribute.builder().id("description").title("Description").build(),
             EntityAttribute.builder().id("created_at").title("Created").type("date").build(),
-            EntityAttribute.builder().id("status").title("Status").type("boolean").filterable(true).filterOptions(Set.of(
-                    FilterOption.create("paused", "Paused"),
-                    FilterOption.create("running", "Running")
+            EntityAttribute.builder().id("disabled").title("Status").type("boolean").filterable(true).filterOptions(Set.of(
+                    FilterOption.create("true", "Paused"),
+                    FilterOption.create("false", "Running")
             )).build()
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
@@ -195,16 +195,16 @@ public class StreamResource extends RestResource {
     @Path("/paginated")
     @ApiOperation(value = "Get a paginated list of streams")
     @Produces(MediaType.APPLICATION_JSON)
-    public StreamPageListResponse getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-        @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-        @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-        @ApiParam(name = "sort",
-                value = "The field to sort the result on",
-                required = true,
-                allowableValues = "title,description,created_at,updated_at,status")
-        @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-        @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-        @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order) {
+    public PageListResponse<StreamDTO> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                               @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                               @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                               @ApiParam(name = "sort",
+                                                         value = "The field to sort the result on",
+                                                         required = true,
+                                                         allowableValues = "title,description,created_at,updated_at,status")
+                                               @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
+                                               @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                               @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order) {
 
         SearchQuery searchQuery;
         try {
@@ -231,7 +231,7 @@ public class StreamResource extends RestResource {
         final PaginatedList<StreamDTO> streamDTOS = new PaginatedList<>(
                 streams, result.pagination().total(), result.pagination().page(), result.pagination().perPage()
         );
-        return StreamPageListResponse.create(query, streamDTOS.pagination(), total, sort, order, streams, attributes, settings);
+        return PageListResponse.create(query, streamDTOS.pagination(), total, sort, order, streams, attributes, settings);
     }
 
     @GET

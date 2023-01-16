@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
@@ -28,15 +29,17 @@ import SidecarStatusFileList from './SidecarStatusFileList';
 import VerboseMessageModal from './VerboseMessageModal';
 
 const SidecarStatus = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     sidecar: PropTypes.object.isRequired,
     collectors: PropTypes.array.isRequired,
   },
 
   getInitialState() {
-    return { collectorName: '', collectorVerbose: '' };
+    return { collectorName: '', collectorVerbose: '', showVerboseModal: false };
   },
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   formatNodeDetails(details) {
     if (!details) {
       return <p>Node details are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to the server.</p>;
@@ -62,6 +65,7 @@ const SidecarStatus = createReactClass({
     );
   },
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   formatCollectorStatus(details, collectors) {
     if (!details || !collectors) {
       return <p>Collectors status are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to the server.</p>;
@@ -136,8 +140,11 @@ const SidecarStatus = createReactClass({
   },
 
   _onShowVerbose(name, verbose) {
-    this.setState({ collectorName: name, collectorVerbose: verbose });
-    this.modal.open();
+    this.setState({ collectorName: name, collectorVerbose: verbose, showVerboseModal: true });
+  },
+
+  _onHideVerbose() {
+    this.setState({ showVerboseModal: false });
   },
 
   render() {
@@ -170,7 +177,8 @@ const SidecarStatus = createReactClass({
             </div>
           </Col>
         </Row>
-        <VerboseMessageModal ref={(c) => { this.modal = c; }}
+        <VerboseMessageModal showModal={this.state.showVerboseModal}
+                             onHide={this._onHideVerbose}
                              collectorName={this.state.collectorName}
                              collectorVerbose={this.state.collectorVerbose} />
       </div>

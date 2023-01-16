@@ -131,7 +131,7 @@ type PaginatedResponse = {
   },
   query: string,
   attributes: Attributes,
-  streams: Array<Stream>,
+  elements: Array<Stream>,
 };
 
 const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
@@ -145,7 +145,7 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
     const promise = fetch('GET', qualifyUrl(url))
       .then((response: PaginatedResponse) => {
         const {
-          streams,
+          elements,
           query,
           attributes,
           pagination: {
@@ -157,7 +157,7 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
         } = response;
 
         return {
-          streams,
+          elements,
           attributes,
           pagination: {
             count,

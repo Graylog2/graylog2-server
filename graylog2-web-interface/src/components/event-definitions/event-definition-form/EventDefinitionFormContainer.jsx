@@ -181,7 +181,7 @@ EventDefinitionFormContainer.defaultProps = {
     field_spec: {},
     key_spec: [],
     notification_settings: {
-      grace_period_ms: 600000,
+      grace_period_ms: 300000,
       // Defaults to system setting for notification backlog size
       backlog_size: null,
     },
