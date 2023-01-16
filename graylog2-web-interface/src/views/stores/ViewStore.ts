@@ -53,6 +53,7 @@ type ViewActionsType = RefluxActions<{
   properties: (properties: Properties) => Promise<void>,
   search: (search: Search) => Promise<View>,
   selectQuery: (queryId: string) => Promise<string>,
+  setDirty: (isDirty: boolean) => Promise<View>,
   state: (state: ViewStateMap) => Promise<View>,
   update: (view: View) => Promise<ViewStoreState>,
 }>;
@@ -67,7 +68,7 @@ export const ViewActions: ViewActionsType = singletonActions(
     search: { asyncResult: true },
     selectQuery: { asyncResult: true },
     state: { asyncResult: true },
-    setNew: { asyncResult: true },
+    setDirty: { asyncResult: true },
     update: { asyncResult: true },
   }),
 );
@@ -218,6 +219,15 @@ export const ViewStore: ViewStoreType = singletonStore(
       const promise = Promise.resolve(this.view);
 
       ViewActions.selectQuery.promise(promise);
+
+      return promise;
+    },
+    setDirty(isDirty) {
+      this.dirty = isDirty;
+      this._trigger();
+      const promise = Promise.resolve(this.view);
+
+      ViewActions.setDirty.promise(promise);
 
       return promise;
     },

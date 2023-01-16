@@ -47,10 +47,8 @@ class ContentPackParameters extends React.Component {
     super(props);
 
     this.state = {
-      newParameter: ObjectUtils.clone(ContentPackParameters.emptyParameter),
+      showParameterModal: false,
       parameterToDelete: undefined,
-      defaultValueError: undefined,
-      nameError: undefined,
     };
   }
 
@@ -115,7 +113,7 @@ class ContentPackParameters extends React.Component {
 
   _confirmationModal = () => {
     return (
-      <BootstrapModalConfirm ref={(c) => { this.modal = c; }}
+      <BootstrapModalConfirm showModal={this.state.showParameterModal}
                              title="Confirm deletion"
                              onConfirm={() => { this._deleteParameter(this.state.parameterToDelete); }}
                              onCancel={this._closeConfirmModal}>
@@ -125,13 +123,11 @@ class ContentPackParameters extends React.Component {
   };
 
   _openConfirmModal = (parameter) => {
-    this.setState({ parameterToDelete: parameter });
-    this.modal.open();
+    this.setState({ showParameterModal: true, parameterToDelete: parameter });
   };
 
   _closeConfirmModal = () => {
-    this.setState({ parameterToDelete: undefined });
-    this.modal.close();
+    this.setState({ showParameterModal: false, parameterToDelete: undefined });
   };
 
   render() {

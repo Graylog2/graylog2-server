@@ -28,6 +28,14 @@ type State = {
   selectedExtractor: string | undefined | null,
 };
 
+const _renderOption = ({ label }: { label: string }) => <strong>{label}</strong>;
+
+const _getExtractorTypes = () => {
+  return ExtractorUtils.EXTRACTOR_TYPES.map((extractorType) => {
+    return { label: ExtractorUtils.getReadableExtractorTypeName(extractorType), value: extractorType };
+  });
+};
+
 class SelectExtractorType extends React.Component<ActionComponentProps, State> {
   static propTypes = {
     onClose: PropTypes.func.isRequired,
@@ -35,11 +43,15 @@ class SelectExtractorType extends React.Component<ActionComponentProps, State> {
 
   static contextType = ActionContext;
 
-  state = {
-    selectedExtractor: undefined,
-  };
-
   extractorRoutes = {};
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      selectedExtractor: undefined,
+    };
+  }
 
   componentDidMount() {
     const { message } = this.context;
@@ -52,9 +64,6 @@ class SelectExtractorType extends React.Component<ActionComponentProps, State> {
       message.index,
       message.id);
   }
-
-  /* eslint-disable-next-line react/no-unused-prop-types */
-  _renderOption = ({ label }: { label: string }) => <strong>{label}</strong>;
 
   _onSubmit = () => {
     const { onClose } = this.props;
@@ -71,12 +80,6 @@ class SelectExtractorType extends React.Component<ActionComponentProps, State> {
     }
   };
 
-  _getExtractorTypes = () => {
-    return ExtractorUtils.EXTRACTOR_TYPES.map((extractorType) => {
-      return { label: ExtractorUtils.getReadableExtractorTypeName(extractorType), value: extractorType };
-    });
-  };
-
   _onChange = (selectedExtractor: string) => {
     this.setState({ selectedExtractor });
   };
@@ -88,12 +91,13 @@ class SelectExtractorType extends React.Component<ActionComponentProps, State> {
       <BootstrapModalForm title="Select extractor type"
                           submitButtonDisabled={!selectedExtractor}
                           show
+                          onCancel={this.props.onClose}
                           onSubmitForm={this._onSubmit}>
         <Select placeholder="Select extractor type"
-                optionRenderer={this._renderOption}
+                optionRenderer={_renderOption}
                 clearable
                 onChange={this._onChange}
-                options={this._getExtractorTypes()} />
+                options={_getExtractorTypes()} />
       </BootstrapModalForm>
     );
   }

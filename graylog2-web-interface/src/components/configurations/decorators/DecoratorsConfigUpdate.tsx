@@ -52,7 +52,7 @@ const _updateOrder = (orderedDecorators, decorators, onChange) => {
   onChange(newDecorators);
 };
 
-const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props, modalRef: React.Ref<BootstrapModalWrapper>) => {
+const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props) => {
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [modifiedDecorators, setModifiedDecorators] = useState(decorators);
   const onCreate = useCallback(
@@ -78,8 +78,7 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
   }, [decorators, onCancel]);
 
   return (
-    <BootstrapModalWrapper ref={modalRef}
-                           showModal={show}
+    <BootstrapModalWrapper showModal={show}
                            onHide={_onCancel}>
       <Modal.Header closeButton>
         <Modal.Title>Update Default Decorators Configuration</Modal.Title>
@@ -104,4 +103,4 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
   );
 };
 
-export default React.forwardRef<BootstrapModalWrapper, Props>(DecoratorsConfigUpdate);
+export default DecoratorsConfigUpdate;

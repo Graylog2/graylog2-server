@@ -128,45 +128,9 @@ class ActionDropdown extends React.Component<Props, ActionDropdownState> {
     this.setState(({ show }) => ({ show: !show }));
   };
 
-  closeOnChildSelect = (child: React.ReactElement, updateDepth: number) => {
-    if (child.props?.onSelect) {
-      return {
-        onSelect: (_eventKey: string | null | undefined, event: SyntheticEvent<HTMLButtonElement>) => {
-          child.props.onSelect();
-          this._onToggle(event);
-        },
-      };
-    }
-
-    if (child.props?.children) {
-      return {
-        children: this.closeOnChildrenSelect(child.props.children, updateDepth + 1),
-      };
-    }
-
-    return {};
-  };
-
-  closeOnChildrenSelect = (children: React.ReactNode, updateDepth: number) => {
-    const maxChildDepth = 2;
-
-    if (updateDepth > maxChildDepth) {
-      return children;
-    }
-
-    return React.Children.map(
-      children,
-      (child: React.ReactElement) => (child?.props ? React.cloneElement(child, {
-        ...child.props,
-        ...this.closeOnChildSelect(child, updateDepth + 1),
-      }) : child),
-    );
-  };
-
   render() {
     const { children, container, element, title } = this.props;
     const { show } = this.state;
-    const mappedChildren = this.closeOnChildrenSelect(children, 0);
 
     return (
       <StopPropagation>
@@ -181,9 +145,9 @@ class ActionDropdown extends React.Component<Props, ActionDropdownState> {
                  onHide={this._onToggle}
                  target={() => this.target}>
           <FilterProps>
-            <DropdownMenu show={show}>
+            <DropdownMenu show={show} onMenuItemSelect={this._onToggle}>
               <MenuItem header>Actions</MenuItem>
-              {mappedChildren}
+              {children}
             </DropdownMenu>
           </FilterProps>
         </Overlay>
