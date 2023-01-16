@@ -39,52 +39,58 @@ const FieldComponent = ({ index, fieldType }: Props) => {
   const { setFieldValue, values } = useFormikContext<WidgetConfigFormValues>();
   const grouping = values.groupBy.groupings[index];
 
-  const onChangeField = (e: { target: { name: string, value: string } }, name: string, onChange) => {
+  const onChangeField = (e: { target: { name: string, value: string } }) => {
     const fieldName = e.target.value;
     const newField = fieldTypes.all.find((field) => field.name === fieldName);
     const newFieldType = newField?.type.type === 'date' ? 'time' : 'values';
 
     if (fieldType !== newFieldType) {
       if (newFieldType === 'time') {
-        setFieldValue(`groupBy.groupings.${index}.limit`, undefined, false);
-
-        setFieldValue(`groupBy.groupings.${index}.interval`, {
-          type: 'auto',
-          scaling: 1.0,
+        setFieldValue(`groupBy.groupings.${index}`, {
+          type: newFieldType,
+          fields: [fieldName],
+          interval: {
+            type: 'auto',
+            scaling: 1.0,
+          },
         });
       }
 
       if (newFieldType === 'values') {
+        setFieldValue(`groupBy.groupings.${index}`, {
+          type: newFieldType,
+          fields: [fieldName],
+          limit: defaultLimit,
+        });
+
         setFieldValue(`groupBy.groupings.${index}.interval`, undefined, false);
 
         if (!('limit' in grouping) || ('limit' in grouping && numberNotSet(grouping.limit))) {
           setFieldValue(`groupBy.groupings.${index}.limit`, defaultLimit);
         }
       }
+
+      return;
     }
 
-    onChange({
-      target: {
-        name,
-        value: [{
-          field: newField.name,
-          type: newFieldType,
-        }],
-      },
+    setFieldValue(`groupBy.groupings.${index}`, {
+      ...grouping,
+      type: newFieldType,
+      fields: [fieldName],
     });
   };
 
   return (
     <Field name={`groupBy.groupings.${index}.fields`}>
-      {({ field: { name, value, onChange }, meta: { error } }) => (
+      {({ field: { name, value }, meta: { error } }) => (
         <FieldSelect id="group-by-field-select"
                      label="Field"
-                     onChange={(e) => onChangeField(e, name, onChange)}
+                     onChange={(e) => onChangeField(e)}
                      error={error}
                      clearable={false}
                      ariaLabel="Field"
                      name={name}
-                     value={value.field}
+                     value={value?.[0]}
                      aria-label="Select a field" />
       )}
     </Field>
