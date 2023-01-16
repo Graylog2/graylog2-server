@@ -14,12 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type * as Immutable from 'immutable';
+
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { GetState, WidgetPositions } from 'views/types';
 import { selectWidgetPositions } from 'views/logic/slices/widgetSelectors';
-import { selectActiveQuery, selectActiveViewState } from 'views/logic/slices/viewSelectors';
+import { selectActiveQuery, selectActiveViewState, selectWidgets } from 'views/logic/slices/viewSelectors';
 import { updateViewState } from 'views/logic/slices/viewSlice';
+import type Widget from 'views/logic/widgets/Widget';
 
 export const updateWidgetPositions = (newWidgetPositions: WidgetPositions) => (dispatch: AppDispatch, getState: GetState) => {
   const activeQuery = selectActiveQuery(getState());
@@ -36,4 +39,25 @@ export const updateWidgetPosition = (id: string, newWidgetPosition: WidgetPositi
   const newWidgetPositions = { ...widgetPositions, [id]: newWidgetPosition };
 
   return dispatch(updateWidgetPositions(newWidgetPositions));
+};
+
+export const updateWidgets = (newWidgets: Immutable.List<Widget>) => (dispatch: AppDispatch, getState: GetState) => {
+  const activeQuery = selectActiveQuery(getState());
+  const activeViewState = selectActiveViewState(getState());
+  const newViewState = activeViewState.toBuilder()
+    .widgets(newWidgets)
+    .build();
+
+  return dispatch(updateViewState(activeQuery, newViewState));
+};
+
+export const addWidget = (widget: Widget) => (dispatch: AppDispatch, getState: GetState) => {
+  if (widget.id === undefined) {
+    throw new Error('Unable to add widget without id to query.');
+  }
+
+  const widgets = selectWidgets(getState());
+  const newWidgets = widgets.push(widget);
+
+  return dispatch(updateWidgets(newWidgets));
 };
