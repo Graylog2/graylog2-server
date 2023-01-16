@@ -1,0 +1,5 @@
+type = "a"
+message = "Expose JVM metrics to prometheus."
+
+issues = ["graylog-plugin-enterprise#4393"]
+pulls = ["14437"]
