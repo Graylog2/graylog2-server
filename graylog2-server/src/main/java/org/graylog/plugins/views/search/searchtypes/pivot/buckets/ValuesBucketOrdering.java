@@ -36,28 +36,8 @@ public class ValuesBucketOrdering {
         return sorts.stream().anyMatch(ValuesBucketOrdering::isGroupingSort);
     }
 
-    private static boolean needsReordering(List<? extends BucketSpec> bucketSpec, List<SortSpec> sorts) {
-        return bucketSpec.size() >= 2 && !sorts.isEmpty() && hasGroupingSort(sorts);
-    }
-
     private static boolean needsReorderingFields(List<String> fields, List<SortSpec> sorts) {
         return fields.size() >= 2 && !sorts.isEmpty() && hasGroupingSort(sorts);
-    }
-
-    @VisibleForTesting
-    public static <T extends BucketSpec> List<T> orderBuckets(List<T> bucketSpec, List<SortSpec> sorts) {
-        if (!needsReordering(bucketSpec, sorts)) {
-            return bucketSpec;
-        }
-
-        final List<String> sortFields = sorts.stream()
-                .filter(ValuesBucketOrdering::isGroupingSort)
-                .map(SortSpec::field)
-                .collect(Collectors.toList());
-
-        return bucketSpec.stream()
-                .sorted(new ValuesBucketComparator<>(sortFields))
-                .collect(Collectors.toList());
     }
 
     public static List<String> orderFields(List<String> fields, List<SortSpec> sorts) {
@@ -72,22 +52,6 @@ public class ValuesBucketOrdering {
 
         return fields.stream()
                 .sorted(new FieldsSortingComparator(sortFields))
-                .collect(Collectors.toList());
-    }
-
-    public static Function<List<String>, List<String>> reorderKeysFunction(List<BucketSpec> bucketSpecs, List<SortSpec> sorts) {
-        if (!needsReordering(bucketSpecs, sorts)) {
-            return Function.identity();
-        }
-
-        final List<BucketSpec> orderedBuckets = orderBuckets(bucketSpecs, sorts);
-        final Map<Integer, Integer> mapping = IntStream.range(0, bucketSpecs.size())
-                .boxed()
-                .collect(Collectors.toMap(Function.identity(), i -> orderedBuckets.indexOf(bucketSpecs.get(i))));
-
-        return (keys) -> IntStream.range(0, bucketSpecs.size())
-                .boxed()
-                .map(i -> keys.get(mapping.get(i)))
                 .collect(Collectors.toList());
     }
 
