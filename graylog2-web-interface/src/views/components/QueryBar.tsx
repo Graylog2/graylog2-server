@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useCallback, useContext } from 'react';
 import type * as Immutable from 'immutable';
 
-import { TitlesActions } from 'views/stores/TitlesStore';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 import ConfirmDeletingDashboardPage from 'views/logic/views/ConfirmDeletingDashboardPage';
 import useQueryIds from 'views/hooks/useQueryIds';
@@ -28,10 +27,9 @@ import type { AppDispatch } from 'stores/useAppDispatch';
 import useAppDispatch from 'stores/useAppDispatch';
 import { selectQuery, createQuery, removeQuery } from 'views/logic/slices/viewSlice';
 import useWidgetIds from 'views/components/useWidgetIds';
+import { setTitle } from 'views/logic/slices/titlesActions';
 
 import QueryTabs from './QueryTabs';
-
-const onTitleChange = (_queryId: string, newTitle: string) => TitlesActions.set('tab', 'title', newTitle);
 
 const onCloseTab = async (dashboardId: string, queryId: string, activeQueryId: string, queries: Immutable.OrderedSet<string>, widgetIds: Immutable.Map<string, Immutable.List<string>>, dispatch: AppDispatch) => {
   if (queries.size === 1) {
@@ -67,13 +65,15 @@ const QueryBar = () => {
   const onRemove = useCallback((queryId: string) => onCloseTab(dashboardId, queryId, activeQueryId, queries, widgetIds, dispatch),
     [dashboardId, activeQueryId, queries, widgetIds, dispatch]);
 
+  const _onTitleChange = useCallback((queryId: string, newTitle: string) => dispatch(setTitle(queryId, 'tab', 'title', newTitle)), [dispatch]);
+
   return (
     <QueryTabs queries={queries}
                activeQueryId={activeQueryId}
                titles={queryTitles}
                dashboardId={dashboardId}
                onSelect={onSelectPage}
-               onTitleChange={onTitleChange}
+               onTitleChange={_onTitleChange}
                onRemove={onRemove} />
   );
 };

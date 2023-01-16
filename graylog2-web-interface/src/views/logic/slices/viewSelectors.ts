@@ -27,6 +27,7 @@ export const selectIsDirty = createSelector(selectRootView, (state) => state.isD
 export const selectIsNew = createSelector(selectRootView, (state) => state.isNew);
 export const selectViewType = createSelector(selectView, (view) => view.type);
 export const selectViewStates = createSelector(selectView, (state) => state.state);
+export const selectViewState = (id: string) => createSelector(selectViewStates, (states) => states.get(id));
 export const selectActiveViewState = createSelector(
   selectActiveQuery,
   selectViewStates,
