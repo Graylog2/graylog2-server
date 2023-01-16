@@ -23,9 +23,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ProcessStateMachine {
 
+    /**
+     * How many times can the OS rest api call fail before we switch to the failed state
+     */
+    public static final int MAX_REST_TEMPORARY_FAILURES = 3;
+
     public static StateMachine<ProcessState, ProcessEvent> createNew() {
 
-        final AtomicInteger failuresCounter = new AtomicInteger(1);
+        final AtomicInteger failuresCounter = new AtomicInteger(0);
 
         StateMachineConfig<ProcessState, ProcessEvent> config = new StateMachineConfig<>();
 
@@ -64,10 +69,10 @@ public class ProcessStateMachine {
     }
 
     private static boolean failedTooManyTimes(AtomicInteger failuresCounter) {
-        return failuresCounter.get() > 3;
+        return failuresCounter.get() >= MAX_REST_TEMPORARY_FAILURES;
     }
 
     private static void resetFailuresCounter(AtomicInteger failuresCounter) {
-        failuresCounter.set(1);
+        failuresCounter.set(0);
     }
 }

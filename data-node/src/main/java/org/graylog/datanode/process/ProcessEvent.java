@@ -20,6 +20,5 @@ public enum ProcessEvent {
     PROCESS_STARTED,
     HEALTH_CHECK_GREEN,
     HEALTH_CHECK_FAILED,
-
     PROCESS_TERMINATED
 }
