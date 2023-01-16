@@ -42,6 +42,8 @@ public class SmartRotationStrategy extends AbstractRotationStrategy {
 
     private final Indices indices;
 
+    // TODO: move this into server.conf or maybe into IndexSetsDefaultConfiguration
+    // also see elasticsearch_max_size_per_index
     public static final Size MAX_INDEX_SIZE = Size.gigabytes(50);
     public static final Size MIN_INDEX_SIZE = Size.gigabytes(20);
 
