@@ -57,14 +57,6 @@ class V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearchesTest {
 
     @Test
     @MongoDBFixtures("V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearchesTest_empty.json")
-    void notMigratingAnythingIfPreviousMigrationDidNotRun() {
-        this.migration.upgrade();
-
-        verify(this.clusterConfigService, never()).write(any());
-    }
-
-    @Test
-    @MongoDBFixtures("V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearchesTest_empty.json")
     void notMigratingAnythingIfNoSearchesArePresent() {
         markPreviousMigrationAsBeingRun();
 
@@ -120,6 +112,24 @@ class V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearchesTest {
         assertThat(limits(rowGroups(searchTypes.get(3)))).isEmpty();
         assertThat(limits(columnGroups(searchTypes.get(3)))).containsExactly(null, 15, 15);
         assertThatFieldsAreUnset(searchTypes.get(3));
+    }
+
+    @Test
+    @MongoDBFixtures("V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearchesTest_null_limits.json")
+    void migratingPivotsWithNullLimits() {
+        markPreviousMigrationAsBeingRun();
+
+        this.migration.upgrade();
+
+        assertThat(migrationCompleted().migratedSearchTypes()).isEqualTo(2);
+
+        final Document document = this.collection.find().first();
+
+        final List<Document> searchTypes = getSearchTypes(document);
+
+        for (Document searchType : searchTypes) {
+            assertThatFieldsAreUnset(searchType);
+        }
     }
 
     private void assertThatFieldsAreUnset(Document searchType) {

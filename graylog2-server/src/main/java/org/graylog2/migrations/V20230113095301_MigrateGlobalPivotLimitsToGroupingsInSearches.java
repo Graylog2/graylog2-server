@@ -42,6 +42,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearches extends Migration {
+    private static final int DEFAULT_LIMIT = 15;
     private static final Logger LOG = LoggerFactory.getLogger(V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViews.class);
     private final ClusterConfigService clusterConfigService;
     private final MongoCollection<Document> searches;
@@ -74,14 +75,15 @@ public class V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearches exten
                         final List<Document> searchTypes = entry.getValue().get("search_types", Collections.emptyList());
                         return EntryStream.of(searchTypes)
                             .filter(searchType -> "pivot".equals(searchType.getValue().getString("type")))
-                            .filter(this::searchTypeHasValuePivots)
                             .flatMap(searchTypeEntry -> {
                                 final Document searchType = searchTypeEntry.getValue();
                                 final Integer searchTypeIndex = searchTypeEntry.getKey();
+                                final boolean hasRowLimit = searchType.containsKey("row_limit");
+                                final boolean hasColumnLimit = searchType.containsKey("column_limit");
                                 final Optional<Integer> rowLimit = Optional.ofNullable(searchType.getInteger("row_limit"));
                                 final Optional<Integer> columnLimit = Optional.ofNullable(searchType.getInteger("column_limit"));
 
-                                if (searchTypeIndex != null && (rowLimit.isPresent() || columnLimit.isPresent())) {
+                                if (searchTypeIndex != null && (hasRowLimit || hasColumnLimit)) {
                                     return Stream.of(new SearchPivotLimitMigration(searchId, queryIndex, searchTypeIndex, rowLimit, columnLimit));
                                 }
                                 return Stream.empty();
@@ -99,30 +101,26 @@ public class V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearches exten
                             doc("$unset", doc(pivotPath(pivotMigration) + ".row_limit", 1))
                         )
                     );
-                    pivotMigration.rowLimit().ifPresent(rowLimit -> {
-                        builder.add(
-                            updateSearch(
-                                pivotMigration.searchId(),
-                                doc("$set", doc(pivotPath(pivotMigration) + ".row_groups.$[pivot].limit", rowLimit)),
-                                matchValuePivots
-                            )
-                        );
-                    });
+                    builder.add(
+                        updateSearch(
+                            pivotMigration.searchId(),
+                            doc("$set", doc(pivotPath(pivotMigration) + ".row_groups.$[pivot].limit", pivotMigration.rowLimit.orElse(DEFAULT_LIMIT))),
+                            matchValuePivots
+                        )
+                    );
                     builder.add(
                             updateSearch(
                                     pivotMigration.searchId(),
                                     doc("$unset", doc(pivotPath(pivotMigration) + ".column_limit", 1))
                             )
                     );
-                    pivotMigration.columnLimit().ifPresent(columnLimit -> {
-                        builder.add(
-                            updateSearch(
-                                pivotMigration.searchId(),
-                                doc("$set", doc(pivotPath(pivotMigration) + ".column_groups.$[pivot].limit", columnLimit)),
-                                matchValuePivots
-                            )
-                        );
-                    });
+                    builder.add(
+                        updateSearch(
+                            pivotMigration.searchId(),
+                            doc("$set", doc(pivotPath(pivotMigration) + ".column_groups.$[pivot].limit", pivotMigration.columnLimit.orElse(DEFAULT_LIMIT))),
+                            matchValuePivots
+                        )
+                    );
                     return builder.build().stream();
                 })
                 .collect(Collectors.toList());
@@ -133,16 +131,6 @@ public class V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearches exten
         }
 
         clusterConfigService.write(new MigrationCompleted(pivotLimitMigrations.size()));
-    }
-
-    private boolean searchTypeHasValuePivots(Map.Entry<Integer, Document> searchTypeEntry) {
-        final Document searchType = searchTypeEntry.getValue();
-        final List<Document> rowPivots = searchType.getList("row_groups", Document.class, Collections.emptyList());
-        if (rowPivots.stream().anyMatch(rowPivot -> "values".equals(rowPivot.get("type")))) {
-            return true;
-        }
-        final List<Document> columnPivots = searchType.getList("column_groups", Document.class, Collections.emptyList());
-        return columnPivots.stream().anyMatch(rowPivot -> "values".equals(rowPivot.get("type")));
     }
 
     private String pivotPath(SearchPivotLimitMigration pivotMigration) {

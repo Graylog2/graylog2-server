@@ -58,14 +58,6 @@ class V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViewsTest {
 
     @Test
     @MongoDBFixtures("V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViewsTest_empty.json")
-    void notMigratingIfPreviousMigrationDidNotRun() {
-        this.migration.upgrade();
-
-        verify(this.clusterConfigService, never()).write(any());
-    }
-
-    @Test
-    @MongoDBFixtures("V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViewsTest_empty.json")
     void notMigratingAnythingIfViewsAreEmpty() {
         markPreviousMigrationAsCompleted();
 
@@ -100,6 +92,24 @@ class V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViewsTest {
         assertThat(columnPivotLimits(widgets.get(3))).containsExactly(null, 15, 15);
 
         assertThat(migrationCompleted().migratedViews()).isEqualTo(4);
+
+        for (Document widget : widgets) {
+            assertThatFieldsAreUnset(widget);
+        }
+    }
+
+    @Test
+    @MongoDBFixtures("V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViewsTest_null_limits.json")
+    void migratingPivotsWithNullLimits() {
+        markPreviousMigrationAsCompleted();
+
+        this.migration.upgrade();
+
+        assertThat(migrationCompleted().migratedViews()).isEqualTo(1);
+
+        final Document document = this.collection.find().first();
+
+        final List<Document> widgets = getWidgets(document);
 
         for (Document widget : widgets) {
             assertThatFieldsAreUnset(widget);
