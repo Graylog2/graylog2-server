@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import styled from 'styled-components';
 import { useContext, useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
@@ -31,7 +30,6 @@ import MessageTable from 'views/components/widgets/MessageTable';
 import ErrorWidget from 'views/components/widgets/ErrorWidget';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type { BackendMessage } from 'views/components/messagelist/Types';
-import type Widget from 'views/logic/widgets/Widget';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
 import { InputsActions } from 'stores/inputs/InputsStore';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
@@ -154,7 +152,7 @@ const MessageList = ({
   const onSortChange = useCallback((newSort: SortConfig[]) => {
     const newConfig = config.toBuilder().sort(newSort).build();
 
-    return onConfigChange(newConfig).then(() => {});
+    return onConfigChange(newConfig);
   }, [config, onConfigChange]);
 
   return (
@@ -187,7 +185,7 @@ MessageList.propTypes = {
 };
 
 MessageList.defaultProps = {
-  onConfigChange: () => Promise.resolve(Immutable.OrderedMap<string, Widget>()),
+  onConfigChange: () => Promise.resolve(),
   pageSize: Messages.DEFAULT_LIMIT,
 };
 

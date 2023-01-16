@@ -22,8 +22,6 @@ import styled from 'styled-components';
 
 import type { BackendWidgetPosition, WidgetResults } from 'views/types';
 import { widgetDefinition } from 'views/logic/Widgets';
-import type { Widgets } from 'views/stores/WidgetStore';
-import { WidgetActions } from 'views/stores/WidgetStore';
 import { TitlesActions } from 'views/stores/TitlesStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -38,6 +36,8 @@ import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useWidgetResults from 'views/components/useWidgetResults';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import useAppDispatch from 'stores/useAppDispatch';
+import { updateWidget, updateWidgetConfig } from 'views/logic/slices/widgetActions';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -66,15 +66,15 @@ export type Result = {
   effective_timerange: AbsoluteTimeRange,
 };
 
-const _visualizationForType = (type) => {
+const _visualizationForType = (type: string) => {
   return widgetDefinition(type).visualizationComponent;
 };
 
-const _editComponentForType = (type) => {
+const _editComponentForType = (type: string) => {
   return widgetDefinition(type).editComponent;
 };
 
-const _hasOwnEditSubmitButton = (type) => {
+const _hasOwnEditSubmitButton = (type: string) => {
   return widgetDefinition(type).hasEditSubmitButton;
 };
 
@@ -88,7 +88,7 @@ type VisualizationProps = Pick<Props, 'title' | 'id' | 'widget' | 'fields' | 'ed
   queryId: string,
   setLoadingState: (loading: boolean) => void,
   onToggleEdit: () => void,
-  onWidgetConfigChange: (newWidgetConfig: WidgetConfig) => Promise<Widgets>,
+  onWidgetConfigChange: (newWidgetConfig: WidgetConfig) => Promise<void>,
 };
 
 const Visualization = ({ title, id, widget, fields, queryId, editing, setLoadingState, onToggleEdit, onWidgetConfigChange }: VisualizationProps) => {
@@ -157,6 +157,7 @@ const Widget = ({ id, editing, widget, fields, title, position, onPositionsChang
   const [loading, setLoading] = useState(false);
   const [oldWidget, setOldWidget] = useState(editing ? widget : undefined);
   const { focusedWidget, setWidgetEditing, unsetWidgetEditing } = useContext(WidgetFocusContext);
+  const dispatch = useAppDispatch();
   const onToggleEdit = useCallback(() => {
     if (editing) {
       unsetWidgetEditing();
@@ -169,13 +170,13 @@ const Widget = ({ id, editing, widget, fields, title, position, onPositionsChang
   }, [editing, setWidgetEditing, unsetWidgetEditing, widget]);
   const onCancelEdit = useCallback(() => {
     if (oldWidget) {
-      WidgetActions.update(id, oldWidget).then(() => {});
+      dispatch(updateWidget(id, oldWidget));
     }
 
     onToggleEdit();
-  }, [id, oldWidget, onToggleEdit]);
+  }, [dispatch, id, oldWidget, onToggleEdit]);
   const onRenameWidget = useCallback((newTitle: string) => TitlesActions.set('widget', id, newTitle), [id]);
-  const onWidgetConfigChange = useCallback((newWidgetConfig: WidgetConfig) => WidgetActions.updateConfig(id, newWidgetConfig), [id]);
+  const onWidgetConfigChange = useCallback((newWidgetConfig: WidgetConfig) => dispatch(updateWidgetConfig(id, newWidgetConfig)).then(() => {}), [dispatch, id]);
   const activeQuery = useActiveQueryId();
 
   const { config } = widget;

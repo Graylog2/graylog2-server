@@ -29,7 +29,6 @@ import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import type { Completer } from 'views/components/searchbar/SearchBarAutocompletions';
 import type { Result } from 'views/components/widgets/Widget';
-import type { Widgets } from 'views/stores/WidgetStore';
 import type { OverrideProps } from 'views/components/WidgetOverrideElements';
 import type {
   VisualizationConfigDefinition,
@@ -88,7 +87,7 @@ export interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig
   fields: Immutable.List<FieldTypeMapping>;
   filter: string;
   queryId: string;
-  onConfigChange: (newConfig: Config) => Promise<Widgets>;
+  onConfigChange: (newConfig: Config) => Promise<void>;
   setLoadingState: (loading: boolean) => void;
   title: string;
   toggleEdit: () => void;

@@ -20,9 +20,10 @@ import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { GetState, WidgetPositions } from 'views/types';
 import { selectWidgetPositions } from 'views/logic/slices/widgetSelectors';
-import { selectActiveQuery, selectActiveViewState, selectWidgets } from 'views/logic/slices/viewSelectors';
+import { selectActiveQuery, selectActiveViewState, selectWidgets, selectWidget } from 'views/logic/slices/viewSelectors';
 import { updateViewState } from 'views/logic/slices/viewSlice';
 import type Widget from 'views/logic/widgets/Widget';
+import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 
 export const updateWidgetPositions = (newWidgetPositions: WidgetPositions) => (dispatch: AppDispatch, getState: GetState) => {
   const activeQuery = selectActiveQuery(getState());
@@ -60,4 +61,20 @@ export const addWidget = (widget: Widget) => (dispatch: AppDispatch, getState: G
   const newWidgets = widgets.push(widget);
 
   return dispatch(updateWidgets(newWidgets));
+};
+
+export const updateWidget = (id: string, updatedWidget: Widget) => (dispatch: AppDispatch, getState: GetState) => {
+  const widgets = selectWidgets(getState());
+  const newWidgets = widgets.map((widget) => (widget.id === id ? updatedWidget : widget)).toList();
+
+  return dispatch(updateWidgets(newWidgets));
+};
+
+export const updateWidgetConfig = (id: string, newWidgetConfig: WidgetConfig) => (dispatch: AppDispatch, getState: GetState) => {
+  const widget = selectWidget(id)(getState());
+  const newWidget = widget.toBuilder()
+    .config(newWidgetConfig)
+    .build();
+
+  return dispatch(updateWidget(id, newWidget));
 };
