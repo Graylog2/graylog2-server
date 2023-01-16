@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.process;
 
+import com.github.oxo42.stateless4j.StateMachine;
 import org.apache.http.HttpHost;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.RestClientBuilder;
@@ -29,17 +30,19 @@ public class OpensearchProcess {
     private final Process process;
     private final OpensearchProcessLogs processLogs;
     private final RestHighLevelClient restClient;
-    private ProcessStatus status;
+
+    private final StateMachine<ProcessState, ProcessEvent> processState;
 
     public OpensearchProcess(String opensearchVersion, Path targetLocation, Process opensearchProcess, OpensearchProcessLogs processLogs) {
         this.opensearchVersion = opensearchVersion;
         this.targetLocation = targetLocation;
         this.process = opensearchProcess;
         this.processLogs = processLogs;
-        this.status = ProcessStatus.STARTED;
 
         RestClientBuilder builder = RestClient.builder(new HttpHost("localhost", 9200, "http"));
         this.restClient = new RestHighLevelClient(builder);
+
+        this.processState = ProcessStateMachine.createNew();
 
     }
 
@@ -63,21 +66,21 @@ public class OpensearchProcess {
         return restClient;
     }
 
-    public ProcessStatus getStatus() {
-        return status;
+    public ProcessState getStatus() {
+        return processState.getState();
     }
 
     public ProcessInfo getProcessInfo() {
         return new ProcessInfo(
                 process.pid(),
-                status,
+                processState.getState(),
                 process.info().startInstant().orElse(null),
                 process.info().totalCpuDuration().orElse(null),
                 process.info().user().orElse(null));
     }
 
-    public void setStatus(ProcessStatus status) {
-        this.status = status;
+    public void onEvent(ProcessEvent event) {
+        this.processState.fire(event);
     }
 }
 

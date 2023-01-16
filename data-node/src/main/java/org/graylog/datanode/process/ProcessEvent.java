@@ -16,5 +16,10 @@
  */
 package org.graylog.datanode.process;
 
-public record ProcessInfo(long pid, ProcessState status, java.time.Instant started, java.time.Duration uptime, String user) {
+public enum ProcessEvent {
+    PROCESS_STARTED,
+    HEALTH_CHECK_GREEN,
+    HEALTH_CHECK_FAILED,
+
+    PROCESS_TERMINATED
 }

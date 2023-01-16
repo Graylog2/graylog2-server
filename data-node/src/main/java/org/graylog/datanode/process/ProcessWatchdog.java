@@ -44,24 +44,34 @@ public class ProcessWatchdog {
     }
 
     @Scheduled(fixedRate = 10_000)
-    public void heartbeat() {
+    public void opensearchApiHeartbeat() {
         managedOpenSearch.getProcesses()
-                .stream().filter(p -> p.getStatus() == ProcessStatus.STARTED)
                 .forEach(process -> {
                     try {
-                        final ClusterHealthResponse health = process.getRestClient().cluster().health(new ClusterHealthRequest(), RequestOptions.DEFAULT);
-                        if (health.getStatus() == ClusterHealthStatus.GREEN) {
-                            process.setStatus(ProcessStatus.RUNNING);
-                        }
+                        final ClusterHealthRequest req = new ClusterHealthRequest();
+                        final ClusterHealthResponse health = process.getRestClient()
+                                .cluster()
+                                .health(req, RequestOptions.DEFAULT);
+                        onClusterStatus(process, health);
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        onRestError(process, e);
                     }
                 });
     }
 
+    private void onClusterStatus(OpensearchProcess process, ClusterHealthResponse health) {
+        if (process.getStatus() == ProcessState.AVAILABLE && health.getStatus() == ClusterHealthStatus.GREEN) {
+            process.onEvent(ProcessEvent.HEALTH_CHECK_GREEN);
+        }
+    }
+
+    private void onRestError(OpensearchProcess process, IOException e) {
+        LOG.warn("Opensearch REST api of process {} unavailable. Cause: {}", process.getProcessInfo().pid(), e.getMessage());
+    }
+
     private void updateStatus(OpensearchProcess process) {
         if (!process.getProcess().isAlive()) {
-            process.setStatus(ProcessStatus.TERMINATED);
+            process.onEvent(ProcessEvent.PROCESS_TERMINATED);
         }
     }
 }

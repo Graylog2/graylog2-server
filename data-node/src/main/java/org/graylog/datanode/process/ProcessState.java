@@ -16,8 +16,13 @@
  */
 package org.graylog.datanode.process;
 
-public enum ProcessStatus {
-    STARTED,
+public enum ProcessState {
+    NEW,
     RUNNING,
+    AVAILABLE,
+
+    FAILING,
+
+    FAILED,
     TERMINATED
 }

@@ -16,16 +16,10 @@
  */
 package org.graylog.datanode;
 
-import com.github.rholder.retry.Attempt;
 import com.github.rholder.retry.RetryException;
-import com.github.rholder.retry.RetryListener;
-import com.github.rholder.retry.Retryer;
-import com.github.rholder.retry.RetryerBuilder;
-import com.github.rholder.retry.StopStrategies;
-import com.github.rholder.retry.WaitStrategies;
 import org.graylog.datanode.process.OpensearchProcess;
 import org.graylog.datanode.process.OpensearchProcessLogs;
-import org.graylog.datanode.process.ProcessStatus;
+import org.graylog.datanode.process.ProcessEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,16 +29,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 @Component
 public class DataNodeRunner {
@@ -92,6 +81,8 @@ public class DataNodeRunner {
 
         final Process process = builder.start();
         final OpensearchProcessLogs logs = OpensearchProcessLogs.createFor(process, logsSize);
-        return new OpensearchProcess(opensearchVersion, targetLocation, process, logs);
+        final OpensearchProcess opensearchProcess = new OpensearchProcess(opensearchVersion, targetLocation, process, logs);
+        opensearchProcess.onEvent(ProcessEvent.PROCESS_STARTED);
+        return opensearchProcess;
     }
 }
