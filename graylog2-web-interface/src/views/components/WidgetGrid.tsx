@@ -20,27 +20,29 @@ import styled, { css } from 'styled-components';
 import { createSelector } from '@reduxjs/toolkit';
 import type * as Immutable from 'immutable';
 
-import type { WidgetPositions, BackendWidgetPosition } from 'views/types';
+import type { WidgetPositions, BackendWidgetPosition, GetState } from 'views/types';
 import ReactGridContainer from 'components/common/ReactGridContainer';
 import { widgetDefinition } from 'views/logic/Widgets';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
-import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import ElementDimensions from 'components/common/ElementDimensions';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useAppSelector from 'stores/useAppSelector';
-import { selectViewStates } from 'views/logic/slices/viewSelectors';
+import { selectViewStates, selectIsDirty } from 'views/logic/slices/viewSelectors';
 import type Widget from 'views/logic/widgets/Widget';
 import findGaps from 'views/components/GridGaps';
 import generateId from 'logic/generateId';
 import NewWidgetPlaceholder from 'views/components/NewWidgetPlaceholder';
 import CreateNewWidgetModal from 'views/components/CreateNewWidgetModal';
 import isDeepEqual from 'stores/isDeepEqual';
-import { ViewActions, ViewStore } from 'views/stores/ViewStore';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import useAppDispatch from 'stores/useAppDispatch';
+import { updateWidgetPositions, updateWidgetPosition } from 'views/logic/slices/widgetActions';
+import { setIsDirty } from 'views/logic/slices/viewSlice';
 
 import WidgetContainer from './WidgetContainer';
 import WidgetComponent from './WidgetComponent';
@@ -161,25 +163,26 @@ const MAXIMUM_GRID_SIZE = 12;
 
 const convertPosition = ({ col, row, height, width }: BackendWidgetPosition) => new WidgetPosition(col, row, height, width >= MAXIMUM_GRID_SIZE ? Infinity : width);
 
-const onPositionChange = (newPosition: BackendWidgetPosition) => {
+const onPositionChange = (dispatch: AppDispatch, newPosition: BackendWidgetPosition) => {
   const { id } = newPosition;
   const widgetPosition = convertPosition(newPosition);
-  CurrentViewStateActions.updateWidgetPosition(id, widgetPosition);
+
+  return dispatch(updateWidgetPosition(id, widgetPosition));
 };
 
-const _onPositionsChange = (newPositions: Array<BackendWidgetPosition>, setLastUpdate: (newValue: string) => void) => {
+const _onPositionsChange = (dispatch: AppDispatch, newPositions: Array<BackendWidgetPosition>, setLastUpdate: (newValue: string) => void) => {
   const widgetPositions = Object.fromEntries(newPositions.map((newPosition) => [newPosition.id, convertPosition(newPosition)]));
-  CurrentViewStateActions.widgetPositions(widgetPositions);
   setLastUpdate(generateId());
+
+  return dispatch(updateWidgetPositions(widgetPositions));
 };
 
-const _onSyncLayout = (positions: WidgetPositions, newPositions: Array<BackendWidgetPosition>) => {
-  const { dirty: isDirty } = ViewStore.getInitialState();
+const _onSyncLayout = (positions: WidgetPositions, newPositions: Array<BackendWidgetPosition>) => (dispatch: AppDispatch, getState: GetState) => {
+  const isDirty = selectIsDirty(getState());
   const widgetPositions = Object.fromEntries(newPositions.map((newPosition) => [newPosition.id, convertPosition(newPosition)]));
 
   if (!isDeepEqual(positions, widgetPositions)) {
-    CurrentViewStateActions.widgetPositions(widgetPositions)
-      .then(() => ViewActions.setDirty(isDirty));
+    dispatch(updateWidgetPositions(widgetPositions)).then(() => dispatch(setIsDirty(isDirty)));
   }
 };
 
@@ -215,19 +218,21 @@ const WidgetGrid = () => {
   const { focusedWidget } = useContext(WidgetFocusContext);
   const [lastUpdate, setLastUpdate] = useState<string>(undefined);
   const preventDoubleUpdate = useRef<BackendWidgetPosition[]>();
+  const dispatch = useAppDispatch();
 
   const [widgets, positions] = useWidgetsAndPositions();
 
   const onPositionsChange = useCallback((newPositions: Array<BackendWidgetPosition>) => {
     preventDoubleUpdate.current = newPositions;
 
-    return _onPositionsChange(newPositions, setLastUpdate);
-  }, []);
+    return _onPositionsChange(dispatch, newPositions, setLastUpdate);
+  }, [dispatch]);
+  const _onPositionChange = useCallback((newPosition: BackendWidgetPosition) => onPositionChange(dispatch, newPosition), [dispatch]);
   const onSyncLayout = useCallback((newPositions: Array<BackendWidgetPosition>) => {
     if (!isDeepEqual(preventDoubleUpdate.current, newPositions)) {
-      _onSyncLayout(positions, newPositions);
+      dispatch(_onSyncLayout(positions, newPositions));
     }
-  }, [positions]);
+  }, [dispatch, positions]);
 
   const fields = useQueryFieldTypes();
 
@@ -241,7 +246,7 @@ const WidgetGrid = () => {
                           positions={positions}
                           widgetId={widgetId}
                           focusedWidget={focusedWidget}
-                          onPositionsChange={onPositionChange} />
+                          onPositionsChange={_onPositionChange} />
         </WidgetContainer>
       ));
 

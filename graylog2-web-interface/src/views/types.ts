@@ -321,6 +321,8 @@ export interface RootState {
   searchMetadata: SearchMetadataState;
 }
 
+export type GetState = () => RootState;
+
 export type ViewsReducer = {
   key: keyof RootState,
   reducer: Reducer<RootState[keyof RootState], AnyAction>,

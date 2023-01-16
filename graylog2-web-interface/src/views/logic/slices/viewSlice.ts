@@ -157,3 +157,13 @@ export const updateQueryString = (queryId: string, newQueryString: string) => (d
 
   return dispatch(setGlobalOverrideQuery(newQueryString));
 };
+
+export const updateViewState = (id: QueryId, newViewState: ViewStateType) => (dispatch: AppDispatch, getState: () => RootState) => {
+  const view = selectView(getState());
+  const newState = view.state.set(id, newViewState);
+  const newView = view.toBuilder()
+    .state(newState)
+    .build();
+
+  return dispatch(loadView(newView));
+};
