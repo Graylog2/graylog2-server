@@ -153,7 +153,7 @@ const _migrateWidgets = (legacyCharts) => {
       // Because all field charts show the results for the defined timerange,
       // the new row pivot always contains the timestamp field.
       const rowPivotConfig = { interval: { type: 'timeunit' as const, ...mapTime(chart.interval) } } as PivotConfigType;
-      const rowPivot = new Pivot(TIMESTAMP_FIELD, 'time', rowPivotConfig);
+      const rowPivot = Pivot.create([TIMESTAMP_FIELD], 'time', rowPivotConfig);
       const visualization = mapVisualization(chart.renderer);
       const visualizationConfig = createVisualizationConfig(chart.interpolation, visualization);
       // create widget with migrated data

@@ -114,7 +114,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
   }
 
   get isTimeline() {
-    return this.rowPivots && this.rowPivots.length === 1 && this.rowPivots[0].field === TIMESTAMP_FIELD;
+    return this.rowPivots && this.rowPivots.length === 1 && !!this.rowPivots[0].fields?.includes(TIMESTAMP_FIELD);
   }
 
   get isEmpty(): boolean {

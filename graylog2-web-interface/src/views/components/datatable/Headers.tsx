@@ -205,8 +205,8 @@ type Props = {
 };
 
 const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup, actualColumnPivotFields, onSortChange, sortConfigMap, onSetColumnsWidth, pinnedColumns, togglePin }: Props) => {
-  const rowFieldNames = rowPivots.map((pivot) => pivot.field);
-  const columnFieldNames = columnPivots.map((pivot) => pivot.field);
+  const rowFieldNames = rowPivots.flatMap((pivot) => pivot.fields);
+  const columnFieldNames = columnPivots.flatMap((pivot) => pivot.fields);
 
   const headerField = ({ field, prefix = '', span = 1, title = field, sortable = false, sortType = undefined, showPinIcon = false }) => {
     return (

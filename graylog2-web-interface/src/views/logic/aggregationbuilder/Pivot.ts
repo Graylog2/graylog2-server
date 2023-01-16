@@ -42,13 +42,13 @@ export const DateType = 'time';
 export const ValuesType = 'values';
 
 export type PivotJson = {
-  field: string,
+  fields: Array<string>,
   type: string,
   config: PivotConfigType,
 };
 
 type InternalState = {
-  field: string,
+  fields: Array<string>,
   type: string,
   config: PivotConfigType,
 };
@@ -56,12 +56,12 @@ type InternalState = {
 export default class Pivot {
   _value: InternalState;
 
-  constructor(field: string, type: string, config: PivotConfigType = { limit: DEFAULT_LIMIT }) {
-    this._value = { field, type, config };
+  constructor(fields: Array<string>, type: string, config: PivotConfigType = { limit: DEFAULT_LIMIT }) {
+    this._value = { fields, type, config };
   }
 
-  get field() {
-    return this._value.field;
+  get fields() {
+    return this._value.fields;
   }
 
   get type() {
@@ -72,19 +72,19 @@ export default class Pivot {
     return this._value.config;
   }
 
-  static create(field: string, type: string, config: PivotConfigType = { limit: DEFAULT_LIMIT }) {
-    return new Pivot(field, type, config);
+  static create(fields: Array<string>, type: string, config: PivotConfigType = { limit: DEFAULT_LIMIT }) {
+    return new Pivot(fields, type, config);
   }
 
   static fromJSON(value: PivotJson) {
-    const { field, type, config = { limit: DEFAULT_LIMIT } } = value;
+    const { fields, type, config = { limit: DEFAULT_LIMIT } } = value;
 
-    return new Pivot(field, type, config);
+    return new Pivot(fields, type, config);
   }
 
   toJSON(): PivotJson {
-    const { field, type, config } = this._value;
+    const { fields, type, config } = this._value;
 
-    return { field, type, config };
+    return { fields, type, config };
   }
 }

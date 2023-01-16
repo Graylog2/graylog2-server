@@ -89,11 +89,11 @@ const labelMapper = (data: Array<{ labels: Array<string> }>) => data.reduce((acc
 
 const legendField = (columnPivots: Array<Pivot>, rowPivots: Array<Pivot>, series: Array<Series>, isFunction: boolean) => {
   if (rowPivots.length === 1 && series.length === 1 && !isFunction) {
-    return rowPivots[0].field;
+    return rowPivots[0].fields.join(', ');
   }
 
   if (columnPivots.length === 1) {
-    return columnPivots[0].field;
+    return columnPivots[0].fields.join(', ');
   }
 
   return null;

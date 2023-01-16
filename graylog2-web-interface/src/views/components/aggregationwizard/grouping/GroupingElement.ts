@@ -37,7 +37,7 @@ import type {
 } from '../WidgetConfigForm';
 
 type GroupByError = {
-  field?: string,
+  fields?: string,
   interval?: string,
   limit?: string,
 };
@@ -45,8 +45,8 @@ type GroupByError = {
 const validateDateGrouping = (grouping: DateGrouping): GroupByError => {
   const groupByError = {} as GroupByError;
 
-  if (!grouping.field?.field) {
-    groupByError.field = 'Field is required.';
+  if (!grouping.fields?.length) {
+    groupByError.fields = 'Field is required.';
   }
 
   if (grouping.interval.type === 'auto') {
@@ -75,8 +75,8 @@ const validateDateGrouping = (grouping: DateGrouping): GroupByError => {
 const validateValuesGrouping = (grouping: ValuesGrouping): GroupByError => {
   const groupByError: GroupByError = {};
 
-  if (!grouping.field?.field) {
-    groupByError.field = 'Field is required.';
+  if (!grouping.fields?.length) {
+    groupByError.fields = 'Field is required.';
   }
 
   const parsedLimit = parseNumber(grouping.limit);
@@ -123,24 +123,26 @@ const addRandomId = <GroupingType extends BaseGrouping>(baseGrouping: Omit<Group
 });
 
 const datePivotToGrouping = (pivot: Pivot, direction: GroupingDirection): DateGrouping => {
-  const { field, config } = pivot;
+  const { fields, config } = pivot;
 
   const { interval } = config as TimeConfigType;
 
   return addRandomId<DateGrouping>({
     direction,
-    field: { field, type: 'time' },
+    fields,
+    type: 'time',
     interval,
   });
 };
 
 const valuesPivotToGrouping = (pivot: Pivot, direction: GroupingDirection): ValuesGrouping => {
-  const { field, config } = pivot;
+  const { fields, config } = pivot;
   const { limit } = config as ValuesConfigType;
 
   return addRandomId<ValuesGrouping>({
     direction,
-    field: { field, type: 'values' },
+    fields,
+    type: 'values',
     limit,
   });
 };
@@ -167,7 +169,7 @@ const pivotsToGrouping = (config: AggregationWidgetConfig) => {
 const groupingToPivot = (grouping: GroupByFormValues) => {
   const pivotConfig = 'interval' in grouping ? { interval: grouping.interval } : { limit: grouping.limit };
 
-  return new Pivot(grouping.field.field, grouping.field.type, pivotConfig);
+  return Pivot.create(grouping.fields, grouping.type, pivotConfig);
 };
 
 const groupByToConfig = (groupBy: WidgetConfigFormValues['groupBy'], config: AggregationWidgetConfigBuilder) => {
@@ -183,10 +185,8 @@ const groupByToConfig = (groupBy: WidgetConfigFormValues['groupBy'], config: Agg
 
 export const createEmptyGrouping = () => addRandomId<ValuesGrouping>({
   direction: 'row',
-  field: {
-    field: undefined,
-    type: 'values',
-  },
+  fields: [],
+  type: 'values',
   limit: DEFAULT_LIMIT,
 });
 

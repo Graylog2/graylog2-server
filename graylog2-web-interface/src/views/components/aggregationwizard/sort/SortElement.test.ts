@@ -51,7 +51,8 @@ describe('SortElement', () => {
           groupings: [{
             id: 'foob',
             direction: 'row',
-            field: { field: 'time', type: 'time' },
+            fields: ['time'],
+            type: 'time',
             interval: { type: 'timeunit', value: 3, unit: 'seconds' },
           }],
         },

@@ -157,7 +157,7 @@ describe('AggregationWizard/Core Visualizations', () => {
   it('allows enabling event annotations for visualizations supporting it', async () => {
     const onChange = jest.fn();
     const timelineConfig = widgetConfig.toBuilder()
-      .rowPivots([Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } })])
+      .rowPivots([Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } })])
       .series([Series.create('count')])
       .build();
 
@@ -178,8 +178,8 @@ describe('AggregationWizard/Core Visualizations', () => {
   it('creates Heatmap config when all required fields are present', async () => {
     const onChange = jest.fn();
     const heatMapConfig = widgetConfig.toBuilder()
-      .rowPivots([Pivot.create('foo', 'values')])
-      .columnPivots([Pivot.create('bar', 'values')])
+      .rowPivots([Pivot.create(['foo'], 'values')])
+      .columnPivots([Pivot.create(['bar'], 'values')])
       .series([Series.create('count')])
       .build();
 

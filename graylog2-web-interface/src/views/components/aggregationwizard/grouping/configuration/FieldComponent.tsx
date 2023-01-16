@@ -66,16 +66,16 @@ const FieldComponent = ({ index, fieldType }: Props) => {
     onChange({
       target: {
         name,
-        value: {
+        value: [{
           field: newField.name,
           type: newFieldType,
-        },
+        }],
       },
     });
   };
 
   return (
-    <Field name={`groupBy.groupings.${index}.field`}>
+    <Field name={`groupBy.groupings.${index}.fields`}>
       {({ field: { name, value, onChange }, meta: { error } }) => (
         <FieldSelect id="group-by-field-select"
                      label="Field"
