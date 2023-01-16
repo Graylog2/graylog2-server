@@ -16,8 +16,8 @@
  */
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
-import type { AppDispatch } from 'src/stores/useAppDispatch';
 
+import type { AppDispatch } from 'stores/useAppDispatch';
 import type { ViewState, RootState } from 'views/types';
 import type { QueryId } from 'views/logic/queries/Query';
 import type ViewStateType from 'views/logic/views/ViewState';
