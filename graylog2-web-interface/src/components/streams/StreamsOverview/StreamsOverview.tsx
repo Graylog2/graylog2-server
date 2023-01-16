@@ -154,7 +154,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
     return <Spinner />;
   }
 
-  const { streams, pagination: { total } } = paginatedStreams;
+  const { elements, pagination: { total } } = paginatedStreams;
 
   return (
     <PaginatedList onChange={onPageChange}
@@ -166,10 +166,10 @@ const StreamsOverview = ({ indexSets }: Props) => {
                     queryHelpComponent={<QueryHelper entityName="stream" />} />
       </div>
       <div>
-        {streams?.length === 0 ? (
+        {elements?.length === 0 ? (
           <NoSearchResult>No streams have been found</NoSearchResult>
         ) : (
-          <EntityDataTable<Stream> data={streams}
+          <EntityDataTable<Stream> data={elements}
                                    visibleColumns={visibleColumns}
                                    columnsOrder={COLUMNS_ORDER}
                                    onColumnsChange={onColumnsChange}

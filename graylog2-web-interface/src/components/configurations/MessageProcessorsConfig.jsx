@@ -52,17 +52,19 @@ const MessageProcessorsConfig = createReactClass({
         disabled_processors: config.disabled_processors,
         processor_order: config.processor_order,
       },
+      showConfigModal: false,
     };
   },
 
   inputs: {},
 
   _openModal() {
-    this.configModal.open();
+    this.setState({ showConfigModal: true });
   },
 
   _closeModal() {
-    this.configModal.close();
+    // Reset to initial state when the modal is closed without saving.
+    this.setState(this.getInitialState());
   },
 
   _saveConfig() {
@@ -74,11 +76,6 @@ const MessageProcessorsConfig = createReactClass({
         this._closeModal();
       });
     }
-  },
-
-  _resetConfig() {
-    // Reset to initial state when the modal is closed without saving.
-    this.setState(this.getInitialState());
   },
 
   _updateSorting(newSorting) {
@@ -184,33 +181,35 @@ const MessageProcessorsConfig = createReactClass({
           <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
         </IfPermitted>
 
-        <BootstrapModalForm ref={(configModal) => { this.configModal = configModal; }}
+        <BootstrapModalForm show={this.state.showConfigModal}
                             title="Update Message Processors Configuration"
                             onSubmitForm={this._saveConfig}
-                            onModalClose={this._resetConfig}
+                            onCancel={this._closeModal}
                             submitButtonText="Update configuration">
-          <h3>Order</h3>
-          <p>Use drag and drop to change the execution order of the message processors.</p>
-          <SortableList items={this._sortableItems()} onMoveItem={this._updateSorting} displayOverlayInPortal />
+          <>
+            <h3>Order</h3>
+            <p>Use drag and drop to change the execution order of the message processors.</p>
+            <SortableList items={this._sortableItems()} onMoveItem={this._updateSorting} displayOverlayInPortal />
 
-          <h3>Status</h3>
-          <p>Change the checkboxes to change the status of a message processor.</p>
-          <Table striped bordered condensed className="top-margin">
-            <thead>
-              <tr>
-                <th>Processor</th>
-                <th>Enabled</th>
-              </tr>
-            </thead>
-            <tbody>
-              {this._statusForm()}
-            </tbody>
-          </Table>
-          {this._hasNoActiveProcessor() && (
-            <Alert bsStyle="danger">
-              <strong>ERROR:</strong> No active message processor!
-            </Alert>
-          )}
+            <h3>Status</h3>
+            <p>Change the checkboxes to change the status of a message processor.</p>
+            <Table striped bordered condensed className="top-margin">
+              <thead>
+                <tr>
+                  <th>Processor</th>
+                  <th>Enabled</th>
+                </tr>
+              </thead>
+              <tbody>
+                {this._statusForm()}
+              </tbody>
+            </Table>
+            {this._hasNoActiveProcessor() && (
+              <Alert bsStyle="danger">
+                <strong>ERROR:</strong> No active message processor!
+              </Alert>
+            )}
+          </>
         </BootstrapModalForm>
       </div>
     );

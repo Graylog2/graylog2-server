@@ -49,13 +49,8 @@ export default class RuleMetricsConfig extends React.Component {
     onChange(nextConfig).then(this.closeModal);
   };
 
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  openModal = () => {
-    this.modal.open();
-  };
-
   closeModal = () => {
-    this.modal.close();
+    this.props.onClose();
   };
 
   propagateChange = (key, value) => {
@@ -73,7 +68,7 @@ export default class RuleMetricsConfig extends React.Component {
   };
 
   render() {
-    const { config, onClose } = this.props;
+    const { config } = this.props;
     const { nextConfig } = this.state;
 
     if (!config) {
@@ -81,11 +76,10 @@ export default class RuleMetricsConfig extends React.Component {
     }
 
     return (
-      <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
+      <BootstrapModalForm show
                           title="Rule Metrics Configuration"
                           onSubmitForm={this.saveConfiguration}
-                          onModalClose={onClose}
-                          show
+                          onCancel={this.closeModal}
                           submitButtonText="Update configuration">
         <Alert bsStyle="warning">
           Rule metrics should only be enabled to debug a performance issue because collecting the

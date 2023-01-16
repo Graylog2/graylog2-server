@@ -22,16 +22,15 @@ import DataTable from 'views/components/datatable/DataTable';
 import type { CreatorProps } from 'views/components/sidebar/create/AddWidgetButton';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 
-export default function CreateCustomAggregation({ view }: CreatorProps) {
-  const newWidget = AggregationWidget.builder()
-    .newId()
-    .timerange(view.type === View.Type.Dashboard ? DEFAULT_TIMERANGE : undefined)
-    .config(AggregationWidgetConfig.builder()
-      .rowPivots([])
-      .series([])
-      .visualization(DataTable.type)
-      .build())
-    .build();
+export const CreateCustomAggregation = ({ view }: CreatorProps) => AggregationWidget.builder()
+  .newId()
+  .timerange(view.type === View.Type.Dashboard ? DEFAULT_TIMERANGE : undefined)
+  .config(AggregationWidgetConfig.builder()
+    .rowPivots([])
+    .series([])
+    .visualization(DataTable.type)
+    .build())
+  .build();
 
-  return WidgetActions.create(newWidget);
-}
+const AddCustomAggregation = (props: CreatorProps) => WidgetActions.create(CreateCustomAggregation(props));
+export default AddCustomAggregation;

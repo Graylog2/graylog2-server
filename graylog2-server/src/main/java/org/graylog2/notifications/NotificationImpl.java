@@ -150,6 +150,7 @@ public class NotificationImpl extends PersistedImpl implements Notification {
 
     @Override
     public Notification addNode(String nodeId) {
+        node_id = nodeId;
         fields.put(FIELD_NODE_ID, nodeId);
         return this;  //To change body of created methods use File | Settings | File Templates.
     }

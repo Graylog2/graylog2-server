@@ -42,7 +42,7 @@ type Props = {
     }
   },
   currentUser: User,
-  onChange: (name: string, value: string | number) => void,
+  onChange: (name: string, newConfig: EventDefinition['config']) => void,
 }
 
 const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, currentUser, onChange }: Props) => {
@@ -77,9 +77,9 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
       .map((type) => ({ label: type.displayName, value: type.type }));
   };
 
-  const handleEventDefinitionTypeChange = (nextType) => {
+  const handleEventDefinitionTypeChange = (nextType: string) => {
     const conditionPlugin = getConditionPlugin(nextType);
-    const defaultConfig = conditionPlugin.defaultConfig || {};
+    const defaultConfig = conditionPlugin?.defaultConfig || {} as EventDefinition['config'];
 
     onChange('config', { ...defaultConfig, type: nextType });
   };
@@ -98,17 +98,21 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
     return <dl>{typeDescriptions}</dl>;
   };
 
+  const disabledSelect = () => {
+    return !formattedEventDefinitionTypes().some((edt) => eventDefinition.config.type === edt.value) && action === 'edit';
+  };
+
   const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
   const isSystemEventDefinition = eventDefinition.config.type === SYSTEM_EVENT_DEFINITION_TYPE;
 
-  const eventDefinitionTypeComponent = eventDefinitionType.formComponent
-    ? React.createElement(eventDefinitionType.formComponent, {
-      action,
-      entityTypes,
-      currentUser,
-      validation,
-      eventDefinition,
-      onChange,
+  const eventDefinitionTypeComponent = eventDefinitionType?.formComponent
+    ? React.createElement<React.ComponentProps<any>>(eventDefinitionType.formComponent, {
+      action: action,
+      entityTypes: entityTypes,
+      currentUser: currentUser,
+      validation: validation,
+      eventDefinition: eventDefinition,
+      onChange: onChange,
       key: eventDefinition.id,
     })
     : null;
@@ -135,6 +139,7 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
                       value={eventDefinition.config.type}
                       onChange={handleEventDefinitionTypeChange}
                       clearable={false}
+                      disabled={disabledSelect()}
                       required />
               <HelpBlock>
                 {lodash.get(validation, 'errors.config[0]', 'Choose the type of Condition for this Event.')}
@@ -144,7 +149,7 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
         )}
       </Col>
 
-      {!isSystemEventDefinition && (
+      {!isSystemEventDefinition && !disabledSelect() && (
         <>
           <Col md={5} lg={5} lgOffset={1}>
             <HelpPanel className={styles.conditionTypesInfo}

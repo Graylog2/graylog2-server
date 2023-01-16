@@ -36,37 +36,15 @@ import 'components/event-definitions/event-definition-types';
 
 import 'components/event-notifications/event-notification-types';
 
+const fetchNotifications = () => {
+  EventNotificationsActions.listAll();
+};
+
+const handleCancel = () => {
+  history.push(Routes.ALERTS.DEFINITIONS.LIST);
+};
+
 class EventDefinitionFormContainer extends React.Component {
-  static propTypes = {
-    action: PropTypes.oneOf(['create', 'edit']),
-    eventDefinition: PropTypes.object,
-    currentUser: PropTypes.object.isRequired,
-    entityTypes: PropTypes.object,
-    notifications: PropTypes.object.isRequired,
-    onEventDefinitionChange: PropTypes.func,
-  };
-
-  static defaultProps = {
-    action: 'edit',
-    eventDefinition: {
-      title: '',
-      description: '',
-      priority: EventDefinitionPriorityEnum.NORMAL,
-      config: {},
-      field_spec: {},
-      key_spec: [],
-      notification_settings: {
-        grace_period_ms: 0,
-        // Defaults to system setting for notification backlog size
-        backlog_size: null,
-      },
-      notifications: [],
-      alert: false,
-    },
-    entityTypes: undefined,
-    onEventDefinitionChange: () => {},
-  };
-
   constructor(props) {
     super(props);
 
@@ -82,12 +60,8 @@ class EventDefinitionFormContainer extends React.Component {
 
   componentDidMount() {
     this.fetchClusterConfig();
-    this.fetchNotifications();
+    fetchNotifications();
   }
-
-  fetchNotifications = () => {
-    EventNotificationsActions.listAll();
-  };
 
   fetchClusterConfig = () => {
     ConfigurationsActions.listEventsClusterConfig().then((config) => this.setState({ eventsClusterConfig: config }));
@@ -104,10 +78,6 @@ class EventDefinitionFormContainer extends React.Component {
 
       return { eventDefinition: nextEventDefinition, isDirty: true };
     });
-  };
-
-  handleCancel = () => {
-    history.push(Routes.ALERTS.DEFINITIONS.LIST);
   };
 
   handleSubmitSuccessResponse = () => {
@@ -185,12 +155,42 @@ class EventDefinitionFormContainer extends React.Component {
                              notifications={notifications.all}
                              defaults={defaults}
                              onChange={this.handleChange}
-                             onCancel={this.handleCancel}
+                             onCancel={handleCancel}
                              onSubmit={this.handleSubmit} />
       </>
     );
   }
 }
+
+EventDefinitionFormContainer.propTypes = {
+  action: PropTypes.oneOf(['create', 'edit']),
+  eventDefinition: PropTypes.object,
+  currentUser: PropTypes.object.isRequired,
+  entityTypes: PropTypes.object,
+  notifications: PropTypes.object.isRequired,
+  onEventDefinitionChange: PropTypes.func,
+};
+
+EventDefinitionFormContainer.defaultProps = {
+  action: 'edit',
+  eventDefinition: {
+    title: '',
+    description: '',
+    priority: EventDefinitionPriorityEnum.NORMAL,
+    config: {},
+    field_spec: {},
+    key_spec: [],
+    notification_settings: {
+      grace_period_ms: 300000,
+      // Defaults to system setting for notification backlog size
+      backlog_size: null,
+    },
+    notifications: [],
+    alert: false,
+  },
+  entityTypes: undefined,
+  onEventDefinitionChange: () => {},
+};
 
 export default connect(EventDefinitionFormContainer, {
   entityTypes: AvailableEventDefinitionTypesStore,
