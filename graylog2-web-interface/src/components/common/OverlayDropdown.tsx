@@ -113,6 +113,7 @@ const OverlayDropdown = ({
                  onEntering={handleOverlayEntering}>
           <FilterProps>
             <DropdownMenu show={show}
+                          onMenuItemSelect={onToggle}
                           zIndex={dropdownZIndex}>
               {children}
             </DropdownMenu>

@@ -17,16 +17,18 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-// eslint-disable-next-line no-restricted-imports
-import { Dropdown } from 'react-bootstrap';
+import type { SyntheticEvent } from 'react';
 
 type Props = {
   children: React.ReactNode,
   zIndex?: number,
   show: boolean,
+  onMenuItemSelect?: (e: SyntheticEvent) => void,
 };
 
-const StyledDropdownMenu = styled(Dropdown.Menu)<{ $show: boolean, $zIndex: number }>(({ $show, $zIndex, theme }) => css`
+const StyledDropdownMenu = styled.ul.attrs(() => ({
+  className: 'dropdown-menu', /* stylelint-disable-line property-no-unknown */
+}))<{ $show: boolean, $zIndex: number }>(({ $show, theme, $zIndex }) => css`
   display: ${$show ? 'block' : 'none'};
   min-width: max-content;
   color: ${theme.colors.variant.dark.default};
@@ -57,11 +59,51 @@ const StyledDropdownMenu = styled(Dropdown.Menu)<{ $show: boolean, $zIndex: numb
   }
 `);
 
-const DropdownMenu = ({ show, children, zIndex, ...restProps }: Props) => (
-  <StyledDropdownMenu {...restProps} $show={show} $zIndex={zIndex}>
-    {children}
-  </StyledDropdownMenu>
-);
+function closeOnChildSelect(child: React.ReactElement, updateDepth: number, onMenuItemSelect) {
+  if (child.props?.onSelect) {
+    return {
+      onSelect: (_eventKey: string | null | undefined, event: SyntheticEvent<HTMLButtonElement>) => {
+        child.props.onSelect();
+        onMenuItemSelect(event);
+      },
+    };
+  }
+
+  if (child.props?.children) {
+    return {
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      children: closeOnChildrenSelect(child.props.children, updateDepth + 1, onMenuItemSelect),
+    };
+  }
+
+  return {};
+}
+
+function closeOnChildrenSelect(children: React.ReactNode, updateDepth: number, onToggle) {
+  const maxChildDepth = 2;
+
+  if (updateDepth > maxChildDepth) {
+    return children;
+  }
+
+  return React.Children.map(
+    children,
+    (child: React.ReactElement) => (child?.props ? React.cloneElement(child, {
+      ...child.props,
+      ...closeOnChildSelect(child, updateDepth + 1, onToggle),
+    }) : child),
+  );
+}
+
+const DropdownMenu = ({ show, children, zIndex, onMenuItemSelect, ...restProps }: Props) => {
+  const mappedChildren = closeOnChildrenSelect(children, 0, onMenuItemSelect);
+
+  return (
+    <StyledDropdownMenu {...restProps} $show={show} $zIndex={zIndex}>
+      {mappedChildren}
+    </StyledDropdownMenu>
+  );
+};
 
 DropdownMenu.propTypes = {
   children: PropTypes.node.isRequired,
@@ -72,6 +114,7 @@ DropdownMenu.propTypes = {
 DropdownMenu.defaultProps = {
   show: false,
   zIndex: 1050,
+  onMenuItemSelect: () => {},
 };
 
 export default DropdownMenu;
