@@ -14,15 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useStore } from 'stores/connect';
-import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
-import { SearchStore } from 'views/stores/SearchStore';
+import { createSelector } from '@reduxjs/toolkit';
 
-const useParameters = () => {
-  const { parameterBindings } = useStore(SearchExecutionStateStore);
-  const { search } = useStore(SearchStore);
+import useAppSelector from 'stores/useAppSelector';
+import { selectParameterBindings } from 'views/logic/slices/searchExecutionSelectors';
+import { selectSearch } from 'views/logic/slices/viewSelectors';
 
-  return { parameterBindings, parameters: search?.parameters };
-};
+const selectParameters = createSelector(
+  selectParameterBindings,
+  selectSearch,
+  (parameterBindings, search) => ({ parameterBindings, parameters: search?.parameters }),
+);
+
+const useParameters = () => useAppSelector(selectParameters);
 
 export default useParameters;
