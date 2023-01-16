@@ -29,6 +29,7 @@ import { axisTypes, DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/vis
 import assertUnreachable from 'logic/assertUnreachable';
 import useViewType from 'views/hooks/useViewType';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
+import useAppDispatch from 'stores/useAppDispatch';
 
 import GenericPlot from './GenericPlot';
 import type { ChartColor, ChartConfig } from './GenericPlot';
@@ -87,7 +88,7 @@ const XYPlot = ({
   setChartColor,
   height,
   plotLayout = {},
-  onZoom = OnZoom,
+  onZoom,
 }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
   const currentQuery = useCurrentQuery();
@@ -104,9 +105,10 @@ const XYPlot = ({
 
   const layout = { ...defaultLayout, ...plotLayout };
   const viewType = useViewType();
+  const dispatch = useAppDispatch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(config.isTimeline
-    ? (from: string, to: string) => onZoom(currentQuery, from, to, viewType, userTimezone)
+    ? (from: string, to: string) => (onZoom ? onZoom(currentQuery, from, to, viewType, userTimezone) : OnZoom(dispatch, currentQuery, from, to, viewType, userTimezone))
     : () => true, [config.isTimeline, onZoom]);
 
   if (config.isTimeline && effectiveTimerange) {
@@ -158,7 +160,7 @@ XYPlot.defaultProps = {
   getChartColor: undefined,
   setChartColor: undefined,
   effectiveTimerange: undefined,
-  onZoom: OnZoom,
+  onZoom: undefined,
   height: undefined,
 };
 

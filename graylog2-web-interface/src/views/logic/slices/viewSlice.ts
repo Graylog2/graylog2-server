@@ -19,7 +19,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { ViewState, RootState } from 'views/types';
-import type { QueryId } from 'views/logic/queries/Query';
+import type { QueryId, TimeRange } from 'views/logic/queries/Query';
 import type ViewStateType from 'views/logic/views/ViewState';
 import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
 import type Query from 'views/logic/queries/Query';
@@ -143,6 +143,15 @@ export const setQueryString = (queryId: QueryId, newQueryString: string) => (dis
   const query = selectQueryById(queryId)(getState());
   const newQuery = query.toBuilder()
     .query({ type: 'elasticsearch', query_string: newQueryString })
+    .build();
+
+  return dispatch(updateQuery([queryId, newQuery]));
+};
+
+export const setTimerange = (queryId: QueryId, timerange: TimeRange) => (dispatch: AppDispatch, getState: () => RootState) => {
+  const query = selectQueryById(queryId)(getState());
+  const newQuery = query.toBuilder()
+    .timerange(timerange)
     .build();
 
   return dispatch(updateQuery([queryId, newQuery]));
