@@ -16,6 +16,7 @@
  */
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
+import type * as Immutable from 'immutable';
 
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { ViewState, RootState } from 'views/types';
@@ -28,8 +29,15 @@ import View from 'views/logic/views/View';
 import { setGlobalOverrideQuery, execute } from 'views/logic/slices/searchExecutionSlice';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
-import { selectActiveQuery, selectView, selectViewType, selectQueryById } from 'views/logic/slices/viewSelectors';
+import {
+  selectActiveQuery,
+  selectView,
+  selectViewType,
+  selectQueryById,
+  selectSearchQueries,
+} from 'views/logic/slices/viewSelectors';
 import createSearch from 'views/logic/slices/createSearch';
+import type { TitlesMap } from 'views/stores/TitleTypes';
 
 const viewSlice = createSlice({
   name: 'view',
@@ -81,8 +89,19 @@ export const loadView = (newView: View, recreateSearch: boolean = false) => asyn
   return dispatch(setView(newView));
 };
 
-export const addQuery = (payload: [Query, ViewStateType]) => async (dispatch: AppDispatch, getState: () => RootState) => {
-  const [query, viewState] = payload;
+export const updateQueries = (newQueries: Immutable.OrderedSet<Query>) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  const view = selectView(getState());
+  const { search } = view;
+  const newView = view.toBuilder()
+    .search(search.toBuilder()
+      .queries(newQueries)
+      .build())
+    .build();
+
+  return dispatch(loadView(newView));
+};
+
+export const addQuery = (query: Query, viewState: ViewStateType) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const state = getState();
   const view = selectView(state);
   const { search } = view;
@@ -136,7 +155,38 @@ export const removeQuery = (queryId: string) => async (dispatch: AppDispatch, ge
 export const createQuery = () => async (dispatch: AppDispatch, getState: () => RootState) => {
   const viewType = selectViewType(getState());
   const [query, state] = await NewQueryActionHandler(viewType);
-  dispatch(addQuery([query, state]));
+  dispatch(addQuery(query, state));
+};
+
+export const setQueriesOrder = (queryIds: Immutable.OrderedSet<string>) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  const queries = selectSearchQueries(getState());
+  const newQueries = queryIds.map((id) => queries.find((q) => q.id === id)).toOrderedSet();
+
+  return dispatch(updateQueries(newQueries));
+};
+
+export const mergeQueryTitles = (newQueryTitles: { queryId: QueryId, titlesMap: TitlesMap}[]) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  const view = selectView(getState());
+  let newState = view.state;
+
+  newQueryTitles.forEach(({ titlesMap: newQueryTitle, queryId }) => {
+    const newViewState = newState.get(queryId);
+    let newViewStateTitles = newViewState.titles;
+
+    newQueryTitle.forEach((titles, titleType) => {
+      titles.forEach((titleValue, titleID) => {
+        newViewStateTitles = newViewStateTitles.setIn([titleType, titleID], titleValue);
+      });
+    });
+
+    newState = newState.set(queryId, newViewState.toBuilder().titles(newViewStateTitles).build());
+  });
+
+  const newView = view.toBuilder()
+    .state(newState)
+    .build();
+
+  return dispatch(loadView(newView));
 };
 
 export const setQueryString = (queryId: QueryId, newQueryString: string) => (dispatch: AppDispatch, getState: () => RootState) => {
