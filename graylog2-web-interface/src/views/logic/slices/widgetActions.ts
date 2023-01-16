@@ -24,6 +24,8 @@ import { selectActiveQuery, selectActiveViewState, selectWidgets, selectWidget }
 import { updateViewState } from 'views/logic/slices/viewSlice';
 import type Widget from 'views/logic/widgets/Widget';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
+import generateId from 'logic/generateId';
+import { setTitle } from 'views/logic/slices/titlesActions';
 
 export const updateWidgetPositions = (newWidgetPositions: WidgetPositions) => (dispatch: AppDispatch, getState: GetState) => {
   const activeQuery = selectActiveQuery(getState());
@@ -77,4 +79,19 @@ export const updateWidgetConfig = (id: string, newWidgetConfig: WidgetConfig) =>
     .build();
 
   return dispatch(updateWidget(id, newWidget));
+};
+
+export const duplicateWidget = (widgetId: string, widgetTitle: string) => async (dispatch: AppDispatch, getState: GetState) => {
+  const widget = selectWidget(widgetId)(getState());
+
+  if (!widget) {
+    throw new Error(`Unable to duplicate widget with id "${widgetId}", it is not found.`);
+  }
+
+  const activeQuery = selectActiveQuery(getState());
+
+  const duplicatedWidget = widget.duplicate(generateId());
+
+  return dispatch(addWidget(duplicatedWidget))
+    .then(() => dispatch(setTitle(activeQuery, 'widget', duplicatedWidget.id, `${widgetTitle} (copy)`)));
 };

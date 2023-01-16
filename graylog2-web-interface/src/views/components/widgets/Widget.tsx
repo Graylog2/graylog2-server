@@ -20,9 +20,8 @@ import type * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import type { BackendWidgetPosition, WidgetResults } from 'views/types';
+import type { BackendWidgetPosition, WidgetResults, GetState } from 'views/types';
 import { widgetDefinition } from 'views/logic/Widgets';
-import { TitlesActions } from 'views/stores/TitlesStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import WidgetModel from 'views/logic/widgets/Widget';
@@ -36,8 +35,11 @@ import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useWidgetResults from 'views/components/useWidgetResults';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import type { AppDispatch } from 'stores/useAppDispatch';
 import useAppDispatch from 'stores/useAppDispatch';
 import { updateWidget, updateWidgetConfig } from 'views/logic/slices/widgetActions';
+import { selectActiveQuery } from 'views/logic/slices/viewSelectors';
+import { setTitle } from 'views/logic/slices/titlesActions';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -153,6 +155,12 @@ const EditWrapper = ({ children, config, editing, fields, id, onToggleEdit, onCa
   ) : children;
 };
 
+const setWidgetTitle = (widgetId: string, newTitle: string) => async (dispatch: AppDispatch, getState: GetState) => {
+  const activeQuery = selectActiveQuery(getState());
+
+  return dispatch(setTitle(activeQuery, 'widget', widgetId, newTitle));
+};
+
 const Widget = ({ id, editing, widget, fields, title, position, onPositionsChange }: Props) => {
   const [loading, setLoading] = useState(false);
   const [oldWidget, setOldWidget] = useState(editing ? widget : undefined);
@@ -175,7 +183,7 @@ const Widget = ({ id, editing, widget, fields, title, position, onPositionsChang
 
     onToggleEdit();
   }, [dispatch, id, oldWidget, onToggleEdit]);
-  const onRenameWidget = useCallback((newTitle: string) => TitlesActions.set('widget', id, newTitle), [id]);
+  const onRenameWidget = useCallback((newTitle: string) => dispatch(setWidgetTitle(id, newTitle)), [dispatch, id]);
   const onWidgetConfigChange = useCallback((newWidgetConfig: WidgetConfig) => dispatch(updateWidgetConfig(id, newWidgetConfig)).then(() => {}), [dispatch, id]);
   const activeQuery = useActiveQueryId();
 

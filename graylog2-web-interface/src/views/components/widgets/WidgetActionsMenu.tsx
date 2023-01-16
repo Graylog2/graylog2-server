@@ -26,7 +26,6 @@ import { loadDashboard } from 'views/logic/views/Actions';
 import { IconButton } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import View from 'views/logic/views/View';
 import SearchActions from 'views/actions/SearchActions';
 import Search from 'views/logic/search/Search';
@@ -43,6 +42,7 @@ import type { AppDispatch } from 'stores/useAppDispatch';
 import useAppDispatch from 'stores/useAppDispatch';
 import { selectQuery, loadView } from 'views/logic/slices/viewSlice';
 import { execute } from 'views/logic/slices/searchExecutionSlice';
+import { duplicateWidget } from 'views/logic/slices/widgetActions';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -123,13 +123,7 @@ const _onDelete = async (widget: Widget, view: View, title: string) => {
   return result === true ? WidgetActions.remove(widget.id) : Promise.resolve();
 };
 
-const _onDuplicate = (widgetId: string, unsetWidgetFocusing: () => void, title: string) => {
-  WidgetActions.duplicate(widgetId).then((newWidget) => {
-    TitlesActions.set(TitleTypes.Widget, newWidget.id, `${title} (copy)`).then(() => {
-      unsetWidgetFocusing();
-    });
-  });
-};
+const _onDuplicate = (widgetId: string, unsetWidgetFocusing: () => void, title: string) => (dispatch: AppDispatch) => dispatch(duplicateWidget(widgetId, title)).then(() => unsetWidgetFocusing());
 
 type Props = {
   isFocused: boolean,
@@ -155,7 +149,7 @@ const WidgetActionsMenu = ({
   const [showMoveWidgetToTab, setShowMoveWidgetToTab] = useState(false);
   const dispatch = useAppDispatch();
 
-  const onDuplicate = useCallback(() => _onDuplicate(widget.id, unsetWidgetFocusing, title), [unsetWidgetFocusing, title, widget.id]);
+  const onDuplicate = useCallback(() => dispatch(_onDuplicate(widget.id, unsetWidgetFocusing, title)), [dispatch, widget.id, unsetWidgetFocusing, title]);
   const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId), [view]);
   const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToPage(dispatch, view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [dispatch, view]);
   const onDelete = useCallback(() => _onDelete(widget, view, title), [title, view, widget]);
