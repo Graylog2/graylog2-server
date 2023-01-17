@@ -60,12 +60,11 @@ public class ProcessWatchdog {
     }
 
     private void onClusterStatus(OpensearchProcess process, ClusterHealthResponse health) {
-        if (process.getStatus() == ProcessState.AVAILABLE && health.getStatus() == ClusterHealthStatus.GREEN) {
-            process.onEvent(ProcessEvent.HEALTH_CHECK_GREEN);
-        }
+        process.onEvent(ProcessEvent.HEALTH_CHECK_GREEN);
     }
 
     private void onRestError(OpensearchProcess process, IOException e) {
+        process.onEvent(ProcessEvent.HEALTH_CHECK_FAILED);
         LOG.warn("Opensearch REST api of process {} unavailable. Cause: {}", process.getProcessInfo().pid(), e.getMessage());
     }
 

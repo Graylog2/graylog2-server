@@ -18,6 +18,7 @@ package org.graylog.datanode.management;
 
 import org.graylog.datanode.DataNodeRunner;
 import org.graylog.datanode.process.OpensearchProcess;
+import org.graylog.datanode.process.ProcessConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -53,8 +54,10 @@ public class ManagedNodes {
         config.put("discovery.type", "single-node");
         config.put("plugins.security.ssl.http.enabled", "false");
         config.put("plugins.security.disabled", "true");
+        final ProcessConfiguration processConfiguration = new ProcessConfiguration(9300, 9400, config);
 
-        this.processes.add(dataNodeRunner.start(Path.of(openseachLocation), opensearchVersion, config));
+        final OpensearchProcess process = dataNodeRunner.start(Path.of(openseachLocation), opensearchVersion, processConfiguration);
+        this.processes.add(process);
     }
 
     public Set<OpensearchProcess> getProcesses() {

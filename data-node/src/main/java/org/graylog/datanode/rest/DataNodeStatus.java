@@ -14,11 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.process;
+package org.graylog.datanode.rest;
 
-public enum ProcessEvent {
-    PROCESS_STARTED,
-    HEALTH_CHECK_GREEN,
-    HEALTH_CHECK_FAILED,
-    PROCESS_TERMINATED
+import java.util.List;
+
+public record DataNodeStatus(String dataNodeVersion, List<StatusResponse>processes) {
 }

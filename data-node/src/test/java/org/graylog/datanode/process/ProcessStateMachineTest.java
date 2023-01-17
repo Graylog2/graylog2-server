@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.datanode.process;
 
 import com.github.oxo42.stateless4j.StateMachine;
@@ -12,7 +28,7 @@ class ProcessStateMachineTest {
         Assertions.assertEquals(machine.getState(), ProcessState.NEW);
 
         machine.fire(ProcessEvent.PROCESS_STARTED);
-        Assertions.assertEquals(ProcessState.RUNNING, machine.getState());
+        Assertions.assertEquals(ProcessState.STARTING, machine.getState());
 
         machine.fire(ProcessEvent.HEALTH_CHECK_GREEN);
         Assertions.assertEquals(ProcessState.AVAILABLE, machine.getState());
@@ -27,7 +43,7 @@ class ProcessStateMachineTest {
         Assertions.assertEquals(machine.getState(), ProcessState.NEW);
 
         machine.fire(ProcessEvent.PROCESS_STARTED);
-        Assertions.assertEquals(ProcessState.RUNNING, machine.getState());
+        Assertions.assertEquals(ProcessState.STARTING, machine.getState());
 
         machine.fire(ProcessEvent.HEALTH_CHECK_GREEN);
         Assertions.assertEquals(ProcessState.AVAILABLE, machine.getState());
@@ -36,7 +52,7 @@ class ProcessStateMachineTest {
         machine.fire(ProcessEvent.HEALTH_CHECK_FAILED);
 
         // three failures are still accepted
-        Assertions.assertEquals(ProcessState.FAILING, machine.getState());
+        Assertions.assertEquals(ProcessState.NOT_RESPONDING, machine.getState());
 
         // fourth should bring the state to FAILED
         machine.fire(ProcessEvent.HEALTH_CHECK_FAILED);
@@ -44,5 +60,24 @@ class ProcessStateMachineTest {
 
         machine.fire(ProcessEvent.HEALTH_CHECK_GREEN);
         Assertions.assertEquals(ProcessState.AVAILABLE, machine.getState());
+    }
+
+    @Test
+    void testStartupFailure() {
+        final StateMachine<ProcessState, ProcessEvent> machine = ProcessStateMachine.createNew();
+        Assertions.assertEquals(machine.getState(), ProcessState.NEW);
+
+        machine.fire(ProcessEvent.PROCESS_STARTED);
+        Assertions.assertEquals(ProcessState.STARTING, machine.getState());
+
+        machine.fire(ProcessEvent.HEALTH_CHECK_FAILED);
+        machine.fire(ProcessEvent.HEALTH_CHECK_FAILED);
+        machine.fire(ProcessEvent.HEALTH_CHECK_FAILED);
+        Assertions.assertEquals(ProcessState.STARTING, machine.getState());
+
+        machine.fire(ProcessEvent.HEALTH_CHECK_FAILED);
+        machine.fire(ProcessEvent.HEALTH_CHECK_FAILED);
+        // after five repetitions we give up waiting for the process start and fail
+        Assertions.assertEquals(ProcessState.FAILED, machine.getState());
     }
 }

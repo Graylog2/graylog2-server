@@ -19,6 +19,7 @@ package org.graylog.datanode;
 import com.github.rholder.retry.RetryException;
 import org.graylog.datanode.process.OpensearchProcess;
 import org.graylog.datanode.process.OpensearchProcessLogs;
+import org.graylog.datanode.process.ProcessConfiguration;
 import org.graylog.datanode.process.ProcessEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,23 +47,24 @@ public class DataNodeRunner {
     public DataNodeRunner() {
     }
 
-    public OpensearchProcess start(Path opensearchLocation, String opensearchVersion, Map<String, String> opensearchConfiguration) {
+    public OpensearchProcess start(Path opensearchLocation, String opensearchVersion, ProcessConfiguration opensearchConfiguration) {
         try {
             setConfiguration(opensearchLocation, opensearchConfiguration);
-            return run(opensearchVersion, opensearchLocation);
+            return run(opensearchVersion, opensearchLocation, opensearchConfiguration);
         } catch (IOException | InterruptedException | ExecutionException | RetryException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void setConfiguration(Path targetLocation, Map<String, String> opensearchOptions) throws IOException {
+    private void setConfiguration(Path targetLocation, ProcessConfiguration config) throws IOException {
         final Path configPath = targetLocation.resolve(Path.of("config", "opensearch.yml"));
         File file = configPath.toFile();
         try (
                 FileWriter fr = new FileWriter(file, StandardCharsets.UTF_8);
                 BufferedWriter br = new BufferedWriter(fr);
         ) {
-            for (Map.Entry<String, String> option : opensearchOptions.entrySet()) {
+
+            for (Map.Entry<String, String> option : config.mergedConfig().entrySet()) {
                 final String optionLine = toOptionLine(option);
                 LOG.info("Setting configuration: " + option);
                 br.write(optionLine + "\n");
@@ -74,14 +76,14 @@ public class DataNodeRunner {
         return option.getKey() + ": " + option.getValue();
     }
 
-    private OpensearchProcess run(String opensearchVersion, Path targetLocation) throws IOException, InterruptedException, ExecutionException, RetryException {
+    private OpensearchProcess run(String opensearchVersion, Path targetLocation, ProcessConfiguration config) throws IOException, InterruptedException, ExecutionException, RetryException {
         final Path binPath = targetLocation.resolve(Paths.get("bin", "opensearch"));
         LOG.info("Running opensearch from " + binPath.toAbsolutePath());
         ProcessBuilder builder = new ProcessBuilder(binPath.toAbsolutePath().toString());
 
         final Process process = builder.start();
         final OpensearchProcessLogs logs = OpensearchProcessLogs.createFor(process, logsSize);
-        final OpensearchProcess opensearchProcess = new OpensearchProcess(opensearchVersion, targetLocation, process, logs);
+        final OpensearchProcess opensearchProcess = new OpensearchProcess(opensearchVersion, targetLocation, process, logs, config.httpPort());
         opensearchProcess.onEvent(ProcessEvent.PROCESS_STARTED);
         return opensearchProcess;
     }

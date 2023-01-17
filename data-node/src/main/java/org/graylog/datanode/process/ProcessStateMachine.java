@@ -23,32 +23,44 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ProcessStateMachine {
 
+    /**
+     * How many times can the OS rest api call fail before we switch to the failed state
+     */
+    public static final int MAX_REST_TEMPORARY_FAILURES = 3;
+    public static final int MAX_REST_STARTUP_FAILURES = 5;
+
     public static StateMachine<ProcessState, ProcessEvent> createNew() {
 
-        final AtomicInteger failuresCounter = new AtomicInteger(1);
+        final AtomicInteger failuresCounter = new AtomicInteger(0);
+        final AtomicInteger startupFailuresCounter = new AtomicInteger(0);
 
         StateMachineConfig<ProcessState, ProcessEvent> config = new StateMachineConfig<>();
 
         config.configure(ProcessState.NEW)
-                .permit(ProcessEvent.PROCESS_STARTED, ProcessState.RUNNING);
+                .permit(ProcessEvent.PROCESS_STARTED, ProcessState.STARTING);
 
-        config.configure(ProcessState.RUNNING)
+        config.configure(ProcessState.STARTING)
+                .onEntry(() -> incrementFailures(startupFailuresCounter))
+                .permitDynamic(ProcessEvent.HEALTH_CHECK_FAILED,
+                        () -> failedTooManyTimes(startupFailuresCounter, MAX_REST_STARTUP_FAILURES) ? ProcessState.FAILED : ProcessState.STARTING)
                 .permit(ProcessEvent.HEALTH_CHECK_GREEN, ProcessState.AVAILABLE)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED);
 
         config.configure(ProcessState.AVAILABLE)
                 .onEntry(() -> resetFailuresCounter(failuresCounter))
-                .permit(ProcessEvent.HEALTH_CHECK_FAILED, ProcessState.FAILING)
+                .permitReentry(ProcessEvent.HEALTH_CHECK_GREEN)
+                .permit(ProcessEvent.HEALTH_CHECK_FAILED, ProcessState.NOT_RESPONDING)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED);
 
-        config.configure(ProcessState.FAILING)
+        config.configure(ProcessState.NOT_RESPONDING)
                 .onEntry(() -> incrementFailures(failuresCounter))
                 .permitDynamic(ProcessEvent.HEALTH_CHECK_FAILED,
-                        () -> failedTooManyTimes(failuresCounter) ? ProcessState.FAILED : ProcessState.FAILING)
+                        () -> failedTooManyTimes(failuresCounter, MAX_REST_TEMPORARY_FAILURES) ? ProcessState.FAILED : ProcessState.NOT_RESPONDING)
                 .permit(ProcessEvent.HEALTH_CHECK_GREEN, ProcessState.AVAILABLE)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED);
 
         config.configure(ProcessState.FAILED)
+                .ignore(ProcessEvent.HEALTH_CHECK_FAILED)
                 .permit(ProcessEvent.HEALTH_CHECK_GREEN, ProcessState.AVAILABLE)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED);
 
@@ -63,11 +75,11 @@ public class ProcessStateMachine {
         failuresCounter.incrementAndGet();
     }
 
-    private static boolean failedTooManyTimes(AtomicInteger failuresCounter) {
-        return failuresCounter.get() > 3;
+    private static boolean failedTooManyTimes(AtomicInteger failuresCounter, int maxRetries) {
+        return failuresCounter.get() >= maxRetries;
     }
 
     private static void resetFailuresCounter(AtomicInteger failuresCounter) {
-        failuresCounter.set(1);
+        failuresCounter.set(0);
     }
 }
