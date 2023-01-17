@@ -28,6 +28,7 @@ import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 import { DEFAULT_LIMIT } from 'views/Constants';
 import { DEFAULT_GROUPING_TYPE } from 'views/components/aggregationwizard/grouping/GroupingElement';
+import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 // import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 const ListItemContainer = styled.div`
@@ -41,9 +42,8 @@ const EditFieldSelect = styled(FieldSelect)`
   flex: 1;
 `;
 
-const Title = styled.div`
-  display: flex;
-  align-items: center;
+const FieldTitle = styled(TextOverflowEllipsis)`
+  flex: 1;
 `;
 
 const DragHandle = styled.div`
@@ -99,12 +99,10 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
 
       {!isEditing && (
         <>
-          <Title>
-            <DragHandle {...dragHandleProps}>
-              <Icon name="bars" />
-            </DragHandle>
-            {item.title}
-          </Title>
+          <DragHandle {...dragHandleProps}>
+            <Icon name="bars" />
+          </DragHandle>
+          <FieldTitle>{item.title}</FieldTitle>
           <div>
             <IconButton name="edit" onClick={() => setIsEditing(true)} />
             <IconButton name="trash-alt" onClick={onRemove} />
