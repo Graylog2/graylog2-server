@@ -18,7 +18,7 @@ package org.graylog2.indexer.retention.strategies;
 
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.rotation.strategies.SmartRotationStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.periodical.IndexRetentionThread;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.shared.system.activities.Activity;
@@ -58,7 +58,7 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
 
     @Override
     public void retain(IndexSet indexSet) {
-        if (indexSet.getConfig().rotationStrategy() instanceof SmartRotationStrategyConfig smartConfig) {
+        if (indexSet.getConfig().rotationStrategy() instanceof TimeBasedSizeOptimizingStrategyConfig smartConfig) {
             retainTimeBased(indexSet, smartConfig);
         }
         else {
@@ -66,7 +66,7 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
         }
     }
 
-    private void retainTimeBased(IndexSet indexSet, SmartRotationStrategyConfig smartConfig) {
+    private void retainTimeBased(IndexSet indexSet, TimeBasedSizeOptimizingStrategyConfig smartConfig) {
         final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
 
         // Account for DST and time zones in determining age

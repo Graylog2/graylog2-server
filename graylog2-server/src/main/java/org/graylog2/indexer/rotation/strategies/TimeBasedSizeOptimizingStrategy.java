@@ -35,9 +35,9 @@ import java.time.Period;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
-public class SmartRotationStrategy extends AbstractRotationStrategy {
-    private static final Logger LOG = LoggerFactory.getLogger(SmartRotationStrategy.class);
-    public static final String NAME = "smart";
+public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
+    private static final Logger LOG = LoggerFactory.getLogger(TimeBasedSizeOptimizingStrategy.class);
+    public static final String NAME = "time-size-optimizing";
     public static final Period ROTATION_PERIOD = Period.ofDays(1);
 
     private final Indices indices;
@@ -48,22 +48,22 @@ public class SmartRotationStrategy extends AbstractRotationStrategy {
     public static final Size MIN_INDEX_SIZE = Size.gigabytes(20);
 
     @Inject
-    public SmartRotationStrategy(Indices indices,
-                                 NodeId nodeId,
-                                 AuditEventSender auditEventSender,
-                                 ElasticsearchConfiguration elasticsearchConfiguration) {
+    public TimeBasedSizeOptimizingStrategy(Indices indices,
+                                           NodeId nodeId,
+                                           AuditEventSender auditEventSender,
+                                           ElasticsearchConfiguration elasticsearchConfiguration) {
         super(auditEventSender, nodeId, elasticsearchConfiguration);
         this.indices = indices;
     }
 
     @Override
     public Class<? extends RotationStrategyConfig> configurationClass() {
-        return SmartRotationStrategyConfig.class;
+        return TimeBasedSizeOptimizingStrategyConfig.class;
     }
 
     @Override
     public RotationStrategyConfig defaultConfiguration() {
-        return SmartRotationStrategyConfig.builder().build();
+        return TimeBasedSizeOptimizingStrategyConfig.builder().build();
     }
 
     @Override
@@ -73,7 +73,7 @@ public class SmartRotationStrategy extends AbstractRotationStrategy {
         final Long sizeInBytes = indices.getStoreSizeInBytes(index).orElseThrow(() -> new IllegalStateException("No index size"));
 
         Period leeWay;
-        if (indexSet.getConfig().rotationStrategy() instanceof SmartRotationStrategyConfig rotationConfig) {
+        if (indexSet.getConfig().rotationStrategy() instanceof TimeBasedSizeOptimizingStrategyConfig rotationConfig) {
             leeWay = rotationConfig.indexLifetimeHard().minus(rotationConfig.indexLifetimeSoft());
         } else {
             throw new IllegalStateException(f("Unsupported RotationStrategyConfig type <%s>", indexSet.getConfig().rotationStrategy()));

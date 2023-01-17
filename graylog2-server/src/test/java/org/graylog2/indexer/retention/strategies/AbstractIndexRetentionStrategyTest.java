@@ -20,7 +20,7 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
-import org.graylog2.indexer.rotation.strategies.SmartRotationStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -236,8 +236,8 @@ public class AbstractIndexRetentionStrategyTest {
                 true,
                 true, "prefix", null, null,
                 1, 0,
-                SmartRotationStrategyConfig.class.getCanonicalName(),
-                SmartRotationStrategyConfig.builder()
+                TimeBasedSizeOptimizingStrategyConfig.class.getCanonicalName(),
+                TimeBasedSizeOptimizingStrategyConfig.builder()
                         .indexLifetimeSoft(java.time.Period.ofDays(minDays))
                         .indexLifetimeHard(java.time.Period.ofDays(maxDays))
                         .build(),

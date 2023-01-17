@@ -20,7 +20,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.indexer.rotation.strategies.SmartRotationStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -103,7 +103,7 @@ public class IndexSetValidator {
 
     @Nullable
     public Violation validateRotation(RotationStrategyConfig rotationStrategyConfig) {
-        if ((rotationStrategyConfig instanceof SmartRotationStrategyConfig smartConfig)) {
+        if ((rotationStrategyConfig instanceof TimeBasedSizeOptimizingStrategyConfig smartConfig)) {
             final java.time.Period leeway = smartConfig.indexLifetimeHard().minus(smartConfig.indexLifetimeSoft());
             if (leeway.isNegative()) {
                 return Violation.create("Maximum and minimum lifetime periods are reversed or use different units");
@@ -113,7 +113,7 @@ public class IndexSetValidator {
             if (maxRetentionPeriod != null
                 && isGreater(smartConfig.indexLifetimeHard(), jodaToJavaPeriod(maxRetentionPeriod))) {
                 f("Lifetime setting %s exceeds the configured maximum of %s=%s.",
-                        SmartRotationStrategyConfig.INDEX_LIFETIME_HARD,
+                        TimeBasedSizeOptimizingStrategyConfig.INDEX_LIFETIME_HARD,
                         ElasticsearchConfiguration.MAX_INDEX_RETENTION_PERIOD, maxRetentionPeriod);
             }
         }

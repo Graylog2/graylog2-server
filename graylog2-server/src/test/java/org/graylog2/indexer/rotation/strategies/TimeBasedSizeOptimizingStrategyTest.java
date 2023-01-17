@@ -35,16 +35,16 @@ import java.time.Period;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.indexer.rotation.strategies.SmartRotationStrategy.MAX_INDEX_SIZE;
-import static org.graylog2.indexer.rotation.strategies.SmartRotationStrategy.MIN_INDEX_SIZE;
-import static org.graylog2.indexer.rotation.strategies.SmartRotationStrategy.ROTATION_PERIOD;
+import static org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy.MAX_INDEX_SIZE;
+import static org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy.MIN_INDEX_SIZE;
+import static org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy.ROTATION_PERIOD;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class SmartRotationStrategyTest {
+class TimeBasedSizeOptimizingStrategyTest {
 
-    private SmartRotationStrategy smartRotationStrategy;
+    private TimeBasedSizeOptimizingStrategy timeBasedSizeOptimizingStrategy;
 
     @Mock
     private Indices indices;
@@ -58,16 +58,16 @@ class SmartRotationStrategyTest {
     @Mock
     private IndexSet indexSet;
 
-    private SmartRotationStrategyConfig smartRotationStrategyConfig;
+    private TimeBasedSizeOptimizingStrategyConfig timeBasedSizeOptimizingStrategyConfig;
     private DateTime now;
 
     @BeforeEach
     void setUp() {
-        smartRotationStrategy = new SmartRotationStrategy(indices, nodeId, auditEventSender, new ElasticsearchConfiguration());
+        timeBasedSizeOptimizingStrategy = new TimeBasedSizeOptimizingStrategy(indices, nodeId, auditEventSender, new ElasticsearchConfiguration());
 
-        smartRotationStrategyConfig = SmartRotationStrategyConfig.builder().build();
+        timeBasedSizeOptimizingStrategyConfig = TimeBasedSizeOptimizingStrategyConfig.builder().build();
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
-        when(indexSetConfig.rotationStrategy()).thenReturn(smartRotationStrategyConfig);
+        when(indexSetConfig.rotationStrategy()).thenReturn(timeBasedSizeOptimizingStrategyConfig);
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         now = DateTime.now(DateTimeZone.UTC);
     }
@@ -78,7 +78,7 @@ class SmartRotationStrategyTest {
         when(indices.indexCreationDate("index_0")).thenReturn(Optional.of(creationDate));
         when(indices.getStoreSizeInBytes("index_0")).thenReturn(Optional.of(MAX_INDEX_SIZE.toBytes() + 10));
 
-        final SmartRotationStrategy.Result result = smartRotationStrategy.shouldRotate("index_0", indexSet);
+        final TimeBasedSizeOptimizingStrategy.Result result = timeBasedSizeOptimizingStrategy.shouldRotate("index_0", indexSet);
 
         assertThat(result.shouldRotate()).isEqualTo(true);
         assertThat(result.getDescription()).contains("exceeds MAX_INDEX_SIZE");
@@ -91,7 +91,7 @@ class SmartRotationStrategyTest {
         when(indices.indexCreationDate("index_0")).thenReturn(Optional.of(creationDate));
         when(indices.getStoreSizeInBytes("index_0")).thenReturn(Optional.of(MIN_INDEX_SIZE.toBytes() + 10));
 
-        final SmartRotationStrategy.Result result = smartRotationStrategy.shouldRotate("index_0", indexSet);
+        final TimeBasedSizeOptimizingStrategy.Result result = timeBasedSizeOptimizingStrategy.shouldRotate("index_0", indexSet);
 
         assertThat(result.shouldRotate()).isEqualTo(true);
         assertThat(result.getDescription()).contains("Index is old enough");
@@ -99,7 +99,7 @@ class SmartRotationStrategyTest {
 
     @Test
     void shouldRotateWhenBeyondLeeWay() {
-        final Period leeWay = smartRotationStrategyConfig.indexLifetimeHard().minus(smartRotationStrategyConfig.indexLifetimeSoft());
+        final Period leeWay = timeBasedSizeOptimizingStrategyConfig.indexLifetimeHard().minus(timeBasedSizeOptimizingStrategyConfig.indexLifetimeSoft());
         // TODO only works with multiple of days
         final java.time.Duration leeWayDuration = java.time.Duration.ofDays(leeWay.getDays() + ROTATION_PERIOD.getDays());
         final DateTime creationDate = now.minus(leeWayDuration.toMillis() + 10); // avoid race between the time of now here and in code
@@ -107,7 +107,7 @@ class SmartRotationStrategyTest {
         when(indices.indexCreationDate("index_0")).thenReturn(Optional.of(creationDate));
         when(indices.getStoreSizeInBytes("index_0")).thenReturn(Optional.of(5L));
 
-        final SmartRotationStrategy.Result result = smartRotationStrategy.shouldRotate("index_0", indexSet);
+        final TimeBasedSizeOptimizingStrategy.Result result = timeBasedSizeOptimizingStrategy.shouldRotate("index_0", indexSet);
 
         assertThat(result.shouldRotate()).isEqualTo(true);
         assertThat(result.getDescription()).contains("exceeds optimization leeway");

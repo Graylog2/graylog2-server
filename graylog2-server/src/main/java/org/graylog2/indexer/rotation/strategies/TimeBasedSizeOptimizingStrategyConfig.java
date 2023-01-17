@@ -29,8 +29,8 @@ import java.time.Period;
 @JsonAutoDetect
 @AutoValue
 @WithBeanGetter
-@JsonDeserialize(builder = SmartRotationStrategyConfig.Builder.class)
-public abstract class SmartRotationStrategyConfig implements RotationStrategyConfig {
+@JsonDeserialize(builder = TimeBasedSizeOptimizingStrategyConfig.Builder.class)
+public abstract class TimeBasedSizeOptimizingStrategyConfig implements RotationStrategyConfig {
     public static final String INDEX_LIFETIME_SOFT = "index_lifetime_soft";
     public static final String INDEX_LIFETIME_HARD = "index_lifetime_hard";
 
@@ -50,8 +50,8 @@ public abstract class SmartRotationStrategyConfig implements RotationStrategyCon
     public abstract static class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_SmartRotationStrategyConfig.Builder()
-                    .type(SmartRotationStrategyConfig.class.getCanonicalName())
+            return new AutoValue_TimeBasedSizeOptimizingStrategyConfig.Builder()
+                    .type(TimeBasedSizeOptimizingStrategyConfig.class.getCanonicalName())
                     .indexLifetimeSoft(DEFAULT_LIFETIME_SOFT)
                     .indexLifetimeHard(DEFAULT_LIFETIME_HARD);
         }
@@ -65,6 +65,6 @@ public abstract class SmartRotationStrategyConfig implements RotationStrategyCon
         @JsonProperty(INDEX_LIFETIME_HARD)
         public abstract Builder indexLifetimeHard(Period hardLimit);
 
-        public abstract SmartRotationStrategyConfig build();
+        public abstract TimeBasedSizeOptimizingStrategyConfig build();
     }
 }
