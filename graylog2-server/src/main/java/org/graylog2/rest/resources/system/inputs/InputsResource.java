@@ -126,11 +126,9 @@ public class InputsResource extends AbstractInputsResource {
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_CREATE)
     public Response create(@ApiParam(name = "JSON body", required = true)
                            @Valid @NotNull InputCreateRequest lr) throws ValidationException {
-
-        final InputCreateRequest transformed = encryptedValuesSupport.transformInputCreateRequest(lr);
         try {
             // TODO Configuration type values need to be checked. See ConfigurationMapConverter.convertValues()
-            final MessageInput messageInput = messageInputFactory.create(transformed, getCurrentUser().getName(), transformed.node());
+            final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node());
 
             messageInput.checkConfiguration();
             final Input input = this.inputService.create(messageInput.asMap());

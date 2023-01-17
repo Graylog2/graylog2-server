@@ -496,7 +496,12 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     }
 
     private InputImpl createFromDbObject(DBObject o) {
-        return new InputImpl((ObjectId) o.get(InputImpl.FIELD_ID), encryptedValuesSupport.transformAfterReading(o.toMap()));
+        final String type = (String) o.get(MessageInput.FIELD_TYPE);
+        final Map<String, Object> config = new HashMap<>(o.toMap());
+
+        //noinspection unchecked
+        config.computeIfPresent(MessageInput.FIELD_CONFIGURATION, (k, v) -> encryptedValuesSupport.fromDbObjects(type, (Map<String, Object>) v));
+        return new InputImpl((ObjectId) o.get(InputImpl.FIELD_ID), config);
     }
 
     @Override

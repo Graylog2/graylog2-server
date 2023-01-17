@@ -17,6 +17,7 @@
 package org.graylog2.shared.inputs;
 
 import com.google.common.collect.Maps;
+import org.graylog2.inputs.EncryptedValuesSupport;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -27,28 +28,31 @@ import java.util.Map;
 
 public class MessageInputFactory {
     private final Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories;
+    private final EncryptedValuesSupport encryptedValuesSupport;
 
     @Inject
-    public MessageInputFactory(Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories) {
+    public MessageInputFactory(Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories, EncryptedValuesSupport encryptedValuesSupport) {
         this.inputFactories = inputFactories;
+        this.encryptedValuesSupport = encryptedValuesSupport;
     }
 
     public MessageInput create(String type, Configuration configuration) throws NoSuchInputTypeException {
         if (inputFactories.containsKey(type)) {
             final MessageInput.Factory<? extends MessageInput> factory = inputFactories.get(type);
-            return factory.create(configuration);
+            return factory.create(encryptedValuesSupport.fromUntypedConfiguration(type, configuration));
         }
         throw new NoSuchInputTypeException("There is no input of type <" + type + "> registered.");
     }
 
     public MessageInput create(InputCreateRequest lr, String user, String nodeId) throws NoSuchInputTypeException {
-        final MessageInput input = create(lr.type(), new Configuration(lr.configuration()));
+        final MessageInput input = create(lr.type(), new Configuration(encryptedValuesSupport.fromUntypedConfiguration(lr.type(), lr.configuration())));
         input.setTitle(lr.title());
         input.setGlobal(lr.global());
         input.setCreatorUserId(user);
         input.setCreatedAt(Tools.nowUTC());
-        if (!lr.global())
+        if (!lr.global()) {
             input.setNodeId(nodeId);
+        }
 
         return input;
     }
