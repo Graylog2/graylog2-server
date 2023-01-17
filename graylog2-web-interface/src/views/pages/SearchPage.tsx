@@ -30,6 +30,7 @@ import type View from 'views/logic/views/View';
 import useLoadView from 'views/hooks/useLoadView';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import useQuery from 'routing/useQuery';
+import useView from 'views/hooks/useView';
 
 type Props = {
   isNew: boolean,
@@ -52,7 +53,7 @@ const SearchPage = ({ isNew, view, loadNewView = defaultLoadNewView, loadView = 
   const query = useQuery();
   useLoadView(view, query?.page as string, isNew);
   const [loaded, HookComponent] = useProcessHooksForView(view, query);
-  const loadedView = useStore(ViewStore, (state) => state?.view);
+  const loadedView = useView();
 
   if (HookComponent) {
     return HookComponent;
