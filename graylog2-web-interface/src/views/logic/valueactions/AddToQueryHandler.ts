@@ -49,7 +49,7 @@ type Arguments = {
   type: FieldType,
 };
 
-const AddToQueryHandler = ({ queryId, field, value = '', type }: Arguments) => (dispatch: AppDispatch, getState: () => RootState) => {
+const AddToQueryHandler = ({ queryId, field, value = '', type }: Arguments) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const oldQuery = selectCurrentQueryString(queryId)(getState());
   const newQuery = formatNewQuery(oldQuery, field, value, type);
 

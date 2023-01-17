@@ -21,9 +21,8 @@ import Query from 'views/logic/queries/Query';
 import { MISSING_BUCKET_NAME } from 'views/Constants';
 import { createSearch } from 'fixtures/searches';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import { updateGlobalOverride } from 'views/logic/slices/searchExecutionSlice';
 import mockDispatch from 'views/test/mockDispatch';
-import { updateQuery } from 'views/logic/slices/viewSlice';
+import { updateQueryString } from 'views/logic/slices/viewSlice';
 import type { RootState } from 'views/types';
 
 import AddToQueryHandler from './AddToQueryHandler';
@@ -36,6 +35,11 @@ const createQuery = (id: string, queryString: string = '') => Query.builder()
   .id(id)
   .query({ type: 'elasticsearch', query_string: queryString })
   .build();
+
+jest.mock('views/logic/slices/viewSlice', () => ({
+  ...jest.requireActual('views/logic/slices/viewSlice'),
+  updateQueryString: jest.fn(() => Promise.resolve()),
+}));
 
 describe('AddToQueryHandler', () => {
   const defaultView = createSearch();
@@ -54,62 +58,56 @@ describe('AddToQueryHandler', () => {
     searchExecution: { executionState: SearchExecutionState.empty() },
   };
 
-  it('formats date field for ES', () => {
+  it('formats date field for ES', async () => {
     const query = createQuery('queryId');
     const view = createViewWithQuery(query);
     const state = { ...mockRootState, view: { view } } as RootState;
     const dispatch = mockDispatch(state);
 
-    dispatch(AddToQueryHandler({
+    await dispatch(AddToQueryHandler({
       queryId: 'queryId',
       field: 'timestamp',
       value: '2019-01-17T11:00:09.025Z',
       type: new FieldType('date', [], []),
     }));
 
-    expect(dispatch).toHaveBeenCalledWith(
-      updateQuery(['queryId', query.toBuilder().query({ type: 'elasticsearch', query_string: 'timestamp:"2019-01-17T11:00:09.025Z"' }).build()]),
-    );
+    expect(updateQueryString).toHaveBeenCalledWith('queryId', 'timestamp:"2019-01-17T11:00:09.025Z"');
   });
 
-  it('updates query string before adding predicate', () => {
+  it('updates query string before adding predicate', async () => {
     const query = createQuery('anotherQueryId', 'foo:23');
     const view = createViewWithQuery(query);
     const state = { ...mockRootState, view: { view } } as RootState;
     const dispatch = mockDispatch(state);
 
-    dispatch(AddToQueryHandler({
+    await dispatch(AddToQueryHandler({
       queryId: 'anotherQueryId',
       field: 'bar',
       value: 42,
       type: new FieldType('keyword', [], []),
     }));
 
-    expect(dispatch).toHaveBeenCalledWith(
-      updateQuery(['anotherQueryId', query.toBuilder().query({ type: 'elasticsearch', query_string: 'foo:23 AND bar:42' }).build()]),
-    );
+    expect(updateQueryString).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND bar:42');
   });
 
-  it('appends NOT _exists_ fragment for proper field in case of missing bucket in input', () => {
+  it('appends NOT _exists_ fragment for proper field in case of missing bucket in input', async () => {
     const query = createQuery('anotherQueryId', 'foo:23');
     const view = createViewWithQuery(query);
     const state = { ...mockRootState, view: { view } } as RootState;
     const dispatch = mockDispatch(state);
 
-    dispatch(AddToQueryHandler({
+    await dispatch(AddToQueryHandler({
       queryId: 'anotherQueryId',
       field: 'bar',
       value: MISSING_BUCKET_NAME,
       type: new FieldType('keyword', [], []),
     }));
 
-    expect(dispatch).toHaveBeenCalledWith(
-      updateQuery(['anotherQueryId', query.toBuilder().query({ type: 'elasticsearch', query_string: 'foo:23 AND NOT _exists_:bar' }).build()]),
-    );
+    expect(updateQueryString).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND NOT _exists_:bar');
   });
 
   describe('for dashboards', () => {
-    it('retrieves query string from global override', () => {
+    it('retrieves query string from global override', async () => {
       const query = createQuery('queryId');
       const view = createViewWithQuery(query, View.Type.Dashboard);
       const state = {
@@ -123,18 +121,14 @@ describe('AddToQueryHandler', () => {
       } as RootState;
       const dispatch = mockDispatch(state);
 
-      dispatch(AddToQueryHandler({
+      await dispatch(AddToQueryHandler({
         queryId: 'queryId',
         field: 'bar',
         value: 42,
         type: new FieldType('keyword', [], []),
       }));
 
-      expect(dispatch).toHaveBeenCalledWith(
-        updateGlobalOverride(
-          GlobalOverride.create(undefined, { type: 'elasticsearch', query_string: 'something AND bar:42' }),
-        ),
-      );
+      expect(updateQueryString).toHaveBeenCalledWith('queryId', 'something AND bar:42');
     });
   });
 });

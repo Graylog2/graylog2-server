@@ -117,11 +117,10 @@ export const addQuery = (query: Query, viewState: ViewStateType) => async (dispa
   return dispatch(loadView(newView, true)).then(() => dispatch(selectQuery(query.id)));
 };
 
-export const updateQuery = (payload: [string, Query]) => async (dispatch: AppDispatch, getState: () => RootState) => {
+export const updateQuery = (queryId: QueryId, query: Query) => async (dispatch: AppDispatch, getState: () => RootState) => {
   const state = getState();
   const view = selectView(state);
   const { queries } = view.search;
-  const [queryId, query] = payload;
   const newQueries = queries.map((q) => (q.id === queryId ? query : q)).toOrderedSet();
   const newSearch = view.search.toBuilder()
     .queries(newQueries)
@@ -195,7 +194,7 @@ export const setQueryString = (queryId: QueryId, newQueryString: string) => (dis
     .query({ type: 'elasticsearch', query_string: newQueryString })
     .build();
 
-  return dispatch(updateQuery([queryId, newQuery]));
+  return dispatch(updateQuery(queryId, newQuery));
 };
 
 export const setTimerange = (queryId: QueryId, timerange: TimeRange) => (dispatch: AppDispatch, getState: () => RootState) => {
@@ -204,7 +203,7 @@ export const setTimerange = (queryId: QueryId, timerange: TimeRange) => (dispatc
     .timerange(timerange)
     .build();
 
-  return dispatch(updateQuery([queryId, newQuery]));
+  return dispatch(updateQuery(queryId, newQuery));
 };
 
 export const updateQueryString = (queryId: string, newQueryString: string) => (dispatch: AppDispatch, getState: () => RootState) => {

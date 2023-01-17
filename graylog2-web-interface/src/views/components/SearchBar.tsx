@@ -91,7 +91,7 @@ const defaultOnSubmit = async (dispatch: AppDispatch, values: SearchBarFormValue
     .build();
 
   if (!currentQuery.equals(newQuery)) {
-    return dispatch(updateQuery([newQuery.id, newQuery]));
+    return dispatch(updateQuery(newQuery.id, newQuery));
   }
 
   return dispatch(execute());
