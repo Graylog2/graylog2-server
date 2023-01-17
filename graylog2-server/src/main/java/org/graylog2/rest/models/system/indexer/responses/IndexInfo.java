@@ -28,6 +28,10 @@ import java.util.List;
 @AutoValue
 @WithBeanGetter
 public abstract class IndexInfo {
+
+    @JsonProperty
+    public abstract String indexName();
+
     @JsonProperty
     public abstract IndexStats primaryShards();
 
@@ -41,10 +45,11 @@ public abstract class IndexInfo {
     public abstract boolean isReopened();
 
     @JsonCreator
-    public static IndexInfo create(@JsonProperty("primary_shards") IndexStats primaryShards,
+    public static IndexInfo create(@JsonProperty("index_name") String indexName,
+                                   @JsonProperty("primary_shards") IndexStats primaryShards,
                                    @JsonProperty("all_shards") IndexStats allShards,
                                    @JsonProperty("routing") List<ShardRouting> routing,
                                    @JsonProperty("is_reopened") boolean isReopened) {
-        return new AutoValue_IndexInfo(primaryShards, allShards, routing, isReopened);
+        return new AutoValue_IndexInfo(indexName, primaryShards, allShards, routing, isReopened);
     }
 }

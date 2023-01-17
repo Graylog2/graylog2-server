@@ -69,9 +69,7 @@ export type IndexerOverview = {
   counts: {
     [key: string]: number,
   },
-  indices: {
-    [key: string]: IndexSummary,
-  },
+  indices: Array<IndexSummary>,
 };
 
 export const IndexerOverviewStore = singletonStore(
