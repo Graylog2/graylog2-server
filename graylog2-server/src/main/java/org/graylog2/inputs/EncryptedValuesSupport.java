@@ -43,6 +43,18 @@ public class EncryptedValuesSupport {
         EncryptedValueMapperConfig.enableDatabase(dbObjectMapper);
     }
 
+    public static Map<String, Object> mergeTypedInputConfigurations(Map<String, Object> orig, Map<String, Object> update) {
+        final Map<String, Object> merged = new HashMap<>(orig);
+        update.forEach((k, v) -> {
+            if (orig.get(k) instanceof EncryptedValue origValue && v instanceof EncryptedValue newValue) {
+                merged.put(k, mergeEncryptedValues(origValue, newValue));
+            } else {
+                merged.put(k, v);
+            }
+        });
+        return merged;
+    }
+
     public Object toDbObject(EncryptedValue encryptedValue) {
         return dbObjectMapper.convertValue(encryptedValue, TypeReferences.MAP_STRING_OBJECT);
     }
@@ -92,5 +104,15 @@ public class EncryptedValuesSupport {
                 .stream()
                 .filter(e -> e.getValue().isEncrypted())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private static EncryptedValue mergeEncryptedValues(EncryptedValue origValue, EncryptedValue newValue) {
+        if (newValue.isKeepValue()) {
+            return origValue;
+        }
+        if (newValue.isDeleteValue()) {
+            return EncryptedValue.createUnset();
+        }
+        return newValue;
     }
 }

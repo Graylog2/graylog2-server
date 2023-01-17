@@ -58,7 +58,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -73,14 +75,12 @@ public class InputsResource extends AbstractInputsResource {
 
     private final InputService inputService;
     private final MessageInputFactory messageInputFactory;
-    private final EncryptedValuesSupport encryptedValuesSupport;
 
     @Inject
-    public InputsResource(InputService inputService, MessageInputFactory messageInputFactory, EncryptedValuesSupport encryptedValuesSupport) {
+    public InputsResource(InputService inputService, MessageInputFactory messageInputFactory) {
         super(messageInputFactory.getAvailableInputs());
         this.inputService = inputService;
         this.messageInputFactory = messageInputFactory;
-        this.encryptedValuesSupport = encryptedValuesSupport;
     }
 
     @GET
@@ -180,12 +180,17 @@ public class InputsResource extends AbstractInputsResource {
 
         final Input input = inputService.find(inputId);
 
-        final Map<String, Object> mergedInput = input.getFields();
         final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), lr.node());
 
         messageInput.checkConfiguration();
 
+        final Map<String, Object> mergedInput = new HashMap<>(input.getFields());
         mergedInput.putAll(messageInput.asMap());
+
+        // Special handling for encrypted values
+        final Map<String, Object> origConfig = input.getConfiguration();
+        final Map<String, Object> updatedConfig = Objects.requireNonNullElse(messageInput.getConfiguration().getSource(), Map.of());
+        mergedInput.put(MessageInput.FIELD_CONFIGURATION, EncryptedValuesSupport.mergeTypedInputConfigurations(origConfig, updatedConfig));
 
         final Input newInput = inputService.create(input.getId(), mergedInput);
         inputService.update(newInput);
