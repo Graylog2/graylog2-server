@@ -22,13 +22,10 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import mockAction from 'helpers/mocking/MockAction';
 import asMock from 'helpers/mocking/AsMock';
-import { MockStore } from 'helpers/mocking';
 import { WidgetActions } from 'views/stores/WidgetStore';
-import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import WidgetModel from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
-import type { ViewStoreState } from 'views/stores/ViewStore';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import SearchActions from 'views/actions/SearchActions';
 import Search from 'views/logic/search/Search';
@@ -37,11 +34,12 @@ import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import ViewState from 'views/logic/views/ViewState';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import { loadDashboard } from 'views/logic/views/Actions';
-import type { TitlesMap } from 'views/stores/TitleTypes';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import { ViewStore } from 'views/stores/ViewStore';
-import useViewType from 'views/hooks/useViewType';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import createSearch from 'views/logic/slices/createSearch';
+import { duplicateWidget } from 'views/logic/slices/widgetActions';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
 
@@ -50,28 +48,15 @@ import type { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
 
 jest.mock('views/components/dashboard/hooks/useDashboards');
-
 jest.mock('views/logic/views/CopyWidgetToDashboard', () => jest.fn());
-
 jest.mock('views/logic/views/Actions');
-
-jest.mock('views/stores/ViewStore', () => ({
-  ViewStore: MockStore(),
-  ViewActions: {
-    loadNew: mockAction(),
-    load: mockAction(),
-  },
-}));
-
-jest.mock('views/stores/WidgetStore', () => ({
-  WidgetActions: {
-    remove: jest.fn(),
-  },
-}));
-
-jest.mock('views/stores/CurrentViewStateStore', () => ({ CurrentViewStateStore: MockStore(['getInitialState', () => ({})]) }));
-
 jest.mock('views/hooks/useViewType');
+jest.mock('views/logic/slices/createSearch');
+
+jest.mock('views/logic/slices/widgetActions', () => ({
+  ...jest.requireActual('views/logic/slices/widgetActions'),
+  duplicateWidget: jest.fn(() => () => Promise.resolve()),
+}));
 
 const openActionDropdown = async () => {
   const actionToggle = await screen.findByTestId('widgetActionDropDown');
@@ -87,7 +72,10 @@ describe('<WidgetActionsMenu />', () => {
     .config({})
     .build();
 
-  const viewState = ViewState.builder().build();
+  const viewState = ViewState.builder()
+    .widgets(Immutable.List([widget]))
+    .titles(Immutable.Map())
+    .build();
   const query = Query.builder().id('query-id').build();
   const searchSearch = Search.builder().queries([query]).id('search-1').build();
   const search = View.builder()
@@ -97,14 +85,6 @@ describe('<WidgetActionsMenu />', () => {
     .id('search-1')
     .title('search 1')
     .build();
-  const viewStoreState: ViewStoreState = {
-    activeQuery: 'query-id',
-    view: search,
-    isNew: false,
-    dirty: false,
-  };
-
-  asMock(ViewStore.getInitialState).mockReturnValue(viewStoreState);
 
   const searchDB1 = Search.builder().id('search-1').build();
   const dashboard1 = View.builder().type(View.Type.Dashboard).id('view-1').title('view 1')
@@ -115,6 +95,7 @@ describe('<WidgetActionsMenu />', () => {
   const dashboardList = [dashboard1, dashboard2];
 
   type DummyWidgetProps = {
+    view?: View,
     widget?: WidgetModel,
     focusedWidget?: WidgetFocusContextType['focusedWidget'],
     setWidgetFocusing?: WidgetFocusContextType['setWidgetFocusing'],
@@ -126,6 +107,7 @@ describe('<WidgetActionsMenu />', () => {
   }
 
   const DummyWidget = ({
+    view = search,
     widget: propsWidget = widget,
     setWidgetFocusing = () => {},
     setWidgetEditing = () => {},
@@ -134,28 +116,35 @@ describe('<WidgetActionsMenu />', () => {
     focusedWidget,
     ...props
   }: DummyWidgetProps) => (
-    <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
-      <WidgetFocusContext.Provider value={{
-        setWidgetFocusing,
-        setWidgetEditing,
-        unsetWidgetFocusing,
-        unsetWidgetEditing,
-        focusedWidget,
-      }}>
-        <WidgetContext.Provider value={propsWidget}>
-          <WidgetActionsMenu isFocused={false}
-                             toggleEdit={() => {}}
-                             title="Widget Title"
-                             position={new WidgetPosition(1, 1, 1, 1)}
-                             onPositionsChange={() => {}}
-                             {...props} />
-        </WidgetContext.Provider>
-      </WidgetFocusContext.Provider>
-    </FieldTypesContext.Provider>
+    <TestStoreProvider view={view} initialQuery="query-id">
+      <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
+        <WidgetFocusContext.Provider value={{
+          setWidgetFocusing,
+          setWidgetEditing,
+          unsetWidgetFocusing,
+          unsetWidgetEditing,
+          focusedWidget,
+        }}>
+          <WidgetContext.Provider value={propsWidget}>
+            <WidgetActionsMenu isFocused={false}
+                               toggleEdit={() => {}}
+                               title="Widget Title"
+                               position={new WidgetPosition(1, 1, 1, 1)}
+                               onPositionsChange={() => {}}
+                               {...props} />
+          </WidgetContext.Provider>
+        </WidgetFocusContext.Provider>
+      </FieldTypesContext.Provider>
+    </TestStoreProvider>
   );
+
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
     jest.clearAllMocks();
+    asMock(createSearch).mockImplementation(async (s) => s);
   });
 
   it('is updating widget focus context on focus', () => {
@@ -185,16 +174,11 @@ describe('<WidgetActionsMenu />', () => {
 
     await openActionDropdown();
 
-    const duplicateBtn = screen.getByText('Duplicate');
-
-    WidgetActions.duplicate = mockAction(jest.fn().mockResolvedValue(WidgetModel.builder().id('duplicatedWidgetId').build()));
-
-    TitlesActions.set = mockAction(jest.fn().mockResolvedValue(Immutable.Map() as TitlesMap));
+    const duplicateBtn = await screen.findByText('Duplicate');
 
     fireEvent.click(duplicateBtn);
 
-    await waitFor(() => expect(WidgetActions.duplicate).toHaveBeenCalled());
-    await waitFor(() => expect(TitlesActions.set).toHaveBeenCalledWith(TitleTypes.Widget, 'duplicatedWidgetId', 'Dummy Widget (copy)'));
+    await waitFor(() => expect(duplicateWidget).toHaveBeenCalledWith(widget.id, 'Dummy Widget'));
   });
 
   it('does not display export action if widget is not a message table', async () => {
@@ -249,10 +233,8 @@ describe('<WidgetActionsMenu />', () => {
         .build());
     });
 
-    const renderAndClick = async () => {
-      asMock(useViewType).mockReturnValue(View.Type.Search);
-
-      render(<DummyWidget />);
+    const renderAndClick = async (view: View = search) => {
+      render(<DummyWidget view={view} />);
 
       await openActionDropdown();
 
@@ -268,7 +250,7 @@ describe('<WidgetActionsMenu />', () => {
     };
 
     it('should get dashboard from backend', async () => {
-      await renderAndClick();
+      await renderAndClick(dashboard1);
       await waitFor(() => expect(ViewManagementActions.get).toHaveBeenCalledTimes(1));
 
       expect(ViewManagementActions.get).toHaveBeenCalledWith('view-1');
@@ -313,7 +295,6 @@ describe('<WidgetActionsMenu />', () => {
     let oldWindowConfirm;
 
     beforeEach(() => {
-      asMock(WidgetActions.remove).mockClear();
       oldWindowConfirm = window.confirm;
       window.confirm = jest.fn();
     });
