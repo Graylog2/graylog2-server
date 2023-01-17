@@ -22,11 +22,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used to mark a property of a class that represents attribute/field in Entity.
  * Contains meta-data for this attribute/field, needed by frontend to properly communicate with the backend.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.FIELD})
+@Target({ElementType.ANNOTATION_TYPE})
 public @interface FrontendAttributeDescription {
 
     String id();

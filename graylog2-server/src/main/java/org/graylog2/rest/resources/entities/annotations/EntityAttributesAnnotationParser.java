@@ -20,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.FilterOption;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,23 +27,24 @@ import java.util.stream.Collectors;
 public class EntityAttributesAnnotationParser {
 
     public List<EntityAttribute> parse(final Class<?> clazz) {
-        final Method[] methods = clazz.getMethods();
+        if (clazz.isAnnotationPresent(ResourceDescription.class)) {
+            final ResourceDescription resourceDescription = clazz.getAnnotation(ResourceDescription.class);
+            return Arrays.stream(resourceDescription.attributes())
+                    .map(annotation -> EntityAttribute.builder()
+                            .id(annotation.id())
+                            .title(annotation.title())
+                            .sortable(annotation.sortable())
+                            .filterable(annotation.filterable())
+                            .type(getType(annotation))
+                            .filterOptions(Arrays.stream(annotation.filterOptions())
+                                    .map(f -> FilterOption.create(f.value(), f.title()))
+                                    .collect(Collectors.toSet()))
+                            .build())
+                    .collect(Collectors.toList());
 
-        return Arrays.stream(methods)
-                .filter(m -> m.isAnnotationPresent(FrontendAttributeDescription.class))
-                .map(m -> m.getAnnotation(FrontendAttributeDescription.class))
-                .map(annotation -> EntityAttribute.builder()
-                        .id(annotation.id())
-                        .title(annotation.title())
-                        .sortable(annotation.sortable())
-                        .filterable(annotation.filterable())
-                        .type(getType(annotation))
-                        .filterOptions(Arrays.stream(annotation.filterOptions())
-                                .map(f -> FilterOption.create(f.value(), f.title()))
-                                .collect(Collectors.toSet()))
-                        .build())
-                .collect(Collectors.toList());
-
+        } else {
+            return List.of();
+        }
 
     }
 

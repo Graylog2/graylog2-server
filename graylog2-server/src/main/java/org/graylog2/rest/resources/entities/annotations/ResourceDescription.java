@@ -22,10 +22,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.ANNOTATION_TYPE})
-public @interface FilterOptionDescription {
+@Target({ElementType.METHOD, ElementType.TYPE})
+public @interface ResourceDescription {
 
-    String value();
-
-    String title();
+    FrontendAttributeDescription[] attributes() default {};
 }

@@ -28,8 +28,6 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.models.alarmcallbacks.requests.AlertReceivers;
 import org.graylog2.rest.models.streams.alerts.AlertConditionSummary;
-import org.graylog2.rest.resources.entities.annotations.FilterOptionDescription;
-import org.graylog2.rest.resources.entities.annotations.FrontendAttributeDescription;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -71,19 +69,11 @@ public abstract class StreamDTO {
     public abstract String matchingType();
 
     @JsonProperty(FIELD_DESCRIPTION)
-    @FrontendAttributeDescription(
-            id = FIELD_DESCRIPTION,
-            title = "Description"
-    )
+
     @Nullable
     public abstract String description();
 
     @JsonProperty(FIELD_CREATED_AT)
-    @FrontendAttributeDescription(
-            id = FIELD_CREATED_AT,
-            title = "Created",
-            type = "date"
-    )
     public abstract Date createdAt();
 
     @JsonProperty(FIELD_RULES)
@@ -91,16 +81,6 @@ public abstract class StreamDTO {
     public abstract Collection<StreamRule> rules();
 
     @JsonProperty(FIELD_DISABLED)
-    @FrontendAttributeDescription(
-            id = FIELD_DISABLED,
-            title = "Status",
-            type = "boolean",
-            filterable = true,
-            filterOptions = {
-                    @FilterOptionDescription(value = "true", title = "Paused"),
-                    @FilterOptionDescription(value = "false", title = "Running")
-            }
-    )
     public abstract boolean disabled();
 
     @JsonProperty(EMBEDDED_ALERT_CONDITIONS)
@@ -114,10 +94,6 @@ public abstract class StreamDTO {
     public abstract AlertReceivers alertReceivers();
 
     @JsonProperty(FIELD_TITLE)
-    @FrontendAttributeDescription(
-            id = FIELD_TITLE,
-            title = "Title"
-    )
     public abstract String title();
 
     @JsonProperty(FIELD_CONTENT_PACK)

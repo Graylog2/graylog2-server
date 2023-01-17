@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.entities;
 import org.graylog2.rest.resources.entities.annotations.EntityAttributesAnnotationParser;
 import org.graylog2.rest.resources.entities.annotations.FilterOptionDescription;
 import org.graylog2.rest.resources.entities.annotations.FrontendAttributeDescription;
+import org.graylog2.rest.resources.entities.annotations.ResourceDescription;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -36,15 +37,15 @@ class EntityAttributesAnnotationParserTest {
         toTest = new EntityAttributesAnnotationParser();
     }
 
-    private interface LightlyAnnotated {
-
-        @FrontendAttributeDescription(
-                id = "id",
-                title = "Id"
-        )
-        String id();
-
-    }
+    @ResourceDescription(
+            attributes = {
+                    @FrontendAttributeDescription(
+                            id = "id",
+                            title = "Id"
+                    )
+            }
+    )
+    private interface LightlyAnnotated {}
 
     @Test
     void testAnnotationProcessingUsesProperDefaults() {
@@ -65,22 +66,22 @@ class EntityAttributesAnnotationParserTest {
                 );
     }
 
-    private interface HeavilyAnnotated {
-
-        @FrontendAttributeDescription(
-                id = "id",
-                title = "Id",
-                type = "long",
-                sortable = false,
-                filterable = true,
-                filterOptions = {
-                        @FilterOptionDescription(value = "1", title = "One"),
-                        @FilterOptionDescription(value = "2", title = "Two")
-                }
-        )
-        String id();
-
-    }
+    @ResourceDescription(
+            attributes = {
+                    @FrontendAttributeDescription(
+                            id = "id",
+                            title = "Id",
+                            type = "long",
+                            sortable = false,
+                            filterable = true,
+                            filterOptions = {
+                                    @FilterOptionDescription(value = "1", title = "One"),
+                                    @FilterOptionDescription(value = "2", title = "Two")
+                            }
+                    )
+            }
+    )
+    private interface HeavilyAnnotated {}
 
     @Test
     void testAnnotationProcessingRetrievesAllData() {
