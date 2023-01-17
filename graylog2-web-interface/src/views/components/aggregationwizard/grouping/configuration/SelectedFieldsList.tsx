@@ -58,6 +58,7 @@ type ListItemProps = {
   dragHandleProps: DraggableProvidedDragHandleProps;
   className: string,
   onChange: (fieldName: string) => void,
+  onRemove: () => void,
   excludedFields: Array<string>,
 }
 
@@ -67,6 +68,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
   draggableProps,
   className,
   onChange,
+  onRemove,
   excludedFields,
 }: ListItemProps, ref) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -102,7 +104,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
           </Title>
           <div>
             <IconButton name="edit" onClick={() => setIsEditing(true)} />
-            <IconButton name="trash-alt" />
+            <IconButton name="trash-alt" onClick={onRemove} />
           </div>
         </>
       )}
@@ -119,19 +121,24 @@ const SelectedFieldsList = ({ groupingIndex }: Props) => {
   const grouping = values.groupBy.groupings[groupingIndex];
   const groupingsForList = useMemo(() => grouping.fields?.map((field) => ({ id: field, title: field })), [grouping.fields]);
 
-  const onChangeFieldName = useCallback((fieldIndex: number, newFieldName: string) => {
+  const onChangeField = useCallback((fieldIndex: number, newFieldName: string) => {
     setFieldValue(`groupBy.groupings.${groupingIndex}.fields.${fieldIndex}`, newFieldName);
   }, [groupingIndex, setFieldValue]);
 
+  const onRemoveField = useCallback((removedFieldName: string) => {
+    setFieldValue(`groupBy.groupings.${groupingIndex}.fields`, grouping.fields.filter((fieldName) => fieldName !== removedFieldName));
+  }, [grouping.fields, groupingIndex, setFieldValue]);
+
   const SortableListItem = useCallback(({ item, index, dragHandleProps, draggableProps, className, ref }) => (
-    <ListItem onChange={(newFieldName) => onChangeFieldName(index, newFieldName)}
+    <ListItem onChange={(newFieldName) => onChangeField(index, newFieldName)}
+              onRemove={() => onRemoveField(item.id)}
               excludedFields={grouping.fields ?? []}
               item={item}
               dragHandleProps={dragHandleProps}
               draggableProps={draggableProps}
               className={className}
               ref={ref} />
-  ), [grouping.fields, onChangeFieldName]);
+  ), [grouping.fields, onChangeField]);
 
   const onSortChange = (newGroupings: Array<{ id: string, title: string }>) => {
     const groupingsForForm = newGroupings.map(({ id }) => id);
