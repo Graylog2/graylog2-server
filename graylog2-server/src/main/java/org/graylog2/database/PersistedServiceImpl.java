@@ -275,7 +275,7 @@ public class PersistedServiceImpl implements PersistedService {
         collection(model).update(qry, update);
     }
 
-    private void fieldTransformations(Map<String, Object> doc) {
+    protected void fieldTransformations(Map<String, Object> doc) {
         for (Map.Entry<String, Object> x : doc.entrySet()) {
 
             // Work on embedded Maps, too.

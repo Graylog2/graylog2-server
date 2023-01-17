@@ -43,14 +43,13 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.plugin.database.validators.ValidationResult;
-import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
+import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.slf4j.Logger;
@@ -67,7 +66,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class InputServiceImpl implements InputService {
+public class InputServiceImpl extends PersistedServiceImpl implements InputService {
     private static final Logger LOG = LoggerFactory.getLogger(InputServiceImpl.class);
 
     private final ExtractorFactory extractorFactory;
@@ -76,27 +75,26 @@ public class InputServiceImpl implements InputService {
     private final EventBus clusterEventBus;
     private final EncryptedValuesSupport encryptedValuesSupport;
     private final DBCollection dbCollection;
-    private final Delegate delegate;
 
     @Inject
     public InputServiceImpl(MongoConnection mongoConnection,
                             ExtractorFactory extractorFactory,
                             ConverterFactory converterFactory,
                             MessageInputFactory messageInputFactory,
-                            ClusterEventBus clusterEventBus, EncryptedValuesSupport encryptedValuesSupport) {
+                            ClusterEventBus clusterEventBus,
+                            EncryptedValuesSupport encryptedValuesSupport) {
+        super(mongoConnection);
         this.extractorFactory = extractorFactory;
         this.converterFactory = converterFactory;
         this.messageInputFactory = messageInputFactory;
         this.clusterEventBus = clusterEventBus;
         this.encryptedValuesSupport = encryptedValuesSupport;
-
-        this.delegate = new Delegate(mongoConnection);
-        this.dbCollection = delegate.collection(InputImpl.class);
+        this.dbCollection = collection(InputImpl.class);
     }
 
     @Override
     public List<Input> all() {
-        final List<DBObject> ownInputs = delegate.query(InputImpl.class, new BasicDBObject());
+        final List<DBObject> ownInputs = query(InputImpl.class, new BasicDBObject());
 
         final ImmutableList.Builder<Input> inputs = ImmutableList.builder();
         for (final DBObject o : ownInputs) {
@@ -111,7 +109,7 @@ public class InputServiceImpl implements InputService {
         final List<BasicDBObject> query = ImmutableList.of(
                 new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
                 new BasicDBObject(MessageInput.FIELD_GLOBAL, true));
-        final List<DBObject> ownInputs = delegate.query(InputImpl.class, new BasicDBObject("$or", query));
+        final List<DBObject> ownInputs = query(InputImpl.class, new BasicDBObject("$or", query));
 
         final ImmutableList.Builder<Input> inputs = ImmutableList.builder();
         for (final DBObject o : ownInputs) {
@@ -131,7 +129,7 @@ public class InputServiceImpl implements InputService {
                 .push(InputImpl.FIELD_ID)
                 .append("$in", objectIds)
                 .get();
-        final Stream<InputImpl> inputStream = delegate.query(InputImpl.class, query).stream()
+        final Stream<InputImpl> inputStream = query(InputImpl.class, query).stream()
                 .map(o -> createFromDbObject(o));
         return inputStream
                 .collect(Collectors.toSet());
@@ -148,10 +146,7 @@ public class InputServiceImpl implements InputService {
     }
 
     private <T extends Persisted> String save(T model, boolean fireEvents) throws ValidationException {
-        if (!(model instanceof Input input)) {
-            throw new IllegalArgumentException("Unexpected persisted entity of type <%s>. Expecting type <Input>.".formatted(model.getClass()));
-        }
-        final String resultId = delegate.save(encryptedValuesSupport.transformBeforeWriting(input));
+        final String resultId = super.save(model);
         if (resultId != null && !resultId.isEmpty() && fireEvents) {
             publishChange(InputCreated.create(resultId));
         }
@@ -160,7 +155,7 @@ public class InputServiceImpl implements InputService {
 
     @Override
     public String update(Input model) throws ValidationException {
-        final String resultId = delegate.save(encryptedValuesSupport.transformBeforeWriting(model));
+        final String resultId = super.save(model);
         if (resultId != null && !resultId.isEmpty()) {
             publishChange(InputUpdated.create(resultId));
         }
@@ -169,10 +164,7 @@ public class InputServiceImpl implements InputService {
 
     @Override
     public <T extends Persisted> String saveWithoutValidation(T model) {
-        if (!(model instanceof Input input)) {
-            throw new IllegalArgumentException("Unexpected persisted entity of type <%s>. Expecting type <Input>.".formatted(model.getClass()));
-        }
-        final String resultId = delegate.saveWithoutValidation(encryptedValuesSupport.transformBeforeWriting(input));
+        final String resultId = super.saveWithoutValidation(model);
         if (resultId != null && !resultId.isEmpty()) {
             publishChange(InputCreated.create(resultId));
         }
@@ -180,32 +172,12 @@ public class InputServiceImpl implements InputService {
     }
 
     @Override
-    public <T extends Persisted> Map<String, List<ValidationResult>> validate(T model, Map<String, Object> fields) {
-        return delegate.validate(model, fields);
-    }
-
-    @Override
-    public <T extends Persisted> Map<String, List<ValidationResult>> validate(T model) {
-        return delegate.validate(model);
-    }
-
-    @Override
-    public Map<String, List<ValidationResult>> validate(Map<String, Validator> validators, Map<String, Object> fields) {
-        return delegate.validate(validators, fields);
-    }
-
-    @Override
     public <T extends Persisted> int destroy(T model) {
-        final int result = delegate.destroy(model);
+        final int result = super.destroy(model);
         if (result > 0) {
             publishChange(InputDeleted.create(model.getId()));
         }
         return result;
-    }
-
-    @Override
-    public <T extends Persisted> int destroyAll(Class<T> modelClass) {
-        return delegate.destroyAll(modelClass);
     }
 
     @Override
@@ -223,7 +195,7 @@ public class InputServiceImpl implements InputService {
         if (!ObjectId.isValid(id)) {
             throw new NotFoundException("Input id <" + id + "> is invalid!");
         }
-        final DBObject o = delegate.get(org.graylog2.inputs.InputImpl.class, id);
+        final DBObject o = get(org.graylog2.inputs.InputImpl.class, id);
         if (o == null) {
             throw new NotFoundException("Input <" + id + "> not found!");
         }
@@ -240,7 +212,7 @@ public class InputServiceImpl implements InputService {
                 new BasicDBObject(InputImpl.FIELD_ID, new ObjectId(id)),
                 new BasicDBObject("$or", forThisNodeOrGlobal));
 
-        final DBObject o = delegate.findOne(InputImpl.class, new BasicDBObject("$and", query));
+        final DBObject o = findOne(InputImpl.class, new BasicDBObject("$and", query));
         return createFromDbObject(o);
     }
 
@@ -254,7 +226,7 @@ public class InputServiceImpl implements InputService {
                 new BasicDBObject(InputImpl.FIELD_ID, new ObjectId(id)),
                 new BasicDBObject("$and", forThisNode));
 
-        final DBObject o = delegate.findOne(InputImpl.class, new BasicDBObject("$and", query));
+        final DBObject o = findOne(InputImpl.class, new BasicDBObject("$and", query));
         if (o == null) {
             throw new NotFoundException("Couldn't find input " + id + " on Graylog node " + nodeId);
         } else {
@@ -264,14 +236,14 @@ public class InputServiceImpl implements InputService {
 
     @Override
     public void addExtractor(Input input, Extractor extractor) throws ValidationException {
-        delegate.embed(input, InputImpl.EMBEDDED_EXTRACTORS, extractor);
+        embed(input, InputImpl.EMBEDDED_EXTRACTORS, extractor);
         publishChange(ExtractorCreated.create(input.getId(), extractor.getId()));
     }
 
     @Override
     public void updateExtractor(Input input, Extractor extractor) throws ValidationException {
-        delegate.removeEmbedded(input, InputImpl.EMBEDDED_EXTRACTORS, extractor.getId());
-        delegate.embed(input, InputImpl.EMBEDDED_EXTRACTORS, extractor);
+        removeEmbedded(input, InputImpl.EMBEDDED_EXTRACTORS, extractor.getId());
+        embed(input, InputImpl.EMBEDDED_EXTRACTORS, extractor);
         publishChange(ExtractorUpdated.create(input.getId(), extractor.getId()));
     }
 
@@ -281,7 +253,7 @@ public class InputServiceImpl implements InputService {
                 InputImpl.FIELD_STATIC_FIELD_KEY, key,
                 InputImpl.FIELD_STATIC_FIELD_VALUE, value);
 
-        delegate.embed(input, InputImpl.EMBEDDED_STATIC_FIELDS, obj);
+        embed(input, InputImpl.EMBEDDED_STATIC_FIELDS, obj);
         publishChange(InputUpdated.create(input.getId()));
     }
 
@@ -398,13 +370,13 @@ public class InputServiceImpl implements InputService {
 
     @Override
     public void removeExtractor(Input input, String extractorId) {
-        delegate.removeEmbedded(input, InputImpl.EMBEDDED_EXTRACTORS, extractorId);
+        removeEmbedded(input, InputImpl.EMBEDDED_EXTRACTORS, extractorId);
         publishChange(ExtractorDeleted.create(input.getId(), extractorId));
     }
 
     @Override
     public void removeStaticField(Input input, String key) {
-        delegate.removeEmbedded(input, InputImpl.FIELD_STATIC_FIELD_KEY, InputImpl.EMBEDDED_STATIC_FIELDS, key);
+        removeEmbedded(input, InputImpl.FIELD_STATIC_FIELD_KEY, InputImpl.EMBEDDED_STATIC_FIELDS, key);
         publishChange(InputUpdated.create(input.getId()));
     }
 
@@ -434,17 +406,17 @@ public class InputServiceImpl implements InputService {
 
     @Override
     public long totalCount() {
-        return delegate.totalCount(InputImpl.class);
+        return totalCount(InputImpl.class);
     }
 
     @Override
     public long globalCount() {
-        return delegate.count(InputImpl.class, new BasicDBObject(MessageInput.FIELD_GLOBAL, true));
+        return count(InputImpl.class, new BasicDBObject(MessageInput.FIELD_GLOBAL, true));
     }
 
     @Override
     public long localCount() {
-        return delegate.count(InputImpl.class, new BasicDBObject(MessageInput.FIELD_GLOBAL, false));
+        return count(InputImpl.class, new BasicDBObject(MessageInput.FIELD_GLOBAL, false));
     }
 
     @Override
@@ -472,7 +444,7 @@ public class InputServiceImpl implements InputService {
                 new BasicDBObject(MessageInput.FIELD_GLOBAL, false),
                 new BasicDBObject("$or", forThisNode));
 
-        return delegate.count(InputImpl.class, new BasicDBObject("$and", query));
+        return count(InputImpl.class, new BasicDBObject("$and", query));
     }
 
     @Override
@@ -481,7 +453,7 @@ public class InputServiceImpl implements InputService {
                 new BasicDBObject(MessageInput.FIELD_GLOBAL, true),
                 new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId));
 
-        return delegate.count(InputImpl.class, new BasicDBObject("$or", query));
+        return count(InputImpl.class, new BasicDBObject("$or", query));
     }
 
     @Override
@@ -527,54 +499,13 @@ public class InputServiceImpl implements InputService {
         return new InputImpl((ObjectId) o.get(InputImpl.FIELD_ID), encryptedValuesSupport.transformAfterReading(o.toMap()));
     }
 
-    private static class Delegate extends PersistedServiceImpl {
-        @Override
-        protected <T extends Persisted> DBCollection collection(Class<T> modelClass) {
-            return super.collection(modelClass);
+    @Override
+    protected void fieldTransformations(Map<String, Object> doc) {
+        for (Map.Entry<String, Object> x : doc.entrySet()) {
+            if (x.getValue() instanceof EncryptedValue encryptedValue) {
+                doc.put(x.getKey(), encryptedValuesSupport.toDbObject(encryptedValue));
+            }
         }
-
-        @Override
-        protected <T extends Persisted> List<DBObject> query(Class<T> modelClass, DBObject query) {
-            return super.query(modelClass, query);
-        }
-
-        @Override
-        protected <T extends Persisted> DBObject get(Class<T> modelClass, String id) {
-            return super.get(modelClass, id);
-        }
-
-        @Override
-        protected <T extends Persisted> DBObject findOne(Class<T> model, DBObject query) {
-            return super.findOne(model, query);
-        }
-
-        @Override
-        protected <T extends Persisted> void embed(T model, String key, EmbeddedPersistable o) throws ValidationException {
-            super.embed(model, key, o);
-        }
-
-        @Override
-        protected <T extends Persisted> void removeEmbedded(T model, String key, String searchId) {
-            super.removeEmbedded(model, key, searchId);
-        }
-
-        @Override
-        protected <T extends Persisted> void removeEmbedded(T model, String arrayKey, String key, String searchId) {
-            super.removeEmbedded(model, arrayKey, key, searchId);
-        }
-
-        @Override
-        protected <T extends Persisted> long totalCount(Class<T> modelClass) {
-            return super.totalCount(modelClass);
-        }
-
-        @Override
-        protected <T extends Persisted> long count(Class<T> modelClass, DBObject query) {
-            return super.count(modelClass, query);
-        }
-
-        protected Delegate(MongoConnection mongoConnection) {
-            super(mongoConnection);
-        }
+        super.fieldTransformations(doc);
     }
 }

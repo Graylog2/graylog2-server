@@ -57,35 +57,6 @@ public class EncryptedValuesSupport {
         return transformed;
     }
 
-    public Input transformBeforeWriting(Input input) {
-
-        final String type = input.getType();
-
-        final Map<String, ConfigurationField> encryptedFields = messageInputFactory.getAvailableInputs().get(type).getConfigurationRequest().getFields().entrySet().stream()
-                .filter(e -> e.getValue().isEncrypted()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        if (encryptedFields.isEmpty()) {
-            return input;
-        }
-
-        final Map<String, Object> transformed = new HashMap<>(input.getFields());
-
-        final Map<String, Object> configuration = input.getConfiguration();
-
-        final Map<String, Object> newConfiguration = new HashMap<>();
-        configuration.forEach((key, value) -> {
-            if (encryptedFields.containsKey(key)) {
-                newConfiguration.put(key, dbObjectMapper.convertValue(value, TypeReferences.MAP_STRING_OBJECT));
-            } else {
-                newConfiguration.put(key, value);
-            }
-        });
-
-        transformed.put(MessageInput.FIELD_CONFIGURATION, newConfiguration);
-
-        return new InputImpl(transformed);
-    }
-
     public InputCreateRequest transformInputCreateRequest(InputCreateRequest request) {
 
         final String type = (String) request.type();
@@ -111,5 +82,9 @@ public class EncryptedValuesSupport {
 
         return request.toBuilder().configuration(newConfiguration).build();
 
+    }
+
+    public Object toDbObject(EncryptedValue encryptedValue) {
+        return dbObjectMapper.convertValue(encryptedValue, TypeReferences.MAP_STRING_OBJECT);
     }
 }
