@@ -18,7 +18,7 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import Widget from 'views/logic/widgets/Widget';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import Series from 'views/logic/aggregationbuilder/Series';
-import { TitleTypes } from 'views/stores/TitlesStore';
+import TitleTypes from 'views/stores/TitleTypes';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { GetState } from 'views/types';
 import { addWidget } from 'views/logic/slices/widgetActions';
