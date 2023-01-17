@@ -15,85 +15,54 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Field, useFormikContext } from 'formik';
+import { useFormikContext } from 'formik';
 import { useContext } from 'react';
 
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
-import parseNumber from 'views/components/aggregationwizard/grouping/parseNumber';
-import { DEFAULT_LIMIT } from 'views/Constants';
+import Input from 'components/bootstrap/Input';
+import SelectedFieldsList from 'views/components/aggregationwizard/grouping/configuration/SelectedFieldsList';
 
 import FieldSelect from '../../FieldSelect';
 
 type Props = {
-  index: number,
-  fieldType: string,
+  groupingIndex: number,
 };
 
-const numberNotSet = (value: string | number | undefined) => parseNumber(value) === undefined;
-
-const defaultLimit = DEFAULT_LIMIT;
-
-const FieldComponent = ({ index, fieldType }: Props) => {
+const FieldComponent = ({ groupingIndex }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
   const { setFieldValue, values } = useFormikContext<WidgetConfigFormValues>();
-  const grouping = values.groupBy.groupings[index];
+  const grouping = values.groupBy.groupings[groupingIndex];
 
-  const onChangeField = (e: { target: { name: string, value: string } }) => {
+  const onAddField = (e: { target: { name: string, value: string } }) => {
     const fieldName = e.target.value;
     const newField = fieldTypes.all.find((field) => field.name === fieldName);
     const newFieldType = newField?.type.type === 'date' ? 'time' : 'values';
 
-    if (fieldType !== newFieldType) {
-      if (newFieldType === 'time') {
-        setFieldValue(`groupBy.groupings.${index}`, {
-          type: newFieldType,
-          fields: [fieldName],
-          interval: {
-            type: 'auto',
-            scaling: 1.0,
-          },
-        });
-      }
-
-      if (newFieldType === 'values') {
-        setFieldValue(`groupBy.groupings.${index}`, {
-          type: newFieldType,
-          fields: [fieldName],
-          limit: defaultLimit,
-        });
-
-        setFieldValue(`groupBy.groupings.${index}.interval`, undefined, false);
-
-        if (!('limit' in grouping) || ('limit' in grouping && numberNotSet(grouping.limit))) {
-          setFieldValue(`groupBy.groupings.${index}.limit`, defaultLimit);
-        }
-      }
-
-      return;
-    }
-
-    setFieldValue(`groupBy.groupings.${index}`, {
+    setFieldValue(`groupBy.groupings.${groupingIndex}`, {
       ...grouping,
       type: newFieldType,
-      fields: [fieldName],
+      fields: [...(grouping.fields ?? []), fieldName],
     });
   };
 
   return (
-    <Field name={`groupBy.groupings.${index}.fields`}>
-      {({ field: { name, value }, meta: { error } }) => (
-        <FieldSelect id="group-by-field-select"
-                     label="Field"
-                     onChange={(e) => onChangeField(e)}
-                     error={error}
-                     clearable={false}
-                     ariaLabel="Field"
-                     name={name}
-                     value={value?.[0]}
-                     aria-label="Select a field" />
-      )}
-    </Field>
+    <Input id="group-by-field-select"
+           label="Fields"
+           labelClassName="col-sm-3"
+           wrapperClassName="col-sm-9">
+      <FieldSelect id="group-by-field-create-select"
+                   onChange={(e) => onAddField(e)}
+                   clearable={false}
+                   ariaLabel="Fields"
+                   persistSelection={false}
+                   name="group-by-field-create-select"
+                   value={undefined}
+                   excludedFields={grouping.fields ?? []}
+                   placeholder="Add a field"
+                   aria-label="Add a field" />
+      <SelectedFieldsList groupingIndex={groupingIndex} />
+    </Input>
   );
 };
 

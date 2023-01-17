@@ -96,8 +96,6 @@ type ColorPickerConfig = {
 const isLabelAFunction = (label: string, series: Series) => series.function === label || series.config.name === label;
 
 const legendField = (columnPivots: Array<Pivot>, rowPivots: Array<Pivot>, series: Array<Series>, neverHide: boolean, isFunction: boolean) => {
-  return 'Test';
-
   if (columnPivots.length === 1 && series.length === 1 && !isFunction) {
     return columnPivots[0].fields.join(', ');
   }
