@@ -23,9 +23,9 @@ import org.graylog.datanode.process.ProcessConfiguration;
 import org.graylog.datanode.process.ProcessEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -36,15 +36,15 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-@Component
 public class DataNodeRunner {
 
-    @Value("${process.logs.buffer.size}")
-    private int logsSize;
+    final private int logsSize;
 
     private static final Logger LOG = LoggerFactory.getLogger(DataNodeRunner.class);
 
-    public DataNodeRunner() {
+    @Inject
+    public DataNodeRunner(@Named(value = "process_logs_buffer_size") int logsSize) {
+        this.logsSize = logsSize;
     }
 
     public OpensearchProcess start(Path opensearchLocation, String opensearchVersion, ProcessConfiguration opensearchConfiguration) {

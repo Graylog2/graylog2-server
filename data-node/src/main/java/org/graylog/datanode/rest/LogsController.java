@@ -17,28 +17,28 @@
 package org.graylog.datanode.rest;
 
 import org.graylog.datanode.management.ManagedNodes;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collections;
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import java.util.List;
 
-@RestController
-@RequestMapping("/logs")
+@Path("/logs")
+@Produces(MediaType.APPLICATION_JSON)
 public class LogsController {
-
     private final ManagedNodes managedOpensearch;
 
-    @Autowired
+    @Inject
     public LogsController(ManagedNodes managedOpenSearch) {
         this.managedOpensearch = managedOpenSearch;
     }
 
-    @GetMapping("/{processId}/stdout")
-    public List<String> getOpensearchStdout(@PathVariable int processId) {
+    @GET
+    @Path("/{processId}/stdout")
+    public List<String> getOpensearchStdout(@PathParam("processId") int processId) {
         return managedOpensearch.getProcesses()
                 .stream()
                 .filter(p -> p.getProcess().pid() == processId)
@@ -47,8 +47,9 @@ public class LogsController {
                 .orElseThrow(() -> new IllegalArgumentException("Process not found: " + processId));
     }
 
-    @GetMapping("/{processId}/stderr")
-    public List<String> getOpensearchStderr(@PathVariable int processId) {
+    @GET
+    @Path("/{processId}/stderr")
+    public List<String> getOpensearchStderr(@PathParam("processId")  int processId) {
         return managedOpensearch.getProcesses()
                 .stream()
                 .filter(p -> p.getProcess().pid() == processId)

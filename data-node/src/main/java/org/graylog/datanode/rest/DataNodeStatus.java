@@ -16,7 +16,9 @@
  */
 package org.graylog.datanode.rest;
 
+import org.graylog2.plugin.Version;
+
 import java.util.List;
 
-public record DataNodeStatus(String dataNodeVersion, List<StatusResponse>processes) {
+public record DataNodeStatus(Version dataNodeVersion, List<StatusResponse>processes) {
 }

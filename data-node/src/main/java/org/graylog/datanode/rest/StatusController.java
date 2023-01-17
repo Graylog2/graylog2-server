@@ -17,29 +17,34 @@
 package org.graylog.datanode.rest;
 
 import org.graylog.datanode.management.ManagedNodes;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.graylog2.plugin.Version;
 
-import java.util.List;
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import java.util.stream.Collectors;
 
-@RestController
+@Path("/")
+@Produces(MediaType.APPLICATION_JSON)
 public class StatusController {
 
-    @Value("${datanode.version}")
-    private String dataNodeVersion;
+    private final Version version = Version.CURRENT_CLASSPATH;
 
-    @Autowired
     private ManagedNodes openSearch;
 
-    @GetMapping("/")
+    @Inject
+    public StatusController(ManagedNodes openSearch) {
+        this.openSearch = openSearch;
+    }
+
+    @GET
     public DataNodeStatus status() {
 
         return openSearch.getProcesses()
                 .stream()
                 .map(process -> new StatusResponse(process.getOpensearchVersion(), process.getProcessInfo()))
-                .collect(Collectors.collectingAndThen(Collectors.toList(), statusResponses -> new DataNodeStatus(dataNodeVersion, statusResponses)));
+                .collect(Collectors.collectingAndThen(Collectors.toList(), statusResponses -> new DataNodeStatus(version, statusResponses)));
     }
 }

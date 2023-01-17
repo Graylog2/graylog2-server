@@ -16,9 +16,11 @@
  */
 package org.graylog.datanode.bindings;
 
+import com.google.inject.Scopes;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.rest.StatusResource;
+import org.graylog.datanode.DataNodeRunner;
+import org.graylog.datanode.management.ManagedNodes;
 import org.graylog.datanode.shared.syste.activities.DataNodeActivityWriter;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -58,6 +60,8 @@ public class ServerBindings extends Graylog2Module {
     }
 
     private void bindSingletons() {
+        bind(DataNodeRunner.class).in(Scopes.SINGLETON);
+        bind(ManagedNodes.class).in(Scopes.SINGLETON);
     }
 
     private void bindInterfaces() {

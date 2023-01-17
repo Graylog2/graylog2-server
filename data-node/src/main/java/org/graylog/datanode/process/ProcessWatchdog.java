@@ -20,30 +20,29 @@ import org.graylog.datanode.management.ManagedNodes;
 import org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.opensearch.client.RequestOptions;
-import org.opensearch.cluster.health.ClusterHealthStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 import java.io.IOException;
 
-@Service
 public class ProcessWatchdog {
-
     private static final Logger LOG = LoggerFactory.getLogger(ProcessWatchdog.class);
 
-    @Autowired
     private ManagedNodes managedOpenSearch;
 
-    @Scheduled(fixedRate = 1000)
+    @Inject
+    public ProcessWatchdog(ManagedNodes managedOpenSearch) {
+        this.managedOpenSearch = managedOpenSearch;
+    }
+
+//    @Scheduled(fixedRate = 1000)
     public void monitorProcess() {
         managedOpenSearch.getProcesses()
                 .forEach(this::updateStatus);
     }
 
-    @Scheduled(fixedRate = 10_000)
+//    @Scheduled(fixedRate = 10_000)
     public void opensearchApiHeartbeat() {
         managedOpenSearch.getProcesses()
                 .forEach(process -> {

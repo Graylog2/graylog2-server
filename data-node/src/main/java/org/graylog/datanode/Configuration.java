@@ -14,11 +14,20 @@ public class Configuration {
     @Parameter(value = "shutdown_timeout", validator = PositiveIntegerValidator.class)
     protected int shutdownTimeout = 30000;
 
+    @Parameter(value = "is_leader")
+    private boolean isLeader = true;
+
     @Parameter("disable_native_system_stats_collector")
     private boolean disableNativeSystemStatsCollector = false;
 
-    @Parameter(value = "is_leader")
-    private boolean isLeader = true;
+    @Parameter(value = "opensearch_location")
+    private String opensearchLocation = "./data-node/bin/opensearch-2.4.1";
+
+    @Parameter(value = "opensearch_version")
+    private String opensearchVersion = "2.4.1";
+
+    @Parameter(value = "process_logs_buffer_size")
+    private Integer logs = 500;
 
     public String getInstallationSource() {
         return installationSource;
@@ -40,4 +49,15 @@ public class Configuration {
         return isLeader;
     }
 
+    public String getOpensearchLocation() {
+        return opensearchLocation;
+    }
+
+    public String getOpensearchVersion() {
+        return opensearchVersion;
+    }
+
+    public Integer getProcessLogsBufferSize() {
+        return logs;
+    }
 }

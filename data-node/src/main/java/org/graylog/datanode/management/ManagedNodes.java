@@ -19,33 +19,32 @@ package org.graylog.datanode.management;
 import org.graylog.datanode.DataNodeRunner;
 import org.graylog.datanode.process.OpensearchProcess;
 import org.graylog.datanode.process.ProcessConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-@Service
-@Scope("singleton")
+@Singleton
 public class ManagedNodes {
-
     private final Set<OpensearchProcess> processes = new LinkedHashSet<>();
 
-    @Value("${opensearch.version}")
-    private String opensearchVersion;
-    @Value("${opensearch.location}")
-    private String openseachLocation;
+    final private String opensearchVersion;
 
-    @Autowired
-    private DataNodeRunner dataNodeRunner;
+    final private String opensearchLocation;
 
-    @EventListener(ApplicationReadyEvent.class)
+    final private DataNodeRunner dataNodeRunner;
+
+    @Inject
+    public ManagedNodes(@Named("opensearch_version") String opensearchVersion, @Named("opensearch_location") String opensearchLocation, DataNodeRunner dataNodeRunner) {
+        this.opensearchVersion = opensearchVersion;
+        this.opensearchLocation = opensearchLocation;
+        this.dataNodeRunner = dataNodeRunner;
+    }
+
     public void startOpensearchProcesses() {
 
         // TODO: obtain configuration from outside, one for each node
@@ -56,7 +55,7 @@ public class ManagedNodes {
         config.put("plugins.security.disabled", "true");
         final ProcessConfiguration processConfiguration = new ProcessConfiguration(9300, 9400, config);
 
-        final OpensearchProcess process = dataNodeRunner.start(Path.of(openseachLocation), opensearchVersion, processConfiguration);
+        final OpensearchProcess process = dataNodeRunner.start(Path.of(opensearchLocation), opensearchVersion, processConfiguration);
         this.processes.add(process);
     }
 
