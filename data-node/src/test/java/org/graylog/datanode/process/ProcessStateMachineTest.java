@@ -28,7 +28,7 @@ class ProcessStateMachineTest {
         Assertions.assertEquals(machine.getState(), ProcessState.NEW);
 
         machine.fire(ProcessEvent.PROCESS_STARTED);
-        Assertions.assertEquals(ProcessState.RUNNING, machine.getState());
+        Assertions.assertEquals(ProcessState.STARTING, machine.getState());
 
         machine.fire(ProcessEvent.HEALTH_CHECK_GREEN);
         Assertions.assertEquals(ProcessState.AVAILABLE, machine.getState());
@@ -43,7 +43,7 @@ class ProcessStateMachineTest {
         Assertions.assertEquals(machine.getState(), ProcessState.NEW);
 
         machine.fire(ProcessEvent.PROCESS_STARTED);
-        Assertions.assertEquals(ProcessState.RUNNING, machine.getState());
+        Assertions.assertEquals(ProcessState.STARTING, machine.getState());
 
         machine.fire(ProcessEvent.HEALTH_CHECK_GREEN);
         Assertions.assertEquals(ProcessState.AVAILABLE, machine.getState());
@@ -52,7 +52,7 @@ class ProcessStateMachineTest {
         machine.fire(ProcessEvent.HEALTH_CHECK_FAILED);
 
         // three failures are still accepted
-        Assertions.assertEquals(ProcessState.FAILING, machine.getState());
+        Assertions.assertEquals(ProcessState.NOT_RESPONDING, machine.getState());
 
         // fourth should bring the state to FAILED
         machine.fire(ProcessEvent.HEALTH_CHECK_FAILED);
@@ -60,5 +60,24 @@ class ProcessStateMachineTest {
 
         machine.fire(ProcessEvent.HEALTH_CHECK_GREEN);
         Assertions.assertEquals(ProcessState.AVAILABLE, machine.getState());
+    }
+
+    @Test
+    void testStartupFailure() {
+        final StateMachine<ProcessState, ProcessEvent> machine = ProcessStateMachine.createNew();
+        Assertions.assertEquals(machine.getState(), ProcessState.NEW);
+
+        machine.fire(ProcessEvent.PROCESS_STARTED);
+        Assertions.assertEquals(ProcessState.STARTING, machine.getState());
+
+        machine.fire(ProcessEvent.HEALTH_CHECK_FAILED);
+        machine.fire(ProcessEvent.HEALTH_CHECK_FAILED);
+        machine.fire(ProcessEvent.HEALTH_CHECK_FAILED);
+        Assertions.assertEquals(ProcessState.STARTING, machine.getState());
+
+        machine.fire(ProcessEvent.HEALTH_CHECK_FAILED);
+        machine.fire(ProcessEvent.HEALTH_CHECK_FAILED);
+        // after five repetitions we give up waiting for the process start and fail
+        Assertions.assertEquals(ProcessState.FAILED, machine.getState());
     }
 }

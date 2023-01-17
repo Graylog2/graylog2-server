@@ -32,14 +32,16 @@ public class OpensearchProcess {
     private final RestHighLevelClient restClient;
 
     private final StateMachine<ProcessState, ProcessEvent> processState;
+    private final int httpPort;
 
-    public OpensearchProcess(String opensearchVersion, Path targetLocation, Process opensearchProcess, OpensearchProcessLogs processLogs) {
+    public OpensearchProcess(String opensearchVersion, Path targetLocation, Process opensearchProcess, OpensearchProcessLogs processLogs, int httpPort) {
         this.opensearchVersion = opensearchVersion;
         this.targetLocation = targetLocation;
         this.process = opensearchProcess;
         this.processLogs = processLogs;
+        this.httpPort = httpPort;
 
-        RestClientBuilder builder = RestClient.builder(new HttpHost("localhost", 9200, "http"));
+        RestClientBuilder builder = RestClient.builder(new HttpHost("localhost", httpPort, "http"));
         this.restClient = new RestHighLevelClient(builder);
 
         this.processState = ProcessStateMachine.createNew();
@@ -76,7 +78,8 @@ public class OpensearchProcess {
                 processState.getState(),
                 process.info().startInstant().orElse(null),
                 process.info().totalCpuDuration().orElse(null),
-                process.info().user().orElse(null));
+                process.info().user().orElse(null),
+                httpPort);
     }
 
     public void onEvent(ProcessEvent event) {

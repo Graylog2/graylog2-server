@@ -24,7 +24,7 @@ public enum ProcessState {
     /**
      * The process is running on the underlying OS and has a process ID. It's not responding to the REST API yet
      */
-    RUNNING,
+    STARTING,
     /**
      * Opensearch is now available on the default port with GREEN cluster status, all good
      */
@@ -33,7 +33,7 @@ public enum ProcessState {
      * There are problems in the REST communication with the opensearch. We'll retry several times before
      * we go to the FAILED state, giving up.
      */
-    FAILING,
+    NOT_RESPONDING,
 
     /**
      * Failed to reach the opensearch REST API, but the underlying process is still alive
