@@ -16,16 +16,29 @@
  */
 package org.graylog.datanode.process;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+/**
+ * Caution, starts initialized with 1, the usage expects that the checks and increments will happen already during
+ * the first error handling.
+ */
+public class FailuresCounter {
 
-public record ProcessConfiguration(int httpPort, int transportPort, Map<String, String> additionalConfiguration) {
-    public Map<String, String> mergedConfig() {
+    private int counter;
+    private final int maxFailuresCount;
 
-        Map<String, String> allConfig = new LinkedHashMap<>();
-        allConfig.put("http.port", String.valueOf(httpPort));
-        allConfig.put("transport.port", String.valueOf(transportPort));
-        allConfig.putAll(additionalConfiguration);
-        return allConfig;
+    public FailuresCounter(int maxFailuresCount) {
+        this.maxFailuresCount = maxFailuresCount;
+        resetFailuresCounter();
+    }
+
+    public synchronized void increment() {
+        this.counter++;
+    }
+
+    public synchronized boolean failedTooManyTimes() {
+        return this.counter >= maxFailuresCount;
+    }
+
+    public synchronized void resetFailuresCounter() {
+        this.counter = 1;
     }
 }
