@@ -42,6 +42,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.GetAliasesResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CloseIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteAliasRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.IndexTemplatesExistRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
@@ -171,6 +173,35 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
+    public void updateIndexMetaData(@Nonnull String index, @Nonnull Map<String, Object> metadata, boolean mergeExisting) {
+        Map<String, Object> metaUpdate = new HashMap<>();
+        if (mergeExisting) {
+            final Map<String, Object> oldMetaData = getIndexMetaData(index);
+            metaUpdate.putAll(oldMetaData);
+        }
+        metaUpdate.putAll(metadata);
+        updateIndexMapping(index, "ignored", Map.of("_meta", metaUpdate));
+    }
+
+    @Override
+    public Map<String, Object> getIndexMetaData(@Nonnull String index) {
+        final GetMappingsRequest request = new GetMappingsRequest()
+                .indices(index)
+                .indicesOptions(IndicesOptions.fromOptions(true, true, true, false));
+
+        final GetMappingsResponse result = client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions),
+                "Couldn't read mapping of index " + index);
+
+        final Object metaData = result.mappings().get(index).sourceAsMap().get("_meta");
+        //noinspection rawtypes
+        if (metaData instanceof Map map) {
+            //noinspection unchecked
+            return map;
+        }
+        return Map.of();
+    }
+
+    @Override
     public boolean ensureIndexTemplate(String templateName, Map<String, Object> template) {
         final PutIndexTemplateRequest request = new PutIndexTemplateRequest(templateName)
                 .source(template);
@@ -201,6 +232,13 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
 
         return creationDate
                 .map(Long::valueOf)
+                .map(instant -> new DateTime(instant, DateTimeZone.UTC));
+    }
+
+    @Override
+    public Optional<DateTime> indexClosingDate(String index) {
+        final Map<String, Object> indexMetaData = getIndexMetaData(index);
+        return Optional.ofNullable(indexMetaData.get("closing_date")).filter(Long.class::isInstance).map(Long.class::cast)
                 .map(instant -> new DateTime(instant, DateTimeZone.UTC));
     }
 
