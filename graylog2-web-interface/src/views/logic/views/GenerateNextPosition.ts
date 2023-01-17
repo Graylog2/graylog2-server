@@ -46,6 +46,8 @@ export default (
       newWidgets: Immutable.List<[string, WidgetPosition]>,
       matrixArray: Array<any>
     }>(({ newWidgets, matrixArray }, widget, index) => {
+      console.log({ [widget.id]: widgetPositions.has(widget.id) });
+
       if (!widgetPositions.has(widget.id)) {
         const positions = GetPositionForNewWidget(widget);
 

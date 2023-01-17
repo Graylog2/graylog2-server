@@ -114,21 +114,27 @@ export const CurrentViewStateStore = singletonStore(
       const { widgetPositions } = this._activeState();
       const additionalPositions = additionalParams?.positions ?? {};
       const positionsMap = Immutable.Map<string, WidgetPosition>({ ...widgetPositions, ...additionalPositions });
+      console.log({ widgetPositions, additionalPositions });
       const nextWidgetIds = nextWidgets.map(({ id }) => id);
       const cleanedPositionsMap = positionsMap.filter((_, widgetId) => nextWidgetIds.includes(widgetId)).toMap();
       const newPositionMap = GenerateNextPosition(cleanedPositionsMap, nextWidgets);
-
+      console.log('widgets', { newPositionMap, objNP: newPositionMap.toObject() });
       const newActiveState = this._activeState().toBuilder()
         .widgets(nextWidgets)
         .widgetPositions(newPositionMap.toObject())
         .build();
+      console.log({ newActiveState });
+      // this.widgetPositions(newPositionMap.toObject());
       const promise = ViewStatesActions.update(this.activeQuery, newActiveState);
 
       CurrentViewStateActions.widgets.promise(promise);
+      CurrentViewStateActions.widgetPositions.promise(promise);
     },
 
     widgetPositions(newPositions) {
+      console.log('CURRENT VIEW', { newPositions });
       const newActiveState = this._activeState().toBuilder().widgetPositions(newPositions).build();
+      console.log({ newActiveState });
       const promise = ViewStatesActions.update(this.activeQuery, newActiveState);
 
       CurrentViewStateActions.widgetPositions.promise(promise);
