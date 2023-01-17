@@ -83,12 +83,12 @@ public class AbstractIndexRetentionStrategyTest {
         indexMap.put("index5", Collections.emptySet());
         indexMap.put("index6", Collections.emptySet());
 
-        when(indices.indexCreationDate("index1")).thenReturn(Optional.of(NOW.minusDays(1)));
-        when(indices.indexCreationDate("index2")).thenReturn(Optional.of(NOW.minusDays(3)));
-        when(indices.indexCreationDate("index3")).thenReturn(Optional.of(NOW.minusDays(9)));
-        when(indices.indexCreationDate("index4")).thenReturn(Optional.of(NOW.minusDays(10)));
-        when(indices.indexCreationDate("index5")).thenReturn(Optional.of(NOW.minusDays(11)));
-        when(indices.indexCreationDate("index6")).thenReturn(Optional.of(NOW.minusDays(15)));
+        when(indices.indexCreationDate("index6")).thenReturn(Optional.of(NOW.minusDays(1)));
+        when(indices.indexCreationDate("index5")).thenReturn(Optional.of(NOW.minusDays(3)));
+        when(indices.indexCreationDate("index4")).thenReturn(Optional.of(NOW.minusDays(9)));
+        when(indices.indexCreationDate("index3")).thenReturn(Optional.of(NOW.minusDays(10)));
+        when(indices.indexCreationDate("index2")).thenReturn(Optional.of(NOW.minusDays(11)));
+        when(indices.indexCreationDate("index1")).thenReturn(Optional.of(NOW.minusDays(15)));
 
         indexSetConfigCountBased = createCountBased();
 
