@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef } from 'react';
+import { useState } from 'react';
 import { Field } from 'formik';
 
 import { Input, BootstrapModalConfirm } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 
 const ServiceAccountFormGroup = () => {
-  const confirmationModalRef = useRef<typeof BootstrapModalConfirm>();
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   return (
     <Field name="service_account">
@@ -31,7 +31,7 @@ const ServiceAccountFormGroup = () => {
           const serviceAccountNewValue = getValueFromInput(newValue.target);
 
           if (serviceAccountNewValue) {
-            confirmationModalRef.current.open();
+            setShowModal(true);
           } else {
             onChange(newValue);
           }
@@ -39,12 +39,12 @@ const ServiceAccountFormGroup = () => {
 
         const handleCheckServiceAccount = () => {
           onChange({ target: { name, value: true } });
-          confirmationModalRef.current.close();
+          setShowModal(false);
         };
 
         const handleCancel = () => {
           onChange({ target: { name, value: false } });
-          confirmationModalRef.current.close();
+          setShowModal(false);
         };
 
         return (
@@ -62,7 +62,7 @@ const ServiceAccountFormGroup = () => {
                      help="When checked, the user becomes a Service Account and will be unable to log into the web interface and edit their settings. (e.g., API tokens)"
                      onChange={(newValue) => onValueChange(newValue)} />
             </Input>
-            <BootstrapModalConfirm ref={confirmationModalRef}
+            <BootstrapModalConfirm showModal={showModal}
                                    title="Are you sure?"
                                    onConfirm={handleCheckServiceAccount}
                                    onCancel={handleCancel}>

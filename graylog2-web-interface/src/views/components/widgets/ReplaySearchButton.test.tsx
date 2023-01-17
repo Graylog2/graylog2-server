@@ -22,8 +22,6 @@ import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 
 import ReplaySearchButton from './ReplaySearchButton';
 
-import DrilldownContext from '../contexts/DrilldownContext';
-
 type OptionalOverrides = {
   streams?: Array<string>,
   query?: ElasticsearchQueryString,
@@ -39,29 +37,12 @@ describe('ReplaySearchButton', () => {
 
   describe('generates link', () => {
     const renderWithContext = ({ query, timerange, streams }: OptionalOverrides = {}) => {
-      const { getByTitle } = render((
-        <DrilldownContext.Consumer>
-          {(context) => (
-            <DrilldownContext.Provider value={{
-              query: query || context.query,
-              timerange: timerange || context.timerange,
-              streams: streams || context.streams,
-            }}>
-              <ReplaySearchButton />
-            </DrilldownContext.Provider>
-          )}
-        </DrilldownContext.Consumer>
-      ));
+      const { getByTitle } = render(<ReplaySearchButton queryString={query?.query_string}
+                                                        timerange={timerange}
+                                                        streams={streams} />);
 
       return asElement(getByTitle('Replay search'), HTMLAnchorElement);
     };
-
-    it('from default drilldown context', () => {
-      const { getByTitle } = render(<ReplaySearchButton />);
-      const button = asElement(getByTitle('Replay search'), HTMLAnchorElement);
-
-      expect(button.href).toEqual('http://localhost/search?rangetype=relative&from=300');
-    });
 
     it('opening in a new page', () => {
       const button = renderWithContext();

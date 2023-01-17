@@ -27,7 +27,7 @@ type Options = {
 
 const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
   data: {
-    streams: Array<Stream>,
+    elements: Array<Stream>,
     pagination: { total: number }
     attributes: Array<{ id: string, title: string, sortable: boolean }>
   } | undefined,
@@ -40,7 +40,7 @@ const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled
       searchParams.page,
       searchParams.pageSize,
       searchParams.query,
-      { sort: searchParams?.sort.attributeId, direction: searchParams?.sort.direction },
+      { sort: searchParams?.sort.attributeId, order: searchParams?.sort.direction },
     ),
     {
       onError: (errorThrown) => {

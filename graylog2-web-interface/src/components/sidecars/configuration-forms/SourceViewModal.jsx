@@ -25,6 +25,8 @@ class SourceViewModal extends React.Component {
   static propTypes = {
     configurationId: PropTypes.string,
     templateString: PropTypes.string,
+    showModal: PropTypes.bool.isRequired,
+    onHide: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -46,19 +48,14 @@ class SourceViewModal extends React.Component {
     if (!lodash.isEqual(this.state, SourceViewModal.initialState) && !lodash.isEqual(prevProps, this.props)) {
       this.resetState();
     }
+
+    if (this.props.showModal) {
+      this._loadConfiguration();
+    }
   }
 
   resetState = () => {
     this.setState(SourceViewModal.initialState);
-  };
-
-  open = () => {
-    this._loadConfiguration();
-    this.sourceModal.open();
-  };
-
-  hide = () => {
-    this.sourceModal.close();
   };
 
   _loadConfiguration = () => {
@@ -92,7 +89,8 @@ class SourceViewModal extends React.Component {
 
   render() {
     return (
-      <BootstrapModalWrapper ref={(c) => { this.sourceModal = c; }}>
+      <BootstrapModalWrapper showModal={this.props.showModal}
+                             onHide={this.props.onHide}>
         <Modal.Header closeButton>
           <Modal.Title><span>Configuration <em>{this.state.name}</em></span></Modal.Title>
         </Modal.Header>
@@ -104,7 +102,7 @@ class SourceViewModal extends React.Component {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button type="button" onClick={this.hide}>Close</Button>
+          <Button type="button" onClick={this.props.onHide}>Close</Button>
         </Modal.Footer>
       </BootstrapModalWrapper>
     );

@@ -14,9 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 
-import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
 import {
   OverlayTrigger,
   PaginatedList,
@@ -26,6 +25,7 @@ import {
   NoSearchResult,
   NoEntitiesExist,
 } from 'components/common';
+import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
 import LUTTableEntry from 'components/lookup-tables/LUTTableEntry';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';

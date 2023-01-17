@@ -21,20 +21,22 @@ import Button from 'components/bootstrap/Button';
 import OverlayDropdown from 'components/common/OverlayDropdown';
 
 type Props = {
-  children: React.ReactNode,
-  title: string,
   bsSize?: string
+  children: React.ReactNode,
   disabled?: boolean
+  dropdownZIndex?: number,
+  title: string,
 };
 
 /**
  * This component is an alternative to the `DropdownButton` component and displays the dropdown in a portal.
  */
-const OverlayDropdownButton = ({ children, title, bsSize, disabled }: Props) => {
+const OverlayDropdownButton = ({ children, title, bsSize, disabled, dropdownZIndex }: Props) => {
   const [show, setShowDropdown] = useState(false);
 
   return (
     <OverlayDropdown show={show}
+                     dropdownZIndex={dropdownZIndex}
                      renderToggle={({ onToggle, toggleTarget }) => (
                        <div className={`dropdown btn-group ${show ? 'open' : ''}`}>
                          <Button bsSize={bsSize}
@@ -56,6 +58,7 @@ const OverlayDropdownButton = ({ children, title, bsSize, disabled }: Props) => 
 OverlayDropdownButton.defaultProps = {
   bsSize: undefined,
   disabled: false,
+  dropdownZIndex: undefined,
 };
 
 export default OverlayDropdownButton;

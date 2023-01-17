@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useMemo } from 'react';
+import { useCallback, useContext, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { WidgetPositions, BackendWidgetPosition } from 'views/types';
@@ -34,6 +34,12 @@ import type { StoreState } from 'stores/StoreTypes';
 import { ViewStatesStore } from 'views/stores/ViewStatesStore';
 import ElementDimensions from 'components/common/ElementDimensions';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import findGaps from 'views/components/GridGaps';
+import generateId from 'logic/generateId';
+import NewWidgetPlaceholder from 'views/components/NewWidgetPlaceholder';
+import CreateNewWidgetModal from 'views/components/CreateNewWidgetModal';
+import isDeepEqual from 'stores/isDeepEqual';
+import { ViewActions, ViewStore } from 'views/stores/ViewStore';
 
 import WidgetContainer from './WidgetContainer';
 import WidgetComponent from './WidgetComponent';
@@ -61,7 +67,7 @@ const StyledReactGridContainer = styled(ReactGridContainer)(({ $hasFocusedWidget
   transition: none;
 `);
 
-const _defaultDimensions = (type) => {
+const _defaultDimensions = (type: string) => {
   const widgetDef = widgetDefinition(type);
 
   return new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth);
@@ -94,11 +100,11 @@ const WidgetGridItem = ({
   );
 };
 
-const generatePositions = (widgets: Array<{ id: string, type: string }>, positions: { [widgetId: string]: WidgetPosition }) => widgets
-  .map<[string, WidgetPosition]>(({ id, type }) => [id, positions[id] ?? _defaultDimensions(type)])
-  .reduce((prev, [id, position]) => ({ ...prev, [id]: position }), {});
+const generatePositions = (widgets: Array<{ id: string, type: string }>, positions: { [widgetId: string]: WidgetPosition }) => Object.fromEntries(
+  widgets.map<[string, WidgetPosition]>(({ id, type }) => [id, positions[id] ?? _defaultDimensions(type)]),
+);
 
-const mapWidgetPositions = (states: StoreState<typeof ViewStatesStore>) => states.map((state) => state.widgetPositions).reduce((prev, cur) => ({ ...prev, ...cur }), {});
+const mapWidgetPositions = (states: StoreState<typeof ViewStatesStore>) => Object.fromEntries(states.toArray().flatMap((state) => Object.entries(state.widgetPositions)));
 const mapWidgets = (state: StoreState<typeof WidgetStore>) => state.map(({ id, type }) => ({ id, type })).toArray();
 
 const useWidgetPositions = (): WidgetPositions => {
@@ -112,11 +118,12 @@ type GridProps = {
   children: React.ReactNode,
   locked: boolean,
   onPositionsChange: (newPositions: Array<BackendWidgetPosition>) => void,
+  onSyncLayout?: (newPositions: Array<BackendWidgetPosition>) => void,
   positions: WidgetPositions,
   width: number,
 };
 
-const Grid = ({ children, locked, onPositionsChange, positions, width }: GridProps) => {
+const Grid = ({ children, locked, onPositionsChange, onSyncLayout, positions, width }: GridProps) => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
   return (
@@ -127,11 +134,16 @@ const Grid = ({ children, locked, onPositionsChange, positions, width }: GridPro
                               positions={positions}
                               measureBeforeMount
                               onPositionsChange={onPositionsChange}
+                              onSyncLayout={onSyncLayout}
                               width={width}
                               draggableHandle=".widget-drag-handle">
       {children}
     </StyledReactGridContainer>
   );
+};
+
+Grid.defaultProps = {
+  onSyncLayout: () => {},
 };
 
 const useQueryFieldTypes = () => {
@@ -151,38 +163,94 @@ const onPositionChange = (newPosition: BackendWidgetPosition) => {
   CurrentViewStateActions.updateWidgetPosition(id, widgetPosition);
 };
 
-const onPositionsChange = (newPositions: Array<BackendWidgetPosition>) => {
+const _onPositionsChange = (newPositions: Array<BackendWidgetPosition>, setLastUpdate: (newValue: string) => void) => {
   const widgetPositions = Object.fromEntries(newPositions.map((newPosition) => [newPosition.id, convertPosition(newPosition)]));
   CurrentViewStateActions.widgetPositions(widgetPositions);
+  setLastUpdate(generateId());
+};
+
+const _onSyncLayout = (positions: WidgetPositions, newPositions: Array<BackendWidgetPosition>) => {
+  const { dirty: isDirty } = ViewStore.getInitialState();
+  const widgetPositions = Object.fromEntries(newPositions.map((newPosition) => [newPosition.id, convertPosition(newPosition)]));
+
+  if (!isDeepEqual(positions, widgetPositions)) {
+    CurrentViewStateActions.widgetPositions(widgetPositions)
+      .then(() => ViewActions.setDirty(isDirty));
+  }
+};
+
+const renderGaps = (widgets: { id: string, type: string}[], positions: WidgetPositions) => {
+  const items = widgets.map((widget) => positions[widget.id])
+    .filter((position) => !!position)
+    .map((p) => ({ start: { x: p.col, y: p.row }, end: { x: p.col + p.width, y: p.row + p.height } }));
+  const gaps = findGaps(items);
+  const _positions = { ...positions };
+
+  const gapsItems = gaps.map((gap) => {
+    const id = `gap-${generateId()}`;
+
+    const gapPosition = WidgetPosition.builder()
+      .col(gap.start.x)
+      .row(gap.start.y)
+      .height(gap.end.y - gap.start.y)
+      .width(gap.end.x - gap.start.x)
+      .build();
+
+    _positions[id] = gapPosition;
+
+    return (
+      <NewWidgetPlaceholder key={id} position={gapPosition} component={CreateNewWidgetModal} />
+    );
+  });
+
+  return [gapsItems, _positions] as const;
 };
 
 const WidgetGrid = () => {
   const isInteractive = useContext(InteractiveContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
+  const [lastUpdate, setLastUpdate] = useState<string>(undefined);
+  const preventDoubleUpdate = useRef<BackendWidgetPosition[]>();
 
   const widgets = useStore(WidgetStore, (state) => state.map(({ id, type }) => ({ id, type })).toArray().reverse());
-
   const positions = useWidgetPositions();
+
+  const onPositionsChange = useCallback((newPositions: Array<BackendWidgetPosition>) => {
+    preventDoubleUpdate.current = newPositions;
+
+    return _onPositionsChange(newPositions, setLastUpdate);
+  }, []);
+  const onSyncLayout = useCallback((newPositions: Array<BackendWidgetPosition>) => {
+    if (!isDeepEqual(preventDoubleUpdate.current, newPositions)) {
+      _onSyncLayout(positions, newPositions);
+    }
+  }, [positions]);
 
   const fields = useQueryFieldTypes();
 
-  const children = useMemo(() => widgets.map(({ id: widgetId }) => {
-    const position = positions[widgetId];
+  const [children, newPositions] = useMemo(() => {
+    const widgetItems = widgets
+      .filter((widget) => !!positions[widget.id])
+      .map(({ id: widgetId }) => (
+        <WidgetContainer key={widgetId} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
+          <WidgetGridItem fields={fields}
+                          positions={positions}
+                          widgetId={widgetId}
+                          focusedWidget={focusedWidget}
+                          onPositionsChange={onPositionChange} />
+        </WidgetContainer>
+      ));
 
-    if (!position) {
-      return null;
+    if (isInteractive) {
+      const [gapItems, _positions] = renderGaps(widgets, positions);
+
+      return [[...widgetItems, ...gapItems], _positions];
     }
 
-    return (
-      <WidgetContainer key={widgetId} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
-        <WidgetGridItem fields={fields}
-                        positions={positions}
-                        widgetId={widgetId}
-                        focusedWidget={focusedWidget}
-                        onPositionsChange={onPositionChange} />
-      </WidgetContainer>
-    );
-  }).filter((x) => (x !== null)), [fields, focusedWidget, positions, widgets]);
+    return [widgetItems, positions];
+    // We need to include lastUpdate explicitly to be able to force recalculation
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fields, focusedWidget, isInteractive, lastUpdate, positions, widgets]);
 
   // Measuring the width is required to update the widget grid
   // when its content height results in a scrollbar
@@ -190,8 +258,9 @@ const WidgetGrid = () => {
     <DashboardWrap>
       {({ width }) => (
         <Grid locked={!isInteractive}
-              positions={positions}
+              positions={newPositions}
               onPositionsChange={onPositionsChange}
+              onSyncLayout={onSyncLayout}
               width={width}>
           {children}
         </Grid>
@@ -201,7 +270,4 @@ const WidgetGrid = () => {
 };
 
 WidgetGrid.displayName = 'WidgetGrid';
-
-const MemoizedWidgetGrid = React.memo(WidgetGrid);
-
-export default MemoizedWidgetGrid;
+export default WidgetGrid;
