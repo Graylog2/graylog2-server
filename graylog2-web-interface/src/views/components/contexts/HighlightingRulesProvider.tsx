@@ -17,19 +17,12 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import useActiveViewState from 'views/hooks/useActiveViewState';
-import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
+import useAppSelector from 'stores/useAppSelector';
+import { selectHighlightingRules } from 'views/logic/slices/highlightSelectors';
 
 import HighlightingRulesContext from './HighlightingRulesContext';
 
-const useHighlightingRules = () => {
-  const viewState = useActiveViewState();
-  const formatting = viewState?.formatting ?? FormattingSettings.empty();
-
-  const { highlighting } = formatting;
-
-  return highlighting;
-};
+const useHighlightingRules = () => useAppSelector(selectHighlightingRules);
 
 const HighlightingRulesProvider = ({ children }: { children: React.ReactElement }): React.ReactElement => {
   const highlightingRules = useHighlightingRules();
