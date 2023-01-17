@@ -95,3 +95,10 @@ export const duplicateWidget = (widgetId: string, widgetTitle: string) => async 
   return dispatch(addWidget(duplicatedWidget))
     .then(() => dispatch(setTitle(activeQuery, 'widget', duplicatedWidget.id, `${widgetTitle} (copy)`)));
 };
+
+export const removeWidget = (widgetId: string) => async (dispatch: AppDispatch, getState: GetState) => {
+  const widgets = selectWidgets(getState());
+  const newWidgets = widgets.filter((widget) => widget.id !== widgetId).toList();
+
+  return dispatch(updateWidgets(newWidgets));
+};

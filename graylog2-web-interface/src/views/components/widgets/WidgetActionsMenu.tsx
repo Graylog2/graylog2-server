@@ -32,7 +32,6 @@ import Search from 'views/logic/search/Search';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import { MenuItem } from 'components/bootstrap';
-import { WidgetActions } from 'views/stores/WidgetStore';
 import type Widget from 'views/logic/widgets/Widget';
 import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 import DrilldownContext from 'views/components/contexts/DrilldownContext';
@@ -42,7 +41,7 @@ import type { AppDispatch } from 'stores/useAppDispatch';
 import useAppDispatch from 'stores/useAppDispatch';
 import { selectQuery, loadView } from 'views/logic/slices/viewSlice';
 import { execute } from 'views/logic/slices/searchExecutionSlice';
-import { duplicateWidget } from 'views/logic/slices/widgetActions';
+import { duplicateWidget, removeWidget } from 'views/logic/slices/widgetActions';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -115,12 +114,12 @@ const _onMoveWidgetToPage = async (
 // eslint-disable-next-line no-alert
 const defaultOnDeleteWidget = async (_widget: Widget, _view: View, title: string) => window.confirm(`Are you sure you want to remove the widget "${title}"?`);
 
-const _onDelete = async (widget: Widget, view: View, title: string) => {
+const _onDelete = (widget: Widget, view: View, title: string) => async (dispatch: AppDispatch) => {
   const pluggableWidgetDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingWidget');
 
   const result = await iterateConfirmationHooks([...pluggableWidgetDeletionHooks, defaultOnDeleteWidget], widget, view, title);
 
-  return result === true ? WidgetActions.remove(widget.id) : Promise.resolve();
+  return result === true ? dispatch(removeWidget(widget.id)) : Promise.resolve();
 };
 
 const _onDuplicate = (widgetId: string, unsetWidgetFocusing: () => void, title: string) => (dispatch: AppDispatch) => dispatch(duplicateWidget(widgetId, title)).then(() => unsetWidgetFocusing());
@@ -152,7 +151,7 @@ const WidgetActionsMenu = ({
   const onDuplicate = useCallback(() => dispatch(_onDuplicate(widget.id, unsetWidgetFocusing, title)), [dispatch, widget.id, unsetWidgetFocusing, title]);
   const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId), [view]);
   const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToPage(dispatch, view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [dispatch, view]);
-  const onDelete = useCallback(() => _onDelete(widget, view, title), [title, view, widget]);
+  const onDelete = useCallback(() => dispatch(_onDelete(widget, view, title)), [dispatch, title, view, widget]);
   const focusWidget = useCallback(() => setWidgetFocusing(widget.id), [setWidgetFocusing, widget.id]);
 
   return (
