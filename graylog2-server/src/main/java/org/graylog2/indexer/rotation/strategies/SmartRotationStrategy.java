@@ -16,20 +16,36 @@
  */
 package org.graylog2.indexer.rotation.strategies;
 
+import com.github.joschi.jadconfig.util.Size;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.utilities.StringUtils;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import java.time.Instant;
+import java.time.Period;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class SmartRotationStrategy extends AbstractRotationStrategy {
+    private static final Logger LOG = LoggerFactory.getLogger(SmartRotationStrategy.class);
     public static final String NAME = "smart";
+    public static final Period ROTATION_PERIOD = Period.ofDays(1);
 
     private final Indices indices;
+
+    // TODO: move this into server.conf or maybe into IndexSetsDefaultConfiguration
+    // also see elasticsearch_max_size_per_index
+    public static final Size MAX_INDEX_SIZE = Size.gigabytes(50);
+    public static final Size MIN_INDEX_SIZE = Size.gigabytes(20);
 
     @Inject
     public SmartRotationStrategy(Indices indices,
@@ -50,14 +66,83 @@ public class SmartRotationStrategy extends AbstractRotationStrategy {
         return SmartRotationStrategyConfig.builder().build();
     }
 
-    @Nullable
     @Override
+    @Nonnull
     protected Result shouldRotate(final String index, IndexSet indexSet) {
-        return null;
+        final DateTime creationDate = indices.indexCreationDate(index).orElseThrow(()-> new IllegalStateException("No index creation date"));
+        final Long sizeInBytes = indices.getStoreSizeInBytes(index).orElseThrow(() -> new IllegalStateException("No index size"));
+
+        Period leeWay;
+        if (indexSet.getConfig().rotationStrategy() instanceof SmartRotationStrategyConfig rotationConfig) {
+            leeWay = rotationConfig.indexLifetimeHard().minus(rotationConfig.indexLifetimeSoft());
+        } else {
+            throw new IllegalStateException(f("Unsupported RotationStrategyConfig type <%s>", indexSet.getConfig().rotationStrategy()));
+        }
+
+        if (indexExceedsSizeLimit(sizeInBytes)) {
+            return new Result(true,
+                    f("Index size <%s> exceeds MAX_INDEX_SIZE <%s>",
+                            StringUtils.humanReadableByteCount(sizeInBytes), MAX_INDEX_SIZE));
+        }
+        if (indexExceedsLeeWay(creationDate, leeWay)) {
+            return new Result(true,
+                    f("Index creation date <%s> exceeds optimization leeway <%s>",
+                            creationDate, leeWay));
+        }
+
+        if (indexIsOldEnough(creationDate) && !indexSubceedsSizeLimit(sizeInBytes)) {
+            return new Result(true,
+                    f("Index is old enough (%s) and has a reasonable size (%s) for rotation",
+                            creationDate, StringUtils.humanReadableByteCount(sizeInBytes)));
+        }
+
+        return new Result(false, "No reason to rotate found");
+    }
+
+    private boolean indexExceedsLeeWay(DateTime creationDate, Period leeWay) {
+        final Instant now = Instant.now();
+        final Instant leewayLimit = now.minus(ROTATION_PERIOD.plus(leeWay));
+
+        return creationDate.isBefore(leewayLimit.toEpochMilli());
+    }
+
+    private boolean indexIsOldEnough(DateTime creationDate) {
+        final Instant now = Instant.now();
+        final Instant rotationLimit = now.minus(ROTATION_PERIOD);
+
+        return creationDate.isBefore(rotationLimit.toEpochMilli());
+    }
+
+    private boolean indexExceedsSizeLimit(long size) {
+        return size > MAX_INDEX_SIZE.toBytes();
+    }
+
+    private boolean indexSubceedsSizeLimit(long size) {
+        return size < MIN_INDEX_SIZE.toBytes();
     }
 
     @Override
     public String getStrategyName() {
         return NAME;
+    }
+    static class Result implements AbstractRotationStrategy.Result {
+        private final boolean shouldRotate;
+        private final String message;
+
+        private Result(boolean shouldRotate, String message) {
+            this.shouldRotate = shouldRotate;
+            this.message = message;
+            LOG.debug("{} because of: {}", shouldRotate ? "Rotating" : "Not rotating", message);
+        }
+
+        @Override
+        public String getDescription() {
+            return message;
+        }
+
+        @Override
+        public boolean shouldRotate() {
+            return shouldRotate;
+        }
     }
 }
