@@ -55,6 +55,9 @@ public class InputServiceImplTest {
     @Mock
     private MessageInputFactory messageInputFactory;
 
+    @Mock
+    private EncryptedValuesSupport encryptedValuesSupport;
+
     private ClusterEventBus clusterEventBus;
     private InputServiceImpl inputService;
 
@@ -67,8 +70,8 @@ public class InputServiceImplTest {
                 extractorFactory,
                 converterFactory,
                 messageInputFactory,
-                clusterEventBus
-        );
+                clusterEventBus,
+                encryptedValuesSupport);
     }
 
     @Test

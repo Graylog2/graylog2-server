@@ -51,7 +51,7 @@ public interface ConfigurationField {
         return DEFAULT_POSITION;
     }
 
-    default boolean isSensitive() {
+    default boolean isEncrypted() {
         return DEFAULT_IS_SENSITIVE;
     }
 }

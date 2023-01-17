@@ -27,10 +27,7 @@ public class TextField extends AbstractConfigurationField {
     public enum Attribute {
         IS_PASSWORD,
         TEXTAREA,
-        /**
-         * @deprecated Use {@link ConfigurationField#isSensitive()} instead.
-         **/
-        @Deprecated IS_SENSITIVE
+        IS_SENSITIVE
     }
 
     private String defaultValue;
@@ -53,12 +50,12 @@ public class TextField extends AbstractConfigurationField {
         this(name, humanName, defaultValue, description, isOptional, DEFAULT_IS_SENSITIVE, position, attrs);
     }
 
-    public TextField(String name, String humanName, String defaultValue, String description, Optional isOptional, boolean isSensitive, Attribute... attrs) {
-        this(name, humanName, defaultValue, description, isOptional, isSensitive, DEFAULT_POSITION, attrs);
+    public TextField(String name, String humanName, String defaultValue, String description, Optional isOptional, boolean isEncrypted, Attribute... attrs) {
+        this(name, humanName, defaultValue, description, isOptional, isEncrypted, DEFAULT_POSITION, attrs);
     }
 
-    public TextField(String name, String humanName, String defaultValue, String description, Optional isOptional, boolean isSensitive, int position, Attribute... attrs) {
-        super(FIELD_TYPE, name, humanName, description, isOptional, position, isSensitive);
+    public TextField(String name, String humanName, String defaultValue, String description, Optional isOptional, boolean isEncrypted, int position, Attribute... attrs) {
+        super(FIELD_TYPE, name, humanName, description, isOptional, position, isEncrypted);
         this.defaultValue = defaultValue;
         this.attributes = Lists.newArrayList();
         if (attrs != null) {

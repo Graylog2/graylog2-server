@@ -48,6 +48,7 @@ import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.grok.InMemoryGrokPatternService;
+import org.graylog2.inputs.EncryptedValuesSupport;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputImpl;
 import org.graylog2.inputs.InputService;
@@ -119,6 +120,8 @@ public class InputFacadeTest {
     private MessageInputFactory messageInputFactory;
     @Mock
     private ServerStatus serverStatus;
+    @Mock
+    private EncryptedValuesSupport encryptedValuesSupport;
 
     private InputService inputService;
     private InputFacade facade;
@@ -136,7 +139,7 @@ public class InputFacadeTest {
                 Executors.newScheduledThreadPool(1));
         final ExtractorFactory extractorFactory = new ExtractorFactory(metricRegistry, grokPatternRegistry, lookupTableService);
         final ConverterFactory converterFactory = new ConverterFactory(lookupTableService);
-        inputService = new InputServiceImpl(mongodb.mongoConnection(), extractorFactory, converterFactory, messageInputFactory, clusterEventBus);
+        inputService = new InputServiceImpl(mongodb.mongoConnection(), extractorFactory, converterFactory, messageInputFactory, clusterEventBus, encryptedValuesSupport);
         final InputRegistry inputRegistry = new InputRegistry();
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
         Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories = new HashMap<>();

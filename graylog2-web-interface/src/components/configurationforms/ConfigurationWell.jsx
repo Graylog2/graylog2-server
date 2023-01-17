@@ -67,7 +67,7 @@ class ConfigurationWell extends React.Component {
       const requestedConfiguration = (typeDefinition && typeDefinition.requested_configuration ? typeDefinition.requested_configuration[key] : undefined);
 
       if (requestedConfiguration
-        && (requestedConfiguration.attributes.indexOf('is_password') > -1 || requestedConfiguration.attributes.indexOf('is_sensitive') > -1 || requestedConfiguration.is_sensitive)) {
+        && (requestedConfiguration.attributes.indexOf('is_password') > -1 || requestedConfiguration.attributes.indexOf('is_sensitive') > -1)) {
         return this._formatPasswordField(value, key);
       }
 

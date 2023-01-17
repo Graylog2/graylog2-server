@@ -45,6 +45,8 @@ public abstract class InputCreateRequest {
     @Nullable
     public abstract String node();
 
+    public abstract Builder toBuilder();
+
     @JsonCreator
     public static InputCreateRequest create(@JsonProperty("title") String title,
                                             @JsonProperty("type") String type,
@@ -52,5 +54,24 @@ public abstract class InputCreateRequest {
                                             @JsonProperty("configuration") Map<String, Object> configuration,
                                             @JsonProperty("node") String node) {
         return new AutoValue_InputCreateRequest(title, type, global, configuration, node);
+    }
+
+    public static Builder builder() {
+        return new AutoValue_InputCreateRequest.Builder();
+    }
+
+    @AutoValue.Builder
+    public abstract static class Builder {
+        public abstract Builder title(String title);
+
+        public abstract Builder type(String type);
+
+        public abstract Builder global(boolean global);
+
+        public abstract Builder configuration(Map<String, Object> configuration);
+
+        public abstract Builder node(String node);
+
+        public abstract InputCreateRequest build();
     }
 }

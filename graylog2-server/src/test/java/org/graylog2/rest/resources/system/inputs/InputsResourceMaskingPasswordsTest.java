@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.inputs.EncryptedValuesSupport;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -60,13 +61,16 @@ public class InputsResourceMaskingPasswordsTest {
     @Mock
     private Subject currentSubject;
 
+    @Mock
+    private EncryptedValuesSupport encryptedValuesSupport;
+
     private Map<String, InputDescription> availableInputs;
 
     private InputsResource inputsResource;
 
     class InputsTestResource extends InputsResource {
         public InputsTestResource(InputService inputService, MessageInputFactory messageInputFactory) {
-            super(inputService, messageInputFactory);
+            super(inputService, messageInputFactory, encryptedValuesSupport);
         }
 
         @Override

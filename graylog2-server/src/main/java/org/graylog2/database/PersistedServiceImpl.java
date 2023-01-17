@@ -294,7 +294,6 @@ public class PersistedServiceImpl implements PersistedService {
             if (x.getValue() instanceof NodeId nodeId) {
                 doc.put(x.getKey(), nodeId.getNodeId());
             }
-
         }
     }
 

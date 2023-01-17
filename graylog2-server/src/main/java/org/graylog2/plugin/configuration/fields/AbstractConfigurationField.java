@@ -27,7 +27,7 @@ public abstract class AbstractConfigurationField implements ConfigurationField {
     protected final String description;
     protected final ConfigurationField.Optional optional;
     protected int position;
-    protected final boolean isSensitive;
+    protected final boolean isEncrypted;
 
     public AbstractConfigurationField(String field_type, String name, String humanName, String description, ConfigurationField.Optional optional) {
         this(field_type, name, humanName, description, optional, DEFAULT_POSITION, false);
@@ -37,14 +37,14 @@ public abstract class AbstractConfigurationField implements ConfigurationField {
         this(field_type, name, humanName, description, optional, position, false);
     }
 
-    public AbstractConfigurationField(String field_type, String name, String humanName, String description, ConfigurationField.Optional optional, int position, boolean isSensitive) {
+    public AbstractConfigurationField(String field_type, String name, String humanName, String description, ConfigurationField.Optional optional, int position, boolean isEncrypted) {
         this.field_type = field_type;
         this.name = name;
         this.humanName = humanName;
         this.description = description;
         this.optional = optional;
         this.position = position;
-        this.isSensitive = isSensitive;
+        this.isEncrypted = isEncrypted;
     }
 
     @Override
@@ -88,7 +88,7 @@ public abstract class AbstractConfigurationField implements ConfigurationField {
     }
 
     @Override
-    public boolean isSensitive() {
-        return isSensitive;
+    public boolean isEncrypted() {
+        return isEncrypted;
     }
 }

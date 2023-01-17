@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.Maps;
+import org.graylog2.security.encryption.EncryptedValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +56,8 @@ public class Configuration implements Serializable {
     private final Map<String, Boolean> bools = Maps.newHashMap();
     @JsonIgnore
     private final Map<String, List<String>> lists = Maps.newHashMap();
+    @JsonIgnore
+    private final Map<String, EncryptedValue> encryptedValues = Maps.newHashMap();
 
     @JsonCreator
     public Configuration(@JsonProperty("source") @Nullable Map<String, Object> m) {
@@ -83,6 +86,8 @@ public class Configuration implements Serializable {
                 } else if (value instanceof List) {
                     final List<String> list = ((List<?>) value).stream().map(element -> (String) element).collect(Collectors.toList());
                     lists.put(key, list);
+                } else if (value instanceof EncryptedValue encryptedValue) {
+                    encryptedValues.put(key, encryptedValue);
                 } else {
                     LOG.error("Cannot handle type [{}] of plugin configuration key <{}>.", value.getClass().getCanonicalName(), key);
                 }
@@ -140,6 +145,14 @@ public class Configuration implements Serializable {
 
     public boolean listIsSet(String key) {
         return lists.containsKey(key);
+    }
+
+    public EncryptedValue getEncryptedValue(String key) {
+        return getEncryptedValue(key, EncryptedValue.createUnset());
+    }
+
+    public EncryptedValue getEncryptedValue(String key, EncryptedValue defaultValue) {
+        return firstNonNull(encryptedValues.get(key), defaultValue);
     }
 
     @Nullable
