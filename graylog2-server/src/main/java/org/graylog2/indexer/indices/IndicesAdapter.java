@@ -49,11 +49,22 @@ public interface IndicesAdapter {
      */
     void updateIndexMapping(@Nonnull String indexName, @Nonnull String mappingType, @Nonnull Map<String, Object> mapping);
 
+    /**
+     * Updates the metadata field (_meta) of an index mapping
+     * @param indexName existing index name
+     * @param metaData  the new metadata
+     * @param mergeExisting merge or overwrite existing metadata
+     */
+    void updateIndexMetaData(@Nonnull String indexName, @Nonnull Map<String, Object> metaData, boolean mergeExisting);
+    Map<String, Object> getIndexMetaData(@Nonnull String indexName);
+
     boolean ensureIndexTemplate(String templateName, Map<String, Object> template);
 
     boolean indexTemplateExists(String templateName);
 
     Optional<DateTime> indexCreationDate(String index);
+
+    Optional<DateTime> indexClosingDate(String index);
 
     void openIndex(String index);
 
