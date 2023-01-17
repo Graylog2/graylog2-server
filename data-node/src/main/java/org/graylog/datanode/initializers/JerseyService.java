@@ -2,6 +2,8 @@ package org.graylog.datanode.initializers;
 
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.jaxrs.base.JsonMappingExceptionMapper;
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
@@ -23,6 +25,8 @@ import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.plugin.rest.exceptionmappers.JacksonPropertyExceptionMapper;
+import org.graylog2.plugin.rest.exceptionmappers.JsonProcessingExceptionMapper;
 import org.graylog2.rest.MoreMediaTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -192,16 +196,16 @@ public class JerseyService extends AbstractIdleService {
                 .property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true)
                 .property(ServerProperties.WADL_FEATURE_DISABLE, true)
                 .property(ServerProperties.MEDIA_TYPE_MAPPINGS, mediaTypeMappings())
-/*                .register(new PrefixAddingModelProcessor(packagePrefixes, graylogConfiguration))
+//                .register(new PrefixAddingModelProcessor(packagePrefixes, graylogConfiguration))
                 .registerClasses(
-                        ShiroSecurityContextFilter.class,
+/*                        ShiroSecurityContextFilter.class,
                         ShiroRequestHeadersBinder.class,
-                        VerboseCsrfProtectionFilter.class,
+                        VerboseCsrfProtectionFilter.class, */
                         JacksonJaxbJsonProvider.class,
                         JsonProcessingExceptionMapper.class,
                         JsonMappingExceptionMapper.class,
-                        JacksonPropertyExceptionMapper.class,
-                        AnyExceptionClassMapper.class,
+                        JacksonPropertyExceptionMapper.class
+/*                        AnyExceptionClassMapper.class,
                         MissingStreamPermissionExceptionMapper.class,
                         WebApplicationExceptionMapper.class,
                         BadRequestExceptionMapper.class,
@@ -211,7 +215,7 @@ public class JerseyService extends AbstractIdleService {
                         XHRFilter.class,
                         NotAuthorizedResponseFilter.class,
                         WebAppNotFoundResponseFilter.class,
-                        EmbeddingControlFilter.class) */
+                        EmbeddingControlFilter.class */)
                 // Replacing this with a lambda leads to missing subtypes - https://github.com/Graylog2/graylog2-server/pull/10617#discussion_r630236360
                 .register(new ContextResolver<ObjectMapper>() {
                     @Override
