@@ -102,7 +102,7 @@ class SmartRotationStrategyTest {
         final Period leeWay = smartRotationStrategyConfig.indexLifetimeHard().minus(smartRotationStrategyConfig.indexLifetimeSoft());
         // TODO only works with multiple of days
         final java.time.Duration leeWayDuration = java.time.Duration.ofDays(leeWay.getDays() + ROTATION_PERIOD.getDays());
-        final DateTime creationDate = now.minus(leeWayDuration.toMillis());
+        final DateTime creationDate = now.minus(leeWayDuration.toMillis() + 10); // avoid race between the time of now here and in code
 
         when(indices.indexCreationDate("index_0")).thenReturn(Optional.of(creationDate));
         when(indices.getStoreSizeInBytes("index_0")).thenReturn(Optional.of(5L));
