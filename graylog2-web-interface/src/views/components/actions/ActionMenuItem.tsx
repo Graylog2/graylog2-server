@@ -159,7 +159,8 @@ const ActionHandlerItem = ({ disabled, action, handlerArgs, setOverflowingCompon
 
 const ActionMenuItem = ({ action, handlerArgs, setOverflowingComponents, overflowingComponents, type, onMenuToggle }: Props) => {
   const { isEnabled = () => true } = action;
-  const actionDisabled = !isEnabled(handlerArgs);
+  const dispatch = useAppDispatch();
+  const actionDisabled = dispatch((_dispatch, getState) => !isEnabled(handlerArgs, getState));
   const { field } = handlerArgs;
 
   if (isExternalLinkAction(action)) {

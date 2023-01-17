@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import type { ActionContexts, RootState } from 'views/types';
+import type { ActionContexts, GetState } from 'views/types';
 import type { FieldName, FieldValue } from 'views/logic/fieldtypes/FieldType';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import type { QueryId } from 'views/logic/queries/Query';
@@ -46,7 +46,7 @@ export type ActionHandlerArguments<Contexts = ActionContexts> = {
 };
 
 export type ActionHandler<Contexts> = (args: ActionHandlerArguments<Contexts>) => Promise<unknown>;
-export type ActionHandlerCondition<Contexts> = (args: ActionHandlerArguments<Contexts>) => boolean;
+export type ActionHandlerCondition<Contexts> = (args: ActionHandlerArguments<Contexts>, getState: GetState) => boolean;
 
 export type ActionConditions<Contexts> = {
   isEnabled?: ActionHandlerCondition<Contexts>,
@@ -61,7 +61,7 @@ type ActionDefinitionBase<Contexts> = {
   condition?: () => boolean,
 };
 
-export type ThunkActionHandler<T> = (args: ActionHandlerArguments<T>) => (dispatch: AppDispatch, getState: () => RootState) => unknown | Promise<unknown>;
+export type ThunkActionHandler<T> = (args: ActionHandlerArguments<T>) => (dispatch: AppDispatch, getState: GetState) => unknown | Promise<unknown>;
 
 type FunctionHandlerAction<Contexts> = {
   handler: ActionHandler<Contexts>,

@@ -217,14 +217,14 @@ const exports: PluginExports = {
     {
       type: 'chart',
       title: 'Chart',
-      handler: ChartActionHandler,
+      thunk: ChartActionHandler,
       isEnabled: ({ type }) => type.isNumeric(),
       resetFocus: true,
     },
     {
       type: 'aggregate',
       title: 'Show top values',
-      handler: AggregateActionHandler,
+      thunk: AggregateActionHandler,
       isEnabled: (({
         field,
         type,
@@ -240,13 +240,13 @@ const exports: PluginExports = {
         type,
         contexts: { analysisDisabledFields },
       }) => (!isFunction(field) && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields))),
-      handler: FieldStatisticsHandler,
+      thunk: FieldStatisticsHandler,
       resetFocus: false,
     },
     {
       type: 'add-to-table',
       title: 'Add to table',
-      handler: AddToTableActionHandler,
+      thunk: AddToTableActionHandler,
       isEnabled: AddToTableActionHandler.isEnabled,
       isHidden: AddToTableActionHandler.isHidden,
       resetFocus: false,
@@ -254,7 +254,7 @@ const exports: PluginExports = {
     {
       type: 'remove-from-table',
       title: 'Remove from table',
-      handler: RemoveFromTableActionHandler,
+      thunk: RemoveFromTableActionHandler,
       isEnabled: RemoveFromTableActionHandler.isEnabled,
       isHidden: RemoveFromTableActionHandler.isHidden,
       resetFocus: false,
@@ -262,14 +262,14 @@ const exports: PluginExports = {
     {
       type: 'add-to-all-tables',
       title: 'Add to all tables',
-      handler: AddToAllTablesActionHandler,
+      thunk: AddToAllTablesActionHandler,
       isEnabled: ({ field, type }) => (!isFunction(field) && !type.isDecorated()),
       resetFocus: false,
     },
     {
       type: 'remove-from-all-tables',
       title: 'Remove from all tables',
-      handler: RemoveFromAllTablesActionHandler,
+      thunk: RemoveFromAllTablesActionHandler,
       isEnabled: ({ field, type }) => (!isFunction(field) && !type.isDecorated()),
       resetFocus: false,
     },
@@ -299,7 +299,7 @@ const exports: PluginExports = {
     {
       type: 'show-bucket',
       title: 'Show documents for value',
-      handler: ShowDocumentsHandler,
+      thunk: ShowDocumentsHandler,
       isEnabled: ShowDocumentsHandler.isEnabled,
       resetFocus: true,
     },
@@ -313,7 +313,7 @@ const exports: PluginExports = {
     {
       type: 'highlight-value',
       title: 'Highlight this value',
-      handler: HighlightValueHandler,
+      thunk: HighlightValueHandler,
       isEnabled: HighlightValueHandler.isEnabled,
       resetFocus: false,
     },
