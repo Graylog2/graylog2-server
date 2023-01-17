@@ -75,9 +75,9 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
                 .stream()
                 .filter(indexName -> !indices.isReopened(indexName))
                 .filter(indexName -> {
-                    DateTime creationDate = indices.indexCreationDate(indexName)
-                            .orElseThrow(() -> new IllegalStateException(f("Index %s has no creation date - retention failed", indexName)));
-                    return creationDate.isBefore(cutoff);
+                    DateTime closingDate = indices.indexClosingDate(indexName)
+                            .orElseThrow(() -> new IllegalStateException(f("Index %s has no closing date - retention failed", indexName)));
+                    return closingDate.isBefore(cutoff);
                 })
                 .count();
 
