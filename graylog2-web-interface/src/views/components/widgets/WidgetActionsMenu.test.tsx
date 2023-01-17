@@ -53,10 +53,6 @@ jest.mock('views/components/dashboard/hooks/useDashboards');
 
 jest.mock('views/logic/views/CopyWidgetToDashboard', () => jest.fn());
 
-jest.mock('views/stores/ChartColorRulesStore', () => ({
-  ChartColorRulesStore: {},
-}));
-
 jest.mock('views/logic/views/Actions');
 
 jest.mock('views/stores/ViewStore', () => ({

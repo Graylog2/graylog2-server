@@ -18,8 +18,9 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 
-import { ChartColorRulesActions } from 'views/stores/ChartColorRulesStore';
 import ColorMapper from 'views/components/visualizations/ColorMapper';
+import useAppDispatch from 'stores/useAppDispatch';
+import { setChartColor } from 'views/logic/slices/widgetActions';
 
 import useColorRules from './useColorRules';
 
@@ -32,23 +33,27 @@ type Props = {
 
 const WidgetColorContext = ({ children, id }: Props) => {
   const colorRules = useColorRules();
-  const colorMapperBuilder = ColorMapper.builder();
-  const colorRulesForWidgetBuilder = colorRules.filter(({ widgetId }) => (widgetId === id))
-    .reduce((prev, { name, color }) => (prev.set(name, color)), colorMapperBuilder);
-  const colorRulesForWidget = colorRulesForWidgetBuilder.build();
+  const colorRulesForWidget = useMemo(() => {
+    const colorMapperBuilder = ColorMapper.builder();
+    const colorRulesForWidgetBuilder = colorRules.filter(({ widgetId }) => (widgetId === id))
+      .reduce((prev, { name, color }) => (prev.set(name, color)), colorMapperBuilder);
+
+    return colorRulesForWidgetBuilder.build();
+  }, [colorRules, id]);
+  const dispatch = useAppDispatch();
 
   const contextValue = useMemo(() => {
     const setColor = (name: string, color: string) => {
       colorRulesForWidget.set(name, color);
 
-      return ChartColorRulesActions.set(id, name, color);
+      return dispatch(setChartColor(id, name, color));
     };
 
     return ({
       colors: colorRulesForWidget,
       setColor,
     });
-  }, [colorRulesForWidget, id]);
+  }, [colorRulesForWidget, dispatch, id]);
 
   return (
     <ChartColorContext.Provider value={contextValue}>

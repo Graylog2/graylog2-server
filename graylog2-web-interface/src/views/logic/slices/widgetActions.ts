@@ -26,6 +26,7 @@ import type Widget from 'views/logic/widgets/Widget';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import generateId from 'logic/generateId';
 import { setTitle } from 'views/logic/slices/titlesActions';
+import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetFormattingSettings';
 
 export const updateWidgetPositions = (newWidgetPositions: WidgetPositions) => (dispatch: AppDispatch, getState: GetState) => {
   const activeQuery = selectActiveQuery(getState());
@@ -101,4 +102,18 @@ export const removeWidget = (widgetId: string) => async (dispatch: AppDispatch, 
   const newWidgets = widgets.filter((widget) => widget.id !== widgetId).toList();
 
   return dispatch(updateWidgets(newWidgets));
+};
+
+export const setChartColor = (widgetId: string, name: string, color: string) => (dispatch: AppDispatch, getState: GetState) => {
+  const widget = selectWidget(widgetId)(getState());
+  const formattingSettings: WidgetFormattingSettings = widget?.config?.formattingSettings ?? WidgetFormattingSettings.empty();
+  const { chartColors } = formattingSettings;
+
+  const newWidget = widget.toBuilder()
+    .config(widget.config.toBuilder()
+      .formattingSettings(formattingSettings.toBuilder()
+        .chartColors({ ...chartColors, [name]: color })
+        .build()).build()).build();
+
+  return dispatch(updateWidget(widgetId, newWidget));
 };

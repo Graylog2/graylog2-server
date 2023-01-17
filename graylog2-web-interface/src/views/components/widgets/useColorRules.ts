@@ -16,11 +16,18 @@
  */
 import useWidgets from 'views/hooks/useWidgets';
 import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetFormattingSettings';
-import type { ColorRule } from 'views/stores/ChartColorRulesStore';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 const isAggregationWidgetConfig = (config: WidgetConfig): config is AggregationWidgetConfig => config && 'formattingSettings' in config;
+
+type Color = string;
+
+export type ColorRule = {
+  widgetId: string,
+  name: string,
+  color: Color,
+};
 
 const useColorRules = () => {
   const widgets = useWidgets();
