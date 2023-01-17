@@ -30,7 +30,7 @@ type Props = {
 }
 
 const SidecarFailureTrackingRows = ({ sidecar }: Props) => {
-  //const annotation = sidecar.active ? '' : ' (inactive)';
+  const annotation = sidecar.active ? '' : ' (inactive)';
   let sidecarStatus = { status: null, message: null, id: null };
 
   if (sidecar.node_details.status && SidecarStatusEnum.isValidStatusCode(sidecar.node_details.status.status)) {
@@ -51,7 +51,7 @@ const SidecarFailureTrackingRows = ({ sidecar }: Props) => {
                 {sidecar.node_name}
               </Link>
             )
-            : sidecar.node_name}
+            : sidecar.node_name + annotation}
         </td>
         <td>
           <RelativeTime dateTime={sidecar.last_seen} />
