@@ -98,7 +98,7 @@ const Metric = ({ index }: Props) => {
                  wrapperClassName="col-sm-9">
             <FieldSelect id="metric-field-select"
                          selectRef={metricFieldSelectRef}
-                         onChange={onChange}
+                         onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
                          clearable={!isFieldRequired}
                          properties={requiredProperties}
                          name={name}

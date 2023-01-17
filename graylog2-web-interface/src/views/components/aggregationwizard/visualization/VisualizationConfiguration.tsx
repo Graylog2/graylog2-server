@@ -45,7 +45,6 @@ const isTimeline = (values: WidgetConfigFormValues) => {
   }
 
   const firstRowGrouping = values.groupBy.groupings.find((grouping) => grouping.direction === 'row');
-  console.log({ firstRowGrouping });
 
   return firstRowGrouping?.fields?.includes(TIMESTAMP_FIELD);
 };
