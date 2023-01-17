@@ -35,11 +35,11 @@ public class StatusController {
     private ManagedNodes openSearch;
 
     @GetMapping("/")
-    public List<StatusResponse> index() {
+    public DataNodeStatus status() {
 
         return openSearch.getProcesses()
                 .stream()
-                .map(process -> new StatusResponse(dataNodeVersion, process.getOpensearchVersion(), process.getProcessInfo()))
-                .collect(Collectors.toList());
+                .map(process -> new StatusResponse(process.getOpensearchVersion(), process.getProcessInfo()))
+                .collect(Collectors.collectingAndThen(Collectors.toList(), statusResponses -> new DataNodeStatus(dataNodeVersion, statusResponses)));
     }
 }

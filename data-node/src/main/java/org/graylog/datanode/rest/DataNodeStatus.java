@@ -14,7 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.process;
+package org.graylog.datanode.rest;
 
-public record ProcessInfo(long pid, ProcessState status, java.time.Instant started, java.time.Duration totalCpuDuration, String user) {
+import java.util.List;
+
+public record DataNodeStatus(String dataNodeVersion, List<StatusResponse>processes) {
 }
