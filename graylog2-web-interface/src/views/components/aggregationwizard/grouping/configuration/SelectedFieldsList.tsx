@@ -16,20 +16,23 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useState } from 'react';
 import { useFormikContext } from 'formik';
+import { useState, useCallback, forwardRef, useMemo } from 'react';
 
 // import { DEFAULT_LIMIT } from 'views/Constants';
 // import parseNumber from 'views/components/aggregationwizard/grouping/parseNumber';
-import { IconButton } from 'components/common';
+import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
+
+import { IconButton, SortableList, Icon } from 'components/common';
 import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 // import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
-const ListItemContainer = styled.li`
+const ListItemContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: 3px;
 `;
 
 const EditFieldSelect = styled(FieldSelect)`
@@ -41,23 +44,41 @@ const Title = styled.div`
   align-items: center;
 `;
 
+const DragHandle = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 25px;
+  margin-right: 5px;
+`;
+
 type ListItemProps = {
-  excludedFields: Array<string>,
-  fieldName: string,
+  item: { id: string, title: string },
+  draggableProps: DraggableProvidedDraggableProps;
+  dragHandleProps: DraggableProvidedDragHandleProps;
+  className: string,
   onChange: (fieldName: string) => void,
+  excludedFields: Array<string>,
 }
 
-const ListItem = ({ fieldName, onChange, excludedFields }: ListItemProps) => {
+const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
+  item,
+  dragHandleProps,
+  draggableProps,
+  className,
+  onChange,
+  excludedFields,
+}: ListItemProps, ref) => {
   const [isEditing, setIsEditing] = useState(false);
 
-  const _onChange = (fieldName: string) => {
-    onChange(fieldName);
+  const _onChange = (newFieldName: string) => {
+    onChange(newFieldName);
     setIsEditing(false);
   };
 
   return (
-    <ListItemContainer>
-      {isEditing ? (
+    <ListItemContainer className={className} ref={ref} {...(draggableProps ?? {})}>
+      {isEditing && (
         <EditFieldSelect id="group-by-field-select"
                          onChange={_onChange}
                          menuIsOpen
@@ -66,12 +87,19 @@ const ListItem = ({ fieldName, onChange, excludedFields }: ListItemProps) => {
                          excludedFields={excludedFields}
                          ariaLabel="Fields"
                          name="group-by-field-create-select"
-                         value={fieldName}
+                         value={item.id}
                          placeholder="Add a field"
                          aria-label="Add a field" />
-      ) : (
+      )}
+
+      {!isEditing && (
         <>
-          <Title><IconButton name="bars" />{fieldName}</Title>
+          <Title>
+            <DragHandle {...dragHandleProps}>
+              <Icon name="bars" />
+            </DragHandle>
+            {item.title}
+          </Title>
           <div>
             <IconButton name="edit" onClick={() => setIsEditing(true)} />
             <IconButton name="trash-alt" />
@@ -80,11 +108,7 @@ const ListItem = ({ fieldName, onChange, excludedFields }: ListItemProps) => {
       )}
     </ListItemContainer>
   );
-};
-
-const FieldsList = styled.ul`
-  padding: 0;
-`;
+});
 
 type Props = {
   groupingIndex: number,
@@ -93,66 +117,35 @@ type Props = {
 const SelectedFieldsList = ({ groupingIndex }: Props) => {
   const { setFieldValue, values } = useFormikContext<WidgetConfigFormValues>();
   const grouping = values.groupBy.groupings[groupingIndex];
+  const groupingsForList = useMemo(() => grouping.fields?.map((field) => ({ id: field, title: field })), [grouping.fields]);
+
+  const onChangeFieldName = useCallback((fieldIndex: number, newFieldName: string) => {
+    setFieldValue(`groupBy.groupings.${groupingIndex}.fields.${fieldIndex}`, newFieldName);
+  }, [groupingIndex, setFieldValue]);
+
+  const SortableListItem = useCallback(({ item, index, dragHandleProps, draggableProps, className, ref }) => (
+    <ListItem onChange={(newFieldName) => onChangeFieldName(index, newFieldName)}
+              excludedFields={grouping.fields ?? []}
+              item={item}
+              dragHandleProps={dragHandleProps}
+              draggableProps={draggableProps}
+              className={className}
+              ref={ref} />
+  ), [grouping.fields, onChangeFieldName]);
+
+  const onSortChange = (newGroupings: Array<{ id: string, title: string }>) => {
+    const groupingsForForm = newGroupings.map(({ id }) => id);
+    setFieldValue(`groupBy.groupings.${groupingIndex}.fields`, groupingsForForm);
+  };
 
   if (!grouping.fields?.length) {
     return null;
   }
 
-  const onChangeFieldName = (fieldIndex: number, newFieldName: string) => {
-    setFieldValue(`groupBy.groupings.${groupingIndex}.fields.${fieldIndex}`, newFieldName);
-  };
-
-  // const onChangeField = (e: { target: { name: string, value: string } }) => {
-  //   const fieldName = e.target.value;
-  //   const newField = fieldTypes.all.find((field) => field.name === fieldName);
-  //   const newFieldType = newField?.type.type === 'date' ? 'time' : 'values';
-  //
-  //   if (fieldType !== newFieldType) {
-  //     if (newFieldType === 'time') {
-  //       setFieldValue(`groupBy.groupings.${groupingIndex}`, {
-  //         type: newFieldType,
-  //         fields: ['action', 'controller'],
-  //         interval: {
-  //           type: 'auto',
-  //           scaling: 1.0,
-  //         },
-  //       });
-  //     }
-  //
-  //     if (newFieldType === 'values') {
-  //       setFieldValue(`groupBy.groupings.${groupingIndex}`, {
-  //         type: newFieldType,
-  //         fields: ['action', 'controller'],
-  //         limit: defaultLimit,
-  //       });
-  //
-  //       setFieldValue(`groupBy.groupings.${groupingIndex}.interval`, undefined, false);
-  //
-  //       if (!('limit' in grouping) || ('limit' in grouping && numberNotSet(grouping.limit))) {
-  //         setFieldValue(`groupBy.groupings.${groupingIndex}.limit`, defaultLimit);
-  //       }
-  //     }
-  //
-  //     return;
-  //   }
-  //
-  //   setFieldValue(`groupBy.groupings.${groupingIndex}`, {
-  //     ...grouping,
-  //     type: newFieldType,
-  //     fields: ['action', 'controller'],
-  //   });
-  // };
-
   return (
-    <FieldsList>
-      {grouping.fields.map((fieldName, fieldIndex) => {
-        return (
-          <ListItem fieldName={fieldName}
-                    onChange={(newFieldName) => onChangeFieldName(fieldIndex, newFieldName)}
-                    excludedFields={grouping.fields ?? []} />
-        );
-      })}
-    </FieldsList>
+    <SortableList items={groupingsForList}
+                  onMoveItem={onSortChange}
+                  customListItemRender={SortableListItem} />
   );
 };
 

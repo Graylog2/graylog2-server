@@ -34,8 +34,7 @@ const FieldComponent = ({ groupingIndex }: Props) => {
   const { setFieldValue, values } = useFormikContext<WidgetConfigFormValues>();
   const grouping = values.groupBy.groupings[groupingIndex];
 
-  const onAddField = (e: { target: { name: string, value: string } }) => {
-    const fieldName = e.target.value;
+  const onAddField = (fieldName: string) => {
     const newField = fieldTypes.all.find((field) => field.name === fieldName);
     const newFieldType = newField?.type.type === 'date' ? 'time' : 'values';
 
