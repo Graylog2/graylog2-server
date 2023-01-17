@@ -232,11 +232,12 @@ export type Props<OptionValue> = {
   matchProp?: 'any' | 'label' | 'value',
   multi?: boolean,
   menuPortalTarget?: HTMLElement,
-  menuIsOpen?: boolean,
   name?: string,
+  openMenuOnFocus?: boolean,
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void,
   onChange: (value: OptionValue) => void,
   onReactSelectChange?: (option: Option | Option[]) => void,
+  onMenuClose?: () => void,
   optionRenderer?: (option: Option) => React.ReactElement,
   options: Array<Option>,
   placeholder: string,
@@ -373,7 +374,6 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     placeholder: PropTypes.string,
     /** Specify if the select should change its state on change */
     persistSelection: PropTypes.bool,
-    menuIsOpen: PropTypes.bool,
     /** Placement of the menu: "top", "bottom", "auto" */
     menuPlacement: PropTypes.oneOf(['top', 'bottom', 'auto']),
     /** Max height of the menu */
@@ -403,10 +403,11 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     onBlur: undefined,
     inputProps: undefined,
     matchProp: 'any',
-    menuIsOpen: undefined,
     multi: false,
     name: undefined,
+    openMenuOnFocus: undefined,
     onReactSelectChange: undefined,
+    onMenuClose: undefined,
     optionRenderer: undefined,
     placeholder: undefined,
     required: false,
@@ -420,7 +421,6 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     total: 0,
     onInputChange: undefined,
     loadOptions: undefined,
-    // ref: undefined,
     menuPortalTarget: undefined,
     forwardedRef: undefined,
   };
