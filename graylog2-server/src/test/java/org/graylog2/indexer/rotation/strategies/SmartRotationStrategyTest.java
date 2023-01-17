@@ -37,6 +37,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.indexer.rotation.strategies.SmartRotationStrategy.MAX_INDEX_SIZE;
 import static org.graylog2.indexer.rotation.strategies.SmartRotationStrategy.MIN_INDEX_SIZE;
+import static org.graylog2.indexer.rotation.strategies.SmartRotationStrategy.ROTATION_PERIOD;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -80,23 +81,27 @@ class SmartRotationStrategyTest {
         final SmartRotationStrategy.Result result = smartRotationStrategy.shouldRotate("index_0", indexSet);
 
         assertThat(result.shouldRotate()).isEqualTo(true);
+        assertThat(result.getDescription()).contains("exceeds MAX_INDEX_SIZE");
     }
 
     @Test
     void shouldRotateWhenRightSizedAndOverRotationPeriod() {
-        final DateTime creationDate = now.minus(Duration.standardDays(1));
+        // TODO only works with multiple of days
+        final DateTime creationDate = now.minus(Duration.standardDays(ROTATION_PERIOD.getDays()));
         when(indices.indexCreationDate("index_0")).thenReturn(Optional.of(creationDate));
         when(indices.getStoreSizeInBytes("index_0")).thenReturn(Optional.of(MIN_INDEX_SIZE.toBytes() + 10));
 
         final SmartRotationStrategy.Result result = smartRotationStrategy.shouldRotate("index_0", indexSet);
 
         assertThat(result.shouldRotate()).isEqualTo(true);
+        assertThat(result.getDescription()).contains("Index is old enough");
     }
 
     @Test
     void shouldRotateWhenBeyondLeeWay() {
         final Period leeWay = smartRotationStrategyConfig.indexLifetimeHard().minus(smartRotationStrategyConfig.indexLifetimeSoft());
-        final java.time.Duration leeWayDuration = java.time.Duration.ofDays(leeWay.getDays());
+        // TODO only works with multiple of days
+        final java.time.Duration leeWayDuration = java.time.Duration.ofDays(leeWay.getDays() + ROTATION_PERIOD.getDays());
         final DateTime creationDate = now.minus(leeWayDuration.toMillis());
 
         when(indices.indexCreationDate("index_0")).thenReturn(Optional.of(creationDate));
@@ -105,5 +110,6 @@ class SmartRotationStrategyTest {
         final SmartRotationStrategy.Result result = smartRotationStrategy.shouldRotate("index_0", indexSet);
 
         assertThat(result.shouldRotate()).isEqualTo(true);
+        assertThat(result.getDescription()).contains("exceeds optimization leeway");
     }
 }

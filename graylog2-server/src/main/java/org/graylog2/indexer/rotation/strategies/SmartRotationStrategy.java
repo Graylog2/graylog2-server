@@ -92,7 +92,7 @@ public class SmartRotationStrategy extends AbstractRotationStrategy {
 
         if (indexIsOldEnough(creationDate) && !indexSubceedsSizeLimit(sizeInBytes)) {
             return new Result(true,
-                    f("Index is old enough (<%s>) and has a reasonable size (<%s>) for rotation",
+                    f("Index is old enough (%s) and has a reasonable size (%s) for rotation",
                             creationDate, StringUtils.humanReadableByteCount(sizeInBytes)));
         }
 
@@ -101,16 +101,16 @@ public class SmartRotationStrategy extends AbstractRotationStrategy {
 
     private boolean indexExceedsLeeWay(DateTime creationDate, Period leeWay) {
         final Instant now = Instant.now();
-        final Instant rotationPlusLeeWay = now.minus(ROTATION_PERIOD.plus(leeWay));
+        final Instant leewayLimit = now.minus(ROTATION_PERIOD.plus(leeWay));
 
-        return creationDate.isAfter(rotationPlusLeeWay.toEpochMilli());
+        return creationDate.isBefore(leewayLimit.toEpochMilli());
     }
 
     private boolean indexIsOldEnough(DateTime creationDate) {
         final Instant now = Instant.now();
-        final Instant aDayAgo = now.minus(ROTATION_PERIOD);
+        final Instant rotationLimit = now.minus(ROTATION_PERIOD);
 
-        return creationDate.isAfter(aDayAgo.toEpochMilli());
+        return creationDate.isBefore(rotationLimit.toEpochMilli());
     }
 
     private boolean indexExceedsSizeLimit(long size) {
