@@ -31,7 +31,6 @@ import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import FieldSortIcon from 'views/components/datatable/FieldSortIcon';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import type { Widgets } from 'views/stores/WidgetStore';
 import { Icon } from 'components/common';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
@@ -66,7 +65,7 @@ type HeaderFilterProps = {
   prefix?: (string | number);
   span?: number;
   title?: string;
-  onSortChange: (sortConfig: Array<SortConfig>) => Promise<Widgets>;
+  onSortChange: (sortConfig: Array<SortConfig>) => Promise<unknown>;
   sortConfigMap: OrderedMap<string, SortConfig>;
   sortable: boolean;
   sortType?: 'pivot' | 'series' | undefined
@@ -197,7 +196,7 @@ type Props = {
   rollup: boolean,
   actualColumnPivotFields: Array<Array<string>>,
   fields: FieldTypeMappingsList,
-  onSortChange: (sortConfig: Array<SortConfig>) => Promise<Widgets>;
+  onSortChange: (sortConfig: Array<SortConfig>) => Promise<unknown>;
   sortConfigMap: OrderedMap<string, SortConfig>;
   onSetColumnsWidth: (props: { field: string, offsetWidth: number }) => void,
   pinnedColumns?: Immutable.Set<string>
