@@ -18,13 +18,16 @@ package org.graylog2.indexer.retention.strategies;
 
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.rotation.strategies.SmartRotationStrategyConfig;
 import org.graylog2.periodical.IndexRetentionThread;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -36,15 +39,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
-public abstract class AbstractIndexCountBasedRetentionStrategy implements RetentionStrategy {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractIndexCountBasedRetentionStrategy.class);
+public abstract class AbstractIndexRetentionStrategy implements RetentionStrategy {
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractIndexRetentionStrategy.class);
 
     private final Indices indices;
     private final ActivityWriter activityWriter;
 
-    public AbstractIndexCountBasedRetentionStrategy(Indices indices,
-                                                    ActivityWriter activityWriter) {
+    public AbstractIndexRetentionStrategy(Indices indices,
+                                          ActivityWriter activityWriter) {
         this.indices = requireNonNull(indices);
         this.activityWriter = requireNonNull(activityWriter);
     }
@@ -54,11 +58,44 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
 
     @Override
     public void retain(IndexSet indexSet) {
+        if (indexSet.getConfig().rotationStrategy() instanceof SmartRotationStrategyConfig smartConfig) {
+            retainTimeBased(indexSet, smartConfig);
+        }
+        else {
+            retainCountBased(indexSet);
+        }
+    }
+
+    private void retainTimeBased(IndexSet indexSet, SmartRotationStrategyConfig smartConfig) {
+        final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
+
+        // Account for DST and time zones in determining age
+        final long cutoff = Instant.now().minus(smartConfig.indexLifetimeSoft()).toEpochMilli();
+        final int removeCount = (int)deflectorIndices.keySet()
+                .stream()
+                .filter(indexName -> !indices.isReopened(indexName))
+                .filter(indexName -> {
+                    DateTime creationDate = indices.indexCreationDate(indexName)
+                            .orElseThrow(() -> new IllegalStateException(f("Index %s has no creation date - retention failed", indexName)));
+                    return creationDate.isBefore(cutoff);
+                })
+                .count();
+
+        if (removeCount > 0) {
+            final String msg = "Running retention for " + removeCount + " aged-out indices.";
+            LOG.info(msg);
+            activityWriter.write(new Activity(msg, IndexRetentionThread.class));
+
+            runRetention(indexSet, deflectorIndices, removeCount);
+        }
+    }
+
+    private void retainCountBased(IndexSet indexSet) {
         final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
         final int indexCount = (int)deflectorIndices.keySet()
-            .stream()
-            .filter(indexName -> !indices.isReopened(indexName))
-            .count();
+                .stream()
+                .filter(indexName -> !indices.isReopened(indexName))
+                .count();
 
         final Optional<Integer> maxIndices = getMaxNumberOfIndices(indexSet);
 

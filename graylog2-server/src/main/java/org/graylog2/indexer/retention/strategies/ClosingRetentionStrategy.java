@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RETENTION_CLOSE;
 
-public class ClosingRetentionStrategy extends AbstractIndexCountBasedRetentionStrategy {
+public class ClosingRetentionStrategy extends AbstractIndexRetentionStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(ClosingRetentionStrategy.class);
     public static final String NAME = "close";
 

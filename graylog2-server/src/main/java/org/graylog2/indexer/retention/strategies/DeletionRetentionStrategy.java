@@ -23,7 +23,6 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.rotation.strategies.SmartRotationStrategy;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -37,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RETENTION_DELETE;
 
-public class DeletionRetentionStrategy extends AbstractIndexCountBasedRetentionStrategy {
+public class DeletionRetentionStrategy extends AbstractIndexRetentionStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(DeletionRetentionStrategy.class);
     public static final String NAME = "delete";
 
@@ -68,15 +67,6 @@ public class DeletionRetentionStrategy extends AbstractIndexCountBasedRetentionS
         final DeletionRetentionStrategyConfig config = (DeletionRetentionStrategyConfig) strategyConfig;
 
         return Optional.of(config.maxNumberOfIndices());
-    }
-
-    @Override
-    public void retain(IndexSet indexSet) {
-        if (indexSet.getConfig().rotationStrategy() instanceof SmartRotationStrategy) {
-           // TODO smart retention
-        } else {
-            super.retain(indexSet);
-        }
     }
 
     @Override

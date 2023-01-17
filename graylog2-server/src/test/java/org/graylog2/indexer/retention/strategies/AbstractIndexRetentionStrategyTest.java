@@ -17,10 +17,16 @@
 package org.graylog2.indexer.retention.strategies;
 
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.SmartRotationStrategyConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,6 +36,8 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -47,11 +55,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class AbstractIndexCountBasedRetentionStrategyTest {
+public class AbstractIndexRetentionStrategyTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private AbstractIndexCountBasedRetentionStrategy retentionStrategy;
+    private AbstractIndexRetentionStrategy retentionStrategy;
     @Mock
     private Indices indices;
     @Mock
@@ -60,6 +68,10 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
     private IndexSet indexSet;
 
     private Map<String, Set<String>> indexMap;
+
+    private IndexSetConfig indexSetConfigCountBased;
+
+    private DateTime NOW = DateTime.now(DateTimeZone.UTC);
 
     @Before
     public void setUp() throws Exception {
@@ -71,11 +83,21 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
         indexMap.put("index5", Collections.emptySet());
         indexMap.put("index6", Collections.emptySet());
 
+        when(indices.indexCreationDate("index6")).thenReturn(Optional.of(NOW.minusDays(1)));
+        when(indices.indexCreationDate("index5")).thenReturn(Optional.of(NOW.minusDays(3)));
+        when(indices.indexCreationDate("index4")).thenReturn(Optional.of(NOW.minusDays(9)));
+        when(indices.indexCreationDate("index3")).thenReturn(Optional.of(NOW.minusDays(10)));
+        when(indices.indexCreationDate("index2")).thenReturn(Optional.of(NOW.minusDays(11)));
+        when(indices.indexCreationDate("index1")).thenReturn(Optional.of(NOW.minusDays(15)));
+
+        indexSetConfigCountBased = createCountBased();
+
         when(indexSet.getAllIndexAliases()).thenReturn(indexMap);
         when(indexSet.getManagedIndices()).thenReturn(indexMap.keySet().stream().toArray(String[]::new));
         when(indexSet.extractIndexNumber(anyString())).then(this::extractIndexNumber);
+        when(indexSet.getConfig()).thenReturn(indexSetConfigCountBased);
 
-        retentionStrategy = spy(new AbstractIndexCountBasedRetentionStrategy(indices, activityWriter) {
+        retentionStrategy = spy(new AbstractIndexRetentionStrategy(indices, activityWriter) {
             @Override
             protected Optional<Integer> getMaxNumberOfIndices(IndexSet indexSet) {
                 return null;
@@ -168,7 +190,62 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
         verify(activityWriter, times(2)).write(any(Activity.class));
     }
 
+    @Test
+    public void retainTimeBased() {
+        when(indexSet.getConfig()).thenReturn(createTimeBased(10, 12));
+
+        retentionStrategy.retain(indexSet);
+
+        final ArgumentCaptor<List> retainedIndexName = ArgumentCaptor.forClass(List.class);
+        verify(retentionStrategy, times(1)).retain(retainedIndexName.capture(), eq(indexSet));
+        assertThat(retainedIndexName.getValue()).containsExactly("index1", "index2", "index3");
+    }
+
+    @Test
+    public void retainTimeBasedNothing() {
+        when(indexSet.getConfig()).thenReturn(createTimeBased(20, 30));
+
+        retentionStrategy.retain(indexSet);
+
+        verify(retentionStrategy, times(0)).retain(any(), any());
+    }
+
     private Optional<Integer> extractIndexNumber(InvocationOnMock invocation) {
-        return Optional.of(Integer.parseInt(((String)invocation.getArgument(0)).replace("index", "")));
+        return Optional.of(Integer.parseInt(((String) invocation.getArgument(0)).replace("index", "")));
+    }
+
+    private IndexSetConfig createCountBased() {
+        return IndexSetConfig.create(
+                "id", "title", "description",
+                true,
+                true, "prefix", null, null,
+                1, 0,
+                MessageCountRotationStrategyConfig.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(3),
+                DeletionRetentionStrategy.class.getCanonicalName(),
+                DeletionRetentionStrategyConfig.createDefault(),
+                ZonedDateTime.now(ZoneId.systemDefault()),
+                null, null, null,
+                1, true,
+                Duration.standardSeconds(5));
+    }
+
+    private IndexSetConfig createTimeBased(int minDays, int maxDays) {
+        return IndexSetConfig.create(
+                "id", "title", "description",
+                true,
+                true, "prefix", null, null,
+                1, 0,
+                SmartRotationStrategyConfig.class.getCanonicalName(),
+                SmartRotationStrategyConfig.builder()
+                        .indexLifetimeSoft(java.time.Period.ofDays(minDays))
+                        .indexLifetimeHard(java.time.Period.ofDays(maxDays))
+                        .build(),
+                DeletionRetentionStrategy.class.getCanonicalName(),
+                DeletionRetentionStrategyConfig.createDefault(),
+                ZonedDateTime.now(ZoneId.systemDefault()),
+                null, null, null,
+                1, true,
+                Duration.standardSeconds(5));
     }
 }
