@@ -93,7 +93,7 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
     currentPageSize: paginationQueryParameter.pageSize || 10,
     currentQuery: pagination.query || '',
     resetPage: paginationQueryParameter.resetPage,
-    setPageSize: paginationQueryParameter.setPageSize,
+    setPagination: paginationQueryParameter.setPagination,
   });
 
   React.useEffect(() => {
@@ -109,13 +109,13 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
 
   const onSearch = React.useCallback((query: string) => {
     localPagination.resetPage();
-    localPagination.setPageSize(localPagination.currentPageSize);
+    localPagination.setPagination({ page: 1, pageSize: localPagination.currentPageSize });
     setLocalPagination({ ...localPagination, currentPage: 1, currentQuery: query });
   }, [localPagination]);
 
   const onReset = React.useCallback(() => {
     localPagination.resetPage();
-    localPagination.setPageSize(localPagination.currentPageSize);
+    localPagination.setPagination({ page: 1, pageSize: localPagination.currentPageSize });
     setLocalPagination({ ...localPagination, currentPage: 1, currentQuery: '' });
   }, [localPagination]);
 
