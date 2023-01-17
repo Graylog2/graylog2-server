@@ -19,9 +19,10 @@ import { useFormikContext } from 'formik';
 import { useContext } from 'react';
 
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import type { WidgetConfigFormValues, GroupByFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import Input from 'components/bootstrap/Input';
 import SelectedFieldsList from 'views/components/aggregationwizard/grouping/configuration/SelectedFieldsList';
+import { DEFAULT_LIMIT, DEFAULT_PIVOT_INTERVAL } from 'views/Constants';
 
 import FieldSelect from '../../FieldSelect';
 
@@ -35,12 +36,31 @@ const FieldComponent = ({ groupingIndex }: Props) => {
   const grouping = values.groupBy.groupings[groupingIndex];
 
   const onAddField = (fieldName: string) => {
-    const newField = fieldTypes.all.find((field) => field.name === fieldName);
-    const newFieldType = newField?.type.type === 'date' ? 'time' : 'values';
+    const field = fieldTypes.all.find(({ name }) => name === fieldName);
+    const fieldType = field?.type.type === 'date' ? 'time' : 'values';
+    const updateGrouping = (newGrouping: Partial<GroupByFormValues>) => setFieldValue(`groupBy.groupings.${groupingIndex}`, { ...grouping, ...newGrouping });
 
-    setFieldValue(`groupBy.groupings.${groupingIndex}`, {
-      ...grouping,
-      type: newFieldType,
+    if (!grouping.fields?.length) {
+      if (fieldType === 'time') {
+        updateGrouping({
+          type: fieldType,
+          fields: [fieldName],
+          interval: DEFAULT_PIVOT_INTERVAL,
+        });
+      }
+
+      if (fieldType === 'values') {
+        updateGrouping({
+          type: fieldType,
+          fields: [fieldName],
+          limit: DEFAULT_LIMIT,
+        });
+      }
+
+      return;
+    }
+
+    updateGrouping({
       fields: [...(grouping.fields ?? []), fieldName],
     });
   };

@@ -26,6 +26,8 @@ import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps 
 import { IconButton, SortableList, Icon } from 'components/common';
 import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
+import { DEFAULT_LIMIT } from 'views/Constants';
+import { DEFAULT_GROUPING_TYPE } from 'views/components/aggregationwizard/grouping/GroupingElement';
 // import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 const ListItemContainer = styled.div`
@@ -83,8 +85,9 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
       {isEditing && (
         <EditFieldSelect id="group-by-field-select"
                          onChange={_onChange}
-                         menuIsOpen
+                         onMenuClose={() => setIsEditing(false)}
                          autoFocus
+                         openMenuOnFocus
                          clearable={false}
                          excludedFields={excludedFields}
                          ariaLabel="Fields"
@@ -126,8 +129,21 @@ const SelectedFieldsList = ({ groupingIndex }: Props) => {
   }, [groupingIndex, setFieldValue]);
 
   const onRemoveField = useCallback((removedFieldName: string) => {
-    setFieldValue(`groupBy.groupings.${groupingIndex}.fields`, grouping.fields.filter((fieldName) => fieldName !== removedFieldName));
-  }, [grouping.fields, groupingIndex, setFieldValue]);
+    const updatedFields = grouping.fields.filter((fieldName) => fieldName !== removedFieldName);
+
+    if (!updatedFields.length) {
+      setFieldValue(`groupBy.groupings.${groupingIndex}`, {
+        ...grouping,
+        type: DEFAULT_GROUPING_TYPE,
+        limit: DEFAULT_LIMIT,
+        fields: [],
+      });
+
+      return;
+    }
+
+    setFieldValue(`groupBy.groupings.${groupingIndex}.fields`, updatedFields);
+  }, [grouping, groupingIndex, setFieldValue]);
 
   const SortableListItem = useCallback(({ item, index, dragHandleProps, draggableProps, className, ref }) => (
     <ListItem onChange={(newFieldName) => onChangeField(index, newFieldName)}
@@ -138,7 +154,7 @@ const SelectedFieldsList = ({ groupingIndex }: Props) => {
               draggableProps={draggableProps}
               className={className}
               ref={ref} />
-  ), [grouping.fields, onChangeField]);
+  ), [grouping.fields, onChangeField, onRemoveField]);
 
   const onSortChange = (newGroupings: Array<{ id: string, title: string }>) => {
     const groupingsForForm = newGroupings.map(({ id }) => id);

@@ -38,7 +38,7 @@ const GroupingConfiguration = React.memo(({ index }: Props) => {
   return (
     <Wrapper>
       <Direction groupingIndex={index} />
-      <FieldComponent groupingIndex={index} fieldType={fieldType} />
+      <FieldComponent groupingIndex={index} />
       {fieldType === 'time' && (<Time index={index} />)}
       {fieldType === 'values' && (
         <FormikFormGroup label="Limit"
