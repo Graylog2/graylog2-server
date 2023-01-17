@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { isEqual } from 'lodash';
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { isEqual } from 'lodash';
 import { useLocation, useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import URI from 'urijs';
@@ -42,7 +42,7 @@ type WidgetEditRequest = {
   focusing: boolean,
 }
 
-const _clearURI = (query) => new URI(query)
+const _clearURI = (query: string) => new URI(query)
   .removeSearch('focusing')
   .removeSearch('editing')
   .removeSearch('focusedId');
@@ -70,7 +70,20 @@ const _updateQueryParams = (
   return baseUri.toString();
 };
 
-const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocusedWidget, widgets }) => {
+type FocusUriParams = {
+  editing: boolean,
+  focusing: boolean,
+  id: string,
+  isPageShown: boolean,
+};
+type SyncStateArgs = {
+  focusedWidget: FocusContextState | undefined,
+  setFocusedWidget: (newFocusedWidget: FocusContextState | undefined) => void,
+  widgetIds: Array<string>,
+  focusUriParams: FocusUriParams,
+}
+
+const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocusedWidget, widgetIds }: SyncStateArgs) => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -78,10 +91,10 @@ const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocused
       id: focusUriParams.id,
       editing: focusUriParams.editing,
       focusing: focusUriParams.focusing || focusUriParams.editing,
-    };
+    } as FocusContextState;
 
     if (!isEqual(focusedWidget, nextFocusedWidget)) {
-      if (focusUriParams.id && !widgets.has(focusUriParams.id)) {
+      if (focusUriParams.id && !widgetIds.includes(focusUriParams.id)) {
         return;
       }
 
@@ -93,17 +106,24 @@ const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocused
         dispatch(execute());
       }
     }
-  }, [focusedWidget, setFocusedWidget, widgets, focusUriParams, dispatch]);
+  }, [focusedWidget, setFocusedWidget, widgetIds, focusUriParams, dispatch]);
 };
 
-const useCleanupQueryParams = ({ focusUriParams, widgets, query, history }) => {
+type CleanupArgs = {
+  focusUriParams: FocusUriParams,
+  widgetIds: Array<string>,
+  query: string,
+  history: ReturnType<typeof useHistory>,
+};
+
+const useCleanupQueryParams = ({ focusUriParams, widgetIds, query, history }: CleanupArgs) => {
   useEffect(() => {
-    if ((focusUriParams?.id && !widgets.has(focusUriParams.id) && focusUriParams.isPageShown) || (focusUriParams?.id === undefined)) {
+    if ((focusUriParams?.id && !widgetIds.includes(focusUriParams.id) && focusUriParams.isPageShown) || (focusUriParams?.id === undefined)) {
       const baseURI = _clearURI(query);
 
       history.replace(baseURI.toString());
     }
-  }, [focusUriParams, widgets, query, history]);
+  }, [focusUriParams, widgetIds, query, history]);
 };
 
 const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
@@ -112,18 +132,19 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
   const history = useHistory();
   const [focusedWidget, setFocusedWidget] = useState<FocusContextState | undefined>();
   const widgets = useWidgets();
+  const widgetIds = useMemo(() => widgets.map((widget) => widget.id).toArray(), [widgets]);
   const activeQuery = useActiveQueryId();
   const params = useQuery();
   const focusUriParams = useMemo(() => ({
     editing: params.editing === 'true',
     focusing: params.focusing === 'true',
-    id: params.focusedId,
+    id: params.focusedId as string,
     isPageShown: !params.page || params.page === activeQuery,
   }), [params.editing, params.focusing, params.focusedId, params.page, activeQuery]);
 
-  useSyncStateWithQueryParams({ focusedWidget, setFocusedWidget, widgets, focusUriParams });
+  useSyncStateWithQueryParams({ focusedWidget, setFocusedWidget, widgetIds, focusUriParams });
 
-  useCleanupQueryParams({ focusUriParams, widgets, query, history });
+  useCleanupQueryParams({ focusUriParams, widgetIds, query, history });
 
   const updateFocusQueryParams = useCallback((newQueryParams: WidgetFocusRequest | WidgetEditRequest | undefined) => {
     const newURI = _updateQueryParams(
