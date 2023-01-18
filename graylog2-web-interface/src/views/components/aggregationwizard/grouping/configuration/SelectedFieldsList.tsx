@@ -27,6 +27,7 @@ import { DEFAULT_LIMIT, DEFAULT_PIVOT_INTERVAL } from 'views/Constants';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import { toValuesGrouping, toTimeGrouping } from 'views/components/aggregationwizard/grouping/GroupingElement';
 // import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 const ListItemContainer = styled.div`
@@ -111,26 +112,6 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
   );
 });
 
-const toValuesGrouping = (g: GroupByFormValues) => {
-  const newG = { ...g, type: 'values', limit: DEFAULT_LIMIT };
-
-  if ('interval' in newG) {
-    delete newG.interval;
-  }
-
-  return newG;
-};
-
-const toTimeGrouping = (g: GroupByFormValues) => {
-  const newG = { ...g, type: 'time', interval: DEFAULT_PIVOT_INTERVAL };
-
-  if ('limit' in newG) {
-    delete newG.limit;
-  }
-
-  return newG;
-};
-
 type Props = {
   groupingIndex: number,
 };
@@ -143,27 +124,32 @@ const SelectedFieldsList = ({ groupingIndex }: Props) => {
   const queryId = useActiveQueryId();
 
   const onChangeField = useCallback((fieldIndex: number, newFieldName: string) => {
-    const field = fieldTypes.queryFields.get(queryId, fieldTypes.all).find(({ name }) => name === newFieldName);
-    const fieldType = field?.type.type === 'date' ? 'time' : 'values';
+    const newGroupingFields = [...grouping.fields];
+    newGroupingFields[fieldIndex] = newFieldName;
 
-    if (grouping.fields?.length > 1 || grouping.type === fieldType) {
+    const groupingHasValuesField = fieldTypes.queryFields.get(queryId, fieldTypes.all).some(({ name, type }) => (
+      newGroupingFields.includes(name) && type.type !== 'date'),
+    );
+    const newGroupingType = groupingHasValuesField ? 'values' : 'time';
+
+    if (grouping.type === newGroupingType) {
       setFieldValue(`groupBy.groupings.${groupingIndex}.fields.${fieldIndex}`, newFieldName);
 
       return;
     }
 
-    if (grouping.type !== fieldType) {
-      if (fieldType === 'values') {
+    if (grouping.type !== newGroupingType) {
+      if (newGroupingType === 'values') {
         setFieldValue(
           `groupBy.groupings.${groupingIndex}`,
-          { ...toValuesGrouping(grouping as GroupByFormValues), fields: [newFieldName] },
+          { ...toValuesGrouping(grouping as GroupByFormValues), fields: newGroupingFields },
         );
       }
 
-      if (fieldType === 'time') {
+      if (newGroupingType === 'time') {
         setFieldValue(
           `groupBy.groupings.${groupingIndex}`,
-          { ...toTimeGrouping(grouping as GroupByFormValues), fields: [newFieldName] },
+          { ...toTimeGrouping(grouping as GroupByFormValues), fields: newGroupingFields },
         );
       }
     }
