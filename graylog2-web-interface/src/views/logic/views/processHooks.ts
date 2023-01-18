@@ -20,7 +20,7 @@ import type View from './View';
 import type { ViewHook, ViewHookArguments } from '../hooks/ViewHook';
 
 const _chainHooks = (hooks: Array<ViewHook>, args: ViewHookArguments) => {
-  return hooks.reduce((prev, cur: ViewHook) => prev.then(() => cur(args)), Promise.resolve());
+  return hooks.reduce((prev, cur: ViewHook) => prev.then((newView) => cur({ ...args, view: newView })), Promise.resolve(args.view));
 };
 
 type Query = { [key: string]: any };
@@ -34,10 +34,14 @@ const _processViewHooks = (viewHooks: Array<ViewHook>, view: View, query: Query,
 
     promise = _chainHooks(viewHooks, { view, retry, query });
   } else {
-    promise = Promise.resolve(true);
+    promise = Promise.resolve(view);
   }
 
-  return promise.then(() => view).then(onSuccess).then(() => view);
+  return promise.then(async (newView) => {
+    await onSuccess(newView);
+
+    return newView;
+  });
 };
 
 const processHooks = (

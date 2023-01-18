@@ -35,7 +35,7 @@ const RequirementsProvided: ViewHook = async ({ view }) => {
     throw Component;
   }
 
-  return true;
+  return view;
 };
 
 export default RequirementsProvided;
