@@ -26,61 +26,75 @@ import SidecarFailureTrackingList from './SidecarFailureTrackingList';
 import type { SidecarListResponse } from '../types';
 
 type SidecarsArgs = {
-  query?: string,
-  onlyActive?: boolean,
   page?: number,
   pageSize?: number,
+  query?: string,
   sortField?: string,
-  order?: 'asc'|'desc',
+  order?: string,
+  onlyActive?: boolean,
 }
 
+const PAGE_SIZES = [10, 25, 50, 100];
+
 const SIDECARS_DEFAULT_ARGS: SidecarsArgs = {
-  query: '',
-  onlyActive: false,
   page: 1,
-  pageSize: 10,
+  pageSize: PAGE_SIZES[0],
+  query: '',
   sortField: 'node_name',
   order: 'asc',
+  onlyActive: false,
 };
 
 const fetchSidecars = (options: SidecarsArgs = SIDECARS_DEFAULT_ARGS, callback: (data: SidecarListResponse) => void = () => {}) => {
   return SidecarsActions.listPaginated({
-    query: options.query || SIDECARS_DEFAULT_ARGS.query,
     page: options.page || SIDECARS_DEFAULT_ARGS.page,
     pageSize: options.pageSize || SIDECARS_DEFAULT_ARGS.pageSize,
-    onlyActive: options.onlyActive || SIDECARS_DEFAULT_ARGS.onlyActive,
+    query: options.query || SIDECARS_DEFAULT_ARGS.query,
     sortField: options.sortField || SIDECARS_DEFAULT_ARGS.sortField,
     order: options.order || SIDECARS_DEFAULT_ARGS.order,
+    onlyActive: options.onlyActive || SIDECARS_DEFAULT_ARGS.onlyActive,
   }).then(callback);
 };
 
 const SidecarFailureTrackingListContainer = () => {
-  const { page, pageSize, resetPage } = usePaginationQueryParameter();
+  const { page, pageSize, resetPage } = usePaginationQueryParameter(PAGE_SIZES);
   const [sidecarData, setSidecarData] = useState<SidecarListResponse|null>(null);
 
   useEffect(() => {
-    fetchSidecars({ page, pageSize }, setSidecarData);
+    if (sidecarData?.pagination.page !== page || sidecarData?.pagination.per_page !== pageSize) {
+      const { query, sort, order, only_active } = sidecarData || {};
+      fetchSidecars({ query, page, pageSize, order, sortField: sort, onlyActive: only_active }, setSidecarData);
+    }
 
     return () => {};
-  }, [page, pageSize]);
+  }, [page, pageSize, sidecarData]);
+
+  const currentSidecarArgs: SidecarsArgs = {
+    page,
+    pageSize,
+    query: sidecarData?.query,
+    sortField: sidecarData?.sort,
+    order: sidecarData?.order,
+    onlyActive: sidecarData?.only_active,
+  };
 
   const handlePageChange = (_page: number, _pageSize: number) => {
-    fetchSidecars({ page: _page, pageSize: _pageSize }, setSidecarData);
+    fetchSidecars({ ...currentSidecarArgs, page: _page, pageSize: _pageSize }, setSidecarData);
   };
 
   const handleQueryChange = (_query: string = '', callback = () => {}) => {
+    fetchSidecars({ ...currentSidecarArgs, query: _query }, setSidecarData).finally(callback);
     resetPage();
-    fetchSidecars({ query: _query }, setSidecarData).finally(callback);
   };
 
   const handleSortChange = (sortField: string) => {
+    fetchSidecars({ ...currentSidecarArgs, sortField, order: sidecarData.order === 'asc' ? 'desc' : 'asc' }, setSidecarData);
     resetPage();
-    fetchSidecars({ sortField, order: sidecarData.order === 'asc' ? 'desc' : 'asc' }, setSidecarData);
   };
 
   const toggleShowInactive = () => {
+    fetchSidecars({ ...currentSidecarArgs, onlyActive: !sidecarData.only_active }, setSidecarData);
     resetPage();
-    fetchSidecars({ onlyActive: !sidecarData.only_active }, setSidecarData);
   };
 
   const isLoading = !sidecarData;
@@ -95,6 +109,7 @@ const SidecarFailureTrackingListContainer = () => {
                                 query={sidecarData.query}
                                 onlyActive={sidecarData.only_active}
                                 sort={{ field: sidecarData.sort, order: sidecarData.order }}
+                                pageSizes={PAGE_SIZES}
                                 onPageChange={handlePageChange}
                                 onQueryChange={handleQueryChange}
                                 onSortChange={handleSortChange}

@@ -32,14 +32,13 @@ const StyledSortIcon = styled(SortIcon)`
   }
 `;
 
-export const PAGE_SIZES = [10, 25, 50, 100];
-
 const SidecarFailureTrackingList = ({
   sidecars,
   pagination,
   query,
   sort,
   onlyActive,
+  pageSizes,
   onPageChange,
   onQueryChange,
   onSortChange,
@@ -83,7 +82,7 @@ const SidecarFailureTrackingList = ({
 
     return (
       <NoSearchResult>
-        There are no sidecars matching the search criteria. Try adjusting your search filter{showInactiveHint}.
+        {`There are no sidecars matching the search criteria. Try adjusting your search filter${showInactiveHint}.`}
       </NoSearchResult>
     );
   };
@@ -117,7 +116,7 @@ const SidecarFailureTrackingList = ({
         </SidecarSearchForm>
       </div>
 
-      <PaginatedList pageSizes={PAGE_SIZES}
+      <PaginatedList pageSizes={pageSizes}
                      totalItems={pagination.total}
                      onChange={onPageChange}>
         <Row>
@@ -136,6 +135,7 @@ SidecarFailureTrackingList.propTypes = {
   query: PropTypes.string.isRequired,
   sort: PropTypes.object.isRequired,
   onlyActive: PropTypes.bool.isRequired,
+  pageSizes: PropTypes.arrayOf(PropTypes.number).isRequired,
   onPageChange: PropTypes.func.isRequired,
   onQueryChange: PropTypes.func.isRequired,
   onSortChange: PropTypes.func.isRequired,
