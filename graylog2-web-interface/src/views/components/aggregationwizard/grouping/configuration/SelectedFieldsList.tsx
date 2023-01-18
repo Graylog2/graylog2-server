@@ -17,18 +17,16 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
-import { useState, useCallback, forwardRef, useMemo } from 'react';
-
-// import { DEFAULT_LIMIT } from 'views/Constants';
-// import parseNumber from 'views/components/aggregationwizard/grouping/parseNumber';
+import { useState, useCallback, forwardRef, useMemo, useContext } from 'react';
 import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 
 import { IconButton, SortableList, Icon } from 'components/common';
 import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
-import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
-import { DEFAULT_LIMIT } from 'views/Constants';
-import { DEFAULT_GROUPING_TYPE } from 'views/components/aggregationwizard/grouping/GroupingElement';
+import type { GroupByFormValues, WidgetConfigFormValues } from 'views/components/aggregationwizard';
+import { DEFAULT_LIMIT, DEFAULT_PIVOT_INTERVAL } from 'views/Constants';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 // import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 const ListItemContainer = styled.div`
@@ -121,19 +119,62 @@ const SelectedFieldsList = ({ groupingIndex }: Props) => {
   const { setFieldValue, values } = useFormikContext<WidgetConfigFormValues>();
   const grouping = values.groupBy.groupings[groupingIndex];
   const groupingsForList = useMemo(() => grouping.fields?.map((field) => ({ id: field, title: field })), [grouping.fields]);
+  const fieldTypes = useContext(FieldTypesContext);
+  const queryId = useActiveQueryId();
+
+  const initializeValuesGrouping = (g: GroupByFormValues) => {
+    const newG = { ...g, type: 'values', limit: DEFAULT_LIMIT };
+
+    if ('interval' in newG) {
+      delete newG.interval;
+    }
+
+    return newG;
+  };
+
+  const initializeTimeGrouping = (g: GroupByFormValues) => {
+    const newG = { ...g, type: 'time', interval: DEFAULT_PIVOT_INTERVAL };
+
+    if ('limit' in newG) {
+      delete newG.limit;
+    }
+
+    return newG;
+  };
 
   const onChangeField = useCallback((fieldIndex: number, newFieldName: string) => {
-    setFieldValue(`groupBy.groupings.${groupingIndex}.fields.${fieldIndex}`, newFieldName);
-  }, [groupingIndex, setFieldValue]);
+    const field = fieldTypes.queryFields.get(queryId, fieldTypes.all).find(({ name }) => name === newFieldName);
+    const fieldType = field?.type.type === 'date' ? 'time' : 'values';
+
+    if (grouping.fields?.length > 1 || grouping.type === fieldType) {
+      setFieldValue(`groupBy.groupings.${groupingIndex}.fields.${fieldIndex}`, newFieldName);
+
+      return;
+    }
+
+    if (grouping.type !== fieldType) {
+      if (fieldType === 'values') {
+        setFieldValue(
+          `groupBy.groupings.${groupingIndex}`,
+          { ...initializeValuesGrouping(grouping as GroupByFormValues), fields: [newFieldName] },
+        );
+      }
+
+      if (fieldType === 'time') {
+        setFieldValue(
+          `groupBy.groupings.${groupingIndex}`,
+          { ...initializeTimeGrouping(grouping as GroupByFormValues), fields: [newFieldName] },
+        );
+      }
+    }
+  }, [fieldTypes.all, fieldTypes.queryFields, grouping, groupingIndex, queryId, setFieldValue]);
 
   const onRemoveField = useCallback((removedFieldName: string) => {
     const updatedFields = grouping.fields.filter((fieldName) => fieldName !== removedFieldName);
 
     if (!updatedFields.length) {
       setFieldValue(`groupBy.groupings.${groupingIndex}`, {
-        ...grouping,
-        type: DEFAULT_GROUPING_TYPE,
-        limit: DEFAULT_LIMIT,
+        ...initializeValuesGrouping(grouping as GroupByFormValues),
         fields: [],
       });
 
