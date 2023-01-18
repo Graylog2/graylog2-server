@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useFormikContext } from 'formik';
-import { useContext } from 'react';
+import { useContext, useCallback } from 'react';
 
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type { WidgetConfigFormValues, GroupByFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
@@ -28,6 +28,18 @@ import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import FieldSelect from '../../FieldSelect';
 
+const placeholder = (grouping: GroupByFormValues) => {
+  if (!grouping.fields?.length) {
+    return 'Add a field';
+  }
+
+  if (grouping.type === 'time') {
+    return 'Add another date field';
+  }
+
+  return 'Add another field';
+};
+
 type Props = {
   groupingIndex: number,
 };
@@ -38,7 +50,7 @@ const FieldComponent = ({ groupingIndex }: Props) => {
   const grouping = values.groupBy.groupings[groupingIndex];
   const queryId = useActiveQueryId();
 
-  const onAddField = (fieldName: string) => {
+  const onAddField = useCallback((fieldName: string) => {
     const updateGrouping = (newGrouping: GroupByFormValues) => setFieldValue(`groupBy.groupings.${groupingIndex}`, newGrouping);
     const newGroupingFields = [...(grouping.fields ?? []), fieldName];
     const groupingHasValuesField = fieldTypes.queryFields.get(queryId, fieldTypes.all).some(({ name, type }) => (
@@ -66,7 +78,7 @@ const FieldComponent = ({ groupingIndex }: Props) => {
         } as GroupByFormValues);
       }
     }
-  };
+  }, [fieldTypes.all, fieldTypes.queryFields, grouping, groupingIndex, queryId, setFieldValue]);
 
   return (
     <Input id="group-by-field-select"
@@ -83,7 +95,7 @@ const FieldComponent = ({ groupingIndex }: Props) => {
                    name="group-by-field-create-select"
                    value={undefined}
                    excludedFields={grouping.fields ?? []}
-                   placeholder="Add a field"
+                   placeholder={placeholder(grouping as GroupByFormValues)}
                    aria-label="Add a field" />
       <SelectedFieldsList groupingIndex={groupingIndex} />
     </Input>
