@@ -22,12 +22,6 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
-import { asMock } from 'helpers/mocking';
-import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
-import Query from 'views/logic/queries/Query';
-import useViewType from 'views/hooks/useViewType';
-import View from 'views/logic/views/View';
-import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
@@ -44,10 +38,6 @@ jest.mock('util/AppConfig', () => ({
   isCloud: jest.fn(() => false),
 }));
 
-jest.mock('views/logic/queries/useCurrentQuery');
-jest.mock('views/logic/queries/useCurrentQueryId');
-jest.mock('views/hooks/useViewType');
-
 const AreaVisualization = (props: React.ComponentProps<typeof OriginalAreaVisualization>) => (
   <TestStoreProvider>
     <OriginalAreaVisualization {...props} />
@@ -60,10 +50,6 @@ describe('AreaVisualization', () => {
   afterAll(unloadViewsPlugin);
 
   it('generates correct props for plot component', () => {
-    const query = Query.builder().newId().build();
-    asMock(useCurrentQuery).mockReturnValue(query);
-    asMock(useCurrentQueryId).mockReturnValue(query.id);
-    asMock(useViewType).mockReturnValue(View.Type.Search);
     const config = AggregationWidgetConfig.builder()
       .visualization('area')
       .columnPivots([])
