@@ -184,7 +184,7 @@ const _migrateWidgets = (legacyCharts: Array<LegacyFieldChart>) => async (_dispa
     .toBuilder()
     .widgets(Immutable.List([
       // @ts-ignore
-      ...currentView.state.widgets,
+      ...currentView.widgets,
       ...newWidgets,
     ]))
     .widgetPositions({ ...existingWidgetPos, ...newWidgetPositions })

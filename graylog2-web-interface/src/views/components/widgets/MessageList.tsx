@@ -21,7 +21,6 @@ import PropTypes from 'prop-types';
 
 import type { WidgetComponentProps, MessageResult } from 'views/types';
 import { Messages } from 'views/Constants';
-import { SearchActions } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
@@ -36,6 +35,8 @@ import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useCurrentSearchTypesResults from 'views/components/widgets/useCurrentSearchTypesResults';
 import useAppDispatch from 'stores/useAppDispatch';
 import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
+import useAppSelector from 'stores/useAppSelector';
+import { selectSearchJobId } from 'views/logic/slices/searchExecutionSelectors';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
 
@@ -67,19 +68,21 @@ type Props = WidgetComponentProps<MessagesWidgetConfig, MessageListResult> & {
 };
 
 const useResetPaginationOnSearchExecution = (setPagination: (pagination: Pagination) => void, currentPage) => {
-  useEffect(() => {
-    const resetPagination = () => {
-      if (currentPage !== 1) {
-        setPagination({ currentPage: 1, pageErrors: [] });
-      }
-    };
-
-    const unlistenSearchExecute = SearchActions.execute.completed.listen(resetPagination);
-
-    return () => {
-      unlistenSearchExecute();
-    };
+  const resetPagination = useCallback(() => {
+    if (currentPage !== 1) {
+      setPagination({ currentPage: 1, pageErrors: [] });
+    }
   }, [currentPage, setPagination]);
+  const searchResultId = useAppSelector(selectSearchJobId);
+  const lastSearchResultId = useRef<string | undefined>();
+
+  useEffect(() => {
+    if (lastSearchResultId.current !== undefined && lastSearchResultId.current !== searchResultId) {
+      resetPagination();
+    }
+
+    lastSearchResultId.current = searchResultId;
+  }, [searchResultId]);
 };
 
 const useResetScrollPositionOnPageChange = (currentPage: number) => {

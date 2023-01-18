@@ -23,5 +23,6 @@ export const selectSearchExecutionRoot = (state: RootState) => state.searchExecu
 export const selectSearchExecutionState = createSelector(selectSearchExecutionRoot, (state) => state.executionState);
 export const selectWidgetsToSearch = createSelector(selectSearchExecutionRoot, (state) => state.widgetsToSearch);
 export const selectSearchExecutionResult = createSelector(selectSearchExecutionRoot, (state) => state.result);
+export const selectSearchJobId = createSelector(selectSearchExecutionResult, (result) => result?.result?.result?.id);
 export const selectGlobalOverride = createSelector(selectSearchExecutionState, (executionState) => executionState.globalOverride);
 export const selectParameterBindings = createSelector(selectSearchExecutionState, (executionState) => executionState.parameterBindings);
