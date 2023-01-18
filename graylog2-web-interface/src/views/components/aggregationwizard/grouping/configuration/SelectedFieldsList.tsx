@@ -111,6 +111,26 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
   );
 });
 
+const toValuesGrouping = (g: GroupByFormValues) => {
+  const newG = { ...g, type: 'values', limit: DEFAULT_LIMIT };
+
+  if ('interval' in newG) {
+    delete newG.interval;
+  }
+
+  return newG;
+};
+
+const toTimeGrouping = (g: GroupByFormValues) => {
+  const newG = { ...g, type: 'time', interval: DEFAULT_PIVOT_INTERVAL };
+
+  if ('limit' in newG) {
+    delete newG.limit;
+  }
+
+  return newG;
+};
+
 type Props = {
   groupingIndex: number,
 };
@@ -121,26 +141,6 @@ const SelectedFieldsList = ({ groupingIndex }: Props) => {
   const groupingsForList = useMemo(() => grouping.fields?.map((field) => ({ id: field, title: field })), [grouping.fields]);
   const fieldTypes = useContext(FieldTypesContext);
   const queryId = useActiveQueryId();
-
-  const initializeValuesGrouping = (g: GroupByFormValues) => {
-    const newG = { ...g, type: 'values', limit: DEFAULT_LIMIT };
-
-    if ('interval' in newG) {
-      delete newG.interval;
-    }
-
-    return newG;
-  };
-
-  const initializeTimeGrouping = (g: GroupByFormValues) => {
-    const newG = { ...g, type: 'time', interval: DEFAULT_PIVOT_INTERVAL };
-
-    if ('limit' in newG) {
-      delete newG.limit;
-    }
-
-    return newG;
-  };
 
   const onChangeField = useCallback((fieldIndex: number, newFieldName: string) => {
     const field = fieldTypes.queryFields.get(queryId, fieldTypes.all).find(({ name }) => name === newFieldName);
@@ -156,14 +156,14 @@ const SelectedFieldsList = ({ groupingIndex }: Props) => {
       if (fieldType === 'values') {
         setFieldValue(
           `groupBy.groupings.${groupingIndex}`,
-          { ...initializeValuesGrouping(grouping as GroupByFormValues), fields: [newFieldName] },
+          { ...toValuesGrouping(grouping as GroupByFormValues), fields: [newFieldName] },
         );
       }
 
       if (fieldType === 'time') {
         setFieldValue(
           `groupBy.groupings.${groupingIndex}`,
-          { ...initializeTimeGrouping(grouping as GroupByFormValues), fields: [newFieldName] },
+          { ...toTimeGrouping(grouping as GroupByFormValues), fields: [newFieldName] },
         );
       }
     }
@@ -174,7 +174,7 @@ const SelectedFieldsList = ({ groupingIndex }: Props) => {
 
     if (!updatedFields.length) {
       setFieldValue(`groupBy.groupings.${groupingIndex}`, {
-        ...initializeValuesGrouping(grouping as GroupByFormValues),
+        ...toValuesGrouping(grouping as GroupByFormValues),
         fields: [],
       });
 
@@ -195,10 +195,10 @@ const SelectedFieldsList = ({ groupingIndex }: Props) => {
               ref={ref} />
   ), [grouping.fields, onChangeField, onRemoveField]);
 
-  const onSortChange = (newGroupings: Array<{ id: string, title: string }>) => {
+  const onSortChange = useCallback((newGroupings: Array<{ id: string, title: string }>) => {
     const groupingsForForm = newGroupings.map(({ id }) => id);
     setFieldValue(`groupBy.groupings.${groupingIndex}.fields`, groupingsForForm);
-  };
+  }, [groupingIndex, setFieldValue]);
 
   if (!grouping.fields?.length) {
     return null;
