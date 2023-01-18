@@ -17,12 +17,8 @@
 import * as React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import WrappingContainer from 'WrappingContainer';
-import * as mockImmutable from 'immutable';
 
-import mockAction from 'helpers/mocking/MockAction';
 import MockStore from 'helpers/mocking/StoreMock';
-import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
-import { SearchActions } from 'views/stores/SearchStore';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import Widget from 'views/logic/widgets/Widget';
 import mockComponent from 'helpers/mocking/MockComponent';
@@ -30,37 +26,13 @@ import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { asMock } from 'helpers/mocking';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
+import { setGlobalOverrideTimerange, setGlobalOverrideQuery, execute } from 'views/logic/slices/searchExecutionSlice';
 
 import WidgetQueryControls from './WidgetQueryControls';
 import WidgetContext from './contexts/WidgetContext';
 
 jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
 jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
-
-jest.mock('views/stores/WidgetStore', () => ({
-  WidgetStore: MockStore(['getInitialState', () => mockImmutable.Map()]),
-  WidgetActions: {
-    update: jest.fn(),
-  },
-}));
-
-jest.mock('views/stores/GlobalOverrideStore', () => ({
-  GlobalOverrideStore: MockStore(),
-  GlobalOverrideActions: {
-    resetTimeRange: jest.fn(() => Promise.resolve()),
-    resetQuery: jest.fn(() => Promise.resolve()),
-  },
-}));
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchStore: MockStore(
-    ['getInitialState', () => ({ search: { parameters: [] } })],
-  ),
-  SearchActions: {
-    execute: mockAction(),
-    refresh: jest.fn(() => Promise.resolve()),
-  },
-}));
 
 jest.mock('moment', () => {
   const mockMoment = jest.requireActual('moment');
@@ -85,6 +57,13 @@ jest.mock('views/stores/SearchConfigStore', () => ({
 }));
 
 jest.mock('views/hooks/useGlobalOverride');
+
+jest.mock('views/logic/slices/searchExecutionSlice', () => ({
+  ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
+  setGlobalOverrideTimerange: jest.fn(() => async () => {}),
+  setGlobalOverrideQuery: jest.fn(() => async () => {}),
+  execute: jest.fn(() => async () => {}),
+}));
 
 describe('WidgetQueryControls', () => {
   beforeEach(() => {
@@ -181,7 +160,7 @@ describe('WidgetQueryControls', () => {
       const resetTimeRangeOverrideButton = await screen.findByRole('button', { name: resetTimeRangeButtonTitle });
       fireEvent.click(resetTimeRangeOverrideButton);
 
-      expect(GlobalOverrideActions.resetTimeRange).toHaveBeenCalled();
+      expect(setGlobalOverrideTimerange).toHaveBeenCalledWith(undefined);
     });
 
     it('triggers resetting global override and query validation when reset query filter button is clicked', async () => {
@@ -192,7 +171,7 @@ describe('WidgetQueryControls', () => {
       const resetQueryFilterButton = await screen.findByRole('button', { name: resetQueryButtonTitle });
       fireEvent.click(resetQueryFilterButton);
 
-      expect(GlobalOverrideActions.resetQuery).toHaveBeenCalled();
+      expect(setGlobalOverrideQuery).toHaveBeenCalledWith(undefined);
     });
 
     it('executes search when reset time range override button is clicked', async () => {
@@ -202,7 +181,7 @@ describe('WidgetQueryControls', () => {
 
       const resetTimeRangeOverrideButton = await screen.findByRole('button', { name: resetTimeRangeButtonTitle });
       fireEvent.click(resetTimeRangeOverrideButton);
-      await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalled());
+      await waitFor(() => expect(execute).toHaveBeenCalled());
     });
 
     it('executes search when reset query filter button is clicked', async () => {
@@ -212,7 +191,7 @@ describe('WidgetQueryControls', () => {
 
       const resetQueryFilterButton = await screen.findByRole('button', { name: resetQueryButtonTitle });
       fireEvent.click(resetQueryFilterButton);
-      await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalled());
+      await waitFor(() => expect(execute).toHaveBeenCalled());
     });
 
     it('emptying `globalOverride` prop removes notifications', async () => {
