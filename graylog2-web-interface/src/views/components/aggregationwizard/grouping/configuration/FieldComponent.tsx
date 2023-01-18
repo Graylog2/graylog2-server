@@ -23,7 +23,7 @@ import type { WidgetConfigFormValues, GroupByFormValues } from 'views/components
 import Input from 'components/bootstrap/Input';
 import SelectedFieldsList from 'views/components/aggregationwizard/grouping/configuration/SelectedFieldsList';
 import type { GroupByError } from 'views/components/aggregationwizard/grouping/GroupingElement';
-import { toTimeGrouping, toValuesGrouping } from 'views/components/aggregationwizard/grouping/GroupingElement';
+import { onGroupingFieldsChange } from 'views/components/aggregationwizard/grouping/GroupingElement';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import FieldSelect from '../../FieldSelect';
@@ -48,37 +48,20 @@ const FieldComponent = ({ groupingIndex }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
   const { setFieldValue, values, errors } = useFormikContext<WidgetConfigFormValues>();
   const grouping = values.groupBy.groupings[groupingIndex];
-  const queryId = useActiveQueryId();
+  const activeQueryId = useActiveQueryId();
 
   const onAddField = useCallback((fieldName: string) => {
-    const updateGrouping = (newGrouping: GroupByFormValues) => setFieldValue(`groupBy.groupings.${groupingIndex}`, newGrouping);
-    const newGroupingFields = [...(grouping.fields ?? []), fieldName];
-    const groupingHasValuesField = fieldTypes.queryFields.get(queryId, fieldTypes.all).some(({ name, type }) => (
-      newGroupingFields.includes(name) && type.type !== 'date'),
-    );
-    const newGroupingType = groupingHasValuesField ? 'values' : 'time';
+    const newFields = [...(grouping.fields ?? []), fieldName];
 
-    if (grouping.type === newGroupingType) {
-      updateGrouping({
-        ...grouping,
-        fields: [...(grouping.fields ?? []), fieldName],
-      } as GroupByFormValues);
-    } else {
-      if (newGroupingType === 'time') {
-        updateGrouping({
-          ...toTimeGrouping(grouping as GroupByFormValues),
-          fields: newGroupingFields,
-        } as GroupByFormValues);
-      }
-
-      if (newGroupingType === 'values') {
-        updateGrouping({
-          ...toValuesGrouping(grouping as GroupByFormValues),
-          fields: newGroupingFields,
-        } as GroupByFormValues);
-      }
-    }
-  }, [fieldTypes.all, fieldTypes.queryFields, grouping, groupingIndex, queryId, setFieldValue]);
+    onGroupingFieldsChange({
+      fieldTypes,
+      activeQueryId,
+      groupingIndex,
+      grouping: grouping as GroupByFormValues,
+      newFields,
+      setFieldValue,
+    });
+  }, [activeQueryId, fieldTypes, grouping, groupingIndex, setFieldValue]);
 
   return (
     <Input id="group-by-field-select"
@@ -90,7 +73,7 @@ const FieldComponent = ({ groupingIndex }: Props) => {
                    onChange={onAddField}
                    clearable={false}
                    ariaLabel="Fields"
-                   qualifiedTypeCategory={grouping.type}
+                   qualifiedTypeCategory={grouping.fields?.length ? grouping.type : undefined}
                    persistSelection={false}
                    name="group-by-field-create-select"
                    value={undefined}
