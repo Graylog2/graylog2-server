@@ -38,8 +38,11 @@ import SearchActions from 'views/actions/SearchActions';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import CopyPageToDashboard from 'views/logic/views/CopyPageToDashboard';
 import { loadDashboard } from 'views/logic/views/Actions';
-import useView from 'views/hooks/useView';
 import createSearch from 'views/logic/slices/createSearch';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import useAppDispatch from 'stores/useAppDispatch';
+import type { GetState } from 'views/types';
+import { selectView, selectActiveQuery } from 'views/logic/slices/viewSelectors';
 
 import type { QueryTabsProps } from './QueryTabs';
 
@@ -202,11 +205,10 @@ const addPageToDashboard = (targetDashboard: View, activeView: View, queryId: st
   );
 };
 
-const _onCopyToDashboard = (
-  view: View,
-  queryId: string,
-  selectedDashboardId: string | undefined | null,
-) => {
+const _onCopyToDashboard = (selectedDashboardId: string | undefined | null) => (_dispatch: AppDispatch, getState: GetState) => {
+  const view = selectView(getState());
+  const queryId = selectActiveQuery(getState());
+
   return ViewManagementActions.get(selectedDashboardId).then((dashboardJson) => {
     const targetDashboard = View.fromJSON(dashboardJson);
 
@@ -217,17 +219,17 @@ const _onCopyToDashboard = (
 };
 
 const AdaptableQueryTabs = ({ maxWidth, queries, titles, activeQueryId, onRemove, onSelect, queryTitleEditModal, dashboardId }: Props) => {
-  const view = useView();
   const [openedMore, setOpenedMore] = useState<boolean>(false);
   const [lockedTab, setLockedTab] = useState<QueryId>();
   const [showConfigurationModal, setShowConfigurationModal] = useState<boolean>(false);
   const [showCopyToDashboardModal, setShowCopyToDashboardModal] = useState<boolean>(false);
+  const dispatch = useAppDispatch();
 
   const toggleCopyToDashboardModal = useCallback(() => {
     setShowCopyToDashboardModal((cur) => !cur);
   }, []);
 
-  const onCopyToDashboard = useCallback((selectedDashboardId: string) => _onCopyToDashboard(view, activeQueryId, selectedDashboardId), [activeQueryId, view]);
+  const onCopyToDashboard = useCallback((selectedDashboardId: string) => dispatch(_onCopyToDashboard(selectedDashboardId)), [dispatch]);
 
   const openTitleEditModal = useCallback((activeQueryTitle: string) => {
     if (queryTitleEditModal) {
