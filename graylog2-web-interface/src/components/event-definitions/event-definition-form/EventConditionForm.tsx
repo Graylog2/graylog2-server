@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import lodash from 'lodash';
 
@@ -23,44 +24,50 @@ import { Select } from 'components/common';
 import { Clearfix, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { HelpPanel } from 'components/event-definitions/common/HelpPanel';
 import type User from 'logic/users/User';
-import type { EventDefinition } from 'logic/alerts/types';
 
 import styles from './EventConditionForm.css';
 
+import type { EventDefinition } from 'logic/alerts/types';
 import commonStyles from '../common/commonStyles.css';
 
 type Props = {
+  action: 'create' | 'edit',
+  entityTypes: any,
   eventDefinition: EventDefinition,
+  validation: {
+    errors: {
+      config: any,
+      title: string,
+    }
+  },
   currentUser: User,
-  validation: { errors: { [key: string]: Array<string> } },
   onChange: (name: string, newConfig: EventDefinition['config']) => void,
-  action: string,
-};
+}
 
-const EventConditionForm = ({ eventDefinition, currentUser, validation, onChange, action }: Props) => {
-  const getConditionPlugin = (type: string | undefined) => {
+const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, currentUser, onChange }: Props) => {
+  const getConditionPlugin = (type): any => {
     if (type === undefined) {
-      return undefined;
+      return {};
     }
 
-    return PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type) || undefined;
+    return PluginStore.exports('eventDefinitionTypes').find((eventDefinitionType) => eventDefinitionType.type === type) || {};
   };
 
-  const sortedEventDefinitionTypes = () => {
-    return PluginStore.exports('eventDefinitionTypes').sort((edt1, edt2) => {
+  const sortedEventDefinitionTypes = (): any => {
+    return (PluginStore.exports('eventDefinitionTypes') as any).sort((eventDefinitionType1, eventDefinitionType2) => {
       // Try to sort by given sort order and displayName if possible, otherwise do it by displayName
-      const edt1Order = edt1.sortOrder;
-      const edt2Order = edt2.sortOrder;
+      const eventDefinitionType1Order = eventDefinitionType1.sortOrder;
+      const eventDefinitionType2Order = eventDefinitionType2.sortOrder;
 
-      if (edt1Order !== undefined || edt2Order !== undefined) {
-        const sort = lodash.defaultTo(edt1Order, Number.MAX_SAFE_INTEGER) - lodash.defaultTo(edt2Order, Number.MAX_SAFE_INTEGER);
+      if (eventDefinitionType1Order !== undefined || eventDefinitionType2Order !== undefined) {
+        const sort = lodash.defaultTo(eventDefinitionType1Order, Number.MAX_SAFE_INTEGER) - lodash.defaultTo(eventDefinitionType2Order, Number.MAX_SAFE_INTEGER);
 
         if (sort !== 0) {
           return sort;
         }
       }
 
-      return naturalSort(edt1.displayName, edt2.displayName);
+      return naturalSort(eventDefinitionType1.displayName, eventDefinitionType2.displayName);
     });
   };
 
@@ -98,11 +105,12 @@ const EventConditionForm = ({ eventDefinition, currentUser, validation, onChange
 
   const eventDefinitionTypeComponent = eventDefinitionType?.formComponent
     ? React.createElement<React.ComponentProps<any>>(eventDefinitionType.formComponent, {
-      eventDefinition: eventDefinition,
+      action: action,
+      entityTypes: entityTypes,
       currentUser: currentUser,
       validation: validation,
+      eventDefinition: eventDefinition,
       onChange: onChange,
-      action: action,
       key: eventDefinition.id,
     })
     : null;
@@ -111,7 +119,6 @@ const EventConditionForm = ({ eventDefinition, currentUser, validation, onChange
     <Row>
       <Col md={7} lg={6}>
         <h2 className={commonStyles.title}>Event Condition</h2>
-
         <p>
           Configure how Graylog should create Events of this kind. You can later use those Events as input on other
           Conditions, making it possible to build powerful Conditions based on others.
@@ -131,6 +138,7 @@ const EventConditionForm = ({ eventDefinition, currentUser, validation, onChange
           </HelpBlock>
         </FormGroup>
       </Col>
+
       {!disabledSelect() && (
         <Col md={5} lg={5} lgOffset={1}>
           <HelpPanel className={styles.conditionTypesInfo}
@@ -151,6 +159,20 @@ const EventConditionForm = ({ eventDefinition, currentUser, validation, onChange
       )}
     </Row>
   );
+};
+
+EventConditionForm.defaultProps = {
+  action: 'create',
+  entityTypes: undefined,
+};
+
+EventConditionForm.propTypes = {
+  action: PropTypes.oneOf(['create', 'edit']),
+  entityTypes: PropTypes.object,
+  eventDefinition: PropTypes.object.isRequired,
+  currentUser: PropTypes.object.isRequired, // Prop is passed down to pluggable entities
+  validation: PropTypes.object.isRequired,
+  onChange: PropTypes.func.isRequired,
 };
 
 export default EventConditionForm;
