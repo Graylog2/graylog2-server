@@ -24,6 +24,7 @@ import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorEngine;
+import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,6 +49,8 @@ public class EventDefinitionsResourceTest {
     @Mock
     EventDefinitionContextService contextService;
     @Mock
+    RecentActivityService recentActivityService;
+    @Mock
     EventProcessorEngine engine;
     @Mock
     EventProcessorConfig config1;
@@ -57,7 +60,7 @@ public class EventDefinitionsResourceTest {
 
     @Before
     public void setup() {
-        resource = new EventDefinitionsResource(dbService, eventDefinitionHandler, contextService, engine);
+        resource = new EventDefinitionsResource(dbService, eventDefinitionHandler, contextService, engine, recentActivityService);
         when(config1.type()).thenReturn(CONFIG_TYPE_1);
         when(config2.type()).thenReturn(CONFIG_TYPE_2);
     }

@@ -16,13 +16,11 @@
  */
 package org.graylog.testing.completebackend.apis;
 
-import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.apis.inputs.GelfInputApi;
 
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
