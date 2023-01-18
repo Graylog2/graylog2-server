@@ -47,7 +47,7 @@ class ISODurationInput extends React.Component {
     autoFocus: PropTypes.bool,
     /** Specify that the Input is required to submit the form. */
     required: PropTypes.bool,
-    /** grays out the input and makes it uneditable  */
+     /** Specify that the Input is disabled or not */
     disabled: PropTypes.bool,
   };
 
