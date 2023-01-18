@@ -149,7 +149,7 @@ class EmailNotificationForm extends React.Component {
                label="Reply-To"
                type="text"
                bsStyle={validation.errors.replyto ? 'error' : null}
-               help={lodash.get(validation, 'errors.reply_to[0]', 'The Reply-To email address that should be used for reply.')}
+               help={lodash.get(validation, 'errors.reply_to[0]', 'The email address that recipients should use for replies.')}
                value={config.reply_to || ''}
                onChange={this.handleChange} />
         <HideOnCloud>
