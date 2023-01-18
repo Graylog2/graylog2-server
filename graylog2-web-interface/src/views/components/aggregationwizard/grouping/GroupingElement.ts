@@ -23,6 +23,7 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import generateId from 'logic/generateId';
 import parseNumber from 'views/components/aggregationwizard/grouping/parseNumber';
 import { DEFAULT_LIMIT, DEFAULT_PIVOT_INTERVAL } from 'views/Constants';
+import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 
 import GroupingsConfiguration from './GroupingsConfiguration';
 
@@ -60,6 +61,60 @@ export const toTimeGrouping = (grouping: GroupByFormValues) => {
   }
 
   return newGrouping;
+};
+
+export const onGroupingFieldsChange = ({
+  fieldTypes,
+  activeQueryId,
+  groupingIndex,
+  grouping,
+  newFields,
+  setFieldValue,
+}: {
+  fieldTypes: FieldTypes,
+  activeQueryId: string,
+  groupingIndex: number,
+  grouping: GroupByFormValues,
+  newFields: Array<string>,
+  setFieldValue: (key: string, value: GroupByFormValues) => void,
+}) => {
+  const updateFormState = (data: GroupByFormValues) => setFieldValue(`groupBy.groupings.${groupingIndex}`, data);
+
+  if (!newFields.length) {
+    updateFormState({
+      ...toValuesGrouping(grouping as GroupByFormValues),
+      fields: [],
+    } as GroupByFormValues);
+
+    return;
+  }
+
+  const groupingHasValuesField = fieldTypes.queryFields.get(activeQueryId, fieldTypes.all).some(({ name, type }) => (
+    newFields.includes(name) && type.type !== 'date'),
+  );
+  const newGroupingType = groupingHasValuesField ? 'values' : 'time';
+
+  if (grouping.type === newGroupingType) {
+    updateFormState({ ...grouping, fields: newFields });
+
+    return;
+  }
+
+  if (grouping.type !== newGroupingType) {
+    if (newGroupingType === 'values') {
+      updateFormState({
+        ...toValuesGrouping(grouping as GroupByFormValues),
+        fields: newFields,
+      } as GroupByFormValues);
+    }
+
+    if (newGroupingType === 'time') {
+      updateFormState({
+        ...toTimeGrouping(grouping as GroupByFormValues),
+        fields: newFields,
+      } as GroupByFormValues);
+    }
+  }
 };
 
 const validateDateGrouping = (grouping: DateGrouping): GroupByError => {

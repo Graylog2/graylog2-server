@@ -26,7 +26,9 @@ import type { GroupByFormValues, WidgetConfigFormValues } from 'views/components
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
-import { toValuesGrouping, toTimeGrouping } from 'views/components/aggregationwizard/grouping/GroupingElement';
+import {
+  onGroupingFieldsChange,
+} from 'views/components/aggregationwizard/grouping/GroupingElement';
 
 const ListItemContainer = styled.div`
   display: flex;
@@ -119,54 +121,34 @@ const SelectedFieldsList = ({ groupingIndex }: Props) => {
   const grouping = values.groupBy.groupings[groupingIndex];
   const groupingsForList = useMemo(() => grouping.fields?.map((field) => ({ id: field, title: field })), [grouping.fields]);
   const fieldTypes = useContext(FieldTypesContext);
-  const queryId = useActiveQueryId();
+  const activeQueryId = useActiveQueryId();
 
   const onChangeField = useCallback((fieldIndex: number, newFieldName: string) => {
-    const newGroupingFields = [...grouping.fields];
-    newGroupingFields[fieldIndex] = newFieldName;
+    const newFields = [...grouping.fields];
+    newFields[fieldIndex] = newFieldName;
 
-    const groupingHasValuesField = fieldTypes.queryFields.get(queryId, fieldTypes.all).some(({ name, type }) => (
-      newGroupingFields.includes(name) && type.type !== 'date'),
-    );
-    const newGroupingType = groupingHasValuesField ? 'values' : 'time';
-
-    if (grouping.type === newGroupingType) {
-      setFieldValue(`groupBy.groupings.${groupingIndex}.fields.${fieldIndex}`, newFieldName);
-
-      return;
-    }
-
-    if (grouping.type !== newGroupingType) {
-      if (newGroupingType === 'values') {
-        setFieldValue(
-          `groupBy.groupings.${groupingIndex}`,
-          { ...toValuesGrouping(grouping as GroupByFormValues), fields: newGroupingFields },
-        );
-      }
-
-      if (newGroupingType === 'time') {
-        setFieldValue(
-          `groupBy.groupings.${groupingIndex}`,
-          { ...toTimeGrouping(grouping as GroupByFormValues), fields: newGroupingFields },
-        );
-      }
-    }
-  }, [fieldTypes.all, fieldTypes.queryFields, grouping, groupingIndex, queryId, setFieldValue]);
+    onGroupingFieldsChange({
+      fieldTypes,
+      activeQueryId,
+      groupingIndex,
+      grouping: grouping as GroupByFormValues,
+      newFields,
+      setFieldValue,
+    });
+  }, [activeQueryId, fieldTypes, grouping, groupingIndex, setFieldValue]);
 
   const onRemoveField = useCallback((removedFieldName: string) => {
-    const updatedFields = grouping.fields.filter((fieldName) => fieldName !== removedFieldName);
+    const newFields = grouping.fields.filter((fieldName) => fieldName !== removedFieldName);
 
-    if (!updatedFields.length) {
-      setFieldValue(`groupBy.groupings.${groupingIndex}`, {
-        ...toValuesGrouping(grouping as GroupByFormValues),
-        fields: [],
-      });
-
-      return;
-    }
-
-    setFieldValue(`groupBy.groupings.${groupingIndex}.fields`, updatedFields);
-  }, [grouping, groupingIndex, setFieldValue]);
+    onGroupingFieldsChange({
+      fieldTypes,
+      activeQueryId,
+      groupingIndex,
+      grouping: grouping as GroupByFormValues,
+      newFields,
+      setFieldValue,
+    });
+  }, [activeQueryId, fieldTypes, grouping, groupingIndex, setFieldValue]);
 
   const SortableListItem = useCallback(({ item, index, dragHandleProps, draggableProps, className, ref }) => (
     <ListItem onChange={(newFieldName) => onChangeField(index, newFieldName)}
