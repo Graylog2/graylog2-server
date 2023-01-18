@@ -69,6 +69,7 @@ public abstract class StreamDTO {
     public abstract String matchingType();
 
     @JsonProperty(FIELD_DESCRIPTION)
+
     @Nullable
     public abstract String description();
 

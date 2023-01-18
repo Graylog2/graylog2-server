@@ -50,8 +50,11 @@ import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
-import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
+import org.graylog2.rest.resources.entities.annotations.EntityAttributesAnnotationParser;
+import org.graylog2.rest.resources.entities.annotations.FilterOptionDescription;
+import org.graylog2.rest.resources.entities.annotations.FrontendAttributeDescription;
+import org.graylog2.rest.resources.entities.annotations.ResourceDescription;
 import org.graylog2.rest.resources.streams.requests.CloneStreamRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.rest.resources.streams.responses.StreamCreatedResponse;
@@ -108,29 +111,52 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+import static org.graylog2.streams.StreamDTO.FIELD_CREATED_AT;
+import static org.graylog2.streams.StreamDTO.FIELD_DESCRIPTION;
+import static org.graylog2.streams.StreamDTO.FIELD_DISABLED;
+import static org.graylog2.streams.StreamDTO.FIELD_TITLE;
 
 @RequiresAuthentication
 @Api(value = "Streams", description = "Manage streams", tags = {CLOUD_VISIBLE})
 @Path("/streams")
+@ResourceDescription(
+        attributes = {
+                @FrontendAttributeDescription(
+                        id = FIELD_DESCRIPTION,
+                        title = "Description"
+                ),
+                @FrontendAttributeDescription(
+                        id = FIELD_CREATED_AT,
+                        title = "Created",
+                        type = "date"
+                ),
+                @FrontendAttributeDescription(
+                        id = FIELD_DISABLED,
+                        title = "Status",
+                        type = "boolean",
+                        filterable = true,
+                        filterOptions = {
+                                @FilterOptionDescription(value = "true", title = "Paused"),
+                                @FilterOptionDescription(value = "false", title = "Running")
+                        }
+                ),
+                @FrontendAttributeDescription(
+                        id = FIELD_TITLE,
+                        title = "Title"
+                )
+        }
+)
 public class StreamResource extends RestResource {
     protected static final Map<String, SearchQueryField> SEARCH_FIELD_MAPPING = Map.of(
             "id", SearchQueryField.create(StreamDTO.FIELD_ID, SearchQueryField.Type.OBJECT_ID),
-            StreamDTO.FIELD_TITLE, SearchQueryField.create(StreamDTO.FIELD_TITLE),
-            StreamDTO.FIELD_DESCRIPTION, SearchQueryField.create(StreamDTO.FIELD_DESCRIPTION),
-            StreamDTO.FIELD_CREATED_AT, SearchQueryField.create(StreamDTO.FIELD_CREATED_AT),
-            "status", SearchQueryField.create(StreamDTO.FIELD_DISABLED)
+            FIELD_TITLE, SearchQueryField.create(FIELD_TITLE),
+            FIELD_DESCRIPTION, SearchQueryField.create(FIELD_DESCRIPTION),
+            FIELD_CREATED_AT, SearchQueryField.create(FIELD_CREATED_AT),
+            "status", SearchQueryField.create(FIELD_DISABLED)
     );
-    private static final String DEFAULT_SORT_FIELD = StreamDTO.FIELD_TITLE;
+    private static final String DEFAULT_SORT_FIELD = FIELD_TITLE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
-    private static final List<EntityAttribute> attributes = List.of(
-            EntityAttribute.builder().id("title").title("Title").build(),
-            EntityAttribute.builder().id("description").title("Description").build(),
-            EntityAttribute.builder().id("created_at").title("Created").type("date").build(),
-            EntityAttribute.builder().id("disabled").title("Status").type("boolean").filterable(true).filterOptions(Set.of(
-                    FilterOption.create("true", "Paused"),
-                    FilterOption.create("false", "Running")
-            )).build()
-    );
+    private final List<EntityAttribute> streamDtoAttributes;
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
             .build();
@@ -146,13 +172,15 @@ public class StreamResource extends RestResource {
                           PaginatedStreamService paginatedStreamService,
                           StreamRuleService streamRuleService,
                           StreamRouterEngine.Factory streamRouterEngineFactory,
-                          IndexSetRegistry indexSetRegistry) {
+                          IndexSetRegistry indexSetRegistry,
+                          EntityAttributesAnnotationParser entityAttributesAnnotationParser) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
         this.indexSetRegistry = indexSetRegistry;
         this.paginatedStreamService = paginatedStreamService;
         this.searchQueryParser = new SearchQueryParser(StreamImpl.FIELD_TITLE, SEARCH_FIELD_MAPPING);
+        this.streamDtoAttributes = entityAttributesAnnotationParser.parse(getClass());
     }
 
     @POST
@@ -225,7 +253,8 @@ public class StreamResource extends RestResource {
         final PaginatedList<StreamDTO> streamDTOS = new PaginatedList<>(
                 streams, result.pagination().total(), result.pagination().page(), result.pagination().perPage()
         );
-        return PageListResponse.create(query, streamDTOS.pagination(), total, sort, order, streams, attributes, settings);
+
+        return PageListResponse.create(query, streamDTOS.pagination(), total, sort, order, streams, streamDtoAttributes, settings);
     }
 
     @GET
