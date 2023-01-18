@@ -38,6 +38,7 @@ type Props = {
   autoFocus?: boolean,
   ariaLabel?: string,
   clearable?: boolean,
+  qualifiedTypeCategory?: 'time' | 'values',
   id: string,
   name: string,
   onChange: (fieldName: string) => void,
@@ -62,6 +63,20 @@ const hasProperty = (fieldType: FieldTypeMapping, properties: Array<Property>) =
     .find((result) => result === false) === undefined;
 };
 
+const isFieldQualified = (field: FieldTypeMapping, properties: Array<Property>, qualifiedTypeCategory: 'time' | 'values' | undefined) => {
+  if (properties) {
+    return hasProperty(field, properties);
+  }
+
+  if (qualifiedTypeCategory) {
+    const fieldTypeCategory = field.type.type === 'date' ? 'time' : 'values';
+
+    return qualifiedTypeCategory === fieldTypeCategory;
+  }
+
+  return true;
+};
+
 const UnqualifiedOption = styled.span(({ theme }) => css`
   color: ${theme.colors.variant.light.default};
 `);
@@ -84,6 +99,7 @@ const FieldSelect = ({
   className,
   clearable,
   excludedFields,
+  qualifiedTypeCategory,
   id,
   name,
   onChange,
@@ -97,12 +113,18 @@ const FieldSelect = ({
 }: Props) => {
   const activeQuery = useActiveQueryId();
   const fieldTypes = useContext(FieldTypesContext);
+
   const fieldOptions = useMemo(() => fieldTypes.queryFields
     .get(activeQuery, Immutable.List())
     .filter((field) => !excludedFields.includes(field.name))
-    .map((field) => ({ label: field.name, value: field.name, type: field.type, qualified: properties ? hasProperty(field, properties) : true }))
+    .map((field) => ({
+      label: field.name,
+      value: field.name,
+      type: field.type,
+      qualified: isFieldQualified(field, properties, qualifiedTypeCategory),
+    }))
     .toArray()
-    .sort(sortByLabel), [activeQuery, excludedFields, fieldTypes.queryFields, properties]);
+    .sort(sortByLabel), [activeQuery, excludedFields, fieldTypes.queryFields, properties, qualifiedTypeCategory]);
 
   return (
     <Select options={fieldOptions}
@@ -131,9 +153,10 @@ FieldSelect.defaultProps = {
   autoFocus: undefined,
   className: undefined,
   clearable: false,
+  qualifiedTypeCategory: undefined,
   excludedFields: [],
-  openMenuOnFocus: undefined,
   onMenuClose: undefined,
+  openMenuOnFocus: undefined,
   persistSelection: undefined,
   placeholder: undefined,
   properties: undefined,
