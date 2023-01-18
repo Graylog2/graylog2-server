@@ -22,7 +22,7 @@ import type { TimeConfigType, ValuesConfigType } from 'views/logic/aggregationbu
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import generateId from 'logic/generateId';
 import parseNumber from 'views/components/aggregationwizard/grouping/parseNumber';
-import { DEFAULT_LIMIT } from 'views/Constants';
+import { DEFAULT_LIMIT, DEFAULT_PIVOT_INTERVAL } from 'views/Constants';
 
 import GroupingsConfiguration from './GroupingsConfiguration';
 
@@ -42,12 +42,24 @@ export type GroupByError = {
   limit?: string,
 };
 
-export const isValuesGrouping = (grouping: GroupByFormValues): grouping is ValuesGrouping => {
-  return grouping.type === 'values';
+export const toValuesGrouping = (grouping: GroupByFormValues) => {
+  const newGrouping = { ...grouping, type: 'values', limit: DEFAULT_LIMIT };
+
+  if ('interval' in newGrouping) {
+    delete newGrouping.interval;
+  }
+
+  return newGrouping;
 };
 
-export const isDateGrouping = (grouping: GroupByFormValues): grouping is DateGrouping => {
-  return grouping.type === 'time';
+export const toTimeGrouping = (grouping: GroupByFormValues) => {
+  const newGrouping = { ...grouping, type: 'time', interval: DEFAULT_PIVOT_INTERVAL };
+
+  if ('limit' in newGrouping) {
+    delete newGrouping.limit;
+  }
+
+  return newGrouping;
 };
 
 const validateDateGrouping = (grouping: DateGrouping): GroupByError => {

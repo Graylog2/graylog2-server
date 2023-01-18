@@ -22,8 +22,9 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type { WidgetConfigFormValues, GroupByFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import Input from 'components/bootstrap/Input';
 import SelectedFieldsList from 'views/components/aggregationwizard/grouping/configuration/SelectedFieldsList';
-import { DEFAULT_LIMIT, DEFAULT_PIVOT_INTERVAL } from 'views/Constants';
 import type { GroupByError } from 'views/components/aggregationwizard/grouping/GroupingElement';
+import { toTimeGrouping, toValuesGrouping } from 'views/components/aggregationwizard/grouping/GroupingElement';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import FieldSelect from '../../FieldSelect';
 
@@ -35,35 +36,36 @@ const FieldComponent = ({ groupingIndex }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
   const { setFieldValue, values, errors } = useFormikContext<WidgetConfigFormValues>();
   const grouping = values.groupBy.groupings[groupingIndex];
+  const queryId = useActiveQueryId();
 
   const onAddField = (fieldName: string) => {
-    const field = fieldTypes.all.find(({ name }) => name === fieldName);
-    const fieldType = field?.type.type === 'date' ? 'time' : 'values';
-    const updateGrouping = (newGrouping: Partial<GroupByFormValues>) => setFieldValue(`groupBy.groupings.${groupingIndex}`, { ...grouping, ...newGrouping });
+    const updateGrouping = (newGrouping: GroupByFormValues) => setFieldValue(`groupBy.groupings.${groupingIndex}`, newGrouping);
+    const newGroupingFields = [...(grouping.fields ?? []), fieldName];
+    const groupingHasValuesField = fieldTypes.queryFields.get(queryId, fieldTypes.all).some(({ name, type }) => (
+      newGroupingFields.includes(name) && type.type !== 'date'),
+    );
+    const newGroupingType = groupingHasValuesField ? 'values' : 'time';
 
-    if (!grouping.fields?.length) {
-      if (fieldType === 'time') {
+    if (grouping.type === newGroupingType) {
+      updateGrouping({
+        ...grouping,
+        fields: [...(grouping.fields ?? []), fieldName],
+      } as GroupByFormValues);
+    } else {
+      if (newGroupingType === 'time') {
         updateGrouping({
-          type: fieldType,
-          fields: [fieldName],
-          interval: DEFAULT_PIVOT_INTERVAL,
-        });
+          ...toTimeGrouping(grouping as GroupByFormValues),
+          fields: newGroupingFields,
+        } as GroupByFormValues);
       }
 
-      if (fieldType === 'values') {
+      if (newGroupingType === 'values') {
         updateGrouping({
-          type: fieldType,
-          fields: [fieldName],
-          limit: DEFAULT_LIMIT,
-        });
+          ...toValuesGrouping(grouping as GroupByFormValues),
+          fields: newGroupingFields,
+        } as GroupByFormValues);
       }
-
-      return;
     }
-
-    updateGrouping({
-      fields: [...(grouping.fields ?? []), fieldName],
-    });
   };
 
   return (
