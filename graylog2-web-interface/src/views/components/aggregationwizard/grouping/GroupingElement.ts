@@ -42,7 +42,13 @@ export type GroupByError = {
   limit?: string,
 };
 
-export const DEFAULT_GROUPING_TYPE = 'values';
+export const isValuesGrouping = (grouping: GroupByFormValues): grouping is ValuesGrouping => {
+  return grouping.type === 'values';
+};
+
+export const isDateGrouping = (grouping: GroupByFormValues): grouping is DateGrouping => {
+  return grouping.type === 'time';
+};
 
 const validateDateGrouping = (grouping: DateGrouping): GroupByError => {
   const groupByError = {} as GroupByError;
@@ -188,7 +194,7 @@ const groupByToConfig = (groupBy: WidgetConfigFormValues['groupBy'], config: Agg
 export const createEmptyGrouping = () => addRandomId<ValuesGrouping>({
   direction: 'row',
   fields: [],
-  type: DEFAULT_GROUPING_TYPE,
+  type: 'values',
   limit: DEFAULT_LIMIT,
 });
 
