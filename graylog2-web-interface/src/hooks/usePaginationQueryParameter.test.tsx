@@ -53,30 +53,30 @@ describe('usePaginationQueryParameter custom hook', () => {
     expect(pageSize).toEqual(DEFAULT_PAGE_SIZES[0]);
   });
 
-  it('should set <page> query parameter with the value sent in setPage', () => {
+  it('should set <page> query parameter with the value sent in setPagination', () => {
     const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
 
-    const { page, setPage } = result.current;
+    const { page, setPagination } = result.current;
 
     expect(page).toEqual(DEFAULT_PAGE);
 
     const nextPage = 4;
 
-    act(() => setPage(nextPage));
+    act(() => setPagination({ page: nextPage }));
 
-    expect(mockHistoryReplace).toHaveBeenCalledWith(`?page=${nextPage}`);
+    expect(mockHistoryReplace).toHaveBeenCalledWith(`?page=${nextPage}&pageSize=10`);
   });
 
-  it('should set <pageSize> query parameter with the value sent in setPageSize and initilize the <page> query parameter', () => {
+  it('should set <pageSize> query parameter with the value sent in setPagination and initialize the <page> query parameter', () => {
     const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
 
-    const { pageSize, setPageSize } = result.current;
+    const { pageSize, setPagination } = result.current;
 
     expect(pageSize).toEqual(DEFAULT_PAGE_SIZES[0]);
 
     const nextPageSize = DEFAULT_PAGE_SIZES[1];
 
-    act(() => setPageSize(nextPageSize));
+    act(() => setPagination({ pageSize: nextPageSize }));
 
     expect(mockHistoryReplace).toHaveBeenCalledWith(`?page=${DEFAULT_PAGE}&pageSize=${nextPageSize}`);
   });
