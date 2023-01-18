@@ -14,17 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import Search from 'views/logic/search/Search';
-import type { SearchJson } from 'views/logic/search/Search';
-import fetchSearch from 'views/logic/views/fetchSearch';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
 
-import View from './View';
-import type { ViewJson } from './View';
+const searchUrl = qualifyUrl('/views/search');
 
-export default function ViewDeserializer(viewResponse: ViewJson): Promise<View> {
-  const view: View = View.fromJSON(viewResponse);
-
-  return fetchSearch(viewResponse.search_id)
-    .then((search: SearchJson): Search => Search.fromJSON(search))
-    .then((search: Search): View => view.toBuilder().search(search).build());
-}
+const fetchSearch = (searchId: string) => fetch('GET', `${searchUrl}/${searchId}`);
+export default fetchSearch;
