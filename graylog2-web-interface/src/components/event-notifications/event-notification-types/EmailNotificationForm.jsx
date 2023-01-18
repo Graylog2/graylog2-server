@@ -146,7 +146,7 @@ class EmailNotificationForm extends React.Component {
                required />
         <Input id="notification-replyto"
                name="reply_to"
-               label="Reply-To"
+               label="Reply-To (Optional)"
                type="text"
                bsStyle={validation.errors.replyto ? 'error' : null}
                help={lodash.get(validation, 'errors.reply_to[0]', 'The email address that recipients should use for replies.')}
