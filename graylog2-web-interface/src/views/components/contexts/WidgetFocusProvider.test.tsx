@@ -25,6 +25,8 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import SearchActions from 'views/actions/SearchActions';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
+import { allMessagesTable } from 'views/logic/Widgets';
+import { createViewWithWidgets } from 'fixtures/searches';
 
 const mockHistoryReplace = jest.fn();
 
@@ -57,21 +59,28 @@ describe('WidgetFocusProvider', () => {
     asMock(useLocation).mockReturnValue(emptyLocation);
   });
 
-  const renderSUT = (consume) => render(
-    <TestStoreProvider>
-      <WidgetFocusProvider>
-        <WidgetFocusContext.Consumer>
-          {consume}
-        </WidgetFocusContext.Consumer>
-      </WidgetFocusProvider>
-    </TestStoreProvider>,
-  );
+  const renderSUT = (consume: (value: WidgetFocusContextType) => JSX.Element) => {
+    const widget = allMessagesTable('widget-id');
+    const view = createViewWithWidgets([widget], {});
+
+    return render(
+      <TestStoreProvider view={view}>
+        <WidgetFocusProvider>
+          <WidgetFocusContext.Consumer>
+            {consume}
+          </WidgetFocusContext.Consumer>
+        </WidgetFocusProvider>
+      </TestStoreProvider>,
+    );
+  };
 
   it('should update url on widget focus', () => {
     let contextValue;
 
     const consume = (value: WidgetFocusContextType) => {
       contextValue = value;
+
+      return null;
     };
 
     renderSUT(consume);
@@ -91,6 +100,8 @@ describe('WidgetFocusProvider', () => {
 
     const consume = (value: WidgetFocusContextType) => {
       contextValue = value;
+
+      return null;
     };
 
     renderSUT(consume);
@@ -110,6 +121,8 @@ describe('WidgetFocusProvider', () => {
 
     const consume = (value: WidgetFocusContextType) => {
       contextValue = value;
+
+      return null;
     };
 
     renderSUT(consume);
@@ -122,6 +135,8 @@ describe('WidgetFocusProvider', () => {
 
     const consume = (value: WidgetFocusContextType) => {
       contextValue = value;
+
+      return null;
     };
 
     renderSUT(consume);
@@ -141,6 +156,8 @@ describe('WidgetFocusProvider', () => {
 
     const consume = (value: WidgetFocusContextType) => {
       contextValue = value;
+
+      return null;
     };
 
     renderSUT(consume);
@@ -160,6 +177,8 @@ describe('WidgetFocusProvider', () => {
 
     const consume = (value: WidgetFocusContextType) => {
       contextValue = value;
+
+      return null;
     };
 
     renderSUT(consume);
@@ -177,6 +196,8 @@ describe('WidgetFocusProvider', () => {
 
     const consume = (value: WidgetFocusContextType) => {
       contextValue = value;
+
+      return null;
     };
 
     renderSUT(consume);
@@ -200,6 +221,8 @@ describe('WidgetFocusProvider', () => {
 
     const consume = (value: WidgetFocusContextType) => {
       contextValue = value;
+
+      return null;
     };
 
     renderSUT(consume);
