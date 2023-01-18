@@ -85,4 +85,29 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
             LOG.debug("Deflector index <{}> should not be rotated. Not doing anything.", indexName);
         }
     }
+
+    public Result createResult(boolean shouldRotate, String message) {
+        return new ResultImpl(shouldRotate, message);
+    }
+
+    static class ResultImpl implements Result {
+        private final boolean shouldRotate;
+        private final String message;
+
+        private ResultImpl(boolean shouldRotate, String message) {
+            this.shouldRotate = shouldRotate;
+            this.message = message;
+            LOG.debug("{} because of: {}", shouldRotate ? "Rotating" : "Not rotating", message);
+        }
+
+        @Override
+        public String getDescription() {
+            return message;
+        }
+
+        @Override
+        public boolean shouldRotate() {
+            return shouldRotate;
+        }
+    }
 }
