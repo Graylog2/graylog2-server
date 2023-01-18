@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import styled from 'styled-components';
 import * as Immutable from 'immutable';
 import { Formik, Form } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -31,7 +32,7 @@ import { Alert, Col, Row, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { UsersActions } from 'stores/users/UsersStore';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
-import { FormSubmit } from 'components/common';
+import { FormSubmit, NoSearchResult, ReadOnlyFormGroup } from 'components/common';
 
 import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';
@@ -44,6 +45,11 @@ import ServiceAccountFormGroup from './ServiceAccountFormGroup';
 
 import { Headline } from '../../common/Section/SectionComponent';
 import useIsGlobalTimeoutEnabled from '../../../hooks/useIsGlobalTimeoutEnabled';
+import { Link } from '../../common/router';
+
+const GlobalTimeoutMessage = styled(ReadOnlyFormGroup)`
+  margin-bottom: 20px;
+`;
 
 const isCloud = AppConfig.isCloud();
 
@@ -190,7 +196,12 @@ const UserCreate = () => {
               </div>
               <div>
                 <Headline>Settings</Headline>
-                <TimeoutFormGroup isGlobalTimeoutEnabled={isGlobalTimeoutEnabled} />
+                {isGlobalTimeoutEnabled ? (
+                  <GlobalTimeoutMessage label="Sessions Timeout"
+                                        value={<NoSearchResult>User session timeout is not editable because the <Link to={Routes.SYSTEM.CONFIGURATIONS}>global session timeout</Link> is enabled.</NoSearchResult>} />
+                ) : (
+                  <TimeoutFormGroup />
+                )}
                 <TimezoneFormGroup />
                 <ServiceAccountFormGroup />
               </div>

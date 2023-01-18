@@ -18,18 +18,14 @@ import * as React from 'react';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 
-import Routes from 'routing/Routes';
 import { Row, Col, HelpBlock, Input } from 'components/bootstrap';
 import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
 
 import { MS_DAY, MS_HOUR, MS_MINUTE, MS_SECOND } from './timeoutConstants';
 
-import { Link } from '../common/router';
-
 type Props = {
   value: number,
   onChange: (value: number) => void;
-  isGlobalTimeoutEnabled: boolean;
 };
 
 const _estimateUnit = (value) => {
@@ -52,7 +48,7 @@ const _estimateUnit = (value) => {
   return MS_SECOND;
 };
 
-const TimeoutInput = ({ value: propsValue, onChange, isGlobalTimeoutEnabled }: Props) => {
+const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
   const [sessionTimeoutNever, setSessionTimeoutNever] = useState(propsValue === -1);
   const [unit, setUnit] = useState(_estimateUnit(propsValue));
   const [value, setValue] = useState(propsValue ? Math.floor(propsValue / Number(unit)) : 0);
@@ -94,8 +90,7 @@ const TimeoutInput = ({ value: propsValue, onChange, isGlobalTimeoutEnabled }: P
                help="When checked, sessions never time out due to inactivity."
                formGroupClassName="no-bm"
                onChange={_onClick}
-               checked={sessionTimeoutNever}
-               disabled={isGlobalTimeoutEnabled} />
+               checked={sessionTimeoutNever} />
 
         <div className="clearfix">
           <Col xs={2}>
@@ -105,26 +100,20 @@ const TimeoutInput = ({ value: propsValue, onChange, isGlobalTimeoutEnabled }: P
                    name="timeout"
                    min={1}
                    formGroupClassName="form-group no-bm"
-                   disabled={sessionTimeoutNever || isGlobalTimeoutEnabled}
+                   disabled={sessionTimeoutNever}
                    value={value}
                    onChange={_onChangeValue} />
           </Col>
           <Col xs={4}>
-            <TimeoutUnitSelect disabled={sessionTimeoutNever || isGlobalTimeoutEnabled}
+            <TimeoutUnitSelect disabled={sessionTimeoutNever}
                                value={`${unit}`}
                                onChange={_onChangeUnit} />
           </Col>
           <Row className="no-bm">
             <Col xs={12}>
-              {isGlobalTimeoutEnabled ? (
-                <HelpBlock>
-                  User session timeout is not editable because the <Link to={Routes.SYSTEM.CONFIGURATIONS}>global session timeout</Link> is enabled.
-                </HelpBlock>
-              ) : (
-                <HelpBlock>
-                  Session automatically end after this amount of time, unless they are actively used.
-                </HelpBlock>
-              )}
+              <HelpBlock>
+                Session automatically end after this amount of time, unless they are actively used.
+              </HelpBlock>
             </Col>
           </Row>
         </div>
@@ -136,13 +125,11 @@ const TimeoutInput = ({ value: propsValue, onChange, isGlobalTimeoutEnabled }: P
 TimeoutInput.propTypes = {
   value: PropTypes.number,
   onChange: PropTypes.func,
-  isGlobalTimeoutEnabled: PropTypes.bool,
 };
 
 TimeoutInput.defaultProps = {
   value: MS_HOUR,
   onChange: () => {},
-  isGlobalTimeoutEnabled: false,
 };
 
 export default TimeoutInput;

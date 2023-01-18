@@ -16,10 +16,12 @@
  */
 import * as React from 'react';
 import { Formik, Form } from 'formik';
+import styled from 'styled-components';
 import type { $PropertyType } from 'utility-types';
 
+import Routes from 'routing/Routes';
 import { Button, Row, Col } from 'components/bootstrap';
-import { IfPermitted } from 'components/common';
+import { IfPermitted, NoSearchResult, ReadOnlyFormGroup } from 'components/common';
 import type User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
@@ -28,6 +30,11 @@ import TimeoutFormGroup from '../UserCreate/TimeoutFormGroup';
 import ServiceAccountFormGroup from '../UserCreate/ServiceAccountFormGroup';
 import StartpageFormGroup from '../StartpageFormGroup';
 import useIsGlobalTimeoutEnabled from '../../../hooks/useIsGlobalTimeoutEnabled';
+import { Link } from '../../common/router';
+
+const GlobalTimeoutMessage = styled(ReadOnlyFormGroup)`
+  margin-bottom: 20px;
+`;
 
 type Props = {
   user: User,
@@ -54,7 +61,12 @@ const SettingsSection = ({
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
             <IfPermitted permissions="*">
-              <TimeoutFormGroup isGlobalTimeoutEnabled={isGlobalTimeoutEnabled} />
+              {isGlobalTimeoutEnabled ? (
+                <GlobalTimeoutMessage label="Sessions Timeout"
+                                      value={<NoSearchResult>User session timeout is not editable because the <Link to={Routes.SYSTEM.CONFIGURATIONS}>global session timeout</Link> is enabled.</NoSearchResult>} />
+              ) : (
+                <TimeoutFormGroup />
+              )}
             </IfPermitted>
             <TimezoneFormGroup />
             <IfPermitted permissions="user:edit">
