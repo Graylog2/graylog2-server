@@ -76,7 +76,7 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
     return undefined;
   }
 
-  const copyHooks = PluginStore.exports('views.hooks.copyWidgetToDashboard') || [];
+  const copyHooks = PluginStore.exports('views.hooks.copyWidgetToDashboard');
 
   const queryMap: Map<QueryId, Query> = Map(search.search.queries.map((q) => [q.id, q]));
   const match: [Widget, QueryId] | undefined | null = FindWidgetAndQueryIdInView(widgetId, search);
@@ -104,7 +104,7 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
 
     const updatedView = UpdateSearchForWidgets(_addWidgetToDashboard(dashboardWidget, dashboard, oldPositions, title));
 
-    return copyHooks.reduce((previousDashboard, copyHook) => copyHook(widgetId, search, previousDashboard), updatedView);
+    return copyHooks.reduce((previousDashboard, copyHook) => copyHook(search, previousDashboard), updatedView);
   }
 
   return undefined;

@@ -57,8 +57,8 @@ const ConfigurationForm = ({
   const [formData, setFormData] = useState(initFormData);
   const [error, setError] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
-  const previewModal = useRef(null);
-  const uploadsModal = useRef(null);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [showUploadsModal, setShowUploadsModal] = useState(false);
   const defaultTemplates = useRef({});
 
   useEffect(() => {
@@ -197,11 +197,11 @@ const ConfigurationForm = ({
   };
 
   const _onShowSource = () => {
-    previewModal.current.open();
+    setShowPreviewModal(true);
   };
 
   const _onShowImports = () => {
-    uploadsModal.current.open();
+    setShowUploadsModal(true);
   };
 
   const _formatCollector = (collector) => {
@@ -348,9 +348,11 @@ const ConfigurationForm = ({
               </Col>
             </Row>
           </form>
-          <SourceViewModal ref={previewModal}
+          <SourceViewModal showModal={showPreviewModal}
+                           onHide={() => setShowPreviewModal(false)}
                            templateString={formData.template} />
-          <ImportsViewModal ref={uploadsModal}
+          <ImportsViewModal showModal={showUploadsModal}
+                            onHide={() => setShowUploadsModal(false)}
                             onApply={_onTemplateImport} />
         </div>
       </Col>
@@ -377,8 +379,12 @@ ConfigurationForm.propTypes = {
 ConfigurationForm.defaultProps = {
   action: 'edit',
   configuration: {
-    color: '#FFFFFF',
+    id: '',
+    name: '',
+    collector_id: '',
     template: '',
+    color: '#FFFFFF',
+    tags: [],
   },
   configurationSidecars: {},
 };

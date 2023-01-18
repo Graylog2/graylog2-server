@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
@@ -33,7 +33,7 @@ type Props = {
 const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessAction }: Props) => {
   const [selectedAction, setSelectedAction] = useState<string>('');
   const [isConfigurationWarningHidden, setIsConfigurationWarningHidden] = useState(false);
-  const modalRef = useRef(null);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const resetSelectedAction = () => {
     setSelectedAction(undefined);
@@ -42,20 +42,24 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
   const handleProcessActionSelect = (processAction: string[], hideCallback: () => void) => {
     hideCallback();
     setSelectedAction(processAction ? processAction[0] : undefined);
-    modalRef.current?.open();
-  };
-
-  const confirmProcessAction = (doneCallback: () => void) => {
-    const callback = () => {
-      doneCallback();
-      resetSelectedAction();
-    };
-
-    onProcessAction(selectedAction, selectedSidecarCollectorPairs, callback);
+    setShowModal(true);
   };
 
   const cancelProcessAction = () => {
     resetSelectedAction();
+    setShowModal(false);
+  };
+
+  const confirmProcessAction = (doneCallback?: () => void) => {
+    const callback = () => {
+      if (doneCallback && typeof doneCallback === 'function') {
+        doneCallback();
+      }
+
+      cancelProcessAction();
+    };
+
+    onProcessAction(selectedAction, selectedSidecarCollectorPairs, callback);
   };
 
   const hideConfigurationWarning = () => {
@@ -103,7 +107,7 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
     const shouldShowConfigurationWarning = !isConfigurationWarningHidden && !allHaveConfigurationsAssigned;
 
     return (
-      <BootstrapModalConfirm ref={modalRef}
+      <BootstrapModalConfirm showModal={showModal}
                              title="Process action summary"
                              confirmButtonDisabled={shouldShowConfigurationWarning}
                              onConfirm={confirmProcessAction}

@@ -25,7 +25,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 
 type PaginatedDashboardsResponse = PaginatedListJSON & {
-  views: Array<ViewJson>,
+  elements: Array<ViewJson>,
 };
 
 type Options = {
@@ -43,8 +43,8 @@ const fetchDashboards = (searchParams: SearchParams) => {
     { sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
 
   return fetch<PaginatedDashboardsResponse>('GET', qualifyUrl(url)).then(
-    ({ views, total, count, page, per_page: perPage }) => ({
-      list: views.map((item) => View.fromJSON(item)),
+    ({ elements, total, count, page, per_page: perPage }) => ({
+      list: elements.map((item) => View.fromJSON(item)),
       pagination: { total, count, page, perPage },
     }),
   );
