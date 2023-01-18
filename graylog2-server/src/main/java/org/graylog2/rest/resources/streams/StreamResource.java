@@ -50,8 +50,8 @@ import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
-import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
+import org.graylog2.rest.resources.entities.annotations.EntityAttributesAnnotationParser;
 import org.graylog2.rest.resources.streams.requests.CloneStreamRequest;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.rest.resources.streams.responses.StreamCreatedResponse;
@@ -122,15 +122,7 @@ public class StreamResource extends RestResource {
     );
     private static final String DEFAULT_SORT_FIELD = StreamDTO.FIELD_TITLE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
-    private static final List<EntityAttribute> attributes = List.of(
-            EntityAttribute.builder().id("title").title("Title").build(),
-            EntityAttribute.builder().id("description").title("Description").build(),
-            EntityAttribute.builder().id("created_at").title("Created").type("date").build(),
-            EntityAttribute.builder().id("disabled").title("Status").type("boolean").filterable(true).filterOptions(Set.of(
-                    FilterOption.create("true", "Paused"),
-                    FilterOption.create("false", "Running")
-            )).build()
-    );
+    private final List<EntityAttribute> streamDtoAttributes;
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
             .build();
@@ -146,13 +138,15 @@ public class StreamResource extends RestResource {
                           PaginatedStreamService paginatedStreamService,
                           StreamRuleService streamRuleService,
                           StreamRouterEngine.Factory streamRouterEngineFactory,
-                          IndexSetRegistry indexSetRegistry) {
+                          IndexSetRegistry indexSetRegistry,
+                          EntityAttributesAnnotationParser entityAttributesAnnotationParser) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
         this.indexSetRegistry = indexSetRegistry;
         this.paginatedStreamService = paginatedStreamService;
         this.searchQueryParser = new SearchQueryParser(StreamImpl.FIELD_TITLE, SEARCH_FIELD_MAPPING);
+        this.streamDtoAttributes = entityAttributesAnnotationParser.parse(StreamDTO.class);
     }
 
     @POST
@@ -225,7 +219,8 @@ public class StreamResource extends RestResource {
         final PaginatedList<StreamDTO> streamDTOS = new PaginatedList<>(
                 streams, result.pagination().total(), result.pagination().page(), result.pagination().perPage()
         );
-        return PageListResponse.create(query, streamDTOS.pagination(), total, sort, order, streams, attributes, settings);
+
+        return PageListResponse.create(query, streamDTOS.pagination(), total, sort, order, streams, streamDtoAttributes, settings);
     }
 
     @GET
