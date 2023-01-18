@@ -27,7 +27,6 @@ import { IconButton } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import View from 'views/logic/views/View';
-import SearchActions from 'views/actions/SearchActions';
 import Search from 'views/logic/search/Search';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import IfSearch from 'views/components/search/IfSearch';
@@ -42,6 +41,7 @@ import useAppDispatch from 'stores/useAppDispatch';
 import { selectQuery, loadView } from 'views/logic/slices/viewSlice';
 import { execute } from 'views/logic/slices/searchExecutionSlice';
 import { duplicateWidget, removeWidget } from 'views/logic/slices/widgetActions';
+import fetchSearch from 'views/logic/views/fetchSearch';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -73,7 +73,7 @@ const _onCopyToDashboard = async (
 
   const dashboardJson = await ViewManagementActions.get(dashboardId);
   const dashboard = View.fromJSON(dashboardJson);
-  const search = await SearchActions.get(dashboardJson.search_id).then((searchJson) => Search.fromJSON(searchJson));
+  const search = await fetchSearch(dashboardJson.search_id).then((searchJson) => Search.fromJSON(searchJson));
   const newDashboard = CopyWidgetToDashboard(widgetId, view, dashboard.toBuilder().search(search).build());
 
   if (newDashboard && newDashboard.search) {

@@ -34,7 +34,6 @@ import CopyToDashboardForm from 'views/components/widgets/CopyToDashboardForm';
 import View from 'views/logic/views/View';
 import type { SearchJson } from 'views/logic/search/Search';
 import Search from 'views/logic/search/Search';
-import SearchActions from 'views/actions/SearchActions';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import CopyPageToDashboard from 'views/logic/views/CopyPageToDashboard';
 import { loadDashboard } from 'views/logic/views/Actions';
@@ -43,6 +42,7 @@ import type { AppDispatch } from 'stores/useAppDispatch';
 import useAppDispatch from 'stores/useAppDispatch';
 import type { GetState } from 'views/types';
 import { selectView, selectActiveQuery } from 'views/logic/slices/viewSelectors';
+import fetchSearch from 'views/logic/views/fetchSearch';
 
 import type { QueryTabsProps } from './QueryTabs';
 
@@ -212,7 +212,7 @@ const _onCopyToDashboard = (selectedDashboardId: string | undefined | null) => (
   return ViewManagementActions.get(selectedDashboardId).then((dashboardJson) => {
     const targetDashboard = View.fromJSON(dashboardJson);
 
-    return SearchActions.get(dashboardJson.search_id).then(addPageToDashboard(targetDashboard, view, queryId)).catch((error) => {
+    return fetchSearch(dashboardJson.search_id).then(addPageToDashboard(targetDashboard, view, queryId)).catch((error) => {
       UserNotification.error(`Copying dashboard page failed with error ${error}`);
     });
   });
