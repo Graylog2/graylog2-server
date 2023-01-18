@@ -184,7 +184,7 @@ export const ConfigurationsStore = singletonStore(
           // default values bellow should be the same in backend.
           [configType]: response || {
             enable_global_session_timeout: false,
-            global_session_timeout_interval: '0',
+            global_session_timeout_interval: 'PT1H',
           },
         };
 
