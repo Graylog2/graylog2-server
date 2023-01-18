@@ -14,56 +14,51 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 import * as Immutable from 'immutable';
-import { act, renderHook } from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react-hooks';
 
-import { asMock, MockStore } from 'helpers/mocking';
-import { ViewStore } from 'views/stores/ViewStore';
 import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import useQueryIds from 'views/hooks/useQueryIds';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
-jest.mock('views/stores/ViewStore', () => ({
-  ViewStore: MockStore(),
-}));
+const createView = (queryIds: Array<string>) => View.builder()
+  .search(Search.builder()
+    .queries(Immutable.OrderedSet(queryIds.map((queryId) => Query.builder().id(queryId).build())))
+    .build())
+  .build();
 
-const createViewStoreState = (queryIds: Array<string>) => ({
-  view: View.builder()
-    .search(Search.builder()
-      .queries(Immutable.OrderedSet(queryIds.map((queryId) => Query.builder().id(queryId).build())))
-      .build())
-    .build(),
-  activeQuery: 'foo',
-  dirty: false,
-  isNew: false,
-});
+const Wrapper = ({ children, queryIds }: React.PropsWithChildren<{ queryIds: Array<string> }>) => (
+  <TestStoreProvider view={createView(queryIds)}>
+    {children}
+  </TestStoreProvider>
+);
+const createWrapper = (queryIds: Array<string>) => ({ children }: React.PropsWithChildren<{}>) => (
+  <Wrapper queryIds={queryIds}>
+    {children}
+  </Wrapper>
+);
 
 describe('useQueryIds', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   it('tracks `ViewStore` updates', async () => {
-    const { result } = renderHook(() => useQueryIds());
-
-    const cb = asMock(ViewStore.listen).mock.calls[0][0] as Parameters<typeof ViewStore.listen>[0];
-
-    act(() => {
-      cb(createViewStoreState(['foo']));
-    });
+    const { result } = renderHook(() => useQueryIds(), { wrapper: createWrapper(['foo']) });
 
     expect(result.current).toEqual(Immutable.OrderedSet(['foo']));
   });
 
   it('keeps order of query ids', async () => {
-    const { result } = renderHook(() => useQueryIds());
-
-    const cb = asMock(ViewStore.listen).mock.calls[0][0] as Parameters<typeof ViewStore.listen>[0];
-
-    act(() => {
-      cb(createViewStoreState(['foo', 'bar', 'baz']));
-    });
+    const { result } = renderHook(() => useQueryIds(), { wrapper: createWrapper(['foo', 'bar', 'baz']) });
 
     expect(result.current).toEqual(Immutable.OrderedSet(['foo', 'bar', 'baz']));
   });
