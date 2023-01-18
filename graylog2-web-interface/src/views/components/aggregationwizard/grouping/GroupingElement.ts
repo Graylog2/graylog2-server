@@ -36,7 +36,7 @@ import type {
   WidgetConfigFormValues, WidgetConfigValidationErrors,
 } from '../WidgetConfigForm';
 
-type GroupByError = {
+export type GroupByError = {
   fields?: string,
   interval?: string,
   limit?: string,

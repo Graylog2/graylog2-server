@@ -23,6 +23,7 @@ import type { WidgetConfigFormValues, GroupByFormValues } from 'views/components
 import Input from 'components/bootstrap/Input';
 import SelectedFieldsList from 'views/components/aggregationwizard/grouping/configuration/SelectedFieldsList';
 import { DEFAULT_LIMIT, DEFAULT_PIVOT_INTERVAL } from 'views/Constants';
+import type { GroupByError } from 'views/components/aggregationwizard/grouping/GroupingElement';
 
 import FieldSelect from '../../FieldSelect';
 
@@ -32,7 +33,7 @@ type Props = {
 
 const FieldComponent = ({ groupingIndex }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
-  const { setFieldValue, values } = useFormikContext<WidgetConfigFormValues>();
+  const { setFieldValue, values, errors } = useFormikContext<WidgetConfigFormValues>();
   const grouping = values.groupBy.groupings[groupingIndex];
 
   const onAddField = (fieldName: string) => {
@@ -69,9 +70,10 @@ const FieldComponent = ({ groupingIndex }: Props) => {
     <Input id="group-by-field-select"
            label="Fields"
            labelClassName="col-sm-3"
+           error={(errors?.groupBy?.groupings?.[groupingIndex] as GroupByError)?.fields}
            wrapperClassName="col-sm-9">
       <FieldSelect id="group-by-field-create-select"
-                   onChange={(e) => onAddField(e)}
+                   onChange={onAddField}
                    clearable={false}
                    ariaLabel="Fields"
                    persistSelection={false}
