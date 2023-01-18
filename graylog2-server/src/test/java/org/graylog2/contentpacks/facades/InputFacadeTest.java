@@ -120,8 +120,7 @@ public class InputFacadeTest {
     private MessageInputFactory messageInputFactory;
     @Mock
     private ServerStatus serverStatus;
-    @Mock
-    private EncryptedValuesSupport encryptedValuesSupport;
+
 
     private InputService inputService;
     private InputFacade facade;
@@ -139,6 +138,7 @@ public class InputFacadeTest {
                 Executors.newScheduledThreadPool(1));
         final ExtractorFactory extractorFactory = new ExtractorFactory(metricRegistry, grokPatternRegistry, lookupTableService);
         final ConverterFactory converterFactory = new ConverterFactory(lookupTableService);
+        final EncryptedValuesSupport encryptedValuesSupport = new EncryptedValuesSupport(Map.of(), new ObjectMapperProvider().get());
         inputService = new InputServiceImpl(mongodb.mongoConnection(), extractorFactory, converterFactory, messageInputFactory, clusterEventBus, encryptedValuesSupport);
         final InputRegistry inputRegistry = new InputRegistry();
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
