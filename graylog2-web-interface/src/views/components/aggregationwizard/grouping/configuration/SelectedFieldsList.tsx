@@ -23,12 +23,10 @@ import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps 
 import { IconButton, SortableList, Icon } from 'components/common';
 import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import type { GroupByFormValues, WidgetConfigFormValues } from 'views/components/aggregationwizard';
-import { DEFAULT_LIMIT, DEFAULT_PIVOT_INTERVAL } from 'views/Constants';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import { toValuesGrouping, toTimeGrouping } from 'views/components/aggregationwizard/grouping/GroupingElement';
-// import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 const ListItemContainer = styled.div`
   display: flex;
