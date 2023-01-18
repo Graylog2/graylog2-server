@@ -51,6 +51,11 @@ jest.mock('views/hooks/useQueryTitles');
 jest.mock('views/hooks/useViewMetadata');
 jest.mock('stores/useAppDispatch');
 
+jest.mock('views/logic/slices/viewSlice', () => ({
+  ...jest.requireActual('views/logic/slices/viewSlice'),
+  removeQuery: jest.fn(() => async () => {}),
+}));
+
 const QueryBar = () => (
   <TestStoreProvider>
     <OriginalQueryBar />
@@ -123,7 +128,7 @@ describe('QueryBar', () => {
 
     fireEvent.click(closeButton);
 
-    await waitFor(() => expect(dispatch).toHaveBeenCalledWith(removeQuery('bar')));
+    await waitFor(() => expect(removeQuery).toHaveBeenCalledWith('bar'));
 
     expect(window.confirm).toHaveBeenCalled();
   });
