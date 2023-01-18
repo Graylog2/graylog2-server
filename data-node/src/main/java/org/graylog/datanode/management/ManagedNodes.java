@@ -17,20 +17,13 @@
 package org.graylog.datanode.management;
 
 import org.graylog.datanode.DataNodeRunner;
-import org.graylog.datanode.process.ClusterConfiguration;
 import org.graylog.datanode.process.OpensearchProcess;
-import org.graylog.datanode.process.OpensearchConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 

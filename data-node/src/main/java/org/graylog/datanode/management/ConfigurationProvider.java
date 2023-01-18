@@ -34,9 +34,17 @@ public class ConfigurationProvider {
     @Value("${opensearch.location}")
     private String openseachLocation;
 
+    @Value("${opensearch.data.location}")
+    private String dataLocation;
+
+    @Value("${opensearch.logs.location}")
+    private String logsLocation;
+
     public Collection<OpensearchConfiguration> get() {
 
         final LinkedHashMap<String, String> config = new LinkedHashMap<>();
+        config.put("path.data", dataLocation);
+        config.put("path.logs", logsLocation);
         config.put("discovery.type", "single-node");
         config.put("plugins.security.ssl.http.enabled", "false");
         config.put("plugins.security.disabled", "true");
@@ -46,8 +54,8 @@ public class ConfigurationProvider {
         final OpensearchConfiguration processConfiguration = new OpensearchConfiguration(
                 opensearchVersion,
                 Path.of(openseachLocation),
+                9200,
                 9300,
-                9400,
                 clusterConfiguration,
                 config);
 
