@@ -21,8 +21,15 @@ import { alice } from 'fixtures/users';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import View from 'views/logic/views/View';
 import Widget from 'views/logic/widgets/Widget';
+import { createSearch } from 'fixtures/searches';
+import mockDispatch from 'views/test/mockDispatch';
+import type { RootState } from 'views/types';
+import { asMock } from 'helpers/mocking';
+import useAppDispatch from 'stores/useAppDispatch';
 
 import ActionMenuItem from './ActionMenuItem';
+
+jest.mock('stores/useAppDispatch');
 
 describe('ActionMenuItem', () => {
   const baseAction = {
@@ -52,6 +59,12 @@ describe('ActionMenuItem', () => {
       isLocalNode: true,
     },
   };
+
+  beforeEach(() => {
+    const view = createSearch();
+    const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
+    asMock(useAppDispatch).mockReturnValue(dispatch);
+  });
 
   it('should display help text for actions with handler', () => {
     const action = {
