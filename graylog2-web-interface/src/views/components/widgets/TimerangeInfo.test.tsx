@@ -18,28 +18,42 @@ import React from 'react';
 import Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import { MockStore } from 'helpers/mocking';
+import SearchResult from 'views/logic/SearchResult';
 import asMock from 'helpers/mocking/AsMock';
-import Search from 'views/logic/search/Search';
 import Widget from 'views/logic/widgets/Widget';
 import type { GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
-import { GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import type { SearchStoreState } from 'views/stores/SearchStore';
-import { SearchStore } from 'views/stores/SearchStore';
 import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useSearchResult from 'views/hooks/useSearchResult';
+import type { SearchExecutionResult } from 'views/actions/SearchActions';
+import useGlobalOverride from 'views/hooks/useGlobalOverride';
 
-import TimerangeInfo from './TimerangeInfo';
+import OriginalTimerangeInfo from './TimerangeInfo';
 
-jest.mock('views/stores/GlobalOverrideStore', () => ({
-  GlobalOverrideStore: MockStore('get'),
-}));
+jest.mock('views/hooks/useGlobalOverride');
 
-const mockSearchStoreState = (storeState: {} = {}): {} => ({
-  result: {
+const defaultSearchResult = {
+  execution: {
+    cancelled: false,
+    completed_exceptionally: false,
+    done: true,
+  },
+  id: 'foo',
+  owner: 'paul',
+  search_id: 'deadbeef',
+  errors: [],
+};
+const mockSearchStoreState = (storeState: Partial<SearchExecutionResult> = {}): SearchExecutionResult => ({
+  result: new SearchResult({
+    ...defaultSearchResult,
     results: {
       'active-query-id': {
-        searchTypes: {
+        execution_stats: {},
+        errors: [],
+        search_types: {
           'search-type-id': {
             type: 'pivot',
             effective_timerange: {
@@ -49,25 +63,29 @@ const mockSearchStoreState = (storeState: {} = {}): {} => ({
         },
       },
     },
-  },
+  }),
   widgetMapping: Immutable.Map({ 'widget-id': Immutable.Set(['search-type-id']) }),
-  search: Search.create(),
-  widgetsToSearch: undefined,
   ...storeState,
 });
 
-jest.mock('views/stores/SearchStore', () => ({
-  SearchStore: MockStore(
-    'get',
-    ['getInitialState', jest.fn(() => mockSearchStoreState())],
-  ),
-}));
+jest.mock('views/hooks/useSearchResult');
+
+const TimerangeInfo = (props: React.ComponentProps<typeof OriginalTimerangeInfo>) => (
+  <TestStoreProvider>
+    <OriginalTimerangeInfo {...props} />
+  </TestStoreProvider>
+);
 
 describe('TimerangeInfo', () => {
   const widget = Widget.empty();
 
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   beforeEach(() => {
-    asMock(GlobalOverrideStore.getInitialState).mockReturnValue(GlobalOverride.empty());
+    asMock(useSearchResult).mockReturnValue(mockSearchStoreState());
+    asMock(useGlobalOverride).mockReturnValue(GlobalOverride.empty());
   });
 
   it('should display the effective timerange as title', () => {
@@ -118,7 +136,7 @@ describe('TimerangeInfo', () => {
 
   it('should display global override', () => {
     const state: GlobalOverrideStoreState = GlobalOverride.empty().toBuilder().timerange({ type: 'relative', range: 3000 }).build();
-    asMock(GlobalOverrideStore.getInitialState).mockReturnValue(state);
+    asMock(useGlobalOverride).mockReturnValue(state);
 
     const keywordWidget = widget.toBuilder()
       .timerange({ type: 'keyword', keyword: '5 minutes ago' })
@@ -132,14 +150,17 @@ describe('TimerangeInfo', () => {
   it('should not throw error when related search type is empty', () => {
     const relativeWidget = widget.toBuilder().timerange({ type: 'relative', range: 3000 }).build();
 
-    asMock(SearchStore.getInitialState).mockReturnValue(mockSearchStoreState({
-      result: {
+    asMock(useSearchResult).mockReturnValue(mockSearchStoreState({
+      result: new SearchResult({
+        ...defaultSearchResult,
         results: {
           'active-query-id': {
-            searchTypes: {},
+            execution_stats: {},
+            errors: [],
+            search_types: {},
           },
         },
-      },
+      }),
     }) as SearchStoreState);
 
     render(<TimerangeInfo widget={relativeWidget} activeQuery="active-query-id" widgetId="widget-id" />);
@@ -148,7 +169,7 @@ describe('TimerangeInfo', () => {
   });
 
   it('should not throw error and display default time range when widget id does not exist in search widget mapping', () => {
-    asMock(SearchStore.getInitialState).mockReturnValue(mockSearchStoreState({
+    asMock(useSearchResult).mockReturnValue(mockSearchStoreState({
       widgetMapping: Immutable.Map(),
     }) as SearchStoreState);
 

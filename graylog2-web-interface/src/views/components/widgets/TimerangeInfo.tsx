@@ -23,9 +23,8 @@ import timerangeToString from 'views/logic/queries/TimeRangeToString';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type { DateTime } from 'util/DateTime';
-import useAppSelector from 'stores/useAppSelector';
-import { selectSearchExecutionResult } from 'views/logic/slices/searchExecutionSelectors';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
+import useSearchResult from 'views/hooks/useSearchResult';
 
 type Props = {
   className?: string,
@@ -44,7 +43,7 @@ const getEffectiveWidgetTimerange = (result, activeQuery, searchTypeId) => resul
 
 const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
   const { formatTime } = useUserDateTime();
-  const { result, widgetMapping } = useAppSelector(selectSearchExecutionResult) ?? {};
+  const { result, widgetMapping } = useSearchResult() ?? {};
   const globalOverride = useGlobalOverride();
 
   const toLocalTimeWithMS = (dateTime: DateTime) => formatTime(dateTime, 'complete');
