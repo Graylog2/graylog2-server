@@ -15,59 +15,76 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
 
 import mockComponent from 'helpers/mocking/MockComponent';
-import { alice as currentUser } from 'fixtures/users';
 import asMock from 'helpers/mocking/AsMock';
 import type { Props as XYPlotProps } from 'views/components/visualizations/XYPlot';
 import XYPlot from 'views/components/visualizations/XYPlot';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Query from 'views/logic/queries/Query';
-import { QueriesActions } from 'views/stores/QueriesStore';
 import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import useViewType from 'views/hooks/useViewType';
 import View from 'views/logic/views/View';
 import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import { createSearch } from 'fixtures/searches';
+import { setTimerange } from 'views/logic/slices/viewSlice';
 
 jest.mock('../GenericPlot', () => mockComponent('GenericPlot'));
-jest.mock('views/stores/QueriesStore');
 jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('views/logic/queries/useCurrentQueryId');
 jest.mock('views/hooks/useViewType');
 
+jest.mock('views/logic/slices/viewSlice', () => ({
+  ...jest.requireActual('views/logic/slices/viewSlice'),
+  setTimerange: jest.fn(() => async () => {}),
+}));
+
+const defaultCurrentQuery = Query.fromJSON({ id: 'dummyquery', query: {}, timerange: {}, search_types: {} });
+
 describe('XYPlot', () => {
-  const currentQuery = Query.fromJSON({ id: 'dummyquery', query: {}, timerange: {}, search_types: {} });
   const timestampPivot = new Pivot('timestamp', 'time', { interval: { type: 'auto', scaling: 1.0 } });
   const config = AggregationWidgetConfig.builder().rowPivots([timestampPivot]).build();
   const getChartColor = () => undefined;
   const setChartColor = () => ({});
   const chartData = [{ y: [23, 42], name: 'count()' }];
 
-  const SimpleXYPlot = (props: Partial<XYPlotProps>) => (
-    <XYPlot chartData={chartData}
-            config={config}
-            getChartColor={getChartColor}
-            setChartColor={setChartColor}
-            {...props} />
-  );
+  const SimpleXYPlot = ({ currentQuery, ...props }: Partial<XYPlotProps> & { currentQuery?: Query }) => {
+    const defaultView = createSearch();
+    const view = defaultView
+      .toBuilder()
+      .search(defaultView.search
+        .toBuilder()
+        .queries([currentQuery])
+        .build())
+      .build();
 
-  SimpleXYPlot.defaultProps = {
-    currentUser,
-    config: config,
-    chartData: chartData,
-    currentQuery: currentQuery,
-    getChartColor: getChartColor,
-    setChartColor: setChartColor,
+    return (
+      <TestStoreProvider view={view} initialQuery={currentQuery.id}>
+        <XYPlot chartData={chartData}
+                config={config}
+                getChartColor={getChartColor}
+                setChartColor={setChartColor}
+                {...props} />
+      </TestStoreProvider>
+    );
   };
 
+  SimpleXYPlot.defaultProps = {
+    currentQuery: defaultCurrentQuery,
+  };
+
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   beforeEach(() => {
-    asMock(QueriesActions.timerange).mockReturnValueOnce(Promise.resolve(Immutable.OrderedMap()));
-    asMock(useCurrentQuery).mockReturnValue(currentQuery);
-    asMock(useCurrentQueryId).mockReturnValue(currentQuery.id);
+    asMock(useCurrentQuery).mockReturnValue(defaultCurrentQuery);
+    asMock(useCurrentQueryId).mockReturnValue(defaultCurrentQuery.id);
     asMock(useViewType).mockReturnValue(View.Type.Search);
   });
 
@@ -88,7 +105,7 @@ describe('XYPlot', () => {
 
     genericPlot.get(0).props.onZoom('from', 'to');
 
-    expect(QueriesActions.timerange).not.toHaveBeenCalled();
+    expect(setTimerange).not.toHaveBeenCalled();
   });
 
   it('adds zoom handler for timeline plot', () => {
@@ -102,7 +119,7 @@ describe('XYPlot', () => {
 
     genericPlot.get(0).props.onZoom('2018-10-12T04:04:21.723Z', '2018-10-12T08:04:21.723Z');
 
-    expect(QueriesActions.timerange).toHaveBeenCalledWith('dummyquery', {
+    expect(setTimerange).toHaveBeenCalledWith('dummyquery', {
       type: 'absolute',
       from: '2018-10-12T04:04:21.723+00:00',
       to: '2018-10-12T08:04:21.723+00:00',
@@ -111,11 +128,9 @@ describe('XYPlot', () => {
 
   it('uses effective time range from pivot result if all messages are selected', () => {
     const timerange = { from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z', type: 'absolute' };
-    const currentQueryForAllMessages = currentQuery.toBuilder().timerange(ALL_MESSAGES_TIMERANGE).build();
-    const user = currentUser.toBuilder().timezone('UTC').build();
+    const currentQueryForAllMessages = defaultCurrentQuery.toBuilder().timerange(ALL_MESSAGES_TIMERANGE).build();
     const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange}
-                                        currentQuery={currentQueryForAllMessages}
-                                        currentUser={user} />);
+                                        currentQuery={currentQueryForAllMessages} />);
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', expect.objectContaining({
