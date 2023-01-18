@@ -19,7 +19,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import type * as Immutable from 'immutable';
 
 import type { AppDispatch } from 'stores/useAppDispatch';
-import type { ViewState, RootState } from 'views/types';
+import type { ViewState, RootState, GetState } from 'views/types';
 import type { QueryId, TimeRange } from 'views/logic/queries/Query';
 import type ViewStateType from 'views/logic/views/ViewState';
 import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
@@ -34,10 +34,11 @@ import {
   selectView,
   selectViewType,
   selectQueryById,
-  selectSearchQueries,
+  selectSearchQueries, selectViewState, selectSearchQuery,
 } from 'views/logic/slices/viewSelectors';
 import createSearch from 'views/logic/slices/createSearch';
 import type { TitlesMap } from 'views/stores/TitleTypes';
+import generateId from 'logic/generateId';
 
 const viewSlice = createSlice({
   name: 'view',
@@ -147,14 +148,26 @@ export const removeQuery = (queryId: string) => async (dispatch: AppDispatch, ge
   const indexedQueryIds = search.queries.map((query) => query.id).toList();
   const newActiveQuery = FindNewActiveQueryId(indexedQueryIds, activeQuery);
 
-  dispatch(loadView(newView, true));
-  dispatch(selectQuery(newActiveQuery));
+  await dispatch(loadView(newView, true));
+  await dispatch(selectQuery(newActiveQuery));
 };
 
 export const createQuery = () => async (dispatch: AppDispatch, getState: () => RootState) => {
   const viewType = selectViewType(getState());
   const [query, state] = await NewQueryActionHandler(viewType);
-  dispatch(addQuery(query, state));
+
+  return dispatch(addQuery(query, state));
+};
+
+export const duplicateQuery = (queryId: string) => async (dispatch: AppDispatch, getState: GetState) => {
+  const newId = generateId();
+  const viewState = selectViewState(queryId)(getState());
+  const newViewState = viewState.duplicate();
+
+  const searchQuery = selectSearchQuery(queryId)(getState());
+  const newSearchQuery = searchQuery.toBuilder().id(newId).build();
+
+  return dispatch(addQuery(newSearchQuery, newViewState));
 };
 
 export const setQueriesOrder = (queryIds: Immutable.OrderedSet<string>) => async (dispatch: AppDispatch, getState: () => RootState) => {

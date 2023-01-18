@@ -36,6 +36,7 @@ export const selectActiveViewState = createSelector(
 export const selectSearch = createSelector(selectView, (view) => view.search);
 export const selectSearchId = createSelector(selectSearch, (search) => search.id);
 export const selectSearchQueries = createSelector(selectSearch, (search) => search.queries);
+export const selectSearchQuery = (queryId: string) => createSelector(selectSearchQueries, (queries) => queries.find((q) => q.id === queryId));
 export const selectCurrentQuery = createSelector(
   selectActiveQuery,
   selectSearchQueries,
