@@ -23,13 +23,12 @@ import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog.testing.utils.IndexSetUtils;
-import org.graylog.testing.utils.StreamUtils;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
+import static org.graylog2.rest.models.tools.responses.PageListResponse.ELEMENTS_FIELD_NAME;
 import static org.hamcrest.Matchers.equalTo;
 
 @ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, serverLifecycle = Lifecycle.CLASS)
@@ -62,36 +61,36 @@ public class StreamsIT {
     void sortByIndexSetTitle() {
         paginatedByFieldWithOrder("New", "title", "asc")
                 .assertThat()
-                .body("streams*.title", equalTo(List.of("New Stream", "New Stream 2", "New Stream 3")));
+                .body(ELEMENTS_FIELD_NAME + "*.title", equalTo(List.of("New Stream", "New Stream 2", "New Stream 3")));
         paginatedByFieldWithOrder("New", "title", "desc")
                 .assertThat()
-                .body("streams*.title", equalTo(List.of("New Stream 3", "New Stream 2", "New Stream")));
+                .body(ELEMENTS_FIELD_NAME + "*.title", equalTo(List.of("New Stream 3", "New Stream 2", "New Stream")));
         paginatedByFieldWithOrder("New", "index_set_title", "asc")
                 .assertThat()
-                .body("streams*.title", equalTo(List.of("New Stream 2", "New Stream 3", "New Stream")));
+                .body(ELEMENTS_FIELD_NAME + "*.title", equalTo(List.of("New Stream 2", "New Stream 3", "New Stream")));
         paginatedByFieldWithOrder("New", "index_set_title", "desc")
                 .assertThat()
-                .body("streams*.title", equalTo(List.of("New Stream", "New Stream 3", "New Stream 2")));
+                .body(ELEMENTS_FIELD_NAME + "*.title", equalTo(List.of("New Stream", "New Stream 3", "New Stream 2")));
     }
 
     @ContainerMatrixTest
     void sortByTitleCaseInsensitive() {
         paginatedByFieldWithOrder("sorttest", "title", "asc")
                 .assertThat()
-                .body("streams*.title", equalTo(List.of("sorttest: 12345", "sorttest: aaaaa", "sorttest: ZZZZZZ")));
+                .body(ELEMENTS_FIELD_NAME + "*.title", equalTo(List.of("sorttest: 12345", "sorttest: aaaaa", "sorttest: ZZZZZZ")));
         paginatedByFieldWithOrder("sorttest", "title", "desc")
                 .assertThat()
-                .body("streams*.title", equalTo(List.of("sorttest: ZZZZZZ", "sorttest: aaaaa", "sorttest: 12345")));
+                .body(ELEMENTS_FIELD_NAME + "*.title", equalTo(List.of("sorttest: ZZZZZZ", "sorttest: aaaaa", "sorttest: 12345")));
     }
 
     @ContainerMatrixTest
     void sortByStatus() {
         paginatedByFieldWithOrder("sorttest", "disabled", "asc")
                 .assertThat()
-                .body("streams*.title", equalTo(List.of("sorttest: aaaaa", "sorttest: ZZZZZZ", "sorttest: 12345")));
+                .body(ELEMENTS_FIELD_NAME + "*.title", equalTo(List.of("sorttest: aaaaa", "sorttest: ZZZZZZ", "sorttest: 12345")));
         paginatedByFieldWithOrder("sorttest", "disabled", "desc")
                 .assertThat()
-                .body("streams*.title", equalTo(List.of("sorttest: ZZZZZZ", "sorttest: 12345", "sorttest: aaaaa")));
+                .body(ELEMENTS_FIELD_NAME + "*.title", equalTo(List.of("sorttest: ZZZZZZ", "sorttest: 12345", "sorttest: aaaaa")));
     }
 
     private ValidatableResponse paginatedByFieldWithOrder(String query, String field, String order) {

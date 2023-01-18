@@ -16,9 +16,14 @@
  */
 package org.graylog.plugins.views.search.views;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DuplicateKeyException;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -28,11 +33,13 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
+import org.mongojack.DBSort;
 import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -43,26 +50,31 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public class ViewService extends PaginatedDbService<ViewDTO> {
+public class ViewService extends PaginatedDbService<ViewDTO> implements ViewUtils<ViewDTO> {
     private static final String COLLECTION_NAME = "views";
 
     private final ClusterConfigService clusterConfigService;
     private final ViewRequirements.Factory viewRequirementsFactory;
     private final EntityOwnershipService entityOwnerShipService;
     private final ViewSummaryService viewSummaryService;
+    private final MongoCollection<Document> collection;
+    private final ObjectMapper mapper;
 
     @Inject
     protected ViewService(MongoConnection mongoConnection,
-                          MongoJackObjectMapperProvider mapper,
+                          MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+                          ObjectMapper mapper,
                           ClusterConfigService clusterConfigService,
                           ViewRequirements.Factory viewRequirementsFactory,
                           EntityOwnershipService entityOwnerShipService,
                           ViewSummaryService viewSummaryService) {
-        super(mongoConnection, mapper, ViewDTO.class, COLLECTION_NAME);
+        super(mongoConnection, mongoJackObjectMapperProvider, ViewDTO.class, COLLECTION_NAME);
         this.clusterConfigService = clusterConfigService;
         this.viewRequirementsFactory = viewRequirementsFactory;
         this.entityOwnerShipService = entityOwnerShipService;
         this.viewSummaryService = viewSummaryService;
+        this.collection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
+        this.mapper = mapper;
         for (String sortField : ViewDTO.SORT_FIELDS) {
             if (!sortField.equals(ViewDTO.FIELD_ID)) { //id has index by default
                 this.db.createIndex(new BasicDBObject(sortField, 1), new BasicDBObject("unique", false));
@@ -70,14 +82,15 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         }
     }
 
-    private PaginatedList<ViewDTO> searchPaginated(DBQuery.Query query,
+    private PaginatedList<ViewDTO> searchPaginated(SearchUser searchUser,
+                                                   SearchQuery query,
                                                    Predicate<ViewDTO> filter,
                                                    String order,
                                                    String sortField,
                                                    DBQuery.Query grandTotalQuery,
                                                    int page,
                                                    int perPage) {
-        final PaginatedList<ViewDTO> viewsList = findPaginatedWithQueryFilterAndSortWithGrandTotal(query, filter, getSortBuilder(order, sortField), grandTotalQuery, page, perPage);
+        final PaginatedList<ViewDTO> viewsList = findPaginatedWithQueryFilterAndSortWithGrandTotal(searchUser, query, filter, getSortBuilder(order, sortField), grandTotalQuery, page, perPage);
         return viewsList.stream()
                 .map(this::requirementsForView)
                 .collect(Collectors.toCollection(() -> viewsList.grandTotal()
@@ -85,13 +98,43 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
                         .orElseGet(() -> new PaginatedList<>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage))));
     }
 
-    public PaginatedList<ViewDTO> searchPaginated(SearchQuery query,
+    public Optional<ViewDTO> get(final SearchUser searchUser, final String id) {
+        return findViews(searchUser, Filters.eq("_id", new ObjectId(id)), getSortBuilder("asc", "_id"))
+                .findFirst().map(this::deserialize);
+    }
+
+    protected PaginatedList<ViewDTO> findPaginatedWithQueryFilterAndSortWithGrandTotal(SearchUser searchUser,
+                                                                                       SearchQuery dbQuery,
+                                                                                       Predicate<ViewDTO> filter,
+                                                                                       DBSort.SortBuilder sort,
+                                                                                       DBQuery.Query grandTotalQuery,
+                                                                                       int page,
+                                                                                       int perPage) {
+        var grandTotal = db.getCount(grandTotalQuery);
+
+        var views = findViews(searchUser, dbQuery.toBson(), sort)
+                .map(this::deserialize)
+                .filter(filter)
+                .toList();
+
+        final List<ViewDTO> paginatedStreams = perPage > 0
+                ? views.stream()
+                .skip((long) perPage * Math.max(0, page - 1))
+                .limit(perPage)
+                .toList()
+                : views;
+
+        return new PaginatedList<>(paginatedStreams, views.size(), page, perPage, grandTotal);
+    }
+
+    public PaginatedList<ViewDTO> searchPaginated(SearchUser searchUser,
+                                                  SearchQuery query,
                                                   Predicate<ViewDTO> filter,
                                                   String order,
                                                   String sortField,
                                                   int page,
                                                   int perPage) {
-        return searchPaginated(query.toDBQuery(), filter, order, sortField, DBQuery.empty(), page, perPage);
+        return searchPaginated(searchUser, query, filter, order, sortField, DBQuery.empty(), page, perPage);
     }
 
     private PaginatedList<ViewDTO> searchPaginatedWithGrandTotal(DBQuery.Query query,
@@ -126,14 +169,15 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         );
     }
 
-    public PaginatedList<ViewSummaryDTO> searchSummariesPaginatedByType(final ViewDTO.Type type,
+    public PaginatedList<ViewSummaryDTO> searchSummariesPaginatedByType(final SearchUser searchUser,
+                                                                        final ViewDTO.Type type,
                                                                         final SearchQuery query,
                                                                         final Predicate<ViewSummaryDTO> filter,
                                                                         final String order,
                                                                         final String sortField,
                                                                         final int page,
                                                                         final int perPage) {
-        return viewSummaryService.searchPaginatedByType(type, query, filter, order, sortField, page, perPage);
+        return viewSummaryService.searchPaginatedByType(searchUser, type, query, filter, order, sortField, page, perPage);
     }
 
     public void saveDefault(ViewDTO dto) {
@@ -214,5 +258,20 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
     public ViewDTO requirementsForView(ViewDTO view) {
         return viewRequirementsFactory.create(view)
                 .rebuildRequirements(ViewDTO::requires, (v, newRequirements) -> v.toBuilder().requires(newRequirements).build());
+    }
+
+    @Override
+    public ObjectMapper mapper() {
+        return mapper;
+    }
+
+    @Override
+    public MongoCollection<Document> collection() {
+        return collection;
+    }
+
+    @Override
+    public Class<ViewDTO> type() {
+        return ViewDTO.class;
     }
 }

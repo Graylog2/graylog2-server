@@ -135,7 +135,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     @Override
     public Stream create(CreateStreamRequest cr, String userId) {
         Map<String, Object> streamData = Maps.newHashMap();
-        streamData.put(StreamImpl.FIELD_TITLE, cr.title());
+        streamData.put(StreamImpl.FIELD_TITLE, cr.title().strip());
         streamData.put(StreamImpl.FIELD_DESCRIPTION, cr.description());
         streamData.put(StreamImpl.FIELD_CREATOR_USER_ID, userId);
         streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.nowUTC());

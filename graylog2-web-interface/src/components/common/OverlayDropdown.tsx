@@ -57,15 +57,25 @@ FilterProps.defaultProps = {
 
 type Props = {
   children: React.ReactNode,
+  dropdownZIndex?: number,
   menuContainer?: HTMLElement,
   onToggle: () => void,
   placement?: Placement,
+  renderToggle?: (payload: { onToggle: () => void, toggleTarget: React.Ref<HTMLElement> }) => React.ReactNode,
   show: boolean,
   toggleChild?: React.ReactNode,
-  renderToggle?: (payload: { onToggle: () => void, toggleTarget: React.Ref<HTMLElement> }) => React.ReactNode,
 }
 
-const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, toggleChild, renderToggle }: Props) => {
+const OverlayDropdown = ({
+  children,
+  dropdownZIndex,
+  menuContainer,
+  onToggle,
+  placement,
+  show,
+  toggleChild,
+  renderToggle,
+}: Props) => {
   const [currentPlacement, setCurrentPlacement] = useState<Placement>(placement);
   const toggleTarget = useRef<HTMLElement>();
 
@@ -102,7 +112,9 @@ const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, t
                  transition={Transition}
                  onEntering={handleOverlayEntering}>
           <FilterProps>
-            <DropdownMenu show={show}>
+            <DropdownMenu show={show}
+                          onMenuItemSelect={onToggle}
+                          zIndex={dropdownZIndex}>
               {children}
             </DropdownMenu>
           </FilterProps>
@@ -114,6 +126,7 @@ const OverlayDropdown = ({ children, menuContainer, onToggle, placement, show, t
 
 OverlayDropdown.propTypes = {
   children: PropTypes.node.isRequired,
+  dropdownZIndex: PropTypes.number,
   menuContainer: PropTypes.object,
   onToggle: PropTypes.func.isRequired,
   placement: PropTypes.string,
@@ -122,6 +135,7 @@ OverlayDropdown.propTypes = {
 };
 
 OverlayDropdown.defaultProps = {
+  dropdownZIndex: undefined,
   menuContainer: document.body,
   placement: 'bottom',
   renderToggle: undefined,

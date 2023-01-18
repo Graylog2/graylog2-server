@@ -1,0 +1,5 @@
+type = "added"
+message = "Implement option to copy a dashboard page to another dashboard."
+
+pulls = ["14348"]
+issues = ["8506"]
