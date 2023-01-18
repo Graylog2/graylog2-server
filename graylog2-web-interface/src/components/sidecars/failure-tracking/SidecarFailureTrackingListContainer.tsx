@@ -69,8 +69,8 @@ const SidecarFailureTrackingListContainer = () => {
     return () => {};
   }, [page, pageSize, sidecarData]);
 
-  const currentSidecarArgs: SidecarsArgs = {
-    page,
+  const previousSidecarArgs: SidecarsArgs = {
+    page: 1,
     pageSize,
     query: sidecarData?.query,
     sortField: sidecarData?.sort,
@@ -79,22 +79,19 @@ const SidecarFailureTrackingListContainer = () => {
   };
 
   const handlePageChange = (_page: number, _pageSize: number) => {
-    fetchSidecars({ ...currentSidecarArgs, page: _page, pageSize: _pageSize }, setSidecarData);
+    fetchSidecars({ ...previousSidecarArgs, page: _page, pageSize: _pageSize }, setSidecarData);
   };
 
   const handleQueryChange = (_query: string = '', callback = () => {}) => {
-    fetchSidecars({ ...currentSidecarArgs, query: _query }, setSidecarData).finally(callback);
-    resetPage();
+    fetchSidecars({ ...previousSidecarArgs, query: _query }, setSidecarData).then(resetPage).finally(callback);
   };
 
   const handleSortChange = (sortField: string) => {
-    fetchSidecars({ ...currentSidecarArgs, sortField, order: sidecarData.order === 'asc' ? 'desc' : 'asc' }, setSidecarData);
-    resetPage();
+    fetchSidecars({ ...previousSidecarArgs, sortField, order: sidecarData.order === 'asc' ? 'desc' : 'asc' }, setSidecarData).then(resetPage);
   };
 
   const toggleShowInactive = () => {
-    fetchSidecars({ ...currentSidecarArgs, onlyActive: !sidecarData.only_active }, setSidecarData);
-    resetPage();
+    fetchSidecars({ ...previousSidecarArgs, onlyActive: !sidecarData.only_active }, setSidecarData).then(resetPage);
   };
 
   const isLoading = !sidecarData;
