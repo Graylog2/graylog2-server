@@ -119,7 +119,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
 
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
-    setSearchParams((cur) => ({ ...cur, query: newQuery }));
+    setSearchParams((cur) => ({ ...cur, query: newQuery, page: 1 }));
   }, [paginationQueryParameter]);
 
   const onReset = useCallback(() => {
