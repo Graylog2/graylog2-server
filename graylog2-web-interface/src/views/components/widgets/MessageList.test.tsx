@@ -35,6 +35,8 @@ import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import SearchResult from 'views/logic/SearchResult';
 import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
 import type { SearchErrorResponse } from 'views/logic/SearchError';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
 import type { MessageListResult } from './MessageList';
 import MessageList from './MessageList';
@@ -104,6 +106,10 @@ describe('MessageList', () => {
     total: 1,
   };
 
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   beforeEach(() => {
     asMock(useActiveQueryId).mockReturnValue('somequery');
     // @ts-expect-error
@@ -125,18 +131,20 @@ describe('MessageList', () => {
   };
 
   const SimpleMessageList = (props: Partial<React.ComponentProps<typeof MessageList>>) => (
-    <MessageList title="Message List"
-                 editing={false}
-                 filter=""
-                 type="messages"
-                 id="message-list"
-                 queryId="deadbeef"
-                 toggleEdit={() => {}}
-                 setLoadingState={() => {}}
-                 data={props.data}
-                 config={props.config}
-                 fields={props.fields}
-                 {...props} />
+    <TestStoreProvider>
+      <MessageList title="Message List"
+                   editing={false}
+                   filter=""
+                   type="messages"
+                   id="message-list"
+                   queryId="deadbeef"
+                   toggleEdit={() => {}}
+                   setLoadingState={() => {}}
+                   data={props.data}
+                   config={props.config}
+                   fields={props.fields}
+                   {...props} />
+    </TestStoreProvider>
   );
 
   SimpleMessageList.defaultProps = {
