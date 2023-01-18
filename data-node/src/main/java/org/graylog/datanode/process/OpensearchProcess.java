@@ -33,6 +33,7 @@ public class OpensearchProcess {
 
     private final StateMachine<ProcessState, ProcessEvent> processState;
     private final int httpPort;
+    private boolean isLeaderNode;
 
     public OpensearchProcess(String opensearchVersion, Path targetLocation, Process opensearchProcess, OpensearchProcessLogs processLogs, int httpPort) {
         this.opensearchVersion = opensearchVersion;
@@ -76,6 +77,7 @@ public class OpensearchProcess {
         return new ProcessInfo(
                 process.pid(),
                 processState.getState(),
+                isLeaderNode,
                 process.info().startInstant().orElse(null),
                 process.info().totalCpuDuration().orElse(null),
                 process.info().user().orElse(null),
@@ -84,6 +86,14 @@ public class OpensearchProcess {
 
     public void onEvent(ProcessEvent event) {
         this.processState.fire(event);
+    }
+
+    public void setLeaderNode(boolean isLeaderNode) {
+        this.isLeaderNode = isLeaderNode;
+    }
+
+    public boolean isLeaderNode() {
+        return isLeaderNode;
     }
 }
 

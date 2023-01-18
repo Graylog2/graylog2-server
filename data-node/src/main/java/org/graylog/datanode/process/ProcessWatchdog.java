@@ -61,6 +61,7 @@ public class ProcessWatchdog {
 
     private void onClusterStatus(OpensearchProcess process, ClusterHealthResponse health) {
         process.onEvent(ProcessEvent.HEALTH_CHECK_GREEN);
+        process.setLeaderNode(health.hasDiscoveredClusterManager());
     }
 
     private void onRestError(OpensearchProcess process, IOException e) {

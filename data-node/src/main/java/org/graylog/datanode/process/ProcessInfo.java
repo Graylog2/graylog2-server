@@ -16,6 +16,6 @@
  */
 package org.graylog.datanode.process;
 
-public record ProcessInfo(long pid, ProcessState status, java.time.Instant started, java.time.Duration totalCpuDuration, String user,
+public record ProcessInfo(long pid, ProcessState status, boolean isLeaderNode, java.time.Instant started, java.time.Duration totalCpuDuration, String user,
                           int httpPort) {
 }

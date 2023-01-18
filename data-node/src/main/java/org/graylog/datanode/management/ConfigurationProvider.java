@@ -16,45 +16,41 @@
  */
 package org.graylog.datanode.management;
 
-import org.graylog.datanode.DataNodeRunner;
 import org.graylog.datanode.process.ClusterConfiguration;
-import org.graylog.datanode.process.OpensearchProcess;
 import org.graylog.datanode.process.OpensearchConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Service
-@Scope("singleton")
-public class ManagedNodes {
+public class ConfigurationProvider {
 
-    private final Set<OpensearchProcess> processes = new LinkedHashSet<>();
+    @Value("${opensearch.version}")
+    private String opensearchVersion;
+    @Value("${opensearch.location}")
+    private String openseachLocation;
 
-    @Autowired
-    private DataNodeRunner dataNodeRunner;
+    public Collection<OpensearchConfiguration> get() {
 
-    @Autowired
-    private ConfigurationProvider configurationProvider;
+        final LinkedHashMap<String, String> config = new LinkedHashMap<>();
+        config.put("discovery.type", "single-node");
+        config.put("plugins.security.ssl.http.enabled", "false");
+        config.put("plugins.security.disabled", "true");
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void startOpensearchProcesses() {
-        configurationProvider.get()
-                .stream()
-                .map(dataNodeRunner::start)
-                .forEach(processes::add);
-    }
+        final ClusterConfiguration clusterConfiguration = new ClusterConfiguration("os-cluster-datanode", null, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
 
-    public Set<OpensearchProcess> getProcesses() {
-        return processes;
+        final OpensearchConfiguration processConfiguration = new OpensearchConfiguration(
+                opensearchVersion,
+                Path.of(openseachLocation),
+                9300,
+                9400,
+                clusterConfiguration,
+                config);
+
+        return Collections.singletonList(processConfiguration);
     }
 }
