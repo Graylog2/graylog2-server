@@ -17,43 +17,38 @@
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 
-import asMock from 'helpers/mocking/AsMock';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
-import useActiveViewState from 'views/hooks/useActiveViewState';
 import ViewState from 'views/logic/views/ViewState';
 import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import type View from 'views/logic/views/View';
+import { createSearch } from 'fixtures/searches';
 
 import HighlightingRulesContext from './HighlightingRulesContext';
 import HighlightingRulesProvider from './HighlightingRulesProvider';
 
-jest.mock('views/stores/HighlightingRulesStore', () => ({
-  HighlightingRulesStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(() => {}),
-  },
-}));
-
-jest.mock('views/hooks/useActiveViewState');
-
 describe('HighlightingRulesProvider', () => {
-  const renderSUT = () => {
+  const renderSUT = (view: View = createSearch()) => {
     const consume = jest.fn();
 
-    render(
-      <HighlightingRulesProvider>
-        <HighlightingRulesContext.Consumer>
-          {consume}
-        </HighlightingRulesContext.Consumer>
-      </HighlightingRulesProvider>,
-    );
+    render((
+      <TestStoreProvider view={view}>
+        <HighlightingRulesProvider>
+          <HighlightingRulesContext.Consumer>
+            {consume}
+          </HighlightingRulesContext.Consumer>
+        </HighlightingRulesProvider>
+      </TestStoreProvider>
+    ));
 
     return consume;
   };
 
-  beforeEach(() => {
-    asMock(useActiveViewState).mockReturnValue(ViewState.create());
-  });
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
 
   it('provides no data when highlighting rules store is empty', () => {
     const consume = renderSUT();
@@ -70,9 +65,12 @@ describe('HighlightingRulesProvider', () => {
     const viewState = ViewState.builder()
       .formatting(FormattingSettings.create([rule]))
       .build();
-    asMock(useActiveViewState).mockReturnValue(viewState);
+    const view = createSearch()
+      .toBuilder()
+      .state({ 'query-id-1': viewState })
+      .build();
 
-    const consume = renderSUT();
+    const consume = renderSUT(view);
 
     expect(consume).toHaveBeenCalledWith([rule]);
   });
