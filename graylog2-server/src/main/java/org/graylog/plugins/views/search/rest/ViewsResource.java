@@ -22,6 +22,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
@@ -37,6 +38,8 @@ import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewResolverDecoder;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.WidgetDTO;
+import org.graylog.plugins.views.startpage.StartPageService;
+import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
@@ -98,14 +101,20 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final Map<String, ViewResolver> viewResolvers;
     private final SearchFilterVisibilityChecker searchFilterVisibilityChecker;
     private final ReferencedSearchFiltersHelper referencedSearchFiltersHelper;
+    private final StartPageService startPageService;
+    private final RecentActivityService recentActivityService;
 
     @Inject
     public ViewsResource(ViewService dbService,
+                         StartPageService startPageService,
+                         RecentActivityService recentActivityService,
                          ClusterEventBus clusterEventBus, SearchDomain searchDomain,
                          Map<String, ViewResolver> viewResolvers,
                          SearchFilterVisibilityChecker searchFilterVisibilityChecker,
                          ReferencedSearchFiltersHelper referencedSearchFiltersHelper) {
         this.dbService = dbService;
+        this.startPageService = startPageService;
+        this.recentActivityService = recentActivityService;
         this.clusterEventBus = clusterEventBus;
         this.searchDomain = searchDomain;
         this.viewResolvers = viewResolvers;
@@ -133,6 +142,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         try {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
             final PaginatedList<ViewDTO> result = dbService.searchPaginated(
+                    searchUser,
                     searchQuery,
                     searchUser::canReadView,
                     order,
@@ -159,8 +169,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         // Attempt to resolve the view from optional view resolvers before using the default database lookup.
         // The view resolvers must be used first, because the ID may not be a valid hex ID string.
-        ViewDTO view = resolveView(id);
+        ViewDTO view = resolveView(searchUser, id);
         if (searchUser.canReadView(view)) {
+            startPageService.addLastOpenedFor(view, searchUser);
             return view;
         }
 
@@ -175,7 +186,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
      *           up in the database.
      * @return An optional view.
      */
-    ViewDTO resolveView(String id) {
+    ViewDTO resolveView(SearchUser searchUser, String id) {
         final ViewResolverDecoder decoder = new ViewResolverDecoder(id);
         if (decoder.isResolverViewId()) {
             final ViewResolver viewResolver = viewResolvers.get(decoder.getResolverName());
@@ -186,7 +197,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                 throw new NotFoundException("Failed to find view resolver: " + decoder.getResolverName());
             }
         } else {
-            return loadView(id);
+            return loadViewIncludingFavorite(searchUser, id);
         }
     }
 
@@ -204,7 +215,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         validateIntegrity(dto, searchUser, true);
 
         final User user = userContext.getUser();
-        return dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
+        var result = dbService.saveWithOwner(dto.toBuilder().owner(searchUser.username()).build(), user);
+        recentActivityService.create(result.id(),result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
+        return result;
     }
 
     private void validateIntegrity(ViewDTO dto, SearchUser searchUser, boolean newCreation) {
@@ -317,7 +330,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         validateIntegrity(updatedDTO, searchUser, false);
 
-        return dbService.update(updatedDTO);
+        var result = dbService.update(updatedDTO);
+        recentActivityService.update(result.id(), result.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, searchUser);
+        return result;
     }
 
     @PUT
@@ -343,6 +358,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         dbService.delete(id);
         triggerDeletedEvent(view);
+        recentActivityService.delete(view.id(), view.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, view.title(), searchUser);
         return view;
     }
 
@@ -361,6 +377,14 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private ViewDTO loadView(String id) {
         try {
             return dbService.get(id).orElseThrow(() -> viewNotFoundException(id));
+        } catch (IllegalArgumentException ignored) {
+            throw viewNotFoundException(id);
+        }
+    }
+
+    private ViewDTO loadViewIncludingFavorite(SearchUser searchUser, String id) {
+        try {
+            return dbService.get(searchUser, id).orElseThrow(() -> viewNotFoundException(id));
         } catch (IllegalArgumentException ignored) {
             throw viewNotFoundException(id);
         }
