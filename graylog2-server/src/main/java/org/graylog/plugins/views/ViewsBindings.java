@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
+import org.graylog.plugins.views.favorites.FavoritesResource;
 import org.graylog.plugins.views.migrations.V20181220133700_AddViewsAdminRole;
 import org.graylog.plugins.views.migrations.V20190127111728_MigrateWidgetFormatSettings;
 import org.graylog.plugins.views.migrations.V20190304102700_MigrateMessageListStructure;
@@ -54,6 +55,7 @@ import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.DashboardsResource;
+import org.graylog.plugins.views.startpage.StartPageResource;
 import org.graylog.plugins.views.search.rest.ExportJobsResource;
 import org.graylog.plugins.views.search.rest.FieldTypesResource;
 import org.graylog.plugins.views.search.rest.MessageExportFormatFilter;
@@ -100,6 +102,7 @@ import org.graylog.plugins.views.search.validation.validators.InvalidOperatorsVa
 import org.graylog.plugins.views.search.validation.validators.UnknownFieldsValidator;
 import org.graylog.plugins.views.search.views.RequiresParameterSupport;
 import org.graylog.plugins.views.search.views.ViewRequirements;
+import org.graylog.plugins.views.startpage.recentActivities.RecentActivityUpdatesListener;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AreaVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
@@ -136,6 +139,8 @@ public class ViewsBindings extends ViewsModule {
         registerExportBackendProvider();
 
         addSystemRestResource(DashboardsResource.class);
+        addSystemRestResource(StartPageResource.class);
+        addSystemRestResource(FavoritesResource.class);
         addSystemRestResource(FieldTypesResource.class);
         addSystemRestResource(MessagesResource.class);
         addSystemRestResource(ExportJobsResource.class);
@@ -186,6 +191,8 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(TimeUnitIntervalDTO.class);
         registerJacksonSubtype(AutoInterval.class);
         registerJacksonSubtype(AutoIntervalDTO.class);
+
+        bind(RecentActivityUpdatesListener.class).asEagerSingleton();
 
         bind(SearchJobService.class).to(InMemorySearchJobService.class).in(Scopes.SINGLETON);
         bind(MappedFieldTypesService.class).to(MappedFieldTypesServiceImpl.class).in(Scopes.SINGLETON);

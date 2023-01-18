@@ -16,9 +16,9 @@
  */
 package org.graylog.plugins.views.search.views;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
@@ -26,6 +26,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -56,19 +57,9 @@ public class ViewServiceUsesViewRequirementsTest {
 
     @Mock
     private ClusterConfigService clusterConfigService;
+    private SearchUser searchUser;
 
     private final SearchQueryParser searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, Collections.emptyMap());
-
-    class MongoJackObjectMapperProviderForTest extends MongoJackObjectMapperProvider {
-        public MongoJackObjectMapperProviderForTest(ObjectMapper objectMapper) {
-            super(objectMapper);
-        }
-
-        @Override
-        public ObjectMapper get() {
-            return super.get().registerModule(new Jdk8Module());
-        }
-    }
 
     @Mock
     private ViewRequirements.Factory viewRequirementsFactory;
@@ -80,15 +71,18 @@ public class ViewServiceUsesViewRequirementsTest {
 
     @Before
     public void setUp() throws Exception {
-        final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProviderForTest(new ObjectMapper());
+        final var mapper = new ObjectMapperProvider();
+        final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(mapper.get());
         this.viewService = new ViewService(
                 mongodb.mongoConnection(),
                 objectMapperProvider,
+                mapper.get(),
                 clusterConfigService,
                 viewRequirementsFactory,
                 mock(EntityOwnershipService.class),
                 mock(ViewSummaryService.class));
         when(viewRequirementsFactory.create(any(ViewDTO.class))).then(invocation -> new ViewRequirements(Collections.emptySet(), invocation.getArgument(0)));
+        this.searchUser = TestSearchUser.builder().build();
     }
 
     @After
@@ -165,6 +159,7 @@ public class ViewServiceUsesViewRequirementsTest {
     @MongoDBFixtures("views.json")
     public void searchPaginatedReturnsViewWithViewRequirements() {
         final PaginatedList<ViewDTO> views = viewService.searchPaginated(
+                searchUser,
                 searchQueryParser.parse("*"),
                 view -> true,
                 "desc",
