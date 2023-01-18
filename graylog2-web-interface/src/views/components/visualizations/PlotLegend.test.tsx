@@ -27,6 +27,7 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import ChartColorContext from './ChartColorContext';
 
 jest.mock('views/logic/queries/useCurrentQueryId', () => () => 'active-query-id');
+jest.mock('stores/useAppDispatch');
 
 const colors = ColorMapper.create();
 const setColor = jest.fn();
