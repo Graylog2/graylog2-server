@@ -64,7 +64,7 @@ const addElement = async (key: 'Grouping' | 'Metric' | 'Sort') => {
 };
 
 const selectField = async (fieldName) => {
-  const fieldSelection = await screen.findByLabelText('Field');
+  const fieldSelection = await screen.findByLabelText('Fields');
 
   await act(async () => {
     await selectEvent.openMenu(fieldSelection);
@@ -147,7 +147,7 @@ describe('AggregationWizard', () => {
     await selectField('timestamp');
     await addElement('Grouping');
 
-    const fieldSelections = await screen.findAllByLabelText('Field');
+    const fieldSelections = await screen.findAllByLabelText('Fields');
 
     await act(async () => {
       await selectEvent.openMenu(fieldSelections[1]);
@@ -218,24 +218,24 @@ describe('AggregationWizard', () => {
     expect(within(configureElementsSection).getByText('Group By')).toBeInTheDocument();
   });
 
-  it('should correctly change config', async () => {
-    const pivot0 = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
-    const pivot1 = Pivot.create(['took_ms'], 'values', { limit: 15 });
+  it('should add multiple fields to one pivot', async () => {
+    const initialPivot = Pivot.create(['took_ms'], 'values', { limit: 15 });
+    const updatedPivot = Pivot.create(['took_ms', 'http_method'], 'values', { limit: 15 });
     const config = widgetConfig
       .toBuilder()
-      .rowPivots([pivot0])
+      .rowPivots([initialPivot])
       .build();
 
     const onChange = jest.fn();
     renderSUT({ onChange, config });
 
-    await screen.findByText('timestamp');
-    await selectField('took_ms');
+    await screen.findByText('took_ms');
+    await selectField('http_method');
     await submitWidgetConfigForm();
 
     const updatedConfig = widgetConfig
       .toBuilder()
-      .rowPivots([pivot1])
+      .rowPivots([updatedPivot])
       .build();
 
     await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
