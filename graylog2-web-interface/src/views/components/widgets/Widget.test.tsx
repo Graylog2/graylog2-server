@@ -26,7 +26,7 @@ import MockStore from 'helpers/mocking/StoreMock';
 import { createSearch } from 'fixtures/searches';
 import asMock from 'helpers/mocking/AsMock';
 import WidgetModel from 'views/logic/widgets/Widget';
-import type { Widgets } from 'views/stores/WidgetStore';
+import type { Widgets } from 'views/types';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { ViewStore } from 'views/stores/ViewStore';

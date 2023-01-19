@@ -327,6 +327,8 @@ export type ViewsReducer = {
   reducer: Reducer<RootState[keyof RootState], AnyAction>,
 }
 
+export type Widgets = Immutable.OrderedMap<string, Widget>;
+
 export interface WidgetCreatorArgs {
   view: View;
 }

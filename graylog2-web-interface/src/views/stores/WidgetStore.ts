@@ -28,8 +28,6 @@ import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewSta
 
 type WidgetId = string;
 
-export type Widgets = Immutable.OrderedMap<string, Widget>;
-
 type WidgetActionsType = RefluxActions<{
   create: (widget: Widget) => Promise<Widget>,
   duplicate: (widgetId: WidgetId) => Promise<Widget>,
