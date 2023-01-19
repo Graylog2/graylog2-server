@@ -158,7 +158,7 @@ describe('AggregationWizard', () => {
   }, extendedTimeout);
 
   it('should add pivot with type "date" to widget when adding time field', async () => {
-    const pivot = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
+    const pivot = Pivot.create(['timestamp'], 'time', { interval: { type: 'timeunit', unit: 'minutes', value: 1 } });
     const onChange = jest.fn();
     renderSUT({ onChange });
 
