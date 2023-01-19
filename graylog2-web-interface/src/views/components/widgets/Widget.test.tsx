@@ -21,12 +21,9 @@ import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import mockComponent from 'helpers/mocking/MockComponent';
-import { createSearch } from 'fixtures/searches';
 import asMock from 'helpers/mocking/AsMock';
 import WidgetModel from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import { ViewStore } from 'views/stores/ViewStore';
-import type { ViewStoreState } from 'views/stores/ViewStore';
 import useWidgetResults from 'views/components/useWidgetResults';
 import type SearchError from 'views/logic/SearchError';
 import { viewSliceReducer } from 'views/logic/slices/viewSlice';
@@ -92,17 +89,6 @@ describe('<Widget />', () => {
     .type('dummy')
     .config({ queryId: 'query-id-1' })
     .build();
-
-  const viewStoreState: ViewStoreState = {
-    activeQuery: 'query-id-1',
-    view: createSearch(),
-    isNew: false,
-    dirty: false,
-  };
-
-  beforeEach(() => {
-    ViewStore.getInitialState = jest.fn(() => viewStoreState);
-  });
 
   type DummyWidgetProps = Partial<WidgetComponentProps> & {
     focusedWidget?: WidgetFocusContextType['focusedWidget'],
