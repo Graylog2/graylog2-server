@@ -22,7 +22,7 @@ import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps 
 
 import { IconButton, SortableList, Icon } from 'components/common';
 import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
-import type { GroupByFormValues, WidgetConfigFormValues } from 'views/components/aggregationwizard';
+import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
@@ -133,7 +133,7 @@ const SelectedFieldsList = ({ groupingIndex }: Props) => {
       fieldTypes,
       activeQueryId,
       groupingIndex,
-      grouping: grouping as GroupByFormValues,
+      grouping,
       newFields,
       setFieldValue,
     });
@@ -146,7 +146,7 @@ const SelectedFieldsList = ({ groupingIndex }: Props) => {
       fieldTypes,
       activeQueryId,
       groupingIndex,
-      grouping: grouping as GroupByFormValues,
+      grouping,
       newFields,
       setFieldValue,
     });
@@ -162,7 +162,7 @@ const SelectedFieldsList = ({ groupingIndex }: Props) => {
               draggableProps={draggableProps}
               className={className}
               ref={ref} />
-  ), [grouping.fields, onChangeField, onRemoveField]);
+  ), [grouping.fields, groupingIndex, onChangeField, onRemoveField]);
 
   const onSortChange = useCallback((newGroupings: Array<{ id: string, title: string }>) => {
     const groupingsForForm = newGroupings.map(({ id }) => id);
