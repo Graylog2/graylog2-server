@@ -18,10 +18,10 @@ import * as React from 'react';
 import { useContext, useMemo } from 'react';
 
 import type Widget from 'views/logic/widgets/Widget';
-import usePluginEntities from 'hooks/usePluginEntities';
 import { MenuItem } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import useAppDispatch from 'stores/useAppDispatch';
+import useWidgetActions from 'views/components/widgets/useWidgetActions';
 
 type Props = {
   onSelect: (eventKey: string, e: MouseEvent) => void,
@@ -30,7 +30,7 @@ type Props = {
 
 const ExtraWidgetActions = ({ onSelect, widget }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
-  const pluginWidgetActions = usePluginEntities('views.widgets.actions');
+  const pluginWidgetActions = useWidgetActions();
   const dispatch = useAppDispatch();
   const extraWidgetActions = useMemo(() => pluginWidgetActions
     .filter(({ isHidden = () => false }) => !isHidden(widget))
