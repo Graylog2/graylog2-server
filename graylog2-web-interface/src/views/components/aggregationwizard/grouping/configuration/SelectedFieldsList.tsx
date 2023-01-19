@@ -60,7 +60,7 @@ type ListItemProps = {
   className: string,
   onChange: (fieldName: string) => void,
   onRemove: () => void,
-  excludedFields: Array<string>,
+  selectedFields: Array<string>,
   testIdPrefix: string,
 }
 
@@ -71,7 +71,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
   className,
   onChange,
   onRemove,
-  excludedFields,
+  selectedFields,
   testIdPrefix,
 }: ListItemProps, ref) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -90,7 +90,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
                          autoFocus
                          openMenuOnFocus
                          clearable={false}
-                         excludedFields={excludedFields}
+                         excludedFields={selectedFields.filter((fieldName) => fieldName !== item.id)}
                          ariaLabel="Fields"
                          name="group-by-add-field-select"
                          value={item.id}
@@ -155,7 +155,7 @@ const SelectedFieldsList = ({ groupingIndex }: Props) => {
   const SortableListItem = useCallback(({ item, index, dragHandleProps, draggableProps, className, ref }) => (
     <ListItem onChange={(newFieldName) => onChangeField(index, newFieldName)}
               onRemove={() => onRemoveField(item.id)}
-              excludedFields={grouping.fields ?? []}
+              selectedFields={grouping.fields ?? []}
               item={item}
               testIdPrefix={`grouping-${groupingIndex}-field-${index}`}
               dragHandleProps={dragHandleProps}
