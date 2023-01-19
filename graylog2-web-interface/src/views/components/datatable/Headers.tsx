@@ -37,7 +37,7 @@ import { Icon } from 'components/common';
 import styles from './DataTable.css';
 
 const StyledTh = styled.th(({ isNumeric }: { isNumeric: boolean }) => css`
-  ${isNumeric ? 'text-align: right' : ''};
+  ${isNumeric ? 'text-align: right;' : ''}
 `);
 
 const CenteredTh = styled.th`
@@ -52,6 +52,7 @@ const PinIcon = styled.button(({ theme }) => {
     cursor: pointer;
     position: relative;
     color: ${theme.colors.gray[70]};
+
     &.active {
       color: ${theme.colors.gray[20]};
     }
