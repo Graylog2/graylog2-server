@@ -285,7 +285,7 @@ class Builder {
 
     const availableSorts = [].concat(rowPivots, columnPivots, series);
     const filteredSorts = sort.filter((s) => availableSorts
-      .find((availableSort) => (s.field === availableSort.function || s.field === availableSort.field)));
+      .find((availableSort) => (s.field === availableSort.function || availableSort.fields?.includes(s.field))));
 
     return new AggregationWidgetConfig(
       columnPivots,
