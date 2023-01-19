@@ -24,7 +24,7 @@ import type { ConfigurationField } from 'views/types';
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
 import PropagateDisableSubmissionState from 'views/components/aggregationwizard/PropagateDisableSubmissionState';
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
-import type { AutoTimeConfig, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
+import type { AutoTimeConfig, TimeUnitConfig, DateType, ValuesType } from 'views/logic/aggregationbuilder/Pivot';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import { updateWidgetAggregationElements } from './AggregationWizard';
@@ -50,12 +50,12 @@ export type BaseGrouping = {
 };
 
 export type DateGrouping = BaseGrouping & {
-  type: 'time',
+  type: typeof DateType,
   interval: AutoTimeConfig | TimeUnitConfig,
 };
 
 export type ValuesGrouping = BaseGrouping & {
-  type: 'values',
+  type: typeof ValuesType,
   limit: number,
 };
 

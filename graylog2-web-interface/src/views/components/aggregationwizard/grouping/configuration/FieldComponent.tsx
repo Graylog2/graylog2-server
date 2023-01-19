@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useFormikContext } from 'formik';
 import { useContext, useCallback } from 'react';
+import { useFormikContext } from 'formik';
 
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type { WidgetConfigFormValues, GroupByFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
@@ -25,6 +25,7 @@ import SelectedFieldsList from 'views/components/aggregationwizard/grouping/conf
 import type { GroupByError } from 'views/components/aggregationwizard/grouping/GroupingElement';
 import { onGroupingFieldsChange } from 'views/components/aggregationwizard/grouping/GroupingElement';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import { DateType } from 'views/logic/aggregationbuilder/Pivot';
 
 import FieldSelect from '../../FieldSelect';
 
@@ -33,7 +34,7 @@ const placeholder = (grouping: GroupByFormValues) => {
     return 'Add a field';
   }
 
-  if (grouping.type === 'time') {
+  if (grouping.type === DateType) {
     return 'Add another date field';
   }
 

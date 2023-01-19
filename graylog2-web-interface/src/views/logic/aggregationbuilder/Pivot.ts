@@ -41,6 +41,8 @@ export type PivotConfigType = TimeConfigType | ValuesConfigType;
 export const DateType = 'time';
 export const ValuesType = 'values';
 
+export type FieldTypeCategory = typeof DateType | typeof ValuesType
+
 export type PivotJson = {
   fields: Array<string>,
   type: string,

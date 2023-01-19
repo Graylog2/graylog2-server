@@ -19,6 +19,8 @@ import { useContext, useMemo } from 'react';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
+import type { FieldTypeCategory } from 'views/logic/aggregationbuilder/Pivot';
+import { DateType, ValuesType } from 'views/logic/aggregationbuilder/Pivot';
 import { defaultCompare } from 'logic/DefaultCompare';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import Select from 'components/common/Select';
@@ -39,7 +41,7 @@ type Props = {
   autoFocus?: boolean,
   ariaLabel?: string,
   clearable?: boolean,
-  qualifiedTypeCategory?: 'time' | 'values',
+  qualifiedTypeCategory?: FieldTypeCategory,
   id: string,
   name: string,
   onChange: (fieldName: string) => void,
@@ -64,13 +66,13 @@ const hasProperty = (fieldType: FieldTypeMapping, properties: Array<Property>) =
     .find((result) => result === false) === undefined;
 };
 
-const isFieldQualified = (field: FieldTypeMapping, properties: Array<Property>, qualifiedTypeCategory: 'time' | 'values' | undefined) => {
+const isFieldQualified = (field: FieldTypeMapping, properties: Array<Property>, qualifiedTypeCategory: FieldTypeCategory | undefined) => {
   if (properties) {
     return hasProperty(field, properties);
   }
 
   if (qualifiedTypeCategory) {
-    const fieldTypeCategory = field.type.type === 'date' ? 'time' : 'values';
+    const fieldTypeCategory = field.type.type === 'date' ? DateType : ValuesType;
 
     return qualifiedTypeCategory === fieldTypeCategory;
   }
