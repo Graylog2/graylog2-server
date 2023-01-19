@@ -28,7 +28,7 @@ describe('GroupByElement', () => {
         const grouping = { direction: 'row', fields: undefined, limit: 10 } as GroupByFormValues;
         const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } });
 
-        expect(result.groupBy.groupings[0].field).toBe('Field is required.');
+        expect(result.groupBy.groupings[0].fields).toBe('Field is required.');
       });
 
       it('should not add an error if everything is fine', () => {
@@ -58,7 +58,7 @@ describe('GroupByElement', () => {
         const grouping = { direction: 'row', fields: undefined, interval: { type: 'auto', scaling: 1 } } as GroupByFormValues;
         const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } });
 
-        expect(result.groupBy.groupings[0].field).toBe('Field is required.');
+        expect(result.groupBy.groupings[0].fields).toBe('Field is required.');
       });
 
       it('should not add an error if everything is fine', () => {
