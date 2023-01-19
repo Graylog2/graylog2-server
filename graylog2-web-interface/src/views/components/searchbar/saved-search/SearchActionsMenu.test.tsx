@@ -20,9 +20,8 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { defaultUser } from 'defaultMockValues';
 
-import { asMock, MockStore } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import { adminUser } from 'fixtures/users';
-import mockAction from 'helpers/mocking/MockAction';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import type { ViewLoaderContextType } from 'views/logic/ViewLoaderContext';
@@ -38,10 +37,11 @@ import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useView from 'views/hooks/useView';
 import useIsDirty from 'views/hooks/useIsDirty';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
 import SearchActionsMenu from './SearchActionsMenu';
 
-jest.mock('routing/Routes', () => ({ pluginRoute: (x) => x }));
 jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('util/History');
 jest.mock('hooks/useCurrentUser');
@@ -49,14 +49,6 @@ jest.mock('hooks/useCurrentUser');
 jest.mock('bson-objectid', () => jest.fn(() => ({
   toString: jest.fn(() => 'new-search-id'),
 })));
-
-jest.mock('views/stores/ViewStore', () => ({
-  ViewActions: {
-    loadNew: mockAction(),
-    load: mockAction(),
-  },
-  ViewStore: MockStore(),
-}));
 
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
@@ -95,13 +87,15 @@ describe('SearchActionsMenu', () => {
     onLoadView,
     ...props
   }: SimpleSearchActionsMenuProps) => (
-    <FieldTypesContext.Provider value={fieldTypes}>
-      <ViewLoaderContext.Provider value={onLoadView}>
-        <NewViewLoaderContext.Provider value={loadNewView}>
-          <SearchActionsMenu {...props} />
-        </NewViewLoaderContext.Provider>
-      </ViewLoaderContext.Provider>
-    </FieldTypesContext.Provider>
+    <TestStoreProvider>
+      <FieldTypesContext.Provider value={fieldTypes}>
+        <ViewLoaderContext.Provider value={onLoadView}>
+          <NewViewLoaderContext.Provider value={loadNewView}>
+            <SearchActionsMenu {...props} />
+          </NewViewLoaderContext.Provider>
+        </ViewLoaderContext.Provider>
+      </FieldTypesContext.Provider>
+    </TestStoreProvider>
   );
 
   const findShareButton = () => screen.findByRole('button', { name: 'Share' });
@@ -120,6 +114,10 @@ describe('SearchActionsMenu', () => {
     asMock(useIsDirty).mockReturnValue(false);
   });
 
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   describe('Button handling', () => {
     const findTitleInput = () => screen.getByRole('textbox', { name: /title/i });
 
@@ -136,7 +134,7 @@ describe('SearchActionsMenu', () => {
       await waitFor(() => expect(history.push).toHaveBeenCalledTimes(1));
 
       expect(history.push).toHaveBeenCalledWith({
-        pathname: 'DASHBOARDS_NEW',
+        pathname: '/dashboards/new',
         state: { view: defaultView },
       });
     });
