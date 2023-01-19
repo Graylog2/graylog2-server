@@ -16,6 +16,7 @@
  */
 package org.graylog2.plugin.inject;
 
+import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
@@ -34,6 +35,13 @@ public abstract class Graylog2Module extends AbstractModule {
     private static class ContainerResponseFilterType extends TypeLiteral<Class<? extends ContainerResponseFilter>> {}
 
     private static class ExceptionMapperType extends TypeLiteral<Class<? extends ExceptionMapper>> {}
+
+    /**
+     * Prefer using {@link #registerJacksonSubtype(Class)} or {@link #registerJacksonSubtype(Class, String)}.
+     */
+    protected Multibinder<NamedType> jacksonSubTypesBinder() {
+        return Multibinder.newSetBinder(binder(), NamedType.class, JacksonSubTypes.class);
+    }
 
     @Nonnull
     protected Multibinder<Class<? extends DynamicFeature>> jerseyDynamicFeatureBinder() {

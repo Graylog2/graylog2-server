@@ -27,6 +27,7 @@ import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bindings.ConfigurationModule;
+import org.graylog.datanode.bindings.ObjectMapperModule;
 import org.graylog.datanode.bindings.PeriodicalBindings;
 import org.graylog.datanode.bindings.ServerBindings;
 import org.graylog.datanode.bootstrap.Main;
@@ -88,9 +89,9 @@ public class Server extends ServerBootstrap {
  //               new MongoDBModule(),
                 new ServerBindings(configuration, isMigrationCommand()),
                 new RestBindings(),
-                new PeriodicalBindings()
+                new PeriodicalBindings(),
 //               new InitializerBindings(),
- //               new ObjectMapperModule(chainingClassLoader),
+                new ObjectMapperModule(chainingClassLoader)
  //               new RestApiBindings(),
  //               new PasswordAlgorithmBindings()
         );
