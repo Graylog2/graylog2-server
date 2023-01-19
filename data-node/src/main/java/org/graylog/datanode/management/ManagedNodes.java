@@ -32,31 +32,20 @@ import java.util.Set;
 public class ManagedNodes {
     private final Set<OpensearchProcess> processes = new LinkedHashSet<>();
 
-    final private String opensearchVersion;
-
-    final private String opensearchLocation;
-
-    final private DataNodeRunner dataNodeRunner;
+    private DataNodeRunner dataNodeRunner;
 
     @Inject
-    public ManagedNodes(@Named("opensearch_version") String opensearchVersion, @Named("opensearch_location") String opensearchLocation, DataNodeRunner dataNodeRunner) {
-        this.opensearchVersion = opensearchVersion;
-        this.opensearchLocation = opensearchLocation;
+    public ManagedNodes(DataNodeRunner dataNodeRunner) {
         this.dataNodeRunner = dataNodeRunner;
     }
 
+    private ConfigurationProvider configurationProvider;
+
     public void startOpensearchProcesses() {
-
-        // TODO: obtain configuration from outside, one for each node
-
-        final LinkedHashMap<String, String> config = new LinkedHashMap<>();
-        config.put("discovery.type", "single-node");
-        config.put("plugins.security.ssl.http.enabled", "false");
-        config.put("plugins.security.disabled", "true");
-        final ProcessConfiguration processConfiguration = new ProcessConfiguration(9300, 9400, config);
-
-        final OpensearchProcess process = dataNodeRunner.start(Path.of(opensearchLocation), opensearchVersion, processConfiguration);
-        this.processes.add(process);
+        configurationProvider.get()
+                .stream()
+                .map(dataNodeRunner::start)
+                .forEach(processes::add);
     }
 
     public Set<OpensearchProcess> getProcesses() {

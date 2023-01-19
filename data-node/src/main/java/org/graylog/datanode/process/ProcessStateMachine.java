@@ -31,55 +31,54 @@ public class ProcessStateMachine {
 
     public static StateMachine<ProcessState, ProcessEvent> createNew() {
 
-        final AtomicInteger failuresCounter = new AtomicInteger(0);
-        final AtomicInteger startupFailuresCounter = new AtomicInteger(0);
+        final FailuresCounter restFailureCounter = new FailuresCounter(MAX_REST_TEMPORARY_FAILURES);
+        final FailuresCounter startupFailuresCounter = new FailuresCounter(MAX_REST_STARTUP_FAILURES);
 
         StateMachineConfig<ProcessState, ProcessEvent> config = new StateMachineConfig<>();
 
+        // Freshly created process, it hasn't started yet and doesn't have any pid.
         config.configure(ProcessState.NEW)
                 .permit(ProcessEvent.PROCESS_STARTED, ProcessState.STARTING);
 
+        // the process has started already, now we have to wait for a running OS and available REST api
+        // the startupFailuresCounter keeps track of failed REST status calls and allow failures during the
+        // startup period
         config.configure(ProcessState.STARTING)
-                .onEntry(() -> incrementFailures(startupFailuresCounter))
                 .permitDynamic(ProcessEvent.HEALTH_CHECK_FAILED,
-                        () -> failedTooManyTimes(startupFailuresCounter, MAX_REST_STARTUP_FAILURES) ? ProcessState.FAILED : ProcessState.STARTING)
+                        () -> startupFailuresCounter.failedTooManyTimes() ? ProcessState.FAILED : ProcessState.STARTING,
+                        startupFailuresCounter::increment)
                 .permit(ProcessEvent.HEALTH_CHECK_GREEN, ProcessState.AVAILABLE)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED);
 
+        // the process is running and responding to the REST status, it's available for any usage
         config.configure(ProcessState.AVAILABLE)
-                .onEntry(() -> resetFailuresCounter(failuresCounter))
+                .onEntry(restFailureCounter::resetFailuresCounter)
                 .permitReentry(ProcessEvent.HEALTH_CHECK_GREEN)
                 .permit(ProcessEvent.HEALTH_CHECK_FAILED, ProcessState.NOT_RESPONDING)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED);
 
+        // if the REST api is not responding, we'll jump to this state and count how many times the failure
+        // occurs. If it fails ttoo many times, we'll mark the process as FAILED
         config.configure(ProcessState.NOT_RESPONDING)
-                .onEntry(() -> incrementFailures(failuresCounter))
                 .permitDynamic(ProcessEvent.HEALTH_CHECK_FAILED,
-                        () -> failedTooManyTimes(failuresCounter, MAX_REST_TEMPORARY_FAILURES) ? ProcessState.FAILED : ProcessState.NOT_RESPONDING)
+                        () -> restFailureCounter.failedTooManyTimes() ? ProcessState.FAILED : ProcessState.NOT_RESPONDING,
+                        restFailureCounter::increment
+                        )
                 .permit(ProcessEvent.HEALTH_CHECK_GREEN, ProcessState.AVAILABLE)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED);
 
+        // failed and we see the process as not recoverable.
+        // TODO: what to do if the process fails? Reboot?
         config.configure(ProcessState.FAILED)
                 .ignore(ProcessEvent.HEALTH_CHECK_FAILED)
                 .permit(ProcessEvent.HEALTH_CHECK_GREEN, ProcessState.AVAILABLE)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED);
 
+        // final state, the process is not alive anymore, terminated on the operating system level
+        // TODO: what to do if the process has been terminated? Reboot?
         config.configure(ProcessState.TERMINATED)
                 .ignore(ProcessEvent.PROCESS_TERMINATED); // final state, all following terminate events are ignored
 
-
         return new StateMachine<>(ProcessState.NEW, config);
-    }
-
-    private static void incrementFailures(AtomicInteger failuresCounter) {
-        failuresCounter.incrementAndGet();
-    }
-
-    private static boolean failedTooManyTimes(AtomicInteger failuresCounter, int maxRetries) {
-        return failuresCounter.get() >= maxRetries;
-    }
-
-    private static void resetFailuresCounter(AtomicInteger failuresCounter) {
-        failuresCounter.set(0);
     }
 }

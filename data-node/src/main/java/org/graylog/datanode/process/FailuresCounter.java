@@ -16,6 +16,29 @@
  */
 package org.graylog.datanode.process;
 
-public record ProcessInfo(long pid, ProcessState status, boolean isLeaderNode, java.time.Instant started, java.time.Duration totalCpuDuration, String user,
-                          int httpPort) {
+/**
+ * Caution, starts initialized with 1, the usage expects that the checks and increments will happen already during
+ * the first error handling.
+ */
+public class FailuresCounter {
+
+    private int counter;
+    private final int maxFailuresCount;
+
+    public FailuresCounter(int maxFailuresCount) {
+        this.maxFailuresCount = maxFailuresCount;
+        resetFailuresCounter();
+    }
+
+    public synchronized void increment() {
+        this.counter++;
+    }
+
+    public synchronized boolean failedTooManyTimes() {
+        return this.counter >= maxFailuresCount;
+    }
+
+    public synchronized void resetFailuresCounter() {
+        this.counter = 1;
+    }
 }
