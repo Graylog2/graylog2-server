@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useContext } from 'react';
 import { mount } from 'wrappedEnzyme';
 
-import { StoreMock as mockStore, asMock } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import View from 'views/logic/views/View';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import type { TimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
@@ -30,10 +30,6 @@ import useGlobalOverride from 'views/hooks/useGlobalOverride';
 
 import DrilldownContextProvider from './DrilldownContextProvider';
 import DrilldownContext from './DrilldownContext';
-
-jest.mock('views/stores/GlobalOverrideStore', () => ({
-  GlobalOverrideStore: mockStore(),
-}));
 
 jest.mock('views/hooks/useViewType');
 jest.mock('views/logic/queries/useCurrentQuery');
