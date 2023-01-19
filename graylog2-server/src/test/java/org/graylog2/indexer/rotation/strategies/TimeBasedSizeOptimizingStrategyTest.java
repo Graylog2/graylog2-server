@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.rotation.strategies;
 
+import org.graylog.scheduler.clock.JobSchedulerSystemClock;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
@@ -63,7 +64,7 @@ class TimeBasedSizeOptimizingStrategyTest {
 
     @BeforeEach
     void setUp() {
-        timeBasedSizeOptimizingStrategy = new TimeBasedSizeOptimizingStrategy(indices, nodeId, auditEventSender, new ElasticsearchConfiguration());
+        timeBasedSizeOptimizingStrategy = new TimeBasedSizeOptimizingStrategy(indices, nodeId, auditEventSender, new ElasticsearchConfiguration(), new JobSchedulerSystemClock());
 
         timeBasedSizeOptimizingStrategyConfig = TimeBasedSizeOptimizingStrategyConfig.builder().build();
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);

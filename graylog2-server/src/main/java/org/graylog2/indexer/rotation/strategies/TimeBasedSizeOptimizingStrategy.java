@@ -17,6 +17,7 @@
 package org.graylog2.indexer.rotation.strategies;
 
 import com.github.joschi.jadconfig.util.Size;
+import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
@@ -30,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.Period;
 
@@ -41,6 +43,7 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
     public static final Period ROTATION_PERIOD = Period.ofDays(1);
 
     private final Indices indices;
+    private final JobSchedulerClock clock;
 
     // TODO: move this into server.conf or maybe into IndexSetsDefaultConfiguration
     // also see elasticsearch_max_size_per_index
@@ -51,9 +54,11 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
     public TimeBasedSizeOptimizingStrategy(Indices indices,
                                            NodeId nodeId,
                                            AuditEventSender auditEventSender,
-                                           ElasticsearchConfiguration elasticsearchConfiguration) {
+                                           ElasticsearchConfiguration elasticsearchConfiguration,
+                                           JobSchedulerClock clock) {
         super(auditEventSender, nodeId, elasticsearchConfiguration);
         this.indices = indices;
+        this.clock = clock;
     }
 
     @Override
@@ -100,21 +105,25 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
     }
 
     private boolean indexExceedsLeeWay(DateTime creationDate, Period leeWay) {
-        final Instant now = Instant.now();
+        final Instant now = clock.instantNow();
         final Instant leewayLimit = now.minus(ROTATION_PERIOD.plus(leeWay));
 
-        return creationDate.isBefore(leewayLimit.toEpochMilli());
+        final Duration between = Duration.between(Instant.ofEpochMilli(creationDate.getMillis()), now);
+        return between.compareTo(Duration.ofDays(ROTATION_PERIOD.plus(leeWay).getDays())) >= 0;
+        //return creationDate.isBefore(leewayLimit.toEpochMilli());
     }
 
     private boolean indexIsOldEnough(DateTime creationDate) {
-        final Instant now = Instant.now();
+        final Instant now = clock.instantNow();
         final Instant rotationLimit = now.minus(ROTATION_PERIOD);
 
-        return creationDate.isBefore(rotationLimit.toEpochMilli());
+        final Duration between = Duration.between(Instant.ofEpochMilli(creationDate.getMillis()), now);
+        return between.compareTo(Duration.ofDays(ROTATION_PERIOD.getDays())) >= 0;
+        //return creationDate.isBefore(rotationLimit.toEpochMilli());
     }
 
     private boolean indexExceedsSizeLimit(long size) {
-        return size > MAX_INDEX_SIZE.toBytes();
+        return size >= MAX_INDEX_SIZE.toBytes();
     }
 
     private boolean indexSubceedsSizeLimit(long size) {

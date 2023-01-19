@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.retention.strategies;
 
+import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
@@ -32,8 +33,8 @@ public class NoopRetentionStrategy extends AbstractIndexRetentionStrategy {
     public static final String NAME = "none";
 
     @Inject
-    public NoopRetentionStrategy(Indices indices, ActivityWriter activityWriter) {
-        super(indices, activityWriter);
+    public NoopRetentionStrategy(Indices indices, ActivityWriter activityWriter, JobSchedulerClock clock) {
+        super(indices, activityWriter, clock);
     }
 
     @Override
