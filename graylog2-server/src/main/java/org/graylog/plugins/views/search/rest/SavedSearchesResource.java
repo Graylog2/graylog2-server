@@ -102,6 +102,7 @@ public class SavedSearchesResource extends RestResource {
         try {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
             final PaginatedList<ViewSummaryDTO> result = dbService.searchSummariesPaginatedByType(
+                    searchUser,
                     ViewDTO.Type.SEARCH,
                     searchQuery,
                     searchUser::canReadView,

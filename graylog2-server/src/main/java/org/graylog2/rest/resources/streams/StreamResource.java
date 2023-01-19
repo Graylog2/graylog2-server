@@ -30,6 +30,8 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
+import org.graylog.grn.GRNTypes;
+import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -140,19 +142,22 @@ public class StreamResource extends RestResource {
     private final StreamRouterEngine.Factory streamRouterEngineFactory;
     private final IndexSetRegistry indexSetRegistry;
     private final SearchQueryParser searchQueryParser;
+    private final RecentActivityService recentActivityService;
 
     @Inject
     public StreamResource(StreamService streamService,
                           PaginatedStreamService paginatedStreamService,
                           StreamRuleService streamRuleService,
                           StreamRouterEngine.Factory streamRouterEngineFactory,
-                          IndexSetRegistry indexSetRegistry) {
+                          IndexSetRegistry indexSetRegistry,
+                          RecentActivityService recentActivityService) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
         this.indexSetRegistry = indexSetRegistry;
         this.paginatedStreamService = paginatedStreamService;
         this.searchQueryParser = new SearchQueryParser(StreamImpl.FIELD_TITLE, SEARCH_FIELD_MAPPING);
+        this.recentActivityService = recentActivityService;
     }
 
     @POST
@@ -181,6 +186,7 @@ public class StreamResource extends RestResource {
             .path("{streamId}")
             .build(id);
 
+        recentActivityService.create(id, GRNTypes.STREAM, userContext.getUser());
         return Response.created(streamUri).entity(result).build();
     }
 
@@ -286,7 +292,8 @@ public class StreamResource extends RestResource {
     public StreamResponse update(@ApiParam(name = "streamId", required = true)
                                  @PathParam("streamId") String streamId,
                                  @ApiParam(name = "JSON body", required = true)
-                                 @Valid @NotNull UpdateStreamRequest cr) throws NotFoundException, ValidationException {
+                                 @Valid @NotNull UpdateStreamRequest cr,
+                                 @Context UserContext userContext) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkNotEditableStream(streamId, "The stream cannot be edited.");
 
@@ -332,6 +339,7 @@ public class StreamResource extends RestResource {
 
         streamService.save(stream);
 
+        recentActivityService.update(streamId, GRNTypes.STREAM, userContext.getUser());
         return streamToResponse(stream);
     }
 
@@ -344,11 +352,13 @@ public class StreamResource extends RestResource {
         @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
     @AuditEvent(type = AuditEventTypes.STREAM_DELETE)
-    public void delete(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId) throws NotFoundException {
+    public void delete(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId,
+                       @Context UserContext userContext) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkNotEditableStream(streamId, "The stream cannot be deleted.");
 
         final Stream stream = streamService.load(streamId);
+        recentActivityService.delete(streamId, GRNTypes.STREAM, stream.getTitle(), userContext.getUser());
         streamService.destroy(stream);
     }
 

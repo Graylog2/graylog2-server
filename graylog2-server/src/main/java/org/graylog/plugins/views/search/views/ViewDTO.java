@@ -22,12 +22,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import org.bson.Document;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.streams.StreamDTO;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
@@ -63,6 +65,7 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
     public static final String FIELD_STATE = "state";
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_OWNER = "owner";
+    public static final String FIELD_FAVORITE = "favorite";
 
     public static final ImmutableSet<String> SORT_FIELDS = ImmutableSet.of(FIELD_ID, FIELD_TITLE, FIELD_CREATED_AT, FIELD_OWNER, FIELD_DESCRIPTION, FIELD_SUMMARY);
 
@@ -106,6 +109,10 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
 
     @JsonProperty(FIELD_CREATED_AT)
     public abstract DateTime createdAt();
+
+    @JsonProperty(FIELD_FAVORITE)
+    @MongoIgnore
+    public abstract boolean favorite();
 
     public static Builder builder() {
         return Builder.create();
@@ -197,6 +204,10 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
         @JsonProperty(FIELD_STATE)
         public abstract Builder state(Map<String, ViewStateDTO> state);
 
+        @JsonProperty(FIELD_FAVORITE)
+        @MongoIgnore
+        public abstract Builder favorite(boolean favorite);
+
         @JsonCreator
         public static Builder create() {
             return new AutoValue_ViewDTO.Builder()
@@ -205,7 +216,8 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
                     .description("")
                     .properties(ImmutableSet.of())
                     .requires(Collections.emptyMap())
-                    .createdAt(DateTime.now(DateTimeZone.UTC));
+                    .createdAt(DateTime.now(DateTimeZone.UTC))
+                    .favorite(false);
         }
 
         public abstract ViewDTO build();
