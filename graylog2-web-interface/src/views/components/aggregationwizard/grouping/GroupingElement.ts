@@ -22,7 +22,7 @@ import type { TimeConfigType, ValuesConfigType } from 'views/logic/aggregationbu
 import Pivot, { DateType, ValuesType } from 'views/logic/aggregationbuilder/Pivot';
 import generateId from 'logic/generateId';
 import parseNumber from 'views/components/aggregationwizard/grouping/parseNumber';
-import { DEFAULT_LIMIT, DEFAULT_PIVOT_INTERVAL } from 'views/Constants';
+import { DEFAULT_PIVOT_LIMIT, DEFAULT_PIVOT_INTERVAL } from 'views/Constants';
 import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 
 import GroupingsConfiguration from './GroupingsConfiguration';
@@ -46,7 +46,7 @@ export const toValuesGrouping = (grouping: GroupByFormValues): ValuesGrouping =>
   const newGrouping = {
     ...grouping,
     type: ValuesType as typeof ValuesType,
-    limit: DEFAULT_LIMIT,
+    limit: DEFAULT_PIVOT_LIMIT,
   };
 
   if ('interval' in newGrouping) {
@@ -269,7 +269,7 @@ export const createEmptyGrouping = () => addRandomId<ValuesGrouping>({
   direction: 'row',
   fields: [],
   type: ValuesType,
-  limit: DEFAULT_LIMIT,
+  limit: DEFAULT_PIVOT_LIMIT,
 });
 
 const GroupByElement: AggregationElement<'groupBy'> = {
