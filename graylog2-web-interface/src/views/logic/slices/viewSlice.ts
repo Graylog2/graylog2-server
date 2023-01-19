@@ -34,7 +34,7 @@ import {
   selectView,
   selectViewType,
   selectQueryById,
-  selectSearchQueries, selectViewState, selectSearchQuery,
+  selectSearchQueries, selectViewState, selectSearchQuery, selectWidgets,
 } from 'views/logic/slices/viewSelectors';
 import createSearch from 'views/logic/slices/createSearch';
 import type { TitlesMap } from 'views/stores/TitleTypes';
@@ -73,9 +73,7 @@ export const viewSliceReducer = viewSlice.reducer;
 export const { setView, selectQuery, setIsDirty, setIsNew } = viewSlice.actions;
 
 export const loadView = (newView: View, recreateSearch: boolean = false) => async (dispatch: AppDispatch, getState: () => RootState) => {
-  const oldView = selectView(getState());
-
-  const oldWidgets = oldView?.state?.map((s) => s.widgets);
+  const oldWidgets = selectWidgets(getState());
   const newWidgets = newView?.state?.map((s) => s.widgets);
 
   if (recreateSearch || !isEqualForSearch(oldWidgets, newWidgets)) {
@@ -83,8 +81,9 @@ export const loadView = (newView: View, recreateSearch: boolean = false) => asyn
     const updatedSearch = await createSearch(updatedView.search);
     const updatedViewWithSearch = updatedView.toBuilder().search(updatedSearch).build();
 
-    dispatch(setView(updatedViewWithSearch));
-    dispatch(execute());
+    await dispatch(setView(updatedViewWithSearch));
+
+    return dispatch(execute());
   }
 
   return dispatch(setView(newView));
