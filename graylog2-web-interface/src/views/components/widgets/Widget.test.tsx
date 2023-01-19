@@ -22,7 +22,6 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
-import MockStore from 'helpers/mocking/StoreMock';
 import { createSearch } from 'fixtures/searches';
 import asMock from 'helpers/mocking/AsMock';
 import WidgetModel from 'views/logic/widgets/Widget';
@@ -55,13 +54,6 @@ jest.mock('views/logic/slices/widgetActions', () => ({
   duplicateWidget: jest.fn(() => async () => {}),
   updateWidget: jest.fn(() => async () => {}),
   updateWidgetConfig: jest.fn(() => async () => {}),
-}));
-
-jest.mock('views/stores/WidgetStore', () => ({
-  WidgetStore: MockStore(),
-  WidgetActions: {
-    update: mockAction(),
-  },
 }));
 
 const pluginManifest: PluginRegistration = {
