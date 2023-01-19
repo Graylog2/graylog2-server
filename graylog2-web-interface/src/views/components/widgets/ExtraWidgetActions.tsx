@@ -21,6 +21,7 @@ import type Widget from 'views/logic/widgets/Widget';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { MenuItem } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import useAppDispatch from 'stores/useAppDispatch';
 
 type Props = {
   onSelect: (eventKey: string, e: MouseEvent) => void,
@@ -30,11 +31,12 @@ type Props = {
 const ExtraWidgetActions = ({ onSelect, widget }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
   const pluginWidgetActions = usePluginEntities('views.widgets.actions');
+  const dispatch = useAppDispatch();
   const extraWidgetActions = useMemo(() => pluginWidgetActions
     .filter(({ isHidden = () => false }) => !isHidden(widget))
     .map(({ title, action, type, disabled = () => false }) => {
       const _onSelect = (eventKey: string, e: MouseEvent) => {
-        action(widget, { widgetFocusContext });
+        dispatch(action(widget, { widgetFocusContext }));
         onSelect(eventKey, e);
       };
 
