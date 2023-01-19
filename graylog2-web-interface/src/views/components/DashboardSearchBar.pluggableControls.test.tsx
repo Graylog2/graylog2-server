@@ -27,28 +27,17 @@ import mockAction from 'helpers/mocking/MockAction';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import FormikInput from 'components/common/FormikInput';
+import { viewSliceReducer } from 'views/logic/slices/viewSlice';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionSlice';
 
-import DashboardSearchBar from './DashboardSearchBar';
+import OriginalDashboardSearchBar from './DashboardSearchBar';
 
 const testTimeout = applyTimeoutMultiplier(30000);
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('views/components/DashboardActionsMenu', () => () => <span>View Actions</span>);
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
-
-jest.mock('views/stores/GlobalOverrideStore', () => ({
-  GlobalOverrideStore: MockStore(),
-  GlobalOverrideActions: {
-    set: jest.fn().mockResolvedValue({}),
-  },
-}));
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchStore: MockStore(['getInitialState', () => ({ search: { parameters: [] } })]),
-  SearchActions: {
-    refresh: jest.fn(),
-  },
-}));
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: MockStore(['getInitialState', () => ({ searchesClusterConfig: mockSearchesClusterConfig })]),
@@ -61,6 +50,12 @@ jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest
   status: 'OK',
   explanations: [],
 })));
+
+const DashboardSearchBar = () => (
+  <TestStoreProvider>
+    <OriginalDashboardSearchBar />
+  </TestStoreProvider>
+);
 
 describe('DashboardSearchBar pluggable controls', () => {
   const PluggableSearchBarControl = () => {
@@ -76,6 +71,10 @@ describe('DashboardSearchBar pluggable controls', () => {
 
   beforeAll(() => {
     PluginStore.register(new PluginManifest({}, {
+      'views.reducers': [
+        { key: 'view', reducer: viewSliceReducer },
+        { key: 'searchExecution', reducer: searchExecutionSliceReducer },
+      ],
       'views.components.searchBar': [
         () => ({
           id: 'pluggable-search-bar-control',
