@@ -18,27 +18,36 @@ package org.graylog.datanode.management;
 
 import org.graylog.datanode.process.ClusterConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 
-@Service
+@Singleton
 public class ConfigurationProvider {
 
-    @Value("${opensearch.version}")
-    private String opensearchVersion;
-    @Value("${opensearch.location}")
-    private String openseachLocation;
+    final private String opensearchVersion;
+    final private String opensearchLocation;
 
-    @Value("${opensearch.data.location}")
-    private String dataLocation;
+    final private String dataLocation;
 
-    @Value("${opensearch.logs.location}")
-    private String logsLocation;
+    final private String logsLocation;
+
+    @Inject
+    public ConfigurationProvider(@Named("opensearch_version") String opensearchVersion,
+                                 @Named("opensearch_location") String opensearchLocation,
+                                 @Named("opensearch_data_location") String opensearchDataLocation,
+                                 @Named("opensearch_logs_location") String opensearchLogsLocation) {
+        this.opensearchVersion = opensearchVersion;
+        this.opensearchLocation = opensearchLocation;
+        this.dataLocation = opensearchDataLocation;
+        this.logsLocation = opensearchLogsLocation;
+    }
+
 
     public Collection<OpensearchConfiguration> get() {
 
@@ -53,7 +62,7 @@ public class ConfigurationProvider {
 
         final OpensearchConfiguration processConfiguration = new OpensearchConfiguration(
                 opensearchVersion,
-                Path.of(openseachLocation),
+                Path.of(opensearchLocation),
                 9200,
                 9300,
                 clusterConfiguration,

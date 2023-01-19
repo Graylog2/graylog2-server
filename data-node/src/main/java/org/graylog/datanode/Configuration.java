@@ -26,6 +26,12 @@ public class Configuration {
     @Parameter(value = "opensearch_version")
     private String opensearchVersion = "2.4.1";
 
+    @Parameter(value = "opensearch_data_location")
+    private String opensearchDataLocation = "./data-node/bin/data";
+
+    @Parameter(value = "opensearch_logs_location")
+    private String opensearchLogsLocation = "./data-node/bin/logs";
+
     @Parameter(value = "process_logs_buffer_size")
     private Integer logs = 500;
 
@@ -55,6 +61,14 @@ public class Configuration {
 
     public String getOpensearchVersion() {
         return opensearchVersion;
+    }
+
+    public String getOpensearchDataLocation() {
+        return opensearchDataLocation;
+    }
+
+    public String getOpensearchLogsLocation() {
+        return opensearchLogsLocation;
     }
 
     public Integer getProcessLogsBufferSize() {

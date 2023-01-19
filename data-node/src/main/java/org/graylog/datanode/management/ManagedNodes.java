@@ -18,13 +18,9 @@ package org.graylog.datanode.management;
 
 import org.graylog.datanode.DataNodeRunner;
 import org.graylog.datanode.process.OpensearchProcess;
-import org.graylog.datanode.process.ProcessConfiguration;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
-import java.nio.file.Path;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -32,14 +28,15 @@ import java.util.Set;
 public class ManagedNodes {
     private final Set<OpensearchProcess> processes = new LinkedHashSet<>();
 
-    private DataNodeRunner dataNodeRunner;
+    final private DataNodeRunner dataNodeRunner;
+    final private ConfigurationProvider configurationProvider;
 
     @Inject
-    public ManagedNodes(DataNodeRunner dataNodeRunner) {
+    public ManagedNodes(DataNodeRunner dataNodeRunner, ConfigurationProvider configurationProvider) {
         this.dataNodeRunner = dataNodeRunner;
+        this.configurationProvider = configurationProvider;
     }
 
-    private ConfigurationProvider configurationProvider;
 
     public void startOpensearchProcesses() {
         configurationProvider.get()
