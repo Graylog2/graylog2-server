@@ -17,8 +17,23 @@
 import type { RootState } from 'views/types';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import { asMock } from 'helpers/mocking';
+import { createSearch } from 'fixtures/searches';
+import type View from 'views/logic/views/View';
 
-const mockDispatch = (state: RootState) => {
+const defaultState = { view: { view: createSearch(), activeQuery: 'query-id-1' } } as RootState;
+
+const mockDispatch = (state: RootState = defaultState) => {
+  const dispatch: AppDispatch = jest.fn();
+
+  asMock(dispatch).mockImplementation((fn: (d: AppDispatch, getState: () => RootState) => unknown) => (typeof fn === 'function'
+    ? fn(dispatch, () => state)
+    : fn));
+
+  return dispatch;
+};
+
+export const mockDispatchForView = (view: View, initialQuery: string = 'query-id-1') => {
+  const state = { ...defaultState, view: { view, activeQuery: initialQuery } } as RootState;
   const dispatch: AppDispatch = jest.fn();
 
   asMock(dispatch).mockImplementation((fn: (d: AppDispatch, getState: () => RootState) => unknown) => (typeof fn === 'function'
