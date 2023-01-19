@@ -30,7 +30,9 @@ export const createSearch = ({ searchId, queryId }: { searchId?: string, queryId
   const exampleSearchId = searchId ?? 'search-id-1';
   const exampleQueryId = queryId ?? 'query-id-1';
 
-  const viewState = ViewState.builder().build();
+  const viewState = ViewState.builder()
+    .titles(Map())
+    .build();
   const query = Query.builder().id(exampleQueryId).build();
   const searchSearch = Search.builder().queries([query]).id(exampleSearchId).build();
 

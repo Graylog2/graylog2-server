@@ -51,9 +51,8 @@ const QueryTitle = ({ active, allowsClosing, id, onClose, openEditModal, openCop
     setTitleValue(title);
   }, [title]);
 
-  const _onDuplicate = useCallback(() => dispatch(duplicateQuery(id)).then(
-    ({ payload }) => setDashboardPage(payload),
-  ), [dispatch, id, setDashboardPage]);
+  const _onDuplicate = useCallback(() => dispatch(duplicateQuery(id))
+    .then(({ payload }) => setDashboardPage(payload)), [dispatch, id, setDashboardPage]);
 
   return (
     <>
@@ -64,7 +63,7 @@ const QueryTitle = ({ active, allowsClosing, id, onClose, openEditModal, openCop
       {active && (
         <QueryActionDropdown>
           <MenuItem onSelect={() => openEditModal(titleValue)}>Edit Title</MenuItem>
-          <MenuItem onSelect={() => _onDuplicate()}>Duplicate</MenuItem>
+          <MenuItem onSelect={_onDuplicate}>Duplicate</MenuItem>
           <MenuItem onSelect={() => openCopyToDashboardModal(true)}>
             Copy to Dashboard
           </MenuItem>
