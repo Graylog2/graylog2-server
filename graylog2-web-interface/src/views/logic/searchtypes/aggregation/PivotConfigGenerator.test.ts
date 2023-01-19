@@ -108,6 +108,7 @@ describe('PivotConfigGenerator', () => {
       expect(timeunit).toEqual(expectedMappedTimeUnit);
     };
 
+    // eslint-disable-next-line jest/expect-expect
     it.each`
     timeUnit      | expectedMappedTimeUnit
     ${'seconds'}  | ${'1s'}
