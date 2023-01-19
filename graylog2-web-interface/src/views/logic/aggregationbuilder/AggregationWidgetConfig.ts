@@ -20,7 +20,7 @@ import isDeepEqual from 'stores/isDeepEqual';
 import { TIMESTAMP_FIELD } from 'views/Constants';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
 
-import Pivot from './Pivot';
+import Pivot, { DateType } from './Pivot';
 import Series from './Series';
 import VisualizationConfig from './visualizations/VisualizationConfig';
 import SortConfig from './SortConfig';
@@ -114,7 +114,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
   }
 
   get isTimeline() {
-    return this.rowPivots && this.rowPivots.length === 1 && this.rowPivots[0].fields?.[0] === TIMESTAMP_FIELD;
+    return this.rowPivots && this.rowPivots.length === 1 && this.rowPivots[0].type === DateType && this.rowPivots[0].fields?.[0] === TIMESTAMP_FIELD;
   }
 
   get isEmpty(): boolean {
