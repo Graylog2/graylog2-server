@@ -19,7 +19,7 @@ import { isEmpty } from 'lodash';
 import type { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { TimeConfigType, ValuesConfigType } from 'views/logic/aggregationbuilder/Pivot';
-import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import Pivot, { DateType, ValuesType } from 'views/logic/aggregationbuilder/Pivot';
 import generateId from 'logic/generateId';
 import parseNumber from 'views/components/aggregationwizard/grouping/parseNumber';
 import { DEFAULT_LIMIT, DEFAULT_PIVOT_INTERVAL } from 'views/Constants';
@@ -44,7 +44,7 @@ export type GroupByError = {
 };
 
 export const toValuesGrouping = (grouping: GroupByFormValues) => {
-  const newGrouping = { ...grouping, type: 'values', limit: DEFAULT_LIMIT };
+  const newGrouping = { ...grouping, type: ValuesType, limit: DEFAULT_LIMIT };
 
   if ('interval' in newGrouping) {
     delete newGrouping.interval;
@@ -54,7 +54,7 @@ export const toValuesGrouping = (grouping: GroupByFormValues) => {
 };
 
 export const toTimeGrouping = (grouping: GroupByFormValues) => {
-  const newGrouping = { ...grouping, type: 'time', interval: DEFAULT_PIVOT_INTERVAL };
+  const newGrouping = { ...grouping, type: DateType, interval: DEFAULT_PIVOT_INTERVAL };
 
   if ('limit' in newGrouping) {
     delete newGrouping.limit;
@@ -92,7 +92,7 @@ export const onGroupingFieldsChange = ({
   const groupingHasValuesField = fieldTypes.queryFields.get(activeQueryId, fieldTypes.all).some(({ name, type }) => (
     newFields.includes(name) && type.type !== 'date'),
   );
-  const newGroupingType = groupingHasValuesField ? 'values' : 'time';
+  const newGroupingType = groupingHasValuesField ? ValuesType : DateType;
 
   if (grouping.type === newGroupingType) {
     updateFormState({ ...grouping, fields: newFields });
@@ -101,14 +101,14 @@ export const onGroupingFieldsChange = ({
   }
 
   if (grouping.type !== newGroupingType) {
-    if (newGroupingType === 'values') {
+    if (newGroupingType === ValuesType) {
       updateFormState({
         ...toValuesGrouping(grouping as GroupByFormValues),
         fields: newFields,
       } as GroupByFormValues);
     }
 
-    if (newGroupingType === 'time') {
+    if (newGroupingType === DateType) {
       updateFormState({
         ...toTimeGrouping(grouping as GroupByFormValues),
         fields: newFields,
@@ -205,7 +205,7 @@ const datePivotToGrouping = (pivot: Pivot, direction: GroupingDirection): DateGr
   return addRandomId<DateGrouping>({
     direction,
     fields,
-    type: 'time',
+    type: DateType,
     interval,
   });
 };
@@ -217,17 +217,17 @@ const valuesPivotToGrouping = (pivot: Pivot, direction: GroupingDirection): Valu
   return addRandomId<ValuesGrouping>({
     direction,
     fields,
-    type: 'values',
+    type: ValuesType,
     limit,
   });
 };
 
 const pivotToGroupings = (pivot: Pivot, direction: GroupingDirection): GroupByFormValues => {
-  if (pivot.type === 'time') {
+  if (pivot.type === DateType) {
     return datePivotToGrouping(pivot, direction);
   }
 
-  if (pivot.type === 'values') {
+  if (pivot.type === ValuesType) {
     return valuesPivotToGrouping(pivot, direction);
   }
 
@@ -261,7 +261,7 @@ const groupByToConfig = (groupBy: WidgetConfigFormValues['groupBy'], config: Agg
 export const createEmptyGrouping = () => addRandomId<ValuesGrouping>({
   direction: 'row',
   fields: [],
-  type: 'values',
+  type: ValuesType,
   limit: DEFAULT_LIMIT,
 });
 
