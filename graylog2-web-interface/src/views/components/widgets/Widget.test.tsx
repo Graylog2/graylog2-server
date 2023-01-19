@@ -28,13 +28,15 @@ import asMock from 'helpers/mocking/AsMock';
 import WidgetModel from 'views/logic/widgets/Widget';
 import type { Widgets } from 'views/stores/WidgetStore';
 import { WidgetActions } from 'views/stores/WidgetStore';
-import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { ViewStore } from 'views/stores/ViewStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
-import type { TitlesMap } from 'views/stores/TitleTypes';
 import useWidgetResults from 'views/components/useWidgetResults';
 import type SearchError from 'views/logic/SearchError';
+import { viewSliceReducer } from 'views/logic/slices/viewSlice';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionSlice';
+import { duplicateWidget, updateWidgetConfig, updateWidget } from 'views/logic/slices/widgetActions';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -48,6 +50,13 @@ jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
 jest.mock('views/components/useWidgetResults');
 
+jest.mock('views/logic/slices/widgetActions', () => ({
+  ...jest.requireActual('views/logic/slices/widgetActions'),
+  duplicateWidget: jest.fn(() => async () => {}),
+  updateWidget: jest.fn(() => async () => {}),
+  updateWidgetConfig: jest.fn(() => async () => {}),
+}));
+
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetStore: MockStore(),
   WidgetActions: {
@@ -57,6 +66,10 @@ jest.mock('views/stores/WidgetStore', () => ({
 
 const pluginManifest: PluginRegistration = {
   exports: {
+    'views.reducers': [
+      { key: 'view', reducer: viewSliceReducer },
+      { key: 'searchExecution', reducer: searchExecutionSliceReducer },
+    ],
     enterpriseWidgets: [
       {
         type: 'dummy',
@@ -120,17 +133,19 @@ describe('<Widget />', () => {
     ...props
   }: DummyWidgetProps) => (
     // eslint-disable-next-line react/jsx-no-constructed-context-values
-    <WidgetFocusContext.Provider value={{ focusedWidget, setWidgetFocusing, setWidgetEditing, unsetWidgetFocusing, unsetWidgetEditing }}>
-      <WidgetContext.Provider value={propsWidget}>
-        <Widget widget={propsWidget}
-                id="widgetId"
-                fields={Immutable.List([])}
-                onPositionsChange={() => {}}
-                title="Widget Title"
-                position={new WidgetPosition(1, 1, 1, 1)}
-                {...props} />
-      </WidgetContext.Provider>
-    </WidgetFocusContext.Provider>
+    <TestStoreProvider>
+      <WidgetFocusContext.Provider value={{ focusedWidget, setWidgetFocusing, setWidgetEditing, unsetWidgetFocusing, unsetWidgetEditing }}>
+        <WidgetContext.Provider value={propsWidget}>
+          <Widget widget={propsWidget}
+                  id="widgetId"
+                  fields={Immutable.List([])}
+                  onPositionsChange={() => {}}
+                  title="Widget Title"
+                  position={new WidgetPosition(1, 1, 1, 1)}
+                  {...props} />
+        </WidgetContext.Provider>
+      </WidgetFocusContext.Provider>
+    </TestStoreProvider>
   );
 
   const getWidgetUpdateButton = () => screen.getByRole('button', { name: /update widget/i });
@@ -212,22 +227,23 @@ describe('<Widget />', () => {
       .type('i-dont-know-this-widget-type')
       .config({})
       .build();
-    const UnknownWidget = (props) => (
-      <WidgetContext.Provider value={unknownWidget}>
-        <Widget widget={unknownWidget}
-                editing
-                id="widgetId"
-                fields={[]}
-                onPositionsChange={() => {}}
-                onSizeChange={() => {}}
-                title="Widget Title"
-                position={new WidgetPosition(1, 1, 1, 1)}
-                {...props} />
-      </WidgetContext.Provider>
+    const UnknownWidget = (props: Partial<React.ComponentProps<typeof Widget>>) => (
+      <TestStoreProvider>
+        <WidgetContext.Provider value={unknownWidget}>
+          <Widget widget={unknownWidget}
+                  editing
+                  id="widgetId"
+                  fields={Immutable.List()}
+                  onPositionsChange={() => {}}
+                  title="Widget Title"
+                  position={new WidgetPosition(1, 1, 1, 1)}
+                  {...props} />
+        </WidgetContext.Provider>
+      </TestStoreProvider>
     );
 
     render(
-      <UnknownWidget data={[]} />,
+      <UnknownWidget />,
     );
 
     await screen.findByText('Unknown widget in edit mode');
@@ -241,14 +257,9 @@ describe('<Widget />', () => {
     fireEvent.click(actionToggle);
     const duplicateBtn = screen.getByText('Duplicate');
 
-    WidgetActions.duplicate = mockAction(jest.fn().mockResolvedValue(WidgetModel.builder().id('duplicatedWidgetId').build()));
-
-    TitlesActions.set = mockAction(jest.fn().mockResolvedValue(Immutable.Map() as TitlesMap));
-
     fireEvent.click(duplicateBtn);
 
-    await waitFor(() => expect(WidgetActions.duplicate).toHaveBeenCalled());
-    await waitFor(() => expect(TitlesActions.set).toHaveBeenCalledWith(TitleTypes.Widget, 'duplicatedWidgetId', 'Dummy Widget (copy)'));
+    await waitFor(() => expect(duplicateWidget).toHaveBeenCalled());
   });
 
   it('adds cancel action to widget in edit mode', async () => {
@@ -296,19 +307,17 @@ describe('<Widget />', () => {
       .build();
     render(<DummyWidget editing widget={widgetWithConfig} />);
 
-    WidgetActions.updateConfig = mockAction(jest.fn(async () => Immutable.OrderedMap() as Widgets));
-    WidgetActions.update = mockAction(jest.fn(async () => Immutable.OrderedMap() as Widgets));
     const onChangeBtn = screen.getByText('Click me');
 
     fireEvent.click(onChangeBtn);
 
-    expect(WidgetActions.updateConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
+    expect(updateWidgetConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
 
     const cancelButton = screen.getByText('Cancel');
 
     fireEvent.click(cancelButton);
 
-    expect(WidgetActions.update).toHaveBeenCalledWith('widgetId', widgetWithConfig);
+    expect(updateWidget).toHaveBeenCalledWith('widgetId', widgetWithConfig);
   });
 
   it('does not restore original state of widget config when clicking "Update widget"', async () => {
@@ -325,13 +334,13 @@ describe('<Widget />', () => {
 
     fireEvent.click(onChangeBtn);
 
-    expect(WidgetActions.updateConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
+    expect(updateWidgetConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
 
     const updateWidgetButton = getWidgetUpdateButton();
     fireEvent.click(updateWidgetButton);
 
     await waitFor(() => expect(updateWidgetButton).not.toBeDisabled());
 
-    expect(WidgetActions.update).not.toHaveBeenCalledWith('widgetId', { config: { foo: 42 }, id: 'widgetId', type: 'dummy' });
+    expect(updateWidget).not.toHaveBeenCalledWith('widgetId', { config: { foo: 42 }, id: 'widgetId', type: 'dummy' });
   });
 });

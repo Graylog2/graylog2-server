@@ -34,7 +34,7 @@ import {
   selectView,
   selectViewType,
   selectQueryById,
-  selectSearchQueries, selectViewState, selectSearchQuery, selectWidgets,
+  selectSearchQueries, selectViewState, selectSearchQuery,
 } from 'views/logic/slices/viewSelectors';
 import createSearch from 'views/logic/slices/createSearch';
 import type { TitlesMap } from 'views/stores/TitleTypes';
