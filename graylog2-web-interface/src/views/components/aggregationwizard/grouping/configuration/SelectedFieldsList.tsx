@@ -84,7 +84,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
   return (
     <ListItemContainer className={className} ref={ref} {...(draggableProps ?? {})}>
       {isEditing && (
-        <EditFieldSelect id="group-by-field-select"
+        <EditFieldSelect id="group-by-add-field"
                          onChange={_onChange}
                          onMenuClose={() => setIsEditing(false)}
                          autoFocus
@@ -92,10 +92,9 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
                          clearable={false}
                          excludedFields={excludedFields}
                          ariaLabel="Fields"
-                         name="group-by-field-create-select"
+                         name="group-by-add-field-select"
                          value={item.id}
-                         placeholder="Add a field"
-                         aria-label="Add a field" />
+                         aria-label={`Edit ${item.title} field`} />
       )}
 
       {!isEditing && (
@@ -120,10 +119,11 @@ type Props = {
 
 const SelectedFieldsList = ({ groupingIndex }: Props) => {
   const { setFieldValue, values } = useFormikContext<WidgetConfigFormValues>();
-  const grouping = values.groupBy.groupings[groupingIndex];
-  const groupingsForList = useMemo(() => grouping.fields?.map((field) => ({ id: field, title: field })), [grouping.fields]);
   const fieldTypes = useContext(FieldTypesContext);
   const activeQueryId = useActiveQueryId();
+
+  const grouping = values.groupBy.groupings[groupingIndex];
+  const groupingFieldsForList = useMemo(() => grouping.fields?.map((field) => ({ id: field, title: field })), [grouping.fields]);
 
   const onChangeField = useCallback((fieldIndex: number, newFieldName: string) => {
     const newFields = [...grouping.fields];
@@ -174,7 +174,7 @@ const SelectedFieldsList = ({ groupingIndex }: Props) => {
   }
 
   return (
-    <SortableList items={groupingsForList}
+    <SortableList items={groupingFieldsForList}
                   onMoveItem={onSortChange}
                   customListItemRender={SortableListItem} />
   );
