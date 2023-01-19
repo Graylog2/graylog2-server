@@ -22,7 +22,6 @@ import SearchResult from 'views/logic/SearchResult';
 import asMock from 'helpers/mocking/AsMock';
 import Widget from 'views/logic/widgets/Widget';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import type { SearchStoreState } from 'views/stores/SearchStore';
 import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
@@ -160,7 +159,7 @@ describe('TimerangeInfo', () => {
           },
         },
       }),
-    }) as SearchStoreState);
+    }) as SearchExecutionResult);
 
     render(<TimerangeInfo widget={relativeWidget} activeQuery="active-query-id" widgetId="widget-id" />);
 
@@ -170,7 +169,7 @@ describe('TimerangeInfo', () => {
   it('should not throw error and display default time range when widget id does not exist in search widget mapping', () => {
     asMock(useSearchResult).mockReturnValue(mockSearchStoreState({
       widgetMapping: Immutable.Map(),
-    }) as SearchStoreState);
+    }) as SearchExecutionResult);
 
     render(<TimerangeInfo widget={widget} activeQuery="active-query-id" widgetId="widget-id" />);
 
