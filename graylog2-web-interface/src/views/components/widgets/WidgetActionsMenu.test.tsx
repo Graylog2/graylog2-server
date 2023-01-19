@@ -22,7 +22,6 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import mockAction from 'helpers/mocking/MockAction';
 import asMock from 'helpers/mocking/AsMock';
-import { WidgetActions } from 'views/stores/WidgetStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import WidgetModel from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
@@ -39,7 +38,9 @@ import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import createSearch from 'views/logic/slices/createSearch';
-import { duplicateWidget } from 'views/logic/slices/widgetActions';
+import { duplicateWidget, removeWidget } from 'views/logic/slices/widgetActions';
+import useViewType from 'views/hooks/useViewType';
+import fetchSearch from 'views/logic/views/fetchSearch';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
 
@@ -50,12 +51,14 @@ import WidgetFocusContext from '../contexts/WidgetFocusContext';
 jest.mock('views/components/dashboard/hooks/useDashboards');
 jest.mock('views/logic/views/CopyWidgetToDashboard', () => jest.fn());
 jest.mock('views/logic/views/Actions');
-jest.mock('views/hooks/useViewType');
 jest.mock('views/logic/slices/createSearch');
+jest.mock('views/hooks/useViewType');
+jest.mock('views/logic/views/fetchSearch');
 
 jest.mock('views/logic/slices/widgetActions', () => ({
   ...jest.requireActual('views/logic/slices/widgetActions'),
-  duplicateWidget: jest.fn(() => () => Promise.resolve()),
+  duplicateWidget: jest.fn(() => async () => {}),
+  removeWidget: jest.fn(() => async () => {}),
 }));
 
 const openActionDropdown = async () => {
@@ -226,11 +229,14 @@ describe('<WidgetActionsMenu />', () => {
       ViewManagementActions.update = mockAction(jest.fn((view) => Promise.resolve(view)));
       SearchActions.get = mockAction(jest.fn(() => Promise.resolve(searchDB1.toJSON())));
       SearchActions.create = mockAction(jest.fn(() => Promise.resolve({ search: searchDB1 })));
+      asMock(fetchSearch).mockResolvedValue(searchDB1.toJSON());
 
       asMock(CopyWidgetToDashboard).mockImplementation(() => View.builder()
         .search(Search.builder().id('search-id').build())
         .id('new-id').type(View.Type.Dashboard)
         .build());
+
+      asMock(useViewType).mockReturnValue(View.Type.Search);
     });
 
     const renderAndClick = async (view: View = search) => {
@@ -250,24 +256,26 @@ describe('<WidgetActionsMenu />', () => {
     };
 
     it('should get dashboard from backend', async () => {
-      await renderAndClick(dashboard1);
+      await renderAndClick();
       await waitFor(() => expect(ViewManagementActions.get).toHaveBeenCalledTimes(1));
+
+      await waitFor(() => expect(loadDashboard).toHaveBeenCalled());
 
       expect(ViewManagementActions.get).toHaveBeenCalledWith('view-1');
     });
 
     it('should get corresponding search to dashboard', async () => {
       await renderAndClick();
-      await waitFor(() => expect(SearchActions.get).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(fetchSearch).toHaveBeenCalledTimes(1));
 
-      expect(SearchActions.get).toHaveBeenCalledWith('search-1');
+      expect(fetchSearch).toHaveBeenCalledWith('search-1');
     });
 
     it('should create new search for dashboard', async () => {
       await renderAndClick();
-      await waitFor(() => expect(SearchActions.create).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(createSearch).toHaveBeenCalledTimes(1));
 
-      expect(SearchActions.create).toHaveBeenCalledWith(Search.builder().id('search-id').parameters([]).queries([])
+      expect(createSearch).toHaveBeenCalledWith(Search.builder().id('search-id').parameters([]).queries([])
         .build());
     });
 
@@ -277,7 +285,7 @@ describe('<WidgetActionsMenu />', () => {
 
       expect(ViewManagementActions.update).toHaveBeenCalledWith(
         View.builder()
-          .search(Search.builder().id('search-1').build())
+          .search(Search.builder().id('search-id').build())
           .id('new-id').type(View.Type.Dashboard)
           .build(),
       );
@@ -312,7 +320,7 @@ describe('<WidgetActionsMenu />', () => {
 
       fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
 
-      await waitFor(() => expect(WidgetActions.remove).toHaveBeenCalledWith('widget-id'));
+      await waitFor(() => expect(removeWidget).toHaveBeenCalledWith('widget-id'));
     });
 
     it('should not delete widget when no deletion hook is installed and prompt is cancelled', async () => {
@@ -326,7 +334,7 @@ describe('<WidgetActionsMenu />', () => {
 
       await waitFor(() => expect(window.confirm).toHaveBeenCalled());
 
-      expect(WidgetActions.remove).not.toHaveBeenCalled();
+      expect(removeWidget).not.toHaveBeenCalled();
     });
 
     describe('with custom deletion hook', () => {
@@ -356,7 +364,7 @@ describe('<WidgetActionsMenu />', () => {
 
         fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
 
-        await waitFor(() => expect(WidgetActions.remove).toHaveBeenCalledWith('widget-id'));
+        await waitFor(() => expect(removeWidget).toHaveBeenCalledWith('widget-id'));
 
         expect(deletingWidgetHook).toHaveBeenCalled();
       });
@@ -371,7 +379,7 @@ describe('<WidgetActionsMenu />', () => {
 
         fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
 
-        expect(WidgetActions.remove).not.toHaveBeenCalledWith('widget-id');
+        expect(removeWidget).not.toHaveBeenCalledWith('widget-id');
 
         expect(deletingWidgetHook).toHaveBeenCalled();
       });
@@ -391,7 +399,7 @@ describe('<WidgetActionsMenu />', () => {
         const oldConsoleTrace = console.trace;
         console.trace = jest.fn();
 
-        await waitFor(() => expect(WidgetActions.remove).toHaveBeenCalledWith('widget-id'));
+        await waitFor(() => expect(removeWidget).toHaveBeenCalledWith('widget-id'));
 
         expect(console.trace).toHaveBeenCalledWith('Exception occurred in deletion confirmation hook: ', e);
 
