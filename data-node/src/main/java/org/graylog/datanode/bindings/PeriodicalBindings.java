@@ -16,22 +16,17 @@
  */
 package org.graylog.datanode.bindings;
 
-import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
-import org.graylog.datanode.initializers.JerseyService;
-import org.graylog.datanode.initializers.PeriodicalsService;
-import org.graylog.datanode.shutdown.GracefulShutdownService;
+import org.graylog.datanode.process.OpensearchHeartbeat;
+import org.graylog.datanode.process.ProcessWatchdog;
+import org.graylog2.plugin.periodical.Periodical;
 
-public class GenericInitializerBindings extends AbstractModule {
+public class PeriodicalBindings extends AbstractModule {
     @Override
     protected void configure() {
-//        bind(ProcessingStatusRecorder.class).to(MongoDBProcessingStatusRecorderService.class).asEagerSingleton();
-
-        Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
-        serviceBinder.addBinding().to(PeriodicalsService.class);
-        serviceBinder.addBinding().to(JerseyService.class);
-        serviceBinder.addBinding().to(GracefulShutdownService.class).asEagerSingleton();
-//        serviceBinder.addBinding().to(MongoDBProcessingStatusRecorderService.class).asEagerSingleton();
+        Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
+        periodicalBinder.addBinding().to(OpensearchHeartbeat.class);
+        periodicalBinder.addBinding().to(ProcessWatchdog.class);
     }
 }

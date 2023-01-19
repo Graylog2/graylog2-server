@@ -31,6 +31,7 @@ import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bindings.ConfigurationModule;
 import org.graylog.datanode.bindings.GenericBindings;
 import org.graylog.datanode.bindings.GenericInitializerBindings;
+import org.graylog.datanode.bindings.SchedulerBindings;
 import org.graylog.datanode.commands.Server;
 import org.graylog.datanode.configuration.PathConfiguration;
 import org.graylog.datanode.management.ManagedNodes;
@@ -302,7 +303,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
 //        result.add(new ServerStatusBindings(capabilities()));
 //        result.add(new ValidatorModule());
 //        result.add(new SharedPeriodicalBindings());
-//        result.add(new SchedulerBindings());
+        result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
 //        result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
 

@@ -18,6 +18,7 @@ package org.graylog.datanode.shutdown;
 
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.initializers.JerseyService;
+import org.graylog.datanode.initializers.PeriodicalsService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -35,6 +36,7 @@ public class GracefulShutdown implements Runnable {
     private final Configuration configuration;
     private final ServerStatus serverStatus;
     private final ActivityWriter activityWriter;
+    private final PeriodicalsService periodicalsService;
     private final JerseyService jerseyService;
     private final GracefulShutdownService gracefulShutdownService;
 
@@ -42,11 +44,13 @@ public class GracefulShutdown implements Runnable {
     public GracefulShutdown(ServerStatus serverStatus,
                             ActivityWriter activityWriter,
                             Configuration configuration,
+                            PeriodicalsService periodicalsService,
                             JerseyService jerseyService,
                             GracefulShutdownService gracefulShutdownService) {
         this.serverStatus = serverStatus;
         this.activityWriter = activityWriter;
         this.configuration = configuration;
+        this.periodicalsService = periodicalsService;
         this.jerseyService = jerseyService;
         this.gracefulShutdownService = gracefulShutdownService;
     }
@@ -74,6 +78,9 @@ public class GracefulShutdown implements Runnable {
         // Stop all services that registered with the shutdown service (e.g. plugins)
         // This must run after the BufferSynchronizerService shutdown to make sure the buffers are empty.
         gracefulShutdownService.stopAsync();
+
+        // stop all maintenance tasks
+        periodicalsService.stopAsync().awaitTerminated();
 
         // Wait until the shutdown service is done
         gracefulShutdownService.awaitTerminated();

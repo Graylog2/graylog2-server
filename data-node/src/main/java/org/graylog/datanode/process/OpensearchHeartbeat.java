@@ -18,34 +18,51 @@ package org.graylog.datanode.process;
 
 import org.graylog.datanode.management.ManagedNodes;
 import org.graylog2.plugin.periodical.Periodical;
+import org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
+import org.opensearch.client.RequestOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.IOException;
 
 @Singleton
-public class ProcessWatchdog extends Periodical {
+public class OpensearchHeartbeat extends Periodical {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ProcessWatchdog.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchHeartbeat.class);
     private final ManagedNodes managedOpenSearch;
 
     @Inject
-    public ProcessWatchdog(ManagedNodes managedOpenSearch) {
+    public OpensearchHeartbeat(ManagedNodes managedOpenSearch) {
         this.managedOpenSearch = managedOpenSearch;
     }
 
-    private void updateStatus(OpensearchProcess process) {
-        if (!process.getProcess().isAlive()) {
-            process.onEvent(ProcessEvent.PROCESS_TERMINATED);
-        }
+    private void onClusterStatus(OpensearchProcess process, ClusterHealthResponse health) {
+        process.onEvent(ProcessEvent.HEALTH_CHECK_GREEN);
+    }
+
+    private void onRestError(OpensearchProcess process, IOException e) {
+        process.onEvent(ProcessEvent.HEALTH_CHECK_FAILED);
+        LOG.warn("Opensearch REST api of process {} unavailable. Cause: {}", process.getProcessInfo().pid(), e.getMessage());
     }
 
     @Override
     // This method is "synchronized" because we are also calling it directly in AutomaticLeaderElectionService
     public synchronized void doRun() {
         managedOpenSearch.getProcesses()
-                .forEach(this::updateStatus);
+                .forEach(process -> {
+                    try {
+                        final ClusterHealthRequest req = new ClusterHealthRequest();
+                        final ClusterHealthResponse health = process.getRestClient()
+                                .cluster()
+                                .health(req, RequestOptions.DEFAULT);
+                        onClusterStatus(process, health);
+                    } catch (IOException e) {
+                        onRestError(process, e);
+                    }
+                });
     }
 
     @Override
@@ -85,6 +102,6 @@ public class ProcessWatchdog extends Periodical {
 
     @Override
     public int getPeriodSeconds() {
-        return 1;
+        return 10;
     }
 }
