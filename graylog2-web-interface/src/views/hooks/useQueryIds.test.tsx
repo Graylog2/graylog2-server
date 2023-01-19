@@ -51,7 +51,7 @@ describe('useQueryIds', () => {
 
   afterAll(unloadViewsPlugin);
 
-  it('tracks `ViewStore` updates', async () => {
+  it('tracks query updates', async () => {
     const { result } = renderHook(() => useQueryIds(), { wrapper: createWrapper(['foo']) });
 
     expect(result.current).toEqual(Immutable.OrderedSet(['foo']));
