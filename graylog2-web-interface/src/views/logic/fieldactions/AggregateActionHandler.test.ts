@@ -45,7 +45,7 @@ describe('AggregateActionHandler', () => {
     expect(config.rowPivots[0]).toEqual(Pivot.create(['foo'], 'values', { limit: 15 }));
   });
 
-  it('uses field type when generating widget', () => {
+  it('duplicates filter of original widget', () => {
     WidgetActions.create = mockAction(jest.fn((widget: Widget) => Promise.resolve(widget)));
     const filter = 'author: "Vanth"';
     const origWidget = Widget.builder().filter(filter).build();

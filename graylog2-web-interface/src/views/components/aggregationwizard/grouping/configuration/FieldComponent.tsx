@@ -51,6 +51,8 @@ const FieldComponent = ({ groupingIndex }: Props) => {
   const grouping = values.groupBy.groupings[groupingIndex];
   const activeQueryId = useActiveQueryId();
 
+  const createSelectPlaceholder = placeholder(grouping);
+
   const onAddField = useCallback((fieldName: string) => {
     const newFields = [...(grouping.fields ?? []), fieldName];
 
@@ -79,8 +81,8 @@ const FieldComponent = ({ groupingIndex }: Props) => {
                    name="group-by-field-create-select"
                    value={undefined}
                    excludedFields={grouping.fields ?? []}
-                   placeholder={placeholder(grouping as GroupByFormValues)}
-                   aria-label="Add a field" />
+                   placeholder={createSelectPlaceholder}
+                   aria-label={createSelectPlaceholder} />
       <SelectedFieldsList groupingIndex={groupingIndex} />
     </Input>
   );
