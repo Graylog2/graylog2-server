@@ -58,7 +58,7 @@ const FieldComponent = ({ groupingIndex }: Props) => {
       fieldTypes,
       activeQueryId,
       groupingIndex,
-      grouping: grouping as GroupByFormValues,
+      grouping,
       newFields,
       setFieldValue,
     });

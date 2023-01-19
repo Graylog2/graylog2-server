@@ -29,7 +29,6 @@ import GroupingsConfiguration from './GroupingsConfiguration';
 
 import type { AggregationElement } from '../AggregationElementType';
 import type {
-  BaseGrouping,
   DateGrouping,
   GroupByFormValues,
   GroupingDirection,
@@ -43,8 +42,12 @@ export type GroupByError = {
   limit?: string,
 };
 
-export const toValuesGrouping = (grouping: GroupByFormValues) => {
-  const newGrouping = { ...grouping, type: ValuesType, limit: DEFAULT_LIMIT };
+export const toValuesGrouping = (grouping: GroupByFormValues): ValuesGrouping => {
+  const newGrouping = {
+    ...grouping,
+    type: ValuesType as typeof ValuesType,
+    limit: DEFAULT_LIMIT,
+  };
 
   if ('interval' in newGrouping) {
     delete newGrouping.interval;
@@ -53,8 +56,12 @@ export const toValuesGrouping = (grouping: GroupByFormValues) => {
   return newGrouping;
 };
 
-export const toTimeGrouping = (grouping: GroupByFormValues) => {
-  const newGrouping = { ...grouping, type: DateType, interval: DEFAULT_PIVOT_INTERVAL };
+export const toTimeGrouping = (grouping: GroupByFormValues): DateGrouping => {
+  const newGrouping = {
+    ...grouping,
+    type: DateType as typeof DateType,
+    interval: DEFAULT_PIVOT_INTERVAL,
+  };
 
   if ('limit' in newGrouping) {
     delete newGrouping.limit;
@@ -82,9 +89,9 @@ export const onGroupingFieldsChange = ({
 
   if (!newFields.length) {
     updateFormState({
-      ...toValuesGrouping(grouping as GroupByFormValues),
+      ...toValuesGrouping(grouping),
       fields: [],
-    } as GroupByFormValues);
+    });
 
     return;
   }
@@ -103,16 +110,16 @@ export const onGroupingFieldsChange = ({
   if (grouping.type !== newGroupingType) {
     if (newGroupingType === ValuesType) {
       updateFormState({
-        ...toValuesGrouping(grouping as GroupByFormValues),
+        ...toValuesGrouping(grouping),
         fields: newFields,
-      } as GroupByFormValues);
+      });
     }
 
     if (newGroupingType === DateType) {
       updateFormState({
-        ...toTimeGrouping(grouping as GroupByFormValues),
+        ...toTimeGrouping(grouping),
         fields: newFields,
-      } as GroupByFormValues);
+      });
     }
   }
 };
@@ -192,7 +199,7 @@ const validateGroupings = (values: WidgetConfigFormValues): WidgetConfigValidati
   return hasErrors(groupingErrors) ? { groupBy: { groupings: groupingErrors } } : emptyErrors;
 };
 
-const addRandomId = <GroupingType extends BaseGrouping>(baseGrouping: Omit<GroupingType, 'id'>) => ({
+const addRandomId = <GroupingType extends GroupByFormValues>(baseGrouping: Omit<GroupingType, 'id'>) => ({
   ...baseGrouping,
   id: generateId(),
 });

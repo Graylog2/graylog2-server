@@ -34,6 +34,8 @@ const StyledForm = styled(Form)`
   width: 100%;
 `;
 
+type Required<T, K extends keyof T> = Pick<T, K> & Partial<T>;
+
 export type MetricFormValues = {
   function: string,
   field: string | undefined,
@@ -49,12 +51,12 @@ export type BaseGrouping = {
   id: string,
 };
 
-export type DateGrouping = BaseGrouping & {
+export type DateGrouping = Required<BaseGrouping, 'id'> & {
   type: typeof DateType,
   interval: AutoTimeConfig | TimeUnitConfig,
 };
 
-export type ValuesGrouping = BaseGrouping & {
+export type ValuesGrouping = Required<BaseGrouping, 'id'> & {
   type: typeof ValuesType,
   limit: number,
 };
@@ -86,13 +88,11 @@ export type SortFormValues = {
   id: string,
 }
 
-type Required<T, K extends keyof T> = Pick<T, K> & Partial<T>;
-
 export interface WidgetConfigFormValues {
   metrics?: Array<MetricFormValues>,
   groupBy?: {
     columnRollup: boolean,
-    groupings: Array<Required<GroupByFormValues, 'id'>>,
+    groupings: Array<GroupByFormValues>,
   },
   visualization?: VisualizationFormValues,
   sort?: Array<SortFormValues>,
