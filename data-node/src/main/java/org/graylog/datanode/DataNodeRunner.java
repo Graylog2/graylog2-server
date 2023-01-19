@@ -17,6 +17,13 @@
 package org.graylog.datanode;
 
 import com.github.rholder.retry.RetryException;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecuteResultHandler;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteStreamHandler;
+import org.apache.commons.exec.ExecuteWatchdog;
+import org.apache.commons.exec.Executor;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.graylog.datanode.process.OpensearchProcess;
 import org.graylog.datanode.process.OpensearchProcessLogs;
 import org.graylog.datanode.process.OpensearchConfiguration;
@@ -33,8 +40,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DataNodeRunner {
 
@@ -49,42 +60,39 @@ public class DataNodeRunner {
 
     public OpensearchProcess start(OpensearchConfiguration opensearchConfiguration) {
         try {
-            setConfiguration(opensearchConfiguration);
             return run(opensearchConfiguration);
         } catch (IOException | InterruptedException | ExecutionException | RetryException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void setConfiguration(OpensearchConfiguration config) throws IOException {
-        final Path configPath = config.opensearchDir().resolve(Path.of("config", "opensearch.yml"));
-        File file = configPath.toFile();
-        try (
-                FileWriter fr = new FileWriter(file, StandardCharsets.UTF_8);
-                BufferedWriter br = new BufferedWriter(fr);
-        ) {
-
-            for (Map.Entry<String, String> option : config.mergedConfig().entrySet()) {
-                final String optionLine = toOptionLine(option);
-                LOG.info("Setting configuration: " + option);
-                br.write(optionLine + "\n");
-            }
-        }
-    }
-
-    private String toOptionLine(Map.Entry<String, String> option) {
-        return option.getKey() + ": " + option.getValue();
-    }
-
     private OpensearchProcess run(OpensearchConfiguration config) throws IOException, InterruptedException, ExecutionException, RetryException {
+
         final Path binPath = config.opensearchDir().resolve(Paths.get("bin", "opensearch"));
         LOG.info("Running opensearch from " + binPath.toAbsolutePath());
-        ProcessBuilder builder = new ProcessBuilder(binPath.toAbsolutePath().toString());
+
+        List<String> command = new ArrayList<>();
+        command.add(binPath.toAbsolutePath().toString());
+        command.addAll(toConfigOptions(config.mergedConfig()));
+        ProcessBuilder builder = new ProcessBuilder(command);
+
+        // TODO: why is this not working?
+        //builder.environment().putAll(config.mergedConfig());
 
         final Process process = builder.start();
         final OpensearchProcessLogs logs = OpensearchProcessLogs.createFor(process, logsSize);
         final OpensearchProcess opensearchProcess = new OpensearchProcess(config.opensearchVersion(), config.opensearchDir(), process, logs, config.httpPort());
         opensearchProcess.onEvent(ProcessEvent.PROCESS_STARTED);
         return opensearchProcess;
+    }
+
+    /**
+     * TODO: this could be potentially very dangerous - with a properly formatted config the user could
+     * execute anything in the underlying system!
+     */
+    private List<String> toConfigOptions(Map<String, String> mergedConfig) {
+        return mergedConfig.entrySet().stream()
+                .map(it -> "-E" + it.getKey() + "=" + it.getValue())
+                .collect(Collectors.toList());
     }
 }

@@ -23,9 +23,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 @Singleton
 public class ConfigurationProvider {
@@ -54,11 +56,17 @@ public class ConfigurationProvider {
         final LinkedHashMap<String, String> config = new LinkedHashMap<>();
         config.put("path.data", dataLocation);
         config.put("path.logs", logsLocation);
-        config.put("discovery.type", "single-node");
+        //config.put("discovery.type", "single-node");
         config.put("plugins.security.ssl.http.enabled", "false");
         config.put("plugins.security.disabled", "true");
+        config.put("cluster.initial_master_nodes", "node1");
 
-        final ClusterConfiguration clusterConfiguration = new ClusterConfiguration("os-cluster-datanode", null, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+        final ClusterConfiguration clusterConfiguration = new ClusterConfiguration(
+                "datanode-cluster",
+                "node1",
+                Collections.emptyList(),
+                Collections.emptyList(),
+                Collections.emptyList());
 
         final OpensearchConfiguration processConfiguration = new OpensearchConfiguration(
                 opensearchVersion,
@@ -68,6 +76,6 @@ public class ConfigurationProvider {
                 clusterConfiguration,
                 config);
 
-        return Collections.singletonList(processConfiguration);
+        return List.of(processConfiguration);
     }
 }

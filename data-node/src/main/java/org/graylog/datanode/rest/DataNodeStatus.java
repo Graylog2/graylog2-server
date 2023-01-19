@@ -16,9 +16,16 @@
  */
 package org.graylog.datanode.rest;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.plugin.Version;
 
 import java.util.List;
 
-public record DataNodeStatus(Version dataNodeVersion, List<StatusResponse>processes) {
+public record DataNodeStatus(@JsonIgnore Version appVersion, List<StatusResponse>processes) {
+
+    @JsonProperty
+    public String dataNodeVersion() {
+        return this.appVersion.toString();
+    }
 }

@@ -45,6 +45,8 @@ public class ProcessWatchdog extends Periodical {
     // This method is "synchronized" because we are also calling it directly in AutomaticLeaderElectionService
     public synchronized void doRun() {
         managedOpenSearch.getProcesses()
+                .stream()
+                .filter(opensearchProcess -> opensearchProcess.getStatus() != ProcessState.TERMINATED)
                 .forEach(this::updateStatus);
     }
 

@@ -21,6 +21,7 @@ import org.graylog2.plugin.periodical.Periodical;
 import org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.opensearch.client.RequestOptions;
+import org.opensearch.cluster.health.ClusterHealthStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +41,13 @@ public class OpensearchHeartbeat extends Periodical {
     }
 
     private void onClusterStatus(OpensearchProcess process, ClusterHealthResponse health) {
-        process.onEvent(ProcessEvent.HEALTH_CHECK_GREEN);
+        final ClusterHealthStatus status = health.getStatus();
+        switch (status) {
+            case GREEN -> process.onEvent(ProcessEvent.HEALTH_CHECK_OK);
+            case YELLOW -> process.onEvent(ProcessEvent.HEALTH_CHECK_OK);
+            case RED -> process.onEvent(ProcessEvent.HEALTH_CHECK_FAILED);
+        }
+        process.setLeaderNode(health.hasDiscoveredClusterManager());
     }
 
     private void onRestError(OpensearchProcess process, IOException e) {

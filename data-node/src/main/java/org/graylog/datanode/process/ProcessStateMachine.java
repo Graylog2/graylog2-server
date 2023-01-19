@@ -19,8 +19,6 @@ package org.graylog.datanode.process;
 import com.github.oxo42.stateless4j.StateMachine;
 import com.github.oxo42.stateless4j.StateMachineConfig;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 public class ProcessStateMachine {
 
     /**
@@ -47,13 +45,13 @@ public class ProcessStateMachine {
                 .permitDynamic(ProcessEvent.HEALTH_CHECK_FAILED,
                         () -> startupFailuresCounter.failedTooManyTimes() ? ProcessState.FAILED : ProcessState.STARTING,
                         startupFailuresCounter::increment)
-                .permit(ProcessEvent.HEALTH_CHECK_GREEN, ProcessState.AVAILABLE)
+                .permit(ProcessEvent.HEALTH_CHECK_OK, ProcessState.AVAILABLE)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED);
 
         // the process is running and responding to the REST status, it's available for any usage
         config.configure(ProcessState.AVAILABLE)
                 .onEntry(restFailureCounter::resetFailuresCounter)
-                .permitReentry(ProcessEvent.HEALTH_CHECK_GREEN)
+                .permitReentry(ProcessEvent.HEALTH_CHECK_OK)
                 .permit(ProcessEvent.HEALTH_CHECK_FAILED, ProcessState.NOT_RESPONDING)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED);
 
@@ -64,19 +62,20 @@ public class ProcessStateMachine {
                         () -> restFailureCounter.failedTooManyTimes() ? ProcessState.FAILED : ProcessState.NOT_RESPONDING,
                         restFailureCounter::increment
                         )
-                .permit(ProcessEvent.HEALTH_CHECK_GREEN, ProcessState.AVAILABLE)
+                .permit(ProcessEvent.HEALTH_CHECK_OK, ProcessState.AVAILABLE)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED);
 
         // failed and we see the process as not recoverable.
         // TODO: what to do if the process fails? Reboot?
         config.configure(ProcessState.FAILED)
                 .ignore(ProcessEvent.HEALTH_CHECK_FAILED)
-                .permit(ProcessEvent.HEALTH_CHECK_GREEN, ProcessState.AVAILABLE)
+                .permit(ProcessEvent.HEALTH_CHECK_OK, ProcessState.AVAILABLE)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED);
 
         // final state, the process is not alive anymore, terminated on the operating system level
         // TODO: what to do if the process has been terminated? Reboot?
         config.configure(ProcessState.TERMINATED)
+                .ignore(ProcessEvent.HEALTH_CHECK_FAILED)
                 .ignore(ProcessEvent.PROCESS_TERMINATED); // final state, all following terminate events are ignored
 
         return new StateMachine<>(ProcessState.NEW, config);

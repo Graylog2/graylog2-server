@@ -30,7 +30,7 @@ class ProcessStateMachineTest {
         machine.fire(ProcessEvent.PROCESS_STARTED);
         Assertions.assertEquals(ProcessState.STARTING, machine.getState());
 
-        machine.fire(ProcessEvent.HEALTH_CHECK_GREEN);
+        machine.fire(ProcessEvent.HEALTH_CHECK_OK);
         Assertions.assertEquals(ProcessState.AVAILABLE, machine.getState());
 
         machine.fire(ProcessEvent.PROCESS_TERMINATED);
@@ -45,7 +45,7 @@ class ProcessStateMachineTest {
         machine.fire(ProcessEvent.PROCESS_STARTED);
         Assertions.assertEquals(ProcessState.STARTING, machine.getState());
 
-        machine.fire(ProcessEvent.HEALTH_CHECK_GREEN);
+        machine.fire(ProcessEvent.HEALTH_CHECK_OK);
         Assertions.assertEquals(ProcessState.AVAILABLE, machine.getState());
         machine.fire(ProcessEvent.HEALTH_CHECK_FAILED);
         machine.fire(ProcessEvent.HEALTH_CHECK_FAILED);
@@ -58,7 +58,7 @@ class ProcessStateMachineTest {
         machine.fire(ProcessEvent.HEALTH_CHECK_FAILED);
         Assertions.assertEquals(ProcessState.FAILED, machine.getState());
 
-        machine.fire(ProcessEvent.HEALTH_CHECK_GREEN);
+        machine.fire(ProcessEvent.HEALTH_CHECK_OK);
         Assertions.assertEquals(ProcessState.AVAILABLE, machine.getState());
     }
 
@@ -95,7 +95,7 @@ class ProcessStateMachineTest {
         Assertions.assertEquals(ProcessState.STARTING, machine.getState());
 
         machine.fire(ProcessEvent.HEALTH_CHECK_FAILED);
-        machine.fire(ProcessEvent.HEALTH_CHECK_GREEN);
+        machine.fire(ProcessEvent.HEALTH_CHECK_OK);
         // succeeded just in time before we give up
         Assertions.assertEquals(ProcessState.AVAILABLE, machine.getState());
     }

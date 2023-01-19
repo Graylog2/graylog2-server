@@ -38,7 +38,7 @@ public record ClusterConfiguration(
             config.put("cluster.name", clusterName);
         }
         if (nodeName != null && !nodeName.isBlank()) {
-            config.put("node.name", clusterName);
+            config.put("node.name", nodeName);
         }
         if (nodeRoles != null && !nodeRoles.isEmpty()) {
             config.put("node.roles", toYamlList(nodeRoles));
@@ -56,6 +56,6 @@ public record ClusterConfiguration(
         return values.stream()
                 .collect(Collectors.collectingAndThen(
                         Collectors.joining(","),
-                        list -> "[" + list + "]"));
+                        list -> "" + list + ""));
     }
 }
