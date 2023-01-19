@@ -20,35 +20,11 @@ import userEvent from '@testing-library/user-event';
 import { Form, Formik } from 'formik';
 
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
-import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import { validationError, validationErrorExplanation } from 'fixtures/queryValidationState';
 import usePluginEntities from 'hooks/usePluginEntities';
-
-import asMock from '../../../../../test/helpers/mocking/AsMock';
-
-jest.mock('views/stores/QueriesStore', () => ({
-  QueriesActions: {
-    validateQuery: jest.fn(() => Promise.resolve()),
-  },
-}));
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(() => ({ search: { parameters: [] } })),
-  },
-}));
-
-const MockSearchExecutionState = new SearchExecutionState();
-
-jest.mock('views/stores/SearchExecutionStateStore', () => ({
-  SearchExecutionStateStore: {
-    getInitialState: jest.fn(() => MockSearchExecutionState),
-    listen: () => jest.fn(),
-  },
-}));
+import asMock from 'helpers/mocking/AsMock';
 
 jest.mock('hooks/usePluginEntities');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));

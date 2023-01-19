@@ -26,19 +26,6 @@ import { setTimerange } from 'views/logic/slices/viewSlice';
 
 import OnZoom from './OnZoom';
 
-jest.mock('views/stores/QueriesStore', () => ({
-  QueriesActions: {
-    query: jest.fn(() => Promise.resolve()),
-    timerange: jest.fn(() => Promise.resolve()),
-  },
-}));
-
-jest.mock('views/stores/GlobalOverrideStore', () => ({
-  GlobalOverrideActions: {
-    timerange: jest.fn(() => Promise.resolve()),
-  },
-}));
-
 jest.mock('views/logic/slices/viewSlice', () => ({
   setTimerange: jest.fn(),
 }));
