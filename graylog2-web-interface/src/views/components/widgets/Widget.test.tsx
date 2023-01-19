@@ -21,12 +21,9 @@ import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import mockComponent from 'helpers/mocking/MockComponent';
-import mockAction from 'helpers/mocking/MockAction';
 import { createSearch } from 'fixtures/searches';
 import asMock from 'helpers/mocking/AsMock';
 import WidgetModel from 'views/logic/widgets/Widget';
-import type { Widgets } from 'views/types';
-import { WidgetActions } from 'views/stores/WidgetStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { ViewStore } from 'views/stores/ViewStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
@@ -282,13 +279,11 @@ describe('<Widget />', () => {
   it('does not trigger action when clicking cancel after no changes were made', () => {
     render(<DummyWidget editing />);
 
-    WidgetActions.updateConfig = mockAction(jest.fn(async () => Immutable.OrderedMap() as Widgets));
-
     const cancelBtn = screen.getByText('Cancel');
 
     fireEvent.click(cancelBtn);
 
-    expect(WidgetActions.updateConfig).not.toHaveBeenCalled();
+    expect(updateWidgetConfig).not.toHaveBeenCalled();
   });
 
   it('restores original state of widget config when clicking cancel after changes were made', () => {
@@ -320,8 +315,6 @@ describe('<Widget />', () => {
       .build();
     render(<DummyWidget editing widget={widgetWithConfig} />);
 
-    WidgetActions.updateConfig = mockAction(jest.fn(async () => Immutable.OrderedMap() as Widgets));
-    WidgetActions.update = mockAction(jest.fn(async () => Immutable.OrderedMap() as Widgets));
     const onChangeBtn = screen.getByText('Click me');
 
     fireEvent.click(onChangeBtn);
