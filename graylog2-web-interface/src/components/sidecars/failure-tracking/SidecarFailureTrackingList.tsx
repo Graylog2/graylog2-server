@@ -24,6 +24,8 @@ import SidecarSearchForm from 'components/sidecars/common/SidecarSearchForm';
 
 import SidecarFailureTrackingRows from './SidecarFailureTrackingRows';
 
+import type { Collector, PaginationInfo, SidecarSummary } from '../types';
+
 const StyledSortIcon = styled(SortIcon)`
   && {
     width: 12px;
@@ -32,8 +34,23 @@ const StyledSortIcon = styled(SortIcon)`
   }
 `;
 
+type Props = {
+  sidecars: SidecarSummary[],
+  collectors: Collector[],
+  pagination: PaginationInfo,
+  query: string,
+  sort: { field: string, order: string },
+  onlyActive: boolean,
+  pageSizes: number[],
+  onPageChange: (page: number, pageSize: number) => void,
+  onQueryChange: (query: string) => void,
+  onSortChange: (sortField: string) => void,
+  toggleShowInactive: () => void,
+}
+
 const SidecarFailureTrackingList = ({
   sidecars,
+  collectors,
   pagination,
   query,
   sort,
@@ -43,7 +60,7 @@ const SidecarFailureTrackingList = ({
   onQueryChange,
   onSortChange,
   toggleShowInactive,
-}) => {
+}: Props) => {
   const formatSidecarList = (sidecarRows: React.ReactNode[]) => {
     const sidecarCollection = {
       node_name: 'Name',
@@ -55,6 +72,13 @@ const SidecarFailureTrackingList = ({
 
     return (
       <Table striped responsive>
+        <colgroup>
+          <col span={1} style={{ width: '12%' }} />
+          <col span={1} style={{ width: '12%' }} />
+          <col span={1} style={{ width: '10%' }} />
+          <col span={1} style={{ width: '16%' }} />
+          <col span={1} style={{ width: '50%' }} />
+        </colgroup>
         <thead>
           <tr>
             {Object.keys(sidecarCollection).map((sort_key) => (
@@ -99,7 +123,7 @@ const SidecarFailureTrackingList = ({
     );
   };
 
-  const sidecarRows = sidecars.map((sidecar) => <SidecarFailureTrackingRows key={sidecar.node_id} sidecar={sidecar} />);
+  const sidecarRows = sidecars.map((sidecar) => <SidecarFailureTrackingRows key={sidecar.node_id} sidecar={sidecar} collectors={collectors} />);
   const showOrHideInactive = (onlyActive ? 'Include' : 'Hide');
   const sidecarList = (sidecarRows.length > 0 ? formatSidecarList(sidecarRows) : renderEmptyList());
 
@@ -131,6 +155,7 @@ const SidecarFailureTrackingList = ({
 
 SidecarFailureTrackingList.propTypes = {
   sidecars: PropTypes.array.isRequired,
+  collectors: PropTypes.array.isRequired,
   pagination: PropTypes.object.isRequired,
   query: PropTypes.string.isRequired,
   sort: PropTypes.object.isRequired,

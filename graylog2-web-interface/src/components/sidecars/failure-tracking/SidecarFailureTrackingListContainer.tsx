@@ -20,10 +20,11 @@ import { useState, useEffect } from 'react';
 import { Spinner } from 'components/common';
 import { SidecarsActions } from 'stores/sidecars/SidecarsStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
+import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
 
 import SidecarFailureTrackingList from './SidecarFailureTrackingList';
 
-import type { SidecarListResponse } from '../types';
+import type { Collector, SidecarListResponse } from '../types';
 
 type SidecarsArgs = {
   page?: number,
@@ -40,8 +41,8 @@ const SIDECARS_DEFAULT_ARGS: SidecarsArgs = {
   page: 1,
   pageSize: PAGE_SIZES[0],
   query: '',
-  sortField: 'node_name',
-  order: 'asc',
+  sortField: 'last_seen',
+  order: 'desc',
   onlyActive: false,
 };
 
@@ -59,15 +60,18 @@ const fetchSidecars = (options: SidecarsArgs = SIDECARS_DEFAULT_ARGS, callback: 
 const SidecarFailureTrackingListContainer = () => {
   const { page, pageSize, resetPage } = usePaginationQueryParameter(PAGE_SIZES);
   const [sidecarData, setSidecarData] = useState<SidecarListResponse|null>(null);
+  const [collectors, setCollectors] = useState<Collector[]>([]);
 
   useEffect(() => {
     if (sidecarData?.pagination.page !== page || sidecarData?.pagination.per_page !== pageSize) {
       const { query, sort, order, only_active } = sidecarData || {};
       fetchSidecars({ query, page, pageSize, order, sortField: sort, onlyActive: only_active }, setSidecarData);
     }
-
-    return () => {};
   }, [page, pageSize, sidecarData]);
+
+  useEffect(() => {
+    CollectorsActions.all().then((response) => setCollectors(response.collectors));
+  }, []);
 
   const previousSidecarArgs: SidecarsArgs = {
     page: 1,
@@ -102,6 +106,7 @@ const SidecarFailureTrackingListContainer = () => {
 
   return (
     <SidecarFailureTrackingList sidecars={sidecarData.sidecars}
+                                collectors={collectors}
                                 pagination={sidecarData.pagination}
                                 query={sidecarData.query}
                                 onlyActive={sidecarData.only_active}

@@ -16,20 +16,34 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { Link } from 'components/common/router';
 import RelativeTime from 'components/common/RelativeTime';
 import Routes from 'routing/Routes';
 import StatusIndicator from 'components/sidecars/common/StatusIndicator';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
+import { Button } from 'components/bootstrap';
 
-import type { SidecarSummary } from '../types';
+import type { Collector, SidecarSummary } from '../types';
+
+const VerboseMessageContainer = styled.div`
+  height: 80px;
+  overflow: hidden;
+  margin-bottom: 6px;
+`;
+
+const CollectorName = styled.div`
+  color: #94979c;
+  font-style: italic;
+`;
 
 type Props = {
   sidecar: SidecarSummary,
+  collectors: Collector[],
 }
 
-const SidecarFailureTrackingRows = ({ sidecar }: Props) => {
+const SidecarFailureTrackingRows = ({ sidecar, collectors }: Props) => {
   const annotation = sidecar.active ? '' : ' (inactive)';
   let sidecarStatus = { status: null, message: null, id: null };
 
@@ -40,6 +54,12 @@ const SidecarFailureTrackingRows = ({ sidecar }: Props) => {
       id: sidecar.node_id,
     };
   }
+
+  const getCollectorInformation = (collectorId: string) => {
+    const collectorData = collectors.find((collector) => collector.id === collectorId);
+
+    return `${collectorData.name} · ${collectorData.node_operating_system}`;
+  };
 
   const renderSidecarCollectorRows = () => {
     return sidecar.node_details.status.collectors.filter((collector) => collector.status === 2).map((collector) => (
@@ -52,6 +72,7 @@ const SidecarFailureTrackingRows = ({ sidecar }: Props) => {
               </Link>
             )
             : sidecar.node_name + annotation}
+          <CollectorName>{getCollectorInformation(collector.collector_id)}</CollectorName>
         </td>
         <td>
           <RelativeTime dateTime={sidecar.last_seen} />
@@ -66,7 +87,14 @@ const SidecarFailureTrackingRows = ({ sidecar }: Props) => {
           {collector.message}
         </td>
         <td>
-          {collector.verbose_message}
+          <VerboseMessageContainer>
+            {collector.verbose_message}
+          </VerboseMessageContainer>
+          <Button bsStyle="link"
+                  bsSize="xs"
+                  onClick={() => {}}>
+            Show Details
+          </Button>
         </td>
       </tr>
     ));
