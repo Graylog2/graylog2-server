@@ -47,6 +47,10 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.rest.bulk.BulkRemover;
+import org.graylog2.rest.bulk.SequentialBulkRemover;
+import org.graylog2.rest.bulk.model.BulkDeleteRequest;
+import org.graylog2.rest.bulk.model.BulkDeleteResponse;
 import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
@@ -143,6 +147,7 @@ public class StreamResource extends RestResource {
     private final IndexSetRegistry indexSetRegistry;
     private final SearchQueryParser searchQueryParser;
     private final RecentActivityService recentActivityService;
+    private final BulkRemover<UserContext> bulkRemover;
 
     @Inject
     public StreamResource(StreamService streamService,
@@ -158,6 +163,7 @@ public class StreamResource extends RestResource {
         this.paginatedStreamService = paginatedStreamService;
         this.searchQueryParser = new SearchQueryParser(StreamImpl.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.recentActivityService = recentActivityService;
+        this.bulkRemover = new SequentialBulkRemover<>(this::delete);
     }
 
     @POST
@@ -363,12 +369,31 @@ public class StreamResource extends RestResource {
     }
 
     @POST
+    @Path("/bulk_delete")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Timed
+    @ApiOperation(value = "Delete a bulk of streams", response = BulkDeleteResponse.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Could not delete at least one of the streams in the bulk.")
+    })
+    @AuditEvent(type = AuditEventTypes.STREAM_DELETE)
+    public Response bulk_delete(@ApiParam(name = "Entities to remove", required = true) final BulkDeleteRequest bulkDeleteRequest,
+                                @Context final UserContext userContext) {
+
+        final BulkDeleteResponse response = bulkRemover.bulkDelete(bulkDeleteRequest, userContext);
+
+        return Response.status(response.failures().isEmpty() ? Response.Status.OK : Response.Status.BAD_REQUEST)
+                .entity(response)
+                .build();
+    }
+
+    @POST
     @Path("/{streamId}/pause")
     @Timed
     @ApiOperation(value = "Pause a stream")
     @ApiResponses(value = {
-        @ApiResponse(code = 404, message = "Stream not found."),
-        @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
+            @ApiResponse(code = 404, message = "Stream not found."),
+            @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
     })
     @AuditEvent(type = AuditEventTypes.STREAM_STOP)
     public void pause(@ApiParam(name = "streamId", required = true)
