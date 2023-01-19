@@ -83,7 +83,8 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
             return new AutoValue_EmailEventNotificationConfigEntity.Builder()
                     .type(TYPE_NAME)
                     .htmlBodyTemplate(ValueReference.of(""))
-                    .timeZone(ValueReference.of("UTC"));
+                    .timeZone(ValueReference.of("UTC"))
+                    .replyTo(ValueReference.of(""));
         }
 
         @JsonProperty(FIELD_SENDER)

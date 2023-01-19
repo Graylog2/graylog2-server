@@ -141,7 +141,7 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
             return new AutoValue_EmailEventNotificationConfig.Builder()
                     .type(TYPE_NAME)
                     .sender(DEFAULT_SENDER)
-                    .replyTo(DEFAULT_SENDER)
+                    .replyTo("")
                     .subject(DEFAULT_SUBJECT)
                     .emailRecipients(ImmutableSet.of())
                     .userRecipients(ImmutableSet.of())
