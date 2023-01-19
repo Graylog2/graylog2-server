@@ -249,7 +249,7 @@ const pivotsToGrouping = (config: AggregationWidgetConfig) => {
 };
 
 const groupingToPivot = (grouping: GroupByFormValues) => {
-  const pivotConfig = 'interval' in grouping ? { interval: grouping.interval } : { limit: grouping.limit };
+  const pivotConfig = 'interval' in grouping ? { interval: grouping.interval } : { limit: parseNumber(grouping.limit) };
 
   return Pivot.create(grouping.fields, grouping.type, pivotConfig);
 };
