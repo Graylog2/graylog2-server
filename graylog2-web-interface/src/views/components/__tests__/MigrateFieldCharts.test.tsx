@@ -17,9 +17,7 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
-import MockAction from 'helpers/mocking/MockAction';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
@@ -52,34 +50,6 @@ const mockStoreGet = (fieldChart = {}, migrated = false) => (key: string) => {
 jest.mock('logic/local-storage/Store', () => ({
   get: jest.fn(),
   set: jest.fn(),
-}));
-
-jest.mock('views/stores/ViewStatesStore', () => ({
-  ViewStatesActions: {
-    update: jest.fn(() => Promise.resolve()),
-  },
-}));
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchActions: {
-    execute: MockAction(),
-  },
-}));
-
-jest.mock('views/actions/SearchActions', () => ({
-  executeWithCurrentState: jest.fn(() => Promise.resolve()),
-}));
-
-jest.mock('views/stores/CurrentViewStateStore', () => ({
-  CurrentViewStateStore: MockStore(
-    ['getInitialState', () => {
-      return {
-        state: mockViewState(),
-        activeQuery: 'active-query-id',
-      };
-    },
-    ],
-  ),
 }));
 
 jest.mock('views/logic/slices/searchExecutionSlice', () => ({
