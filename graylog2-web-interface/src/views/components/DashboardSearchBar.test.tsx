@@ -21,29 +21,16 @@ import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 import MockStore from 'helpers/mocking/StoreMock';
-import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
-import { SearchActions } from 'views/stores/SearchStore';
 import type { WidgetEditingState, WidgetFocusingState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import { execute, setGlobalOverride } from 'views/logic/slices/searchExecutionSlice';
 
-import DashboardSearchBar from './DashboardSearchBar';
+import OriginalDashboardSearchBar from './DashboardSearchBar';
 
 jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 jest.mock('views/components/DashboardActionsMenu', () => () => <span>View Actions</span>);
-
-jest.mock('views/stores/GlobalOverrideStore', () => ({
-  GlobalOverrideStore: MockStore(),
-  GlobalOverrideActions: {
-    set: jest.fn().mockResolvedValue({}),
-  },
-}));
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchStore: MockStore(['getInitialState', () => ({ search: { parameters: [] } })]),
-  SearchActions: {
-    refresh: jest.fn(),
-  },
-}));
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: MockStore(['getInitialState', () => ({ searchesClusterConfig: mockSearchesClusterConfig })]),
@@ -57,12 +44,26 @@ jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => () =
   explanations: [],
 }));
 
-jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
+jest.mock('views/logic/slices/searchExecutionSlice', () => ({
+  ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
+  execute: jest.fn(() => async () => {}),
+  setGlobalOverride: jest.fn(() => async () => {}),
+}));
+
+const DashboardSearchBar = () => (
+  <TestStoreProvider>
+    <OriginalDashboardSearchBar />
+  </TestStoreProvider>
+);
 
 describe('DashboardSearchBar', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
+
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
 
   it('should render the DashboardSearchBar', async () => {
     render(<DashboardSearchBar />);
@@ -88,7 +89,7 @@ describe('DashboardSearchBar', () => {
 
     userEvent.click(searchButton);
 
-    await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(execute).toHaveBeenCalledTimes(1));
   });
 
   it('should call SearchActions.refresh and set global override on submit when there are changes', async () => {
@@ -108,8 +109,8 @@ describe('DashboardSearchBar', () => {
 
     userEvent.click(searchButton);
 
-    await waitFor(() => expect(GlobalOverrideActions.set).toHaveBeenCalledWith({ type: 'relative', from: 300 }, ''));
-    await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(setGlobalOverride).toHaveBeenCalledWith('', { type: 'relative', from: 300 }));
+    await waitFor(() => expect(execute).toHaveBeenCalledTimes(1));
   }, applyTimeoutMultiplier(10000));
 
   it('should hide the save and load controls if a widget is being edited', async () => {
