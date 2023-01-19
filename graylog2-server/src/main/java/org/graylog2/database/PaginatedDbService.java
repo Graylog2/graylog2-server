@@ -29,6 +29,7 @@ import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -281,5 +282,28 @@ public abstract class PaginatedDbService<DTO> {
             sortBuilder = DBSort.asc(field);
         }
         return sortBuilder;
+    }
+
+    /**
+     * Utility method to use, if you can't page it inside of MongoDB
+     *
+     * @param sourceList
+     * @param page
+     * @param pageSize
+     * @return
+     * @param <T>
+     */
+    public static <T> List<T> getPage(List<T> sourceList, int page, int pageSize) {
+        if(pageSize <= 0 || page <= 0) {
+            throw new IllegalArgumentException("invalid page size: " + pageSize);
+        }
+
+        int fromIndex = (page - 1) * pageSize;
+        if(sourceList == null || sourceList.size() <= fromIndex){
+            return Collections.emptyList();
+        }
+
+        // toIndex exclusive
+        return sourceList.subList(fromIndex, Math.min(fromIndex + pageSize, sourceList.size()));
     }
 }
