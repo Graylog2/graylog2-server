@@ -80,23 +80,23 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
         }
 
         if (indexExceedsSizeLimit(sizeInBytes)) {
-            return new Result(true,
+            return createResult(true,
                     f("Index size <%s> exceeds MAX_INDEX_SIZE <%s>",
                             StringUtils.humanReadableByteCount(sizeInBytes), MAX_INDEX_SIZE));
         }
         if (indexExceedsLeeWay(creationDate, leeWay)) {
-            return new Result(true,
+            return createResult(true,
                     f("Index creation date <%s> exceeds optimization leeway <%s>",
                             creationDate, leeWay));
         }
 
         if (indexIsOldEnough(creationDate) && !indexSubceedsSizeLimit(sizeInBytes)) {
-            return new Result(true,
+            return createResult(true,
                     f("Index is old enough (%s) and has a reasonable size (%s) for rotation",
                             creationDate, StringUtils.humanReadableByteCount(sizeInBytes)));
         }
 
-        return new Result(false, "No reason to rotate found");
+        return createResult(false, "No reason to rotate found");
     }
 
     private boolean indexExceedsLeeWay(DateTime creationDate, Period leeWay) {
@@ -124,25 +124,5 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
     @Override
     public String getStrategyName() {
         return NAME;
-    }
-    static class Result implements AbstractRotationStrategy.Result {
-        private final boolean shouldRotate;
-        private final String message;
-
-        private Result(boolean shouldRotate, String message) {
-            this.shouldRotate = shouldRotate;
-            this.message = message;
-            LOG.debug("{} because of: {}", shouldRotate ? "Rotating" : "Not rotating", message);
-        }
-
-        @Override
-        public String getDescription() {
-            return message;
-        }
-
-        @Override
-        public boolean shouldRotate() {
-            return shouldRotate;
-        }
     }
 }
