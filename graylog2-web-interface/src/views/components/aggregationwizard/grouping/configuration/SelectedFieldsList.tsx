@@ -61,6 +61,7 @@ type ListItemProps = {
   onChange: (fieldName: string) => void,
   onRemove: () => void,
   excludedFields: Array<string>,
+  testIdPrefix: string,
 }
 
 const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
@@ -71,6 +72,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
   onChange,
   onRemove,
   excludedFields,
+  testIdPrefix,
 }: ListItemProps, ref) => {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -98,13 +100,13 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
 
       {!isEditing && (
         <>
-          <DragHandle {...dragHandleProps}>
+          <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
             <Icon name="bars" />
           </DragHandle>
           <FieldTitle>{item.title}</FieldTitle>
           <div>
-            <IconButton name="edit" onClick={() => setIsEditing(true)} />
-            <IconButton name="trash-alt" onClick={onRemove} />
+            <IconButton name="edit" title={`Edit ${item.title} field`} onClick={() => setIsEditing(true)} />
+            <IconButton name="trash-alt" title={`Remove ${item.title} field`} onClick={onRemove} />
           </div>
         </>
       )}
@@ -155,6 +157,7 @@ const SelectedFieldsList = ({ groupingIndex }: Props) => {
               onRemove={() => onRemoveField(item.id)}
               excludedFields={grouping.fields ?? []}
               item={item}
+              testIdPrefix={`grouping-${groupingIndex}-field-${index}`}
               dragHandleProps={dragHandleProps}
               draggableProps={draggableProps}
               className={className}
