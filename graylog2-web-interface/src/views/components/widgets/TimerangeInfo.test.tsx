@@ -21,7 +21,6 @@ import { render, screen } from 'wrappedTestingLibrary';
 import SearchResult from 'views/logic/SearchResult';
 import asMock from 'helpers/mocking/AsMock';
 import Widget from 'views/logic/widgets/Widget';
-import type { GlobalOverrideStoreState } from 'views/stores/GlobalOverrideStore';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import type { SearchStoreState } from 'views/stores/SearchStore';
 import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
@@ -135,7 +134,7 @@ describe('TimerangeInfo', () => {
   });
 
   it('should display global override', () => {
-    const state: GlobalOverrideStoreState = GlobalOverride.empty().toBuilder().timerange({ type: 'relative', range: 3000 }).build();
+    const state = GlobalOverride.empty().toBuilder().timerange({ type: 'relative', range: 3000 }).build();
     asMock(useGlobalOverride).mockReturnValue(state);
 
     const keywordWidget = widget.toBuilder()
