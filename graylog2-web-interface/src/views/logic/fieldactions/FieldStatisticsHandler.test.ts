@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Widget from 'views/logic/widgets/Widget';
-import { TitleTypes } from 'views/stores/TitlesStore';
+import TitleTypes from 'views/stores/TitleTypes';
 import { createViewWithWidgets } from 'fixtures/searches';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import mockDispatch from 'views/test/mockDispatch';
