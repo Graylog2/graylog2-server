@@ -112,10 +112,18 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             EntityAttribute.builder().id("title").title("Title").build(),
             EntityAttribute.builder().id("description").title("Description").build(),
             EntityAttribute.builder().id("priority").title("Priority").type("number").build(),
-            EntityAttribute.builder().id("alert").title("Status").type("boolean").filterable(true).filterOptions(Set.of(
+            EntityAttribute.builder().id("alert").title("Alert").type("boolean").filterable(true).filterOptions(Set.of(
                     FilterOption.create("true", "enabled"),
                     FilterOption.create("false", "disabled")
-            )).build()
+            )).build(),
+            EntityAttribute.builder().id("is_scheduled").title("Scheduled").type("boolean").filterable(true).filterOptions(Set.of(
+                    FilterOption.create("true", "enabled"),
+                    FilterOption.create("false", "disabled")
+            )).build(),
+            EntityAttribute.builder().id("status").title("Status").build(),
+            EntityAttribute.builder().id("next_time").title("Next run").type("date").build(),
+            EntityAttribute.builder().id("triggered_at").title("Triggered at").type("date").build(),
+            EntityAttribute.builder().id("queued_notifications").title("Notifications").type("number").build()
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
@@ -176,8 +184,19 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         PaginatedList<EventDefinitionDto> definitionDtos = new PaginatedList<>(
                 result.delegate(), result.pagination().total(), result.pagination().page(), result.pagination().perPage()
         );
+
+        final ImmutableMap<String, Object> context = contextService.contextFor(result.delegate());
+        ImmutableMap<String, EventDefinitionContextService.SchedulerCtx> schedulerCtx =
+                (ImmutableMap<String, EventDefinitionContextService.SchedulerCtx>) context.get(EventDefinitionContextService.SCHEDULER_KEY);
+
+        final List<EventDefinitionDto> eventDefinitionDtos =
+                result.delegate()
+                        .stream()
+                        .map(eventDefinition -> eventDefinition.toBuilder().schedulerCtx(schedulerCtx.get(eventDefinition.id())).build())
+                        .toList();
+
         return PageListResponse.create(query, definitionDtos.pagination(),
-                result.grandTotal().orElse(0L), sort, order, result.delegate(), attributes, settings);
+                result.grandTotal().orElse(0L), sort, order, eventDefinitionDtos, attributes, settings);
     }
 
     @GET

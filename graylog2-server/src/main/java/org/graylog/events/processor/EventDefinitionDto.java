@@ -29,6 +29,7 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
 import org.graylog.events.contentpack.entities.EventNotificationHandlerConfigEntity;
 import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
+import org.graylog.events.context.EventDefinitionContextService;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
@@ -66,6 +67,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     private static final String FIELD_KEY_SPEC = "key_spec";
     private static final String FIELD_NOTIFICATION_SETTINGS = "notification_settings";
     private static final String FIELD_STORAGE = "storage";
+    private static final String FIELD_SCHEDULERCTX = "scheduler";
 
     @Override
     @Id
@@ -113,6 +115,11 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     @Override
     @JsonProperty(FIELD_STORAGE)
     public abstract ImmutableList<EventStorageHandler.Config> storage();
+
+    @Override
+    @JsonProperty(FIELD_SCHEDULERCTX)
+    @Nullable
+    public abstract EventDefinitionContextService.SchedulerCtx schedulerCtx();
 
     public static Builder builder() {
         return Builder.create();
@@ -194,6 +201,9 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
 
         @JsonProperty(FIELD_STORAGE)
         public abstract Builder storage(ImmutableList<EventStorageHandler.Config> storageHandlers);
+
+        @JsonProperty(FIELD_SCHEDULERCTX)
+        public abstract Builder schedulerCtx(EventDefinitionContextService.SchedulerCtx schedulerCtx);
 
         abstract EventDefinitionDto autoBuild();
 
