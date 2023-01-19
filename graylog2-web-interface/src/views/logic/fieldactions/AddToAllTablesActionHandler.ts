@@ -21,7 +21,7 @@ import type { GetState } from 'views/types';
 import { selectWidgets } from 'views/logic/slices/viewSelectors';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 
-const AddToAllTablesActionHandler = ({ field }: ActionHandlerArguments<{}>) => (dispatch: AppDispatch, getState: GetState) => {
+const AddToAllTablesActionHandler = ({ field }: ActionHandlerArguments<{}>) => async (dispatch: AppDispatch, getState: GetState) => {
   const widgets = selectWidgets(getState());
   const newWidgets = widgets.map((widget) => {
     if (widget.type.toUpperCase() === MessagesWidget.type.toUpperCase()) {
