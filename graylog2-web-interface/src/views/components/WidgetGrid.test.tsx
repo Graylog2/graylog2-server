@@ -16,10 +16,8 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { Map as MockMap } from 'immutable';
 import { mount } from 'wrappedEnzyme';
 
-import { MockStore } from 'helpers/mocking';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Widget from 'views/components/widgets/Widget';
 import _Widget from 'views/logic/widgets/Widget';
@@ -37,18 +35,6 @@ jest.mock('./widgets/Widget', () => () => 'widget');
 jest.mock('components/common/ReactGridContainer', () => ({ children }) => <span>{children}</span>);
 
 jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
-
-jest.mock('views/stores/WidgetStore', () => ({
-  WidgetStore: MockStore(['getInitialState', jest.fn()]),
-}));
-
-jest.mock('views/stores/CurrentViewStateStore', () => ({
-  CurrentViewStateStore: MockStore(['getInitialState', jest.fn(() => ({ state: { widgetPositions: {} } }))]),
-}));
-
-jest.mock('views/stores/TitlesStore', () => ({
-  TitlesStore: MockStore(['getInitialState', jest.fn(() => MockMap())]),
-}));
 
 const fieldTypes: FieldTypes = {
   all: Immutable.List(),
