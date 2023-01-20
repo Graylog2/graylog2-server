@@ -1,0 +1,5 @@
+type = "c"
+message = "Implement async HTTP request processing for cluster metrics resources to avoid HTTP thread pool starvation."
+
+issues = [""]
+pulls = ["14462"]
