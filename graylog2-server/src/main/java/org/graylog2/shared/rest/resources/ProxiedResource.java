@@ -84,7 +84,7 @@ public abstract class ProxiedResource extends RestResource {
     }
 
     protected Duration getDefaultProxyCallTimeout() {
-        return Duration.ofMillis(defaultProxyCallTimeout.toMilliseconds());
+        return Duration.ofMillis(requireNonNull(defaultProxyCallTimeout, "defaultProxyCallTimeout not injected").toMilliseconds());
     }
 
     protected void processAsync(AsyncResponse asyncResponse, Supplier<Object> responseSupplier) {
