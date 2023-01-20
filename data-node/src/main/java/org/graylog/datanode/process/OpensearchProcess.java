@@ -28,14 +28,14 @@ public class OpensearchProcess {
     private final String opensearchVersion;
     private final Path targetLocation;
     private final Process process;
-    private final OpensearchProcessLogs processLogs;
+    private final ExecOpensearchProcessLogs processLogs;
     private final RestHighLevelClient restClient;
 
     private final StateMachine<ProcessState, ProcessEvent> processState;
     private final int httpPort;
     private boolean isLeaderNode;
 
-    public OpensearchProcess(String opensearchVersion, Path targetLocation, Process opensearchProcess, OpensearchProcessLogs processLogs, int httpPort) {
+    public OpensearchProcess(String opensearchVersion, Path targetLocation, Process opensearchProcess, ExecOpensearchProcessLogs processLogs, int httpPort) {
         this.opensearchVersion = opensearchVersion;
         this.targetLocation = targetLocation;
         this.process = opensearchProcess;
@@ -61,7 +61,7 @@ public class OpensearchProcess {
         return targetLocation;
     }
 
-    public OpensearchProcessLogs getProcessLogs() {
+    public ExecOpensearchProcessLogs getProcessLogs() {
         return processLogs;
     }
 

@@ -19,32 +19,24 @@ package org.graylog.datanode;
 import com.github.rholder.retry.RetryException;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteStreamHandler;
 import org.apache.commons.exec.ExecuteWatchdog;
-import org.apache.commons.exec.Executor;
-import org.apache.commons.exec.PumpStreamHandler;
-import org.graylog.datanode.process.OpensearchProcess;
-import org.graylog.datanode.process.OpensearchProcessLogs;
+import org.graylog.datanode.process.ExecOpensearchProcessLogs;
 import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog.datanode.process.OpensearchProcess;
 import org.graylog.datanode.process.ProcessEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 
 public class DataNodeRunner {
@@ -60,39 +52,41 @@ public class DataNodeRunner {
 
     public OpensearchProcess start(OpensearchConfiguration opensearchConfiguration) {
         try {
-            return run(opensearchConfiguration);
+            return doStartProcess(opensearchConfiguration);
         } catch (IOException | InterruptedException | ExecutionException | RetryException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private OpensearchProcess run(OpensearchConfiguration config) throws IOException, InterruptedException, ExecutionException, RetryException {
+    private OpensearchProcess doStartProcess(OpensearchConfiguration config) throws IOException, InterruptedException, ExecutionException, RetryException {
 
         final Path binPath = config.opensearchDir().resolve(Paths.get("bin", "opensearch"));
         LOG.info("Running opensearch from " + binPath.toAbsolutePath());
 
-        List<String> command = new ArrayList<>();
-        command.add(binPath.toAbsolutePath().toString());
-        command.addAll(toConfigOptions(config.mergedConfig()));
-        ProcessBuilder builder = new ProcessBuilder(command);
+        CommandLine cmdLine = new CommandLine(binPath.toAbsolutePath().toString());
 
-        // TODO: why is this not working?
-        //builder.environment().putAll(config.mergedConfig());
+        toConfigOptions(config.mergedConfig())
+                .forEach(it -> cmdLine.addArgument(it, true));
 
-        final Process process = builder.start();
-        final OpensearchProcessLogs logs = OpensearchProcessLogs.createFor(process, logsSize);
-        final OpensearchProcess opensearchProcess = new OpensearchProcess(config.opensearchVersion(), config.opensearchDir(), process, logs, config.httpPort());
+        ProcessProvidingExecutor executor = new ProcessProvidingExecutor();
+        DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+        final ExecOpensearchProcessLogs logger = new ExecOpensearchProcessLogs(logsSize);
+        executor.setStreamHandler(logger);
+        executor.execute(cmdLine, resultHandler);
+
+        final Process process;
+        try {
+            process = executor.getProcess().get(5, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            throw new RuntimeException("Failed to obtain process", e);
+        }
+        final OpensearchProcess opensearchProcess = new OpensearchProcess(config.opensearchVersion(), config.opensearchDir(), process, logger, config.httpPort());
         opensearchProcess.onEvent(ProcessEvent.PROCESS_STARTED);
         return opensearchProcess;
     }
 
-    /**
-     * TODO: this could be potentially very dangerous - with a properly formatted config the user could
-     * execute anything in the underlying system!
-     */
-    private List<String> toConfigOptions(Map<String, String> mergedConfig) {
+    private Stream<String> toConfigOptions(Map<String, String> mergedConfig) {
         return mergedConfig.entrySet().stream()
-                .map(it -> "-E" + it.getKey() + "=" + it.getValue())
-                .collect(Collectors.toList());
+                .map(it -> String.format(Locale.ROOT, "-E%s=%s", it.getKey(), it.getValue()));
     }
 }
