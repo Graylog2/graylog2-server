@@ -1,0 +1,5 @@
+type = "removed"
+message = "Removed garbage collection warnings."
+
+issues = ["8592"]
+pulls = ["14298"]

@@ -59,6 +59,7 @@ class ContentPacksList extends React.Component {
     super(props);
 
     this.state = {
+      showModal: false,
       filteredContentPacks: props.contentPacks,
       pageSize: 10,
       currentPage: 1,
@@ -74,26 +75,27 @@ class ContentPacksList extends React.Component {
   }
 
   _installModal(item) {
-    let modalRef;
     let installRef;
 
     const { onInstall: onInstallProp } = this.props;
 
     const closeModal = () => {
-      modalRef.close();
+      this.setState({ showModal: false });
     };
 
     const open = () => {
-      modalRef.open();
+      this.setState({ showModal: true });
     };
 
     const onInstall = () => {
       installRef.onInstall();
-      modalRef.close();
+      closeModal();
     };
 
     const modal = (
-      <BootstrapModalWrapper ref={(node) => { modalRef = node; }} bsSize="large">
+      <BootstrapModalWrapper showModal={this.state.showModal}
+                             onHide={closeModal}
+                             bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title>Install Content Pack</Modal.Title>
         </Modal.Header>

@@ -15,15 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { cloneDeep } from 'lodash';
 
-import { Row, Col, Button, BootstrapModalForm, Input } from 'components/bootstrap';
+import { Row, Col, Button, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import type { PipelineType } from 'stores/pipelines/PipelinesStore';
 import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { FormSubmit } from 'components/common';
+
+import BootstrapModalForm from '../bootstrap/BootstrapModalForm';
 
 type Props = {
   pipeline: PipelineType,
@@ -35,13 +37,11 @@ type Props = {
 
 const PipelineForm = ({ pipeline, create, modal, save, onCancel }: Props) => {
   const currentUser = useCurrentUser();
-  const modalRef = useRef<BootstrapModalForm>();
   const [nextPipeline, setNextPipeline] = useState<PipelineType>(cloneDeep(pipeline));
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const _openModal = () => {
-    if (modalRef.current) {
-      modalRef.current.open();
-    }
+    setShowModal(true);
   };
 
   const _onChange = ({ target }) => {
@@ -49,9 +49,7 @@ const PipelineForm = ({ pipeline, create, modal, save, onCancel }: Props) => {
   };
 
   const _closeModal = () => {
-    if (modalRef.current) {
-      modalRef.current.close();
-    }
+    setShowModal(false);
   };
 
   const _onSaved = () => {
@@ -100,9 +98,10 @@ const PipelineForm = ({ pipeline, create, modal, save, onCancel }: Props) => {
                 bsStyle="success">
           {create ? 'Add new pipeline' : 'Edit pipeline details'}
         </Button>
-        <BootstrapModalForm ref={modalRef}
+        <BootstrapModalForm show={showModal}
                             title={`${create ? 'Add new' : 'Edit'} pipeline ${nextPipeline.title}`}
                             onSubmitForm={_handleSubmit}
+                            onCancel={_closeModal}
                             submitButtonText={create ? 'Add pipeline' : 'Update pipeline'}>
           {content}
         </BootstrapModalForm>

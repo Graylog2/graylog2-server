@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { createRef } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
@@ -30,9 +30,8 @@ class CopyCollectorModal extends React.Component {
   constructor(props) {
     super(props);
 
-    this.modalRef = createRef();
-
     this.state = {
+      showModal: false,
       id: props.collector.id,
       name: '',
       errorMessage: undefined,
@@ -40,7 +39,7 @@ class CopyCollectorModal extends React.Component {
   }
 
   openModal = () => {
-    this.modalRef.current.open();
+    this.setState({ showModal: true });
   };
 
   _getId = (prefixIdName) => {
@@ -50,7 +49,7 @@ class CopyCollectorModal extends React.Component {
   };
 
   _closeModal = () => {
-    this.modalRef.current.close();
+    this.setState({ showModal: false });
   };
 
   _saved = () => {
@@ -86,16 +85,17 @@ class CopyCollectorModal extends React.Component {
   };
 
   render() {
-    const { errorMessage, name } = this.state;
+    const { errorMessage, name, showModal } = this.state;
 
     return (
       <CloneMenuItem onSelect={this.openModal}
+                     onClose={this._closeModal}
                      onSave={this._save}
                      id={this._getId('collector-name')}
                      onChange={this._changeName}
                      error={errorMessage}
                      name={name}
-                     modalRef={this.modalRef} />
+                     showModal={showModal} />
     );
   }
 }

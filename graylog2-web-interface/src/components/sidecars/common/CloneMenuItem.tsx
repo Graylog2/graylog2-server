@@ -19,14 +19,15 @@ import PropTypes from 'prop-types';
 
 import { MenuItem, BootstrapModalForm, Input } from 'components/bootstrap';
 
-const CloneMenuItem = ({ error, id, modalRef, name, onChange, onSave, onSelect }) => {
+const CloneMenuItem = ({ error, id, showModal, onClose, name, onChange, onSave, onSelect }) => {
   return (
     <>
       <MenuItem onSelect={onSelect}>Clone</MenuItem>
-      <BootstrapModalForm ref={modalRef}
+      <BootstrapModalForm show={showModal}
                           title="Clone"
                           onSubmitForm={onSave}
-                          submitButtonDisabled={!!error}
+                          onCancel={onClose}
+                          submitButtonDisabled={Boolean(error)}
                           submitButtonText="Done">
         <fieldset>
           <Input type="text"
@@ -47,11 +48,12 @@ const CloneMenuItem = ({ error, id, modalRef, name, onChange, onSave, onSelect }
 CloneMenuItem.propTypes = {
   error: PropTypes.string,
   id: PropTypes.string.isRequired,
-  modalRef: PropTypes.shape({ current: PropTypes.any }).isRequired,
+  showModal: PropTypes.bool.isRequired,
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
 CloneMenuItem.defaultProps = {

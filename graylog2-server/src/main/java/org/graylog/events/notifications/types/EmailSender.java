@@ -121,6 +121,10 @@ public class EmailSender {
             email.setFrom(config.sender());
         }
 
+        if (!isNullOrEmpty(config.replyTo())) {
+            email.addReplyTo(config.replyTo());
+        }
+
         if (email.getFromAddress() == null) {
             throw new TransportConfigurationException("No from address specified for email transport.");
         }

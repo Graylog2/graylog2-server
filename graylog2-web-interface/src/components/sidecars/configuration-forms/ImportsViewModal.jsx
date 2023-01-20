@@ -26,6 +26,8 @@ import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigu
 class ImportsViewModal extends React.Component {
   static propTypes = {
     onApply: PropTypes.func.isRequired,
+    showModal: PropTypes.bool.isRequired,
+    onHide: PropTypes.func.isRequired,
   };
 
   static initialState = {
@@ -43,15 +45,11 @@ class ImportsViewModal extends React.Component {
     this.state = ImportsViewModal.initialState;
   }
 
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  open = () => {
-    this._loadUploads(this.state.pagination.page);
-    this.uploadsModal.open();
-  };
-
-  hide = () => {
-    this.uploadsModal.close();
-  };
+  componentDidUpdate() {
+    if (this.props.showModal) {
+      this._loadUploads(this.state.pagination.page);
+    }
+  }
 
   _isLoading = () => {
     return !this.state.uploads;
@@ -142,7 +140,9 @@ class ImportsViewModal extends React.Component {
 
   render() {
     return (
-      <BootstrapModalWrapper bsSize="large" ref={(c) => { this.uploadsModal = c; }}>
+      <BootstrapModalWrapper showModal={this.props.showModal}
+                             onHide={this.props.onHide}
+                             bsSize="large">
         <Modal.Header closeButton>
           <Modal.Title><span>Imports from the old Collector system</span></Modal.Title>
           Edit the imported configuration after pressing the Apply button by hand. Dynamic values like the node ID can be replaced with the variables system, e.g. <code>{this._buildVariableName('nodeId')}</code>
@@ -151,7 +151,7 @@ class ImportsViewModal extends React.Component {
           {this._formatModalBody()}
         </Modal.Body>
         <Modal.Footer>
-          <Button type="button" onClick={this.hide}>Close</Button>
+          <Button type="button" onClick={this.props.onHide}>Close</Button>
         </Modal.Footer>
       </BootstrapModalWrapper>
     );

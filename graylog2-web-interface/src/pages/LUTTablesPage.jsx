@@ -62,7 +62,10 @@ class LUTTablesPage extends React.Component {
   }
 
   componentWillUnmount() {
+    const { page, pageSize } = this.props.paginationQueryParameter;
+
     clearInterval(this.errorStatesTimer);
+    LookupTablesActions.searchPaginated(page, pageSize);
   }
 
   _startErrorStatesTimer = () => {
