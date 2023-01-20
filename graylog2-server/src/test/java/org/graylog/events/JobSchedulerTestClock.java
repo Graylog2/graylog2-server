@@ -45,6 +45,10 @@ public class JobSchedulerTestClock implements JobSchedulerClock {
         this.instant = instant.plus(unit.toMillis(duration));
     }
 
+    public void setTime(DateTime newTime) {
+        this.instant = newTime.toInstant();
+    }
+
     /**
      * {@inheritDoc}
      */

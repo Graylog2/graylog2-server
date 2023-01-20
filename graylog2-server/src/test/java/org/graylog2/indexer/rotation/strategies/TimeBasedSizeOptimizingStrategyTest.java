@@ -16,7 +16,7 @@
  */
 package org.graylog2.indexer.rotation.strategies;
 
-import org.graylog.scheduler.clock.JobSchedulerSystemClock;
+import org.graylog.events.JobSchedulerTestClock;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
@@ -25,10 +25,12 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Days;
 import org.joda.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -60,22 +62,26 @@ class TimeBasedSizeOptimizingStrategyTest {
     private IndexSet indexSet;
 
     private TimeBasedSizeOptimizingStrategyConfig timeBasedSizeOptimizingStrategyConfig;
-    private DateTime now;
+    private JobSchedulerTestClock clock;
 
     @BeforeEach
     void setUp() {
-        timeBasedSizeOptimizingStrategy = new TimeBasedSizeOptimizingStrategy(indices, nodeId, auditEventSender, new ElasticsearchConfiguration(), new JobSchedulerSystemClock());
+        DateTime now = DateTime.now(DateTimeZone.UTC);
+        clock = new JobSchedulerTestClock(now);
+        timeBasedSizeOptimizingStrategy = new TimeBasedSizeOptimizingStrategy(indices, nodeId, auditEventSender, new ElasticsearchConfiguration(), clock);
 
         timeBasedSizeOptimizingStrategyConfig = TimeBasedSizeOptimizingStrategyConfig.builder().build();
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
         when(indexSetConfig.rotationStrategy()).thenReturn(timeBasedSizeOptimizingStrategyConfig);
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        now = DateTime.now(DateTimeZone.UTC);
     }
 
-    @Test
-    void shouldRotateWhenTooBig() {
-        final DateTime creationDate = now.minus(Duration.standardMinutes(10));
+    @ParameterizedTest
+    @ValueSource(strings = {"2020-12-01T09:00:00Z", "now"})
+    void shouldRotateWhenTooBig(String startDate) {
+        setClockTo(startDate);
+
+        final DateTime creationDate = clock.nowUTC().minus(Duration.standardMinutes(10));
         when(indices.indexCreationDate("index_0")).thenReturn(Optional.of(creationDate));
         when(indices.getStoreSizeInBytes("index_0")).thenReturn(Optional.of(MAX_INDEX_SIZE.toBytes() + 10));
 
@@ -85,10 +91,20 @@ class TimeBasedSizeOptimizingStrategyTest {
         assertThat(result.getDescription()).contains("exceeds MAX_INDEX_SIZE");
     }
 
-    @Test
-    void shouldRotateWhenRightSizedAndOverRotationPeriod() {
-        // TODO only works with multiple of days
-        final DateTime creationDate = now.minus(Duration.standardDays(ROTATION_PERIOD.getDays()));
+    private void setClockTo(String startDate) {
+        if (startDate.equals("now")) {
+            clock.setTime(DateTime.now(DateTimeZone.UTC));
+        } else {
+            clock.setTime(DateTime.parse(startDate));
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"2020-12-01T09:00:00Z", "now"})
+    void shouldRotateWhenRightSizedAndOverRotationPeriod(String startDate) {
+        setClockTo(startDate);
+
+        final DateTime creationDate = clock.nowUTC().minus(ROTATION_PERIOD);
         when(indices.indexCreationDate("index_0")).thenReturn(Optional.of(creationDate));
         when(indices.getStoreSizeInBytes("index_0")).thenReturn(Optional.of(MIN_INDEX_SIZE.toBytes() + 10));
 
@@ -98,12 +114,14 @@ class TimeBasedSizeOptimizingStrategyTest {
         assertThat(result.getDescription()).contains("Index is old enough");
     }
 
-    @Test
-    void shouldRotateWhenBeyondLeeWay() {
+    @ParameterizedTest
+    @ValueSource(strings = {"2020-12-01T09:00:00Z", "now"})
+    void shouldRotateWhenBeyondLeeWay(String startDate) {
+        setClockTo(startDate);
+
         final Period leeWay = timeBasedSizeOptimizingStrategyConfig.indexLifetimeHard().minus(timeBasedSizeOptimizingStrategyConfig.indexLifetimeSoft());
-        // TODO only works with multiple of days
-        final java.time.Duration leeWayDuration = java.time.Duration.ofDays(leeWay.getDays() + ROTATION_PERIOD.getDays());
-        final DateTime creationDate = now.minus(leeWayDuration.toMillis() + 10); // avoid race between the time of now here and in code
+        final Days leewayDays = Days.days(leeWay.getDays());
+        final DateTime creationDate = clock.nowUTC().minus(ROTATION_PERIOD.plus(leewayDays)).minus(Duration.millis(10)); // avoid race between the time of now here and in code
 
         when(indices.indexCreationDate("index_0")).thenReturn(Optional.of(creationDate));
         when(indices.getStoreSizeInBytes("index_0")).thenReturn(Optional.of(5L));
