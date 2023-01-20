@@ -19,7 +19,6 @@ package org.graylog.datanode.bindings;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.datanode.process.OpensearchHeartbeat;
-import org.graylog.datanode.process.ProcessWatchdog;
 import org.graylog2.plugin.periodical.Periodical;
 
 public class PeriodicalBindings extends AbstractModule {
@@ -27,6 +26,5 @@ public class PeriodicalBindings extends AbstractModule {
     protected void configure() {
         Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
         periodicalBinder.addBinding().to(OpensearchHeartbeat.class);
-        periodicalBinder.addBinding().to(ProcessWatchdog.class);
     }
 }

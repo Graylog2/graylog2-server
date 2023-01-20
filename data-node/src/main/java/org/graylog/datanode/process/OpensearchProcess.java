@@ -27,7 +27,7 @@ import java.nio.file.Path;
 public class OpensearchProcess {
     private final String opensearchVersion;
     private final Path targetLocation;
-    private final Process process;
+    private Process process;
     private final ExecOpensearchProcessLogs processLogs;
     private final RestHighLevelClient restClient;
 
@@ -35,22 +35,15 @@ public class OpensearchProcess {
     private final int httpPort;
     private boolean isLeaderNode;
 
-    public OpensearchProcess(String opensearchVersion, Path targetLocation, Process opensearchProcess, ExecOpensearchProcessLogs processLogs, int httpPort) {
+    public OpensearchProcess(String opensearchVersion, Path targetLocation, ExecOpensearchProcessLogs processLogs, int httpPort) {
         this.opensearchVersion = opensearchVersion;
         this.targetLocation = targetLocation;
-        this.process = opensearchProcess;
         this.processLogs = processLogs;
         this.httpPort = httpPort;
 
         RestClientBuilder builder = RestClient.builder(new HttpHost("localhost", httpPort, "http"));
         this.restClient = new RestHighLevelClient(builder);
-
         this.processState = ProcessStateMachine.createNew();
-
-    }
-
-    public Process getProcess() {
-        return process;
     }
 
     public String getOpensearchVersion() {
@@ -88,12 +81,21 @@ public class OpensearchProcess {
         this.processState.fire(event);
     }
 
+    public void bind(Process process) {
+        this.process = process;
+        onEvent(ProcessEvent.PROCESS_STARTED);
+    }
+
     public void setLeaderNode(boolean isLeaderNode) {
         this.isLeaderNode = isLeaderNode;
     }
 
     public boolean isLeaderNode() {
         return isLeaderNode;
+    }
+
+    public boolean hasPid(int processId) {
+        return process != null && process.pid() == processId;
     }
 }
 

@@ -19,11 +19,10 @@ package org.graylog.datanode;
 import com.github.rholder.retry.RetryException;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
-import org.apache.commons.exec.ExecuteWatchdog;
+import org.apache.commons.exec.ExecuteResultHandler;
 import org.graylog.datanode.process.ExecOpensearchProcessLogs;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.OpensearchProcess;
-import org.graylog.datanode.process.ProcessEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,23 +64,24 @@ public class DataNodeRunner {
 
         CommandLine cmdLine = new CommandLine(binPath.toAbsolutePath().toString());
 
+        final ExecOpensearchProcessLogs logger = new ExecOpensearchProcessLogs(logsSize);
+        final OpensearchProcess opensearchProcess = new OpensearchProcess(config.opensearchVersion(), config.opensearchDir(), logger, config.httpPort());
+
         toConfigOptions(config.mergedConfig())
                 .forEach(it -> cmdLine.addArgument(it, true));
 
         ProcessProvidingExecutor executor = new ProcessProvidingExecutor();
-        DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
-        final ExecOpensearchProcessLogs logger = new ExecOpensearchProcessLogs(logsSize);
+        ExecuteResultHandler resultHandler = new EventResultHandler(opensearchProcess);
         executor.setStreamHandler(logger);
         executor.execute(cmdLine, resultHandler);
 
         final Process process;
         try {
             process = executor.getProcess().get(5, TimeUnit.SECONDS);
+            opensearchProcess.bind(process);
         } catch (TimeoutException e) {
             throw new RuntimeException("Failed to obtain process", e);
         }
-        final OpensearchProcess opensearchProcess = new OpensearchProcess(config.opensearchVersion(), config.opensearchDir(), process, logger, config.httpPort());
-        opensearchProcess.onEvent(ProcessEvent.PROCESS_STARTED);
         return opensearchProcess;
     }
 

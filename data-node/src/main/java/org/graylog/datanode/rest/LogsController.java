@@ -41,7 +41,7 @@ public class LogsController {
     public List<String> getOpensearchStdout(@PathParam("processId") int processId) {
         return managedOpensearch.getProcesses()
                 .stream()
-                .filter(p -> p.getProcess().pid() == processId)
+                .filter(p -> p.hasPid(processId))
                 .findFirst()
                 .map(node -> node.getProcessLogs().getStdOut())
                 .orElseThrow(() -> new IllegalArgumentException("Process not found: " + processId));
@@ -52,7 +52,7 @@ public class LogsController {
     public List<String> getOpensearchStderr(@PathParam("processId")  int processId) {
         return managedOpensearch.getProcesses()
                 .stream()
-                .filter(p -> p.getProcess().pid() == processId)
+                .filter(p -> p.hasPid(processId))
                 .findFirst()
                 .map(node -> node.getProcessLogs().getStdErr())
                 .orElseThrow(() -> new IllegalArgumentException("Process not found: " + processId));

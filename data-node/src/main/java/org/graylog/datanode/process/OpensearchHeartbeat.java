@@ -59,6 +59,8 @@ public class OpensearchHeartbeat extends Periodical {
     // This method is "synchronized" because we are also calling it directly in AutomaticLeaderElectionService
     public synchronized void doRun() {
         managedOpenSearch.getProcesses()
+                .stream()
+                .filter(p -> p.getStatus() != ProcessState.TERMINATED)
                 .forEach(process -> {
                     try {
                         final ClusterHealthRequest req = new ClusterHealthRequest();
