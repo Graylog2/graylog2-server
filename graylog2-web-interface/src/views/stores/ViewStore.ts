@@ -19,7 +19,6 @@ import * as Immutable from 'immutable';
 
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
-import { QueriesActions } from 'views/actions/QueriesActions';
 import type { Properties, ViewStateMap } from 'views/logic/views/View';
 import type View from 'views/logic/views/View';
 import type { QuerySet } from 'views/logic/search/Search';
@@ -106,8 +105,6 @@ export const ViewStore: ViewStoreType = singletonStore(
     isNew: false,
 
     init() {
-      QueriesActions.create.listen(this.createQuery);
-
       ViewManagementActions.update.completed.listen(() => {
         this.dirty = false;
         this._trigger();
@@ -146,8 +143,6 @@ export const ViewStore: ViewStoreType = singletonStore(
           return Immutable.OrderedMap<QueryId, Query>(newSearch.queries.map((q) => [q.id, q]).toArray());
         },
       );
-
-      QueriesActions.create.promise(promise);
     },
     update(view: View) {
       this.dirty = false;
