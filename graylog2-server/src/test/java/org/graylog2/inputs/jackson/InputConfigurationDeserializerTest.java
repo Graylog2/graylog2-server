@@ -25,7 +25,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.BeanDeserializer;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableMap;
 import org.graylog2.inputs.WithInputConfiguration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
@@ -68,6 +70,7 @@ class InputConfigurationDeserializerTest {
         when(inputConfig.combinedRequestedConfiguration()).thenReturn(configRequest);
 
         this.objectMapper = new ObjectMapper()
+                .registerModule(new GuavaModule()) // for immutable collections
                 .registerModule(new SimpleModule("Test")
                         .setDeserializerModifier(new BeanDeserializerModifier() {
                             @Override
@@ -113,7 +116,7 @@ class InputConfigurationDeserializerTest {
 
         @Override
         @JsonProperty("configuration")
-        public abstract Map<String, Object> configuration();
+        public abstract ImmutableMap<String, Object> configuration();
 
         @Override
         public Value withConfiguration(Map<String, Object> configuration) {
@@ -123,7 +126,7 @@ class InputConfigurationDeserializerTest {
         @JsonCreator
         public static Value create(@JsonProperty("type") String type,
                                    @JsonProperty("configuration") Map<String, Object> configuration) {
-            return new AutoValue_InputConfigurationDeserializerTest_Value(type, configuration);
+            return new AutoValue_InputConfigurationDeserializerTest_Value(type, ImmutableMap.copyOf(configuration));
         }
     }
 }

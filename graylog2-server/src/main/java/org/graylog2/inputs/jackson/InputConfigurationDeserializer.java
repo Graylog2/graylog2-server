@@ -16,7 +16,6 @@
  */
 package org.graylog2.inputs.jackson;
 
-import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -28,6 +27,7 @@ import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.shared.inputs.MessageInputFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,7 +46,7 @@ public class InputConfigurationDeserializer extends BeanDeserializer {
     }
 
     @Override
-    public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
+    public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         final var value = deserializer.deserialize(p, ctxt);
 
         if (value instanceof WithInputConfiguration<?> valueWithConfiguration) {
@@ -57,7 +57,7 @@ public class InputConfigurationDeserializer extends BeanDeserializer {
             }
 
             final var objectMapper = (ObjectMapper) p.getCodec();
-            final var configuration = valueWithConfiguration.configuration();
+            final var configuration = new HashMap<>(valueWithConfiguration.configuration());
 
             encryptedFields.forEach(field -> {
                 final var encryptedValue = objectMapper.convertValue(configuration.get(field), EncryptedValue.class);
