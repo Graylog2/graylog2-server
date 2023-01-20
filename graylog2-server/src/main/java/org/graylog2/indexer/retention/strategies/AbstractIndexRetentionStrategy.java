@@ -79,6 +79,8 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
                 .filter(indexName -> !hasCurrentWriteAlias(indexSet, deflectorIndices, indexName))
                 .filter(indexName -> {
                     DateTime closingDate = indices.indexClosingDate(indexName)
+                            // TODO we might encounter older indices that don't have a closing date yet. How do we handle this?
+                            // TODO maybe use the creationDate as a fallback?
                             .orElseThrow(() -> new IllegalStateException(f("Index %s has no closing date - retention failed", indexName)));
                     return closingDate.isBefore(cutoff + 1);
                 })
