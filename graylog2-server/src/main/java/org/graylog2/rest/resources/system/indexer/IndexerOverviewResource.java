@@ -18,17 +18,18 @@ package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.counts.Counts;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
+import org.graylog2.indexer.indices.util.NumberBasedIndexNameComparator;
 import org.graylog2.rest.models.count.responses.MessageCountResponse;
 import org.graylog2.rest.models.system.deflector.responses.DeflectorSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
@@ -49,6 +50,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -126,7 +128,7 @@ public class IndexerOverviewResource extends RestResource {
         final List<String> indexNames = new ArrayList<>();
         indexStats.fieldNames().forEachRemaining(indexNames::add);
         final Map<String, Boolean> areReopened = indices.areReopened(indexNames);
-        final Map<String, IndexSummary> indicesSummaries = buildIndexSummaries(deflectorSummary, indexSet, indexRanges, indexStats, areReopened);
+        final List<IndexSummary> indicesSummaries = buildIndexSummaries(deflectorSummary, indexSet, indexRanges, indexStats, areReopened);
 
         return IndexerOverview.create(deflectorSummary,
                 IndexerClusterOverview.create(indexerClusterResource.clusterHealth(), indexerClusterResource.clusterName().name()),
@@ -134,22 +136,24 @@ public class IndexerOverviewResource extends RestResource {
                 indicesSummaries);
     }
 
-    private Map<String, IndexSummary> buildIndexSummaries(DeflectorSummary deflectorSummary, IndexSet indexSet, List<IndexRangeSummary> indexRanges, JsonNode indexStats, Map<String, Boolean> areReopened) {
+    private List<IndexSummary> buildIndexSummaries(DeflectorSummary deflectorSummary, IndexSet indexSet, List<IndexRangeSummary> indexRanges, JsonNode indexStats, Map<String, Boolean> areReopened) {
         final Iterator<Map.Entry<String, JsonNode>> fields = indexStats.fields();
-        final ImmutableMap.Builder<String, IndexSummary> indexSummaries = ImmutableMap.builder();
+        final List<IndexSummary> indexSummaries = new ArrayList<>();
         while (fields.hasNext()) {
             final Map.Entry<String, JsonNode> entry = fields.next();
-            indexSummaries.put(entry.getKey(), buildIndexSummary(entry, indexRanges, deflectorSummary, areReopened));
+            indexSummaries.add(buildIndexSummary(entry, indexRanges, deflectorSummary, areReopened));
 
         }
-        indices.getClosedIndices(indexSet).forEach(indexName -> indexSummaries.put(indexName, IndexSummary.create(
+        indices.getClosedIndices(indexSet).forEach(indexName -> indexSummaries.add(IndexSummary.create(
+                indexName,
                 null,
                 indexRanges.stream().filter((indexRangeSummary) -> indexRangeSummary.indexName().equals(indexName)).findFirst().orElse(null),
                 indexName.equals(deflectorSummary.currentTarget()),
                 true,
                 false
         )));
-        return indexSummaries.build();
+        indexSummaries.sort(Comparator.comparing(IndexSummary::indexName, new NumberBasedIndexNameComparator(MongoIndexSet.SEPARATOR)));
+        return indexSummaries;
     }
 
     private IndexSummary buildIndexSummary(Map.Entry<String, JsonNode> indexStats,
@@ -171,6 +175,7 @@ public class IndexerOverviewResource extends RestResource {
         final boolean isReopened = areReopened.get(index);
 
         return IndexSummary.create(
+                indexStats.getKey(),
                 IndexSizeSummary.create(count, deleted, sizeInBytes),
                 range.orElse(null),
                 isDeflector,

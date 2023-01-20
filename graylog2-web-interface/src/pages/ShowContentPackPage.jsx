@@ -49,6 +49,7 @@ const ShowContentPackPage = createReactClass({
 
   getInitialState() {
     return {
+      showModal: false,
       selectedVersion: undefined,
       uninstallEntities: undefined,
       uninstallContentPackId: undefined,
@@ -107,21 +108,19 @@ const ShowContentPackPage = createReactClass({
     });
 
     this.setState({
+      showModal: true,
       uninstallContentPackId: contentPackId,
       uninstallInstallId: installId,
     });
-
-    this.modal.open();
   },
 
   _clearUninstall() {
     this.setState({
+      showModal: false,
       uninstallContentPackId: undefined,
       uninstallInstallId: undefined,
       uninstallEntities: undefined,
     });
-
-    this.modal.close();
   },
 
   _uninstallContentPackRev() {
@@ -201,7 +200,7 @@ const ShowContentPackPage = createReactClass({
             </Col>
           </Row>
         </span>
-        <BootstrapModalConfirm ref={(c) => { this.modal = c; }}
+        <BootstrapModalConfirm showModal={this.state.showModal}
                                title="Do you really want to uninstall this Content Pack?"
                                onConfirm={this._uninstallContentPackRev}
                                onCancel={this._clearUninstall}>

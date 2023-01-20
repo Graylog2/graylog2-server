@@ -103,7 +103,11 @@ The following Java Code API changes have been made.
 All previously deprecated index set configuration properties in `org.graylog2.configuration.ElasticsearchConfiguration`
 have been un-deprecated, as Graylog intends to maintain them going forward. 
 
-## Breaking Changes
+## REST API Endpoint Changes
+
+| Endpoint                    | Description                                                       |
+|-----------------------------|-------------------------------------------------------------------|
+| `GET /system/configuration` | Key `gc_warning_threshold` has been removed from response object. |                                                                                                
 
 ## Behaviour Changes
 
@@ -112,7 +116,8 @@ have been un-deprecated, as Graylog intends to maintain them going forward.
 
 ## Configuration File Changes
 
-| Option                                      | Action | Description                                                                                |
-|---------------------------------------------|--------|--------------------------------------------------------------------------------------------|
-| `transport_email_socket_connection_timeout` | added  | Connection timeout for establishing a connection to the email server. Default: 10 seconds. |
-| `transport_email_socket_timeout`            | added  | Read timeout while communicating with the email server. Default: 10 seconds.               |
+| Option                                      | Action  | Description                                                                                |
+|---------------------------------------------|---------|--------------------------------------------------------------------------------------------|
+| `gc_warning_threshold`                      | removed | GC warnings have been removed.                                                             |
+| `transport_email_socket_connection_timeout` | added   | Connection timeout for establishing a connection to the email server. Default: 10 seconds. |
+| `transport_email_socket_timeout`            | added   | Read timeout while communicating with the email server. Default: 10 seconds.               |"

@@ -37,11 +37,10 @@ class ContentPackUploadControls extends React.Component {
 
   _openModal() {
     this.setState({ isOpen: true });
-    this.uploadModal.open();
   }
 
   _closeModal() {
-    this.uploadModal.close();
+    this.setState({ isOpen: false });
   }
 
   _save(submitEvent) {
@@ -92,8 +91,8 @@ class ContentPackUploadControls extends React.Component {
                 bsStyle="info"
                 onClick={this._openModal}>Upload
         </Button>
-        <BootstrapModalForm onModalClose={() => { this.setState({ isOpen: false }); }}
-                            ref={(node) => { this.uploadModal = node; }}
+        <BootstrapModalForm onCancel={this._closeModal}
+                            show={isOpen}
                             onSubmitForm={this._save}
                             title="Upload Content Pack"
                             submitButtonText="Upload">

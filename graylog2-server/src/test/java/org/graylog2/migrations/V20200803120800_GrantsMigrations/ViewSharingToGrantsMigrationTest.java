@@ -16,6 +16,7 @@
  */
 package org.graylog2.migrations.V20200803120800_GrantsMigrations;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -31,6 +32,7 @@ import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.GRNExtension;
+import org.graylog.testing.ObjectMapperExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
@@ -62,6 +64,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
+@ExtendWith(ObjectMapperExtension.class)
 @ExtendWith(GRNExtension.class)
 @ExtendWith(MockitoExtension.class)
 @MongoDBFixtures("view-sharings.json")
@@ -75,6 +78,7 @@ class ViewSharingToGrantsMigrationTest {
     @BeforeEach
     void setUp(MongoDBTestService mongodb,
                MongoJackObjectMapperProvider objectMapperProvider,
+               ObjectMapper mapper,
                GRNRegistry grnRegistry,
                @Mock ClusterConfigService clusterConfigService,
                @Mock UserService userService,
@@ -91,7 +95,7 @@ class ViewSharingToGrantsMigrationTest {
         });
 
         final EntityOwnershipService entityOwnershipService = new EntityOwnershipService(grantService, grnRegistry);
-        final TestViewService viewService = new TestViewService(mongodb.mongoConnection(), objectMapperProvider, clusterConfigService, entityOwnershipService);
+        final TestViewService viewService = new TestViewService(mongodb.mongoConnection(), objectMapperProvider, mapper, clusterConfigService, entityOwnershipService);
 
         this.migration = new ViewSharingToGrantsMigration(mongodb.mongoConnection(), grantService, userService, roleService, "admin", viewService, grnRegistry);
     }
@@ -200,10 +204,11 @@ class ViewSharingToGrantsMigrationTest {
 
     public static class TestViewService extends ViewService {
         public TestViewService(MongoConnection mongoConnection,
-                               MongoJackObjectMapperProvider mapper,
+                               MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+                               ObjectMapper mapper,
                                ClusterConfigService clusterConfigService,
                                EntityOwnershipService entityOwnerShipService) {
-            super(mongoConnection, mapper, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityOwnerShipService, mock(ViewSummaryService.class));
+            super(mongoConnection, mongoJackObjectMapperProvider, mapper, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityOwnerShipService, mock(ViewSummaryService.class));
         }
     }
 }

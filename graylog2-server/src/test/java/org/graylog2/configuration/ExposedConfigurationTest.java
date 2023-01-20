@@ -54,7 +54,6 @@ public class ExposedConfigurationTest {
         assertThat(c.staleLeaderTimeout()).isEqualTo(configuration.getStaleLeaderTimeout());
         //noinspection deprecation
         assertThat(c.staleMasterTimeout()).isEqualTo(configuration.getStaleLeaderTimeout());
-        assertThat(c.gcWarningThreshold()).isEqualTo(configuration.getGcWarningThreshold().toString());
     }
 
     @Test
@@ -81,7 +80,6 @@ public class ExposedConfigurationTest {
         assertThat((int) JsonPath.read(json, "$.output_module_timeout")).isEqualTo((int) c.outputModuleTimeout());
         assertThat((int) JsonPath.read(json, "$.stale_leader_timeout")).isEqualTo(c.staleLeaderTimeout());
         assertThat((int) JsonPath.read(json, "$.stale_master_timeout")).isEqualTo(c.staleLeaderTimeout());
-        assertThat((String) JsonPath.read(json, "$.gc_warning_threshold")).isEqualTo(c.gcWarningThreshold());
     }
 
     @Test
@@ -104,8 +102,7 @@ public class ExposedConfigurationTest {
                 "  \"stream_processing_max_faults\": 3," +
                 "  \"output_module_timeout\": 10000," +
                 "  \"stale_leader_timeout\": 2000," +
-                "  \"stale_master_timeout\": 3000," +
-                "  \"gc_warning_threshold\": \"1 second\"" +
+                "  \"stale_master_timeout\": 3000" +
                 "}";
 
         final ExposedConfiguration c = objectMapper.readValue(json, ExposedConfiguration.class);
@@ -129,6 +126,5 @@ public class ExposedConfigurationTest {
         //noinspection deprecation
         assertThat(c.staleLeaderTimeout()).isEqualTo(JsonPath.read(json, "$.stale_leader_timeout"))
                 .isEqualTo(c.staleMasterTimeout());
-        assertThat(c.gcWarningThreshold()).isEqualTo(JsonPath.read(json, "$.gc_warning_threshold"));
     }
 }
