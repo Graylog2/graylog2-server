@@ -29,6 +29,7 @@ import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import useQuery from 'routing/useQuery';
 import PluggableStoreProvider from 'components/PluggableStoreProvider';
 import useViewTitle from 'views/hooks/useViewTitle';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 type Props = {
   isNew: boolean,
@@ -50,16 +51,23 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
 const SearchPage = ({ isNew, view: viewPromise, loadNewView = defaultLoadNewView, loadView = defaultLoadView }: Props) => {
   const query = useQuery();
   const initialQuery = query?.page as string;
+  const initialExecutionState = SearchExecutionState.empty();
   useLoadView(viewPromise, isNew);
-  const [view, HookComponent] = useProcessHooksForView(viewPromise, query);
+  const result = useProcessHooksForView(viewPromise, initialExecutionState, query);
 
-  if (HookComponent) {
-    return HookComponent;
+  if (result.status === 'loading') {
+    return <Spinner />;
   }
+
+  if (result.status === 'interrupted') {
+    return result.component;
+  }
+
+  const { view, executionState } = result;
 
   return view
     ? (
-      <PluggableStoreProvider view={view} isNew={isNew} initialQuery={initialQuery}>
+      <PluggableStoreProvider view={view} executionState={executionState} isNew={isNew} initialQuery={initialQuery}>
         <SearchPageTitle>
           <DashboardPageContextProvider>
             <NewViewLoaderContext.Provider value={loadNewView}>

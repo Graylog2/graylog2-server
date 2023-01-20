@@ -26,10 +26,10 @@ import { SearchActions } from 'views/stores/SearchStore';
 import { SearchConfigActions } from 'views/stores/SearchConfigStore';
 import View from 'views/logic/views/View';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
-import PluggableStoreProvider from 'components/PluggableStoreProvider';
 import viewsReducers from 'views/viewsReducers';
 import ViewState from 'views/logic/views/ViewState';
 import SearchModel from 'views/logic/search/Search';
+import TestStoreProvider from 'views/test/TestStoreProvider';
 
 import OriginalSearch from './Search';
 
@@ -77,9 +77,9 @@ const view = View.create()
   .build();
 
 const Search = () => (
-  <PluggableStoreProvider view={view} initialQuery="foobar" isNew>
+  <TestStoreProvider view={view} initialQuery="foobar" isNew>
     <OriginalSearch />
-  </PluggableStoreProvider>
+  </TestStoreProvider>
 );
 
 const plugin = {

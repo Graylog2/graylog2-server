@@ -15,20 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import isDeepEqual from 'stores/isDeepEqual';
-import type { ViewHook } from 'views/logic/hooks/ViewHook';
+import type { ViewHook, ViewHookArguments } from 'views/logic/hooks/ViewHook';
 import View from 'views/logic/views/View';
-import type { RawQuery } from 'views/logic/NormalizeSearchURLQueryParams';
 import normalizeSearchURLQueryParams from 'views/logic/NormalizeSearchURLQueryParams';
 
-const bindSearchParamsFromQuery: ViewHook = async ({ query, view }: { query: RawQuery, view: View }) => {
+const bindSearchParamsFromQuery: ViewHook = async ({ query, view, executionState }: ViewHookArguments) => {
   if (view.type !== View.Type.Search) {
-    return view;
+    return [view, executionState];
   }
 
   const { queryString, timeRange, streamsFilter } = normalizeSearchURLQueryParams(query);
 
   if (!queryString && !timeRange && !streamsFilter) {
-    return view;
+    return [view, executionState];
   }
 
   const { queries } = view.search;
@@ -61,8 +60,8 @@ const bindSearchParamsFromQuery: ViewHook = async ({ query, view }: { query: Raw
     .build();
 
   return isDeepEqual(newQuery, firstQuery)
-    ? view
-    : newView;
+    ? [view, executionState]
+    : [newView, executionState];
 };
 
 export default bindSearchParamsFromQuery;

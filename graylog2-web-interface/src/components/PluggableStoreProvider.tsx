@@ -24,14 +24,16 @@ import createStore from 'store';
 import type View from 'views/logic/views/View';
 import type { QueryId } from 'views/logic/queries/Query';
 import type { QuerySet } from 'views/logic/search/Search';
+import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 type Props = {
   initialQuery: QueryId,
   isNew: boolean,
   view: View,
+  executionState: SearchExecutionState,
 }
 
-const PluggableStoreProvider = ({ initialQuery, children, isNew, view }: React.PropsWithChildren<Props>) => {
+const PluggableStoreProvider = ({ initialQuery, children, isNew, view, executionState }: React.PropsWithChildren<Props>) => {
   const reducers = usePluginEntities('views.reducers');
   const activeQuery = useMemo(() => {
     if (initialQuery) {
@@ -42,7 +44,16 @@ const PluggableStoreProvider = ({ initialQuery, children, isNew, view }: React.P
 
     return queries.first()?.id;
   }, [initialQuery, view?.search?.queries]);
-  const store = useMemo(() => createStore(reducers, { view: { view, isDirty: false, isNew, activeQuery } }), [activeQuery, isNew, reducers, view]);
+  const initialState = useMemo(() => ({
+    view: { view, isDirty: false, isNew, activeQuery },
+    searchExecution: {
+      widgetsToSearch: undefined,
+      executionState,
+      isLoading: false,
+      result: undefined,
+    },
+  }), [activeQuery, executionState, isNew, view]);
+  const store = useMemo(() => createStore(reducers, initialState), [initialState, reducers]);
 
   return (
     <Provider store={store}>

@@ -29,6 +29,7 @@ import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import { createSearch } from 'fixtures/searches';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import StreamSearchPage from './StreamSearchPage';
 
@@ -65,11 +66,11 @@ describe('StreamSearchPage', () => {
     asMock(useQuery).mockReturnValue({});
     asMock(useParams).mockReturnValue({ streamId });
     asMock(useCreateSavedSearch).mockReturnValue(Promise.resolve(mockView));
-    asMock(useProcessHooksForView).mockReturnValue([mockView, undefined]);
+    asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: mockView, executionState: SearchExecutionState.empty() });
   });
 
   it('shows loading spinner before rendering page', async () => {
-    asMock(useProcessHooksForView).mockReturnValue([undefined, undefined]);
+    asMock(useProcessHooksForView).mockReturnValue({ status: 'loading' });
 
     const { findByText } = render(<SimpleStreamSearchPage />);
 
@@ -144,7 +145,7 @@ describe('StreamSearchPage', () => {
 
       await waitFor(() => expect(useProcessHooksForView).toHaveBeenCalled());
 
-      expect(useProcessHooksForView).toHaveBeenCalledWith(expect.anything(), {
+      expect(useProcessHooksForView).toHaveBeenCalledWith(expect.anything(), SearchExecutionState.empty(), {
         q: '',
         rangetype: 'relative',
         relative: '300',

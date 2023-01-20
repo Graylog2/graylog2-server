@@ -31,9 +31,9 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
-import PluggableStoreProvider from 'components/PluggableStoreProvider';
 import { createSearch } from 'fixtures/searches';
 import viewsReducers from 'views/viewsReducers';
+import TestStoreProvider from 'views/test/TestStoreProvider';
 
 const plugin: PluginRegistration = { exports: { visualizationTypes: bindings, 'views.reducers': viewsReducers } };
 
@@ -54,7 +54,7 @@ jest.mock('views/hooks/useAggregationFunctions');
 const view = createSearch();
 
 const SimpleAggregationWizard = (props: Partial<React.ComponentProps<typeof AggregationWizard>>) => (
-  <PluggableStoreProvider view={view} isNew initialQuery="query-id-1">
+  <TestStoreProvider view={view} isNew initialQuery="query-id-1">
     <FieldTypesContext.Provider value={fieldTypes}>
       <AggregationWizard config={widgetConfig}
                          editing
@@ -68,7 +68,7 @@ const SimpleAggregationWizard = (props: Partial<React.ComponentProps<typeof Aggr
         <span>The visualization</span>
       </AggregationWizard>
     </FieldTypesContext.Provider>
-  </PluggableStoreProvider>
+  </TestStoreProvider>
 );
 
 const submitButton = async () => screen.findByRole('button', { name: /update preview/i });

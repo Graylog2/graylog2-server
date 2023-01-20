@@ -24,10 +24,12 @@ import type { AppDispatch } from 'stores/useAppDispatch';
 import type { RootState } from 'views/types';
 import { selectView } from 'views/logic/slices/viewSelectors';
 import useAppDispatch from 'stores/useAppDispatch';
+import { selectSearchExecutionState } from 'views/logic/slices/searchExecutionSelectors';
 
-const bindSearchParamsFromQueryThunk = (query) => (dispatch: AppDispatch, getState: () => RootState) => {
+const bindSearchParamsFromQueryThunk = (query: { [key: string]: unknown; }) => (_dispatch: AppDispatch, getState: () => RootState) => {
   const view = selectView(getState());
-  bindSearchParamsFromQuery({ view, query, retry: () => Promise.resolve(), dispatch });
+  const executionState = selectSearchExecutionState(getState());
+  bindSearchParamsFromQuery({ view, query, retry: () => Promise.resolve(), executionState });
 };
 
 const useBindSearchParamsFromQuery = (query: { [key: string]: unknown }) => {

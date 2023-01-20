@@ -26,6 +26,7 @@ import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import StreamsContext from 'contexts/StreamsContext';
 import useLoadView from 'views/hooks/useLoadView';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import NewDashboardPage from './NewDashboardPage';
 
@@ -57,7 +58,7 @@ describe('NewDashboardPage', () => {
   beforeEach(() => {
     asMock(useLocation).mockReturnValue(mockLocation);
     asMock(useQuery).mockReturnValue({});
-    asMock(useProcessHooksForView).mockReturnValue([View.create(), undefined]);
+    asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: View.create(), executionState: SearchExecutionState.empty() });
   });
 
   afterEach(() => {
@@ -65,7 +66,7 @@ describe('NewDashboardPage', () => {
   });
 
   it('shows loading spinner before rendering page', async () => {
-    asMock(useProcessHooksForView).mockReturnValue([undefined, undefined]);
+    asMock(useProcessHooksForView).mockReturnValue({ status: 'loading' });
 
     const { findByText } = render(<SimpleNewDashboardPage />);
 
@@ -120,7 +121,7 @@ describe('NewDashboardPage', () => {
 
     expect(useProcessHooksForView).toHaveBeenCalled();
 
-    expect(useProcessHooksForView).toHaveBeenCalledWith(expect.anything(), {
+    expect(useProcessHooksForView).toHaveBeenCalledWith(expect.anything(), SearchExecutionState.empty(), {
       q: '',
       rangetype: 'relative',
       relative: '300',

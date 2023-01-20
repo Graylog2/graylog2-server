@@ -20,6 +20,7 @@ import View from 'views/logic/views/View';
 import Query, { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import mockDispatch from 'views/test/mockDispatch';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import bindSearchParamsFromQuery from './BindSearchParamsFromQuery';
 
@@ -43,6 +44,7 @@ describe('BindSearchParamsFromQuery should', () => {
   const defaultInput = {
     query: {},
     view,
+    executionState: SearchExecutionState.empty(),
     retry: () => Promise.resolve(),
     dispatch,
   };
@@ -59,13 +61,13 @@ describe('BindSearchParamsFromQuery should', () => {
       view: view.toBuilder().type(View.Type.Dashboard).build(),
     };
 
-    const newView = await bindSearchParamsFromQuery(input);
+    const [newView] = await bindSearchParamsFromQuery(input);
 
     expect(findMockQuery(newView).query.query_string).toBe('');
   });
 
   it('not update query when query is already up to date', async () => {
-    const newView = await bindSearchParamsFromQuery(defaultInput);
+    const [newView] = await bindSearchParamsFromQuery(defaultInput);
 
     expect(findMockQuery(newView).query.query_string).toBe('');
   });
@@ -76,13 +78,13 @@ describe('BindSearchParamsFromQuery should', () => {
       query: { q: 'gl2_source_input:source-input-id' },
     };
 
-    const newView = await bindSearchParamsFromQuery(input);
+    const [newView] = await bindSearchParamsFromQuery(input);
 
     expect(findMockQuery(newView).query.query_string).toBe('gl2_source_input:source-input-id');
   });
 
   it('not update query string when no query param is provided', async () => {
-    const newView = await bindSearchParamsFromQuery(defaultInput);
+    const [newView] = await bindSearchParamsFromQuery(defaultInput);
 
     expect(findMockQuery(newView).query.query_string).toBe('');
   });
@@ -97,7 +99,7 @@ describe('BindSearchParamsFromQuery should', () => {
       range: 0,
     };
 
-    const newView = await bindSearchParamsFromQuery(input);
+    const [newView] = await bindSearchParamsFromQuery(input);
 
     expect(findMockQuery(newView).timerange).toEqual(expectedTimerange);
   });
@@ -113,7 +115,7 @@ describe('BindSearchParamsFromQuery should', () => {
       to: input.query.to,
     };
 
-    const newView = await bindSearchParamsFromQuery(input);
+    const [newView] = await bindSearchParamsFromQuery(input);
 
     expect(findMockQuery(newView).timerange).toEqual(expectedTimerange);
   });
@@ -127,7 +129,7 @@ describe('BindSearchParamsFromQuery should', () => {
       type: input.query.rangetype, keyword: input.query.keyword,
     };
 
-    const newView = await bindSearchParamsFromQuery(input);
+    const [newView] = await bindSearchParamsFromQuery(input);
 
     expect(findMockQuery(newView).timerange).toEqual(expectedTimerange);
   });
@@ -138,7 +140,7 @@ describe('BindSearchParamsFromQuery should', () => {
       query: { streams: 'stream1, stream2,  stream3 ' },
     };
 
-    const newView = await bindSearchParamsFromQuery(input);
+    const [newView] = await bindSearchParamsFromQuery(input);
 
     const expectedFilter = Immutable.Map({
       type: 'or',
@@ -158,7 +160,7 @@ describe('BindSearchParamsFromQuery should', () => {
       query: { streams: '' },
     };
 
-    const newView = await bindSearchParamsFromQuery(input);
+    const [newView] = await bindSearchParamsFromQuery(input);
 
     expect(newView).toEqual(view);
   });

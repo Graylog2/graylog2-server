@@ -28,6 +28,7 @@ import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import { createSearch } from 'fixtures/searches';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import NewSearchPage from './NewSearchPage';
 
@@ -60,7 +61,7 @@ describe('NewSearchPage', () => {
   beforeEach(() => {
     asMock(useQuery).mockReturnValue(query);
     asMock(useCreateSavedSearch).mockReturnValue(Promise.resolve(mockView));
-    asMock(useProcessHooksForView).mockReturnValue([mockView, undefined]);
+    asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: mockView, executionState: SearchExecutionState.empty() });
     asMock(SearchComponent).mockImplementation(() => <span>Extended Search Page</span>);
   });
 
@@ -71,7 +72,7 @@ describe('NewSearchPage', () => {
   });
 
   it('should show spinner while loading view', async () => {
-    asMock(useProcessHooksForView).mockReturnValue([undefined, undefined]);
+    asMock(useProcessHooksForView).mockReturnValue({ status: 'loading' });
 
     const { findByText } = render(<SimpleNewSearchPage />);
 
@@ -89,7 +90,7 @@ describe('NewSearchPage', () => {
     it('should process hooks with provided location query', async () => {
       render(<SimpleNewSearchPage />);
 
-      await waitFor(() => expect(useProcessHooksForView).toHaveBeenCalledWith(expect.anything(), {
+      await waitFor(() => expect(useProcessHooksForView).toHaveBeenCalledWith(expect.anything(), SearchExecutionState.empty(), {
         q: '',
         rangetype: 'relative',
         relative: '300',
@@ -97,7 +98,7 @@ describe('NewSearchPage', () => {
     });
 
     it('should display errors which occur when processing hooks', async () => {
-      asMock(useProcessHooksForView).mockImplementation(() => [undefined, <span>An unknown error has occurred.</span>]);
+      asMock(useProcessHooksForView).mockImplementation(() => ({ status: 'interrupted', component: <span>An unknown error has occurred.</span> }));
 
       render(<SimpleNewSearchPage />);
 
@@ -151,7 +152,7 @@ describe('NewSearchPage', () => {
 
       await waitFor(() => expect(useProcessHooksForView).toHaveBeenCalled());
 
-      expect(useProcessHooksForView).toHaveBeenCalledWith(expect.anything(), query);
+      expect(useProcessHooksForView).toHaveBeenCalledWith(expect.anything(), SearchExecutionState.empty(), query);
     });
   });
 });

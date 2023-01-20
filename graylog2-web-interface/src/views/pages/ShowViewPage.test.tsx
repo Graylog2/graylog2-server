@@ -27,6 +27,7 @@ import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import ShowViewPage from './ShowViewPage';
 
@@ -71,12 +72,12 @@ describe('ShowViewPage', () => {
   beforeEach(() => {
     asMock(useQuery).mockReturnValue({});
     asMock(useParams).mockReturnValue({ viewId: 'foo' });
-    asMock(useProcessHooksForView).mockReturnValue([view, undefined]);
+    asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view, executionState: SearchExecutionState.empty() });
     asMock(useFetchView).mockResolvedValue(view);
   });
 
   it('renders Spinner while loading', async () => {
-    asMock(useProcessHooksForView).mockReturnValue([undefined, undefined]);
+    asMock(useProcessHooksForView).mockReturnValue({ status: 'loading' });
 
     render(<SimpleShowViewPage />);
 

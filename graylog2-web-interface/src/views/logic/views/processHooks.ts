@@ -14,49 +14,56 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import type View from './View';
 
 import type { ViewHook, ViewHookArguments } from '../hooks/ViewHook';
 
 const _chainHooks = (hooks: Array<ViewHook>, args: ViewHookArguments) => {
-  return hooks.reduce((prev, cur: ViewHook) => prev.then((newView) => cur({ ...args, view: newView })), Promise.resolve(args.view));
+  return hooks.reduce(
+    (prev, cur: ViewHook) => prev.then(([newView, newExecutionState]) => cur({ ...args, view: newView, executionState: newExecutionState })),
+    Promise.resolve([args.view, args.executionState] as const),
+  );
 };
 
 type Query = { [key: string]: any };
-type OnSuccess = (view: View) => void;
+type OnSuccess = (view: View, executionState: SearchExecutionState) => void;
 
-const _processViewHooks = (viewHooks: Array<ViewHook>, view: View, query: Query, onSuccess: OnSuccess, dispatch: AppDispatch) => {
-  let promise;
+const _processViewHooks = (viewHooks: Array<ViewHook>, view: View, query: Query, executionState: SearchExecutionState, onSuccess: OnSuccess) => {
+  let promise: Promise<readonly [View, SearchExecutionState]>;
 
   if (viewHooks.length > 0) {
-    const retry = () => _processViewHooks(viewHooks, view, query, onSuccess, dispatch);
+    const retry: ViewHookArguments['retry'] = (args) => {
+      const _view = args.view ?? view;
+      const _executionState = args.executionState ?? executionState;
 
-    promise = _chainHooks(viewHooks, { view, retry, query, dispatch });
+      return _processViewHooks(viewHooks, _view, query, _executionState, onSuccess);
+    };
+
+    promise = _chainHooks(viewHooks, { view, retry, query, executionState });
   } else {
-    promise = Promise.resolve(view);
+    promise = Promise.resolve([view, executionState] as const);
   }
 
-  return promise.then(async (newView) => {
-    await onSuccess(newView);
+  return promise.then(async ([newView, newExecutionState]) => {
+    await onSuccess(newView, newExecutionState);
 
-    return newView;
+    return [newView, newExecutionState] as const;
   });
 };
 
 const processHooks = (
-  dispatch: AppDispatch,
   promise: Promise<View>,
+  executionState: SearchExecutionState,
   loadingViewHooks: Array<ViewHook> = [],
   executingViewHooks: Array<ViewHook> = [],
   query: Query = {},
   onSuccess: OnSuccess = () => {},
 ) => {
   return promise
-    .then((view: View) => _processViewHooks(loadingViewHooks, view, query, onSuccess, dispatch))
-    .then((view: View) => _processViewHooks(executingViewHooks, view, query, onSuccess, dispatch));
+    .then((view: View) => _processViewHooks(loadingViewHooks, view, query, executionState, onSuccess))
+    .then(([newView, newExecutionState]) => _processViewHooks(executingViewHooks, newView, query, newExecutionState, onSuccess));
 };
 
 export default processHooks;

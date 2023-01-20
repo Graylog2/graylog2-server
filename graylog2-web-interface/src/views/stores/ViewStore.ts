@@ -143,6 +143,8 @@ export const ViewStore: ViewStoreType = singletonStore(
           return Immutable.OrderedMap<QueryId, Query>(newSearch.queries.map((q) => [q.id, q]).toArray());
         },
       );
+
+      return promise;
     },
     update(view: View) {
       this.dirty = false;

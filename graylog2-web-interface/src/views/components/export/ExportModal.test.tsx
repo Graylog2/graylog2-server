@@ -44,6 +44,7 @@ import useViewType from 'views/hooks/useViewType';
 import { viewSliceReducer } from 'views/logic/slices/viewSlice';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useSearchExecutionState from 'views/hooks/useSearchExecutionState';
+import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionSlice';
 
 import type { Props as ExportModalProps } from './ExportModal';
 import ExportModal from './ExportModal';
@@ -62,7 +63,10 @@ const pluginExports: PluginRegistration = {
       mimeType: 'text/csv',
       fileExtension: 'csv',
     }],
-    'views.reducers': [{ key: 'view', reducer: viewSliceReducer }],
+    'views.reducers': [
+      { key: 'view', reducer: viewSliceReducer },
+      { key: 'searchExecution', reducer: searchExecutionSliceReducer },
+    ],
   },
 };
 

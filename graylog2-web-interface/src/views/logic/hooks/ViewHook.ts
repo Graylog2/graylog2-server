@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type View from 'views/logic/views/View';
-import type { AppDispatch } from 'stores/useAppDispatch';
+import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 export type ViewHookArguments = {
   view: View,
-  retry: () => Promise<unknown>,
+  executionState: SearchExecutionState,
+  retry: (args: { view: View, executionState: SearchExecutionState }) => Promise<unknown>,
   query: { [key: string]: any },
-  dispatch: AppDispatch,
 };
 
-export type ViewHook = (args: ViewHookArguments) => Promise<View>;
+export type ViewHook = (args: ViewHookArguments) => Promise<[View, SearchExecutionState]>;

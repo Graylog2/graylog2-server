@@ -22,6 +22,7 @@ import asMock from 'helpers/mocking/AsMock';
 import type { PluginMetadata } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import mockDispatch from 'views/test/mockDispatch';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import RequirementsProvided from './RequirementsProvided';
 
@@ -49,6 +50,7 @@ describe('RequirementsProvided', () => {
   const defaultArgs = {
     retry,
     query: {},
+    executionState: SearchExecutionState.empty(),
     dispatch,
   };
 

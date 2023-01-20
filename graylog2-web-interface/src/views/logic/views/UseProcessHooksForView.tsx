@@ -19,7 +19,7 @@ import * as React from 'react';
 
 import ErrorPage from 'components/errors/ErrorPage';
 import usePluginEntities from 'hooks/usePluginEntities';
-import useAppDispatch from 'stores/useAppDispatch';
+import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import type View from './View';
 import processHooks from './processHooks';
@@ -45,36 +45,33 @@ const LoadViewError = ({ error }: { error: Error }) => {
 
 type HookComponent = JSX.Element;
 
-type Loading = [undefined, undefined];
-type Loaded = [View, undefined];
-type Interrupted = [undefined, HookComponent];
+type Loading = { status: 'loading' };
+type Loaded = { status: 'loaded', view: View, executionState: SearchExecutionState };
+type Interrupted = { status: 'interrupted', component: HookComponent };
 type ResultType = Loading | Loaded | Interrupted;
 
-const useProcessHooksForView = (view: Promise<View>, query: { [key: string]: any }): ResultType => {
+const useProcessHooksForView = (view: Promise<View>, executionState: SearchExecutionState, query: { [key: string]: any }): ResultType => {
   const loadingViewHooks = usePluginEntities('views.hooks.loadingView');
   const executingViewHooks = usePluginEntities('views.hooks.executingView');
 
-  const [result, setResult] = useState<ResultType>([undefined, undefined]);
-  const dispatch = useAppDispatch();
+  const [result, setResult] = useState<ResultType>({ status: 'loading' });
 
   useEffect(() => {
     processHooks(
-      dispatch,
       view,
+      executionState,
       loadingViewHooks,
       executingViewHooks,
       query,
-      (v) => {
-        setResult([v, undefined]);
+      (v, e) => {
+        setResult({ status: 'loaded', view: v, executionState: e });
       },
-    ).catch((e) => {
-      if (e instanceof Error) {
-        setResult([undefined, <LoadViewError error={e} />]);
+    ).catch((e: Error | HookComponent) => {
+      const component = e instanceof Error
+        ? <LoadViewError error={e} />
+        : e;
 
-        return;
-      }
-
-      setResult([undefined, e]);
+      setResult({ status: 'interrupted', component });
     });
   },
   // eslint-disable-next-line react-hooks/exhaustive-deps
