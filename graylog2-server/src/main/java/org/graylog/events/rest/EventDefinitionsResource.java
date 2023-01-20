@@ -17,11 +17,14 @@
 package org.graylog.events.rest;
 
 
+import com.codahale.metrics.annotation.Timed;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.events.audit.EventsAuditEventTypes;
@@ -41,6 +44,10 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
+import org.graylog2.rest.bulk.BulkRemover;
+import org.graylog2.rest.bulk.SequentialBulkRemover;
+import org.graylog2.rest.bulk.model.BulkDeleteRequest;
+import org.graylog2.rest.bulk.model.BulkDeleteResponse;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
@@ -98,6 +105,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private final EventProcessorEngine engine;
     private final SearchQueryParser searchQueryParser;
     private final RecentActivityService recentActivityService;
+    private final BulkRemover<UserContext> bulkRemover;
 
     @Inject
     public EventDefinitionsResource(DBEventDefinitionService dbService,
@@ -111,6 +119,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         this.engine = engine;
         this.searchQueryParser = new SearchQueryParser(EventDefinitionDto.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.recentActivityService = recentActivityService;
+        this.bulkRemover = new SequentialBulkRemover<>(this::delete);
     }
 
     @GET
@@ -208,6 +217,25 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 recentActivityService.delete(d.id(), GRNTypes.EVENT_DEFINITION, d.title(), userContext.getUser())
         );
         eventDefinitionHandler.delete(definitionId);
+    }
+
+    @POST
+    @Path("/bulk_delete")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Timed
+    @ApiOperation(value = "Delete a bulk of event definitions", response = BulkDeleteResponse.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Could not delete at least one of the event definitions in the bulk.")
+    })
+    @NoAuditEvent("Audit events triggered manually") //TODO: are they?
+    public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkDeleteRequest bulkDeleteRequest,
+                               @Context UserContext userContext) {
+
+        final BulkDeleteResponse response = bulkRemover.bulkDelete(bulkDeleteRequest, userContext);
+
+        return Response.status(response.failures().isEmpty() ? Response.Status.OK : Response.Status.BAD_REQUEST)
+                .entity(response)
+                .build();
     }
 
     @PUT
