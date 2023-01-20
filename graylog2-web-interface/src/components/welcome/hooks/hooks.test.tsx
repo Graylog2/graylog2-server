@@ -24,8 +24,12 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import suppressConsole from 'helpers/suppressConsole';
 import { qualifyUrl } from 'util/URLUtils';
-import { urlPrefix, useLastOpened, useFavoriteItems, useRecentActivity } from 'components/welcome/hooks';
 import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
+import useLastOpened from 'components/welcome/hooks/useLastOpened';
+import useFavoriteItems from 'components/welcome/hooks/useFavoriteItems';
+import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
+
+const urlPrefix = '/startpage';
 
 const getUrl = (url: string, prefix: string = urlPrefix) => qualifyUrl(`${prefix}/${url}?page=1&per_page=5`);
 const queryClient = new QueryClient({

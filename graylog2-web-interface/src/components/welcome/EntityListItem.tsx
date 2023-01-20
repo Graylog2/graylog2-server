@@ -48,7 +48,7 @@ const EntityItem = ({ type, title, id }: Props) => {
 
   return (
     <StyledListGroupItem>
-      <StyledLabel bsStyle="info">{entityTypeMap[type].typeTitle}</StyledLabel>
+      <StyledLabel bsStyle="info">{entityTypeMap[type]?.typeTitle || 'unknown'}</StyledLabel>
       <Link to={entityLink}>{title}</Link>
     </StyledListGroupItem>
   );

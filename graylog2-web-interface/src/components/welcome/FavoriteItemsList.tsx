@@ -21,9 +21,9 @@ import { ListGroup } from 'components/bootstrap';
 import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
 import EntityItem from 'components/welcome/EntityListItem';
 import { NoSearchResult, PaginatedList, Spinner } from 'components/common';
-import { useFavoriteItems } from 'components/welcome/hooks';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
+import useFavoriteItems from 'components/welcome/hooks/useFavoriteItems';
 
 const FavoriteItemsList = () => {
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
@@ -38,6 +38,7 @@ const FavoriteItemsList = () => {
     return (
       <NoSearchResult>
         You do not have any favorite items yet.
+        <br />
         Make any <Link to={Routes.SEARCH}>Search</Link> or <Link to={Routes.pluginRoute('DASHBOARDS_NEW')}>Dashboard</Link> favorite to show up here.
       </NoSearchResult>
     );

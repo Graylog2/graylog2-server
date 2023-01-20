@@ -20,13 +20,12 @@ import styled, { css } from 'styled-components';
 
 import { Table } from 'components/bootstrap';
 import { DEFAULT_PAGINATION, entityTypeMap } from 'components/welcome/Constants';
-import { NoSearchResult, PaginatedList, Spinner } from 'components/common';
-import { relativeDifference } from 'util/DateTime';
+import { NoSearchResult, PaginatedList, RelativeTime, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
 import { StyledLabel } from 'components/welcome/EntityListItem';
-import { useRecentActivity } from 'components/welcome/hooks';
 import type { EntityItemType, RecentActivityType } from 'components/welcome/types';
+import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
 
 const ActionItemLink = styled(Link)(({ theme }) => css`
   color: ${theme.colors.variant.primary};
@@ -73,8 +72,9 @@ const RecentActivityList = () => {
     return (
       <NoSearchResult>
         There is no recent activity yet.
-        <p />
-        Whenever any other user will update content you have access to, or share new content with you, it will show up here.
+        <p>
+          Whenever any other user will update content you have access to, or share new content with you, it will show up here.
+        </p>
       </NoSearchResult>
     );
   }
@@ -84,20 +84,21 @@ const RecentActivityList = () => {
       <Table striped>
         <tbody>
           {
-              recentActivity.map(({ id, timestamp, activityType, itemType, itemId, itemTitle, userName }) => {
-                return (
-                  <tr key={id}>
-                    <td style={{ width: 110 }}>
-                      <StyledLabel title={timestamp} bsStyle="primary">{relativeDifference(timestamp)}
-                      </StyledLabel>
-                    </td>
-                    <td>
-                      <ActionItem itemId={itemId} activityType={activityType} itemTitle={itemTitle} itemType={itemType} userName={userName} />
-                    </td>
-                  </tr>
-                );
-              })
-        }
+            recentActivity.map(({ id, timestamp, activityType, itemType, itemId, itemTitle, userName }) => {
+              return (
+                <tr key={id}>
+                  <td style={{ width: 110 }}>
+                    <StyledLabel bsStyle="primary">
+                      <RelativeTime dateTime={timestamp} />
+                    </StyledLabel>
+                  </td>
+                  <td>
+                    <ActionItem itemId={itemId} activityType={activityType} itemTitle={itemTitle} itemType={itemType} userName={userName} />
+                  </td>
+                </tr>
+              );
+            })
+          }
         </tbody>
       </Table>
     </PaginatedList>

@@ -17,35 +17,15 @@
 
 import { useQuery } from '@tanstack/react-query';
 
+import type { PaginatedRecentActivity, PaginatedResponseRecentActivity, RequestQuery } from 'components/welcome/types';
+import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
+import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import PaginationURL from 'util/PaginationURL';
 import UserNotification from 'util/UserNotification';
-import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
-import type {
-  PaginatedLastOpened,
-  PaginatedFavoriteItems,
-  RequestQuery,
-  PaginatedRecentActivity,
-  PaginatedResponseRecentActivity,
-} from 'components/welcome/types';
 
-export const urlPrefix = '/startpage';
-export const LAST_OPEN_QUERY_KEY = 'last_open_query_key';
-export const PINNED_ITEMS_QUERY_KEY = 'pinned_items_query_key';
+const urlPrefix = '/startpage';
 export const RECENT_ACTIONS_QUERY_KEY = 'recent_actions_query_key';
-
-const fetchLastOpen = async ({ page }: RequestQuery): Promise<PaginatedLastOpened> => {
-  const url = PaginationURL(`${urlPrefix}/lastOpened`, page, 5, '');
-
-  return fetch('GET', qualifyUrl(url));
-};
-
-const fetchFavoriteItems = async ({ page }: RequestQuery): Promise<PaginatedFavoriteItems> => {
-  const url = PaginationURL('/favorites', page, 5, '');
-
-  return fetch('GET', qualifyUrl(url));
-};
 
 const fetchRecentActivities = async ({ page }: RequestQuery): Promise<PaginatedRecentActivity> => {
   const url = PaginationURL(`${urlPrefix}/recentActivity`, page, 5, '');
@@ -69,35 +49,7 @@ const fetchRecentActivities = async ({ page }: RequestQuery): Promise<PaginatedR
   });
 };
 
-export const useLastOpened = (pagination: RequestQuery): { data: PaginatedLastOpened, isFetching: boolean } => {
-  return useQuery([LAST_OPEN_QUERY_KEY, pagination], () => fetchLastOpen(pagination), {
-    onError: (errorThrown) => {
-      UserNotification.error(`Loading last opened items failed with status: ${errorThrown}`,
-        'Could not load last opened items');
-    },
-    retry: 0,
-    initialData: {
-      lastOpened: [],
-      ...DEFAULT_PAGINATION,
-    },
-  });
-};
-
-export const useFavoriteItems = (pagination: RequestQuery): {data: PaginatedFavoriteItems, isFetching: boolean} => {
-  return useQuery([PINNED_ITEMS_QUERY_KEY, pagination], () => fetchFavoriteItems(pagination), {
-    onError: (errorThrown) => {
-      UserNotification.error(`Loading favorite items failed with status: ${errorThrown}`,
-        'Could not load favorite items');
-    },
-    retry: 0,
-    initialData: {
-      favorites: [],
-      ...DEFAULT_PAGINATION,
-    },
-  });
-};
-
-export const useRecentActivity = (pagination: RequestQuery): { data: PaginatedRecentActivity, isFetching: boolean} => {
+const useRecentActivity = (pagination: RequestQuery): { data: PaginatedRecentActivity, isFetching: boolean } => {
   return useQuery([RECENT_ACTIONS_QUERY_KEY, pagination], () => fetchRecentActivities(pagination), {
     onError: (errorThrown) => {
       UserNotification.error(`Loading recent activity failed with status: ${errorThrown}`,
@@ -110,3 +62,5 @@ export const useRecentActivity = (pagination: RequestQuery): { data: PaginatedRe
     },
   });
 };
+
+export default useRecentActivity;
