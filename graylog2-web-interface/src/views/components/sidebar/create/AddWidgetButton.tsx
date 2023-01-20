@@ -135,7 +135,7 @@ class AddWidgetButton extends React.Component<Props, State> {
   };
 
   _createMenuItem = (creator: Creator): React.ReactNode => {
-    const disabled = creator.condition?.() ?? false;
+    const disabled = creator.condition?.() === false;
 
     return (
       <WithDispatch key={creator.title}>

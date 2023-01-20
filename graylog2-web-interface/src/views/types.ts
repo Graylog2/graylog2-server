@@ -50,6 +50,7 @@ import type { CustomCommand, CustomCommandContext } from 'views/components/searc
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type SearchMetadata from 'views/logic/search/SearchMetadata';
 import type { SearchExecutionResult } from 'views/actions/SearchActions';
+import type { AppDispatch } from 'stores/useAppDispatch';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -262,8 +263,8 @@ export interface CombinedSearchBarFormValues {
 export interface SearchBarControl {
   component: React.ComponentType;
   id: string;
-  onSearchSubmit?: <T extends Query | undefined>(values: CombinedSearchBarFormValues, currentQuery?: T) => Promise<T>,
-  onDashboardWidgetSubmit: (values: CombinedSearchBarFormValues, currentWidget: Widget) => Promise<Widget | void>,
+  onSearchSubmit?: <T extends Query | undefined>(values: CombinedSearchBarFormValues, dispatch: AppDispatch, currentQuery?: T) => Promise<T>,
+  onDashboardWidgetSubmit: (values: CombinedSearchBarFormValues, dispatch: AppDispatch, currentWidget: Widget) => Promise<Widget | void>,
   onValidate?: (values: CombinedSearchBarFormValues) => FormikErrors<{}>,
   placement: 'left' | 'right';
   useInitialSearchValues?: (currentQuery?: Query) => ({ [key: string]: any }),

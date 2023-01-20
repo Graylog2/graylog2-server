@@ -94,7 +94,7 @@ export const updateWidgetSearchControls = (widget, { timerange, streams, querySt
 
 const onSubmit = async (dispatch: AppDispatch, values: CombinedSearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, widget: Widget) => {
   const { timerange, streams, queryString } = values;
-  const widgetWithPluginData = await executePluggableSubmitHandler(values, pluggableSearchBarControls, widget);
+  const widgetWithPluginData = await executePluggableSubmitHandler(dispatch, values, pluggableSearchBarControls, widget);
   const newWidget = updateWidgetSearchControls(widgetWithPluginData, { timerange, streams, queryString });
 
   if (!widget.equals(newWidget)) {

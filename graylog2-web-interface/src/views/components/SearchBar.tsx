@@ -82,7 +82,7 @@ const StreamsAndRefresh = styled.div`
 const defaultOnSubmit = async (dispatch: AppDispatch, values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, currentQuery: Query) => {
   const { timerange, streams, queryString } = values;
 
-  const queryWithPluginData = await executePluggableSubmitHandler(values, pluggableSearchBarControls, currentQuery);
+  const queryWithPluginData = await executePluggableSubmitHandler(dispatch, values, pluggableSearchBarControls, currentQuery);
 
   const newQuery = queryWithPluginData.toBuilder()
     .timerange(timerange)

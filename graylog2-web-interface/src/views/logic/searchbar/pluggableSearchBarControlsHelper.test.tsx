@@ -19,6 +19,7 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import type { SearchBarControl } from 'views/types';
+import mockDispatch from 'views/test/mockDispatch';
 
 import {
   useInitialSearchValues,
@@ -33,8 +34,8 @@ describe('pluggableSearchBarControlsHandler', () => {
     component: () => <div />,
     useInitialSearchValues: () => ({ pluggableControl: 'Initial Value' }),
     useInitialDashboardWidgetValues: () => ({ pluggableControl: 'Initial Value' }),
-    onSearchSubmit: (_values, entity) => Promise.resolve(entity),
-    onDashboardWidgetSubmit: (_values, entity) => Promise.resolve(entity),
+    onSearchSubmit: (_values, _dispatch, entity) => Promise.resolve(entity),
+    onDashboardWidgetSubmit: (_values, _dispatch, entity) => Promise.resolve(entity),
     validationPayload: (values) => {
       // @ts-ignore
       const { pluggableControl } = values;
@@ -58,6 +59,8 @@ describe('pluggableSearchBarControlsHandler', () => {
     // eslint-disable-next-line no-console
     console.error = original;
   });
+
+  const dispatch = mockDispatch();
 
   it('useInitialSearchValues should catch errors', async () => {
     PluginStore.register(new PluginManifest({}, {
@@ -83,6 +86,7 @@ describe('pluggableSearchBarControlsHandler', () => {
 
   it('executeSearchSubmitHandler should catch errors', async () => {
     const result = await executeSearchSubmitHandler(
+      dispatch,
       {},
       [() => ({
         ...pluggableSearchBarControl,

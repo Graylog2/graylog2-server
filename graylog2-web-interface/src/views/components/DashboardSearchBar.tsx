@@ -111,7 +111,7 @@ const DashboardSearchBar = () => {
 
   const submitForm = useCallback(async (values) => {
     const { timerange: newTimerange, queryString: newQueryString } = values;
-    await executePluggableSubmitHandler(values, pluggableSearchBarControls);
+    await executePluggableSubmitHandler(dispatch, values, pluggableSearchBarControls);
 
     dispatch(setGlobalOverride(newQueryString, newTimerange));
     dispatch(execute());
