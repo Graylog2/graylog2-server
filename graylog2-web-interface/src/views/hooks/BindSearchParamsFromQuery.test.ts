@@ -19,6 +19,7 @@ import * as Immutable from 'immutable';
 import View from 'views/logic/views/View';
 import Query, { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
+import mockDispatch from 'views/test/mockDispatch';
 
 import bindSearchParamsFromQuery from './BindSearchParamsFromQuery';
 
@@ -38,10 +39,12 @@ describe('BindSearchParamsFromQuery should', () => {
     .type(View.Type.Search)
     .search(search)
     .build();
+  const dispatch = mockDispatch();
   const defaultInput = {
     query: {},
     view,
     retry: () => Promise.resolve(),
+    dispatch,
   };
 
   afterEach(() => {

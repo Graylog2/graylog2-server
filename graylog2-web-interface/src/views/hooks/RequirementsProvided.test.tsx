@@ -21,6 +21,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import asMock from 'helpers/mocking/AsMock';
 import type { PluginMetadata } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
+import mockDispatch from 'views/test/mockDispatch';
 
 import RequirementsProvided from './RequirementsProvided';
 
@@ -44,12 +45,19 @@ describe('RequirementsProvided', () => {
     url: 'https://www.graylog.org',
   };
 
+  const dispatch = mockDispatch();
+  const defaultArgs = {
+    retry,
+    query: {},
+    dispatch,
+  };
+
   it('returns resolved promise for empty requirements', async () => {
     asMock(PluginStore.exports).mockReturnValue([]);
 
     const view = View.create().toBuilder().requires({}).build();
 
-    expect(await RequirementsProvided({ view, query: {}, retry })).toBeTruthy();
+    expect(await RequirementsProvided({ ...defaultArgs, view })).toBeTruthy();
   });
 
   it('returns resolved promise if all requirements are provided', async () => {
@@ -64,7 +72,7 @@ describe('RequirementsProvided', () => {
       })
       .build();
 
-    expect(await RequirementsProvided({ view, query: {}, retry })).toBeTruthy();
+    expect(await RequirementsProvided({ ...defaultArgs, view })).toBeTruthy();
   });
 
   it('throws Component if not all requirements are provided', async () => {
@@ -89,7 +97,7 @@ describe('RequirementsProvided', () => {
     let Component;
 
     try {
-      await RequirementsProvided({ view, query: {}, retry });
+      await RequirementsProvided({ ...defaultArgs, view });
     } catch (component) {
       Component = component;
     }

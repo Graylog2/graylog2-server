@@ -19,6 +19,7 @@ import * as React from 'react';
 
 import ErrorPage from 'components/errors/ErrorPage';
 import usePluginEntities from 'hooks/usePluginEntities';
+import useAppDispatch from 'stores/useAppDispatch';
 
 import type View from './View';
 import processHooks from './processHooks';
@@ -54,9 +55,11 @@ const useProcessHooksForView = (view: Promise<View>, query: { [key: string]: any
   const executingViewHooks = usePluginEntities('views.hooks.executingView');
 
   const [result, setResult] = useState<ResultType>([undefined, undefined]);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     processHooks(
+      dispatch,
       view,
       loadingViewHooks,
       executingViewHooks,

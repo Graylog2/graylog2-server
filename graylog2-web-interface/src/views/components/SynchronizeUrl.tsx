@@ -25,9 +25,9 @@ import type { RootState } from 'views/types';
 import { selectView } from 'views/logic/slices/viewSelectors';
 import useAppDispatch from 'stores/useAppDispatch';
 
-const bindSearchParamsFromQueryThunk = (query) => (_dispatch: AppDispatch, getState: () => RootState) => {
+const bindSearchParamsFromQueryThunk = (query) => (dispatch: AppDispatch, getState: () => RootState) => {
   const view = selectView(getState());
-  bindSearchParamsFromQuery({ view, query, retry: () => Promise.resolve() });
+  bindSearchParamsFromQuery({ view, query, retry: () => Promise.resolve(), dispatch });
 };
 
 const useBindSearchParamsFromQuery = (query: { [key: string]: unknown }) => {

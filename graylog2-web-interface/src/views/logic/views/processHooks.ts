@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import type { AppDispatch } from 'stores/useAppDispatch';
+
 import type View from './View';
 
 import type { ViewHook, ViewHookArguments } from '../hooks/ViewHook';
@@ -26,13 +28,13 @@ const _chainHooks = (hooks: Array<ViewHook>, args: ViewHookArguments) => {
 type Query = { [key: string]: any };
 type OnSuccess = (view: View) => void;
 
-const _processViewHooks = (viewHooks: Array<ViewHook>, view: View, query: Query, onSuccess: OnSuccess) => {
+const _processViewHooks = (viewHooks: Array<ViewHook>, view: View, query: Query, onSuccess: OnSuccess, dispatch: AppDispatch) => {
   let promise;
 
   if (viewHooks.length > 0) {
-    const retry = () => _processViewHooks(viewHooks, view, query, onSuccess);
+    const retry = () => _processViewHooks(viewHooks, view, query, onSuccess, dispatch);
 
-    promise = _chainHooks(viewHooks, { view, retry, query });
+    promise = _chainHooks(viewHooks, { view, retry, query, dispatch });
   } else {
     promise = Promise.resolve(view);
   }
@@ -45,6 +47,7 @@ const _processViewHooks = (viewHooks: Array<ViewHook>, view: View, query: Query,
 };
 
 const processHooks = (
+  dispatch: AppDispatch,
   promise: Promise<View>,
   loadingViewHooks: Array<ViewHook> = [],
   executingViewHooks: Array<ViewHook> = [],
@@ -52,8 +55,8 @@ const processHooks = (
   onSuccess: OnSuccess = () => {},
 ) => {
   return promise
-    .then((view: View) => _processViewHooks(loadingViewHooks, view, query, onSuccess))
-    .then((view: View) => _processViewHooks(executingViewHooks, view, query, onSuccess));
+    .then((view: View) => _processViewHooks(loadingViewHooks, view, query, onSuccess, dispatch))
+    .then((view: View) => _processViewHooks(executingViewHooks, view, query, onSuccess, dispatch));
 };
 
 export default processHooks;
