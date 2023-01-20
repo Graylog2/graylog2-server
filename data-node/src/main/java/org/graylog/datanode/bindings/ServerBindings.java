@@ -18,7 +18,7 @@ package org.graylog.datanode.bindings;
 
 import com.google.inject.Scopes;
 import com.google.inject.multibindings.Multibinder;
-import org.graylog.datanode.Configuration;
+import org.graylog.datanode.DataNodeConfiguration;
 import org.graylog.datanode.DataNodeRunner;
 import org.graylog.datanode.management.ManagedNodes;
 import org.graylog.datanode.shared.system.activities.DataNodeActivityWriter;
@@ -29,10 +29,10 @@ import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
 
 public class ServerBindings extends Graylog2Module {
-    private final Configuration configuration;
+    private final DataNodeConfiguration configuration;
     private final boolean isMigrationCommand;
 
-    public ServerBindings(Configuration configuration, boolean isMigrationCommand) {
+    public ServerBindings(DataNodeConfiguration configuration, boolean isMigrationCommand) {
 
         this.configuration = configuration;
         this.isMigrationCommand = isMigrationCommand;

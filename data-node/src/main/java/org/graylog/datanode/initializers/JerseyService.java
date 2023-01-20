@@ -27,7 +27,6 @@ import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.glassfish.grizzly.http.CompressionConfig;
-import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
@@ -36,7 +35,7 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
-import org.graylog.datanode.Configuration;
+import org.graylog.datanode.DataNodeConfiguration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.inject.Graylog2Module;
@@ -49,8 +48,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.ws.rs.Path;
-import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
@@ -74,7 +71,7 @@ public class JerseyService extends AbstractIdleService {
     private static final String RESOURCE_PACKAGE_WEB = "org.graylog2.web.resources";
 
     private final HttpConfiguration configuration;
-    private final Configuration graylogConfiguration;
+    private final DataNodeConfiguration graylogConfiguration;
     private final Set<Class<?>> systemRestResources;
 //    private final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources;
 
@@ -91,7 +88,7 @@ public class JerseyService extends AbstractIdleService {
 
     @Inject
     public JerseyService(final HttpConfiguration configuration,
-                         Configuration graylogConfiguration,
+                         DataNodeConfiguration graylogConfiguration,
                          Set<Class<? extends DynamicFeature>> dynamicFeatures,
 //                         Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
                          Set<Class<? extends ExceptionMapper>> exceptionMappers,

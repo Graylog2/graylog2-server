@@ -17,10 +17,14 @@
 package org.graylog.datanode;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 
-public class Configuration {
+import java.util.Collections;
+import java.util.List;
+
+public class DataNodeConfiguration {
     @Parameter(value = "installation_source", validator = StringNotBlankValidator.class)
     private String installationSource = "unknown";
 
@@ -50,6 +54,21 @@ public class Configuration {
 
     @Parameter(value = "process_logs_buffer_size")
     private Integer logs = 500;
+
+
+    @Parameter(value = "datanode.node.name")
+    private String datanodeNodeName = "node1";
+
+    @Parameter(value = "opensearch.http.port")
+    private String opensearchHttpPort = "9200";
+
+
+    @Parameter(value = "opensearch.transport.port")
+    private String opensearchTransportPort = "9300";
+
+    @Parameter(value = "opensearch.discovery.seed.hosts", converter = StringListConverter.class)
+    private List<String> opensearchDiscoverySeedHosts = Collections.emptyList();
+
 
     public String getInstallationSource() {
         return installationSource;

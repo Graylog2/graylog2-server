@@ -14,23 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.rest;
+package org.graylog.datanode.periodicals;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog2.plugin.Version;
 
-import java.util.List;
+import java.util.Map;
 
-public record DataNodeStatus(@JsonIgnore Version appVersion, List<StatusResponse> processes) {
-
-    @JsonProperty
-    public String dataNodeVersion() {
-        return this.appVersion.toString();
-    }
-
-    @JsonProperty
-    public boolean isLeader() {
-        return processes.stream().anyMatch(p -> p.info().isLeaderNode());
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record ClusterStateResponse(@JsonProperty("cluster_manager_node") String clusterManagerNode,  @JsonProperty("nodes") Map<String, NodeState> nodes) {
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record NodeState(@JsonProperty("name") String name, @JsonProperty("transport_address") String transportAddress) {
     }
 }

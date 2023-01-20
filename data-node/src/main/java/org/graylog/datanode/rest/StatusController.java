@@ -32,7 +32,7 @@ public class StatusController {
 
     private final Version version = Version.CURRENT_CLASSPATH;
 
-    private ManagedNodes openSearch;
+    private final ManagedNodes openSearch;
 
     @Inject
     public StatusController(ManagedNodes openSearch) {

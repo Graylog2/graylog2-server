@@ -65,7 +65,13 @@ public class DataNodeRunner {
         CommandLine cmdLine = new CommandLine(binPath.toAbsolutePath().toString());
 
         final ExecOpensearchProcessLogs logger = new ExecOpensearchProcessLogs(logsSize);
-        final OpensearchProcess opensearchProcess = new OpensearchProcess(config.opensearchVersion(), config.opensearchDir(), logger, config.httpPort());
+        final OpensearchProcess opensearchProcess = new OpensearchProcess(
+                config.opensearchVersion(),
+                config.opensearchDir(),
+                logger,
+                config.httpPort(),
+                config.clusterConfiguration().nodeName()
+        );
 
         toConfigOptions(config.mergedConfig())
                 .forEach(it -> cmdLine.addArgument(it, true));

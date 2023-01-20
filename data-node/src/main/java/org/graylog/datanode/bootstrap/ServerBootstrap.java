@@ -27,12 +27,11 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.ProvisionException;
-import org.graylog.datanode.Configuration;
+import org.graylog.datanode.DataNodeConfiguration;
 import org.graylog.datanode.bindings.ConfigurationModule;
 import org.graylog.datanode.bindings.GenericBindings;
 import org.graylog.datanode.bindings.GenericInitializerBindings;
 import org.graylog.datanode.bindings.SchedulerBindings;
-import org.graylog.datanode.commands.Server;
 import org.graylog.datanode.configuration.PathConfiguration;
 import org.graylog.datanode.management.ManagedNodes;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
@@ -71,7 +70,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
     private boolean isFreshInstallation;
 
-    protected ServerBootstrap(String commandName, Configuration configuration) {
+    protected ServerBootstrap(String commandName, DataNodeConfiguration configuration) {
         super(commandName, configuration);
         this.commandName = commandName;
     }
@@ -249,7 +248,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
         try {
 //            leaderElectionService.startAsync().awaitRunning();
             serviceManager.startAsync().awaitHealthy();
-            openSearch.startOpensearchProcesses();
         } catch (Exception e) {
             try {
                 serviceManager.stopAsync().awaitStopped(configuration.getShutdownTimeout(), TimeUnit.MILLISECONDS);

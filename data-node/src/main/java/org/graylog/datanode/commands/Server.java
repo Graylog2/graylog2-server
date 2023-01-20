@@ -19,13 +19,12 @@ package org.graylog.datanode.commands;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
-import org.graylog.datanode.Configuration;
+import org.graylog.datanode.DataNodeConfiguration;
 import org.graylog.datanode.bindings.ConfigurationModule;
 import org.graylog.datanode.bindings.ObjectMapperModule;
 import org.graylog.datanode.bindings.PeriodicalBindings;
@@ -46,7 +45,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -58,7 +56,7 @@ import java.util.Set;
 public class Server extends ServerBootstrap {
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
-    protected static final Configuration configuration = new Configuration();
+    protected static final DataNodeConfiguration configuration = new DataNodeConfiguration();
     private final HttpConfiguration httpConfiguration = new HttpConfiguration();
     private final MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
  //   private final VersionCheckConfiguration versionCheckConfiguration = new VersionCheckConfiguration();

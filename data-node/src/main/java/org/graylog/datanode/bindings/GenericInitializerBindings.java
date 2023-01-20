@@ -20,7 +20,9 @@ import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.datanode.initializers.JerseyService;
+import org.graylog.datanode.initializers.OpensearchProcessService;
 import org.graylog.datanode.initializers.PeriodicalsService;
+import org.graylog.datanode.process.OpensearchProcess;
 import org.graylog.datanode.shutdown.GracefulShutdownService;
 
 public class GenericInitializerBindings extends AbstractModule {
@@ -29,9 +31,15 @@ public class GenericInitializerBindings extends AbstractModule {
 //        bind(ProcessingStatusRecorder.class).to(MongoDBProcessingStatusRecorderService.class).asEagerSingleton();
 
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
+
+        // this service both starts and provides the opensearch process
+        serviceBinder.addBinding().to(OpensearchProcessService.class).asEagerSingleton();
+        bind(OpensearchProcess.class).toProvider(OpensearchProcessService.class);
+
         serviceBinder.addBinding().to(PeriodicalsService.class);
         serviceBinder.addBinding().to(JerseyService.class);
         serviceBinder.addBinding().to(GracefulShutdownService.class).asEagerSingleton();
+
 //        serviceBinder.addBinding().to(MongoDBProcessingStatusRecorderService.class).asEagerSingleton();
     }
 }

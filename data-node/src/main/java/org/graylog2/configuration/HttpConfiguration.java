@@ -47,7 +47,7 @@ public class HttpConfiguration {
     public static final String PATH_WEB = "";
     public static final String PATH_API = "api/";
 
-    @Parameter(value = "http_bind_address", required = true)
+    @Parameter(value = "datanode.bind.address", required = true)
     private HostAndPort httpBindAddress = HostAndPort.fromParts("127.0.0.1", GRAYLOG_DATANODE_DEFAULT_PORT);
 
     @Parameter(value = "http_publish_uri", validator = URIAbsoluteValidator.class)

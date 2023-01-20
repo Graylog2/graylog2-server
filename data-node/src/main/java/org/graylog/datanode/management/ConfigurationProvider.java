@@ -21,16 +21,16 @@ import org.graylog.datanode.process.OpensearchConfiguration;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 @Singleton
-public class ConfigurationProvider {
+public class ConfigurationProvider implements Provider<OpensearchConfiguration> {
 
     final private String opensearchVersion;
     final private String opensearchLocation;
@@ -38,24 +38,39 @@ public class ConfigurationProvider {
     final private String dataLocation;
 
     final private String logsLocation;
+    private final String nodeName;
+    private final int opensearchHttpPort;
+    private final int opensearchTransportPort;
+    private final List<String> discoverySeedHosts;
 
     @Inject
     public ConfigurationProvider(@Named("opensearch_version") String opensearchVersion,
                                  @Named("opensearch_location") String opensearchLocation,
                                  @Named("opensearch_data_location") String opensearchDataLocation,
-                                 @Named("opensearch_logs_location") String opensearchLogsLocation) {
+                                 @Named("opensearch_logs_location") String opensearchLogsLocation,
+                                 @Named("datanode.node.name") String nodeName,
+                                 @Named("opensearch.http.port") int opensearchHttpPort,
+                                 @Named("opensearch.transport.port") int opensearchTransportPort,
+                                 @Named("opensearch.discovery.seed.hosts") List<String> discoverySeedHosts
+
+
+    ) {
         this.opensearchVersion = opensearchVersion;
         this.opensearchLocation = opensearchLocation;
         this.dataLocation = opensearchDataLocation;
         this.logsLocation = opensearchLogsLocation;
+        this.nodeName = nodeName;
+        this.opensearchHttpPort = opensearchHttpPort;
+        this.opensearchTransportPort = opensearchTransportPort;
+        this.discoverySeedHosts = discoverySeedHosts;
     }
 
 
-    public Collection<OpensearchConfiguration> get() {
-
+    @Override
+    public OpensearchConfiguration get() {
         final LinkedHashMap<String, String> config = new LinkedHashMap<>();
-        config.put("path.data", dataLocation);
-        config.put("path.logs", logsLocation);
+        config.put("path.data", Path.of(dataLocation).resolve(nodeName).toAbsolutePath().toString());
+        config.put("path.logs", Path.of(logsLocation).resolve(nodeName).toAbsolutePath().toString());
         //config.put("discovery.type", "single-node");
         config.put("plugins.security.ssl.http.enabled", "false");
         config.put("plugins.security.disabled", "true");
@@ -63,19 +78,17 @@ public class ConfigurationProvider {
 
         final ClusterConfiguration clusterConfiguration = new ClusterConfiguration(
                 "datanode-cluster",
-                "node1",
+                nodeName,
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Collections.emptyList());
+                discoverySeedHosts);
 
-        final OpensearchConfiguration processConfiguration = new OpensearchConfiguration(
+        return new OpensearchConfiguration(
                 opensearchVersion,
                 Path.of(opensearchLocation),
-                9200,
-                9300,
+                opensearchHttpPort,
+                opensearchTransportPort,
                 clusterConfiguration,
                 config);
-
-        return List.of(processConfiguration);
     }
 }

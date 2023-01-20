@@ -18,19 +18,19 @@ package org.graylog.datanode.bindings;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import org.graylog.datanode.Configuration;
+import org.graylog.datanode.DataNodeConfiguration;
 
 import static java.util.Objects.requireNonNull;
 
 public class ConfigurationModule implements Module {
-    private final Configuration configuration;
+    private final DataNodeConfiguration configuration;
 
-    public ConfigurationModule(Configuration configuration) {
+    public ConfigurationModule(DataNodeConfiguration configuration) {
         this.configuration = requireNonNull(configuration);
     }
 
     @Override
     public void configure(Binder binder) {
-        binder.bind(Configuration.class).toInstance(configuration);
+        binder.bind(DataNodeConfiguration.class).toInstance(configuration);
     }
 }

@@ -33,13 +33,15 @@ public class OpensearchProcess {
 
     private final StateMachine<ProcessState, ProcessEvent> processState;
     private final int httpPort;
+    private String nodeName;
     private boolean isLeaderNode;
 
-    public OpensearchProcess(String opensearchVersion, Path targetLocation, ExecOpensearchProcessLogs processLogs, int httpPort) {
+    public OpensearchProcess(String opensearchVersion, Path targetLocation, ExecOpensearchProcessLogs processLogs, int httpPort, String nodeName) {
         this.opensearchVersion = opensearchVersion;
         this.targetLocation = targetLocation;
         this.processLogs = processLogs;
         this.httpPort = httpPort;
+        this.nodeName = nodeName;
 
         RestClientBuilder builder = RestClient.builder(new HttpHost("localhost", httpPort, "http"));
         this.restClient = new RestHighLevelClient(builder);
@@ -69,12 +71,13 @@ public class OpensearchProcess {
     public ProcessInfo getProcessInfo() {
         return new ProcessInfo(
                 process.pid(),
-                processState.getState(),
+                nodeName, processState.getState(),
                 isLeaderNode,
                 process.info().startInstant().orElse(null),
                 process.info().totalCpuDuration().orElse(null),
                 process.info().user().orElse(null),
-                httpPort);
+                httpPort
+        );
     }
 
     public void onEvent(ProcessEvent event) {
@@ -92,6 +95,10 @@ public class OpensearchProcess {
 
     public boolean isLeaderNode() {
         return isLeaderNode;
+    }
+
+    public String getNodeName() {
+        return nodeName;
     }
 
     public boolean hasPid(int processId) {

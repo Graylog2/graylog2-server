@@ -20,32 +20,30 @@ import org.graylog.datanode.DataNodeRunner;
 import org.graylog.datanode.process.OpensearchProcess;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Singleton
 public class ManagedNodes {
-    private final Set<OpensearchProcess> processes = new LinkedHashSet<>();
 
-    final private DataNodeRunner dataNodeRunner;
-    final private ConfigurationProvider configurationProvider;
+    private final Provider<OpensearchProcess> opensearchProcessProvider;
 
     @Inject
-    public ManagedNodes(DataNodeRunner dataNodeRunner, ConfigurationProvider configurationProvider) {
-        this.dataNodeRunner = dataNodeRunner;
-        this.configurationProvider = configurationProvider;
+    public ManagedNodes(Provider<OpensearchProcess> opensearchProcessProvider) {
+        this.opensearchProcessProvider = opensearchProcessProvider;
     }
 
-
-    public void startOpensearchProcesses() {
-        configurationProvider.get()
-                .stream()
-                .map(dataNodeRunner::start)
-                .forEach(processes::add);
-    }
 
     public Set<OpensearchProcess> getProcesses() {
-        return processes;
+
+        return Optional.ofNullable(opensearchProcessProvider.get())
+                .stream()
+                .collect(Collectors.toSet());
+
     }
 }

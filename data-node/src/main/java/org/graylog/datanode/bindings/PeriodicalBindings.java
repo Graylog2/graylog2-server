@@ -18,13 +18,15 @@ package org.graylog.datanode.bindings;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
-import org.graylog.datanode.process.OpensearchHeartbeat;
+import org.graylog.datanode.periodicals.ClusterManagerDiscovery;
+import org.graylog.datanode.periodicals.OpensearchNodeHeartbeat;
 import org.graylog2.plugin.periodical.Periodical;
 
 public class PeriodicalBindings extends AbstractModule {
     @Override
     protected void configure() {
         Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
-        periodicalBinder.addBinding().to(OpensearchHeartbeat.class);
+        periodicalBinder.addBinding().to(OpensearchNodeHeartbeat.class);
+        periodicalBinder.addBinding().to(ClusterManagerDiscovery.class);
     }
 }

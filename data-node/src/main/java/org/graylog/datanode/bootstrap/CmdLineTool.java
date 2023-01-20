@@ -36,7 +36,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.inject.Binder;
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
@@ -52,7 +51,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.graylog.datanode.Configuration;
+import org.graylog.datanode.DataNodeConfiguration;
 import org.graylog.datanode.bootstrap.commands.MigrateCmd;
 import org.graylog.datanode.configuration.PathConfiguration;
 import org.graylog2.bootstrap.CliCommand;
@@ -60,7 +59,6 @@ import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.featureflag.FeatureFlagsFactory;
 import org.graylog2.plugin.Plugin;
-import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
@@ -69,19 +67,16 @@ import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.IsDevelopmentBindings;
 import org.graylog2.shared.metrics.MetricRegistryFactory;
 import org.graylog2.shared.plugins.ChainingClassLoader;
-import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.management.ManagementFactory;
 import java.nio.file.AccessDeniedException;
-import java.nio.file.Path;
 import java.security.Security;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -107,7 +102,7 @@ public abstract class CmdLineTool implements CliCommand {
     protected static final String TMPDIR = System.getProperty("java.io.tmpdir", "/tmp");
 
     protected final JadConfig jadConfig;
-    protected final Configuration configuration;
+    protected final DataNodeConfiguration configuration;
     protected final ChainingClassLoader chainingClassLoader;
 
     @Option(name = "--dump-config", description = "Show the effective Graylog DataNode configuration and exit")
@@ -131,11 +126,11 @@ public abstract class CmdLineTool implements CliCommand {
     protected Injector coreConfigInjector;
     protected FeatureFlags featureFlags;
 
-    protected CmdLineTool(Configuration configuration) {
+    protected CmdLineTool(DataNodeConfiguration configuration) {
         this(null, configuration);
     }
 
-    protected CmdLineTool(String commandName, Configuration configuration) {
+    protected CmdLineTool(String commandName, DataNodeConfiguration configuration) {
         jadConfig = new JadConfig();
         jadConfig.addConverterFactory(new GuavaConverterFactory());
         jadConfig.addConverterFactory(new JodaTimeConverterFactory());
