@@ -21,7 +21,7 @@ import com.google.inject.multibindings.Multibinder;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.DataNodeRunner;
 import org.graylog.datanode.management.ManagedNodes;
-import org.graylog.datanode.shared.syste.activities.DataNodeActivityWriter;
+import org.graylog.datanode.shared.system.activities.DataNodeActivityWriter;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.shared.system.activities.ActivityWriter;
 
