@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import type { PluginRoute } from 'graylog-web-plugin';
 
 import App from 'routing/App';
@@ -118,11 +118,10 @@ const renderPluginRoute = ({ path, component: Component, parentComponent, requir
     </ParentComponent>
   );
 
-  return (
-    <Route key={`${path}-${Component.displayName}`}
-           path={appPrefixed(path)}
-           element={<WrappedComponent />} />
-  );
+  return {
+    path: appPrefixed(path),
+    element: <WrappedComponent />,
+  };
 };
 
 const routeHasAppParent = (route: PluginRoute) => route.parentComponent === App;
@@ -136,198 +135,171 @@ const AppRouter = () => {
 
   const isCloud = AppConfig.isCloud();
 
+  const router = createBrowserRouter([
+    ...pluginRoutesWithNullParent,
+
+    {
+      path: RoutePaths.STARTPAGE,
+      element: <App />,
+      children: [
+        { path: RoutePaths.STARTPAGE, element: <StartPage /> },
+        { path: RoutePaths.SEARCH, element: <DelegatedSearchPage /> },
+        ...pluginRoutesWithParent,
+        ...pluginRoutesWithAppParent,
+        {
+          path: '/',
+          element: <PageContentLayout />,
+          children: [
+            { path: RoutePaths.message_show(':index', ':messageId'), element: <ShowMessagePage /> },
+            { path: Routes.WELCOME, element: <WelcomePage /> },
+            { path: RoutePaths.STREAMS, element: <StreamsPage /> },
+            { path: RoutePaths.stream_edit(':streamId'), element: <StreamEditPage /> },
+            !isCloud && { path: RoutePaths.stream_outputs(':streamId'), element: <StreamOutputsPage /> },
+
+            { path: RoutePaths.ALERTS.LIST, element: <EventsPage /> },
+            { path: RoutePaths.ALERTS.DEFINITIONS.LIST, element: <EventDefinitionsPage /> },
+            { path: RoutePaths.ALERTS.DEFINITIONS.CREATE, element: <CreateEventDefinitionPage /> },
+            {
+              path: RoutePaths.ALERTS.DEFINITIONS.edit(':definitionId'),
+              element: <EditEventDefinitionPage />,
+            },
+            {
+              path: RoutePaths.ALERTS.DEFINITIONS.show(':definitionId'),
+              element: <ViewEventDefinitionPage />,
+            },
+            { path: RoutePaths.ALERTS.NOTIFICATIONS.LIST, element: <EventNotificationsPage /> },
+            { path: RoutePaths.ALERTS.NOTIFICATIONS.CREATE, element: <CreateEventNotificationPage /> },
+            {
+              path: RoutePaths.ALERTS.NOTIFICATIONS.edit(':notificationId'),
+              element: <EditEventNotificationPage />,
+            },
+            {
+              path: RoutePaths.ALERTS.NOTIFICATIONS.show(':notificationId'),
+              element: <ShowEventNotificationPage />,
+            },
+
+            !isCloud && { path: RoutePaths.SYSTEM.INPUTS, element: <InputsPage /> },
+            !isCloud && { path: RoutePaths.node_inputs(':nodeId'), element: <NodeInputsPage /> },
+            !isCloud && { path: RoutePaths.global_input_extractors(':inputId'), element: <ExtractorsPage /> },
+            !isCloud && { path: RoutePaths.local_input_extractors(':nodeId', ':inputId'), element: <ExtractorsPage /> },
+            !isCloud && { path: RoutePaths.new_extractor(':nodeId', ':inputId'), element: <CreateExtractorsPage /> },
+            !isCloud && { path: RoutePaths.edit_extractor(':nodeId', ':inputId', ':extractorId'), element: <EditExtractorsPage /> },
+            !isCloud && { path: RoutePaths.import_extractors(':nodeId', ':inputId'), element: <ImportExtractorsPage /> },
+            !isCloud && { path: RoutePaths.export_extractors(':nodeId', ':inputId'), element: <ExportExtractorsPage /> },
+
+            { path: RoutePaths.SYSTEM.CONFIGURATIONS, element: <ConfigurationsPage /> },
+
+            { path: RoutePaths.SYSTEM.CONTENTPACKS.LIST, element: <ContentPacksPage /> },
+            { path: RoutePaths.SYSTEM.CONTENTPACKS.CREATE, element: <CreateContentPackPage /> },
+            {
+              path: RoutePaths.SYSTEM.CONTENTPACKS.edit(':contentPackId', ':contentPackRev'),
+              element: <EditContentPackPage />,
+            },
+            { path: RoutePaths.SYSTEM.CONTENTPACKS.show(':contentPackId'), element: <ShowContentPackPage /> },
+
+            { path: RoutePaths.SYSTEM.GROKPATTERNS, element: <GrokPatternsPage /> },
+
+            { path: RoutePaths.SYSTEM.INDEX_SETS.CREATE, element: <IndexSetCreationPage /> },
+            { path: RoutePaths.SYSTEM.INDEX_SETS.SHOW(':indexSetId'), element: <IndexSetPage /> },
+            { path: RoutePaths.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId'), element: <IndexSetConfigurationPage /> },
+
+            { path: RoutePaths.SYSTEM.INDICES.LIST, element: <IndicesPage /> },
+            !isCloud && (
+              { path: RoutePaths.SYSTEM.INDICES.FAILURES, element: <IndexerFailuresPage /> }
+            ),
+
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.OVERVIEW, element: <LUTTablesPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CREATE, element: <LUTTablesPage action="create" /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.show(':tableName'), element: <LUTTablesPage action="show" /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.edit(':tableName'), element: <LUTTablesPage action="edit" /> },
+
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW, element: <LUTCachesPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.CREATE, element: <LUTCachesPage action="create" /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.show(':cacheName'), element: <LUTCachesPage action="show" /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.edit(':cacheName'), element: <LUTCachesPage action="edit" /> },
+
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW, element: <LUTDataAdaptersPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE, element: <LUTDataAdaptersPage action="create" /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(':adapterName'), element: <LUTDataAdaptersPage action="show" /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(':adapterName'), element: <LUTDataAdaptersPage action="edit" /> },
+
+            { path: RoutePaths.SYSTEM.PIPELINES.OVERVIEW, element: <PipelinesOverviewPage /> },
+            { path: RoutePaths.SYSTEM.PIPELINES.RULES, element: <RulesPage /> },
+            { path: RoutePaths.SYSTEM.PIPELINES.RULE(':ruleId'), element: <RuleDetailsPage /> },
+            { path: RoutePaths.SYSTEM.PIPELINES.SIMULATOR, element: <SimulatorPage /> },
+            { path: RoutePaths.SYSTEM.PIPELINES.PIPELINE(':pipelineId'), element: <PipelineDetailsPage /> },
+
+            !isCloud && { path: RoutePaths.SYSTEM.LOGGING, element: <LoggersPage /> },
+            { path: RoutePaths.SYSTEM.METRICS(':nodeId'), element: <ShowMetricsPage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.NODES.LIST, element: <NodesPage /> },
+            !isCloud && { path: RoutePaths.SYSTEM.NODES.SHOW(':nodeId'), element: <ShowNodePage /> },
+
+            !isCloud && { path: RoutePaths.SYSTEM.OUTPUTS, element: <SystemOutputsPage /> },
+
+            !isCloud && (
+              { path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE, element: <AuthenticationPage /> }
+            ),
+            !isCloud && (
+              { path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.CREATE, element: <AuthenticationCreatePage /> }
+            ),
+            !isCloud && (
+              { path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW, element: <AuthenticationOverviewPage /> }
+            ),
+            !isCloud && (
+              { path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.show(':backendId'), element: <AuthenticationBackendDetailsPage /> }
+            ),
+            !isCloud && (
+              { path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.edit(':backendId'), element: <AuthenticationBackendEditPage /> }
+            ),
+            !isCloud && (
+              { path: RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.createBackend(':name'), element: <AuthenticationBackendCreatePage /> }
+            ),
+
+            !isCloud && (
+              { path: RoutePaths.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW, element: <AuthenticatorsPage /> }
+            ),
+            !isCloud && (
+              { path: RoutePaths.SYSTEM.AUTHENTICATION.AUTHENTICATORS.EDIT, element: <AuthenticatorsEditPage /> }
+            ),
+
+            { path: RoutePaths.SYSTEM.USERS.OVERVIEW, element: <UsersOverviewPage /> },
+            { path: RoutePaths.SYSTEM.USERS.CREATE, element: <UserCreatePage /> },
+            { path: RoutePaths.SYSTEM.USERS.show(':userId'), element: <UserDetailsPage /> },
+            { path: RoutePaths.SYSTEM.USERS.edit(':userId'), element: <UserEditPage /> },
+            { path: RoutePaths.SYSTEM.USERS.TOKENS.edit(':userId'), element: <UserTokensEditPage /> },
+
+            { path: RoutePaths.SYSTEM.AUTHZROLES.OVERVIEW, element: <RolesOverviewPage /> },
+            { path: RoutePaths.SYSTEM.AUTHZROLES.show(':roleId'), element: <RoleDetailsPage /> },
+            { path: RoutePaths.SYSTEM.AUTHZROLES.edit(':roleId'), element: <RoleEditPage /> },
+
+            { path: RoutePaths.SYSTEM.OVERVIEW, element: <SystemOverviewPage /> },
+            { path: RoutePaths.SYSTEM.PROCESSBUFFERDUMP(':nodeId'), element: <ProcessBufferDumpPage /> },
+            { path: RoutePaths.SYSTEM.THREADDUMP(':nodeId'), element: <ThreadDumpPage /> },
+            { path: RoutePaths.SYSTEM.ENTERPRISE, element: <EnterprisePage /> },
+            { path: RoutePaths.SECURITY, element: <SecurityPage /> },
+
+            { path: RoutePaths.SYSTEM.SIDECARS.OVERVIEW, element: <SidecarsPage /> },
+            { path: RoutePaths.SYSTEM.SIDECARS.STATUS(':sidecarId'), element: <SidecarStatusPage /> },
+            { path: RoutePaths.SYSTEM.SIDECARS.ADMINISTRATION, element: <SidecarAdministrationPage /> },
+            { path: RoutePaths.SYSTEM.SIDECARS.CONFIGURATION, element: <SidecarConfigurationPage /> },
+            { path: RoutePaths.SYSTEM.SIDECARS.FAILURE_TRACKING, element: <SidecarFailureTrackingPage />},
+            { path: RoutePaths.SYSTEM.SIDECARS.NEW_CONFIGURATION, element: <SidecarNewConfigurationPage /> },
+            { path: RoutePaths.SYSTEM.SIDECARS.EDIT_CONFIGURATION(':configurationId'), element: <SidecarEditConfigurationPage /> },
+            { path: RoutePaths.SYSTEM.SIDECARS.NEW_COLLECTOR, element: <SidecarNewCollectorPage /> },
+            { path: RoutePaths.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId'), element: <SidecarEditCollectorPage /> },
+            ...standardPluginRoutes,
+            { path: '*', element: <NotFoundPage displayPageLayout={false} /> },
+          ].filter((route) => !!route),
+        },
+        { path: RoutePaths.NOTFOUND, element: <NotFoundPage /> },
+      ],
+    },
+  ]);
+
   return (
-    <BrowserRouter>
-      <RouterErrorBoundary>
-        <Routes>
-          {pluginRoutesWithNullParent}
-
-          <Route path={RoutePaths.STARTPAGE} element={<App />}>
-            <Route index element={<StartPage />} />
-            <Route path={RoutePaths.SEARCH} element={<DelegatedSearchPage />} />
-            {pluginRoutesWithParent}
-            {pluginRoutesWithAppParent}
-            <Route path="/" element={<PageContentLayout />}>
-              <Route path={RoutePaths.message_show(':index', ':messageId')} element={<ShowMessagePage />} />
-              <Route path={RoutePaths.GETTING_STARTED} element={<GettingStartedPage />} />
-              <Route path={RoutePaths.STREAMS} element={<StreamsPage />} />
-              <Route path={RoutePaths.stream_edit(':streamId')} element={<StreamEditPage />} />
-              {!isCloud && <Route path={RoutePaths.stream_outputs(':streamId')} element={<StreamOutputsPage />} />}
-
-              <Route path={RoutePaths.ALERTS.LIST} element={<EventsPage />} />
-              <Route path={RoutePaths.ALERTS.DEFINITIONS.LIST} element={<EventDefinitionsPage />} />
-              <Route path={RoutePaths.ALERTS.DEFINITIONS.CREATE} element={<CreateEventDefinitionPage />} />
-              <Route path={RoutePaths.ALERTS.DEFINITIONS.edit(':definitionId')}
-                     element={<EditEventDefinitionPage />} />
-              <Route path={RoutePaths.ALERTS.DEFINITIONS.show(':definitionId')}
-                     element={<ViewEventDefinitionPage />} />
-              <Route path={RoutePaths.ALERTS.NOTIFICATIONS.LIST} element={<EventNotificationsPage />} />
-              <Route path={RoutePaths.ALERTS.NOTIFICATIONS.CREATE} element={<CreateEventNotificationPage />} />
-              <Route path={RoutePaths.ALERTS.NOTIFICATIONS.edit(':notificationId')}
-                     element={<EditEventNotificationPage />} />
-              <Route path={RoutePaths.ALERTS.NOTIFICATIONS.show(':notificationId')}
-                     element={<ShowEventNotificationPage />} />
-
-                      <Route path={RoutePaths.SYSTEM.INPUTS} element={<InputsPage />} />
-              {!isCloud && <Route path={RoutePaths.node_inputs(':nodeId')} element={<NodeInputsPage />} />}
-              {!isCloud && (
-                <Route path={RoutePaths.global_input_extractors(':inputId')} element={<ExtractorsPage />} />
-              )}
-              {!isCloud && (
-                <Route path={RoutePaths.local_input_extractors(':nodeId', ':inputId')}
-                       element={<ExtractorsPage />} />
-              )}
-              {!isCloud && (
-                <Route path={RoutePaths.new_extractor(':nodeId', ':inputId')}
-                       element={<CreateExtractorsPage />} />
-              )}
-              {!isCloud && (
-                <Route path={RoutePaths.edit_extractor(':nodeId', ':inputId', ':extractorId')}
-                       element={<EditExtractorsPage />} />
-              )}
-              {!isCloud && (
-                <Route path={RoutePaths.import_extractors(':nodeId', ':inputId')}
-                       element={<ImportExtractorsPage />} />
-              )}
-              {!isCloud && (
-                <Route path={RoutePaths.export_extractors(':nodeId', ':inputId')}
-                       element={<ExportExtractorsPage />} />
-              )}
-
-              <Route path={RoutePaths.SYSTEM.CONFIGURATIONS} element={<ConfigurationsPage />} />
-
-              <Route path={RoutePaths.SYSTEM.CONTENTPACKS.LIST} element={<ContentPacksPage />} />
-              <Route path={RoutePaths.SYSTEM.CONTENTPACKS.CREATE} element={<CreateContentPackPage />} />
-              <Route path={RoutePaths.SYSTEM.CONTENTPACKS.edit(':contentPackId', ':contentPackRev')}
-                     element={<EditContentPackPage />} />
-              <Route path={RoutePaths.SYSTEM.CONTENTPACKS.show(':contentPackId')}
-                     element={<ShowContentPackPage />} />
-
-              <Route path={RoutePaths.SYSTEM.GROKPATTERNS} element={<GrokPatternsPage />} />
-
-              <Route path={RoutePaths.SYSTEM.INDEX_SETS.CREATE} element={<IndexSetCreationPage />} />
-              <Route path={RoutePaths.SYSTEM.INDEX_SETS.SHOW(':indexSetId')} element={<IndexSetPage />} />
-              <Route path={RoutePaths.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId')}
-                     element={<IndexSetConfigurationPage />} />
-
-              <Route path={RoutePaths.SYSTEM.INDICES.LIST} element={<IndicesPage />} />
-              {!isCloud && (
-                <Route path={RoutePaths.SYSTEM.INDICES.FAILURES} element={<IndexerFailuresPage />} />
-              )}
-
-              <Route path={RoutePaths.SYSTEM.LOOKUPTABLES.OVERVIEW} element={<LUTTablesPage />} />
-              <Route path={RoutePaths.SYSTEM.LOOKUPTABLES.CREATE}
-                     element={<LUTTablesPage action="create" />} />
-              <Route path={RoutePaths.SYSTEM.LOOKUPTABLES.show(':tableName')}
-                     element={<LUTTablesPage action="show" />} />
-              <Route path={RoutePaths.SYSTEM.LOOKUPTABLES.edit(':tableName')}
-                     element={<LUTTablesPage action="edit" />} />
-
-              <Route path={RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW} element={<LUTCachesPage />} />
-              <Route path={RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.CREATE}
-                     element={<LUTCachesPage action="create" />} />
-              <Route path={RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.show(':cacheName')}
-                     element={<LUTCachesPage action="show" />} />
-              <Route path={RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.edit(':cacheName')}
-                     element={<LUTCachesPage action="edit" />} />
-
-              <Route path={RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}
-                     element={<LUTDataAdaptersPage />} />
-              <Route path={RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE}
-                     element={<LUTDataAdaptersPage action="create" />} />
-              <Route path={RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(':adapterName')}
-                     element={<LUTDataAdaptersPage action="show" />} />
-              <Route path={RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(':adapterName')}
-                     element={<LUTDataAdaptersPage action="edit" />} />
-
-              <Route path={RoutePaths.SYSTEM.PIPELINES.OVERVIEW} element={<PipelinesOverviewPage />} />
-              <Route path={RoutePaths.SYSTEM.PIPELINES.RULES} element={<RulesPage />} />
-              <Route path={RoutePaths.SYSTEM.PIPELINES.RULE(':ruleId')} element={<RuleDetailsPage />} />
-              <Route path={RoutePaths.SYSTEM.PIPELINES.SIMULATOR} element={<SimulatorPage />} />
-              <Route path={RoutePaths.SYSTEM.PIPELINES.PIPELINE(':pipelineId')} element={<PipelineDetailsPage />} />
-
-              {!isCloud && <Route path={RoutePaths.SYSTEM.LOGGING} element={<LoggersPage />} />}
-              <Route path={RoutePaths.SYSTEM.METRICS(':nodeId')} element={<ShowMetricsPage />} />
-              {!isCloud && <Route path={RoutePaths.SYSTEM.NODES.LIST} element={<NodesPage />} />}
-              {!isCloud && <Route path={RoutePaths.SYSTEM.NODES.SHOW(':nodeId')} element={<ShowNodePage />} />}
-
-              {!isCloud && <Route path={RoutePaths.SYSTEM.OUTPUTS} element={<SystemOutputsPage />} />}
-
-              {!isCloud && (
-                <Route path={RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE}
-                       element={<AuthenticationPage />} />
-              )}
-              {!isCloud && (
-                <Route path={RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.CREATE}
-                       element={<AuthenticationCreatePage />} />
-              )}
-              {!isCloud && (
-                <Route path={RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.OVERVIEW}
-                       element={<AuthenticationOverviewPage />} />
-              )}
-              {!isCloud && (
-                <Route path={RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.show(':backendId')}
-                       element={<AuthenticationBackendDetailsPage />} />
-              )}
-              {!isCloud && (
-                <Route path={RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.edit(':backendId')}
-                       element={<AuthenticationBackendEditPage />} />
-              )}
-              {!isCloud && (
-                <Route path={RoutePaths.SYSTEM.AUTHENTICATION.BACKENDS.createBackend(':name')}
-                       element={<AuthenticationBackendCreatePage />} />
-              )}
-
-              {!isCloud && (
-                <Route path={RoutePaths.SYSTEM.AUTHENTICATION.AUTHENTICATORS.SHOW}
-                       element={<AuthenticatorsPage />} />
-              )}
-              {!isCloud && (
-                <Route path={RoutePaths.SYSTEM.AUTHENTICATION.AUTHENTICATORS.EDIT}
-                       element={<AuthenticatorsEditPage />} />
-              )}
-
-              <Route path={RoutePaths.SYSTEM.USERS.OVERVIEW} element={<UsersOverviewPage />} />
-              <Route path={RoutePaths.SYSTEM.USERS.CREATE} element={<UserCreatePage />} />
-              <Route path={RoutePaths.SYSTEM.USERS.show(':userId')} element={<UserDetailsPage />} />
-              <Route path={RoutePaths.SYSTEM.USERS.edit(':userId')} element={<UserEditPage />} />
-              <Route path={RoutePaths.SYSTEM.USERS.TOKENS.edit(':userId')} element={<UserTokensEditPage />} />
-
-              <Route path={RoutePaths.SYSTEM.AUTHZROLES.OVERVIEW} element={<RolesOverviewPage />} />
-              <Route path={RoutePaths.SYSTEM.AUTHZROLES.show(':roleId')} element={<RoleDetailsPage />} />
-              <Route path={RoutePaths.SYSTEM.AUTHZROLES.edit(':roleId')} element={<RoleEditPage />} />
-
-              <Route path={RoutePaths.SYSTEM.OVERVIEW} element={<SystemOverviewPage />} />
-              <Route path={RoutePaths.SYSTEM.PROCESSBUFFERDUMP(':nodeId')} element={<ProcessBufferDumpPage />} />
-              <Route path={RoutePaths.SYSTEM.THREADDUMP(':nodeId')} element={<ThreadDumpPage />} />
-              <Route path={RoutePaths.SYSTEM.ENTERPRISE} element={<EnterprisePage />} />
-              <Route path={RoutePaths.SECURITY} element={<SecurityPage />} />
-
-              <Route path={RoutePaths.SYSTEM.SIDECARS.OVERVIEW} element={<SidecarsPage />} />
-              <Route path={RoutePaths.SYSTEM.SIDECARS.STATUS(':sidecarId')}
-                     element={<SidecarStatusPage />} />
-              <Route path={RoutePaths.SYSTEM.SIDECARS.ADMINISTRATION}
-                     element={<SidecarAdministrationPage />} />
-              <Route path={RoutePaths.SYSTEM.SIDECARS.CONFIGURATION}
-                     element={<SidecarConfigurationPage />} />
-              <Route path={RoutePaths.SYSTEM.SIDECARS.FAILURE_TRACKING}
-                     element={>SidecarFailureTrackingPage />} />
-              <Route path={RoutePaths.SYSTEM.SIDECARS.NEW_CONFIGURATION}
-                     element={<SidecarNewConfigurationPage />} />
-              <Route path={RoutePaths.SYSTEM.SIDECARS.EDIT_CONFIGURATION(':configurationId')}
-                     element={<SidecarEditConfigurationPage />} />
-              <Route path={RoutePaths.SYSTEM.SIDECARS.NEW_COLLECTOR}
-                     element={<SidecarNewCollectorPage />} />
-              <Route path={RoutePaths.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId')}
-                     element={<SidecarEditCollectorPage />} />
-              {standardPluginRoutes}
-              <Route path="*" element={<NotFoundPage displayPageLayout={false} />} />
-            </Route>
-            <Route path={RoutePaths.NOTFOUND} element={<NotFoundPage />} />
-          </Route>
-        </Routes>
-      </RouterErrorBoundary>
-    </BrowserRouter>
+    <RouterErrorBoundary>
+      <RouterProvider router={router} />
+    </RouterErrorBoundary>
   );
 };
 
