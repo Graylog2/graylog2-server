@@ -45,6 +45,7 @@ import org.graylog.plugins.views.startpage.StartPageService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.events.ClusterEventBus;
@@ -381,9 +382,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Could not delete at least one of the views in the bulk.")
     })
-    @AuditEvent(type = ViewsAuditEventTypes.VIEW_DELETE)
-    public Response bulk_delete(@ApiParam(name = "Entities to remove", required = true) final BulkDeleteRequest bulkDeleteRequest,
-                                @Context final SearchUser searchUser) {
+    @NoAuditEvent("Audit events triggered manually")
+    public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkDeleteRequest bulkDeleteRequest,
+                               @Context final SearchUser searchUser) {
 
         final BulkDeleteResponse response = bulkRemover.bulkDelete(bulkDeleteRequest, searchUser);
 

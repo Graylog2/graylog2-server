@@ -28,12 +28,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.rest.bulk.SequentialBulkRemover.NO_ENTITY_IDS_FAILURE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -44,11 +46,13 @@ class SequentialBulkRemoverTest {
     private SequentialBulkRemover<Object> toTest;
     @Mock
     private SingleEntityRemover<Object> singleEntityRemover;
+    @Mock
+    private Consumer<String> auditLogEventCreator;
     private final Object context = new Object();
 
     @BeforeEach
     void setUp() {
-        toTest = new SequentialBulkRemover<>(singleEntityRemover);
+        toTest = new SequentialBulkRemover<>(singleEntityRemover, auditLogEventCreator);
     }
 
     @Test
@@ -57,6 +61,7 @@ class SequentialBulkRemoverTest {
         assertThat(bulkDeleteResponse.successfullyRemoved()).isEqualTo(0);
         assertThat(bulkDeleteResponse.failures()).containsOnly(NO_ENTITY_IDS_FAILURE);
         verifyNoInteractions(singleEntityRemover);
+        verifyNoInteractions(auditLogEventCreator);
     }
 
     @Test
@@ -65,6 +70,7 @@ class SequentialBulkRemoverTest {
         assertThat(bulkDeleteResponse.successfullyRemoved()).isEqualTo(0);
         assertThat(bulkDeleteResponse.failures()).containsOnly(NO_ENTITY_IDS_FAILURE);
         verifyNoInteractions(singleEntityRemover);
+        verifyNoInteractions(auditLogEventCreator);
     }
 
     @Test
@@ -76,6 +82,10 @@ class SequentialBulkRemoverTest {
         verify(singleEntityRemover).remove("2", context);
         verify(singleEntityRemover).remove("3", context);
         verifyNoMoreInteractions(singleEntityRemover);
+        verify(auditLogEventCreator).accept("1");
+        verify(auditLogEventCreator).accept("2");
+        verify(auditLogEventCreator).accept("3");
+        verifyNoMoreInteractions(auditLogEventCreator);
     }
 
     @Test
@@ -94,6 +104,7 @@ class SequentialBulkRemoverTest {
         verify(singleEntityRemover).remove("good", context);
         verify(singleEntityRemover).remove("ids", context);
         verifyNoMoreInteractions(singleEntityRemover);
+        verifyNoInteractions(auditLogEventCreator);
     }
 
     @Test
@@ -109,6 +120,21 @@ class SequentialBulkRemoverTest {
         verify(singleEntityRemover).remove("1", context);
         verify(singleEntityRemover).remove("2", context);
         verify(singleEntityRemover).remove("3", context);
+        verifyNoMoreInteractions(singleEntityRemover);
+        verify(auditLogEventCreator, never()).accept("1");
+        verify(auditLogEventCreator).accept("2");
+        verify(auditLogEventCreator).accept("3");
+        verifyNoMoreInteractions(auditLogEventCreator);
+
+    }
+
+    @Test
+    void exceptionInAuditLogStoringDoesNotInfluenceResponse() throws Exception {
+        doThrow(new MongoException("MongoDB audit_log collection became anti-collection when bombed by Bozon particles")).when(auditLogEventCreator).accept(eq("1"));
+        final BulkDeleteResponse bulkDeleteResponse = toTest.bulkDelete(new BulkDeleteRequest(List.of("1")), context);
+        assertThat(bulkDeleteResponse.successfullyRemoved()).isEqualTo(1);
+        assertThat(bulkDeleteResponse.failures()).isEmpty();
+        verify(singleEntityRemover).remove("1", context);
         verifyNoMoreInteractions(singleEntityRemover);
     }
 }

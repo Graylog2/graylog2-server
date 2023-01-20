@@ -376,9 +376,9 @@ public class StreamResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Could not delete at least one of the streams in the bulk.")
     })
-    @AuditEvent(type = AuditEventTypes.STREAM_DELETE)
-    public Response bulk_delete(@ApiParam(name = "Entities to remove", required = true) final BulkDeleteRequest bulkDeleteRequest,
-                                @Context final UserContext userContext) {
+    @NoAuditEvent("Audit events triggered manually")
+    public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkDeleteRequest bulkDeleteRequest,
+                               @Context final UserContext userContext) {
 
         final BulkDeleteResponse response = bulkRemover.bulkDelete(bulkDeleteRequest, userContext);
 
