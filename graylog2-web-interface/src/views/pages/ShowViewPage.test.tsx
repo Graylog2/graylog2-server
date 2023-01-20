@@ -27,6 +27,7 @@ import useFetchView from 'views/hooks/useFetchView';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
+import useView from 'views/hooks/useView';
 
 import ShowViewPage from './ShowViewPage';
 
@@ -45,9 +46,10 @@ jest.mock('actions/errors/ErrorsActions', () => ({
   report: jest.fn(),
 }));
 
-jest.mock('views/components/Search', () => 'extended-search-page');
+jest.mock('views/components/Search', () => () => <span>Hello from search page!</span>);
 jest.mock('views/hooks/useFetchView');
 jest.mock('views/hooks/useLoadView');
+jest.mock('views/hooks/useView');
 jest.mock('views/logic/views/UseProcessHooksForView');
 
 jest.mock('routing/useParams');
@@ -80,6 +82,7 @@ describe('ShowViewPage', () => {
     asMock(useParams).mockReturnValue({ viewId: 'foo' });
     asMock(useProcessHooksForView).mockReturnValue([true, undefined]);
     asMock(useFetchView).mockResolvedValue(view);
+    asMock(useView).mockReturnValue(view);
   });
 
   it('renders Spinner while loading', async () => {
@@ -90,14 +93,18 @@ describe('ShowViewPage', () => {
     await screen.findByText('Loading...');
   });
 
-  it('loads view with id passed from props', () => {
+  it('loads view with id passed from props', async () => {
     render(<SimpleShowViewPage />);
 
     expect(useFetchView).toHaveBeenCalledWith('foo');
+
+    await screen.findByText('Hello from search page!');
   });
 
-  it('fetches views again if view id prop changes', () => {
+  it('fetches views again if view id prop changes', async () => {
     const { rerender } = render(<SimpleShowViewPage />);
+
+    await screen.findByText('Hello from search page!');
 
     expect(useFetchView).toHaveBeenCalledWith('foo');
 

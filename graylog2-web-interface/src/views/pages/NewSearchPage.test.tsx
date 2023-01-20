@@ -36,6 +36,7 @@ import NewSearchPage from './NewSearchPage';
 
 const mockView = View.create()
   .toBuilder()
+  .newId()
   .type(View.Type.Search)
   .search(Search.builder().build())
   .build();
@@ -64,7 +65,6 @@ describe('NewSearchPage', () => {
       <NewSearchPage />
     </StreamsContext.Provider>
   );
-  const defaultView = createSearch();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -72,7 +72,7 @@ describe('NewSearchPage', () => {
     asMock(useCreateSavedSearch).mockReturnValue(Promise.resolve(mockView));
     asMock(useProcessHooksForView).mockReturnValue([true, undefined]);
     asMock(SearchComponent).mockImplementation(() => <span>Extended Search Page</span>);
-    asMock(useView).mockReturnValue(defaultView);
+    asMock(useView).mockReturnValue(mockView);
   });
 
   it('should render minimal', async () => {

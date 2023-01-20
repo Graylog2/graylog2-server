@@ -64,7 +64,7 @@ jest.mock('views/stores/ViewManagementStore', () => ({
 }));
 
 describe('SearchActionsMenu', () => {
-  const createViewStoreState = (dirty = true, id = undefined) => ({
+  const createViewStoreState = (dirty = true, id = undefined, isNew = false) => ({
     activeQuery: '',
     view: View.builder()
       .id(id)
@@ -76,7 +76,7 @@ describe('SearchActionsMenu', () => {
       .owner('owningUser')
       .build(),
     dirty,
-    isNew: false,
+    isNew,
   });
 
   const defaultViewStoreState = createViewStoreState();
@@ -193,7 +193,7 @@ describe('SearchActionsMenu', () => {
     it('should loadView after create', async () => {
       ViewManagementActions.create = mockAction(jest.fn((view) => Promise.resolve(view)));
       const onLoadView = jest.fn((view) => Promise.resolve(view));
-      asMock(ViewStore.getInitialState).mockReturnValue(createViewStoreState(false));
+      asMock(ViewStore.getInitialState).mockReturnValue(createViewStoreState(false, 'deadbeef', true));
 
       render(<SimpleSearchActionsMenu onLoadView={onLoadView} />);
 
@@ -328,6 +328,8 @@ describe('SearchActionsMenu', () => {
       });
 
       it('which should be disabled if search is unsaved', async () => {
+        asMock(ViewStore.getInitialState).mockReturnValue(createViewStoreState(false, 'some-id', true));
+
         render(<SimpleSearchActionsMenu />);
 
         expect(await findShareButton()).toBeDisabled();
@@ -337,7 +339,7 @@ describe('SearchActionsMenu', () => {
 
   describe('render the SearchActionsMenu', () => {
     it('should render not dirty with unsaved view', async () => {
-      asMock(ViewStore.getInitialState).mockReturnValue(createViewStoreState(false));
+      asMock(ViewStore.getInitialState).mockReturnValue(createViewStoreState(false, 'deadbeef', true));
       render(<SimpleSearchActionsMenu />);
 
       await screen.findByRole('button', { name: 'Save search' });
@@ -354,7 +356,7 @@ describe('SearchActionsMenu', () => {
           .id('id-beef')
           .build(),
         dirty: false,
-        isNew: true,
+        isNew: false,
       };
       asMock(ViewStore.getInitialState).mockReturnValue(viewStoreState);
       render(<SimpleSearchActionsMenu />);

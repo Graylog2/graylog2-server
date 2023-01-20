@@ -27,6 +27,7 @@ import StreamsContext from 'contexts/StreamsContext';
 import useLoadView from 'views/hooks/useLoadView';
 import { createSearch } from 'fixtures/searches';
 import useView from 'views/hooks/useView';
+import ViewTransformer from 'views/logic/views/ViewTransformer';
 
 import NewDashboardPage from './NewDashboardPage';
 
@@ -37,6 +38,7 @@ jest.mock('routing/useQuery');
 jest.mock('views/logic/views/UseProcessHooksForView');
 jest.mock('views/hooks/useLoadView');
 jest.mock('views/hooks/useView');
+jest.mock('views/logic/views/ViewTransformer');
 
 const SimpleNewDashboardPage = () => (
   <StreamsContext.Provider value={[{}]}>
@@ -89,6 +91,9 @@ describe('NewDashboardPage', () => {
       .build();
 
     asMock(useLocation).mockReturnValue({ ...mockLocation, state: { view } });
+    const dashboardView = view.toBuilder().newId().type(View.Type.Dashboard).build();
+    asMock(ViewTransformer).mockReturnValue(dashboardView);
+    asMock(useView).mockReturnValue(dashboardView);
 
     const { findByText } = render(<SimpleNewDashboardPage />);
 
@@ -103,6 +108,10 @@ describe('NewDashboardPage', () => {
     const view = View.create().toBuilder().type(View.Type.Search).search(Search.builder().build())
       .createdAt(new Date('2019-10-16T14:38:44.681Z'))
       .build();
+
+    const dashboardView = view.toBuilder().newId().type(View.Type.Dashboard).build();
+    asMock(ViewTransformer).mockReturnValue(dashboardView);
+    asMock(useView).mockReturnValue(dashboardView);
 
     asMock(useLocation).mockReturnValue({ ...mockLocation, state: { view } });
 
