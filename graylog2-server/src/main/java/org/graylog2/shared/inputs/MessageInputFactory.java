@@ -25,6 +25,7 @@ import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
 
 import javax.inject.Inject;
 import java.util.Map;
+import java.util.Optional;
 
 public class MessageInputFactory {
     private final Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories;
@@ -68,5 +69,12 @@ public class MessageInputFactory {
         }
 
         return result;
+    }
+
+    public Optional<MessageInput.Config> getConfig(String type) {
+        if (inputFactories.containsKey(type)) {
+            return Optional.of(inputFactories.get(type).getConfig());
+        }
+        return Optional.empty();
     }
 }

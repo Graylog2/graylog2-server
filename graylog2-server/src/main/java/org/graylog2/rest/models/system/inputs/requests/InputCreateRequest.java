@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.inputs.WithInputConfiguration;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -28,16 +29,18 @@ import java.util.Map;
 @JsonAutoDetect
 @AutoValue
 @WithBeanGetter
-public abstract class InputCreateRequest {
+public abstract class InputCreateRequest implements WithInputConfiguration<InputCreateRequest> {
     @JsonProperty
     public abstract String title();
 
+    @Override
     @JsonProperty
     public abstract String type();
 
     @JsonProperty
     public abstract boolean global();
 
+    @Override
     @JsonProperty
     public abstract Map<String, Object> configuration();
 
@@ -46,6 +49,11 @@ public abstract class InputCreateRequest {
     public abstract String node();
 
     public abstract Builder toBuilder();
+
+    @Override
+    public InputCreateRequest withConfiguration(Map<String, Object> configuration) {
+        return toBuilder().configuration(configuration).build();
+    }
 
     @JsonCreator
     public static InputCreateRequest create(@JsonProperty("title") String title,
