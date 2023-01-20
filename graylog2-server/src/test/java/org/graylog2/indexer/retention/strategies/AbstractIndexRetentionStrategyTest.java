@@ -91,6 +91,8 @@ public class AbstractIndexRetentionStrategyTest {
         when(indices.indexClosingDate("index2")).thenReturn(Optional.of(NOW.minusDays(11)));
         when(indices.indexClosingDate("index1")).thenReturn(Optional.of(NOW.minusDays(15)));
 
+        when (indices.isClosed(anyString())).thenReturn(true);
+
         indexSetConfigCountBased = createCountBased();
 
         when(indexSet.getAllIndexAliases()).thenReturn(indexMap);

@@ -20,6 +20,7 @@ import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
+import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.periodical.IndexRetentionThread;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.shared.system.activities.Activity;
@@ -77,13 +78,7 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
                 .stream()
                 .filter(indexName -> !indices.isReopened(indexName))
                 .filter(indexName -> !hasCurrentWriteAlias(indexSet, deflectorIndices, indexName))
-                .filter(indexName -> {
-                    DateTime closingDate = indices.indexClosingDate(indexName)
-                            // TODO we might encounter older indices that don't have a closing date yet. How do we handle this?
-                            // TODO maybe use the creationDate as a fallback?
-                            .orElseThrow(() -> new IllegalStateException(f("Index %s has no closing date - retention failed", indexName)));
-                    return closingDate.isBefore(cutoff + 1);
-                })
+                .filter(indexName -> getClosingDateBestEffort(indexName).isBefore(cutoff + 1))
                 .count();
 
         if (removeCount > 0) {
@@ -93,6 +88,22 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
 
             runRetention(indexSet, deflectorIndices, removeCount);
         }
+    }
+
+    private DateTime getClosingDateBestEffort(String indexName) {
+        if (!indices.isClosed(indexName)) {
+            throw new IllegalStateException(f("Invalid request for closing date - index %s is not closed", indexName));
+        }
+        Optional<DateTime> closingDate = indices.indexClosingDate(indexName);
+        if (closingDate.isPresent()) {
+            return closingDate.get();
+        }
+        final IndexRangeStats indexRangeStats = indices.indexRangeStatsOfIndex(indexName);
+        if (indexRangeStats != IndexRangeStats.EMPTY) {
+            return indices.indexRangeStatsOfIndex(indexName).max();
+        }
+        return indices.indexCreationDate(indexName)
+            .orElseThrow(() -> new IllegalStateException(f("Unable to determine dates for Index %s", indexName)));
     }
 
     private void retainCountBased(IndexSet indexSet) {
