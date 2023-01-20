@@ -17,6 +17,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import * as Immutable from 'immutable';
+import trim from 'lodash/trim';
 
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { SearchExecution, RootState, GetState } from 'views/types';
@@ -155,9 +156,22 @@ export const removeParameter = (parameterName: string) => async (dispatch: AppDi
   const parameters = selectParameters(getState());
   const newParameters = parameters.filter((p) => p.name !== parameterName).toArray();
   const parameterBindings = selectParameterBindings(getState());
-  const newParameterBindings = parameterBindings.filter((_binding, name) => name !== parameterName).toMap();
+  const newParameterBindings = parameterBindings.remove(parameterName);
 
   await dispatch(setParameters(newParameters));
 
   return dispatch(searchExecutionSlice.actions.setParameterBindings(newParameterBindings));
+};
+
+export const updateParameter = (parameterName: string, newParameter: Parameter) => async (dispatch: AppDispatch, getState: GetState) => {
+  const parameters = selectParameters(getState());
+  const newParameters = parameters.map((p) => (p.name === parameterName ? newParameter : p)).toArray();
+  const parameterBindings = selectParameterBindings(getState());
+
+  if (!trim(parameterBindings.get(parameterName, ParameterBinding.empty()).value) && newParameter.defaultValue) {
+    const newParameterBindings = parameterBindings.set(parameterName, ParameterBinding.forValue(newParameter.defaultValue));
+    await dispatch(searchExecutionSlice.actions.setParameterBindings(newParameterBindings));
+  }
+
+  return dispatch(setParameters(newParameters));
 };
