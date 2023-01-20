@@ -160,9 +160,9 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
         timeBasedSizeOptimizingStrategy.rotate(indexSet);
         assertThat(indexSet.getIndicesNames()).isEqualTo(List.of("test_0", "test_1", "test_2"));
 
-        // If an index reaches TimeBasedSizeOptimizingStrategy.MAX_INDEX_SIZE
+        // If an index exceeds TimeBasedSizeOptimizingStrategy.MAX_INDEX_SIZE
         // it can be rotated, even if the rotation period has been reached.
-        indexSet.getNewest().setSize(TimeBasedSizeOptimizingStrategy.MAX_INDEX_SIZE.toBytes());
+        indexSet.getNewest().setSize(TimeBasedSizeOptimizingStrategy.MAX_INDEX_SIZE.toBytes() + 1);
         clock.plus(12, TimeUnit.HOURS);
         timeBasedSizeOptimizingStrategy.rotate(indexSet);
         assertThat(indexSet.getIndicesNames()).isEqualTo(List.of("test_0", "test_1", "test_2", "test_3"));

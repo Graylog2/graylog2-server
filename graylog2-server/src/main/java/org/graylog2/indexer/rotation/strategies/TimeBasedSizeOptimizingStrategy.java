@@ -26,6 +26,7 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.utilities.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +41,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(TimeBasedSizeOptimizingStrategy.class);
     public static final String NAME = "time-size-optimizing";
-    public static final Period ROTATION_PERIOD = Period.ofDays(1);
+    public static final org.joda.time.Period ROTATION_PERIOD = org.joda.time.Period.days(1);
 
     private final Indices indices;
     private final JobSchedulerClock clock;
@@ -105,25 +106,24 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
     }
 
     private boolean indexExceedsLeeWay(DateTime creationDate, Period leeWay) {
-        final Instant now = clock.instantNow();
-        final Instant leewayLimit = now.minus(ROTATION_PERIOD.plus(leeWay));
-
-        final Duration between = Duration.between(Instant.ofEpochMilli(creationDate.getMillis()), now);
-        return between.compareTo(Duration.ofDays(ROTATION_PERIOD.plus(leeWay).getDays())) >= 0;
-        //return creationDate.isBefore(leewayLimit.toEpochMilli());
+        final Days leewayDays = Days.days(leeWay.getDays()); // can only be a multiple of Days
+        return timePassedIsBeyondLimit(creationDate, ROTATION_PERIOD.plus(leewayDays));
     }
 
     private boolean indexIsOldEnough(DateTime creationDate) {
-        final Instant now = clock.instantNow();
-        final Instant rotationLimit = now.minus(ROTATION_PERIOD);
+        return timePassedIsBeyondLimit(creationDate, ROTATION_PERIOD);
+    }
 
-        final Duration between = Duration.between(Instant.ofEpochMilli(creationDate.getMillis()), now);
-        return between.compareTo(Duration.ofDays(ROTATION_PERIOD.getDays())) >= 0;
-        //return creationDate.isBefore(rotationLimit.toEpochMilli());
+    private boolean timePassedIsBeyondLimit(DateTime date, org.joda.time.Period limit) {
+        final Instant now = clock.instantNow();
+        final Duration timePassed = Duration.between(Instant.ofEpochMilli(date.getMillis()), now);
+        final Duration limitAsDuration = Duration.ofSeconds(limit.toStandardSeconds().getSeconds());
+
+        return timePassed.compareTo(limitAsDuration) >= 0;
     }
 
     private boolean indexExceedsSizeLimit(long size) {
-        return size >= MAX_INDEX_SIZE.toBytes();
+        return size > MAX_INDEX_SIZE.toBytes();
     }
 
     private boolean indexSubceedsSizeLimit(long size) {
