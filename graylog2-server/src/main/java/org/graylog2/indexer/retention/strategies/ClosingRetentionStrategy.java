@@ -18,6 +18,7 @@ package org.graylog2.indexer.retention.strategies;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
+import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.IndexSet;
@@ -48,8 +49,9 @@ public class ClosingRetentionStrategy extends AbstractIndexRetentionStrategy {
     public ClosingRetentionStrategy(Indices indices,
                                     ActivityWriter activityWriter,
                                     NodeId nodeId,
-                                    AuditEventSender auditEventSender) {
-        super(indices, activityWriter);
+                                    AuditEventSender auditEventSender,
+                                    JobSchedulerClock clock) {
+        super(indices, activityWriter, clock);
         this.indices = indices;
         this.nodeId = nodeId;
         this.auditEventSender = auditEventSender;

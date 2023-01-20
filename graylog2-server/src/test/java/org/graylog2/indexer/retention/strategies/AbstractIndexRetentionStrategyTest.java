@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.retention.strategies;
 
+import org.graylog.scheduler.clock.JobSchedulerSystemClock;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
@@ -97,7 +98,7 @@ public class AbstractIndexRetentionStrategyTest {
         when(indexSet.extractIndexNumber(anyString())).then(this::extractIndexNumber);
         when(indexSet.getConfig()).thenReturn(indexSetConfigCountBased);
 
-        retentionStrategy = spy(new AbstractIndexRetentionStrategy(indices, activityWriter) {
+        retentionStrategy = spy(new AbstractIndexRetentionStrategy(indices, activityWriter, new JobSchedulerSystemClock()) {
             @Override
             protected Optional<Integer> getMaxNumberOfIndices(IndexSet indexSet) {
                 return null;

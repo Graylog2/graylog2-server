@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.retention.strategies;
 
+import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
@@ -27,7 +28,6 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -46,11 +46,14 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
 
     private final Indices indices;
     private final ActivityWriter activityWriter;
+    private JobSchedulerClock clock;
 
     public AbstractIndexRetentionStrategy(Indices indices,
-                                          ActivityWriter activityWriter) {
+                                          ActivityWriter activityWriter,
+                                          JobSchedulerClock clock) {
         this.indices = requireNonNull(indices);
         this.activityWriter = requireNonNull(activityWriter);
+        this.clock = clock;
     }
 
     protected abstract Optional<Integer> getMaxNumberOfIndices(IndexSet indexSet);
@@ -60,8 +63,7 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
     public void retain(IndexSet indexSet) {
         if (indexSet.getConfig().rotationStrategy() instanceof TimeBasedSizeOptimizingStrategyConfig smartConfig) {
             retainTimeBased(indexSet, smartConfig);
-        }
-        else {
+        } else {
             retainCountBased(indexSet);
         }
     }
@@ -70,14 +72,17 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
         final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
 
         // Account for DST and time zones in determining age
-        final long cutoff = Instant.now().minus(smartConfig.indexLifetimeSoft()).toEpochMilli();
+        final long cutoff = clock.instantNow().minus(smartConfig.indexLifetimeSoft()).toEpochMilli();
         final int removeCount = (int)deflectorIndices.keySet()
                 .stream()
                 .filter(indexName -> !indices.isReopened(indexName))
+                .filter(indexName -> !hasCurrentWriteAlias(indexSet, deflectorIndices, indexName))
                 .filter(indexName -> {
                     DateTime closingDate = indices.indexClosingDate(indexName)
+                            // TODO we might encounter older indices that don't have a closing date yet. How do we handle this?
+                            // TODO maybe use the creationDate as a fallback?
                             .orElseThrow(() -> new IllegalStateException(f("Index %s has no closing date - retention failed", indexName)));
-                    return closingDate.isBefore(cutoff);
+                    return closingDate.isBefore(cutoff + 1);
                 })
                 .count();
 
@@ -124,7 +129,7 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
     private void runRetention(IndexSet indexSet, Map<String, Set<String>> deflectorIndices, int removeCount) {
         final Set<String> orderedIndices = Arrays.stream(indexSet.getManagedIndices())
             .filter(indexName -> !indices.isReopened(indexName))
-            .filter(indexName -> !(deflectorIndices.getOrDefault(indexName, Collections.emptySet()).contains(indexSet.getWriteIndexAlias())))
+            .filter(indexName -> !hasCurrentWriteAlias(indexSet, deflectorIndices, indexName))
             .sorted((indexName1, indexName2) -> indexSet.extractIndexNumber(indexName2).orElse(0).compareTo(indexSet.extractIndexNumber(indexName1).orElse(0)))
             .collect(Collectors.toCollection(LinkedHashSet::new));
 
@@ -145,5 +150,9 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
         activityWriter.write(new Activity(msg, IndexRetentionThread.class));
 
         retain(orderedIndicesDescending, indexSet);
+    }
+
+    private static boolean hasCurrentWriteAlias(IndexSet indexSet, Map<String, Set<String>> deflectorIndices, String indexName) {
+        return deflectorIndices.getOrDefault(indexName, Collections.emptySet()).contains(indexSet.getWriteIndexAlias());
     }
 }
