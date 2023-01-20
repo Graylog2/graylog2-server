@@ -49,7 +49,7 @@ const COLUMN_DEFINITIONS = [
   { id: 'description', title: 'Description', sortable: true },
   { id: 'summary', title: 'Summary', sortable: true },
   { id: 'owner', title: 'Owner', sortable: true },
-  { id: 'favorite', title: '', sortable: true },
+  { id: 'favorite', title: 'Favorite' },
 ];
 
 const DEFAULT_PAGINATION = {
@@ -114,7 +114,6 @@ const customColumnRenderers = (onLoadSavedSearch: () => void, {
                       ));
                     }} />
     ),
-    staticWidth: 30,
   },
 });
 

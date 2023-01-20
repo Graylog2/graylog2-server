@@ -51,6 +51,10 @@ const DefaultColumnRenderers = {
     ),
     staticWidth: 120,
   },
+  favorite: {
+    renderHeader: () => '',
+    staticWidth: 30,
+  },
 };
 
 export default DefaultColumnRenderers;

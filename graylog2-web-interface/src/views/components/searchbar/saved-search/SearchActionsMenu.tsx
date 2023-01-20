@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useState, useContext, useRef } from 'react';
 
 import { useStore } from 'stores/connect';
@@ -56,6 +56,7 @@ const _isAllowedToEdit = (view: View, currentUser: User | undefined | null) => (
 );
 
 const SearchActionsMenu = () => {
+  const theme = useTheme();
   const { view, dirty } = useStore(ViewStore);
   const viewLoaderFunc = useContext(ViewLoaderContext);
   const currentUser = useCurrentUser();
@@ -70,6 +71,7 @@ const SearchActionsMenu = () => {
   const [newTitle, setNewTitle] = useState((view && view.title) || '');
 
   const loaded = (view && view.id);
+  const savedSearchColor = dirty ? theme.colors.variant.dark.warning : theme.colors.variant.info;
   const disableReset = !(dirty || loaded);
   const savedViewTitle = loaded ? 'Saved search' : 'Save search';
   const title = dirty ? 'Unsaved changes' : savedViewTitle;
@@ -153,7 +155,7 @@ const SearchActionsMenu = () => {
   return (
     <Container aria-label="Search Meta Buttons">
       <Button title={title} ref={formTarget} onClick={toggleFormModal}>
-        <Icon name="floppy-disk" type={loaded ? 'solid' : 'regular'} /> Save
+        <Icon style={{ color: loaded ? savedSearchColor : undefined }} name="floppy-disk" type={loaded ? 'solid' : 'regular'} /> Save
       </Button>
       {showForm && (
         <SavedSearchForm onChangeTitle={onChangeTitle}
