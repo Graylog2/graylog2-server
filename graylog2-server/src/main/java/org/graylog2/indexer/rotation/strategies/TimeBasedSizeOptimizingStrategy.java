@@ -41,10 +41,10 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(TimeBasedSizeOptimizingStrategy.class);
     public static final String NAME = "time-size-optimizing";
-    public static final org.joda.time.Period ROTATION_PERIOD = org.joda.time.Period.days(1);
 
     private final Indices indices;
     private final JobSchedulerClock clock;
+    public final org.joda.time.Period rotationPeriod;
 
     // TODO: move this into server.conf or maybe into IndexSetsDefaultConfiguration
     // also see elasticsearch_max_size_per_index
@@ -60,6 +60,7 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
         super(auditEventSender, nodeId, elasticsearchConfiguration);
         this.indices = indices;
         this.clock = clock;
+        this.rotationPeriod = elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod();
     }
 
     @Override
@@ -107,11 +108,11 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
 
     private boolean indexExceedsLeeWay(DateTime creationDate, Period leeWay) {
         final Days leewayDays = Days.days(leeWay.getDays()); // can only be a multiple of Days
-        return timePassedIsBeyondLimit(creationDate, ROTATION_PERIOD.plus(leewayDays));
+        return timePassedIsBeyondLimit(creationDate, rotationPeriod.plus(leewayDays));
     }
 
     private boolean indexIsOldEnough(DateTime creationDate) {
-        return timePassedIsBeyondLimit(creationDate, ROTATION_PERIOD);
+        return timePassedIsBeyondLimit(creationDate, rotationPeriod);
     }
 
     private boolean timePassedIsBeyondLimit(DateTime date, org.joda.time.Period limit) {

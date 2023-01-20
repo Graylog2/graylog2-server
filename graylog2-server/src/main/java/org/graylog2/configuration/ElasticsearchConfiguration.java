@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+@SuppressWarnings({"FieldMayBeFinal", "FieldCanBeLocal"})
 public class ElasticsearchConfiguration {
     public static final String MAX_INDEX_RETENTION_PERIOD = "max_index_retention_period";
     public static final String DEFAULT_EVENTS_INDEX_PREFIX = "default_events_index_prefix";
@@ -95,6 +96,10 @@ public class ElasticsearchConfiguration {
     // Retention
     @Parameter(value = "elasticsearch_max_number_of_indices", required = true, validator = PositiveIntegerValidator.class)
     private int maxNumberOfIndices = 20;
+
+    // TimeBasedSizeOptimizingStrategy Rotation
+    @Parameter(value = "time_size_optimizing_rotation_period")
+    private Period timeSizeOptimizingRotationPeriod = Period.days(1);
 
     @Parameter(value = "elasticsearch_disable_version_check")
     private boolean disableVersionCheck = false;
@@ -200,6 +205,10 @@ public class ElasticsearchConfiguration {
 
     public int getMaxNumberOfIndices() {
         return maxNumberOfIndices;
+    }
+
+    public Period getTimeSizeOptimizingRotationPeriod() {
+        return timeSizeOptimizingRotationPeriod;
     }
 
     public boolean isDisableVersionCheck() {
