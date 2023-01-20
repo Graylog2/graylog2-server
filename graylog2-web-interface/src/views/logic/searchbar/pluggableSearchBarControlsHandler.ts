@@ -17,7 +17,7 @@
 import { merge } from 'lodash';
 
 import UserNotification from 'util/UserNotification';
-import type { SearchBarControl, CombinedSearchBarFormValues } from 'views/types';
+import type { SearchBarControl, CombinedSearchBarFormValues, HandlerContext } from 'views/types';
 import usePluginEntities from 'hooks/usePluginEntities';
 import type Widget from 'views/logic/widgets/Widget';
 import type Query from 'views/logic/queries/Query';
@@ -95,10 +95,10 @@ export const executeDashboardWidgetSubmitHandler = (dispatch: AppDispatch, value
   return executeSubmitHandler(dispatch, values, pluginSubmitHandlers, currentWidget);
 };
 
-export const pluggableValidationPayload = (values: CombinedSearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl> = []) => {
+export const pluggableValidationPayload = (values: CombinedSearchBarFormValues, context: HandlerContext, pluggableSearchBarControls: Array<() => SearchBarControl> = []) => {
   const validationPayloadHandler = pluggableSearchBarControls.map((pluginFn) => pluginFn()?.validationPayload).filter((validationPayloadFn) => !!validationPayloadFn);
   const validationPayload: Array<{ [key: string ]: any }> = validationPayloadHandler.map((validationPayloadFn) => executeSafely(
-    () => validationPayloadFn(values),
+    () => validationPayloadFn(values, context),
     'An error occurred when preparing search bar validation for a plugin',
     {},
   ));
@@ -106,11 +106,11 @@ export const pluggableValidationPayload = (values: CombinedSearchBarFormValues, 
   return merge({}, ...validationPayload);
 };
 
-export const validatePluggableValues = (values: CombinedSearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl> = []) => {
+export const validatePluggableValues = (values: CombinedSearchBarFormValues, context: HandlerContext, pluggableSearchBarControls: Array<() => SearchBarControl> = []) => {
   const validationHandler = pluggableSearchBarControls.map((pluginFn) => pluginFn()?.onValidate).filter((onValidate) => !!onValidate);
 
   const errors = validationHandler.map((onValidate) => executeSafely(
-    () => onValidate(values),
+    () => onValidate(values, context),
     'An error occurred when validating search bar values from a plugin',
     {},
   ));

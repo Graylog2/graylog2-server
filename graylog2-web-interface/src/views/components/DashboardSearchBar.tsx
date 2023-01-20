@@ -41,7 +41,7 @@ import {
   useInitialSearchValues as usePluggableInitialValues,
   pluggableValidationPayload,
 } from 'views/logic/searchbar/pluggableSearchBarControlsHandler';
-import type { SearchBarControl } from 'views/types';
+import type { SearchBarControl, HandlerContext } from 'views/types';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import useUserDateTime from 'hooks/useUserDateTime';
@@ -56,6 +56,7 @@ import PluggableCommands from 'views/components/searchbar/queryinput/PluggableCo
 import useAppDispatch from 'stores/useAppDispatch';
 import { setGlobalOverride, execute } from 'views/logic/slices/searchExecutionSlice';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
+import useHandlerContext from 'views/components/useHandlerContext';
 
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
@@ -84,11 +85,11 @@ const StyledTimeRangeInput = styled(TimeRangeInput)(({ theme }) => css`
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
-const _validateQueryString = (values: DashboardFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, userTimezone: string) => {
+const _validateQueryString = (values: DashboardFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, userTimezone: string, context: HandlerContext) => {
   const request = {
     timeRange: isNoTimeRangeOverride(values?.timerange) ? undefined : values?.timerange,
     queryString: values?.queryString,
-    ...pluggableValidationPayload(values, pluggableSearchBarControls),
+    ...pluggableValidationPayload(values, context, pluggableSearchBarControls),
   };
 
   return debouncedValidateQuery(request, userTimezone);
@@ -108,6 +109,7 @@ const DashboardSearchBar = () => {
   const { timerange, query: { query_string: queryString = '' } = {} } = useGlobalOverride() ?? {};
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const dispatch = useAppDispatch();
+  const handlerContext = useHandlerContext();
 
   const submitForm = useCallback(async (values) => {
     const { timerange: newTimerange, queryString: newQueryString } = values;
@@ -134,7 +136,7 @@ const DashboardSearchBar = () => {
             <DashboardSearchForm initialValues={initialValues}
                                  limitDuration={limitDuration}
                                  onSubmit={submitForm}
-                                 validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls, userTimezone)}>
+                                 validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls, userTimezone, handlerContext)}>
               {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
                 const disableSearchSubmit = isSubmitting || isValidating || !isValid;
 
