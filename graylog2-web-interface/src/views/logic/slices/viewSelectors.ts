@@ -58,3 +58,5 @@ export const selectCurrentQueryString = (queryId: string) => createSelector(
     ? search.queries.find((q) => q.id === queryId).query.query_string
     : globalOverride.query.query_string),
 );
+
+export const selectParameters = createSelector(selectSearch, (search) => search.parameters);

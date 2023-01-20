@@ -16,10 +16,10 @@
  */
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type * as Immutable from 'immutable';
+import * as Immutable from 'immutable';
 
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import type { SearchExecution, RootState } from 'views/types';
+import type { SearchExecution, RootState, GetState } from 'views/types';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import { parseSearch } from 'views/logic/slices/searchMetadataSlice';
 import executeSearch from 'views/logic/slices/executeSearch';
@@ -34,6 +34,9 @@ import {
 } from 'views/logic/slices/searchExecutionSelectors';
 import type { TimeRange } from 'views/logic/queries/Query';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
+import type { ParameterMap } from 'views/logic/parameters/Parameter';
+import type Parameter from 'views/logic/parameters/Parameter';
+import { setParameters } from 'views/logic/slices/viewSlice';
 
 const searchExecutionSlice = createSlice({
   name: 'searchExecution',
@@ -72,6 +75,18 @@ const searchExecutionSlice = createSlice({
       return {
         ...state,
         executionState: state.executionState.toBuilder().parameterBindings(parameterBindings).build(),
+      };
+    },
+    addParameterBindings: (state, action: PayloadAction<Array<Parameter>>) => {
+      const { parameterBindings } = state.executionState;
+      const newParameters = action.payload;
+      const newParameterBindings = Immutable.Map<string, any>(newParameters.filter((parameter) => !!parameter.defaultValue)
+        .map((parameter) => [parameter.name, parameter.defaultValue]));
+      const mergedParameterBindings = parameterBindings.merge(newParameterBindings);
+
+      return {
+        ...state,
+        executionState: state.executionState.toBuilder().parameterBindings(mergedParameterBindings).build(),
       };
     },
   },
@@ -123,4 +138,11 @@ export const setGlobalOverride = (queryString: string, timerange: TimeRange) => 
     .build();
 
   return dispatch(searchExecutionSlice.actions.updateGlobalOverride(newGlobalOverride));
+};
+
+export const declareParameters = (newParameters: ParameterMap) => async (dispatch: AppDispatch) => {
+  const newParametersArray = newParameters.valueSeq().toArray();
+  await dispatch(searchExecutionSlice.actions.addParameterBindings(newParametersArray));
+
+  return dispatch(setParameters(newParametersArray));
 };

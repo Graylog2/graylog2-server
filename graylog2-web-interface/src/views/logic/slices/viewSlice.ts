@@ -34,11 +34,12 @@ import {
   selectView,
   selectViewType,
   selectQueryById,
-  selectSearchQueries, selectViewState, selectSearchQuery,
+  selectSearchQueries, selectViewState, selectSearchQuery, selectSearch,
 } from 'views/logic/slices/viewSelectors';
 import createSearch from 'views/logic/slices/createSearch';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import generateId from 'logic/generateId';
+import type Parameter from 'views/logic/parameters/Parameter';
 
 const viewSlice = createSlice({
   name: 'view',
@@ -235,6 +236,18 @@ export const updateViewState = (id: QueryId, newViewState: ViewStateType) => (di
   const newView = view.toBuilder()
     .state(newState)
     .build();
+
+  return dispatch(loadView(newView));
+};
+
+export const setParameters = (newParameters: Array<Parameter>) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  const view = selectView(getState());
+  const search = selectSearch(getState());
+  const newSearch = search.toBuilder()
+    .parameters(newParameters)
+    .build();
+
+  const newView = view.toBuilder().search(newSearch).build();
 
   return dispatch(loadView(newView));
 };
