@@ -115,15 +115,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             EntityAttribute.builder().id("alert").title("Alert").type("boolean").filterable(true).filterOptions(Set.of(
                     FilterOption.create("true", "enabled"),
                     FilterOption.create("false", "disabled")
-            )).build(),
-            EntityAttribute.builder().id("is_scheduled").title("Scheduled").type("boolean").filterable(true).filterOptions(Set.of(
-                    FilterOption.create("true", "enabled"),
-                    FilterOption.create("false", "disabled")
-            )).build(),
-            EntityAttribute.builder().id("status").title("Status").build(),
-            EntityAttribute.builder().id("next_time").title("Next run").type("date").build(),
-            EntityAttribute.builder().id("triggered_at").title("Triggered at").type("date").build(),
-            EntityAttribute.builder().id("queued_notifications").title("Notifications").type("number").build()
+            )).build()
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
