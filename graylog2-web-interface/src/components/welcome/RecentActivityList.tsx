@@ -16,7 +16,6 @@
  */
 
 import React, { useCallback, useMemo, useState } from 'react';
-import styled, { css } from 'styled-components';
 
 import { Table } from 'components/bootstrap';
 import { DEFAULT_PAGINATION, entityTypeMap } from 'components/welcome/Constants';
@@ -26,13 +25,6 @@ import { Link } from 'components/common/router';
 import { StyledLabel } from 'components/welcome/EntityListItem';
 import type { EntityItemType, RecentActivityType } from 'components/welcome/types';
 import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
-
-const ActionItemLink = styled(Link)(({ theme }) => css`
-  color: ${theme.colors.variant.primary};
-  &:hover {
-    color: ${theme.colors.variant.darker.primary};
-  }
-`);
 
 type Props = { itemType: EntityItemType, itemId: string, activityType: RecentActivityType, itemTitle: string, userName?: string };
 
@@ -47,7 +39,7 @@ const ActionItem = ({ itemType, itemId, activityType, itemTitle, userName }: Pro
       {`The ${typeTitle} `}
       {activityType === 'delete'
         ? <i>{itemTitle || itemId}</i>
-        : <ActionItemLink target="_blank" to={entityLink}>{itemTitle || itemId}</ActionItemLink>}
+        : <Link target="_blank" to={entityLink}>{itemTitle || itemId}</Link>}
       {' was '}
       {`${activityType}d`}
       {userName ? ` by ${userName}` : ''}
