@@ -29,7 +29,6 @@ import { loadNewView, loadView } from 'views/logic/views/Actions';
 import useQuery from 'routing/useQuery';
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
-import { createSearch } from 'fixtures/searches';
 import useView from 'views/hooks/useView';
 
 import NewSearchPage from './NewSearchPage';
