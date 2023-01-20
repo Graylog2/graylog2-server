@@ -91,9 +91,6 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
     }
 
     private DateTime getClosingDateBestEffort(String indexName) {
-        if (!indices.isClosed(indexName)) {
-            throw new IllegalStateException(f("Invalid request for closing date - index %s is not closed", indexName));
-        }
         Optional<DateTime> closingDate = indices.indexClosingDate(indexName);
         if (closingDate.isPresent()) {
             return closingDate.get();
