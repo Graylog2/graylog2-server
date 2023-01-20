@@ -26,11 +26,11 @@ import executeSearch from 'views/logic/slices/executeSearch';
 import type View from 'views/logic/views/View';
 import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import { selectView } from 'views/logic/slices/viewSelectors';
+import { selectView, selectParameters } from 'views/logic/slices/viewSelectors';
 import {
   selectGlobalOverride,
   selectWidgetsToSearch,
-  selectSearchExecutionState,
+  selectSearchExecutionState, selectParameterBindings,
 } from 'views/logic/slices/searchExecutionSelectors';
 import type { TimeRange } from 'views/logic/queries/Query';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
@@ -77,6 +77,10 @@ const searchExecutionSlice = createSlice({
         executionState: state.executionState.toBuilder().parameterBindings(parameterBindings).build(),
       };
     },
+    setParameterBindings: (state, action: PayloadAction<Immutable.Map<string, ParameterBinding>>) => ({
+      ...state,
+      executionState: state.executionState.toBuilder().parameterBindings(action.payload).build(),
+    }),
     addParameterBindings: (state, action: PayloadAction<Array<Parameter>>) => {
       const { parameterBindings } = state.executionState;
       const newParameters = action.payload;
@@ -145,4 +149,15 @@ export const declareParameters = (newParameters: ParameterMap) => async (dispatc
   await dispatch(searchExecutionSlice.actions.addParameterBindings(newParametersArray));
 
   return dispatch(setParameters(newParametersArray));
+};
+
+export const removeParameter = (parameterName: string) => async (dispatch: AppDispatch, getState: GetState) => {
+  const parameters = selectParameters(getState());
+  const newParameters = parameters.filter((p) => p.name !== parameterName).toArray();
+  const parameterBindings = selectParameterBindings(getState());
+  const newParameterBindings = parameterBindings.filter((_binding, name) => name !== parameterName).toMap();
+
+  await dispatch(setParameters(newParameters));
+
+  return dispatch(searchExecutionSlice.actions.setParameterBindings(newParameterBindings));
 };
