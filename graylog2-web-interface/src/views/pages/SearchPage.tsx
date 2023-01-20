@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
@@ -49,11 +50,20 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+const useWaitUntilViewLoaded = (view: Promise<View>) => {
+  const [targetView, setTargetView] = useState<View>(undefined);
+  const loadedView = useView();
+  useEffect(() => { view.then((v) => setTargetView(v)); }, [view]);
+
+  return !!targetView && targetView?.id === loadedView?.id;
+};
+
 const SearchPage = ({ isNew, view, loadNewView = defaultLoadNewView, loadView = defaultLoadView }: Props) => {
   const query = useQuery();
   useLoadView(view, query?.page as string, isNew);
   const [loaded, HookComponent] = useProcessHooksForView(view, query);
-  const loadedView = useView();
+
+  const loadedView = useWaitUntilViewLoaded(view);
 
   if (HookComponent) {
     return HookComponent;

@@ -168,8 +168,8 @@ export const ViewStore: ViewStoreType = singletonStore(
       const queries = view?.search?.queries;
       const selectedQuery = _selectedQuery(queries, this.activeQuery, queryId);
 
-      this.selectQuery(selectedQuery);
       this.isNew = isNew;
+      this.selectQuery(selectedQuery);
 
       const promise = Promise.resolve(this._state());
 
@@ -184,8 +184,6 @@ export const ViewStore: ViewStoreType = singletonStore(
 
       const queries: QuerySet = view?.search?.queries ?? Immutable.Set();
       this.activeQuery = _selectedQuery(queries, this.activeQuery, queryId);
-
-      this._trigger();
 
       const promise = ViewActions.search(view.search)
         .then(() => {
