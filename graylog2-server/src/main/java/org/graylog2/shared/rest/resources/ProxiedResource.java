@@ -19,8 +19,6 @@ package org.graylog2.shared.rest.resources;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Stopwatch;
-import okhttp3.HttpUrl;
-import okhttp3.Request;
 import okhttp3.ResponseBody;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
@@ -83,6 +81,10 @@ public abstract class ProxiedResource extends RestResource {
         this.remoteInterfaceProvider = remoteInterfaceProvider;
         this.executor = executorService;
         this.authenticationToken = authenticationToken(httpHeaders);
+    }
+
+    protected Duration getDefaultProxyCallTimeout() {
+        return Duration.ofMillis(defaultProxyCallTimeout.toMilliseconds());
     }
 
     protected void processAsync(AsyncResponse asyncResponse, Supplier<Object> responseSupplier) {
@@ -191,7 +193,7 @@ public abstract class ProxiedResource extends RestResource {
             Function<String, Optional<RemoteInterfaceType>> interfaceProvider,
             Function<RemoteCallResponseType, FinalResponseType> transformer,
             Duration timeout) {
-        final long callTimeoutMs = Duration.ZERO.equals(timeout) ? defaultProxyCallTimeout.toMilliseconds() : timeout.toMillis();
+        final long callTimeoutMs = Duration.ZERO.equals(timeout) ? getDefaultProxyCallTimeout().toMillis() : timeout.toMillis();
 
         final Map<String, Future<Optional<FinalResponseType>>> futures = this.nodeService.allActive().keySet().stream()
                 .collect(Collectors.toMap(Function.identity(), node -> interfaceProvider.apply(node)
@@ -294,20 +296,19 @@ public abstract class ProxiedResource extends RestResource {
             Duration timeout
     ) {
 
-        final long callTimeoutMs = Duration.ZERO.equals(timeout) ? defaultProxyCallTimeout.toMilliseconds() : timeout.toMillis();
+        final long callTimeoutMs = Duration.ZERO.equals(timeout) ? getDefaultProxyCallTimeout().toMillis() : timeout.toMillis();
 
         final Map<String, Future<CallResult<FinalResponseType>>> futures = this.nodeService.allActive().keySet().stream()
                 .collect(Collectors.toMap(Function.identity(), nodeId -> executor.submit(() -> {
                             final Stopwatch sw = Stopwatch.createStarted();
                             try {
                                 return CallResult.success(doNodeApiCall(nodeId, remoteInterfaceProvider, remoteInterfaceCallProvider, responseTransformer, callTimeoutMs));
-                            } catch (NodeAPICallException e) {
-                                final HttpUrl requestUrl = e.request.url();
+                            } catch (Exception e) {
                                 final long elapsedMs = sw.stop().elapsed().toMillis();
                                 if (LOG.isDebugEnabled()) {
-                                    LOG.warn("Failed to call {} on node <{}>, cause: {} (duration: {} ms)", requestUrl, nodeId, e.getMessage(), elapsedMs, e);
+                                    LOG.warn("Failed to call API on node <{}>, cause: {} (duration: {} ms)", nodeId, e.getMessage(), elapsedMs, e);
                                 } else {
-                                    LOG.warn("Failed to call {} on node <{}>, cause: {} (duration: {} ms)", requestUrl, nodeId, e.getMessage(), elapsedMs);
+                                    LOG.warn("Failed to call API on node <{}>, cause: {} (duration: {} ms)", nodeId, e.getMessage(), elapsedMs);
                                 }
                                 return CallResult.error(e.getMessage());
                             }
@@ -324,6 +325,7 @@ public abstract class ProxiedResource extends RestResource {
                         // requests times out before we hit the timeout on this Future#get call.
                         return entry.getValue().get(callTimeoutMs * 2, TimeUnit.MILLISECONDS);
                     } catch (InterruptedException | ExecutionException e) {
+                        System.out.println(e.getClass().getCanonicalName());
                         LOG.debug("Couldn't retrieve future", e);
                         throw new RuntimeException(e);
                     } catch (TimeoutException e) {
@@ -360,7 +362,7 @@ public abstract class ProxiedResource extends RestResource {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No active leader node found"));
 
-        return doNodeApiCall(leaderNode.getNodeId(), remoteInterfaceProvider, remoteInterfaceFunction, Function.identity(), defaultProxyCallTimeout.toMilliseconds());
+        return doNodeApiCall(leaderNode.getNodeId(), remoteInterfaceProvider, remoteInterfaceFunction, Function.identity(), getDefaultProxyCallTimeout().toMillis());
     }
 
     private <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> NodeResponse<FinalResponseType> doNodeApiCall(
@@ -376,32 +378,15 @@ public abstract class ProxiedResource extends RestResource {
 
         call.timeout().timeout(callTimeoutMs, TimeUnit.MILLISECONDS);
 
-        try {
-            final Response<RemoteCallResponseType> response = call.execute();
+        final Response<RemoteCallResponseType> response = call.execute();
 
-            try (final ResponseBody errorBody = response.errorBody()) {
-                return NodeResponse.create(
-                        response.isSuccessful(),
-                        response.code(),
-                        transformer.apply(response.body()),
-                        errorBody == null ? null : errorBody.bytes()
-                );
-            }
-        } catch (Exception e) {
-            throw new NodeAPICallException(call.request(), e);
-        }
-    }
-
-    private static class NodeAPICallException extends IOException {
-        private final Request request;
-
-        public NodeAPICallException(Request request, Exception e) {
-            super(e.getMessage(), e);
-            this.request = request;
-        }
-
-        public Request getRequest() {
-            return request;
+        try (final ResponseBody errorBody = response.errorBody()) {
+            return NodeResponse.create(
+                    response.isSuccessful(),
+                    response.code(),
+                    transformer.apply(response.body()),
+                    errorBody == null ? null : errorBody.bytes()
+            );
         }
     }
 

@@ -21,6 +21,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
+import okio.Timeout;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
@@ -37,6 +38,7 @@ import retrofit2.Response;
 
 import javax.ws.rs.core.HttpHeaders;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -95,6 +97,11 @@ public class ClusterLookupTableResourceTest {
                                 .setNameFormat("proxied-requests-test-pool-%d")
                                 .build()
                 )) {
+            @Override
+            protected Duration getDefaultProxyCallTimeout() {
+                return Duration.ofSeconds(5);
+            }
+
             @Override
             protected Subject getSubject() {
                 return mock(Subject.class);
@@ -156,6 +163,7 @@ public class ClusterLookupTableResourceTest {
 
         });
         assertThat(res.get("node_2")).satisfies(nodeRes -> {
+            System.out.println(nodeRes);
             assertThat(nodeRes.isCallExecuted()).isTrue();
             assertThat(nodeRes.serverErrorMessage()).isNull();
             assertThat(nodeRes.response().code()).isEqualTo(404);
@@ -195,9 +203,15 @@ public class ClusterLookupTableResourceTest {
         });
     }
 
+    private Call<Void> callMock() {
+        final Call<Void> call = mock(Call.class);
+        when(call.timeout()).thenReturn(new Timeout());
+        return call;
+    }
+
     private void mock204Response(String tableName, String key,
                                  RemoteLookupTableResource remoteLookupTableResource) throws IOException {
-        final Call<Void> call = mock(Call.class);
+        final Call<Void> call = callMock();
 
         when(remoteLookupTableResource.performPurge(tableName, key))
                 .thenReturn(call);
@@ -213,7 +227,7 @@ public class ClusterLookupTableResourceTest {
 
     private void mock404Response(String tableName, String key,
                                  RemoteLookupTableResource remoteLookupTableResource) throws IOException {
-        final Call<Void> call = mock(Call.class);
+        final Call<Void> call = callMock();
 
         when(remoteLookupTableResource.performPurge(tableName, key))
                 .thenReturn(call);
