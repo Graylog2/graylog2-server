@@ -16,6 +16,7 @@
  */
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
+import type * as Immutable from 'immutable';
 
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { SearchExecution, RootState } from 'views/types';
@@ -32,6 +33,7 @@ import {
   selectSearchExecutionState,
 } from 'views/logic/slices/searchExecutionSelectors';
 import type { TimeRange } from 'views/logic/queries/Query';
+import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 
 const searchExecutionSlice = createSlice({
   name: 'searchExecution',
@@ -59,10 +61,23 @@ const searchExecutionSlice = createSlice({
       ...state,
       widgetsToSearch: action.payload,
     }),
+    setParameterValues: (state, action: PayloadAction<Immutable.Map<string, any>>) => {
+      const parameterMap = action.payload;
+      let { parameterBindings } = state.executionState;
+
+      parameterMap.forEach((value, parameterName) => {
+        parameterBindings = parameterBindings.set(parameterName, ParameterBinding.forValue(value));
+      });
+
+      return {
+        ...state,
+        executionState: state.executionState.toBuilder().parameterBindings(parameterBindings).build(),
+      };
+    },
   },
 });
 
-export const { loading, finishedLoading, updateGlobalOverride, setWidgetsToSearch } = searchExecutionSlice.actions;
+export const { loading, finishedLoading, updateGlobalOverride, setWidgetsToSearch, setParameterValues } = searchExecutionSlice.actions;
 
 export const searchExecutionSliceReducer = searchExecutionSlice.reducer;
 
