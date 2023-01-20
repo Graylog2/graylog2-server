@@ -36,6 +36,7 @@ type Props = {
   view: Promise<View>,
   loadNewView?: () => unknown,
   loadView?: (viewId: string) => unknown,
+  executionState?: SearchExecutionState,
 };
 
 const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
@@ -48,10 +49,9 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const SearchPage = ({ isNew, view: viewPromise, loadNewView = defaultLoadNewView, loadView = defaultLoadView }: Props) => {
+const SearchPage = ({ isNew, view: viewPromise, loadNewView = defaultLoadNewView, loadView = defaultLoadView, executionState: initialExecutionState }: Props) => {
   const query = useQuery();
   const initialQuery = query?.page as string;
-  const initialExecutionState = SearchExecutionState.empty();
   useLoadView(viewPromise, isNew);
   const result = useProcessHooksForView(viewPromise, initialExecutionState, query);
 
@@ -87,6 +87,7 @@ const SearchPage = ({ isNew, view: viewPromise, loadNewView = defaultLoadNewView
 SearchPage.defaultProps = {
   loadNewView: defaultLoadNewView,
   loadView: defaultLoadView,
+  executionState: SearchExecutionState.empty(),
 };
 
 export default React.memo(SearchPage);
