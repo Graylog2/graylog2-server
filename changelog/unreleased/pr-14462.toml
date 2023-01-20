@@ -1,5 +1,4 @@
-type = "c"
-message = "Implement async HTTP request processing for cluster metrics resources to avoid HTTP thread pool starvation."
+type = "f"
+message = "Fix possible HTTP API thread pool exhaustion by processing proxied cluster metrics requests asynchronously."
 
-issues = [""]
 pulls = ["14462"]
