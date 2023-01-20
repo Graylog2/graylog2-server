@@ -163,7 +163,6 @@ public class ClusterLookupTableResourceTest {
 
         });
         assertThat(res.get("node_2")).satisfies(nodeRes -> {
-            System.out.println(nodeRes);
             assertThat(nodeRes.isCallExecuted()).isTrue();
             assertThat(nodeRes.serverErrorMessage()).isNull();
             assertThat(nodeRes.response().code()).isEqualTo(404);

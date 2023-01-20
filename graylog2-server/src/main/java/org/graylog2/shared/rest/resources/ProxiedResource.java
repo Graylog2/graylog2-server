@@ -325,7 +325,6 @@ public abstract class ProxiedResource extends RestResource {
                         // requests times out before we hit the timeout on this Future#get call.
                         return entry.getValue().get(callTimeoutMs * 2, TimeUnit.MILLISECONDS);
                     } catch (InterruptedException | ExecutionException e) {
-                        System.out.println(e.getClass().getCanonicalName());
                         LOG.debug("Couldn't retrieve future", e);
                         throw new RuntimeException(e);
                     } catch (TimeoutException e) {
