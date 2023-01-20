@@ -38,12 +38,17 @@ const CollectorName = styled.div`
   font-style: italic;
 `;
 
+const ShowDetailsLink = styled(Button)`
+  padding-left: 0;
+`;
+
 type Props = {
   sidecar: SidecarSummary,
   collectors: Collector[],
+  onShowDetails: (obj: { name: string, verbose_message: string }) => void,
 }
 
-const SidecarFailureTrackingRows = ({ sidecar, collectors }: Props) => {
+const SidecarFailureTrackingRows = ({ sidecar, collectors, onShowDetails }: Props) => {
   const annotation = sidecar.active ? '' : ' (inactive)';
   let sidecarStatus = { status: null, message: null, id: null };
 
@@ -56,48 +61,50 @@ const SidecarFailureTrackingRows = ({ sidecar, collectors }: Props) => {
   }
 
   const getCollectorInformation = (collectorId: string) => {
-    const collectorData = collectors.find((collector) => collector.id === collectorId);
-
-    return collectorData ? `${collectorData?.name} · ${collectorData?.node_operating_system}` : '';
+    return collectors.find((collector) => collector.id === collectorId);
   };
 
   const renderSidecarCollectorRows = () => {
-    return sidecar.node_details.status.collectors.filter((collector) => collector.status === 2).map((collector) => (
-      <tr key={collector.collector_id + collector.configuration_id}>
-        <td>
-          {sidecar.active
-            ? (
-              <Link to={Routes.SYSTEM.SIDECARS.STATUS(sidecar.node_id)}>
-                {sidecar.node_name}
-              </Link>
-            )
-            : sidecar.node_name + annotation}
-          <CollectorName>{getCollectorInformation(collector.collector_id)}</CollectorName>
-        </td>
-        <td>
-          <RelativeTime dateTime={sidecar.last_seen} />
-        </td>
-        <td>
-          <StatusIndicator status={sidecarStatus.status}
-                           message={sidecarStatus.message}
-                           id={sidecarStatus.id}
-                           lastSeen={sidecar.last_seen} />
-        </td>
-        <td>
-          {collector.message}
-        </td>
-        <td>
-          <VerboseMessageContainer>
-            {collector.verbose_message}
-          </VerboseMessageContainer>
-          <Button bsStyle="link"
-                  bsSize="xs"
-                  onClick={() => {}}>
-            Show Details
-          </Button>
-        </td>
-      </tr>
-    ));
+    return sidecar.node_details.status.collectors.filter((collector) => collector.status === 2).map((collector) => {
+      const collectorData = getCollectorInformation(collector.collector_id);
+
+      return (
+        <tr key={collector.collector_id + collector.configuration_id}>
+          <td>
+            {sidecar.active
+              ? (
+                <Link to={Routes.SYSTEM.SIDECARS.STATUS(sidecar.node_id)}>
+                  {sidecar.node_name}
+                </Link>
+              )
+              : sidecar.node_name + annotation}
+            <CollectorName>{collectorData?.name} · {collectorData?.node_operating_system}</CollectorName>
+          </td>
+          <td>
+            <RelativeTime dateTime={sidecar.last_seen} />
+          </td>
+          <td>
+            <StatusIndicator status={sidecarStatus.status}
+                             message={sidecarStatus.message}
+                             id={sidecarStatus.id}
+                             lastSeen={sidecar.last_seen} />
+          </td>
+          <td>
+            {collector.message}
+          </td>
+          <td>
+            <VerboseMessageContainer>
+              {collector.verbose_message}
+            </VerboseMessageContainer>
+            <ShowDetailsLink bsStyle="link"
+                             bsSize="xs"
+                             onClick={() => onShowDetails({ name: collectorData?.name, verbose_message: collector.verbose_message })}>
+              Show Details
+            </ShowDetailsLink>
+          </td>
+        </tr>
+      );
+    });
   };
 
   return (

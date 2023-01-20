@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -24,6 +25,7 @@ import SidecarSearchForm from 'components/sidecars/common/SidecarSearchForm';
 
 import SidecarFailureTrackingRows from './SidecarFailureTrackingRows';
 
+import VerboseMessageModal from '../sidecars/VerboseMessageModal';
 import type { Collector, PaginationInfo, SidecarSummary } from '../types';
 
 const StyledSortIcon = styled(SortIcon)`
@@ -61,6 +63,8 @@ const SidecarFailureTrackingList = ({
   onSortChange,
   toggleShowInactive,
 }: Props) => {
+  const [collectorDetailsToShow, setCollectorDetailsToShow] = useState<{ name: string, verbose_message: string }|null>(null);
+
   const formatSidecarList = (sidecarRows: React.ReactNode[]) => {
     const sidecarCollection = {
       node_name: 'Name',
@@ -123,7 +127,7 @@ const SidecarFailureTrackingList = ({
     );
   };
 
-  const sidecarRows = sidecars.map((sidecar) => <SidecarFailureTrackingRows key={sidecar.node_id} sidecar={sidecar} collectors={collectors} />);
+  const sidecarRows = sidecars.map((sidecar) => <SidecarFailureTrackingRows key={sidecar.node_id} sidecar={sidecar} collectors={collectors} onShowDetails={setCollectorDetailsToShow} />);
   const showOrHideInactive = (onlyActive ? 'Include' : 'Hide');
   const sidecarList = (sidecarRows.length > 0 ? formatSidecarList(sidecarRows) : renderEmptyList());
 
@@ -149,6 +153,13 @@ const SidecarFailureTrackingList = ({
           </Col>
         </Row>
       </PaginatedList>
+
+      {collectorDetailsToShow && (
+        <VerboseMessageModal showModal
+                             onHide={() => setCollectorDetailsToShow(null)}
+                             collectorName={collectorDetailsToShow.name}
+                             collectorVerbose={collectorDetailsToShow.verbose_message} />
+      )}
     </div>
   );
 };
