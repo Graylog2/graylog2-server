@@ -136,7 +136,7 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
     }
 
     void testRotation() {
-        indexSet.addNewIndex(0, TimeBasedSizeOptimizingStrategy.MIN_INDEX_SIZE.toBytes());
+        indexSet.addNewIndex(0, elasticsearchConfiguration.getTimeSizeOptimizingRotationMinSize().toBytes());
         assertThat(indexSet.getIndicesNames()).isEqualTo(List.of("test_0"));
 
         // We rotate _after_ 1 day. This is too early
@@ -155,20 +155,20 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
         assertThat(indexSet.getIndicesNames()).isEqualTo(List.of("test_0", "test_1"));
 
         // with the minimum required size, this works
-        indexSet.getNewest().setSize(TimeBasedSizeOptimizingStrategy.MIN_INDEX_SIZE.toBytes());
+        indexSet.getNewest().setSize(elasticsearchConfiguration.getTimeSizeOptimizingRotationMinSize().toBytes());
         clock.plus(1, TimeUnit.DAYS);
         timeBasedSizeOptimizingStrategy.rotate(indexSet);
         assertThat(indexSet.getIndicesNames()).isEqualTo(List.of("test_0", "test_1", "test_2"));
 
-        // If an index exceeds TimeBasedSizeOptimizingStrategy.MAX_INDEX_SIZE
+        // If an index exceeds its maximum size
         // it can be rotated, even if the rotation period has been reached.
-        indexSet.getNewest().setSize(TimeBasedSizeOptimizingStrategy.MAX_INDEX_SIZE.toBytes() + 1);
+        indexSet.getNewest().setSize(elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxSize().toBytes() + 1);
         clock.plus(12, TimeUnit.HOURS);
         timeBasedSizeOptimizingStrategy.rotate(indexSet);
         assertThat(indexSet.getIndicesNames()).isEqualTo(List.of("test_0", "test_1", "test_2", "test_3"));
 
-        // If an index doesn't reach TimeBasedSizeOptimizingStrategy.MAX_INDEX_SIZE
-        // But exceeds the optimization "leeway" ( indexLifetimeHard - indexLifetimeSoft) (6 - 4) = 2 days
+        // If an index doesn't reach its minimum size
+        // but exceeds the optimization "leeway" ( indexLifetimeHard - indexLifetimeSoft) (6 - 4) = 2 days
         // it will also be rotated.
         indexSet.getNewest().setSize(100);
         clock.plus(3, TimeUnit.DAYS);

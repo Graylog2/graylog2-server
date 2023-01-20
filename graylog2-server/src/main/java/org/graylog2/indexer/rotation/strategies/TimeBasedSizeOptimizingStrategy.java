@@ -44,12 +44,10 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
 
     private final Indices indices;
     private final JobSchedulerClock clock;
-    public final org.joda.time.Period rotationPeriod;
+    private final org.joda.time.Period rotationPeriod;
 
-    // TODO: move this into server.conf or maybe into IndexSetsDefaultConfiguration
-    // also see elasticsearch_max_size_per_index
-    public static final Size MAX_INDEX_SIZE = Size.gigabytes(50);
-    public static final Size MIN_INDEX_SIZE = Size.gigabytes(20);
+    private final Size maxIndexSize;
+    private final Size minIndexSize;
 
     @Inject
     public TimeBasedSizeOptimizingStrategy(Indices indices,
@@ -61,6 +59,8 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
         this.indices = indices;
         this.clock = clock;
         this.rotationPeriod = elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod();
+        this.maxIndexSize = elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxSize();
+        this.minIndexSize = elasticsearchConfiguration.getTimeSizeOptimizingRotationMinSize();
     }
 
     @Override
@@ -89,7 +89,7 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
         if (indexExceedsSizeLimit(sizeInBytes)) {
             return createResult(true,
                     f("Index size <%s> exceeds MAX_INDEX_SIZE <%s>",
-                            StringUtils.humanReadableByteCount(sizeInBytes), MAX_INDEX_SIZE));
+                            StringUtils.humanReadableByteCount(sizeInBytes), maxIndexSize));
         }
         if (indexExceedsLeeWay(creationDate, leeWay)) {
             return createResult(true,
@@ -124,11 +124,11 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
     }
 
     private boolean indexExceedsSizeLimit(long size) {
-        return size > MAX_INDEX_SIZE.toBytes();
+        return size > maxIndexSize.toBytes();
     }
 
     private boolean indexSubceedsSizeLimit(long size) {
-        return size < MIN_INDEX_SIZE.toBytes();
+        return size < minIndexSize.toBytes();
     }
 
     @Override

@@ -19,6 +19,7 @@ package org.graylog2.configuration;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.util.Size;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
@@ -100,6 +101,12 @@ public class ElasticsearchConfiguration {
     // TimeBasedSizeOptimizingStrategy Rotation
     @Parameter(value = "time_size_optimizing_rotation_period")
     private Period timeSizeOptimizingRotationPeriod = Period.days(1);
+
+    @Parameter(value = "time_size_optimizing_rotation_min_size")
+    private Size timeSizeOptimizingRotationMinSize = Size.gigabytes(20);
+
+    @Parameter(value = "time_size_optimizing_rotation_max_size")
+    private Size timeSizeOptimizingRotationMaxSize = Size.gigabytes(50);
 
     @Parameter(value = "elasticsearch_disable_version_check")
     private boolean disableVersionCheck = false;
@@ -209,6 +216,14 @@ public class ElasticsearchConfiguration {
 
     public Period getTimeSizeOptimizingRotationPeriod() {
         return timeSizeOptimizingRotationPeriod;
+    }
+
+    public Size getTimeSizeOptimizingRotationMinSize() {
+        return timeSizeOptimizingRotationMinSize;
+    }
+
+    public Size getTimeSizeOptimizingRotationMaxSize() {
+        return timeSizeOptimizingRotationMaxSize;
     }
 
     public boolean isDisableVersionCheck() {
