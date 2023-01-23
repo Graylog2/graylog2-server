@@ -29,6 +29,7 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy;
 import org.joda.time.Period;
 
 import javax.annotation.Nullable;
@@ -118,7 +119,9 @@ public class ElasticsearchConfiguration {
     private boolean noRetention = false;
 
     @Parameter(value = "enabled_index_rotation_strategies", converter = StringListConverter.class, validators = RotationStrategyValidator.class)
-    private List<String> enabledRotationStrategies = Arrays.asList(TimeBasedRotationStrategy.NAME, MessageCountRotationStrategy.NAME, SizeBasedRotationStrategy.NAME);
+    private List<String> enabledRotationStrategies = Arrays.asList(
+            TimeBasedRotationStrategy.NAME, MessageCountRotationStrategy.NAME,
+            SizeBasedRotationStrategy.NAME, TimeBasedSizeOptimizingStrategy.NAME);
 
     /**
      * Provides a hard upper limit for the retention period of any index set at configuration time.
