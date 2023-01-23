@@ -32,6 +32,7 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfi
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.jupiter.api.BeforeAll;
 
+import java.util.List;
 import java.util.Set;
 
 import static io.restassured.RestAssured.given;
@@ -137,13 +138,12 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
     }
 
     @ContainerMatrixTest
-    void testTwoFieldAggregationHasProperMissingBucket() {
+    void testTwoTupledFieldAggregationHasProperMissingBucket() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
                 .series(Count.builder().build(), Average.builder().field("age").build())
                 .rowGroups(
-                        Values.builder().field("firstName").limit(8).build(),
-                        Values.builder().field("lastName").limit(8).build()
+                        Values.builder().fields(List.of("firstName", "lastName")).limit(8).build()
                 )
                 .build();
         final ValidatableResponse validatableResponse = execute(pivot);
