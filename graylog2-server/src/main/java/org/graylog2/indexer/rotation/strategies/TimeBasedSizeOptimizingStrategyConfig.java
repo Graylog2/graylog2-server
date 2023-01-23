@@ -23,8 +23,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
+import org.joda.time.Period;
 
-import java.time.Period;
 
 @JsonAutoDetect
 @AutoValue
@@ -34,8 +34,8 @@ public abstract class TimeBasedSizeOptimizingStrategyConfig implements RotationS
     public static final String INDEX_LIFETIME_SOFT = "index_lifetime_soft";
     public static final String INDEX_LIFETIME_HARD = "index_lifetime_hard";
 
-    private static final Period DEFAULT_LIFETIME_SOFT = Period.ofDays(30);
-    private static final Period DEFAULT_LIFETIME_HARD = Period.ofDays(40);
+    private static final Period DEFAULT_LIFETIME_SOFT = Period.days(30);
+    private static final Period DEFAULT_LIFETIME_HARD = Period.days(40);
     @JsonProperty(INDEX_LIFETIME_SOFT)
     public abstract Period indexLifetimeSoft();
 

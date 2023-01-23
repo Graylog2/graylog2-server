@@ -72,7 +72,7 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
         final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
 
         // Account for DST and time zones in determining age
-        final long cutoff = clock.instantNow().minus(smartConfig.indexLifetimeSoft()).toEpochMilli();
+        final long cutoff = clock.nowUTC().minus(smartConfig.indexLifetimeSoft()).getMillis();
         final int removeCount = (int)deflectorIndices.keySet()
                 .stream()
                 .filter(indexName -> !indices.isReopened(indexName))

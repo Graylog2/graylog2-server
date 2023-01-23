@@ -75,7 +75,7 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
         }
         LOG.debug("Rotation strategy result: {}", rotate.getDescription());
         if (rotate.shouldRotate()) {
-            LOG.info("Deflector index <{}> (index set <{}>) should be rotated, Pointing deflector to new index now!", indexSetTitle, indexName);
+            LOG.info("Deflector index <{}> (index set <{}>) should be rotated ({}), Pointing deflector to new index now!", indexSetTitle, indexName, rotate.getDescription());
             indexSet.cycle();
             auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_ROTATION_COMPLETE, ImmutableMap.of(
                     "index_name", indexName,

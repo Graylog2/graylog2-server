@@ -26,7 +26,8 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.utilities.StringUtils;
 import org.joda.time.DateTime;
-import org.joda.time.Days;
+import org.joda.time.Period;
+import org.joda.time.Seconds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,6 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.Period;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -107,15 +107,15 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
     }
 
     private boolean indexExceedsLeeWay(DateTime creationDate, Period leeWay) {
-        final Days leewayDays = Days.days(leeWay.getDays()); // can only be a multiple of Days
-        return timePassedIsBeyondLimit(creationDate, rotationPeriod.plus(leewayDays));
+        final Seconds leewaySeconds = Seconds.seconds(leeWay.toStandardSeconds().getSeconds());
+        return timePassedIsBeyondLimit(creationDate, rotationPeriod.plus(leewaySeconds));
     }
 
     private boolean indexIsOldEnough(DateTime creationDate) {
         return timePassedIsBeyondLimit(creationDate, rotationPeriod);
     }
 
-    private boolean timePassedIsBeyondLimit(DateTime date, org.joda.time.Period limit) {
+    private boolean timePassedIsBeyondLimit(DateTime date, Period limit) {
         final Instant now = clock.instantNow();
         final Duration timePassed = Duration.between(Instant.ofEpochMilli(date.getMillis()), now);
         final Duration limitAsDuration = Duration.ofSeconds(limit.toStandardSeconds().getSeconds());
