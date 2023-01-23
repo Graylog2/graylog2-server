@@ -163,6 +163,33 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
     }
 
     @ContainerMatrixTest
+    void testTwoNestedFieldAggregationHasProperMissingBucket() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .series(Count.builder().build(), Average.builder().field("age").build())
+                .rowGroups(
+                        Values.builder().field("firstName").limit(8).build(),
+                        Values.builder().field("lastName").limit(8).build()
+                )
+                .build();
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        //General verification
+        validatableResponse.rootPath(PIVOT_RESULTS_PATH)
+                .body(".rows", hasSize(6))
+                .body(".rows.findAll{ it.key[0] == 'Joe' }", hasSize(2)) // Joe-Biden, Joe-Smith
+                .body(".rows.findAll{ it.key[0] == 'Jane' }", hasSize(1)) // Jane-Smith
+                .body(".rows.findAll{ it.key == ['Bob', '" + MISSING_BUCKET_NAME + "'] }", hasSize(1)) // Bob has no last name
+                .body(".rows.findAll{ it.key[0] == '" + MISSING_BUCKET_NAME + "' }", hasSize(1))
+                .body(".rows.find{ it.key == [] }", notNullValue()) //totals
+                .body(".total", equalTo(5));
+
+        //Empty buckets verification
+        //We have only one entry with missing first name {(...)"lastName": "Cooper","age": 60(...)}, so both empty buckets will have the same values
+        validatableResponse.body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "'] }.values.value", hasItems(1, 60.0f));
+    }
+
+    @ContainerMatrixTest
     void testRowAndColumnPivotHasProperMissingBucket() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
