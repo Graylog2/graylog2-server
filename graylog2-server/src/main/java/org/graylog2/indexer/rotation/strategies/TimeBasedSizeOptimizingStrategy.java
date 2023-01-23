@@ -86,6 +86,10 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
             throw new IllegalStateException(f("Unsupported RotationStrategyConfig type <%s>", indexSet.getConfig().rotationStrategy()));
         }
 
+        if (sizeInBytes == 0) {
+            return createResult(false, "Index is empty");
+        }
+
         if (indexExceedsSizeLimit(sizeInBytes)) {
             return createResult(true,
                     f("Index size <%s> exceeds MAX_INDEX_SIZE <%s>",
