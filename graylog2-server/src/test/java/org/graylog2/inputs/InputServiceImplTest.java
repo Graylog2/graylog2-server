@@ -23,6 +23,13 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.TextField;
+import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.security.encryption.EncryptedValue;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.MessageInputFactory;
@@ -33,11 +40,22 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.graylog2.plugin.inputs.MessageInput.FIELD_CONFIGURATION;
+import static org.graylog2.plugin.inputs.MessageInput.FIELD_CREATED_AT;
+import static org.graylog2.plugin.inputs.MessageInput.FIELD_CREATOR_USER_ID;
+import static org.graylog2.plugin.inputs.MessageInput.FIELD_TITLE;
+import static org.graylog2.plugin.inputs.MessageInput.FIELD_TYPE;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class InputServiceImplTest {
     @Rule
@@ -59,11 +77,13 @@ public class InputServiceImplTest {
 
     private ClusterEventBus clusterEventBus;
     private InputServiceImpl inputService;
+    private EncryptedValueService encryptedValueService;
 
     @Before
     @SuppressForbidden("Executors#newSingleThreadExecutor() is okay for tests")
     public void setUp() throws Exception {
         clusterEventBus = new ClusterEventBus("inputs-test", Executors.newSingleThreadExecutor());
+        encryptedValueService = new EncryptedValueService(UUID.randomUUID().toString());
         inputService = new InputServiceImpl(
                 mongodb.mongoConnection(),
                 extractorFactory,
@@ -136,4 +156,38 @@ public class InputServiceImplTest {
         assertThat(inputService.localCountForNode("cd03ee44-b2a7-cafe-babe-0000deadbeef")).isEqualTo(2);
         assertThat(inputService.localCountForNode("cd03ee44-b2a7-0000-0000-000000000000")).isEqualTo(0);
     }
+
+    @Test
+    public void handlesEncryptedValue() throws ValidationException, NotFoundException {
+
+        // Setup required to detect fields that need conversion from Map to EncryptedValue when reading
+        final MessageInput.Config inputConfig = mock(MessageInput.Config.class);
+        when(inputConfig.combinedRequestedConfiguration()).thenReturn(ConfigurationRequest.createWithFields(
+                new TextField("encrypted", "", "", "",
+                        ConfigurationField.Optional.OPTIONAL, true)
+        ));
+        when(messageInputFactory.getConfig("test type")).thenReturn(Optional.of(
+                inputConfig
+        ));
+
+        final EncryptedValue secret = encryptedValueService.encrypt("secret");
+        final String id = inputService.save(new InputImpl(Map.of(
+                FIELD_TYPE, "test type",
+                FIELD_TITLE, "test title",
+                FIELD_CREATED_AT, new Date(),
+                FIELD_CREATOR_USER_ID, "test creator",
+                FIELD_CONFIGURATION, Map.of(
+                        "encrypted", secret
+                )
+        )));
+
+        assertThat(id).isNotBlank();
+
+        final Input input = inputService.find(id);
+        assertThat(input.getConfiguration()).hasEntrySatisfying("encrypted", value -> {
+            assertThat(value).isInstanceOf(EncryptedValue.class);
+            assertThat(value).isEqualTo(secret);
+        });
+    }
+
 }
