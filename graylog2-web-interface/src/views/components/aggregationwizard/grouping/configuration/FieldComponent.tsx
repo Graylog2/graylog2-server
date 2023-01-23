@@ -72,6 +72,7 @@ const FieldComponent = ({ groupingIndex }: Props) => {
            labelClassName="col-sm-3"
            error={(errors?.groupBy?.groupings?.[groupingIndex] as GroupByError)?.fields}
            wrapperClassName="col-sm-9">
+      <SelectedFieldsList groupingIndex={groupingIndex} />
       <FieldSelect id="group-by-field-create-select"
                    onChange={onAddField}
                    clearable={false}
@@ -83,7 +84,6 @@ const FieldComponent = ({ groupingIndex }: Props) => {
                    excludedFields={grouping.fields ?? []}
                    placeholder={createSelectPlaceholder}
                    aria-label={createSelectPlaceholder} />
-      <SelectedFieldsList groupingIndex={groupingIndex} />
     </Input>
   );
 };
