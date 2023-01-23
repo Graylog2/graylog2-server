@@ -32,7 +32,7 @@ import { Alert, Col, Row, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { UsersActions } from 'stores/users/UsersStore';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
-import { FormSubmit, NoSearchResult, ReadOnlyFormGroup } from 'components/common';
+import { FormSubmit, IfPermitted, NoSearchResult, ReadOnlyFormGroup } from 'components/common';
 
 import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';
@@ -202,7 +202,7 @@ const UserCreate = () => {
                 <Headline>Settings</Headline>
                 {isGlobalTimeoutEnabled ? (
                   <GlobalTimeoutMessage label="Sessions Timeout"
-                                        value={<NoSearchResult>User session timeout is not editable because the <Link to={Routes.SYSTEM.CONFIGURATIONS}>global session timeout</Link> is enabled.</NoSearchResult>} />
+                                        value={<NoSearchResult>User session timeout is not editable because the <IfPermitted permissions={['clusterconfigentry:read']}><Link to={Routes.SYSTEM.CONFIGURATIONS}>global session timeout</Link></IfPermitted> is enabled.</NoSearchResult>} />
                 ) : (
                   <TimeoutFormGroup />
                 )}

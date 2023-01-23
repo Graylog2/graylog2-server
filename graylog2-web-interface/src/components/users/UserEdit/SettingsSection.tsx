@@ -67,7 +67,7 @@ const SettingsSection = ({
             <IfPermitted permissions="*">
               {isGlobalTimeoutEnabled ? (
                 <GlobalTimeoutMessage label="Sessions Timeout"
-                                      value={<NoSearchResult>User session timeout is not editable because the <Link to={Routes.SYSTEM.CONFIGURATIONS}>global session timeout</Link> is enabled.</NoSearchResult>} />
+                                      value={<NoSearchResult>User session timeout is not editable because the <IfPermitted permissions={['clusterconfigentry:read']}><Link to={Routes.SYSTEM.CONFIGURATIONS}>global session timeout</Link></IfPermitted> is enabled.</NoSearchResult>} />
               ) : (
                 <TimeoutFormGroup />
               )}

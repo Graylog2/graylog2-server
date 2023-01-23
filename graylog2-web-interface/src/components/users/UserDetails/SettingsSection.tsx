@@ -20,7 +20,7 @@ import { upperFirst } from 'lodash';
 
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
-import { ReadOnlyFormGroup } from 'components/common';
+import { IfPermitted, ReadOnlyFormGroup } from 'components/common';
 import type User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { StreamsActions } from 'stores/streams/StreamsStore';
@@ -33,7 +33,9 @@ type Props = {
 
 const _sessionTimeout = (sessionTimeout: { value: number, unitString: string }, isGlobalTimeoutEnabled: boolean) => {
   if (sessionTimeout) {
-    return <>{sessionTimeout.value} {sessionTimeout.unitString} {isGlobalTimeoutEnabled && <>(<Link to={Routes.SYSTEM.CONFIGURATIONS}>globally set</Link>)</>}</>;
+    const globalTimeoutLink = <IfPermitted permissions={['clusterconfigentry:read']}>(<Link to={Routes.SYSTEM.CONFIGURATIONS}>globally set</Link>)</IfPermitted>;
+
+    return <>{sessionTimeout.value} {sessionTimeout.unitString} {isGlobalTimeoutEnabled && globalTimeoutLink}</>;
   }
 
   return 'Sessions do not timeout';
