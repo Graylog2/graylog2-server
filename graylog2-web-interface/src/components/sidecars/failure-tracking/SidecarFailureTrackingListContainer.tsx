@@ -35,7 +35,7 @@ type SidecarsArgs = {
   onlyActive?: boolean,
 }
 
-const PAGE_SIZES = [10, 25, 50, 100];
+const PAGE_SIZES = [25, 50, 100];
 
 const SIDECARS_DEFAULT_ARGS: SidecarsArgs = {
   page: 1,

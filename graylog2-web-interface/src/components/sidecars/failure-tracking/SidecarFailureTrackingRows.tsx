@@ -29,11 +29,12 @@ import type { Collector, SidecarSummary } from '../types';
 
 const VerboseMessageContainer = styled.div`
   height: 80px;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: scroll;
   margin-bottom: 6px;
 `;
 
-const CollectorName = styled.div`
+const SecondaryText = styled.div`
   color: #94979c;
   font-style: italic;
 `;
@@ -71,14 +72,10 @@ const SidecarFailureTrackingRows = ({ sidecar, collectors, onShowDetails }: Prop
       return (
         <tr key={collector.collector_id + collector.configuration_id}>
           <td>
-            {sidecar.active
-              ? (
-                <Link to={Routes.SYSTEM.SIDECARS.STATUS(sidecar.node_id)}>
-                  {sidecar.node_name}
-                </Link>
-              )
-              : sidecar.node_name + annotation}
-            <CollectorName>{collectorData?.name} · {collectorData?.node_operating_system}</CollectorName>
+            <Link to={Routes.SYSTEM.SIDECARS.STATUS(sidecar.node_id)}>
+              {collectorData?.name} on {sidecar.node_name}
+            </Link>
+            <SecondaryText>{annotation}</SecondaryText>
           </td>
           <td>
             <RelativeTime dateTime={sidecar.last_seen} />

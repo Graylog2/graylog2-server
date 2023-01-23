@@ -77,10 +77,10 @@ const SidecarFailureTrackingList = ({
     return (
       <Table striped responsive>
         <colgroup>
-          <col span={1} style={{ width: '12%' }} />
-          <col span={1} style={{ width: '12%' }} />
+          <col span={1} style={{ width: '15%' }} />
           <col span={1} style={{ width: '10%' }} />
-          <col span={1} style={{ width: '16%' }} />
+          <col span={1} style={{ width: '10%' }} />
+          <col span={1} style={{ width: '15%' }} />
           <col span={1} style={{ width: '50%' }} />
         </colgroup>
         <thead>
