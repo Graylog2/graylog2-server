@@ -42,8 +42,8 @@ import org.graylog.grn.GRNKeyDeserializer;
 import org.graylog.grn.GRNRegistry;
 import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.jackson.AutoValueSubtypeResolver;
-import org.graylog2.jackson.CustomBeanDeserializerModifier;
 import org.graylog2.jackson.DeserializationProblemHandlerModule;
+import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.jackson.JodaDurationCompatSerializer;
 import org.graylog2.jackson.JodaTimePeriodKeyDeserializer;
 import org.graylog2.jackson.SemverDeserializer;
@@ -98,7 +98,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                 Collections.emptySet(),
                 new EncryptedValueService(UUID.randomUUID().toString()),
                 GRNRegistry.createWithBuiltinTypes(),
-                CustomBeanDeserializerModifier.forBuiltinTypes());
+                InputConfigurationBeanDeserializerModifier.withoutConfig());
     }
 
     // WARNING: This constructor should ONLY be used for tests!
@@ -107,7 +107,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                 subtypes,
                 new EncryptedValueService(UUID.randomUUID().toString()),
                 GRNRegistry.createWithBuiltinTypes(),
-                CustomBeanDeserializerModifier.forBuiltinTypes());
+                InputConfigurationBeanDeserializerModifier.withoutConfig());
     }
 
     @Inject
@@ -115,7 +115,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                                 @JacksonSubTypes Set<NamedType> subtypes,
                                 EncryptedValueService encryptedValueService,
                                 GRNRegistry grnRegistry,
-                                CustomBeanDeserializerModifier customBeanDeserializerModifier) {
+                                InputConfigurationBeanDeserializerModifier inputConfigurationBeanDeserializerModifier) {
         final ObjectMapper mapper = new ObjectMapper();
         final TypeFactory typeFactory = mapper.getTypeFactory().withClassLoader(classLoader);
         final AutoValueSubtypeResolver subtypeResolver = new AutoValueSubtypeResolver();
@@ -152,7 +152,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                         .addDeserializer(Requirement.class, new SemverRequirementDeserializer())
                         .addDeserializer(GRN.class, new GRNDeserializer(grnRegistry))
                         .addDeserializer(EncryptedValue.class, new EncryptedValueDeserializer(encryptedValueService))
-                        .setDeserializerModifier(customBeanDeserializerModifier)
+                        .setDeserializerModifier(inputConfigurationBeanDeserializerModifier)
                 );
 
         if (subtypes != null) {

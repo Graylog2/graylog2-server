@@ -29,21 +29,19 @@ import org.graylog2.shared.inputs.MessageInputFactory;
 import javax.inject.Inject;
 import java.util.Optional;
 
-public class CustomBeanDeserializerModifier extends BeanDeserializerModifier {
+public class InputConfigurationBeanDeserializerModifier extends BeanDeserializerModifier {
     private final InputFieldConfigProvider inputFieldConfigProvider;
 
-    public static CustomBeanDeserializerModifier forBuiltinTypes() {
-        // TODO: figure out how to provide config for builtin types
-        InputFieldConfigProvider configProvider = type -> Optional.empty();
-        return new CustomBeanDeserializerModifier(configProvider);
+    public static InputConfigurationBeanDeserializerModifier withoutConfig() {
+        return new InputConfigurationBeanDeserializerModifier(type -> Optional.empty());
     }
 
     @Inject
-    public CustomBeanDeserializerModifier(MessageInputFactory messageInputFactory) {
+    public InputConfigurationBeanDeserializerModifier(MessageInputFactory messageInputFactory) {
         this.inputFieldConfigProvider = messageInputFactory::getConfig;
     }
 
-    public CustomBeanDeserializerModifier(InputFieldConfigProvider inputFieldConfigProvider) {
+    public InputConfigurationBeanDeserializerModifier(InputFieldConfigProvider inputFieldConfigProvider) {
         this.inputFieldConfigProvider = inputFieldConfigProvider;
     }
 
