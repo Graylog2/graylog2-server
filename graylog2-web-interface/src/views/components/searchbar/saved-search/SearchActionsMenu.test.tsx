@@ -39,6 +39,7 @@ import useView from 'views/hooks/useView';
 import useIsDirty from 'views/hooks/useIsDirty';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useIsNew from 'views/hooks/useIsNew';
 
 import SearchActionsMenu from './SearchActionsMenu';
 
@@ -58,6 +59,7 @@ jest.mock('views/stores/ViewManagementStore', () => ({
 
 jest.mock('views/hooks/useView');
 jest.mock('views/hooks/useIsDirty');
+jest.mock('views/hooks/useIsNew');
 
 describe('SearchActionsMenu', () => {
   const createView = (id: string = undefined) => View.builder()
@@ -112,6 +114,7 @@ describe('SearchActionsMenu', () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
     asMock(useView).mockReturnValue(defaultView);
     asMock(useIsDirty).mockReturnValue(false);
+    asMock(useIsNew).mockReturnValue(false);
   });
 
   beforeAll(loadViewsPlugin);
@@ -191,6 +194,7 @@ describe('SearchActionsMenu', () => {
     });
 
     it('should loadView after create', async () => {
+      asMock(useIsNew).mockReturnValue(true);
       const onLoadView = jest.fn((view) => Promise.resolve(view));
 
       render(<SimpleSearchActionsMenu onLoadView={onLoadView} />);
@@ -322,6 +326,7 @@ describe('SearchActionsMenu', () => {
       });
 
       it('which should be disabled if search is unsaved', async () => {
+        asMock(useIsNew).mockReturnValue(true);
         asMock(useView).mockReturnValue(defaultView);
 
         render(<SimpleSearchActionsMenu />);
@@ -333,6 +338,7 @@ describe('SearchActionsMenu', () => {
 
   describe('render the SearchActionsMenu', () => {
     it('should render not dirty with unsaved view', async () => {
+      asMock(useIsNew).mockReturnValue(true);
       asMock(useView).mockReturnValue(defaultView.toBuilder().id(undefined).build());
 
       render(<SimpleSearchActionsMenu />);

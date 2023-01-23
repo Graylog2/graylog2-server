@@ -31,6 +31,8 @@ import Query from 'views/logic/queries/Query';
 import viewsReducers from 'views/viewsReducers';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { createSearch } from 'fixtures/searches';
+import View from 'views/logic/views/View';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import OriginalSearchBar from './SearchBar';
 
@@ -93,7 +95,7 @@ describe('SearchBar pluggable controls', () => {
     );
   };
 
-  const mockOnSubmitFromPlugin = jest.fn((_values, _entity) => Promise.resolve(_entity));
+  const mockOnSubmitFromPlugin = jest.fn((_values, _dispatch, entity) => Promise.resolve(entity));
   const mockOnValidate = jest.fn(() => Promise.resolve({}));
 
   beforeAll(() => {
@@ -160,6 +162,7 @@ describe('SearchBar pluggable controls', () => {
         streams: [],
         timerange: { from: 300, type: 'relative' },
       },
+      expect.any(Function),
       mockCurrentQuery,
     ));
   }, testTimeout);
@@ -173,6 +176,10 @@ describe('SearchBar pluggable controls', () => {
         queryString: '*',
         streams: [],
         timerange: { from: 300, type: 'relative' },
+      },
+      {
+        view: expect.objectContaining({ type: View.Type.Dashboard }),
+        executionState: SearchExecutionState.empty(),
       },
     ));
   });

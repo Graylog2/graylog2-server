@@ -30,6 +30,7 @@ import FormikInput from 'components/common/FormikInput';
 import { viewSliceReducer } from 'views/logic/slices/viewSlice';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionSlice';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import OriginalDashboardSearchBar from './DashboardSearchBar';
 
@@ -130,6 +131,7 @@ describe('DashboardSearchBar pluggable controls', () => {
         queryString: '',
         timerange: undefined,
       },
+      expect.any(Function),
       undefined,
     ));
   }, testTimeout);
@@ -141,6 +143,9 @@ describe('DashboardSearchBar pluggable controls', () => {
       pluggableControl: 'Initial Value',
       queryString: '',
       timerange: {},
+    }, {
+      executionState: SearchExecutionState.empty(),
+      view: expect.objectContaining({ id: 'search-id-1' }),
     }));
   });
 

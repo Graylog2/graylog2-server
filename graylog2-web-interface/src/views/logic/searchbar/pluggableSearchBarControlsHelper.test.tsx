@@ -20,6 +20,8 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import type { SearchBarControl } from 'views/types';
 import mockDispatch from 'views/test/mockDispatch';
+import { createSearch } from 'fixtures/searches';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import {
   useInitialSearchValues,
@@ -101,10 +103,15 @@ describe('pluggableSearchBarControlsHandler', () => {
     expect(result).toStrictEqual(undefined);
   });
 
+  const handlerContext = {
+    view: createSearch(),
+    executionState: SearchExecutionState.empty(),
+  };
+
   it('pluggableValidationPayload should catch errors', async () => {
     const result = pluggableValidationPayload(
       {},
-      {},
+      handlerContext,
       [() => ({
         ...pluggableSearchBarControl,
         validationPayload: () => { throw Error('something went wrong!'); },
@@ -121,7 +128,7 @@ describe('pluggableSearchBarControlsHandler', () => {
   it('validatePluggableValues should catch errors', async () => {
     const result = validatePluggableValues(
       {},
-      {},
+      handlerContext,
       [() => ({ ...pluggableSearchBarControl, onValidate: () => { throw Error('something went wrong!'); } })],
     );
 
