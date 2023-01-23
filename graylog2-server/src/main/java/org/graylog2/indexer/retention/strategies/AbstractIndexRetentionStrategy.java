@@ -28,6 +28,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -48,7 +49,7 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
     private final ActivityWriter activityWriter;
     private JobSchedulerClock clock;
 
-    public AbstractIndexRetentionStrategy(Indices indices,
+    protected AbstractIndexRetentionStrategy(Indices indices,
                                           ActivityWriter activityWriter,
                                           JobSchedulerClock clock) {
         this.indices = requireNonNull(indices);
@@ -72,18 +73,14 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
         final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
 
         // Account for DST and time zones in determining age
-        final long cutoff = clock.nowUTC().minus(smartConfig.indexLifetimeSoft()).getMillis();
+        final DateTime now = clock.nowUTC();
+        final long cutoffSoft = now.minus(smartConfig.indexLifetimeSoft()).getMillis();
+        final long cutoffHard = now.minus(smartConfig.indexLifetimeHard()).getMillis();
         final int removeCount = (int)deflectorIndices.keySet()
                 .stream()
                 .filter(indexName -> !indices.isReopened(indexName))
                 .filter(indexName -> !hasCurrentWriteAlias(indexSet, deflectorIndices, indexName))
-                .filter(indexName -> {
-                    DateTime closingDate = indices.indexClosingDate(indexName)
-                            // TODO we might encounter older indices that don't have a closing date yet. How do we handle this?
-                            // TODO maybe use the creationDate as a fallback?
-                            .orElseThrow(() -> new IllegalStateException(f("Index %s has no closing date - retention failed", indexName)));
-                    return closingDate.isBefore(cutoff + 1);
-                })
+                .filter(indexName -> exceedsAgeLimit(indexName, cutoffSoft, cutoffHard))
                 .count();
 
         if (removeCount > 0) {
@@ -93,6 +90,21 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
 
             runRetention(indexSet, deflectorIndices, removeCount);
         }
+    }
+
+    private boolean exceedsAgeLimit(String indexName, long cutoffSoft, long cutoffHard) {
+        Optional<DateTime> closingDate = indices.indexClosingDate(indexName);
+        if (closingDate.isPresent()) {
+            return closingDate.get().isBefore(cutoffSoft + 1);
+        }
+
+        Optional<DateTime> creationDate = indices.indexCreationDate(indexName);
+        if (creationDate.isPresent()) {
+            return creationDate.get().isBefore(cutoffHard + 1);
+        }
+
+        LOG.warn(f("Unable to determine creation or closing dates for Index %s - forcing retention", indexName));
+        return true;
     }
 
     private void retainCountBased(IndexSet indexSet) {
