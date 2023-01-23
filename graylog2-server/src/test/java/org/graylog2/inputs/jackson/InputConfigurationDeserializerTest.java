@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -91,7 +92,7 @@ class InputConfigurationDeserializerTest {
     @Test
     void deserializer() throws Exception {
         var value = Value.create("org.graylog2.inputs.FooInput", Map.of("username", "jane", "password", "s3cr3t"));
-        var json = """
+        var json = f("""
                 {
                   "type": "%s",
                   "configuration": {
@@ -99,7 +100,7 @@ class InputConfigurationDeserializerTest {
                     "password": "%s"
                   }
                 }
-                """.formatted(value.type(), value.configuration().get("username"), value.configuration().get("password"));
+                """, value.type(), value.configuration().get("username"), value.configuration().get("password"));
 
         var parsedValue = objectMapper.readValue(json.getBytes(StandardCharsets.UTF_8), Value.class);
 
