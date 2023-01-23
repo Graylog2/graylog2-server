@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 public class EventResultHandler extends DefaultExecuteResultHandler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DataNodeRunner.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EventResultHandler.class);
 
     private final OpensearchProcess process;
 

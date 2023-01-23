@@ -16,40 +16,90 @@
  */
 package org.graylog.datanode.initializers;
 
+import com.github.rholder.retry.RetryException;
 import com.google.common.util.concurrent.AbstractIdleService;
-import org.graylog.datanode.DataNodeRunner;
-import org.graylog.datanode.management.ConfigurationProvider;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.ExecuteResultHandler;
+import org.graylog.datanode.EventResultHandler;
+import org.graylog.datanode.ProcessProvidingExecutor;
+import org.graylog.datanode.process.ExecOpensearchProcessLogs;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.OpensearchProcess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.stream.Stream;
 
 @Singleton
 public class OpensearchProcessService extends AbstractIdleService implements Provider<OpensearchProcess> {
 
-    final private DataNodeRunner dataNodeRunner;
-    final private ConfigurationProvider configurationProvider;
-    private OpensearchProcess process;
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessService.class);
+    private final OpensearchConfiguration config;
+
+    private final OpensearchProcess process;
 
     @Inject
-    public OpensearchProcessService(DataNodeRunner dataNodeRunner, ConfigurationProvider configurationProvider) {
-        this.dataNodeRunner = dataNodeRunner;
-        this.configurationProvider = configurationProvider;
+    public OpensearchProcessService(OpensearchConfiguration config, @Named(value = "process_logs_buffer_size") int logsSize) {
+        this.config = config;
+        final ExecOpensearchProcessLogs logger = new ExecOpensearchProcessLogs(logsSize);
+        this.process = new OpensearchProcess(
+                config.opensearchVersion(),
+                config.opensearchDir(),
+                logger,
+                config.httpPort(),
+                config.clusterConfiguration().nodeName()
+        );
     }
 
     @Override
     protected void startUp() throws Exception {
-        final OpensearchConfiguration opensearchConfiguration = configurationProvider.get();
-        final OpensearchProcess process = dataNodeRunner.start(opensearchConfiguration);
-        this.process = process;
-
+        doStartProcess();
     }
 
-    @Override
-    protected void shutDown() throws Exception {
+    private void doStartProcess() throws IOException, InterruptedException, ExecutionException {
+        final Path binPath = config.opensearchDir().resolve(Paths.get("bin", "opensearch"));
+        LOG.info("Running opensearch from " + binPath.toAbsolutePath());
 
+        CommandLine cmdLine = new CommandLine(binPath.toAbsolutePath().toString());
+
+        toConfigOptions(config.mergedConfig())
+                .forEach(it -> cmdLine.addArgument(it, true));
+
+        ProcessProvidingExecutor executor = new ProcessProvidingExecutor();
+        ExecuteResultHandler resultHandler = new EventResultHandler(this.process);
+        executor.setStreamHandler(this.process.getProcessLogs());
+        executor.execute(cmdLine, resultHandler);
+
+        final Process process;
+        try {
+            process = executor.getProcess().get(5, TimeUnit.SECONDS);
+            this.process.bind(process);
+        } catch (TimeoutException e) {
+            throw new RuntimeException("Failed to obtain process", e);
+        }
+    }
+
+    private Stream<String> toConfigOptions(Map<String, String> mergedConfig) {
+        return mergedConfig.entrySet().stream()
+                .map(it -> String.format(Locale.ROOT, "-E%s=%s", it.getKey(), it.getValue()));
+    }
+
+
+    @Override
+    protected void shutDown() {
+        this.process.terminate();
     }
 
     @Override

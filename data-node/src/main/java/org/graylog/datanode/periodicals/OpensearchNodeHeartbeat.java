@@ -16,7 +16,6 @@
  */
 package org.graylog.datanode.periodicals;
 
-import org.graylog.datanode.management.ManagedNodes;
 import org.graylog.datanode.process.OpensearchProcess;
 import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessState;
@@ -34,28 +33,25 @@ import java.io.IOException;
 public class OpensearchNodeHeartbeat extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchNodeHeartbeat.class);
-    private final ManagedNodes managedOpenSearch;
+    private final OpensearchProcess process;
 
     @Inject
-    public OpensearchNodeHeartbeat(ManagedNodes managedOpenSearch) {
-        this.managedOpenSearch = managedOpenSearch;
+    public OpensearchNodeHeartbeat(OpensearchProcess process) {
+        this.process = process;
     }
 
     @Override
     // This method is "synchronized" because we are also calling it directly in AutomaticLeaderElectionService
     public synchronized void doRun() {
-        managedOpenSearch.getProcesses()
-                .stream()
-                .filter(p -> p.getStatus() != ProcessState.TERMINATED)
-                .forEach(process -> {
-                    try {
-                        final MainResponse health = process.getRestClient()
-                                .info(RequestOptions.DEFAULT);
-                        onNodeResponse(process, health);
-                    } catch (IOException e) {
-                        onRestError(process, e);
-                    }
-                });
+        if (!process.isInState(ProcessState.TERMINATED)) {
+            try {
+                final MainResponse health = process.getRestClient()
+                        .info(RequestOptions.DEFAULT);
+                onNodeResponse(process, health);
+            } catch (IOException e) {
+                onRestError(process, e);
+            }
+        }
     }
 
     private void onNodeResponse(OpensearchProcess process, MainResponse nodeResponse) {

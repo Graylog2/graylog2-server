@@ -17,7 +17,6 @@
 package org.graylog.datanode.periodicals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.datanode.management.ManagedNodes;
 import org.graylog.datanode.process.OpensearchProcess;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog2.plugin.periodical.Periodical;
@@ -34,11 +33,11 @@ import java.util.Optional;
 public class ClusterManagerDiscovery extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClusterManagerDiscovery.class);
-    private final ManagedNodes managedOpenSearch;
+    private final OpensearchProcess managedOpenSearch;
     private final ObjectMapper objectMapper;
 
     @Inject
-    public ClusterManagerDiscovery(ManagedNodes managedOpenSearch, ObjectMapper objectMapper) {
+    public ClusterManagerDiscovery(OpensearchProcess managedOpenSearch, ObjectMapper objectMapper) {
         this.managedOpenSearch = managedOpenSearch;
         this.objectMapper = objectMapper;
     }
@@ -46,17 +45,13 @@ public class ClusterManagerDiscovery extends Periodical {
     @Override
     // This method is "synchronized" because we are also calling it directly in AutomaticLeaderElectionService
     public synchronized void doRun() {
-
-        managedOpenSearch.getProcesses()
-                .stream()
-                .filter(p -> p.getStatus() == ProcessState.AVAILABLE)
-                .flatMap(p -> getClusterStateResponse(p).stream())
-                .findFirst()
-                .ifPresent(clusterStateResponse -> {
-                    final ClusterStateResponse.NodeState managerNode = clusterStateResponse.nodes().get(clusterStateResponse.clusterManagerNode());
-                    managedOpenSearch.getProcesses().forEach(p -> p.setLeaderNode(p.getNodeName().equals(managerNode.name())));
-                });
-
+        if (managedOpenSearch.isInState(ProcessState.AVAILABLE)) {
+            final Boolean isManagerNode = getClusterStateResponse(managedOpenSearch)
+                    .map(r -> r.nodes().get(r.clusterManagerNode()))
+                    .map(managerNode -> managedOpenSearch.getNodeName().equals(managerNode.name()))
+                    .orElse(false);
+            managedOpenSearch.setLeaderNode(isManagerNode);
+        }
     }
 
 

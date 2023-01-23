@@ -16,7 +16,7 @@
  */
 package org.graylog.datanode.rest;
 
-import org.graylog.datanode.management.ManagedNodes;
+import org.graylog.datanode.process.OpensearchProcess;
 import org.graylog2.plugin.Version;
 
 import javax.inject.Inject;
@@ -24,7 +24,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.stream.Collectors;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -32,19 +31,18 @@ public class StatusController {
 
     private final Version version = Version.CURRENT_CLASSPATH;
 
-    private final ManagedNodes openSearch;
+    private final OpensearchProcess openSearch;
 
     @Inject
-    public StatusController(ManagedNodes openSearch) {
+    public StatusController(OpensearchProcess openSearch) {
         this.openSearch = openSearch;
     }
 
     @GET
     public DataNodeStatus status() {
-
-        return openSearch.getProcesses()
-                .stream()
-                .map(process -> new StatusResponse(process.getOpensearchVersion(), process.getProcessInfo()))
-                .collect(Collectors.collectingAndThen(Collectors.toList(), statusResponses -> new DataNodeStatus(version, statusResponses)));
+        return new DataNodeStatus(
+                version,
+                new StatusResponse(openSearch.getOpensearchVersion(), openSearch.getProcessInfo())
+        );
     }
 }

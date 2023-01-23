@@ -22,15 +22,10 @@ import org.graylog2.plugin.Version;
 
 import java.util.List;
 
-public record DataNodeStatus(@JsonIgnore Version appVersion, List<StatusResponse> processes) {
+public record DataNodeStatus(@JsonIgnore Version appVersion, StatusResponse processes) {
 
     @JsonProperty
     public String dataNodeVersion() {
         return this.appVersion.toString();
-    }
-
-    @JsonProperty
-    public boolean isLeader() {
-        return processes.stream().anyMatch(p -> p.info().isLeaderNode());
     }
 }

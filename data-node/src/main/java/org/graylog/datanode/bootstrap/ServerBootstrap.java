@@ -33,7 +33,6 @@ import org.graylog.datanode.bindings.GenericBindings;
 import org.graylog.datanode.bindings.GenericInitializerBindings;
 import org.graylog.datanode.bindings.SchedulerBindings;
 import org.graylog.datanode.configuration.PathConfiguration;
-import org.graylog.datanode.management.ManagedNodes;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
@@ -222,12 +221,9 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         final ActivityWriter activityWriter;
         final ServiceManager serviceManager;
-        final Service leaderElectionService;
-        final ManagedNodes openSearch;
         try {
             activityWriter = injector.getInstance(ActivityWriter.class);
             serviceManager = injector.getInstance(ServiceManager.class);
-            openSearch = injector.getInstance(ManagedNodes.class);
 //            leaderElectionService = injector.getInstance(Key.get(Service.class, Names.named("LeaderElectionService")));
         } catch (ProvisionException e) {
             LOG.error("Guice error", e);

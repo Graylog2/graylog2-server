@@ -16,7 +16,7 @@
  */
 package org.graylog.datanode.rest;
 
-import org.graylog.datanode.management.ManagedNodes;
+import org.graylog.datanode.process.OpensearchProcess;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -25,35 +25,32 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
+import java.util.Optional;
 
 @Path("/logs")
 @Produces(MediaType.APPLICATION_JSON)
 public class LogsController {
-    private final ManagedNodes managedOpensearch;
+    private final OpensearchProcess managedOpensearch;
 
     @Inject
-    public LogsController(ManagedNodes managedOpenSearch) {
+    public LogsController(OpensearchProcess managedOpenSearch) {
         this.managedOpensearch = managedOpenSearch;
     }
 
     @GET
     @Path("/{processId}/stdout")
     public List<String> getOpensearchStdout(@PathParam("processId") int processId) {
-        return managedOpensearch.getProcesses()
-                .stream()
+        return Optional.of(managedOpensearch)
                 .filter(p -> p.hasPid(processId))
-                .findFirst()
                 .map(node -> node.getProcessLogs().getStdOut())
                 .orElseThrow(() -> new IllegalArgumentException("Process not found: " + processId));
     }
 
     @GET
     @Path("/{processId}/stderr")
-    public List<String> getOpensearchStderr(@PathParam("processId")  int processId) {
-        return managedOpensearch.getProcesses()
-                .stream()
+    public List<String> getOpensearchStderr(@PathParam("processId") int processId) {
+        return Optional.of(managedOpensearch)
                 .filter(p -> p.hasPid(processId))
-                .findFirst()
                 .map(node -> node.getProcessLogs().getStdErr())
                 .orElseThrow(() -> new IllegalArgumentException("Process not found: " + processId));
     }

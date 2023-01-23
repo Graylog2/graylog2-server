@@ -89,6 +89,10 @@ public class OpensearchProcess {
         onEvent(ProcessEvent.PROCESS_STARTED);
     }
 
+    public void terminate() {
+        this.process.destroy();
+    }
+
     public void setLeaderNode(boolean isLeaderNode) {
         this.isLeaderNode = isLeaderNode;
     }
@@ -103,6 +107,10 @@ public class OpensearchProcess {
 
     public boolean hasPid(int processId) {
         return process != null && process.pid() == processId;
+    }
+
+    public boolean isInState(ProcessState expectedState) {
+        return this.getStatus().equals(expectedState);
     }
 }
 
