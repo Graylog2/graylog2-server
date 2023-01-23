@@ -27,6 +27,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.joda.time.DateTime;
+import org.joda.time.Period;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.time.Period;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -83,8 +83,8 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
         elasticsearchConfiguration = new ElasticsearchConfiguration();
         timeBasedSizeOptimizingStrategy = new TimeBasedSizeOptimizingStrategy(indices, nodeId, auditEventSender, elasticsearchConfiguration, clock);
         rotationStrategyConfig = TimeBasedSizeOptimizingStrategyConfig.builder()
-                .indexLifetimeSoft(Period.ofDays(4))
-                .indexLifetimeHard(Period.ofDays(6))
+                .indexLifetimeSoft(Period.days(4))
+                .indexLifetimeHard(Period.days(6))
                 .build();
 
         final DeletionRetentionStrategyConfig deletionRetention = DeletionRetentionStrategyConfig.createDefault();
@@ -212,7 +212,7 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
         if (i.getClosingDate() == null) {
             return "null";
         }
-        return org.joda.time.Period.fieldDifference(clock.nowUTC().toLocalDateTime(), i.getClosingDate().toLocalDateTime()).toString();
+        return Period.fieldDifference(clock.nowUTC().toLocalDateTime(), i.getClosingDate().toLocalDateTime()).toString();
     }
 
     class TestIndexSet extends org.graylog2.indexer.TestIndexSet {
