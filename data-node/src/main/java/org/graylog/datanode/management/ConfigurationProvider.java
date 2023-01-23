@@ -48,10 +48,10 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
                                  @Named("opensearch_location") String opensearchLocation,
                                  @Named("opensearch_data_location") String opensearchDataLocation,
                                  @Named("opensearch_logs_location") String opensearchLogsLocation,
-                                 @Named("datanode.node.name") String nodeName,
-                                 @Named("opensearch.http.port") int opensearchHttpPort,
-                                 @Named("opensearch.transport.port") int opensearchTransportPort,
-                                 @Named("opensearch.discovery.seed.hosts") List<String> discoverySeedHosts
+                                 @Named("datanode_node_name") String nodeName,
+                                 @Named("opensearch_http_port") int opensearchHttpPort,
+                                 @Named("opensearch_transport_port") int opensearchTransportPort,
+                                 @Named("opensearch_discovery_seed_hosts") List<String> discoverySeedHosts
 
 
     ) {

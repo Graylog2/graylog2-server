@@ -56,17 +56,17 @@ public class DataNodeConfiguration {
     private Integer logs = 500;
 
 
-    @Parameter(value = "datanode.node.name")
+    @Parameter(value = "datanode_node_name")
     private String datanodeNodeName = "node1";
 
-    @Parameter(value = "opensearch.http.port")
+    @Parameter(value = "opensearch_http_port")
     private String opensearchHttpPort = "9200";
 
 
-    @Parameter(value = "opensearch.transport.port")
+    @Parameter(value = "opensearch_transport_port")
     private String opensearchTransportPort = "9300";
 
-    @Parameter(value = "opensearch.discovery.seed.hosts", converter = StringListConverter.class)
+    @Parameter(value = "opensearch_discovery_seed_hosts", converter = StringListConverter.class)
     private List<String> opensearchDiscoverySeedHosts = Collections.emptyList();
 
 
