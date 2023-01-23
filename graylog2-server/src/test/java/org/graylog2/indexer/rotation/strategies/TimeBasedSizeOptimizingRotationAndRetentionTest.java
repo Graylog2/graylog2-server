@@ -116,6 +116,8 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
             return index.map(TestIndex::getSize);
         });
 
+        lenient().when(indices.numberOfMessages(anyString())).thenReturn(10L);
+
         lenient().when(indices.indexClosingDate(anyString())).then(a -> {
             final String indexName = a.getArgument(0);
             final Optional<TestIndex> index = indexSet.findByName(indexName);

@@ -39,6 +39,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -76,6 +77,8 @@ class TimeBasedSizeOptimizingStrategyTest {
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
         when(indexSetConfig.rotationStrategy()).thenReturn(timeBasedSizeOptimizingStrategyConfig);
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
+
+        when(indices.numberOfMessages(anyString())).thenReturn(10L);
     }
 
     @ParameterizedTest
