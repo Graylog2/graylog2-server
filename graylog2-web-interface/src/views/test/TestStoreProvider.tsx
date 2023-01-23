@@ -24,7 +24,7 @@ const TestStoreProvider = ({ children, ...rest }: React.PropsWithChildren<Partia
   const view = rest.view ?? createSearch();
   const isNew = rest.isNew ?? false;
   const initialQuery = rest.initialQuery ?? 'query-id-1';
-  const executionState = SearchExecutionState.empty();
+  const executionState = rest.executionState ?? SearchExecutionState.empty();
 
   return (
     <PluggableStoreProvider view={view} initialQuery={initialQuery} isNew={isNew} executionState={executionState}>
