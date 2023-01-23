@@ -18,11 +18,10 @@ import { useEffect, useState } from 'react';
 import * as React from 'react';
 
 import ErrorPage from 'components/errors/ErrorPage';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import type View from './View';
-import { processHooks } from './ViewLoader';
-
-import usePluginEntities from '../../../hooks/usePluginEntities';
+import processHooks from './processHooks';
 
 const LoadViewError = ({ error }: { error: Error }) => (
   <ErrorPage title="Something went wrong"
@@ -33,12 +32,14 @@ const LoadViewError = ({ error }: { error: Error }) => (
   </ErrorPage>
 );
 
-const useLoadView = (view: Promise<View>, query: { [key: string]: any }) => {
+type HookComponent = JSX.Element;
+
+const useProcessHooksForView = (view: Promise<View>, query: { [key: string]: any }): [boolean, HookComponent] => {
   const loadingViewHooks = usePluginEntities('views.hooks.loadingView');
   const executingViewHooks = usePluginEntities('views.hooks.executingView');
 
   const [loaded, setLoaded] = useState(false);
-  const [hookComponent, setHookComponent] = useState(undefined);
+  const [hookComponent, setHookComponent] = useState<HookComponent>(undefined);
 
   useEffect(() => {
     processHooks(
@@ -66,4 +67,4 @@ const useLoadView = (view: Promise<View>, query: { [key: string]: any }) => {
   return [loaded, hookComponent];
 };
 
-export default useLoadView;
+export default useProcessHooksForView;
