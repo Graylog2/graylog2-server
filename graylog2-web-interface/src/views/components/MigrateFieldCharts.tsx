@@ -188,6 +188,7 @@ const _migrateWidgets = (legacyCharts) => {
       .widgetPositions({ ...existingWidgetPos, ...newWidgetPositions })
       .build();
 
+    // eslint-disable-next-line no-promise-executor-return
     return resolve({ newViewState, currentQueryId: currentView.activeQuery });
   });
 };
