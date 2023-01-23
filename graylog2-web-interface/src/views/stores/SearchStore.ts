@@ -22,7 +22,6 @@ import type { Store } from 'stores/StoreTypes';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
-import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import { runSearchJob, searchJobStatus } from 'views/stores/SearchJobs';
 import { ViewStore, ViewActions } from 'views/stores/ViewStore';
 import SearchResult from 'views/logic/SearchResult';
@@ -92,7 +91,7 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
     },
 
     _debouncedParse: debounce((search) => {
-      SearchMetadataActions.parseSearch(search);
+      // SearchMetadataActions.parseSearch(search);
     }, 500),
 
     onViewStoreUpdate({ view }: { view: View }) {
