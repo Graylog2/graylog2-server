@@ -14,23 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useParams } from 'react-router-dom';
 
-import useParams from 'routing/useParams';
-import useFetchView from 'views/hooks/useFetchView';
-
-import SearchPage from './SearchPage';
-
-const ShowViewPage = () => {
-  const { viewId } = useParams<{ viewId?: string }>();
-
-  if (!viewId) {
-    throw new Error('No view id specified!');
-  }
-
-  const view = useFetchView(viewId);
-
-  return <SearchPage view={view} isNew={false} />;
-};
-
-export default ShowViewPage;
+export default useParams;

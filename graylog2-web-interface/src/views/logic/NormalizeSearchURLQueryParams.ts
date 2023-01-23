@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useMemo } from 'react';
 
 import type {
   TimeRange,
@@ -27,6 +28,7 @@ import {
 import type { TimeRangeQueryParameter } from 'views/logic/TimeRange';
 import { timeRangeFromQueryParameter } from 'views/logic/TimeRange';
 import { DEFAULT_RANGE_TYPE } from 'views/Constants';
+import useQuery from 'routing/useQuery';
 
 type StreamsQuery = {
   streams?: string,
@@ -69,6 +71,12 @@ const normalizeSearchURLQueryParams = (query: RawQuery): NormalizedSearchURLQuer
     streamsFilter,
     queryString: queryString ? createElasticsearchQueryString(queryString) : undefined,
   };
+};
+
+export const useSearchURLQueryParams = () => {
+  const query = useQuery();
+
+  return useMemo(() => normalizeSearchURLQueryParams(query), [query]);
 };
 
 export default normalizeSearchURLQueryParams;

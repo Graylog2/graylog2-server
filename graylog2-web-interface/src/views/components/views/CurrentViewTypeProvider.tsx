@@ -17,25 +17,22 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import connect from 'stores/connect';
-import { ViewStore } from 'views/stores/ViewStore';
-import type { ViewType } from 'views/logic/views/View';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import { useStore } from 'stores/connect';
+import { ViewStore } from 'views/stores/ViewStore';
 
 type Props = {
-  type: ViewType | undefined | null,
   children: React.ReactNode,
 };
 
-const CurrentViewTypeProvider = ({ type, children }: Props) => <ViewTypeContext.Provider value={type}>{children}</ViewTypeContext.Provider>;
+const CurrentViewTypeProvider = ({ children }: Props) => {
+  const type = useStore(ViewStore, (state) => state?.view?.type);
+
+  return <ViewTypeContext.Provider value={type}>{children}</ViewTypeContext.Provider>;
+};
 
 CurrentViewTypeProvider.propTypes = {
-  type: PropTypes.oneOf<ViewType>(['SEARCH', 'DASHBOARD']).isRequired,
   children: PropTypes.node.isRequired,
 };
 
-export default connect(
-  CurrentViewTypeProvider,
-  { view: ViewStore },
-  ({ view }) => ({ type: (view && view.view) ? view.view.type : undefined }),
-);
+export default CurrentViewTypeProvider;

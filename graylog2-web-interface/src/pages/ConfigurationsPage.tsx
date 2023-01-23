@@ -40,6 +40,7 @@ import ConfigletContainer from './configurations/ConfigletContainer';
 import PluginConfigRows from './configurations/PluginConfigRows';
 
 import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
+import UserConfig from '../components/configurations/UserConfig';
 
 const SEARCHES_CLUSTER_CONFIG = 'org.graylog2.indexer.searches.SearchesClusterConfig';
 const MESSAGE_PROCESSORS_CONFIG = 'org.graylog2.messageprocessors.MessageProcessorsConfig';
@@ -48,6 +49,7 @@ const EVENTS_CONFIG = 'org.graylog.events.configuration.EventsConfiguration';
 const INDEX_SETS_DEFAULTS_CONFIG = 'org.graylog2.configuration.IndexSetsDefaultConfiguration';
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
 const PERMISSIONS_CONFIG = 'org.graylog2.users.UserAndTeamsConfig';
+const USER_CONFIG = 'org.graylog2.users.UserConfiguration';
 
 const _getConfig = (configType, configuration) => configuration?.[configType] ?? null;
 
@@ -80,6 +82,7 @@ const ConfigurationsPage = () => {
       ConfigurationsActions.list(INDEX_SETS_DEFAULTS_CONFIG),
       ConfigurationsActions.list(EVENTS_CONFIG),
       ConfigurationsActions.listPermissionsConfig(PERMISSIONS_CONFIG),
+      ConfigurationsActions.listUserConfig(USER_CONFIG),
     ];
 
     if (isPermitted(currentUser.permissions, ['urlwhitelist:read'])) {
@@ -106,6 +109,7 @@ const ConfigurationsPage = () => {
     const urlWhiteListConfig = _getConfig(URL_WHITELIST_CONFIG, configuration);
     const indexSetsDefaultsConfig = _getConfig(INDEX_SETS_DEFAULTS_CONFIG, configuration);
     const permissionsConfig = _getConfig(PERMISSIONS_CONFIG, configuration);
+    const userConfig = _getConfig(USER_CONFIG, configuration);
 
     Output = (
       <>
@@ -155,6 +159,12 @@ const ConfigurationsPage = () => {
                                        updateConfig={_onUpdate(INDEX_SETS_DEFAULTS_CONFIG)} />
             </ConfigletContainer>
           </HideOnCloud>
+        )}
+        {userConfig && (
+          <ConfigletContainer title="User Configuration">
+            <UserConfig config={userConfig}
+                        updateConfig={_onUpdate(USER_CONFIG)} />
+          </ConfigletContainer>
         )}
       </>
     );
