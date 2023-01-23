@@ -190,7 +190,7 @@ public class InputsResource extends AbstractInputsResource {
         // Special handling for encrypted values
         final Map<String, Object> origConfig = input.getConfiguration();
         final Map<String, Object> updatedConfig = Objects.requireNonNullElse(messageInput.getConfiguration().getSource(), Map.of());
-        mergedInput.put(MessageInput.FIELD_CONFIGURATION, EncryptedInputConfigs.mergeInputConfiguration(origConfig, updatedConfig));
+        mergedInput.put(MessageInput.FIELD_CONFIGURATION, EncryptedInputConfigs.merge(origConfig, updatedConfig));
 
         final Input newInput = inputService.create(input.getId(), mergedInput);
         inputService.update(newInput);

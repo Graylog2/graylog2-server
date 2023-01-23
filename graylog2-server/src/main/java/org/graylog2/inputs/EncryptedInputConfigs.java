@@ -21,12 +21,22 @@ import org.graylog2.security.encryption.EncryptedValue;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Utility functions to deal with input configuration that contains encrypted values.
+ */
 public class EncryptedInputConfigs {
 
     private EncryptedInputConfigs() {
     }
 
-    public static Map<String, Object> mergeInputConfiguration(Map<String, Object> orig, Map<String, Object> update) {
+    /**
+     * Merges two configuration by applying updates while treating encrypted values correctly
+     *
+     * @param orig   The original config that should be updated
+     * @param update The new config containing the changes that should be applied to the original config
+     * @return The merged config with encrypted values being properly handled
+     */
+    public static Map<String, Object> merge(Map<String, Object> orig, Map<String, Object> update) {
         final Map<String, Object> merged = new HashMap<>(orig);
         update.forEach((k, v) -> {
             if (orig.get(k) instanceof EncryptedValue origValue && v instanceof EncryptedValue newValue) {
