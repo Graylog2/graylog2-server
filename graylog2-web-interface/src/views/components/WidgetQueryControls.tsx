@@ -185,7 +185,6 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                      limitDuration={limitDuration}
                      formRef={formRef}
                      onSubmit={_onSubmit}
-                     validateOnMount={false}
                      validateQueryString={validate}>
         {({ dirty, errors, isValid, isSubmitting, handleSubmit, values, setFieldValue, validateForm }) => {
           const disableSearchSubmit = isSubmitting || isValidatingQuery || !isValid;

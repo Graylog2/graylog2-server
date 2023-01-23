@@ -29,6 +29,8 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import { viewSliceReducer } from 'views/logic/slices/viewSlice';
 import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionSlice';
 import type Search from 'views/logic/search/Search';
+import View from 'views/logic/views/View';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import WidgetContext from './contexts/WidgetContext';
 import WidgetQueryControls from './WidgetQueryControls';
@@ -101,7 +103,7 @@ describe('WidgetQueryControls pluggable controls', () => {
     );
   };
 
-  const mockOnSubmit = jest.fn((_values, entity) => Promise.resolve(entity));
+  const mockOnSubmit = jest.fn((_values, _dispatch, entity) => Promise.resolve(entity));
   const mockOnValidate = jest.fn(() => Promise.resolve({}));
 
   beforeAll(() => {
@@ -178,6 +180,7 @@ describe('WidgetQueryControls pluggable controls', () => {
         streams: undefined,
         timerange: { from: 300, type: 'relative' },
       },
+      expect.any(Function),
       widget,
     ));
   }, testTimeout);
@@ -185,12 +188,18 @@ describe('WidgetQueryControls pluggable controls', () => {
   it('should register validation handler', async () => {
     renderSUT();
 
-    await waitFor(() => expect(mockOnValidate).toHaveBeenCalledWith({
-      pluggableControl: 'Initial Value',
-      queryString: '',
-      streams: undefined,
-      timerange: { from: 300, type: 'relative' },
-    }));
+    await waitFor(() => expect(mockOnValidate).toHaveBeenCalledWith(
+      {
+        pluggableControl: 'Initial Value',
+        queryString: '',
+        streams: undefined,
+        timerange: { from: 300, type: 'relative' },
+      },
+      {
+        view: expect.objectContaining({ type: View.Type.Dashboard }),
+        executionState: SearchExecutionState.empty(),
+      },
+    ));
   });
 
   it('should extend query validation payload', async () => {
