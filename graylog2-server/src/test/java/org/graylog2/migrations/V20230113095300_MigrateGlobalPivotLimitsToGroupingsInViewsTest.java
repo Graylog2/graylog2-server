@@ -59,8 +59,6 @@ class V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViewsTest {
     @Test
     @MongoDBFixtures("V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViewsTest_empty.json")
     void notMigratingAnythingIfViewsAreEmpty() {
-        markPreviousMigrationAsCompleted();
-
         this.migration.upgrade();
 
         assertThat(migrationCompleted().migratedViews()).isZero();
@@ -69,8 +67,6 @@ class V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViewsTest {
     @Test
     @MongoDBFixtures("V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViewsTest_multiplePivots.json")
     void migratingMultiplePivots() {
-        markPreviousMigrationAsCompleted();
-
         this.migration.upgrade();
 
         assertThat(migrationCompleted().migratedViews()).isEqualTo(4);
@@ -101,8 +97,6 @@ class V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViewsTest {
     @Test
     @MongoDBFixtures("V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViewsTest_null_limits.json")
     void migratingPivotsWithNullLimits() {
-        markPreviousMigrationAsCompleted();
-
         this.migration.upgrade();
 
         assertThat(migrationCompleted().migratedViews()).isEqualTo(1);
@@ -133,11 +127,6 @@ class V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViewsTest {
         return rowPivots.stream()
                 .map(rowPivot -> rowPivot.getEmbedded(List.of("config", "limit"), Integer.class))
                 .collect(Collectors.toList());
-    }
-
-    private void markPreviousMigrationAsCompleted() {
-        when(this.clusterConfigService.get(V20220929145442_MigratePivotLimitsInViews.MigrationCompleted.class))
-                .thenReturn(new V20220929145442_MigratePivotLimitsInViews.MigrationCompleted(0));
     }
 
     private V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViews.MigrationCompleted migrationCompleted() {

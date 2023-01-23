@@ -58,8 +58,6 @@ class V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearchesTest {
     @Test
     @MongoDBFixtures("V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearchesTest_empty.json")
     void notMigratingAnythingIfNoSearchesArePresent() {
-        markPreviousMigrationAsBeingRun();
-
         this.migration.upgrade();
 
         assertThat(migrationCompleted().migratedSearchTypes()).isZero();
@@ -68,8 +66,6 @@ class V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearchesTest {
     @Test
     @MongoDBFixtures("V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearchesTest_simpleSearch.json")
     void migratingSimpleView() {
-        markPreviousMigrationAsBeingRun();
-
         this.migration.upgrade();
 
         assertThat(migrationCompleted().migratedSearchTypes()).isEqualTo(1);
@@ -87,8 +83,6 @@ class V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearchesTest {
     @Test
     @MongoDBFixtures("V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearchesTest_multiplePivots.json")
     void migratingMultiplePivots() {
-        markPreviousMigrationAsBeingRun();
-
         this.migration.upgrade();
 
         assertThat(migrationCompleted().migratedSearchTypes()).isEqualTo(4);
@@ -117,8 +111,6 @@ class V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearchesTest {
     @Test
     @MongoDBFixtures("V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearchesTest_null_limits.json")
     void migratingPivotsWithNullLimits() {
-        markPreviousMigrationAsBeingRun();
-
         this.migration.upgrade();
 
         assertThat(migrationCompleted().migratedSearchTypes()).isEqualTo(2);
@@ -135,11 +127,6 @@ class V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearchesTest {
     private void assertThatFieldsAreUnset(Document searchType) {
         assertThat(searchType.getInteger("row_limit")).isNull();
         assertThat(searchType.getInteger("column_limit")).isNull();
-    }
-
-    private void markPreviousMigrationAsBeingRun() {
-        when(clusterConfigService.get(V20220930095323_MigratePivotLimitsInSearches.MigrationCompleted.class))
-                .thenReturn(new V20220930095323_MigratePivotLimitsInSearches.MigrationCompleted(0));
     }
 
     private V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearches.MigrationCompleted migrationCompleted() {
