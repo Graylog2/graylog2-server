@@ -63,7 +63,7 @@ type Props = {
   },
   query: string,
   onPageChange: (page: number, size: number) => void,
-  onQueryChange: (newQuery: string) => void,
+  onQueryChange: (newQuery?: string) => void,
   onDelete: (eventDefinition: EventDefinition) => void,
   onCopy: (eventDefinition: EventDefinition) => void,
   onEnable: (eventDefinition: EventDefinition) => void,

@@ -17,15 +17,15 @@
 import PropTypes from 'prop-types';
 import * as React from 'react';
 import Promise from 'bluebird';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useState, useEffect } from 'react';
 
 import { Button } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 
-const FormContent = styled.div(({ buttonLeftMargin }) => `
+const FormContent = styled.div<{ $buttonLeftMargin: number }>(({ $buttonLeftMargin }) => css`
   > :not(:last-child) {
-    margin-right: ${buttonLeftMargin}px;
+    margin-right: ${$buttonLeftMargin}px;
   }
 
   > * {
@@ -45,13 +45,35 @@ const HelpFeedback = styled.span`
   }
 `;
 
-const StyledContainer = styled.div(({ topMargin }) => `
-  margin-top: ${topMargin}px;
+const StyledContainer = styled.div<{ $topMargin: number }>(({ $topMargin }) => css`
+  margin-top: ${$topMargin}px;
 `);
 
-const StyledInput = styled.input(({ queryWidth }) => `
-  width: ${queryWidth} !important;
+const StyledInput = styled.input<{ $queryWidth }>(({ $queryWidth }) => css`
+  width: ${$queryWidth} !important;
 `);
+
+type Props = {
+  useLoadingState?: boolean,
+  queryHelpComponent?: React.ReactNode,
+  queryWidth?: number,
+  focusAfterMount?: boolean,
+  children?: React.ReactNode,
+  className?: string,
+  placeholder?: string,
+  resetButtonLabel?: React.ReactNode,
+  buttonLeftMargin?: number,
+  label?: React.ReactNode,
+  onReset?: () => void,
+  onSearch?: (query: string, reset?: () => void) => void,
+  wrapperClass?: string,
+  topMargin?: number,
+  searchButtonLabel: React.ReactNode,
+  loadingLabel?: string,
+  searchBsStyle?: string,
+  onQueryChange: (query: string) => void,
+  query?: string,
+}
 
 /**
  * Component that renders a customizable search form. The component
@@ -77,14 +99,14 @@ const SearchForm = ({
   loadingLabel,
   searchBsStyle,
   onQueryChange,
-  ...props
-}) => {
-  const [query, setQuery] = useState(props.query);
+  query: propsQuery,
+}: Props) => {
+  const [query, setQuery] = useState(propsQuery);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    setQuery(props.query);
-  }, [props.query]);
+    setQuery(propsQuery);
+  }, [propsQuery]);
 
   /**
    * This sets the loading state and returns a promise which gets resolved once the loading state is set.
@@ -110,7 +132,7 @@ const SearchForm = ({
     }
   };
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.SyntheticEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -138,44 +160,44 @@ const SearchForm = ({
   };
 
   return (
-    <StyledContainer className={`${wrapperClass} ${className}`} topMargin={topMargin}>
+    <StyledContainer className={`${wrapperClass} ${className}`} $topMargin={topMargin}>
       <form className="form-inline" onSubmit={handleSearch}>
-        <FormContent buttonLeftMargin={buttonLeftMargin}>
+        <FormContent $buttonLeftMargin={buttonLeftMargin}>
           <div className={`form-group ${queryHelpComponent ? 'has-feedback' : ''}`}>
             {label && (
-            <label htmlFor="common-search-form-query-input" className="control-label">
-              {label}
-            </label>
+              <label htmlFor="common-search-form-query-input" className="control-label">
+                {label}
+              </label>
             )}
             <StyledInput id="common-search-form-query-input"
-                           /* eslint-disable-next-line jsx-a11y/no-autofocus */
+                         /* eslint-disable-next-line jsx-a11y/no-autofocus */
                          autoFocus={focusAfterMount}
                          onChange={handleQueryChange}
                          value={query}
                          placeholder={placeholder}
                          type="text"
-                         queryWidth={queryWidth}
+                         $queryWidth={queryWidth}
                          className="query form-control"
                          autoComplete="off"
                          spellCheck="false" />
             {queryHelpComponent && (
-            <HelpFeedback className="form-control-feedback">{queryHelpComponent}</HelpFeedback>
+              <HelpFeedback className="form-control-feedback">{queryHelpComponent}</HelpFeedback>
             )}
           </div>
 
           {onSearch && (
-          <Button bsStyle={searchBsStyle}
-                  type="submit"
-                  disabled={isLoading}
-                  className="submit-button">
-            {isLoading ? <Spinner text={loadingLabel} delay={0} /> : searchButtonLabel}
-          </Button>
+            <Button bsStyle={searchBsStyle}
+                    type="submit"
+                    disabled={isLoading}
+                    className="submit-button">
+              {isLoading ? <Spinner text={loadingLabel} delay={0} /> : searchButtonLabel}
+            </Button>
           )}
 
           {onReset && (
-          <Button type="reset" className="reset-button" onClick={handleReset}>
-            {resetButtonLabel}
-          </Button>
+            <Button type="reset" className="reset-button" onClick={handleReset}>
+              {resetButtonLabel}
+            </Button>
           )}
           {children}
         </FormContent>
