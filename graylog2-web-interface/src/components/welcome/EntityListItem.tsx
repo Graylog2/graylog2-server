@@ -42,14 +42,18 @@ type Props = {
 }
 
 const EntityItem = ({ type, title, id }: Props) => {
+  const entityType = entityTypeMap[type] ?? entityTypeMap.unknown;
   const entityLink = useMemo(() => {
-    return entityTypeMap[type] ? Routes.pluginRoute(entityTypeMap[type].link)(id) : undefined;
-  }, [type, id]);
+    return entityType.link ? Routes.pluginRoute(entityType.link)(id) : undefined;
+  }, [entityType, id]);
+  const entityTitle = title || id;
 
   return (
     <StyledListGroupItem>
-      <StyledLabel bsStyle="info">{entityTypeMap[type]?.typeTitle || 'unknown'}</StyledLabel>
-      <Link to={entityLink}>{title}</Link>
+      <StyledLabel bsStyle="info">{entityType.typeTitle}</StyledLabel>
+      {!entityLink
+        ? <i>{entityTitle}</i>
+        : <Link target="_blank" to={entityLink}>{entityTitle}</Link>}
     </StyledListGroupItem>
   );
 };

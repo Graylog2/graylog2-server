@@ -29,17 +29,18 @@ import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
 type Props = { itemType: EntityItemType, itemId: string, activityType: RecentActivityType, itemTitle: string, userName?: string };
 
 const ActionItem = ({ itemType, itemId, activityType, itemTitle, userName }: Props) => {
-  const { typeTitle } = entityTypeMap[itemType];
+  const entityType = entityTypeMap[itemType] ?? entityTypeMap.unknown;
   const entityLink = useMemo(() => {
-    return entityTypeMap[itemType] ? Routes.pluginRoute(entityTypeMap[itemType].link)(itemId) : undefined;
-  }, [itemId, itemType]);
+    return entityType.link ? Routes.pluginRoute(entityType.link)(itemId) : undefined;
+  }, [entityType, itemId]);
+  const entityTitle = itemTitle || itemId;
 
   return (
     <div>
-      {`The ${typeTitle} `}
-      {activityType === 'delete'
-        ? <i>{itemTitle || itemId}</i>
-        : <Link target="_blank" to={entityLink}>{itemTitle || itemId}</Link>}
+      {`The ${entityType.typeTitle} `}
+      {activityType === 'delete' || !entityLink
+        ? <i>{entityTitle}</i>
+        : <Link target="_blank" to={entityLink}>{entityTitle}</Link>}
       {' was '}
       {`${activityType}d`}
       {userName ? ` by ${userName}` : ''}
