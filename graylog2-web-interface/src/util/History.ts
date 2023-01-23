@@ -14,23 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { createBrowserHistory } from 'history';
 
-import useParams from 'routing/useParams';
-import useFetchView from 'views/hooks/useFetchView';
+declare global {
+  interface Window { graylogHistory: ReturnType<typeof createBrowserHistory>; }
+}
 
-import SearchPage from './SearchPage';
+if (!window.graylogHistory) {
+  window.graylogHistory = createBrowserHistory();
+}
 
-const ShowViewPage = () => {
-  const { viewId } = useParams<{ viewId?: string }>();
-
-  if (!viewId) {
-    throw new Error('No view id specified!');
-  }
-
-  const view = useFetchView(viewId);
-
-  return <SearchPage view={view} isNew={false} />;
-};
-
-export default ShowViewPage;
+export default window.graylogHistory;

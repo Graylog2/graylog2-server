@@ -16,20 +16,21 @@
  */
 import { useMemo } from 'react';
 
-import View from 'views/logic/views/View';
-import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';
-import ViewGenerator from 'views/logic/views/ViewGenerator';
+import ErrorsActions from 'actions/errors/ErrorsActions';
+import { ViewManagementActions } from 'views/stores/ViewManagementStore';
+import ViewDeserializer from 'views/logic/views/ViewDeserializer';
+import { createFromFetchError } from 'logic/errors/ReportedErrors';
 
-const useCreateSavedSearch = (
-  streamId?: string,
-  timeRange?: TimeRange,
-  queryString?: ElasticsearchQueryString,
-) => {
-  return useMemo(
-    () => ViewGenerator(View.Type.Search, streamId, timeRange, queryString),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [streamId],
-  );
+const useFetchView = (viewId: string) => {
+  const viewJsonPromise = useMemo(() => ViewManagementActions.get(viewId), [viewId]);
+
+  return useMemo(() => viewJsonPromise.then((viewJson) => ViewDeserializer(viewJson), (error) => {
+    if (error.status === 404) {
+      ErrorsActions.report(createFromFetchError(error));
+    }
+
+    throw error;
+  }), [viewJsonPromise]);
 };
 
-export default useCreateSavedSearch;
+export default useFetchView;

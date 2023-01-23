@@ -25,19 +25,17 @@ const _missingRequirements = (requirements, requirementsProvided): Requirements 
   .filter(([require]) => !requirementsProvided.includes(require))
   .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
 
-const RequirementsProvided: ViewHook = ({ view }) => {
-  return new Promise((resolve, reject) => {
-    const providedRequirements = PluginStore.exports('views.requires.provided');
-    const missingRequirements = _missingRequirements(view.requires, providedRequirements);
+const RequirementsProvided: ViewHook = async ({ view }) => {
+  const providedRequirements = PluginStore.exports('views.requires.provided');
+  const missingRequirements = _missingRequirements(view.requires, providedRequirements);
 
-    if (Object.keys(missingRequirements).length > 0) {
-      const Component = () => <MissingRequirements view={view} missingRequirements={missingRequirements} />;
+  if (Object.keys(missingRequirements).length > 0) {
+    const Component = () => <MissingRequirements view={view} missingRequirements={missingRequirements} />;
 
-      return reject(Component);
-    }
+    throw Component;
+  }
 
-    return resolve(true);
-  });
+  return true;
 };
 
 export default RequirementsProvided;
