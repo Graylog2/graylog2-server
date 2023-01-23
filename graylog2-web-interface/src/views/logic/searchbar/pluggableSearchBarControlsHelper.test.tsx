@@ -104,6 +104,7 @@ describe('pluggableSearchBarControlsHandler', () => {
   it('pluggableValidationPayload should catch errors', async () => {
     const result = pluggableValidationPayload(
       {},
+      {},
       [() => ({
         ...pluggableSearchBarControl,
         validationPayload: () => { throw Error('something went wrong!'); },
@@ -119,6 +120,7 @@ describe('pluggableSearchBarControlsHandler', () => {
 
   it('validatePluggableValues should catch errors', async () => {
     const result = validatePluggableValues(
+      {},
       {},
       [() => ({ ...pluggableSearchBarControl, onValidate: () => { throw Error('something went wrong!'); } })],
     );
