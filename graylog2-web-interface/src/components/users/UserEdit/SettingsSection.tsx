@@ -16,10 +16,12 @@
  */
 import * as React from 'react';
 import { Formik, Form } from 'formik';
+import styled from 'styled-components';
 import type { $PropertyType } from 'utility-types';
 
+import Routes from 'routing/Routes';
 import { Button, Row, Col } from 'components/bootstrap';
-import { IfPermitted } from 'components/common';
+import { IfPermitted, NoSearchResult, ReadOnlyFormGroup } from 'components/common';
 import type User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
@@ -27,6 +29,16 @@ import TimezoneFormGroup from '../UserCreate/TimezoneFormGroup';
 import TimeoutFormGroup from '../UserCreate/TimeoutFormGroup';
 import ServiceAccountFormGroup from '../UserCreate/ServiceAccountFormGroup';
 import StartpageFormGroup from '../StartpageFormGroup';
+import useIsGlobalTimeoutEnabled from '../../../hooks/useIsGlobalTimeoutEnabled';
+import { Link } from '../../common/router';
+
+const GlobalTimeoutMessage = styled(ReadOnlyFormGroup)`
+  margin-bottom: 20px;
+  
+  .read-only-value-col {
+    padding-top: 0px;
+  }
+`;
 
 type Props = {
   user: User,
@@ -43,37 +55,46 @@ const SettingsSection = ({
     serviceAccount,
   },
   onSubmit,
-}: Props) => (
-  <SectionComponent title="Settings">
-    <Formik onSubmit={onSubmit}
-            initialValues={{ timezone, session_timeout_ms: sessionTimeoutMs, startpage, service_account: serviceAccount }}>
-      {({ isSubmitting, isValid }) => (
-        <Form className="form form-horizontal">
-          <IfPermitted permissions="*">
-            <TimeoutFormGroup />
-          </IfPermitted>
-          <TimezoneFormGroup />
-          <IfPermitted permissions="user:edit">
-            <ServiceAccountFormGroup />
-          </IfPermitted>
-          <StartpageFormGroup userId={id} permissions={permissions} />
+}: Props) => {
+  const isGlobalTimeoutEnabled = useIsGlobalTimeoutEnabled();
 
-          <Row className="no-bm">
-            <Col xs={12}>
-              <div className="pull-right">
-                <Button bsStyle="success"
-                        disabled={isSubmitting || !isValid}
-                        title="Update Settings"
-                        type="submit">
-                  Update Settings
-                </Button>
-              </div>
-            </Col>
-          </Row>
-        </Form>
-      )}
-    </Formik>
-  </SectionComponent>
-);
+  return (
+    <SectionComponent title="Settings">
+      <Formik onSubmit={onSubmit}
+              initialValues={{ timezone, session_timeout_ms: sessionTimeoutMs, startpage, service_account: serviceAccount }}>
+        {({ isSubmitting, isValid }) => (
+          <Form className="form form-horizontal">
+            <IfPermitted permissions="*">
+              {isGlobalTimeoutEnabled ? (
+                <GlobalTimeoutMessage label="Sessions Timeout"
+                                      value={<NoSearchResult>User session timeout is not editable because the <IfPermitted permissions={['clusterconfigentry:read']}><Link to={Routes.SYSTEM.CONFIGURATIONS}>global session timeout</Link></IfPermitted> is enabled.</NoSearchResult>} />
+              ) : (
+                <TimeoutFormGroup />
+              )}
+            </IfPermitted>
+            <TimezoneFormGroup />
+            <IfPermitted permissions="user:edit">
+              <ServiceAccountFormGroup />
+            </IfPermitted>
+            <StartpageFormGroup userId={id} permissions={permissions} />
+
+            <Row className="no-bm">
+              <Col xs={12}>
+                <div className="pull-right">
+                  <Button bsStyle="success"
+                          disabled={isSubmitting || !isValid}
+                          title="Update Settings"
+                          type="submit">
+                    Update Settings
+                  </Button>
+                </div>
+              </Col>
+            </Row>
+          </Form>
+        )}
+      </Formik>
+    </SectionComponent>
+  );
+};
 
 export default SettingsSection;
