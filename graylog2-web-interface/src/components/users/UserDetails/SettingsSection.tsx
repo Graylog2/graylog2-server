@@ -25,14 +25,15 @@ import type User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { StreamsActions } from 'stores/streams/StreamsStore';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
+import useIsGlobalTimeoutEnabled from 'hooks/useIsGlobalTimeoutEnabled';
 
 type Props = {
   user: User,
 };
 
-const _sessionTimeout = (sessionTimeout) => {
+const _sessionTimeout = (sessionTimeout: { value: number, unitString: string }, isGlobalTimeoutEnabled: boolean) => {
   if (sessionTimeout) {
-    return `${sessionTimeout.value} ${sessionTimeout.unitString}`;
+    return <>{sessionTimeout.value} {sessionTimeout.unitString} {isGlobalTimeoutEnabled && <>(<Link to={Routes.SYSTEM.CONFIGURATIONS}>globally set</Link>)</>}</>;
   }
 
   return 'Sessions do not timeout';
@@ -71,13 +72,17 @@ const SettingsSection = ({
     sessionTimeout,
     startpage,
   },
-}: Props) => (
-  <SectionComponent title="Settings">
-    <ReadOnlyFormGroup label="Sessions Timeout" value={_sessionTimeout(sessionTimeout)} />
-    <ReadOnlyFormGroup label="Service Account" value={serviceAccount} />
-    <ReadOnlyFormGroup label="Timezone" value={timezone} />
-    <ReadOnlyFormGroup label="Startpage" value={<StartpageValue type={startpage?.type} id={startpage?.id} />} />
-  </SectionComponent>
-);
+}: Props) => {
+  const isGlobalTimeoutEnabled = useIsGlobalTimeoutEnabled();
+
+  return (
+    <SectionComponent title="Settings">
+      <ReadOnlyFormGroup label="Sessions Timeout" value={_sessionTimeout(sessionTimeout, isGlobalTimeoutEnabled)} />
+      <ReadOnlyFormGroup label="Service Account" value={serviceAccount} />
+      <ReadOnlyFormGroup label="Timezone" value={timezone} />
+      <ReadOnlyFormGroup label="Startpage" value={<StartpageValue type={startpage?.type} id={startpage?.id} />} />
+    </SectionComponent>
+  );
+};
 
 export default SettingsSection;
