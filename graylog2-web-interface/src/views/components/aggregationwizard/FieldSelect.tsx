@@ -30,18 +30,11 @@ import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypeIcon from 'views/components/sidebar/fields/FieldTypeIcon';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 
-type Props = {
-  ariaLabel?: string,
-  clearable?: boolean,
-  error?: string,
-  id: string,
-  label: string,
-  name: string,
-  onChange: (changeEvent: { target: { name: string, value: string } }) => void,
-  value: string | undefined,
-  selectRef?: React.Ref<React.ComponentType>
-  properties?: Array<Property>,
-}
+const FieldName = styled.span`
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+`;
 
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
 
@@ -64,10 +57,23 @@ type OptionRendererProps = {
 };
 
 const OptionRenderer = ({ label, qualified, type }: OptionRendererProps) => {
-  const children = <><FieldTypeIcon type={type} /> {label}</>;
+  const children = <FieldName><FieldTypeIcon type={type} /> {label}</FieldName>;
 
   return qualified ? <span>{children}</span> : <UnqualifiedOption>{children}</UnqualifiedOption>;
 };
+
+type Props = {
+  ariaLabel?: string,
+  clearable?: boolean,
+  error?: string,
+  id: string,
+  label: string,
+  name: string,
+  onChange: (changeEvent: { target: { name: string, value: string } }) => void,
+  value: string | undefined,
+  selectRef?: React.Ref<React.ComponentType>
+  properties?: Array<Property>,
+}
 
 const FieldSelect = ({ name, id, error, clearable, value, onChange, label, ariaLabel, selectRef, properties }: Props) => {
   const { activeQuery } = useStore(ViewMetadataStore);
