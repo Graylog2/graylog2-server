@@ -24,4 +24,4 @@ export type ViewHookArguments = {
   query: { [key: string]: any },
 };
 
-export type ViewHook = (args: ViewHookArguments) => Promise<[View, SearchExecutionState]>;
+export type ViewHook = (args: ViewHookArguments) => Promise<readonly [View, SearchExecutionState]>;

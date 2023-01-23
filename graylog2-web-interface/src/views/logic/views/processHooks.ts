@@ -20,9 +20,19 @@ import type View from './View';
 
 import type { ViewHook, ViewHookArguments } from '../hooks/ViewHook';
 
+const checkReturnType = ((result) => {
+  if (!result || !(result instanceof Array) || result.length < 2) {
+    // eslint-disable-next-line no-console
+    console.error('Return value supplied by processing hook is not array with two elements. It is: ', JSON.stringify(result, null, 2));
+  }
+
+  return result;
+});
+
 const _chainHooks = (hooks: Array<ViewHook>, args: ViewHookArguments) => {
   return hooks.reduce(
-    (prev, cur: ViewHook) => prev.then(([newView, newExecutionState]) => cur({ ...args, view: newView, executionState: newExecutionState })),
+    (prev, cur: ViewHook) => prev.then(checkReturnType)
+      .then(([newView, newExecutionState]) => cur({ ...args, view: newView, executionState: newExecutionState })),
     Promise.resolve([args.view, args.executionState] as const),
   );
 };
@@ -46,7 +56,7 @@ const _processViewHooks = (viewHooks: Array<ViewHook>, view: View, query: Query,
     promise = Promise.resolve([view, executionState] as const);
   }
 
-  return promise.then(async ([newView, newExecutionState]) => {
+  return promise.then(checkReturnType).then(async ([newView, newExecutionState]) => {
     await onSuccess(newView, newExecutionState);
 
     return [newView, newExecutionState] as const;

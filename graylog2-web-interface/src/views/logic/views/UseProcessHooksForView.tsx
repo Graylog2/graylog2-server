@@ -67,6 +67,11 @@ const useProcessHooksForView = (view: Promise<View>, executionState: SearchExecu
         setResult({ status: 'loaded', view: v, executionState: e });
       },
     ).catch((e: Error | HookComponent) => {
+      if (e instanceof Error) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+      }
+
       const component = e instanceof Error
         ? <LoadViewError error={e} />
         : e;
