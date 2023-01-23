@@ -61,7 +61,9 @@ const PipelineStage = styled.div<{ $idle?: boolean }>(({ $idle, theme }) => css`
   padding: 20px;
   text-align: center;
   width: 120px;
-  background-color: ${$idle ? theme.utils.colorLevel(theme.colors.global.contentBackground, 10) : theme.colors.global.contentBackground};
+  background-color: ${$idle
+    ? theme.utils.colorLevel(theme.colors.global.contentBackground, 10)
+    : theme.colors.global.contentBackground};
 `);
 
 const PipelineNameTD = styled.td`
@@ -104,7 +106,7 @@ const _loadPipelines = (pagination, setLoading, setPaginatedPipelines) => {
 const ProcessingTimelineComponent = () => {
   const currentUser = useCurrentUser();
   const { connections } = useStore(PipelineConnectionsStore);
-  const { page, pageSize: perPage, resetPage, setPage } = usePaginationQueryParameter();
+  const { page, pageSize: perPage, resetPage, setPagination } = usePaginationQueryParameter();
   const [query, setQuery] = useState('');
   const [streams, setStreams] = useState<Stream[] | undefined>();
   const [paginatedPipelines, setPaginatedPipelines] = useState<PaginatedPipelines|undefined>();
@@ -172,7 +174,7 @@ const ProcessingTimelineComponent = () => {
       if (window.confirm(`Do you really want to delete pipeline "${pipeline.title}"? This action cannot be undone.`)) {
         PipelinesActions.delete(pipeline.id).then(() => {
           _loadPipelines({ page, perPage, query }, setLoading, setPaginatedPipelines);
-          setPage(Math.max(DEFAULT_PAGINATION.page, page - 1));
+          setPagination({ page: Math.max(DEFAULT_PAGINATION.page, page - 1) });
         });
       }
     };

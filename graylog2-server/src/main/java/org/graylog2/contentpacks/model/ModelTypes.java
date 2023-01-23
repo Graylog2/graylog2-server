@@ -34,5 +34,6 @@ public interface ModelTypes {
     ModelType DASHBOARD_V1 = ModelType.of("dashboard", "1");
     ModelType DASHBOARD_V2 = ModelType.of("dashboard", "2");
     ModelType SEARCH_V1 = ModelType.of("search", "1");
+    ModelType SEARCH_FILTER_V1 = ModelType.of("search_filter", "1");
     ModelType URL_WHITELIST_ENTRY_V1 = ModelType.of("url_whitelist_entry", "1");
 }

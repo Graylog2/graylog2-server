@@ -21,9 +21,12 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.SimpleType;
+import org.graylog.plugins.views.search.views.MongoIgnore;
 import org.graylog2.indexer.retention.strategies.UnknownRetentionStrategyConfig;
 import org.graylog2.jackson.MongoJodaDateTimeDeserializer;
 import org.graylog2.jackson.MongoJodaDateTimeSerializer;
@@ -50,6 +53,12 @@ public class MongoJackObjectMapperProvider implements Provider<ObjectMapper> {
         this.objectMapper = objectMapper.copy()
                 .addHandler(new ReplaceUnknownSubtypesWithFallbackHandler())
                 .setPropertyNamingStrategy(new PreserveLeadingUnderscoreStrategy())
+                .setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
+                    @Override
+                    public boolean hasIgnoreMarker(final AnnotatedMember member) {
+                        return super.hasIgnoreMarker(member) || member.hasAnnotation(MongoIgnore.class);
+                    }
+                })
                 .registerModule(new SimpleModule("JSR-310-MongoJack")
                         .addSerializer(ZonedDateTime.class, new MongoZonedDateTimeSerializer())
                         .addDeserializer(ZonedDateTime.class, new MongoZonedDateTimeDeserializer())
