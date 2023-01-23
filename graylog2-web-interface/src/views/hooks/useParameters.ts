@@ -18,14 +18,14 @@ import { createSelector } from '@reduxjs/toolkit';
 
 import useAppSelector from 'stores/useAppSelector';
 import { selectParameterBindings } from 'views/logic/slices/searchExecutionSelectors';
-import { selectSearch } from 'views/logic/slices/viewSelectors';
+import { selectParameters } from 'views/logic/slices/viewSelectors';
 
-const selectParameters = createSelector(
+const selectParametersAndBindings = createSelector(
   selectParameterBindings,
-  selectSearch,
-  (parameterBindings, search) => ({ parameterBindings, parameters: search?.parameters }),
+  selectParameters,
+  (parameterBindings, parameters) => ({ parameterBindings, parameters }),
 );
 
-const useParameters = () => useAppSelector(selectParameters);
+const useParameters = () => useAppSelector(selectParametersAndBindings);
 
 export default useParameters;
