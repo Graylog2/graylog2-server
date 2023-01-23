@@ -26,7 +26,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.inputs.EncryptedValuesSupport;
+import org.graylog2.inputs.EncryptedInputConfigs;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.configuration.ConfigurationException;
@@ -190,7 +190,7 @@ public class InputsResource extends AbstractInputsResource {
         // Special handling for encrypted values
         final Map<String, Object> origConfig = input.getConfiguration();
         final Map<String, Object> updatedConfig = Objects.requireNonNullElse(messageInput.getConfiguration().getSource(), Map.of());
-        mergedInput.put(MessageInput.FIELD_CONFIGURATION, EncryptedValuesSupport.mergeTypedInputConfigurations(origConfig, updatedConfig));
+        mergedInput.put(MessageInput.FIELD_CONFIGURATION, EncryptedInputConfigs.mergeInputConfiguration(origConfig, updatedConfig));
 
         final Input newInput = inputService.create(input.getId(), mergedInput);
         inputService.update(newInput);

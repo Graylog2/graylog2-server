@@ -23,11 +23,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.BeanDeserializer;
 import org.graylog2.inputs.WithInputConfiguration;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.security.encryption.EncryptedValue;
-import org.graylog2.shared.inputs.MessageInputFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,13 +37,17 @@ import java.util.stream.Collectors;
  */
 public class InputConfigurationDeserializer extends BeanDeserializer {
     private final BeanDeserializer deserializer;
-    private final MessageInputFactory messageInputFactory;
+    private final InputFieldConfigProvider inputFieldConfigProvider;
+
+    public interface InputFieldConfigProvider {
+        Optional<MessageInput.Config> getConfig(String type);
+    }
 
     public InputConfigurationDeserializer(BeanDeserializer deserializer,
-                                          MessageInputFactory messageInputFactory) {
+                                          InputFieldConfigProvider inputFieldConfigProvider) {
         super(deserializer);
         this.deserializer = deserializer;
-        this.messageInputFactory = messageInputFactory;
+        this.inputFieldConfigProvider = inputFieldConfigProvider;
     }
 
     @Override
@@ -71,7 +76,7 @@ public class InputConfigurationDeserializer extends BeanDeserializer {
     }
 
     private Set<String> getEncryptedFields(String type) {
-        return messageInputFactory.getConfig(type).map(config -> config.combinedRequestedConfiguration()
+        return inputFieldConfigProvider.getConfig(type).map(config -> config.combinedRequestedConfiguration()
                         .getFields()
                         .values()
                         .stream()
@@ -79,7 +84,6 @@ public class InputConfigurationDeserializer extends BeanDeserializer {
                         .map(ConfigurationField::getName)
                         .collect(Collectors.toSet()))
                 .orElse(Set.of());
-
     }
 
     @Override

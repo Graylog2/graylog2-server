@@ -24,6 +24,7 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.shared.SuppressForbidden;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,8 +56,6 @@ public class InputServiceImplTest {
     @Mock
     private MessageInputFactory messageInputFactory;
 
-    @Mock
-    private EncryptedValuesSupport encryptedValuesSupport;
 
     private ClusterEventBus clusterEventBus;
     private InputServiceImpl inputService;
@@ -71,7 +70,7 @@ public class InputServiceImplTest {
                 converterFactory,
                 messageInputFactory,
                 clusterEventBus,
-                encryptedValuesSupport);
+                new ObjectMapperProvider().get());
     }
 
     @Test

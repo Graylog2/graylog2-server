@@ -78,7 +78,7 @@ class InputConfigurationDeserializerTest {
                                                                           BeanDescription beanDesc,
                                                                           JsonDeserializer<?> deserializer) {
                                 if (WithInputConfiguration.class.isAssignableFrom(beanDesc.getBeanClass())) {
-                                    return new InputConfigurationDeserializer((BeanDeserializer) deserializer, messageInputFactory);
+                                    return new InputConfigurationDeserializer((BeanDeserializer) deserializer, messageInputFactory::getConfig);
                                 }
 
                                 return super.modifyDeserializer(config, beanDesc, deserializer);
