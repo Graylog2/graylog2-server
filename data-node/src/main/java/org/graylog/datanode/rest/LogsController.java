@@ -38,20 +38,18 @@ public class LogsController {
     }
 
     @GET
-    @Path("/{processId}/stdout")
-    public List<String> getOpensearchStdout(@PathParam("processId") int processId) {
+    @Path("/stdout")
+    public List<String> getOpensearchStdout() {
         return Optional.of(managedOpensearch)
-                .filter(p -> p.hasPid(processId))
                 .map(node -> node.getProcessLogs().getStdOut())
-                .orElseThrow(() -> new IllegalArgumentException("Process not found: " + processId));
+                .orElseThrow(() -> new IllegalArgumentException("No opensearch process available"));
     }
 
     @GET
-    @Path("/{processId}/stderr")
-    public List<String> getOpensearchStderr(@PathParam("processId") int processId) {
+    @Path("/stderr")
+    public List<String> getOpensearchStderr() {
         return Optional.of(managedOpensearch)
-                .filter(p -> p.hasPid(processId))
                 .map(node -> node.getProcessLogs().getStdErr())
-                .orElseThrow(() -> new IllegalArgumentException("Process not found: " + processId));
+                .orElseThrow(() -> new IllegalArgumentException("No opensearch process available"));
     }
 }
