@@ -40,6 +40,7 @@ import {
 } from 'views/logic/views/pluggableSaveViewFormHandler';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useIsDirty from 'views/hooks/useIsDirty';
+import useIsNew from 'views/hooks/useIsNew';
 import useView from 'views/hooks/useView';
 import useAppDispatch from 'stores/useAppDispatch';
 
@@ -60,6 +61,7 @@ const SearchActionsMenu = () => {
   const theme = useTheme();
   const dirty = useIsDirty();
   const view = useView();
+  const isNew = useIsNew();
   const viewLoaderFunc = useContext(ViewLoaderContext);
   const currentUser = useCurrentUser();
   const loadNewView = useContext(NewViewLoaderContext);
@@ -74,7 +76,7 @@ const SearchActionsMenu = () => {
   const dispatch = useAppDispatch();
   const _onSaveView = useCallback(() => dispatch(onSaveView(view)), [dispatch, view]);
 
-  const loaded = !!view.id;
+  const loaded = isNew === false;
   const savedSearchColor = dirty ? theme.colors.variant.warning : theme.colors.variant.info;
   const disableReset = !(dirty || loaded);
   const savedViewTitle = loaded ? 'Saved search' : 'Save search';
@@ -165,7 +167,7 @@ const SearchActionsMenu = () => {
                          saveSearch={saveSearch}
                          saveAsSearch={saveAsSearch}
                          disableCreateNew={newTitle === view.title}
-                         isCreateNew={!view.id || !isAllowedToEdit}
+                         isCreateNew={isNew || !isAllowedToEdit}
                          toggleModal={toggleFormModal}
                          value={newTitle} />
       )}
@@ -182,7 +184,7 @@ const SearchActionsMenu = () => {
                    entityId={view.id}
                    onClick={toggleShareSearch}
                    bsStyle="default"
-                   disabledInfo={!view.id && 'Only saved searches can be shared.'} />
+                   disabledInfo={isNew && 'Only saved searches can be shared.'} />
       <DropdownButton title={<Icon name="ellipsis-h" />}
                       aria-label="Open search actions dropdown"
                       id="search-actions-dropdown"
