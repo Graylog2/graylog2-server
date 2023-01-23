@@ -132,7 +132,14 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
                 });
 
         return otherBucket.getDocCount() > 0
-                ? Stream.concat(bucketStream, Stream.of(PivotBucket.create(MISSING_BUCKET_KEYS, otherBucket, true)))
+                ? Stream.concat(bucketStream, Stream.of(PivotBucket.create(
+                    ImmutableList.<String>builder()
+                        .addAll(previousKeys)
+                        .addAll(MISSING_BUCKET_KEYS)
+                        .build(),
+                    otherBucket,
+                    true
+                )))
                 : bucketStream;
     }
 
