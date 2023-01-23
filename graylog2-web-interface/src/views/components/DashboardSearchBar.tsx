@@ -57,6 +57,7 @@ import useAppDispatch from 'stores/useAppDispatch';
 import { setGlobalOverride, execute } from 'views/logic/slices/searchExecutionSlice';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import useHandlerContext from 'views/components/useHandlerContext';
+import type { TimeRange } from 'views/logic/queries/Query';
 
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
@@ -95,7 +96,7 @@ const _validateQueryString = (values: DashboardFormValues, pluggableSearchBarCon
   return debouncedValidateQuery(request, userTimezone);
 };
 
-const useInitialFormValues = (timerange, queryString) => {
+const useInitialFormValues = (timerange: TimeRange, queryString: string) => {
   const initialValuesFromPlugins = usePluggableInitialValues();
 
   return useMemo(() => {
