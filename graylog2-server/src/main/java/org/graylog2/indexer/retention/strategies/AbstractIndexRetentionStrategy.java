@@ -20,7 +20,6 @@ import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
-import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.periodical.IndexRetentionThread;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.shared.system.activities.Activity;
@@ -29,6 +28,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -49,7 +49,7 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
     private final ActivityWriter activityWriter;
     private JobSchedulerClock clock;
 
-    public AbstractIndexRetentionStrategy(Indices indices,
+    protected AbstractIndexRetentionStrategy(Indices indices,
                                           ActivityWriter activityWriter,
                                           JobSchedulerClock clock) {
         this.indices = requireNonNull(indices);
@@ -73,12 +73,14 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
         final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
 
         // Account for DST and time zones in determining age
-        final long cutoff = clock.instantNow().minus(smartConfig.indexLifetimeSoft()).toEpochMilli();
+        final Instant now = clock.instantNow();
+        final long cutoffSoft = now.minus(smartConfig.indexLifetimeSoft()).toEpochMilli();
+        final long cutoffHard = now.minus(smartConfig.indexLifetimeHard()).toEpochMilli();
         final int removeCount = (int)deflectorIndices.keySet()
                 .stream()
                 .filter(indexName -> !indices.isReopened(indexName))
                 .filter(indexName -> !hasCurrentWriteAlias(indexSet, deflectorIndices, indexName))
-                .filter(indexName -> getClosingDateBestEffort(indexName).isBefore(cutoff + 1))
+                .filter(indexName -> exceedsAgeLimit(indexName, cutoffSoft, cutoffHard))
                 .count();
 
         if (removeCount > 0) {
@@ -90,17 +92,19 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
         }
     }
 
-    private DateTime getClosingDateBestEffort(String indexName) {
+    private boolean exceedsAgeLimit(String indexName, long cutoffSoft, long cutoffHard) {
         Optional<DateTime> closingDate = indices.indexClosingDate(indexName);
         if (closingDate.isPresent()) {
-            return closingDate.get();
+            return closingDate.get().isBefore(cutoffSoft + 1);
         }
-        final IndexRangeStats indexRangeStats = indices.indexRangeStatsOfIndex(indexName);
-        if (indexRangeStats != IndexRangeStats.EMPTY) {
-            return indices.indexRangeStatsOfIndex(indexName).max();
+
+        Optional<DateTime> creationDate = indices.indexCreationDate(indexName);
+        if (creationDate.isPresent()) {
+            return creationDate.get().isBefore(cutoffHard + 1);
         }
-        return indices.indexCreationDate(indexName)
-            .orElseThrow(() -> new IllegalStateException(f("Unable to determine dates for Index %s", indexName)));
+
+        LOG.warn(f("Unable to determine creation or closing dates for Index %s - forcing retention", indexName));
+        return true;
     }
 
     private void retainCountBased(IndexSet indexSet) {

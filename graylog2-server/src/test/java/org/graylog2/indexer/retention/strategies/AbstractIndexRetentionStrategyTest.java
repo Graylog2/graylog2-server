@@ -50,6 +50,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -84,20 +85,18 @@ public class AbstractIndexRetentionStrategyTest {
         indexMap.put("index5", Collections.emptySet());
         indexMap.put("index6", Collections.emptySet());
 
-        when(indices.indexClosingDate("index6")).thenReturn(Optional.of(NOW.minusDays(1)));
-        when(indices.indexClosingDate("index5")).thenReturn(Optional.of(NOW.minusDays(3)));
-        when(indices.indexClosingDate("index4")).thenReturn(Optional.of(NOW.minusDays(9)));
-        when(indices.indexClosingDate("index3")).thenReturn(Optional.of(NOW.minusDays(10)));
-        when(indices.indexClosingDate("index2")).thenReturn(Optional.of(NOW.minusDays(11)));
-        when(indices.indexClosingDate("index1")).thenReturn(Optional.of(NOW.minusDays(15)));
-
-        when (indices.isClosed(anyString())).thenReturn(true);
+        lenient().when(indices.indexClosingDate("index6")).thenReturn(Optional.of(NOW.minusDays(1)));
+        lenient().when(indices.indexClosingDate("index5")).thenReturn(Optional.of(NOW.minusDays(3)));
+        lenient().when(indices.indexClosingDate("index4")).thenReturn(Optional.of(NOW.minusDays(9)));
+        lenient().when(indices.indexClosingDate("index3")).thenReturn(Optional.of(NOW.minusDays(10)));
+        lenient().when(indices.indexClosingDate("index2")).thenReturn(Optional.of(NOW.minusDays(11)));
+        lenient().when(indices.indexClosingDate("index1")).thenReturn(Optional.of(NOW.minusDays(15)));
 
         indexSetConfigCountBased = createCountBased();
 
         when(indexSet.getAllIndexAliases()).thenReturn(indexMap);
-        when(indexSet.getManagedIndices()).thenReturn(indexMap.keySet().stream().toArray(String[]::new));
-        when(indexSet.extractIndexNumber(anyString())).then(this::extractIndexNumber);
+        lenient().when(indexSet.getManagedIndices()).thenReturn(indexMap.keySet().stream().toArray(String[]::new));
+        lenient().when(indexSet.extractIndexNumber(anyString())).then(this::extractIndexNumber);
         when(indexSet.getConfig()).thenReturn(indexSetConfigCountBased);
 
         retentionStrategy = spy(new AbstractIndexRetentionStrategy(indices, activityWriter, new JobSchedulerSystemClock()) {
@@ -122,7 +121,7 @@ public class AbstractIndexRetentionStrategyTest {
             }
         });
 
-        when(retentionStrategy.getMaxNumberOfIndices(eq(indexSet))).thenReturn(Optional.of(5));
+        lenient().when(retentionStrategy.getMaxNumberOfIndices(eq(indexSet))).thenReturn(Optional.of(5));
         when(indices.isReopened(anyString())).thenReturn(false);
     }
 
@@ -211,6 +210,32 @@ public class AbstractIndexRetentionStrategyTest {
         retentionStrategy.retain(indexSet);
 
         verify(retentionStrategy, times(0)).retain(any(), any());
+    }
+
+    @Test
+    public void timeBasedMissingClosingDate() {
+        when(indexSet.getConfig()).thenReturn(createTimeBased(14, 16));
+        when(indices.indexClosingDate("index1")).thenReturn(Optional.empty());
+        when(indices.indexCreationDate("index1")).thenReturn(Optional.of(NOW.minusDays(17)));
+
+        retentionStrategy.retain(indexSet);
+
+        final ArgumentCaptor<List> retainedIndexName = ArgumentCaptor.forClass(List.class);
+        verify(retentionStrategy, times(1)).retain(retainedIndexName.capture(), eq(indexSet));
+        assertThat(retainedIndexName.getValue()).containsExactly("index1");
+    }
+
+    @Test
+    public void timeBasedNoDates() {
+        when(indexSet.getConfig()).thenReturn(createTimeBased(14, 16));
+        when(indices.indexClosingDate("index1")).thenReturn(Optional.empty());
+        when(indices.indexCreationDate("index1")).thenReturn(Optional.empty());
+
+        retentionStrategy.retain(indexSet);
+
+        final ArgumentCaptor<List> retainedIndexName = ArgumentCaptor.forClass(List.class);
+        verify(retentionStrategy, times(1)).retain(retainedIndexName.capture(), eq(indexSet));
+        assertThat(retainedIndexName.getValue()).containsExactly("index1");
     }
 
     private Optional<Integer> extractIndexNumber(InvocationOnMock invocation) {
