@@ -35,6 +35,7 @@ import type { ViewStoreState } from 'views/stores/ViewStore';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import useWidgetResults from 'views/components/useWidgetResults';
 import type SearchError from 'views/logic/SearchError';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -42,6 +43,7 @@ import type { Props as WidgetComponentProps } from './Widget';
 import WidgetContext from '../contexts/WidgetContext';
 import type { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
+import FieldTypesContext from '../contexts/FieldTypesContext';
 
 jest.mock('../searchbar/queryinput/QueryInput', () => mockComponent('QueryInput'));
 jest.mock('./WidgetHeader', () => 'widget-header');
@@ -98,6 +100,11 @@ describe('<Widget />', () => {
     dirty: false,
   };
 
+  const fieldTypes = {
+    all: Immutable.List<FieldTypeMapping>(),
+    queryFields: Immutable.Map<string, Immutable.List<FieldTypeMapping>>(),
+  };
+
   beforeEach(() => {
     ViewStore.getInitialState = jest.fn(() => viewStoreState);
   });
@@ -119,17 +126,19 @@ describe('<Widget />', () => {
     unsetWidgetEditing = () => {},
     ...props
   }: DummyWidgetProps) => (
-    // eslint-disable-next-line react/jsx-no-constructed-context-values
-    <WidgetFocusContext.Provider value={{ focusedWidget, setWidgetFocusing, setWidgetEditing, unsetWidgetFocusing, unsetWidgetEditing }}>
-      <WidgetContext.Provider value={propsWidget}>
-        <Widget widget={propsWidget}
-                id="widgetId"
-                onPositionsChange={() => {}}
-                title="Widget Title"
-                position={new WidgetPosition(1, 1, 1, 1)}
-                {...props} />
-      </WidgetContext.Provider>
-    </WidgetFocusContext.Provider>
+    <FieldTypesContext.Provider value={fieldTypes}>
+      {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
+      <WidgetFocusContext.Provider value={{ focusedWidget, setWidgetFocusing, setWidgetEditing, unsetWidgetFocusing, unsetWidgetEditing }}>
+        <WidgetContext.Provider value={propsWidget}>
+          <Widget widget={propsWidget}
+                  id="widgetId"
+                  onPositionsChange={() => {}}
+                  title="Widget Title"
+                  position={new WidgetPosition(1, 1, 1, 1)}
+                  {...props} />
+        </WidgetContext.Provider>
+      </WidgetFocusContext.Provider>
+    </FieldTypesContext.Provider>
   );
 
   const getWidgetUpdateButton = () => screen.getByRole('button', { name: /update widget/i });
@@ -189,7 +198,6 @@ describe('<Widget />', () => {
     const UnknownWidget = (props) => (
       <DummyWidget widget={unknownWidget}
                    id="widgetId"
-                   fields={[]}
                    onPositionsChange={() => {}}
                    onSizeChange={() => {}}
                    title="Widget Title"
@@ -212,17 +220,18 @@ describe('<Widget />', () => {
       .config({})
       .build();
     const UnknownWidget = (props) => (
-      <WidgetContext.Provider value={unknownWidget}>
-        <Widget widget={unknownWidget}
-                editing
-                id="widgetId"
-                fields={[]}
-                onPositionsChange={() => {}}
-                onSizeChange={() => {}}
-                title="Widget Title"
-                position={new WidgetPosition(1, 1, 1, 1)}
-                {...props} />
-      </WidgetContext.Provider>
+      <FieldTypesContext.Provider value={fieldTypes}>
+        <WidgetContext.Provider value={unknownWidget}>
+          <Widget widget={unknownWidget}
+                  editing
+                  id="widgetId"
+                  onPositionsChange={() => {}}
+                  onSizeChange={() => {}}
+                  title="Widget Title"
+                  position={new WidgetPosition(1, 1, 1, 1)}
+                  {...props} />
+        </WidgetContext.Provider>
+      </FieldTypesContext.Provider>
     );
 
     render(
