@@ -24,11 +24,6 @@ import useLastOpened from 'components/welcome/hooks/useLastOpened';
 import useFavoriteItems from 'components/welcome/hooks/useFavoriteItems';
 import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
 
-jest.mock('routing/Routes', () => ({
-  SEARCH: '/search',
-  pluginRoute: () => () => '/route',
-}));
-
 jest.mock('components/welcome/hooks/useLastOpened', () => jest.fn(() => ({
   data: {
     lastOpened: [{ id: '1', title: 'Title 1', type: 'dashboard' }, {
@@ -86,6 +81,13 @@ jest.mock('components/welcome/hooks/useRecentActivity', () => jest.fn(() => ({
   },
   isFetching: false,
 })));
+
+jest.mock('routing/Routes', () => ({
+  pluginRoute: (x) => x,
+  dashboard_show: (x) => `/route/DASHBOARDS_VIEWID/${x}`,
+  getPluginRoute: (x) => () => x,
+  SEARCH: '/search',
+}));
 
 describe('Welcome', () => {
   describe('Last opened list', () => {

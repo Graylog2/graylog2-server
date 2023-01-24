@@ -20,7 +20,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import EntityListItem from 'components/welcome/EntityListItem';
 
-jest.mock('routing/Routes', () => ({ pluginRoute: (type) => (id) => `/route/${type}/${id}` }));
+jest.mock('routing/Routes', () => ({ pluginRoute: (x) => x, dashboard_show: (x) => `/route/DASHBOARDS_VIEWID/${x}` }));
 
 describe('EntityListItem', () => {
   it('Show type', async () => {
