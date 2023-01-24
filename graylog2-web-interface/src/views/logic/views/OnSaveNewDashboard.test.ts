@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import asMock from 'helpers/mocking/AsMock';
-import { ViewActions } from 'views/stores/ViewStore';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import mockDispatch from 'views/test/mockDispatch';
@@ -29,12 +28,6 @@ import { loadDashboard } from './Actions';
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
     create: jest.fn((v) => Promise.resolve(v)).mockName('create'),
-  },
-}));
-
-jest.mock('views/stores/ViewStore', () => ({
-  ViewActions: {
-    load: jest.fn(() => Promise.resolve({ view: { id: 'deadbeef' } })).mockName('load'),
   },
 }));
 
@@ -92,7 +85,6 @@ describe('OnSaveNewDashboard', () => {
 
     await dispatch(OnSaveNewDashboard(view));
 
-    expect(ViewActions.load).not.toHaveBeenCalled();
     expect(loadDashboard).not.toHaveBeenCalled();
     expect(UserNotification.success).not.toHaveBeenCalled();
     expect(UserNotification.error).toHaveBeenCalledTimes(1);
