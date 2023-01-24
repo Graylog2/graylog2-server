@@ -22,8 +22,6 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 import MockStore from 'helpers/mocking/StoreMock';
-import { SearchActions } from 'views/stores/SearchStore';
-import mockAction from 'helpers/mocking/MockAction';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import FormikInput from 'components/common/FormikInput';
@@ -106,7 +104,6 @@ describe('DashboardSearchBar pluggable controls', () => {
   });
 
   beforeEach(() => {
-    SearchActions.refresh = mockAction();
     SearchConfigStore.getInitialState = jest.fn(() => ({ searchesClusterConfig: mockSearchesClusterConfig }));
   });
 

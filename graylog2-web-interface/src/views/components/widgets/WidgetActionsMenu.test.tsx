@@ -26,7 +26,6 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import WidgetModel from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import SearchActions from 'views/actions/SearchActions';
 import Search from 'views/logic/search/Search';
 import Query from 'views/logic/queries/Query';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
@@ -227,8 +226,6 @@ describe('<WidgetActionsMenu />', () => {
 
       ViewManagementActions.get = mockAction(jest.fn((async () => Promise.resolve(dashboard1.toJSON()))));
       ViewManagementActions.update = mockAction(jest.fn((view) => Promise.resolve(view)));
-      SearchActions.get = mockAction(jest.fn(() => Promise.resolve(searchDB1.toJSON())));
-      SearchActions.create = mockAction(jest.fn(() => Promise.resolve({ search: searchDB1 })));
       asMock(fetchSearch).mockResolvedValue(searchDB1.toJSON());
 
       asMock(CopyWidgetToDashboard).mockImplementation(() => View.builder()

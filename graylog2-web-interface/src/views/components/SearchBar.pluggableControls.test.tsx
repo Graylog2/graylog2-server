@@ -21,8 +21,6 @@ import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
-import mockAction from 'helpers/mocking/MockAction';
-import { SearchActions } from 'views/stores/SearchStore';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
@@ -131,7 +129,6 @@ describe('SearchBar pluggable controls', () => {
   });
 
   beforeEach(() => {
-    SearchActions.refresh = mockAction();
     SearchConfigStore.getInitialState = jest.fn(() => ({ searchesClusterConfig: mockSearchesClusterConfig }));
   });
 

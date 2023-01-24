@@ -80,7 +80,7 @@ describe('DashboardSearchBar', () => {
     await screen.findByText('No Override');
   });
 
-  it('should call SearchActions.refresh on submit when there are no changes', async () => {
+  it('should trigger search execution on submit when there are no changes', async () => {
     render(<DashboardSearchBar />);
 
     const searchButton = await screen.findByRole('button', { name: /perform search/i });
@@ -92,7 +92,7 @@ describe('DashboardSearchBar', () => {
     await waitFor(() => expect(execute).toHaveBeenCalledTimes(1));
   });
 
-  it('should call SearchActions.refresh and set global override on submit when there are changes', async () => {
+  it('should call trigger search execution and set global override on submit when there are changes', async () => {
     render(<DashboardSearchBar />);
 
     const timeRangeInput = await screen.findByText(/no override/i);

@@ -22,7 +22,6 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
 import { StreamsActions } from 'views/stores/StreamsStore';
-import { SearchActions } from 'views/stores/SearchStore';
 import { SearchConfigActions } from 'views/stores/SearchConfigStore';
 import View from 'views/logic/views/View';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
@@ -55,7 +54,7 @@ jest.mock('views/stores/StreamsStore');
 jest.mock('views/components/common/WindowLeaveMessage', () => jest.fn(mockComponent('WindowLeaveMessage')));
 jest.mock('views/components/SearchBar', () => mockComponent('SearchBar'));
 
-const mockRefreshSearch = () => SearchActions.refresh();
+const mockRefreshSearch = jest.fn();
 
 jest.mock('views/components/DashboardSearchBar', () => () => (
   <button type="button" onClick={mockRefreshSearch}>Execute Query</button>
