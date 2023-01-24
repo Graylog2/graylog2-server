@@ -42,6 +42,7 @@ import org.graylog.plugins.views.startpage.recentActivities.RecentActivityServic
 import org.graylog.security.UserContext;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.PasswordAlgorithmFactory;
@@ -460,7 +461,8 @@ public class ViewsResourceTest {
 
 
     private UserContext mockUserContext() {
-        final UserImpl testUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()), ImmutableMap.of("username", "testuser"));
+        final UserImpl testUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
+                mock(ClusterConfigService.class), ImmutableMap.of("username", "testuser"));
         final UserContext userContext = mock(UserContext.class);
         when(userContext.getUser()).thenReturn(testUser);
         return userContext;

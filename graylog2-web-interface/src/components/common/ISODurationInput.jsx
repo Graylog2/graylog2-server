@@ -47,6 +47,8 @@ class ISODurationInput extends React.Component {
     autoFocus: PropTypes.bool,
     /** Specify that the Input is required to submit the form. */
     required: PropTypes.bool,
+    /** Specify that the Input is disabled or not */
+    disabled: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -56,11 +58,16 @@ class ISODurationInput extends React.Component {
     errorText: 'invalid',
     autoFocus: false,
     required: false,
+    disabled: false,
   };
 
-  state = {
-    duration: this.props.duration,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      duration: this.props.duration,
+    };
+  }
 
   _onUpdate = () => {
     let duration = this.isoDuration.getValue().toUpperCase();
@@ -89,7 +96,8 @@ class ISODurationInput extends React.Component {
              addonAfter={ISODurationUtils.humanizeDuration(this.state.duration, this.props.validator, this.props.errorText)}
              bsStyle={ISODurationUtils.durationStyle(this.state.duration, this.props.validator)}
              autoFocus={this.props.autoFocus}
-             required={this.props.required} />
+             required={this.props.required}
+             disabled={this.props.disabled} />
     );
   }
 }

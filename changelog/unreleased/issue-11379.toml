@@ -1,0 +1,10 @@
+type = "added"
+message = "Add global session timeout configuration."
+
+issues = ["11379"]
+pulls = ["14343"]
+
+details.user = """
+Introducing a cluster-global configuration for user session timeouts.
+When enabled, it overrides any per-user timeout settings.
+"""
