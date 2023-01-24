@@ -21,14 +21,14 @@ import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Qu
 import ViewGenerator from 'views/logic/views/ViewGenerator';
 
 const useCreateSavedSearch = (
-  streamId?: string,
+  streamId?: string | string[],
   timeRange?: TimeRange,
   queryString?: ElasticsearchQueryString,
 ) => {
   return useMemo(
     () => ViewGenerator(View.Type.Search, streamId, timeRange, queryString),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [streamId],
+    [],
   );
 };
 

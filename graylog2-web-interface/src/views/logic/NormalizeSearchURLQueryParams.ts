@@ -24,6 +24,7 @@ import type {
 import {
   filtersForQuery,
   createElasticsearchQueryString,
+  filtersToStreamSet,
 } from 'views/logic/queries/Query';
 import type { TimeRangeQueryParameter } from 'views/logic/TimeRange';
 import { timeRangeFromQueryParameter } from 'views/logic/TimeRange';
@@ -76,7 +77,11 @@ const normalizeSearchURLQueryParams = (query: RawQuery): NormalizedSearchURLQuer
 export const useSearchURLQueryParams = () => {
   const query = useQuery();
 
-  return useMemo(() => normalizeSearchURLQueryParams(query), [query]);
+  return useMemo(() => {
+    const { timeRange, queryString, streamsFilter } = normalizeSearchURLQueryParams(query);
+
+    return { timeRange, queryString, streams: filtersToStreamSet(streamsFilter).toArray() };
+  }, [query]);
 };
 
 export default normalizeSearchURLQueryParams;
