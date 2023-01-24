@@ -31,12 +31,14 @@ const VerboseMessageContainer = styled.div`
   height: 80px;
   overflow-x: hidden;
   overflow-y: scroll;
+  white-space: pre-wrap;
   margin-bottom: 6px;
 `;
 
 const SecondaryText = styled.div`
   color: #94979c;
   font-style: italic;
+  font-size: 66%;
 `;
 
 const ShowDetailsLink = styled(Button)`
@@ -76,6 +78,9 @@ const SidecarFailureTrackingRows = ({ sidecar, collectors, onShowDetails }: Prop
               {collectorData?.name} on {sidecar.node_name}
             </Link>
             <SecondaryText>{annotation}</SecondaryText>
+            <SecondaryText>{collectorData?.node_operating_system}</SecondaryText>
+            <SecondaryText>v{sidecar.sidecar_version}</SecondaryText>
+            <SecondaryText>{sidecar.node_id}</SecondaryText>
           </td>
           <td>
             <RelativeTime dateTime={sidecar.last_seen} />
@@ -96,7 +101,7 @@ const SidecarFailureTrackingRows = ({ sidecar, collectors, onShowDetails }: Prop
             <ShowDetailsLink bsStyle="link"
                              bsSize="xs"
                              onClick={() => onShowDetails({ name: collectorData?.name, verbose_message: collector.verbose_message })}>
-              Show Details
+              Show more
             </ShowDetailsLink>
           </td>
         </tr>
