@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 //TODO: to be replaced by MongoDB storage in a new collection, or session storage, or maybe even combination of both...no decision made yet
+//TODO: when replacing with proper, permanent storage, consider replacing "sort" String with enum
 public class InMemoryEntityListPreferencesService implements EntityListPreferencesService {
 
     private static final Map<String, Map<String, StoredEntityListPreferences>> INMEMORY_STORAGE = new HashMap<>();
