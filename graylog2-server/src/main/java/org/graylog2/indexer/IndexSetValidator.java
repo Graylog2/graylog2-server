@@ -104,18 +104,18 @@ public class IndexSetValidator {
 
     @Nullable
     public Violation validateRotation(RotationStrategyConfig rotationStrategyConfig) {
-        if ((rotationStrategyConfig instanceof TimeBasedSizeOptimizingStrategyConfig smartConfig)) {
-            final Period leeway = smartConfig.indexLifetimeHard().minus(smartConfig.indexLifetimeSoft());
+        if ((rotationStrategyConfig instanceof TimeBasedSizeOptimizingStrategyConfig config)) {
+            final Period leeway = config.indexLifetimeHard().minus(config.indexLifetimeSoft());
             if (leeway.toStandardSeconds().getSeconds() < 0) {
-                return Violation.create(f("%s <%s> is shorter than %s <%s>", INDEX_LIFETIME_HARD, smartConfig.indexLifetimeHard(),
-                        INDEX_LIFETIME_SOFT, smartConfig.indexLifetimeSoft()));
+                return Violation.create(f("%s <%s> is shorter than %s <%s>", INDEX_LIFETIME_HARD, config.indexLifetimeHard(),
+                        INDEX_LIFETIME_SOFT, config.indexLifetimeSoft()));
             }
 
             final Period maxRetentionPeriod = elasticsearchConfiguration.getMaxIndexRetentionPeriod();
             if (maxRetentionPeriod != null
-                    && smartConfig.indexLifetimeHard().toStandardSeconds().isGreaterThan(maxRetentionPeriod.toStandardSeconds())) {
+                    && config.indexLifetimeHard().toStandardSeconds().isGreaterThan(maxRetentionPeriod.toStandardSeconds())) {
                 f("Lifetime setting %s <%s> exceeds the configured maximum of %s=%s.",
-                        INDEX_LIFETIME_HARD, smartConfig.indexLifetimeHard(),
+                        INDEX_LIFETIME_HARD, config.indexLifetimeHard(),
                         ElasticsearchConfiguration.MAX_INDEX_RETENTION_PERIOD, maxRetentionPeriod);
             }
         }
