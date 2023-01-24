@@ -35,8 +35,7 @@ import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useCurrentSearchTypesResults from 'views/components/widgets/useCurrentSearchTypesResults';
 import useAppDispatch from 'stores/useAppDispatch';
 import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
-import useAppSelector from 'stores/useAppSelector';
-import { selectSearchJobId } from 'views/logic/slices/searchExecutionSelectors';
+import useOnSearchExecution from 'views/hooks/useOnSearchExecution';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
 
@@ -73,16 +72,7 @@ const useResetPaginationOnSearchExecution = (setPagination: (pagination: Paginat
       setPagination({ currentPage: 1, pageErrors: [] });
     }
   }, [currentPage, setPagination]);
-  const searchResultId = useAppSelector(selectSearchJobId);
-  const lastSearchResultId = useRef<string | undefined>();
-
-  useEffect(() => {
-    if (lastSearchResultId.current !== undefined && lastSearchResultId.current !== searchResultId) {
-      resetPagination();
-    }
-
-    lastSearchResultId.current = searchResultId;
-  }, [searchResultId]);
+  useOnSearchExecution(resetPagination);
 };
 
 const useResetScrollPositionOnPageChange = (currentPage: number) => {
