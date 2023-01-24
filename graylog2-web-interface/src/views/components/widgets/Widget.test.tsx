@@ -124,7 +124,6 @@ describe('<Widget />', () => {
       <WidgetContext.Provider value={propsWidget}>
         <Widget widget={propsWidget}
                 id="widgetId"
-                fields={Immutable.List([])}
                 onPositionsChange={() => {}}
                 title="Widget Title"
                 position={new WidgetPosition(1, 1, 1, 1)}

@@ -24,16 +24,13 @@ import { widgetDefinition } from 'views/logic/Widgets';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import { useStore } from 'stores/connect';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import type { StoreState } from 'stores/StoreTypes';
 import { ViewStatesStore } from 'views/stores/ViewStatesStore';
 import ElementDimensions from 'components/common/ElementDimensions';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import findGaps from 'views/components/GridGaps';
 import generateId from 'logic/generateId';
 import NewWidgetPlaceholder from 'views/components/NewWidgetPlaceholder';
@@ -74,7 +71,6 @@ const _defaultDimensions = (type: string) => {
 };
 
 type WidgetsProps = {
-  fields: FieldTypeMappingsList,
   widgetId: string,
   focusedWidget: FocusContextState | undefined,
   onPositionsChange: (position: BackendWidgetPosition) => void,
@@ -82,7 +78,6 @@ type WidgetsProps = {
 };
 
 const WidgetGridItem = ({
-  fields,
   onPositionsChange,
   positions,
   widgetId,
@@ -93,7 +88,6 @@ const WidgetGridItem = ({
 
   return (
     <WidgetComponent editing={editing}
-                     fields={fields}
                      onPositionsChange={onPositionsChange}
                      position={widgetPosition}
                      widgetId={widgetId} />
@@ -144,13 +138,6 @@ const Grid = ({ children, locked, onPositionsChange, onSyncLayout, positions, wi
 
 Grid.defaultProps = {
   onSyncLayout: () => {},
-};
-
-const useQueryFieldTypes = () => {
-  const fieldTypes = useContext(FieldTypesContext);
-  const queryId = useActiveQueryId();
-
-  return useMemo(() => fieldTypes.queryFields.get(queryId, fieldTypes.all), [fieldTypes.all, fieldTypes.queryFields, queryId]);
 };
 
 const MAXIMUM_GRID_SIZE = 12;
@@ -226,15 +213,12 @@ const WidgetGrid = () => {
     }
   }, [positions]);
 
-  const fields = useQueryFieldTypes();
-
   const [children, newPositions] = useMemo(() => {
     const widgetItems = widgets
       .filter((widget) => !!positions[widget.id])
       .map(({ id: widgetId }) => (
         <WidgetContainer key={widgetId} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
-          <WidgetGridItem fields={fields}
-                          positions={positions}
+          <WidgetGridItem positions={positions}
                           widgetId={widgetId}
                           focusedWidget={focusedWidget}
                           onPositionsChange={onPositionChange} />
@@ -250,7 +234,7 @@ const WidgetGrid = () => {
     return [widgetItems, positions];
     // We need to include lastUpdate explicitly to be able to force recalculation
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fields, focusedWidget, isInteractive, lastUpdate, positions, widgets]);
+  }, [focusedWidget, isInteractive, lastUpdate, positions, widgets]);
 
   // Measuring the width is required to update the widget grid
   // when its content height results in a scrollbar
