@@ -24,7 +24,7 @@ const useOnSearchExecution = (fn: () => void) => {
   const lastSearchResultId = useRef<string | undefined>();
 
   useEffect(() => {
-    if (lastSearchResultId.current !== undefined && lastSearchResultId.current !== searchResultId) {
+    if (lastSearchResultId.current !== searchResultId) {
       fn();
     }
 
