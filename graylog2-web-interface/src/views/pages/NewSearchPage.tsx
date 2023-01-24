@@ -22,8 +22,8 @@ import { useSearchURLQueryParams } from 'views/logic/NormalizeSearchURLQueryPara
 import SearchPage from './SearchPage';
 
 const NewSearchPage = () => {
-  const { timeRange, queryString } = useSearchURLQueryParams();
-  const view = useCreateSavedSearch(undefined, timeRange, queryString);
+  const { timeRange, queryString, streams } = useSearchURLQueryParams();
+  const view = useCreateSavedSearch(streams, timeRange, queryString);
 
   return <SearchPage view={view} isNew />;
 };
