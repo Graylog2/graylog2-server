@@ -14,10 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { createBrowserHistory } from 'history';
+import { useEffect } from 'react';
 
-if (!window.graylogHistory) {
-  window.graylogHistory = createBrowserHistory();
-}
+import type View from 'views/logic/views/View';
+import { ViewActions } from 'views/stores/ViewStore';
 
-export default window.graylogHistory;
+const useLoadView = (viewPromise: Promise<View>, queryId: string, isNew: boolean) => {
+  useEffect(() => {
+    viewPromise.then((view) => (isNew ? ViewActions.loadNew(view, queryId) : ViewActions.load(view, false, queryId)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewPromise]);
+};
+
+export default useLoadView;

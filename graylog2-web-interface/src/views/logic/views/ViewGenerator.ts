@@ -35,6 +35,7 @@ export default async (
 
   return View.create()
     .toBuilder()
+    .newId()
     .type(type)
     .state({ [query.id]: viewState })
     .search(search)
