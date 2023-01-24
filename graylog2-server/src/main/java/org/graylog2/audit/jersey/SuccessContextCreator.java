@@ -14,13 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.bulk;
+package org.graylog2.audit.jersey;
 
-import org.graylog.security.HasUser;
+import java.util.Map;
 
-@FunctionalInterface
-public interface SingleEntityRemover<T, C extends HasUser> {
+public interface SuccessContextCreator<T> {
 
-    T remove(final String entityId, final C userContext) throws Exception;
-
+    Map<String, Object> create(final T entity, final Class<?> entityClass);
 }

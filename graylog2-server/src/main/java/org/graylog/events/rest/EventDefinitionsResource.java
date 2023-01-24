@@ -18,6 +18,7 @@ package org.graylog.events.rest;
 
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
@@ -39,11 +40,13 @@ import org.graylog.events.processor.EventProcessorParametersWithTimerange;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
+import org.graylog2.rest.bulk.AuditParams;
 import org.graylog2.rest.bulk.BulkRemover;
 import org.graylog2.rest.bulk.SequentialBulkRemover;
 import org.graylog2.rest.bulk.model.BulkDeleteRequest;
@@ -105,21 +108,24 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private final EventProcessorEngine engine;
     private final SearchQueryParser searchQueryParser;
     private final RecentActivityService recentActivityService;
-    private final BulkRemover<UserContext> bulkRemover;
+    private final BulkRemover<EventDefinitionDto, UserContext> bulkRemover;
 
     @Inject
     public EventDefinitionsResource(DBEventDefinitionService dbService,
                                     EventDefinitionHandler eventDefinitionHandler,
                                     EventDefinitionContextService contextService,
                                     EventProcessorEngine engine,
-                                    RecentActivityService recentActivityService) {
+                                    RecentActivityService recentActivityService,
+                                    AuditEventSender auditEventSender,
+                                    ObjectMapper objectMapper
+    ) {
         this.dbService = dbService;
         this.eventDefinitionHandler = eventDefinitionHandler;
         this.contextService = contextService;
         this.engine = engine;
         this.searchQueryParser = new SearchQueryParser(EventDefinitionDto.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.recentActivityService = recentActivityService;
-        this.bulkRemover = new SequentialBulkRemover<>(this::delete);
+        this.bulkRemover = new SequentialBulkRemover<>(this::delete, auditEventSender, objectMapper);
     }
 
     @GET
@@ -210,13 +216,15 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Path("{definitionId}")
     @ApiOperation("Delete event definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_DELETE)
-    public void delete(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
-                       @Context UserContext userContext) {
+    public EventDefinitionDto delete(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
+                                     @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_DELETE, definitionId);
-        dbService.get(definitionId).ifPresent(d ->
+        final Optional<EventDefinitionDto> eventDefinitionDto = dbService.get(definitionId);
+        eventDefinitionDto.ifPresent(d ->
                 recentActivityService.delete(d.id(), GRNTypes.EVENT_DEFINITION, d.title(), userContext.getUser())
         );
         eventDefinitionHandler.delete(definitionId);
+        return eventDefinitionDto.orElse(null);
     }
 
     @POST
@@ -227,11 +235,13 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Could not delete at least one of the event definitions in the bulk.")
     })
-    @NoAuditEvent("Audit events triggered manually") //TODO: are they?
+    @NoAuditEvent("Audit events triggered manually")
     public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkDeleteRequest bulkDeleteRequest,
                                @Context UserContext userContext) {
 
-        final BulkDeleteResponse response = bulkRemover.bulkDelete(bulkDeleteRequest, userContext);
+        final BulkDeleteResponse response = bulkRemover.bulkDelete(bulkDeleteRequest,
+                userContext,
+                new AuditParams(EventsAuditEventTypes.EVENT_DEFINITION_DELETE, "definitionId", EventDefinitionDto.class));
 
         return Response.status(response.failures().isEmpty() ? Response.Status.OK : Response.Status.BAD_REQUEST)
                 .entity(response)

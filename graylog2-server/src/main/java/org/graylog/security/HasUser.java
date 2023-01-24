@@ -14,13 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.bulk;
+package org.graylog.security;
 
-import org.graylog.security.HasUser;
+import org.graylog2.plugin.database.users.User;
 
-@FunctionalInterface
-public interface SingleEntityRemover<T, C extends HasUser> {
+public interface HasUser {
 
-    T remove(final String entityId, final C userContext) throws Exception;
-
+    User getUser();
 }

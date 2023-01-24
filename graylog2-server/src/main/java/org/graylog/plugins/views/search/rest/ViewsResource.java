@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
@@ -44,6 +45,7 @@ import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.startpage.StartPageService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
@@ -52,6 +54,7 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.rest.bulk.AuditParams;
 import org.graylog2.rest.bulk.BulkRemover;
 import org.graylog2.rest.bulk.SequentialBulkRemover;
 import org.graylog2.rest.bulk.model.BulkDeleteRequest;
@@ -113,7 +116,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final ReferencedSearchFiltersHelper referencedSearchFiltersHelper;
     private final StartPageService startPageService;
     private final RecentActivityService recentActivityService;
-    private final BulkRemover<SearchUser> bulkRemover;
+    private final BulkRemover<ViewDTO, SearchUser> bulkRemover;
 
     @Inject
     public ViewsResource(ViewService dbService,
@@ -122,7 +125,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                          ClusterEventBus clusterEventBus, SearchDomain searchDomain,
                          Map<String, ViewResolver> viewResolvers,
                          SearchFilterVisibilityChecker searchFilterVisibilityChecker,
-                         ReferencedSearchFiltersHelper referencedSearchFiltersHelper) {
+                         ReferencedSearchFiltersHelper referencedSearchFiltersHelper,
+                         AuditEventSender auditEventSender,
+                         ObjectMapper objectMapper) {
         this.dbService = dbService;
         this.startPageService = startPageService;
         this.recentActivityService = recentActivityService;
@@ -132,7 +137,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.searchFilterVisibilityChecker = searchFilterVisibilityChecker;
         this.referencedSearchFiltersHelper = referencedSearchFiltersHelper;
-        this.bulkRemover = new SequentialBulkRemover<>(this::delete);
+        this.bulkRemover = new SequentialBulkRemover<>(this::delete, auditEventSender, objectMapper);
+
+
     }
 
     @GET
@@ -386,7 +393,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkDeleteRequest bulkDeleteRequest,
                                @Context final SearchUser searchUser) {
 
-        final BulkDeleteResponse response = bulkRemover.bulkDelete(bulkDeleteRequest, searchUser);
+        final BulkDeleteResponse response = bulkRemover.bulkDelete(bulkDeleteRequest,
+                searchUser,
+                new AuditParams(ViewsAuditEventTypes.VIEW_DELETE, "id", ViewDTO.class));
 
         return Response.status(response.failures().isEmpty() ? Response.Status.OK : Response.Status.BAD_REQUEST)
                 .entity(response)

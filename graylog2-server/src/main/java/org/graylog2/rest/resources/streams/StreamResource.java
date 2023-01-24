@@ -33,8 +33,10 @@ import org.bson.types.ObjectId;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.DefaultFailureContextCreator;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
@@ -47,6 +49,7 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.rest.bulk.AuditParams;
 import org.graylog2.rest.bulk.BulkRemover;
 import org.graylog2.rest.bulk.SequentialBulkRemover;
 import org.graylog2.rest.bulk.model.BulkDeleteRequest;
@@ -147,7 +150,7 @@ public class StreamResource extends RestResource {
     private final IndexSetRegistry indexSetRegistry;
     private final SearchQueryParser searchQueryParser;
     private final RecentActivityService recentActivityService;
-    private final BulkRemover<UserContext> bulkRemover;
+    private final BulkRemover<Stream, UserContext> bulkRemover;
 
     @Inject
     public StreamResource(StreamService streamService,
@@ -155,7 +158,8 @@ public class StreamResource extends RestResource {
                           StreamRuleService streamRuleService,
                           StreamRouterEngine.Factory streamRouterEngineFactory,
                           IndexSetRegistry indexSetRegistry,
-                          RecentActivityService recentActivityService) {
+                          RecentActivityService recentActivityService,
+                          AuditEventSender auditEventSender) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
@@ -163,7 +167,15 @@ public class StreamResource extends RestResource {
         this.paginatedStreamService = paginatedStreamService;
         this.searchQueryParser = new SearchQueryParser(StreamImpl.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.recentActivityService = recentActivityService;
-        this.bulkRemover = new SequentialBulkRemover<>(this::delete);
+        this.bulkRemover = new SequentialBulkRemover<>(this::delete,
+                auditEventSender,
+                (entity, entityClass) ->
+                        Map.of("response_entity",
+                                Map.of("stream_id", entity.getId(),
+                                        "title", entity.getTitle()
+                                )),
+                new DefaultFailureContextCreator());
+
     }
 
     @POST
@@ -354,18 +366,19 @@ public class StreamResource extends RestResource {
     @Timed
     @ApiOperation(value = "Delete a stream")
     @ApiResponses(value = {
-        @ApiResponse(code = 404, message = "Stream not found."),
-        @ApiResponse(code = 400, message = "Invalid ObjectId.")
+            @ApiResponse(code = 404, message = "Stream not found."),
+            @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
     @AuditEvent(type = AuditEventTypes.STREAM_DELETE)
-    public void delete(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId,
-                       @Context UserContext userContext) throws NotFoundException {
+    public Stream delete(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId,
+                         @Context UserContext userContext) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkNotEditableStream(streamId, "The stream cannot be deleted.");
 
         final Stream stream = streamService.load(streamId);
         recentActivityService.delete(streamId, GRNTypes.STREAM, stream.getTitle(), userContext.getUser());
         streamService.destroy(stream);
+        return stream;
     }
 
     @POST
@@ -380,7 +393,10 @@ public class StreamResource extends RestResource {
     public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkDeleteRequest bulkDeleteRequest,
                                @Context final UserContext userContext) {
 
-        final BulkDeleteResponse response = bulkRemover.bulkDelete(bulkDeleteRequest, userContext);
+        final BulkDeleteResponse response = bulkRemover.bulkDelete(
+                bulkDeleteRequest,
+                userContext,
+                new AuditParams(AuditEventTypes.STREAM_DELETE, "streamId", Stream.class));
 
         return Response.status(response.failures().isEmpty() ? Response.Status.OK : Response.Status.BAD_REQUEST)
                 .entity(response)

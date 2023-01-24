@@ -16,11 +16,7 @@
  */
 package org.graylog2.rest.bulk;
 
-import org.graylog.security.HasUser;
-
-@FunctionalInterface
-public interface SingleEntityRemover<T, C extends HasUser> {
-
-    T remove(final String entityId, final C userContext) throws Exception;
-
+public record AuditParams(String eventType,
+                          String entityIdInPathParam,
+                          Class<?> entityClass) {
 }
