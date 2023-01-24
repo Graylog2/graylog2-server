@@ -114,12 +114,12 @@ const SchedulingInfo = ({
     .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
 
   return (
-    <p>
+    <>
       {`Runs every ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}. `}
       <OverlayTrigger trigger="click" rootClose placement="left" overlay={detailsPopover(title, scheduler, clearNotifications)}>
         <DetailsButton bsStyle="link"><Icon name="circle-info" /></DetailsButton>
       </OverlayTrigger>
-    </p>
+    </>
   );
 };
 

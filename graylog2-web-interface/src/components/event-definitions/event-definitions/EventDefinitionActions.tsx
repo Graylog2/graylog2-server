@@ -122,8 +122,10 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
   const handleConfirm = () => {
     switch (dialogType) {
       case 'copy':
-        EventDefinitionsActions.copy(currentDefinition);
-        handleClearState();
+        EventDefinitionsActions.copy(currentDefinition).finally(() => {
+          handleClearState();
+        });
+        
         break;
       case 'delete':
         EventDefinitionsActions.delete(currentDefinition).then(
@@ -135,17 +137,20 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
             UserNotification.error(`Deleting Event Definition "${eventDefinition.title}" failed with status: ${error}`,
               'Could not delete Event Definition');
           },
-        );
+        ).finally(() => {
+          handleClearState();
+        });
 
-        handleClearState();
         break;
       case 'enable':
-        EventDefinitionsActions.enable(currentDefinition);
-        handleClearState();
+        EventDefinitionsActions.enable(currentDefinition).finally(() => {
+          handleClearState();
+        });
         break;
       case 'disable':
-        EventDefinitionsActions.disable(currentDefinition);
-        handleClearState();
+        EventDefinitionsActions.disable(currentDefinition).finally(() => {
+          handleClearState();
+        });
         break;
       default:
         break;

@@ -31,10 +31,12 @@ import StatusCell from './StatusCell';
 
 import type { EventDefinition } from '../event-definitions-types';
 import useEventDefinitions from '../hooks/useEventDefinitions';
+import BulkActions from './BulkActions';
 
 const CUSTOM_COLUMN_DEFINITIONS = [
   { id: 'title', title: 'Event Definition title', sortable: true },
   { id: 'scheduling', title: 'Scheduling', sortable: false },
+  { id: 'status', title: 'Status', sortable: true },
 ];
 
 const INITIAL_COLUMNS = ['title', 'description', 'priority', 'scheduling', 'status'];
@@ -103,10 +105,12 @@ const EventDefinitionsContainer = () => {
   ), [refetchEventDefinitions]);
 
   const renderBulkActions = (
-    // selectedEventDefinitionsIds: Array<string>,
-    // setSelectedEventDefinitionsIds: (eventDefinitionsId: Array<string>) => void,
+     selectedEventDefinitionsIds: Array<string>,
+     setSelectedEventDefinitionsIds: (eventDefinitionsId: Array<string>) => void,
   ) => (
-    <span>Bulkactions</span>
+    <BulkActions selectedDefintions={selectedEventDefinitionsIds} 
+                 setSelectedEventDefinitionsIds={setSelectedEventDefinitionsIds}
+                 refetchEventDefinitions={refetchEventDefinitions} />
   );
 
   if (!paginatedEventDefinitions) {
@@ -114,7 +118,7 @@ const EventDefinitionsContainer = () => {
   }
 
   const { elements, pagination: { total } } = paginatedEventDefinitions;
-
+  
   return (
     <PaginatedList onChange={onPageChange}
                    pageSize={searchParams.pageSize}

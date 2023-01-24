@@ -35,7 +35,7 @@ const useEventDefinitions = (searchParams: SearchParams, { enabled }: Options = 
   isFetching: boolean,
 } => {
   const { data, refetch, isFetching } = useQuery(
-    ['streams', 'overview', searchParams],
+    ['eventDefinition', 'overview', searchParams],
     () => EventDefinitionsStore.searchPaginated(
       searchParams.page,
       searchParams.pageSize,

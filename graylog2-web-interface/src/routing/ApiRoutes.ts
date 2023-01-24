@@ -134,6 +134,14 @@ const ApiRoutes = {
     userSharesPaginated: (username: string) => { return { url: `/authz/shares/user/${username}` }; },
     entityScopes: () => { return { url: '/entity_scopes' }; },
   },
+  EventDefinitionsApiController: {
+    list: () => { return { url: '/events/definitions' }; },
+    paginated: () => { return { url: '/events/definitions/paginated' }; },
+    get: (definitionId: string) => { return { url: `/events/definitions/${definitionId}` }; },
+    create: () => { return { url: '/events/definitions' }; },
+    update: (definitionId: string) => { return { url: `/events/definitions/${definitionId}` }; },
+    delete: (definitionId: string) => { return { url: `/events/definitions/${definitionId}` }; },
+  },
   HTTPHeaderAuthConfigController: {
     load: () => ({ url: '/system/authentication/http-header-auth-config' }),
     update: () => ({ url: '/system/authentication/http-header-auth-config' }),
