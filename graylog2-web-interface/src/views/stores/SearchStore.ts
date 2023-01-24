@@ -21,7 +21,6 @@ import { debounce, get, isEqual } from 'lodash';
 import type { Store } from 'stores/StoreTypes';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { runSearchJob, searchJobStatus } from 'views/stores/SearchJobs';
 import { ViewStore, ViewActions } from 'views/stores/ViewStore';
 import SearchResult from 'views/logic/SearchResult';
@@ -83,7 +82,7 @@ export const SearchStore: Store<SearchStoreState> = singletonStore(
 
     init() {
       this.listenTo(ViewStore, this.onViewStoreUpdate, this.onViewStoreUpdate);
-      this.listenTo(SearchExecutionStateStore, this.onSearchExecutionStateUpdate, this.onSearchExecutionStateUpdate);
+      // this.listenTo(SearchExecutionStateStore, this.onSearchExecutionStateUpdate, this.onSearchExecutionStateUpdate);
     },
 
     getInitialState() {
