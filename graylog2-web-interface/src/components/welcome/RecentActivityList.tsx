@@ -18,26 +18,37 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
 import { Table } from 'components/bootstrap';
-import { DEFAULT_PAGINATION, entityTypeMap } from 'components/welcome/Constants';
+import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
 import { NoSearchResult, PaginatedList, RelativeTime, Spinner } from 'components/common';
-import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
 import { StyledLabel } from 'components/welcome/EntityListItem';
 import type { EntityItemType, RecentActivityType } from 'components/welcome/types';
 import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
+import getShowRouteForEntity from 'routing/getShowRouteForEntity';
+import getTitleForEntityType from 'util/getTitleForEntityType';
 
 type Props = { itemType: EntityItemType, itemId: string, activityType: RecentActivityType, itemTitle: string, userName?: string };
 
 const ActionItem = ({ itemType, itemId, activityType, itemTitle, userName }: Props) => {
-  const entityType = entityTypeMap[itemType] ?? entityTypeMap.unknown;
+  const entityTypeTitle = useMemo(() => {
+    try {
+      return getTitleForEntityType(itemType);
+    } catch (e) {
+      return `(unsupported type ${itemType})`;
+    }
+  }, [itemType]);
   const entityLink = useMemo(() => {
-    return entityType.link ? Routes.pluginRoute(entityType.link)(itemId) : undefined;
-  }, [entityType, itemId]);
+    try {
+      return getShowRouteForEntity(itemId, itemType);
+    } catch (e) {
+      return undefined;
+    }
+  }, [itemType, itemId]);
   const entityTitle = itemTitle || itemId;
 
   return (
     <div>
-      {`The ${entityType.typeTitle} `}
+      {`The ${entityTypeTitle} `}
       {activityType === 'delete' || !entityLink
         ? <i>{entityTitle}</i>
         : <Link target="_blank" to={entityLink}>{entityTitle}</Link>}

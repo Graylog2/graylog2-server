@@ -19,10 +19,10 @@ import React, { useMemo } from 'react';
 import styled from 'styled-components';
 
 import { Link } from 'components/common/router';
-import Routes from 'routing/Routes';
 import { ListGroupItem, Label } from 'components/bootstrap';
-import { entityTypeMap } from 'components/welcome/Constants';
 import type { EntityItemType } from 'components/welcome/types';
+import getTitleForEntityType from 'util/getTitleForEntityType';
+import getShowRouteForEntity from 'routing/getShowRouteForEntity';
 
 const StyledListGroupItem = styled(ListGroupItem)`
   display: flex;
@@ -42,15 +42,25 @@ type Props = {
 }
 
 const EntityItem = ({ type, title, id }: Props) => {
-  const entityType = entityTypeMap[type] ?? entityTypeMap.unknown;
+  const entityTypeTitle = useMemo(() => {
+    try {
+      return getTitleForEntityType(type);
+    } catch (e) {
+      return 'unknown';
+    }
+  }, [type]);
   const entityLink = useMemo(() => {
-    return entityType.link ? Routes.pluginRoute(entityType.link)(id) : undefined;
-  }, [entityType, id]);
+    try {
+      return getShowRouteForEntity(id, type);
+    } catch (e) {
+      return undefined;
+    }
+  }, [type, id]);
   const entityTitle = title || id;
 
   return (
     <StyledListGroupItem>
-      <StyledLabel bsStyle="info">{entityType.typeTitle}</StyledLabel>
+      <StyledLabel bsStyle="info">{entityTypeTitle}</StyledLabel>
       {!entityLink
         ? <i>{entityTitle}</i>
         : <Link target="_blank" to={entityLink}>{entityTitle}</Link>}
