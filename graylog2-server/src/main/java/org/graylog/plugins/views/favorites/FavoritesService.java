@@ -65,9 +65,9 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
         return PaginatedResponse.create("favorites", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
     }
 
-    public void addFavoriteItemFor(final String id, final SearchUser searchUser) {
+    protected void addFavoriteItemFor(final String id, final String type, final SearchUser searchUser) {
         final var favorites = this.findForUser(searchUser);
-        final var item = new FavoriteDTO(id, catalog.getType(id));
+        final var item = new FavoriteDTO(id, type);
         if(favorites.isPresent()) {
             var fi = favorites.get();
             fi.items().add(item);
@@ -76,6 +76,14 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
             var items = new FavoritesForUserDTO(searchUser.getUser().getId(), List.of(item));
             this.create(items, searchUser);
         }
+    }
+
+    public void addFavoriteItemFor(final FavoriteDTO dto, final SearchUser searchUser) {
+        this.addFavoriteItemFor(dto.id(), dto.type(), searchUser);
+    }
+
+    public void addFavoriteItemFor(final String id, final SearchUser searchUser) {
+        this.addFavoriteItemFor(id, catalog.getType(id), searchUser);
     }
 
     public void removeFavoriteItemFor(final String id, final SearchUser searchUser) {

@@ -22,11 +22,14 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.rest.models.PaginatedResponse;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -62,12 +65,24 @@ public class FavoritesResource {
         return favoritesService.findFavoritesFor(searchUser, type, page, perPage);
     }
 
+    /**
+     *  method will get removed asap in favor of the method that receives a body
+     */
     @PUT
     @Path("/{id}")
     @ApiOperation("Add an item for inclusion on the Start Page for the user")
     @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_ADD_FAVORITE_ITEM)
-    public void addItemToFavorites(@ApiParam(name = "id", required = true) @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
+    @Deprecated
+    public void deprecatedAddItemToFavorites(@ApiParam(name = "id", required = true) @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
         favoritesService.addFavoriteItemFor(id, searchUser);
+    }
+
+    @PUT
+    @ApiOperation("Add an item for inclusion on the Start Page for the user")
+    @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_ADD_FAVORITE_ITEM)
+    @Deprecated
+    public void addItemToFavorites(@ApiParam @NotNull(message = "Favorite is mandatory") FavoriteDTO dto, @Context SearchUser searchUser) {
+        favoritesService.addFavoriteItemFor(dto, searchUser);
     }
 
     @DELETE
