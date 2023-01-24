@@ -23,6 +23,8 @@ import org.graylog.plugins.views.favorites.Favorite;
 import org.graylog.plugins.views.favorites.FavoriteDTO;
 import org.graylog.plugins.views.favorites.FavoritesForUserDTO;
 import org.graylog.plugins.views.favorites.FavoritesService;
+import org.graylog.plugins.views.search.views.ViewResolver;
+import org.graylog.plugins.views.search.views.ViewResolverDecoder;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpened;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedForUserDTO;
@@ -38,8 +40,11 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import javax.inject.Inject;
+import javax.ws.rs.NotFoundException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -47,16 +52,19 @@ public class StartPageService {
     private final Catalog catalog;
     private final LastOpenedService lastOpenedService;
     private final RecentActivityService recentActivityService;
+    private final Map<String, ViewResolver> viewResolvers;
     private final long MAXIMUM_LAST_OPENED_PER_USER = 100;
 
     @Inject
     public StartPageService(Catalog catalog,
                             LastOpenedService lastOpenedService,
                             RecentActivityService recentActivityService,
+                            Map<String, ViewResolver> viewResolvers,
                             EventBus eventBus) {
         this.catalog = catalog;
         this.lastOpenedService = lastOpenedService;
         this.recentActivityService = recentActivityService;
+        this.viewResolvers = viewResolvers;
         eventBus.register(this);
     }
 
@@ -66,10 +74,35 @@ public class StartPageService {
                 .orElse(new LastOpenedForUserDTO(searchUser.getUser().getId(), List.of()))
                 .items()
                 .stream()
-                .map(i -> new LastOpened(i.id(), catalog.getType(i.id()), catalog.getTitle(i.id()), i.timestamp()))
+                .map(this::createLastOpened)
                 .toList();
 
         return PaginatedResponse.create("lastOpened", new PaginatedList<>(PaginatedDbService.getPage(items, page, perPage), items.size(), page, perPage));
+    }
+
+    private LastOpened unknownEntity(final LastOpenedDTO dto) {
+        return new LastOpened(dto.id(), "Unknown entity: " + dto.id(), "Unknown entity: " + dto.id(), dto.timestamp());
+    }
+
+    private String convertViewType(final ViewDTO viewDTO) {
+        return viewDTO.type().name().toLowerCase(Locale.ROOT);
+    }
+
+    private LastOpened createLastOpened(final LastOpenedDTO dto) {
+        final ViewResolverDecoder decoder = new ViewResolverDecoder(dto.id());
+        if (decoder.isResolverViewId()) {
+            final ViewResolver viewResolver = viewResolvers.get(decoder.getResolverName());
+            if (viewResolver != null) {
+                return viewResolver
+                        .get(decoder.getViewId())
+                        .map(view -> new LastOpened(dto.id(), this.convertViewType(view), view.title(), dto.timestamp()))
+                        .orElse(this.unknownEntity(dto));
+            } else {
+                return this.unknownEntity(dto);
+            }
+        } else {
+            return new LastOpened(dto.id(), catalog.getType(dto.id()), catalog.getTitle(dto.id()), dto.timestamp());
+        }
     }
 
     private String getType(RecentActivityDTO i) {
