@@ -51,7 +51,6 @@ const viewJson: ViewJson = {
   created_at: '2019-05-24T12:34:04.993Z',
   owner: 'admin',
   requires: {},
-  favorite: false,
 };
 
 describe('ViewLoader', () => {
@@ -87,7 +86,6 @@ describe('ViewLoader', () => {
               .build(),
           )
           .requires({})
-          .favorite(false)
           .build(),
       );
     });
