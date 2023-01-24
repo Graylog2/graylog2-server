@@ -117,7 +117,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     public abstract ImmutableList<EventStorageHandler.Config> storage();
 
     @Override
-    @JsonProperty(FIELD_SCHEDULERCTX)
+    @JsonProperty(value = FIELD_SCHEDULERCTX, access = JsonProperty.Access.READ_ONLY)
     @Nullable
     public abstract EventDefinitionContextService.SchedulerCtx schedulerCtx();
 
@@ -202,7 +202,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
         @JsonProperty(FIELD_STORAGE)
         public abstract Builder storage(ImmutableList<EventStorageHandler.Config> storageHandlers);
 
-        @JsonProperty(FIELD_SCHEDULERCTX)
+        @JsonProperty(value = FIELD_SCHEDULERCTX, access = JsonProperty.Access.READ_ONLY)
         public abstract Builder schedulerCtx(EventDefinitionContextService.SchedulerCtx schedulerCtx);
 
         abstract EventDefinitionDto autoBuild();
