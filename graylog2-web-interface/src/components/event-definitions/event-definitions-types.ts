@@ -15,8 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { Stream } from 'src/stores/streams/StreamsStore';
-
 type Provider = {
   type: string,
   template: string,
@@ -54,7 +52,7 @@ export type EventDefinition = {
     execute_every_ms?: number,
     search_within_ms?: number,
     sigma_rule_id?: string,
-    streams?: Array<Stream>
+    streams?: Array<string>
   },
   title: string,
   description?: string,
