@@ -80,18 +80,18 @@ const CacheTableEntry = ({ cache }: Props) => {
     return `${NumberUtils.formatNumber(hitRate)}%`;
   };
 
-  const handleEdit = () => {
+  const handleEdit = React.useCallback(() => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cache.name));
-  };
+  }, [history, cache.name]);
 
-  const handleDelete = () => {
+  const handleDelete = React.useCallback(() => {
     // eslint-disable-next-line no-alert
     const shouldDelete = window.confirm(`Are you sure you want to delete cache "${cache.title}"?`);
 
     if (shouldDelete) {
       LookupTableCachesActions.delete(cache.id).then(() => LookupTableCachesActions.reloadPage());
     }
-  };
+  }, [cache.title, cache.id]);
 
   return (
     <tbody>

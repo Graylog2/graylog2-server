@@ -123,6 +123,49 @@ const LUTItem = ({ table, caches, dataAdapters, errorStates }: ItemProps) => {
   );
 };
 
+const NoResults = ({ query }: { query: string }) => {
+  return (
+    <tbody>
+      <tr>
+        <td colSpan={6}>
+          {query
+            ? <NoSearchResult>No tables found with title &quot;{query}&quot;</NoSearchResult>
+            : <NoEntitiesExist>There are no data adapters to list</NoEntitiesExist>}
+        </td>
+      </tr>
+    </tbody>
+  );
+};
+
+const DataRow = ({
+  tables,
+  caches,
+  dataAdapters,
+  query,
+  errorStates,
+}: {
+  tables: LookupTable[],
+  caches: LookupTableCache[],
+  dataAdapters: LookupTableAdapter[],
+  query: string,
+  errorStates: { [key: string]: { [key: string]: string } },
+}) => {
+  return tables.length > 0
+    ? (
+      <>
+        {tables.map((table: LookupTable) => (
+          <LUTItem key={`table-item-${table.id}`}
+                   table={table}
+                   caches={caches}
+                   dataAdapters={dataAdapters}
+                   errorStates={errorStates} />
+        ))}
+      </>
+    ) : (
+      <NoResults query={query} />
+    );
+};
+
 type Props = {
   tables: LookupTable[],
   caches: LookupTableCache[],
@@ -144,7 +187,7 @@ const LookupTablesOverview = ({
   const [localPagination, setLocalPagination] = React.useState({
     currentPage: paginationQueryParameter.page || 1,
     currentPageSize: paginationQueryParameter.pageSize || 10,
-    currentQuery: pagination.query || '',
+    currentQuery: pagination.query ? decodeURI(pagination.query) : '',
     resetPage: paginationQueryParameter.resetPage,
     setPagination: paginationQueryParameter.setPagination,
   });
@@ -171,41 +214,6 @@ const LookupTablesOverview = ({
     localPagination.setPagination({ page: 1, pageSize: localPagination.currentPageSize });
     setLocalPagination({ ...localPagination, currentPage: 1, currentQuery: '' });
   }, [localPagination]);
-
-  const getComponent = () => {
-    switch (true) {
-      case loading:
-        return <Spinner text="Loading tables" />;
-      case (tables.length === 0 && !!localPagination.currentQuery):
-        return (
-          <tbody>
-            <tr>
-              <td colSpan={6}>
-                <NoSearchResult>No tables found with title &quot;{localPagination.currentQuery}&quot;</NoSearchResult>
-              </td>
-            </tr>
-          </tbody>
-        );
-      case tables.length > 0:
-        return tables.map((table: LookupTable) => (
-          <LUTItem key={`table-item-${table.id}`}
-                   table={table}
-                   caches={caches}
-                   dataAdapters={dataAdapters}
-                   errorStates={errorStates} />
-        ));
-      default:
-        return (
-          <tbody>
-            <tr>
-              <td colSpan={6}>
-                <NoEntitiesExist>There are no tables to list</NoEntitiesExist>
-              </td>
-            </tr>
-          </tbody>
-        );
-    }
-  };
 
   return (
     <Row className="content">
@@ -234,7 +242,13 @@ const LookupTablesOverview = ({
                   <th className={Styles.rowActions}>Actions</th>
                 </tr>
               </thead>
-              {getComponent()}
+              {loading ? <Spinner text="Loading data adapters" /> : (
+                <DataRow tables={tables}
+                         caches={caches}
+                         dataAdapters={dataAdapters}
+                         query={localPagination.currentQuery}
+                         errorStates={errorStates} />
+              )}
             </Table>
           </div>
         </PaginatedList>

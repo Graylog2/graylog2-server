@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import { Alert } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -30,16 +29,13 @@ type Props = {
  * Usage should include utilizing the `children` props to supply the user with a descriptive message.
 */
 const NoSearchResult = ({ children, className }: Props) => (
-  <Alert className={`${className ?? ''} no-bm`}><Icon name="info-circle" />&nbsp;{children}</Alert>
+  <Alert className={`${className ?? ''} no-bm`}>
+    <Icon name="info-circle" />
+    &nbsp;{children || 'No data available.'}
+  </Alert>
 );
 
-NoSearchResult.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  className: PropTypes.string,
-};
-
 NoSearchResult.defaultProps = {
-  children: 'No data available.',
   className: undefined,
 };
 

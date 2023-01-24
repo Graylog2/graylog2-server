@@ -79,6 +79,33 @@ const buildHelpPopover = () => {
   );
 };
 
+const NoResults = ({ query }: { query: string }) => {
+  return (
+    <tbody>
+      <tr>
+        <td colSpan={7}>
+          {query
+            ? <NoSearchResult>No caches found with title &quot;{query}&quot;</NoSearchResult>
+            : <NoEntitiesExist>There are no caches to list</NoEntitiesExist>}
+        </td>
+      </tr>
+    </tbody>
+  );
+};
+
+const DataRow = ({ caches, query }: { caches: LookupTableCache[], query: string }) => {
+  return caches.length > 0
+    ? (
+      <>
+        {caches.map((cache: LookupTableCache) => (
+          <CacheTableEntry key={`cache-item-${cache.id}`} cache={cache} />
+        ))}
+      </>
+    ) : (
+      <NoResults query={query} />
+    );
+};
+
 type Props = {
   caches: LookupTableCache[],
   pagination: PaginationType,
@@ -90,7 +117,7 @@ const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props)
   const [localPagination, setLocalPagination] = React.useState({
     currentPage: paginationQueryParameter.page || 1,
     currentPageSize: paginationQueryParameter.pageSize || 10,
-    currentQuery: pagination.query || '',
+    currentQuery: pagination.query ? decodeURI(pagination.query) : '',
     resetPage: paginationQueryParameter.resetPage,
     setPagination: paginationQueryParameter.setPagination,
   });
@@ -117,37 +144,6 @@ const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props)
     localPagination.setPagination({ page: 1, pageSize: localPagination.currentPageSize });
     setLocalPagination({ ...localPagination, currentPage: 1, currentQuery: '' });
   }, [localPagination]);
-
-  const getComponent = () => {
-    switch (true) {
-      case loading:
-        return <Spinner text="Loading data adapters" />;
-      case (caches.length === 0 && !!localPagination.currentQuery):
-        return (
-          <tbody>
-            <tr>
-              <td colSpan={6}>
-                <NoSearchResult>No caches found with title &quot;{localPagination.currentQuery}&quot;</NoSearchResult>
-              </td>
-            </tr>
-          </tbody>
-        );
-      case caches.length > 0:
-        return caches.map((cache: LookupTableCache) => (
-          <CacheTableEntry key={`cache-item-${cache.id}`} cache={cache} />
-        ));
-      default:
-        return (
-          <tbody>
-            <tr>
-              <td colSpan={6}>
-                <NoEntitiesExist>There are no caches to list</NoEntitiesExist>
-              </td>
-            </tr>
-          </tbody>
-        );
-    }
-  };
 
   return (
     <Row className="content">
@@ -180,7 +176,9 @@ const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props)
                   <th className={Styles.rowActions}>Actions</th>
                 </tr>
               </thead>
-              {getComponent()}
+              {loading ? <Spinner text="Loading data adapters" /> : (
+                <DataRow caches={caches} query={localPagination.currentQuery} />
+              )}
             </Table>
           </div>
         </PaginatedList>

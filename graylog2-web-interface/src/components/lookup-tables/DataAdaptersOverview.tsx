@@ -79,6 +79,43 @@ const buildHelpPopover = () => {
   );
 };
 
+const NoResults = ({ query }: { query: string }) => {
+  return (
+    <tbody>
+      <tr>
+        <td colSpan={5}>
+          {query
+            ? <NoSearchResult>No data adapters found with title &quot;{query}&quot;</NoSearchResult>
+            : <NoEntitiesExist>There are no data adapters to list</NoEntitiesExist>}
+        </td>
+      </tr>
+    </tbody>
+  );
+};
+
+const DataRow = ({
+  dataAdapters,
+  query,
+  errors,
+}: {
+  dataAdapters: LookupTableAdapter[],
+  query: string,
+  errors: { [key: string]: string },
+}) => {
+  return dataAdapters.length > 0
+    ? (
+      <>
+        {dataAdapters.map((dataAdapter: LookupTableAdapter) => (
+          <DataAdapterTableEntry key={dataAdapter.id}
+                                 adapter={dataAdapter}
+                                 error={errors[dataAdapter.name]} />
+        ))}
+      </>
+    ) : (
+      <NoResults query={query} />
+    );
+};
+
 type Props = {
   dataAdapters: LookupTableAdapter[],
   pagination: PaginationType,
@@ -91,7 +128,7 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
   const [localPagination, setLocalPagination] = React.useState({
     currentPage: paginationQueryParameter.page || 1,
     currentPageSize: paginationQueryParameter.pageSize || 10,
-    currentQuery: pagination.query || '',
+    currentQuery: pagination.query ? decodeURI(pagination.query) : '',
     resetPage: paginationQueryParameter.resetPage,
     setPagination: paginationQueryParameter.setPagination,
   });
@@ -118,39 +155,6 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
     localPagination.setPagination({ page: 1, pageSize: localPagination.currentPageSize });
     setLocalPagination({ ...localPagination, currentPage: 1, currentQuery: '' });
   }, [localPagination]);
-
-  const getComponent = () => {
-    switch (true) {
-      case loading:
-        return <Spinner text="Loading data adapters" />;
-      case (dataAdapters.length === 0 && !!localPagination.currentQuery):
-        return (
-          <tbody>
-            <tr>
-              <td colSpan={6}>
-                <NoSearchResult>No data adapters found with title &quot;{localPagination.currentQuery}&quot;</NoSearchResult>
-              </td>
-            </tr>
-          </tbody>
-        );
-      case dataAdapters.length > 0:
-        return dataAdapters.map((dataAdapter: LookupTableAdapter) => (
-          <DataAdapterTableEntry key={dataAdapter.id}
-                                 adapter={dataAdapter}
-                                 error={errorStates.dataAdapters[dataAdapter.name]} />
-        ));
-      default:
-        return (
-          <tbody>
-            <tr>
-              <td colSpan={6}>
-                <NoEntitiesExist>There are no data adapters to list</NoEntitiesExist>
-              </td>
-            </tr>
-          </tbody>
-        );
-    }
-  };
 
   return (
     <Row className="content">
@@ -181,7 +185,11 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
                   <th className={Styles.rowActions}>Actions</th>
                 </tr>
               </thead>
-              {getComponent()}
+              {loading ? <Spinner text="Loading data adapters" /> : (
+                <DataRow dataAdapters={dataAdapters}
+                         query={localPagination.currentQuery}
+                         errors={errorStates.dataAdapters} />
+              )}
             </Table>
           </div>
         </PaginatedList>
