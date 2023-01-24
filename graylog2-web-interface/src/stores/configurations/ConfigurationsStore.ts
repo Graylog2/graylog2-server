@@ -31,6 +31,7 @@ type ConfigurationsActionsType = {
   listIndexSetsDefaultsClusterConfig: () => Promise<unknown>,
   listWhiteListConfig: (configType: any) => Promise<unknown>,
   listPermissionsConfig: (configType: string) => Promise<unknown>,
+  listUserConfig: (configType: string) => Promise<unknown>,
   update: (configType: any, config: any) => Promise<void>,
   updateWhitelist: (configType: any, config: any) => Promise<void>,
   updateIndexSetDefaults: (configType: any, config: any) => Promise<void>,
@@ -46,6 +47,7 @@ export const ConfigurationsActions = singletonActions(
     listIndexSetsDefaultsClusterConfig: { asyncResult: true },
     listWhiteListConfig: { asyncResult: true },
     listPermissionsConfig: { asyncResult: true },
+    listUserConfig: { asyncResult: true },
     update: { asyncResult: true },
     updateWhitelist: { asyncResult: true },
     updateIndexSetDefaults: { asyncResult: true },
@@ -68,6 +70,10 @@ export type WhiteListConfig = {
 export type PermissionsConfigType = {
   allow_sharing_with_everyone: boolean,
   allow_sharing_with_users: boolean,
+}
+export type UserConfigType = {
+  enable_global_session_timeout: boolean,
+  global_session_timeout_interval: string,
 }
 export type ConfigurationsStoreState = {
   configuration: Record<string, any>,
@@ -169,6 +175,25 @@ export const ConfigurationsStore = singletonStore(
       });
 
       ConfigurationsActions.listPermissionsConfig.promise(promise);
+    },
+
+    listUserConfig(configType) {
+      const promise = fetch('GET', this._url(`/${configType}`)).then((response: UserConfigType) => {
+        this.configuration = {
+          ...this.configuration,
+          // default values bellow should be the same in backend.
+          [configType]: response || {
+            enable_global_session_timeout: false,
+            global_session_timeout_interval: 'PT1H',
+          },
+        };
+
+        this.propagateChanges();
+
+        return response;
+      });
+
+      ConfigurationsActions.listUserConfig.promise(promise);
     },
 
     listEventsClusterConfig() {

@@ -16,18 +16,24 @@
  */
 package org.graylog.storage.opensearch2;
 
+import com.google.common.collect.ImmutableMap;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionEntry;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionError;
+import org.graylog.plugins.views.search.engine.suggestions.SuggestionFieldType;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.ScriptQueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.script.Script;
+import org.graylog.shaded.opensearch2.org.opensearch.script.ScriptType;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.ParsedStringTerms;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.ParsedTerms;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.suggest.SuggestBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.suggest.SuggestBuilders;
@@ -59,7 +65,9 @@ public class QuerySuggestionsOS2 implements QuerySuggestionsService {
         final TermSuggestionBuilder suggestionBuilder = SuggestBuilders.termSuggestion(req.field()).text(req.input()).size(req.size());
         final BoolQueryBuilder query = QueryBuilders.boolQuery()
                 .filter(QueryBuilders.termsQuery(Message.FIELD_STREAMS, req.streams()))
-                .filter(QueryBuilders.prefixQuery(req.field(), req.input()));
+                .filter(TimeRangeQueryFactory.create(req.timerange()))
+                .filter(QueryBuilders.existsQuery(req.field()))
+                .filter(getPrefixQuery(req));
         final SearchSourceBuilder search = new SearchSourceBuilder()
                 .query(query)
                 .size(0)
@@ -68,7 +76,7 @@ public class QuerySuggestionsOS2 implements QuerySuggestionsService {
 
         try {
             final SearchResponse result = client.singleSearch(new SearchRequest(affectedIndices.toArray(new String[]{})).source(search), "Failed to execute aggregation");
-            final ParsedStringTerms fieldValues = result.getAggregations().get("fieldvalues");
+            final ParsedTerms fieldValues = result.getAggregations().get("fieldvalues");
             final List<SuggestionEntry> entries = fieldValues.getBuckets().stream().map(b -> new SuggestionEntry(b.getKeyAsString(), b.getDocCount())).collect(Collectors.toList());
 
             if(!entries.isEmpty()) {
@@ -85,6 +93,25 @@ public class QuerySuggestionsOS2 implements QuerySuggestionsService {
                     .orElseGet(() -> parseException(exception));
             return SuggestionResponse.forError(req.field(), req.input(), err);
         }
+    }
+
+    private QueryBuilder getPrefixQuery(SuggestionRequest req) {
+        return switch (req.fieldType()) {
+            case TEXTUAL -> QueryBuilders.prefixQuery(req.field(), req.input());
+            default -> getScriptedPrefixQuery(req);
+        };
+    }
+
+    /**
+     * Unlike prefix query, this scripted implementation works also for numerical fields.
+     * TODO: would it make sense to switch between this scripted implementation and the standard prefix
+     * query based on our information about the field type? Would it be faster?
+     */
+    private static ScriptQueryBuilder getScriptedPrefixQuery(SuggestionRequest req) {
+        final Script script = new Script(ScriptType.INLINE, "painless",
+                "String val = doc[params.field].value.toString(); return val.startsWith(params.input);",
+                ImmutableMap.of("field", req.field(), "input", req.input()));
+        return QueryBuilders.scriptQuery(script);
     }
 
     private Optional<SuggestionError> tryResponseException(org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException exception) {
