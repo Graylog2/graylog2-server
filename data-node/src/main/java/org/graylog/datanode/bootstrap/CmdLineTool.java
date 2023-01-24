@@ -287,6 +287,9 @@ public abstract class CmdLineTool implements CliCommand {
         final List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
         LOG.info("Running with JVM arguments: {}", Joiner.on(' ').join(arguments));
 
+
+        beforeInjectorCreation(Collections.emptySet());
+
         injector = setupInjector(
                 new IsDevelopmentBindings(),
                 new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
