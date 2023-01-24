@@ -28,6 +28,7 @@ import org.graylog2.shared.system.activities.ActivityWriter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
+import org.joda.time.Period;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -266,8 +267,8 @@ public class AbstractIndexRetentionStrategyTest {
                 1, 0,
                 TimeBasedSizeOptimizingStrategyConfig.class.getCanonicalName(),
                 TimeBasedSizeOptimizingStrategyConfig.builder()
-                        .indexLifetimeSoft(java.time.Period.ofDays(minDays))
-                        .indexLifetimeHard(java.time.Period.ofDays(maxDays))
+                        .indexLifetimeSoft(Period.days(minDays))
+                        .indexLifetimeHard(Period.days(maxDays))
                         .build(),
                 DeletionRetentionStrategy.class.getCanonicalName(),
                 DeletionRetentionStrategyConfig.createDefault(),

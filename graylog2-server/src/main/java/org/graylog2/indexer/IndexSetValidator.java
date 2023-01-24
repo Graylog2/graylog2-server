@@ -20,8 +20,8 @@ import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.joda.time.DateTime;
@@ -31,9 +31,10 @@ import org.joda.time.Period;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import java.time.Instant;
 import java.util.Optional;
 
+import static org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig.INDEX_LIFETIME_HARD;
+import static org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig.INDEX_LIFETIME_SOFT;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class IndexSetValidator {
@@ -103,32 +104,24 @@ public class IndexSetValidator {
 
     @Nullable
     public Violation validateRotation(RotationStrategyConfig rotationStrategyConfig) {
-        if ((rotationStrategyConfig instanceof TimeBasedSizeOptimizingStrategyConfig smartConfig)) {
-            final java.time.Period leeway = smartConfig.indexLifetimeHard().minus(smartConfig.indexLifetimeSoft());
-            if (leeway.isNegative()) {
-                return Violation.create("Maximum and minimum lifetime periods are reversed or use different units");
+        if ((rotationStrategyConfig instanceof TimeBasedSizeOptimizingStrategyConfig config)) {
+            final Period leeway = config.indexLifetimeHard().minus(config.indexLifetimeSoft());
+            if (leeway.toStandardSeconds().getSeconds() < 0) {
+                return Violation.create(f("%s <%s> is shorter than %s <%s>", INDEX_LIFETIME_HARD, config.indexLifetimeHard(),
+                        INDEX_LIFETIME_SOFT, config.indexLifetimeSoft()));
             }
 
             final Period maxRetentionPeriod = elasticsearchConfiguration.getMaxIndexRetentionPeriod();
             if (maxRetentionPeriod != null
-                && isGreater(smartConfig.indexLifetimeHard(), jodaToJavaPeriod(maxRetentionPeriod))) {
-                f("Lifetime setting %s exceeds the configured maximum of %s=%s.",
-                        TimeBasedSizeOptimizingStrategyConfig.INDEX_LIFETIME_HARD,
+                    && config.indexLifetimeHard().toStandardSeconds().isGreaterThan(maxRetentionPeriod.toStandardSeconds())) {
+                f("Lifetime setting %s <%s> exceeds the configured maximum of %s=%s.",
+                        INDEX_LIFETIME_HARD, config.indexLifetimeHard(),
                         ElasticsearchConfiguration.MAX_INDEX_RETENTION_PERIOD, maxRetentionPeriod);
             }
         }
         return null;
     }
 
-    private static java.time.Period jodaToJavaPeriod (Period jodaPeriod) {
-        return java.time.Period.of(jodaPeriod.getYears(), jodaPeriod.getMonths(), jodaPeriod.getDays());
-    }
-
-    // Note that periods are generally NOT comparable (e.g. is 1 month > 30 days?).
-    private static boolean isGreater(java.time.Period p1, java.time.Period p2) {
-        final Instant NOW = Instant.now();
-        return (NOW.plus(p1).isAfter(NOW.plus(p2)));
-    }
 
     @Nullable
     public Violation validateRetentionPeriod(RotationStrategyConfig rotationStrategyConfig, RetentionStrategyConfig retentionStrategyConfig) {

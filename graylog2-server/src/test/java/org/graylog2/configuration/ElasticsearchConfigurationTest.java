@@ -54,7 +54,7 @@ public class ElasticsearchConfigurationTest {
         assertFalse(configuration.isDisableVersionCheck());
         assertNull(configuration.getMaxWriteIndexAge());
         assertTrue(configuration.performRetention());
-        assertEquals(3, configuration.getEnabledRotationStrategies().size());
+        assertEquals(4, configuration.getEnabledRotationStrategies().size());
         assertNull(configuration.getMaxIndexRetentionPeriod());
         assertEquals(Duration.hours(1), configuration.getIndexOptimizationTimeout());
         assertEquals(10, configuration.getIndexOptimizationJobs());

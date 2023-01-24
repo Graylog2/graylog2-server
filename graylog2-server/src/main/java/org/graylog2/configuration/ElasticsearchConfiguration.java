@@ -19,6 +19,7 @@ package org.graylog2.configuration;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.util.Size;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
@@ -28,6 +29,7 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy;
 import org.joda.time.Period;
 
 import javax.annotation.Nullable;
@@ -35,6 +37,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+@SuppressWarnings({"FieldMayBeFinal", "FieldCanBeLocal"})
 public class ElasticsearchConfiguration {
     public static final String MAX_INDEX_RETENTION_PERIOD = "max_index_retention_period";
     public static final String DEFAULT_EVENTS_INDEX_PREFIX = "default_events_index_prefix";
@@ -96,6 +99,16 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_max_number_of_indices", required = true, validator = PositiveIntegerValidator.class)
     private int maxNumberOfIndices = 20;
 
+    // TimeBasedSizeOptimizingStrategy Rotation
+    @Parameter(value = "time_size_optimizing_rotation_period")
+    private Period timeSizeOptimizingRotationPeriod = Period.days(1);
+
+    @Parameter(value = "time_size_optimizing_rotation_min_size")
+    private Size timeSizeOptimizingRotationMinSize = Size.gigabytes(20);
+
+    @Parameter(value = "time_size_optimizing_rotation_max_size")
+    private Size timeSizeOptimizingRotationMaxSize = Size.gigabytes(50);
+
     @Parameter(value = "elasticsearch_disable_version_check")
     private boolean disableVersionCheck = false;
 
@@ -106,7 +119,9 @@ public class ElasticsearchConfiguration {
     private boolean noRetention = false;
 
     @Parameter(value = "enabled_index_rotation_strategies", converter = StringListConverter.class, validators = RotationStrategyValidator.class)
-    private List<String> enabledRotationStrategies = Arrays.asList(TimeBasedRotationStrategy.NAME, MessageCountRotationStrategy.NAME, SizeBasedRotationStrategy.NAME);
+    private List<String> enabledRotationStrategies = Arrays.asList(
+            TimeBasedRotationStrategy.NAME, MessageCountRotationStrategy.NAME,
+            SizeBasedRotationStrategy.NAME, TimeBasedSizeOptimizingStrategy.NAME);
 
     /**
      * Provides a hard upper limit for the retention period of any index set at configuration time.
@@ -200,6 +215,18 @@ public class ElasticsearchConfiguration {
 
     public int getMaxNumberOfIndices() {
         return maxNumberOfIndices;
+    }
+
+    public Period getTimeSizeOptimizingRotationPeriod() {
+        return timeSizeOptimizingRotationPeriod;
+    }
+
+    public Size getTimeSizeOptimizingRotationMinSize() {
+        return timeSizeOptimizingRotationMinSize;
+    }
+
+    public Size getTimeSizeOptimizingRotationMaxSize() {
+        return timeSizeOptimizingRotationMaxSize;
     }
 
     public boolean isDisableVersionCheck() {
