@@ -16,10 +16,8 @@
  */
 package org.graylog2.rest.resources.entities.preferences.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
-public record StoredEntityListPreferences(@JsonProperty("user_id") String userId,
-                                          @JsonProperty("entity_list_id") String entityListId,
+public record StoredEntityListPreferences(@JsonUnwrapped StoredEntityListPreferencesId preferencesId,
                                           @JsonUnwrapped EntityListPreferences preferences) {
 }

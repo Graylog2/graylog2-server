@@ -29,6 +29,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.resources.entities.preferences.model.EntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
+import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
 import org.graylog2.rest.resources.entities.preferences.service.EntityListPreferencesService;
 
 import javax.inject.Inject;
@@ -68,7 +69,11 @@ public class EntityListPreferencesResource {
                            @Context UserContext userContext) throws ValidationException {
 
         final String currentUserId = userContext.getUserId();
-        final StoredEntityListPreferences storedPreferences = new StoredEntityListPreferences(currentUserId, entityListId, entityListPreferences);
+        final StoredEntityListPreferencesId complexId = StoredEntityListPreferencesId.builder()
+                .userId(currentUserId)
+                .entityListId(entityListId)
+                .build();
+        final StoredEntityListPreferences storedPreferences = new StoredEntityListPreferences(complexId, entityListPreferences);
         entityListPreferencesService.save(storedPreferences);
         return Response.ok().build();
     }
@@ -85,7 +90,11 @@ public class EntityListPreferencesResource {
                                      @Context UserContext userContext) throws NotFoundException {
 
         final String currentUserId = userContext.getUserId();
-        final StoredEntityListPreferences entityListPreferences = entityListPreferencesService.get(currentUserId, entityListId);
+        final StoredEntityListPreferencesId complexId = StoredEntityListPreferencesId.builder()
+                .userId(currentUserId)
+                .entityListId(entityListId)
+                .build();
+        final StoredEntityListPreferences entityListPreferences = entityListPreferencesService.get(complexId);
         if (entityListPreferences == null) {
             throw new NotFoundException("Preferences not found for user " + userContext.getUser().getName() + " and entity list id " + entityListId);
         }

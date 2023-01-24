@@ -17,10 +17,11 @@
 package org.graylog2.rest.resources.entities.preferences.service;
 
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
+import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
 
 public interface EntityListPreferencesService {
 
-    StoredEntityListPreferences get(String userId, String entityListId);
+    StoredEntityListPreferences get(final StoredEntityListPreferencesId preferencesId);
 
-    void save(StoredEntityListPreferences preferences);
+    void save(final StoredEntityListPreferences preferences);
 }

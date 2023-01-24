@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.entities.preferences.service;
 
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
+import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,15 +28,17 @@ public class InMemoryEntityListPreferencesService implements EntityListPreferenc
     private static final Map<String, Map<String, StoredEntityListPreferences>> INMEMORY_STORAGE = new HashMap<>();
 
     @Override
-    public StoredEntityListPreferences get(final String userId, final String entityListId) {
-        final Map<String, StoredEntityListPreferences> userPreferences = INMEMORY_STORAGE.getOrDefault(userId, Map.of());
-        return userPreferences.get(entityListId);
+    public StoredEntityListPreferences get(final StoredEntityListPreferencesId preferencesId) {
+        final Map<String, StoredEntityListPreferences> userPreferences = INMEMORY_STORAGE.getOrDefault(preferencesId.userId(), Map.of());
+        return userPreferences.get(preferencesId.entityListId());
     }
 
     @Override
     public void save(final StoredEntityListPreferences preferences) {
-        final Map<String, StoredEntityListPreferences> userPreferences = INMEMORY_STORAGE.getOrDefault(preferences.userId(), new HashMap<>());
-        userPreferences.put(preferences.entityListId(), preferences);
-        INMEMORY_STORAGE.put(preferences.userId(), userPreferences);
+        final String userId = preferences.preferencesId().userId();
+        final String entityListId = preferences.preferencesId().entityListId();
+        final Map<String, StoredEntityListPreferences> userPreferences = INMEMORY_STORAGE.getOrDefault(userId, new HashMap<>());
+        userPreferences.put(entityListId, preferences);
+        INMEMORY_STORAGE.put(userId, userPreferences);
     }
 }
