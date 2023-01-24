@@ -26,7 +26,7 @@ import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import useSearchResult from 'views/hooks/useSearchResult';
-import type { SearchExecutionResult } from 'views/actions/SearchActions';
+import type { SearchExecutionResult } from 'views/types';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
 
 import OriginalTimerangeInfo from './TimerangeInfo';

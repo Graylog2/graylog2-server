@@ -49,8 +49,9 @@ import type Query from 'views/logic/queries/Query';
 import type { CustomCommand, CustomCommandContext } from 'views/components/searchbar/queryinput/types';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type SearchMetadata from 'views/logic/search/SearchMetadata';
-import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import type { AppDispatch } from 'stores/useAppDispatch';
+import type SearchResult from 'views/logic/SearchResult';
+import type { WidgetMapping } from 'views/logic/views/types';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -307,6 +308,11 @@ export interface ViewState {
   isDirty: boolean;
   isNew: boolean;
 }
+
+export type SearchExecutionResult = {
+  result: SearchResult,
+  widgetMapping: WidgetMapping,
+};
 
 export interface SearchExecution {
   executionState: SearchExecutionState;

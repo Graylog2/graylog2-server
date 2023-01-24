@@ -20,12 +20,11 @@ import * as Immutable from 'immutable';
 import trim from 'lodash/trim';
 
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import type { SearchExecution, RootState, GetState } from 'views/types';
+import type { SearchExecution, RootState, GetState, SearchExecutionResult } from 'views/types';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import { parseSearch } from 'views/logic/slices/searchMetadataSlice';
 import executeSearch from 'views/logic/slices/executeSearch';
 import type View from 'views/logic/views/View';
-import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import { selectView, selectParameters } from 'views/logic/slices/viewSelectors';
 import {

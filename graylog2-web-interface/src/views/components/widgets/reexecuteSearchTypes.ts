@@ -18,10 +18,9 @@ import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { AppDispatch } from 'stores/useAppDispatch';
-import type { RootState } from 'views/types';
+import type { RootState, SearchExecutionResult } from 'views/types';
 import { selectView } from 'views/logic/slices/viewSelectors';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import type { SearchExecutionResult } from 'views/actions/SearchActions';
 import {
   selectGlobalOverride,
   selectParameterBindings,

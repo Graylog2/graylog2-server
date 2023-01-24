@@ -21,7 +21,7 @@ import GlobalOverride from 'views/logic/search/GlobalOverride';
 import type { SearchJobType } from 'views/stores/SearchJobs';
 import { runSearchJob, searchJobStatus } from 'views/stores/SearchJobs';
 import type View from 'views/logic/views/View';
-import type { SearchExecutionResult } from 'views/actions/SearchActions';
+import type { SearchExecutionResult } from 'views/types';
 import SearchResult from 'views/logic/SearchResult';
 
 const trackJobStatus = (job: SearchJobType): Promise<SearchJobType> => {

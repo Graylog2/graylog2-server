@@ -25,7 +25,7 @@ import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import Query, { filtersForQuery } from 'views/logic/queries/Query';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
-import type { SearchExecutionResult } from 'views/actions/SearchActions';
+import type { SearchExecutionResult } from 'views/types';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import useAppDispatch from 'stores/useAppDispatch';
