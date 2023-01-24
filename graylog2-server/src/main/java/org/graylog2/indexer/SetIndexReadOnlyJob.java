@@ -82,11 +82,12 @@ public class SetIndexReadOnlyJob extends SystemJob {
         log.info("Flushing old index <{}>.", index);
         indices.flush(index);
 
+        // Record the time an index was set read-only.
+        // We call this the "closing date" because it denotes when we stopped writing to it.
+        indices.setClosingDate(index, Tools.nowUTC());
+
         log.info("Setting old index <{}> to read-only.", index);
         indices.setReadOnly(index);
-
-        // record time index was "closed"
-        indices.setClosingDate(index, Tools.nowUTC());
 
         activityWriter.write(new Activity("Flushed and set <" + index + "> to read-only.", SetIndexReadOnlyJob.class));
 
