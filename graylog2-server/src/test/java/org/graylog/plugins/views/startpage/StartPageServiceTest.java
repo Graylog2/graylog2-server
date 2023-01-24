@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.plugins.views.search.rest.TestUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpened;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedForUserDTO;
@@ -50,7 +51,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -118,7 +123,28 @@ public class StartPageServiceTest {
         var entityOwnerShipService = new EntityOwnershipService(dbGrantService, grnRegistry);
         var lastOpenedService = new LastOpenedService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, entityOwnerShipService);
         var recentActivityService = new RecentActivityService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, eventbus, grnRegistry, permissionAndRoleResolver);
-        startPageService = new StartPageService(new TestCatalog(), lastOpenedService, recentActivityService, eventbus);
+        var viewResolvers = Map.of("graylog-security-views", (ViewResolver)new ViewResolver() {
+            @Override
+            public Optional<ViewDTO> get(String id) {
+                return Optional.empty();
+            }
+
+            @Override
+            public Set<ViewDTO> getBySearchId(String searchId) {
+                return Set.of();
+            }
+
+            @Override
+            public Set<String> getSearchIds() {
+                return Set.of();
+            }
+
+            @Override
+            public boolean canReadView(String viewId, Predicate<String> permissionTester, BiPredicate<String, String> entityPermissionsTester) {
+                return false;
+            }
+        });
+        startPageService = new StartPageService(new TestCatalog(), lastOpenedService, recentActivityService, viewResolvers, eventbus);
     }
 
     @Test
