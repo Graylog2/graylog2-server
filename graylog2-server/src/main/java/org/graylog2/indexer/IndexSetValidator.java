@@ -27,10 +27,12 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
+import org.joda.time.DurationFieldType;
 import org.joda.time.Period;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig.INDEX_LIFETIME_HARD;
@@ -114,12 +116,27 @@ public class IndexSetValidator {
             final Period maxRetentionPeriod = elasticsearchConfiguration.getMaxIndexRetentionPeriod();
             if (maxRetentionPeriod != null
                     && config.indexLifetimeHard().toStandardSeconds().isGreaterThan(maxRetentionPeriod.toStandardSeconds())) {
-                f("Lifetime setting %s <%s> exceeds the configured maximum of %s=%s.",
+                return Violation.create(f("Lifetime setting %s <%s> exceeds the configured maximum of %s=%s.",
                         INDEX_LIFETIME_HARD, config.indexLifetimeHard(),
-                        ElasticsearchConfiguration.MAX_INDEX_RETENTION_PERIOD, maxRetentionPeriod);
+                        ElasticsearchConfiguration.MAX_INDEX_RETENTION_PERIOD, maxRetentionPeriod));
+            }
+
+            if (periodOtherThanDays(config.indexLifetimeHard())) {
+                return Violation.create(f("Lifetime setting %s <%s> can only be a multiple of days",
+                        INDEX_LIFETIME_HARD, config.indexLifetimeHard()));
+            }
+            if (periodOtherThanDays(config.indexLifetimeSoft())) {
+                return Violation.create(f("Lifetime setting %s <%s> can only be a multiple of days",
+                        INDEX_LIFETIME_SOFT, config.indexLifetimeHard()));
             }
         }
         return null;
+    }
+
+    private boolean periodOtherThanDays(Period period) {
+        return Arrays.stream(period.getFieldTypes())
+                .filter(type -> !type.equals(DurationFieldType.days()))
+                .anyMatch(type -> period.get(type) != 0);
     }
 
 
