@@ -103,10 +103,21 @@ The following Java Code API changes have been made.
 All previously deprecated index set configuration properties in `org.graylog2.configuration.ElasticsearchConfiguration`
 have been un-deprecated, as Graylog intends to maintain them going forward. 
 
-## Breaking Changes
+## REST API Endpoint Changes
+
+| Endpoint                    | Description                                                       |
+|-----------------------------|-------------------------------------------------------------------|
+| `GET /system/configuration` | Key `gc_warning_threshold` has been removed from response object. |                                                                                                
 
 ## Behaviour Changes
 
-The `JSON path value from HTTP API` input will now only run on the leader node,
-if the `Global` option has been selected in the input configuration.
-Previously, the input was started on all nodes in the cluster.
+- The `JSON path value from HTTP API` input will now only run on the leader node, if the `Global` option has been selected in the input configuration. Previously, the input was started on all nodes in the cluster.
+- The default connection and read timeouts for email sending have been reduced from 60 seconds to 10 seconds.
+
+## Configuration File Changes
+
+| Option                                      | Action  | Description                                                                                |
+|---------------------------------------------|---------|--------------------------------------------------------------------------------------------|
+| `gc_warning_threshold`                      | removed | GC warnings have been removed.                                                             |
+| `transport_email_socket_connection_timeout` | added   | Connection timeout for establishing a connection to the email server. Default: 10 seconds. |
+| `transport_email_socket_timeout`            | added   | Read timeout while communicating with the email server. Default: 10 seconds.               |"

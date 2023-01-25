@@ -104,9 +104,9 @@ public class MoreSearch {
                     .collect(Collectors.toSet());
         } else {
             final Set<Stream> streams = loadStreams(streamIds);
-            final IndexRangeContainsOneOfStreams indexRangeContainsOneOfStreams = new IndexRangeContainsOneOfStreams(streams);
+            final IndexRangeContainsOneOfStreams indexRangeContainsOneOfStreams = new IndexRangeContainsOneOfStreams();
             return indexRanges.stream()
-                    .filter(indexRangeContainsOneOfStreams)
+                    .filter(ir -> indexRangeContainsOneOfStreams.test(ir, streams))
                     .map(IndexRange::indexName)
                     .collect(Collectors.toSet());
         }

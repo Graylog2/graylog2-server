@@ -24,7 +24,7 @@ import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootst
 import { Icon, ShareButton } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
-import { ViewStore, ViewActions } from 'views/stores/ViewStore';
+import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
@@ -43,7 +43,7 @@ import {
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 
 import SavedSearchForm from './SavedSearchForm';
-import SavedSearchList from './SavedSearchList';
+import SavedSearchesModal from './SavedSearchesModal';
 
 const Container = styled(ButtonGroup)`
   display: flex;
@@ -57,7 +57,7 @@ const _isAllowedToEdit = (view: View, currentUser: User | undefined | null) => (
 
 const SearchActionsMenu = () => {
   const theme = useTheme();
-  const { view, dirty } = useStore(ViewStore);
+  const { view, dirty, isNew } = useStore(ViewStore);
   const viewLoaderFunc = useContext(ViewLoaderContext);
   const currentUser = useCurrentUser();
   const loadNewView = useContext(NewViewLoaderContext);
@@ -69,9 +69,8 @@ const SearchActionsMenu = () => {
   const [showMetadataEdit, setShowMetadataEdit] = useState(false);
   const [showShareSearch, setShowShareSearch] = useState(false);
   const [newTitle, setNewTitle] = useState((view && view.title) || '');
-
-  const loaded = (view && view.id);
-  const savedSearchColor = dirty ? theme.colors.variant.warning : theme.colors.variant.info;
+  const loaded = isNew === false;
+  const savedSearchColor = dirty ? theme.colors.variant.dark.warning : theme.colors.variant.info;
   const disableReset = !(dirty || loaded);
   const savedViewTitle = loaded ? 'Saved search' : 'Save search';
   const title = dirty ? 'Unsaved changes' : savedViewTitle;
@@ -136,11 +135,12 @@ const SearchActionsMenu = () => {
   const deleteSavedSearch = (deletedView: View) => {
     return ViewManagementActions.delete(deletedView)
       .then(() => UserNotification.success(`Deleting view "${deletedView.title}" was successful!`, 'Success!'))
-      .then(() => ViewActions.create(View.Type.Search))
       .then(() => {
         if (deletedView.id === view.id) {
           loadNewSearch();
         }
+
+        return Promise.resolve();
       })
       .catch((error) => UserNotification.error(`Deleting view failed: ${_extractErrorMessage(error)}`, 'Error!'));
   };
@@ -152,7 +152,7 @@ const SearchActionsMenu = () => {
   return (
     <Container aria-label="Search Meta Buttons">
       <Button title={title} ref={formTarget} onClick={toggleFormModal}>
-        <Icon style={{ color: loaded ? savedSearchColor : undefined }} name="star" type={loaded ? 'solid' : 'regular'} /> Save
+        <Icon style={{ color: loaded ? savedSearchColor : undefined }} name="floppy-disk" type={loaded ? 'solid' : 'regular'} /> Save
       </Button>
       {showForm && (
         <SavedSearchForm onChangeTitle={onChangeTitle}
@@ -160,7 +160,7 @@ const SearchActionsMenu = () => {
                          saveSearch={saveSearch}
                          saveAsSearch={saveAsSearch}
                          disableCreateNew={newTitle === view.title}
-                         isCreateNew={!view.id || !isAllowedToEdit}
+                         isCreateNew={isNew || !isAllowedToEdit}
                          toggleModal={toggleFormModal}
                          value={newTitle} />
       )}
@@ -169,15 +169,15 @@ const SearchActionsMenu = () => {
         <Icon name="folder" type="regular" /> Load
       </Button>
       {showList && (
-        <SavedSearchList deleteSavedSearch={deleteSavedSearch}
-                         toggleModal={toggleListModal}
-                         activeSavedSearchId={view.id} />
+        <SavedSearchesModal deleteSavedSearch={deleteSavedSearch}
+                            toggleModal={toggleListModal}
+                            activeSavedSearchId={view.id} />
       )}
       <ShareButton entityType="search"
                    entityId={view.id}
                    onClick={toggleShareSearch}
                    bsStyle="default"
-                   disabledInfo={!view.id && 'Only saved searches can be shared.'} />
+                   disabledInfo={isNew && 'Only saved searches can be shared.'} />
       <DropdownButton title={<Icon name="ellipsis-h" />}
                       aria-label="Open search actions dropdown"
                       id="search-actions-dropdown"

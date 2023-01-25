@@ -38,6 +38,7 @@ export type IndexShardRouting = {
 };
 
 export type IndexInfo = {
+  index_name: string,
   primary_shards: {
     flush: IndexTimeAndTotalStats,
     get: IndexTimeAndTotalStats,
@@ -74,15 +75,14 @@ export type IndexInfo = {
   reopened: boolean,
 };
 
-export type Indices = {
-  [key: string]: IndexInfo,
-};
+export type Indices = Array<IndexInfo>
+
 type IndicesListResponse = {
   all: {
-    indices: IndexInfo,
+    indices: Indices,
   },
   closed: {
-    indices: IndexInfo,
+    indices: Indices,
   },
 };
 
@@ -150,14 +150,14 @@ export const IndicesStore = singletonStore(
     multiple() {
       const indexNames = Object.keys(this.registrations);
 
-      if (indexNames.length <= 0) {
+      if (!indexNames.length) {
         return;
       }
 
       const urlList = qualifyUrl(ApiRoutes.IndicesApiController.multiple().url);
       const request = { indices: indexNames };
       const promise = fetch('POST', urlList, request).then((response: Indices) => {
-        this.indices = { ...this.indices, ...response };
+        this.indices = [...this.indices, ...response];
         this.trigger({ indices: this.indices, closedIndices: this.closedIndices });
 
         return { indices: this.indices, closedIndices: this.closedIndices };

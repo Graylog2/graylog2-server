@@ -63,7 +63,7 @@ public class NotificationImpl extends PersistedImpl implements Notification {
     }
 
     public NotificationImpl() {
-        super(new HashMap<String, Object>());
+        super(new HashMap<>());
     }
 
     @Override
@@ -116,8 +116,9 @@ public class NotificationImpl extends PersistedImpl implements Notification {
     @Override
     public Notification addDetail(String key, Object value) {
         Map<String, Object> details;
-        if (fields.get(FIELD_DETAILS) == null)
+        if (fields.get(FIELD_DETAILS) == null) {
             fields.put(FIELD_DETAILS, new HashMap<String, Object>());
+        }
 
         details = (Map<String, Object>) fields.get(FIELD_DETAILS);
         details.put(key, value);
@@ -127,10 +128,16 @@ public class NotificationImpl extends PersistedImpl implements Notification {
     @Override
     public Object getDetail(String key) {
         final Map<String, Object> details = (Map<String, Object>) fields.get(FIELD_DETAILS);
-        if (details == null)
+        if (details == null) {
             return null;
+        }
 
         return details.get(key);
+    }
+
+    @Override
+    public Map<String, Object> getDetails() {
+        return (Map<String, Object>) fields.get(FIELD_DETAILS);
     }
 
     @Override
@@ -143,6 +150,7 @@ public class NotificationImpl extends PersistedImpl implements Notification {
 
     @Override
     public Notification addNode(String nodeId) {
+        node_id = nodeId;
         fields.put(FIELD_NODE_ID, nodeId);
         return this;  //To change body of created methods use File | Settings | File Templates.
     }

@@ -87,7 +87,7 @@ const BackendCreate = () => {
   } = enterpriseGroupSyncPlugin?.wizardConfig?.activeDirectory ?? {};
   const help = { ...HELP, ...groupSyncHelp };
   const initialValues = { ...INITIAL_VALUES, ...initialGroupSyncValues };
-  const excludedFields = { ...groupSyncExcludedFields, userUniqueIdAttribute: true };
+  const excludedFields = { ...groupSyncExcludedFields, userUniqueIdAttribute: true, emailAttributes: true };
 
   return (
     <DocumentTitle title="Create Active Directory Authentication Services">

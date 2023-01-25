@@ -16,9 +16,16 @@
  */
 package org.graylog2.migrations;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;
+import org.graylog.events.notifications.EventNotificationSettings;
+import org.graylog.events.processor.DBEventDefinitionService;
+import org.graylog.events.processor.EventDefinitionDto;
+import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
+import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
+import org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorConfig;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexSet;
@@ -56,6 +63,7 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     private final IndexSetValidator indexSetValidator;
     private final StreamService streamService;
     private final IndexSetConfigFactory indexSetConfigFactory;
+    private final DBEventDefinitionService dbService;
 
     @Inject
     public V20190705071400_AddEventIndexSetsMigration(ElasticsearchConfiguration elasticsearchConfiguration,
@@ -63,13 +71,15 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
                                                       MongoIndexSet.Factory mongoIndexSetFactory,
                                                       IndexSetService indexSetService,
                                                       IndexSetValidator indexSetValidator,
-                                                      StreamService streamService) {
+                                                      StreamService streamService,
+                                                      DBEventDefinitionService dbService) {
         this.elasticsearchConfiguration = elasticsearchConfiguration;
         this.indexSetConfigFactory = indexSetConfigFactory;
         this.mongoIndexSetFactory = mongoIndexSetFactory;
         this.indexSetService = indexSetService;
         this.indexSetValidator = indexSetValidator;
         this.streamService = streamService;
+        this.dbService = dbService;
     }
 
     @Override
@@ -97,6 +107,7 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
                 "All system events",
                 "Stream containing all system events created by Graylog"
         );
+        ensureSystemNotificationEventsDefinition();
     }
 
     private void ensureEventsStreamAndIndexSet(String indexSetTitle,
@@ -190,6 +201,27 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
             LOG.info("Successfully created events stream <{}/{}>", stream.getId(), stream.getTitle());
         } catch (ValidationException e) {
             LOG.error("Couldn't create events stream <{}/{}>! This is a bug!", streamId, streamTitle, e);
+        }
+    }
+
+    private void ensureSystemNotificationEventsDefinition() {
+        if (dbService.getSystemEventDefinitions().isEmpty()) {
+            EventDefinitionDto eventDto =
+                    EventDefinitionDto.builder()
+                            .title("System notification events")
+                            .description("Reserved event definition for system notification events")
+                            .alert(false)
+                            .priority(1)
+                            .keySpec(ImmutableList.of())
+                            .notificationSettings(EventNotificationSettings.builder()
+                                    .gracePeriodMs(0) // Defaults to 0 in the UI
+                                    .backlogSize(0) // Defaults to 0 in the UI
+                                    .build())
+                            .config(SystemNotificationEventProcessorConfig.builder().build())
+                            .storage(ImmutableList.of(PersistToStreamsStorageHandler.Config.createWithSystemEventsStream()))
+                            .scope(SystemNotificationEventEntityScope.NAME)
+                            .build();
+            dbService.save(eventDto);
         }
     }
 }

@@ -52,7 +52,7 @@ const isDisabledInput = (props: Props): props is DisabledInputProps => props.dis
 
 const getMarkers = (errors: QueryValidationState | undefined, warnings: QueryValidationState | undefined) => {
   const markerClassName = 'ace_marker';
-  const createMarkers = (explanations = [], className = '') => explanations.map(({
+  const createMarkers = (explanations: QueryValidationState['explanations'] = [], className: string = '') => explanations.map(({
     beginLine,
     beginColumn,
     endLine,
@@ -74,7 +74,7 @@ const getMarkers = (errors: QueryValidationState | undefined, warnings: QueryVal
 
 // Basic query input component which is being implemented by the `QueryInput` component.
 // This is just a very basic query input which can be implemented for example to display a read only query.
-const BasicQueryInput = forwardRef<StyledAceEditor, Props>((props, ref) => {
+const BasicQueryInput = forwardRef<{ editor: Editor }, Props>((props, ref) => {
   const {
     className,
     disabled,

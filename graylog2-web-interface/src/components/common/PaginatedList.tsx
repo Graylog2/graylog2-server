@@ -15,91 +15,62 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 
 import IfInteractive from 'views/components/dashboard/IfInteractive';
-import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
+import usePaginationQueryParameter, { DEFAULT_PAGE_SIZES } from 'hooks/usePaginationQueryParameter';
 
 import Pagination from './Pagination';
 import PageSizeSelect from './PageSizeSelect';
 
-const DEFAULT_PAGE_SIZES = [10, 20, 50, 100];
 export const INITIAL_PAGE = 1;
 
 type Props = {
-  activePage?: number,
   children: React.ReactNode,
   className?: string,
   hideFirstAndLastPageLinks?: boolean
   hidePreviousAndNextPageLinks?: boolean
   onChange?: (currentPage: number, pageSize: number) => void,
   pageSizes?: Array<number>,
-  pageSize?: number,
   showPageSizeSelect?: boolean,
   totalItems: number,
-  useQueryParameter?: boolean,
 };
 
-/**
- * Wrapper component around an element that renders pagination
- * controls and provides a callback when the page or page size change.
- * You still need to fetch or filter the data yourself to ensure that
- * the selected page is displayed on screen.
- */
-const PaginatedList = ({
-  activePage,
+const ListBase = ({
   children,
   className,
+  currentPage,
+  currentPageSize,
   hideFirstAndLastPageLinks,
   hidePreviousAndNextPageLinks,
   onChange,
-  pageSize: propPageSize,
   pageSizes,
+  setPagination,
   showPageSizeSelect,
   totalItems,
-  useQueryParameter,
-}: Props) => {
-  const { page, setPage, pageSize: queryParamPageSize, setPageSize } = usePaginationQueryParameter(pageSizes, propPageSize);
-
-  const [{ currentPage, currentPageSize }, setPagination] = React.useState({
-    currentPage: useQueryParameter ? page : Math.max(activePage, INITIAL_PAGE),
-    currentPageSize: (useQueryParameter && showPageSizeSelect) ? queryParamPageSize : propPageSize,
-  });
-
-  const executeOnChageCB = React.useCallback(() => {
-    if (currentPage !== page || currentPageSize !== queryParamPageSize) {
-      setPagination({
-        currentPage: Math.max(page, INITIAL_PAGE),
-        currentPageSize: queryParamPageSize,
-      });
-
-      if (onChange) onChange(Math.max(page, INITIAL_PAGE), queryParamPageSize);
-    }
-  }, [page, queryParamPageSize, currentPage, currentPageSize, onChange]);
-
-  React.useEffect(() => {
-    if (useQueryParameter) executeOnChageCB();
-  }, [useQueryParameter, executeOnChageCB]);
-
-  const numberPages = React.useMemo(() => (
+}: Required<Props> & {
+  currentPageSize: number,
+  currentPage: number;
+  setPagination: (newPagination: { page: number, pageSize: number }) => void
+}) => {
+  const numberPages = useMemo(() => (
     currentPageSize > 0 ? Math.ceil(totalItems / currentPageSize) : 0
   ), [currentPageSize, totalItems]);
 
-  const _onChangePageSize = React.useCallback((event: React.ChangeEvent<HTMLOptionElement>) => {
+  const _onChangePageSize = useCallback((event: React.ChangeEvent<HTMLOptionElement>) => {
     event.preventDefault();
     const newPageSize = Number(event.target.value);
-    setPagination({ currentPage: INITIAL_PAGE, currentPageSize: newPageSize });
 
-    if (useQueryParameter) setPageSize(newPageSize);
+    setPagination({ page: INITIAL_PAGE, pageSize: newPageSize });
     if (onChange) onChange(INITIAL_PAGE, newPageSize);
-  }, [onChange, setPageSize, useQueryParameter]);
+  }, [onChange, setPagination]);
 
-  const _onChangePage = React.useCallback((pageNum: number) => {
-    setPagination({ currentPage: pageNum, currentPageSize });
-    if (useQueryParameter) setPage(pageNum);
+  const _onChangePage = useCallback((pageNum: number) => {
+    setPagination({ page: pageNum, pageSize: currentPageSize });
     if (onChange) onChange(pageNum, currentPageSize);
-  }, [useQueryParameter, setPage, onChange, currentPageSize]);
+  }, [setPagination, currentPageSize, onChange]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (numberPages > 0 && currentPage > numberPages) _onChangePage(numberPages);
   }, [currentPage, numberPages, _onChangePage]);
 
@@ -121,6 +92,92 @@ const PaginatedList = ({
         </div>
       </IfInteractive>
     </>
+  );
+};
+
+const ListBasedOnQueryParams = ({
+  pageSizes,
+  ...props
+}: Required<Props> & { pageSize: number }) => {
+  const { page: currentPage, pageSize: currentPageSize, setPagination } = usePaginationQueryParameter(pageSizes, props.pageSize);
+
+  return <ListBase {...props} currentPage={currentPage} currentPageSize={currentPageSize} setPagination={setPagination} pageSizes={pageSizes} />;
+};
+
+const ListWithOwnState = ({
+  activePage,
+  pageSize: propPageSize,
+  ...props
+}: Required<Props> & { activePage: number, pageSize: number }) => {
+  const [{ page: currentPage, pageSize: currentPageSize }, setPagination] = React.useState({
+    page: Math.max(activePage, INITIAL_PAGE),
+    pageSize: propPageSize,
+  });
+
+  useEffect(() => {
+    if (activePage > 0 && activePage !== currentPage) {
+      setPagination((cur) => ({ ...cur, page: activePage }));
+    }
+  }, [activePage, currentPage]);
+
+  return (
+    <ListBase {...props}
+              currentPage={currentPage}
+              currentPageSize={currentPageSize}
+              setPagination={setPagination} />
+  );
+};
+
+/**
+ * Wrapper component around an element that renders pagination
+ * controls and provides a callback when the page or page size change.
+ * You still need to fetch or filter the data yourself to ensure that
+ * the selected page is displayed on screen.
+ */
+const PaginatedList = ({
+  activePage,
+  children,
+  className,
+  hideFirstAndLastPageLinks,
+  hidePreviousAndNextPageLinks,
+  onChange,
+  pageSize,
+  pageSizes,
+  showPageSizeSelect,
+  totalItems,
+  useQueryParameter,
+}: Props & {
+  activePage?: number,
+  pageSize?: number,
+  useQueryParameter?: boolean,
+}) => {
+  if (useQueryParameter) {
+    return (
+      <ListBasedOnQueryParams className={className}
+                              hideFirstAndLastPageLinks={hideFirstAndLastPageLinks}
+                              hidePreviousAndNextPageLinks={hidePreviousAndNextPageLinks}
+                              onChange={onChange}
+                              pageSizes={pageSizes}
+                              pageSize={pageSize}
+                              showPageSizeSelect={showPageSizeSelect}
+                              totalItems={totalItems}>
+        {children}
+      </ListBasedOnQueryParams>
+    );
+  }
+
+  return (
+    <ListWithOwnState className={className}
+                      hideFirstAndLastPageLinks={hideFirstAndLastPageLinks}
+                      hidePreviousAndNextPageLinks={hidePreviousAndNextPageLinks}
+                      onChange={onChange}
+                      pageSizes={pageSizes}
+                      pageSize={pageSize}
+                      showPageSizeSelect={showPageSizeSelect}
+                      totalItems={totalItems}
+                      activePage={activePage}>
+      {children}
+    </ListWithOwnState>
   );
 };
 

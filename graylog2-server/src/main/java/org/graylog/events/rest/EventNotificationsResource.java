@@ -30,6 +30,8 @@ import org.graylog.events.notifications.DBNotificationService;
 import org.graylog.events.notifications.NotificationDto;
 import org.graylog.events.notifications.NotificationResourceHandler;
 import org.graylog.events.notifications.types.EmailEventNotificationConfig;
+import org.graylog.grn.GRNTypes;
+import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -90,17 +92,20 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     private final SearchQueryParser searchQueryParser;
     private final NotificationResourceHandler resourceHandler;
     private final EmailConfiguration emailConfiguration;
+    private final RecentActivityService recentActivityService;
 
     @Inject
     public EventNotificationsResource(DBNotificationService dbNotificationService,
                                       Set<AlarmCallback> availableLegacyAlarmCallbacks,
                                       NotificationResourceHandler resourceHandler,
-                                      EmailConfiguration emailConfiguration) {
+                                      EmailConfiguration emailConfiguration,
+                                      RecentActivityService recentActivityService) {
         this.dbNotificationService = dbNotificationService;
         this.availableLegacyAlarmCallbacks = availableLegacyAlarmCallbacks;
         this.resourceHandler = resourceHandler;
         this.searchQueryParser = new SearchQueryParser(NotificationDto.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.emailConfiguration = emailConfiguration;
+        this.recentActivityService = recentActivityService;
 
     }
 
@@ -135,7 +140,9 @@ public class EventNotificationsResource extends RestResource implements PluginRe
         if (validationResult.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
-        return Response.ok().entity(resourceHandler.create(dto, java.util.Optional.ofNullable(userContext.getUser()))).build();
+        var entity = resourceHandler.create(dto, java.util.Optional.ofNullable(userContext.getUser()));
+        recentActivityService.create(entity.id(), GRNTypes.EVENT_NOTIFICATION, userContext.getUser());
+        return Response.ok().entity(entity).build();
     }
 
     @PUT
@@ -143,7 +150,8 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @ApiOperation("Update existing notification")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_UPDATE)
     public Response update(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId,
-                                  @ApiParam(name = "JSON Body") NotificationDto dto) {
+                           @ApiParam(name = "JSON Body") NotificationDto dto,
+                           @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_EDIT, notificationId);
         dbNotificationService.get(notificationId)
                 .orElseThrow(() -> new NotFoundException("Notification " + notificationId + " doesn't exist"));
@@ -158,6 +166,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
 
+        recentActivityService.update(notificationId, GRNTypes.EVENT_NOTIFICATION, userContext.getUser());
         return Response.ok().entity(resourceHandler.update(dto)).build();
     }
 
@@ -194,8 +203,12 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @Path("/{notificationId}")
     @ApiOperation("Delete a notification")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_DELETE)
-    public void delete(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId) {
+    public void delete(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId,
+                       @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_DELETE, notificationId);
+        dbNotificationService.get(notificationId).ifPresent(n ->
+            recentActivityService.delete(notificationId, GRNTypes.EVENT_NOTIFICATION, n.title(), userContext.getUser())
+        );
         resourceHandler.delete(notificationId);
     }
 

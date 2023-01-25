@@ -34,6 +34,7 @@ type ActionToggleProps = {
   onClick: (event: SyntheticEvent) => void,
   // eslint-disable-next-line react/no-unused-prop-types
   bsRole?: string,
+  title: string,
 };
 
 type ActionDropdownState = {
@@ -45,13 +46,7 @@ type FilterPropsProps = {
   style?: { [key: string]: any },
 };
 
-type ActionDropdownProps = {
-  children: React.ReactNode,
-  container?: HTMLElement,
-  element: React.ReactNode,
-};
-
-const ActionToggle = ({ children, onClick }: ActionToggleProps) => {
+const ActionToggle = ({ children, onClick, title }: ActionToggleProps) => {
   const handleClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -69,7 +64,7 @@ const ActionToggle = ({ children, onClick }: ActionToggleProps) => {
   };
 
   return (
-    <span onClick={handleClick} onKeyDown={handleKeyDown} role="presentation">
+    <span onClick={handleClick} onKeyDown={handleKeyDown} role="presentation" title={title}>
       {children}
     </span>
   );
@@ -98,11 +93,19 @@ FilterProps.defaultProps = {
   style: {},
 };
 
-class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdownState> {
+type Props = {
+  children: React.ReactNode,
+  container?: HTMLElement,
+  element: React.ReactNode,
+  title?: string,
+};
+
+class ActionDropdown extends React.Component<Props, ActionDropdownState> {
   target: HTMLElement | undefined | null;
 
   static defaultProps = {
     container: undefined,
+    title: 'Actions',
   };
 
   static propTypes = {
@@ -111,7 +114,7 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
     element: PropTypes.node.isRequired,
   };
 
-  constructor(props: ActionDropdownProps) {
+  constructor(props: Props) {
     super(props);
 
     this.state = {
@@ -125,49 +128,13 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
     this.setState(({ show }) => ({ show: !show }));
   };
 
-  closeOnChildSelect = (child: React.ReactElement, updateDepth: number) => {
-    if (child.props?.onSelect) {
-      return {
-        onSelect: (_eventKey: string | null | undefined, event: SyntheticEvent<HTMLButtonElement>) => {
-          child.props.onSelect();
-          this._onToggle(event);
-        },
-      };
-    }
-
-    if (child.props?.children) {
-      return {
-        children: this.closeOnChildrenSelect(child.props.children, updateDepth + 1),
-      };
-    }
-
-    return {};
-  };
-
-  closeOnChildrenSelect = (children: React.ReactNode, updateDepth: number) => {
-    const maxChildDepth = 2;
-
-    if (updateDepth > maxChildDepth) {
-      return children;
-    }
-
-    return React.Children.map(
-      children,
-      (child: React.ReactElement) => (child?.props ? React.cloneElement(child, {
-        ...child.props,
-        ...this.closeOnChildSelect(child, updateDepth + 1),
-      }) : child),
-    );
-  };
-
   render() {
-    const { children, container, element } = this.props;
+    const { children, container, element, title } = this.props;
     const { show } = this.state;
-    const mappedChildren = this.closeOnChildrenSelect(children, 0);
 
     return (
       <StopPropagation>
-        <ActionToggle bsRole="toggle" onClick={this._onToggle}>
+        <ActionToggle bsRole="toggle" onClick={this._onToggle} title={title}>
           <span ref={(elem) => { this.target = elem; }}>{element}</span>
         </ActionToggle>
         <Overlay show={show}
@@ -178,9 +145,9 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
                  onHide={this._onToggle}
                  target={() => this.target}>
           <FilterProps>
-            <DropdownMenu show={show}>
+            <DropdownMenu show={show} onMenuItemSelect={this._onToggle}>
               <MenuItem header>Actions</MenuItem>
-              {mappedChildren}
+              {children}
             </DropdownMenu>
           </FilterProps>
         </Overlay>

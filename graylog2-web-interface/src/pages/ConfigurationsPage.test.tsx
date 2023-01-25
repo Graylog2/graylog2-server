@@ -43,6 +43,7 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
     list: jest.fn(() => Promise.resolve()),
     listMessageProcessorsConfig: jest.fn(() => Promise.resolve()),
     listPermissionsConfig: jest.fn(() => Promise.resolve()),
+    listUserConfig: jest.fn(() => Promise.resolve()),
   },
 }));
 

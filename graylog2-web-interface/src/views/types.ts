@@ -46,6 +46,10 @@ import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import type Query from 'views/logic/queries/Query';
+import type { CustomCommand, CustomCommandContext } from 'views/components/searchbar/queryinput/types';
+
+export type ArrayElement<ArrayType extends readonly unknown[]> =
+  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 
 export type BackendWidgetPosition = {
   id: string,
@@ -236,7 +240,7 @@ type MessageDetailContextProviderProps = {
   message: Message,
 }
 
-export type CopyWidgetToDashboardHook = (widgetId: string, search: View, dashboard: View) => View;
+export type CopyParamsToView = (sourceView: View, targetView: View) => View;
 
 type RemovingWidgetHook = (widgetId: string, dashboardId: string) => boolean;
 
@@ -283,6 +287,20 @@ export type SaveViewControls = {
   onDashboardDuplication?: (view: View, userPermissions: Immutable.List<string>) => Promise<View>,
 }
 
+export type CustomCommandContextProvider<T extends keyof CustomCommandContext> = {
+  key: T,
+  provider: () => CustomCommandContext[T],
+}
+
+export interface WidgetCreatorArgs {
+  view: View;
+}
+export interface WidgetCreator {
+  title: string;
+  func: (args: WidgetCreatorArgs) => Widget;
+  icon: React.ComponentType<{}>,
+}
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -309,12 +327,16 @@ declare module 'graylog-web-plugin/plugin' {
     'views.hooks.confirmDeletingWidget'?: Array<(widget: Widget, view: View, title: string) => Promise<boolean | null>>,
     'views.hooks.executingView'?: Array<ViewHook>;
     'views.hooks.loadingView'?: Array<ViewHook>;
-    'views.hooks.copyWidgetToDashboard'?: Array<CopyWidgetToDashboardHook>;
+    'views.hooks.copyWidgetToDashboard'?: Array<CopyParamsToView>;
+    'views.hooks.copyPageToDashboard'?: Array<CopyParamsToView>;
     'views.hooks.removingWidget'?: Array<RemovingWidgetHook>;
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
     'views.widgets.actions'?: Array<WidgetActionType>;
     'views.requires.provided'?: Array<string>;
+    'views.queryInput.commands'?: Array<CustomCommand>;
+    'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any>>,
     visualizationTypes?: Array<VisualizationType<any>>;
+    widgetCreators?: Array<WidgetCreator>;
   }
 }
 export interface ViewActions {

@@ -17,7 +17,6 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
-import type { $PropertyType } from 'utility-types';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import { alice as currentUser } from 'fixtures/users';
@@ -31,7 +30,7 @@ import Query from 'views/logic/queries/Query';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
-import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
+import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 
 jest.mock('views/stores/CurrentViewStateStore', () => ({
   CurrentViewStateStore: MockStore(
@@ -54,6 +53,7 @@ jest.mock('views/stores/SearchStore', () => ({
 
 jest.mock('../GenericPlot', () => mockComponent('GenericPlot'));
 jest.mock('views/stores/QueriesStore');
+jest.mock('views/logic/queries/useCurrentQuery');
 
 describe('XYPlot', () => {
   const currentQuery = Query.fromJSON({ id: 'dummyquery', query: {}, timerange: {}, search_types: {} });
@@ -63,27 +63,23 @@ describe('XYPlot', () => {
   const setChartColor = () => ({});
   const chartData = [{ y: [23, 42], name: 'count()' }];
   type SimpleXYPlotProps = {
-    config?: $PropertyType<XYPlotProps, 'chartData'>,
-    chartData?: $PropertyType<XYPlotProps, 'chartData'>,
-    currentQuery?: $PropertyType<XYPlotProps, 'currentQuery'>,
-    effectiveTimerange?: $PropertyType<XYPlotProps, 'effectiveTimerange'>,
-    getChartColor?: $PropertyType<XYPlotProps, 'getChartColor'>,
-    height?: $PropertyType<XYPlotProps, 'height'>,
-    setChartColor?: $PropertyType<XYPlotProps, 'setChartColor'>,
+    config?: XYPlotProps['chartData'],
+    chartData?: XYPlotProps['chartData'],
+    effectiveTimerange?: XYPlotProps['effectiveTimerange'],
+    getChartColor?: XYPlotProps['getChartColor'],
+    height?: XYPlotProps['height'],
+    setChartColor?: XYPlotProps['setChartColor'],
     tz?: string,
-    plotLayout?: $PropertyType<XYPlotProps, 'plotLayout'>,
-    onZoom?: $PropertyType<XYPlotProps, 'onZoom'>,
+    plotLayout?: XYPlotProps['plotLayout'],
+    onZoom?: XYPlotProps['onZoom'],
   };
 
-  const SimpleXYPlot = ({ tz = 'UTC', ...props }: SimpleXYPlotProps) => (
-    <UserDateTimeProvider tz={tz}>
-      <XYPlot chartData={chartData}
-              config={config}
-              getChartColor={getChartColor}
-              setChartColor={setChartColor}
-              currentQuery={currentQuery}
-              {...props} />
-    </UserDateTimeProvider>
+  const SimpleXYPlot = (props: SimpleXYPlotProps) => (
+    <XYPlot chartData={chartData}
+            config={config}
+            getChartColor={getChartColor}
+            setChartColor={setChartColor}
+            {...props} />
   );
 
   SimpleXYPlot.defaultProps = {
@@ -101,6 +97,7 @@ describe('XYPlot', () => {
 
   beforeEach(() => {
     asMock(QueriesActions.timerange).mockReturnValueOnce(Promise.resolve(Immutable.OrderedMap()));
+    asMock(useCurrentQuery).mockReturnValue(currentQuery);
   });
 
   it('renders generic X/Y-Plot when no timeline config is passed', () => {
@@ -110,7 +107,7 @@ describe('XYPlot', () => {
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', {
-      yaxis: { fixedrange: true, rangemode: 'tozero', tickformat: ',~r' },
+      yaxis: { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: 'linear' },
       xaxis: { fixedrange: true },
       showlegend: false,
       hovermode: 'x',
@@ -129,7 +126,7 @@ describe('XYPlot', () => {
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', expect.objectContaining({
-      xaxis: { range: ['2018-10-11T22:04:21.723-04:00', '2018-10-12T06:04:21.723-04:00'], type: 'date' },
+      xaxis: { range: ['2018-10-12T04:04:21.723+02:00', '2018-10-12T12:04:21.723+02:00'], type: 'date' },
     }));
 
     genericPlot.get(0).props.onZoom('2018-10-12T04:04:21.723Z', '2018-10-12T08:04:21.723Z');
@@ -153,7 +150,7 @@ describe('XYPlot', () => {
     const genericPlot = wrapper.find('GenericPlot');
 
     expect(genericPlot).toHaveProp('layout', expect.objectContaining({
-      xaxis: { range: ['2018-10-12T02:04:21.723+00:00', '2018-10-12T10:04:21.723+00:00'], type: 'date' },
+      xaxis: { range: ['2018-10-12T04:04:21.723+02:00', '2018-10-12T12:04:21.723+02:00'], type: 'date' },
     }));
   });
 

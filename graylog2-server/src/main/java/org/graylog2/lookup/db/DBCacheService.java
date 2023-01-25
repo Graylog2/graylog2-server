@@ -53,6 +53,7 @@ public class DBCacheService extends ScopedDbService<CacheDto> {
         db.createIndex(new BasicDBObject("name", 1), new BasicDBObject("unique", true));
     }
 
+    @Override
     public Optional<CacheDto> get(String idOrName) {
         if (ObjectId.isValid(idOrName)) {
             return Optional.ofNullable(db.findOneById(new ObjectId(idOrName)));
@@ -67,6 +68,10 @@ public class DBCacheService extends ScopedDbService<CacheDto> {
         clusterEventBus.post(CachesUpdated.create(savedCache.id()));
 
         return savedCache;
+    }
+
+    public void postBulkUpdate(Set<String> updatedCacheIds) {
+        clusterEventBus.post(CachesUpdated.create(updatedCacheIds));
     }
 
     public PaginatedList<CacheDto> findPaginated(DBQuery.Query query, DBSort.SortBuilder sort, int page, int perPage) {
@@ -87,7 +92,7 @@ public class DBCacheService extends ScopedDbService<CacheDto> {
 
     public void deleteAndPostEventImmutable(String idOrName) {
         final Optional<CacheDto> cacheDto = get(idOrName);
-        super.deleteImmutable(idOrName);
+        super.forceDelete(idOrName);
         cacheDto.ifPresent(cache -> clusterEventBus.post(CachesDeleted.create(cache.id())));
     }
 

@@ -20,10 +20,11 @@ import { uniq } from 'lodash';
 
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
+import type { EntityBase } from 'components/common/EntityDataTable/types';
 
 type CheckboxStatus = 'CHECKED' | 'UNCHECKED' | 'PARTIAL';
 
-const useCheckboxStatus = <Entity extends { id: string }>(data: Readonly<Array<Entity>>, selectedEntityIds: Array<string>) => {
+const useCheckboxStatus = <Entity extends EntityBase>(data: Readonly<Array<Entity>>, selectedEntityIds: Array<string>) => {
   const checkboxRef = useRef<HTMLInputElement>();
 
   const checkboxStatus: CheckboxStatus = useMemo(() => {
@@ -58,13 +59,13 @@ const useCheckboxStatus = <Entity extends { id: string }>(data: Readonly<Array<E
   };
 };
 
-type Props<Entity extends { id: string }> = {
+type Props<Entity extends EntityBase> = {
   data: Readonly<Array<Entity>>,
   selectedEntities: Array<string>,
   setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>,
 }
 
-const BulkSelectHead = <Entity extends { id: string }>({
+const BulkSelectHead = <Entity extends EntityBase>({
   data,
   setSelectedEntities,
   selectedEntities,

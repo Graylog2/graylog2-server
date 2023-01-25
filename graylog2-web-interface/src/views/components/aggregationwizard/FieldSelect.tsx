@@ -23,25 +23,17 @@ import { defaultCompare } from 'logic/DefaultCompare';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
-import { useStore } from 'stores/connect';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import type { Property } from 'views/logic/fieldtypes/FieldType';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypeIcon from 'views/components/sidebar/fields/FieldTypeIcon';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
-type Props = {
-  ariaLabel?: string,
-  clearable?: boolean,
-  error?: string,
-  id: string,
-  label: string,
-  name: string,
-  onChange: (changeEvent: { target: { name: string, value: string } }) => void,
-  value: string | undefined,
-  selectRef?: React.Ref<React.ComponentType>
-  properties?: Array<Property>,
-}
+const FieldName = styled.span`
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+`;
 
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
 
@@ -64,13 +56,26 @@ type OptionRendererProps = {
 };
 
 const OptionRenderer = ({ label, qualified, type }: OptionRendererProps) => {
-  const children = <><FieldTypeIcon type={type} /> {label}</>;
+  const children = <FieldName><FieldTypeIcon type={type} /> {label}</FieldName>;
 
   return qualified ? <span>{children}</span> : <UnqualifiedOption>{children}</UnqualifiedOption>;
 };
 
+type Props = {
+  ariaLabel?: string,
+  clearable?: boolean,
+  error?: string,
+  id: string,
+  label: string,
+  name: string,
+  onChange: (changeEvent: { target: { name: string, value: string } }) => void,
+  value: string | undefined,
+  selectRef?: React.Ref<React.ComponentType>
+  properties?: Array<Property>,
+}
+
 const FieldSelect = ({ name, id, error, clearable, value, onChange, label, ariaLabel, selectRef, properties }: Props) => {
-  const { activeQuery } = useStore(ViewMetadataStore);
+  const activeQuery = useActiveQueryId();
   const fieldTypes = useContext(FieldTypesContext);
   const fieldTypeOptions = useMemo(() => fieldTypes.queryFields
     .get(activeQuery, Immutable.List())

@@ -142,6 +142,7 @@ describe('AggregationWizard/Core Visualizations', () => {
     await selectOption('Select visualization type', 'Line Chart');
 
     await selectOption('Select Interpolation', 'spline');
+
     await expectSubmitButtonNotToBeDisabled();
 
     userEvent.click(await submitButton());

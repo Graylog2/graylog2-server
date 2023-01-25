@@ -45,7 +45,6 @@ import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -62,6 +61,7 @@ import static org.hamcrest.Matchers.hasEntry;
                                    enabledFeatureFlags = ScriptingApiModule.FEATURE_FLAG)
 public class ScriptingApiResourceIT {
 
+    public static final String DEFAULT_STREAM = "000000000000000000000001";
     private final RequestSpecification requestSpec;
     private final GraylogApis api;
 
@@ -78,18 +78,7 @@ public class ScriptingApiResourceIT {
 
         final String defaultIndexSetId = api.indices().defaultIndexSetId();
 
-        final JsonPath user = api.users().createUser(new Users.User(
-                "john.doe",
-                "asdfgh",
-                "John",
-                "Doe",
-                "john.doe@example.com",
-                false,
-                30_000,
-                "Europe/Vienna",
-                Collections.emptyList(),
-                Collections.emptyList()
-        ));
+        final JsonPath user = api.users().createUser(Users.JOHN_DOE);
 
         final String userId = user.getString("id");
 
@@ -117,6 +106,32 @@ public class ScriptingApiResourceIT {
 
         api.search().waitForMessagesCount(3);
         api.fieldTypes().waitForFieldTypeDefinitions( "source", "facility", "level");
+    }
+
+    @ContainerMatrixTest
+    void testAggregationByStream() {
+        final ValidatableResponse validatableResponse =
+                api.post("/search/aggregate","""
+                         {
+                           "group_by": [
+                             {
+                               "field": "streams"
+                             }
+                           ],
+                           "metrics": [
+                             {
+                               "function": "count"
+                             }
+                           ]
+                        }
+                         """, 200);
+
+        validatableResponse.log().ifValidationFails()
+                .assertThat().body("datarows", Matchers.hasSize(3));
+
+        validateRow(validatableResponse, DEFAULT_STREAM, 3);
+        validateRow(validatableResponse, stream2Id, 2);
+        validateRow(validatableResponse, stream1Id, 1);
     }
 
     @ContainerMatrixTest
@@ -607,7 +622,7 @@ public class ScriptingApiResourceIT {
                 .statusCode(400)
                 .assertThat()
                 .body("type", Matchers.equalTo("ApiError"))
-                .body("message", Matchers.containsString("Failed to obtain aggregation results"));
+                .body("message", Matchers.containsString("Failed to obtain results"));
     }
 
     @ContainerMatrixTest

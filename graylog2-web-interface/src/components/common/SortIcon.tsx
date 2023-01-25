@@ -20,19 +20,17 @@ import React, { useCallback } from 'react';
 
 import Icon from 'components/common/Icon';
 
-const StyledSortIcon = styled.button(({ theme }) => {
-  return css`
-    border: 0;
-    background: transparent;
-    padding: 5px;
-    cursor: pointer;
-    position: relative;
-    color: ${theme.colors.gray[70]};
-    &.active {
-      color: ${theme.colors.gray[20]};
-    }
-  `;
-});
+const StyledSortIcon = styled.button(({ theme }) => css`
+  border: 0;
+  background: transparent;
+  padding: 5px;
+  cursor: pointer;
+  position: relative;
+  color: ${theme.colors.gray[70]};
+  &.active {
+    color: ${theme.colors.gray[20]};
+  }
+`);
 
 const Bulb = styled.span(({ theme }) => css`
   position: absolute;
@@ -69,12 +67,12 @@ const SortIcon = <AscDirection extends string, DescDirection extends string>({
   const sortActive = !!activeDirection;
 
   return (
-    <StyledSortIcon className={sortActive ? 'active' : ''}
+    <StyledSortIcon className={`${className} ${sortActive ? 'active' : ''}`}
                     title={title}
                     type="button"
                     aria-label={title}
                     onClick={handleSortChange}>
-      <Icon name={iconName} className={className} data-testid="sort-icon-svg" />
+      <Icon name={iconName} data-testid="sort-icon-svg" />
       {order && <Bulb>{order}</Bulb>}
     </StyledSortIcon>
   );

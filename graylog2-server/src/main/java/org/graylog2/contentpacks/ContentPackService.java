@@ -332,6 +332,10 @@ public class ContentPackService {
         return entityIndexBuilder.build();
     }
 
+    public Map<String, EntityExcerpt> getEntityExcerpts() {
+        return listAllEntityExcerpts().stream().collect(Collectors.toMap(x -> x.id().id(), x -> x));
+    }
+
     public Set<EntityDescriptor> resolveEntities(Collection<EntityDescriptor> unresolvedEntities) {
         final MutableGraph<EntityDescriptor> dependencyGraph = GraphBuilder.directed()
                 .allowsSelfLoops(false)

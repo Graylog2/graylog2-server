@@ -45,7 +45,7 @@ const HelpFeedback = styled.span`
 `;
 
 const StyledContainer = styled.div(({ topMargin }) => `
-  margin-top: ${topMargin};
+  margin-top: ${topMargin}px;
 `);
 
 const StyledInput = styled.input(({ queryWidth }) => `
@@ -134,7 +134,7 @@ class SearchForm extends React.Component {
     placeholder: 'Enter search query...',
     wrapperClass: 'search',
     queryWidth: 'auto',
-    topMargin: 15,
+    topMargin: 0,
     buttonLeftMargin: 5,
     searchBsStyle: 'default',
     searchButtonLabel: 'Search',

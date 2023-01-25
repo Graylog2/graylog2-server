@@ -70,6 +70,10 @@ public class DBDataAdapterService extends ScopedDbService<DataAdapterDto> {
         return savedDataAdapter;
     }
 
+    public void postBulkUpdate(Set<String> updatedAdapterIds) {
+        clusterEventBus.post(DataAdaptersUpdated.create(updatedAdapterIds));
+    }
+
     public PaginatedList<DataAdapterDto> findPaginated(DBQuery.Query query, DBSort.SortBuilder sort, int page, int perPage) {
         try (DBCursor<DataAdapterDto> cursor = db.find(query)
                 .sort(sort)
@@ -88,7 +92,7 @@ public class DBDataAdapterService extends ScopedDbService<DataAdapterDto> {
 
     public void deleteAndPostEventImmutable(String idOrName) {
         final Optional<DataAdapterDto> dataAdapterDto = get(idOrName);
-        super.deleteImmutable(idOrName);
+        super.forceDelete(idOrName);
         dataAdapterDto.ifPresent(dataAdapter -> clusterEventBus.post(DataAdaptersDeleted.create(dataAdapter.id())));
     }
 

@@ -15,15 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React, { useState, useEffect, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
-import { Alert, Label } from 'components/bootstrap';
-import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
+import { Label } from 'components/bootstrap';
+import { PaginatedList, SearchForm, NoSearchResult } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';
-import type { Stream, StreamRuleType } from 'stores/streams/StreamsStore';
+import type { Stream } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
@@ -32,22 +31,15 @@ import EntityDataTable from 'components/common/EntityDataTable';
 import StreamActions from 'components/streams/StreamsOverview/StreamActions';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import type { ColumnRenderers, Sort } from 'components/common/EntityDataTable';
-import UserNotification from 'util/UserNotification';
+import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import IndexSetCell from 'components/streams/StreamsOverview/IndexSetCell';
 import BulkActions from 'components/streams/StreamsOverview/BulkActions';
 import ThroughputCell from 'components/streams/StreamsOverview/ThroughputCell';
+import type { SearchParams, Sort } from 'stores/PaginationTypes';
+import useStreams from 'components/streams/hooks/useStreams';
+import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 
 import StatusCell from './StatusCell';
-
-import CreateStreamButton from '../CreateStreamButton';
-
-type SearchParams = {
-  page: number,
-  pageSize: number,
-  query: string,
-  sort: Sort
-}
 
 const DefaultLabel = styled(Label)`
   display: inline-flex;
@@ -55,15 +47,13 @@ const DefaultLabel = styled(Label)`
   vertical-align: inherit;
 `;
 
-const COLUMN_DEFINITIONS = [
-  { id: 'title', title: 'Title', sortable: true },
-  { id: 'description', title: 'Description', sortable: true },
+const CUSTOM_COLUMN_DEFINITIONS = [
   { id: 'index_set_title', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },
   { id: 'throughput', title: 'Throughput' },
-  { id: 'disabled', title: 'Status', sortable: true },
 ];
 
 const INITIAL_COLUMNS = ['title', 'description', 'index_set_title', 'throughput', 'disabled'];
+const COLUMNS_ORDER = ['title', 'description', 'index_set_title', 'throughput', 'disabled', 'created_at'];
 
 const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stream> => ({
   title: {
@@ -88,52 +78,11 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
   },
 });
 
-const usePaginatedStreams = (searchParams: SearchParams): { data: { streams: Array<Stream>, pagination: { total: number } } | undefined, refetch: () => void } => {
-  const { data, refetch } = useQuery(
-    ['streams', 'overview', searchParams],
-    () => StreamsStore.searchPaginated(
-      searchParams.page,
-      searchParams.pageSize,
-      searchParams.query,
-      { sort: searchParams?.sort.columnId, order: searchParams?.sort.order },
-    ),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading streams failed with status: ${errorThrown}`,
-          'Could not load streams');
-      },
-      keepPreviousData: true,
-    },
-  );
-
-  return ({
-    data,
-    refetch,
-  });
-};
-
-const useStreamRuleTypes = (): { data: Array<StreamRuleType> | undefined } => {
-  const { data } = useQuery(
-    ['streams', 'rule-types'],
-    () => StreamRulesStore.types(),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading stream rule types failed with status: ${errorThrown}`,
-          'Could not load stream rule types');
-      },
-      keepPreviousData: true,
-    },
-  );
-
-  return ({ data });
-};
-
 type Props = {
-  onStreamCreate: (stream: Stream) => Promise<void>,
   indexSets: Array<IndexSet>
 }
 
-const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
+const StreamsOverview = ({ indexSets }: Props) => {
   const [visibleColumns, setVisibleColumns] = useState(INITIAL_COLUMNS);
   const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
   const [searchParams, setSearchParams] = useState<SearchParams>({
@@ -141,12 +90,17 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
     pageSize: paginationQueryParameter.pageSize,
     query: '',
     sort: {
-      columnId: 'title',
-      order: 'asc',
+      attributeId: 'title',
+      direction: 'asc',
     },
   });
   const { data: streamRuleTypes } = useStreamRuleTypes();
-  const { data: paginatedStreams, refetch: refetchStreams } = usePaginatedStreams(searchParams);
+  const { data: paginatedStreams, refetch: refetchStreams } = useStreams(searchParams);
+  const columnRenderers = useMemo(() => customColumnRenderers(indexSets), [indexSets]);
+  const columnDefinitions = useMemo(
+    () => ([...(paginatedStreams?.attributes ?? []), ...CUSTOM_COLUMN_DEFINITIONS]),
+    [paginatedStreams?.attributes],
+  );
 
   useEffect(() => {
     StreamsStore.onChange(() => refetchStreams());
@@ -165,7 +119,7 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
 
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
-    setSearchParams((cur) => ({ ...cur, query: newQuery }));
+    setSearchParams((cur) => ({ ...cur, query: newQuery, page: 1 }));
   }, [paginationQueryParameter]);
 
   const onReset = useCallback(() => {
@@ -197,10 +151,10 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
   );
 
   if (!paginatedStreams || !streamRuleTypes) {
-    return (<Spinner />);
+    return <Spinner />;
   }
 
-  const { streams, pagination: { total } } = paginatedStreams;
+  const { elements, pagination: { total } } = paginatedStreams;
 
   return (
     <PaginatedList onChange={onPageChange}
@@ -212,38 +166,26 @@ const StreamsOverview = ({ onStreamCreate, indexSets }: Props) => {
                     queryHelpComponent={<QueryHelper entityName="stream" />} />
       </div>
       <div>
-        {streams?.length === 0
-          ? (
-            <Alert bsStyle="warning">
-              <Icon name="info-circle" />&nbsp;No streams found.
-              <IfPermitted permissions="streams:create">
-                <CreateStreamButton bsSize="small"
-                                    bsStyle="link"
-                                    className="btn-text"
-                                    buttonText="Create one now"
-                                    indexSets={indexSets}
-                                    onCreate={onStreamCreate} />
-              </IfPermitted>
-            </Alert>
-          )
-          : (
-            <EntityDataTable data={streams}
-                             visibleColumns={visibleColumns}
-                             onColumnsChange={onColumnsChange}
-                             onSortChange={onSortChange}
-                             bulkActions={renderBulkActions}
-                             activeSort={searchParams.sort}
-                             rowActions={renderStreamActions}
-                             columnRenderers={customColumnRenderers(indexSets)}
-                             columnDefinitions={COLUMN_DEFINITIONS} />
-          )}
+        {elements?.length === 0 ? (
+          <NoSearchResult>No streams have been found</NoSearchResult>
+        ) : (
+          <EntityDataTable<Stream> data={elements}
+                                   visibleColumns={visibleColumns}
+                                   columnsOrder={COLUMNS_ORDER}
+                                   onColumnsChange={onColumnsChange}
+                                   onSortChange={onSortChange}
+                                   bulkActions={renderBulkActions}
+                                   activeSort={searchParams.sort}
+                                   rowActions={renderStreamActions}
+                                   columnRenderers={columnRenderers}
+                                   columnDefinitions={columnDefinitions} />
+        )}
       </div>
     </PaginatedList>
   );
 };
 
 StreamsOverview.propTypes = {
-  onStreamCreate: PropTypes.func.isRequired,
   indexSets: PropTypes.array.isRequired,
 };
 

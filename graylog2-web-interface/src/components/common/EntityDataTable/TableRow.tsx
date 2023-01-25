@@ -18,8 +18,10 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useCallback } from 'react';
 
+import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
+
 import TableCell from './TableCell';
-import type { ColumnRenderers, Column } from './types';
+import type { ColumnRenderers, Column, EntityBase } from './types';
 import RowCheckbox from './RowCheckbox';
 
 const ActionsCell = styled.th`
@@ -34,7 +36,7 @@ const ActionsRef = styled.div`
   display: inline-flex;
 `;
 
-type Props<Entity extends { id: string }> = {
+type Props<Entity extends EntityBase> = {
   actionsRef: React.RefObject<HTMLDivElement>
   columns: Array<Column>,
   columnRenderers: ColumnRenderers<Entity>,
@@ -47,7 +49,7 @@ type Props<Entity extends { id: string }> = {
   rowActions?: (entity: Entity) => React.ReactNode,
 };
 
-const TableRow = <Entity extends { id: string }>({
+const TableRow = <Entity extends EntityBase>({
   columns,
   columnRenderers,
   displaySelect,
@@ -63,6 +65,8 @@ const TableRow = <Entity extends { id: string }>({
     () => onToggleEntitySelect(entity.id),
     [entity.id, onToggleEntitySelect],
   );
+
+  const actionButtons = displayActions ? <ButtonToolbar>{rowActions(entity)}</ButtonToolbar> : null;
 
   return (
     <tr key={entity.id}>
@@ -85,7 +89,7 @@ const TableRow = <Entity extends { id: string }>({
       })}
       {displayActions ? (
         <ActionsCell>
-          {index === 0 ? <ActionsRef ref={actionsRef}>{rowActions(entity)}</ActionsRef> : rowActions(entity)}
+          {index === 0 ? <ActionsRef ref={actionsRef}>{actionButtons}</ActionsRef> : actionButtons}
         </ActionsCell>
       ) : null}
     </tr>

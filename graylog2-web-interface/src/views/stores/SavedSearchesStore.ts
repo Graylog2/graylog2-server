@@ -24,7 +24,19 @@ import type { RefluxActions } from 'stores/StoreTypes';
 import type { PaginatedViews, SortOrder } from './ViewManagementStore';
 
 export type SavedSearchesActionsType = RefluxActions<{
-  search: (query?: string, page?: number, perPage?: number, sortBy?: string, order?: SortOrder) => Promise<PaginatedViews>,
+  search: ({
+    query,
+    page,
+    perPage,
+    sortBy,
+    order,
+  }: {
+    query?: string,
+    page?: number,
+    perPage?: number,
+    sortBy?: string,
+    order?: SortOrder
+  }) => Promise<PaginatedViews>,
 }>;
 
 const SavedSearchesActions: SavedSearchesActionsType = singletonActions(
@@ -44,7 +56,7 @@ const SavedSearchesStore = singletonStore(
     search({ query = '', page = 1, perPage = 10, sortBy = 'title', order = 'asc' }): Promise<PaginatedViews> {
       const promise = fetch('GET', `${savedSearchesUrl}?query=${query}&page=${page}&per_page=${perPage}&sort=${sortBy}&order=${order}`)
         .then((response) => ({
-          list: response.views,
+          list: response.elements,
           pagination: {
             count: response.count,
             page: response.page,

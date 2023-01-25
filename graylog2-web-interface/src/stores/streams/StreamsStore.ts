@@ -25,17 +25,19 @@ import PaginationURL from 'util/PaginationURL';
 import StreamsActions from 'actions/streams/StreamsActions';
 import { singletonStore } from 'logic/singleton';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import type { Attributes } from 'stores/PaginationTypes';
 
 export type Stream = {
   id: string,
+  creator_user_id: string,
   outputs: any[],
   matching_type: string,
   description: string,
   created_at: string,
   disabled: boolean,
   rules: StreamRule[],
-  alert_conditions: any[],
-  alert_receivers: {
+  alert_conditions?: any[],
+  alert_receivers?: {
     emails: Array<string>,
     users: Array<string>,
   },
@@ -128,7 +130,8 @@ type PaginatedResponse = {
     per_page: number,
   },
   query: string,
-  streams: Array<Stream>,
+  attributes: Attributes,
+  elements: Array<Stream>,
 };
 
 const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
@@ -142,8 +145,9 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
     const promise = fetch('GET', qualifyUrl(url))
       .then((response: PaginatedResponse) => {
         const {
-          streams,
+          elements,
           query,
+          attributes,
           pagination: {
             count,
             total,
@@ -153,7 +157,8 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
         } = response;
 
         return {
-          streams,
+          elements,
+          attributes,
           pagination: {
             count,
             total,
