@@ -21,6 +21,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.plugin.Tools;
@@ -49,6 +50,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.shared.utilities.StringUtils.f;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -122,6 +124,19 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
             final String indexName = a.getArgument(0);
             final Optional<TestIndex> index = indexSet.findByName(indexName);
             return index.map(TestIndex::getClosingDate);
+        });
+
+        // Report all indices that have a closingDate as read-only
+        lenient().when(indices.getIndicesBlocksStatus(anyList())).then(a -> {
+            final List<String> indices = a.getArgument(0);
+            final IndicesBlockStatus indicesBlockStatus = new IndicesBlockStatus();
+            indices.forEach(i -> {
+                final Optional<TestIndex> index = indexSet.findByName(i);
+                if (index.map(TestIndex::getClosingDate).orElse(null) != null) {
+                    indicesBlockStatus.addIndexBlocks(i, Set.of("index.blocks.write"));
+                }
+            });
+            return indicesBlockStatus;
         });
 
         lenient().doAnswer(a -> {
@@ -208,6 +223,40 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
         clock.plus(10, TimeUnit.DAYS);
         deletionRetentionStrategy.retain(indexSet);
         assertThat(indexSet.getIndicesNames()).isEqualTo(List.of("test_4"));
+    }
+
+    @Test
+    public void testRetentionWithoutClosingDate() {
+        // Report all but the newest index as read-only
+        lenient().when(indices.getIndicesBlocksStatus(anyList())).then(a -> {
+            final List<String> indices = a.getArgument(0);
+            final IndicesBlockStatus indicesBlockStatus = new IndicesBlockStatus();
+            final String newestIndex = indexSet.getNewestIndex();
+            indices.forEach(i -> {
+                if (!newestIndex.equals(i)) {
+                    indicesBlockStatus.addIndexBlocks(i, Set.of("index.blocks.write"));
+                }
+            });
+            return indicesBlockStatus;
+        });
+
+        indexSet.addNewIndex(0, elasticsearchConfiguration.getTimeSizeOptimizingRotationMinSize().toBytes());
+        clock.plus(1, TimeUnit.DAYS);
+        indexSet.addNewIndex(1, elasticsearchConfiguration.getTimeSizeOptimizingRotationMinSize().toBytes());
+        clock.plus(1, TimeUnit.DAYS);
+        indexSet.addNewIndex(2, elasticsearchConfiguration.getTimeSizeOptimizingRotationMinSize().toBytes());
+
+        assertThat(indexSet.getIndicesNames()).isEqualTo(List.of("test_0", "test_1", "test_2"));
+
+        clock.plus(2, TimeUnit.DAYS);
+
+        // Retention without a closingDate should not happen after indexLifetimeSoft (4 days), but after indexLifetimeHard (6 days)
+        deletionRetentionStrategy.retain(indexSet);
+        assertThat(indexSet.getIndicesNames()).isEqualTo(List.of("test_0", "test_1", "test_2"));
+
+        clock.plus(2, TimeUnit.DAYS);
+        deletionRetentionStrategy.retain(indexSet);
+        assertThat(indexSet.getIndicesNames()).isEqualTo(List.of("test_1", "test_2"));
     }
 
     private String getBetween(TestIndex i) {

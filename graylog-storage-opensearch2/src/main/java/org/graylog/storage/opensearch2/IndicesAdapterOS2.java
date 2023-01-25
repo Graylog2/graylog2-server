@@ -253,6 +253,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     @Override
     public void setReadOnly(String index) {
         // https://www.elastic.co/guide/en/elasticsearch/reference/7.8/indices-update-settings.html
+        // https://www.elastic.co/guide/en/elasticsearch/reference/7.10/index-modules-blocks.html
         final Map<String, Object> settings = ImmutableMap.of(
                 "index", ImmutableMap.of("blocks",
                         ImmutableMap.of(

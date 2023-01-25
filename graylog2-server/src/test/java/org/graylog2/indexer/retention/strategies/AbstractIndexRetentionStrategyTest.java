@@ -20,6 +20,7 @@ import org.graylog.scheduler.clock.JobSchedulerSystemClock;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
@@ -49,6 +50,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
@@ -99,6 +101,19 @@ public class AbstractIndexRetentionStrategyTest {
         lenient().when(indexSet.getManagedIndices()).thenReturn(indexMap.keySet().stream().toArray(String[]::new));
         lenient().when(indexSet.extractIndexNumber(anyString())).then(this::extractIndexNumber);
         when(indexSet.getConfig()).thenReturn(indexSetConfigCountBased);
+
+        // Report all but the newest index as read-only
+        lenient().when(indices.getIndicesBlocksStatus(anyList())).then(a -> {
+            final List<String> indices = a.getArgument(0);
+            final IndicesBlockStatus indicesBlockStatus = new IndicesBlockStatus();
+            final String newestIndex = "index6";
+            indices.forEach(i -> {
+                if (!newestIndex.equals(i)) {
+                    indicesBlockStatus.addIndexBlocks(i, Set.of("index.blocks.write"));
+                }
+            });
+            return indicesBlockStatus;
+        });
 
         retentionStrategy = spy(new AbstractIndexRetentionStrategy(indices, activityWriter, new JobSchedulerSystemClock()) {
             @Override
