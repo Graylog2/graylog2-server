@@ -89,8 +89,6 @@ class EventsSearchBar extends React.Component {
           <div className={styles.searchForm}>
             <SearchForm query={parameters.query}
                         onSearch={onQueryChange}
-                        searchButtonLabel={<Icon name="search" />}
-                        loadingLabel=""
                         placeholder="Find Events"
                         queryWidth="100%"
                         topMargin={0}

@@ -113,8 +113,7 @@ const PaginatedItemOverview = ({
                   label="Filter"
                   wrapperClass="has-bm"
                   placeholder="Enter query to filter"
-                  queryHelpComponent={queryHelper}
-                  searchButtonLabel="Filter" />
+                  queryHelpComponent={queryHelper} />
       <ResultsWrapperComponent isEmptyResult={!itemList}>
         {itemList ?? emptyResult}
       </ResultsWrapperComponent>

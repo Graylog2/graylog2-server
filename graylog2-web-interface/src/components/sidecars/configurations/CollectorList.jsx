@@ -84,7 +84,6 @@ const CollectorList = createReactClass({
             <SearchForm query={query}
                         onSearch={onQueryChange}
                         onReset={onQueryChange}
-                        searchButtonLabel="Find"
                         placeholder="Find collectors"
                         wrapperClass={style.inline}
                         queryWidth={300}

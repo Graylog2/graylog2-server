@@ -93,7 +93,6 @@ const EventDefinitions = ({ eventDefinitions, context, pagination, query, onPage
         <SearchForm query={query}
                     onSearch={onQueryChange}
                     onReset={onQueryChange}
-                    searchButtonLabel="Find"
                     placeholder="Find Event Definitions"
                     wrapperClass={styles.inline}
                     queryHelpComponent={<QueryHelper entityName="event definition" />}

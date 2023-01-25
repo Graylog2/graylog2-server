@@ -194,7 +194,6 @@ const InputsList = createReactClass({
             <SearchForm onSearch={this._onFilterInputs}
                         topMargin={0}
                         onReset={this._onFilterReset}
-                        searchButtonLabel="Filter"
                         placeholder="Filter by title" />
             <br />
             <h2>

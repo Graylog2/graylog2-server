@@ -96,7 +96,6 @@ class SidecarSearchForm extends React.Component {
       <SearchForm query={query}
                   onSearch={onSearch}
                   onReset={onReset}
-                  searchButtonLabel="Find"
                   placeholder="Find sidecars"
                   queryWidth={400}
                   queryHelpComponent={queryHelp}

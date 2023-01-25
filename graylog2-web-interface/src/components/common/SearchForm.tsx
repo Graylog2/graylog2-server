@@ -19,9 +19,12 @@ import * as React from 'react';
 import Promise from 'bluebird';
 import styled, { css } from 'styled-components';
 import { useState, useEffect } from 'react';
+import { debounce } from 'lodash';
 
 import { Button } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
+
+const SEARCH_DEBOUNCE_THRESHOLD = 300;
 
 const FormContent = styled.div<{ $buttonLeftMargin: number }>(({ $buttonLeftMargin }) => css`
   > :not(:last-child) {
@@ -53,6 +56,39 @@ const StyledInput = styled.input<{ $queryWidth }>(({ $queryWidth }) => css`
   width: ${$queryWidth} !important;
 `);
 
+const handleSearch = (query, onSearch, useLoadingState, setLoadingState, resetLoadingState) => {
+  if (useLoadingState) {
+    setLoadingState().then(() => {
+      onSearch(query, resetLoadingState);
+    });
+  } else {
+    onSearch(query);
+  }
+};
+
+const handleQueryChange = (query, onSearch, useLoadingState, setLoadingState, resetLoadingState) => {
+  if (useLoadingState) {
+    setLoadingState().then(() => {
+      onSearch(query, resetLoadingState);
+    });
+  } else {
+    onSearch(query);
+  }
+};
+
+const debounceOnSearch = debounce((
+  query,
+  onSearch,
+  useLoadingState,
+  setLoadingState,
+  resetLoadingState,
+) => handleQueryChange(query,
+  onSearch,
+  useLoadingState,
+  setLoadingState,
+  resetLoadingState,
+), SEARCH_DEBOUNCE_THRESHOLD);
+
 type Props = {
   useLoadingState?: boolean,
   queryHelpComponent?: React.ReactNode,
@@ -68,9 +104,6 @@ type Props = {
   onSearch?: (query: string, reset?: () => void) => void,
   wrapperClass?: string,
   topMargin?: number,
-  searchButtonLabel: React.ReactNode,
-  loadingLabel?: string,
-  searchBsStyle?: string,
   onQueryChange: (query: string) => void,
   query?: string,
 }
@@ -95,9 +128,6 @@ const SearchForm = ({
   onSearch,
   wrapperClass,
   topMargin,
-  searchButtonLabel,
-  loadingLabel,
-  searchBsStyle,
   onQueryChange,
   query: propsQuery,
 }: Props) => {
@@ -132,19 +162,6 @@ const SearchForm = ({
     }
   };
 
-  const handleSearch = (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (useLoadingState) {
-      setLoadingState().then(() => {
-        onSearch(query, resetLoadingState);
-      });
-    } else {
-      onSearch(query);
-    }
-  };
-
   const handleReset = () => {
     resetLoadingState();
     setQuery(query);
@@ -152,56 +169,54 @@ const SearchForm = ({
     onReset();
   };
 
-  const handleQueryChange = (e) => {
+  const onChange = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     const newQuery = e.target.value;
 
     setQuery(newQuery);
-    onQueryChange(query);
+
+    if (typeof onQueryChange === 'function') {
+      onQueryChange(query);
+    }
+
+    if (typeof onSearch === 'function') {
+      debounceOnSearch(newQuery, onSearch, useLoadingState, setLoadingState, resetLoadingState);
+    }
   };
 
   return (
     <StyledContainer className={`${wrapperClass} ${className}`} $topMargin={topMargin}>
-      <form className="form-inline" onSubmit={handleSearch}>
-        <FormContent $buttonLeftMargin={buttonLeftMargin}>
-          <div className={`form-group ${queryHelpComponent ? 'has-feedback' : ''}`}>
-            {label && (
-              <label htmlFor="common-search-form-query-input" className="control-label">
-                {label}
-              </label>
-            )}
-            <StyledInput id="common-search-form-query-input"
-                         /* eslint-disable-next-line jsx-a11y/no-autofocus */
-                         autoFocus={focusAfterMount}
-                         onChange={handleQueryChange}
-                         value={query}
-                         placeholder={placeholder}
-                         type="text"
-                         $queryWidth={queryWidth}
-                         className="query form-control"
-                         autoComplete="off"
-                         spellCheck="false" />
-            {queryHelpComponent && (
-              <HelpFeedback className="form-control-feedback">{queryHelpComponent}</HelpFeedback>
-            )}
-          </div>
-
-          {onSearch && (
-            <Button bsStyle={searchBsStyle}
-                    type="submit"
-                    disabled={isLoading}
-                    className="submit-button">
-              {isLoading ? <Spinner text={loadingLabel} delay={0} /> : searchButtonLabel}
-            </Button>
+      <FormContent $buttonLeftMargin={buttonLeftMargin}>
+        <div className={`form-group ${queryHelpComponent ? 'has-feedback' : ''}`}>
+          {label && (
+            <label htmlFor="common-search-form-query-input" className="control-label">
+              {label}
+            </label>
           )}
-
-          {onReset && (
-            <Button type="reset" className="reset-button" onClick={handleReset}>
-              {resetButtonLabel}
-            </Button>
+          <StyledInput id="common-search-form-query-input"
+                       /* eslint-disable-next-line jsx-a11y/no-autofocus */
+                       autoFocus={focusAfterMount}
+                       onChange={onChange}
+                       value={query}
+                       placeholder={placeholder}
+                       type="text"
+                       $queryWidth={queryWidth}
+                       className="query form-control"
+                       autoComplete="off"
+                       spellCheck="false" />
+          {queryHelpComponent && (
+            <HelpFeedback className="form-control-feedback">{queryHelpComponent}</HelpFeedback>
           )}
-          {children}
-        </FormContent>
-      </form>
+        </div>
+
+        {onReset && (
+          <Button type="reset" className="reset-button" onClick={handleReset}>
+            {resetButtonLabel}
+          </Button>
+        )}
+        {children}
+      </FormContent>
     </StyledContainer>
   );
 };
@@ -235,17 +250,8 @@ SearchForm.propTypes = {
   topMargin: PropTypes.number,
   /** Separation between search field and buttons. */
   buttonLeftMargin: PropTypes.number,
-  /** bsStyle for search button. */
-  searchBsStyle: PropTypes.string,
-  /** Text to display in the search button. */
-  searchButtonLabel: PropTypes.node,
   /** Text to display in the reset button. */
   resetButtonLabel: PropTypes.node,
-  /**
-   * Text to display in the search button while the search is loading. This
-   * will only be used if `useLoadingState` is true.
-   */
-  loadingLabel: PropTypes.string,
   /**
    * Specifies if it should display a loading state from the moment the
    * search button is pressed until the component receives new props or
@@ -275,7 +281,7 @@ SearchForm.propTypes = {
 SearchForm.defaultProps = {
   query: '',
   className: '',
-  onQueryChange: () => {},
+  onQueryChange: undefined,
   onSearch: null,
   onReset: null,
   label: null,
@@ -284,11 +290,8 @@ SearchForm.defaultProps = {
   queryWidth: 'auto',
   topMargin: 0,
   buttonLeftMargin: 5,
-  searchBsStyle: 'default',
-  searchButtonLabel: 'Search',
   resetButtonLabel: 'Reset',
   useLoadingState: false,
-  loadingLabel: 'Loading...',
   queryHelpComponent: null,
   children: null,
   focusAfterMount: false,

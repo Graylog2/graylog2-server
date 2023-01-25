@@ -87,7 +87,6 @@ class ConfigurationList extends React.Component {
             <SearchForm query={query}
                         onSearch={onQueryChange}
                         onReset={onQueryChange}
-                        searchButtonLabel="Find"
                         placeholder="Find configurations"
                         wrapperClass={style.inline}
                         queryWidth={300}
