@@ -111,6 +111,7 @@ const PaginatedItemOverview = ({
                    useQueryParameter={false}>
       <SearchForm onSearch={(newQuery) => setPagination({ ...pagination, page: INITIAL_PAGE, query: newQuery })}
                   label="Filter"
+                  queryWidth={300}
                   wrapperClass="has-bm"
                   placeholder="Enter query to filter"
                   queryHelpComponent={queryHelper} />

@@ -90,7 +90,6 @@ class EventsSearchBar extends React.Component {
             <SearchForm query={parameters.query}
                         onSearch={onQueryChange}
                         placeholder="Find Events"
-                        queryWidth="100%"
                         topMargin={0}
                         useLoadingState>
               <Button onClick={this.handleSearchReload} disabled={isReloadingResults}>

@@ -86,7 +86,6 @@ const CollectorList = createReactClass({
                         onReset={onQueryChange}
                         placeholder="Find collectors"
                         wrapperClass={style.inline}
-                        queryWidth={300}
                         topMargin={0}
                         useLoadingState />
 

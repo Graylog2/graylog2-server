@@ -96,7 +96,6 @@ const EventDefinitions = ({ eventDefinitions, context, pagination, query, onPage
                     placeholder="Find Event Definitions"
                     wrapperClass={styles.inline}
                     queryHelpComponent={<QueryHelper entityName="event definition" />}
-                    queryWidth={200}
                     topMargin={0}
                     useLoadingState />
 

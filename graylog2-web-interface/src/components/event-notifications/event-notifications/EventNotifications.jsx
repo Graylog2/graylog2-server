@@ -176,7 +176,6 @@ class EventNotifications extends React.Component {
                         placeholder="Find Notifications"
                         wrapperClass={styles.inline}
                         queryHelpComponent={<QueryHelper entityName="notification" />}
-                        queryWidth={200}
                         topMargin={0}
                         useLoadingState />
 

@@ -89,7 +89,6 @@ class ConfigurationList extends React.Component {
                         onReset={onQueryChange}
                         placeholder="Find configurations"
                         wrapperClass={style.inline}
-                        queryWidth={300}
                         topMargin={0}
                         useLoadingState />
 

@@ -76,7 +76,6 @@ const SearchFormExample = createReactClass({
                     onReset={this.onReset}
                     query={this.state.queryTemplate}
                     label="Search"
-                    queryWidth={300}
                     queryHelpComponent={(
                       <Button onClick={() => alert('help!')} bsStyle="link">
                         <Icon name="question-circle" />

@@ -45,6 +45,8 @@ const InputFeedback = styled.div`
   top: 0;
   display: flex;
   align-items: center;
+  min-height: 34px;
+  padding-right: 3px;
 `;
 
 const StyledContainer = styled.div<{ $topMargin: number }>(({ $topMargin }) => css`
@@ -56,8 +58,8 @@ const StyledInput = styled.input<{ $queryWidth: number, $feedbackContainerWidth:
   padding-right: ${$feedbackContainerWidth ?? 12}px;
 `);
 
-const StyledSpinner = styled(Spinner)`
-
+const Label = styled.label`
+  margin-right: 5px;
 `;
 
 const InputContainer = styled.div`
@@ -194,9 +196,9 @@ const SearchForm = ({
       <FormContent $buttonLeftMargin={buttonLeftMargin}>
         <div className="form-group">
           {label && (
-            <label htmlFor="common-search-form-query-input" className="control-label">
+            <Label htmlFor="common-search-form-query-input" className="control-label">
               {label}
-            </label>
+            </Label>
           )}
           <InputContainer>
             <StyledInput id="common-search-form-query-input"
@@ -212,8 +214,8 @@ const SearchForm = ({
                          spellCheck="false"
                          $feedbackContainerWidth={inputFeedbackContainer.current?.scrollWidth} />
             <InputFeedback ref={inputFeedbackContainer}>
-              {isLoading && <StyledSpinner text="" />}
-              {query && <IconButton name="xmark" title="Reset search" onClick={handleReset} />}
+              {isLoading && <Spinner text="" />}
+              {(query && typeof onReset === 'function') && <IconButton name="xmark" title="Reset search" onClick={handleReset} />}
               {queryHelpComponent}
             </InputFeedback>
           </InputContainer>
@@ -288,7 +290,7 @@ SearchForm.defaultProps = {
   label: null,
   placeholder: 'Enter search query...',
   wrapperClass: 'search',
-  queryWidth: 350,
+  queryWidth: 400,
   topMargin: 0,
   buttonLeftMargin: 5,
   useLoadingState: false,

@@ -97,7 +97,6 @@ class SidecarSearchForm extends React.Component {
                   onSearch={onSearch}
                   onReset={onReset}
                   placeholder="Find sidecars"
-                  queryWidth={400}
                   queryHelpComponent={queryHelp}
                   topMargin={0}
                   useLoadingState>
