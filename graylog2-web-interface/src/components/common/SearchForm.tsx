@@ -25,7 +25,7 @@ import Spinner from 'components/common/Spinner';
 
 import IconButton from './IconButton';
 
-const SEARCH_DEBOUNCE_THRESHOLD = 300;
+export const SEARCH_DEBOUNCE_THRESHOLD = 300;
 
 const FormContent = styled.div<{ $buttonLeftMargin: number }>(({ $buttonLeftMargin }) => css`
   > :not(:last-child) {
@@ -83,7 +83,8 @@ const debounceOnSearch = debounce((
   useLoadingState,
   setLoadingState,
   resetLoadingState,
-) => handleQueryChange(query,
+) => handleQueryChange(
+  query,
   onSearch,
   useLoadingState,
   setLoadingState,
