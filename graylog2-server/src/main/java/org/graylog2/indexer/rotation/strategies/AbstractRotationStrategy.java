@@ -22,6 +22,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.NoTargetIndexException;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
@@ -44,12 +45,14 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
     private final AuditEventSender auditEventSender;
     private final NodeId nodeId;
     protected final ElasticsearchConfiguration elasticsearchConfiguration;
+    protected final Indices indices;
 
     public AbstractRotationStrategy(
-            AuditEventSender auditEventSender, NodeId nodeId, ElasticsearchConfiguration elasticsearchConfiguration) {
+            AuditEventSender auditEventSender, NodeId nodeId, ElasticsearchConfiguration elasticsearchConfiguration, Indices indices) {
         this.auditEventSender = requireNonNull(auditEventSender);
         this.nodeId = nodeId;
         this.elasticsearchConfiguration = elasticsearchConfiguration;
+        this.indices = indices;
     }
 
     @Nullable
@@ -67,6 +70,9 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
             LOG.error("Could not find current deflector target of index set <{}>. Aborting.", indexSetTitle, e);
             return;
         }
+
+        // Refresh so we have current stats on idle indices
+        indices.refresh(indexName);
 
         final Result rotate = shouldRotate(indexName, indexSet);
         if (rotate == null) {

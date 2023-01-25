@@ -63,16 +63,14 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
     public static final String NAME = "time";
     public static final String OVERRIDE_HINT = "(elasticsearch_max_write_index_age overrides configured period)";
 
-    private final Indices indices;
     private Map<String, DateTime> anchor;
 
     @Inject
     public TimeBasedRotationStrategy(Indices indices, NodeId nodeId,
                                      AuditEventSender auditEventSender,
                                      ElasticsearchConfiguration elasticsearchConfiguration) {
-        super(auditEventSender, nodeId, elasticsearchConfiguration);
+        super(auditEventSender, nodeId, elasticsearchConfiguration, indices);
         this.anchor = new ConcurrentHashMap<>();
-        this.indices = requireNonNull(indices, "indices must not be null");
     }
 
     @Override

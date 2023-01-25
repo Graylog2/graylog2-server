@@ -32,15 +32,12 @@ import java.util.Optional;
 public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
     public static final String NAME = "size";
 
-    private final Indices indices;
-
     @Inject
     public SizeBasedRotationStrategy(Indices indices,
                                      NodeId nodeId,
                                      AuditEventSender auditEventSender,
                                      ElasticsearchConfiguration elasticsearchConfiguration) {
-        super(auditEventSender, nodeId, elasticsearchConfiguration);
-        this.indices = indices;
+        super(auditEventSender, nodeId, elasticsearchConfiguration, indices);
     }
 
     @Override
