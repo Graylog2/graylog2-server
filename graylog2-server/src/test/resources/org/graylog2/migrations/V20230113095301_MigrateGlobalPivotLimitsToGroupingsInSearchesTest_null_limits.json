@@ -1,0 +1,264 @@
+{
+  "searches": [{
+    "_id" : { "$oid": "63c54679c2497d791ba04ffe" },
+    "queries" : [
+      {
+        "id" : "a1647eb6-a064-4fe6-b459-1e4267d3f659",
+        "timerange" : {
+          "range" : 300,
+          "type" : "relative"
+        },
+        "filters" : [],
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "search_types" : [
+          {
+            "timerange" : {
+              "range" : 300,
+              "type" : "relative"
+            },
+            "query" : null,
+            "streams" : [],
+            "id" : "4486ed5c-1567-4894-9fa4-21344dc956a2",
+            "name" : "chart",
+            "series" : [
+              {
+                "type" : "count",
+                "id" : "Message count"
+              }
+            ],
+            "sort" : [
+              {
+                "type" : "series",
+                "field" : "count()",
+                "direction" : "Descending"
+              }
+            ],
+            "rollup" : true,
+            "type" : "pivot",
+            "row_groups" : [
+              {
+                "type" : "values",
+                "field" : "source",
+                "limit" : 15
+              }
+            ],
+            "column_groups" : [],
+            "filters" : []
+          },
+          {
+            "timerange" : {
+              "range" : 300,
+              "type" : "relative"
+            },
+            "query" : null,
+            "streams" : [],
+            "id" : "59bee5f1-4905-4c0c-ad4c-dfb98d480a8d",
+            "name" : "chart",
+            "series" : [
+              {
+                "type" : "count",
+                "id" : "Message count"
+              }
+            ],
+            "sort" : [
+              {
+                "type" : "series",
+                "field" : "count()",
+                "direction" : "Descending"
+              }
+            ],
+            "rollup" : true,
+            "type" : "pivot",
+            "row_groups" : [
+              {
+                "type" : "values",
+                "field" : "source",
+                "limit" : 10
+              }
+            ],
+            "column_groups" : [],
+            "filters" : []
+          },
+          {
+            "timerange" : {
+              "range" : 300,
+              "type" : "relative"
+            },
+            "query" : null,
+            "streams" : [],
+            "id" : "c7691d2e-063f-4dd4-b1aa-1a22dfbab5c1",
+            "name" : "chart",
+            "series" : [
+              {
+                "type" : "count",
+                "id" : "Message count"
+              }
+            ],
+            "sort" : [],
+            "rollup" : true,
+            "type" : "pivot",
+            "row_groups" : [
+              {
+                "type" : "time",
+                "field" : "timestamp",
+                "interval" : {
+                  "type" : "auto",
+                  "scaling" : 1.0
+                }
+              }
+            ],
+            "column_groups" : [],
+            "filters" : [],
+            "row_limit" : null,
+            "column_limit" : null
+          }
+        ]
+      },
+      {
+        "id" : "f1bdcf53-312b-4c88-aa23-262cc59173ac",
+        "timerange" : {
+          "from" : 300,
+          "type" : "relative"
+        },
+        "filters" : [],
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "search_types" : [
+          {
+            "timerange" : {
+              "from" : 300,
+              "type" : "relative"
+            },
+            "query" : null,
+            "streams" : [],
+            "id" : "9014a081-95b0-4291-9db5-c6e7996e7b75",
+            "name" : "chart",
+            "series" : [
+              {
+                "type" : "count",
+                "id" : "count()"
+              }
+            ],
+            "sort" : [],
+            "rollup" : true,
+            "type" : "pivot",
+            "row_groups" : [
+              {
+                "type" : "values",
+                "field" : "action",
+                "limit" : 15
+              },
+              {
+                "type" : "values",
+                "field" : "controller",
+                "limit" : 15
+              }
+            ],
+            "column_groups" : [],
+            "filters" : []
+          },
+          {
+            "timerange" : {
+              "from" : 300,
+              "type" : "relative"
+            },
+            "query" : null,
+            "streams" : [],
+            "id" : "104de35f-1b10-4147-9013-68bade6ad0ab",
+            "name" : "chart",
+            "series" : [
+              {
+                "type" : "count",
+                "id" : "count()"
+              }
+            ],
+            "sort" : [],
+            "rollup" : true,
+            "type" : "pivot",
+            "row_groups" : [],
+            "column_groups" : [],
+            "filters" : [],
+            "row_limit" : null,
+            "column_limit" : null
+          },
+          {
+            "timerange" : {
+              "from" : 300,
+              "type" : "relative"
+            },
+            "query" : null,
+            "streams" : [],
+            "id" : "c3355a35-105c-47f0-a80e-81b69951e2ff",
+            "name" : "chart",
+            "series" : [
+              {
+                "type" : "count",
+                "id" : "count()"
+              }
+            ],
+            "sort" : [],
+            "rollup" : true,
+            "type" : "pivot",
+            "row_groups" : [
+              {
+                "type" : "values",
+                "field" : "action",
+                "limit" : 15
+              },
+              {
+                "type" : "values",
+                "field" : "controller",
+                "limit" : 15
+              }
+            ],
+            "column_groups" : [],
+            "filters" : []
+          },
+          {
+            "timerange" : {
+              "from" : 300,
+              "type" : "relative"
+            },
+            "query" : null,
+            "streams" : [],
+            "id" : "8618b7c0-b5d1-458b-b6a5-2d9a1df2e78e",
+            "name" : "chart",
+            "series" : [
+              {
+                "type" : "count",
+                "id" : "count()"
+              }
+            ],
+            "sort" : [],
+            "rollup" : false,
+            "type" : "pivot",
+            "row_groups" : [
+              {
+                "type" : "values",
+                "field" : "action",
+                "limit" : 15
+              }
+            ],
+            "column_groups" : [
+              {
+                "type" : "values",
+                "field" : "controller",
+                "limit" : 15
+              }
+            ],
+            "filters" : []
+          }
+        ]
+      }
+    ],
+    "parameters" : [],
+    "requires" : {},
+    "owner" : "admin",
+    "created_at" : { "$date":  "2023-01-16T12:43:37.484Z" }
+  }]
+}

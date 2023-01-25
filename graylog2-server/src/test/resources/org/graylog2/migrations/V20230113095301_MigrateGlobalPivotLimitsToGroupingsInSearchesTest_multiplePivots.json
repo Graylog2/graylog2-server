@@ -37,18 +37,18 @@
             "row_groups" : [
               {
                 "type" : "values",
-                "field" : "action",
-                "limit" : 3
+                "field" : "action"
               }
             ],
             "column_groups" : [
               {
                 "type" : "values",
-                "field" : "controller",
-                "limit" : 10
+                "field" : "controller"
               }
             ],
-            "filters" : []
+            "filters" : [],
+            "row_limit": 3,
+            "column_limit": 10
           }, {
             "timerange" : {
               "from" : 300,
@@ -70,8 +70,7 @@
             "row_groups" : [
               {
                 "type" : "values",
-                "field" : "action",
-                "limit" : 10
+                "field" : "action"
               }, {
                 "type" : "time",
                 "field" : "timestamp",
@@ -81,12 +80,12 @@
                 }
               }, {
                 "type" : "values",
-                "field" : "controller",
-                "limit": 20
+                "field" : "controller"
               }
             ],
             "column_groups" : [],
-            "filters" : []
+            "filters" : [],
+            "row_limit": 20
           }, {
             "timerange" : {
               "from" : 300,
@@ -108,20 +107,18 @@
             "row_groups" : [
               {
                 "type" : "values",
-                "field" : "action",
-                "limit" : 15
+                "field" : "action"
               }, {
                 "type" : "values",
-                "field" : "controller",
-                "limit" : 15
+                "field" : "controller"
               }, {
                 "type" : "values",
-                "field" : "http_method",
-                "limit" : 15
-              },
+                "field" : "http_method"
+              }
             ],
             "column_groups" : [],
-            "filters" : []
+            "filters" : [],
+            "row_limit": 15
           }, {
             "timerange" : {
               "from" : 300,
@@ -151,15 +148,14 @@
                 }
               }, {
                 "type" : "values",
-                "field" : "action",
-                "limit" : 3
+                "field" : "action"
               }, {
                 "type" : "values",
-                "field" : "controller",
-                "limit": 15
+                "field" : "controller"
               }
             ],
-            "filters" : []
+            "filters" : [],
+            "column_limit": 15
           }
         ]
       }

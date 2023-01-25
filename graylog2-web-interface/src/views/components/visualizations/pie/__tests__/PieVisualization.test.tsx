@@ -43,7 +43,7 @@ const SimplePieVisualization = (props: Pick<React.ComponentProps<typeof PieVisua
 describe('PieVisualization', () => {
   it('should use correct field in legend for aggregations with one row pivot', async () => {
     const config = AggregationWidgetConfig.builder()
-      .rowPivots([Pivot.create('action', 'string')])
+      .rowPivots([Pivot.create(['action'], 'string')])
       .series([Series.forFunction('count()')])
       .build();
     render(<SimplePieVisualization config={config} data={oneRowPivot} />);
@@ -55,8 +55,8 @@ describe('PieVisualization', () => {
 
   it('should use correct field in legend for aggregations with one row and one column pivot', async () => {
     const config = AggregationWidgetConfig.builder()
-      .columnPivots([Pivot.create('controller', 'string')])
-      .rowPivots([Pivot.create('action', 'string')])
+      .columnPivots([Pivot.create(['controller'], 'string')])
+      .rowPivots([Pivot.create(['action'], 'string')])
       .series([Series.forFunction('count()')])
       .build();
     render(<SimplePieVisualization config={config} data={oneRowPivotOneColumnPivot} />);

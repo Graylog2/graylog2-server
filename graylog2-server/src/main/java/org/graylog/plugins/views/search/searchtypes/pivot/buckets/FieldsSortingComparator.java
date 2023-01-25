@@ -16,25 +16,23 @@
  */
 package org.graylog.plugins.views.search.searchtypes.pivot.buckets;
 
-import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
-
 import java.util.Comparator;
 import java.util.List;
 
-public class ValuesBucketComparator<T extends BucketSpec> implements Comparator<T> {
+public class FieldsSortingComparator implements Comparator<String> {
     private final List<String> sortFields;
 
-    public ValuesBucketComparator(List<String> sortFields) {
+    public FieldsSortingComparator(List<String> sortFields) {
         this.sortFields = sortFields;
     }
 
     @Override
-    public int compare(T s1, T s2) {
+    public int compare(String s1, String s2) {
         if (sortFields.isEmpty()) {
             return 0;
         }
-        int s1Index = sortFields.indexOf(s1.field());
-        int s2Index = sortFields.indexOf(s2.field());
+        int s1Index = sortFields.indexOf(s1);
+        int s2Index = sortFields.indexOf(s2);
         if (s1Index == s2Index) {
             return 0;
         }

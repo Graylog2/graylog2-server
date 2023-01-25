@@ -44,7 +44,6 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.PivotBucket;
 import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -58,10 +57,10 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
 
     @Nonnull
     @Override
-    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, List<Values> bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Values bucketSpec, ESGeneratedQueryContext queryContext, Query query) {
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
-        final int limit = extractLimit(direction, pivot).orElse(Values.DEFAULT_LIMIT);
-        final List<Values> orderedBuckets = ValuesBucketOrdering.orderBuckets(bucketSpec, pivot.sort());
+        final int limit = bucketSpec.limit();
+        final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
         final AggregationBuilder termsAggregation = createTerms(orderedBuckets, ordering, limit);
         final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets)
                 .subAggregation(termsAggregation);
@@ -69,17 +68,9 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
         return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
     }
 
-    private Optional<Integer> extractLimit(Direction direction, Pivot pivot) {
-        return switch (direction) {
-            case Row -> pivot.rowLimit();
-            case Column -> pivot.columnLimit();
-        };
-    }
-
-    private FiltersAggregationBuilder createFilter(String name, List<Values> bucketSpecs) {
+    private FiltersAggregationBuilder createFilter(String name, List<String> fields) {
         final BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
-        bucketSpecs.stream()
-                .map(Values::field)
+        fields.stream()
                 .map(QueryBuilders::existsQuery)
                 .forEach(queryBuilder::filter);
         return AggregationBuilders.filters(name, queryBuilder)
@@ -87,37 +78,37 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
     }
 
 
-    private AggregationBuilder createTerms(List<Values> valueBuckets, List<BucketOrder> ordering, int limit) {
+    private AggregationBuilder createTerms(List<String> valueBuckets, List<BucketOrder> ordering, int limit) {
         return valueBuckets.size() > 1
                 ? createScriptedTerms(valueBuckets, ordering, limit)
                 : createSimpleTerms(valueBuckets.get(0), ordering, limit);
     }
 
-    private TermsAggregationBuilder createSimpleTerms(Values value, List<BucketOrder> ordering, int limit) {
+    private TermsAggregationBuilder createSimpleTerms(String field, List<BucketOrder> ordering, int limit) {
         return AggregationBuilders.terms(AGG_NAME)
-                .field(value.field())
+                .field(field)
                 .order(ordering)
                 .size(limit);
     }
 
-    private TermsAggregationBuilder createScriptedTerms(List<? extends BucketSpec> buckets, List<BucketOrder> ordering, int limit) {
+    private TermsAggregationBuilder createScriptedTerms(List<String> buckets, List<BucketOrder> ordering, int limit) {
         return AggregationBuilders.terms(AGG_NAME)
                 .script(scriptForPivots(buckets))
                 .size(limit)
                 .order(ordering);
     }
 
-    private Script scriptForPivots(Collection<? extends BucketSpec> pivots) {
+    private Script scriptForPivots(Collection<String> pivots) {
         final String scriptSource = Joiner.on(KEY_SEPARATOR_PHRASE).join(pivots.stream()
                 .map(bucket -> """
                         String.valueOf((doc.containsKey('%1$s') && doc['%1$s'].size() > 0) ? doc['%1$s'].value : "%2$s")
-                        """.formatted(bucket.field(), MissingBucketConstants.MISSING_BUCKET_NAME))
+                        """.formatted(bucket, MissingBucketConstants.MISSING_BUCKET_NAME))
                 .collect(Collectors.toList()));
         return new Script(scriptSource);
     }
 
     @Override
-    public Stream<PivotBucket> extractBuckets(Pivot pivot, List<BucketSpec> bucketSpecs, PivotBucket initialBucket) {
+    public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpec, PivotBucket initialBucket) {
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
         final Aggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
@@ -128,7 +119,7 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
         final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
         final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
 
-        final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderKeysFunction(bucketSpecs, pivot.sort());
+        final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderFieldsFunction(bucketSpec.fields(), pivot.sort());
         final Stream<PivotBucket> bucketStream = termsAggregation.getBuckets()
                 .stream()
                 .map(bucket -> {
@@ -137,11 +128,18 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
                             .addAll(reorderKeys.apply(splitKeys(bucket.getKeyAsString())))
                             .build();
 
-                    return PivotBucket.create(keys, bucket);
+                    return PivotBucket.create(keys, bucket, false);
                 });
 
         return otherBucket.getDocCount() > 0
-                ? Stream.concat(bucketStream, Stream.of(PivotBucket.create(MISSING_BUCKET_KEYS, otherBucket)))
+                ? Stream.concat(bucketStream, Stream.of(PivotBucket.create(
+                    ImmutableList.<String>builder()
+                        .addAll(previousKeys)
+                        .addAll(MISSING_BUCKET_KEYS)
+                        .build(),
+                    otherBucket,
+                    true
+                )))
                 : bucketStream;
     }
 
