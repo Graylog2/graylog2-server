@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.Message;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +30,7 @@ import java.util.Map;
  */
 public abstract class IndexMapping implements IndexMappingTemplate {
     public static final String TYPE_MESSAGE = "message";
+    final String indexRefreshInterval = "30s"; // TODO: Index refresh interval must be configurable
 
     @Override
     public Map<String, Object> toTemplate(IndexSetConfig indexSetConfig, String indexPattern, int order) {
@@ -44,9 +44,10 @@ public abstract class IndexMapping implements IndexMappingTemplate {
     }
 
     public Map<String, Object> messageTemplate(final String template, final String analyzer, final int order) {
-        final Map<String, Object> settings = Collections.singletonMap(
-                "analysis", Collections.singletonMap("analyzer", analyzerKeyword())
-                );
+        final Map<String, Object> settings = Map.of(
+                "analysis", Map.of("analyzer", analyzerKeyword()),
+                "index.refresh_interval", indexRefreshInterval
+        );
         final Map<String, Object> mappings = mapping(analyzer);
 
         return createTemplate(template, order, settings, mappings);
