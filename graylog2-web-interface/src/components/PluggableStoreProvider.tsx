@@ -36,11 +36,11 @@ type Props = {
 const PluggableStoreProvider = ({ initialQuery, children, isNew, view, executionState }: React.PropsWithChildren<Props>) => {
   const reducers = usePluginEntities('views.reducers');
   const activeQuery = useMemo(() => {
-    if (initialQuery) {
+    const queries: QuerySet = view?.search?.queries ?? Immutable.Set();
+
+    if (initialQuery && queries.find((q) => q.id === initialQuery) !== undefined) {
       return initialQuery;
     }
-
-    const queries: QuerySet = view?.search?.queries ?? Immutable.Set();
 
     return queries.first()?.id;
   }, [initialQuery, view?.search?.queries]);
