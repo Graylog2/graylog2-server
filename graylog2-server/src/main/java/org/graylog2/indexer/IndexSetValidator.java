@@ -17,6 +17,7 @@
 package org.graylog2.indexer;
 
 import com.google.auto.value.AutoValue;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -127,18 +128,18 @@ public class IndexSetValidator {
             }
             if (periodOtherThanDays(config.indexLifetimeSoft())) {
                 return Violation.create(f("Lifetime setting %s <%s> can only be a multiple of days",
-                        INDEX_LIFETIME_SOFT, config.indexLifetimeHard()));
+                        INDEX_LIFETIME_SOFT, config.indexLifetimeSoft()));
             }
         }
         return null;
     }
 
-    private boolean periodOtherThanDays(Period period) {
+    @VisibleForTesting
+    boolean periodOtherThanDays(Period period) {
         return Arrays.stream(period.getFieldTypes())
                 .filter(type -> !type.equals(DurationFieldType.days()))
                 .anyMatch(type -> period.get(type) != 0);
     }
-
 
     @Nullable
     public Violation validateRetentionPeriod(RotationStrategyConfig rotationStrategyConfig, RetentionStrategyConfig retentionStrategyConfig) {
