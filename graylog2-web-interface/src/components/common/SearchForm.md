@@ -25,7 +25,6 @@ const SearchFormExample = createReactClass({
         <span>Query: "{this.state.query}"</span>
         <SearchForm onSearch={this.onSearch}
                     onReset={this.onReset}
-                    resetButtonLabel="Nevermind"
                     label="Search"
                     useLoadingState>
           <Button>Add-on</Button>
