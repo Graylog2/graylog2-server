@@ -16,8 +16,6 @@
  */
 import { useEffect } from 'react';
 
-import type View from 'views/logic/views/View';
-import type { QueryId } from 'views/logic/queries/Query';
 import useAppDispatch from 'stores/useAppDispatch';
 import { selectQuery } from 'views/logic/slices/viewSlice';
 import useView from 'views/hooks/useView';

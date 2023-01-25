@@ -22,6 +22,7 @@ import View from 'views/logic/views/View';
 import OriginalShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import mockAction from 'helpers/mocking/MockAction';
 
 const mockView = View.builder()
   .type(View.Type.Dashboard)
@@ -37,7 +38,7 @@ jest.mock('views/stores/RefreshStore', () => ({
   },
 }));
 
-jest.mock('views/pages/ShowViewPage', () => () => null);
+jest.mock('views/pages/ShowViewPage', () => ({ children }: React.PropsWithChildren<{}>) => children);
 jest.mock('routing/withLocation', () => (x) => x);
 jest.mock('routing/withParams', () => (x) => x);
 
@@ -64,7 +65,7 @@ describe('ShowDashboardInBigDisplayMode', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    RefreshActions.disable = jest.fn();
+    RefreshActions.disable = mockAction(jest.fn());
   });
 
   it('set refresh interval correctly based on location query', async () => {

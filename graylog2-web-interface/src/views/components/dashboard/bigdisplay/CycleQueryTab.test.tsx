@@ -19,6 +19,7 @@ import { render } from 'wrappedTestingLibrary';
 
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
+import type { QueryId } from 'views/logic/queries/Query';
 import Query from 'views/logic/queries/Query';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -28,8 +29,13 @@ import { selectQuery } from 'views/logic/slices/viewSlice';
 
 import OriginalCycleQueryTab from './CycleQueryTab';
 
-const CycleQueryTab = (props: React.ComponentProps<typeof OriginalCycleQueryTab>) => (
-  <TestStoreProvider>
+type AdditionalProps = {
+  view: View,
+  activeQuery: QueryId,
+};
+
+const CycleQueryTab = ({ view, activeQuery, ...props }: AdditionalProps & React.ComponentProps<typeof OriginalCycleQueryTab>) => (
+  <TestStoreProvider view={view} initialQuery={activeQuery}>
     <OriginalCycleQueryTab {...props} />
   </TestStoreProvider>
 );

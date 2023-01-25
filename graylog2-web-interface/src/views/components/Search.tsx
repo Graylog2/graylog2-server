@@ -52,6 +52,7 @@ import useAppDispatch from 'stores/useAppDispatch';
 import { execute } from 'views/logic/slices/searchExecutionSlice';
 import { selectSearchExecutionResult } from 'views/logic/slices/searchExecutionSelectors';
 import useAppSelector from 'stores/useAppSelector';
+import { RefreshActions } from 'views/stores/RefreshStore';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -113,6 +114,10 @@ const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
+const useAutoRefresh = (refresh: () => void) => {
+  useEffect(() => RefreshActions.refresh.listen(refresh), [refresh]);
+};
+
 const Search = () => {
   const dispatch = useAppDispatch();
   const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
@@ -121,6 +126,8 @@ const Search = () => {
   useEffect(() => {
     refreshSearch();
   }, [refreshSearch]);
+
+  useAutoRefresh(refreshSearch);
 
   useEffect(() => {
     SearchConfigActions.refresh();

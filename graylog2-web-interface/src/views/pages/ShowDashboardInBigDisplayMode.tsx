@@ -24,8 +24,6 @@ import { RefreshActions } from 'views/stores/RefreshStore';
 import type { UntypedBigDisplayModeQuery } from 'views/components/dashboard/BigDisplayModeConfiguration';
 import type { Location } from 'routing/withLocation';
 import withLocation from 'routing/withLocation';
-import useView from 'views/hooks/useView';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import ShowViewPage from './ShowViewPage';
 
