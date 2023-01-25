@@ -125,7 +125,7 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
         EventDefinitionsActions.copy(currentDefinition).finally(() => {
           handleClearState();
         });
-        
+
         break;
       case 'delete':
         EventDefinitionsActions.delete(currentDefinition).then(
@@ -146,11 +146,13 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
         EventDefinitionsActions.enable(currentDefinition).finally(() => {
           handleClearState();
         });
+
         break;
       case 'disable':
         EventDefinitionsActions.disable(currentDefinition).finally(() => {
           handleClearState();
         });
+
         break;
       default:
         break;

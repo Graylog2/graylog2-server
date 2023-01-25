@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import { uniq } from 'lodash';
 import * as React from 'react';
 import { useCallback } from 'react';
@@ -22,6 +38,7 @@ const BulkActions = ({ selectedDefintions, refetchEventDefinitions, setSelectedE
   const selectedItemsAmount = selectedDefintions?.length;
   const descriptor = StringUtils.pluralize(selectedItemsAmount, 'event definition', 'event definitions');
   const onDelete = useCallback(() => {
+    // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}?`)) {
       const deleteCalls = selectedDefintions.map((eventDefinitionId) => fetch('DELETE', qualifyUrl(ApiRoutes.EventDefinitionsApiController.delete(eventDefinitionId).url)).then(() => eventDefinitionId));
 

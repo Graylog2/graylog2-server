@@ -28,10 +28,10 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import EventDefinitionActions from './EventDefinitionActions';
 import SchedulingCell from './SchedulingCell';
 import StatusCell from './StatusCell';
+import BulkActions from './BulkActions';
 
 import type { EventDefinition } from '../event-definitions-types';
 import useEventDefinitions from '../hooks/useEventDefinitions';
-import BulkActions from './BulkActions';
 
 const CUSTOM_COLUMN_DEFINITIONS = [
   { id: 'title', title: 'Event Definition title', sortable: true },
@@ -105,10 +105,10 @@ const EventDefinitionsContainer = () => {
   ), [refetchEventDefinitions]);
 
   const renderBulkActions = (
-     selectedEventDefinitionsIds: Array<string>,
-     setSelectedEventDefinitionsIds: (eventDefinitionsId: Array<string>) => void,
+    selectedEventDefinitionsIds: Array<string>,
+    setSelectedEventDefinitionsIds: (eventDefinitionsId: Array<string>) => void,
   ) => (
-    <BulkActions selectedDefintions={selectedEventDefinitionsIds} 
+    <BulkActions selectedDefintions={selectedEventDefinitionsIds}
                  setSelectedEventDefinitionsIds={setSelectedEventDefinitionsIds}
                  refetchEventDefinitions={refetchEventDefinitions} />
   );
@@ -118,7 +118,7 @@ const EventDefinitionsContainer = () => {
   }
 
   const { elements, pagination: { total } } = paginatedEventDefinitions;
-  
+
   return (
     <PaginatedList onChange={onPageChange}
                    pageSize={searchParams.pageSize}
