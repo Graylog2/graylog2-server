@@ -66,7 +66,7 @@ class OpensearchProcessImpl implements OpensearchProcess {
         this.opensearchVersion = configuration.opensearchVersion();
         this.targetLocation = configuration.opensearchDir();
         this.httpPort = configuration.httpPort();
-        this.nodeName = configuration.clusterConfiguration().nodeName();
+        this.nodeName = configuration.nodeName();
         this.configuration = configuration;
         this.logsSize = logsSize;
 
@@ -141,7 +141,7 @@ class OpensearchProcessImpl implements OpensearchProcess {
 
         CommandLine cmdLine = new CommandLine(binPath.toAbsolutePath().toString());
 
-        toConfigOptions(configuration.mergedConfig())
+        toConfigOptions(configuration.asMap())
                 .forEach(it -> cmdLine.addArgument(it, true));
 
         ProcessProvidingExecutor executor = new ProcessProvidingExecutor();

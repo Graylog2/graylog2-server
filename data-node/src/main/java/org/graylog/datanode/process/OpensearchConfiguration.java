@@ -18,22 +18,46 @@ package org.graylog.datanode.process;
 
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public record OpensearchConfiguration(
         String opensearchVersion,
         Path opensearchDir,
         int httpPort,
         int transportPort,
-        ClusterConfiguration clusterConfiguration,
-        Map<String, String> additionalConfiguration) {
-    public Map<String, String> mergedConfig() {
+        String clusterName, String nodeName, List<String> nodeRoles, List<String> networkHost,
+        List<String> discoverySeedHosts, Map<String, String> additionalConfiguration
+) {
+    public Map<String, String> asMap() {
 
-        Map<String, String> allConfig = new LinkedHashMap<>();
-        allConfig.put("http.port", String.valueOf(httpPort));
-        allConfig.put("transport.port", String.valueOf(transportPort));
-        allConfig.putAll(clusterConfiguration.toMap());
-        allConfig.putAll(additionalConfiguration);
-        return allConfig;
+        Map<String, String> config = new LinkedHashMap<>();
+        config.put("http.port", String.valueOf(httpPort));
+        config.put("transport.port", String.valueOf(transportPort));
+        if (clusterName != null && !clusterName.isBlank()) {
+            config.put("cluster.name", clusterName);
+        }
+        if (nodeName != null && !nodeName.isBlank()) {
+            config.put("node.name", nodeName);
+        }
+        if (nodeRoles != null && !nodeRoles.isEmpty()) {
+            config.put("node.roles", toYamlList(nodeRoles));
+        }
+        if (networkHost != null && !networkHost.isEmpty()) {
+            config.put("network.host", toYamlList(networkHost));
+        }
+        if (discoverySeedHosts != null && !discoverySeedHosts.isEmpty()) {
+            config.put("discovery.seed_hosts", toYamlList(discoverySeedHosts));
+        }
+        config.putAll(additionalConfiguration);
+        return config;
+    }
+
+    private String toYamlList(List<String> values) {
+        return values.stream()
+                .collect(Collectors.collectingAndThen(
+                        Collectors.joining(","),
+                        list -> "" + list + ""));
     }
 }
