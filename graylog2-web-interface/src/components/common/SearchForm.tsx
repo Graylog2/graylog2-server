@@ -52,7 +52,7 @@ const StyledContainer = styled.div<{ $topMargin: number }>(({ $topMargin }) => c
 `);
 
 const StyledInput = styled.input<{ $queryWidth: number, $feedbackContainerWidth: number }>(({ $queryWidth, $feedbackContainerWidth }) => css`
-  width: ${$queryWidth};
+  width: ${$queryWidth}px;
   padding-right: ${$feedbackContainerWidth ?? 12}px;
 `);
 
@@ -288,7 +288,7 @@ SearchForm.defaultProps = {
   label: null,
   placeholder: 'Enter search query...',
   wrapperClass: 'search',
-  queryWidth: '350px',
+  queryWidth: 350,
   topMargin: 0,
   buttonLeftMargin: 5,
   useLoadingState: false,
