@@ -31,13 +31,13 @@ import PluggableStoreProvider from 'components/PluggableStoreProvider';
 import useViewTitle from 'views/hooks/useViewTitle';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
-type Props = {
+type Props = React.PropsWithChildren<{
   isNew: boolean,
   view: Promise<View>,
   loadNewView?: () => unknown,
   loadView?: (viewId: string) => unknown,
   executionState?: SearchExecutionState,
-};
+}>;
 
 const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
   const title = useViewTitle();
@@ -49,7 +49,7 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const SearchPage = ({ isNew, view: viewPromise, loadNewView = defaultLoadNewView, loadView = defaultLoadView, executionState: initialExecutionState }: Props) => {
+const SearchPage = ({ children, isNew, view: viewPromise, loadNewView = defaultLoadNewView, loadView = defaultLoadView, executionState: initialExecutionState }: Props) => {
   const query = useQuery();
   const initialQuery = query?.page as string;
   useLoadView(viewPromise, isNew);
@@ -72,6 +72,7 @@ const SearchPage = ({ isNew, view: viewPromise, loadNewView = defaultLoadNewView
           <DashboardPageContextProvider>
             <NewViewLoaderContext.Provider value={loadNewView}>
               <ViewLoaderContext.Provider value={loadView}>
+                {children}
                 <IfUserHasAccessToAnyStream>
                   <Search />
                 </IfUserHasAccessToAnyStream>

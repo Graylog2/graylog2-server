@@ -20,15 +20,17 @@ import type View from 'views/logic/views/View';
 import type { QueryId } from 'views/logic/queries/Query';
 import useAppDispatch from 'stores/useAppDispatch';
 import { selectQuery } from 'views/logic/slices/viewSlice';
+import useView from 'views/hooks/useView';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 type Props = {
   interval: number,
-  view: View | undefined | null
-  activeQuery: QueryId | undefined | null
   tabs?: Array<number> | undefined | null,
 };
 
-const CycleQueryTab = ({ interval, view, activeQuery, tabs }: Props) => {
+const CycleQueryTab = ({ interval, tabs }: Props) => {
+  const view = useView();
+  const activeQuery = useActiveQueryId();
   const dispatch = useAppDispatch();
 
   useEffect(() => {

@@ -53,8 +53,6 @@ const BodyPositioningWrapper = styled.div`
 `;
 
 const ShowDashboardInBigDisplayMode = ({ location }: Props) => {
-  const view = useView();
-  const activeQuery = useActiveQueryId();
   const { query } = location;
   const configuration = castQueryWithDefaults(query);
 
@@ -70,9 +68,10 @@ const ShowDashboardInBigDisplayMode = ({ location }: Props) => {
   return (
     <InteractiveContext.Provider value={false}>
       <BodyPositioningWrapper>
-        {view && activeQuery ? <CycleQueryTab interval={configuration.interval} view={view} activeQuery={activeQuery} tabs={configuration.tabs} /> : null}
-        <BigDisplayModeHeader />
-        <ShowViewPage />
+        <ShowViewPage>
+          <CycleQueryTab interval={configuration.interval} tabs={configuration.tabs} />
+          <BigDisplayModeHeader />
+        </ShowViewPage>
       </BodyPositioningWrapper>
     </InteractiveContext.Provider>
   );
