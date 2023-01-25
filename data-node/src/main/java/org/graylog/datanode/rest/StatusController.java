@@ -16,7 +16,7 @@
  */
 package org.graylog.datanode.rest;
 
-import org.graylog.datanode.process.OpensearchProcess;
+import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog2.plugin.Version;
 
 import javax.inject.Inject;
@@ -42,7 +42,7 @@ public class StatusController {
     public DataNodeStatus status() {
         return new DataNodeStatus(
                 version,
-                new StatusResponse(openSearch.getOpensearchVersion(), openSearch.getProcessInfo())
+                new StatusResponse(openSearch.opensearchVersion(), openSearch.processInfo())
         );
     }
 }

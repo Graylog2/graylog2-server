@@ -16,12 +16,12 @@
  */
 package org.graylog.datanode;
 
-import org.apache.commons.exec.DefaultExecuteResultHandler;
-import org.apache.commons.exec.ExecuteException;
-import org.graylog.datanode.process.OpensearchProcess;
-import org.graylog.datanode.process.ProcessEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+ import org.apache.commons.exec.DefaultExecuteResultHandler;
+ import org.apache.commons.exec.ExecuteException;
+ import org.graylog.datanode.management.OpensearchProcess;
+ import org.graylog.datanode.process.ProcessEvent;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
 
 public class EventResultHandler extends DefaultExecuteResultHandler {
 

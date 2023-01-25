@@ -26,11 +26,13 @@ public class ProcessStateMachine {
      */
     public static final int MAX_REST_TEMPORARY_FAILURES = 3;
     public static final int MAX_REST_STARTUP_FAILURES = 5;
+    public static final int MAX_REBOOT_FAILURES = 3;
 
     public static StateMachine<ProcessState, ProcessEvent> createNew() {
 
         final FailuresCounter restFailureCounter = new FailuresCounter(MAX_REST_TEMPORARY_FAILURES);
         final FailuresCounter startupFailuresCounter = new FailuresCounter(MAX_REST_STARTUP_FAILURES);
+        final FailuresCounter rebootCounter = new FailuresCounter(MAX_REBOOT_FAILURES);
 
         StateMachineConfig<ProcessState, ProcessEvent> config = new StateMachineConfig<>();
 
@@ -51,6 +53,7 @@ public class ProcessStateMachine {
         // the process is running and responding to the REST status, it's available for any usage
         config.configure(ProcessState.AVAILABLE)
                 .onEntry(restFailureCounter::resetFailuresCounter)
+                .onEntry(rebootCounter::resetFailuresCounter)
                 .permitReentry(ProcessEvent.HEALTH_CHECK_OK)
                 .permit(ProcessEvent.HEALTH_CHECK_FAILED, ProcessState.NOT_RESPONDING)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED);
@@ -61,7 +64,7 @@ public class ProcessStateMachine {
                 .permitDynamic(ProcessEvent.HEALTH_CHECK_FAILED,
                         () -> restFailureCounter.failedTooManyTimes() ? ProcessState.FAILED : ProcessState.NOT_RESPONDING,
                         restFailureCounter::increment
-                        )
+                )
                 .permit(ProcessEvent.HEALTH_CHECK_OK, ProcessState.AVAILABLE)
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED);
 
@@ -73,8 +76,8 @@ public class ProcessStateMachine {
                 .permit(ProcessEvent.PROCESS_TERMINATED, ProcessState.TERMINATED);
 
         // final state, the process is not alive anymore, terminated on the operating system level
-        // TODO: what to do if the process has been terminated? Reboot?
         config.configure(ProcessState.TERMINATED)
+                .permit(ProcessEvent.PROCESS_STARTED, ProcessState.STARTING, rebootCounter::increment)
                 .ignore(ProcessEvent.HEALTH_CHECK_FAILED)
                 .ignore(ProcessEvent.PROCESS_TERMINATED); // final state, all following terminate events are ignored
 

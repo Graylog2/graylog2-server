@@ -29,7 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class OpensearchProcessLogs implements Closeable {
+public class OpensearchProcessLogs implements ProcessLogs, Closeable {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessLogs.class);
 
@@ -65,12 +65,12 @@ public class OpensearchProcessLogs implements Closeable {
         return new OpensearchProcessLogs(process.pid(), process.getInputStream(), process.getErrorStream(), logsBufferSize);
     }
 
-    public List<String> getStdOut() {
+    public List<String> stdOut() {
         return new ArrayList<>(stdOut);
     }
 
 
-    public List<String> getStdErr() {
+    public List<String> stdErr() {
         return new ArrayList<>(stdErr);
     }
 

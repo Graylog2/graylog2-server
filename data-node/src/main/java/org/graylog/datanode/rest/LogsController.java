@@ -16,12 +16,11 @@
  */
 package org.graylog.datanode.rest;
 
-import org.graylog.datanode.process.OpensearchProcess;
+import org.graylog.datanode.management.OpensearchProcess;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
@@ -41,7 +40,7 @@ public class LogsController {
     @Path("/stdout")
     public List<String> getOpensearchStdout() {
         return Optional.of(managedOpensearch)
-                .map(node -> node.getProcessLogs().getStdOut())
+                .map(node -> node.processLogs().stdOut())
                 .orElseThrow(() -> new IllegalArgumentException("No opensearch process available"));
     }
 
@@ -49,7 +48,7 @@ public class LogsController {
     @Path("/stderr")
     public List<String> getOpensearchStderr() {
         return Optional.of(managedOpensearch)
-                .map(node -> node.getProcessLogs().getStdErr())
+                .map(node -> node.processLogs().stdErr())
                 .orElseThrow(() -> new IllegalArgumentException("No opensearch process available"));
     }
 }

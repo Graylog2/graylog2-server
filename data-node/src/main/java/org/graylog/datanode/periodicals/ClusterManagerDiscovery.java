@@ -17,7 +17,7 @@
 package org.graylog.datanode.periodicals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.datanode.process.OpensearchProcess;
+import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog2.plugin.periodical.Periodical;
 import org.opensearch.client.Request;
@@ -48,7 +48,7 @@ public class ClusterManagerDiscovery extends Periodical {
         if (managedOpenSearch.isInState(ProcessState.AVAILABLE)) {
             final Boolean isManagerNode = getClusterStateResponse(managedOpenSearch)
                     .map(r -> r.nodes().get(r.clusterManagerNode()))
-                    .map(managerNode -> managedOpenSearch.getNodeName().equals(managerNode.name()))
+                    .map(managerNode -> managedOpenSearch.nodeName().equals(managerNode.name()))
                     .orElse(false);
             managedOpenSearch.setLeaderNode(isManagerNode);
         }
@@ -57,7 +57,7 @@ public class ClusterManagerDiscovery extends Periodical {
 
     private Optional<ClusterStateResponse> getClusterStateResponse(OpensearchProcess process) {
         try {
-            final Response response = process.getRestClient()
+            final Response response = process.restClient()
                     .getLowLevelClient()
                     .performRequest(new Request("GET", "_cluster/state/"));
 

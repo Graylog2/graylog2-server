@@ -32,7 +32,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class ExecOpensearchProcessLogs implements ExecuteStreamHandler {
+public class ExecOpensearchProcessLogs implements ExecuteStreamHandler, ProcessLogs {
 
     private static final Logger LOG = LoggerFactory.getLogger(ExecOpensearchProcessLogs.class);
 
@@ -49,12 +49,12 @@ public class ExecOpensearchProcessLogs implements ExecuteStreamHandler {
     }
 
 
-    public List<String> getStdOut() {
+    public List<String> stdOut() {
         return new ArrayList<>(stdOut);
     }
 
 
-    public List<String> getStdErr() {
+    public List<String> stdErr() {
         return new ArrayList<>(stdErr);
     }
 
@@ -93,7 +93,6 @@ public class ExecOpensearchProcessLogs implements ExecuteStreamHandler {
     @Override
     public void stop() throws IOException {
         try {
-            executor.shutdown();
             executor.awaitTermination(10, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             throw new RuntimeException("Failed to terminate logger threads", e);

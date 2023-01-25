@@ -20,11 +20,11 @@ import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.datanode.initializers.JerseyService;
-import org.graylog.datanode.initializers.OpensearchProcessService;
+import org.graylog.datanode.management.OpensearchProcessService;
 import org.graylog.datanode.initializers.PeriodicalsService;
 import org.graylog.datanode.management.ConfigurationProvider;
 import org.graylog.datanode.process.OpensearchConfiguration;
-import org.graylog.datanode.process.OpensearchProcess;
+import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.shutdown.GracefulShutdownService;
 
 public class GenericInitializerBindings extends AbstractModule {
