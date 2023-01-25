@@ -40,6 +40,7 @@ const viewJson = {
   created_at: '2022-01-01 00:00:00',
   owner: 'admin',
   requires: {},
+  favorite: false,
 } as ViewJson;
 
 jest.mock('views/stores/ViewManagementStore', () => ({

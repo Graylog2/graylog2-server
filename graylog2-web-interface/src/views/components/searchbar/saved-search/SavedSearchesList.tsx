@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import { useState, useCallback, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
 
 import { Button } from 'components/bootstrap';
 import { PaginatedList, SearchForm, Spinner, NoEntitiesExist, NoSearchResult } from 'components/common';
@@ -31,6 +32,7 @@ import type FetchError from 'logic/errors/FetchError';
 import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
+import FavoriteIcon from 'views/components/FavoriteIcon';
 import type { Sort } from 'stores/PaginationTypes';
 
 type SearchParams = {
@@ -40,13 +42,14 @@ type SearchParams = {
   sort: Sort
 }
 
-const INITIAL_COLUMNS = ['title', 'description', 'summary'];
+const INITIAL_COLUMNS = ['title', 'description', 'summary', 'favorite'];
 const COLUMN_DEFINITIONS = [
   { id: 'created_at', title: 'Created At', sortable: true },
   { id: 'title', title: 'Title', sortable: true },
   { id: 'description', title: 'Description', sortable: true },
   { id: 'summary', title: 'Summary', sortable: true },
   { id: 'owner', title: 'Owner', sortable: true },
+  { id: 'favorite', title: 'Favorite' },
 ];
 
 const DEFAULT_PAGINATION = {
@@ -67,7 +70,10 @@ const onLoad = (onLoadSavedSearch: () => void, selectedSavedSearchId: string, lo
   return false;
 };
 
-const customColumnRenderers = (onLoadSavedSearch: () => void): ColumnRenderers<View> => ({
+const customColumnRenderers = (onLoadSavedSearch: () => void, {
+  queryClient,
+  searchParams,
+}: { queryClient: QueryClient, searchParams: SearchParams}): ColumnRenderers<View> => ({
   title: {
     renderCell: (search) => (
       <ViewLoaderContext.Consumer key={search.id}>
@@ -85,6 +91,28 @@ const customColumnRenderers = (onLoadSavedSearch: () => void): ColumnRenderers<V
           );
         }}
       </ViewLoaderContext.Consumer>
+    ),
+  },
+  favorite: {
+    renderCell: (search) => (
+      <FavoriteIcon isFavorite={search.favorite}
+                    id={search.id}
+                    onChange={(newValue) => {
+                      queryClient.setQueriesData(['saved-searches', 'overview', searchParams], (cur: {
+                        list: Array<View>,
+                        pagination: { total: number }
+                      }) => ({
+                        ...cur,
+                        list: cur.list.map((view) => {
+                          if (view.id === search.id) {
+                            return ({ ...view, favorite: newValue });
+                          }
+
+                          return view;
+                        }),
+                      }
+                      ));
+                    }} />
     ),
   },
 });
@@ -143,6 +171,7 @@ const SavedSearchesList = ({
   deleteSavedSearch,
   onLoadSavedSearch,
 }: Props) => {
+  const queryClient = useQueryClient();
   const [visibleColumns, setVisibleColumns] = useState(INITIAL_COLUMNS);
   const [searchParams, setSearchParams] = useState<SearchParams>({
     page: DEFAULT_PAGINATION.page,
@@ -193,8 +222,8 @@ const SavedSearchesList = ({
   ), [activeSavedSearchId, deleteSavedSearch, refetch]);
 
   const columnRenderers = useMemo(
-    () => customColumnRenderers(onLoadSavedSearch),
-    [onLoadSavedSearch],
+    () => customColumnRenderers(onLoadSavedSearch, { queryClient, searchParams }),
+    [onLoadSavedSearch, queryClient, searchParams],
   );
 
   if (isLoading) {

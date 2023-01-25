@@ -69,9 +69,8 @@ const SearchActionsMenu = () => {
   const [showMetadataEdit, setShowMetadataEdit] = useState(false);
   const [showShareSearch, setShowShareSearch] = useState(false);
   const [newTitle, setNewTitle] = useState((view && view.title) || '');
-
   const loaded = isNew === false;
-  const savedSearchColor = dirty ? theme.colors.variant.warning : theme.colors.variant.info;
+  const savedSearchColor = dirty ? theme.colors.variant.dark.warning : theme.colors.variant.info;
   const disableReset = !(dirty || loaded);
   const savedViewTitle = loaded ? 'Saved search' : 'Save search';
   const title = dirty ? 'Unsaved changes' : savedViewTitle;
@@ -153,7 +152,7 @@ const SearchActionsMenu = () => {
   return (
     <Container aria-label="Search Meta Buttons">
       <Button title={title} ref={formTarget} onClick={toggleFormModal}>
-        <Icon style={{ color: loaded ? savedSearchColor : undefined }} name="star" type={loaded ? 'solid' : 'regular'} /> Save
+        <Icon style={{ color: loaded ? savedSearchColor : undefined }} name="floppy-disk" type={loaded ? 'solid' : 'regular'} /> Save
       </Button>
       {showForm && (
         <SavedSearchForm onChangeTitle={onChangeTitle}
