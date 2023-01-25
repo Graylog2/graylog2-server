@@ -70,7 +70,7 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQ
 
   const handlerContext = useHandlerContext();
   const _validate = useCallback((values: DashboardFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime, handlerContext),
-    [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime]);
+    [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime, handlerContext]);
 
   return (
     <Formik<DashboardFormValues> initialValues={_initialValues}

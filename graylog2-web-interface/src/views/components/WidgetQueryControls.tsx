@@ -170,7 +170,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
   const { parameters } = useParameters();
   const handlerContext = useHandlerContext();
   const validate = useCallback((values: SearchBarFormValues) => _validateQueryString(values, globalOverride, pluggableSearchBarControls, userTimezone, handlerContext),
-    [globalOverride, pluggableSearchBarControls, userTimezone]);
+    [globalOverride, pluggableSearchBarControls, userTimezone, handlerContext]);
   const initialValues = useInitialFormValues(widget);
   const dispatch = useAppDispatch();
   const _onSubmit = useCallback((values: CombinedSearchBarFormValues) => onSubmit(dispatch, values, pluggableSearchBarControls, widget), [dispatch, pluggableSearchBarControls, widget]);

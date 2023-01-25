@@ -29,6 +29,7 @@ const useOnSearchExecution = (fn: () => void) => {
     }
 
     lastSearchResultId.current = searchResultId;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchResultId]);
 };
 

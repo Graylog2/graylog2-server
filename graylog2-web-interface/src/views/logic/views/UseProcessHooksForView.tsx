@@ -26,6 +26,7 @@ import processHooks from './processHooks';
 
 const LoadViewError = ({ error }: { error: Error }) => {
   useEffect(() => {
+    // eslint-disable-next-line no-console
     console.log(error);
   }, [error]);
 

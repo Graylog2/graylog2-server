@@ -35,7 +35,7 @@ const useLoadView = (viewPromise: Promise<View>, isNew: boolean) => {
 
       return Promise.resolve(view.search);
     });
-  }, [viewPromise]);
+  }, [isNew, viewPromise]);
 };
 
 export default useLoadView;

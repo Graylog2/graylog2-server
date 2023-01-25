@@ -98,7 +98,7 @@ describe('DefaultFieldTypesProvider', () => {
     const TriggerRefresh = () => {
       const dispatch = useAppDispatch();
 
-      return <button onClick={() => dispatch(execute())}>Refresh search</button>;
+      return <button type="button" onClick={() => dispatch(execute())}>Refresh search</button>;
     };
 
     asMock(executeSearch).mockResolvedValue({ result: { result: { id: generateId() } } } as SearchExecutionResult);

@@ -131,7 +131,7 @@ const _updateEditorConfiguration = (node: { editor: Editor; }, completer: AutoCo
 };
 
 const useCompleter = ({ streams, timeRange, completerFactory, userTimezone }: Pick<Props, 'streams' | 'timeRange' | 'completerFactory'> & { userTimezone: string }) => {
-  const completers = usePluginEntities('views.completers') ?? [];
+  const completers = usePluginEntities('views.completers');
   const { data: queryFields } = useFieldTypes(streams, isNoTimeRangeOverride(timeRange) ? DEFAULT_TIMERANGE : timeRange);
   const { data: allFields } = useFieldTypes([], DEFAULT_TIMERANGE);
   const fieldTypes = useMemo(() => {
@@ -143,8 +143,8 @@ const useCompleter = ({ streams, timeRange, completerFactory, userTimezone }: Pi
   const view = useView();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  return useMemo(() => completerFactory(completers, timeRange, streams, fieldTypes, userTimezone, view),
-    [completerFactory, timeRange, streams, fieldTypes, userTimezone, view]);
+  return useMemo(() => completerFactory(completers ?? [], timeRange, streams, fieldTypes, userTimezone, view),
+    [completerFactory, completers, timeRange, streams, fieldTypes, userTimezone, view]);
 };
 
 type Props = BaseProps & {

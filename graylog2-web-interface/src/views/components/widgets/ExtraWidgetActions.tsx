@@ -41,7 +41,7 @@ const ExtraWidgetActions = ({ onSelect, widget }: Props) => {
       };
 
       return (<MenuItem key={`${type}-${widget.id}`} disabled={disabled()} onSelect={_onSelect}>{title(widget)}</MenuItem>);
-    }), [onSelect, pluginWidgetActions, widget, widgetFocusContext]);
+    }), [dispatch, onSelect, pluginWidgetActions, widget, widgetFocusContext]);
 
   return extraWidgetActions.length > 0
     ? (

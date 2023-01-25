@@ -101,7 +101,7 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, dashboard
         dispatch(mergeQueryTitles(newTitles));
         setShow(false);
       });
-  }, [orderedQueriesList, queriesList, activeQueryId, setDashboardPage, setShow]);
+  }, [dispatch, orderedQueriesList, queriesList, activeQueryId, setDashboardPage, setShow]);
   const onPagesConfigurationModalClose = useCallback(() => setShow(false), [setShow]);
   const updatePageSorting = useCallback((order: Array<PageListItem>) => {
     setOrderedQueriesList(Immutable.OrderedSet(order));
