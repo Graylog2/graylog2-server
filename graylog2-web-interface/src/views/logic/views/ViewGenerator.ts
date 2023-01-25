@@ -25,7 +25,7 @@ import QueryGenerator from '../queries/QueryGenerator';
 
 export default async (
   type: ViewType,
-  streamId: string | undefined | null,
+  streamId: string | string[] | undefined | null,
   timeRange?: TimeRange,
   queryString?: ElasticsearchQueryString,
 ) => {

@@ -31,6 +31,11 @@ jest.mock('views/components/dashboard/hooks/useDashboards');
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
     delete: jest.fn(),
+    update: {
+      completed: {
+        listen: () => jest.fn(),
+      },
+    },
   },
 }));
 
@@ -49,6 +54,7 @@ const loadDashboardsResponse = (count = 1) => {
         .createdAt(new Date())
         .requires({})
         .search(Search.builder().id('search.id').build())
+        .favorite(true)
         .build();
       dashboards.push(simpleView());
     }

@@ -14,18 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog2.rest.resources.entities.preferences.model;
 
-import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
-import { useSearchURLQueryParams } from 'views/logic/NormalizeSearchURLQueryParams';
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import SearchPage from './SearchPage';
+import java.util.List;
 
-const NewSearchPage = () => {
-  const { timeRange, queryString, streams } = useSearchURLQueryParams();
-  const view = useCreateSavedSearch(streams, timeRange, queryString);
+public record EntityListPreferences(@JsonProperty("displayed_attributes") List<String> displayedAttributes,
+                                    @JsonProperty("sort") String sort,
+                                    @JsonProperty("order") String order,
+                                    @JsonProperty("query") String query,
+                                    @JsonProperty("per_page") int perPage
 
-  return <SearchPage view={view} isNew />;
-};
-
-export default NewSearchPage;
+) {
+}
