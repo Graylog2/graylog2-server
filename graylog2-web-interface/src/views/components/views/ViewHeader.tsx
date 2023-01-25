@@ -29,6 +29,7 @@ import useViewTitle from 'views/hooks/useViewTitle';
 import useView from 'views/hooks/useView';
 import useAppDispatch from 'stores/useAppDispatch';
 import FavoriteIcon from 'views/components/FavoriteIcon';
+import { loadView } from 'views/logic/slices/viewSlice';
 
 const links = {
   [View.Type.Dashboard]: {
@@ -83,9 +84,7 @@ const ViewHeader = () => {
 
   const typeText = view?.type?.toLocaleLowerCase();
   const title = useViewTitle();
-  const onChangeFavorite = useCallback((newValue) => {
-    ViewActions.update(view.toBuilder().favorite(newValue).build());
-  }, [view]);
+  const onChangeFavorite = useCallback((newValue) => dispatch(loadView(view.toBuilder().favorite(newValue).build())), [dispatch, view]);
 
   return (
     <Row>
