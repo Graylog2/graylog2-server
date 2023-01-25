@@ -29,7 +29,6 @@ public class ViewsAuditEventTypes implements PluginAuditEventTypes {
     public static final String VIEW_CREATE = PREFIX + VIEW + ":create";
     public static final String VIEW_UPDATE = PREFIX + VIEW + ":update";
     public static final String VIEW_DELETE = PREFIX + VIEW + ":delete";
-    public static final String VIEW_BULK_DELETE = PREFIX + VIEW + ":bulk_delete";
 
     private static final String VIEW_SHARING = "view_sharing";
     public static final String VIEW_SHARING_CREATE = PREFIX + VIEW_SHARING + ":create";
