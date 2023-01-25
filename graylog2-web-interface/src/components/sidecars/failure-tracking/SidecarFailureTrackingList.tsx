@@ -91,6 +91,7 @@ const SidecarFailureTrackingList = ({
                 {['node_name', 'last_seen'].includes(sort_key) && (
                   <StyledSortIcon activeDirection={sort.field === sort_key ? sort.order : null}
                                   onChange={() => onSortChange(sort_key)}
+                                  title={sort_key}
                                   ascId="asc"
                                   descId="desc" />
                 )}
@@ -110,7 +111,7 @@ const SidecarFailureTrackingList = ({
 
     return (
       <NoSearchResult>
-        {`There are no sidecars matching the search criteria. Try adjusting your search filter${showInactiveHint}.`}
+        {`There are no sidecars with failures matching the search criteria. Try adjusting your search filter${showInactiveHint}.`}
       </NoSearchResult>
     );
   };
