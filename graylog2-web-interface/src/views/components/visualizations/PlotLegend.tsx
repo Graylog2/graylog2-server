@@ -42,8 +42,7 @@ const ColorHint = styled.div(({ color }) => `
 
 const Container = styled.div`
   display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 4fr auto;
+  grid-template: 4fr auto / 1fr;
   grid-template-areas: "." ".";
   height: 100%;
 `;
@@ -95,12 +94,12 @@ type ColorPickerConfig = {
 const isLabelAFunction = (label: string, series: Series) => series.function === label || series.config.name === label;
 
 const legendField = (columnPivots: Array<Pivot>, rowPivots: Array<Pivot>, series: Array<Series>, neverHide: boolean, isFunction: boolean) => {
-  if (columnPivots.length === 1 && series.length === 1 && !isFunction) {
-    return columnPivots[0].field;
+  if (columnPivots.length === 1 && series.length === 1 && columnPivots[0].fields?.length === 1 && !isFunction) {
+    return columnPivots[0].fields[0];
   }
 
-  if (!neverHide && rowPivots.length === 1) {
-    return rowPivots[0].field;
+  if (!neverHide && rowPivots.length === 1 && rowPivots[0].fields?.length === 1) {
+    return rowPivots[0].fields[0];
   }
 
   return null;

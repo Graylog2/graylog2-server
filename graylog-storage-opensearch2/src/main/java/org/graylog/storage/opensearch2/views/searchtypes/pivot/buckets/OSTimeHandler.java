@@ -41,15 +41,15 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
 
     @Nonnull
     @Override
-    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, List<Time> bucketSpec, OSGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Time timeSpec, OSGeneratedQueryContext queryContext, Query query) {
         AggregationBuilder root = null;
         AggregationBuilder leaf = null;
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
 
-        for (Time timeSpec : bucketSpec) {
+        for (String field : timeSpec.fields()) {
             final DateHistogramInterval dateHistogramInterval = new DateHistogramInterval(timeSpec.interval().toDateInterval(query.effectiveTimeRange(pivot)).toString());
             final DateHistogramAggregationBuilder builder = AggregationBuilders.dateHistogram(name)
-                    .field(timeSpec.field())
+                    .field(field)
                     .order(ordering)
                     .format("date_time");
 
@@ -76,10 +76,7 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
     }
 
     @Override
-    public Stream<PivotBucket> extractBuckets(Pivot pivot, List<BucketSpec> bucketSpecs, PivotBucket initialBucket) {
-        if (bucketSpecs.isEmpty()) {
-            return Stream.empty();
-        }
+    public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket initialBucket) {
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
         final MultiBucketsAggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
@@ -90,11 +87,7 @@ public class OSTimeHandler extends OSPivotBucketSpecHandler<Time> {
                             .add(bucket.getKeyAsString())
                             .build();
 
-                    if (bucketSpecs.size() == 1) {
-                        return Stream.of(PivotBucket.create(keys, bucket));
-                    }
-
-                    return extractBuckets(pivot, bucketSpecs.subList(0, bucketSpecs.size()), PivotBucket.create(keys, bucket));
+                    return Stream.of(PivotBucket.create(keys, bucket));
                 });
     }
 }

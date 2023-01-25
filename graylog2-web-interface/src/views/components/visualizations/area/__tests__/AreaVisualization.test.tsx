@@ -53,7 +53,7 @@ describe('AreaVisualization', () => {
     const config = AggregationWidgetConfig.builder()
       .visualization('area')
       .columnPivots([])
-      .rowPivots([Pivot.create('timestamp', 'time', { interval: { type: 'timeunit', unit: 'minutes', value: 10 } })])
+      .rowPivots([Pivot.create(['timestamp'], 'time', { interval: { type: 'timeunit', unit: 'minutes', value: 10 } })])
       .series([Series.forFunction('avg(nf_bytes)'), Series.forFunction('sum(nf_pkts)')])
       .build();
 

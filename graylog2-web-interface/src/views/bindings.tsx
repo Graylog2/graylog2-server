@@ -175,7 +175,7 @@ const exports: PluginExports = {
       searchTypes: PivotConfigGenerator,
       titleGenerator: (widget: Widget) => {
         if (widget.config.rowPivots.length > 0) {
-          return `Aggregating ${widget.config.series.map((s) => s.effectiveName).join(', ')} by ${widget.config.rowPivots.map(({ field }) => field).join(', ')}`;
+          return `Aggregating ${widget.config.series.map((s) => s.effectiveName).join(', ')} by ${widget.config.rowPivots.flatMap(({ fields }) => fields).join(', ')}`;
         }
 
         if (widget.config.series.length > 0) {

@@ -197,8 +197,8 @@ const DataTable = ({
 
   const rows = retrieveChartData(data) ?? [];
 
-  const rowFieldNames = rowPivots.map<string>((pivot) => pivot.field);
-  const columnFieldNames = columnPivots.map((pivot) => pivot.field);
+  const rowFieldNames = rowPivots.flatMap((pivot) => pivot.fields);
+  const columnFieldNames = columnPivots.flatMap((pivot) => pivot.fields);
 
   const seriesToMerge = rollup ? series : [];
   const effectiveFields = Immutable.OrderedSet(rowFieldNames.map((field) => ({ field, source: field })))
@@ -215,11 +215,13 @@ const DataTable = ({
     let prev = 0;
     const res = [];
 
-    rowPivots.forEach((row, index) => {
-      if (pinnedColumns.has(row.field)) {
-        const column = row.field;
+    const rowPivotsFields = rowPivots.flatMap((rowPivot) => rowPivot.fields ?? []);
+
+    rowPivotsFields.forEach((field, index) => {
+      if (pinnedColumns.has(field)) {
+        const column = field;
         res.push({ index, column, leftMargin: prev });
-        prev += rowPivotColumnsWidth[row.field];
+        prev += rowPivotColumnsWidth[field];
       }
     });
 

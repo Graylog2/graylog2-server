@@ -36,7 +36,7 @@ const chartData = [
   { name: 'name2' },
   { name: 'name3' },
 ];
-const columnPivots = [Pivot.create('field1', 'unknown')];
+const columnPivots = [Pivot.create(['field1'], 'unknown')];
 const config = AggregationWidgetConfig.builder().series([Series.forFunction('count')]).columnPivots(columnPivots).build();
 
 // eslint-disable-next-line react/require-default-props
