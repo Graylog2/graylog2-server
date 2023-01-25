@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import View from 'views/logic/views/View';
-import Query from 'views/logic/queries/Query';
 import mockDispatch from 'views/test/mockDispatch';
 import type { RootState } from 'views/types';
 import { updateGlobalOverride } from 'views/logic/slices/searchExecutionSlice';
@@ -31,13 +30,13 @@ jest.mock('views/logic/slices/viewSlice', () => ({
 }));
 
 describe('OnZoom', () => {
-  const view = createSearch({ queryId: 'query1' });
+  const defaultView = createSearch({ queryId: 'query1' });
 
   it('sets the global override timerange if called from a dashboard', async () => {
-    const query = Query.builder().build();
+    const view = defaultView.toBuilder().type(View.Type.Dashboard).build();
 
     const dispatch = mockDispatch({ view: { view }, searchExecution: { executionState: SearchExecutionState.empty() } } as RootState);
-    OnZoom(dispatch, query, '2020-01-10 13:23:42.000', '2020-01-10 14:23:42.000', View.Type.Dashboard, 'Europe/Berlin');
+    dispatch(OnZoom('2020-01-10 13:23:42.000', '2020-01-10 14:23:42.000', 'Europe/Berlin'));
 
     expect(dispatch).toHaveBeenCalledWith(updateGlobalOverride(GlobalOverride.create({
       from: '2020-01-10T12:23:42.000+00:00',
@@ -47,10 +46,10 @@ describe('OnZoom', () => {
   });
 
   it('sets the query timerange if called from a dashboard', async () => {
-    const query = Query.builder().id('query1').build();
+    const view = defaultView.toBuilder().type(View.Type.Search).build();
 
-    const dispatch = mockDispatch({ view: { view }, searchExecution: { executionState: SearchExecutionState.empty() } } as RootState);
-    OnZoom(dispatch, query, '2020-01-10 13:23:42.000', '2020-01-10 14:23:42.000', View.Type.Search, 'Europe/Berlin');
+    const dispatch = mockDispatch({ view: { view, activeQuery: 'query1' }, searchExecution: { executionState: SearchExecutionState.empty() } } as RootState);
+    dispatch(OnZoom('2020-01-10 13:23:42.000', '2020-01-10 14:23:42.000', 'Europe/Berlin'));
 
     expect(setTimerange).toHaveBeenCalledWith('query1', {
       from: '2020-01-10T12:23:42.000+00:00',

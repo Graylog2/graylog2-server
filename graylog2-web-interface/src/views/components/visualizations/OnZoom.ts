@@ -15,16 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type Query from 'views/logic/queries/Query';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
-import type { ViewType } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import { adjustFormat, toUTCFromTz } from 'util/DateTime';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import { setGlobalOverrideTimerange, execute } from 'views/logic/slices/searchExecutionSlice';
 import { setTimerange } from 'views/logic/slices/viewSlice';
+import type { GetState } from 'views/types';
+import { selectActiveQuery, selectViewType } from 'views/logic/slices/viewSelectors';
 
-const onZoom = (dispatch: AppDispatch, currentQuery: Query, from: string, to: string, viewType: ViewType | undefined | null, userTz: string) => {
+const onZoom = (from: string, to: string, userTz: string) => (dispatch: AppDispatch, getState: GetState) => {
+  const activeQuery = selectActiveQuery(getState());
+  const viewType = selectViewType(getState());
   const newTimeRange: AbsoluteTimeRange = {
     type: 'absolute',
     from: adjustFormat(toUTCFromTz(from, userTz), 'internal'),
@@ -34,7 +36,7 @@ const onZoom = (dispatch: AppDispatch, currentQuery: Query, from: string, to: st
   if (viewType === View.Type.Dashboard) {
     dispatch(setGlobalOverrideTimerange(newTimeRange)).then(() => dispatch(execute()));
   } else {
-    dispatch(setTimerange(currentQuery.id, newTimeRange));
+    dispatch(setTimerange(activeQuery, newTimeRange));
   }
 
   return false;
