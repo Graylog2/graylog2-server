@@ -93,6 +93,7 @@ public class ExecOpensearchProcessLogs implements ExecuteStreamHandler, ProcessL
     @Override
     public void stop() throws IOException {
         try {
+            executor.shutdown();
             executor.awaitTermination(10, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             throw new RuntimeException("Failed to terminate logger threads", e);
