@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback, useMemo } from 'react';
+import type { QueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 import type { SearchParams, Sort } from 'stores/PaginationTypes';
 import { PaginatedList, SearchForm, Spinner, NoSearchResult, NoEntitiesExist } from 'components/common';
@@ -26,10 +28,11 @@ import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import usePluginEntities from 'hooks/usePluginEntities';
 import DashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
+import FavoriteIcon from 'views/components/FavoriteIcon';
 
 import TitleCell from './TitleCell';
 
-const INITIAL_COLUMNS = ['title', 'description', 'summary'];
+const INITIAL_COLUMNS = ['title', 'description', 'summary', 'favorite'];
 
 const COLUMN_DEFINITIONS = [
   { id: 'created_at', title: 'Created At', sortable: true },
@@ -37,15 +40,39 @@ const COLUMN_DEFINITIONS = [
   { id: 'description', title: 'Description', sortable: true },
   { id: 'summary', title: 'Summary', sortable: true },
   { id: 'owner', title: 'Owner', sortable: true },
+  { id: 'favorite', title: 'Favorite' },
 ];
 
-const useCustomColumnRenderers = () => {
+const useCustomColumnRenderers = ({ queryClient, searchParams }: { queryClient: QueryClient, searchParams: SearchParams
+}) => {
   const requirementsProvided = usePluginEntities('views.requires.provided');
   const customColumnRenderers: ColumnRenderers<View> = useMemo(() => ({
     title: {
       renderCell: (dashboard) => <TitleCell dashboard={dashboard} requirementsProvided={requirementsProvided} />,
     },
-  }), [requirementsProvided]);
+    favorite: {
+      renderCell: (search) => (
+        <FavoriteIcon isFavorite={search.favorite}
+                      id={search.id}
+                      onChange={(newValue) => {
+                        queryClient.setQueriesData(['dashboards', 'overview', searchParams], (cur: {
+                          list: Readonly<Array<View>>,
+                          pagination: { total: number }
+                        }) => ({
+                          ...cur,
+                          list: cur.list.map((view) => {
+                            if (view.id === search.id) {
+                              return view.toBuilder().favorite(newValue).build();
+                            }
+
+                            return view;
+                          }),
+                        }
+                        ));
+                      }} />
+      ),
+    },
+  }), [queryClient, requirementsProvided, searchParams]);
 
   return customColumnRenderers;
 };
@@ -53,6 +80,7 @@ const useCustomColumnRenderers = () => {
 const DashboardsOverview = () => {
   const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
   const [visibleColumns, setVisibleColumns] = useState(INITIAL_COLUMNS);
+  const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useState<SearchParams>({
     page: paginationQueryParameter.page,
     pageSize: paginationQueryParameter.pageSize,
@@ -62,7 +90,7 @@ const DashboardsOverview = () => {
       direction: 'asc',
     },
   });
-  const columnRenderers = useCustomColumnRenderers();
+  const columnRenderers = useCustomColumnRenderers({ queryClient, searchParams });
   const { data: paginatedDashboards, refetch } = useDashboards(searchParams);
 
   const onSearch = useCallback((newQuery: string) => {

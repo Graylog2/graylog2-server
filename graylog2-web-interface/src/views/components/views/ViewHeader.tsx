@@ -28,6 +28,7 @@ import Routes from 'routing/Routes';
 import useViewTitle from 'views/hooks/useViewTitle';
 import useView from 'views/hooks/useView';
 import useAppDispatch from 'stores/useAppDispatch';
+import FavoriteIcon from 'views/components/FavoriteIcon';
 
 const links = {
   [View.Type.Dashboard]: {
@@ -82,6 +83,9 @@ const ViewHeader = () => {
 
   const typeText = view?.type?.toLocaleLowerCase();
   const title = useViewTitle();
+  const onChangeFavorite = useCallback((newValue) => {
+    ViewActions.update(view.toBuilder().favorite(newValue).build());
+  }, [view]);
 
   return (
     <Row>
@@ -93,12 +97,15 @@ const ViewHeader = () => {
         <TitleWrapper>
           <span>{title}</span>
           {isSavedView && (
-          <EditButton onClick={toggleMetadataEdit}
-                      role="button"
-                      title={`Edit ${typeText} ${view.title} metadata`}
-                      tabIndex={0}>
-            <Icon name="pen-to-square" />
-          </EditButton>
+            <>
+              <FavoriteIcon isFavorite={view.favorite} id={view.id} onChange={onChangeFavorite} />
+              <EditButton onClick={toggleMetadataEdit}
+                          role="button"
+                          title={`Edit ${typeText} ${view.title} metadata`}
+                          tabIndex={0}>
+                <Icon name="pen-to-square" />
+              </EditButton>
+            </>
           )}
         </TitleWrapper>
         {showMetadataEdit && (

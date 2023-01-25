@@ -21,16 +21,16 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 
-export const urlPrefix = '/startpage';
+export const urlPrefix = '/favorites';
 
 const putFavoriteItem = async (id: string) => {
-  const url = `${urlPrefix}/addToFavorites/${id}`;
+  const url = `${urlPrefix}/${id}`;
 
   return fetch('PUT', qualifyUrl(url));
 };
 
 const deleteFavoriteItem = (id: string) => {
-  const url = `${urlPrefix}/removeFromFavorites/${id}`;
+  const url = `${urlPrefix}/${id}`;
 
   return fetch('DELETE', qualifyUrl(url));
 };

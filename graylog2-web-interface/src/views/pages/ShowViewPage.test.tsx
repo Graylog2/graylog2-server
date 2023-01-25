@@ -56,6 +56,7 @@ describe('ShowViewPage', () => {
     created_at: '2022-01-01 00:00:00',
     owner: 'admin',
     requires: {},
+    favorite: false,
   }).toBuilder()
     .search(Search.create().toBuilder().parameters([]).build())
     .build();
