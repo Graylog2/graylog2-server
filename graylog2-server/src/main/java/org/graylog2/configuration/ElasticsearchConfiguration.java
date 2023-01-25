@@ -17,6 +17,8 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.util.Size;
@@ -37,11 +39,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 @SuppressWarnings({"FieldMayBeFinal", "FieldCanBeLocal"})
 public class ElasticsearchConfiguration {
     public static final String MAX_INDEX_RETENTION_PERIOD = "max_index_retention_period";
     public static final String DEFAULT_EVENTS_INDEX_PREFIX = "default_events_index_prefix";
     public static final String DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX = "default_system_events_index_prefix";
+    public static final String TIME_SIZE_OPTIMIZING_ROTATION_MIN_SIZE = "time_size_optimizing_rotation_min_size";
+    public static final String TIME_SIZE_OPTIMIZING_ROTATION_MAX_SIZE = "time_size_optimizing_rotation_max_size";
 
     @Parameter(value = "elasticsearch_index_prefix", required = true)
     private String defaultIndexPrefix = "graylog";
@@ -58,16 +64,16 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_analyzer", required = true)
     private String analyzer = "standard";
 
-    @Parameter(value = "elasticsearch_shards", validator = PositiveIntegerValidator.class, required = true)
+    @Parameter(value = "elasticsearch_shards", validators = PositiveIntegerValidator.class, required = true)
     private int shards = 1;
 
-    @Parameter(value = "elasticsearch_replicas", validator = PositiveIntegerValidator.class, required = true)
+    @Parameter(value = "elasticsearch_replicas", validators = PositiveIntegerValidator.class, required = true)
     private int replicas = 0;
 
     @Parameter(value = "disable_index_optimization")
     private boolean disableIndexOptimization = false;
 
-    @Parameter(value = "index_optimization_max_num_segments", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "index_optimization_max_num_segments", validators = PositiveIntegerValidator.class)
     private int indexOptimizationMaxNumSegments = 1;
 
     @Parameter(value = "index_field_type_periodical_full_refresh_interval", validators = {PositiveDurationValidator.class})
@@ -88,25 +94,25 @@ public class ElasticsearchConfiguration {
     private boolean rotateEmptyIndex = false;
 
     // Rotation
-    @Parameter(value = "elasticsearch_max_docs_per_index", validator = PositiveIntegerValidator.class, required = true)
+    @Parameter(value = "elasticsearch_max_docs_per_index", validators = PositiveIntegerValidator.class, required = true)
     private int maxDocsPerIndex = 20000000;
 
     // Rotation
-    @Parameter(value = "elasticsearch_max_size_per_index", validator = PositiveLongValidator.class, required = true)
+    @Parameter(value = "elasticsearch_max_size_per_index", validators = PositiveLongValidator.class, required = true)
     private long maxSizePerIndex = 30L * 1024 * 1024 * 1024; // 30GB
 
     // Retention
-    @Parameter(value = "elasticsearch_max_number_of_indices", required = true, validator = PositiveIntegerValidator.class)
+    @Parameter(value = "elasticsearch_max_number_of_indices", required = true, validators = PositiveIntegerValidator.class)
     private int maxNumberOfIndices = 20;
 
     // TimeBasedSizeOptimizingStrategy Rotation
     @Parameter(value = "time_size_optimizing_rotation_period")
     private Period timeSizeOptimizingRotationPeriod = Period.days(1);
 
-    @Parameter(value = "time_size_optimizing_rotation_min_size")
+    @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_MIN_SIZE)
     private Size timeSizeOptimizingRotationMinSize = Size.gigabytes(20);
 
-    @Parameter(value = "time_size_optimizing_rotation_max_size")
+    @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_MAX_SIZE)
     private Size timeSizeOptimizingRotationMaxSize = Size.gigabytes(50);
 
     @Parameter(value = "elasticsearch_disable_version_check")
@@ -141,10 +147,10 @@ public class ElasticsearchConfiguration {
         return maxIndexRetentionPeriod;
     }
 
-    @Parameter(value = "elasticsearch_index_optimization_timeout", validator = DurationCastedToIntegerValidator.class)
+    @Parameter(value = "elasticsearch_index_optimization_timeout", validators = DurationCastedToIntegerValidator.class)
     private Duration indexOptimizationTimeout = Duration.hours(1L);
 
-    @Parameter(value = "elasticsearch_index_optimization_jobs", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "elasticsearch_index_optimization_jobs", validators = PositiveIntegerValidator.class)
     private int indexOptimizationJobs = 10;
 
     public String getDefaultIndexPrefix() {
@@ -251,5 +257,16 @@ public class ElasticsearchConfiguration {
 
     public int getIndexOptimizationJobs() {
         return indexOptimizationJobs;
+    }
+
+    @ValidatorMethod
+    @SuppressWarnings("unused")
+    public void validateTimeSizeOptimizingRotation() throws ValidationException {
+        if (getTimeSizeOptimizingRotationMaxSize().compareTo(getTimeSizeOptimizingRotationMinSize()) < 0) {
+            throw new ValidationException(f("\"%s=%s\" cannot be larger than \"%s=%s\"",
+                    TIME_SIZE_OPTIMIZING_ROTATION_MIN_SIZE, getTimeSizeOptimizingRotationMinSize(),
+                    TIME_SIZE_OPTIMIZING_ROTATION_MAX_SIZE, getTimeSizeOptimizingRotationMaxSize())
+            );
+        }
     }
 }
