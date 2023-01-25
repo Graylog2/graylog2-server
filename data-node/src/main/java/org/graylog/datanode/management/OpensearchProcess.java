@@ -23,6 +23,7 @@ import org.graylog.datanode.process.ProcessState;
 import org.opensearch.client.RestHighLevelClient;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public interface OpensearchProcess {
     boolean isInState(ProcessState state);
@@ -30,7 +31,7 @@ public interface OpensearchProcess {
     void start() throws IOException;
     void stop();
 
-    ProcessLogs processLogs();
+    Optional<ProcessLogs> processLogs();
 
     void onEvent(ProcessEvent event);
 
