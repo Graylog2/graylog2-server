@@ -9,8 +9,7 @@
           "filter": "lowercase"
         }
       }
-    },
-    "index.refresh_interval": "30s"
+    }
   },
   "mappings": {
     "properties": {
