@@ -157,7 +157,7 @@ const DataTable = ({
     }
 
     return Promise.reject();
-  }, [formContext?.dirty, editing, dispatch, widget.id, config]);
+  }, [formContext?.dirty, editing, dispatch, widget?.id, config]);
 
   const togglePin = useCallback((field: string) => {
     const dirty = formContext?.dirty;
@@ -191,7 +191,7 @@ const DataTable = ({
     }
 
     return Promise.reject();
-  }, [formContext?.dirty, editing, widget.config, widget.id, dispatch]);
+  }, [formContext?.dirty, editing, widget?.config, widget?.id, dispatch]);
 
   const { columnPivots, rowPivots, series, rollupForBackendQuery: rollup } = config;
 

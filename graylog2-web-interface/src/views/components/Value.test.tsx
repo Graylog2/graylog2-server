@@ -44,7 +44,7 @@ describe('Value', () => {
     const Component = (props) => <Value {...props} />;
 
     it('renders without type information but no children', async () => {
-      render(<Value field="foo" queryId="someQueryId" value={42} type={FieldType.Unknown} />);
+      render(<Value field="foo" value={42} type={FieldType.Unknown} />);
 
       openActionsMenu('42');
 
@@ -194,7 +194,7 @@ describe('Value', () => {
     ${''}
     ${' '}
   `('renders (unicode) spaces as `EmptyValue` component', async ({ value }) => {
-    render(<Value type={FieldType.Unknown} field="foo" queryId="someQueryId" value={value} />);
+    render(<Value type={FieldType.Unknown} field="foo" value={value} />);
 
     await screen.findByText(/Empty Value/);
   });

@@ -27,7 +27,6 @@ import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizat
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
 import ElementDimensions from 'components/common/ElementDimensions';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import Trend from './Trend';
 import AutoFontSizer from './AutoFontSizer';
@@ -93,7 +92,6 @@ const NumberVisualization = ({ config, fields, data }: VisualizationComponentPro
   const targetRef = useRef();
   const onRenderComplete = useContext(RenderCompletionCallback);
   const visualizationConfig = (config.visualizationConfig as NumberVisualizationConfig) ?? NumberVisualizationConfig.create();
-  const activeQuery = useActiveQueryId();
 
   const field = _extractFirstSeriesName(config);
 
@@ -118,7 +116,6 @@ const NumberVisualization = ({ config, fields, data }: VisualizationComponentPro
               <Value field={field}
                      type={fieldTypeFor(field, fields)}
                      value={value}
-                     queryId={activeQuery}
                      render={DecoratedValue} />
             </CustomHighlighting>
           </AutoFontSizer>

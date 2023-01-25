@@ -55,9 +55,9 @@ type Props = {
 
 const _c = (field, value, path, source) => ({ field, value, path, source });
 
-type ColumnProps = { field: string, value: any, selectedQuery: string, type: FieldType, valuePath: ValuePath, source: string | undefined | null };
+type ColumnProps = { field: string, value: any, type: FieldType, valuePath: ValuePath, source: string | undefined | null };
 
-const Column = ({ field, value, selectedQuery, type, valuePath, source }: ColumnProps) => {
+const Column = ({ field, value, type, valuePath, source }: ColumnProps) => {
   const additionalContextValue = useMemo(() => ({ valuePath }), [valuePath]);
 
   return (
@@ -69,7 +69,6 @@ const Column = ({ field, value, selectedQuery, type, valuePath, source }: Column
               <Value field={source ?? field}
                      type={type}
                      value={value}
-                     queryId={selectedQuery}
                      render={DecoratedValue} />
             ) : null}
         </CustomHighlighting>
@@ -122,7 +121,6 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
         <Column key={`${activeQuery}-${field}=${value}-${idx}`}
                 field={field}
                 value={value}
-                selectedQuery={activeQuery}
                 type={fieldTypeFor(columnNameToField(field, series), types)}
                 valuePath={path.slice()}
                 source={source} />

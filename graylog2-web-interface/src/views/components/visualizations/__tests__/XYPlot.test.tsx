@@ -57,6 +57,7 @@ describe('XYPlot', () => {
     const defaultView = createSearch();
     const view = defaultView
       .toBuilder()
+      .type(View.Type.Search)
       .search(defaultView.search
         .toBuilder()
         .queries([currentQuery])

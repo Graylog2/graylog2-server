@@ -31,7 +31,6 @@ import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/E
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type Series from 'views/logic/aggregationbuilder/Series';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
-import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
 
 const ColorHint = styled.div(({ color }) => `
   cursor: pointer;
@@ -125,7 +124,6 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
   const [colorPickerConfig, setColorPickerConfig] = useState<ColorPickerConfig | undefined>();
   const { rowPivots, columnPivots, series } = config;
   const labels: Array<string> = labelMapper(chartData);
-  const activeQuery = useCurrentQueryId();
   const { colors, setColor } = useContext(ChartColorContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
   const defaultFieldMapper = useCallback((isFunction: boolean) => legendField(columnPivots, rowPivots, series, !neverHide, isFunction), [columnPivots, neverHide, rowPivots, series]);
@@ -150,7 +148,7 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
     const defaultColor = value === eventsDisplayName ? EVENT_COLOR : undefined;
     const isFunction = isLabelAFunction(value, series[0]);
     const field = (fieldMapper ?? defaultFieldMapper)(isFunction);
-    const val = field !== null ? <Value type={FieldType.Unknown} value={value} field={field} queryId={activeQuery}>{value}</Value> : value;
+    const val = field !== null ? <Value type={FieldType.Unknown} value={value} field={field}>{value}</Value> : value;
 
     return (
       <LegendCell key={value}>

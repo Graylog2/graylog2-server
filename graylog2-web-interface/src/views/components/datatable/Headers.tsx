@@ -116,16 +116,15 @@ HeaderField.defaultProps = {
 };
 
 type HeaderFieldForValueProps = {
-  activeQuery: string,
   field: string,
   value: any,
   span?: number,
   prefix?: string,
   type: FieldType,
 };
-const HeaderFieldForValue = ({ activeQuery, field, value, span = 1, prefix = '', type }: HeaderFieldForValueProps) => (
+const HeaderFieldForValue = ({ field, value, span = 1, prefix = '', type }: HeaderFieldForValueProps) => (
   <CenteredTh key={`${prefix}${field}-${value}`} colSpan={span} className={styles.leftAligned}>
-    <Value field={field} value={value} queryId={activeQuery} type={type} />
+    <Value field={field} value={value} type={type} />
   </CenteredTh>
 );
 
@@ -137,7 +136,6 @@ HeaderFieldForValue.defaultProps = {
 const Spacer = ({ span }: { span: number }) => <th aria-label="spacer" colSpan={span} className={styles.leftAligned} />;
 
 type ColumnHeadersProps = {
-  activeQuery: string,
   fields: (FieldTypeMappingsList | Array<FieldTypeMapping>);
   pivots: string[],
   values: any[][],
@@ -145,7 +143,7 @@ type ColumnHeadersProps = {
   offset?: number,
 };
 
-const ColumnPivotFieldsHeaders = ({ activeQuery, fields, pivots, values, series, offset = 1 }: ColumnHeadersProps) => {
+const ColumnPivotFieldsHeaders = ({ fields, pivots, values, series, offset = 1 }: ColumnHeadersProps) => {
   const headerRows = pivots.map((columnPivot, idx) => {
     const actualValues = values.map((key) => ({ path: key.slice(0, idx).join('-'), key: key[idx] || '', count: 1 }));
     const actualValuesWithoutDuplicates = actualValues.reduce((prev, cur) => {
@@ -170,7 +168,6 @@ const ColumnPivotFieldsHeaders = ({ activeQuery, fields, pivots, values, series,
         {offset > 0 && <Spacer span={offset} />}
         {actualValuesWithoutDuplicates.map((value) => (
           <HeaderFieldForValue key={`header-field-value-${value.path}-${value.key}`}
-                               activeQuery={activeQuery}
                                field={columnPivot}
                                value={value.key}
                                span={value.count * series.length}
@@ -235,8 +232,7 @@ const Headers = ({ columnPivots, fields, rowPivots, series, rollup, actualColumn
 
   return (
     <>
-      <ColumnPivotFieldsHeaders activeQuery={activeQuery}
-                                fields={fields}
+      <ColumnPivotFieldsHeaders fields={fields}
                                 pivots={columnFieldNames}
                                 values={actualColumnPivotFields}
                                 series={series}
