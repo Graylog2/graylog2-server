@@ -32,7 +32,7 @@ public class DefaultSuccessContextCreator<T> implements SuccessContextCreator<T>
         if (respEntityContext != null) {
             return Map.of("response_entity", respEntityContext);
         } else {
-            return Map.of();
+            return Map.of("response_entity", Map.of());
         }
     }
 }
