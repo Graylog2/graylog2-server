@@ -26,17 +26,8 @@ const createStore = (reducers: PluggableReducer[], initialState: Partial<RootSta
     reducer,
     preloadedState: initialState,
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
-      serializableCheck: {
-        // Ignore these field paths in all actions
-        ignoredActionPaths: ['payload'],
-        // Ignore these paths in the state
-        ignoredPaths: [
-          'view.view',
-          'searchExecution.executionState',
-          'searchExecution.result',
-          'searchMetadata.metadata',
-        ],
-      },
+      serializableCheck: false,
+      immutableCheck: false,
     }),
   });
 };
