@@ -72,7 +72,8 @@ public class DashboardsResource extends RestResource {
             EntityAttribute.builder().id(ViewDTO.FIELD_CREATED_AT).title("Created").type("date").build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_DESCRIPTION).title("Description").build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_SUMMARY).title("Summary").build(),
-            EntityAttribute.builder().id(ViewDTO.FIELD_OWNER).title("Owner").build()
+            EntityAttribute.builder().id(ViewDTO.FIELD_OWNER).title("Owner").build(),
+            EntityAttribute.builder().id(ViewDTO.FIELD_FAVORITE).title("Favorite").sortable(false).build()
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
