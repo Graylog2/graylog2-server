@@ -152,6 +152,8 @@ public class IndexSetValidatorTest {
         // no max retention period configured
         assertThat(validator.validate(testIndexSetConfig())).isNotPresent();
 
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
+
         // max retention period >= effective retention period
         when(elasticsearchConfiguration.getMaxIndexRetentionPeriod()).thenReturn(Period.days(10));
         assertThat(validator.validate(testIndexSetConfig())).isNotPresent();
@@ -186,6 +188,8 @@ public class IndexSetValidatorTest {
 
     @Test
     public void timeBasedSizeOptimizingOnlyWithMultipleOfDays() {
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
+
         when(indexSetRegistry.iterator()).thenReturn(Collections.emptyIterator());
         final IndexSetConfig sizeOptimizingConfig = testIndexSetConfig().toBuilder()
                 .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
