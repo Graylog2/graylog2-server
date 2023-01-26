@@ -25,34 +25,43 @@ import FavoriteItemsList from './FavoriteItemsList';
 import RecentActivityList from './RecentActivityList';
 
 import SectionGrid from '../common/Section/SectionGrid';
+import useCurrentUser from '../../hooks/useCurrentUser';
 
 const StyledSectionComponent = styled(SectionComponent)`
   flex-grow: 1;
 `;
 
-const Welcome = () => (
-  <>
-    <PageHeader title="Welcome to Graylog">
-      <span>
-        Here you can find most used content.
-        <br />
-        Last open - entities which were recently viewed.
-        Favorite items - entities which were added to the favorites.
-        Recent activity - shows all actions ( creating, updating, sharing e.t.c) which were made with all entities.
-      </span>
-    </PageHeader>
-    <SectionGrid>
-      <StyledSectionComponent title="Last opened">
-        <LastOpenList />
+const Welcome = () => {
+  const { permissions } = useCurrentUser();
+  const isAdmin = permissions.includes('*');
+
+  return (
+    <>
+      <PageHeader title="Welcome to Graylog">
+        <span>
+          Here you can find most used content.
+        </span>
+      </PageHeader>
+      <SectionGrid>
+        <StyledSectionComponent title="Last opened">
+          <p className="description">Overview of recently visited saved searches and dashboards.</p>
+          <LastOpenList />
+        </StyledSectionComponent>
+        <StyledSectionComponent title="Favorite items">
+          <p className="description">Overview of your favorite saved searches and dashboards.</p>
+          <FavoriteItemsList />
+        </StyledSectionComponent>
+      </SectionGrid>
+      <StyledSectionComponent title="Recent activity">
+        <p className="description">
+          {isAdmin
+            ? 'This list includes all actions graylog users performed, like creating or sharing an entity.'
+            : 'Overview of actions you made with entities or somebody else made with entities which relates to you, like creating or sharing an entity.'}
+        </p>
+        <RecentActivityList />
       </StyledSectionComponent>
-      <StyledSectionComponent title="Favorite items">
-        <FavoriteItemsList />
-      </StyledSectionComponent>
-    </SectionGrid>
-    <StyledSectionComponent title="Recent activity">
-      <RecentActivityList />
-    </StyledSectionComponent>
-  </>
-);
+    </>
+  );
+};
 
 export default Welcome;
