@@ -29,6 +29,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.delete
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.flush.FlushRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.forcemerge.ForceMergeRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.open.OpenIndexRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.refresh.RefreshRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.get.GetSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.get.GetSettingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
@@ -39,6 +40,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchType;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.GetAliasesResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Requests;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CloseIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteAliasRequest;
@@ -547,6 +549,12 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     @Override
     public boolean isClosed(String index) {
         return indexHasState(index, State.Closed);
+    }
+
+    @Override
+    public void refresh(String... indices) {
+        final RefreshRequest refreshRequest = Requests.refreshRequest(indices);
+        client.execute((c, requestOptions) -> c.indices().refresh(refreshRequest, requestOptions));
     }
 
     private Boolean indexHasState(String index, State open) {

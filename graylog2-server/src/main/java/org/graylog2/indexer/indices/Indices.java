@@ -375,4 +375,8 @@ public class Indices {
     public String getIndexId(String indexName) {
         return indicesAdapter.getIndexId(indexName);
     }
+
+    public void refresh(String... indices) {
+        indicesAdapter.refresh(indices);
+    }
 }

@@ -29,6 +29,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.flush.FlushRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.forcemerge.ForceMergeRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.settings.get.GetSettingsResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
@@ -39,6 +40,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchT
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.GetAliasesResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Requests;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CloseIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.DeleteAliasRequest;
@@ -547,6 +549,12 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     @Override
     public boolean isClosed(String index) {
         return indexHasState(index, State.Closed);
+    }
+
+    @Override
+    public void refresh(String... indices) {
+        final RefreshRequest refreshRequest = Requests.refreshRequest(indices);
+        client.execute((c, requestOptions) -> c.indices().refresh(refreshRequest, requestOptions));
     }
 
     private Boolean indexHasState(String index, State open) {

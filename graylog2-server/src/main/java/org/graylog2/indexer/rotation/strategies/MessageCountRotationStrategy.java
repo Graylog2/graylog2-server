@@ -35,14 +35,11 @@ public class MessageCountRotationStrategy extends AbstractRotationStrategy {
     private static final Logger log = LoggerFactory.getLogger(MessageCountRotationStrategy.class);
     public static final String NAME = "count";
 
-    private final Indices indices;
-
     @Inject
     public MessageCountRotationStrategy(Indices indices, NodeId nodeId,
                                         AuditEventSender auditEventSender,
                                         ElasticsearchConfiguration elasticsearchConfiguration) {
-        super(auditEventSender, nodeId, elasticsearchConfiguration);
-        this.indices = indices;
+        super(auditEventSender, nodeId, elasticsearchConfiguration, indices);
     }
 
     @Override

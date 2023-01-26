@@ -122,4 +122,6 @@ public interface IndicesAdapter {
     boolean isClosed(String index);
 
     String getIndexId(String index);
+
+    void refresh(String... indices);
 }

@@ -41,7 +41,6 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(TimeBasedSizeOptimizingStrategy.class);
     public static final String NAME = "time-size-optimizing";
 
-    private final Indices indices;
     private final JobSchedulerClock clock;
     private final org.joda.time.Period rotationPeriod;
 
@@ -54,8 +53,7 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
                                            AuditEventSender auditEventSender,
                                            ElasticsearchConfiguration elasticsearchConfiguration,
                                            JobSchedulerClock clock) {
-        super(auditEventSender, nodeId, elasticsearchConfiguration);
-        this.indices = indices;
+        super(auditEventSender, nodeId, elasticsearchConfiguration, indices);
         this.clock = clock;
         this.rotationPeriod = elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod();
         this.maxIndexSize = elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxSize();
