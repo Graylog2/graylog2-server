@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import { render, waitFor } from 'wrappedTestingLibrary';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -23,12 +22,10 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import { SearchConfigActions } from 'views/stores/SearchConfigStore';
-import View from 'views/logic/views/View';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import viewsReducers from 'views/viewsReducers';
-import ViewState from 'views/logic/views/ViewState';
-import SearchModel from 'views/logic/search/Search';
 import TestStoreProvider from 'views/test/TestStoreProvider';
+import { createSearch } from 'fixtures/searches';
 
 import OriginalSearch from './Search';
 
@@ -68,12 +65,7 @@ jest.mock('routing/withLocation', () => (Component) => (props) => (
 
 jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
 
-const view = View.create()
-  .toBuilder()
-  .type(View.Type.Dashboard)
-  .state(Immutable.Map({ foobar: ViewState.create() }))
-  .search(SearchModel.create())
-  .build();
+const view = createSearch({ queryId: 'foobar' });
 
 const Search = () => (
   <TestStoreProvider view={view} initialQuery="foobar" isNew>
