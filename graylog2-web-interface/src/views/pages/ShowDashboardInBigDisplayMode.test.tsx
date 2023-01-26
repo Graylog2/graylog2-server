@@ -23,8 +23,9 @@ import OriginalShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBi
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import mockAction from 'helpers/mocking/MockAction';
+import { createSearch } from 'fixtures/searches';
 
-const mockView = View.builder()
+const mockView = createSearch({ queryId: 'somequery' }).toBuilder()
   .type(View.Type.Dashboard)
   .id('view-id')
   .title('view title')
