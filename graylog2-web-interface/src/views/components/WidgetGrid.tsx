@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback, useContext, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { mapValues } from 'lodash';
 
 import type { WidgetPositions, BackendWidgetPosition } from 'views/types';
 import ReactGridContainer from 'components/common/ReactGridContainer';
@@ -27,11 +28,11 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import { useStore } from 'stores/connect';
 import { WidgetStore } from 'views/stores/WidgetStore';
-import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
+import { CurrentViewStateActions, CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import type { StoreState } from 'stores/StoreTypes';
-import { ViewStatesStore } from 'views/stores/ViewStatesStore';
+import type { ViewStatesStore } from 'views/stores/ViewStatesStore';
 import ElementDimensions from 'components/common/ElementDimensions';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import findGaps from 'views/components/GridGaps';
@@ -108,8 +109,9 @@ const mapWidgetPositions = (states: StoreState<typeof ViewStatesStore>) => Objec
 const mapWidgets = (state: StoreState<typeof WidgetStore>) => state.map(({ id, type }) => ({ id, type })).toArray();
 
 const useWidgetPositions = (): WidgetPositions => {
-  const initialPositions = useStore(ViewStatesStore, mapWidgetPositions);
-  const widgets = useStore(WidgetStore, mapWidgets);
+  const initialPositions = useStore(CurrentViewStateStore).state.widgetPositions;
+  const widgets = useStore(CurrentViewStateStore).state.widgets.map(({ id, type }) => ({ id, type })).toArray();
+  console.log({ initialPositions });
 
   return useMemo(() => generatePositions(widgets, initialPositions), [widgets, initialPositions]);
 };
@@ -170,10 +172,12 @@ const _onPositionsChange = (newPositions: Array<BackendWidgetPosition>, setLastU
 };
 
 const _onSyncLayout = (positions: WidgetPositions, newPositions: Array<BackendWidgetPosition>) => {
+  console.log('_onSyncLayout', { positions, newPositions });
   const { dirty: isDirty } = ViewStore.getInitialState();
   const widgetPositions = Object.fromEntries(newPositions.map((newPosition) => [newPosition.id, convertPosition(newPosition)]));
+  console.log({ positions, widgetPositions, P: mapValues(positions, (i) => i.toJSON()), PW: mapValues(widgetPositions, (i) => i.toJSON()), BOOL: !isDeepEqual(positions, widgetPositions) });
 
-  if (!isDeepEqual(positions, widgetPositions)) {
+  if (!isDeepEqual(mapValues(positions, (i) => i.toJSON()), mapValues(widgetPositions, (i) => i.toJSON()))) {
     CurrentViewStateActions.widgetPositions(widgetPositions)
       .then(() => ViewActions.setDirty(isDirty));
   }
@@ -214,13 +218,16 @@ const WidgetGrid = () => {
 
   const widgets = useStore(WidgetStore, (state) => state.map(({ id, type }) => ({ id, type })).toArray().reverse());
   const positions = useWidgetPositions();
-
+  console.log({ positions, widgets });
   const onPositionsChange = useCallback((newPositions: Array<BackendWidgetPosition>) => {
     preventDoubleUpdate.current = newPositions;
+    console.log('!!!!!!!!', { newPositions });
 
     return _onPositionsChange(newPositions, setLastUpdate);
   }, []);
   const onSyncLayout = useCallback((newPositions: Array<BackendWidgetPosition>) => {
+    console.log('!!onSyncLayout!!', { positions, newPositions });
+
     if (!isDeepEqual(preventDoubleUpdate.current, newPositions)) {
       _onSyncLayout(positions, newPositions);
     }
@@ -254,6 +261,8 @@ const WidgetGrid = () => {
 
   // Measuring the width is required to update the widget grid
   // when its content height results in a scrollbar
+  console.log({ newPositions });
+
   return (
     <DashboardWrap>
       {({ width }) => (

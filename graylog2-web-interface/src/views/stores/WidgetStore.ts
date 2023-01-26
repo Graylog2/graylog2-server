@@ -23,16 +23,18 @@ import type Widget from 'views/logic/widgets/Widget';
 import { singletonActions, singletonStore } from 'logic/singleton';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import generateId from 'logic/generateId';
+import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 
+const MAXIMUM_GRID_SIZE = 12;
 type WidgetId = string;
 
 export type Widgets = Immutable.OrderedMap<string, Widget>;
 
 type WidgetActionsType = RefluxActions<{
   create: (widget: Widget) => Promise<Widget>,
-  duplicate: (widgetId: WidgetId) => Promise<Widget>,
+  duplicate: (widgetId: WidgetId, position: WidgetPosition) => Promise<Widget>,
   filter: (widgetId: WidgetId, filter: string) => Promise<Widgets>,
   timerange: (widgetId: WidgetId, timerange: TimeRange) => Promise<Widgets>,
   query: (widgetId: WidgetId, queryString: QueryString) => Promise<Widgets>,
@@ -96,14 +98,14 @@ export const WidgetStore = singletonStore(
         throw new Error('Unable to add widget without id to query.');
       }
 
-      const newWidgets = this.widgets.set(widget.id, widget);
+      const newWidgets = Immutable.OrderedMap({ [widget.id]: widget }).concat(this.widgets);
       const promise = this._updateWidgets(newWidgets).then(() => widget);
 
       WidgetActions.create.promise(promise);
 
       return widget;
     },
-    duplicate(widgetId): Promise<Widget> {
+    duplicate(widgetId, position): Promise<Widget> {
       const widget = this.widgets.get(widgetId);
 
       if (!widget) {
@@ -111,8 +113,36 @@ export const WidgetStore = singletonStore(
       }
 
       const duplicatedWidget = widget.duplicate(generateId());
-      const newWidgets = this.widgets.set(duplicatedWidget.id, duplicatedWidget);
-      const promise = this._updateWidgets(newWidgets);
+      const newWidgets = this.widgets.reduce((res, cur) => {
+        let widgets = res.set(cur.id, cur);
+
+        if (cur.id === widgetId) {
+          widgets = widgets.set(duplicatedWidget.id, duplicatedWidget);
+        }
+
+        return widgets;
+      }, Immutable.OrderedMap());
+
+      // const newWidgets = this.widgets.set(duplicatedWidget.id, duplicatedWidget);
+      const spaceAfterWidget = MAXIMUM_GRID_SIZE - (position.col + position.width - 1);
+      const notEnoughSpace = spaceAfterWidget < position.width;
+      const duplicatedWidgetCol = notEnoughSpace ? position.col : position.col + position.width;
+      const duplicatedWidgetRow = notEnoughSpace ? position.row + 1 : position.row;
+
+      console.log({
+        notEnoughSpace,
+        duplicatedWidgetCol,
+        duplicatedWidgetRow,
+        newId: duplicatedWidget.id,
+        oldId: widgetId,
+        newWidgets,
+      });
+
+      const promise = this._updateWidgets(newWidgets, {
+        positions: {
+          [duplicatedWidget.id]: position.toBuilder().col(duplicatedWidgetCol).row(duplicatedWidgetRow).build(),
+        },
+      });
 
       WidgetActions.duplicate.promise(promise.then(() => duplicatedWidget));
 
@@ -181,10 +211,10 @@ export const WidgetStore = singletonStore(
 
       return newWidgets;
     },
-    _updateWidgets(newWidgets) {
+    _updateWidgets(newWidgets, additionalParams) {
       const widgets = newWidgets.valueSeq().toList();
 
-      return CurrentViewStateActions.widgets(widgets);
+      return CurrentViewStateActions.widgets(widgets, additionalParams);
     },
     _trigger() {
       this.trigger(this.widgets);
