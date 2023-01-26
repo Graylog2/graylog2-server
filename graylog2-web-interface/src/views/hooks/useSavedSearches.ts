@@ -58,7 +58,7 @@ const useSavedSearches = (searchParams: SearchParams): {
   isLoading: boolean,
 } => {
   const { data, refetch, isLoading } = useQuery(
-    ['searches', 'overview', searchParams],
+    ['saved-searches', 'overview', searchParams],
     () => fetchSavedSearches(searchParams),
     {
       onError: (errorThrown) => {
