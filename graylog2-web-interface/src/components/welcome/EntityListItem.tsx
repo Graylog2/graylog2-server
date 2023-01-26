@@ -23,10 +23,14 @@ import { ListGroupItem, Label } from 'components/bootstrap';
 import type { EntityItemType } from 'components/welcome/types';
 import getTitleForEntityType from 'util/getTitleForEntityType';
 import getShowRouteForEntity from 'routing/getShowRouteForEntity';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
+import getPermissionPrefixByType from 'util/getPermissionPrefixByType';
 
 const StyledListGroupItem = styled(ListGroupItem)`
   display: flex;
   gap: 16px;
+  align-items: flex-start;
 `;
 
 export const StyledLabel = styled(Label)`
@@ -42,13 +46,8 @@ type Props = {
 }
 
 const EntityItem = ({ type, title, id }: Props) => {
-  const entityTypeTitle = useMemo(() => {
-    try {
-      return getTitleForEntityType(type);
-    } catch (e) {
-      return 'unknown';
-    }
-  }, [type]);
+  const { permissions } = useCurrentUser();
+  const entityTypeTitle = useMemo(() => getTitleForEntityType(type, false) ?? 'unknown', [type]);
   const entityLink = useMemo(() => {
     try {
       return getShowRouteForEntity(id, type);
@@ -57,11 +56,12 @@ const EntityItem = ({ type, title, id }: Props) => {
     }
   }, [type, id]);
   const entityTitle = title || id;
+  const showLink = !!entityLink && isPermitted(permissions, `${getPermissionPrefixByType(type)}read:${id}`);
 
   return (
     <StyledListGroupItem>
       <StyledLabel bsStyle="info">{entityTypeTitle}</StyledLabel>
-      {!entityLink
+      {!showLink
         ? <i>{entityTitle}</i>
         : <Link target="_blank" to={entityLink}>{entityTitle}</Link>}
     </StyledListGroupItem>

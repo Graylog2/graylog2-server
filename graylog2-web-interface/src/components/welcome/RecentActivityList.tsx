@@ -26,17 +26,15 @@ import type { EntityItemType, RecentActivityType } from 'components/welcome/type
 import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
 import getShowRouteForEntity from 'routing/getShowRouteForEntity';
 import getTitleForEntityType from 'util/getTitleForEntityType';
+import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
+import getPermissionPrefixByType from 'util/getPermissionPrefixByType';
 
 type Props = { itemType: EntityItemType, itemId: string, activityType: RecentActivityType, itemTitle: string, userName?: string };
 
 const ActionItem = ({ itemType, itemId, activityType, itemTitle, userName }: Props) => {
-  const entityTypeTitle = useMemo(() => {
-    try {
-      return getTitleForEntityType(itemType);
-    } catch (e) {
-      return `(unsupported type ${itemType})`;
-    }
-  }, [itemType]);
+  const { permissions } = useCurrentUser();
+  const entityTypeTitle = useMemo(() => getTitleForEntityType(itemType, false) ?? `(unsupported type ${itemType})`, [itemType]);
   const entityLink = useMemo(() => {
     try {
       return getShowRouteForEntity(itemId, itemType);
@@ -45,11 +43,12 @@ const ActionItem = ({ itemType, itemId, activityType, itemTitle, userName }: Pro
     }
   }, [itemType, itemId]);
   const entityTitle = itemTitle || itemId;
+  const showLink = activityType !== 'delete' && !!entityLink && isPermitted(permissions, `${getPermissionPrefixByType(itemType)}read:${itemId}`);
 
   return (
     <div>
       {`The ${entityTypeTitle} `}
-      {activityType === 'delete' || !entityLink
+      {!showLink
         ? <i>{entityTitle}</i>
         : <Link target="_blank" to={entityLink}>{entityTitle}</Link>}
       {' was '}

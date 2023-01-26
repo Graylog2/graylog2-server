@@ -14,10 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import lowerCase from 'lodash/lowerCase';
 
 const assertUnreachable = (type: string): never => {
-  throw new Error(`Can't find title for type: ${type ?? '(undefined)'}`);
+  throw new Error(`Can't find prefix for type: ${type ?? '(undefined)'}`);
 };
 
 const supportedTypes = new Set([
@@ -34,10 +33,17 @@ const supportedTypes = new Set([
   'output',
 ]);
 
-const getTitleForEntityType = (type: string, throwErrorOnUnknown = true) => {
-  if (supportedTypes.has(type)) return lowerCase(type);
-
-  return throwErrorOnUnknown ? assertUnreachable(type) : undefined;
+const typePrefixCornerCasesMap = {
+  event_definition: 'eventdefinitions',
+  notification: 'eventnotifications',
+  search: 'view',
+  report: 'report',
 };
 
-export default getTitleForEntityType;
+const getPermissionPrefixByType = (type: string, throwErrorOnUnknown = true) => {
+  if (supportedTypes.has(type)) return typePrefixCornerCasesMap[type] ?? `${type}s`;
+
+  return throwErrorOnUnknown ? assertUnreachable(type) : `(unsupported type ${type})`;
+};
+
+export default getPermissionPrefixByType;
