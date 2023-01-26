@@ -29,9 +29,9 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
-class BulkRemoverTest {
+class BulkExecutorTest {
 
-    private final BulkRemover<Object, HasUser> toTest = (request, userContext, params) -> null;
+    private final BulkExecutor<Object, HasUser> toTest = (request, userContext, params) -> null;
 
     @Mock
     HasUser context;

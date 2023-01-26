@@ -50,10 +50,10 @@ import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.bulk.AuditParams;
-import org.graylog2.rest.bulk.BulkRemover;
-import org.graylog2.rest.bulk.SequentialBulkRemover;
-import org.graylog2.rest.bulk.model.BulkDeleteRequest;
-import org.graylog2.rest.bulk.model.BulkDeleteResponse;
+import org.graylog2.rest.bulk.BulkExecutor;
+import org.graylog2.rest.bulk.SequentialBulkExecutor;
+import org.graylog2.rest.bulk.model.BulkOperationRequest;
+import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
@@ -150,7 +150,7 @@ public class StreamResource extends RestResource {
     private final IndexSetRegistry indexSetRegistry;
     private final SearchQueryParser searchQueryParser;
     private final RecentActivityService recentActivityService;
-    private final BulkRemover<Stream, UserContext> bulkRemover;
+    private final BulkExecutor<Stream, UserContext> bulkExecutor;
 
     @Inject
     public StreamResource(StreamService streamService,
@@ -167,7 +167,7 @@ public class StreamResource extends RestResource {
         this.paginatedStreamService = paginatedStreamService;
         this.searchQueryParser = new SearchQueryParser(StreamImpl.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.recentActivityService = recentActivityService;
-        this.bulkRemover = new SequentialBulkRemover<>(this::delete,
+        this.bulkExecutor = new SequentialBulkExecutor<>(this::delete,
                 auditEventSender,
                 (entity, entityClass) ->
                         Map.of("response_entity",
@@ -385,16 +385,16 @@ public class StreamResource extends RestResource {
     @Path("/bulk_delete")
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
-    @ApiOperation(value = "Delete a bulk of streams", response = BulkDeleteResponse.class)
+    @ApiOperation(value = "Delete a bulk of streams", response = BulkOperationResponse.class)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Could not delete at least one of the streams in the bulk.")
     })
     @NoAuditEvent("Audit events triggered manually")
-    public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkDeleteRequest bulkDeleteRequest,
+    public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
                                @Context final UserContext userContext) {
 
-        final BulkDeleteResponse response = bulkRemover.bulkDelete(
-                bulkDeleteRequest,
+        final BulkOperationResponse response = bulkExecutor.executeBulkOperation(
+                bulkOperationRequest,
                 userContext,
                 new AuditParams(AuditEventTypes.STREAM_DELETE, "streamId", Stream.class));
 

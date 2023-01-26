@@ -47,10 +47,10 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.bulk.AuditParams;
-import org.graylog2.rest.bulk.BulkRemover;
-import org.graylog2.rest.bulk.SequentialBulkRemover;
-import org.graylog2.rest.bulk.model.BulkDeleteRequest;
-import org.graylog2.rest.bulk.model.BulkDeleteResponse;
+import org.graylog2.rest.bulk.BulkExecutor;
+import org.graylog2.rest.bulk.SequentialBulkExecutor;
+import org.graylog2.rest.bulk.model.BulkOperationRequest;
+import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
@@ -108,7 +108,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private final EventProcessorEngine engine;
     private final SearchQueryParser searchQueryParser;
     private final RecentActivityService recentActivityService;
-    private final BulkRemover<EventDefinitionDto, UserContext> bulkRemover;
+    private final BulkExecutor<EventDefinitionDto, UserContext> bulkExecutor;
 
     @Inject
     public EventDefinitionsResource(DBEventDefinitionService dbService,
@@ -125,7 +125,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         this.engine = engine;
         this.searchQueryParser = new SearchQueryParser(EventDefinitionDto.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.recentActivityService = recentActivityService;
-        this.bulkRemover = new SequentialBulkRemover<>(this::delete, auditEventSender, objectMapper);
+        this.bulkExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
     }
 
     @GET
@@ -231,15 +231,15 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Path("/bulk_delete")
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
-    @ApiOperation(value = "Delete a bulk of event definitions", response = BulkDeleteResponse.class)
+    @ApiOperation(value = "Delete a bulk of event definitions", response = BulkOperationResponse.class)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Could not delete at least one of the event definitions in the bulk.")
     })
     @NoAuditEvent("Audit events triggered manually")
-    public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkDeleteRequest bulkDeleteRequest,
+    public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
                                @Context UserContext userContext) {
 
-        final BulkDeleteResponse response = bulkRemover.bulkDelete(bulkDeleteRequest,
+        final BulkOperationResponse response = bulkExecutor.executeBulkOperation(bulkOperationRequest,
                 userContext,
                 new AuditParams(EventsAuditEventTypes.EVENT_DEFINITION_DELETE, "definitionId", EventDefinitionDto.class));
 

@@ -55,10 +55,10 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.bulk.AuditParams;
-import org.graylog2.rest.bulk.BulkRemover;
-import org.graylog2.rest.bulk.SequentialBulkRemover;
-import org.graylog2.rest.bulk.model.BulkDeleteRequest;
-import org.graylog2.rest.bulk.model.BulkDeleteResponse;
+import org.graylog2.rest.bulk.BulkExecutor;
+import org.graylog2.rest.bulk.SequentialBulkExecutor;
+import org.graylog2.rest.bulk.model.BulkOperationRequest;
+import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
@@ -116,7 +116,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final ReferencedSearchFiltersHelper referencedSearchFiltersHelper;
     private final StartPageService startPageService;
     private final RecentActivityService recentActivityService;
-    private final BulkRemover<ViewDTO, SearchUser> bulkRemover;
+    private final BulkExecutor<ViewDTO, SearchUser> bulkExecutor;
 
     @Inject
     public ViewsResource(ViewService dbService,
@@ -137,7 +137,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.searchFilterVisibilityChecker = searchFilterVisibilityChecker;
         this.referencedSearchFiltersHelper = referencedSearchFiltersHelper;
-        this.bulkRemover = new SequentialBulkRemover<>(this::delete, auditEventSender, objectMapper);
+        this.bulkExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
 
 
     }
@@ -385,15 +385,15 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Path("/bulk_delete")
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
-    @ApiOperation(value = "Delete a bulk of views", response = BulkDeleteResponse.class)
+    @ApiOperation(value = "Delete a bulk of views", response = BulkOperationResponse.class)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Could not delete at least one of the views in the bulk.")
     })
     @NoAuditEvent("Audit events triggered manually")
-    public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkDeleteRequest bulkDeleteRequest,
+    public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
                                @Context final SearchUser searchUser) {
 
-        final BulkDeleteResponse response = bulkRemover.bulkDelete(bulkDeleteRequest,
+        final BulkOperationResponse response = bulkExecutor.executeBulkOperation(bulkOperationRequest,
                 searchUser,
                 new AuditParams(ViewsAuditEventTypes.VIEW_DELETE, "id", ViewDTO.class));
 

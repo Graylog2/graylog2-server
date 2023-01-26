@@ -23,9 +23,9 @@ import org.graylog2.audit.jersey.FailureContextCreator;
 import org.graylog2.audit.jersey.SuccessContextCreator;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.rest.bulk.model.BulkDeleteRequest;
-import org.graylog2.rest.bulk.model.BulkDeleteResponse;
 import org.graylog2.rest.bulk.model.BulkOperationFailure;
+import org.graylog2.rest.bulk.model.BulkOperationRequest;
+import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +35,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.rest.bulk.SequentialBulkRemover.NO_ENTITY_IDS_FAILURE;
+import static org.graylog2.rest.bulk.SequentialBulkExecutor.NO_ENTITY_IDS_FAILURE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -47,11 +47,11 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @ExtendWith(MockitoExtension.class)
-class SequentialBulkRemoverTest {
+class SequentialBulkExecutorTest {
 
-    private SequentialBulkRemover<Object, HasUser> toTest;
+    private SequentialBulkExecutor<Object, HasUser> toTest;
     @Mock
-    private SingleEntityRemover<Object, HasUser> singleEntityRemover;
+    private SingleEntityOperationExecutor<Object, HasUser> singleEntityOperationExecutor;
     @Mock
     private HasUser context;
     @Mock
@@ -70,15 +70,15 @@ class SequentialBulkRemoverTest {
 
     @BeforeEach
     void setUp() {
-        toTest = new SequentialBulkRemover<>(singleEntityRemover, auditEventSender, successAuditLogContextCreator, failureAuditLogContextCreator);
+        toTest = new SequentialBulkExecutor<>(singleEntityOperationExecutor, auditEventSender, successAuditLogContextCreator, failureAuditLogContextCreator);
     }
 
     @Test
     void returnsProperFailureMsgOnNullEntityIdsList() {
-        final BulkDeleteResponse bulkDeleteResponse = toTest.bulkDelete(new BulkDeleteRequest(null), context, params);
-        assertThat(bulkDeleteResponse.successfullyRemoved()).isEqualTo(0);
-        assertThat(bulkDeleteResponse.failures()).containsOnly(NO_ENTITY_IDS_FAILURE);
-        verifyNoInteractions(singleEntityRemover);
+        final BulkOperationResponse bulkOperationResponse = toTest.executeBulkOperation(new BulkOperationRequest(null), context, params);
+        assertThat(bulkOperationResponse.successfullyPerformed()).isEqualTo(0);
+        assertThat(bulkOperationResponse.failures()).containsOnly(NO_ENTITY_IDS_FAILURE);
+        verifyNoInteractions(singleEntityOperationExecutor);
         verifyNoInteractions(auditEventSender);
         verifyNoInteractions(successAuditLogContextCreator);
         verifyNoInteractions(failureAuditLogContextCreator);
@@ -86,10 +86,10 @@ class SequentialBulkRemoverTest {
 
     @Test
     void returnsProperFailureMsgOnEmptyEntityIdsList() {
-        final BulkDeleteResponse bulkDeleteResponse = toTest.bulkDelete(new BulkDeleteRequest(List.of()), context, params);
-        assertThat(bulkDeleteResponse.successfullyRemoved()).isEqualTo(0);
-        assertThat(bulkDeleteResponse.failures()).containsOnly(NO_ENTITY_IDS_FAILURE);
-        verifyNoInteractions(singleEntityRemover);
+        final BulkOperationResponse bulkOperationResponse = toTest.executeBulkOperation(new BulkOperationRequest(List.of()), context, params);
+        assertThat(bulkOperationResponse.successfullyPerformed()).isEqualTo(0);
+        assertThat(bulkOperationResponse.failures()).containsOnly(NO_ENTITY_IDS_FAILURE);
+        verifyNoInteractions(singleEntityOperationExecutor);
         verifyNoInteractions(auditEventSender);
         verifyNoInteractions(successAuditLogContextCreator);
         verifyNoInteractions(failureAuditLogContextCreator);
@@ -99,18 +99,18 @@ class SequentialBulkRemoverTest {
     void returnsProperResponseOnSuccessfulBulkRemoval() throws Exception {
         mockUserContext();
         Object entity1 = new Object();
-        doReturn(entity1).when(singleEntityRemover).remove("1", context);
+        doReturn(entity1).when(singleEntityOperationExecutor).execute("1", context);
         Object entity2 = new Object();
-        doReturn(entity2).when(singleEntityRemover).remove("2", context);
+        doReturn(entity2).when(singleEntityOperationExecutor).execute("2", context);
         Object entity3 = new Object();
-        doReturn(entity3).when(singleEntityRemover).remove("3", context);
-        final BulkDeleteResponse bulkDeleteResponse = toTest.bulkDelete(new BulkDeleteRequest(List.of("1", "2", "3")), context, params);
-        assertThat(bulkDeleteResponse.successfullyRemoved()).isEqualTo(3);
-        assertThat(bulkDeleteResponse.failures()).isEmpty();
-        verify(singleEntityRemover).remove("1", context);
-        verify(singleEntityRemover).remove("2", context);
-        verify(singleEntityRemover).remove("3", context);
-        verifyNoMoreInteractions(singleEntityRemover);
+        doReturn(entity3).when(singleEntityOperationExecutor).execute("3", context);
+        final BulkOperationResponse bulkOperationResponse = toTest.executeBulkOperation(new BulkOperationRequest(List.of("1", "2", "3")), context, params);
+        assertThat(bulkOperationResponse.successfullyPerformed()).isEqualTo(3);
+        assertThat(bulkOperationResponse.failures()).isEmpty();
+        verify(singleEntityOperationExecutor).execute("1", context);
+        verify(singleEntityOperationExecutor).execute("2", context);
+        verify(singleEntityOperationExecutor).execute("3", context);
+        verifyNoMoreInteractions(singleEntityOperationExecutor);
         verify(auditEventSender, times(3)).success(any(), eq(eventType), any());
         verifyNoInteractions(failureAuditLogContextCreator);
         verify(successAuditLogContextCreator).create(entity1, Object.class);
@@ -120,22 +120,36 @@ class SequentialBulkRemoverTest {
     }
 
     @Test
+    void doesNotCreateAuditLogIfAuditParamsAreNull() throws Exception {
+        final BulkOperationResponse bulkOperationResponse = toTest.executeBulkOperation(new BulkOperationRequest(List.of("1", "2", "3")), context, null);
+        assertThat(bulkOperationResponse.successfullyPerformed()).isEqualTo(3);
+        assertThat(bulkOperationResponse.failures()).isEmpty();
+        verify(singleEntityOperationExecutor).execute("1", context);
+        verify(singleEntityOperationExecutor).execute("2", context);
+        verify(singleEntityOperationExecutor).execute("3", context);
+        verifyNoMoreInteractions(singleEntityOperationExecutor);
+        verifyNoInteractions(auditEventSender);
+        verifyNoInteractions(failureAuditLogContextCreator);
+        verifyNoInteractions(successAuditLogContextCreator);
+    }
+
+    @Test
     void returnsProperResponseOnFailedBulkRemoval() throws Exception {
         mockUserContext();
-        doThrow(new NotFoundException("!?!?")).when(singleEntityRemover).remove(any(), eq(context));
-        final BulkDeleteResponse bulkDeleteResponse = toTest.bulkDelete(new BulkDeleteRequest(List.of("no", "good", "ids")), context, params);
-        assertThat(bulkDeleteResponse.successfullyRemoved()).isEqualTo(0);
-        assertThat(bulkDeleteResponse.failures())
+        doThrow(new NotFoundException("!?!?")).when(singleEntityOperationExecutor).execute(any(), eq(context));
+        final BulkOperationResponse bulkOperationResponse = toTest.executeBulkOperation(new BulkOperationRequest(List.of("no", "good", "ids")), context, params);
+        assertThat(bulkOperationResponse.successfullyPerformed()).isEqualTo(0);
+        assertThat(bulkOperationResponse.failures())
                 .hasSize(3)
                 .containsExactly(
                         new BulkOperationFailure("no", "!?!?"),
                         new BulkOperationFailure("good", "!?!?"),
                         new BulkOperationFailure("ids", "!?!?")
                 );
-        verify(singleEntityRemover).remove("no", context);
-        verify(singleEntityRemover).remove("good", context);
-        verify(singleEntityRemover).remove("ids", context);
-        verifyNoMoreInteractions(singleEntityRemover);
+        verify(singleEntityOperationExecutor).execute("no", context);
+        verify(singleEntityOperationExecutor).execute("good", context);
+        verify(singleEntityOperationExecutor).execute("ids", context);
+        verifyNoMoreInteractions(singleEntityOperationExecutor);
         verifyNoInteractions(successAuditLogContextCreator);
 
         verify(failureAuditLogContextCreator).create(entityIdInPathParam, "no");
@@ -149,18 +163,18 @@ class SequentialBulkRemoverTest {
     @Test
     void returnsProperResponseOnPartiallySuccessfulBulkRemoval() throws Exception {
         mockUserContext();
-        doThrow(new MongoException("MongoDB is striking against increasing retirement age")).when(singleEntityRemover).remove(eq("1"), eq(context));
-        final BulkDeleteResponse bulkDeleteResponse = toTest.bulkDelete(new BulkDeleteRequest(List.of("1", "2", "3")), context, params);
-        assertThat(bulkDeleteResponse.successfullyRemoved()).isEqualTo(2);
-        assertThat(bulkDeleteResponse.failures())
+        doThrow(new MongoException("MongoDB is striking against increasing retirement age")).when(singleEntityOperationExecutor).execute(eq("1"), eq(context));
+        final BulkOperationResponse bulkOperationResponse = toTest.executeBulkOperation(new BulkOperationRequest(List.of("1", "2", "3")), context, params);
+        assertThat(bulkOperationResponse.successfullyPerformed()).isEqualTo(2);
+        assertThat(bulkOperationResponse.failures())
                 .hasSize(1)
                 .containsExactly(
                         new BulkOperationFailure("1", "MongoDB is striking against increasing retirement age")
                 );
-        verify(singleEntityRemover).remove("1", context);
-        verify(singleEntityRemover).remove("2", context);
-        verify(singleEntityRemover).remove("3", context);
-        verifyNoMoreInteractions(singleEntityRemover);
+        verify(singleEntityOperationExecutor).execute("1", context);
+        verify(singleEntityOperationExecutor).execute("2", context);
+        verify(singleEntityOperationExecutor).execute("3", context);
+        verifyNoMoreInteractions(singleEntityOperationExecutor);
 
         verify(auditEventSender, times(1)).failure(any(), eq(eventType), any());
         verify(auditEventSender, times(2)).success(any(), eq(eventType), any());
@@ -171,11 +185,11 @@ class SequentialBulkRemoverTest {
     void exceptionInAuditLogStoringDoesNotInfluenceResponse() throws Exception {
         mockUserContext();
         doThrow(new MongoException("MongoDB audit_log collection became anti-collection when bombed by Bozon particles")).when(auditEventSender).success(any(), anyString(), any());
-        final BulkDeleteResponse bulkDeleteResponse = toTest.bulkDelete(new BulkDeleteRequest(List.of("1")), context, params);
-        assertThat(bulkDeleteResponse.successfullyRemoved()).isEqualTo(1);
-        assertThat(bulkDeleteResponse.failures()).isEmpty();
-        verify(singleEntityRemover).remove("1", context);
-        verifyNoMoreInteractions(singleEntityRemover);
+        final BulkOperationResponse bulkOperationResponse = toTest.executeBulkOperation(new BulkOperationRequest(List.of("1")), context, params);
+        assertThat(bulkOperationResponse.successfullyPerformed()).isEqualTo(1);
+        assertThat(bulkOperationResponse.failures()).isEmpty();
+        verify(singleEntityOperationExecutor).execute("1", context);
+        verifyNoMoreInteractions(singleEntityOperationExecutor);
     }
 
     private void mockUserContext() {

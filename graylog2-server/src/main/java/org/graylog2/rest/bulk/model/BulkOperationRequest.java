@@ -14,13 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.bulk;
+package org.graylog2.rest.bulk.model;
 
-import org.graylog.security.HasUser;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@FunctionalInterface
-public interface SingleEntityRemover<T, C extends HasUser> {
+import java.util.List;
 
-    T remove(final String entityId, final C userContext) throws Exception;
-
+public record BulkOperationRequest(@JsonProperty("entity_ids") List<String> entityIds) {
 }

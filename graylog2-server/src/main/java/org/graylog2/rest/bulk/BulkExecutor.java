@@ -19,12 +19,12 @@ package org.graylog2.rest.bulk;
 import org.graylog.security.HasUser;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.rest.bulk.model.BulkDeleteRequest;
-import org.graylog2.rest.bulk.model.BulkDeleteResponse;
+import org.graylog2.rest.bulk.model.BulkOperationRequest;
+import org.graylog2.rest.bulk.model.BulkOperationResponse;
 
-public interface BulkRemover<T, C extends HasUser> {
+public interface BulkExecutor<T, C extends HasUser> {
 
-    BulkDeleteResponse bulkDelete(final BulkDeleteRequest request, final C userContext, final AuditParams params);
+    BulkOperationResponse executeBulkOperation(final BulkOperationRequest request, final C userContext, final AuditParams params);
 
     default String getUserName(final C userContext) {
         final User user = userContext.getUser();

@@ -20,6 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public record BulkDeleteResponse(@JsonProperty("successfully_removed") int successfullyRemoved,
-                                 @JsonProperty("failures") List<BulkOperationFailure> failures) {
+public record BulkOperationResponse(@JsonProperty("successfully_performed") int successfullyPerformed,
+                                    @JsonProperty("failures") List<BulkOperationFailure> failures) {
 }
