@@ -38,11 +38,11 @@
               {
                 "type" : "values",
                 "field" : "action",
-                "limit" : 10
               }
             ],
             "column_groups" : [],
-            "filters" : []
+            "filters" : [],
+            "row_limit": 10
           }
         ]
       }

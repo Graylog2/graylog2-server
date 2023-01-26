@@ -55,8 +55,6 @@ import static com.google.common.collect.ImmutableList.of;
 @JsonDeserialize(builder = Pivot.Builder.class)
 public abstract class Pivot implements SearchType {
     public static final String NAME = "pivot";
-    private static final String FIELD_ROW_LIMIT = "row_limit";
-    private static final String FIELD_COLUMN_LIMIT = "column_limit";
 
     @Override
     public abstract String type();
@@ -92,36 +90,6 @@ public abstract class Pivot implements SearchType {
     @Override
     @JsonProperty(FIELD_SEARCH_FILTERS)
     public abstract List<UsedSearchFilter> filters();
-
-    @JsonProperty(FIELD_ROW_LIMIT)
-    public Optional<Integer> rowLimit() {
-        return optionalRowLimit()
-                .or(() -> rowGroups().stream()
-                        .filter(group -> group instanceof Values)
-                        .map(group -> (Values)group)
-                        .map(values -> Optional.ofNullable(values.limit()))
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .max(Integer::compare));
-    }
-
-    @JsonIgnore
-    abstract Optional<Integer> optionalRowLimit();
-
-    @JsonProperty(FIELD_COLUMN_LIMIT)
-    public Optional<Integer> columnLimit() {
-        return optionalColumnLimit()
-                .or(() -> columnGroups().stream()
-                        .filter(group -> group instanceof Values)
-                        .map(group -> (Values)group)
-                        .map(values -> Optional.ofNullable(values.limit()))
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .max(Integer::compare));
-    }
-
-    @JsonIgnore
-    abstract Optional<Integer> optionalColumnLimit();
 
     public abstract Builder toBuilder();
 
@@ -213,12 +181,6 @@ public abstract class Pivot implements SearchType {
         @JsonProperty(FIELD_SEARCH_FILTERS)
         public abstract Builder filters(List<UsedSearchFilter> filters);
 
-        @JsonProperty(FIELD_ROW_LIMIT)
-        public abstract Builder optionalRowLimit(@Nullable Integer limit);
-
-        @JsonProperty(FIELD_COLUMN_LIMIT)
-        public abstract Builder optionalColumnLimit(@Nullable Integer limit);
-
         @JsonProperty
         @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = false)
         @JsonSubTypes({
@@ -264,8 +226,6 @@ public abstract class Pivot implements SearchType {
                 .rollup(rollup())
                 .series(series())
                 .type(type());
-        builder = rowLimit().map(builder::rowLimit).orElse(builder);
-        builder = columnLimit().map(builder::columnLimit).orElse(builder);
         return builder.build();
     }
 }

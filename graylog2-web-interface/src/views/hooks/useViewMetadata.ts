@@ -14,13 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.elasticsearch7.views.searchtypes.pivot;
+import { useStore } from 'stores/connect';
+import type { ViewStoreState } from 'views/stores/ViewStore';
+import { ViewStore } from 'views/stores/ViewStore';
 
-import com.google.common.collect.ImmutableList;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
+const mapViewMetadata = ({ activeQuery, view }: ViewStoreState) => {
+  if (view) {
+    const { id, title, description, summary } = view;
 
-public record PivotBucket(ImmutableList<String> keys, MultiBucketsAggregation.Bucket bucket, boolean isMissingBucket) {
-    public static PivotBucket create(ImmutableList<String> keys, MultiBucketsAggregation.Bucket bucket, boolean isMissingBucket) {
-        return new PivotBucket(keys, bucket, isMissingBucket);
-    }
-}
+    return { id, title, description, summary, activeQuery };
+  }
+
+  return {};
+};
+
+const useViewMetadata = () => useStore(ViewStore, mapViewMetadata);
+
+export default useViewMetadata;

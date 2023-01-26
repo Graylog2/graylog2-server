@@ -28,31 +28,27 @@ import java.util.function.Function;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ValuesBucketOrderingTest {
-    private final Values fooPivot = Values.builder().field("foo").build();
-    private final Values barPivot = Values.builder().field("bar").build();
-    private final Values bazPivot = Values.builder().field("baz").build();
-
     @Test
     void staysInSameOrderIfNoPivotIsUsedForSort() {
-        final List<Values> orderedBuckets = ValuesBucketOrdering.orderBuckets(List.of(fooPivot, barPivot, bazPivot), Collections.emptyList());
+        final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(List.of("foo", "bar", "baz"), Collections.emptyList());
 
-        assertThat(orderedBuckets).containsExactly(fooPivot, barPivot, bazPivot);
+        assertThat(orderedBuckets).containsExactly("foo", "bar", "baz");
     }
 
     @Test
     void staysInSameOrderIfNoPivotSortsAreUsedForSort() {
-        final List<Values> orderedBuckets = ValuesBucketOrdering.orderBuckets(List.of(fooPivot, barPivot, bazPivot), List.of(SeriesSort.create("max(took_ms)", SortSpec.Direction.Descending)));
+        final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(List.of("foo", "bar", "baz"), List.of(SeriesSort.create("max(took_ms)", SortSpec.Direction.Descending)));
 
-        assertThat(orderedBuckets).containsExactly(fooPivot, barPivot, bazPivot);
+        assertThat(orderedBuckets).containsExactly("foo", "bar", "baz");
     }
 
     @Test
     void pivotUsedForSortIsPulledToTop() {
         final List<SortSpec> pivotSorts = List.of(PivotSort.create("baz", SortSpec.Direction.Descending));
 
-        final List<Values> orderedBuckets = ValuesBucketOrdering.orderBuckets(List.of(fooPivot, barPivot, bazPivot), pivotSorts);
+        final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(List.of("foo", "bar", "baz"), pivotSorts);
 
-        assertThat(orderedBuckets).containsExactly(bazPivot, fooPivot, barPivot);
+        assertThat(orderedBuckets).containsExactly("baz", "foo", "bar");
     }
 
     @Test
@@ -62,14 +58,14 @@ class ValuesBucketOrderingTest {
                 PivotSort.create("bar", SortSpec.Direction.Ascending)
         );
 
-        final List<Values> orderedBuckets = ValuesBucketOrdering.orderBuckets(List.of(fooPivot, barPivot, bazPivot), pivotSorts);
+        final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(List.of("foo", "bar", "baz"), pivotSorts);
 
-        assertThat(orderedBuckets).containsExactly(bazPivot, barPivot, fooPivot);
+        assertThat(orderedBuckets).containsExactly("baz", "bar", "foo");
     }
 
     @Test
     void reordersKeysBasedOnSortConfiguration() {
-        final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderKeysFunction(List.of(fooPivot, barPivot, bazPivot), List.of(
+        final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderFieldsFunction(List.of("foo", "bar", "baz"), List.of(
                 PivotSort.create("baz", SortSpec.Direction.Descending),
                 PivotSort.create("bar", SortSpec.Direction.Ascending)
         ));
@@ -79,7 +75,7 @@ class ValuesBucketOrderingTest {
 
     @Test
     void reorderKeysFunctionDoesNotDoAnythingIfNoSortsSpecified() {
-        final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderKeysFunction(List.of(fooPivot, barPivot, bazPivot), List.of());
+        final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderFieldsFunction(List.of("foo", "bar", "baz"), List.of());
 
         assertThat(reorderKeys.apply(List.of("baz", "bar", "foo"))).containsExactly("baz", "bar", "foo");
     }

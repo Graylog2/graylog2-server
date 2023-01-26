@@ -36,14 +36,13 @@ public class ValuesBucketOrdering {
         return sorts.stream().anyMatch(ValuesBucketOrdering::isGroupingSort);
     }
 
-    private static boolean needsReordering(List<? extends BucketSpec> bucketSpec, List<SortSpec> sorts) {
-        return bucketSpec.size() >= 2 && !sorts.isEmpty() && hasGroupingSort(sorts);
+    private static boolean needsReorderingFields(List<String> fields, List<SortSpec> sorts) {
+        return fields.size() >= 2 && !sorts.isEmpty() && hasGroupingSort(sorts);
     }
 
-    @VisibleForTesting
-    public static <T extends BucketSpec> List<T> orderBuckets(List<T> bucketSpec, List<SortSpec> sorts) {
-        if (!needsReordering(bucketSpec, sorts)) {
-            return bucketSpec;
+    public static List<String> orderFields(List<String> fields, List<SortSpec> sorts) {
+        if (!needsReorderingFields(fields, sorts)) {
+            return fields;
         }
 
         final List<String> sortFields = sorts.stream()
@@ -51,22 +50,22 @@ public class ValuesBucketOrdering {
                 .map(SortSpec::field)
                 .collect(Collectors.toList());
 
-        return bucketSpec.stream()
-                .sorted(new ValuesBucketComparator<>(sortFields))
+        return fields.stream()
+                .sorted(new FieldsSortingComparator(sortFields))
                 .collect(Collectors.toList());
     }
 
-    public static Function<List<String>, List<String>> reorderKeysFunction(List<BucketSpec> bucketSpecs, List<SortSpec> sorts) {
-        if (!needsReordering(bucketSpecs, sorts)) {
+    public static Function<List<String>, List<String>> reorderFieldsFunction(List<String> fields, List<SortSpec> sorts) {
+        if (!needsReorderingFields(fields, sorts)) {
             return Function.identity();
         }
 
-        final List<BucketSpec> orderedBuckets = orderBuckets(bucketSpecs, sorts);
-        final Map<Integer, Integer> mapping = IntStream.range(0, bucketSpecs.size())
+        final List<String> orderedBuckets = orderFields(fields, sorts);
+        final Map<Integer, Integer> mapping = IntStream.range(0, fields.size())
                 .boxed()
-                .collect(Collectors.toMap(Function.identity(), i -> orderedBuckets.indexOf(bucketSpecs.get(i))));
+                .collect(Collectors.toMap(Function.identity(), i -> orderedBuckets.indexOf(fields.get(i))));
 
-        return (keys) -> IntStream.range(0, bucketSpecs.size())
+        return (keys) -> IntStream.range(0, fields.size())
                 .boxed()
                 .map(i -> keys.get(mapping.get(i)))
                 .collect(Collectors.toList());

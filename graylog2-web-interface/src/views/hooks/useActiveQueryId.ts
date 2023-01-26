@@ -14,13 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.elasticsearch7.views.searchtypes.pivot;
+import useViewMetadata from 'views/hooks/useViewMetadata';
 
-import com.google.common.collect.ImmutableList;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
+const useActiveQueryId = () => {
+  const { activeQuery } = useViewMetadata();
 
-public record PivotBucket(ImmutableList<String> keys, MultiBucketsAggregation.Bucket bucket, boolean isMissingBucket) {
-    public static PivotBucket create(ImmutableList<String> keys, MultiBucketsAggregation.Bucket bucket, boolean isMissingBucket) {
-        return new PivotBucket(keys, bucket, isMissingBucket);
-    }
-}
+  return activeQuery;
+};
+
+export default useActiveQueryId;
