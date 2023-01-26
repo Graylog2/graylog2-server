@@ -20,16 +20,16 @@ import { useMemo, useState, useCallback, useRef } from 'react';
 import type * as Immutable from 'immutable';
 import { merge } from 'lodash';
 
-import { Button, Table, ButtonToolbar } from 'components/bootstrap';
+import { Table } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
-import StringUtils from 'util/StringUtils';
 import ColumnsVisibilitySelect from 'components/common/EntityDataTable/ColumnsVisibilitySelect';
 import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
 import { CELL_PADDING, BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import useColumnsWidths from 'components/common/EntityDataTable/hooks/useColumnsWidths';
 import useElementDimensions from 'hooks/useElementDimensions';
 import type { Sort } from 'stores/PaginationTypes';
+import BulkActions from 'components/common/EntityDataTable/BulkActions';
 
 import TableHead from './TableHead';
 import TableRow from './TableRow';
@@ -53,15 +53,6 @@ const ActionsRow = styled.div`
   justify-content: space-between;
   margin-bottom: 10px;
   min-height: 22px;
-`;
-
-const BulkActionsWrapper = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const BulkActions = styled(ButtonToolbar)`
-  margin-left: 5px;
 `;
 
 const filterAccessibleColumns = (
@@ -113,7 +104,7 @@ const useElementsWidths = <Entity extends EntityBase>({
 type Props<Entity extends EntityBase> = {
   /** Currently active sort */
   activeSort?: Sort,
-  /** Supported batch operations */
+  /** Supported bulk actions */
   bulkActions?: (selectedEntities: Array<string>, setSelectedEntities: (streamIds: Array<string>) => void) => React.ReactNode
   /** List of all available columns. */
   columnDefinitions: Array<Column>,
@@ -180,20 +171,14 @@ const EntityDataTable = <Entity extends EntityBase>({
     }));
   }, []);
 
-  const unselectAllItems = useCallback(() => setSelectedEntities([]), []);
-
   return (
     <>
       <ActionsRow>
         <div>
-          {(displayBulkSelectCol && !!selectedEntities?.length) && (
-            <BulkActionsWrapper>
-              {selectedEntities.length} {StringUtils.pluralize(selectedEntities.length, 'item', 'items')} selected
-              <BulkActions>
-                {bulkActions(selectedEntities, setSelectedEntities)}
-                <Button bsSize="xsmall" onClick={unselectAllItems}>Cancel</Button>
-              </BulkActions>
-            </BulkActionsWrapper>
+          {displayBulkSelectCol && (
+            <BulkActions bulkActions={bulkActions}
+                         selectedEntities={selectedEntities}
+                         setSelectedEntities={setSelectedEntities} />
           )}
         </div>
         <div>

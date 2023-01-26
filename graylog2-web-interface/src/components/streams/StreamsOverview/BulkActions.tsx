@@ -19,9 +19,9 @@ import { uniq } from 'lodash';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { Formik, Form } from 'formik';
-import { Streams } from '@graylog/server-api';
 
-import { Button, Modal } from 'components/bootstrap';
+import { Streams } from '@graylog/server-api';
+import { Modal } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -31,6 +31,7 @@ import UserNotification from 'util/UserNotification';
 import ModalSubmit from 'components/common/ModalSubmit';
 import IfPermitted from 'components/common/IfPermitted';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import MenuItem from 'components/bootstrap/MenuItem';
 
 import IndexSetSelect from '../IndexSetSelect';
 
@@ -154,9 +155,9 @@ const BulkActions = ({ selectedStreamIds, refetchStreams, setSelectedStreamIds, 
   return (
     <>
       <IfPermitted permissions="indexsets:read">
-        <Button bsSize="xsmall" bsStyle="info" onClick={toggleAssignIndexSetModal}>Assign index set</Button>
+        <MenuItem onClick={toggleAssignIndexSetModal}>Assign index set</MenuItem>
       </IfPermitted>
-      <Button bsSize="xsmall" bsStyle="danger" onClick={onDelete}>Delete</Button>
+      <MenuItem onClick={onDelete}>Delete</MenuItem>
       {showIndexSetModal && (
         <AssignIndexSetModal selectedStreamIds={selectedStreamIds}
                              setSelectedStreamIds={setSelectedStreamIds}
