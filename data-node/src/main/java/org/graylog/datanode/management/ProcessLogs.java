@@ -16,31 +16,9 @@
  */
 package org.graylog.datanode.management;
 
-import org.graylog.datanode.process.ProcessEvent;
-import org.graylog.datanode.process.ProcessInfo;
-import org.graylog.datanode.process.ProcessState;
-import org.opensearch.client.RestHighLevelClient;
+import java.util.List;
 
-import java.io.IOException;
-import java.util.Optional;
-
-public interface OpensearchProcess {
-    boolean isInState(ProcessState state);
-
-    void start() throws IOException;
-    void stop();
-
-    Optional<ProcessLogs> processLogs();
-
-    void onEvent(ProcessEvent event);
-
-    ProcessInfo processInfo();
-
-    RestHighLevelClient restClient();
-
-    Object nodeName();
-
-    void setLeaderNode(boolean isManagerNode);
-
-    String opensearchVersion();
+public interface ProcessLogs {
+    List<String> stdOut();
+    List<String> stdErr();
 }

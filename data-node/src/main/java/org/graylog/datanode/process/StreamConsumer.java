@@ -17,6 +17,8 @@
 package org.graylog.datanode.process;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -32,6 +34,16 @@ public class StreamConsumer implements Runnable {
     }
 
     public void run() {
-        new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8)).lines().forEach(consumeInputLine);
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
+            String line;
+            // the readLine blocks till the underlying stream either produces some data or terminates
+            // there is no clean way how to interrupt this waiting thread
+            while ((line = br.readLine()) != null) {
+                consumeInputLine.accept(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

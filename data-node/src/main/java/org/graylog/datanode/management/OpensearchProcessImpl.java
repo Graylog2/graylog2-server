@@ -17,6 +17,7 @@
 package org.graylog.datanode.management;
 
 import com.github.oxo42.stateless4j.StateMachine;
+import org.apache.commons.exec.ExecuteException;
 import org.apache.http.HttpHost;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.ProcessEvent;
@@ -29,29 +30,35 @@ import org.opensearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-class OpensearchProcessImpl extends AbstractCommandLineProcess {
+class OpensearchProcessImpl implements OpensearchProcess, ProcessListener  {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessService.class);
     private final OpensearchConfiguration configuration;
-    private int logsSize;
-
     private final RestHighLevelClient restClient;
 
     private final StateMachine<ProcessState, ProcessEvent> processState;
     private boolean isLeaderNode;
+    private final CommandLineProcess commandLineProcess;
 
     public OpensearchProcessImpl(OpensearchConfiguration configuration, int logsSize) {
         this.configuration = configuration;
-        this.logsSize = logsSize;
         RestClientBuilder builder = RestClient.builder(new HttpHost("localhost", configuration.httpPort(), "http"));
         this.restClient = new RestHighLevelClient(builder);
         this.processState = ProcessStateMachine.createNew();
+
+        final Path executable = configuration.opensearchDir().resolve(Paths.get("bin", "opensearch"));
+
+        final List<String> arguments = configuration.asMap().entrySet().stream()
+                .map(it -> String.format(Locale.ROOT, "-E%s=%s", it.getKey(), it.getValue())).toList();
+        commandLineProcess = new CommandLineProcess(executable, arguments, logsSize, this);
     }
 
     public String opensearchVersion() {
@@ -79,6 +86,10 @@ class OpensearchProcessImpl extends AbstractCommandLineProcess {
         )).orElseGet(() -> new ProcessInfo(-1, configuration.nodeName(), processState.getState(), false, null, null, null, configuration.httpPort()));
     }
 
+    private Optional<Process> process() {
+        return Optional.ofNullable(commandLineProcess).flatMap(CommandLineProcess::getProcess);
+    }
+
     public void onEvent(ProcessEvent event) {
         this.processState.fire(event);
     }
@@ -100,20 +111,33 @@ class OpensearchProcessImpl extends AbstractCommandLineProcess {
     }
 
     @Override
-    protected Path getExecutable() {
-        return this.configuration.opensearchDir().resolve(Paths.get("bin", "opensearch"));
+    public void start() throws IOException {
+        commandLineProcess.start();
     }
 
     @Override
-    protected List<String> getCommandLineArguments() {
-        return configuration.asMap().entrySet().stream()
-                .map(it -> String.format(Locale.ROOT, "-E%s=%s", it.getKey(), it.getValue()))
-                .collect(Collectors.toList());
+    public void stop() {
+        commandLineProcess.stop();
     }
 
     @Override
-    protected int getLogsSize() {
-        return logsSize;
+    public Optional<ProcessLogs> processLogs() {
+        return Optional.ofNullable(commandLineProcess).map(CommandLineProcess::getLogs);
+    }
+
+    @Override
+    public void onStart() {
+        onEvent(ProcessEvent.PROCESS_STARTED);
+    }
+
+    @Override
+    public void onProcessComplete(int exitValue) {
+        onEvent(ProcessEvent.PROCESS_TERMINATED);
+    }
+
+    @Override
+    public void onProcessFailed(ExecuteException e) {
+        onEvent(ProcessEvent.PROCESS_TERMINATED);
     }
 }
 

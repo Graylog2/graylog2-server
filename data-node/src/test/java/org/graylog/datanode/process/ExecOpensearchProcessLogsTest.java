@@ -22,6 +22,7 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import org.assertj.core.api.Assertions;
+import org.graylog.datanode.management.LogsCache;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -39,7 +40,7 @@ class ExecOpensearchProcessLogsTest {
         final ByteArrayInputStream stdout = new ByteArrayInputStream("stdout-line".getBytes(StandardCharsets.UTF_8));
         final ByteArrayInputStream stderr = new ByteArrayInputStream("stderr-line".getBytes(StandardCharsets.UTF_8));
 
-        final ExecOpensearchProcessLogs logger = new ExecOpensearchProcessLogs(10);
+        final LogsCache logger = new LogsCache(10);
         logger.setProcessOutputStream(stdout);
         logger.setProcessErrorStream(stderr);
 

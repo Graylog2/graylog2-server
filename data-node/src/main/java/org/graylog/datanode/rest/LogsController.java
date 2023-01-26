@@ -17,7 +17,7 @@
 package org.graylog.datanode.rest;
 
 import org.graylog.datanode.management.OpensearchProcess;
-import org.graylog.datanode.process.ProcessLogs;
+import org.graylog.datanode.management.ProcessLogs;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;

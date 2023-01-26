@@ -14,15 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.process;
+package org.graylog.datanode.management;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteStreamHandler;
+import org.graylog.datanode.process.StreamConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,11 +30,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-public class ExecOpensearchProcessLogs implements ExecuteStreamHandler, ProcessLogs {
+public class LogsCache implements ExecuteStreamHandler, ProcessLogs {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ExecOpensearchProcessLogs.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LogsCache.class);
 
     private final ExecutorService executor;
     private final CircularFifoQueue<String> stdOut;
@@ -42,10 +41,10 @@ public class ExecOpensearchProcessLogs implements ExecuteStreamHandler, ProcessL
     private InputStream processErrorStream;
     private InputStream processOutputStream;
 
-    public ExecOpensearchProcessLogs(int logsBufferSize) {
+    public LogsCache(int logsBufferSize) {
         this.stdOut = new CircularFifoQueue<>(logsBufferSize);
         this.stdErr = new CircularFifoQueue<>(logsBufferSize);
-        this.executor = Executors.newFixedThreadPool(2, new ThreadFactoryBuilder().setNameFormat("output-logging-%d").build());
+        this.executor = Executors.newFixedThreadPool(2, new ThreadFactoryBuilder().setDaemon(true).setNameFormat("output-logging-%d").build());
     }
 
 
@@ -91,14 +90,7 @@ public class ExecOpensearchProcessLogs implements ExecuteStreamHandler, ProcessL
 
     @Override
     public void stop() throws IOException {
-        try {
-            executor.shutdown();
-            final boolean successfullyTerminated = executor.awaitTermination(10, TimeUnit.SECONDS);
-            if(!successfullyTerminated) {
-                throw new RuntimeException("Failed to terminate logger threads");
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Failed to terminate logger threads", e);
-        }
+        // consumer threads are blocked by read waiting and can't be cleanly interrupted. Kill them witohout trying.
+        executor.shutdownNow();
     }
 }

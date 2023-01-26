@@ -14,11 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.process;
+package org.graylog.datanode.management;
 
-import java.util.List;
+import org.apache.commons.exec.ExecuteResultHandler;
 
-public interface ProcessLogs {
-    List<String> stdOut();
-    List<String> stdErr();
+public interface ProcessListener extends ExecuteResultHandler {
+    void onStart();
 }
