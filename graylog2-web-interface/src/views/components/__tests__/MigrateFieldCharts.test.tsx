@@ -31,6 +31,7 @@ import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import createSearch from 'views/logic/slices/createSearch';
 import { updateViewState } from 'views/logic/slices/viewSlice';
+import Query from 'views/logic/queries/Query';
 
 import { mockFieldCharts, viewState as mockViewState } from './MigrateFieldCharts.fixtures';
 
@@ -76,7 +77,10 @@ const getNewWidgetConfig = (actionMock) => {
 };
 
 const MigrateFieldCharts = () => {
-  const search = Search.create();
+  const search = Search.builder()
+    .newId()
+    .queries([Query.builder().id('query1').build()])
+    .build();
   const view = View.builder()
     .type(View.Type.Search)
     .state({ query1: mockViewState() })
