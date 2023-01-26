@@ -147,10 +147,9 @@ describe('AggregationWizard', () => {
     await selectField('status_code');
     await submitWidgetConfigForm();
 
-    const pivot = Pivot.create('status_code', 'values');
+    const pivot = Pivot.create(['status_code'], 'values');
     const updatedConfig = widgetConfig
       .toBuilder()
-      .rowLimit(15)
       .rowPivots([pivot])
       .build();
 
@@ -161,10 +160,9 @@ describe('AggregationWizard', () => {
 
   it('should not throw an error when field in config no longer exists in field types list.', async () => {
     const onChange = jest.fn();
-    const pivot = Pivot.create('status_code', 'values');
+    const pivot = Pivot.create(['status_code'], 'values');
     const initialConfig = widgetConfig
       .toBuilder()
-      .rowLimit(15)
       .rowPivots([pivot])
       .build();
 
