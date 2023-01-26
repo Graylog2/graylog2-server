@@ -16,6 +16,9 @@
  */
 package org.graylog.datanode.process;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -25,6 +28,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
 public class StreamConsumer implements Runnable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(StreamConsumer.class);
+
     private final InputStream inputStream;
     private final Consumer<String> consumeInputLine;
 
@@ -43,7 +49,8 @@ public class StreamConsumer implements Runnable {
                 consumeInputLine.accept(line);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            // closed stream is a typical exception that can happen here and should be ignored
+            LOG.debug("Failed to read process stream", e);
         }
     }
 }

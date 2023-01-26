@@ -90,7 +90,7 @@ public class LogsCache implements ExecuteStreamHandler, ProcessLogs {
 
     @Override
     public void stop() throws IOException {
-        // consumer threads are blocked by read waiting and can't be cleanly interrupted. Kill them witohout trying.
+        // consumer threads are blocked by read waiting and can't be cleanly interrupted. Kill them without trying.
         executor.shutdownNow();
     }
 }
