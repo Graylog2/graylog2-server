@@ -34,14 +34,14 @@ const supportedTypes = new Set([
 ]);
 
 const typePrefixCornerCasesMap = {
-  event_definition: 'eventdefinitions',
-  notification: 'eventnotifications',
-  search: 'view',
-  report: 'report',
+  event_definition: 'eventdefinitions:',
+  notification: 'eventnotifications:',
+  search: 'view:',
+  report: 'report:',
 };
 
 const getPermissionPrefixByType = (type: string, throwErrorOnUnknown = true) => {
-  if (supportedTypes.has(type)) return typePrefixCornerCasesMap[type] ?? `${type}s`;
+  if (supportedTypes.has(type)) return typePrefixCornerCasesMap[type] ?? `${type}s:`;
 
   return throwErrorOnUnknown ? assertUnreachable(type) : `(unsupported type ${type})`;
 };
