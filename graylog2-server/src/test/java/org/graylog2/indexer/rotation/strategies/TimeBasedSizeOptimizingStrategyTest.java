@@ -118,7 +118,7 @@ class TimeBasedSizeOptimizingStrategyTest {
         final TimeBasedSizeOptimizingStrategy.Result result = timeBasedSizeOptimizingStrategy.shouldRotate("index_0", indexSet);
 
         assertThat(result.shouldRotate()).isEqualTo(true);
-        assertThat(result.getDescription()).contains("Index is old enough");
+        assertThat(result.getDescription()).contains("has passed rotation period");
     }
 
     @ParameterizedTest
@@ -158,6 +158,6 @@ class TimeBasedSizeOptimizingStrategyTest {
         final TimeBasedSizeOptimizingStrategy.Result result = timeBasedSizeOptimizingStrategy.shouldRotate("index_0", indexSet);
 
         assertThat(result.shouldRotate()).isEqualTo(true);
-        assertThat(result.getDescription()).contains("Index is old enough");
+        assertThat(result.getDescription()).contains("has passed rotation period");
     }
 }

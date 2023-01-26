@@ -182,7 +182,7 @@ public class IndexSetValidatorTest {
                 .build();
         assertThat(validator.validate(sizeOptimizingConfig)).hasValueSatisfying(v ->
                 assertThat(v.message()).contains(
-                        "Lifetime setting index_lifetime_hard <P30D> exceeds the configured maximum of max_index_retention_period=P9D")
+                        "Lifetime setting index_lifetime_max <P30D> exceeds the configured maximum of max_index_retention_period=P9D")
         );
     }
 
@@ -202,7 +202,7 @@ public class IndexSetValidatorTest {
 
         assertThat(validator.validate(sizeOptimizingConfig)).hasValueSatisfying(v ->
                 assertThat(v.message()).contains(
-                        "Lifetime setting index_lifetime_soft <P2DT2H> can only be a multiple of days")
+                        "Lifetime setting index_lifetime_min <P2DT2H> can only be a multiple of days")
         );
 
         assertThat(validator.periodOtherThanDays(Period.days(5))).isFalse();
