@@ -24,27 +24,23 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 
-type PaginatedDashboardsResponse = PaginatedListJSON & {
+type PaginatedSearchesResponse = PaginatedListJSON & {
   elements: Array<ViewJson>,
-  attributes: Array<Attribute>,
+  attributes: Array<Attribute>
 };
 
-type Options = {
-  enabled: boolean,
-}
+const savedSearchesUrl = qualifyUrl('/search/saved');
 
-const dashboardsUrl = qualifyUrl('/dashboards');
-
-const fetchDashboards = (searchParams: SearchParams) => {
+const fetchSavedSearches = (searchParams: SearchParams) => {
   const url = PaginationURL(
-    dashboardsUrl,
+    savedSearchesUrl,
     searchParams.page,
     searchParams.pageSize,
     searchParams.query,
     { sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
 
-  return fetch<PaginatedDashboardsResponse>('GET', qualifyUrl(url)).then(
-    ({ elements, total, count, page, per_page: perPage, attributes }) => ({
+  return fetch<PaginatedSearchesResponse>('GET', qualifyUrl(url)).then(
+    ({ elements, attributes, total, count, page, per_page: perPage }) => ({
       list: elements.map((item) => View.fromJSON(item)),
       pagination: { total, count, page, perPage },
       attributes,
@@ -52,33 +48,32 @@ const fetchDashboards = (searchParams: SearchParams) => {
   );
 };
 
-const useDashboards = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
+const useSavedSearches = (searchParams: SearchParams): {
   data: {
     list: Readonly<Array<View>>,
     pagination: { total: number },
-    attributes: Array<Attribute>
+    attributes: Array<Attribute>,
   } | undefined,
   refetch: () => void,
-  isFetching: boolean,
+  isLoading: boolean,
 } => {
-  const { data, refetch, isFetching } = useQuery(
-    ['dashboards', 'overview', searchParams],
-    () => fetchDashboards(searchParams),
+  const { data, refetch, isLoading } = useQuery(
+    ['saved-searches', 'overview', searchParams],
+    () => fetchSavedSearches(searchParams),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading dashboards failed with status: ${errorThrown}`,
-          'Could not load dashboards');
+        UserNotification.error(`Loading saved searches failed with status: ${errorThrown}`,
+          'Could not load saved searches');
       },
       keepPreviousData: true,
-      enabled,
     },
   );
 
   return ({
     data,
     refetch,
-    isFetching,
+    isLoading,
   });
 };
 
-export default useDashboards;
+export default useSavedSearches;

@@ -57,7 +57,7 @@ jest.mock('views/logic/queries/useCurrentQuery');
 
 describe('XYPlot', () => {
   const currentQuery = Query.fromJSON({ id: 'dummyquery', query: {}, timerange: {}, search_types: {} });
-  const timestampPivot = new Pivot('timestamp', 'time', { interval: { type: 'auto', scaling: 1.0 } });
+  const timestampPivot = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1.0 } });
   const config = AggregationWidgetConfig.builder().rowPivots([timestampPivot]).build();
   const getChartColor = () => undefined;
   const setChartColor = () => ({});

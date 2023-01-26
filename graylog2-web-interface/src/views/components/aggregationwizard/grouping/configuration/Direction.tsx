@@ -29,11 +29,11 @@ div:first-child {
 `;
 
 type Props = {
-  index: number,
+  groupingIndex: number,
 };
 
-const Direction = ({ index }: Props) => (
-  <Field name={`groupBy.groupings.${index}.direction`}>
+const Direction = ({ groupingIndex }: Props) => (
+  <Field name={`groupBy.groupings.${groupingIndex}.direction`}>
     {({ field: { name, value, onChange, onBlur }, meta: { error } }) => (
       <Input id="group-by-direction"
              label="Direction"

@@ -47,7 +47,7 @@ describe('TransformKeys', () => {
       key: ['foo'],
       rollup: false,
     }];
-    const result = transformKeys([Pivot.create('foo', 'value')], [Pivot.create('bar', 'value')], formatTime)(rows);
+    const result = transformKeys([Pivot.create(['foo'], 'value')], [Pivot.create(['bar'], 'value')], formatTime)(rows);
 
     expect(result).toEqual(rows);
   });
@@ -66,7 +66,7 @@ describe('TransformKeys', () => {
       },
     ];
 
-    const result = transformKeys([Pivot.create('timestamp', 'time')], [], formatTimeForLocalTz('Europe/Berlin'))(input);
+    const result = transformKeys([Pivot.create(['timestamp'], 'time')], [], formatTimeForLocalTz('Europe/Berlin'))(input);
 
     expect(result).toEqual([
       {
@@ -95,7 +95,7 @@ describe('TransformKeys', () => {
       },
     ];
 
-    const result = transformKeys([Pivot.create('timestamp', 'time')], [], formatTimeForLocalTz('America/Los_Angeles'))(input);
+    const result = transformKeys([Pivot.create(['timestamp'], 'time')], [], formatTimeForLocalTz('America/Los_Angeles'))(input);
 
     expect(result).toEqual([
       {

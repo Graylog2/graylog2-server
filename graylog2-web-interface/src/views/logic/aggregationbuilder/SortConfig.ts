@@ -16,7 +16,6 @@
  */
 import * as Immutable from 'immutable';
 
-import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 import type Series from 'views/logic/aggregationbuilder/Series';
 
 import type { DirectionJson } from './Direction';
@@ -84,15 +83,6 @@ export default class SortConfig {
 
   static registerSubtype(type: string, implementingClass: typeof SortConfig) {
     this.__registrations[type.toLowerCase()] = implementingClass;
-  }
-
-  static fromPivot(pivot: Pivot) {
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder()
-      .type(this.PIVOT_TYPE)
-      .field(pivot.field)
-      .direction(Direction.Ascending)
-      .build();
   }
 
   static fromSeries(series: Series) {

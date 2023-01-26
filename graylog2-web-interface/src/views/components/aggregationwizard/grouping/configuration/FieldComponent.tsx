@@ -15,80 +15,76 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Field, useFormikContext } from 'formik';
-import { useContext } from 'react';
+import { useContext, useCallback } from 'react';
+import { useFormikContext } from 'formik';
 
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
-import parseNumber from 'views/components/aggregationwizard/grouping/parseNumber';
+import type { WidgetConfigFormValues, GroupByFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import Input from 'components/bootstrap/Input';
+import SelectedFieldsList from 'views/components/aggregationwizard/grouping/configuration/SelectedFieldsList';
+import type { GroupByError } from 'views/components/aggregationwizard/grouping/GroupingElement';
+import { onGroupingFieldsChange } from 'views/components/aggregationwizard/grouping/GroupingElement';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import { DateType } from 'views/logic/aggregationbuilder/Pivot';
 
 import FieldSelect from '../../FieldSelect';
 
-type Props = {
-  index: number,
-  fieldType: string,
+const placeholder = (grouping: GroupByFormValues) => {
+  if (!grouping.fields?.length) {
+    return 'Add a field';
+  }
+
+  if (grouping.type === DateType) {
+    return 'Add another date field';
+  }
+
+  return 'Add another field';
 };
 
-const numberNotSet = (value: string | number | undefined) => parseNumber(value) === undefined;
+type Props = {
+  groupingIndex: number,
+};
 
-const defaultLimit = 15;
-
-const FieldComponent = ({ index, fieldType }: Props) => {
+const FieldComponent = ({ groupingIndex }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
-  const { setFieldValue, values } = useFormikContext<WidgetConfigFormValues>();
-  const grouping = values.groupBy.groupings[index];
+  const { setFieldValue, values, errors } = useFormikContext<WidgetConfigFormValues>();
+  const grouping = values.groupBy.groupings[groupingIndex];
+  const activeQueryId = useActiveQueryId();
 
-  const onChangeField = (e: { target: { name: string, value: string } }, name: string, onChange) => {
-    const fieldName = e.target.value;
-    const newField = fieldTypes.all.find((field) => field.name === fieldName);
-    const newFieldType = newField?.type.type === 'date' ? 'time' : 'values';
+  const createSelectPlaceholder = placeholder(grouping);
 
-    if (fieldType !== newFieldType) {
-      if (newFieldType === 'time') {
-        setFieldValue(`groupBy.groupings.${index}.interval`, {
-          type: 'auto',
-          scaling: 1.0,
-        });
-      }
+  const onAddField = useCallback((fieldName: string) => {
+    const newFields = [...(grouping.fields ?? []), fieldName];
 
-      if (newFieldType === 'values') {
-        setFieldValue(`groupBy.groupings.${index}.interval`, undefined, false);
-
-        if (grouping.direction === 'row' && numberNotSet(values.groupBy.rowLimit)) {
-          setFieldValue('groupBy.rowLimit', defaultLimit);
-        }
-
-        if (grouping.direction === 'column' && numberNotSet(values.groupBy.columnLimit)) {
-          setFieldValue('groupBy.columnLimit', defaultLimit);
-        }
-      }
-    }
-
-    onChange({
-      target: {
-        name,
-        value: {
-          field: newField.name,
-          type: newFieldType,
-        },
-      },
+    onGroupingFieldsChange({
+      fieldTypes,
+      activeQueryId,
+      groupingIndex,
+      grouping,
+      newFields,
+      setFieldValue,
     });
-  };
+  }, [activeQueryId, fieldTypes, grouping, groupingIndex, setFieldValue]);
 
   return (
-    <Field name={`groupBy.groupings.${index}.field`}>
-      {({ field: { name, value, onChange }, meta: { error } }) => (
-        <FieldSelect id="group-by-field-select"
-                     label="Field"
-                     onChange={(e) => onChangeField(e, name, onChange)}
-                     error={error}
-                     clearable={false}
-                     ariaLabel="Field"
-                     name={name}
-                     value={value.field}
-                     aria-label="Select a field" />
-      )}
-    </Field>
+    <Input id="group-by-field-select"
+           label="Fields"
+           labelClassName="col-sm-3"
+           error={(errors?.groupBy?.groupings?.[groupingIndex] as GroupByError)?.fields}
+           wrapperClassName="col-sm-9">
+      <SelectedFieldsList groupingIndex={groupingIndex} />
+      <FieldSelect id="group-by-field-create-select"
+                   onChange={onAddField}
+                   clearable={false}
+                   ariaLabel="Fields"
+                   qualifiedTypeCategory={grouping.fields?.length ? grouping.type : undefined}
+                   persistSelection={false}
+                   name="group-by-field-create-select"
+                   value={undefined}
+                   excludedFields={grouping.fields ?? []}
+                   placeholder={createSelectPlaceholder}
+                   aria-label={createSelectPlaceholder} />
+    </Input>
   );
 };
 
