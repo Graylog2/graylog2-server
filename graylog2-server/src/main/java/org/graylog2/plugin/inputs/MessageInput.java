@@ -375,11 +375,10 @@ public abstract class MessageInput implements Stoppable {
     public void processRawMessage(RawMessage rawMessage) {
         final int payloadLength = rawMessage.getPayload().length;
         if (payloadLength == 0) {
-            LOG.debug("Discarding empty message {} from input [{}/{}] (remote address {}). Turn logger org.graylog2.plugin.journal.RawMessage to TRACE to see originating stack trace.",
-                      rawMessage.getId(),
-                      getTitle(),
-                      getId(),
-                      rawMessage.getRemoteAddress() == null ? "unknown" : rawMessage.getRemoteAddress());
+            LOG.debug("Discarding empty message {} from input {} (remote address {}). Turn logger org.graylog2.plugin.journal.RawMessage to TRACE to see originating stack trace.",
+                    rawMessage.getId(),
+                    toIdentifier(),
+                    rawMessage.getRemoteAddress() == null ? "unknown" : rawMessage.getRemoteAddress());
             emptyMessages.inc();
             return;
         }
@@ -465,5 +464,9 @@ public abstract class MessageInput implements Stoppable {
                 .add("type", getType())
                 .add("nodeId", getNodeId())
                 .toString();
+    }
+
+    public String toIdentifier() {
+        return String.format("[%s/%s/%s]", getName(), getTitle(), getId());
     }
 }
