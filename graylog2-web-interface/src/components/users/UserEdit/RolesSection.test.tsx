@@ -75,10 +75,7 @@ describe('<RolesSection />', () => {
     await act(() => mockLoadRolesPromise.then());
 
     const filterInput = screen.getByPlaceholderText('Enter query to filter');
-    const filterSubmitButton = screen.getByRole('button', { name: 'Filter' });
-
     fireEvent.change(filterInput, { target: { value: 'name of an assigned role' } });
-    fireEvent.click(filterSubmitButton);
 
     await waitFor(() => expect(AuthzRolesActions.loadRolesForUser).toHaveBeenCalledTimes(2));
 
