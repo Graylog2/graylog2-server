@@ -282,8 +282,8 @@ public class AbstractIndexRetentionStrategyTest {
                 1, 0,
                 TimeBasedSizeOptimizingStrategyConfig.class.getCanonicalName(),
                 TimeBasedSizeOptimizingStrategyConfig.builder()
-                        .indexLifetimeSoft(Period.days(minDays))
-                        .indexLifetimeHard(Period.days(maxDays))
+                        .indexLifetimeMin(Period.days(minDays))
+                        .indexLifetimeMax(Period.days(maxDays))
                         .build(),
                 DeletionRetentionStrategy.class.getCanonicalName(),
                 DeletionRetentionStrategyConfig.createDefault(),

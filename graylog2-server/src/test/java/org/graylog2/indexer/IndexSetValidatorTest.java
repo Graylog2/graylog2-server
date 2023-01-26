@@ -175,8 +175,8 @@ public class IndexSetValidatorTest {
         final IndexSetConfig sizeOptimizingConfig = testIndexSetConfig().toBuilder()
                 .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
                 .rotationStrategy(TimeBasedSizeOptimizingStrategyConfig.builder()
-                        .indexLifetimeSoft(Period.days(2))
-                        .indexLifetimeHard(Period.days(30))
+                        .indexLifetimeMin(Period.days(2))
+                        .indexLifetimeMax(Period.days(30))
                         .build()
                 )
                 .build();
@@ -194,8 +194,8 @@ public class IndexSetValidatorTest {
         final IndexSetConfig sizeOptimizingConfig = testIndexSetConfig().toBuilder()
                 .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
                 .rotationStrategy(TimeBasedSizeOptimizingStrategyConfig.builder()
-                        .indexLifetimeSoft(Period.days(2).withHours(2))
-                        .indexLifetimeHard(Period.days(30))
+                        .indexLifetimeMin(Period.days(2).withHours(2))
+                        .indexLifetimeMax(Period.days(30))
                         .build()
                 )
                 .build();

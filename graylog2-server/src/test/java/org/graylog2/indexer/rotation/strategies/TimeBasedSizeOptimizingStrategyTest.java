@@ -126,7 +126,7 @@ class TimeBasedSizeOptimizingStrategyTest {
     void shouldRotateWhenBeyondLeeWay(String startDate) {
         setClockTo(startDate);
 
-        final Period leeWay = timeBasedSizeOptimizingStrategyConfig.indexLifetimeHard().minus(timeBasedSizeOptimizingStrategyConfig.indexLifetimeSoft());
+        final Period leeWay = timeBasedSizeOptimizingStrategyConfig.indexLifetimeMax().minus(timeBasedSizeOptimizingStrategyConfig.indexLifetimeMin());
         final Days leewayDays = Days.days(leeWay.getDays());
         final DateTime creationDate = clock.nowUTC().minus(
                 elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod().plus(leewayDays))

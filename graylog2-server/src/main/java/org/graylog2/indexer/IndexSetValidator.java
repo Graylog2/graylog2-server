@@ -37,8 +37,8 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import static org.graylog2.configuration.ElasticsearchConfiguration.TIME_SIZE_OPTIMIZING_ROTATION_PERIOD;
-import static org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig.INDEX_LIFETIME_HARD;
-import static org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig.INDEX_LIFETIME_SOFT;
+import static org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig.INDEX_LIFETIME_MAX;
+import static org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig.INDEX_LIFETIME_MIN;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class IndexSetValidator {
@@ -109,31 +109,31 @@ public class IndexSetValidator {
     @Nullable
     public Violation validateRotation(RotationStrategyConfig rotationStrategyConfig) {
         if ((rotationStrategyConfig instanceof TimeBasedSizeOptimizingStrategyConfig config)) {
-            final Period leeway = config.indexLifetimeHard().minus(config.indexLifetimeSoft());
+            final Period leeway = config.indexLifetimeMax().minus(config.indexLifetimeMin());
             if (leeway.toStandardSeconds().getSeconds() < 0) {
-                return Violation.create(f("%s <%s> is shorter than %s <%s>", INDEX_LIFETIME_HARD, config.indexLifetimeHard(),
-                        INDEX_LIFETIME_SOFT, config.indexLifetimeSoft()));
+                return Violation.create(f("%s <%s> is shorter than %s <%s>", INDEX_LIFETIME_MAX, config.indexLifetimeMax(),
+                        INDEX_LIFETIME_MIN, config.indexLifetimeMin()));
             }
             if (leeway.toStandardSeconds().isLessThan(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod().toStandardSeconds())) {
-                return Violation.create(f("The duration between %s and %s <%s> cannot be shorter than %s <%s>", INDEX_LIFETIME_HARD, INDEX_LIFETIME_SOFT,
+                return Violation.create(f("The duration between %s and %s <%s> cannot be shorter than %s <%s>", INDEX_LIFETIME_MAX, INDEX_LIFETIME_MIN,
                         leeway, TIME_SIZE_OPTIMIZING_ROTATION_PERIOD, elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()));
             }
 
             final Period maxRetentionPeriod = elasticsearchConfiguration.getMaxIndexRetentionPeriod();
             if (maxRetentionPeriod != null
-                    && config.indexLifetimeHard().toStandardSeconds().isGreaterThan(maxRetentionPeriod.toStandardSeconds())) {
+                    && config.indexLifetimeMax().toStandardSeconds().isGreaterThan(maxRetentionPeriod.toStandardSeconds())) {
                 return Violation.create(f("Lifetime setting %s <%s> exceeds the configured maximum of %s=%s.",
-                        INDEX_LIFETIME_HARD, config.indexLifetimeHard(),
+                        INDEX_LIFETIME_MAX, config.indexLifetimeMax(),
                         ElasticsearchConfiguration.MAX_INDEX_RETENTION_PERIOD, maxRetentionPeriod));
             }
 
-            if (periodOtherThanDays(config.indexLifetimeHard())) {
+            if (periodOtherThanDays(config.indexLifetimeMax())) {
                 return Violation.create(f("Lifetime setting %s <%s> can only be a multiple of days",
-                        INDEX_LIFETIME_HARD, config.indexLifetimeHard()));
+                        INDEX_LIFETIME_MAX, config.indexLifetimeMax()));
             }
-            if (periodOtherThanDays(config.indexLifetimeSoft())) {
+            if (periodOtherThanDays(config.indexLifetimeMin())) {
                 return Violation.create(f("Lifetime setting %s <%s> can only be a multiple of days",
-                        INDEX_LIFETIME_SOFT, config.indexLifetimeSoft()));
+                        INDEX_LIFETIME_MIN, config.indexLifetimeMin()));
             }
         }
         return null;

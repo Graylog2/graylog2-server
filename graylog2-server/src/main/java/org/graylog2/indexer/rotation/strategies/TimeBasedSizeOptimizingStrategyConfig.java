@@ -31,16 +31,16 @@ import org.joda.time.Period;
 @WithBeanGetter
 @JsonDeserialize(builder = TimeBasedSizeOptimizingStrategyConfig.Builder.class)
 public abstract class TimeBasedSizeOptimizingStrategyConfig implements RotationStrategyConfig {
-    public static final String INDEX_LIFETIME_SOFT = "index_lifetime_soft";
-    public static final String INDEX_LIFETIME_HARD = "index_lifetime_hard";
+    public static final String INDEX_LIFETIME_MIN = "index_lifetime_min";
+    public static final String INDEX_LIFETIME_MAX = "index_lifetime_max";
 
-    private static final Period DEFAULT_LIFETIME_SOFT = Period.days(30);
-    private static final Period DEFAULT_LIFETIME_HARD = Period.days(40);
-    @JsonProperty(INDEX_LIFETIME_SOFT)
-    public abstract Period indexLifetimeSoft();
+    private static final Period DEFAULT_LIFETIME_MIN = Period.days(30);
+    private static final Period DEFAULT_LIFETIME_MAX = Period.days(40);
+    @JsonProperty(INDEX_LIFETIME_MIN)
+    public abstract Period indexLifetimeMin();
 
-    @JsonProperty(INDEX_LIFETIME_HARD)
-    public abstract Period indexLifetimeHard();
+    @JsonProperty(INDEX_LIFETIME_MAX)
+    public abstract Period indexLifetimeMax();
 
     public static Builder builder() {
         return Builder.create();
@@ -52,18 +52,18 @@ public abstract class TimeBasedSizeOptimizingStrategyConfig implements RotationS
         public static Builder create() {
             return new AutoValue_TimeBasedSizeOptimizingStrategyConfig.Builder()
                     .type(TimeBasedSizeOptimizingStrategyConfig.class.getCanonicalName())
-                    .indexLifetimeSoft(DEFAULT_LIFETIME_SOFT)
-                    .indexLifetimeHard(DEFAULT_LIFETIME_HARD);
+                    .indexLifetimeMin(DEFAULT_LIFETIME_MIN)
+                    .indexLifetimeMax(DEFAULT_LIFETIME_MAX);
         }
 
         @JsonProperty(TYPE_FIELD)
         public abstract Builder type(String type);
 
-        @JsonProperty(INDEX_LIFETIME_SOFT)
-        public abstract Builder indexLifetimeSoft(Period softLimit);
+        @JsonProperty(INDEX_LIFETIME_MIN)
+        public abstract Builder indexLifetimeMin(Period softLimit);
 
-        @JsonProperty(INDEX_LIFETIME_HARD)
-        public abstract Builder indexLifetimeHard(Period hardLimit);
+        @JsonProperty(INDEX_LIFETIME_MAX)
+        public abstract Builder indexLifetimeMax(Period hardLimit);
 
         public abstract TimeBasedSizeOptimizingStrategyConfig build();
     }
