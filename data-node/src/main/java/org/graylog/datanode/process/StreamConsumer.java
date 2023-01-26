@@ -41,7 +41,7 @@ public class StreamConsumer implements Runnable {
 
     public void run() {
 
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             String line;
             // the readLine blocks till the underlying stream either produces some data or terminates
             // there is no clean way how to interrupt this waiting thread
