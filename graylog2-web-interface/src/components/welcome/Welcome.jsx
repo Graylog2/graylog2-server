@@ -33,7 +33,13 @@ const StyledSectionComponent = styled(SectionComponent)`
 const Welcome = () => (
   <>
     <PageHeader title="Welcome to Graylog">
-      <span>Here you can find most used content</span>
+      <span>
+        Here you can find most used content.
+        <br />
+        Last open - entities which were recently viewed.
+        Favorite items - entities which were added to the favorites.
+        Recent activity - shows all actions ( creating, updating, sharing e.t.c) which were made with all entities.
+      </span>
     </PageHeader>
     <SectionGrid>
       <StyledSectionComponent title="Last opened">
