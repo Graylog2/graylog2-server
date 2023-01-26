@@ -27,7 +27,6 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.utilities.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
-import org.joda.time.Seconds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,8 +110,7 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
     }
 
     private boolean indexExceedsLeeWay(DateTime creationDate, Period leeWay) {
-        final Seconds leewaySeconds = Seconds.seconds(leeWay.toStandardSeconds().getSeconds());
-        return timePassedIsBeyondLimit(creationDate, rotationPeriod.plus(leewaySeconds));
+        return timePassedIsBeyondLimit(creationDate, leeWay);
     }
 
     private boolean indexIsOldEnough(DateTime creationDate) {

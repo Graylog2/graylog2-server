@@ -48,6 +48,7 @@ public class ElasticsearchConfiguration {
     public static final String DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX = "default_system_events_index_prefix";
     public static final String TIME_SIZE_OPTIMIZING_ROTATION_MIN_SIZE = "time_size_optimizing_rotation_min_size";
     public static final String TIME_SIZE_OPTIMIZING_ROTATION_MAX_SIZE = "time_size_optimizing_rotation_max_size";
+    public static final String TIME_SIZE_OPTIMIZING_ROTATION_PERIOD = "time_size_optimizing_rotation_period";
 
     @Parameter(value = "elasticsearch_index_prefix", required = true)
     private String defaultIndexPrefix = "graylog";
@@ -106,7 +107,7 @@ public class ElasticsearchConfiguration {
     private int maxNumberOfIndices = 20;
 
     // TimeBasedSizeOptimizingStrategy Rotation
-    @Parameter(value = "time_size_optimizing_rotation_period")
+    @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_PERIOD)
     private Period timeSizeOptimizingRotationPeriod = Period.days(1);
 
     @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_MIN_SIZE)

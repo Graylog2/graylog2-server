@@ -188,7 +188,7 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
         // but exceeds the optimization "leeway" ( indexLifetimeHard - indexLifetimeSoft) (6 - 4) = 2 days
         // it will also be rotated.
         indexSet.getNewest().setSize(100);
-        clock.plus(3, TimeUnit.DAYS);
+        clock.plus(2, TimeUnit.DAYS);
         timeBasedSizeOptimizingStrategy.rotate(indexSet);
         assertThat(indexSet.getIndicesNames()).isEqualTo(List.of("test_0", "test_1", "test_2", "test_3", "test_4"));
     }
@@ -207,7 +207,7 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
         assertThat(indexSet.getIndicesNames()).isEqualTo(List.of("test_1", "test_2", "test_3", "test_4"));
 
         // Moving forward in time will retain more indices
-        clock.plus(12, TimeUnit.HOURS);
+        clock.plus(36, TimeUnit.HOURS);
         deletionRetentionStrategy.retain(indexSet);
         assertThat(indexSet.getIndicesNames()).isEqualTo(List.of("test_2", "test_3", "test_4"));
 

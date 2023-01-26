@@ -36,6 +36,7 @@ import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.Optional;
 
+import static org.graylog2.configuration.ElasticsearchConfiguration.TIME_SIZE_OPTIMIZING_ROTATION_PERIOD;
 import static org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig.INDEX_LIFETIME_HARD;
 import static org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig.INDEX_LIFETIME_SOFT;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -112,6 +113,10 @@ public class IndexSetValidator {
             if (leeway.toStandardSeconds().getSeconds() < 0) {
                 return Violation.create(f("%s <%s> is shorter than %s <%s>", INDEX_LIFETIME_HARD, config.indexLifetimeHard(),
                         INDEX_LIFETIME_SOFT, config.indexLifetimeSoft()));
+            }
+            if (leeway.toStandardSeconds().isLessThan(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod().toStandardSeconds())) {
+                return Violation.create(f("The duration between %s and %s <%s> cannot be shorter than %s <%s>", INDEX_LIFETIME_HARD, INDEX_LIFETIME_SOFT,
+                        leeway, TIME_SIZE_OPTIMIZING_ROTATION_PERIOD, elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()));
             }
 
             final Period maxRetentionPeriod = elasticsearchConfiguration.getMaxIndexRetentionPeriod();
