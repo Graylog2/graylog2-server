@@ -69,6 +69,18 @@ const loadDashboardsResponse = (count = 1) => {
         count,
       },
       list: dashboards,
+      attributes: [
+        {
+          id: 'title',
+          title: 'Title',
+          sortable: true,
+        },
+        {
+          id: 'description',
+          title: 'Description',
+          sortable: true,
+        },
+      ],
     },
     refetch: () => {},
     isFetching: false,
