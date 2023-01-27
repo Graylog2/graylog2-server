@@ -19,11 +19,9 @@ package org.graylog.datanode.management;
 import org.graylog.datanode.process.ProcessInfo;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface OpensearchProcess extends ManagableProcess {
-
-    Optional<ProcessLogs> processLogs();
 
     ProcessInfo processInfo();
 
@@ -34,4 +32,7 @@ public interface OpensearchProcess extends ManagableProcess {
     void setLeaderNode(boolean isManagerNode);
 
     String opensearchVersion();
+
+    List<String> stdOutLogs();
+    List<String> stdErrLogs();
 }

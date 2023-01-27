@@ -18,6 +18,7 @@ package org.graylog.datanode.management;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.ExecuteWatchdog;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.graylog.datanode.ProcessProvidingExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,14 +38,12 @@ class CommandLineProcess {
     private final List<String> arguments;
     private final ProcessListener listener;
     private final ExecuteWatchdog watchDog;
-    private final LogsCache logs;
 
     private Process process;
 
-    public CommandLineProcess(Path executable, List<String> arguments, int persistedLogsSize, ProcessListener listener) {
+    public CommandLineProcess(Path executable, List<String> arguments, ProcessListener listener) {
         this.executable = executable;
         this.arguments = arguments;
-        this.logs = new LogsCache(persistedLogsSize);
         this.listener = listener;
         this.watchDog = new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT);
     }
@@ -61,7 +60,8 @@ class CommandLineProcess {
 
         ProcessProvidingExecutor executor = new ProcessProvidingExecutor();
 
-        executor.setStreamHandler(logs);
+        //executor.setStreamHandler(logs);
+        executor.setStreamHandler(new PumpStreamHandler(new LoggingOutputStream(listener::onStdOut), new LoggingOutputStream(listener::onStdErr)));
         executor.setWatchdog(watchDog);
         executor.execute(cmdLine, listener);
 
@@ -78,13 +78,8 @@ class CommandLineProcess {
     public void stop() {
         this.watchDog.destroyProcess();
     }
-
-    public LogsCache getLogs() {
-        return logs;
-    }
-
     /**
-     * "Do not rely on the undelying process if not necessarry"
+     * "Do not rely on the undelying process if not necessary"
      */
     @Deprecated(forRemoval = true)
     public Optional<Process> getProcess() {

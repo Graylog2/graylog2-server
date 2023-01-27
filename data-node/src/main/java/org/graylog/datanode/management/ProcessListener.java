@@ -20,4 +20,6 @@ import org.apache.commons.exec.ExecuteResultHandler;
 
 public interface ProcessListener extends ExecuteResultHandler {
     void onStart();
+    void onStdOut(String line);
+    void onStdErr(String line);
 }

@@ -20,9 +20,8 @@ import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
-import org.graylog2.plugin.periodical.Periodical;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.core.MainResponse;
+import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

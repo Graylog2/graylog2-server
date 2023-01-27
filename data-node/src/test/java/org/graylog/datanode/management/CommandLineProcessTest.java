@@ -30,6 +30,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -39,12 +40,13 @@ import java.util.concurrent.TimeoutException;
 class CommandLineProcessTest {
 
     @Test
-    void testProcessLifecycle() throws IOException, ExecutionException, InterruptedException, TimeoutException, RetryException, URISyntaxException {
+    void testManualStop() throws IOException, ExecutionException, InterruptedException, TimeoutException, RetryException, URISyntaxException {
         final URL bin = getClass().getResource("test-script.sh");
         assert bin != null;
         final Path binPath = Path.of(bin.toURI());
 
-        final CompletableFuture<Integer> exitValueFuture = new CompletableFuture<>();
+        List<String> stdout = new LinkedList<>();
+        List<String> stdErr = new LinkedList<>();
 
         final ProcessListener listener = new ProcessListener() {
             @Override
@@ -52,47 +54,92 @@ class CommandLineProcessTest {
             }
 
             @Override
+            public void onStdOut(String line) {
+                stdout.add(line);
+            }
+
+            @Override
+            public void onStdErr(String line) {
+                stdErr.add(line);
+            }
+
+            @Override
             public void onProcessComplete(int exitValue) {
-                exitValueFuture.complete(exitValue);
             }
 
             @Override
             public void onProcessFailed(ExecuteException e) {
-                // If we terminate the process from outside it will lead to an execute exception here. The exit value
-                // is available in the exception itself.
-                exitValueFuture.complete(e.getExitValue());
             }
         };
-        final CommandLineProcess process = new CommandLineProcess(binPath, Collections.emptyList(), 10, listener);
+        final CommandLineProcess process = new CommandLineProcess(binPath, Collections.emptyList(), listener);
         process.start();
 
-        waitTillLogsAreAvailable(process.getLogs());
+        waitTillLogsAreAvailable(stdout, 3);
+        waitTillLogsAreAvailable(stdErr, 1);
 
         // if the lines are there, it switches to infinite loop. We'll have to terminate it
         process.stop();
 
-        final Integer exitValue = exitValueFuture.get(10, TimeUnit.SECONDS);
-        Assertions.assertThat(exitValue).isGreaterThan(0);
-
-
-        Assertions.assertThat(process.getLogs().stdOut())
+        Assertions.assertThat(stdout)
                 .hasSize(3)
                 .containsExactlyInAnyOrder("Hello World", "second line", "third line");
 
-        Assertions.assertThat(process.getLogs().stdErr())
+        Assertions.assertThat(stdErr)
                 .hasSize(1)
                 .contains("This message goes to stderr");
 
     }
 
-    private static void waitTillLogsAreAvailable(LogsCache logs) throws ExecutionException, RetryException {
+    private void waitTillLogsAreAvailable(List<String> logs, int expectedLinesCount) throws ExecutionException, RetryException {
         final Retryer<List<String>> retryer = RetryerBuilder.<List<String>>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(100, TimeUnit.MILLISECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(20))
-                .retryIfResult((res) -> res.size() < 3)
+                .retryIfResult((res) -> res.size() < expectedLinesCount)
                 .build();
 
-        // now we are waiting till the process produces 3 lines of stdoutput
-        retryer.call(logs::stdOut);
+
+        retryer.call(() -> logs);
+    }
+
+    @Test
+    void testExitCode() throws IOException, URISyntaxException, ExecutionException, InterruptedException, TimeoutException {
+        final URL bin = getClass().getResource("test-script.sh");
+        assert bin != null;
+        final Path binPath = Path.of(bin.toURI());
+
+        List<String> stdout = new LinkedList<>();
+        List<String> stdErr = new LinkedList<>();
+
+        final CompletableFuture<Integer> exitCodeFuture = new CompletableFuture<>();
+
+        final ProcessListener listener = new ProcessListener() {
+            @Override
+            public void onStart() {
+            }
+
+            @Override
+            public void onStdOut(String line) {
+            }
+
+            @Override
+            public void onStdErr(String line) {
+            }
+
+            @Override
+            public void onProcessComplete(int exitValue) {
+                exitCodeFuture.complete(exitValue);
+            }
+
+            @Override
+            public void onProcessFailed(ExecuteException e) {
+                exitCodeFuture.complete(e.getExitValue());
+            }
+        };
+        final CommandLineProcess process = new CommandLineProcess(binPath, List.of("143"), listener);
+        process.start();
+
+        final Integer exitCode = exitCodeFuture.get(10, TimeUnit.SECONDS);
+
+        Assertions.assertThat(exitCode).isEqualTo(143);
     }
 }

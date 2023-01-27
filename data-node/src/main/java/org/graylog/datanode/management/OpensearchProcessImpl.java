@@ -17,6 +17,7 @@
 package org.graylog.datanode.management;
 
 import com.github.oxo42.stateless4j.StateMachine;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.ProcessEvent;
@@ -36,6 +37,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Queue;
 
 class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
@@ -44,15 +46,18 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     private final RestHighLevelClient restClient;
 
     private final StateMachine<ProcessState, ProcessEvent> processState;
-    private final int logsCacheSize;
     private boolean isLeaderNode;
     private CommandLineProcess commandLineProcess;
+
+    private final Queue<String> stdout;
+    private final Queue<String> stderr;
 
     OpensearchProcessImpl(OpensearchConfiguration configuration, int logsCacheSize) {
         this.configuration = configuration;
         this.restClient = createRestClient(configuration);
         this.processState = ProcessStateMachine.createNew();
-        this.logsCacheSize = logsCacheSize;
+        this.stdout =  new CircularFifoQueue<>(logsCacheSize);
+        this.stderr =  new CircularFifoQueue<>(logsCacheSize);
     }
 
     private static RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
@@ -62,6 +67,16 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     public String opensearchVersion() {
         return configuration.opensearchVersion();
+    }
+
+    @Override
+    public List<String> stdOutLogs() {
+        return stdout.stream().toList();
+    }
+
+    @Override
+    public List<String> stdErrLogs() {
+        return stderr.stream().toList();
     }
 
     public RestHighLevelClient restClient() {
@@ -114,7 +129,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         final Path executable = configuration.opensearchDir().resolve(Paths.get("bin", "opensearch"));
         final List<String> arguments = configuration.asMap().entrySet().stream()
                 .map(it -> String.format(Locale.ROOT, "-E%s=%s", it.getKey(), it.getValue())).toList();
-        commandLineProcess = new CommandLineProcess(executable, arguments, this.logsCacheSize, this);
+        commandLineProcess = new CommandLineProcess(executable, arguments, this);
         commandLineProcess.start();
     }
 
@@ -124,13 +139,20 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     @Override
-    public Optional<ProcessLogs> processLogs() {
-        return Optional.ofNullable(commandLineProcess).map(CommandLineProcess::getLogs);
+    public void onStart() {
+        onEvent(ProcessEvent.PROCESS_STARTED);
     }
 
     @Override
-    public void onStart() {
-        onEvent(ProcessEvent.PROCESS_STARTED);
+    public void onStdOut(String line) {
+        LOG.info(line);
+        stdout.offer(line);
+    }
+
+    @Override
+    public void onStdErr(String line) {
+        LOG.warn(line);
+        stderr.offer(line);
     }
 
     @Override
