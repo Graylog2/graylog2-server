@@ -17,19 +17,24 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
+import { Pluralize } from 'components/common';
+
 import type { TimeBasedSizeOptimizingStrategyConfig } from './TimeBasedSizeOptimizingStrategyConfiguration';
 import { durationToRoundedDays } from './TimeBasedSizeOptimizingStrategyConfiguration';
 
 const TimeBasedSizeOptimizingStrategySummary = ({ config: { index_lifetime_hard, index_lifetime_soft } }: {config: TimeBasedSizeOptimizingStrategyConfig}) => {
+  const softLifetimeAsDays = durationToRoundedDays(index_lifetime_soft);
+  const hardLifetimeAsDays = durationToRoundedDays(index_lifetime_hard);
+
   return (
     <div>
       <dl>
         <dt>Index rotation strategy:</dt>
         <dd>Index Smart Size/Time</dd>
-        <dt>Soft lifetime:</dt>
-        <dd>{index_lifetime_soft} ({durationToRoundedDays(index_lifetime_soft)} day(s))</dd>
-        <dt>Hard lifetime:</dt>
-        <dd>{index_lifetime_hard} ({durationToRoundedDays(index_lifetime_hard)} day(s))</dd>
+        <dt>Minimum lifetime:</dt>
+        <dd>{index_lifetime_soft} ({softLifetimeAsDays} <Pluralize singular="day" plural="days" value={softLifetimeAsDays} /> )</dd>
+        <dt>Maximum lifetime:</dt>
+        <dd>{index_lifetime_hard} ({hardLifetimeAsDays} <Pluralize singular="day" plural="days" value={hardLifetimeAsDays} />)</dd>
       </dl>
     </div>
   );
