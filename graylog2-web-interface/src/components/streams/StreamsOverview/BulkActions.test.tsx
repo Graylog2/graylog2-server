@@ -18,8 +18,8 @@ import * as React from 'react';
 import { render, screen, within, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import selectEvent from 'react-select-event';
-import { Streams } from '@graylog/server-api';
 
+import { Streams } from '@graylog/server-api';
 import UserNotification from 'util/UserNotification';
 import BulkActions from 'components/streams/StreamsOverview/BulkActions';
 import { indexSets } from 'fixtures/indexSets';
@@ -39,7 +39,7 @@ jest.mock('@graylog/server-api', () => ({
 
 describe('StreamsOverview BulkActions', () => {
   const assignIndexSet = async () => {
-    userEvent.click(await screen.findByRole('button', { name: /assign index set/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /assign index set/i }));
 
     await screen.findByRole('heading', {
       name: /assign index set to 2 streams/i,
