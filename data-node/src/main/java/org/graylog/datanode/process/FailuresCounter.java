@@ -16,18 +16,24 @@
  */
 package org.graylog.datanode.process;
 
-/**
- * Caution, starts initialized with 1, the usage expects that the checks and increments will happen already during
- * the first error handling.
- */
 public class FailuresCounter {
 
     private int counter;
+    private final int initialValue;
     private final int maxFailuresCount;
 
-    public FailuresCounter(int maxFailuresCount) {
+    private FailuresCounter(int initialValue, int maxFailuresCount) {
         this.maxFailuresCount = maxFailuresCount;
+        this.initialValue = initialValue;
         resetFailuresCounter();
+    }
+
+    public static FailuresCounter oneBased(int maxFailuresCount) {
+        return new FailuresCounter(1, maxFailuresCount);
+    }
+
+    public static FailuresCounter zeroBased(int maxFailuresCount) {
+        return new FailuresCounter(0, maxFailuresCount);
     }
 
     public synchronized void increment() {
@@ -39,6 +45,6 @@ public class FailuresCounter {
     }
 
     public synchronized void resetFailuresCounter() {
-        this.counter = 1;
+        this.counter = initialValue;
     }
 }

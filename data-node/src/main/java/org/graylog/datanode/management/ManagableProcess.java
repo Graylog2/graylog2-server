@@ -17,24 +17,17 @@
 package org.graylog.datanode.management;
 
 import org.graylog.datanode.process.ProcessEvent;
-import org.graylog.datanode.process.ProcessInfo;
 import org.graylog.datanode.process.ProcessState;
-import org.opensearch.client.RestHighLevelClient;
 
 import java.io.IOException;
-import java.util.Optional;
 
-public interface OpensearchProcess extends ManagableProcess {
+public interface ManagableProcess {
 
-    Optional<ProcessLogs> processLogs();
+    void start() throws IOException;
 
-    ProcessInfo processInfo();
+    void stop();
 
-    RestHighLevelClient restClient();
+    void onEvent(ProcessEvent event);
 
-    Object nodeName();
-
-    void setLeaderNode(boolean isManagerNode);
-
-    String opensearchVersion();
+    boolean isInState(ProcessState state);
 }

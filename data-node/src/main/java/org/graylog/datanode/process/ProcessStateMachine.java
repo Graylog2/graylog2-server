@@ -30,9 +30,9 @@ public class ProcessStateMachine {
 
     public static StateMachine<ProcessState, ProcessEvent> createNew() {
 
-        final FailuresCounter restFailureCounter = new FailuresCounter(MAX_REST_TEMPORARY_FAILURES);
-        final FailuresCounter startupFailuresCounter = new FailuresCounter(MAX_REST_STARTUP_FAILURES);
-        final FailuresCounter rebootCounter = new FailuresCounter(MAX_REBOOT_FAILURES);
+        final FailuresCounter restFailureCounter = FailuresCounter.oneBased(MAX_REST_TEMPORARY_FAILURES);
+        final FailuresCounter startupFailuresCounter = FailuresCounter.oneBased(MAX_REST_STARTUP_FAILURES);
+        final FailuresCounter rebootCounter = FailuresCounter.oneBased(MAX_REBOOT_FAILURES);
 
         StateMachineConfig<ProcessState, ProcessEvent> config = new StateMachineConfig<>();
 

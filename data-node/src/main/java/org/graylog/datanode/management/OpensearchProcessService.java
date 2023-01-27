@@ -28,20 +28,24 @@ import javax.inject.Singleton;
 public class OpensearchProcessService extends AbstractIdleService implements Provider<OpensearchProcess> {
 
     private final OpensearchProcess process;
+    private final ProcessWatchdog processWatchdog;
 
     @Inject
     public OpensearchProcessService(OpensearchConfiguration config, @Named(value = "process_logs_buffer_size") int logsSize) {
         this.process = new OpensearchProcessImpl(config, logsSize);
+        this.processWatchdog = new ProcessWatchdog(process);
     }
 
     @Override
     protected void startUp() throws Exception {
         this.process.start();
+        this.processWatchdog.start();
     }
 
 
     @Override
     protected void shutDown() {
+        this.processWatchdog.stop();
         this.process.stop();
     }
 

@@ -37,27 +37,27 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-class OpensearchProcessImpl implements OpensearchProcess, ProcessListener  {
+class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessService.class);
     private final OpensearchConfiguration configuration;
     private final RestHighLevelClient restClient;
 
     private final StateMachine<ProcessState, ProcessEvent> processState;
+    private final int logsCacheSize;
     private boolean isLeaderNode;
-    private final CommandLineProcess commandLineProcess;
+    private CommandLineProcess commandLineProcess;
 
-    public OpensearchProcessImpl(OpensearchConfiguration configuration, int logsSize) {
+    OpensearchProcessImpl(OpensearchConfiguration configuration, int logsCacheSize) {
         this.configuration = configuration;
-        RestClientBuilder builder = RestClient.builder(new HttpHost("localhost", configuration.httpPort(), "http"));
-        this.restClient = new RestHighLevelClient(builder);
+        this.restClient = createRestClient(configuration);
         this.processState = ProcessStateMachine.createNew();
+        this.logsCacheSize = logsCacheSize;
+    }
 
-        final Path executable = configuration.opensearchDir().resolve(Paths.get("bin", "opensearch"));
-
-        final List<String> arguments = configuration.asMap().entrySet().stream()
-                .map(it -> String.format(Locale.ROOT, "-E%s=%s", it.getKey(), it.getValue())).toList();
-        commandLineProcess = new CommandLineProcess(executable, arguments, logsSize, this);
+    private static RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
+        RestClientBuilder builder = RestClient.builder(new HttpHost("localhost", configuration.httpPort(), "http"));
+        return new RestHighLevelClient(builder);
     }
 
     public String opensearchVersion() {
@@ -110,12 +110,16 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener  {
     }
 
     @Override
-    public void start() throws IOException {
+    public synchronized void start() throws IOException {
+        final Path executable = configuration.opensearchDir().resolve(Paths.get("bin", "opensearch"));
+        final List<String> arguments = configuration.asMap().entrySet().stream()
+                .map(it -> String.format(Locale.ROOT, "-E%s=%s", it.getKey(), it.getValue())).toList();
+        commandLineProcess = new CommandLineProcess(executable, arguments, this.logsCacheSize, this);
         commandLineProcess.start();
     }
 
     @Override
-    public void stop() {
+    public synchronized void stop() {
         commandLineProcess.stop();
     }
 

@@ -17,24 +17,39 @@
 package org.graylog.datanode.management;
 
 import org.graylog.datanode.process.ProcessEvent;
-import org.graylog.datanode.process.ProcessInfo;
 import org.graylog.datanode.process.ProcessState;
-import org.opensearch.client.RestHighLevelClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.Optional;
+public class TestableProcess implements ManagableProcess {
 
-public interface OpensearchProcess extends ManagableProcess {
+    private static final Logger LOG = LoggerFactory.getLogger(TestableProcess.class);
 
-    Optional<ProcessLogs> processLogs();
+    private volatile ProcessState state;
 
-    ProcessInfo processInfo();
+    public TestableProcess() {
+        this.state = ProcessState.NEW;
+    }
 
-    RestHighLevelClient restClient();
+    @Override
+    public void start() {
+        LOG.debug("Starting process");
+        this.state = ProcessState.STARTING;
+    }
 
-    Object nodeName();
+    @Override
+    public void stop() {
+        LOG.debug("Stopping process process");
+        this.state = ProcessState.TERMINATED;
+    }
 
-    void setLeaderNode(boolean isManagerNode);
+    @Override
+    public void onEvent(ProcessEvent event) {
+        // ignored
+    }
 
-    String opensearchVersion();
+    @Override
+    public boolean isInState(ProcessState state) {
+        return this.state == state;
+    }
 }
