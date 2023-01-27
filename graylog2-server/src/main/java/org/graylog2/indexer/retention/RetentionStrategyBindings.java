@@ -25,7 +25,10 @@ public class RetentionStrategyBindings extends PluginModule {
     @Override
     protected void configure() {
         addRetentionStrategy(DeletionRetentionStrategy.class);
-        addRetentionStrategy(ClosingRetentionStrategy.class);
-        addRetentionStrategy(NoopRetentionStrategy.class);
+
+        if (!isCloud()) {
+            addRetentionStrategy(ClosingRetentionStrategy.class);
+            addRetentionStrategy(NoopRetentionStrategy.class);
+        }
     }
 }
