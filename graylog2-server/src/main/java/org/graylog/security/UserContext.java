@@ -34,7 +34,7 @@ import java.util.concurrent.Callable;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-public class UserContext {
+public class UserContext implements HasUser {
     private final UserService userService;
     private final String userId;
     private final Subject subject;
@@ -116,6 +116,7 @@ public class UserContext {
         return userId;
     }
 
+    @Override
     public User getUser() {
         return Optional.ofNullable(userService.loadById(userId)).orElseThrow(() -> new IllegalStateException("Cannot load user <" + userId + "> from db"));
     }
