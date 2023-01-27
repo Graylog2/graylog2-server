@@ -46,7 +46,6 @@ import com.google.inject.name.Names;
 import com.google.inject.spi.Message;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
-import joptsimple.internal.Strings;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -214,7 +213,7 @@ public abstract class CmdLineTool implements CliCommand {
         // c.f. https://github.com/Graylog2/graylog2-server/issues/10944
         if (tlsProtocols == null || !(tlsProtocols.isEmpty() || tlsProtocols.contains("TLSv1") || tlsProtocols.contains("TLSv1.1"))) {
             disabledAlgorithms.addAll(ImmutableSet.of("CBC", "3DES"));
-            Security.setProperty("jdk.tls.disabledAlgorithms", Strings.join(disabledAlgorithms, ", "));
+            Security.setProperty("jdk.tls.disabledAlgorithms", String.join(", ", disabledAlgorithms));
         } else {
             // Remove explicitly enabled legacy TLS protocols from the disabledAlgorithms filter
             Set<String> reEnabledTLSProtocols;
@@ -227,7 +226,7 @@ public abstract class CmdLineTool implements CliCommand {
                     .filter(p -> !reEnabledTLSProtocols.contains(p))
                     .collect(Collectors.toList());
 
-            Security.setProperty("jdk.tls.disabledAlgorithms", Strings.join(updatedProperties, ", "));
+            Security.setProperty("jdk.tls.disabledAlgorithms", String.join(", ", updatedProperties));
         }
 
         // Explicitly register Bouncy Castle as security provider.

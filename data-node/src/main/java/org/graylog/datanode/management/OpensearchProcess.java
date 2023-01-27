@@ -16,12 +16,9 @@
  */
 package org.graylog.datanode.management;
 
-import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessInfo;
-import org.graylog.datanode.process.ProcessState;
-import org.opensearch.client.RestHighLevelClient;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 
-import java.io.IOException;
 import java.util.Optional;
 
 public interface OpensearchProcess extends ManagableProcess {

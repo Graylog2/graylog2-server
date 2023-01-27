@@ -40,6 +40,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <opensearch.version>2.4.1</opensearch.version>
+        <opensearch.rest.client.version>2.2.0-1</opensearch.rest.client.version>
     </properties>
 
     <dependencies>
@@ -314,10 +315,11 @@
             <version>${joda-time.version}</version>
         </dependency>
 
+
         <dependency>
-            <groupId>org.opensearch.client</groupId>
-            <artifactId>opensearch-rest-high-level-client</artifactId>
-            <version>${opensearch.version}</version>
+            <groupId>org.graylog.shaded</groupId>
+            <artifactId>opensearch22-rest-high-level-client</artifactId>
+            <version>${opensearch.rest.client.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
@@ -325,6 +327,19 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.graylog.shaded</groupId>
+            <artifactId>opensearch22-rest-client-sniffer</artifactId>
+            <version>${opensearch.rest.client.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>

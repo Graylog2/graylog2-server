@@ -19,9 +19,9 @@ package org.graylog.datanode.periodicals;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.process.ProcessState;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog2.plugin.periodical.Periodical;
-import org.opensearch.client.Request;
-import org.opensearch.client.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
