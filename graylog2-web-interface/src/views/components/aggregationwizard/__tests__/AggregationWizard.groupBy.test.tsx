@@ -33,7 +33,6 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import dataTable from 'views/components/datatable/bindings';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 
 import AggregationWizard from '../AggregationWizard';
