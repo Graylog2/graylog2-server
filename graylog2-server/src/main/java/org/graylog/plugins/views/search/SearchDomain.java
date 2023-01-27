@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search;
 
+import io.opentelemetry.api.trace.Tracer;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog.plugins.views.search.permissions.SearchPermissions;
@@ -38,29 +39,40 @@ public class SearchDomain {
     private final SearchExecutionGuard executionGuard;
     private final ViewService viewService;
     private final Map<String, ViewResolver> viewResolvers;
+    private Tracer tracer;
 
     @Inject
     public SearchDomain(SearchDbService dbService,
                         SearchExecutionGuard executionGuard,
                         ViewService viewService,
-                        Map<String, ViewResolver> viewResolvers) {
+                        Map<String, ViewResolver> viewResolvers,
+                        Tracer tracer) {
         this.dbService = dbService;
         this.executionGuard = executionGuard;
         this.viewService = viewService;
         this.viewResolvers = viewResolvers;
+        this.tracer = tracer;
     }
 
     public Optional<Search> getForUser(String id, SearchUser searchUser) {
-        final Optional<Search> search = dbService.get(id);
+        var span = tracer.spanBuilder("SearchDomain#getForUser")
+                .setAttribute("search-id", id)
+                .startSpan();
+        try (var cs = span.makeCurrent()) {
+            final Optional<Search> search = dbService.get(id);
 
-        search.ifPresent(s -> checkPermission(searchUser, s));
+            search.ifPresent(s -> checkPermission(searchUser, s));
 
-        return search;
+            return search;
+        } finally {
+            span.end();
+        }
     }
 
     private void checkPermission(SearchUser searchUser, Search search) {
-        if (!hasReadPermissionFor(searchUser, searchUser::canReadView, search))
+        if (!hasReadPermissionFor(searchUser, searchUser::canReadView, search)) {
             throw new PermissionException("User " + searchUser.username() + " does not have permission to load search " + search.id());
+        }
     }
 
     public List<Search> getAllForUser(SearchPermissions searchPermissions, Predicate<ViewDTO> viewReadPermission) {
@@ -90,8 +102,9 @@ public class SearchDomain {
         views.addAll(viewService.forSearch(search.id()));
         views.addAll(viewResolvers.values().stream()
                 .flatMap(viewResolver -> viewResolver.getBySearchId(search.id()).stream()).collect(Collectors.toSet()));
-        if (views.isEmpty())
+        if (views.isEmpty()) {
             return false;
+        }
 
         return views.stream().anyMatch(viewReadPermission);
     }

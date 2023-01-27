@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch2.views;
 
 import com.google.common.collect.Maps;
 import com.google.inject.name.Named;
+import io.opentelemetry.api.trace.Tracer;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
@@ -75,6 +76,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
     private final IndexLookup indexLookup;
     private final OSGeneratedQueryContext.Factory queryContextFactory;
     private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
+    private Tracer tracer;
     private final boolean allowLeadingWildcard;
 
     @Inject
@@ -83,6 +85,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                              IndexLookup indexLookup,
                              OSGeneratedQueryContext.Factory queryContextFactory,
                              UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,
+                             Tracer tracer,
                              @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
         this.openSearchSearchTypeHandlers = elasticsearchSearchTypeHandlers;
         this.client = client;
@@ -90,6 +93,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
 
         this.queryContextFactory = queryContextFactory;
         this.usedSearchFiltersToQueryStringsMapper = usedSearchFiltersToQueryStringsMapper;
+        this.tracer = tracer;
         this.allowLeadingWildcard = allowLeadingWildcard;
     }
 
@@ -202,92 +206,100 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
 
     @Override
     public QueryResult doRun(SearchJob job, Query query, OSGeneratedQueryContext queryContext) {
-        if (query.searchTypes().isEmpty()) {
-            return QueryResult.builder()
-                    .query(query)
-                    .searchTypes(Collections.emptyMap())
-                    .errors(new HashSet<>(queryContext.errors()))
-                    .build();
-        }
-        LOG.debug("Running query {} for job {}", query.id(), job.getId());
-        final HashMap<String, SearchType.Result> resultsMap = Maps.newHashMap();
-
-        final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(query.usedStreamIds(), query.timerange());
-
-        final Map<String, SearchSourceBuilder> searchTypeQueries = queryContext.searchTypeQueries();
-        final List<String> searchTypeIds = new ArrayList<>(searchTypeQueries.keySet());
-
-        final List<SearchRequest> searches = searchTypeIds
-                .stream()
-                .map(searchTypeId -> {
-                    final Set<String> affectedIndicesForSearchType = query.searchTypes().stream()
-                            .filter(s -> s.id().equalsIgnoreCase(searchTypeId)).findFirst()
-                            .flatMap(searchType -> {
-                                if (searchType.effectiveStreams().isEmpty()
-                                        && !query.globalOverride().flatMap(GlobalOverride::timerange).isPresent()
-                                        && !searchType.timerange().isPresent()) {
-                                    return Optional.empty();
-                                }
-                                return Optional.of(indexLookup.indexNamesForStreamsInTimeRange(query.effectiveStreams(searchType), query.effectiveTimeRange(searchType)));
-                            })
-                            .orElse(affectedIndices);
-
-                    Set<String> indices = affectedIndicesForSearchType.isEmpty() ? Collections.singleton("") : affectedIndicesForSearchType;
-                    return new SearchRequest()
-                            .source(searchTypeQueries.get(searchTypeId))
-                            .indices(indices.toArray(new String[0]))
-                            .indicesOptions(IndicesOptions.fromOptions(false, false, true, false));
-                })
-                .collect(Collectors.toList());
-
-        final List<MultiSearchResponse.Item> results = client.msearch(searches, "Unable to perform search query: ");
-
-        for (SearchType searchType : query.searchTypes()) {
-            final String searchTypeId = searchType.id();
-            final Provider<OSSearchTypeHandler<? extends SearchType>> handlerProvider = openSearchSearchTypeHandlers.get(searchType.type());
-            if (handlerProvider == null) {
-                LOG.error("Unknown search type '{}', cannot convert query result.", searchType.type());
-                // no need to add another error here, as the query generation code will have added the error about the missing handler already
-                continue;
+        var span = tracer.spanBuilder("OpenSearchBackend#doRun")
+                .setAttribute("org.graylog.search.id", job.getSearchId())
+                .setAttribute("org.graylog.search.job.id", job.getId())
+                .startSpan();
+        try (var cs = span.makeCurrent()) {
+            if (query.searchTypes().isEmpty()) {
+                return QueryResult.builder()
+                        .query(query)
+                        .searchTypes(Collections.emptyMap())
+                        .errors(new HashSet<>(queryContext.errors()))
+                        .build();
             }
+            LOG.debug("Running query {} for job {}", query.id(), job.getId());
+            final HashMap<String, SearchType.Result> resultsMap = Maps.newHashMap();
 
-            if (isSearchTypeWithError(queryContext, searchTypeId)) {
-                LOG.error("Failed search type '{}', cannot convert query result, skipping.", searchType.type());
-                // no need to add another error here, as the query generation code will have added the error about the missing handler already
-                continue;
-            }
+            final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(query.usedStreamIds(), query.timerange());
 
-            // we create a new instance because some search type handlers might need to track information between generating the query and
-            // processing its result, such as aggregations, which depend on the name and type
-            final OSSearchTypeHandler<? extends SearchType> handler = handlerProvider.get();
-            final int searchTypeIndex = searchTypeIds.indexOf(searchTypeId);
-            final MultiSearchResponse.Item multiSearchResponse = results.get(searchTypeIndex);
-            if (multiSearchResponse.isFailure()) {
-                ElasticsearchException e = new ElasticsearchException("Search type returned error: ", multiSearchResponse.getFailure());
-                queryContext.addError(SearchTypeErrorParser.parse(query, searchTypeId, e));
-            } else if (checkForFailedShards(multiSearchResponse).isPresent()) {
-                ElasticsearchException e = checkForFailedShards(multiSearchResponse).get();
-                queryContext.addError(SearchTypeErrorParser.parse(query, searchTypeId, e));
-            } else {
-                try {
-                    final SearchType.Result searchTypeResult = handler.extractResult(job, query, searchType, multiSearchResponse.getResponse(), queryContext);
-                    if (searchTypeResult != null) {
-                        resultsMap.put(searchTypeId, searchTypeResult);
-                    }
-                } catch (Exception e) {
-                    LOG.warn("Unable to extract results: ", e);
-                    queryContext.addError(new SearchTypeError(query, searchTypeId, e));
+            final Map<String, SearchSourceBuilder> searchTypeQueries = queryContext.searchTypeQueries();
+            final List<String> searchTypeIds = new ArrayList<>(searchTypeQueries.keySet());
+
+            final List<SearchRequest> searches = searchTypeIds
+                    .stream()
+                    .map(searchTypeId -> {
+                        final Set<String> affectedIndicesForSearchType = query.searchTypes().stream()
+                                .filter(s -> s.id().equalsIgnoreCase(searchTypeId)).findFirst()
+                                .flatMap(searchType -> {
+                                    if (searchType.effectiveStreams().isEmpty()
+                                            && !query.globalOverride().flatMap(GlobalOverride::timerange).isPresent()
+                                            && !searchType.timerange().isPresent()) {
+                                        return Optional.empty();
+                                    }
+                                    return Optional.of(indexLookup.indexNamesForStreamsInTimeRange(query.effectiveStreams(searchType), query.effectiveTimeRange(searchType)));
+                                })
+                                .orElse(affectedIndices);
+
+                        Set<String> indices = affectedIndicesForSearchType.isEmpty() ? Collections.singleton("") : affectedIndicesForSearchType;
+                        return new SearchRequest()
+                                .source(searchTypeQueries.get(searchTypeId))
+                                .indices(indices.toArray(new String[0]))
+                                .indicesOptions(IndicesOptions.fromOptions(false, false, true, false));
+                    })
+                    .collect(Collectors.toList());
+
+            final List<MultiSearchResponse.Item> results = client.msearch(searches, "Unable to perform search query: ");
+
+            for (SearchType searchType : query.searchTypes()) {
+                final String searchTypeId = searchType.id();
+                final Provider<OSSearchTypeHandler<? extends SearchType>> handlerProvider = openSearchSearchTypeHandlers.get(searchType.type());
+                if (handlerProvider == null) {
+                    LOG.error("Unknown search type '{}', cannot convert query result.", searchType.type());
+                    // no need to add another error here, as the query generation code will have added the error about the missing handler already
+                    continue;
                 }
 
-            }
-        }
+                if (isSearchTypeWithError(queryContext, searchTypeId)) {
+                    LOG.error("Failed search type '{}', cannot convert query result, skipping.", searchType.type());
+                    // no need to add another error here, as the query generation code will have added the error about the missing handler already
+                    continue;
+                }
 
-        LOG.debug("Query {} ran for job {}", query.id(), job.getId());
-        return QueryResult.builder()
-                .query(query)
-                .searchTypes(resultsMap)
-                .errors(new HashSet<>(queryContext.errors()))
-                .build();
+                // we create a new instance because some search type handlers might need to track information between generating the query and
+                // processing its result, such as aggregations, which depend on the name and type
+                final OSSearchTypeHandler<? extends SearchType> handler = handlerProvider.get();
+                final int searchTypeIndex = searchTypeIds.indexOf(searchTypeId);
+                final MultiSearchResponse.Item multiSearchResponse = results.get(searchTypeIndex);
+                if (multiSearchResponse.isFailure()) {
+                    ElasticsearchException e = new ElasticsearchException("Search type returned error: ", multiSearchResponse.getFailure());
+                    queryContext.addError(SearchTypeErrorParser.parse(query, searchTypeId, e));
+                } else if (checkForFailedShards(multiSearchResponse).isPresent()) {
+                    ElasticsearchException e = checkForFailedShards(multiSearchResponse).get();
+                    queryContext.addError(SearchTypeErrorParser.parse(query, searchTypeId, e));
+                } else {
+                    try {
+                        final SearchType.Result searchTypeResult = handler.extractResult(job, query, searchType, multiSearchResponse.getResponse(), queryContext);
+                        if (searchTypeResult != null) {
+                            resultsMap.put(searchTypeId, searchTypeResult);
+                        }
+                    } catch (Exception e) {
+                        LOG.warn("Unable to extract results: ", e);
+                        queryContext.addError(new SearchTypeError(query, searchTypeId, e));
+                    }
+
+                }
+            }
+
+            LOG.debug("Query {} ran for job {}", query.id(), job.getId());
+            return QueryResult.builder()
+                    .query(query)
+                    .searchTypes(resultsMap)
+                    .errors(new HashSet<>(queryContext.errors()))
+                    .build();
+        } finally {
+            span.end();
+        }
     }
 
     private Optional<ElasticsearchException> checkForFailedShards(MultiSearchResponse.Item multiSearchResponse) {

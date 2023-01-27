@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -83,6 +84,7 @@ public class MongoDbAuthorizationRealm extends AuthorizingRealm {
         return principals.asSet();
     }
 
+    @WithSpan("MongoDbAuthorizationRealm#doGetAuthorizationInfo")
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         LOG.debug("Retrieving authorization information for: {}", principals);

@@ -17,6 +17,9 @@
 package org.graylog.plugins.views.search.engine;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Context;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryMetadata;
 import org.graylog.plugins.views.search.QueryMetadataDecorator;
@@ -47,6 +50,7 @@ public class QueryEngine {
 
     private final Set<QueryMetadataDecorator> queryMetadataDecorators;
     private final QueryParser queryParser;
+    private Tracer tracer;
 
     // TODO proper thread pool with tunable settings
     private final Executor queryPool = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("query-engine-%d").build());
@@ -55,10 +59,12 @@ public class QueryEngine {
     @Inject
     public QueryEngine(QueryBackend<? extends GeneratedQueryContext> backend,
                        Set<QueryMetadataDecorator> queryMetadataDecorators,
-                       QueryParser queryParser) {
+                       QueryParser queryParser,
+                       Tracer tracer) {
         this.backend = backend;
         this.queryMetadataDecorators = queryMetadataDecorators;
         this.queryParser = queryParser;
+        this.tracer = tracer;
     }
 
     public QueryMetadata parse(Search search, Query query) {
@@ -76,55 +82,71 @@ public class QueryEngine {
                 .filter(query -> !isQueryWithError(validationErrors, query))
                 .collect(Collectors.toSet());
 
-        validQueries.forEach(query -> searchJob.addQueryResultFuture(query.id(),
-                // generate and run each query, making sure we never let an exception escape
-                // if need be we default to an empty result with a failed state and the wrapped exception
-                CompletableFuture.supplyAsync(() -> prepareAndRun(searchJob, query, validationErrors), queryPool)
-                        .handle((queryResult, throwable) -> {
-                            if (throwable != null) {
-                                final Throwable cause = throwable.getCause();
-                                final SearchError error;
-                                if (cause instanceof SearchException) {
-                                    error = ((SearchException) cause).error();
-                                } else {
-                                    error = new QueryError(query, cause);
+        var span = tracer.spanBuilder("QueryEngine#execute")
+                .setAttribute("org.graylog.search.id", searchJob.getSearchId())
+                .setAttribute("org.graylog.search.job.id", searchJob.getId())
+                .startSpan();
+
+        try {
+            validQueries.forEach(query -> searchJob.addQueryResultFuture(query.id(),
+                    // generate and run each query, making sure we never let an exception escape
+                    // if need be we default to an empty result with a failed state and the wrapped exception
+                    CompletableFuture.supplyAsync(() -> prepareAndRun(searchJob, query, validationErrors, span), queryPool)
+                            .handle((queryResult, throwable) -> {
+                                if (throwable != null) {
+                                    final Throwable cause = throwable.getCause();
+                                    final SearchError error;
+                                    if (cause instanceof SearchException) {
+                                        error = ((SearchException) cause).error();
+                                    } else {
+                                        error = new QueryError(query, cause);
+                                    }
+                                    LOG.debug("Running query {} failed: {}", query.id(), cause);
+                                    searchJob.addError(error);
+                                    return QueryResult.failedQueryWithError(query, error);
                                 }
-                                LOG.debug("Running query {} failed: {}", query.id(), cause);
-                                searchJob.addError(error);
-                                return QueryResult.failedQueryWithError(query, error);
-                            }
-                            return queryResult;
-                        })
-        ));
+                                return queryResult;
+                            })
+            ));
 
-        validQueries.forEach(query -> {
-            final CompletableFuture<QueryResult> queryResultFuture = searchJob.getQueryResultFuture(query.id());
-            if (!queryResultFuture.isDone()) {
-                // this is not going to throw an exception, because we will always replace it with a placeholder "FAILED" result above
-                final QueryResult result = queryResultFuture.join();
+            validQueries.forEach(query -> {
+                final CompletableFuture<QueryResult> queryResultFuture = searchJob.getQueryResultFuture(query.id());
+                if (!queryResultFuture.isDone()) {
+                    // this is not going to throw an exception, because we will always replace it with a placeholder "FAILED" result above
+                    final QueryResult result = queryResultFuture.join();
 
-            } else {
-                LOG.debug("[{}] Not generating query for query {}", defaultIfEmpty(query.id(), "root"), query);
-            }
-        });
+                } else {
+                    LOG.debug("[{}] Not generating query for query {}", defaultIfEmpty(query.id(), "root"), query);
+                }
+            });
 
-        LOG.debug("Search job {} executing", searchJob.getId());
-        return searchJob.seal();
+            LOG.debug("Search job {} executing", searchJob.getId());
+            return searchJob.seal();
+        } finally {
+            span.end();
+        }
     }
 
-    private QueryResult prepareAndRun(SearchJob searchJob, Query query, Set<SearchError> validationErrors) {
-        LOG.debug("[{}] Using {} to generate query", query.id(), backend);
-        // with all the results done, we can execute the current query and eventually complete our own result
-        // if any of this throws an exception, the handle in #execute will convert it to an error and return a "failed" result instead
-        // if the backend already returns a "failed result" then nothing special happens here
-        final GeneratedQueryContext generatedQueryContext = backend.generate(query, validationErrors);
-        LOG.trace("[{}] Generated query {}, running it on backend {}", query.id(), generatedQueryContext, backend);
-        final QueryResult result = backend.run(searchJob, query, generatedQueryContext);
-        LOG.debug("[{}] Query returned {}", query.id(), result);
-        if (!generatedQueryContext.errors().isEmpty()) {
-            generatedQueryContext.errors().forEach(searchJob::addError);
+    private QueryResult prepareAndRun(SearchJob searchJob, Query query, Set<SearchError> validationErrors, Span parentSpan) {
+        var span = tracer.spanBuilder("QueryEngine#prepareAndRun")
+                .setParent(Context.current().with(parentSpan))
+                .startSpan();
+        try (var cs = span.makeCurrent()) {
+            LOG.debug("[{}] Using {} to generate query", query.id(), backend);
+            // with all the results done, we can execute the current query and eventually complete our own result
+            // if any of this throws an exception, the handle in #execute will convert it to an error and return a "failed" result instead
+            // if the backend already returns a "failed result" then nothing special happens here
+            final GeneratedQueryContext generatedQueryContext = backend.generate(query, validationErrors);
+            LOG.trace("[{}] Generated query {}, running it on backend {}", query.id(), generatedQueryContext, backend);
+            final QueryResult result = backend.run(searchJob, query, generatedQueryContext);
+            LOG.debug("[{}] Query returned {}", query.id(), result);
+            if (!generatedQueryContext.errors().isEmpty()) {
+                generatedQueryContext.errors().forEach(searchJob::addError);
+            }
+            return result;
+        } finally {
+            span.end();
         }
-        return result;
     }
 
     private boolean isQueryWithError(Collection<SearchError> validationErrors, Query query) {
