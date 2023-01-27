@@ -78,7 +78,7 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
 
         Period leeWay;
         if (indexSet.getConfig().rotationStrategy() instanceof TimeBasedSizeOptimizingStrategyConfig rotationConfig) {
-            leeWay = rotationConfig.indexLifetimeHard().minus(rotationConfig.indexLifetimeSoft());
+            leeWay = rotationConfig.indexLifetimeMax().minus(rotationConfig.indexLifetimeMin());
         } else {
             throw new IllegalStateException(f("Unsupported RotationStrategyConfig type <%s>", indexSet.getConfig().rotationStrategy()));
         }
@@ -100,8 +100,8 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
 
         if (indexIsOldEnough(creationDate) && !indexSubceedsSizeLimit(sizeInBytes)) {
             return createResult(true,
-                    f("Index is old enough (%s) and has a reasonable size (%s) for rotation",
-                            creationDate, StringUtils.humanReadableByteCount(sizeInBytes)));
+                    f("Index creation date <%s> has passed rotation period <%s> and has a reasonable size <%s> for rotation",
+                            creationDate, rotationPeriod, StringUtils.humanReadableByteCount(sizeInBytes)));
         }
 
         return createResult(false, "No reason to rotate found");

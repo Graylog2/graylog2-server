@@ -118,7 +118,7 @@ class TimeBasedSizeOptimizingStrategyTest {
         final TimeBasedSizeOptimizingStrategy.Result result = timeBasedSizeOptimizingStrategy.shouldRotate("index_0", indexSet);
 
         assertThat(result.shouldRotate()).isEqualTo(true);
-        assertThat(result.getDescription()).contains("Index is old enough");
+        assertThat(result.getDescription()).contains("has passed rotation period");
     }
 
     @ParameterizedTest
@@ -126,7 +126,7 @@ class TimeBasedSizeOptimizingStrategyTest {
     void shouldRotateWhenBeyondLeeWay(String startDate) {
         setClockTo(startDate);
 
-        final Period leeWay = timeBasedSizeOptimizingStrategyConfig.indexLifetimeHard().minus(timeBasedSizeOptimizingStrategyConfig.indexLifetimeSoft());
+        final Period leeWay = timeBasedSizeOptimizingStrategyConfig.indexLifetimeMax().minus(timeBasedSizeOptimizingStrategyConfig.indexLifetimeMin());
         final Days leewayDays = Days.days(leeWay.getDays());
         final DateTime creationDate = clock.nowUTC().minus(
                 elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod().plus(leewayDays))
@@ -158,6 +158,6 @@ class TimeBasedSizeOptimizingStrategyTest {
         final TimeBasedSizeOptimizingStrategy.Result result = timeBasedSizeOptimizingStrategy.shouldRotate("index_0", indexSet);
 
         assertThat(result.shouldRotate()).isEqualTo(true);
-        assertThat(result.getDescription()).contains("Index is old enough");
+        assertThat(result.getDescription()).contains("has passed rotation period");
     }
 }

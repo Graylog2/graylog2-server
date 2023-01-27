@@ -85,8 +85,8 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
         elasticsearchConfiguration = new ElasticsearchConfiguration();
         timeBasedSizeOptimizingStrategy = new TimeBasedSizeOptimizingStrategy(indices, nodeId, auditEventSender, elasticsearchConfiguration, clock);
         rotationStrategyConfig = TimeBasedSizeOptimizingStrategyConfig.builder()
-                .indexLifetimeSoft(Period.days(4))
-                .indexLifetimeHard(Period.days(6))
+                .indexLifetimeMin(Period.days(4))
+                .indexLifetimeMax(Period.days(6))
                 .build();
 
         final DeletionRetentionStrategyConfig deletionRetention = DeletionRetentionStrategyConfig.createDefault();

@@ -62,21 +62,21 @@ public abstract class AbstractIndexRetentionStrategy implements RetentionStrateg
 
     @Override
     public void retain(IndexSet indexSet) {
-        if (indexSet.getConfig().rotationStrategy() instanceof TimeBasedSizeOptimizingStrategyConfig smartConfig) {
-            retainTimeBased(indexSet, smartConfig);
+        if (indexSet.getConfig().rotationStrategy() instanceof TimeBasedSizeOptimizingStrategyConfig timeBasedConfig) {
+            retainTimeBased(indexSet, timeBasedConfig);
         } else {
             retainCountBased(indexSet);
         }
     }
 
-    private void retainTimeBased(IndexSet indexSet, TimeBasedSizeOptimizingStrategyConfig smartConfig) {
+    private void retainTimeBased(IndexSet indexSet, TimeBasedSizeOptimizingStrategyConfig timeBasedConfig) {
         final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
 
         final IndicesBlockStatus indicesBlocksStatus = indices.getIndicesBlocksStatus(deflectorIndices.keySet().stream().toList());
         // Account for DST and time zones in determining age
         final DateTime now = clock.nowUTC();
-        final long cutoffSoft = now.minus(smartConfig.indexLifetimeSoft()).getMillis();
-        final long cutoffHard = now.minus(smartConfig.indexLifetimeHard()).getMillis();
+        final long cutoffSoft = now.minus(timeBasedConfig.indexLifetimeMin()).getMillis();
+        final long cutoffHard = now.minus(timeBasedConfig.indexLifetimeMax()).getMillis();
         final int removeCount = (int)deflectorIndices.keySet()
                 .stream()
                 .filter(indexName -> indexIsReadOnly(indicesBlocksStatus, indexName))
