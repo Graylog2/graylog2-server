@@ -19,7 +19,7 @@ import { useContext, useCallback } from 'react';
 import { useFormikContext } from 'formik';
 
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import type { WidgetConfigFormValues, GroupByFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import type { GroupByFormValues, WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import Input from 'components/bootstrap/Input';
 import SelectedFieldsList from 'views/components/aggregationwizard/grouping/configuration/SelectedFieldsList';
 import type { GroupByError } from 'views/components/aggregationwizard/grouping/GroupingElement';
@@ -50,7 +50,6 @@ const FieldComponent = ({ groupingIndex }: Props) => {
   const { setFieldValue, values, errors } = useFormikContext<WidgetConfigFormValues>();
   const grouping = values.groupBy.groupings[groupingIndex];
   const activeQueryId = useActiveQueryId();
-
   const createSelectPlaceholder = placeholder(grouping);
 
   const onAddField = useCallback((fieldName: string) => {
