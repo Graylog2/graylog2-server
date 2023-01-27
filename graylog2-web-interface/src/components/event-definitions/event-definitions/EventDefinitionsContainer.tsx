@@ -34,7 +34,6 @@ import type { EventDefinition } from '../event-definitions-types';
 import useEventDefinitions from '../hooks/useEventDefinitions';
 
 const CUSTOM_COLUMN_DEFINITIONS = [
-  { id: 'title', title: 'Event Definition title', sortable: true },
   { id: 'scheduling', title: 'Scheduling', sortable: false },
   { id: 'status', title: 'Status', sortable: true },
 ];
@@ -53,9 +52,11 @@ const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
     ),
   },
   status: {
-    renderCell: (eventDefinition) => (
-      <StatusCell status={eventDefinition?.scheduler?.is_scheduled} />
-    ),
+    renderCell: (eventDefinition) => <StatusCell status={eventDefinition?.scheduler?.is_scheduled} />,
+    staticWidth: 100,
+  },
+  prority: {
+    staticWidth: 50,
   },
 });
 
