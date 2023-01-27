@@ -75,12 +75,15 @@ const SidecarFailureTrackingRows = ({ sidecar, collectors, onShowDetails }: Prop
         <tr key={collector.collector_id + collector.configuration_id}>
           <td>
             <Link to={Routes.SYSTEM.SIDECARS.STATUS(sidecar.node_id)}>
-              {collectorData?.name} on {sidecar.node_name}
+              {sidecar.node_name}
             </Link>
             <SecondaryText>{annotation}</SecondaryText>
             <SecondaryText>{collectorData?.node_operating_system}</SecondaryText>
             <SecondaryText>v{sidecar.sidecar_version}</SecondaryText>
             <SecondaryText>{sidecar.node_id}</SecondaryText>
+          </td>
+          <td>
+            {collectorData?.name}
           </td>
           <td>
             <RelativeTime dateTime={sidecar.last_seen} />

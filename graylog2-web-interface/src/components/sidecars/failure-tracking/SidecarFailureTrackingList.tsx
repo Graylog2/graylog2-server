@@ -36,6 +36,18 @@ const StyledSortIcon = styled(SortIcon)`
   }
 `;
 
+const StandardWidthCol = styled.col`
+  width: 9%;
+`;
+
+const ErrorMessageCol = styled.col`
+  width: 14%;
+`;
+
+const VerboseMessageCol = styled.col`
+  width: 50%;
+`;
+
 type Props = {
   sidecars: SidecarSummary[],
   collectors: Collector[],
@@ -67,7 +79,8 @@ const SidecarFailureTrackingList = ({
 
   const formatSidecarList = (sidecarRows: React.ReactNode[]) => {
     const sidecarCollection = {
-      node_name: 'Name',
+      node_name: 'Sidecar',
+      collector: 'Collector',
       last_seen: 'Last Seen',
       'node_details.status.status': 'Status',
       message: 'Error Message',
@@ -77,11 +90,12 @@ const SidecarFailureTrackingList = ({
     return (
       <Table striped responsive>
         <colgroup>
-          <col span={1} style={{ width: '15%' }} />
-          <col span={1} style={{ width: '10%' }} />
-          <col span={1} style={{ width: '10%' }} />
-          <col span={1} style={{ width: '15%' }} />
-          <col span={1} style={{ width: '50%' }} />
+          <StandardWidthCol />
+          <StandardWidthCol />
+          <StandardWidthCol />
+          <StandardWidthCol />
+          <ErrorMessageCol />
+          <VerboseMessageCol />
         </colgroup>
         <thead>
           <tr>

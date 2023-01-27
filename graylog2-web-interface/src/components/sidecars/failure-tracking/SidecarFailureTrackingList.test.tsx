@@ -100,7 +100,8 @@ describe('SidecarFailureTrackingList', () => {
                                   toggleShowInactive={toggleShowInactive} />,
     );
 
-    await findByText('Name');
+    await findByText('Sidecar');
+    await findByText('Collector');
     await findByText('Last Seen');
     await findByText('Status');
     await findByText('Error Message');
