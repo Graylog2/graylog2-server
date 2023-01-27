@@ -128,13 +128,6 @@ const Grid = ({ children, locked, onPositionsChange, positions, width }: GridPro
   );
 };
 
-const useQueryFieldTypes = () => {
-  const fieldTypes = useContext(FieldTypesContext);
-  const queryId = useStore(ViewMetadataStore, (viewMetadataStore) => viewMetadataStore.activeQuery);
-
-  return useMemo(() => fieldTypes.queryFields.get(queryId, fieldTypes.all), [fieldTypes.all, fieldTypes.queryFields, queryId]);
-};
-
 const MAXIMUM_GRID_SIZE = 12;
 
 const convertPosition = ({ col, row, height, width }: BackendWidgetPosition) => new WidgetPosition(col, row, height, width >= MAXIMUM_GRID_SIZE ? Infinity : width);
@@ -158,8 +151,6 @@ const WidgetGrid = () => {
 
   const positions = useWidgetPositions();
 
-  const fields = useQueryFieldTypes();
-
   const children = useMemo(() => widgets.map(({ id: widgetId }) => {
     const position = positions[widgetId];
 
@@ -169,14 +160,13 @@ const WidgetGrid = () => {
 
     return (
       <WidgetContainer key={widgetId} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
-        <WidgetGridItem fields={fields}
-                        positions={positions}
+        <WidgetGridItem positions={positions}
                         widgetId={widgetId}
                         focusedWidget={focusedWidget}
                         onPositionsChange={onPositionChange} />
       </WidgetContainer>
     );
-  }).filter((x) => (x !== null)), [fields, focusedWidget, positions, widgets]);
+  }).filter((x) => (x !== null)), [focusedWidget, positions, widgets]);
 
   // Measuring the width is required to update the widget grid
   // when its content height results in a scrollbar
