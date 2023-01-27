@@ -240,6 +240,7 @@ const ApiRoutes = {
     update: (streamId: string) => { return { url: `/streams/${streamId}` }; },
     cloneStream: (streamId: string) => { return { url: `/streams/${streamId}/clone` }; },
     delete: (streamId: string) => { return { url: `/streams/${streamId}` }; },
+    bulk_delete: { url: '/streams/bulk_delete' },
     pause: (streamId: string) => { return { url: `/streams/${streamId}/pause` }; },
     resume: (streamId: string) => { return { url: `/streams/${streamId}/resume` }; },
     testMatch: (streamId: string) => { return { url: `/streams/${streamId}/testMatch` }; },
