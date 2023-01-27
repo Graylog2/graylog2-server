@@ -48,7 +48,7 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime
   const minLifetimeAsDays = durationToRoundedDays(indexLifetimeMin);
   const maxLifetimeAsDays = durationToRoundedDays(indexLifetimeMax);
   const maxRotationPeriod = useMaxIndexRotationLimit();
-  const isMinGreaterThanMax = minLifetimeAsDays > maxLifetimeAsDays;
+  const isMinGreaterThanMax = useCallback(() => minLifetimeAsDays > maxLifetimeAsDays, [maxLifetimeAsDays, minLifetimeAsDays]);
 
   const _isValidPeriod = useCallback((duration: string) => {
     const checkInDays = durationToRoundedDays(duration);
@@ -64,11 +64,11 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime
     return _isValidPeriod(duration) ? `${durationToRoundedDays(duration)} days` : `invalid (min 1 day${maxRotationPeriodErrorMessage})`;
   }, [_isValidPeriod, maxRotationPeriod]);
 
-  const getHardlifetimeHelp = () => {
-    return isMinGreaterThanMax
+  const getHardlifetimeHelp = useCallback(() => {
+    return isMinGreaterThanMax()
       ? `Minimum lifetime ${minLifetimeAsDays} cannot be greater than the maximum ${maxLifetimeAsDays}`
       : 'The maximum time that data is available for searches. At least 1 day more than the minimum above. (i.e. "P10D" for 10 day).';
-  };
+  }, [isMinGreaterThanMax, maxLifetimeAsDays, minLifetimeAsDays]);
 
   const onLifetimeMinChange = (event: React.ChangeEvent<HTMLOptionElement>): void => {
     const inputValue = getValueFromInput(event.target);
@@ -91,7 +91,7 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime
   };
 
   const validationState = (duration: string) => {
-    if (_isValidPeriod(duration) && !isMinGreaterThanMax) {
+    if (_isValidPeriod(duration) && !isMinGreaterThanMax()) {
       return null;
     }
 
