@@ -22,7 +22,7 @@ import SizeBasedRotationStrategyConfiguration from './SizeBasedRotationStrategyC
 import SizeBasedRotationStrategySummary from './SizeBasedRotationStrategySummary';
 import TimeBasedRotationStrategyConfiguration from './TimeBasedRotationStrategyConfiguration';
 import TimeBasedRotationStrategySummary from './TimeBasedRotationStrategySummary';
-import TimeBasedSizeOptimizingStrategy from './TimeBasedSizeOptimizingStrategyConfiguration';
+import TimeBasedSizeOptimizingStrategyConfiguration from './TimeBasedSizeOptimizingStrategyConfiguration';
 import TimeBasedSizeOptimizingStrategySummary from './TimeBasedSizeOptimizingStrategySummary';
 
 PluginStore.register(new PluginManifest({}, {
@@ -48,7 +48,7 @@ PluginStore.register(new PluginManifest({}, {
     {
       type: 'org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy',
       displayName: 'Index Smart Time',
-      configComponent: TimeBasedSizeOptimizingStrategy,
+      configComponent: TimeBasedSizeOptimizingStrategyConfiguration,
       summaryComponent: TimeBasedSizeOptimizingStrategySummary,
     },
   ],

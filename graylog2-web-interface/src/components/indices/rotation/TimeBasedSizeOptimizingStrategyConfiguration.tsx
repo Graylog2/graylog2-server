@@ -42,7 +42,7 @@ const _validationLimit = (durationInDays, rotationLimit) => {
   return durationInDays <= durationToRoundedDays(rotationLimit);
 };
 
-const TimeBasedSizeOptimizingStrategy = ({ config: { index_lifetime_hard, index_lifetime_soft }, updateConfig }: Props) => {
+const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime_hard, index_lifetime_soft }, updateConfig }: Props) => {
   const [indexLifetimeHard, setIndexLifetimeHard] = useState(index_lifetime_hard);
   const [indexLifetimeSoft, setIndexLifetimeSoft] = useState(index_lifetime_soft);
   const softLifetimeAsDays = durationToRoundedDays(indexLifetimeSoft);
@@ -128,9 +128,9 @@ const TimeBasedSizeOptimizingStrategy = ({ config: { index_lifetime_hard, index_
   );
 };
 
-TimeBasedSizeOptimizingStrategy.propTypes = {
+TimeBasedSizeOptimizingStrategyConfiguration.propTypes = {
   config: PropTypes.object.isRequired,
   updateConfig: PropTypes.func.isRequired,
 };
 
-export default TimeBasedSizeOptimizingStrategy;
+export default TimeBasedSizeOptimizingStrategyConfiguration;
