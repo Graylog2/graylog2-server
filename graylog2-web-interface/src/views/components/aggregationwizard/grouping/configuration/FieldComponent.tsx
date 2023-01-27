@@ -20,6 +20,8 @@ import { useContext } from 'react';
 
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import { useStore } from 'stores/connect';
+import { ViewStore } from 'views/stores/ViewStore';
 
 import FieldSelect from '../../FieldSelect';
 
@@ -30,11 +32,13 @@ type Props = {
 
 const FieldComponent = ({ index, fieldType }: Props) => {
   const fieldTypes = useContext(FieldTypesContext);
+  const activeQueryId = useStore(ViewStore, ({ activeQuery: currentQuery }) => currentQuery);
   const { setFieldValue } = useFormikContext<WidgetConfigFormValues>();
+  const queryFieldTypes = fieldTypes.queryFields.get(activeQueryId, fieldTypes.all);
 
   const onChangeField = (e, name, onChange) => {
     const fieldName = e.target.value;
-    const newField = fieldTypes.all.find((field) => field.name === fieldName);
+    const newField = queryFieldTypes.find((field) => field.name === fieldName);
     const newFieldType = newField?.type.type === 'date' ? 'time' : 'values';
 
     if (fieldType !== newFieldType) {
