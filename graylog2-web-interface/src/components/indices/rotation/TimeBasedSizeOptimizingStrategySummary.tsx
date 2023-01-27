@@ -22,9 +22,9 @@ import { Pluralize } from 'components/common';
 import type { TimeBasedSizeOptimizingStrategyConfig } from './TimeBasedSizeOptimizingStrategyConfiguration';
 import { durationToRoundedDays } from './TimeBasedSizeOptimizingStrategyConfiguration';
 
-const TimeBasedSizeOptimizingStrategySummary = ({ config: { index_lifetime_hard, index_lifetime_soft } }: {config: TimeBasedSizeOptimizingStrategyConfig}) => {
-  const softLifetimeAsDays = durationToRoundedDays(index_lifetime_soft);
-  const hardLifetimeAsDays = durationToRoundedDays(index_lifetime_hard);
+const TimeBasedSizeOptimizingStrategySummary = ({ config: { index_lifetime_max, index_lifetime_min } }: {config: TimeBasedSizeOptimizingStrategyConfig}) => {
+  const minLifetimeAsDays = durationToRoundedDays(index_lifetime_max);
+  const maxLifetimeAsDays = durationToRoundedDays(index_lifetime_min);
 
   return (
     <div>
@@ -32,9 +32,9 @@ const TimeBasedSizeOptimizingStrategySummary = ({ config: { index_lifetime_hard,
         <dt>Index rotation strategy:</dt>
         <dd>Index Smart Size/Time</dd>
         <dt>Minimum lifetime:</dt>
-        <dd>{index_lifetime_soft} ({softLifetimeAsDays} <Pluralize singular="day" plural="days" value={softLifetimeAsDays} /> )</dd>
+        <dd>{index_lifetime_min} ({minLifetimeAsDays} <Pluralize singular="day" plural="days" value={minLifetimeAsDays} /> )</dd>
         <dt>Maximum lifetime:</dt>
-        <dd>{index_lifetime_hard} ({hardLifetimeAsDays} <Pluralize singular="day" plural="days" value={hardLifetimeAsDays} />)</dd>
+        <dd>{index_lifetime_max} ({maxLifetimeAsDays} <Pluralize singular="day" plural="days" value={maxLifetimeAsDays} />)</dd>
       </dl>
     </div>
   );

@@ -24,8 +24,8 @@ import { Input } from 'components/bootstrap';
 import useMaxIndexRotationLimit from 'hooks/useMaxIndexRotationLimit';
 
 export type TimeBasedSizeOptimizingStrategyConfig = {
-  index_lifetime_hard: string,
-  index_lifetime_soft: string,
+  index_lifetime_max: string,
+  index_lifetime_min: string,
   type: string,
 }
 
@@ -42,13 +42,13 @@ const _validationLimit = (durationInDays, rotationLimit) => {
   return durationInDays <= durationToRoundedDays(rotationLimit);
 };
 
-const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime_hard, index_lifetime_soft }, updateConfig }: Props) => {
-  const [indexLifetimeHard, setIndexLifetimeHard] = useState(index_lifetime_hard);
-  const [indexLifetimeSoft, setIndexLifetimeSoft] = useState(index_lifetime_soft);
-  const softLifetimeAsDays = durationToRoundedDays(indexLifetimeSoft);
-  const hardLifetimeAsDays = durationToRoundedDays(indexLifetimeHard);
+const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime_max, index_lifetime_min }, updateConfig }: Props) => {
+  const [indexLifetimeMax, setIndexLifetimeMax] = useState(index_lifetime_max);
+  const [indexLifetimeMin, setIndexLifetimeMin] = useState(index_lifetime_min);
+  const minLifetimeAsDays = durationToRoundedDays(indexLifetimeMin);
+  const maxLifetimeAsDays = durationToRoundedDays(indexLifetimeMax);
   const maxRotationPeriod = useMaxIndexRotationLimit();
-  const isMinGreaterThanMax = softLifetimeAsDays > hardLifetimeAsDays;
+  const isMinGreaterThanMax = minLifetimeAsDays > maxLifetimeAsDays;
 
   const _isValidPeriod = useCallback((duration: string) => {
     const checkInDays = durationToRoundedDays(duration);
@@ -66,27 +66,27 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime
 
   const getHardlifetimeHelp = () => {
     return isMinGreaterThanMax
-      ? `Min lifetime ${softLifetimeAsDays} cannot be greater than the Maximum ${hardLifetimeAsDays}`
-      : 'The maximum time data in the is index kept before it is rotated. At least 1 day more than the minimum above. (i.e. "P1D" for 1 day).';
+      ? `Minimum lifetime ${minLifetimeAsDays} cannot be greater than the maximum ${maxLifetimeAsDays}`
+      : 'The maximum time that data is available for searches. At least 1 day more than the minimum above. (i.e. "P10D" for 10 day).';
   };
 
-  const onLifetimeSoftChange = (event: React.ChangeEvent<HTMLOptionElement>): void => {
+  const onLifetimeMinChange = (event: React.ChangeEvent<HTMLOptionElement>): void => {
     const inputValue = getValueFromInput(event.target);
 
-    setIndexLifetimeSoft(inputValue);
+    setIndexLifetimeMin(inputValue);
 
     if (_isValidPeriod(inputValue)) {
-      updateConfig({ index_lifetime_hard: indexLifetimeHard, index_lifetime_soft: inputValue });
+      updateConfig({ index_lifetime_max: indexLifetimeMax, index_lifetime_min: inputValue });
     }
   };
 
-  const onLifetimeHardChange = (event: React.ChangeEvent<HTMLOptionElement>): void => {
+  const onLifetimeMaxChange = (event: React.ChangeEvent<HTMLOptionElement>): void => {
     const inputValue = getValueFromInput(event.target);
 
-    setIndexLifetimeHard(inputValue);
+    setIndexLifetimeMax(inputValue);
 
     if (_isValidPeriod(inputValue)) {
-      updateConfig({ index_lifetime_soft: indexLifetimeSoft, index_lifetime_hard: inputValue });
+      updateConfig({ index_lifetime_min: indexLifetimeMin, index_lifetime_max: inputValue });
     }
   };
 
@@ -107,22 +107,22 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9"
              label="Minimum lifetime (ISO8601 Duration)"
-             onChange={onLifetimeSoftChange}
-             value={indexLifetimeSoft}
+             onChange={onLifetimeMinChange}
+             value={indexLifetimeMin}
              help={`The minimum time data in the is index kept before it is rotated. (i.e. "P1D" for 1 day).${maxRotationPeriodHelpText}`}
-             addonAfter={formatDuration(indexLifetimeSoft)}
-             bsStyle={validationState(indexLifetimeSoft)}
+             addonAfter={formatDuration(indexLifetimeMin)}
+             bsStyle={validationState(indexLifetimeMin)}
              required />
       <Input id="rotation-index-lifetime-hard"
              type="text"
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9"
              label="Maximum lifetime (ISO8601 Duration)"
-             onChange={onLifetimeHardChange}
-             value={indexLifetimeHard}
+             onChange={onLifetimeMaxChange}
+             value={indexLifetimeMax}
              help={`${getHardlifetimeHelp()} ${maxRotationPeriodHelpText}`}
-             addonAfter={formatDuration(indexLifetimeHard)}
-             bsStyle={validationState(indexLifetimeHard)}
+             addonAfter={formatDuration(indexLifetimeMax)}
+             bsStyle={validationState(indexLifetimeMax)}
              required />
     </div>
   );
