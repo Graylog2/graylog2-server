@@ -24,13 +24,10 @@ import { widgetDefinition } from 'views/logic/Widgets';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import { useStore } from 'stores/connect';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import type { StoreState } from 'stores/StoreTypes';
 import { ViewStatesStore } from 'views/stores/ViewStatesStore';
 import ElementDimensions from 'components/common/ElementDimensions';
@@ -68,7 +65,6 @@ const _defaultDimensions = (type) => {
 };
 
 type WidgetsProps = {
-  fields: FieldTypeMappingsList,
   widgetId: string,
   focusedWidget: FocusContextState | undefined,
   onPositionsChange: (position: BackendWidgetPosition) => void,
@@ -76,7 +72,6 @@ type WidgetsProps = {
 };
 
 const WidgetGridItem = ({
-  fields,
   onPositionsChange,
   positions,
   widgetId,
@@ -87,7 +82,6 @@ const WidgetGridItem = ({
 
   return (
     <WidgetComponent editing={editing}
-                     fields={fields}
                      onPositionsChange={onPositionsChange}
                      position={widgetPosition}
                      widgetId={widgetId} />
