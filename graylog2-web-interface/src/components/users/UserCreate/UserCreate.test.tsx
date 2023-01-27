@@ -138,7 +138,6 @@ describe('<UserCreate />', () => {
       roles: ['Reader'],
       email: 'username@example.org',
       permissions: [],
-      session_timeout_ms: 3600000,
       password: 'thepassword',
     }));
   }, extendedTimeout);

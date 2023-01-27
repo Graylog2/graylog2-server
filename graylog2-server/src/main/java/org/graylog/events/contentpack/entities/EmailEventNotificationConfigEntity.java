@@ -37,6 +37,7 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
 
     public static final String TYPE_NAME = "email-notification-v1";
     private static final String FIELD_SENDER = "sender";
+    private static final String FIELD_REPLY_TO = "replyTo";
     private static final String FIELD_SUBJECT = "subject";
     private static final String FIELD_BODY_TEMPLATE = "body_template";
     private static final String FIELD_HTML_BODY_TEMPLATE = "html_body_template";
@@ -46,6 +47,9 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
 
     @JsonProperty(FIELD_SENDER)
     public abstract ValueReference sender();
+
+    @JsonProperty(FIELD_REPLY_TO)
+    public abstract ValueReference replyTo();
 
     @JsonProperty(FIELD_SUBJECT)
     public abstract ValueReference subject();
@@ -79,11 +83,15 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
             return new AutoValue_EmailEventNotificationConfigEntity.Builder()
                     .type(TYPE_NAME)
                     .htmlBodyTemplate(ValueReference.of(""))
-                    .timeZone(ValueReference.of("UTC"));
+                    .timeZone(ValueReference.of("UTC"))
+                    .replyTo(ValueReference.of(""));
         }
 
         @JsonProperty(FIELD_SENDER)
         public abstract Builder sender(ValueReference sender);
+
+        @JsonProperty(FIELD_REPLY_TO)
+        public abstract Builder replyTo(ValueReference sender);
 
         @JsonProperty(FIELD_SUBJECT)
         public abstract Builder subject(ValueReference subject);
@@ -110,6 +118,7 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
     public EventNotificationConfig toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
         return EmailEventNotificationConfig.builder()
                 .sender(sender().asString(parameters))
+                .replyTo(replyTo().asString())
                 .subject(subject().asString(parameters))
                 .bodyTemplate(bodyTemplate().asString())
                 .htmlBodyTemplate(htmlBodyTemplate().asString())

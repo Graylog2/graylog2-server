@@ -20,9 +20,9 @@ import { SearchStore } from 'views/stores/SearchStore';
 
 const useParameters = () => {
   const { parameterBindings } = useStore(SearchExecutionStateStore);
-  const { search: { parameters } } = useStore(SearchStore);
+  const { search } = useStore(SearchStore);
 
-  return { parameterBindings, parameters };
+  return { parameterBindings, parameters: search?.parameters };
 };
 
 export default useParameters;

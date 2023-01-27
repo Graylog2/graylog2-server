@@ -62,7 +62,7 @@ jest.mock('views/logic/views/Actions');
 jest.mock('views/stores/ViewStore', () => ({
   ViewStore: MockStore(),
   ViewActions: {
-    create: mockAction(),
+    loadNew: mockAction(),
     load: mockAction(),
   },
 }));
@@ -237,6 +237,18 @@ describe('<WidgetActionsMenu />', () => {
         data: {
           list: dashboardList,
           pagination: { total: 2 },
+          attributes: [
+            {
+              id: 'title',
+              title: 'Title',
+              sortable: true,
+            },
+            {
+              id: 'description',
+              title: 'Description',
+              sortable: true,
+            },
+          ],
         },
         isFetching: false,
         refetch: () => {},

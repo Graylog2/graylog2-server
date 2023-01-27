@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.AllPermission;
 import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.validators.ValidationResult;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.security.Permissions;
@@ -50,11 +51,20 @@ public class UserImplTest {
     @Mock
     private PasswordAlgorithmFactory passwordAlgorithmFactory;
 
+    @Mock
+    private ClusterConfigService clusterConfigService;
+
     private UserImpl user;
+
+    private UserImpl createUserImpl(PasswordAlgorithmFactory passwordAlgorithmFactory,
+                                    Permissions permissions,
+                                    Map<String, Object> fields) {
+        return new UserImpl(passwordAlgorithmFactory, permissions, clusterConfigService, fields);
+    }
 
     @Test
     public void testFirstLastFullNames() {
-        user = new UserImpl(null, null, null);
+        user = createUserImpl(null, null, null);
         user.setFirstLastFullNames("First", "Last");
         assertTrue(user.getFirstName().isPresent());
         assertTrue(user.getLastName().isPresent());
@@ -65,7 +75,7 @@ public class UserImplTest {
 
     @Test
     public void testSetFullName() {
-        user = new UserImpl(null, null, null);
+        user = createUserImpl(null, null, null);
         user.setFullName("Full Name");
         assertEquals("Full Name", user.getFullName());
         assertFalse(user.getFirstName().isPresent());
@@ -74,13 +84,13 @@ public class UserImplTest {
 
     @Test
     public void testNoFullNameEmptyString() {
-        user = new UserImpl(null, null, null);
+        user = createUserImpl(null, null, null);
         assertEquals("", user.getFullName());
     }
 
     @Test
     public void testFirstLastRequired() {
-        user = new UserImpl(null, null, null);
+        user = createUserImpl(null, null, null);
         assertThatThrownBy(() -> user.setFirstLastFullNames(null, "Last"))
                 .isExactlyInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("A firstName value is required");
@@ -92,7 +102,7 @@ public class UserImplTest {
 
     @Test
     public void testFirstNameLengthValidation() {
-        user = new UserImpl(null, null, null);
+        user = createUserImpl(null, null, null);
         ValidationResult result = user.getValidations().get(UserImpl.FIRST_NAME)
                                             .validate(StringUtils.repeat("*", 10));
         assertTrue(result.passed());
@@ -103,7 +113,7 @@ public class UserImplTest {
 
     @Test
     public void testLastNameLengthValidation() {
-        user = new UserImpl(null, null, null);
+        user = createUserImpl(null, null, null);
         ValidationResult result = user.getValidations().get(UserImpl.LAST_NAME)
                                       .validate(StringUtils.repeat("*", 10));
         assertTrue(result.passed());
@@ -116,7 +126,7 @@ public class UserImplTest {
     public void getPermissionsWorksWithEmptyPermissions() throws Exception {
         final Permissions permissions = new Permissions(Collections.emptySet());
         final Map<String, Object> fields = Collections.singletonMap(UserImpl.USERNAME, "foobar");
-        user = new UserImpl(passwordAlgorithmFactory, permissions, fields);
+        user = createUserImpl(passwordAlgorithmFactory, permissions, fields);
         assertThat(user.getPermissions()).containsAll(permissions.userSelfEditPermissions("foobar"));
     }
 
@@ -127,7 +137,7 @@ public class UserImplTest {
         final Map<String, Object> fields = ImmutableMap.of(
             UserImpl.USERNAME, "foobar",
             UserImpl.PERMISSIONS, customPermissions);
-        user = new UserImpl(passwordAlgorithmFactory, permissions, fields);
+        user = createUserImpl(passwordAlgorithmFactory, permissions, fields);
         assertThat(user.getPermissions())
             .containsAll(permissions.userSelfEditPermissions("foobar"))
             .contains("subject:action");
@@ -137,7 +147,7 @@ public class UserImplTest {
     public void permissionsArentModified() {
         final Permissions permissions = new Permissions(Collections.emptySet());
         final Map<String, Object> fields = Collections.singletonMap(UserImpl.USERNAME, "foobar");
-        user = new UserImpl(passwordAlgorithmFactory, permissions, fields);
+        user = createUserImpl(passwordAlgorithmFactory, permissions, fields);
 
         final List<String> newPermissions = ImmutableList.<String>builder()
                 .addAll(user.getPermissions())
@@ -153,7 +163,7 @@ public class UserImplTest {
         final Map<String, Object> fields = ImmutableMap.of(
                 UserImpl.USERNAME, "foobar",
                 UserImpl.PERMISSIONS, customPermissions);
-        user = new UserImpl(passwordAlgorithmFactory, permissions, fields);
+        user = createUserImpl(passwordAlgorithmFactory, permissions, fields);
 
         final Set<Permission> userSelfEditPermissions = permissions.userSelfEditPermissions("foobar").stream().map(CaseSensitiveWildcardPermission::new).collect(Collectors.toSet());
         assertThat(user.getObjectPermissions())

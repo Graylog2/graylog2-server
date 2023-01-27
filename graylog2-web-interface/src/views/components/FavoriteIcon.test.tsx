@@ -26,26 +26,29 @@ jest.mock('hooks/useFavoriteItemMutation');
 describe('FavoriteIcon', () => {
   const putItem = jest.fn(() => Promise.resolve());
   const deleteItem = jest.fn(() => Promise.resolve());
+  const onChange = jest.fn();
 
   beforeEach(() => {
     asMock(useFavoriteItemMutation).mockReturnValue({ putItem, deleteItem });
   });
 
   it('has correct state for favorite', async () => {
-    render(<FavoriteIcon isFavorite id="111" />);
+    render(<FavoriteIcon isFavorite id="111" onChange={onChange} />);
 
     const favIcon = await screen.findByTitle('Remove from favorites');
     fireEvent.click(favIcon);
 
     await expect(deleteItem).toHaveBeenCalledWith('111');
+    await expect(onChange).toHaveBeenCalledWith(false);
   });
 
   it('has correct state for non-favorite', async () => {
-    render(<FavoriteIcon isFavorite={false} id="111" />);
+    render(<FavoriteIcon isFavorite={false} id="111" onChange={onChange} />);
 
     const favIcon = await screen.findByTitle('Add to favorites');
     fireEvent.click(favIcon);
 
     await expect(putItem).toHaveBeenCalledWith('111');
+    await expect(onChange).toHaveBeenCalledWith(true);
   });
 });

@@ -16,11 +16,15 @@
  */
 package org.graylog.plugins.views.search.rest;
 
+import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
@@ -41,13 +45,20 @@ import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.startpage.StartPageService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.rest.bulk.AuditParams;
+import org.graylog2.rest.bulk.BulkExecutor;
+import org.graylog2.rest.bulk.SequentialBulkExecutor;
+import org.graylog2.rest.bulk.model.BulkOperationRequest;
+import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
@@ -60,6 +71,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.ForbiddenException;
@@ -73,6 +85,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Locale;
@@ -103,6 +116,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     private final ReferencedSearchFiltersHelper referencedSearchFiltersHelper;
     private final StartPageService startPageService;
     private final RecentActivityService recentActivityService;
+    private final BulkExecutor<ViewDTO, SearchUser> bulkExecutor;
 
     @Inject
     public ViewsResource(ViewService dbService,
@@ -111,7 +125,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                          ClusterEventBus clusterEventBus, SearchDomain searchDomain,
                          Map<String, ViewResolver> viewResolvers,
                          SearchFilterVisibilityChecker searchFilterVisibilityChecker,
-                         ReferencedSearchFiltersHelper referencedSearchFiltersHelper) {
+                         ReferencedSearchFiltersHelper referencedSearchFiltersHelper,
+                         AuditEventSender auditEventSender,
+                         ObjectMapper objectMapper) {
         this.dbService = dbService;
         this.startPageService = startPageService;
         this.recentActivityService = recentActivityService;
@@ -121,6 +137,9 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.searchFilterVisibilityChecker = searchFilterVisibilityChecker;
         this.referencedSearchFiltersHelper = referencedSearchFiltersHelper;
+        this.bulkExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
+
+
     }
 
     @GET
@@ -360,6 +379,27 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         triggerDeletedEvent(view);
         recentActivityService.delete(view.id(), view.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH, view.title(), searchUser);
         return view;
+    }
+
+    @POST
+    @Path("/bulk_delete")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Timed
+    @ApiOperation(value = "Delete a bulk of views", response = BulkOperationResponse.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Could not delete at least one of the views in the bulk.")
+    })
+    @NoAuditEvent("Audit events triggered manually")
+    public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
+                               @Context final SearchUser searchUser) {
+
+        final BulkOperationResponse response = bulkExecutor.executeBulkOperation(bulkOperationRequest,
+                searchUser,
+                new AuditParams(ViewsAuditEventTypes.VIEW_DELETE, "id", ViewDTO.class));
+
+        return Response.status(response.failures().isEmpty() ? Response.Status.OK : Response.Status.BAD_REQUEST)
+                .entity(response)
+                .build();
     }
 
     private String summarize(ViewDTO view) {

@@ -22,14 +22,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
-import org.bson.Document;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.streams.StreamDTO;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
@@ -68,6 +66,7 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder>, Vi
     public static final String FIELD_FAVORITE = "favorite";
 
     public static final ImmutableSet<String> SORT_FIELDS = ImmutableSet.of(FIELD_ID, FIELD_TITLE, FIELD_CREATED_AT, FIELD_OWNER, FIELD_DESCRIPTION, FIELD_SUMMARY);
+    public static final ImmutableSet<String> STRING_SORT_FIELDS = ImmutableSet.of(FIELD_TITLE, FIELD_OWNER, FIELD_DESCRIPTION, FIELD_SUMMARY);
 
     @Override
     @ObjectId

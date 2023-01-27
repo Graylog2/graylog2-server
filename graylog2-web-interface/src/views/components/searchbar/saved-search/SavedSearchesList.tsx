@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import { useState, useCallback, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
 
 import { Button } from 'components/bootstrap';
 import { PaginatedList, SearchForm, Spinner, NoEntitiesExist, NoSearchResult } from 'components/common';
@@ -25,13 +26,11 @@ import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import QueryHelper from 'components/common/QueryHelper';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import EntityDataTable from 'components/common/EntityDataTable';
-import type { PaginatedViews } from 'views/stores/ViewManagementStore';
-import { SavedSearchesActions } from 'views/stores/SavedSearchesStore';
-import type FetchError from 'logic/errors/FetchError';
-import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 import { Link } from 'components/common/router';
+import FavoriteIcon from 'views/components/FavoriteIcon';
 import type { Sort } from 'stores/PaginationTypes';
+import useSavedSearches from 'views/hooks/useSavedSearches';
 
 type SearchParams = {
   page: number,
@@ -40,14 +39,8 @@ type SearchParams = {
   sort: Sort
 }
 
-const INITIAL_COLUMNS = ['title', 'description', 'summary'];
-const COLUMN_DEFINITIONS = [
-  { id: 'created_at', title: 'Created At', sortable: true },
-  { id: 'title', title: 'Title', sortable: true },
-  { id: 'description', title: 'Description', sortable: true },
-  { id: 'summary', title: 'Summary', sortable: true },
-  { id: 'owner', title: 'Owner', sortable: true },
-];
+const INITIAL_COLUMNS = ['title', 'description', 'summary', 'favorite'];
+const COLUMNS_ORDER = ['title', 'summary', 'description', 'owner', 'created_at', 'favorite'];
 
 const DEFAULT_PAGINATION = {
   query: '',
@@ -67,7 +60,10 @@ const onLoad = (onLoadSavedSearch: () => void, selectedSavedSearchId: string, lo
   return false;
 };
 
-const customColumnRenderers = (onLoadSavedSearch: () => void): ColumnRenderers<View> => ({
+const customColumnRenderers = (onLoadSavedSearch: () => void, {
+  queryClient,
+  searchParams,
+}: { queryClient: QueryClient, searchParams: SearchParams}): ColumnRenderers<View> => ({
   title: {
     renderCell: (search) => (
       <ViewLoaderContext.Consumer key={search.id}>
@@ -87,6 +83,28 @@ const customColumnRenderers = (onLoadSavedSearch: () => void): ColumnRenderers<V
       </ViewLoaderContext.Consumer>
     ),
   },
+  favorite: {
+    renderCell: (search) => (
+      <FavoriteIcon isFavorite={search.favorite}
+                    id={search.id}
+                    onChange={(newValue) => {
+                      queryClient.setQueriesData(['saved-searches', 'overview', searchParams], (cur: {
+                        list: Array<View>,
+                        pagination: { total: number }
+                      }) => ({
+                        ...cur,
+                        list: cur.list.map((view) => {
+                          if (view.id === search.id) {
+                            return ({ ...view, favorite: newValue });
+                          }
+
+                          return view;
+                        }),
+                      }
+                      ));
+                    }} />
+    ),
+  },
 });
 
 const onDelete = (e, savedSearch: View, deleteSavedSearch: (search: View) => Promise<View>, activeSavedSearchId: string, refetch: () => void) => {
@@ -102,36 +120,6 @@ const onDelete = (e, savedSearch: View, deleteSavedSearch: (search: View) => Pro
   }
 };
 
-const usePaginatedSavedSearches = (searchParams: SearchParams): {
-  data: PaginatedViews | undefined,
-  refetch: () => void,
-  isLoading: boolean
-} => {
-  const { data, refetch, isLoading } = useQuery(
-    ['saved-searches', 'overview', searchParams],
-    () => SavedSearchesActions.search({
-      query: searchParams.query,
-      page: searchParams.page,
-      perPage: searchParams.pageSize,
-      sortBy: searchParams.sort.attributeId,
-      order: searchParams.sort.direction,
-    }),
-    {
-      onError: (error: FetchError) => {
-        UserNotification.error(`Fetching saved searches failed with status: ${error}`,
-          'Could not retrieve saved searches');
-      },
-      keepPreviousData: true,
-    },
-  );
-
-  return ({
-    data,
-    refetch,
-    isLoading,
-  });
-};
-
 type Props = {
   activeSavedSearchId: string,
   deleteSavedSearch: (view: View) => Promise<View>,
@@ -143,6 +131,7 @@ const SavedSearchesList = ({
   deleteSavedSearch,
   onLoadSavedSearch,
 }: Props) => {
+  const queryClient = useQueryClient();
   const [visibleColumns, setVisibleColumns] = useState(INITIAL_COLUMNS);
   const [searchParams, setSearchParams] = useState<SearchParams>({
     page: DEFAULT_PAGINATION.page,
@@ -154,7 +143,7 @@ const SavedSearchesList = ({
     },
   });
 
-  const { data, isLoading, refetch } = usePaginatedSavedSearches(searchParams);
+  const { data: paginatedSavedSearches, isLoading, refetch } = useSavedSearches(searchParams);
 
   const handleSearch = useCallback(
     (newQuery: string) => setSearchParams((cur) => ({
@@ -193,15 +182,15 @@ const SavedSearchesList = ({
   ), [activeSavedSearchId, deleteSavedSearch, refetch]);
 
   const columnRenderers = useMemo(
-    () => customColumnRenderers(onLoadSavedSearch),
-    [onLoadSavedSearch],
+    () => customColumnRenderers(onLoadSavedSearch, { queryClient, searchParams }),
+    [onLoadSavedSearch, queryClient, searchParams],
   );
 
   if (isLoading) {
     return <Spinner />;
   }
 
-  const { list: savedSearches, pagination } = data;
+  const { list: savedSearches, pagination, attributes } = paginatedSavedSearches;
 
   return (
     <PaginatedList onChange={handlePageSizeChange}
@@ -229,12 +218,13 @@ const SavedSearchesList = ({
       {!!savedSearches?.length && (
         <EntityDataTable<View> data={savedSearches}
                                visibleColumns={visibleColumns}
+                               columnsOrder={COLUMNS_ORDER}
                                onColumnsChange={onColumnsChange}
                                onSortChange={onSortChange}
                                activeSort={searchParams.sort}
                                rowActions={renderSavedSearchActions}
                                columnRenderers={columnRenderers}
-                               columnDefinitions={COLUMN_DEFINITIONS} />
+                               columnDefinitions={attributes} />
       )}
     </PaginatedList>
   );
