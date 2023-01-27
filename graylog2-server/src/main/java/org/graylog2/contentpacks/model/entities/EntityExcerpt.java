@@ -22,12 +22,15 @@ import com.google.auto.value.AutoValue;
 import org.graylog2.contentpacks.model.Identified;
 import org.graylog2.contentpacks.model.Typed;
 
+import javax.annotation.Nullable;
+
 @AutoValue
 @JsonDeserialize(builder = AutoValue_EntityExcerpt.Builder.class)
 public abstract class EntityExcerpt implements Identified, Typed {
     public static final String FIELD_TITLE = "title";
 
     @JsonProperty(FIELD_TITLE)
+    @Nullable
     public abstract String title();
 
     public static Builder builder() {
