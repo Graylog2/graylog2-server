@@ -26,6 +26,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -37,8 +39,10 @@ import java.util.concurrent.TimeoutException;
 class CommandLineProcessTest {
 
     @Test
-    void testProcessLifecycle() throws IOException, ExecutionException, InterruptedException, TimeoutException, RetryException {
-        final String bin = getClass().getResource("test-script.sh").getFile();
+    void testProcessLifecycle() throws IOException, ExecutionException, InterruptedException, TimeoutException, RetryException, URISyntaxException {
+        final URL bin = getClass().getResource("test-script.sh");
+        assert bin != null;
+        final Path binPath = Path.of(bin.toURI());
 
         final CompletableFuture<Integer> exitValueFuture = new CompletableFuture<>();
 
@@ -59,7 +63,7 @@ class CommandLineProcessTest {
                 exitValueFuture.complete(e.getExitValue());
             }
         };
-        final CommandLineProcess process = new CommandLineProcess(Path.of(bin), Collections.emptyList(), 10, listener);
+        final CommandLineProcess process = new CommandLineProcess(binPath, Collections.emptyList(), 10, listener);
         process.start();
 
         waitTillLogsAreAvailable(process.getLogs());
