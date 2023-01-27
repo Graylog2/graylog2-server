@@ -93,7 +93,7 @@ public class EntityDependencyResolver {
 
         return dependencies.stream()
                 .map(dependency -> {
-                    String title = entityExcerpts.get(dependency).orElse("unnamed dependency: <" + dependency + ">");
+                    String title = entityExcerpts.get(dependency) != null ? entityExcerpts.get(dependency).orElse("unnamed dependency: <" + dependency + ">") : "unknown dependency: <" + dependency + ">";
                     return EntityDescriptor.create(
                             dependency,
                             title,
