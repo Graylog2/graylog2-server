@@ -38,6 +38,7 @@ import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useWidgetResults from 'views/components/useWidgetResults';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -75,9 +76,9 @@ const _editComponentForType = (type) => {
 
 const useQueryFieldTypes = () => {
   const fieldTypes = useContext(FieldTypesContext);
-  const activeQueryId = useStore(ViewStore, ({ activeQuery: currentQuery }) => currentQuery);
+  const queryId = useStore(ViewMetadataStore, (viewMetadataStore) => viewMetadataStore.activeQuery);
 
-  return useMemo(() => fieldTypes.queryFields.get(activeQueryId, fieldTypes.all), [fieldTypes.all, fieldTypes.queryFields, activeQueryId]);
+  return useMemo(() => fieldTypes.queryFields.get(queryId, fieldTypes.all), [fieldTypes.all, fieldTypes.queryFields, queryId]);
 };
 
 const WidgetFooter = styled.div`
