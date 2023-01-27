@@ -30,7 +30,7 @@ const TimeBasedSizeOptimizingStrategySummary = ({ config: { index_lifetime_max, 
     <div>
       <dl>
         <dt>Index rotation strategy:</dt>
-        <dd>Index Smart Size/Time</dd>
+        <dd>Index Size Optimising Time</dd>
         <dt>Minimum lifetime:</dt>
         <dd>{index_lifetime_min} ({minLifetimeAsDays} <Pluralize singular="day" plural="days" value={minLifetimeAsDays} /> )</dd>
         <dt>Maximum lifetime:</dt>
