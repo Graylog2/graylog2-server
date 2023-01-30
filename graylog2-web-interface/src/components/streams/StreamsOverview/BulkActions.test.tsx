@@ -77,19 +77,15 @@ describe('StreamsOverview BulkActions', () => {
   });
 
   it('should assign index set', async () => {
-    const refetchStreams = jest.fn();
-
     render(<BulkActions selectedStreamIds={['stream-id-1', 'stream-id-2']}
                         setSelectedStreamIds={() => {}}
-                        indexSets={indexSets}
-                        refetchStreams={refetchStreams} />);
+                        indexSets={indexSets} />);
 
     await assignIndexSet();
 
     await waitFor(() => expect(Streams.assignToIndexSet).toHaveBeenCalledWith('index-set-id-2', ['stream-id-1', 'stream-id-2']));
 
     expect(UserNotification.success).toHaveBeenCalledWith('Index set was assigned to 2 streams successfully.', 'Success');
-    expect(refetchStreams).toHaveBeenCalledTimes(1);
   });
 
   it('should handle errors when assigning index set', async () => {
@@ -97,8 +93,7 @@ describe('StreamsOverview BulkActions', () => {
 
     render(<BulkActions selectedStreamIds={['stream-id-1', 'stream-id-2']}
                         setSelectedStreamIds={() => {}}
-                        indexSets={indexSets}
-                        refetchStreams={() => {}} />);
+                        indexSets={indexSets} />);
 
     await assignIndexSet();
 
@@ -107,13 +102,11 @@ describe('StreamsOverview BulkActions', () => {
 
   it('should delete selected streams', async () => {
     asMock(fetch).mockReturnValue(Promise.resolve({ failures: [] }));
-    const refetchStreams = jest.fn();
     const setSelectedStreamIds = jest.fn();
 
     render(<BulkActions selectedStreamIds={['stream-id-1', 'stream-id-2']}
                         setSelectedStreamIds={setSelectedStreamIds}
-                        indexSets={indexSets}
-                        refetchStreams={refetchStreams} />);
+                        indexSets={indexSets} />);
 
     await deleteStreams();
 
@@ -124,7 +117,6 @@ describe('StreamsOverview BulkActions', () => {
     ));
 
     expect(UserNotification.success).toHaveBeenCalledWith('2 streams were deleted successfully.', 'Success');
-    expect(refetchStreams).toHaveBeenCalledTimes(1);
     expect(setSelectedStreamIds).toHaveBeenCalledWith([]);
   });
 
@@ -135,13 +127,11 @@ describe('StreamsOverview BulkActions', () => {
       ],
     }));
 
-    const refetchStreams = jest.fn();
     const setSelectedStreamIds = jest.fn();
 
     render(<BulkActions selectedStreamIds={['stream-id-1', 'stream-id-2']}
                         setSelectedStreamIds={setSelectedStreamIds}
-                        indexSets={indexSets}
-                        refetchStreams={refetchStreams} />);
+                        indexSets={indexSets} />);
 
     await deleteStreams();
 
@@ -152,7 +142,6 @@ describe('StreamsOverview BulkActions', () => {
     ));
 
     expect(UserNotification.error).toHaveBeenCalledWith('1 out of 2 selected streams could not be deleted.');
-    expect(refetchStreams).toHaveBeenCalledTimes(1);
     expect(setSelectedStreamIds).toHaveBeenCalledWith(['stream-id-1']);
   });
 });

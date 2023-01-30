@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 import { Formik, Form } from 'formik';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Streams } from '@graylog/server-api';
 import { Button, Modal } from 'components/bootstrap';
@@ -105,14 +106,16 @@ type Props = {
   selectedStreamIds: Array<string>,
   setSelectedStreamIds: (streamIds: Array<string>) => void,
   indexSets: Array<IndexSet>
-  refetchStreams: () => void
 }
 
-const BulkActions = ({ selectedStreamIds, refetchStreams, setSelectedStreamIds, indexSets }: Props) => {
+const BulkActions = ({ selectedStreamIds, setSelectedStreamIds, indexSets }: Props) => {
   const [showIndexSetModal, setShowIndexSetModal] = useState(false);
+  const queryClient = useQueryClient();
 
   const selectedItemsAmount = selectedStreamIds?.length;
   const descriptor = StringUtils.pluralize(selectedItemsAmount, 'stream', 'streams');
+
+  const refetchStreams = useCallback(() => queryClient.invalidateQueries(['streams', 'overview']), [queryClient]);
 
   const onDelete = useCallback(() => {
     // eslint-disable-next-line no-alert
@@ -136,7 +139,13 @@ const BulkActions = ({ selectedStreamIds, refetchStreams, setSelectedStreamIds, 
         refetchStreams();
       });
     }
-  }, [descriptor, refetchStreams, selectedItemsAmount, selectedStreamIds, setSelectedStreamIds]);
+  }, [
+    descriptor,
+    refetchStreams,
+    selectedItemsAmount,
+    selectedStreamIds,
+    setSelectedStreamIds,
+  ]);
 
   const toggleAssignIndexSetModal = useCallback(() => {
     setShowIndexSetModal((cur) => !cur);
