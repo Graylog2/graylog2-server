@@ -42,6 +42,18 @@ describe('CopyToDashboardForm', () => {
       data: {
         list: dashboardList,
         pagination: { total: 2 },
+        attributes: [
+          {
+            id: 'title',
+            title: 'Title',
+            sortable: true,
+          },
+          {
+            id: 'description',
+            title: 'Description',
+            sortable: true,
+          },
+        ],
       },
       isFetching: false,
       refetch: () => {},
@@ -66,6 +78,18 @@ describe('CopyToDashboardForm', () => {
       data: {
         list: [],
         pagination: { total: 0 },
+        attributes: [
+          {
+            id: 'title',
+            title: 'Title',
+            sortable: true,
+          },
+          {
+            id: 'description',
+            title: 'Description',
+            sortable: true,
+          },
+        ],
       },
       isFetching: false,
       refetch: () => {},

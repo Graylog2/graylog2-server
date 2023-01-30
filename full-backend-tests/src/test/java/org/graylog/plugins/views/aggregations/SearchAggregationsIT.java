@@ -17,6 +17,8 @@
 package org.graylog.plugins.views.aggregations;
 
 import com.google.common.base.Joiner;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
@@ -168,10 +170,9 @@ public class SearchAggregationsIT {
     void testFindTopPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
-                .rowGroups(Values.builder().field("http_method").build())
+                .rowGroups(Values.builder().field("http_method").limit(1).build())
                 .sort(SeriesSort.create(SeriesSort.Type, "max(took_ms)", SortSpec.Direction.Descending))
                 .series(Max.builder().field("took_ms").build())
-                .optionalRowLimit(1)
                 .build();
 
         final ValidatableResponse validatableResponse = execute(pivot);
@@ -189,10 +190,9 @@ public class SearchAggregationsIT {
     void testFindBottomPivot() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
-                .rowGroups(Values.builder().field("http_method").build())
+                .rowGroups(Values.builder().field("http_method").limit(1).build())
                 .sort(SeriesSort.create(SeriesSort.Type, "max(took_ms)", SortSpec.Direction.Ascending))
                 .series(Max.builder().field("took_ms").build())
-                .optionalRowLimit(1)
                 .build();
 
         final ValidatableResponse validatableResponse = execute(pivot);
@@ -392,7 +392,7 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
-    void testTwoRowPivots() {
+    void testTwoNestedRowPivots() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
                 .rowGroups(
@@ -438,12 +438,110 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
-    void testTwoRowPivotsWithSorting() {
+    void testTwoTupleRowPivots() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .rowGroups(
+                        Values.builder().fields(List.of("http_method", "http_response_code")).limit(15).build()
+                )
+                .series(Count.builder().build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000))
+                .body("rows", hasSize(11));
+
+        final String searchTypeResultPath = PIVOT_PATH + ".rows";
+
+        validatableResponse
+                .rootPath(searchTypeResultPath)
+                .body(pathToMetricResult(List.of("GET", "200"), List.of("count()")), equalTo(847))
+                .body(pathToMetricResult(List.of("GET", "500"), List.of("count()")), equalTo(11))
+                .body(pathToMetricResult(List.of("GET", "504"), List.of("count()")), equalTo(2));
+
+        validatableResponse
+                .rootPath(searchTypeResultPath)
+                .body(pathToMetricResult(List.of("DELETE", "204"), List.of("count()")), equalTo(51))
+                .body(pathToMetricResult(List.of("DELETE", "500"), List.of("count()")), equalTo(1));
+
+        validatableResponse
+                .rootPath(searchTypeResultPath)
+                .body(pathToMetricResult(List.of("POST", "201"), List.of("count()")), equalTo(43))
+                .body(pathToMetricResult(List.of("POST", "500"), List.of("count()")), equalTo(1))
+                .body(pathToMetricResult(List.of("POST", "504"), List.of("count()")), equalTo(1));
+
+        validatableResponse
+                .rootPath(searchTypeResultPath)
+                .body(pathToMetricResult(List.of("PUT", "200"), List.of("count()")), equalTo(42))
+                .body(pathToMetricResult(List.of("PUT", "504"), List.of("count()")), equalTo(1));
+
+        validatableResponse
+                .rootPath(searchTypeResultPath)
+                .body(pathToMetricResult(Collections.emptyList(), List.of("count()")), equalTo(1000));
+    }
+
+    @ContainerMatrixTest
+    void testTwoNestedRowPivotsWithSorting() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
                 .rowGroups(
                         Values.builder().field("http_method").limit(15).build(),
                         Values.builder().field("http_response_code").limit(15).build()
+                )
+                .sort(PivotSort.create("http_response_code", SortSpec.Direction.Ascending))
+                .series(Count.builder().build())
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000))
+                .body("rows", hasSize(10));
+
+        final String searchTypeResultPath = PIVOT_PATH + ".rows";
+
+        final List<List<String>> rows = validatableResponse
+                .extract()
+                .jsonPath().getList(searchTypeResultPath + "*.key");
+        final List<List<Integer>> metrics = validatableResponse
+                .extract()
+                .jsonPath()
+                .getList(searchTypeResultPath + "*.values*.value");
+
+        assertThat(rows).containsExactly(
+                List.of("DELETE", "204"),
+                List.of("DELETE", "500"),
+                List.of("GET", "200"),
+                List.of("GET", "500"),
+                List.of("GET", "504"),
+                List.of("POST", "201"),
+                List.of("POST", "500"),
+                List.of("POST", "504"),
+                List.of("PUT", "200"),
+                List.of("PUT", "504")
+        );
+        assertThat(metrics).containsExactly(
+                List.of(51),
+                List.of(1),
+                List.of(847),
+                List.of(11),
+                List.of(2),
+                List.of(43),
+                List.of(1),
+                List.of(1),
+                List.of(42),
+                List.of(1)
+        );
+    }
+
+    @ContainerMatrixTest
+    void testTwoTupleRowPivotsWithSorting() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(false)
+                .rowGroups(
+                        Values.builder().fields(List.of("http_method", "http_response_code")).limit(15).build()
                 )
                 .sort(PivotSort.create("http_response_code", SortSpec.Direction.Ascending))
                 .series(Count.builder().build())
@@ -476,7 +574,42 @@ public class SearchAggregationsIT {
     }
 
     @ContainerMatrixTest
-    void testTwoRowPivotsWithMetricsSorting() {
+    void testTwoTupleRowPivotsWithMetricsSorting() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(false)
+                .rowGroups(
+                        Values.builder().fields(List.of("action", "controller")).limit(15).build()
+                )
+                .series(List.of(Max.builder().field("took_ms").build(), Min.builder().field("took_ms").build()))
+                .sort(SeriesSort.create("min(took_ms)", SortSpec.Direction.Ascending), SeriesSort.create("max(took_ms)", SortSpec.Direction.Descending))
+                .build();
+
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000));
+
+        final String searchTypeResultPath = PIVOT_PATH + ".rows";
+
+        validatableResponse.rootPath(PIVOT_PATH)
+                .body("total", equalTo(1000))
+                .body("rows", hasSize(5));
+
+        final List<List<Float>> rows = validatableResponse
+                .extract()
+                .jsonPath().getList(searchTypeResultPath + "*.values*.value");
+
+        assertThat(rows).containsExactly(
+                List.of(5300.0f, 36.0f),
+                List.of(5000.0f, 36.0f),
+                List.of(174.0f, 36.0f),
+                List.of(138.0f, 36.0f),
+                List.of(147.0f, 37.0f)
+        );
+    }
+
+    @ContainerMatrixTest
+    void testTwoNestedRowPivotsWithMetricsSorting() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
                 .rowGroups(
@@ -504,10 +637,10 @@ public class SearchAggregationsIT {
 
         assertThat(rows).containsExactly(
                 List.of(5300.0f, 36.0f),
+                List.of(147.0f, 37.0f),
                 List.of(5000.0f, 36.0f),
                 List.of(174.0f, 36.0f),
-                List.of(138.0f, 36.0f),
-                List.of(147.0f, 37.0f)
+                List.of(138.0f, 36.0f)
         );
     }
 

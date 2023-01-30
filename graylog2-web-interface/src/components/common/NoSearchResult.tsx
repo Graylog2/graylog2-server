@@ -34,7 +34,7 @@ const NoSearchResult = ({ children, className }: Props) => (
 );
 
 NoSearchResult.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+  children: PropTypes.node,
   className: PropTypes.string,
 };
 

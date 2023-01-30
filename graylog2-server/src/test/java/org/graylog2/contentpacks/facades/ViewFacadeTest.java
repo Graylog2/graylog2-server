@@ -109,17 +109,19 @@ public class ViewFacadeTest {
 
     public static class TestViewService extends ViewService {
         protected TestViewService(MongoConnection mongoConnection,
-                                  MongoJackObjectMapperProvider mapper,
+                                  MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+                                  ObjectMapper mapper,
                                   ClusterConfigService clusterConfigService) {
-            super(mongoConnection, mapper, clusterConfigService,
+            super(mongoConnection, mongoJackObjectMapperProvider, mapper, clusterConfigService,
                     dto -> new ViewRequirements(Collections.emptySet(), dto), mock(EntityOwnershipService.class), mock(ViewSummaryService.class));
         }
     }
 
     public static class TestViewSummaryService extends ViewSummaryService {
         protected TestViewSummaryService(MongoConnection mongoConnection,
-                                         MongoJackObjectMapperProvider mapper) {
-            super(mongoConnection, mapper);
+                                         MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+                                         ObjectMapper mapper) {
+            super(mongoConnection, mongoJackObjectMapperProvider, mapper);
         }
     }
 
@@ -152,8 +154,8 @@ public class ViewFacadeTest {
         final MongoConnection mongoConnection = mongodb.mongoConnection();
         final MongoJackObjectMapperProvider mapper = new MongoJackObjectMapperProvider(objectMapper);
         searchDbService = new TestSearchDBService(mongoConnection, mapper);
-        viewService = new TestViewService(mongoConnection, mapper, null);
-        viewSummaryService = new TestViewSummaryService(mongoConnection, mapper);
+        viewService = new TestViewService(mongoConnection, mapper, objectMapper, null);
+        viewSummaryService = new TestViewSummaryService(mongoConnection, mapper, objectMapper);
         userService = mock(UserService.class);
 
         facade = new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService);
@@ -235,7 +237,8 @@ public class ViewFacadeTest {
         final Entity viewEntity = createViewEntity();
         final Map<EntityDescriptor, Object> nativeEntities = new HashMap<>(1);
         nativeEntities.put(EntityDescriptor.create(newStreamId, ModelTypes.STREAM_V1), stream);
-        final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()), ImmutableMap.of("username", "testuser"));
+        final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
+                mock(ClusterConfigService.class), ImmutableMap.of("username", "testuser"));
         when(userService.load("testuser")).thenReturn(fakeUser);
         final NativeEntity<ViewDTO> nativeEntity = facade.createNativeEntity(viewEntity,
                 Collections.emptyMap(), nativeEntities, "testuser");

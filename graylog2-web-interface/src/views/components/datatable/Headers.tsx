@@ -37,7 +37,7 @@ import { Icon } from 'components/common';
 import styles from './DataTable.css';
 
 const StyledTh = styled.th(({ isNumeric }: { isNumeric: boolean }) => css`
-  ${isNumeric ? 'text-align: right' : ''};
+  ${isNumeric ? 'text-align: right;' : ''}
 `);
 
 const CenteredTh = styled.th`
@@ -52,6 +52,7 @@ const PinIcon = styled.button(({ theme }) => {
     cursor: pointer;
     position: relative;
     color: ${theme.colors.gray[70]};
+
     &.active {
       color: ${theme.colors.gray[20]};
     }
@@ -205,8 +206,8 @@ type Props = {
 };
 
 const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup, actualColumnPivotFields, onSortChange, sortConfigMap, onSetColumnsWidth, pinnedColumns, togglePin }: Props) => {
-  const rowFieldNames = rowPivots.map((pivot) => pivot.field);
-  const columnFieldNames = columnPivots.map((pivot) => pivot.field);
+  const rowFieldNames = rowPivots.flatMap((pivot) => pivot.fields);
+  const columnFieldNames = columnPivots.flatMap((pivot) => pivot.fields);
 
   const headerField = ({ field, prefix = '', span = 1, title = field, sortable = false, sortType = undefined, showPinIcon = false }) => {
     return (

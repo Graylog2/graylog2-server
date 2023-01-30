@@ -19,13 +19,14 @@ import { useQuery } from '@tanstack/react-query';
 import UserNotification from 'util/UserNotification';
 import type { ViewJson } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
-import type { SearchParams, PaginatedListJSON } from 'stores/PaginationTypes';
+import type { SearchParams, PaginatedListJSON, Attribute } from 'stores/PaginationTypes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 
 type PaginatedDashboardsResponse = PaginatedListJSON & {
-  views: Array<ViewJson>,
+  elements: Array<ViewJson>,
+  attributes: Array<Attribute>,
 };
 
 type Options = {
@@ -43,9 +44,10 @@ const fetchDashboards = (searchParams: SearchParams) => {
     { sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
 
   return fetch<PaginatedDashboardsResponse>('GET', qualifyUrl(url)).then(
-    ({ views, total, count, page, per_page: perPage }) => ({
-      list: views.map((item) => View.fromJSON(item)),
+    ({ elements, total, count, page, per_page: perPage, attributes }) => ({
+      list: elements.map((item) => View.fromJSON(item)),
       pagination: { total, count, page, perPage },
+      attributes,
     }),
   );
 };
@@ -53,7 +55,8 @@ const fetchDashboards = (searchParams: SearchParams) => {
 const useDashboards = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
   data: {
     list: Readonly<Array<View>>,
-    pagination: { total: number }
+    pagination: { total: number },
+    attributes: Array<Attribute>
   } | undefined,
   refetch: () => void,
   isFetching: boolean,

@@ -23,12 +23,12 @@ describe('PivotGenerator', () => {
   it('generates time pivot for date fields', () => {
     const result = PivotGenerator('foo', new FieldType('date', [], []));
 
-    expect(result).toEqual(new Pivot('foo', 'time', { interval: { type: 'auto', scaling: 1.0 } }));
+    expect(result).toEqual(Pivot.create(['foo'], 'time', { interval: { type: 'auto', scaling: 1.0 } }));
   });
 
   it('generates values pivot for other fields', () => {
     const result = PivotGenerator('foo', new FieldType('keyword', [], []));
 
-    expect(result).toEqual(new Pivot('foo', 'values', { limit: 15 }));
+    expect(result).toEqual(Pivot.create(['foo'], 'values', { limit: 15 }));
   });
 });

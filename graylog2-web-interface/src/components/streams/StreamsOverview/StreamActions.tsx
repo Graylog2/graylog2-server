@@ -126,7 +126,8 @@ const StreamActions = ({
                    bsSize="xsmall" />
       <OverlayDropdownButton title="More Actions"
                              bsSize="xsmall"
-                             disabled={isNotEditable}>
+                             disabled={isNotEditable}
+                             dropdownZIndex={1000}>
         <IfPermitted permissions={[`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`]} anyPermissions>
           <MenuItem bsStyle="success"
                     onSelect={onToggleStreamStatus}
@@ -184,7 +185,7 @@ const StreamActions = ({
           <MenuItem divider />
         </IfPermitted>
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
-          <MenuItem onSelect={onDelete} disabled={isDefaultStream}>
+          <MenuItem onSelect={onDelete}>
             Delete this stream {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>

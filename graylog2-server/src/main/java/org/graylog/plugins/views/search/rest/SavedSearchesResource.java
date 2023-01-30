@@ -67,7 +67,8 @@ public class SavedSearchesResource extends RestResource {
             EntityAttribute.builder().id(ViewDTO.FIELD_CREATED_AT).title("Created").type("date").build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_DESCRIPTION).title("Description").build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_SUMMARY).title("Summary").build(),
-            EntityAttribute.builder().id(ViewDTO.FIELD_OWNER).title("Owner").build()
+            EntityAttribute.builder().id(ViewDTO.FIELD_OWNER).title("Owner").build(),
+            EntityAttribute.builder().id(ViewDTO.FIELD_FAVORITE).title("Favorite").sortable(false).build()
     );
 
     private static final EntityDefaults settings = EntityDefaults.builder()
@@ -102,6 +103,7 @@ public class SavedSearchesResource extends RestResource {
         try {
             final SearchQuery searchQuery = searchQueryParser.parse(query);
             final PaginatedList<ViewSummaryDTO> result = dbService.searchSummariesPaginatedByType(
+                    searchUser,
                     ViewDTO.Type.SEARCH,
                     searchQuery,
                     searchUser::canReadView,

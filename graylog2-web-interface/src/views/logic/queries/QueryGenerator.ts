@@ -20,12 +20,16 @@ import Query, { createElasticsearchQueryString, filtersForQuery } from 'views/lo
 import generateId from 'logic/generateId';
 
 export default (
-  streamId?: string,
+  streamId?: string | string[],
   id: QueryId | undefined = generateId(),
   timeRange?: TimeRange,
   queryString?: ElasticsearchQueryString,
 ): Query => {
-  const streamIds = streamId ? [streamId] : null;
+  const streamIds = streamId
+    ? streamId instanceof Array
+      ? streamId
+      : [streamId]
+    : null;
   const streamFilter = filtersForQuery(streamIds);
   const builder = Query.builder()
     .id(id)

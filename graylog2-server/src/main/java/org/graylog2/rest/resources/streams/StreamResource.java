@@ -30,9 +30,13 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
+import org.graylog.grn.GRNTypes;
+import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.DefaultFailureContextCreator;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
@@ -45,6 +49,11 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.rest.bulk.AuditParams;
+import org.graylog2.rest.bulk.BulkExecutor;
+import org.graylog2.rest.bulk.SequentialBulkExecutor;
+import org.graylog2.rest.bulk.model.BulkOperationRequest;
+import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.rest.models.streams.requests.UpdateStreamRequest;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
@@ -140,19 +149,33 @@ public class StreamResource extends RestResource {
     private final StreamRouterEngine.Factory streamRouterEngineFactory;
     private final IndexSetRegistry indexSetRegistry;
     private final SearchQueryParser searchQueryParser;
+    private final RecentActivityService recentActivityService;
+    private final BulkExecutor<Stream, UserContext> bulkExecutor;
 
     @Inject
     public StreamResource(StreamService streamService,
                           PaginatedStreamService paginatedStreamService,
                           StreamRuleService streamRuleService,
                           StreamRouterEngine.Factory streamRouterEngineFactory,
-                          IndexSetRegistry indexSetRegistry) {
+                          IndexSetRegistry indexSetRegistry,
+                          RecentActivityService recentActivityService,
+                          AuditEventSender auditEventSender) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
         this.indexSetRegistry = indexSetRegistry;
         this.paginatedStreamService = paginatedStreamService;
         this.searchQueryParser = new SearchQueryParser(StreamImpl.FIELD_TITLE, SEARCH_FIELD_MAPPING);
+        this.recentActivityService = recentActivityService;
+        this.bulkExecutor = new SequentialBulkExecutor<>(this::delete,
+                auditEventSender,
+                (entity, entityClass) ->
+                        Map.of("response_entity",
+                                Map.of("stream_id", entity.getId(),
+                                        "title", entity.getTitle()
+                                )),
+                new DefaultFailureContextCreator());
+
     }
 
     @POST
@@ -181,6 +204,7 @@ public class StreamResource extends RestResource {
             .path("{streamId}")
             .build(id);
 
+        recentActivityService.create(id, GRNTypes.STREAM, userContext.getUser());
         return Response.created(streamUri).entity(result).build();
     }
 
@@ -286,7 +310,8 @@ public class StreamResource extends RestResource {
     public StreamResponse update(@ApiParam(name = "streamId", required = true)
                                  @PathParam("streamId") String streamId,
                                  @ApiParam(name = "JSON body", required = true)
-                                 @Valid @NotNull UpdateStreamRequest cr) throws NotFoundException, ValidationException {
+                                 @Valid @NotNull UpdateStreamRequest cr,
+                                 @Context UserContext userContext) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkNotEditableStream(streamId, "The stream cannot be edited.");
 
@@ -332,6 +357,7 @@ public class StreamResource extends RestResource {
 
         streamService.save(stream);
 
+        recentActivityService.update(streamId, GRNTypes.STREAM, userContext.getUser());
         return streamToResponse(stream);
     }
 
@@ -340,16 +366,38 @@ public class StreamResource extends RestResource {
     @Timed
     @ApiOperation(value = "Delete a stream")
     @ApiResponses(value = {
-        @ApiResponse(code = 404, message = "Stream not found."),
-        @ApiResponse(code = 400, message = "Invalid ObjectId.")
+            @ApiResponse(code = 404, message = "Stream not found."),
+            @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
     @AuditEvent(type = AuditEventTypes.STREAM_DELETE)
-    public void delete(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId) throws NotFoundException {
+    public Stream delete(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId,
+                         @Context UserContext userContext) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkNotEditableStream(streamId, "The stream cannot be deleted.");
 
         final Stream stream = streamService.load(streamId);
+        recentActivityService.delete(streamId, GRNTypes.STREAM, stream.getTitle(), userContext.getUser());
         streamService.destroy(stream);
+        return stream;
+    }
+
+    @POST
+    @Path("/bulk_delete")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Timed
+    @ApiOperation(value = "Delete a bulk of streams", response = BulkOperationResponse.class)
+    @NoAuditEvent("Audit events triggered manually")
+    public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
+                               @Context final UserContext userContext) {
+
+        final BulkOperationResponse response = bulkExecutor.executeBulkOperation(
+                bulkOperationRequest,
+                userContext,
+                new AuditParams(AuditEventTypes.STREAM_DELETE, "streamId", Stream.class));
+
+        return Response.status(Response.Status.OK)
+                .entity(response)
+                .build();
     }
 
     @POST
@@ -357,8 +405,8 @@ public class StreamResource extends RestResource {
     @Timed
     @ApiOperation(value = "Pause a stream")
     @ApiResponses(value = {
-        @ApiResponse(code = 404, message = "Stream not found."),
-        @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
+            @ApiResponse(code = 404, message = "Stream not found."),
+            @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
     })
     @AuditEvent(type = AuditEventTypes.STREAM_STOP)
     public void pause(@ApiParam(name = "streamId", required = true)

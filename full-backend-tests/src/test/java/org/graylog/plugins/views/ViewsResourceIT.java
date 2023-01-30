@@ -16,23 +16,17 @@
  */
 package org.graylog.plugins.views;
 
-import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 @ContainerMatrixTestsConfiguration
 public class ViewsResourceIT {
-    private final RequestSpecification requestSpec;
     private final GraylogApis api;
 
-    public ViewsResourceIT(RequestSpecification requestSpec, GraylogApis apis) {
-        this.requestSpec = requestSpec;
+    public ViewsResourceIT(GraylogApis apis) {
         this.api = apis;
     }
 

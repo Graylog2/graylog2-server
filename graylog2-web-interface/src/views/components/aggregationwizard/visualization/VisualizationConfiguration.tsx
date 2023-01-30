@@ -26,6 +26,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import { defaultCompare } from 'logic/DefaultCompare';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { TIMESTAMP_FIELD } from 'views/Constants';
+import { DateType } from 'views/logic/aggregationbuilder/Pivot';
 
 import VisualizationConfigurationOptions from './VisualizationConfigurationOptions';
 import VisualizationElement from './VisualizationElement';
@@ -46,7 +47,7 @@ const isTimeline = (values: WidgetConfigFormValues) => {
 
   const firstRowGrouping = values.groupBy.groupings.find((grouping) => grouping.direction === 'row');
 
-  return firstRowGrouping?.field?.field === TIMESTAMP_FIELD;
+  return firstRowGrouping?.type === DateType && firstRowGrouping?.fields?.[0] === TIMESTAMP_FIELD;
 };
 
 const VisualizationConfiguration = () => {

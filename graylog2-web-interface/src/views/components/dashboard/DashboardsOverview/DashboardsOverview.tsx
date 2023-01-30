@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback, useMemo } from 'react';
+import type { QueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import type { SearchParams, Sort } from 'src/stores/PaginationTypes';
 
 import { PaginatedList, SearchForm, Spinner, NoSearchResult, NoEntitiesExist } from 'components/common';
@@ -26,26 +28,43 @@ import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import usePluginEntities from 'hooks/usePluginEntities';
 import DashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
+import FavoriteIcon from 'views/components/FavoriteIcon';
 
 import TitleCell from './TitleCell';
 
-const INITIAL_COLUMNS = ['title', 'description', 'summary'];
+const INITIAL_COLUMNS = ['title', 'description', 'summary', 'favorite'];
+const COLUMNS_ORDER = ['title', 'summary', 'description', 'owner', 'created_at', 'favorite'];
 
-const COLUMN_DEFINITIONS = [
-  { id: 'created_at', title: 'Created At', sortable: true },
-  { id: 'title', title: 'Title', sortable: true },
-  { id: 'description', title: 'Description', sortable: true },
-  { id: 'summary', title: 'Summary', sortable: true },
-  { id: 'owner', title: 'Owner', sortable: true },
-];
-
-const useCustomColumnRenderers = () => {
+const useCustomColumnRenderers = ({ queryClient, searchParams }: { queryClient: QueryClient, searchParams: SearchParams
+}) => {
   const requirementsProvided = usePluginEntities('views.requires.provided');
   const customColumnRenderers: ColumnRenderers<View> = useMemo(() => ({
     title: {
       renderCell: (dashboard) => <TitleCell dashboard={dashboard} requirementsProvided={requirementsProvided} />,
     },
-  }), [requirementsProvided]);
+    favorite: {
+      renderCell: (search) => (
+        <FavoriteIcon isFavorite={search.favorite}
+                      id={search.id}
+                      onChange={(newValue) => {
+                        queryClient.setQueriesData(['dashboards', 'overview', searchParams], (cur: {
+                          list: Readonly<Array<View>>,
+                          pagination: { total: number }
+                        }) => ({
+                          ...cur,
+                          list: cur.list.map((view) => {
+                            if (view.id === search.id) {
+                              return view.toBuilder().favorite(newValue).build();
+                            }
+
+                            return view;
+                          }),
+                        }
+                        ));
+                      }} />
+      ),
+    },
+  }), [queryClient, requirementsProvided, searchParams]);
 
   return customColumnRenderers;
 };
@@ -53,6 +72,7 @@ const useCustomColumnRenderers = () => {
 const DashboardsOverview = () => {
   const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
   const [visibleColumns, setVisibleColumns] = useState(INITIAL_COLUMNS);
+  const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useState<SearchParams>({
     page: paginationQueryParameter.page,
     pageSize: paginationQueryParameter.pageSize,
@@ -62,7 +82,7 @@ const DashboardsOverview = () => {
       direction: 'asc',
     },
   });
-  const columnRenderers = useCustomColumnRenderers();
+  const columnRenderers = useCustomColumnRenderers({ queryClient, searchParams });
   const { data: paginatedDashboards, refetch } = useDashboards(searchParams);
 
   const onSearch = useCallback((newQuery: string) => {
@@ -96,7 +116,7 @@ const DashboardsOverview = () => {
     return <Spinner />;
   }
 
-  const { list: dashboards, pagination } = paginatedDashboards;
+  const { list: dashboards, pagination, attributes } = paginatedDashboards;
 
   return (
     <PaginatedList onChange={onPageChange}
@@ -124,7 +144,8 @@ const DashboardsOverview = () => {
                                activeSort={searchParams.sort}
                                rowActions={renderDashboardActions}
                                columnRenderers={columnRenderers}
-                               columnDefinitions={COLUMN_DEFINITIONS} />
+                               columnsOrder={COLUMNS_ORDER}
+                               columnDefinitions={attributes} />
       )}
     </PaginatedList>
   );
