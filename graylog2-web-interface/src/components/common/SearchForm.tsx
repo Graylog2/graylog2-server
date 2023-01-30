@@ -184,7 +184,7 @@ const SearchForm = ({
     setQuery(newQuery);
 
     if (typeof onQueryChange === 'function') {
-      onQueryChange(query);
+      onQueryChange(newQuery);
     }
 
     if (typeof onSearch === 'function') {
