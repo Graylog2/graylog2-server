@@ -39,7 +39,7 @@ class BulkExecutorTest {
     @Test
     void returnsUnknownUsernameOnNullUser() {
         final String result = toTest.getUserName(context);
-        assertEquals("<UNKNOWN>", result);
+        assertEquals(AuditActor.UNKNOWN_USERNAME, result);
     }
 
     @Test
@@ -47,7 +47,7 @@ class BulkExecutorTest {
         User user = mock(User.class);
         doReturn(user).when(context).getUser();
         final String result = toTest.getUserName(context);
-        assertEquals("<UNKNOWN>", result);
+        assertEquals(AuditActor.UNKNOWN_USERNAME, result);
     }
 
     @Test
@@ -56,7 +56,7 @@ class BulkExecutorTest {
         doReturn(user).when(context).getUser();
         doReturn("").when(user).getName();
         final String result = toTest.getUserName(context);
-        assertEquals("<UNKNOWN>", result);
+        assertEquals(AuditActor.UNKNOWN_USERNAME, result);
     }
 
     @Test
