@@ -467,6 +467,6 @@ public abstract class MessageInput implements Stoppable {
     }
 
     public String toIdentifier() {
-        return String.format("[%s/%s/%s]", getName(), getTitle(), getId());
+        return "[" + getName() + "/" + getTitle() + "/" + getId() + "]";
     }
 }
