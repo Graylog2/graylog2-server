@@ -278,7 +278,7 @@ SearchForm.propTypes = {
 };
 
 SearchForm.defaultProps = {
-  query: 'aa',
+  query: '',
   className: '',
   onQueryChange: undefined,
   onSearch: null,
