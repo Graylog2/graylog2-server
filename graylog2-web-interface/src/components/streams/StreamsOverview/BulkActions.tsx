@@ -15,12 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { uniq } from 'lodash';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { Formik, Form } from 'formik';
-import { Streams } from '@graylog/server-api';
 
+import { Streams } from '@graylog/server-api';
 import { Button, Modal } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -120,29 +119,22 @@ const BulkActions = ({ selectedStreamIds, refetchStreams, setSelectedStreamIds, 
   const onDelete = useCallback(() => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}?`)) {
-      const deleteCalls = selectedStreamIds.map((streamId) => fetch('DELETE', qualifyUrl(ApiRoutes.StreamsApiController.delete(streamId).url)).then(() => streamId));
-
-      Promise.allSettled(deleteCalls).then((result) => {
-        const fulfilledRequests = result.filter((response) => response.status === 'fulfilled') as Array<{ status: 'fulfilled', value: string }>;
-        const deletedStreamIds = fulfilledRequests.map(({ value }) => value);
-        const notDeletedStreamIds = selectedStreamIds?.filter((streamId) => !deletedStreamIds.includes(streamId));
-
-        if (notDeletedStreamIds.length) {
-          const rejectedRequests = result.filter((response) => response.status === 'rejected') as Array<{ status: 'rejected', reason: FetchError }>;
-          const errorMessages = uniq(rejectedRequests.map((request) => request.reason.responseMessage));
-
-          if (notDeletedStreamIds.length !== selectedStreamIds.length) {
-            queryClient.invalidateQueries(['streams', 'overview']);
-          }
-
-          UserNotification.error(`${notDeletedStreamIds.length} out of ${selectedItemsAmount} selected ${descriptor} could not be deleted. Status: ${errorMessages.join()}`);
-
-          return;
+      fetch(
+        'POST',
+        qualifyUrl(ApiRoutes.StreamsApiController.bulk_delete().url),
+        { entity_ids: selectedStreamIds },
+      ).then(({ failures }) => {
+        if (failures?.length) {
+          const notDeletedStreamIds = failures.map(({ entity_id }) => entity_id);
+          setSelectedStreamIds(notDeletedStreamIds);
+          UserNotification.error(`${notDeletedStreamIds.length} out of ${selectedItemsAmount} selected ${descriptor} could not be deleted.`);
+        } else {
+          setSelectedStreamIds([]);
         }
-
+      }).catch((error) => {
+        UserNotification.error(`An error occurred while deleting streams. ${error}`);
+      }).finally(() => {
         queryClient.invalidateQueries(['streams', 'overview']);
-        setSelectedStreamIds(notDeletedStreamIds);
-        UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`, 'Success');
       });
     }
   }, [descriptor, queryClient, selectedItemsAmount, selectedStreamIds, setSelectedStreamIds]);
