@@ -24,6 +24,8 @@ import com.github.rholder.retry.WaitStrategies;
 import org.apache.commons.exec.ExecuteException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -38,6 +40,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 class CommandLineProcessTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CommandLineProcessTest.class);
 
     @Test
     void testManualStop() throws IOException, ExecutionException, InterruptedException, TimeoutException, RetryException, URISyntaxException {
@@ -55,11 +59,13 @@ class CommandLineProcessTest {
 
             @Override
             public void onStdOut(String line) {
+                LOG.info("Stdout:" + line);
                 stdout.add(line);
             }
 
             @Override
             public void onStdErr(String line) {
+                LOG.info("Stderr:" + line);
                 stdErr.add(line);
             }
 
@@ -107,9 +113,6 @@ class CommandLineProcessTest {
         assert bin != null;
         final Path binPath = Path.of(bin.toURI());
 
-        List<String> stdout = new LinkedList<>();
-        List<String> stdErr = new LinkedList<>();
-
         final CompletableFuture<Integer> exitCodeFuture = new CompletableFuture<>();
 
         final ProcessListener listener = new ProcessListener() {
@@ -119,10 +122,12 @@ class CommandLineProcessTest {
 
             @Override
             public void onStdOut(String line) {
+                LOG.info("Stdout:" + line);
             }
 
             @Override
             public void onStdErr(String line) {
+                LOG.info("Stderr:" + line);
             }
 
             @Override
