@@ -49,6 +49,8 @@ describe('DashboardsOverview BulkActions', () => {
 
     await deleteDashboards();
 
+    expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 dashboards?');
+
     await waitFor(() => expect(fetch).toHaveBeenCalledWith(
       'POST',
       expect.stringContaining('/views/bulk_delete'),
@@ -72,6 +74,8 @@ describe('DashboardsOverview BulkActions', () => {
                         setSelectedDashboardIds={setSelectedDashboardIds} />);
 
     await deleteDashboards();
+
+    expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 dashboards?');
 
     await waitFor(() => expect(fetch).toHaveBeenCalledWith(
       'POST',
