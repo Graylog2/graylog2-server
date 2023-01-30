@@ -32,10 +32,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.ws.rs.BadRequestException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.rest.bulk.SequentialBulkExecutor.NO_ENTITY_IDS_FAILURE;
+import static org.graylog2.rest.bulk.SequentialBulkExecutor.NO_ENTITY_IDS_ERROR;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -74,25 +76,17 @@ class SequentialBulkExecutorTest {
     }
 
     @Test
-    void returnsProperFailureMsgOnNullEntityIdsList() {
-        final BulkOperationResponse bulkOperationResponse = toTest.executeBulkOperation(new BulkOperationRequest(null), context, params);
-        assertThat(bulkOperationResponse.successfullyPerformed()).isEqualTo(0);
-        assertThat(bulkOperationResponse.failures()).containsOnly(NO_ENTITY_IDS_FAILURE);
-        verifyNoInteractions(singleEntityOperationExecutor);
-        verifyNoInteractions(auditEventSender);
-        verifyNoInteractions(successAuditLogContextCreator);
-        verifyNoInteractions(failureAuditLogContextCreator);
+    void throwsBadRequestExceptionOnNullEntityIdsList() {
+        assertThrows(BadRequestException.class,
+                () -> toTest.executeBulkOperation(new BulkOperationRequest(null), context, params),
+                NO_ENTITY_IDS_ERROR);
     }
 
     @Test
-    void returnsProperFailureMsgOnEmptyEntityIdsList() {
-        final BulkOperationResponse bulkOperationResponse = toTest.executeBulkOperation(new BulkOperationRequest(List.of()), context, params);
-        assertThat(bulkOperationResponse.successfullyPerformed()).isEqualTo(0);
-        assertThat(bulkOperationResponse.failures()).containsOnly(NO_ENTITY_IDS_FAILURE);
-        verifyNoInteractions(singleEntityOperationExecutor);
-        verifyNoInteractions(auditEventSender);
-        verifyNoInteractions(successAuditLogContextCreator);
-        verifyNoInteractions(failureAuditLogContextCreator);
+    void throwsBadRequestExceptionOnEmptyEntityIdsList() {
+        assertThrows(BadRequestException.class,
+                () -> toTest.executeBulkOperation(new BulkOperationRequest(List.of()), context, params),
+                NO_ENTITY_IDS_ERROR);
     }
 
     @Test

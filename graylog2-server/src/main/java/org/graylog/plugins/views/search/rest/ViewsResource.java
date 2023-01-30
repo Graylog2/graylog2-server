@@ -23,8 +23,6 @@ import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
@@ -386,9 +384,6 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
     @ApiOperation(value = "Delete a bulk of views", response = BulkOperationResponse.class)
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Could not delete at least one of the views in the bulk.")
-    })
     @NoAuditEvent("Audit events triggered manually")
     public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
                                @Context final SearchUser searchUser) {
@@ -397,7 +392,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                 searchUser,
                 new AuditParams(ViewsAuditEventTypes.VIEW_DELETE, "id", ViewDTO.class));
 
-        return Response.status(response.failures().isEmpty() ? Response.Status.OK : Response.Status.BAD_REQUEST)
+        return Response.status(Response.Status.OK)
                 .entity(response)
                 .build();
     }
