@@ -70,6 +70,14 @@ const useCustomColumnRenderers = ({ queryClient, searchParams }: { queryClient: 
   return customColumnRenderers;
 };
 
+const renderBulkActions = (
+  selectedDashboardIds: Array<string>,
+  setSelectedDashboardIds: (streamIds: Array<string>) => void,
+) => (
+  <BulkActions selectedDashboardIds={selectedDashboardIds}
+               setSelectedDashboardIds={setSelectedDashboardIds} />
+);
+
 const DashboardsOverview = () => {
   const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
   const [visibleColumns, setVisibleColumns] = useState(INITIAL_COLUMNS);
@@ -112,14 +120,6 @@ const DashboardsOverview = () => {
     setSearchParams((cur) => ({ ...cur, sort: newSort, page: 1 }));
     paginationQueryParameter.resetPage();
   }, [paginationQueryParameter]);
-
-  const renderBulkActions = useCallback((
-    selectedDashboardIds: Array<string>,
-    setSelectedDashboardIds: (streamIds: Array<string>) => void,
-  ) => (
-    <BulkActions selectedDashboardIds={selectedDashboardIds}
-                 setSelectedDashboardIds={setSelectedDashboardIds} />
-  ), []);
 
   if (!paginatedDashboards) {
     return <Spinner />;
