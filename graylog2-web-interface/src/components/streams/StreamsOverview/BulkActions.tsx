@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { Formik, Form } from 'formik';
 
@@ -110,7 +109,6 @@ type Props = {
 }
 
 const BulkActions = ({ selectedStreamIds, refetchStreams, setSelectedStreamIds, indexSets }: Props) => {
-  const queryClient = useQueryClient();
   const [showIndexSetModal, setShowIndexSetModal] = useState(false);
 
   const selectedItemsAmount = selectedStreamIds?.length;
@@ -130,14 +128,15 @@ const BulkActions = ({ selectedStreamIds, refetchStreams, setSelectedStreamIds, 
           UserNotification.error(`${notDeletedStreamIds.length} out of ${selectedItemsAmount} selected ${descriptor} could not be deleted.`);
         } else {
           setSelectedStreamIds([]);
+          UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`, 'Success');
         }
       }).catch((error) => {
         UserNotification.error(`An error occurred while deleting streams. ${error}`);
       }).finally(() => {
-        queryClient.invalidateQueries(['streams', 'overview']);
+        refetchStreams();
       });
     }
-  }, [descriptor, queryClient, selectedItemsAmount, selectedStreamIds, setSelectedStreamIds]);
+  }, [descriptor, refetchStreams, selectedItemsAmount, selectedStreamIds, setSelectedStreamIds]);
 
   const toggleAssignIndexSetModal = useCallback(() => {
     setShowIndexSetModal((cur) => !cur);

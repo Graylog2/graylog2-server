@@ -18,13 +18,17 @@ import * as React from 'react';
 import { render, screen, within, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import selectEvent from 'react-select-event';
-import { Streams } from '@graylog/server-api';
 
+import fetch from 'logic/rest/FetchProvider';
+import { Streams } from '@graylog/server-api';
 import UserNotification from 'util/UserNotification';
 import BulkActions from 'components/streams/StreamsOverview/BulkActions';
 import { indexSets } from 'fixtures/indexSets';
 import { asMock } from 'helpers/mocking';
 import suppressConsole from 'helpers/suppressConsole';
+import ApiRoutes from 'routing/ApiRoutes';
+
+jest.mock('logic/rest/FetchProvider', () => jest.fn());
 
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
@@ -64,6 +68,10 @@ describe('StreamsOverview BulkActions', () => {
     });
   };
 
+  const deleteStreams = async () => {
+    userEvent.click(await screen.findByRole('button', { name: /delete/i }));
+  };
+
   beforeEach(() => {
     window.confirm = jest.fn(() => true);
   });
@@ -95,5 +103,56 @@ describe('StreamsOverview BulkActions', () => {
     await assignIndexSet();
 
     await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith('Assigning index set failed with status: Error: Unexpected error!', 'Error'));
+  });
+
+  it('should delete selected streams', async () => {
+    asMock(fetch).mockReturnValue(Promise.resolve({ failures: [] }));
+    const refetchStreams = jest.fn();
+    const setSelectedStreamIds = jest.fn();
+
+    render(<BulkActions selectedStreamIds={['stream-id-1', 'stream-id-2']}
+                        setSelectedStreamIds={setSelectedStreamIds}
+                        indexSets={indexSets}
+                        refetchStreams={refetchStreams} />);
+
+    await deleteStreams();
+
+    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
+      'POST',
+      expect.stringContaining(ApiRoutes.StreamsApiController.bulk_delete().url),
+      { entity_ids: ['stream-id-1', 'stream-id-2'] },
+    ));
+
+    expect(UserNotification.success).toHaveBeenCalledWith('2 streams were deleted successfully.', 'Success');
+    expect(refetchStreams).toHaveBeenCalledTimes(1);
+    expect(setSelectedStreamIds).toHaveBeenCalledWith([]);
+  });
+
+  it('should display warning and not reset streams which could not be deleted', async () => {
+    asMock(fetch).mockReturnValue(Promise.resolve({
+      failures: [
+        { entity_id: 'stream-id-1', failure_explanation: 'The stream cannot be deleted.' },
+      ],
+    }));
+
+    const refetchStreams = jest.fn();
+    const setSelectedStreamIds = jest.fn();
+
+    render(<BulkActions selectedStreamIds={['stream-id-1', 'stream-id-2']}
+                        setSelectedStreamIds={setSelectedStreamIds}
+                        indexSets={indexSets}
+                        refetchStreams={refetchStreams} />);
+
+    await deleteStreams();
+
+    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
+      'POST',
+      expect.stringContaining(ApiRoutes.StreamsApiController.bulk_delete().url),
+      { entity_ids: ['stream-id-1', 'stream-id-2'] },
+    ));
+
+    expect(UserNotification.error).toHaveBeenCalledWith('1 out of 2 selected streams could not be deleted.');
+    expect(refetchStreams).toHaveBeenCalledTimes(1);
+    expect(setSelectedStreamIds).toHaveBeenCalledWith(['stream-id-1']);
   });
 });
