@@ -110,6 +110,8 @@ describe('StreamsOverview BulkActions', () => {
 
     await deleteStreams();
 
+    expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 streams?');
+
     await waitFor(() => expect(fetch).toHaveBeenCalledWith(
       'POST',
       expect.stringContaining(ApiRoutes.StreamsApiController.bulk_delete().url),
@@ -134,6 +136,8 @@ describe('StreamsOverview BulkActions', () => {
                         indexSets={indexSets} />);
 
     await deleteStreams();
+
+    expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 streams?');
 
     await waitFor(() => expect(fetch).toHaveBeenCalledWith(
       'POST',
