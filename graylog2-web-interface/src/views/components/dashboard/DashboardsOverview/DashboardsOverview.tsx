@@ -30,6 +30,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import DashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 
+import BulkActions from './BulkActions';
 import TitleCell from './TitleCell';
 
 const INITIAL_COLUMNS = ['title', 'description', 'summary', 'favorite'];
@@ -112,6 +113,14 @@ const DashboardsOverview = () => {
     paginationQueryParameter.resetPage();
   }, [paginationQueryParameter]);
 
+  const renderBulkActions = useCallback((
+    selectedDashboardIds: Array<string>,
+    setSelectedDashboardIds: (streamIds: Array<string>) => void,
+  ) => (
+    <BulkActions selectedDashboardIds={selectedDashboardIds}
+                 setSelectedDashboardIds={setSelectedDashboardIds} />
+  ), []);
+
   if (!paginatedDashboards) {
     return <Spinner />;
   }
@@ -143,6 +152,7 @@ const DashboardsOverview = () => {
                                onSortChange={onSortChange}
                                activeSort={searchParams.sort}
                                rowActions={renderDashboardActions}
+                               bulkActions={renderBulkActions}
                                columnRenderers={columnRenderers}
                                columnsOrder={COLUMNS_ORDER}
                                columnDefinitions={attributes} />
