@@ -77,20 +77,6 @@ const handleQueryChange = (query, onSearch, useLoadingState, setLoadingState, re
   }
 };
 
-const debounceOnSearch = debounce((
-  query,
-  onSearch,
-  useLoadingState,
-  setLoadingState,
-  resetLoadingState,
-) => handleQueryChange(
-  query,
-  onSearch,
-  useLoadingState,
-  setLoadingState,
-  resetLoadingState,
-), SEARCH_DEBOUNCE_THRESHOLD);
-
 type Props = {
   useLoadingState?: boolean,
   queryHelpComponent?: React.ReactNode,
@@ -131,12 +117,12 @@ const SearchForm = ({
   onQueryChange,
   query: propsQuery,
 }: Props) => {
-  const [query, setQuery] = useState(propsQuery);
+  const inputRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
   const inputFeedbackContainer = useRef<HTMLDivElement>(undefined);
 
   useEffect(() => {
-    setQuery(propsQuery);
+    inputRef.current.value = propsQuery;
   }, [propsQuery]);
 
   /**
@@ -165,7 +151,7 @@ const SearchForm = ({
 
   const handleReset = () => {
     resetLoadingState();
-    setQuery(propsQuery);
+    inputRef.current.value = propsQuery;
 
     if (typeof onQueryChange === 'function') {
       onQueryChange(propsQuery);
@@ -176,20 +162,29 @@ const SearchForm = ({
     }
   };
 
-  const onChange = (e) => {
+  const debouncedOnChange = useRef(debounce((e) => {
     e.preventDefault();
     e.stopPropagation();
     const newQuery = e.target.value;
 
-    setQuery(newQuery);
-
     if (typeof onQueryChange === 'function') {
-      onQueryChange(query);
+      onQueryChange(newQuery);
     }
 
     if (typeof onSearch === 'function') {
-      debounceOnSearch(newQuery, onSearch, useLoadingState, setLoadingState, resetLoadingState);
+      handleQueryChange(
+        newQuery,
+        onSearch,
+        useLoadingState,
+        setLoadingState,
+        resetLoadingState,
+      );
     }
+  }, SEARCH_DEBOUNCE_THRESHOLD)).current;
+
+  const handleOnChange = (e) => {
+    e.persist();
+    debouncedOnChange(e);
   };
 
   return (
@@ -205,18 +200,18 @@ const SearchForm = ({
             <StyledInput id="common-search-form-query-input"
                          /* eslint-disable-next-line jsx-a11y/no-autofocus */
                          autoFocus={focusAfterMount}
-                         onChange={onChange}
-                         value={query}
+                         onChange={handleOnChange}
                          placeholder={placeholder}
                          type="text"
                          $queryWidth={queryWidth}
                          className="query form-control"
                          autoComplete="off"
                          spellCheck="false"
-                         $feedbackContainerWidth={inputFeedbackContainer.current?.scrollWidth} />
+                         ref={inputRef}
+                         $feedbackContainerWidth={inputFeedbackContainer?.current?.scrollWidth} />
             <InputFeedback ref={inputFeedbackContainer}>
               {isLoading && <Spinner text="" />}
-              {(query && typeof onReset === 'function') && <IconButton name="xmark" title="Reset search" onClick={handleReset} />}
+              {(inputRef?.current?.value && typeof onReset === 'function') && <IconButton name="xmark" title="Reset search" onClick={handleReset} />}
               {queryHelpComponent}
             </InputFeedback>
           </InputContainer>
@@ -283,7 +278,7 @@ SearchForm.propTypes = {
 };
 
 SearchForm.defaultProps = {
-  query: '',
+  query: 'aa',
   className: '',
   onQueryChange: undefined,
   onSearch: null,
