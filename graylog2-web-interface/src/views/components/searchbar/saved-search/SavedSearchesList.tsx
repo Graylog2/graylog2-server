@@ -32,6 +32,8 @@ import FavoriteIcon from 'views/components/FavoriteIcon';
 import type { Sort } from 'stores/PaginationTypes';
 import useSavedSearches from 'views/hooks/useSavedSearches';
 
+import BulkActions from './BulkActions';
+
 type SearchParams = {
   page: number,
   pageSize: number,
@@ -119,6 +121,14 @@ const onDelete = (e, savedSearch: View, deleteSavedSearch: (search: View) => Pro
     });
   }
 };
+
+const renderBulkActions = (
+  selectedSavedSearchIds: Array<string>,
+  setSelectedSavedSearchIds: (streamIds: Array<string>) => void,
+) => (
+  <BulkActions selectedSavedSearchIds={selectedSavedSearchIds}
+               setSelectedSavedSearchIds={setSelectedSavedSearchIds} />
+);
 
 type Props = {
   activeSavedSearchId: string,
@@ -220,6 +230,7 @@ const SavedSearchesList = ({
                                visibleColumns={visibleColumns}
                                columnsOrder={COLUMNS_ORDER}
                                onColumnsChange={onColumnsChange}
+                               bulkActions={renderBulkActions}
                                onSortChange={onSortChange}
                                activeSort={searchParams.sort}
                                rowActions={renderSavedSearchActions}
