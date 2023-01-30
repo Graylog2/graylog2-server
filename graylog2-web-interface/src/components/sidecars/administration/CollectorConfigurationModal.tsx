@@ -25,6 +25,7 @@ import { SearchForm, Icon } from 'components/common';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import { Link } from 'components/common/router';
+import Alert from 'components/bootstrap/Alert';
 
 import type { Collector, Configuration, SidecarSummary } from '../types';
 
@@ -108,6 +109,12 @@ const StyledSearchForm = styled(SearchForm)`
   .form-group, .query {
     width: 100% !important;
   }
+`;
+
+const InfoContainer = styled(Alert)`
+  border: unset;
+  margin-bottom: 0px;
+  margin-top: 4px;
 `;
 
 const getFilterQuery = (_query: string) => {
@@ -223,6 +230,11 @@ const CollectorConfigurationModal = ({
         <StyledSearchForm query={searchQuery}
                           onQueryChange={(q) => setSearchQuery(q)}
                           topMargin={0} />
+        {(rows.length > 0) && (
+          <InfoContainer bsStyle="info">
+            Sidecars that have a lock icon &nbsp;<Icon name="lock" size="xs" />&nbsp; have been assigned using tags and cannot be changed here.
+          </InfoContainer>
+        )}
         <ConfigurationContainer>
           <ConfigurationTable className="table-condensed table-hover">
             <tbody>
