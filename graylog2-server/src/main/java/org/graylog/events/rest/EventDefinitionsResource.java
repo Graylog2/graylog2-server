@@ -24,8 +24,6 @@ import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.events.audit.EventsAuditEventTypes;
@@ -232,9 +230,6 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
     @ApiOperation(value = "Delete a bulk of event definitions", response = BulkOperationResponse.class)
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Could not delete at least one of the event definitions in the bulk.")
-    })
     @NoAuditEvent("Audit events triggered manually")
     public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
                                @Context UserContext userContext) {
@@ -243,7 +238,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 userContext,
                 new AuditParams(EventsAuditEventTypes.EVENT_DEFINITION_DELETE, "definitionId", EventDefinitionDto.class));
 
-        return Response.status(response.failures().isEmpty() ? Response.Status.OK : Response.Status.BAD_REQUEST)
+        return Response.status(Response.Status.OK)
                 .entity(response)
                 .build();
     }
