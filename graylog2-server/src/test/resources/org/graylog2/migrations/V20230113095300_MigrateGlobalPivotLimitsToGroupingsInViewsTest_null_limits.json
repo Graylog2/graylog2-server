@@ -17,28 +17,22 @@
         },
         "widgets" : [
           {
-            "id" : "fd4c2728-9348-41a9-8f26-b40979ddb9b1",
+            "id" : "fd4c2728-9348-41a9-8f26-b40979ddb9b4",
             "type" : "aggregation",
             "filters" : [],
             "timerange" : null,
             "query" : null,
             "streams" : [],
             "config" : {
-              "row_pivots" : [
-                {
-                  "field" : "action",
-                  "type" : "values",
-                  "config" : {
-                    "limit": 5
-                  }
-                }
-              ],
               "column_pivots" : [],
+              "row_pivots" : [],
               "series" : [],
               "sort" : [],
               "visualization" : "table",
               "rollup" : true,
-              "event_annotation" : false
+              "event_annotation" : false,
+              "row_limit": null,
+              "column_limit": null
             }
           }
         ],

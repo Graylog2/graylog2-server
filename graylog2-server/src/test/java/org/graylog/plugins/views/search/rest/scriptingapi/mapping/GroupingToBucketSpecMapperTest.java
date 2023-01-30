@@ -22,6 +22,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -48,7 +50,7 @@ class GroupingToBucketSpecMapperTest {
         assertThat(bucketSpec)
                 .isNotNull()
                 .isInstanceOf(Values.class)
-                .satisfies(b -> assertEquals("source", b.field()))
+                .satisfies(b -> assertEquals(Collections.singletonList("source"), b.fields()))
                 .satisfies(b -> assertEquals(Values.NAME, b.type()))
                 .satisfies(b -> assertEquals(3, ((Values) b).limit()));
     }
@@ -61,7 +63,7 @@ class GroupingToBucketSpecMapperTest {
         assertThat(bucketSpec)
                 .isNotNull()
                 .isInstanceOf(Values.class)
-                .satisfies(b -> assertEquals("source", b.field()))
+                .satisfies(b -> assertEquals(Collections.singletonList("source"), b.fields()))
                 .satisfies(b -> assertEquals(Values.NAME, b.type()))
                 .satisfies(b -> assertEquals(Values.DEFAULT_LIMIT, ((Values) b).limit()));
     }

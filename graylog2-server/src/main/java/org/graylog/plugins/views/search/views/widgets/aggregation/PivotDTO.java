@@ -23,6 +23,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.OptionalInt;
 
 @AutoValue
@@ -30,11 +32,12 @@ import java.util.OptionalInt;
 @WithBeanGetter
 public abstract class PivotDTO {
     private static final String FIELD_FIELD_NAME = "field";
+    private static final String FIELD_FIELDS_NAME = "fields";
     private static final String FIELD_TYPE = "type";
     private static final String FIELD_CONFIG = "config";
 
-    @JsonProperty(FIELD_FIELD_NAME)
-    public abstract String field();
+    @JsonProperty(FIELD_FIELDS_NAME)
+    public abstract List<String> fields();
 
     @JsonProperty(FIELD_TYPE)
     public abstract String type();
@@ -45,7 +48,12 @@ public abstract class PivotDTO {
     @AutoValue.Builder
     public static abstract class Builder {
         @JsonProperty(FIELD_FIELD_NAME)
-        public abstract Builder field(String field);
+        public Builder field(String field) {
+            return fields(Collections.singletonList(field));
+        }
+
+        @JsonProperty(FIELD_FIELDS_NAME)
+        public abstract Builder fields(List<String> field);
 
         @JsonProperty(FIELD_CONFIG)
         @JsonTypeInfo(
