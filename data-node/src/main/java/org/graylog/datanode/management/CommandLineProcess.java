@@ -66,7 +66,7 @@ class CommandLineProcess {
         executor.execute(cmdLine, listener);
 
         try {
-            this.process = executor.getProcess().get(10, TimeUnit.SECONDS);
+            this.process = executor.getProcess().get(30, TimeUnit.SECONDS);
             listener.onStart();
         } catch (TimeoutException e) {
             throw new RuntimeException("Failed to obtain process", e);
