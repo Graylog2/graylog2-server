@@ -22,8 +22,9 @@ import userEvent from '@testing-library/user-event';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
+import type { Map } from 'immutable';
 
-import { MockStore } from 'helpers/mocking';
+import { MockStore, asMock } from 'helpers/mocking';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import DataTable from 'views/components/datatable/DataTable';
 import FieldType, { FieldTypes } from 'views/logic/fieldtypes/FieldType';
@@ -32,10 +33,14 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import dataTable from 'views/components/datatable/bindings';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import AggregationWizard from '../AggregationWizard';
 
 const extendedTimeout = applyTimeoutMultiplier(15000);
+
+jest.mock('views/hooks/useActiveQueryId');
 
 jest.mock('views/stores/ViewMetadataStore', () => ({
   ViewMetadataStore: MockStore(['getInitialState', () => ({ activeQuery: 'queryId' })]),
@@ -78,8 +83,15 @@ const submitWidgetConfigForm = async () => {
 };
 
 describe('AggregationWizard', () => {
-  const renderSUT = (props = {}) => render(
-    <FieldTypesContext.Provider value={fieldTypes}>
+  type Props = Partial<React.ComponentProps<typeof AggregationWizard>> & {
+    fieldTypesList?: {
+      all: FieldTypeMappingsList
+      queryFields: Map<string, FieldTypeMappingsList>,
+    }
+  }
+
+  const renderSUT = ({ fieldTypesList = fieldTypes, ...props }: Props = {}) => render(
+    <FieldTypesContext.Provider value={fieldTypesList}>
       <AggregationWizard config={widgetConfig}
                          editing
                          id="widget-id"
@@ -97,6 +109,10 @@ describe('AggregationWizard', () => {
   beforeAll(() => PluginStore.register(plugin));
 
   afterAll(() => PluginStore.unregister(plugin));
+
+  beforeEach(() => {
+    asMock(useActiveQueryId).mockReturnValue('queryId');
+  });
 
   it('should require group by function when adding a group by element', async () => {
     renderSUT();
@@ -123,6 +139,44 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
 
     expect(onChange).toHaveBeenCalledWith(updatedConfig);
+  });
+
+  it('should update config, even when field only exists for current query', async () => {
+    const onChange = jest.fn();
+    const queryFieldTypeMapping = new FieldTypeMapping('status_code', fieldType);
+    const queryFields = Immutable.List([queryFieldTypeMapping]);
+    renderSUT({ onChange, fieldTypesList: { all: fields, queryFields: Immutable.Map({ queryId: queryFields }) } });
+
+    await addElement('Grouping');
+    await selectField('status_code');
+    await submitWidgetConfigForm();
+
+    const pivot = Pivot.create(['status_code'], 'values');
+    const updatedConfig = widgetConfig
+      .toBuilder()
+      .rowPivots([pivot])
+      .build();
+
+    await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+
+    expect(onChange).toHaveBeenCalledWith(updatedConfig);
+  });
+
+  it('should not throw an error when field in config no longer exists in field types list.', async () => {
+    const onChange = jest.fn();
+    const pivot = Pivot.create(['status_code'], 'values');
+    const initialConfig = widgetConfig
+      .toBuilder()
+      .rowPivots([pivot])
+      .build();
+
+    renderSUT({
+      onChange,
+      fieldTypesList: { all: Immutable.List([]), queryFields: Immutable.Map({ queryId: Immutable.List([]) }) },
+      config: initialConfig,
+    });
+
+    await screen.findByRole('button', { name: /update preview/i });
   });
 
   it('should add multiple pivots to widget', async () => {
