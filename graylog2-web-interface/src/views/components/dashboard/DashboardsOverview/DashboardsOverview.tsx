@@ -30,6 +30,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import DashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 
+import BulkActions from './BulkActions';
 import TitleCell from './TitleCell';
 
 const INITIAL_COLUMNS = ['title', 'description', 'summary', 'favorite'];
@@ -68,6 +69,14 @@ const useCustomColumnRenderers = ({ queryClient, searchParams }: { queryClient: 
 
   return customColumnRenderers;
 };
+
+const renderBulkActions = (
+  selectedDashboardIds: Array<string>,
+  setSelectedDashboardIds: (streamIds: Array<string>) => void,
+) => (
+  <BulkActions selectedDashboardIds={selectedDashboardIds}
+               setSelectedDashboardIds={setSelectedDashboardIds} />
+);
 
 const DashboardsOverview = () => {
   const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
@@ -143,6 +152,7 @@ const DashboardsOverview = () => {
                                onSortChange={onSortChange}
                                activeSort={searchParams.sort}
                                rowActions={renderDashboardActions}
+                               bulkActions={renderBulkActions}
                                columnRenderers={columnRenderers}
                                columnsOrder={COLUMNS_ORDER}
                                columnDefinitions={attributes} />
