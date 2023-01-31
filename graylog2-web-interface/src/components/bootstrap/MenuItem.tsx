@@ -22,6 +22,11 @@ import styled from 'styled-components';
 
 import Icon from 'components/common/Icon';
 
+const InnerContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
 const IconWrapper = styled.div`
   display: inline-flex;
   min-width: 20px;
@@ -37,10 +42,10 @@ type Props = React.ComponentProps<typeof BootstrapMenuItem> & {
 const CustomMenuItem = ({ className, children, icon, ...props } : Props) => (
   <BootstrapMenuItem bsClass={className} {...props}>
     {children && (
-      <>
+      <InnerContainer>
         {icon && <IconWrapper><Icon name={icon} /></IconWrapper>}
         {children}
-      </>
+      </InnerContainer>
     )}
   </BootstrapMenuItem>
 );
