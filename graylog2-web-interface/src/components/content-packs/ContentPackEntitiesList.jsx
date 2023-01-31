@@ -207,8 +207,7 @@ class ContentPackEntitiesList extends React.Component {
       <div>
         <h2>Entity list</h2>
         <br />
-        <SearchForm searchButtonLabel="Filter"
-                    onSearch={this._filterEntities}
+        <SearchForm onSearch={this._filterEntities}
                     onReset={() => { this._filterEntities(''); }} />
         <DataTable id="entity-list"
                    headers={headers}
