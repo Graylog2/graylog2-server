@@ -25,7 +25,7 @@ import QueryGenerator from '../queries/QueryGenerator';
 
 export default async (
   type: ViewType,
-  streamId: string | undefined | null,
+  streamId: string | string[] | undefined | null,
   timeRange?: TimeRange,
   queryString?: ElasticsearchQueryString,
 ) => {
@@ -35,6 +35,7 @@ export default async (
 
   return View.create()
     .toBuilder()
+    .newId()
     .type(type)
     .state({ [query.id]: viewState })
     .search(search)

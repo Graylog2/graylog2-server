@@ -32,18 +32,17 @@ import org.graylog.storage.opensearch2.views.searchtypes.pivot.PivotBucket;
 import org.joda.time.base.AbstractDateTime;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 import java.util.stream.Stream;
 
 public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket> {
     private static final String AGG_NAME = "agg";
     @Nonnull
     @Override
-    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, List<DateRangeBucket> bucketSpecs, OSGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, DateRangeBucket dateRangeBucket, OSGeneratedQueryContext queryContext, Query query) {
         AggregationBuilder root = null;
         AggregationBuilder leaf = null;
-        for (DateRangeBucket dateRangeBucket : bucketSpecs) {
-            final DateRangeAggregationBuilder builder = AggregationBuilders.dateRange(name).field(dateRangeBucket.field());
+        for (String field : dateRangeBucket.fields()) {
+            final DateRangeAggregationBuilder builder = AggregationBuilders.dateRange(name).field(field);
             dateRangeBucket.ranges().forEach(r -> {
                 final String from = r.from().map(AbstractDateTime::toString).orElse(null);
                 final String to = r.to().map(AbstractDateTime::toString).orElse(null);
@@ -73,14 +72,11 @@ public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket
     }
 
     @Override
-    public Stream<PivotBucket> extractBuckets(Pivot pivot, List<BucketSpec> bucketSpecs, PivotBucket initialBucket) {
-        if (bucketSpecs.isEmpty()) {
-            return Stream.empty();
-        }
+    public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket initialBucket) {
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
         final ParsedDateRange aggregation = previousBucket.getAggregations().get(AGG_NAME);
-        final DateRangeBucket dateRangeBucket = (DateRangeBucket) bucketSpecs.get(0);
+        final DateRangeBucket dateRangeBucket = (DateRangeBucket) bucketSpecs;
 
         return aggregation.getBuckets().stream()
                 .flatMap(bucket -> {
@@ -92,11 +88,7 @@ public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket
                             .add(bucketKey)
                             .build();
 
-                    if (bucketSpecs.size() == 1) {
-                        return Stream.of(PivotBucket.create(keys, bucket));
-                    }
-
-                    return extractBuckets(pivot, bucketSpecs.subList(0, bucketSpecs.size()), PivotBucket.create(keys, bucket));
+                    return Stream.of(PivotBucket.create(keys, bucket));
                 });
     }
 }

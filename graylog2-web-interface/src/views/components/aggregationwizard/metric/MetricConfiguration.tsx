@@ -91,16 +91,20 @@ const Metric = ({ index }: Props) => {
       </Field>
       <Field name={`metrics.${index}.field`}>
         {({ field: { name, value, onChange }, meta: { error } }) => (
-          <FieldSelect id="metric-field-select"
-                       selectRef={metricFieldSelectRef}
-                       label="Field"
-                       onChange={onChange}
-                       error={error}
-                       clearable={!isFieldRequired}
-                       properties={requiredProperties}
-                       name={name}
-                       value={value}
-                       ariaLabel="Select a field" />
+          <Input id="metric-field"
+                 label="Field"
+                 error={error}
+                 labelClassName="col-sm-3"
+                 wrapperClassName="col-sm-9">
+            <FieldSelect id="metric-field-select"
+                         selectRef={metricFieldSelectRef}
+                         onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
+                         clearable={!isFieldRequired}
+                         properties={requiredProperties}
+                         name={name}
+                         value={value}
+                         ariaLabel="Select a field" />
+          </Input>
         )}
       </Field>
       {isPercentile && (

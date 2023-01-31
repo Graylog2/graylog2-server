@@ -18,7 +18,7 @@ declare module 'reflux' {
   import type { RefluxActions, Store } from 'stores/StoreTypes';
 
   export interface StoreDefinition {
-    listenables?: any[];
+    listenables?: RefluxActions<any>[];
     init?: Function;
     getInitialState?: Function;
 

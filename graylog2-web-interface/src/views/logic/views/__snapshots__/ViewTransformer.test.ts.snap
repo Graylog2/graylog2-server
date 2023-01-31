@@ -5,6 +5,7 @@ exports[`ViewTransformer transform with all attributes should transform a view w
   "_value": {
     "createdAt": 2019-10-14T07:58:06.562Z,
     "description": "",
+    "favorite": undefined,
     "id": Any<String>,
     "owner": "admin",
     "properties": Immutable.List [],

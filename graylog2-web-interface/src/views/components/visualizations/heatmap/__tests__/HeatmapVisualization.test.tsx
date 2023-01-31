@@ -33,8 +33,8 @@ jest.mock('../../GenericPlot', () => mockComponent('GenericPlot'));
 
 describe('HeatmapVisualization', () => {
   it('generates correct props for plot component', () => {
-    const columnPivot = new Pivot('http_status', 'values');
-    const rowPivot = new Pivot('hour', 'values');
+    const columnPivot = Pivot.create(['http_status'], 'values');
+    const rowPivot = Pivot.create(['hour'], 'values');
     const series = new Series('count()');
     const config = AggregationWidgetConfig.builder()
       .rowPivots([rowPivot])
@@ -73,8 +73,8 @@ describe('HeatmapVisualization', () => {
   });
 
   it('generates correct props for plot component with empty data with use smallest value as default', () => {
-    const columnPivot = new Pivot('http_status', 'values');
-    const rowPivot = new Pivot('hour', 'values');
+    const columnPivot = Pivot.create(['http_status'], 'values');
+    const rowPivot = Pivot.create(['hour'], 'values');
     const series = new Series('count()');
     const config = AggregationWidgetConfig.builder()
       .rowPivots([rowPivot])

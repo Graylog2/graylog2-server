@@ -183,7 +183,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
 
           <ScratchpadToggle />
 
-          <HelpMenu active={_isActive(pathname, Routes.GETTING_STARTED)} />
+          <HelpMenu active={_isActive(pathname, Routes.WELCOME)} />
 
           <UserMenu fullName={fullName} readOnly={readOnly} userId={userId} />
         </Nav>

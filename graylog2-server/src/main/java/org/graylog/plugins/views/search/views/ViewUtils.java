@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.Collation;
 import com.mongodb.client.model.Field;
 import com.mongodb.client.model.Variable;
 import org.bson.Document;
@@ -80,7 +81,7 @@ public interface ViewUtils<T> {
                         Aggregates.unset("favorites"),
                         Aggregates.sort(sort)
                 )
-        );
+        ).collation(Collation.builder().locale("en").build());
 
         return StreamSupport.stream(result.spliterator(), false);
     }

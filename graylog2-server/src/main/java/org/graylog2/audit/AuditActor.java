@@ -31,6 +31,8 @@ public abstract class AuditActor {
     private static final String URN_GRAYLOG_NODE = "urn:graylog:node:";
     private static final String URN_GRAYLOG_USER = "urn:graylog:user:";
 
+    public static final String UNKNOWN_USERNAME = "<UNKNOWN>";
+
     public abstract String urn();
 
     public static AuditActor user(@Nonnull String username) {

@@ -22,4 +22,4 @@ export type ViewHookArguments = {
   query: { [key: string]: any },
 };
 
-export type ViewHook = (ViewHookArguments) => Promise<boolean>;
+export type ViewHook = (args: ViewHookArguments) => Promise<boolean>;

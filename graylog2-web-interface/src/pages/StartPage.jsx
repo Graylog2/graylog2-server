@@ -14,81 +14,50 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
+import React, { useCallback, useEffect } from 'react';
 
 import { Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import history from 'util/History';
-import PermissionsMixin from 'util/PermissionsMixin';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
-import { GettingStartedActions, GettingStartedStore } from 'stores/gettingstarted/GettingStartedStore';
 
-const StartPage = createReactClass({
-  displayName: 'StartPage',
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.listenTo(GettingStartedStore, 'onGettingStartedUpdate')],
+import { useStore } from '../stores/connect';
 
-  getInitialState() {
-    return {
-      gettingStarted: undefined,
-    };
-  },
+const redirect = (page) => {
+  history.replace(page);
+};
 
-  componentDidMount() {
-    GettingStartedActions.getStatus();
-    CurrentUserStore.reload();
-  },
-
-  componentDidUpdate() {
-    if (!this._isLoading()) {
-      this._redirectToStartpage();
-    }
-  },
-
-  onGettingStartedUpdate(state) {
-    this.setState({ gettingStarted: state.status });
-  },
-
-  _redirect(page) {
-    history.replace(page);
-  },
-
-  _redirectToStartpage() {
-    const { currentUser: { startpage, permissions }, gettingStarted } = this.state;
-
-    // Show getting started page if user is an admin and getting started wasn't dismissed
-    if (PermissionsMixin.isPermitted(permissions, ['inputs:create'])) {
-      if (gettingStarted.show) {
-        this._redirect(Routes.GETTING_STARTED);
-
-        return;
-      }
-    }
+const StartPage = () => {
+  const { currentUser } = useStore(CurrentUserStore);
+  const isLoading = !currentUser;
+  const redirectToStartPage = useCallback(() => {
+    const startPage = currentUser?.startpage;
 
     // Show custom startpage if it was set
-    if (startpage !== null && Object.keys(startpage).length > 0) {
-      if (startpage.type === 'stream') {
-        this._redirect(Routes.stream_search(startpage.id));
+    if (startPage !== null && Object.keys(startPage).length > 0) {
+      if (startPage.type === 'stream') {
+        redirect(Routes.stream_search(startPage.id));
       } else {
-        this._redirect(Routes.dashboard_show(startpage.id));
+        redirect(Routes.dashboard_show(startPage.id));
       }
 
       return;
     }
 
-    this._redirect(Routes.SEARCH);
-  },
+    redirect(Routes.WELCOME);
+  }, [currentUser?.startpage]);
 
-  _isLoading() {
-    const { currentUser, gettingStarted } = this.state;
+  useEffect(() => {
+    CurrentUserStore.reload();
+  }, []);
 
-    return !currentUser || !gettingStarted;
-  },
+  useEffect(() => {
+    if (!isLoading) {
+      redirectToStartPage();
+    }
+  }, [isLoading, redirectToStartPage]);
 
-  render() {
-    return <Spinner />;
-  },
-});
+  return <Spinner />;
+};
 
 export default StartPage;
