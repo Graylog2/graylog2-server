@@ -31,7 +31,6 @@ public class EntityListPreferencesServiceImpl implements EntityListPreferencesSe
 
     private final JacksonDBCollection<StoredEntityListPreferences, StoredEntityListPreferencesId> db;
 
-
     @Inject
     public EntityListPreferencesServiceImpl(final MongoConnection mongoConnection,
                                             final MongoJackObjectMapperProvider mapper) {
