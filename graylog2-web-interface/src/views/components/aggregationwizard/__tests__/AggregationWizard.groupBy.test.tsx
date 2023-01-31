@@ -31,6 +31,7 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import dataTable from 'views/components/datatable/bindings';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 
 import AggregationWizard from '../AggregationWizard';
 
@@ -76,8 +77,15 @@ const submitWidgetConfigForm = async () => {
 };
 
 describe('AggregationWizard', () => {
-  const renderSUT = (props = {}) => render(
-    <FieldTypesContext.Provider value={fieldTypes}>
+  type Props = Partial<React.ComponentProps<typeof AggregationWizard>> & {
+    fieldTypesList?: {
+      all: FieldTypeMappingsList
+      queryFields: Immutable.Map<string, FieldTypeMappingsList>,
+    }
+  }
+
+  const renderSUT = ({ fieldTypesList = fieldTypes, ...props }: Props = {}) => render(
+    <FieldTypesContext.Provider value={fieldTypesList}>
       <AggregationWizard config={widgetConfig}
                          editing
                          id="widget-id"
@@ -85,7 +93,7 @@ describe('AggregationWizard', () => {
                          fields={Immutable.List([])}
                          onChange={() => {}}
                          {...props}>
-        <>The Visualization</>
+        <div>The Visualization</div>
       </AggregationWizard>,
     </FieldTypesContext.Provider>,
   );
@@ -200,6 +208,27 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
+  });
+
+  it('should update config, even when field only exists for current query', async () => {
+    const onChange = jest.fn();
+    const queryFieldTypeMapping = new FieldTypeMapping('status_code', fieldType);
+    const queryFields = Immutable.List([queryFieldTypeMapping]);
+    renderSUT({ onChange, fieldTypesList: { all: fields, queryFields: Immutable.Map({ queryId: queryFields }) } });
+
+    await addElement('Grouping');
+    await selectField('status_code');
+    await submitWidgetConfigForm();
+
+    const pivot = Pivot.create('status_code', 'values');
+    const updatedConfig = widgetConfig
+      .toBuilder()
+      .rowPivots([pivot])
+      .build();
+
+    await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+
+    expect(onChange).toHaveBeenCalledWith(updatedConfig);
   });
 
   it('should display group by section even if config has no pivots', async () => {
