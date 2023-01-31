@@ -67,7 +67,19 @@ const InputContainer = styled.div`
   position: relative;
 `;
 
-const handleQueryChange = (query, onSearch, useLoadingState, setLoadingState, resetLoadingState) => {
+const handleQueryChange = debounce(({
+  query,
+  onSearch,
+  useLoadingState,
+  setLoadingState,
+  resetLoadingState,
+}: {
+  query: string,
+  onSearch: (query: string, resetLoadingState?: () => void) => void,
+  useLoadingState: boolean,
+  setLoadingState: () => Promise<void>,
+  resetLoadingState: () => void,
+}) => {
   if (useLoadingState) {
     setLoadingState().then(() => {
       onSearch(query, resetLoadingState);
@@ -75,21 +87,7 @@ const handleQueryChange = (query, onSearch, useLoadingState, setLoadingState, re
   } else {
     onSearch(query);
   }
-};
-
-const debounceOnSearch = debounce((
-  query,
-  onSearch,
-  useLoadingState,
-  setLoadingState,
-  resetLoadingState,
-) => handleQueryChange(
-  query,
-  onSearch,
-  useLoadingState,
-  setLoadingState,
-  resetLoadingState,
-), SEARCH_DEBOUNCE_THRESHOLD);
+}, SEARCH_DEBOUNCE_THRESHOLD);
 
 type Props = {
   useLoadingState?: boolean,
@@ -188,7 +186,13 @@ const SearchForm = ({
     }
 
     if (typeof onSearch === 'function') {
-      debounceOnSearch(newQuery, onSearch, useLoadingState, setLoadingState, resetLoadingState);
+      handleQueryChange({
+        query: newQuery,
+        onSearch,
+        useLoadingState,
+        setLoadingState,
+        resetLoadingState,
+      });
     }
   };
 
