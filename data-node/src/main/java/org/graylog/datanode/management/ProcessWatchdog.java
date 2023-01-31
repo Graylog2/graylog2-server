@@ -50,9 +50,10 @@ public class ProcessWatchdog implements Runnable {
 
     @Override
     public void run() {
+        // TODO:  remove busy-waiting and replace with some post-termination hook of the process
         while (!Thread.interrupted() && !stopped) {
             if (process.isInState(ProcessState.TERMINATED)) {
-                if(!failureCounter.failedTooManyTimes()) {
+                if (!failureCounter.failedTooManyTimes()) {
                     restartProcess();
                 } else {
                     // give up trying, stop the watchdog
@@ -77,7 +78,7 @@ public class ProcessWatchdog implements Runnable {
             LOG.info("Detected terminated process, restarting");
             process.start();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOG.warn("Failed to start the process.", e);
         } finally {
             failureCounter.increment();
         }

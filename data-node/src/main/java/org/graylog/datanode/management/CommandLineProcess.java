@@ -64,7 +64,6 @@ class CommandLineProcess {
         executor.setStreamHandler(new PumpStreamHandler(new LoggingOutputStream(listener::onStdOut), new LoggingOutputStream(listener::onStdErr)));
         executor.setWatchdog(watchDog);
         executor.execute(cmdLine, listener);
-
         try {
             this.process = executor.getProcess().get(30, TimeUnit.SECONDS);
             listener.onStart();
