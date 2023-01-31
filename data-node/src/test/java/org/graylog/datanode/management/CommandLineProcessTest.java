@@ -71,10 +71,12 @@ class CommandLineProcessTest {
 
             @Override
             public void onProcessComplete(int exitValue) {
+                LOG.info("On process complete:" + exitValue);
             }
 
             @Override
             public void onProcessFailed(ExecuteException e) {
+                LOG.info("On process failed:", e);
             }
         };
         final CommandLineProcess process = new CommandLineProcess(binPath, Collections.emptyList(), listener);
