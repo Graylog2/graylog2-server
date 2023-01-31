@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -44,7 +43,7 @@ class CommandLineProcessTest {
     private static final Logger LOG = LoggerFactory.getLogger(CommandLineProcessTest.class);
 
     @Test
-    void testManualStop() throws IOException, ExecutionException, InterruptedException, TimeoutException, RetryException, URISyntaxException {
+    void testManualStop() throws IOException, ExecutionException, RetryException, URISyntaxException {
         final URL bin = getClass().getResource("test-script.sh");
         assert bin != null;
         final Path binPath = Path.of(bin.toURI());
@@ -79,7 +78,7 @@ class CommandLineProcessTest {
                 LOG.info("On process failed:", e);
             }
         };
-        final CommandLineProcess process = new CommandLineProcess(binPath, Collections.emptyList(), listener);
+        final CommandLineProcess process = new CommandLineProcess(Path.of("/bin/sh"), List.of(getScriptPath()), listener);
         process.start();
 
         waitTillLogsAreAvailable(stdout, 3);
@@ -111,10 +110,6 @@ class CommandLineProcessTest {
 
     @Test
     void testExitCode() throws IOException, URISyntaxException, ExecutionException, InterruptedException, TimeoutException {
-        final URL bin = getClass().getResource("test-script.sh");
-        assert bin != null;
-        final Path binPath = Path.of(bin.toURI());
-
         final CompletableFuture<Integer> exitCodeFuture = new CompletableFuture<>();
 
         final ProcessListener listener = new ProcessListener() {
@@ -142,11 +137,18 @@ class CommandLineProcessTest {
                 exitCodeFuture.complete(e.getExitValue());
             }
         };
-        final CommandLineProcess process = new CommandLineProcess(binPath, List.of("143"), listener);
+        final CommandLineProcess process = new CommandLineProcess(Path.of("/bin/sh"), List.of(getScriptPath(), "143"), listener);
         process.start();
 
         final Integer exitCode = exitCodeFuture.get(10, TimeUnit.SECONDS);
 
         Assertions.assertThat(exitCode).isEqualTo(143);
+    }
+
+    private String getScriptPath() throws URISyntaxException {
+        final URL bin = getClass().getResource("test-script.sh");
+        assert bin != null;
+        final Path binPath = Path.of(bin.toURI());
+        return binPath.toAbsolutePath().toString();
     }
 }
