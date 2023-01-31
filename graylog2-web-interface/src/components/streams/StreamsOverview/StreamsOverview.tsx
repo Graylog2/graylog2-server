@@ -140,15 +140,14 @@ const StreamsOverview = ({ indexSets }: Props) => {
                    streamRuleTypes={streamRuleTypes} />
   ), [indexSets, streamRuleTypes]);
 
-  const renderBulkActions = (
+  const renderBulkActions = useCallback((
     selectedStreamIds: Array<string>,
     setSelectedStreamIds: (streamIds: Array<string>) => void,
   ) => (
     <BulkActions selectedStreamIds={selectedStreamIds}
                  setSelectedStreamIds={setSelectedStreamIds}
-                 refetchStreams={refetchStreams}
                  indexSets={indexSets} />
-  );
+  ), [indexSets]);
 
   if (!paginatedStreams || !streamRuleTypes) {
     return <Spinner />;
