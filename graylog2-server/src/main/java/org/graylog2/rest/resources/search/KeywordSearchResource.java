@@ -99,7 +99,7 @@ public class KeywordSearchResource extends SearchResource {
 
         final TimeRange timeRange = buildKeywordTimeRange(keyword, timezone);
 
-        return search(query, limit, filter, decorate, searchUser, fieldList, sorting, timeRange);
+        return search(query, limit, offset, filter, decorate, searchUser, fieldList, sorting, timeRange);
     }
 
     @GET
