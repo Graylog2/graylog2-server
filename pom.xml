@@ -27,6 +27,7 @@
         <module>graylog-storage-opensearch2</module>
         <module>distribution</module>
         <module>data-node</module>
+        <module>data-node-distribution</module>
     </modules>
 
     <groupId>org.graylog</groupId>

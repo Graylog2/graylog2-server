@@ -39,6 +39,8 @@
     <inceptionYear>2023</inceptionYear>
 
     <properties>
+        <mainClass>org.graylog.datanode.bootstrap.Main</mainClass>
+
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -434,7 +436,7 @@
                 </executions>
             </plugin>
 
-            <plugin>
+            <!-- plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
@@ -457,6 +459,19 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin -->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <finalName>datanode-${project.version}</finalName>
+                    <archive>
+                        <manifest>
+                            <mainClass>${mainClass}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
             </plugin>
 
             <plugin>
