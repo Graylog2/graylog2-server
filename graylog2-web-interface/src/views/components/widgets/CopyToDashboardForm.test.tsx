@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, fireEvent, screen } from 'wrappedTestingLibrary';
+import { render, fireEvent, screen, waitFor } from 'wrappedTestingLibrary';
 
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
@@ -42,6 +42,18 @@ describe('CopyToDashboardForm', () => {
       data: {
         list: dashboardList,
         pagination: { total: 2 },
+        attributes: [
+          {
+            id: 'title',
+            title: 'Title',
+            sortable: true,
+          },
+          {
+            id: 'description',
+            title: 'Description',
+            sortable: true,
+          },
+        ],
       },
       isFetching: false,
       refetch: () => {},
@@ -66,6 +78,18 @@ describe('CopyToDashboardForm', () => {
       data: {
         list: [],
         pagination: { total: 0 },
+        attributes: [
+          {
+            id: 'title',
+            title: 'Title',
+            sortable: true,
+          },
+          {
+            id: 'description',
+            title: 'Description',
+            sortable: true,
+          },
+        ],
       },
       isFetching: false,
       refetch: () => {},
@@ -116,19 +140,16 @@ describe('CopyToDashboardForm', () => {
     expect(onSubmit).toHaveBeenCalledWith('view-1');
   });
 
-  it('should query for all dashboards & specific dashboards', () => {
-    const { getByPlaceholderText, getByText } = render(<SUT />);
+  it('should query for all dashboards & specific dashboards', async () => {
+    render(<SUT />);
 
     expect(useDashboards).toHaveBeenCalledTimes(1);
 
-    const searchInput = getByPlaceholderText('Enter search query...');
+    const searchInput = screen.getByPlaceholderText('Enter search query...');
 
     fireEvent.change(searchInput, { target: { value: 'view 1' } });
-    const searchButton = getByText('Search');
 
-    fireEvent.click(searchButton);
-
-    expect(useDashboards).toHaveBeenCalledWith({
+    await waitFor(() => expect(useDashboards).toHaveBeenCalledWith({
       query: 'view 1',
       page: 1,
       pageSize: 5,
@@ -136,6 +157,6 @@ describe('CopyToDashboardForm', () => {
         attributeId: 'title',
         direction: 'asc',
       },
-    });
+    }));
   });
 });

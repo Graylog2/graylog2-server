@@ -382,8 +382,7 @@ class ContentPackSelection extends React.Component {
           <Col smOffset={1} lg={8}>
             <SearchForm id="filter-input"
                         onSearch={this._onSetFilter}
-                        onReset={this._onClearFilter}
-                        searchButtonLabel="Filter" />
+                        onReset={this._onClearFilter} />
           </Col>
         </Row>
         <Row>

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { GroupByFormValues, WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 
 import GroupingElement from './GroupingElement';
 
@@ -24,87 +24,111 @@ describe('GroupByElement', () => {
     const groupBy = { columnRollup: true, groupings: [] } as WidgetConfigFormValues['groupBy'];
 
     describe('Values', () => {
+      const valuesGrouping = {
+        id: 'random-id',
+        direction: 'row' as const,
+        type: 'values' as const,
+        fields: ['action'],
+        limit: 10,
+      };
+
       it('should add an error if field absence', () => {
-        const grouping = { direction: 'row', field: { field: undefined } } as GroupByFormValues;
+        const grouping = {
+          ...valuesGrouping,
+          fields: undefined,
+        };
         const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } });
 
-        expect(result.groupBy.groupings[0].field).toBe('Field is required.');
+        expect(result.groupBy.groupings[0].fields).toBe('Field is required.');
       });
 
       it('should not add an error if everything is fine', () => {
-        const grouping = { direction: 'row', field: { field: 'action' } } as GroupByFormValues;
-        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } });
+        const result = validate({ groupBy: { ...groupBy, groupings: [valuesGrouping] } });
 
         expect(result.groupBy).toBeUndefined();
       });
 
-      it('should add an error if row limit is undefined', () => {
-        const grouping = { direction: 'row', field: { field: 'action', type: 'values' } } as GroupByFormValues;
+      it('should add an error if limit is undefined', () => {
+        const grouping = {
+          ...valuesGrouping,
+          limit: undefined,
+        };
         const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } });
 
-        expect(result.groupBy?.rowLimit).toBe('Row limit is required.');
+        expect(result.groupBy.groupings[0].limit).toBe('Limit is required.');
       });
 
-      it('should add an error if column limit is undefined', () => {
-        const grouping = { direction: 'column', field: { field: 'action', type: 'values' } } as GroupByFormValues;
+      it('should add an error if limit is smaller than 0', () => {
+        const grouping = {
+          ...valuesGrouping,
+          limit: -1,
+        };
         const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } });
 
-        expect(result.groupBy?.columnLimit).toBe('Column limit is required.');
-      });
-
-      it('should add an error if row limit is smaller than 0', () => {
-        const grouping = { direction: 'row', field: { field: 'action', type: 'values' } } as GroupByFormValues;
-        const result = validate({ groupBy: { ...groupBy, rowLimit: -1, groupings: [grouping] } });
-
-        expect(result.groupBy.rowLimit).toBe('Must be greater than 0.');
-      });
-
-      it('should add an error if column limit is smaller than 0', () => {
-        const grouping = { direction: 'column', field: { field: 'action', type: 'values' } } as GroupByFormValues;
-        const result = validate({ groupBy: { ...groupBy, columnLimit: -1, groupings: [grouping] } });
-
-        expect(result.groupBy.columnLimit).toBe('Must be greater than 0.');
+        expect(result.groupBy.groupings[0].limit).toBe('Must be greater than 0.');
       });
     });
 
     describe('Dates', () => {
+      const timeGrouping = {
+        id: 'random-id',
+        type: 'time' as const,
+        direction: 'row' as const,
+        fields: ['action'],
+        interval: { type: 'auto', scaling: 1 } as const,
+      };
+
       it('should add an error if field absence', () => {
-        const grouping = { direction: 'row', field: { field: undefined }, interval: { type: 'auto', scaling: 1 } } as GroupByFormValues;
+        const grouping = {
+          ...timeGrouping,
+          fields: undefined,
+        };
         const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } });
 
-        expect(result.groupBy.groupings[0].field).toBe('Field is required.');
+        expect(result.groupBy.groupings[0].fields).toBe('Field is required.');
       });
 
       it('should not add an error if everything is fine', () => {
-        const grouping = { direction: 'row', field: { field: 'action' }, interval: { type: 'auto', scaling: 1 } } as GroupByFormValues;
-        const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } });
+        const result = validate({ groupBy: { ...groupBy, groupings: [timeGrouping] } });
 
         expect(result.groupBy).toBeUndefined();
       });
 
       it('should add an error if scaling absence', () => {
-        const grouping = { direction: 'row', field: { field: undefined }, interval: { type: 'auto', scaling: undefined } } as GroupByFormValues;
+        const grouping = {
+          ...timeGrouping,
+          interval: { type: 'auto', scaling: undefined } as const,
+        };
         const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } });
 
         expect(result.groupBy.groupings[0].interval).toBe('Scaling is required.');
       });
 
       it('should add an error if scaling out of range', () => {
-        const grouping = { direction: 'row', field: { field: undefined }, interval: { type: 'auto', scaling: -1 } } as GroupByFormValues;
+        const grouping = {
+          ...timeGrouping,
+          interval: { type: 'auto', scaling: -1 } as const,
+        };
         const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } });
 
         expect(result.groupBy.groupings[0].interval).toBe('Must be greater than 0 and smaller or equals 10.');
       });
 
       it('should add an error if value is out of range', () => {
-        const grouping = { direction: 'row', field: { field: undefined }, interval: { type: 'timeunit', value: -1, unit: 'seconds' } } as GroupByFormValues;
+        const grouping = {
+          ...timeGrouping,
+          interval: { type: 'timeunit', value: -1, unit: 'seconds' } as const,
+        };
         const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } });
 
         expect(result.groupBy.groupings[0].interval).toBe('Must be greater than 0.');
       });
 
       it('should add an error if value is absent', () => {
-        const grouping = { direction: 'row', field: { field: undefined }, interval: { type: 'timeunit', value: undefined, unit: 'seconds' } } as GroupByFormValues;
+        const grouping = {
+          ...timeGrouping,
+          interval: { type: 'timeunit', value: undefined, unit: 'seconds' } as const,
+        };
         const result = validate({ groupBy: { ...groupBy, groupings: [grouping] } });
 
         expect(result.groupBy.groupings[0].interval).toBe('Value is required.');
@@ -114,33 +138,58 @@ describe('GroupByElement', () => {
 
   describe('remove grouping', () => {
     const { onRemove } = GroupingElement;
-    const values = { groupBy: { columnRollup: true, groupings: [] } } as WidgetConfigFormValues;
+    const groupBy = { columnRollup: true, groupings: [] } as WidgetConfigFormValues['groupBy'];
 
     it('should remove form values from a grouping', () => {
-      const grouping1 = { direction: 'row', field: { field: 'action' } } as GroupByFormValues;
-      const grouping2 = { direction: 'column', field: { field: 'controller' } } as GroupByFormValues;
-      values.groupBy.groupings = [grouping1, grouping2];
+      const grouping1 = {
+        id: 'random-id',
+        direction: 'row' as const,
+        type: 'values' as const,
+        fields: ['action'],
+        limit: 15,
+      };
+      const grouping2 = {
+        id: 'random-id',
+        direction: 'column' as const,
+        type: 'values' as const,
+        fields: ['controller'],
+        limit: 10,
+      };
 
-      const result = onRemove(1, values);
+      const result = onRemove(1, { groupBy: { ...groupBy, groupings: [grouping1, grouping2] } });
 
       expect(result.groupBy.groupings).toStrictEqual([grouping1]);
     });
 
     it('should remove form values to the last from a grouping', () => {
-      const grouping1 = { direction: 'row', field: { field: 'action' } } as GroupByFormValues;
-      values.groupBy.groupings = [grouping1];
+      const grouping1 = {
+        id: 'random-id',
+        direction: 'row' as const,
+        type: 'values' as const,
+        fields: ['action'],
+        limit: 15,
+      };
+      const result = onRemove(0, { groupBy: { ...groupBy, groupings: [grouping1] } });
 
-      const result = onRemove(0, values);
-
-      expect(result.groupBy).toStrictEqual({ columnRollup: true, groupings: [], rowLimit: undefined, columnLimit: undefined });
+      expect(result.groupBy).toStrictEqual({ columnRollup: true, groupings: [] });
     });
 
     it('should remove nothing if index is not contained', () => {
-      const grouping1 = { direction: 'row', field: { field: 'action' } } as GroupByFormValues;
-      const grouping2 = { direction: 'column', field: { field: 'controller' } } as GroupByFormValues;
-      values.groupBy.groupings = [grouping1, grouping2];
-
-      const result = onRemove(4, values);
+      const grouping1 = {
+        id: 'random-id',
+        direction: 'row' as const,
+        type: 'values' as const,
+        fields: ['action'],
+        limit: 15,
+      };
+      const grouping2 = {
+        id: 'random-id',
+        direction: 'column' as const,
+        type: 'values' as const,
+        fields: ['controller'],
+        limit: 15,
+      };
+      const result = onRemove(4, { groupBy: { ...groupBy, groupings: [grouping1, grouping2] } });
 
       expect(result.groupBy.groupings).toStrictEqual([grouping1, grouping2]);
     });

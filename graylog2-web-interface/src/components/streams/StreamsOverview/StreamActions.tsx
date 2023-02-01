@@ -185,7 +185,7 @@ const StreamActions = ({
           <MenuItem divider />
         </IfPermitted>
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
-          <MenuItem onSelect={onDelete} disabled={isDefaultStream}>
+          <MenuItem onSelect={onDelete}>
             Delete this stream {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>

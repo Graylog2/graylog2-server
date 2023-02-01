@@ -56,7 +56,7 @@ export const SearchExecutionStateStore: Store<SearchExecutionState> = singletonS
     executionState: defaultExecutionState,
 
     init() {
-      ViewActions.create.completed.listen(this.clear);
+      ViewActions.loadNew.completed.listen(this.clear);
       ViewActions.load.completed.listen(this.clear);
     },
 

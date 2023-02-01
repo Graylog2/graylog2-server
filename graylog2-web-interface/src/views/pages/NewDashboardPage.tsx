@@ -17,50 +17,30 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 
-import withLocation from 'routing/withLocation';
-import type { Location } from 'routing/withLocation';
-import Spinner from 'components/common/Spinner';
+import useLocation from 'routing/useLocation';
 import viewTransformer from 'views/logic/views/ViewTransformer';
-import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import { IfPermitted } from 'components/common';
-import useLoadView from 'views/logic/views/UseLoadView';
+import ViewGenerator from 'views/logic/views/ViewGenerator';
 
 import SearchPage from './SearchPage';
 
-type Props = {
-  location: Location & {
-    state?: {
-      view?: View,
-    },
-  },
+type LocationState = {
+  view?: View,
 };
 
-const NewDashboardPage = ({ location }: Props) => {
-  const { state = {} } = location;
-  const { view: searchView } = state;
-  const loadedView = useMemo(() => {
-    if (searchView?.search) {
-      const dashboardView = viewTransformer(searchView);
+const NewDashboardPage = () => {
+  const location = useLocation<LocationState>();
+  const searchView = location?.state?.view;
 
-      return ViewActions.load(dashboardView, true).then(() => dashboardView);
-    }
+  const view = useMemo(() => (searchView?.search
+    ? Promise.resolve(viewTransformer(searchView))
+    : ViewGenerator(View.Type.Dashboard, undefined)),
+  // This should be run only once upon mount on purpose.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  []);
 
-    return ViewActions.create(View.Type.Dashboard).then(({ view }) => view);
-    // This should be run only once upon mount on purpose.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const [loaded, HookComponent] = useLoadView(loadedView, location.query);
-
-  if (HookComponent) {
-    return HookComponent;
-  }
-
-  return loaded
-    ? <IfPermitted permissions="dashboards:create"><SearchPage /></IfPermitted>
-    : <Spinner />;
+  return <IfPermitted permissions="dashboards:create"><SearchPage view={view} isNew /></IfPermitted>;
 };
 
-NewDashboardPage.propTypes = {};
-export default withLocation(NewDashboardPage);
+export default NewDashboardPage;

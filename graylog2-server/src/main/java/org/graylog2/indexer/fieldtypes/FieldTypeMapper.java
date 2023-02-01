@@ -34,22 +34,22 @@ import static org.graylog2.indexer.fieldtypes.FieldTypes.Type.createType;
 @Singleton
 public class FieldTypeMapper {
     private static final String PROP_ENUMERABLE = "enumerable";
-    private static final String PROP_FULL_TEXT_SEARCH = "full-text-search";
-    private static final String PROP_NUMERIC = "numeric";
+    public static final String PROP_FULL_TEXT_SEARCH = "full-text-search";
+    public static final String PROP_NUMERIC = "numeric";
 
-    private static final FieldTypes.Type STRING_TYPE = createType("string", of(PROP_ENUMERABLE));
-    private static final FieldTypes.Type STRING_FTS_TYPE = createType("string", of(PROP_FULL_TEXT_SEARCH));
-    private static final FieldTypes.Type LONG_TYPE = createType("long", of(PROP_NUMERIC, PROP_ENUMERABLE));
-    private static final FieldTypes.Type INT_TYPE = createType("int", of(PROP_NUMERIC, PROP_ENUMERABLE));
-    private static final FieldTypes.Type SHORT_TYPE = createType("short", of(PROP_NUMERIC, PROP_ENUMERABLE));
-    private static final FieldTypes.Type BYTE_TYPE = createType("byte", of(PROP_NUMERIC, PROP_ENUMERABLE));
-    private static final FieldTypes.Type DOUBLE_TYPE = createType("double", of(PROP_NUMERIC, PROP_ENUMERABLE));
-    private static final FieldTypes.Type FLOAT_TYPE = createType("float", of(PROP_NUMERIC, PROP_ENUMERABLE));
-    private static final FieldTypes.Type DATE_TYPE = createType("date", of(PROP_ENUMERABLE));
-    private static final FieldTypes.Type BOOLEAN_TYPE = createType("boolean", of(PROP_ENUMERABLE));
-    private static final FieldTypes.Type BINARY_TYPE = createType("binary", of());
-    private static final FieldTypes.Type GEO_POINT_TYPE = createType("geo-point", of());
-    private static final FieldTypes.Type IP_TYPE = createType("ip", of(PROP_ENUMERABLE));
+    public static final FieldTypes.Type STRING_TYPE = createType("string", of(PROP_ENUMERABLE));
+    public static final FieldTypes.Type STRING_FTS_TYPE = createType("string", of(PROP_FULL_TEXT_SEARCH));
+    public static final FieldTypes.Type LONG_TYPE = createType("long", of(PROP_NUMERIC, PROP_ENUMERABLE));
+    public static final FieldTypes.Type INT_TYPE = createType("int", of(PROP_NUMERIC, PROP_ENUMERABLE));
+    public static final FieldTypes.Type SHORT_TYPE = createType("short", of(PROP_NUMERIC, PROP_ENUMERABLE));
+    public static final FieldTypes.Type BYTE_TYPE = createType("byte", of(PROP_NUMERIC, PROP_ENUMERABLE));
+    public static final FieldTypes.Type DOUBLE_TYPE = createType("double", of(PROP_NUMERIC, PROP_ENUMERABLE));
+    public static final FieldTypes.Type FLOAT_TYPE = createType("float", of(PROP_NUMERIC, PROP_ENUMERABLE));
+    public static final FieldTypes.Type DATE_TYPE = createType("date", of(PROP_ENUMERABLE));
+    public static final FieldTypes.Type BOOLEAN_TYPE = createType("boolean", of(PROP_ENUMERABLE));
+    public static final FieldTypes.Type BINARY_TYPE = createType("binary", of());
+    public static final FieldTypes.Type GEO_POINT_TYPE = createType("geo-point", of());
+    public static final FieldTypes.Type IP_TYPE = createType("ip", of(PROP_ENUMERABLE));
 
     /**
      * A map from Elasticsearch types to Graylog logical types.
