@@ -24,4 +24,6 @@ public interface EntityListPreferencesService {
     StoredEntityListPreferences get(final StoredEntityListPreferencesId preferencesId);
 
     boolean save(final StoredEntityListPreferences preferences);
+
+    int deleteAllForUser(final String userId);
 }

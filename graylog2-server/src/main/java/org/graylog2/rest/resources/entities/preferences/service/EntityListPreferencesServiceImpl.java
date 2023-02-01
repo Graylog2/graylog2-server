@@ -16,6 +16,8 @@
  */
 package org.graylog2.rest.resources.entities.preferences.service;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
@@ -24,6 +26,8 @@ import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
+
+import static org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId.USER_ID_SUB_FIELD;
 
 public class EntityListPreferencesServiceImpl implements EntityListPreferencesService {
 
@@ -51,5 +55,13 @@ public class EntityListPreferencesServiceImpl implements EntityListPreferencesSe
     public boolean save(final StoredEntityListPreferences preferences) {
         final WriteResult<StoredEntityListPreferences, StoredEntityListPreferencesId> save = db.save(preferences);
         return save.getWriteResult().getN() > 0;
+    }
+
+    @Override
+    public int deleteAllForUser(String userId) {
+        DBObject query = new BasicDBObject();
+        query.put("_id." + USER_ID_SUB_FIELD, userId);
+        final WriteResult<StoredEntityListPreferences, StoredEntityListPreferencesId> result = this.db.remove(query);
+        return result.getN();
     }
 }

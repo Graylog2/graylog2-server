@@ -36,6 +36,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.security.PasswordAlgorithm;
+import org.graylog2.rest.resources.entities.preferences.service.EntityListPreferencesService;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.security.PasswordAlgorithmFactory;
@@ -62,6 +63,8 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 public class UserServiceImplTest {
@@ -86,6 +89,8 @@ public class UserServiceImplTest {
     private EventBus serverEventBus;
     @Mock
     private PermissionAndRoleResolver permissionAndRoleResolver;
+    @Mock
+    EntityListPreferencesService entityListPreferencesService;
 
     @Before
     public void setUp() throws Exception {
@@ -94,7 +99,7 @@ public class UserServiceImplTest {
         this.permissions = new Permissions(ImmutableSet.of(new RestPermissions()));
         this.userFactory = new UserImplFactory(configuration, permissions);
         this.userService = new UserServiceImpl(mongoConnection, configuration, roleService, accessTokenService,
-                userFactory, permissionsResolver, serverEventBus, GRNRegistry.createWithBuiltinTypes(), permissionAndRoleResolver);
+                userFactory, permissionsResolver, serverEventBus, GRNRegistry.createWithBuiltinTypes(), permissionAndRoleResolver, entityListPreferencesService);
 
         when(roleService.getAdminRoleObjectId()).thenReturn("deadbeef");
     }
@@ -196,10 +201,25 @@ public class UserServiceImplTest {
 
     @Test
     @MongoDBFixtures("UserServiceImplTest.json")
-    public void testDelete() throws Exception {
+    public void testDeleteByName() throws Exception {
         assertThat(userService.delete("user1")).isEqualTo(1);
         assertThat(userService.delete("user-duplicate")).isEqualTo(2);
         assertThat(userService.delete("user-does-not-exist")).isEqualTo(0);
+        verify(entityListPreferencesService).deleteAllForUser("54e3deadbeefdeadbeef0001");//user1
+        verify(entityListPreferencesService).deleteAllForUser("54e3deadbeefdeadbeef0003");//user-duplicate : 1
+        verify(entityListPreferencesService).deleteAllForUser("54e3deadbeefdeadbeef0004");//user-duplicate : 2
+        verifyNoMoreInteractions(entityListPreferencesService);
+    }
+
+    @Test
+    @MongoDBFixtures("UserServiceImplTest.json")
+    public void testDeleteById() throws Exception {
+        assertThat(userService.deleteById("54e3deadbeefdeadbeef0001")).isEqualTo(1);
+        assertThat(userService.deleteById("54e3deadbeefdeadbeef0003")).isEqualTo(1);
+        assertThat(userService.deleteById("00000eadbeefdeadbee00000")).isEqualTo(0);
+        verify(entityListPreferencesService).deleteAllForUser("54e3deadbeefdeadbeef0001");
+        verify(entityListPreferencesService).deleteAllForUser("54e3deadbeefdeadbeef0003");
+        verifyNoMoreInteractions(entityListPreferencesService);
     }
 
     @Test
@@ -317,7 +337,7 @@ public class UserServiceImplTest {
         final GRNRegistry grnRegistry = GRNRegistry.createWithBuiltinTypes();
         final UserService userService = new UserServiceImpl(mongoConnection, configuration, roleService,
                 accessTokenService, userFactory, permissionResolver,
-                serverEventBus, grnRegistry, permissionAndRoleResolver);
+                serverEventBus, grnRegistry, permissionAndRoleResolver, entityListPreferencesService);
 
         final UserImplFactory factory = new UserImplFactory(new Configuration(), permissions);
         final UserImpl user = factory.create(new HashMap<>());
