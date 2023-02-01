@@ -41,7 +41,7 @@ const EventNotificationsPage = loadAsync(() => import('./EventNotificationsPage'
 const EventsPage = loadAsync(() => import('./EventsPage'));
 const ExportExtractorsPage = loadAsync(() => import('pages/ExportExtractorsPage'));
 const ExtractorsPage = loadAsync(() => import('./ExtractorsPage'));
-const GettingStartedPage = loadAsync(() => import('./GettingStartedPage'));
+const WelcomePage = loadAsync(() => import('./WelcomePage'));
 const GrokPatternsPage = loadAsync(() => import('./GrokPatternsPage'));
 const ImportExtractorsPage = loadAsync(() => import('./ImportExtractorsPage'));
 const IndexerFailuresPage = loadAsync(() => import('./IndexerFailuresPage'));
@@ -122,7 +122,7 @@ export {
   EventsPage,
   ExportExtractorsPage,
   ExtractorsPage,
-  GettingStartedPage,
+  WelcomePage,
   GrokPatternsPage,
   ImportExtractorsPage,
   IndexerFailuresPage,

@@ -24,7 +24,7 @@ import type View from 'views/logic/views/View';
 import type Parameter from 'views/logic/parameters/Parameter';
 import type { ViewJson } from 'views/logic/views/View';
 import { singletonActions, singletonStore } from 'logic/singleton';
-import type { Pagination } from 'stores/PaginationTypes';
+import type { Pagination, Attribute } from 'stores/PaginationTypes';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 export type SortOrder = 'asc' | 'desc';
@@ -37,6 +37,7 @@ export type PaginatedViews = {
     count: number,
   },
   list: Array<View>,
+  attributes: Array<Attribute>
 };
 
 export type ViewSummary = {

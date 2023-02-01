@@ -17,7 +17,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import UserNotification from 'util/UserNotification';
-import type { SearchParams } from 'stores/PaginationTypes';
+import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import type { Stream } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 
@@ -29,7 +29,7 @@ const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled
   data: {
     elements: Array<Stream>,
     pagination: { total: number }
-    attributes: Array<{ id: string, title: string, sortable: boolean }>
+    attributes: Array<Attribute>
   } | undefined,
   refetch: () => void,
   isFetching: boolean,
