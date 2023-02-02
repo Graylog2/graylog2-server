@@ -32,7 +32,6 @@ import org.graylog2.plugin.database.users.User;
 import org.mongojack.DBQuery;
 
 import javax.inject.Inject;
-import java.util.stream.Collectors;
 
 public class RecentActivityService extends PaginatedDbService<RecentActivityDTO> {
     private static final String COLLECTION_NAME = "recent_activity";
@@ -113,5 +112,9 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
         final var grns = permissionAndRoleResolver.resolveGrantees(principal).stream().map(GRN::toString).toList();
         var query = DBQuery.in(RecentActivityDTO.FIELD_GRANTEE, grns);
         return findPaginatedWithQueryAndSort(query, sort, page, perPage);
+    }
+
+    public void deleteAllEntriesForEntity(GRN grn) {
+        db.remove(DBQuery.is(RecentActivityDTO.FIELD_ITEM_GRN, grn.toString()));
     }
 }
