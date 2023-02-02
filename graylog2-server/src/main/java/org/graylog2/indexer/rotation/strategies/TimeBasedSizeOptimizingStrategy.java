@@ -86,7 +86,6 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
 
         final int shards = indexSet.getConfig().shards();
 
-        //final Size maxIndexSize = getTotalIndexSizeLimit(shards, maxShardSize);
         final long maxIndexSize = maxShardSize.toBytes() * shards;
         if (sizeInBytes > maxIndexSize) {
             return createResult(true,
