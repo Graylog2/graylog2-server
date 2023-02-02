@@ -18,9 +18,6 @@ package org.graylog2.rest.resources.entities.preferences.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
-
-public record EntityListPreferences(@JsonProperty("displayed_attributes") List<String> displayedAttributes,
-                                    @JsonProperty("per_page") int perPage,
-                                    @JsonProperty("sort") SortPreferences sort) {
+public record SingleFieldSortPreferences(@JsonProperty("field") String sortField,
+                                         @JsonProperty("order") SortOrder sortOrder) implements SortPreferences {
 }

@@ -46,13 +46,12 @@ public class AbstractInputsResource extends RestResource {
      */
     protected InputSummary getInputSummary(Input input) {
         final InputDescription inputDescription = this.availableInputs.get(input.getType());
-        final String name = inputDescription != null ? inputDescription.getName() : "Unknown Input (" + input.getType() + ")";
         final ConfigurationRequest configurationRequest = inputDescription != null ? inputDescription.getConfigurationRequest() : null;
         final Map<String, Object> configuration = isPermitted(RestPermissions.INPUTS_EDIT, input.getId()) ?
                 input.getConfiguration() : maskPasswordsInConfiguration(input.getConfiguration(), configurationRequest);
         return InputSummary.create(input.getTitle(),
                 input.isGlobal(),
-                name,
+                InputDescription.getInputDescriptionName(inputDescription, input.getType()),
                 input.getContentPack(),
                 input.getId(),
                 input.getCreatedAt(),

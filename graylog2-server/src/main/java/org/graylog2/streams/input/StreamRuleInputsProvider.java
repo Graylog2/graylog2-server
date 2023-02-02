@@ -14,13 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.resources.entities.preferences.model;
+package org.graylog2.streams.input;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Set;
 
-import java.util.List;
+public interface StreamRuleInputsProvider {
 
-public record EntityListPreferences(@JsonProperty("displayed_attributes") List<String> displayedAttributes,
-                                    @JsonProperty("per_page") int perPage,
-                                    @JsonProperty("sort") SortPreferences sort) {
+    Set<StreamRuleInput> inputs();
 }

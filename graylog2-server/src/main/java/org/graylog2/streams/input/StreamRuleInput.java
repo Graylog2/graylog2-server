@@ -14,34 +14,38 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.contentpacks.model.entities;
+package org.graylog2.streams.input;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog2.contentpacks.model.Identified;
-import org.graylog2.contentpacks.model.Typed;
-
-import javax.annotation.Nullable;
+import org.graylog.autovalue.WithBeanGetter;
 
 @AutoValue
-@JsonDeserialize(builder = AutoValue_EntityExcerpt.Builder.class)
-public abstract class EntityExcerpt implements Identified, Typed {
-    public static final String FIELD_TITLE = "title";
+@WithBeanGetter
+public abstract class StreamRuleInput {
 
-    @JsonProperty(FIELD_TITLE)
-    @Nullable
+    @JsonProperty
     public abstract String title();
 
+    @JsonProperty
+    public abstract String name();
+
+    @JsonProperty
+    public abstract String id();
+
     public static Builder builder() {
-        return new AutoValue_EntityExcerpt.Builder();
+        return new AutoValue_StreamRuleInput.Builder();
     }
 
     @AutoValue.Builder
-    public interface Builder extends IdBuilder<Builder>, TypeBuilder<Builder> {
-        @JsonProperty(FIELD_TITLE)
-        Builder title(String title);
+    public abstract static class Builder {
+        public abstract Builder title(String title);
 
-        EntityExcerpt build();
+        public abstract Builder name(String name);
+
+        public abstract Builder id(String id);
+
+        public abstract StreamRuleInput build();
     }
+
 }
