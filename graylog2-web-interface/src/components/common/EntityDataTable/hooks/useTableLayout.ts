@@ -26,7 +26,7 @@ const useTableLayout = ({ entityTableId, defaultSort, defaultPageSize, defaultDi
   defaultDisplayedAttributes: Array<string>
   defaultPageSize: number,
 }) => {
-  const { data: userLayoutPreferences, isLoading } = useUserLayoutPreferences(entityTableId);
+  const { data: userLayoutPreferences = {}, isLoading } = useUserLayoutPreferences(entityTableId);
 
   return useMemo(() => ({
     layoutConfig: {

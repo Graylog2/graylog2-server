@@ -20,6 +20,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { TableLayoutPreferences, TableLayoutPreferencesJSON } from 'components/common/EntityDataTable/types';
 import UserNotification from 'util/UserNotification';
+import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 
 const preferencesToJSON = ({
   displayedAttributes,
@@ -31,12 +32,13 @@ const preferencesToJSON = ({
   per_page: perPage,
 });
 
-const useUpdateTableLayoutPreferences = (entityTableId: string) => {
+const useUpdateUserLayoutPreferences = (entityTableId: string) => {
   const queryClient = useQueryClient();
+  const { data: userLayoutPreferences } = useUserLayoutPreferences(entityTableId);
   const action = (newPreferences: TableLayoutPreferences) => fetch(
     'POST',
     qualifyUrl(`/entitylists/preferences/${entityTableId}`),
-    preferencesToJSON(newPreferences),
+    preferencesToJSON({ ...userLayoutPreferences, ...newPreferences }),
   );
   const { mutate } = useMutation({
     mutationFn: action,
@@ -54,4 +56,4 @@ const useUpdateTableLayoutPreferences = (entityTableId: string) => {
   return { mutate };
 };
 
-export default useUpdateTableLayoutPreferences;
+export default useUpdateUserLayoutPreferences;

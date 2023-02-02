@@ -38,7 +38,7 @@ import ThroughputCell from 'components/streams/StreamsOverview/ThroughputCell';
 import type { Sort } from 'stores/PaginationTypes';
 import useStreams from 'components/streams/hooks/useStreams';
 import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
-import useUpdateTableLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateTableLayoutPreferences';
+import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 
 import StatusCell from './StatusCell';
@@ -105,7 +105,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
     defaultDisplayedAttributes: INITIAL_DISPLAYED_ATTRIBUTES,
     defaultSort: DEFAULT_SORT,
   });
-  const { mutate: updateTableLayout } = useUpdateTableLayoutPreferences(ENTITY_TABLE_ID);
+  const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
   const { data: paginatedStreams, refetch: refetchStreams } = useStreams({
     ...filterParams,
     pageSize: layoutConfig.pageSize,
@@ -147,7 +147,8 @@ const StreamsOverview = ({ indexSets }: Props) => {
   }, [updateTableLayout]);
 
   const onSortChange = useCallback((newSort: Sort) => {
-    setFilterParams((cur) => ({ ...cur, sort: newSort, page: 1 }));
+    updateTableLayout({ sort: newSort });
+    setFilterParams((cur) => ({ ...cur, page: 1 }));
   }, []);
 
   const renderStreamActions = useCallback((listItem: Stream) => (

@@ -43,7 +43,6 @@ const useUserLayoutPreferences = (entityId: string) => useQuery(
       UserNotification.error(`Loading use preferences failed with error: ${error}`);
     },
     keepPreviousData: true,
-    initialData: {},
   });
 
 export default useUserLayoutPreferences;
