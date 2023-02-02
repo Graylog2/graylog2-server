@@ -42,3 +42,17 @@ export type ColumnRenderer<Entity extends EntityBase> = {
 export type ColumnRenderers<Entity extends EntityBase> = {
   [columnId: string]: ColumnRenderer<Entity>
 }
+
+export type TableLayoutPreferences = {
+  displayedAttributes?: Array<string>,
+  sort?: string,
+  order?: 'asc' | 'desc',
+  perPage?: number,
+}
+
+export type TableLayoutPreferencesJSON = {
+  displayed_attributes?: Array<string>,
+  sort?: string,
+  order?: 'asc' | 'desc',
+  per_page?: number
+}

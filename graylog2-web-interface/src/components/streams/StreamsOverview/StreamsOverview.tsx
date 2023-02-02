@@ -35,11 +35,21 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import IndexSetCell from 'components/streams/StreamsOverview/IndexSetCell';
 import BulkActions from 'components/streams/StreamsOverview/BulkActions';
 import ThroughputCell from 'components/streams/StreamsOverview/ThroughputCell';
-import type { SearchParams, Sort } from 'stores/PaginationTypes';
+import type { Sort } from 'stores/PaginationTypes';
 import useStreams from 'components/streams/hooks/useStreams';
 import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
+import useUpdateTableLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateTableLayoutPreferences';
+import useTableLayoutPreferences from 'components/common/EntityDataTable/hooks/useTableLayoutPreferences';
 
 import StatusCell from './StatusCell';
+
+const ENTITY_TABLE_ID = 'streams';
+
+const DEFAULT_PAGE_SIZE = 50;
+const DEFAULT_SORT = {
+  attributeId: 'title',
+  direction: 'asc',
+} as const;
 
 const DefaultLabel = styled(Label)`
   display: inline-flex;
@@ -52,7 +62,7 @@ const CUSTOM_COLUMN_DEFINITIONS = [
   { id: 'throughput', title: 'Throughput' },
 ];
 
-const INITIAL_COLUMNS = ['title', 'description', 'index_set_title', 'throughput', 'disabled'];
+const INITIAL_DISPLAYED_COLUMNS = ['title', 'description', 'index_set_title', 'throughput', 'disabled'];
 const COLUMNS_ORDER = ['title', 'description', 'index_set_title', 'throughput', 'disabled', 'created_at'];
 
 const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stream> => ({
@@ -78,24 +88,50 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
   },
 });
 
+const useTableLayout = () => {
+  const { data: userLayoutPreferences, isLoading } = useTableLayoutPreferences(ENTITY_TABLE_ID);
+
+  return useMemo(() => {
+    const sort = userLayoutPreferences.sort ? {
+      attributeId: userLayoutPreferences.sort,
+      direction: userLayoutPreferences.order ?? DEFAULT_SORT.direction,
+    } : DEFAULT_SORT;
+
+    return ({
+      layoutConfig: {
+        pageSize: userLayoutPreferences.perPage ?? DEFAULT_PAGE_SIZE,
+        sort,
+        displayedAttributes: userLayoutPreferences?.displayedAttributes ?? INITIAL_DISPLAYED_COLUMNS,
+      },
+      isLoading,
+    });
+  }, [
+    isLoading,
+    userLayoutPreferences.displayedAttributes,
+    userLayoutPreferences.order,
+    userLayoutPreferences.perPage,
+    userLayoutPreferences.sort]);
+};
+
 type Props = {
   indexSets: Array<IndexSet>
 }
 
 const StreamsOverview = ({ indexSets }: Props) => {
-  const [visibleColumns, setVisibleColumns] = useState(INITIAL_COLUMNS);
   const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
-  const [searchParams, setSearchParams] = useState<SearchParams>({
+  const [filterParams, setFilterParams] = useState({
     page: paginationQueryParameter.page,
-    pageSize: paginationQueryParameter.pageSize,
     query: '',
-    sort: {
-      attributeId: 'title',
-      direction: 'asc',
-    },
   });
   const { data: streamRuleTypes } = useStreamRuleTypes();
-  const { data: paginatedStreams, refetch: refetchStreams } = useStreams(searchParams);
+  const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout();
+  const { mutate: updateTableLayout } = useUpdateTableLayoutPreferences(ENTITY_TABLE_ID);
+  const { data: paginatedStreams, refetch: refetchStreams } = useStreams({
+    ...filterParams,
+    pageSize: layoutConfig.pageSize,
+    sort: layoutConfig.sort,
+  }, { enabled: !isLoadingLayoutPreferences });
+
   const columnRenderers = useMemo(() => customColumnRenderers(indexSets), [indexSets]);
   const columnDefinitions = useMemo(
     () => ([...(paginatedStreams?.attributes ?? []), ...CUSTOM_COLUMN_DEFINITIONS]),
@@ -113,25 +149,25 @@ const StreamsOverview = ({ indexSets }: Props) => {
   }, [refetchStreams]);
 
   const onPageChange = useCallback(
-    (newPage: number, newPageSize: number) => setSearchParams((cur) => ({ ...cur, page: newPage, pageSize: newPageSize })),
+    (newPage: number, newPageSize: number) => setFilterParams((cur) => ({ ...cur, page: newPage, pageSize: newPageSize })),
     [],
   );
 
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
-    setSearchParams((cur) => ({ ...cur, query: newQuery, page: 1 }));
+    setFilterParams((cur) => ({ ...cur, query: newQuery, page: 1 }));
   }, [paginationQueryParameter]);
 
   const onReset = useCallback(() => {
     onSearch('');
   }, [onSearch]);
 
-  const onColumnsChange = useCallback((newVisibleColumns: Array<string>) => {
-    setVisibleColumns(newVisibleColumns);
-  }, []);
+  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
+    updateTableLayout({ displayedAttributes });
+  }, [updateTableLayout]);
 
   const onSortChange = useCallback((newSort: Sort) => {
-    setSearchParams((cur) => ({ ...cur, sort: newSort, page: 1 }));
+    setFilterParams((cur) => ({ ...cur, sort: newSort, page: 1 }));
   }, []);
 
   const renderStreamActions = useCallback((listItem: Stream) => (
@@ -157,7 +193,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
 
   return (
     <PaginatedList onChange={onPageChange}
-                   pageSize={searchParams.pageSize}
+                   pageSize={layoutConfig.pageSize}
                    totalItems={total}>
       <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
@@ -169,12 +205,12 @@ const StreamsOverview = ({ indexSets }: Props) => {
           <NoSearchResult>No streams have been found</NoSearchResult>
         ) : (
           <EntityDataTable<Stream> data={elements}
-                                   visibleColumns={visibleColumns}
+                                   visibleColumns={layoutConfig.displayedAttributes}
                                    columnsOrder={COLUMNS_ORDER}
                                    onColumnsChange={onColumnsChange}
                                    onSortChange={onSortChange}
                                    bulkActions={renderBulkActions}
-                                   activeSort={searchParams.sort}
+                                   activeSort={layoutConfig.sort}
                                    rowActions={renderStreamActions}
                                    columnRenderers={columnRenderers}
                                    columnDefinitions={columnDefinitions} />
