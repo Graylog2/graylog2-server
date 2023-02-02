@@ -116,7 +116,7 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
         // if an entity is deleted, we can no longer see it in the lastOpened collection
         if (event.activityType().equals(ActivityType.DELETE)) {
             DBObject query = new BasicDBObject();
-            final DBObject modifications = new BasicDBObject("$pull", new BasicDBObject("items", new BasicDBObject("id", event.grn().entity())));
+            final DBObject modifications = new BasicDBObject("$pull", new BasicDBObject(FavoritesForUserDTO.FIELD_ITEMS, new BasicDBObject(FavoriteDTO.FIELD_ID, event.grn().entity())));
             db.updateMulti(query, modifications);
         }
     }
