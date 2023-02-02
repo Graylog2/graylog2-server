@@ -70,7 +70,7 @@ public class EntityDependencyResolver {
         final ImmutableMap<GRN, Optional<String>> entityExcerpts = contentPackService.listAllEntityExcerpts().stream()
                 // TODO: Use the GRNRegistry instead of manually building a GRN. Requires all entity types to be in the registry.
                 .collect(ImmutableMap.toImmutableMap(e -> GRNType.create(e.type().name(), e.type().name() + ":").newGRNBuilder().entity(e.id().id()).build(),
-                        v -> Optional.ofNullable(v.title()));
+                        v -> Optional.ofNullable(v.title())));
 
         final Set<org.graylog2.contentpacks.model.entities.EntityDescriptor> descriptors = contentPackService.resolveEntities(Collections.singleton(org.graylog2.contentpacks.model.entities.EntityDescriptor.builder()
                 .id(ModelId.of(entity.entity()))
