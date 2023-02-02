@@ -33,7 +33,7 @@ const preferencesFromJSON = ({
 const fetchUserLayoutPreferences = (entityId: string) => fetch(
   'GET',
   qualifyUrl(`/entitylists/preferences/${entityId}`),
-).then(preferencesFromJSON);
+).then((res) => preferencesFromJSON(res ?? {}));
 
 const useUserLayoutPreferences = (entityId: string) => useQuery(
   ['table-layout', entityId],
@@ -43,6 +43,7 @@ const useUserLayoutPreferences = (entityId: string) => useQuery(
       UserNotification.error(`Loading use preferences failed with error: ${error}`);
     },
     keepPreviousData: true,
+    staleTime: 60 * (60 * 1000), // 1 hour
   });
 
 export default useUserLayoutPreferences;

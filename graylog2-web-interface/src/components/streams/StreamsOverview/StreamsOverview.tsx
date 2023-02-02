@@ -94,10 +94,7 @@ type Props = {
 
 const StreamsOverview = ({ indexSets }: Props) => {
   const paginationQueryParameter = usePaginationQueryParameter(undefined, DEFAULT_PAGE_SIZE);
-  const [filterParams, setFilterParams] = useState({
-    page: paginationQueryParameter.page,
-    query: '',
-  });
+  const [query, setQuery] = useState('');
   const { data: streamRuleTypes } = useStreamRuleTypes();
   const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
@@ -107,7 +104,8 @@ const StreamsOverview = ({ indexSets }: Props) => {
   });
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
   const { data: paginatedStreams, refetch: refetchStreams } = useStreams({
-    ...filterParams,
+    query,
+    page: paginationQueryParameter.page,
     pageSize: layoutConfig.pageSize,
     sort: layoutConfig.sort,
   }, { enabled: !isLoadingLayoutPreferences });
@@ -128,14 +126,15 @@ const StreamsOverview = ({ indexSets }: Props) => {
     };
   }, [refetchStreams]);
 
-  const onPageChange = useCallback(
-    (newPage: number, newPageSize: number) => setFilterParams((cur) => ({ ...cur, page: newPage, pageSize: newPageSize })),
-    [],
-  );
+  const onPageChange = useCallback((_newPage: number, newPageSize: number) => {
+    if (newPageSize) {
+      updateTableLayout({ perPage: newPageSize });
+    }
+  }, [updateTableLayout]);
 
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
-    setFilterParams((cur) => ({ ...cur, query: newQuery, page: 1 }));
+    setQuery(newQuery);
   }, [paginationQueryParameter]);
 
   const onReset = useCallback(() => {
@@ -148,8 +147,8 @@ const StreamsOverview = ({ indexSets }: Props) => {
 
   const onSortChange = useCallback((newSort: Sort) => {
     updateTableLayout({ sort: newSort });
-    setFilterParams((cur) => ({ ...cur, page: 1 }));
-  }, []);
+    paginationQueryParameter.resetPage();
+  }, [paginationQueryParameter, updateTableLayout]);
 
   const renderStreamActions = useCallback((listItem: Stream) => (
     <StreamActions stream={listItem}
