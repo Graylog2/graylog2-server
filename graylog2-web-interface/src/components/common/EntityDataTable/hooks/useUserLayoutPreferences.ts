@@ -35,12 +35,12 @@ const fetchUserLayoutPreferences = (entityId: string) => fetch(
   qualifyUrl(`/entitylists/preferences/${entityId}`),
 ).then((res) => preferencesFromJSON(res ?? {}));
 
-const useUserLayoutPreferences = (entityId: string) => useQuery(
+const useUserLayoutPreferences = (entityId: string): { data: TableLayoutPreferences | undefined, isLoading: boolean } => useQuery(
   ['table-layout', entityId],
   () => fetchUserLayoutPreferences(entityId),
   {
     onError: (error) => {
-      UserNotification.error(`Loading use preferences failed with error: ${error}`);
+      UserNotification.error(`Loading layout preferences for "${entityId}" overview failed with ${error}`);
     },
     keepPreviousData: true,
     staleTime: 60 * (60 * 1000), // 1 hour

@@ -34,7 +34,7 @@ const preferencesToJSON = ({
 
 const useUpdateUserLayoutPreferences = (entityTableId: string) => {
   const queryClient = useQueryClient();
-  const { data: userLayoutPreferences } = useUserLayoutPreferences(entityTableId);
+  const { data: userLayoutPreferences = {} } = useUserLayoutPreferences(entityTableId);
   const action = (newPreferences: TableLayoutPreferences) => fetch(
     'POST',
     qualifyUrl(`/entitylists/preferences/${entityTableId}`),
