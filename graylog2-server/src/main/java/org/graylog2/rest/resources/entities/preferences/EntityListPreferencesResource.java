@@ -103,7 +103,7 @@ public class EntityListPreferencesResource {
                 .build();
         final StoredEntityListPreferences entityListPreferences = entityListPreferencesService.get(complexId);
         if (entityListPreferences == null) {
-            throw new NotFoundException("Preferences not found for user " + userContext.getUser().getName() + " and entity list id " + entityListId);
+            return null;
         }
         return entityListPreferences.preferences();
     }
