@@ -19,7 +19,7 @@ import { Formik, Form, Field } from 'formik';
 import { useCallback, useMemo, useEffect } from 'react';
 
 import Version from 'util/Version';
-import type { StreamRule, StreamRuleType } from 'stores/streams/StreamsStore';
+import type { StreamRule } from 'stores/streams/StreamsStore';
 import {
   Icon,
   TypeAheadFieldInput,
@@ -36,6 +36,7 @@ import DocsHelper from 'util/DocsHelper';
 import { useStore } from 'stores/connect';
 import { StreamRulesInputsStore, StreamRulesInputsActions } from 'stores/inputs/StreamRulesInputsStore';
 import STREAM_RULE_TYPES from 'logic/streams/streamRuleTypes';
+import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 
 type FormValues = Partial<Pick<StreamRule, 'type' | 'field' | 'description' | 'value' | 'inverted'>>
 
@@ -63,7 +64,6 @@ const validate = (values: FormValues) => {
 type Props = {
   onSubmit: (streamRuleId: string | undefined | null, currentStreamRule: FormValues) => Promise<void>,
   initialValues?: Partial<StreamRule>,
-  streamRuleTypes: Array<StreamRuleType> | undefined,
   title: string,
   onClose: () => void,
   submitButtonText: string
@@ -71,7 +71,6 @@ type Props = {
 };
 
 const StreamRuleModal = ({
-  streamRuleTypes,
   title,
   onClose,
   submitButtonText,
@@ -80,6 +79,7 @@ const StreamRuleModal = ({
   initialValues,
 }: Props) => {
   const { inputs } = useStore(StreamRulesInputsStore);
+  const { data: streamRuleTypes } = useStreamRuleTypes();
 
   useEffect(() => {
     StreamRulesInputsActions.list();
