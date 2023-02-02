@@ -153,7 +153,7 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
     }
 
     void testRotation() {
-        indexSet.addNewIndex(0, elasticsearchConfiguration.getTimeSizeOptimizingRotationMinSize().toBytes());
+        indexSet.addNewIndex(0, elasticsearchConfiguration.getTimeSizeOptimizingRotationMinShardSize().toBytes());
         assertThat(indexSet.getIndicesNames()).isEqualTo(List.of("test_0"));
 
         // We rotate _after_ 1 day. This is too early
@@ -172,14 +172,14 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
         assertThat(indexSet.getIndicesNames()).isEqualTo(List.of("test_0", "test_1"));
 
         // with the minimum required size, this works
-        indexSet.getNewest().setSize(elasticsearchConfiguration.getTimeSizeOptimizingRotationMinSize().toBytes());
+        indexSet.getNewest().setSize(elasticsearchConfiguration.getTimeSizeOptimizingRotationMinShardSize().toBytes());
         clock.plus(1, TimeUnit.DAYS);
         timeBasedSizeOptimizingStrategy.rotate(indexSet);
         assertThat(indexSet.getIndicesNames()).isEqualTo(List.of("test_0", "test_1", "test_2"));
 
         // If an index exceeds its maximum size
         // it can be rotated, even if the rotation period has been reached.
-        indexSet.getNewest().setSize(elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxSize().toBytes() + 1);
+        indexSet.getNewest().setSize(elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxShardSize().toBytes() + 1);
         clock.plus(12, TimeUnit.HOURS);
         timeBasedSizeOptimizingStrategy.rotate(indexSet);
         assertThat(indexSet.getIndicesNames()).isEqualTo(List.of("test_0", "test_1", "test_2", "test_3"));
@@ -240,11 +240,11 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
             return indicesBlockStatus;
         });
 
-        indexSet.addNewIndex(0, elasticsearchConfiguration.getTimeSizeOptimizingRotationMinSize().toBytes());
+        indexSet.addNewIndex(0, elasticsearchConfiguration.getTimeSizeOptimizingRotationMinShardSize().toBytes());
         clock.plus(1, TimeUnit.DAYS);
-        indexSet.addNewIndex(1, elasticsearchConfiguration.getTimeSizeOptimizingRotationMinSize().toBytes());
+        indexSet.addNewIndex(1, elasticsearchConfiguration.getTimeSizeOptimizingRotationMinShardSize().toBytes());
         clock.plus(1, TimeUnit.DAYS);
-        indexSet.addNewIndex(2, elasticsearchConfiguration.getTimeSizeOptimizingRotationMinSize().toBytes());
+        indexSet.addNewIndex(2, elasticsearchConfiguration.getTimeSizeOptimizingRotationMinShardSize().toBytes());
 
         assertThat(indexSet.getIndicesNames()).isEqualTo(List.of("test_0", "test_1", "test_2"));
 

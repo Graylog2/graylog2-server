@@ -24,7 +24,6 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.utilities.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.slf4j.Logger;
@@ -36,6 +35,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
+import static org.graylog2.shared.utilities.StringUtils.humanReadableByteCount;
 
 public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(TimeBasedSizeOptimizingStrategy.class);
@@ -44,8 +44,8 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
     private final JobSchedulerClock clock;
     private final org.joda.time.Period rotationPeriod;
 
-    private final Size maxIndexSize;
-    private final Size minIndexSize;
+    private final Size maxShardSize;
+    private final Size minShardSize;
 
     @Inject
     public TimeBasedSizeOptimizingStrategy(Indices indices,
@@ -56,8 +56,8 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
         super(auditEventSender, nodeId, elasticsearchConfiguration, indices);
         this.clock = clock;
         this.rotationPeriod = elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod();
-        this.maxIndexSize = elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxSize();
-        this.minIndexSize = elasticsearchConfiguration.getTimeSizeOptimizingRotationMinSize();
+        this.maxShardSize = elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxShardSize();
+        this.minShardSize = elasticsearchConfiguration.getTimeSizeOptimizingRotationMinShardSize();
     }
 
     @Override
@@ -76,10 +76,7 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
         final DateTime creationDate = indices.indexCreationDate(index).orElseThrow(()-> new IllegalStateException("No index creation date"));
         final Long sizeInBytes = indices.getStoreSizeInBytes(index).orElseThrow(() -> new IllegalStateException("No index size"));
 
-        Period leeWay;
-        if (indexSet.getConfig().rotationStrategy() instanceof TimeBasedSizeOptimizingStrategyConfig rotationConfig) {
-            leeWay = rotationConfig.indexLifetimeMax().minus(rotationConfig.indexLifetimeMin());
-        } else {
+        if (!(indexSet.getConfig().rotationStrategy() instanceof TimeBasedSizeOptimizingStrategyConfig config)) {
             throw new IllegalStateException(f("Unsupported RotationStrategyConfig type <%s>", indexSet.getConfig().rotationStrategy()));
         }
 
@@ -87,21 +84,27 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
             return createResult(false, "Index is empty");
         }
 
-        if (indexExceedsSizeLimit(sizeInBytes)) {
+        final int shards = indexSet.getConfig().shards();
+
+        final long maxIndexSize = maxShardSize.toBytes() * shards;
+        if (sizeInBytes > maxIndexSize) {
             return createResult(true,
-                    f("Index size <%s> exceeds MAX_INDEX_SIZE <%s>",
-                            StringUtils.humanReadableByteCount(sizeInBytes), maxIndexSize));
+                    f("Index size <%s> exceeds maximum size <%s>",
+                            humanReadableByteCount(sizeInBytes), humanReadableByteCount(maxIndexSize)));
         }
+
+        Period leeWay = config.indexLifetimeMax().minus(config.indexLifetimeMin());
         if (indexExceedsLeeWay(creationDate, leeWay)) {
             return createResult(true,
                     f("Index creation date <%s> exceeds optimization leeway <%s>",
                             creationDate, leeWay));
         }
 
-        if (indexIsOldEnough(creationDate) && !indexSubceedsSizeLimit(sizeInBytes)) {
+        final long minIndexSize = minShardSize.toBytes() * shards;
+        if (indexIsOldEnough(creationDate) && sizeInBytes >= minIndexSize) {
             return createResult(true,
                     f("Index creation date <%s> has passed rotation period <%s> and has a reasonable size <%s> for rotation",
-                            creationDate, rotationPeriod, StringUtils.humanReadableByteCount(sizeInBytes)));
+                            creationDate, rotationPeriod, humanReadableByteCount(minIndexSize)));
         }
 
         return createResult(false, "No reason to rotate found");
@@ -121,14 +124,6 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
         final Duration limitAsDuration = Duration.ofSeconds(limit.toStandardSeconds().getSeconds());
 
         return timePassed.compareTo(limitAsDuration) >= 0;
-    }
-
-    private boolean indexExceedsSizeLimit(long size) {
-        return size > maxIndexSize.toBytes();
-    }
-
-    private boolean indexSubceedsSizeLimit(long size) {
-        return size < minIndexSize.toBytes();
     }
 
     @Override

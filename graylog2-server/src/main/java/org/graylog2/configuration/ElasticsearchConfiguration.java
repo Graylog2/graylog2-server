@@ -46,8 +46,8 @@ public class ElasticsearchConfiguration {
     public static final String MAX_INDEX_RETENTION_PERIOD = "max_index_retention_period";
     public static final String DEFAULT_EVENTS_INDEX_PREFIX = "default_events_index_prefix";
     public static final String DEFAULT_SYSTEM_EVENTS_INDEX_PREFIX = "default_system_events_index_prefix";
-    public static final String TIME_SIZE_OPTIMIZING_ROTATION_MIN_SIZE = "time_size_optimizing_rotation_min_size";
-    public static final String TIME_SIZE_OPTIMIZING_ROTATION_MAX_SIZE = "time_size_optimizing_rotation_max_size";
+    public static final String TIME_SIZE_OPTIMIZING_ROTATION_MIN_SHARD_SIZE = "time_size_optimizing_rotation_min_shard_size";
+    public static final String TIME_SIZE_OPTIMIZING_ROTATION_MAX_SHARD_SIZE = "time_size_optimizing_rotation_max_shard_size";
     public static final String TIME_SIZE_OPTIMIZING_ROTATION_PERIOD = "time_size_optimizing_rotation_period";
 
     @Parameter(value = "elasticsearch_index_prefix", required = true)
@@ -110,11 +110,11 @@ public class ElasticsearchConfiguration {
     @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_PERIOD)
     private Period timeSizeOptimizingRotationPeriod = Period.days(1);
 
-    @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_MIN_SIZE)
-    private Size timeSizeOptimizingRotationMinSize = Size.gigabytes(20);
+    @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_MIN_SHARD_SIZE)
+    private Size timeSizeOptimizingRotationMinShardSize = Size.gigabytes(20);
 
-    @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_MAX_SIZE)
-    private Size timeSizeOptimizingRotationMaxSize = Size.gigabytes(50);
+    @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_MAX_SHARD_SIZE)
+    private Size timeSizeOptimizingRotationMaxShardSize = Size.gigabytes(50);
 
     @Parameter(value = "elasticsearch_disable_version_check")
     private boolean disableVersionCheck = false;
@@ -228,12 +228,12 @@ public class ElasticsearchConfiguration {
         return timeSizeOptimizingRotationPeriod;
     }
 
-    public Size getTimeSizeOptimizingRotationMinSize() {
-        return timeSizeOptimizingRotationMinSize;
+    public Size getTimeSizeOptimizingRotationMinShardSize() {
+        return timeSizeOptimizingRotationMinShardSize;
     }
 
-    public Size getTimeSizeOptimizingRotationMaxSize() {
-        return timeSizeOptimizingRotationMaxSize;
+    public Size getTimeSizeOptimizingRotationMaxShardSize() {
+        return timeSizeOptimizingRotationMaxShardSize;
     }
 
     public boolean isDisableVersionCheck() {
@@ -263,10 +263,10 @@ public class ElasticsearchConfiguration {
     @ValidatorMethod
     @SuppressWarnings("unused")
     public void validateTimeSizeOptimizingRotation() throws ValidationException {
-        if (getTimeSizeOptimizingRotationMaxSize().compareTo(getTimeSizeOptimizingRotationMinSize()) < 0) {
+        if (getTimeSizeOptimizingRotationMaxShardSize().compareTo(getTimeSizeOptimizingRotationMinShardSize()) < 0) {
             throw new ValidationException(f("\"%s=%s\" cannot be larger than \"%s=%s\"",
-                    TIME_SIZE_OPTIMIZING_ROTATION_MIN_SIZE, getTimeSizeOptimizingRotationMinSize(),
-                    TIME_SIZE_OPTIMIZING_ROTATION_MAX_SIZE, getTimeSizeOptimizingRotationMaxSize())
+                    TIME_SIZE_OPTIMIZING_ROTATION_MIN_SHARD_SIZE, getTimeSizeOptimizingRotationMinShardSize(),
+                    TIME_SIZE_OPTIMIZING_ROTATION_MAX_SHARD_SIZE, getTimeSizeOptimizingRotationMaxShardSize())
             );
         }
     }
