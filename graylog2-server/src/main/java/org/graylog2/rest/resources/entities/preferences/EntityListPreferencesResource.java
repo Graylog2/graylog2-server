@@ -63,7 +63,7 @@ public class EntityListPreferencesResource {
     @Timed
     @ApiOperation(value = "Create or update user preferences for certain entity list")
     @Consumes(MediaType.APPLICATION_JSON)
-    @NoAuditEvent("Audit logs are not stored for entity list preferences") //TODO: make sure it is true
+    @NoAuditEvent("Audit logs are not stored for entity list preferences")
     public Response create(@ApiParam(name = "JSON body", required = true) EntityListPreferences entityListPreferences,
                            @ApiParam(name = "entity_list_id", required = true) @PathParam("entity_list_id") @NotEmpty String entityListId,
                            @Context UserContext userContext) throws ValidationException {
