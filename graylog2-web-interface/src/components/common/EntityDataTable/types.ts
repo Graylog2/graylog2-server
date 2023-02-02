@@ -16,6 +16,8 @@
  */
 import type * as React from 'react';
 
+import type { Sort } from 'stores/PaginationTypes';
+
 export type EntityBase = {
   id: string,
 }
@@ -45,14 +47,15 @@ export type ColumnRenderers<Entity extends EntityBase> = {
 
 export type TableLayoutPreferences = {
   displayedAttributes?: Array<string>,
-  sort?: string,
-  order?: 'asc' | 'desc',
+  sort?: Sort,
   perPage?: number,
 }
 
 export type TableLayoutPreferencesJSON = {
   displayed_attributes?: Array<string>,
-  sort?: string,
-  order?: 'asc' | 'desc',
+  sort?: {
+    field: string,
+    order: 'asc' | 'desc',
+  },
   per_page?: number
 }

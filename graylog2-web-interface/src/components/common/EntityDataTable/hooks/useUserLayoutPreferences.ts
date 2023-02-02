@@ -16,30 +16,28 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import UserNotification from 'util/UserNotification';
+import type { TableLayoutPreferences, TableLayoutPreferencesJSON } from 'components/common/EntityDataTable/types';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import type { TableLayoutPreferences, TableLayoutPreferencesJSON } from 'components/common/EntityDataTable/types';
+import UserNotification from 'util/UserNotification';
 
 const preferencesFromJSON = ({
   displayed_attributes,
   sort,
-  order,
   per_page,
 }: TableLayoutPreferencesJSON): TableLayoutPreferences => ({
   displayedAttributes: displayed_attributes,
-  sort,
-  order,
+  sort: sort ? { attributeId: sort.field, direction: sort.order } : undefined,
   perPage: per_page,
 });
-const fetchLayoutConfig = (entityId: string) => fetch(
+const fetchUserLayoutPreferences = (entityId: string) => fetch(
   'GET',
   qualifyUrl(`/entitylists/preferences/${entityId}`),
 ).then(preferencesFromJSON);
 
-const useTableLayoutPreferences = (entityId: string) => useQuery(
+const useUserLayoutPreferences = (entityId: string) => useQuery(
   ['table-layout', entityId],
-  () => fetchLayoutConfig(entityId),
+  () => fetchUserLayoutPreferences(entityId),
   {
     onError: (error) => {
       UserNotification.error(`Loading use preferences failed with error: ${error}`);
@@ -48,4 +46,4 @@ const useTableLayoutPreferences = (entityId: string) => useQuery(
     initialData: {},
   });
 
-export default useTableLayoutPreferences;
+export default useUserLayoutPreferences;

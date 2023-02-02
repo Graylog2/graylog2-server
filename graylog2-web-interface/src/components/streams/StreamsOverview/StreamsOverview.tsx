@@ -39,13 +39,13 @@ import type { Sort } from 'stores/PaginationTypes';
 import useStreams from 'components/streams/hooks/useStreams';
 import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 import useUpdateTableLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateTableLayoutPreferences';
-import useTableLayoutPreferences from 'components/common/EntityDataTable/hooks/useTableLayoutPreferences';
+import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 
 import StatusCell from './StatusCell';
 
 const ENTITY_TABLE_ID = 'streams';
+const DEFAULT_PAGE_SIZE = 20;
 
-const DEFAULT_PAGE_SIZE = 50;
 const DEFAULT_SORT = {
   attributeId: 'title',
   direction: 'asc',
@@ -62,7 +62,7 @@ const CUSTOM_COLUMN_DEFINITIONS = [
   { id: 'throughput', title: 'Throughput' },
 ];
 
-const INITIAL_DISPLAYED_COLUMNS = ['title', 'description', 'index_set_title', 'throughput', 'disabled'];
+const INITIAL_DISPLAYED_ATTRIBUTES = ['title', 'description', 'index_set_title', 'throughput', 'disabled'];
 const COLUMNS_ORDER = ['title', 'description', 'index_set_title', 'throughput', 'disabled', 'created_at'];
 
 const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stream> => ({
@@ -88,43 +88,23 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
   },
 });
 
-const useTableLayout = () => {
-  const { data: userLayoutPreferences, isLoading } = useTableLayoutPreferences(ENTITY_TABLE_ID);
-
-  return useMemo(() => {
-    const sort = userLayoutPreferences.sort ? {
-      attributeId: userLayoutPreferences.sort,
-      direction: userLayoutPreferences.order ?? DEFAULT_SORT.direction,
-    } : DEFAULT_SORT;
-
-    return ({
-      layoutConfig: {
-        pageSize: userLayoutPreferences.perPage ?? DEFAULT_PAGE_SIZE,
-        sort,
-        displayedAttributes: userLayoutPreferences?.displayedAttributes ?? INITIAL_DISPLAYED_COLUMNS,
-      },
-      isLoading,
-    });
-  }, [
-    isLoading,
-    userLayoutPreferences.displayedAttributes,
-    userLayoutPreferences.order,
-    userLayoutPreferences.perPage,
-    userLayoutPreferences.sort]);
-};
-
 type Props = {
   indexSets: Array<IndexSet>
 }
 
 const StreamsOverview = ({ indexSets }: Props) => {
-  const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
+  const paginationQueryParameter = usePaginationQueryParameter(undefined, DEFAULT_PAGE_SIZE);
   const [filterParams, setFilterParams] = useState({
     page: paginationQueryParameter.page,
     query: '',
   });
   const { data: streamRuleTypes } = useStreamRuleTypes();
-  const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout();
+  const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
+    entityTableId: ENTITY_TABLE_ID,
+    defaultPageSize: paginationQueryParameter.pageSize,
+    defaultDisplayedAttributes: INITIAL_DISPLAYED_ATTRIBUTES,
+    defaultSort: DEFAULT_SORT,
+  });
   const { mutate: updateTableLayout } = useUpdateTableLayoutPreferences(ENTITY_TABLE_ID);
   const { data: paginatedStreams, refetch: refetchStreams } = useStreams({
     ...filterParams,
