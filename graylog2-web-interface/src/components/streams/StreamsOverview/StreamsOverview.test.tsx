@@ -21,10 +21,13 @@ import { indexSets } from 'fixtures/indexSets';
 import { asMock } from 'helpers/mocking';
 import useStreams from 'components/streams/hooks/useStreams';
 import { stream } from 'fixtures/streams';
+import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
+import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 
 import StreamsOverview from './StreamsOverview';
 
 jest.mock('components/streams/hooks/useStreams');
+jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
 const attributes = [
   {
@@ -54,7 +57,17 @@ const paginatedStreams = ({
   isFetching: false,
 });
 
+const layoutPreferences = {
+  displayedAttributes: ['title', 'description'],
+  perPage: 50,
+  sort: { attributeId: 'title', direction: 'asc' } as const,
+};
+
 describe('StreamsOverview', () => {
+  beforeEach(() => {
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isLoading: false });
+  });
+
   it('should render empty', async () => {
     const emptyPaginatedStreams = ({
       data: {
