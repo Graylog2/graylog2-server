@@ -31,7 +31,7 @@ import org.graylog2.inputs.persistence.MongoInputStatusService;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.notifications.NotificationServiceImpl;
 import org.graylog2.rest.resources.entities.preferences.service.EntityListPreferencesService;
-import org.graylog2.rest.resources.entities.preferences.service.InMemoryEntityListPreferencesService;
+import org.graylog2.rest.resources.entities.preferences.service.EntityListPreferencesServiceImpl;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.AccessTokenServiceImpl;
 import org.graylog2.security.MongoDBSessionService;
@@ -64,6 +64,6 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(AccessTokenService.class).to(AccessTokenServiceImpl.class);
         bind(MongoDBSessionService.class).to(MongoDBSessionServiceImpl.class);
         bind(InputStatusService.class).to(MongoInputStatusService.class).asEagerSingleton();
-        bind(EntityListPreferencesService.class).to(InMemoryEntityListPreferencesService.class);
+        bind(EntityListPreferencesService.class).to(EntityListPreferencesServiceImpl.class);
     }
 }
