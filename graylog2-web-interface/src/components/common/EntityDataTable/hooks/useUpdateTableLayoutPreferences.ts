@@ -24,12 +24,10 @@ import UserNotification from 'util/UserNotification';
 const preferencesToJSON = ({
   displayedAttributes,
   sort,
-  order,
   perPage,
 }: TableLayoutPreferences): TableLayoutPreferencesJSON => ({
   displayed_attributes: displayedAttributes,
-  sort,
-  order,
+  sort: sort ? { order: sort.direction, field: sort.attributeId } : undefined,
   per_page: perPage,
 });
 
