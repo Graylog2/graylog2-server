@@ -21,6 +21,7 @@ import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.rest.resources.entities.preferences.model.EntityListPreferences;
+import org.graylog2.rest.resources.entities.preferences.model.SingleFieldSortPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
 import org.junit.Before;
@@ -29,6 +30,8 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.graylog2.rest.resources.entities.preferences.model.SortPreferences.SortOrder.ASC;
+import static org.graylog2.rest.resources.entities.preferences.model.SortPreferences.SortOrder.DESC;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -67,7 +70,7 @@ public class EntityListPreferencesServiceImplTest {
     public void performsSaveAndGetOperationsCorrectly() {
         final StoredEntityListPreferences existingPreference = StoredEntityListPreferences.builder()
                 .preferencesId(existingId)
-                .preferences(new EntityListPreferences(List.of("title", "description"), 42))
+                .preferences(new EntityListPreferences(List.of("title", "description"), 42, new SingleFieldSortPreferences("title", ASC)))
                 .build();
 
         //save
@@ -85,7 +88,7 @@ public class EntityListPreferencesServiceImplTest {
         //update with save
         final StoredEntityListPreferences updatedPreference = StoredEntityListPreferences.builder()
                 .preferencesId(existingId)
-                .preferences(new EntityListPreferences(List.of("title", "description", "owner"), 13))
+                .preferences(new EntityListPreferences(List.of("title", "description", "owner"), 13, new SingleFieldSortPreferences("title", DESC)))
                 .build();
         saved = toTest.save(updatedPreference);
         assertTrue(saved);
