@@ -50,6 +50,8 @@ public class LastOpenedService extends PaginatedDbService<LastOpenedForUserDTO> 
         super(mongoConnection, mapper, LastOpenedForUserDTO.class, COLLECTION_NAME);
         this.entityOwnerShipService = entityOwnerShipService;
         eventBus.register(this);
+
+        db.createIndex(new BasicDBObject(LastOpenedForUserDTO.FIELD_USER_ID, 1));
     }
 
     public Optional<LastOpenedForUserDTO> findForUser(final SearchUser searchUser) {
