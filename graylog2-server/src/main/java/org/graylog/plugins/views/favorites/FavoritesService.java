@@ -59,6 +59,7 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
         this.catalog = catalog;
 
         db.createIndex(new BasicDBObject(FavoritesForUserDTO.FIELD_USER_ID, 1));
+        db.createIndex(new BasicDBObject(FavoritesForUserDTO.FIELD_ITEMS + "." + FavoriteDTO.FIELD_ID, 1));
     }
 
     public PaginatedResponse<Favorite> findFavoritesFor(final SearchUser searchUser, final Optional<String> type, final int page, final int perPage) {
@@ -117,7 +118,7 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
     public void removeFavoriteOnEntityDeletion(final RecentActivityEvent event) {
         // if an entity is deleted, we can no longer see it in the favorites collection
         if (event.activityType().equals(ActivityType.DELETE)) {
-            DBObject query = new BasicDBObject();
+            DBObject query = new BasicDBObject(FavoritesForUserDTO.FIELD_ITEMS + "." + FavoriteDTO.FIELD_ID, new BasicDBObject("$eq", event.grn().entity()));
             final DBObject modifications = new BasicDBObject("$pull", new BasicDBObject(FavoritesForUserDTO.FIELD_ITEMS, new BasicDBObject(FavoriteDTO.FIELD_ID, event.grn().entity())));
             db.updateMulti(query, modifications);
         }
