@@ -57,12 +57,6 @@ const paginatedStreams = ({
   isFetching: false,
 });
 
-const layoutPreferences = {
-  displayedAttributes: ['title', 'description'],
-  perPage: 50,
-  sort: { attributeId: 'title', direction: 'asc' } as const,
-};
-
 describe('StreamsOverview', () => {
   beforeEach(() => {
     asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isLoading: false });
