@@ -15,60 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback, useMemo } from 'react';
-import type { QueryClient } from '@tanstack/react-query';
-import { useQueryClient } from '@tanstack/react-query';
-import type { SearchParams, Sort } from 'src/stores/PaginationTypes';
+import type { Sort } from 'src/stores/PaginationTypes';
 
 import { PaginatedList, SearchForm, Spinner, NoSearchResult, NoEntitiesExist } from 'components/common';
 import QueryHelper from 'components/common/QueryHelper';
-import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import EntityDataTable from 'components/common/EntityDataTable';
 import type View from 'views/logic/views/View';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
-import usePluginEntities from 'hooks/usePluginEntities';
 import DashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
-import FavoriteIcon from 'views/components/FavoriteIcon';
+import useColumnRenderers from 'views/components/dashboard/DashboardsOverview/useColumnRenderers';
+import { DEFAULT_LAYOUT, ENTITY_TABLE_ID } from 'views/components/dashboard/DashboardsOverview/Constants';
+import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
+import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 
 import BulkActions from './BulkActions';
-import TitleCell from './TitleCell';
-
-const INITIAL_COLUMNS = ['title', 'description', 'summary', 'favorite'];
-const COLUMNS_ORDER = ['title', 'summary', 'description', 'owner', 'created_at', 'favorite'];
-
-const useCustomColumnRenderers = ({ queryClient, searchParams }: { queryClient: QueryClient, searchParams: SearchParams
-}) => {
-  const requirementsProvided = usePluginEntities('views.requires.provided');
-  const customColumnRenderers: ColumnRenderers<View> = useMemo(() => ({
-    title: {
-      renderCell: (dashboard) => <TitleCell dashboard={dashboard} requirementsProvided={requirementsProvided} />,
-    },
-    favorite: {
-      renderCell: (search) => (
-        <FavoriteIcon isFavorite={search.favorite}
-                      id={search.id}
-                      onChange={(newValue) => {
-                        queryClient.setQueriesData(['dashboards', 'overview', searchParams], (cur: {
-                          list: Readonly<Array<View>>,
-                          pagination: { total: number }
-                        }) => ({
-                          ...cur,
-                          list: cur.list.map((view) => {
-                            if (view.id === search.id) {
-                              return view.toBuilder().favorite(newValue).build();
-                            }
-
-                            return view;
-                          }),
-                        }
-                        ));
-                      }} />
-      ),
-    },
-  }), [queryClient, requirementsProvided, searchParams]);
-
-  return customColumnRenderers;
-};
 
 const renderBulkActions = (
   selectedDashboardIds: Array<string>,
@@ -79,29 +40,35 @@ const renderBulkActions = (
 );
 
 const DashboardsOverview = () => {
-  const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
-  const [visibleColumns, setVisibleColumns] = useState(INITIAL_COLUMNS);
-  const queryClient = useQueryClient();
-  const [searchParams, setSearchParams] = useState<SearchParams>({
-    page: paginationQueryParameter.page,
-    pageSize: paginationQueryParameter.pageSize,
-    query: '',
-    sort: {
-      attributeId: 'title',
-      direction: 'asc',
-    },
+  const [query, setQuery] = useState('');
+  const paginationQueryParameter = usePaginationQueryParameter(undefined, DEFAULT_LAYOUT.pageSize);
+  const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
+    entityTableId: ENTITY_TABLE_ID,
+    defaultPageSize: paginationQueryParameter.pageSize,
+    defaultDisplayedAttributes: DEFAULT_LAYOUT.displayedColumns,
+    defaultSort: DEFAULT_LAYOUT.sort,
   });
-  const columnRenderers = useCustomColumnRenderers({ queryClient, searchParams });
-  const { data: paginatedDashboards, refetch } = useDashboards(searchParams);
-
+  const searchParams = useMemo(() => ({
+    query,
+    page: paginationQueryParameter.page,
+    pageSize: layoutConfig.pageSize,
+    sort: layoutConfig.sort,
+  }), [layoutConfig.pageSize,
+    layoutConfig.sort,
+    paginationQueryParameter.page,
+    query,
+  ]);
+  const customColumnRenderers = useColumnRenderers({ searchParams });
+  const { data: paginatedDashboards, refetch } = useDashboards(searchParams, { enabled: !isLoadingLayoutPreferences });
+  const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
-    setSearchParams((cur) => ({ ...cur, query: newQuery, page: 1 }));
+    setQuery(newQuery);
   }, [paginationQueryParameter]);
 
-  const onColumnsChange = useCallback((newVisibleColumns: Array<string>) => {
-    setVisibleColumns(newVisibleColumns);
-  }, []);
+  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
+    updateTableLayout({ displayedAttributes });
+  }, [updateTableLayout]);
 
   const renderDashboardActions = useCallback((dashboard: View) => (
     <DashboardActions dashboard={dashboard} refetchDashboards={refetch} />
@@ -112,14 +79,17 @@ const DashboardsOverview = () => {
   }, [onSearch]);
 
   const onPageChange = useCallback(
-    (newPage: number, newPageSize: number) => setSearchParams((cur) => ({ ...cur, page: newPage, pageSize: newPageSize })),
-    [],
+    (_newPage: number, newPageSize: number) => {
+      if (newPageSize) {
+        updateTableLayout({ perPage: newPageSize });
+      }
+    }, [updateTableLayout],
   );
 
   const onSortChange = useCallback((newSort: Sort) => {
-    setSearchParams((cur) => ({ ...cur, sort: newSort, page: 1 }));
+    updateTableLayout({ sort: newSort });
     paginationQueryParameter.resetPage();
-  }, [paginationQueryParameter]);
+  }, [paginationQueryParameter, updateTableLayout]);
 
   if (!paginatedDashboards) {
     return <Spinner />;
@@ -129,7 +99,7 @@ const DashboardsOverview = () => {
 
   return (
     <PaginatedList onChange={onPageChange}
-                   pageSize={searchParams.pageSize}
+                   pageSize={layoutConfig.pageSize}
                    totalItems={pagination.total}>
       <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
@@ -137,24 +107,24 @@ const DashboardsOverview = () => {
                     onReset={onReset}
                     topMargin={0} />
       </div>
-      {!dashboards?.length && !searchParams.query && (
+      {!dashboards?.length && !query && (
         <NoEntitiesExist>
           No dashboards have been created yet.
         </NoEntitiesExist>
       )}
-      {!dashboards?.length && searchParams.query && (
+      {!dashboards?.length && query && (
         <NoSearchResult>No dashboards have been found.</NoSearchResult>
       )}
       {!!dashboards?.length && (
         <EntityDataTable<View> data={dashboards}
-                               visibleColumns={visibleColumns}
+                               visibleColumns={layoutConfig.displayedAttributes}
                                onColumnsChange={onColumnsChange}
                                onSortChange={onSortChange}
-                               activeSort={searchParams.sort}
+                               activeSort={layoutConfig.sort}
                                rowActions={renderDashboardActions}
                                bulkActions={renderBulkActions}
-                               columnRenderers={columnRenderers}
-                               columnsOrder={COLUMNS_ORDER}
+                               columnRenderers={customColumnRenderers}
+                               columnsOrder={DEFAULT_LAYOUT.columnsOrder}
                                columnDefinitions={attributes} />
       )}
     </PaginatedList>
