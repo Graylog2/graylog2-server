@@ -22,6 +22,7 @@ import { asMock } from 'helpers/mocking';
 import useStreams from 'components/streams/hooks/useStreams';
 import { stream } from 'fixtures/streams';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 
 import StreamsOverview from './StreamsOverview';
 
@@ -55,12 +56,6 @@ const paginatedStreams = ({
   refetch: () => {},
   isFetching: false,
 });
-
-const layoutPreferences = {
-  displayedAttributes: ['title', 'description'],
-  perPage: 50,
-  sort: { attributeId: 'title', direction: 'asc' } as const,
-};
 
 describe('StreamsOverview', () => {
   beforeEach(() => {

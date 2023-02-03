@@ -22,6 +22,7 @@ import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import suppressConsole from 'helpers/suppressConsole';
+import { layoutPreferencesJSON, layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 
 import useUserLayoutPreferences from './useUserLayoutPreferences';
 
@@ -38,18 +39,6 @@ const wrapper = ({ children }) => (
     {children}
   </QueryClientProvider>
 );
-
-const layoutPreferencesJSON = {
-  displayed_attributes: ['title', 'description'],
-  per_page: 50,
-  sort: { field: 'title', order: 'asc' },
-};
-
-const layoutPreferences = {
-  displayedAttributes: ['title', 'description'],
-  perPage: 50,
-  sort: { attributeId: 'title', direction: 'asc' },
-};
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('util/UserNotification', () => ({ error: jest.fn() }));

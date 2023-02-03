@@ -18,6 +18,7 @@ import React from 'react';
 import { renderHook, act } from '@testing-library/react-hooks';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 
+import { layoutPreferences, layoutPreferencesJSON } from 'fixtures/entityListLayoutPreferences';
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
@@ -38,21 +39,8 @@ const wrapper = ({ children }) => (
   </QueryClientProvider>
 );
 
-const layoutPreferences = {
-  displayedAttributes: ['title', 'description'],
-  perPage: 50,
-  sort: { attributeId: 'title', direction: 'asc' } as const,
-};
-
-const layoutPreferencesJSON = {
-  displayed_attributes: ['title', 'description'],
-  per_page: 50,
-  sort: { field: 'title', order: 'asc' },
-};
-
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('util/UserNotification', () => ({ error: jest.fn() }));
-
 jest.mock('./useUserLayoutPreferences');
 
 describe('useUserSearchFilterQuery hook', () => {
@@ -67,9 +55,7 @@ describe('useUserSearchFilterQuery hook', () => {
   it('should update user layout preferences', async () => {
     const { result, waitFor } = renderHook(() => useUpdateUserLayoutPreferences('streams'), { wrapper });
 
-    act(() => {
-      result.current.mutate(layoutPreferences);
-    });
+    result.current.mutate(layoutPreferences);
 
     await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/entitylists/preferences/streams'), layoutPreferencesJSON));
   });

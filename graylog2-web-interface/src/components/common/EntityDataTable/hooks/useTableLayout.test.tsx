@@ -20,6 +20,7 @@ import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 
 import asMock from 'helpers/mocking/AsMock';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
+import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 
 import useUserLayoutPreferences from './useUserLayoutPreferences';
 
@@ -37,15 +38,8 @@ const wrapper = ({ children }) => (
   </QueryClientProvider>
 );
 
-const layoutPreferences = {
-  displayedAttributes: ['title', 'description'],
-  perPage: 50,
-  sort: { attributeId: 'title', direction: 'asc' } as const,
-};
-
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('util/UserNotification', () => ({ error: jest.fn() }));
-
 jest.mock('./useUserLayoutPreferences');
 
 describe('useUserSearchFilterQuery hook', () => {
