@@ -23,7 +23,6 @@ import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.rest.resources.entities.preferences.service.EntityListPreferencesService;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.shared.users.ChangeUserRequest;
@@ -42,10 +41,9 @@ public class UserManagementServiceImpl extends UserServiceImpl implements UserMa
                                      final InMemoryRolePermissionResolver inMemoryRolePermissionResolver,
                                      final EventBus serverEventBus,
                                      final GRNRegistry grnRegistry,
-                                     final PermissionAndRoleResolver permissionAndRoleResolver,
-                                     final EntityListPreferencesService entityListPreferencesService) {
+                                     final PermissionAndRoleResolver permissionAndRoleResolver) {
         super(mongoConnection, configuration, roleService, accessTokenService, userFactory,
-                inMemoryRolePermissionResolver, serverEventBus, grnRegistry, permissionAndRoleResolver, entityListPreferencesService);
+                inMemoryRolePermissionResolver, serverEventBus, grnRegistry, permissionAndRoleResolver);
     }
 
     @Override

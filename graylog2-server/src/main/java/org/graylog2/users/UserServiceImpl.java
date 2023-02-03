@@ -42,7 +42,6 @@ import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.rest.resources.entities.preferences.service.EntityListPreferencesService;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.shared.users.Role;
@@ -81,7 +80,6 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     private final EventBus serverEventBus;
     private final GRNRegistry grnRegistry;
     private final PermissionAndRoleResolver permissionAndRoleResolver;
-    private final EntityListPreferencesService entityListPreferencesService;
 
     @Inject
     public UserServiceImpl(final MongoConnection mongoConnection,
@@ -92,8 +90,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
                            final InMemoryRolePermissionResolver inMemoryRolePermissionResolver,
                            final EventBus serverEventBus,
                            final GRNRegistry grnRegistry,
-                           final PermissionAndRoleResolver permissionAndRoleResolver,
-                           final EntityListPreferencesService entityListPreferencesService
+                           final PermissionAndRoleResolver permissionAndRoleResolver
     ) {
         super(mongoConnection);
         this.configuration = configuration;
@@ -104,7 +101,6 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         this.serverEventBus = serverEventBus;
         this.grnRegistry = grnRegistry;
         this.permissionAndRoleResolver = permissionAndRoleResolver;
-        this.entityListPreferencesService = entityListPreferencesService;
 
         // ensure that the users' roles array is indexed
         collection(UserImpl.class).createIndex(UserImpl.ROLES);
@@ -245,12 +241,9 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         if (deleteCount > 1) {
             LOG.warn("Removed {} users matching username \"{}\".", deleteCount, username);
         }
-        accesstokenService.deleteAllForUser(username);
+        accesstokenService.deleteAllForUser(username); //TODO: probably should go through listener subscribing to delete event
         final ImmutableList<UserDeletedEvent> deletedUsers = deletedUsersBuilder.build();
         deletedUsers.forEach(serverEventBus::post);
-        deletedUsers.stream()
-                .map(UserDeletedEvent::userId)
-                .forEach(entityListPreferencesService::deleteAllForUser);
         return deleteCount;
     }
 
@@ -263,8 +256,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         DBObject query = new BasicDBObject();
         query.put("_id", new ObjectId(userId));
         final int deleteCount = destroy(query, UserImpl.COLLECTION_NAME);
-        accesstokenService.deleteAllForUser(user.getName());
-        entityListPreferencesService.deleteAllForUser(userId);
+        accesstokenService.deleteAllForUser(user.getName()); //TODO: probably should go through listener subscribing to delete event
         serverEventBus.post(UserDeletedEvent.create(userId, user.getName()));
         return deleteCount;
     }
