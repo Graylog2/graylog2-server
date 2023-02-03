@@ -33,7 +33,7 @@
     <artifactId>data-node</artifactId>
     <packaging>jar</packaging>
 
-    <name>data-node</name>
+    <name>DataNode</name>
     <description>Graylog management tool for Opensearch</description>
 
     <inceptionYear>2023</inceptionYear>
