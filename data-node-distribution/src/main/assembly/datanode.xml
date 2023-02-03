@@ -11,11 +11,25 @@
     <fileSets>
         <fileSet>
             <directory>${project.basedir}/../data-node</directory>
+            <outputDirectory>.</outputDirectory>
             <includes>
                 <include>README.md</include>
                 <include>LICENSE</include>
                 <include>UPGRADING.md</include>
-                <include>bin/**</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/../data-node/bin</directory>
+            <outputDirectory>bin</outputDirectory>
+            <includes>
+                <include>*/**</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/../data-node/target/lib</directory>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>*/**</include>
             </includes>
         </fileSet>
 
