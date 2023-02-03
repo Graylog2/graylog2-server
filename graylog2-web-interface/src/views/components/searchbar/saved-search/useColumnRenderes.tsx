@@ -25,10 +25,6 @@ import Routes from 'routing/Routes';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 import type { SearchParams } from 'stores/PaginationTypes';
 
-type Options = {
-  enabled: boolean,
-}
-
 const onLoad = (
   onLoadSavedSearch: () => void,
   selectedSavedSearchId: string,
