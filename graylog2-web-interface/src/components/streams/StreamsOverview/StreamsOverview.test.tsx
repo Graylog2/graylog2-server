@@ -21,7 +21,6 @@ import { indexSets } from 'fixtures/indexSets';
 import { asMock } from 'helpers/mocking';
 import useStreams from 'components/streams/hooks/useStreams';
 import { stream } from 'fixtures/streams';
-import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 
 import StreamsOverview from './StreamsOverview';
