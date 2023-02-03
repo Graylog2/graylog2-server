@@ -15,9 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React from 'react';
 import { renderHook } from '@testing-library/react-hooks';
-import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
@@ -32,19 +31,6 @@ import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
 const urlPrefix = '/startpage';
 
 const getUrl = (url: string, prefix: string = urlPrefix) => qualifyUrl(`${prefix}/${url}?page=1&per_page=5`);
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-    },
-  },
-});
-
-const wrapper = ({ children }: { children: React.ReactNode }) => (
-  <QueryClientProvider client={queryClient}>
-    {children}
-  </QueryClientProvider>
-);
 
 const mockLastOpened = {
   lastOpened: [{
@@ -101,7 +87,7 @@ describe('Hooks for welcome page', () => {
 
     it('Test return initial data and take from fetch', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve(mockLastOpened));
-      const { result, waitFor } = renderHook(() => useLastOpened(DEFAULT_PAGINATION), { wrapper });
+      const { result, waitFor } = renderHook(() => useLastOpened(DEFAULT_PAGINATION), { wrapper: DefaultQueryClientProvider });
 
       await waitFor(() => result.current.isFetching);
       await waitFor(() => !result.current.isFetching);
@@ -113,7 +99,7 @@ describe('Hooks for welcome page', () => {
     it('Test trigger notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useLastOpened(DEFAULT_PAGINATION), { wrapper });
+      const { result, waitFor } = renderHook(() => useLastOpened(DEFAULT_PAGINATION), { wrapper: DefaultQueryClientProvider });
 
       await suppressConsole(async () => {
         await waitFor(() => result.current.isFetching);
@@ -133,7 +119,7 @@ describe('Hooks for welcome page', () => {
 
     it('Test return initial data and take from fetch', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve(mockFavoriteItems));
-      const { result, waitFor } = renderHook(() => useFavoriteItems(DEFAULT_PAGINATION), { wrapper });
+      const { result, waitFor } = renderHook(() => useFavoriteItems(DEFAULT_PAGINATION), { wrapper: DefaultQueryClientProvider });
 
       await waitFor(() => result.current.isFetching);
       await waitFor(() => !result.current.isFetching);
@@ -145,7 +131,7 @@ describe('Hooks for welcome page', () => {
     it('Test trigger notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useFavoriteItems(DEFAULT_PAGINATION), { wrapper });
+      const { result, waitFor } = renderHook(() => useFavoriteItems(DEFAULT_PAGINATION), { wrapper: DefaultQueryClientProvider });
 
       await suppressConsole(async () => {
         await waitFor(() => result.current.isFetching);
@@ -165,7 +151,7 @@ describe('Hooks for welcome page', () => {
 
     it('Test return initial data and take from fetch', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve(mockedRecentActivityResponse));
-      const { result, waitFor } = renderHook(() => useRecentActivity(DEFAULT_PAGINATION), { wrapper });
+      const { result, waitFor } = renderHook(() => useRecentActivity(DEFAULT_PAGINATION), { wrapper: DefaultQueryClientProvider });
 
       await waitFor(() => result.current.isFetching);
       await waitFor(() => !result.current.isFetching);
@@ -177,7 +163,7 @@ describe('Hooks for welcome page', () => {
     it('Test trigger notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useRecentActivity(DEFAULT_PAGINATION), { wrapper });
+      const { result, waitFor } = renderHook(() => useRecentActivity(DEFAULT_PAGINATION), { wrapper: DefaultQueryClientProvider });
 
       await suppressConsole(async () => {
         await waitFor(() => result.current.isFetching);

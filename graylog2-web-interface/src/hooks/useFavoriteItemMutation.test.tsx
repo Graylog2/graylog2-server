@@ -14,10 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import React from 'react';
 import { act, renderHook } from '@testing-library/react-hooks';
-import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
@@ -33,19 +32,10 @@ const logger = {
   error: () => {},
 };
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-    },
-  },
-  logger,
-});
-
 const wrapper = ({ children }: { children: React.ReactNode }) => (
-  <QueryClientProvider client={queryClient}>
+  <DefaultQueryClientProvider options={{ logger }}>
     {children}
-  </QueryClientProvider>
+  </DefaultQueryClientProvider>
 );
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));

@@ -14,9 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { renderHook } from '@testing-library/react-hooks';
-import * as React from 'react';
+import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
 import { asMock } from 'helpers/mocking';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -26,27 +25,13 @@ jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('hooks/usePluginEntities');
 
 describe('useSaveViewFormControls', () => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
-  });
-
-  const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
-  );
-
   beforeEach(() => {
     asMock(usePluginEntities).mockReturnValue([]);
   });
 
   it('should return save view form controls from plugin store', async () => {
     const saveViewFromControl = {
-      component: () => <div>Pluggable component!</div>,
+      component: () => 'Pluggable component!',
       id: 'example-plugin-component',
     };
 
@@ -54,7 +39,7 @@ describe('useSaveViewFormControls', () => {
       'views.components.saveViewForm': [() => saveViewFromControl],
     }[entityKey]));
 
-    const { result } = renderHook(() => useSaveViewFormControls(), { wrapper });
+    const { result } = renderHook(() => useSaveViewFormControls(), { wrapper: DefaultQueryClientProvider });
 
     expect(result.current).toEqual([saveViewFromControl]);
   });
