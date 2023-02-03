@@ -44,15 +44,11 @@ const fetchDashboards = (searchParams: SearchParams) => {
     { sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
 
   return fetch<PaginatedDashboardsResponse>('GET', qualifyUrl(url)).then(
-    ({ elements, total, count, page, per_page: perPage, attributes }) => {
-      console.log({ elements });
-
-      return ({
-        list: elements.map((item) => View.fromJSON(item)),
-        pagination: { total, count, page, perPage },
-        attributes,
-      });
-    },
+    ({ elements, total, count, page, per_page: perPage, attributes }) => ({
+      list: elements.map((item) => View.fromJSON(item)),
+      pagination: { total, count, page, perPage },
+      attributes,
+    }),
   );
 };
 
