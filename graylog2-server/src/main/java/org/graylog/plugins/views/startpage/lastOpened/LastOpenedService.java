@@ -56,7 +56,11 @@ public class LastOpenedService extends PaginatedDbService<LastOpenedForUserDTO> 
     }
 
     public Optional<LastOpenedForUserDTO> findForUser(final SearchUser searchUser) {
-        return streamQuery(DBQuery.is(LastOpenedForUserDTO.FIELD_USER_ID, searchUser.getUser().getId())).findAny();
+        return findForUser(searchUser.getUser().getId());
+    }
+
+    Optional<LastOpenedForUserDTO> findForUser(final String userId) {
+        return streamQuery(DBQuery.is(LastOpenedForUserDTO.FIELD_USER_ID, userId)).findAny();
     }
 
     public Optional<LastOpenedForUserDTO> create(final LastOpenedForUserDTO lastOpenedItems, final SearchUser searchUser) {

@@ -97,8 +97,12 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
         }
     }
 
-    protected Optional<FavoritesForUserDTO> findForUser(final SearchUser searchUser) {
-        return streamQuery(DBQuery.is(FavoritesForUserDTO.FIELD_USER_ID, searchUser.getUser().getId())).findAny();
+    Optional<FavoritesForUserDTO> findForUser(final SearchUser searchUser) {
+        return findForUser(searchUser.getUser().getId());
+    }
+
+    Optional<FavoritesForUserDTO> findForUser(final String userId) {
+        return streamQuery(DBQuery.is(FavoritesForUserDTO.FIELD_USER_ID, userId)).findAny();
     }
 
     public Optional<FavoritesForUserDTO> create(final FavoritesForUserDTO favorite, final SearchUser searchUser) {
