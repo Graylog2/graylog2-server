@@ -462,7 +462,7 @@ public abstract class MessageInput implements Stoppable {
         }
 
         public boolean isCloudCompatible() {
-            return true;
+            return false;
         }
     }
 
