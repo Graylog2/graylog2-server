@@ -39,6 +39,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.users.events.UserDeletedEvent;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -103,9 +104,9 @@ public class LastOpenedServiceTest {
 
     @Test
     public void testRemoveOnUserDeletion() {
-        lastOpenedService.save(new LastOpenedForUserDTO("user1", List.of(new LastOpenedDTO("1", DateTime.now()), new LastOpenedDTO("2", DateTime.now()))));
-        lastOpenedService.save(new LastOpenedForUserDTO("user2", List.of(new LastOpenedDTO("1", DateTime.now()), new LastOpenedDTO("2", DateTime.now()))));
-        lastOpenedService.save(new LastOpenedForUserDTO("user3", List.of(new LastOpenedDTO("1", DateTime.now()), new LastOpenedDTO("2", DateTime.now()))));
+        lastOpenedService.save(new LastOpenedForUserDTO("user1", List.of(new LastOpenedDTO("1",DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO("2",DateTime.now(DateTimeZone.UTC)))));
+        lastOpenedService.save(new LastOpenedForUserDTO("user2", List.of(new LastOpenedDTO("1",DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO("2",DateTime.now(DateTimeZone.UTC)))));
+        lastOpenedService.save(new LastOpenedForUserDTO("user3", List.of(new LastOpenedDTO("1",DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO("2",DateTime.now(DateTimeZone.UTC)))));
 
         assertThat(lastOpenedService.streamAll().toList().size()).isEqualTo(3);
         lastOpenedService.removeFavoriteEntityOnUserDeletion(UserDeletedEvent.create("user2", "user2"));
@@ -116,10 +117,10 @@ public class LastOpenedServiceTest {
 
     @Test
     public void testRemoveOnEntityDeletion() {
-        lastOpenedService.save(new LastOpenedForUserDTO("user1", List.of(new LastOpenedDTO("2", DateTime.now()))));
-        lastOpenedService.save(new LastOpenedForUserDTO("user2", List.of(new LastOpenedDTO("1", DateTime.now()), new LastOpenedDTO("2", DateTime.now()))));
-        lastOpenedService.save(new LastOpenedForUserDTO("user3", List.of(new LastOpenedDTO("1", DateTime.now()), new LastOpenedDTO("2", DateTime.now()), new LastOpenedDTO("3", DateTime.now()))));
-        lastOpenedService.save(new LastOpenedForUserDTO("user4", List.of(new LastOpenedDTO("1", DateTime.now()), new LastOpenedDTO("4", DateTime.now()), new LastOpenedDTO("3", DateTime.now()))));
+        lastOpenedService.save(new LastOpenedForUserDTO("user1", List.of(new LastOpenedDTO("2",DateTime.now(DateTimeZone.UTC)))));
+        lastOpenedService.save(new LastOpenedForUserDTO("user2", List.of(new LastOpenedDTO("1",DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO("2", DateTime.now(DateTimeZone.UTC)))));
+        lastOpenedService.save(new LastOpenedForUserDTO("user3", List.of(new LastOpenedDTO("1",DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO("2",DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO("3",DateTime.now(DateTimeZone.UTC)))));
+        lastOpenedService.save(new LastOpenedForUserDTO("user4", List.of(new LastOpenedDTO("1",DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO("4",DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO("3",DateTime.now(DateTimeZone.UTC)))));
 
         assertThat(lastOpenedService.streamAll().toList().size()).isEqualTo(4);
         lastOpenedService.removeLastOpenedOnEntityDeletion(new RecentActivityEvent(ActivityType.DELETE, grnRegistry.newGRN(GRNTypes.SEARCH_FILTER, "2"), "user4"));
