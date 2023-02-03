@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.startpage.recentActivities;
 
 import com.google.common.eventbus.EventBus;
+import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
@@ -69,6 +70,8 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
         this.grnRegistry = grnRegistry;
         this.permissionAndRoleResolver = permissionAndRoleResolver;
         this.eventBus = eventBus;
+
+        db.createIndex(new BasicDBObject(RecentActivityDTO.FIELD_ITEM_GRN, 1));
     }
 
     private void postRecentActivity(final RecentActivityEvent event) {
