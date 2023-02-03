@@ -15,13 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export const layoutPreferences = {
+import type { TableLayoutPreferences, TableLayoutPreferencesJSON } from 'components/common/EntityDataTable/types';
+
+export const layoutPreferences: TableLayoutPreferences = {
   displayedAttributes: ['title', 'description'],
   perPage: 50,
   sort: { attributeId: 'title', direction: 'asc' } as const,
 };
 
-export const layoutPreferencesJSON = {
+export const layoutPreferencesJSON: TableLayoutPreferencesJSON = {
   displayed_attributes: ['title', 'description'],
   per_page: 50,
   sort: { field: 'title', order: 'asc' },

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { renderHook, act } from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react-hooks';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 
 import { layoutPreferences, layoutPreferencesJSON } from 'fixtures/entityListLayoutPreferences';
@@ -64,9 +64,7 @@ describe('useUserSearchFilterQuery hook', () => {
     asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isLoading: false });
     const { result, waitFor } = renderHook(() => useUpdateUserLayoutPreferences('streams'), { wrapper });
 
-    act(() => {
-      result.current.mutate({ perPage: 100 });
-    });
+    result.current.mutate({ perPage: 100 });
 
     await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/entitylists/preferences/streams'), {
       displayed_attributes: layoutPreferencesJSON.displayed_attributes,
