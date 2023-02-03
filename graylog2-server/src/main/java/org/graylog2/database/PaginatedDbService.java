@@ -292,11 +292,19 @@ public abstract class PaginatedDbService<DTO> {
         DBSort.SortBuilder sortBuilder = null;
         if ("desc".equalsIgnoreCase(order)) {
             for (String field : distinctFields) {
-                sortBuilder = DBSort.desc(field);
+                if (sortBuilder == null) {
+                    sortBuilder = DBSort.desc(field);
+                } else {
+                    sortBuilder = sortBuilder.desc(field);
+                }
             }
         } else {
             for (String field : distinctFields) {
-                sortBuilder = DBSort.asc(field);
+                if (sortBuilder == null) {
+                    sortBuilder = DBSort.asc(field);
+                } else {
+                    sortBuilder = sortBuilder.asc(field);
+                }
             }
         }
         return sortBuilder;
