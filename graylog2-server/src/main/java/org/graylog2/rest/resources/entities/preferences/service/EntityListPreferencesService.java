@@ -23,5 +23,5 @@ public interface EntityListPreferencesService {
 
     StoredEntityListPreferences get(final StoredEntityListPreferencesId preferencesId);
 
-    void save(final StoredEntityListPreferences preferences);
+    boolean save(final StoredEntityListPreferences preferences);
 }
