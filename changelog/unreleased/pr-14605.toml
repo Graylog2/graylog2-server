@@ -1,0 +1,4 @@
+type = "f"
+message = "Handle deprecated short time zone IDs in job scheduler definitions."
+
+pulls = ["14605"]
