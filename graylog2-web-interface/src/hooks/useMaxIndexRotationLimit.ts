@@ -24,10 +24,8 @@ const useMaxIndexRotationLimit = () => {
   const maxRetentionPeriod = retentionStrategiesContext?.max_index_retention_period;
 
   useEffect(() => {
-    if (!maxRetentionPeriod) {
-      IndicesConfigurationActions.loadRetentionStrategies();
-    }
-  });
+    IndicesConfigurationActions.loadRetentionStrategies();
+  }, []);
 
   return maxRetentionPeriod;
 };
