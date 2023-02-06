@@ -23,6 +23,8 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.retention.strategies.ClosingRetentionStrategyConfig;
+import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -40,7 +42,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -61,6 +63,9 @@ class TimeBasedSizeOptimizingStrategyTest {
     @Mock
     private IndexSet indexSet;
 
+    @Mock
+    private IndexSetConfig indexSetConfig;
+
     private TimeBasedSizeOptimizingStrategyConfig timeBasedSizeOptimizingStrategyConfig;
     private JobSchedulerTestClock clock;
 
@@ -74,14 +79,13 @@ class TimeBasedSizeOptimizingStrategyTest {
         timeBasedSizeOptimizingStrategy = new TimeBasedSizeOptimizingStrategy(indices, nodeId, auditEventSender, elasticsearchConfiguration, clock);
 
         timeBasedSizeOptimizingStrategyConfig = TimeBasedSizeOptimizingStrategyConfig.builder().build();
-        final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
         when(indexSetConfig.shards()).thenReturn(1);
 
         when(indexSetConfig.rotationStrategy()).thenReturn(timeBasedSizeOptimizingStrategyConfig);
+        lenient().when(indexSetConfig.retentionStrategy()).thenReturn(ClosingRetentionStrategyConfig.createDefault());
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
 
         when(indices.numberOfMessages(anyString())).thenReturn(10L);
-
     }
 
     @ParameterizedTest
@@ -162,5 +166,26 @@ class TimeBasedSizeOptimizingStrategyTest {
 
         assertThat(result.shouldRotate()).isEqualTo(true);
         assertThat(result.getDescription()).contains("has passed rotation period");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"2020-12-01T09:00:00Z", "now"})
+    void shouldIgnoreLeeWayWhenNoopRetention(String startDate) {
+        setClockTo(startDate);
+
+        final Period leeWay = timeBasedSizeOptimizingStrategyConfig.indexLifetimeMax().minus(timeBasedSizeOptimizingStrategyConfig.indexLifetimeMin());
+        final Days leewayDays = Days.days(leeWay.getDays());
+        final DateTime creationDate = clock.nowUTC().minus(
+                        elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod().plus(leewayDays))
+                .minus(Duration.millis(10)); // avoid race between the time of now here and in code
+
+        when(indices.indexCreationDate("index_0")).thenReturn(Optional.of(creationDate));
+        when(indices.getStoreSizeInBytes("index_0")).thenReturn(Optional.of(5L));
+
+        when(indexSetConfig.retentionStrategy()).thenReturn(NoopRetentionStrategyConfig.createDefault());
+
+        final TimeBasedSizeOptimizingStrategy.Result result = timeBasedSizeOptimizingStrategy.shouldRotate("index_0", indexSet);
+
+        assertThat(result.shouldRotate()).isEqualTo(false);
     }
 }
