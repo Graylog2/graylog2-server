@@ -16,14 +16,12 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useMemo, useState } from 'react';
-import type * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import type { BackendWidgetPosition, WidgetResults, GetState } from 'views/types';
 import { widgetDefinition } from 'views/logic/Widgets';
 import { RefreshActions } from 'views/stores/RefreshStore';
-import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import WidgetModel from 'views/logic/widgets/Widget';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -34,6 +32,7 @@ import IfDashboard from 'views/components/dashboard/IfDashboard';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useWidgetResults from 'views/components/useWidgetResults';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import useAppDispatch from 'stores/useAppDispatch';
@@ -56,7 +55,6 @@ export type Props = {
   id: string,
   widget: WidgetModel,
   editing: boolean,
-  fields: Immutable.List<FieldTypeMapping>,
   title: string,
   position: WidgetPosition,
   onPositionsChange: (position: BackendWidgetPosition) => void,
@@ -80,17 +78,25 @@ const _hasOwnEditSubmitButton = (type: string) => {
   return widgetDefinition(type).hasEditSubmitButton;
 };
 
+const useQueryFieldTypes = () => {
+  const fieldTypes = useContext(FieldTypesContext);
+  const queryId = useActiveQueryId();
+
+  return useMemo(() => fieldTypes.queryFields.get(queryId, fieldTypes.all), [fieldTypes.all, fieldTypes.queryFields, queryId]);
+};
+
 const WidgetFooter = styled.div`
   width: 100%;
   display: flex;
   justify-content: flex-end;
 `;
 
-type VisualizationProps = Pick<Props, 'title' | 'id' | 'widget' | 'fields' | 'editing'> & {
+type VisualizationProps = Pick<Props, 'title' | 'id' | 'widget' | 'editing'> & {
   queryId: string,
   setLoadingState: (loading: boolean) => void,
   onToggleEdit: () => void,
   onWidgetConfigChange: (newWidgetConfig: WidgetConfig) => Promise<void>,
+  fields: FieldTypeMappingsList,
 };
 
 const Visualization = ({ title, id, widget, fields, queryId, editing, setLoadingState, onToggleEdit, onWidgetConfigChange }: VisualizationProps) => {
@@ -161,7 +167,8 @@ const setWidgetTitle = (widgetId: string, newTitle: string) => async (dispatch: 
   return dispatch(setTitle(activeQuery, 'widget', widgetId, newTitle));
 };
 
-const Widget = ({ id, editing, widget, fields, title, position, onPositionsChange }: Props) => {
+const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Props) => {
+  const fields = useQueryFieldTypes();
   const [loading, setLoading] = useState(false);
   const [oldWidget, setOldWidget] = useState(editing ? widget : undefined);
   const { focusedWidget, setWidgetEditing, unsetWidgetEditing } = useContext(WidgetFocusContext);
@@ -241,7 +248,6 @@ const Widget = ({ id, editing, widget, fields, title, position, onPositionsChang
 
 Widget.propTypes = {
   editing: PropTypes.bool,
-  fields: PropTypes.any.isRequired,
   id: PropTypes.string.isRequired,
   onPositionsChange: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,

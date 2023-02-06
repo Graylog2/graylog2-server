@@ -63,7 +63,7 @@ type Props = {
   },
   query: string,
   onPageChange: (page: number, size: number) => void,
-  onQueryChange: (newQuery: string) => void,
+  onQueryChange: (newQuery?: string) => void,
   onDelete: (eventDefinition: EventDefinition) => void,
   onCopy: (eventDefinition: EventDefinition) => void,
   onEnable: (eventDefinition: EventDefinition) => void,
@@ -93,11 +93,9 @@ const EventDefinitions = ({ eventDefinitions, context, pagination, query, onPage
         <SearchForm query={query}
                     onSearch={onQueryChange}
                     onReset={onQueryChange}
-                    searchButtonLabel="Find"
                     placeholder="Find Event Definitions"
                     wrapperClass={styles.inline}
                     queryHelpComponent={<QueryHelper entityName="event definition" />}
-                    queryWidth={200}
                     topMargin={0}
                     useLoadingState />
 

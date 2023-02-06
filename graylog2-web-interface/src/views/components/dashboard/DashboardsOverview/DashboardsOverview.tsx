@@ -30,18 +30,11 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import DashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 
+import BulkActions from './BulkActions';
 import TitleCell from './TitleCell';
 
 const INITIAL_COLUMNS = ['title', 'description', 'summary', 'favorite'];
-
-const COLUMN_DEFINITIONS = [
-  { id: 'created_at', title: 'Created At', sortable: true },
-  { id: 'title', title: 'Title', sortable: true },
-  { id: 'description', title: 'Description', sortable: true },
-  { id: 'summary', title: 'Summary', sortable: true },
-  { id: 'owner', title: 'Owner', sortable: true },
-  { id: 'favorite', title: 'Favorite' },
-];
+const COLUMNS_ORDER = ['title', 'summary', 'description', 'owner', 'created_at', 'favorite'];
 
 const useCustomColumnRenderers = ({ queryClient, searchParams }: { queryClient: QueryClient, searchParams: SearchParams
 }) => {
@@ -76,6 +69,14 @@ const useCustomColumnRenderers = ({ queryClient, searchParams }: { queryClient: 
 
   return customColumnRenderers;
 };
+
+const renderBulkActions = (
+  selectedDashboardIds: Array<string>,
+  setSelectedDashboardIds: (streamIds: Array<string>) => void,
+) => (
+  <BulkActions selectedDashboardIds={selectedDashboardIds}
+               setSelectedDashboardIds={setSelectedDashboardIds} />
+);
 
 const DashboardsOverview = () => {
   const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
@@ -124,7 +125,7 @@ const DashboardsOverview = () => {
     return <Spinner />;
   }
 
-  const { list: dashboards, pagination } = paginatedDashboards;
+  const { list: dashboards, pagination, attributes } = paginatedDashboards;
 
   return (
     <PaginatedList onChange={onPageChange}
@@ -151,8 +152,10 @@ const DashboardsOverview = () => {
                                onSortChange={onSortChange}
                                activeSort={searchParams.sort}
                                rowActions={renderDashboardActions}
+                               bulkActions={renderBulkActions}
                                columnRenderers={columnRenderers}
-                               columnDefinitions={COLUMN_DEFINITIONS} />
+                               columnsOrder={COLUMNS_ORDER}
+                               columnDefinitions={attributes} />
       )}
     </PaginatedList>
   );
