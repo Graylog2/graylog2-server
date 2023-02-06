@@ -22,6 +22,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
@@ -93,11 +94,14 @@ public class TimeBasedSizeOptimizingStrategy extends AbstractRotationStrategy {
                             humanReadableByteCount(sizeInBytes), humanReadableByteCount(maxIndexSize)));
         }
 
-        Period leeWay = config.indexLifetimeMax().minus(config.indexLifetimeMin());
-        if (indexExceedsLeeWay(creationDate, leeWay)) {
-            return createResult(true,
-                    f("Index creation date <%s> exceeds optimization leeway <%s>",
-                            creationDate, leeWay));
+        // If no retention is selected, we have an "indefinite" optimization leeway
+        if (!(indexSet.getConfig().retentionStrategy() instanceof NoopRetentionStrategyConfig)) {
+            Period leeWay = config.indexLifetimeMax().minus(config.indexLifetimeMin());
+            if (indexExceedsLeeWay(creationDate, leeWay)) {
+                return createResult(true,
+                        f("Index creation date <%s> exceeds optimization leeway <%s>",
+                                creationDate, leeWay));
+            }
         }
 
         final long minIndexSize = minShardSize.toBytes() * shards;
