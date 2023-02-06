@@ -37,7 +37,7 @@ export const durationToRoundedDays = (duration: string) => {
   return Math.round(moment.duration(duration).asDays());
 };
 
-const getRangeInDays = (indexLifeTimeMin = 'PT1H', IndexLifeTimeMax = 'P2D') => {
+const getRangeInDays = (indexLifeTimeMin = 'PT1H', IndexLifeTimeMax = 'P4D') => {
   return [durationToRoundedDays(indexLifeTimeMin), durationToRoundedDays(IndexLifeTimeMax)];
 };
 
