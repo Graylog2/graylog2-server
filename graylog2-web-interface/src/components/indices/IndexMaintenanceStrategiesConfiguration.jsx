@@ -19,12 +19,18 @@ import * as React from 'react';
 import { useCallback, useState } from 'react';
 import { useFormikContext } from 'formik';
 import styled from 'styled-components';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Alert, Col, Input, Row } from 'components/bootstrap';
 import { Icon, Select } from 'components/common';
 
-const TIME_BASED_ROTATION_STRATEGY = 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy';
-const NOOP_RETENTION_STRATEGY = 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy';
+import {
+  TIME_BASED_ROTATION_STRATEGY,
+  TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY,
+  TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY_TYPE,
+  NOOP_RETENTION_STRATEGY,
+  ARCHIVE_RETENTION_STRATEGY,
+} from './types';
 
 const StyledH3 = styled.h3`
   margin-bottom: 10px;
@@ -57,6 +63,10 @@ const _getTimeBaseStrategyWithElasticLimit = (activeConfig, strategies) => {
 };
 
 const _getStrategyConfig = (selectedStrategy, activeStrategy, activeConfig, strategies) => {
+  if (selectedStrategy === TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY) {
+    return activeConfig;
+  }
+
   if (activeStrategy === selectedStrategy) {
     // If the newly selected strategy is the current active strategy, we use the active configuration.
     return activeStrategy === TIME_BASED_ROTATION_STRATEGY ? _getTimeBaseStrategyWithElasticLimit(activeConfig, strategies) : activeConfig;
@@ -89,6 +99,7 @@ const _getConfigurationComponent = (selectedStrategy, pluginExports, strategies,
 
 const IndexMaintenanceStrategiesConfiguration = ({
   title,
+  name,
   description,
   selectPlaceholder,
   pluginExports,
@@ -102,10 +113,17 @@ const IndexMaintenanceStrategiesConfiguration = ({
     setValues,
     values,
     values: {
+      rotation_strategy: rotationStrategy,
       rotation_strategy_class: rotationStrategyClass,
       retention_strategy_class: retentionStrategyClass,
     },
   } = useFormikContext();
+
+  const retentionIsNotNoop = retentionStrategyClass !== NOOP_RETENTION_STRATEGY;
+  const isArchiveRetention = retentionStrategyClass !== ARCHIVE_RETENTION_STRATEGY;
+  const shouldShowMaxRetentionWarning = maxRetentionPeriod && rotationStrategyClass === TIME_BASED_ROTATION_STRATEGY && retentionIsNotNoop;
+  const isTimeBasedSizeOptimizing = rotationStrategyClass === TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY;
+  const shouldShowTimeBasedSizeOptimizing = isTimeBasedSizeOptimizing && name === 'retention';
 
   const _onSelect = (selectedStrategy) => {
     if (!selectedStrategy || selectedStrategy.length < 1) {
@@ -137,6 +155,12 @@ const IndexMaintenanceStrategiesConfiguration = ({
     setValues({ ...values, ...getState(newStrategy, configuration) });
   }, [getState, newStrategy, setValues, strategies, values]);
 
+  const _onIndexTimeSizeOptimizingUpdate = useCallback((newConfig) => {
+    if (isTimeBasedSizeOptimizing) {
+      setValues({ ...values, ...{ rotation_strategy_class: rotationStrategyClass, rotation_strategy: { ...newConfig, type: TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY_TYPE } } });
+    }
+  }, [isTimeBasedSizeOptimizing, rotationStrategyClass, setValues, values]);
+
   const _availableSelectOptions = () => {
     return pluginExports
       .filter((c) => strategies.find(({ type }) => type === c.type))
@@ -148,9 +172,6 @@ const IndexMaintenanceStrategiesConfiguration = ({
   const _activeSelection = () => {
     return newStrategy;
   };
-
-  const retentionIsNotNoop = retentionStrategyClass !== NOOP_RETENTION_STRATEGY;
-  const shouldShowMaxRetentionWarning = maxRetentionPeriod && rotationStrategyClass === TIME_BASED_ROTATION_STRATEGY && retentionIsNotNoop;
 
   function getDescription() {
     if (description) {
@@ -192,7 +213,24 @@ const IndexMaintenanceStrategiesConfiguration = ({
       </Row>
       <Row>
         <Col md={12}>
-          {_getConfigurationComponent(_activeSelection(), pluginExports, strategies, strategy, config, _onConfigUpdate)}
+          {shouldShowTimeBasedSizeOptimizing && _getConfigurationComponent(
+            TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY,
+            PluginStore.exports('indexRotationConfig'),
+            [rotationStrategy],
+            rotationStrategy,
+            rotationStrategy,
+            _onIndexTimeSizeOptimizingUpdate,
+          )}
+          {(!isTimeBasedSizeOptimizing
+          || (name === 'retention' && (!retentionIsNotNoop || !isArchiveRetention)))
+          && _getConfigurationComponent(
+            _activeSelection(),
+            pluginExports,
+            strategies,
+            strategy,
+            config,
+            _onConfigUpdate,
+          )}
         </Col>
       </Row>
     </span>
@@ -201,6 +239,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
 
 IndexMaintenanceStrategiesConfiguration.propTypes = {
   title: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
   description: PropTypes.string,
   selectPlaceholder: PropTypes.string.isRequired,
   pluginExports: PropTypes.array.isRequired,

@@ -141,7 +141,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
 
       rotationConfig = (
         <IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
-                                                 key="rotation"
+                                                 name="rotation"
                                                  description="Graylog uses multiple indices to store documents in. You can configure the strategy it uses to determine when to rotate the currently active write index."
                                                  selectPlaceholder="Select rotation strategy"
                                                  pluginExports={PluginStore.exports('indexRotationConfig')}
@@ -164,7 +164,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
 
       retentionConfig = (
         <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
-                                                 key="retention"
+                                                 name="retention"
                                                  description="Graylog uses a retention strategy to clean up old indices."
                                                  selectPlaceholder="Select retention strategy"
                                                  pluginExports={PluginStore.exports('indexRetentionConfig')}
