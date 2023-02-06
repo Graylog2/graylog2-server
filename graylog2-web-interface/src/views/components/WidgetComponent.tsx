@@ -17,13 +17,11 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import type * as Immutable from 'immutable';
 
 import type { BackendWidgetPosition } from 'views/types';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import type TFieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import ExportSettingsContextProvider from 'views/components/ExportSettingsContextProvider';
 import View from 'views/logic/views/View';
 import { useStore } from 'stores/connect';
@@ -41,7 +39,6 @@ import WidgetFieldTypesContextProvider from './contexts/WidgetFieldTypesContextP
 
 type Props = {
   editing: boolean,
-  fields: Immutable.List<TFieldTypeMapping>,
   onPositionsChange: (position: BackendWidgetPosition) => void,
   position: WidgetPosition,
   widgetId: string,
@@ -52,7 +49,6 @@ const useTitle = (widget: WidgetType) => useStore(TitlesStore, (titles) => title
 
 const WidgetComponent = ({
   editing,
-  fields,
   onPositionsChange = () => undefined,
   position,
   widgetId,
@@ -71,7 +67,6 @@ const WidgetComponent = ({
           <ExportSettingsContextProvider>
             <WidgetFieldTypesIfDashboard>
               <Widget editing={editing}
-                      fields={fields}
                       id={widget.id}
                       onPositionsChange={onPositionsChange}
                       position={position}
@@ -87,7 +82,6 @@ const WidgetComponent = ({
 
 WidgetComponent.propTypes = {
   editing: PropTypes.bool.isRequired,
-  fields: PropTypes.object.isRequired,
   onPositionsChange: PropTypes.func,
   position: PropTypes.shape(Position).isRequired,
 };

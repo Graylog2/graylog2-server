@@ -22,6 +22,7 @@ import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.subject.Subject;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.security.Permissions;
@@ -68,7 +69,7 @@ class UserContextTest {
         subjectDAO.setSessionStorageEvaluator(sessionStorageEvaluator);
         sm.setSubjectDAO(subjectDAO);
 
-        final User user = new UserImpl(mock(PasswordAlgorithmFactory.class), mock(Permissions.class), ImmutableMap.of());
+        final User user = new UserImpl(mock(PasswordAlgorithmFactory.class), mock(Permissions.class), mock(ClusterConfigService.class), ImmutableMap.of());
         when(userService.load(anyString())).thenReturn(user);
         when(userService.loadById(anyString())).thenReturn(user);
 

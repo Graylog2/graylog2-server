@@ -35,6 +35,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -66,9 +67,10 @@ public class EntityDependencyResolver {
 
     public ImmutableSet<EntityDescriptor> resolve(GRN entity) {
         // TODO: Replace entity excerpt usage with GRNDescriptors once we implemented GRN descriptors for every entity
-        final ImmutableMap<GRN, String> entityExcerpts = contentPackService.listAllEntityExcerpts().stream()
+        final ImmutableMap<GRN, Optional<String>> entityExcerpts = contentPackService.listAllEntityExcerpts().stream()
                 // TODO: Use the GRNRegistry instead of manually building a GRN. Requires all entity types to be in the registry.
-                .collect(ImmutableMap.toImmutableMap(e -> GRNType.create(e.type().name(), e.type().name() + ":").newGRNBuilder().entity(e.id().id()).build(), EntityExcerpt::title));
+                .collect(ImmutableMap.toImmutableMap(e -> GRNType.create(e.type().name(), e.type().name() + ":").newGRNBuilder().entity(e.id().id()).build(),
+                        v -> Optional.ofNullable(v.title())));
 
         final Set<org.graylog2.contentpacks.model.entities.EntityDescriptor> descriptors = contentPackService.resolveEntities(Collections.singleton(org.graylog2.contentpacks.model.entities.EntityDescriptor.builder()
                 .id(ModelId.of(entity.entity()))
@@ -91,10 +93,7 @@ public class EntityDependencyResolver {
 
         return dependencies.stream()
                 .map(dependency -> {
-                    String title = entityExcerpts.get(dependency);
-                    if (title == null) {
-                        title = "unknown dependency: <" + dependency + ">";
-                    }
+                    String title = entityExcerpts.get(dependency) != null ? entityExcerpts.get(dependency).orElse("unnamed dependency: <" + dependency + ">") : "unknown dependency: <" + dependency + ">";
                     return EntityDescriptor.create(
                             dependency,
                             title,

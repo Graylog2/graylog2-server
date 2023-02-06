@@ -16,13 +16,11 @@
  */
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
-import { get } from 'lodash';
 
 import type { RefluxActions, Store } from 'stores/StoreTypes';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
-import ViewGenerator from 'views/logic/views/ViewGenerator';
 import { QueriesActions } from 'views/actions/QueriesActions';
-import type { Properties, ViewType, ViewStateMap } from 'views/logic/views/View';
+import type { Properties, ViewStateMap } from 'views/logic/views/View';
 import type View from 'views/logic/views/View';
 import type { QuerySet } from 'views/logic/search/Search';
 import type Search from 'views/logic/search/Search';
@@ -30,7 +28,7 @@ import type ViewState from 'views/logic/views/ViewState';
 import type Query from 'views/logic/queries/Query';
 import SearchActions from 'views/actions/SearchActions';
 import { singletonActions, singletonStore } from 'logic/singleton';
-import type { QueryId, TimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
+import type { QueryId } from 'views/logic/queries/Query';
 
 import { ViewManagementActions } from './ViewManagementStore';
 import isEqualForSearch from './isEqualForSearch';
@@ -43,12 +41,7 @@ export type ViewStoreState = {
 };
 
 type ViewActionsType = RefluxActions<{
-  create: (
-    type: ViewType,
-    streamId?: string,
-    timeRange?: TimeRange,
-    queryString?: ElasticsearchQueryString,
-  ) => Promise<ViewStoreState>,
+  loadNew: (view: View, queryId?: string) => Promise<ViewStoreState>,
   load: (view: View, isNew?: boolean, queryId?: string) => Promise<ViewStoreState>,
   properties: (properties: Properties) => Promise<void>,
   search: (search: Search) => Promise<View>,
@@ -61,9 +54,9 @@ type ViewActionsType = RefluxActions<{
 export const ViewActions: ViewActionsType = singletonActions(
   'views.View',
   () => Reflux.createActions({
-    create: { asyncResult: true },
     dashboardState: { asyncResult: true },
     load: { asyncResult: true },
+    loadNew: { asyncResult: true },
     properties: { asyncResult: true },
     search: { asyncResult: true },
     selectQuery: { asyncResult: true },
@@ -75,7 +68,25 @@ export const ViewActions: ViewActionsType = singletonActions(
 
 type ViewStoreType = Store<ViewStoreState>;
 
-const _selectedQuery = (queries: QuerySet = Immutable.Set(), activeQuery: string, queryId: string): QueryId => {
+const _updateSearch = (view: View, oldView: View): [View, boolean] => {
+  if (!view.search) {
+    return [view, false];
+  }
+
+  const oldWidgets = oldView?.state?.map((s) => s.widgets);
+  const newWidgets = view?.state?.map((s) => s.widgets);
+
+  if (!isEqualForSearch(oldWidgets, newWidgets)) {
+    const newView = UpdateSearchForWidgets(view);
+
+    return [newView, true];
+  }
+
+  return [view, false];
+};
+
+const _selectedQuery = (_queries: QuerySet, activeQuery: string, queryId: string): QueryId => {
+  const queries = _queries ?? Immutable.Set();
   const selectedQuery = queryId ?? activeQuery;
 
   if (selectedQuery && queries.find(({ id }) => (id === selectedQuery))) {
@@ -107,35 +118,6 @@ export const ViewStore: ViewStoreType = singletonStore(
       return this._state();
     },
 
-    create(
-      type: ViewType,
-      streamId: string = null,
-      timeRange?: TimeRange,
-      queryString?: ElasticsearchQueryString,
-    ) {
-      return ViewGenerator(type, streamId, timeRange, queryString)
-        .then((newView) => {
-          const [view] = this._updateSearch(newView);
-
-          this.view = view;
-          const queries: QuerySet = get(view, 'search.queries', Immutable.Set());
-
-          this.activeQuery = queries.first().id;
-
-          return view;
-        }).then((view) => {
-          const promise = ViewActions.search(view.search)
-            .then(() => {
-              this.dirty = false;
-              this.isNew = true;
-            })
-            .then(() => this._trigger());
-
-          ViewActions.create.promise(promise.then(() => this._state()));
-
-          return promise;
-        });
-    },
     createQuery(query: Query, viewState: ViewState) {
       if (query.id === undefined) {
         throw new Error('Unable to add query without id to view.');
@@ -149,10 +131,10 @@ export const ViewStore: ViewStoreType = singletonStore(
       const newState = this.view.state.set(query.id, viewState);
 
       this.dirty = true;
-      const [view, isModified] = this._updateSearch(this.view.toBuilder()
+      const [view, isModified] = _updateSearch(this.view.toBuilder()
         .state(newState)
         .search(newSearch)
-        .build());
+        .build(), this.view);
 
       this.view = view;
       this.activeQuery = query.id;
@@ -186,12 +168,31 @@ export const ViewStore: ViewStoreType = singletonStore(
       const queries = view?.search?.queries;
       const selectedQuery = _selectedQuery(queries, this.activeQuery, queryId);
 
-      this.selectQuery(selectedQuery);
       this.isNew = isNew;
+      this.selectQuery(selectedQuery);
 
       const promise = Promise.resolve(this._state());
 
       ViewActions.load.promise(promise);
+
+      return promise;
+    },
+    loadNew(newView: View, queryId?: string) {
+      const [view] = _updateSearch(newView, this.view);
+
+      this.view = view;
+
+      const queries: QuerySet = view?.search?.queries ?? Immutable.Set();
+      this.activeQuery = _selectedQuery(queries, this.activeQuery, queryId);
+
+      const promise = ViewActions.search(view.search)
+        .then(() => {
+          this.dirty = false;
+          this.isNew = true;
+        })
+        .then(() => this._trigger());
+
+      ViewActions.loadNew.promise(promise.then(() => this._state()));
 
       return promise;
     },
@@ -233,7 +234,7 @@ export const ViewStore: ViewStoreType = singletonStore(
     },
     state(newState: ViewState) {
       this.dirty = true;
-      const [view, isModified] = this._updateSearch(this.view.toBuilder().state(newState).build());
+      const [view, isModified] = _updateSearch(this.view.toBuilder().state(newState).build(), this.view);
 
       this.view = view;
       const promise = (isModified ? ViewActions.search(view.search) : Promise.resolve(view)).then(() => this._trigger());
@@ -241,22 +242,6 @@ export const ViewStore: ViewStoreType = singletonStore(
       ViewActions.state.promise(promise);
 
       return promise;
-    },
-    _updateSearch(view: View): [View, boolean] {
-      if (!view.search) {
-        return [view, false];
-      }
-
-      const oldWidgets = get(this.view, 'state') && this.view.state.map((s) => s.widgets);
-      const newWidgets = get(view, 'state') && view.state.map((s) => s.widgets);
-
-      if (!isEqualForSearch(oldWidgets, newWidgets)) {
-        const newView = UpdateSearchForWidgets(view);
-
-        return [newView, true];
-      }
-
-      return [view, false];
     },
     _state(): ViewStoreState {
       return {

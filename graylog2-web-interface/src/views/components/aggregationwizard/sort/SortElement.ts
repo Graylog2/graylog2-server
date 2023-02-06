@@ -52,7 +52,7 @@ const validateSorts = (values: WidgetConfigFormValues) => {
       sortError.direction = 'Direction is required.';
     }
 
-    const timeRowExists = !!values.groupBy?.groupings.find((g) => g.direction === 'row' && g.field.type === 'time');
+    const timeRowExists = !!values.groupBy?.groupings.find((g) => g.direction === 'row' && g.type === 'time');
     const nonDataTableVisExists = values.visualization && values.visualization.type !== 'table';
 
     if (timeRowExists && nonDataTableVisExists) {

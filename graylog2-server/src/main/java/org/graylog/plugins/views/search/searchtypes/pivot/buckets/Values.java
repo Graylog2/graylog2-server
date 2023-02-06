@@ -28,6 +28,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.TypedBuilder;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
 
 @AutoValue
 @JsonTypeName(Values.NAME)
@@ -41,10 +43,9 @@ public abstract class Values implements BucketSpec {
 
     @Override
     @JsonProperty
-    public abstract String field();
+    public abstract List<String> fields();
 
-    @JsonIgnore
-    @Nullable
+    @JsonProperty
     public abstract Integer limit();
 
     public static Values.Builder builder() {
@@ -59,14 +60,19 @@ public abstract class Values implements BucketSpec {
 
         @JsonCreator
         public static Builder create() {
-            return Values.builder();
+            return Values.builder().limit(DEFAULT_LIMIT);
         }
 
         @JsonProperty
-        public abstract Builder field(String field);
+        public Builder field(String field) {
+            return fields(Collections.singletonList(field));
+        }
 
         @JsonProperty
-        public abstract Builder limit(@Nullable Integer limit);
+        public abstract Builder fields(List<String> fields);
+
+        @JsonProperty
+        public abstract Builder limit(Integer limit);
 
     }
 

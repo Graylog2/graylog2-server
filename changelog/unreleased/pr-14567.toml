@@ -1,0 +1,4 @@
+type = "a"
+message = "Add option to bulk delete saved searches in saved searches overview."
+
+pulls = ["14567"]

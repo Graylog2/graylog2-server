@@ -19,7 +19,7 @@ import { useCallback } from 'react';
 import { useFormikContext, FieldArray, Field } from 'formik';
 import styled, { css } from 'styled-components';
 
-import { HoverForHelp, SortableList, FormikFormGroup } from 'components/common';
+import { HoverForHelp, SortableList } from 'components/common';
 import { Checkbox } from 'components/bootstrap';
 
 import GroupingConfiguration from './GroupingConfiguration';
@@ -71,9 +71,6 @@ const GroupingsConfiguration = () => {
 
   const isEmpty = (groupBy?.groupings ?? []).length === 0;
 
-  const hasValuesRowPivots = groupBy?.groupings?.find(({ direction, field }) => (direction === 'row' && field?.type === 'values')) !== undefined;
-  const hasValuesColumnPivots = groupBy?.groupings?.find(({ direction, field }) => (direction === 'column' && field?.type === 'values')) !== undefined;
-
   const GroupingsItem = useCallback(({ item, index, dragHandleProps, draggableProps, className, ref }: GroupingsItemProps) => (
     <ElementConfigurationContainer key={`grouping-${item.id}`}
                                    dragHandleProps={dragHandleProps}
@@ -114,18 +111,6 @@ const GroupingsConfiguration = () => {
                 </RollupColumnsCheckbox>
               )}
             </Field>
-            {hasValuesRowPivots && (
-            <FormikFormGroup label="Row Limit"
-                             name="groupBy.rowLimit"
-                             type="number"
-                             bsSize="small" />
-            )}
-            {hasValuesColumnPivots && (
-            <FormikFormGroup label="Column Limit"
-                             name="groupBy.columnLimit"
-                             type="number"
-                             bsSize="small" />
-            )}
           </ElementConfigurationContainer>
         </>
       )}

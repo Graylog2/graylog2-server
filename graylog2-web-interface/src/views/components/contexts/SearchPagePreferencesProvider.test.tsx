@@ -29,6 +29,7 @@ import type { PreferencesMap } from 'stores/users/PreferencesStore';
 import { PreferencesActions } from 'stores/users/PreferencesStore';
 import type User from 'logic/users/User';
 import useCurrentUser from 'hooks/useCurrentUser';
+import { ViewStore } from 'views/stores/ViewStore';
 
 import SearchPagePreferencesContext from './SearchPagePreferencesContext';
 import SearchPagePreferencesProvider from './SearchPagePreferencesProvider';
@@ -57,12 +58,22 @@ jest.mock('views/stores/ViewStore', () => ({
 
 describe('SearchPagePreferencesProvider', () => {
   beforeEach(() => {
+    asMock(ViewStore.getInitialState).mockReturnValue({
+      view: View.create()
+        .toBuilder()
+        .type(View.Type.Search)
+        .build(),
+      activeQuery: 'foo',
+      isNew: true,
+      dirty: false,
+    });
+
     asMock(useCurrentUser).mockReturnValue(defaultUser);
   });
 
   const SimpleProvider = ({ children }: { children: any }) => (
     <CurrentUserPreferencesProvider>
-      <CurrentViewTypeProvider type={View.Type.Search}>
+      <CurrentViewTypeProvider>
         <SearchPagePreferencesProvider>
           <SearchPagePreferencesContext.Consumer>
             {children}

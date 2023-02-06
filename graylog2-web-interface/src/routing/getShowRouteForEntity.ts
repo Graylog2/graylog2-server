@@ -38,6 +38,12 @@ const getShowRouteForEntity = (id: string, type: string) => {
       return Routes.stream_search(id);
     case 'search_filter':
       return Routes.getPluginRoute('MY-FILTERS_DETAILS_FILTERID')(id);
+    case 'report':
+      return Routes.getPluginRoute('REPORTS_REPORTID_CONFIGURATION')(id);
+    case 'role':
+      return Routes.SYSTEM.AUTHZROLES.show(id);
+    case 'output':
+      return Routes.SYSTEM.OUTPUTS;
     default:
       return assertUnreachable(type);
   }

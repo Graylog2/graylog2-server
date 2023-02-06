@@ -48,7 +48,6 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -68,34 +67,26 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
 
     @Nonnull
     @Override
-    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, List<Values> bucketSpecs, OSGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, Values bucketSpec, OSGeneratedQueryContext queryContext, Query query) {
         final List<BucketOrder> ordering = orderListForPivot(pivot, queryContext, defaultOrder);
-        final int limit = extractLimit(direction, pivot).orElse(Values.DEFAULT_LIMIT);
-        final List<Values> orderedBuckets = ValuesBucketOrdering.orderBuckets(bucketSpecs, pivot.sort());
+        final int limit = bucketSpec.limit();
+        final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
         final AggregationBuilder termsAggregation = createTerms(orderedBuckets, ordering, limit);
         final FiltersAggregationBuilder filterAggregation = createFilter(name, orderedBuckets)
                 .subAggregation(termsAggregation);
         return CreatedAggregations.create(filterAggregation, termsAggregation, List.of(termsAggregation, filterAggregation));
     }
 
-    private Optional<Integer> extractLimit(Direction direction, Pivot pivot) {
-        return switch (direction) {
-            case Row -> pivot.rowLimit();
-            case Column -> pivot.columnLimit();
-        };
-    }
-
-    private FiltersAggregationBuilder createFilter(String name, List<Values> bucketSpecs) {
+    private FiltersAggregationBuilder createFilter(String name, List<String> bucketSpecs) {
         final BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
         bucketSpecs.stream()
-                .map(Values::field)
                 .map(QueryBuilders::existsQuery)
                 .forEach(queryBuilder::filter);
         return AggregationBuilders.filters(name, queryBuilder)
                 .otherBucket(true);
     }
 
-    private AggregationBuilder createTerms(List<Values> valueBuckets, List<BucketOrder> ordering, int limit) {
+    private AggregationBuilder createTerms(List<String> valueBuckets, List<BucketOrder> ordering, int limit) {
         return valueBuckets.size() > 1
                 ? supportsMultiTerms
                     ? createMultiTerms(valueBuckets, ordering, limit)
@@ -103,42 +94,42 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
                 : createSimpleTerms(valueBuckets.get(0), ordering, limit);
     }
 
-    private AggregationBuilder createSimpleTerms(Values values, List<BucketOrder> ordering, int limit) {
+    private AggregationBuilder createSimpleTerms(String field, List<BucketOrder> ordering, int limit) {
         return AggregationBuilders.terms(AGG_NAME)
-                .field(values.field())
+                .field(field)
                 .order(ordering)
                 .size(limit);
     }
 
-    private AggregationBuilder createMultiTerms(List<Values> valueBuckets, List<BucketOrder> ordering, int limit) {
+    private AggregationBuilder createMultiTerms(List<String> valueBuckets, List<BucketOrder> ordering, int limit) {
         return AggregationBuilders.multiTerms(AGG_NAME)
                 .terms(valueBuckets.stream()
                         .map(value -> new MultiTermsValuesSourceConfig.Builder()
-                                .setFieldName(value.field())
+                                .setFieldName(value)
                                 .build())
                         .collect(Collectors.toList()))
                 .order(ordering)
                 .size(limit);
     }
 
-    private TermsAggregationBuilder createScriptedTerms(List<? extends BucketSpec> buckets, List<BucketOrder> ordering, int limit) {
+    private TermsAggregationBuilder createScriptedTerms(List<String> buckets, List<BucketOrder> ordering, int limit) {
         return AggregationBuilders.terms(AGG_NAME)
                 .script(scriptForPivots(buckets))
                 .size(limit)
                 .order(ordering.isEmpty() ? List.of(BucketOrder.count(false)) : ordering);
     }
 
-    private Script scriptForPivots(Collection<? extends BucketSpec> pivots) {
+    private Script scriptForPivots(Collection<String> pivots) {
         final String scriptSource = Joiner.on(KEY_SEPARATOR_PHRASE).join(pivots.stream()
                 .map(bucket -> """
                         String.valueOf((doc.containsKey('%1$s') && doc['%1$s'].size() > 0) ? doc['%1$s'].value : "%2$s")
-                        """.formatted(bucket.field(), MissingBucketConstants.MISSING_BUCKET_NAME))
+                        """.formatted(bucket, MissingBucketConstants.MISSING_BUCKET_NAME))
                 .collect(Collectors.toList()));
         return new Script(scriptSource);
     }
 
     @Override
-    public Stream<PivotBucket> extractBuckets(Pivot pivot, List<BucketSpec> bucketSpecs, PivotBucket initialBucket) {
+    public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket initialBucket) {
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
         final Aggregation aggregation = previousBucket.getAggregations().get(AGG_NAME);
@@ -149,7 +140,7 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
         final MultiBucketsAggregation termsAggregation = filterAggregation.getBuckets().get(0).getAggregations().get(AGG_NAME);
         final Filters.Bucket otherBucket = filterAggregation.getBuckets().get(1);
 
-        final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderKeysFunction(bucketSpecs, pivot.sort());
+        final Function<List<String>, List<String>> reorderKeys = ValuesBucketOrdering.reorderFieldsFunction(bucketSpecs.fields(), pivot.sort());
         final Stream<PivotBucket> bucketStream = termsAggregation.getBuckets().stream()
                 .map(bucket -> {
                     final ImmutableList<String> keys = ImmutableList.<String>builder()
@@ -161,7 +152,13 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
                 });
 
         return otherBucket.getDocCount() > 0
-                ? Stream.concat(bucketStream, Stream.of(PivotBucket.create(MISSING_BUCKET_KEYS, otherBucket)))
+                ? Stream.concat(bucketStream, Stream.of(PivotBucket.create(
+                    ImmutableList.<String>builder()
+                            .addAll(previousKeys)
+                            .addAll(MISSING_BUCKET_KEYS)
+                            .build(),
+                    otherBucket
+                )))
                 : bucketStream;
     }
 

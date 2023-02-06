@@ -228,10 +228,10 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
             return 0;
         }
 
-        final ImmutableList.Builder<UserDeletedEvent> deletedUsers = ImmutableList.builder();
+        final ImmutableList.Builder<UserDeletedEvent> deletedUsersBuilder = ImmutableList.builder();
         result.forEach(userObject -> {
             final ObjectId userId = (ObjectId) userObject.get("_id");
-            deletedUsers.add(UserDeletedEvent.create(userId.toHexString(), username));
+            deletedUsersBuilder.add(UserDeletedEvent.create(userId.toHexString(), username));
         });
 
         LOG.debug("Deleting user(s) with username \"{}\"", username);
@@ -241,8 +241,9 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         if (deleteCount > 1) {
             LOG.warn("Removed {} users matching username \"{}\".", deleteCount, username);
         }
-        accesstokenService.deleteAllForUser(username);
-        deletedUsers.build().forEach(serverEventBus::post);
+        accesstokenService.deleteAllForUser(username); //TODO: probably should go through listener subscribing to delete event
+        final ImmutableList<UserDeletedEvent> deletedUsers = deletedUsersBuilder.build();
+        deletedUsers.forEach(serverEventBus::post);
         return deleteCount;
     }
 
@@ -255,7 +256,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         DBObject query = new BasicDBObject();
         query.put("_id", new ObjectId(userId));
         final int deleteCount = destroy(query, UserImpl.COLLECTION_NAME);
-        accesstokenService.deleteAllForUser(user.getName());
+        accesstokenService.deleteAllForUser(user.getName()); //TODO: probably should go through listener subscribing to delete event
         serverEventBus.post(UserDeletedEvent.create(userId, user.getName()));
         return deleteCount;
     }

@@ -54,12 +54,12 @@ type FormattedInterval = {
 
 type FormattedPivot = {
   type: string,
-  field: string,
+  fields: Array<string>,
   interval: FormattedInterval,
 };
 
 const formatPivot = (pivot: Pivot): FormattedPivot => {
-  const { type, field, config } = pivot;
+  const { type, fields, config } = pivot;
   const newConfig = { ...config } as unknown;
 
   switch (type) {
@@ -82,7 +82,7 @@ const formatPivot = (pivot: Pivot): FormattedPivot => {
 
   return {
     type,
-    field,
+    fields,
     ...(newConfig as { interval: FormattedInterval }),
   } as FormattedPivot;
 };
@@ -97,8 +97,6 @@ const generateConfig = (id: string, name: string, {
   columnPivots,
   series,
   sort,
-  rowLimit,
-  columnLimit,
 }: AggregationWidgetConfig) => ({
   id,
   name,
@@ -109,9 +107,7 @@ const generateConfig = (id: string, name: string, {
     row_groups: rowPivots.map(formatPivot),
     column_groups: columnPivots.map(formatPivot),
     series: series.map<FormattedSeries>((s) => ({ id: s.effectiveName, ...parseSeries(s.function) })),
-    sort: sort,
-    row_limit: rowLimit,
-    column_limit: columnLimit,
+    sort,
   },
 });
 

@@ -33,7 +33,7 @@ public abstract class ValueConfigDTO implements PivotConfigDTO {
     public static final String NAME = "values";
     static final String FIELD_LIMIT = "limit";
 
-    @JsonIgnore
+    @JsonProperty
     public abstract OptionalInt limit();
 
     public static ValueConfigDTO create() {

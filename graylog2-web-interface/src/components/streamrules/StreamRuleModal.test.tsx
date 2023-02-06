@@ -24,11 +24,11 @@ import { streamRuleTypes } from 'fixtures/streamRuleTypes';
 
 import StreamRuleModal from './StreamRuleModal';
 
-jest.mock('stores/inputs/InputsStore', () => ({
-  InputsActions: {
+jest.mock('stores/inputs/StreamRulesInputsStore', () => ({
+  StreamRulesInputsActions: {
     list: jest.fn(),
   },
-  InputsStore: MockStore(['getInitialState', () => ({
+  StreamRulesInputsStore: MockStore(['getInitialState', () => ({
     inputs: [
       { id: 'my-id', title: 'input title', name: 'name' },
     ],

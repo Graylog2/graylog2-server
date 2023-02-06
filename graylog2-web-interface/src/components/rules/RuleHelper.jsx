@@ -213,7 +213,6 @@ class RuleHelper extends React.Component {
                     <SearchForm onSearch={this._filterDescriptors}
                                 label="Filter rules"
                                 topMargin={0}
-                                searchButtonLabel="Filter"
                                 onReset={this._onFilterReset} />
                     <div className={`table-responsive ${RuleHelperStyle.marginTab}`}>
                       <PaginatedList totalItems={ruleDescriptors.length}
