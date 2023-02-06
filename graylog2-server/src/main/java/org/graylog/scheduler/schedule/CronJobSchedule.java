@@ -25,7 +25,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.clock.JobSchedulerClock;
@@ -33,7 +32,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Null;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -79,7 +77,7 @@ public abstract class CronJobSchedule implements JobSchedule {
     private ZonedDateTime getZonedDateTime(JobSchedulerClock clock) {
         final DateTime now = clock.nowUTC();
         Instant instant = Instant.ofEpochMilli(now.getMillis());
-        ZoneId zoneId = ZoneId.of(timezone().orElse(DEFAULT_TIMEZONE));
+        ZoneId zoneId = ZoneId.of(timezone().orElse(DEFAULT_TIMEZONE), ZoneId.SHORT_IDS);
         return ZonedDateTime.ofInstant(instant, zoneId);
     }
 
