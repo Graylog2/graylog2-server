@@ -19,9 +19,8 @@ import { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
-import { getValueFromInput } from 'util/FormsUtils';
-import { Input } from 'components/bootstrap';
 import useMaxIndexRotationLimit from 'hooks/useMaxIndexRotationLimit';
+import RangeInput from 'components/common/RangeInput';
 
 export type TimeBasedSizeOptimizingStrategyConfig = {
   index_lifetime_max: string,
@@ -38,92 +37,51 @@ export const durationToRoundedDays = (duration: string) => {
   return Math.round(moment.duration(duration).asDays());
 };
 
-const _validationLimit = (durationInDays, rotationLimit) => {
-  return durationInDays <= durationToRoundedDays(rotationLimit);
+const getRangeInDays = (indexLifeTimeMin = 'PT1H', IndexLifeTimeMax = 'P2D') => {
+  return [durationToRoundedDays(indexLifeTimeMin), durationToRoundedDays(IndexLifeTimeMax)];
 };
 
 const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime_max, index_lifetime_min }, updateConfig }: Props) => {
-  const [indexLifetimeMax, setIndexLifetimeMax] = useState(index_lifetime_max);
-  const [indexLifetimeMin, setIndexLifetimeMin] = useState(index_lifetime_min);
-  const minLifetimeAsDays = durationToRoundedDays(indexLifetimeMin);
-  const maxLifetimeAsDays = durationToRoundedDays(indexLifetimeMax);
+  const [indexLifetimeRange, setIndexLifetimeRange] = useState(getRangeInDays(index_lifetime_min, index_lifetime_max));
+
   const maxRotationPeriod = useMaxIndexRotationLimit();
-  const isMinGreaterThanMax = useCallback(() => minLifetimeAsDays > maxLifetimeAsDays, [maxLifetimeAsDays, minLifetimeAsDays]);
 
-  const _isValidPeriod = useCallback((duration: string) => {
-    const checkInDays = durationToRoundedDays(duration);
+  const _isValidRange = useCallback((range: Array<number>) => {
+    return range[0] !== range[1];
+  }, []);
 
-    return checkInDays >= 1 && (
-      maxRotationPeriod ? _validationLimit(checkInDays, maxRotationPeriod) : true
-    );
-  }, [maxRotationPeriod]);
-
-  const formatDuration = useCallback((duration: string) => {
-    const maxRotationPeriodErrorMessage = maxRotationPeriod ? ` and max ${durationToRoundedDays(maxRotationPeriod)} days` : '';
-
-    return _isValidPeriod(duration) ? `${durationToRoundedDays(duration)} days` : `invalid (min 1 day${maxRotationPeriodErrorMessage})`;
-  }, [_isValidPeriod, maxRotationPeriod]);
-
-  const getHardlifetimeHelp = useCallback(() => {
-    return isMinGreaterThanMax()
-      ? `Minimum lifetime ${minLifetimeAsDays} cannot be greater than the maximum ${maxLifetimeAsDays}`
-      : 'The maximum time that data is available for searches. At least 1 day more than the minimum above. (i.e. "P10D" for 10 day).';
-  }, [isMinGreaterThanMax, maxLifetimeAsDays, minLifetimeAsDays]);
-
-  const onLifetimeMinChange = (event: React.ChangeEvent<HTMLOptionElement>): void => {
-    const inputValue = getValueFromInput(event.target);
-
-    setIndexLifetimeMin(inputValue);
-
-    if (_isValidPeriod(inputValue)) {
-      updateConfig({ index_lifetime_max: indexLifetimeMax, index_lifetime_min: inputValue });
-    }
-  };
-
-  const onLifetimeMaxChange = (event: React.ChangeEvent<HTMLOptionElement>): void => {
-    const inputValue = getValueFromInput(event.target);
-
-    setIndexLifetimeMax(inputValue);
-
-    if (_isValidPeriod(inputValue)) {
-      updateConfig({ index_lifetime_min: indexLifetimeMin, index_lifetime_max: inputValue });
-    }
-  };
-
-  const validationState = (duration: string) => {
-    if (_isValidPeriod(duration) && !isMinGreaterThanMax()) {
+  const validationState = (range: Array<number>): null | 'error' => {
+    if (_isValidRange(range)) {
       return null;
     }
 
     return 'error';
   };
 
+  const errorMessage = 'There should be at least 1 days beteween minimum and maximum Lifetime.';
+
+  const onRangeChange = (range: Array<number>) => {
+    setIndexLifetimeRange(range);
+
+    if (_isValidRange(range)) {
+      updateConfig({ index_lifetime_min: moment.duration(range[0], 'days').toISOString(), index_lifetime_max: moment.duration(range[1], 'days').toISOString() });
+    }
+  };
+
   const maxRotationPeriodHelpText = maxRotationPeriod ? ` The max rotation period is set to ${durationToRoundedDays(maxRotationPeriod)} by Administrator.` : '';
 
   return (
     <div>
-      <Input id="rotation-index-lifetime-soft"
-             type="text"
-             labelClassName="col-sm-3"
-             wrapperClassName="col-sm-9"
-             label="Minimum lifetime (ISO8601 Duration)"
-             onChange={onLifetimeMinChange}
-             value={indexLifetimeMin}
-             help={`The minimum time data in the is index kept before it is rotated. (i.e. "P1D" for 1 day).${maxRotationPeriodHelpText}`}
-             addonAfter={formatDuration(indexLifetimeMin)}
-             bsStyle={validationState(indexLifetimeMin)}
-             required />
-      <Input id="rotation-index-lifetime-hard"
-             type="text"
-             labelClassName="col-sm-3"
-             wrapperClassName="col-sm-9"
-             label="Maximum lifetime (ISO8601 Duration)"
-             onChange={onLifetimeMaxChange}
-             value={indexLifetimeMax}
-             help={`${getHardlifetimeHelp()} ${maxRotationPeriodHelpText}`}
-             addonAfter={formatDuration(indexLifetimeMax)}
-             bsStyle={validationState(indexLifetimeMax)}
-             required />
+      <RangeInput label="Lifetime Range"
+                  labelClassName="col-sm-3"
+                  wrapperClassName="col-sm-9"
+                  value={indexLifetimeRange}
+                  help={_isValidRange(indexLifetimeRange) ? `The range of minimum and maximum time data is index kept before it is rotated. (i.e. "P1D" for 1 day).${maxRotationPeriodHelpText}` : errorMessage}
+                  min={1}
+                  step={1}
+                  bsStyle={validationState(indexLifetimeRange)}
+                  max={durationToRoundedDays(maxRotationPeriod) || 365}
+                  onAfterChange={(value) => onRangeChange(value)} />
     </div>
   );
 };

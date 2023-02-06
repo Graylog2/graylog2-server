@@ -23,8 +23,8 @@ import type { TimeBasedSizeOptimizingStrategyConfig } from './TimeBasedSizeOptim
 import { durationToRoundedDays } from './TimeBasedSizeOptimizingStrategyConfiguration';
 
 const TimeBasedSizeOptimizingStrategySummary = ({ config: { index_lifetime_max, index_lifetime_min } }: {config: TimeBasedSizeOptimizingStrategyConfig}) => {
-  const minLifetimeAsDays = durationToRoundedDays(index_lifetime_max);
-  const maxLifetimeAsDays = durationToRoundedDays(index_lifetime_min);
+  const minLifetimeAsDays = durationToRoundedDays(index_lifetime_min);
+  const maxLifetimeAsDays = durationToRoundedDays(index_lifetime_max);
 
   return (
     <div>
