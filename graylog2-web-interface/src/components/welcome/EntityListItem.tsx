@@ -16,7 +16,8 @@
  */
 
 import React, { useMemo } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
 
 import { Link } from 'components/common/router';
 import { ListGroupItem, Label } from 'components/bootstrap';
@@ -26,6 +27,7 @@ import getShowRouteForEntity from 'routing/getShowRouteForEntity';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
 import getPermissionPrefixByType from 'util/getPermissionPrefixByType';
+import { RelativeTime } from 'components/common';
 
 const StyledListGroupItem = styled(ListGroupItem)`
   display: flex;
@@ -39,13 +41,18 @@ export const StyledLabel = styled(Label)`
   display: block;
 `;
 
+const LastOpenedTime = styled.i(({ theme }: { theme: DefaultTheme }) => css`
+  color: ${theme.colors.gray[60]};
+`);
+
 type Props = {
   id: string,
   title: string,
   type: EntityItemType,
+  timestamp?: string,
 }
 
-const EntityItem = ({ type, title, id }: Props) => {
+const EntityItem = ({ type, title, id, timestamp }: Props) => {
   const { permissions } = useCurrentUser();
   const entityTypeTitle = useMemo(() => getTitleForEntityType(type, false) ?? 'unknown', [type]);
   const entityLink = useMemo(() => {
@@ -64,8 +71,13 @@ const EntityItem = ({ type, title, id }: Props) => {
       {!showLink
         ? <i>{entityTitle}</i>
         : <Link target="_blank" to={entityLink}>{entityTitle}</Link>}
+      {timestamp ? <LastOpenedTime><RelativeTime dateTime={timestamp} /></LastOpenedTime> : null}
     </StyledListGroupItem>
   );
+};
+
+EntityItem.defaultProps = {
+  timestamp: undefined,
 };
 
 export default EntityItem;
