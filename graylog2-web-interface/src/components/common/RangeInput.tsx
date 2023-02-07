@@ -23,6 +23,7 @@ import type { DefaultTheme } from 'styled-components';
 import { Input } from 'components/bootstrap';
 
 type Props = {
+  id: string,
   label?: string,
   help?: string | React.ReactElement,
   error?: string,
@@ -61,6 +62,7 @@ const StyledTrack = styled.div(({ theme }: { theme: DefaultTheme }) => css`
 const Track = (props, state) => <StyledTrack {...props} index={state.index} />;
 
 const RangeInput = ({
+  id,
   label,
   help,
   error,
@@ -71,6 +73,7 @@ const RangeInput = ({
 }: Props) => {
   return (
     <Input labelClassName={labelClassName}
+           id={id}
            wrapperClassName={wrapperClassName}
            help={help}
            bsStyle={bsStyle}
