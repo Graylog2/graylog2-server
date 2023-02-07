@@ -44,8 +44,13 @@ import org.mongojack.DBQuery;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
@@ -854,5 +859,50 @@ public class DBJobTriggerServiceTest {
                 .build());
         assertThat(dbJobTriggerService.nextRunnableTrigger()).isEmpty();
         dbJobTriggerService.deleteByQuery(DBQuery.empty());
+    }
+
+    @Test
+    public void parallelTrigger() throws InterruptedException {
+        AtomicInteger gotRunnableTrigger = new AtomicInteger(0);
+
+        final JobTriggerDto trigger1 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
+                .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
+                .schedule(IntervalJobSchedule.builder()
+                        .interval(1)
+                        .unit(TimeUnit.SECONDS)
+                        .build())
+                .build());
+        final JobTriggerDto trigger2 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
+                .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
+                .schedule(IntervalJobSchedule.builder()
+                        .interval(1)
+                        .unit(TimeUnit.SECONDS)
+                        .build())
+                .build());
+        final JobTriggerUpdate update = JobTriggerUpdate.withNextTime(clock.nowUTC());
+
+        int numberOfThreads = 10;
+        ExecutorService service = Executors.newFixedThreadPool(10);
+        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        for (int i = 0; i < numberOfThreads; i++) {
+            service.execute(() -> {
+
+                // Lock the trigger
+                final Optional<JobTriggerDto> trigger = dbJobTriggerService.nextRunnableTrigger();
+                if (trigger.isPresent()) {
+                    gotRunnableTrigger.addAndGet(1);
+                    assertThat(dbJobTriggerService.releaseTrigger(trigger.get(), update)).isTrue();
+                }
+
+                latch.countDown();
+            });
+        }
+        latch.await();
+
+        System.out.printf("Mongo Logs\n%s", mongodb.getLogs());
+        assertThat(gotRunnableTrigger).hasValue(10);
+
     }
 }

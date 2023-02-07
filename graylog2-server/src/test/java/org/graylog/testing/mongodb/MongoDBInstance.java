@@ -128,6 +128,9 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
             fixtureImporter.importResources(service.mongoDatabase());
         }
     }
+    public String getLogs() {
+        return service.getLogs();
+    }
 
     @Override
     protected void before() {

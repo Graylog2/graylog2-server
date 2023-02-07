@@ -97,10 +97,15 @@ public class MongoDBTestService implements AutoCloseable {
 
         final MongoDbConfiguration mongoConfiguration = new MongoDbConfiguration();
         mongoConfiguration.setUri(uri());
+        container.getLogs();
 
         this.mongoConnection = new MongoConnectionImpl(mongoConfiguration);
         this.mongoConnection.connect();
         this.mongoConnection.getMongoDatabase().drop();
+    }
+
+    public String getLogs() {
+        return container.getLogs();
     }
 
     /**
