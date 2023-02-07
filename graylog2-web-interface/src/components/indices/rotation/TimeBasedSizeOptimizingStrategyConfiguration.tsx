@@ -68,7 +68,7 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime
     return 'error';
   };
 
-  const errorMessage = 'There should be at least 1 days beteween minimum and maximum Lifetime.';
+  const errorMessage = 'There needs to be at least 1 day between the minimum and maximum lifetime.';
 
   const addYearToMaxrange = (currentMax: number, currentSelectedMax) => {
     if (!maxRotationPeriod && currentMax === currentSelectedMax) {
@@ -89,12 +89,12 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime
 
   return (
     <div>
-      <RangeInput label="Lifetime Range"
+      <RangeInput label="Lifetime in days"
                   id="lifetime-range"
                   labelClassName="col-sm-3"
                   wrapperClassName="col-sm-9"
                   value={indexLifetimeRange}
-                  help={_isValidRange(indexLifetimeRange) ? `The range of minimum and maximum time data is index kept before it is rotated. (i.e. "P1D" for 1 day).${maxRotationPeriodHelpText}` : errorMessage}
+                  help={_isValidRange(indexLifetimeRange) ? `The minimum / maximum number of days the data in this index is kept before it is retained. ${maxRotationPeriodHelpText}` : errorMessage}
                   min={1}
                   step={1}
                   bsStyle={validationState(indexLifetimeRange)}

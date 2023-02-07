@@ -124,6 +124,12 @@ const IndexMaintenanceStrategiesConfiguration = ({
   const shouldShowMaxRetentionWarning = maxRetentionPeriod && rotationStrategyClass === TIME_BASED_ROTATION_STRATEGY && retentionIsNotNoop;
   const isTimeBasedSizeOptimizing = rotationStrategyClass === TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY;
   const shouldShowTimeBasedSizeOptimizing = isTimeBasedSizeOptimizing && name === 'retention';
+  const helpText = isTimeBasedSizeOptimizing && name === 'rotation' ?
+    'The Time Based Size Optimizing Rotation Strategy tries to rotate the index daily.' +
+    ' It can however skip the rotation to achieve optimal sized indices by keeping the shard size between 20 and 50 GB.' +
+    ' The optimization can delay the rotation within the range of the configured retention min/max lifetime.' +
+    ' If an index is older than the range between min/max, it will be rotated regardless of its current size.'
+    : null;
 
   const _onSelect = (selectedStrategy) => {
     if (!selectedStrategy || selectedStrategy.length < 1) {
@@ -185,10 +191,23 @@ const IndexMaintenanceStrategiesConfiguration = ({
     return null;
   }
 
+  function getHelpText() {
+    if (helpText) {
+      return (
+        <StyledAlert>
+          <Icon name="info-circle" />{' '} {helpText}
+        </StyledAlert>
+      );
+    }
+
+    return null;
+  }
+
   return (
     <span>
       <StyledH3>{title}</StyledH3>
       {getDescription()}
+      {getHelpText()}
       {shouldShowMaxRetentionWarning && (
         <StyledAlert bsStyle="warning">
           <Icon name="exclamation-triangle" />{' '} The effective retention period value calculated from the
