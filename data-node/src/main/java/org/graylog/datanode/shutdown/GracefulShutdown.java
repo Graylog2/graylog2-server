@@ -16,7 +16,7 @@
  */
 package org.graylog.datanode.shutdown;
 
-import org.graylog.datanode.DataNodeConfiguration;
+import org.graylog.datanode.Configuration;
 import org.graylog.datanode.initializers.JerseyService;
 import org.graylog.datanode.initializers.PeriodicalsService;
 import org.graylog2.plugin.ServerStatus;
@@ -33,7 +33,7 @@ import javax.inject.Singleton;
 public class GracefulShutdown implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(GracefulShutdown.class);
 
-    private final DataNodeConfiguration configuration;
+    private final Configuration configuration;
     private final ServerStatus serverStatus;
     private final ActivityWriter activityWriter;
     private final PeriodicalsService periodicalsService;
@@ -43,7 +43,7 @@ public class GracefulShutdown implements Runnable {
     @Inject
     public GracefulShutdown(ServerStatus serverStatus,
                             ActivityWriter activityWriter,
-                            DataNodeConfiguration configuration,
+                            Configuration configuration,
                             PeriodicalsService periodicalsService,
                             JerseyService jerseyService,
                             GracefulShutdownService gracefulShutdownService) {

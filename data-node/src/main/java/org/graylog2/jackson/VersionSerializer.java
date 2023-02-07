@@ -14,23 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bindings;
+package org.graylog2.jackson;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
-import org.graylog.datanode.Configuration;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.github.zafarkhaja.semver.Version;
 
-import static java.util.Objects.requireNonNull;
+import java.io.IOException;
 
-public class ConfigurationModule implements Module {
-    private final Configuration configuration;
-
-    public ConfigurationModule(Configuration configuration) {
-        this.configuration = requireNonNull(configuration);
+public class VersionSerializer extends StdSerializer<Version> {
+    public VersionSerializer() {
+        super(Version.class);
     }
 
     @Override
-    public void configure(Binder binder) {
-        binder.bind(Configuration.class).toInstance(configuration);
+    public void serialize(final Version value, final JsonGenerator gen, final SerializerProvider provider) throws IOException {
+        final String version = value.toString();
+        gen.writeString(version);
     }
 }

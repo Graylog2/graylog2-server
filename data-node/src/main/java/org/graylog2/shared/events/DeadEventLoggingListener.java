@@ -14,23 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bindings;
+package org.graylog2.shared.events;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
-import org.graylog.datanode.Configuration;
+import com.google.common.eventbus.DeadEvent;
+import com.google.common.eventbus.Subscribe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static java.util.Objects.requireNonNull;
+public class DeadEventLoggingListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeadEventLoggingListener.class);
 
-public class ConfigurationModule implements Module {
-    private final Configuration configuration;
-
-    public ConfigurationModule(Configuration configuration) {
-        this.configuration = requireNonNull(configuration);
-    }
-
-    @Override
-    public void configure(Binder binder) {
-        binder.bind(Configuration.class).toInstance(configuration);
+    @Subscribe
+    public void handleDeadEvent(DeadEvent event) {
+        LOGGER.debug("Received unhandled event of type <{}> from event bus <{}>", event.getEvent().getClass().getCanonicalName(),
+                event.getSource().toString());
+        LOGGER.debug("Dead event contents: {}", event.getEvent());
     }
 }

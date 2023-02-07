@@ -14,23 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bindings;
+package org.graylog2.plugin.system;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
-import org.graylog.datanode.Configuration;
-
-import static java.util.Objects.requireNonNull;
-
-public class ConfigurationModule implements Module {
-    private final Configuration configuration;
-
-    public ConfigurationModule(Configuration configuration) {
-        this.configuration = requireNonNull(configuration);
+/**
+ * Created by dennis on 11/12/14.
+ */
+public class NodeIdPersistenceException extends RuntimeException {
+    public NodeIdPersistenceException() {
+        super();
     }
 
-    @Override
-    public void configure(Binder binder) {
-        binder.bind(Configuration.class).toInstance(configuration);
+    public NodeIdPersistenceException(String message) {
+        super(message);
+    }
+
+    public NodeIdPersistenceException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public NodeIdPersistenceException(Throwable cause) {
+        super(cause);
     }
 }

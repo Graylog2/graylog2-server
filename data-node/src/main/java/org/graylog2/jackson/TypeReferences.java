@@ -14,23 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bindings;
+package org.graylog2.jackson;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
-import org.graylog.datanode.Configuration;
+import com.fasterxml.jackson.core.type.TypeReference;
 
-import static java.util.Objects.requireNonNull;
+import java.util.Map;
 
-public class ConfigurationModule implements Module {
-    private final Configuration configuration;
-
-    public ConfigurationModule(Configuration configuration) {
-        this.configuration = requireNonNull(configuration);
-    }
-
-    @Override
-    public void configure(Binder binder) {
-        binder.bind(Configuration.class).toInstance(configuration);
-    }
+public interface TypeReferences {
+    TypeReference<Map<Object, Object>> MAP_OBJECT_OBJECT = new TypeReference<Map<Object, Object>>() {
+    };
+    TypeReference<Map<String, Object>> MAP_STRING_OBJECT = new TypeReference<Map<String, Object>>() {
+    };
+    TypeReference<Map<String, String>> MAP_STRING_STRING = new TypeReference<Map<String, String>>() {
+    };
 }

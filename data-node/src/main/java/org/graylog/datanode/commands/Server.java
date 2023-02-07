@@ -24,7 +24,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
-import org.graylog.datanode.DataNodeConfiguration;
+import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bindings.ConfigurationModule;
 import org.graylog.datanode.bindings.ObjectMapperModule;
 import org.graylog.datanode.bindings.PeriodicalBindings;
@@ -33,6 +33,7 @@ import org.graylog.datanode.bootstrap.Main;
 import org.graylog.datanode.bootstrap.ServerBootstrap;
 import org.graylog.datanode.rest.RestBindings;
 import org.graylog.datanode.shutdown.GracefulShutdown;
+import org.graylog2.bindings.MongoDBModule;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
@@ -56,7 +57,7 @@ import java.util.Set;
 public class Server extends ServerBootstrap {
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
-    protected static final DataNodeConfiguration configuration = new DataNodeConfiguration();
+    protected static final Configuration configuration = new Configuration();
     private final HttpConfiguration httpConfiguration = new HttpConfiguration();
     private final MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
  //   private final VersionCheckConfiguration versionCheckConfiguration = new VersionCheckConfiguration();
@@ -84,7 +85,7 @@ public class Server extends ServerBootstrap {
         modules.add(
  //               new VersionAwareStorageModule(),
                 new ConfigurationModule(configuration),
- //               new MongoDBModule(),
+                new MongoDBModule(),
                 new ServerBindings(configuration, isMigrationCommand()),
                 new RestBindings(),
                 new PeriodicalBindings(),

@@ -14,23 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bindings;
+package org.graylog2.jackson;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
-import org.graylog.datanode.Configuration;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.KeyDeserializer;
+import org.joda.time.format.ISOPeriodFormat;
 
-import static java.util.Objects.requireNonNull;
+import java.io.IOException;
 
-public class ConfigurationModule implements Module {
-    private final Configuration configuration;
-
-    public ConfigurationModule(Configuration configuration) {
-        this.configuration = requireNonNull(configuration);
-    }
-
+public class JodaTimePeriodKeyDeserializer extends KeyDeserializer {
     @Override
-    public void configure(Binder binder) {
-        binder.bind(Configuration.class).toInstance(configuration);
+    public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
+        if (key.length() == 0) {
+            return null;
+        }
+        return ISOPeriodFormat.standard().parsePeriod(key);
     }
 }

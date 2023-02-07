@@ -14,23 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bindings;
+package org.graylog2.plugin.cluster;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
-import org.graylog.datanode.Configuration;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
-import static java.util.Objects.requireNonNull;
+@JsonAutoDetect
+@AutoValue
+@WithBeanGetter
+public abstract class ClusterId {
+    @JsonProperty
+    public abstract String clusterId();
 
-public class ConfigurationModule implements Module {
-    private final Configuration configuration;
-
-    public ConfigurationModule(Configuration configuration) {
-        this.configuration = requireNonNull(configuration);
-    }
-
-    @Override
-    public void configure(Binder binder) {
-        binder.bind(Configuration.class).toInstance(configuration);
+    @JsonCreator
+    public static ClusterId create(@JsonProperty("cluster_id") String clusterId) {
+        return new AutoValue_ClusterId(clusterId);
     }
 }

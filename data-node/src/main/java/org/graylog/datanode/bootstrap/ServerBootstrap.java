@@ -26,7 +26,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.ProvisionException;
-import org.graylog.datanode.DataNodeConfiguration;
+import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bindings.ConfigurationModule;
 import org.graylog.datanode.bindings.GenericBindings;
 import org.graylog.datanode.bindings.GenericInitializerBindings;
@@ -69,7 +69,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
     private boolean isFreshInstallation;
 
-    protected ServerBootstrap(String commandName, DataNodeConfiguration configuration) {
+    protected ServerBootstrap(String commandName, Configuration configuration) {
         super(commandName, configuration);
         this.commandName = commandName;
     }

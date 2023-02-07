@@ -14,23 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bindings;
+package org.graylog.datanode.configuration;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
-import org.graylog.datanode.Configuration;
+import com.github.joschi.jadconfig.Parameter;
 
-import static java.util.Objects.requireNonNull;
+public class BaseConfiguration extends PathConfiguration {
+    @Parameter(value = "async_eventbus_processors")
+    private int asyncEventbusProcessors = 2;
 
-public class ConfigurationModule implements Module {
-    private final Configuration configuration;
-
-    public ConfigurationModule(Configuration configuration) {
-        this.configuration = requireNonNull(configuration);
+    public int getAsyncEventbusProcessors() {
+        return asyncEventbusProcessors;
     }
 
-    @Override
-    public void configure(Binder binder) {
-        binder.bind(Configuration.class).toInstance(configuration);
-    }
 }

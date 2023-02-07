@@ -14,23 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bindings;
+package org.graylog2.bindings;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
-import org.graylog.datanode.Configuration;
+import com.google.inject.AbstractModule;
+import org.graylog2.bindings.providers.MongoConnectionProvider;
+import org.graylog2.database.MongoConnection;
 
-import static java.util.Objects.requireNonNull;
-
-public class ConfigurationModule implements Module {
-    private final Configuration configuration;
-
-    public ConfigurationModule(Configuration configuration) {
-        this.configuration = requireNonNull(configuration);
-    }
-
+public class MongoDBModule extends AbstractModule {
     @Override
-    public void configure(Binder binder) {
-        binder.bind(Configuration.class).toInstance(configuration);
+    protected void configure() {
+        bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
     }
 }

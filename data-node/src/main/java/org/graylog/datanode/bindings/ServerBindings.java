@@ -17,8 +17,13 @@
 package org.graylog.datanode.bindings;
 
 import com.google.inject.multibindings.Multibinder;
-import org.graylog.datanode.DataNodeConfiguration;
+import com.google.inject.multibindings.OptionalBinder;
+import org.graylog.datanode.Configuration;
 import org.graylog.datanode.shared.system.activities.DataNodeActivityWriter;
+import org.graylog2.bindings.providers.ClusterEventBusProvider;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.plugin.cluster.ClusterIdFactory;
+import org.graylog2.plugin.cluster.RandomUUIDClusterIdFactory;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.shared.system.activities.ActivityWriter;
 
@@ -26,10 +31,10 @@ import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
 
 public class ServerBindings extends Graylog2Module {
-    private final DataNodeConfiguration configuration;
+    private final Configuration configuration;
     private final boolean isMigrationCommand;
 
-    public ServerBindings(DataNodeConfiguration configuration, boolean isMigrationCommand) {
+    public ServerBindings(Configuration configuration, boolean isMigrationCommand) {
 
         this.configuration = configuration;
         this.isMigrationCommand = isMigrationCommand;
@@ -50,6 +55,7 @@ public class ServerBindings extends Graylog2Module {
     }
 
     private void bindProviders() {
+        bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
     }
 
     private void bindFactoryModules() {
@@ -61,6 +67,7 @@ public class ServerBindings extends Graylog2Module {
 
     private void bindInterfaces() {
         bind(ActivityWriter.class).to(DataNodeActivityWriter.class);
+        OptionalBinder.newOptionalBinder(binder(), ClusterIdFactory.class).setDefault().to(RandomUUIDClusterIdFactory.class);
     }
 
     private void bindDynamicFeatures() {

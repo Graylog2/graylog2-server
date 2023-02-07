@@ -305,7 +305,15 @@
 
         <dependency>
             <groupId>com.google.auto.value</groupId>
+            <artifactId>auto-value-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.auto.value</groupId>
             <artifactId>auto-value</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog.autovalue</groupId>
+            <artifactId>auto-value-javabean</artifactId>
         </dependency>
 
         <dependency>
@@ -320,6 +328,15 @@
             <version>${joda-time.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.cryptomator</groupId>
+            <artifactId>siv-mode</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-core</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.graylog.shaded</groupId>

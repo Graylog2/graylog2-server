@@ -50,7 +50,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.graylog.datanode.DataNodeConfiguration;
+import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bootstrap.commands.MigrateCmd;
 import org.graylog.datanode.configuration.PathConfiguration;
 import org.graylog2.bootstrap.CliCommand;
@@ -101,7 +101,7 @@ public abstract class CmdLineTool implements CliCommand {
     protected static final String TMPDIR = System.getProperty("java.io.tmpdir", "/tmp");
 
     protected final JadConfig jadConfig;
-    protected final DataNodeConfiguration configuration;
+    protected final Configuration configuration;
     protected final ChainingClassLoader chainingClassLoader;
 
     @Option(name = "--dump-config", description = "Show the effective Graylog DataNode configuration and exit")
@@ -125,11 +125,11 @@ public abstract class CmdLineTool implements CliCommand {
     protected Injector coreConfigInjector;
     protected FeatureFlags featureFlags;
 
-    protected CmdLineTool(DataNodeConfiguration configuration) {
+    protected CmdLineTool(Configuration configuration) {
         this(null, configuration);
     }
 
-    protected CmdLineTool(String commandName, DataNodeConfiguration configuration) {
+    protected CmdLineTool(String commandName, Configuration configuration) {
         jadConfig = new JadConfig();
         jadConfig.addConverterFactory(new GuavaConverterFactory());
         jadConfig.addConverterFactory(new JodaTimeConverterFactory());

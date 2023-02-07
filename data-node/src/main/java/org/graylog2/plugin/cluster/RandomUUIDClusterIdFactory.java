@@ -14,23 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bindings;
+package org.graylog2.plugin.cluster;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
-import org.graylog.datanode.Configuration;
+import java.util.UUID;
 
-import static java.util.Objects.requireNonNull;
-
-public class ConfigurationModule implements Module {
-    private final Configuration configuration;
-
-    public ConfigurationModule(Configuration configuration) {
-        this.configuration = requireNonNull(configuration);
-    }
-
+public class RandomUUIDClusterIdFactory implements ClusterIdFactory {
     @Override
-    public void configure(Binder binder) {
-        binder.bind(Configuration.class).toInstance(configuration);
+    public ClusterId create() {
+        return ClusterId.create(UUID.randomUUID().toString());
     }
 }

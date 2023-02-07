@@ -35,7 +35,7 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
-import org.graylog.datanode.DataNodeConfiguration;
+import org.graylog.datanode.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.inject.Graylog2Module;
@@ -71,7 +71,7 @@ public class JerseyService extends AbstractIdleService {
     private static final String RESOURCE_PACKAGE_WEB = "org.graylog2.web.resources";
 
     private final HttpConfiguration configuration;
-    private final DataNodeConfiguration graylogConfiguration;
+    private final Configuration graylogConfiguration;
     private final Set<Class<?>> systemRestResources;
 //    private final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources;
 
@@ -88,7 +88,7 @@ public class JerseyService extends AbstractIdleService {
 
     @Inject
     public JerseyService(final HttpConfiguration configuration,
-                         DataNodeConfiguration graylogConfiguration,
+                         Configuration graylogConfiguration,
                          Set<Class<? extends DynamicFeature>> dynamicFeatures,
 //                         Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
                          Set<Class<? extends ExceptionMapper>> exceptionMappers,
