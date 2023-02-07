@@ -199,7 +199,7 @@ const IndexSetsDefaultsConfig = ({ initialConfig, updateConfig }: Props) => {
                                        hideCheckbox
                                        units={TIME_UNITS} />
                         <IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
-                                                                 key="rotation"
+                                                                 name="rotation"
                                                                  selectPlaceholder="Select rotation strategy"
                                                                  pluginExports={PluginStore.exports('indexRotationConfig')}
                                                                  strategies={rotationStrategies.strategies}
@@ -207,7 +207,7 @@ const IndexSetsDefaultsConfig = ({ initialConfig, updateConfig }: Props) => {
                                                                  getState={getRotationConfigState} />
 
                         <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
-                                                                 key="retention"
+                                                                 name="retention"
                                                                  selectPlaceholder="Select rotation strategy"
                                                                  pluginExports={PluginStore.exports('indexRetentionConfig')}
                                                                  strategies={retentionStrategies.strategies}
