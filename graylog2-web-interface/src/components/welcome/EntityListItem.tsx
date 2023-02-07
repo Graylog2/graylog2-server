@@ -70,7 +70,7 @@ const EntityItem = ({ type, title, id, timestamp }: Props) => {
       <StyledLabel bsStyle="info">{entityTypeTitle}</StyledLabel>
       {!showLink
         ? <i>{entityTitle}</i>
-        : <Link target="_blank" to={entityLink}>{entityTitle}</Link>}
+        : <Link to={entityLink}>{entityTitle}</Link>}
       {timestamp ? <LastOpenedTime><RelativeTime dateTime={timestamp} /></LastOpenedTime> : null}
     </StyledListGroupItem>
   );
