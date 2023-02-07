@@ -16,10 +16,15 @@
  */
 package org.graylog2.inputs;
 
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.security.encryption.EncryptedValue;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Utility functions to deal with input configuration that contains encrypted values.
@@ -46,6 +51,19 @@ public class EncryptedInputConfigs {
             }
         });
         return merged;
+    }
+
+    /**
+     * Returns the names of those fields in an input configuration that are expected to hold {@link EncryptedValue}s.
+     */
+    public static Set<String> getEncryptedFields(@Nonnull MessageInput.Config messageInputConfig) {
+        return messageInputConfig.combinedRequestedConfiguration()
+                .getFields()
+                .values()
+                .stream()
+                .filter(ConfigurationField::isEncrypted)
+                .map(ConfigurationField::getName)
+                .collect(Collectors.toSet());
     }
 
     private static EncryptedValue mergeEncryptedValues(EncryptedValue origValue, EncryptedValue newValue) {

@@ -21,8 +21,8 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.BeanDeserializer;
+import org.graylog2.inputs.EncryptedInputConfigs;
 import org.graylog2.inputs.WithInputConfiguration;
-import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.security.encryption.EncryptedValue;
 
@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Custom {@link BeanDeserializer} for input configuration values with transparent {@link EncryptedValue} handling.
@@ -76,13 +75,8 @@ public class InputConfigurationDeserializer extends BeanDeserializer {
     }
 
     private Set<String> getEncryptedFields(String type) {
-        return inputFieldConfigProvider.getConfig(type).map(config -> config.combinedRequestedConfiguration()
-                        .getFields()
-                        .values()
-                        .stream()
-                        .filter(ConfigurationField::isEncrypted)
-                        .map(ConfigurationField::getName)
-                        .collect(Collectors.toSet()))
+        return inputFieldConfigProvider.getConfig(type)
+                .map(EncryptedInputConfigs::getEncryptedFields)
                 .orElse(Set.of());
     }
 

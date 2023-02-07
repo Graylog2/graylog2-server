@@ -42,7 +42,6 @@ import org.graylog2.inputs.extractors.events.ExtractorDeleted;
 import org.graylog2.inputs.extractors.events.ExtractorUpdated;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
@@ -523,13 +522,8 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     }
 
     private Set<String> getEncryptedFields(String type) {
-        return messageInputFactory.getConfig(type).map(config -> config.combinedRequestedConfiguration()
-                        .getFields()
-                        .values()
-                        .stream()
-                        .filter(ConfigurationField::isEncrypted)
-                        .map(ConfigurationField::getName)
-                        .collect(Collectors.toSet()))
+        return messageInputFactory.getConfig(type)
+                .map(EncryptedInputConfigs::getEncryptedFields)
                 .orElse(Set.of());
     }
 
