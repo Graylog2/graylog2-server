@@ -46,7 +46,7 @@ const usePaginationQueryParameter = (PAGE_SIZES: number[] = DEFAULT_PAGE_SIZES, 
   };
 
   const resetPage = () => {
-    setPagination({ page: DEFAULT_PAGE, pageSize: Number(pageSizeQueryParameter) });
+    setPagination({ page: DEFAULT_PAGE });
   };
 
   return { page, resetPage, pageSize, setPagination };
