@@ -73,6 +73,7 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime
   return (
     <div>
       <RangeInput label="Lifetime Range"
+                  id="lifetime-range"
                   labelClassName="col-sm-3"
                   wrapperClassName="col-sm-9"
                   value={indexLifetimeRange}

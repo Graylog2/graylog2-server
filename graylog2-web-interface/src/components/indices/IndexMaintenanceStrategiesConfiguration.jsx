@@ -30,7 +30,7 @@ import {
   TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY_TYPE,
   NOOP_RETENTION_STRATEGY,
   ARCHIVE_RETENTION_STRATEGY,
-} from './types';
+} from './Types';
 
 const StyledH3 = styled.h3`
   margin-bottom: 10px;
