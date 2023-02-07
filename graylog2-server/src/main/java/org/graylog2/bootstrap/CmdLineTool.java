@@ -469,6 +469,10 @@ public abstract class CmdLineTool implements CliCommand {
     }
 
     private void installConfigRepositories() {
+        installConfigRepositories(jadConfig);
+    }
+
+    protected void installConfigRepositories(JadConfig jadConfig) {
         jadConfig.setRepositories(getConfigRepositories(configFile));
     }
 
