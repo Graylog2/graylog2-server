@@ -48,6 +48,7 @@ import {
   EventDefinitionsPage,
   EventNotificationsPage,
   EventsPage,
+  EventReplaySearchPage,
   ExportExtractorsPage,
   ExtractorsPage,
   WelcomePage,
@@ -161,6 +162,7 @@ const AppRouter = () => {
                       {!isCloud && <Route exact path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage} />}
 
                       <Route exact path={Routes.ALERTS.LIST} component={EventsPage} />
+                      <Route exact path={Routes.ALERTS.replay_search(':alertId')} component={EventReplaySearchPage} />
                       <Route exact path={Routes.ALERTS.DEFINITIONS.LIST} component={EventDefinitionsPage} />
                       <Route exact path={Routes.ALERTS.DEFINITIONS.CREATE} component={CreateEventDefinitionPage} />
                       <Route exact

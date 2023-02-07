@@ -108,6 +108,7 @@ class AggregationConditionsForm extends React.Component {
     const { eventDefinition, validation } = this.props;
     const expression = eventDefinition.config.conditions.expression || initialEmptyConditionConfig;
     const expressionValidation = validateExpression(expression, eventDefinition.config.series);
+    console.log({ eventDefinition, expression });
 
     return (
       <>

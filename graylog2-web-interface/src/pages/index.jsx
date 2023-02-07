@@ -39,6 +39,7 @@ const EnterprisePage = loadAsync(() => import('./EnterprisePage'));
 const EventDefinitionsPage = loadAsync(() => import('./EventDefinitionsPage'));
 const EventNotificationsPage = loadAsync(() => import('./EventNotificationsPage'));
 const EventsPage = loadAsync(() => import('./EventsPage'));
+const EventReplaySearchPage = loadAsync(() => import('./EventReplaySearchPage'));
 const ExportExtractorsPage = loadAsync(() => import('pages/ExportExtractorsPage'));
 const ExtractorsPage = loadAsync(() => import('./ExtractorsPage'));
 const WelcomePage = loadAsync(() => import('./WelcomePage'));
@@ -120,6 +121,7 @@ export {
   EventDefinitionsPage,
   EventNotificationsPage,
   EventsPage,
+  EventReplaySearchPage,
   ExportExtractorsPage,
   ExtractorsPage,
   WelcomePage,

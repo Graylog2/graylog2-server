@@ -28,7 +28,7 @@ export type EventDefinition = {
     query_parameters: string[],
     streams: string[],
     group_by: string[],
-    series: string[],
+    series: Array<{field: string, id: string, function: string}>,
     conditions: {
       expression: string | null,
     },

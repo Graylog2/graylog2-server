@@ -89,6 +89,8 @@ const EditEventDefinitionPage = () => {
     );
   }
 
+  console.log({ eventDefinition });
+
   return (
     <DocumentTitle title={`Edit "${eventDefinition.title}" Event Definition`}>
       <EventsPageNavigation />
