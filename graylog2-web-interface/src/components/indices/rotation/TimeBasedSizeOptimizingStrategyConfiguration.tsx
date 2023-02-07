@@ -41,14 +41,24 @@ const getRangeInDays = (indexLifeTimeMin = 'PT1H', IndexLifeTimeMax = 'P4D') => 
   return [durationToRoundedDays(indexLifeTimeMin), durationToRoundedDays(IndexLifeTimeMax)];
 };
 
+const YEARS_DAYS = 365;
+
+const getInitialMaxRange = (maxRotationPeriod: number, maxLifetime: number) => {
+  if (maxRotationPeriod) {
+    return maxRotationPeriod;
+  }
+
+  return maxLifetime > YEARS_DAYS ? maxLifetime + YEARS_DAYS : YEARS_DAYS;
+};
+
 const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime_max, index_lifetime_min }, updateConfig }: Props) => {
   const [indexLifetimeRange, setIndexLifetimeRange] = useState(getRangeInDays(index_lifetime_min, index_lifetime_max));
-
   const maxRotationPeriod = useMaxIndexRotationLimit();
+  const [maxRange, setMaxRange] = useState(getInitialMaxRange(durationToRoundedDays(maxRotationPeriod), indexLifetimeRange[1]));
 
   const _isValidRange = useCallback((range: Array<number>) => {
-    return range[0] !== range[1];
-  }, []);
+    return range[0] < range[1] && range[1] <= maxRange;
+  }, [maxRange]);
 
   const validationState = (range: Array<number>): null | 'error' => {
     if (_isValidRange(range)) {
@@ -60,8 +70,15 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime
 
   const errorMessage = 'There should be at least 1 days beteween minimum and maximum Lifetime.';
 
+  const addYearToMaxrange = (currentMax: number, currentSelectedMax) => {
+    if (!maxRotationPeriod && currentMax === currentSelectedMax) {
+      setMaxRange(currentMax + YEARS_DAYS);
+    }
+  };
+
   const onRangeChange = (range: Array<number>) => {
     setIndexLifetimeRange(range);
+    addYearToMaxrange(maxRange, range[1]);
 
     if (_isValidRange(range)) {
       updateConfig({ index_lifetime_min: moment.duration(range[0], 'days').toISOString(), index_lifetime_max: moment.duration(range[1], 'days').toISOString() });
@@ -81,7 +98,7 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime
                   min={1}
                   step={1}
                   bsStyle={validationState(indexLifetimeRange)}
-                  max={durationToRoundedDays(maxRotationPeriod) || 365}
+                  max={durationToRoundedDays(maxRotationPeriod) || maxRange}
                   onAfterChange={(value) => onRangeChange(value)} />
     </div>
   );
