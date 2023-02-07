@@ -39,12 +39,14 @@ const StyledSlider = styled(ReactSlider)(({ theme }: { theme: DefaultTheme }) =>
 `);
 
 const StyledThumb = styled.div(({ theme }: { theme: DefaultTheme }) => css`
-    height: 25px;
+    height: auto;
+    min-height: 25px;
     line-height: 25px;
-    width: 25px;
+    width: auto;
+    min-width: 25px ;
     text-align: center;
     background-color: #5082bc;
-    color: ${theme.colors.variant.textDefault};
+    color: ${theme.colors.input.color};
     border-radius: 50%;
     cursor: grab;
     top: -5px;
