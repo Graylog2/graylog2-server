@@ -18,9 +18,15 @@ package org.graylog2.rest.models.tools.responses;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.rest.resources.entities.EntityAttribute;
+import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.rest.resources.entities.Sorting;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PageListResponseTest {
@@ -31,7 +37,9 @@ class PageListResponseTest {
                 new PaginatedList<>(
                         ImmutableList.of("1", "2"),
                         500, 1, 5),
-                "whatever", "asc");
+                "whatever", "asc",
+                List.of(EntityAttribute.builder().title("some_attr").id("some_id").build()),
+                EntityDefaults.builder().sort(Sorting.create("some_id", Sorting.Direction.ASC)).build());
 
         assertThat(pageListResponse.total()).isEqualTo(500);
         assertThat(pageListResponse.paginationInfo().page()).isEqualTo(1);
@@ -40,6 +48,8 @@ class PageListResponseTest {
         assertThat(pageListResponse.sort()).isEqualTo("whatever");
         assertThat(pageListResponse.order()).isEqualTo("asc");
         assertTrue(pageListResponse.elements().containsAll(ImmutableList.of("1", "2")));
+        assertEquals(pageListResponse.attributes(), List.of(EntityAttribute.builder().title("some_attr").id("some_id").build()));
+        assertEquals(pageListResponse.defaults(), EntityDefaults.builder().sort(Sorting.create("some_id", Sorting.Direction.ASC)).build());
     }
 
 }

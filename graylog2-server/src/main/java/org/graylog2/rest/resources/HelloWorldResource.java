@@ -60,7 +60,7 @@ public class HelloWorldResource extends RestResource {
         final ClusterId clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create("UNKNOWN"));
         return HelloWorldResponse.create(
             clusterId.clusterId(),
-            nodeId.toString(),
+            nodeId.getNodeId(),
             Version.CURRENT_CLASSPATH.toString(),
             "Manage your logs in the dark and have lasers going and make it look like you're from space!"
         );

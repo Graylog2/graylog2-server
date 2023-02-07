@@ -56,6 +56,11 @@ class LUTCachesPage extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    const { page, pageSize } = this.props.paginationQueryParameter;
+    LookupTableCachesActions.searchPaginated(page, pageSize);
+  }
+
   _loadData = (props) => {
     const { pagination } = props;
     const { page, pageSize } = this.props.paginationQueryParameter;

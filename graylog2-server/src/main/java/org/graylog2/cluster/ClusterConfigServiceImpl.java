@@ -142,12 +142,12 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
             return;
         }
 
-        ClusterConfig clusterConfig = ClusterConfig.create(key, payload, nodeId.toString());
+        ClusterConfig clusterConfig = ClusterConfig.create(key, payload, nodeId.getNodeId());
 
         dbCollection.update(DBQuery.is("type", key), clusterConfig, true, false, WriteConcern.JOURNALED);
 
         ClusterConfigChangedEvent event = ClusterConfigChangedEvent.create(
-                DateTime.now(DateTimeZone.UTC), nodeId.toString(), key);
+                DateTime.now(DateTimeZone.UTC), nodeId.getNodeId(), key);
         clusterEventBus.post(event);
     }
 

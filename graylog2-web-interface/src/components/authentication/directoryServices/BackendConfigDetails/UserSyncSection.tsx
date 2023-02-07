@@ -46,6 +46,7 @@ const UserSyncSection = ({ authenticationBackend, roles, excludedFields }: Props
     userNameAttribute,
     userFullNameAttribute,
     userUniqueIdAttribute,
+    emailAttributes,
   } = authenticationBackend.config;
   const {
     defaultRoles = Immutable.List(),
@@ -57,6 +58,7 @@ const UserSyncSection = ({ authenticationBackend, roles, excludedFields }: Props
       <ReadOnlyFormGroup label="Search Pattern" value={userSearchPattern} />
       <ReadOnlyFormGroup label="Name Attribute" value={userNameAttribute} />
       <ReadOnlyFormGroup label="Full Name Attribute" value={userFullNameAttribute} />
+      {!excludedFields.emailAttributes && <ReadOnlyFormGroup label="Email Attribute" value={emailAttributes.join(',')} />}
       {!excludedFields.userUniqueIdAttribute && (
         <ReadOnlyFormGroup label="ID Attribute" value={userUniqueIdAttribute} />
       )}

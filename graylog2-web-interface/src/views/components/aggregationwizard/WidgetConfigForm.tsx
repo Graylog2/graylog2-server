@@ -24,7 +24,7 @@ import type { ConfigurationField } from 'views/types';
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
 import PropagateDisableSubmissionState from 'views/components/aggregationwizard/PropagateDisableSubmissionState';
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
-import type { AutoTimeConfig, TimeUnitConfig } from 'views/logic/aggregationbuilder/Pivot';
+import type { AutoTimeConfig, TimeUnitConfig, DateType, ValuesType } from 'views/logic/aggregationbuilder/Pivot';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import { updateWidgetAggregationElements } from './AggregationWizard';
@@ -34,6 +34,8 @@ const StyledForm = styled(Form)`
   width: 100%;
 `;
 
+type Required<T, K extends keyof T> = Pick<T, K> & Partial<T>;
+
 export type MetricFormValues = {
   function: string,
   field: string | undefined,
@@ -41,25 +43,22 @@ export type MetricFormValues = {
   percentile?: number | undefined,
 };
 
-type GroupingField<T extends 'values' | 'time'> = {
-  field: string | undefined
-  type: T;
-}
-
 export type GroupingDirection = 'row' | 'column';
 
 export type BaseGrouping = {
+  fields: Array<string>,
   direction: GroupingDirection,
   id: string,
 };
 
-export type DateGrouping = BaseGrouping & {
-  field: GroupingField<'time'>,
+export type DateGrouping = Required<BaseGrouping, 'id'> & {
+  type: typeof DateType,
   interval: AutoTimeConfig | TimeUnitConfig,
 };
 
-export type ValuesGrouping = BaseGrouping & {
-  field: GroupingField<'values'>,
+export type ValuesGrouping = Required<BaseGrouping, 'id'> & {
+  type: typeof ValuesType,
+  limit: number,
 };
 
 export type GroupByFormValues = DateGrouping | ValuesGrouping;
@@ -89,15 +88,11 @@ export type SortFormValues = {
   id: string,
 }
 
-type Required<T, K extends keyof T> = Pick<T, K> & Partial<T>;
-
 export interface WidgetConfigFormValues {
   metrics?: Array<MetricFormValues>,
   groupBy?: {
     columnRollup: boolean,
-    groupings: Array<Required<GroupByFormValues, 'id'>>,
-    rowLimit: string | number | undefined,
-    columnLimit: string | number | undefined,
+    groupings: Array<GroupByFormValues>,
   },
   visualization?: VisualizationFormValues,
   sort?: Array<SortFormValues>,
@@ -109,8 +104,6 @@ export interface WidgetConfigValidationErrors {
   metrics?: Array<{ [key: string]: string }>,
   groupBy?: {
     groupings?: Array<{ [key: string]: string }>,
-    rowLimit?: string,
-    columnLimit?: string,
   },
   visualization?: { [key: string]: string | any },
   sort?: Array<{ [key: string]: string }>,

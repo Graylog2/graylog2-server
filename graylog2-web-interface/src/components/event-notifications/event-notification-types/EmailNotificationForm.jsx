@@ -92,6 +92,7 @@ class EmailNotificationForm extends React.Component {
     sender: '', // TODO: Default sender should come from the server. The default should be empty or the address configured in the email server settings
     // eslint-disable-next-line no-template-curly-in-string
     subject: 'Graylog event notification: ${event_definition_title}', // TODO: Default subject should come from the server
+    reply_to: '',
     body_template: DEFAULT_BODY_TEMPLATE, // TODO: Default body template should come from the server
     html_body_template: DEFAULT_HTML_BODY_TEMPLATE,
     user_recipients: [],
@@ -143,6 +144,14 @@ class EmailNotificationForm extends React.Component {
                value={config.subject || ''}
                onChange={this.handleChange}
                required />
+        <Input id="notification-replyto"
+               name="reply_to"
+               label="Reply-To (Optional)"
+               type="text"
+               bsStyle={validation.errors.replyto ? 'error' : null}
+               help={lodash.get(validation, 'errors.reply_to[0]', 'The email address that recipients should use for replies.')}
+               value={config.reply_to || ''}
+               onChange={this.handleChange} />
         <HideOnCloud>
           <Input id="notification-sender"
                  name="sender"

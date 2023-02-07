@@ -52,8 +52,8 @@ const CUSTOM_COLUMN_DEFINITIONS = [
   { id: 'throughput', title: 'Throughput' },
 ];
 
-const INITIAL_COLUMNS = ['title', 'description', 'index_set_title', 'throughput', 'status'];
-const COLUMNS_ORDER = ['title', 'description', 'index_set_title', 'throughput', 'status', 'created_at'];
+const INITIAL_COLUMNS = ['title', 'description', 'index_set_title', 'throughput', 'disabled'];
+const COLUMNS_ORDER = ['title', 'description', 'index_set_title', 'throughput', 'disabled', 'created_at'];
 
 const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stream> => ({
   title: {
@@ -72,7 +72,7 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
     renderCell: (stream) => <ThroughputCell stream={stream} />,
     staticWidth: 120,
   },
-  status: {
+  disabled: {
     renderCell: (stream) => <StatusCell stream={stream} />,
     staticWidth: 100,
   },
@@ -119,7 +119,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
 
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
-    setSearchParams((cur) => ({ ...cur, query: newQuery }));
+    setSearchParams((cur) => ({ ...cur, query: newQuery, page: 1 }));
   }, [paginationQueryParameter]);
 
   const onReset = useCallback(() => {
@@ -140,21 +140,20 @@ const StreamsOverview = ({ indexSets }: Props) => {
                    streamRuleTypes={streamRuleTypes} />
   ), [indexSets, streamRuleTypes]);
 
-  const renderBulkActions = (
+  const renderBulkActions = useCallback((
     selectedStreamIds: Array<string>,
     setSelectedStreamIds: (streamIds: Array<string>) => void,
   ) => (
     <BulkActions selectedStreamIds={selectedStreamIds}
                  setSelectedStreamIds={setSelectedStreamIds}
-                 refetchStreams={refetchStreams}
                  indexSets={indexSets} />
-  );
+  ), [indexSets]);
 
   if (!paginatedStreams || !streamRuleTypes) {
     return <Spinner />;
   }
 
-  const { streams, pagination: { total } } = paginatedStreams;
+  const { elements, pagination: { total } } = paginatedStreams;
 
   return (
     <PaginatedList onChange={onPageChange}
@@ -166,10 +165,10 @@ const StreamsOverview = ({ indexSets }: Props) => {
                     queryHelpComponent={<QueryHelper entityName="stream" />} />
       </div>
       <div>
-        {streams?.length === 0 ? (
+        {elements?.length === 0 ? (
           <NoSearchResult>No streams have been found</NoSearchResult>
         ) : (
-          <EntityDataTable<Stream> data={streams}
+          <EntityDataTable<Stream> data={elements}
                                    visibleColumns={visibleColumns}
                                    columnsOrder={COLUMNS_ORDER}
                                    onColumnsChange={onColumnsChange}

@@ -49,11 +49,11 @@ import ExcludeFromQueryHandler from 'views/logic/valueactions/ExcludeFromQueryHa
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
 import EditMessageList from 'views/components/widgets/EditMessageList';
 import { DashboardsPage, ShowViewPage, NewSearchPage, NewDashboardPage, StreamSearchPage } from 'views/pages';
-import AddMessageCountActionHandler from 'views/logic/fieldactions/AddMessageCountActionHandler';
-import AddMessageTableActionHandler from 'views/logic/fieldactions/AddMessageTableActionHandler';
+import AddMessageCountActionHandler, { CreateMessageCount } from 'views/logic/fieldactions/AddMessageCountActionHandler';
+import AddMessageTableActionHandler, { CreateMessagesWidget } from 'views/logic/fieldactions/AddMessageTableActionHandler';
 import RemoveFromTableActionHandler from 'views/logic/fieldactions/RemoveFromTableActionHandler';
 import RemoveFromAllTablesActionHandler from 'views/logic/fieldactions/RemoveFromAllTablesActionHandler';
-import CreateCustomAggregation from 'views/logic/creatoractions/CreateCustomAggregation';
+import AddCustomAggregation, { CreateCustomAggregation } from 'views/logic/creatoractions/AddCustomAggregation';
 import SelectExtractorType from 'views/logic/valueactions/SelectExtractorType';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
@@ -85,6 +85,9 @@ import CopyValueToClipboard from 'views/logic/valueactions/CopyValueToClipboard'
 import CopyFieldToClipboard from 'views/logic/fieldactions/CopyFieldToClipboard';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import ViewHeader from 'views/components/views/ViewHeader';
+import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/ScatterVisualizationConfig';
+import ScatterVisualization from 'views/components/visualizations/scatter/ScatterVisualization';
+import Icon from 'components/common/Icon';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -106,6 +109,7 @@ VisualizationConfig.registerSubtype(LineVisualization.type, LineVisualizationCon
 VisualizationConfig.registerSubtype(AreaVisualization.type, AreaVisualizationConfig);
 VisualizationConfig.registerSubtype(HeatmapVisualization.type, HeatmapVisualizationConfig);
 VisualizationConfig.registerSubtype(DataTable.type, DataTableVisualizationConfig);
+VisualizationConfig.registerSubtype(ScatterVisualization.type, ScatterVisualizationConfig);
 
 Parameter.registerSubtype(ValueParameter.type, ValueParameter);
 Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);
@@ -170,7 +174,7 @@ const exports: PluginExports = {
       searchTypes: PivotConfigGenerator,
       titleGenerator: (widget: Widget) => {
         if (widget.config.rowPivots.length > 0) {
-          return `Aggregating ${widget.config.series.map((s) => s.effectiveName).join(', ')} by ${widget.config.rowPivots.map(({ field }) => field).join(', ')}`;
+          return `Aggregating ${widget.config.series.map((s) => s.effectiveName).join(', ')} by ${widget.config.rowPivots.flatMap(({ fields }) => fields).join(', ')}`;
         }
 
         if (widget.config.series.length > 0) {
@@ -321,6 +325,19 @@ const exports: PluginExports = {
     },
   ], ['create-extractor']),
   visualizationTypes: visualizationBindings,
+  widgetCreators: [{
+    title: 'Message Count',
+    func: CreateMessageCount,
+    icon: () => <Icon name="hashtag" />,
+  }, {
+    title: 'Message Table',
+    func: CreateMessagesWidget,
+    icon: () => <Icon name="list" />,
+  }, {
+    title: 'Custom Aggregation',
+    func: CreateCustomAggregation,
+    icon: () => <Icon name="chart-column" />,
+  }],
   creators: [
     {
       type: 'preset',
@@ -335,7 +352,7 @@ const exports: PluginExports = {
     {
       type: 'generic',
       title: 'Aggregation',
-      func: CreateCustomAggregation,
+      func: AddCustomAggregation,
     },
   ],
   'views.completers': [

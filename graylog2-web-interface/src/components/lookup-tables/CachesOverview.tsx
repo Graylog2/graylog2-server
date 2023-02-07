@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
-import { OverlayTrigger, PaginatedList, SearchForm, Spinner, Icon } from 'components/common';
+import { OverlayTrigger, PaginatedList, SearchForm, Icon, NoEntitiesExist, NoSearchResult } from 'components/common';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
 import CacheTableEntry from 'components/lookup-tables/CacheTableEntry';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
@@ -26,56 +27,67 @@ import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryPar
 
 import Styles from './Overview.css';
 
-const buildHelpPopover = () => {
-  return (
-    <Popover id="search-query-help" className={Styles.popoverWide} title="Search Syntax Help">
-      <p><strong>Available search fields</strong></p>
-      <Table condensed>
-        <thead>
-          <tr>
-            <th>Field</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>id</td>
-            <td>Cache ID</td>
-          </tr>
-          <tr>
-            <td>title</td>
-            <td>The title of the cache</td>
-          </tr>
-          <tr>
-            <td>name</td>
-            <td>The reference name of the cache</td>
-          </tr>
-          <tr>
-            <td>description</td>
-            <td>The description of cache</td>
-          </tr>
-        </tbody>
-      </Table>
-      <p><strong>Examples</strong></p>
-      <p>
-        Find caches by parts of their names:<br />
-        <kbd>name:guava</kbd><br />
-        <kbd>name:gua</kbd>
-      </p>
-      <p>
-        Searching without a field name matches against the <code>title</code> field:<br />
-        <kbd>guava</kbd> <br />is the same as<br />
-        <kbd>title:guava</kbd>
-      </p>
-    </Popover>
-  );
-};
+const ScrollContainer = styled.div`
+  overflow-x: auto;
+`;
+
+const buildHelpPopover = () => (
+  <Popover id="search-query-help" className={Styles.popoverWide} title="Search Syntax Help">
+    <p><strong>Available search fields</strong></p>
+    <Table condensed>
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>id</td>
+          <td>Cache ID</td>
+        </tr>
+        <tr>
+          <td>title</td>
+          <td>The title of the cache</td>
+        </tr>
+        <tr>
+          <td>name</td>
+          <td>The reference name of the cache</td>
+        </tr>
+        <tr>
+          <td>description</td>
+          <td>The description of cache</td>
+        </tr>
+      </tbody>
+    </Table>
+    <p><strong>Examples</strong></p>
+    <p>
+      Find caches by parts of their names:<br />
+      <kbd>name:guava</kbd><br />
+      <kbd>name:gua</kbd>
+    </p>
+    <p>
+      Searching without a field name matches against the <code>title</code> field:<br />
+      <kbd>guava</kbd> <br />is the same as<br />
+      <kbd>title:guava</kbd>
+    </p>
+  </Popover>
+);
 
 type Props = {
   caches: LookupTableCache[],
   pagination: PaginationType,
   paginationQueryParameter: PaginationQueryParameterResult,
 };
+
+const queryHelpComponent = (
+  <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover()}>
+    <Button bsStyle="link"
+            className={Styles.searchHelpButton}>
+      <Icon name="question-circle" fixedWidth />
+    </Button>
+  </OverlayTrigger>
+);
 
 const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props) => {
   const { currentPage, currentPageSize, resetPage } = React.useMemo(() => ({
@@ -98,6 +110,10 @@ const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props)
     LookupTableCachesActions.searchPaginated(currentPage, currentPageSize);
   }, [resetPage, currentPage, currentPageSize]);
 
+  const emptyListComponent = pagination.query === ''
+    ? (<NoEntitiesExist>No Cache exist.</NoEntitiesExist>)
+    : (<NoSearchResult>No Cache found.</NoSearchResult>);
+
   return (
     <Row className="content">
       <Col md={12}>
@@ -108,34 +124,29 @@ const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props)
                        pageSize={currentPageSize}
                        onChange={onPageChange}
                        totalItems={pagination.total}>
-          <SearchForm onSearch={onSearch} onReset={onReset}>
-            <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover()}>
-              <Button bsStyle="link"
-                      className={Styles.searchHelpButton}>
-                <Icon name="question-circle" fixedWidth />
-              </Button>
-            </OverlayTrigger>
-          </SearchForm>
-          <div style={{ overflowX: 'auto' }}>
-            <Table condensed hover className={Styles.overviewTable}>
-              <thead>
-                <tr>
-                  <th className={Styles.rowTitle}>Title</th>
-                  <th className={Styles.rowDescription}>Description</th>
-                  <th className={Styles.rowName}>Name</th>
-                  <th>Entries</th>
-                  <th>Hit rate</th>
-                  <th>Throughput</th>
-                  <th className={Styles.rowActions}>Actions</th>
-                </tr>
-              </thead>
-              {caches.length === 0
-                ? <Spinner text="Loading caches" />
-                : caches.map((cache: LookupTableCache) => (
-                  <CacheTableEntry key={cache.id} cache={cache} />
-                ))}
-            </Table>
-          </div>
+          <SearchForm onSearch={onSearch} onReset={onReset} queryHelpComponent={queryHelpComponent} />
+          <ScrollContainer>
+            {caches.length === 0
+              ? (emptyListComponent)
+              : (
+                <Table condensed hover className={Styles.overviewTable}>
+                  <thead>
+                    <tr>
+                      <th className={Styles.rowTitle}>Title</th>
+                      <th className={Styles.rowDescription}>Description</th>
+                      <th className={Styles.rowName}>Name</th>
+                      <th>Entries</th>
+                      <th>Hit rate</th>
+                      <th>Throughput</th>
+                      <th className={Styles.rowActions}>Actions</th>
+                    </tr>
+                  </thead>
+                  {caches.map((cache: LookupTableCache) => (
+                    <CacheTableEntry key={cache.id} cache={cache} />
+                  ))}
+                </Table>
+              )}
+          </ScrollContainer>
         </PaginatedList>
       </Col>
     </Row>

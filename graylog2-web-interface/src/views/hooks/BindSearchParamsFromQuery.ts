@@ -21,15 +21,15 @@ import View from 'views/logic/views/View';
 import type { RawQuery } from 'views/logic/NormalizeSearchURLQueryParams';
 import normalizeSearchURLQueryParams from 'views/logic/NormalizeSearchURLQueryParams';
 
-const bindSearchParamsFromQuery: ViewHook = ({ query, view }: { query: RawQuery, view: View }) => {
+const bindSearchParamsFromQuery: ViewHook = async ({ query, view }: { query: RawQuery, view: View }) => {
   if (view.type !== View.Type.Search) {
-    return Promise.resolve(true);
+    return true;
   }
 
   const { queryString, timeRange, streamsFilter } = normalizeSearchURLQueryParams(query);
 
   if (!queryString && !timeRange && !streamsFilter) {
-    return Promise.resolve(true);
+    return true;
   }
 
   const { queries } = view.search;
@@ -56,7 +56,7 @@ const bindSearchParamsFromQuery: ViewHook = ({ query, view }: { query: RawQuery,
   const newQuery = queryBuilder.build();
 
   return isDeepEqual(newQuery, firstQuery)
-    ? Promise.resolve(true)
+    ? true
     : QueriesActions.update(firstQuery.id, queryBuilder.build())
       .then(() => true, () => false);
 };

@@ -66,7 +66,7 @@ const ReadOnlyFormGroup = ({ label, value, help, className }: Props) => (
     <LabelCol sm={3}>
       {label}
     </LabelCol>
-    <ValueCol sm={9}>
+    <ValueCol sm={9} className="read-only-value-col">
       {readableValue(value)}
       {help && <HelpBlock>{help}</HelpBlock>}
     </ValueCol>

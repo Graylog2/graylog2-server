@@ -36,6 +36,6 @@ public class NodeIdResponseFilter implements ContainerResponseFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
-        responseContext.getHeaders().add("X-Graylog-Node-ID", nodeId.toString());
+        responseContext.getHeaders().add("X-Graylog-Node-ID", nodeId.getNodeId());
     }
 }

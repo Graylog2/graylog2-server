@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
-import { OverlayTrigger, PaginatedList, SearchForm, Spinner, Icon } from 'components/common';
+import { OverlayTrigger, PaginatedList, SearchForm, Icon, NoEntitiesExist, NoSearchResult } from 'components/common';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
 import DataAdapterTableEntry from 'components/lookup-tables/DataAdapterTableEntry';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
@@ -26,50 +27,61 @@ import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryPar
 
 import Styles from './Overview.css';
 
-const buildHelpPopover = () => {
-  return (
-    <Popover id="search-query-help" className={Styles.popoverWide} title="Search Syntax Help">
-      <p><strong>Available search fields</strong></p>
-      <Table condensed>
-        <thead>
-          <tr>
-            <th>Field</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>id</td>
-            <td>Data Adapter ID</td>
-          </tr>
-          <tr>
-            <td>title</td>
-            <td>The title of the data adapter</td>
-          </tr>
-          <tr>
-            <td>name</td>
-            <td>The reference name of the data adapter</td>
-          </tr>
-          <tr>
-            <td>description</td>
-            <td>The description of data adapter</td>
-          </tr>
-        </tbody>
-      </Table>
-      <p><strong>Example</strong></p>
-      <p>
-        Find data adapters by parts of their names:<br />
-        <kbd>name:geoip</kbd><br />
-        <kbd>name:geo</kbd>
-      </p>
-      <p>
-        Searching without a field name matches against the <code>title</code> field:<br />
-        <kbd>geoip</kbd> <br />is the same as<br />
-        <kbd>title:geoip</kbd>
-      </p>
-    </Popover>
-  );
-};
+const ScrollContainer = styled.div`
+  overflow-x: auto;
+`;
+
+const buildHelpPopover = () => (
+  <Popover id="search-query-help" className={Styles.popoverWide} title="Search Syntax Help">
+    <p><strong>Available search fields</strong></p>
+    <Table condensed>
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>id</td>
+          <td>Data Adapter ID</td>
+        </tr>
+        <tr>
+          <td>title</td>
+          <td>The title of the data adapter</td>
+        </tr>
+        <tr>
+          <td>name</td>
+          <td>The reference name of the data adapter</td>
+        </tr>
+        <tr>
+          <td>description</td>
+          <td>The description of data adapter</td>
+        </tr>
+      </tbody>
+    </Table>
+    <p><strong>Example</strong></p>
+    <p>
+      Find data adapters by parts of their names:<br />
+      <kbd>name:geoip</kbd><br />
+      <kbd>name:geo</kbd>
+    </p>
+    <p>
+      Searching without a field name matches against the <code>title</code> field:<br />
+      <kbd>geoip</kbd> <br />is the same as<br />
+      <kbd>title:geoip</kbd>
+    </p>
+  </Popover>
+);
+
+const queryHelpComponent = (
+  <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover()}>
+    <Button bsStyle="link"
+            className={Styles.searchHelpButton}>
+      <Icon name="question-circle" fixedWidth />
+    </Button>
+  </OverlayTrigger>
+);
 
 type Props = {
   dataAdapters: LookupTableAdapter[],
@@ -99,6 +111,10 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
     LookupTableDataAdaptersActions.searchPaginated(currentPage, currentPageSize);
   }, [resetPage, currentPage, currentPageSize]);
 
+  const emptyListComponent = pagination.query === ''
+    ? (<NoEntitiesExist>No Data adapter exist.</NoEntitiesExist>)
+    : (<NoSearchResult>No Data adapter found.</NoSearchResult>);
+
   return (
     <Row className="content">
       <Col md={12}>
@@ -109,34 +125,29 @@ const DataAdaptersOverview = ({ dataAdapters, pagination, errorStates, paginatio
                        pageSize={currentPageSize}
                        onChange={onPageChange}
                        totalItems={pagination.total}>
-          <SearchForm onSearch={onSearch} onReset={onReset}>
-            <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover()}>
-              <Button bsStyle="link"
-                      className={Styles.searchHelpButton}>
-                <Icon name="question-circle" fixedWidth />
-              </Button>
-            </OverlayTrigger>
-          </SearchForm>
-          <div style={{ overflowX: 'auto' }}>
-            <Table condensed hover className={Styles.overviewTable}>
-              <thead>
-                <tr>
-                  <th className={Styles.rowTitle}>Title</th>
-                  <th className={Styles.rowDescription}>Description</th>
-                  <th className={Styles.rowName}>Name</th>
-                  <th>Throughput</th>
-                  <th className={Styles.rowActions}>Actions</th>
-                </tr>
-              </thead>
-              {dataAdapters.length === 0
-                ? <Spinner text="Loading data adapters" />
-                : dataAdapters.map((dataAdapter: LookupTableAdapter) => (
-                  <DataAdapterTableEntry key={dataAdapter.id}
-                                         adapter={dataAdapter}
-                                         error={errorStates.dataAdapters[dataAdapter.name]} />
-                ))}
-            </Table>
-          </div>
+          <SearchForm onSearch={onSearch} onReset={onReset} queryHelpComponent={queryHelpComponent} />
+          <ScrollContainer>
+            {dataAdapters.length === 0
+              ? (emptyListComponent)
+              : (
+                <Table condensed hover className={Styles.overviewTable}>
+                  <thead>
+                    <tr>
+                      <th className={Styles.rowTitle}>Title</th>
+                      <th className={Styles.rowDescription}>Description</th>
+                      <th className={Styles.rowName}>Name</th>
+                      <th>Throughput</th>
+                      <th className={Styles.rowActions}>Actions</th>
+                    </tr>
+                  </thead>
+                  {dataAdapters.map((dataAdapter: LookupTableAdapter) => (
+                    <DataAdapterTableEntry key={dataAdapter.id}
+                                           adapter={dataAdapter}
+                                           error={errorStates.dataAdapters[dataAdapter.name]} />
+                  ))}
+                </Table>
+              )}
+          </ScrollContainer>
         </PaginatedList>
       </Col>
     </Row>

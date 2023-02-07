@@ -22,36 +22,10 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { ConfigurationFormField, TitleField } from 'components/configurationforms';
 
 class ConfigurationForm extends React.Component {
-  static propTypes = {
-    cancelAction: PropTypes.func,
-    children: PropTypes.node,
-    helpBlock: PropTypes.node,
-    includeTitleField: PropTypes.bool,
-    submitAction: PropTypes.func.isRequired,
-    title: PropTypes.node,
-    titleValue: PropTypes.string,
-    typeName: PropTypes.string,
-    // eslint-disable-next-line react/no-unused-prop-types
-    values: PropTypes.object,
-    wrapperComponent: PropTypes.elementType,
-    submitButtonText: PropTypes.string.isRequired,
-  };
-
-  static defaultProps = {
-    cancelAction: () => {},
-    children: null,
-    helpBlock: null,
-    title: null,
-    includeTitleField: true,
-    titleValue: '',
-    typeName: undefined,
-    values: {},
-    wrapperComponent: BootstrapModalForm,
-  };
-
   constructor(props) {
     super(props);
-    this.state = this._copyStateFromProps(this.props);
+
+    this.state = { ...this._copyStateFromProps(this.props), showConfigurationModal: false };
   }
 
   UNSAFE_componentWillReceiveProps(props) {
@@ -135,15 +109,13 @@ class ConfigurationForm extends React.Component {
 
   // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => {
-    if (this.modal && this.modal.open) {
-      this.modal.open();
-    }
+    this.setState({ showConfigurationModal: true });
   };
 
   _closeModal = () => {
     const { cancelAction, titleValue } = this.props;
 
-    this.setState($.extend(this._copyStateFromProps(this.props), { titleValue: titleValue }));
+    this.setState($.extend(this._copyStateFromProps(this.props), { titleValue: titleValue, showConfigurationModal: false }));
 
     if (cancelAction) {
       cancelAction();
@@ -221,7 +193,7 @@ class ConfigurationForm extends React.Component {
     });
 
     return (
-      <WrapperComponent ref={(modal) => { this.modal = modal; }}
+      <WrapperComponent show={this.state.showConfigurationModal}
                         title={title}
                         onCancel={this._closeModal}
                         onSubmitForm={this._save}
@@ -236,5 +208,32 @@ class ConfigurationForm extends React.Component {
     );
   }
 }
+
+ConfigurationForm.propTypes = {
+  cancelAction: PropTypes.func,
+  children: PropTypes.node,
+  helpBlock: PropTypes.node,
+  includeTitleField: PropTypes.bool,
+  submitAction: PropTypes.func.isRequired,
+  title: PropTypes.node,
+  titleValue: PropTypes.string,
+  typeName: PropTypes.string,
+  // eslint-disable-next-line react/no-unused-prop-types
+  values: PropTypes.object,
+  wrapperComponent: PropTypes.elementType,
+  submitButtonText: PropTypes.string.isRequired,
+};
+
+ConfigurationForm.defaultProps = {
+  cancelAction: () => {},
+  children: null,
+  helpBlock: null,
+  title: null,
+  includeTitleField: true,
+  titleValue: '',
+  typeName: undefined,
+  values: {},
+  wrapperComponent: BootstrapModalForm,
+};
 
 export default ConfigurationForm;

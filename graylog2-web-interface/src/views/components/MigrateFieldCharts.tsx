@@ -26,8 +26,8 @@ import Store from 'logic/local-storage/Store';
 import { widgetDefinition } from 'views/logic/Widgets';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import type { PivotConfigType } from 'views/logic/aggregationbuilder/Pivot';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import type { TimeUnits } from 'views/Constants';
 import Series from 'views/logic/aggregationbuilder/Series';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
@@ -89,12 +89,12 @@ const mapVisualization = (legacyVisualization: LegacyVisualization) => {
   }
 };
 
-const mapTime = (legacyTime: string) => {
+const mapTime = (legacyTime: string): { value: number, unit: keyof typeof TimeUnits } => {
   switch (legacyTime) {
     case 'quarter':
       return { unit: 'months', value: 3 };
     default:
-      return { unit: `${legacyTime}s`, value: 1 };
+      return { unit: `${legacyTime}s` as keyof typeof TimeUnits, value: 1 };
   }
 };
 
@@ -118,15 +118,15 @@ const createVisualizationConfig = (legacyInterpolation: LegacyInterpolation, vis
 
   switch (visualization) {
     case 'line':
-      return new LineVisualizationConfig(interpolation);
+      return LineVisualizationConfig.create(interpolation);
     case 'area':
-      return new AreaVisualizationConfig(interpolation);
+      return AreaVisualizationConfig.create(interpolation);
     default:
       return undefined;
   }
 };
 
-const _updateExistingWidgetPos = (existingPositions, rowOffset) => {
+const _updateExistingWidgetPos = (existingPositions: { [key: string]: WidgetPosition; }, rowOffset: number) => {
   const updatedWidgetPos = { ...existingPositions };
 
   Object.keys(updatedWidgetPos).forEach((widgetId) => {
@@ -138,7 +138,7 @@ const _updateExistingWidgetPos = (existingPositions, rowOffset) => {
   return updatedWidgetPos;
 };
 
-const _migrateWidgets = (legacyCharts) => {
+const _migrateWidgets = (legacyCharts: Array<LegacyFieldChart>) => {
   return new Promise((resolve) => {
     const { defaultHeight } = widgetDefinition(AggregationWidget.type);
     const currentView = CurrentViewStateStore.getInitialState();
@@ -151,8 +151,8 @@ const _migrateWidgets = (legacyCharts) => {
       const series = new Series(mapSeries(chart.valuetype, field));
       // Because all field charts show the results for the defined timerange,
       // the new row pivot always contains the timestamp field.
-      const rowPivotConfig = { interval: { type: 'timeunit', ...mapTime(chart.interval) } } as PivotConfigType;
-      const rowPivot = new Pivot(TIMESTAMP_FIELD, 'time', rowPivotConfig);
+      const rowPivotConfig = { interval: { type: 'timeunit' as const, ...mapTime(chart.interval) } };
+      const rowPivot = Pivot.create([TIMESTAMP_FIELD], 'time', rowPivotConfig);
       const visualization = mapVisualization(chart.renderer);
       const visualizationConfig = createVisualizationConfig(chart.interpolation, visualization);
       // create widget with migrated data
@@ -187,7 +187,7 @@ const _migrateWidgets = (legacyCharts) => {
       .widgetPositions({ ...existingWidgetPos, ...newWidgetPositions })
       .build();
 
-    return resolve({ newViewState, currentQueryId: currentView.activeQuery });
+    resolve({ newViewState, currentQueryId: currentView.activeQuery });
   });
 };
 
@@ -205,7 +205,7 @@ const _onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: (migrat
   });
 };
 
-const _onCancel = (setMigrationFinished) => {
+const _onCancel = (setMigrationFinished: (finished: boolean) => void) => {
   Store.set(FIELD_CHARTS_MIGRATED_KEY, 'discarded');
   setMigrationFinished(true);
 };

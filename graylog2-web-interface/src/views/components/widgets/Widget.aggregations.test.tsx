@@ -31,7 +31,6 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import WidgetModel from 'views/logic/widgets/Widget';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import type { ViewType } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import { ViewStore } from 'views/stores/ViewStore';
 import type { ViewStoreState } from 'views/stores/ViewStore';
@@ -39,6 +38,8 @@ import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import viewsBindings from 'views/bindings';
 import DataTable from 'views/components/datatable/DataTable';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
+import { asMock } from 'helpers/mocking';
+import useViewType from 'views/hooks/useViewType';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -46,7 +47,6 @@ import type { Props as WidgetComponentProps } from './Widget';
 import WidgetContext from '../contexts/WidgetContext';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
 import FieldTypesContext from '../contexts/FieldTypesContext';
-import ViewTypeContext from '../contexts/ViewTypeContext';
 
 const testTimeout = applyTimeoutMultiplier(30000);
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
@@ -86,6 +86,8 @@ jest.mock('views/stores/SearchStore', () => ({
   },
 }));
 
+jest.mock('views/hooks/useViewType');
+
 const viewsPlugin = new PluginManifest({}, viewsBindings);
 
 const selectEventConfig = { container: document.body };
@@ -123,13 +125,10 @@ describe('Aggregation Widget', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    jest.resetModules();
     jest.useRealTimers();
   });
 
-  type AggregationWidgetProps = Partial<WidgetComponentProps> & {
-    viewType: ViewType,
-  }
+  type AggregationWidgetProps = Partial<WidgetComponentProps>;
 
   const widgetFocusContextState = {
     focusedWidget: undefined,
@@ -141,17 +140,15 @@ describe('Aggregation Widget', () => {
 
   const AggregationWidget = ({
     widget: propsWidget = dataTableWidget,
-    viewType,
     ...props
   }: AggregationWidgetProps) => (
-    <ViewTypeContext.Provider value={viewType}>
+    <>
       {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
       <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
         <WidgetFocusContext.Provider value={widgetFocusContextState}>
           <WidgetContext.Provider value={propsWidget}>
             <Widget widget={propsWidget}
                     id="widgetId"
-                    fields={Immutable.List([])}
                     onPositionsChange={() => {}}
                     title="Widget Title"
                     position={new WidgetPosition(1, 1, 1, 1)}
@@ -159,7 +156,7 @@ describe('Aggregation Widget', () => {
           </WidgetContext.Provider>
         </WidgetFocusContext.Provider>
       </FieldTypesContext.Provider>
-    </ViewTypeContext.Provider>
+    </>
   );
 
   const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: /update preview/i });
@@ -170,6 +167,10 @@ describe('Aggregation Widget', () => {
   };
 
   describe('on a dashboard', () => {
+    beforeEach(() => {
+      asMock(useViewType).mockReturnValue(View.Type.Dashboard);
+    });
+
     it('should apply not submitted widget search controls and aggregation elements changes when clicking on "Update widget"', async () => {
       const newSeries = Series.create('count').toBuilder().config(SeriesConfig.empty().toBuilder().name('Metric name').build()).build();
       const updatedConfig = dataTableWidget.config
@@ -181,7 +182,7 @@ describe('Aggregation Widget', () => {
         .config(updatedConfig)
         .streams(['stream-id-1'])
         .build();
-      render(<AggregationWidget editing viewType={View.Type.Dashboard} />);
+      render(<AggregationWidget editing />);
 
       // Change widget aggregation elements
       const addMetricButton = await screen.findByRole('button', { name: 'Add a Metric' });
@@ -223,7 +224,7 @@ describe('Aggregation Widget', () => {
         })
         .build();
 
-      render(<AggregationWidget editing viewType={View.Type.Dashboard} />);
+      render(<AggregationWidget editing />);
 
       // Change widget time range
       const timeRangeDropdownButton = await screen.findByLabelText('Open Time Range Selector');
@@ -261,7 +262,7 @@ describe('Aggregation Widget', () => {
       const updatedWidget = dataTableWidget.toBuilder()
         .config(updatedConfig)
         .build();
-      render(<AggregationWidget editing viewType={View.Type.Dashboard} />);
+      render(<AggregationWidget editing />);
 
       // Change widget aggregation elements
       const addMetricButton = await screen.findByRole('button', { name: 'Add a Metric' });

@@ -16,11 +16,11 @@
  */
 import { SearchSuggestions } from '@graylog/server-api';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType, { Properties } from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypes } from 'views/components/searchbar/SearchBarAutocompletions';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import FieldValueCompletion from './FieldValueCompletion';
 
@@ -41,17 +41,13 @@ const fieldTypes: FieldTypes = {
   },
 };
 
-jest.mock('views/stores/ViewMetadataStore', () => ({
-  ViewMetadataStore: MockStore(
-    ['getInitialState', jest.fn(() => ({ activeQuery: 'query1' }))],
-  ),
-}));
-
 jest.mock('@graylog/server-api', () => ({
   SearchSuggestions: {
     suggestFieldValue: jest.fn(),
   },
 }));
+
+jest.mock('views/hooks/useActiveQueryId');
 
 describe('FieldValueCompletion', () => {
   const suggestionsResponse = {
@@ -74,6 +70,7 @@ describe('FieldValueCompletion', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(SearchSuggestions.suggestFieldValue).mockResolvedValue(suggestionsResponse);
+    asMock(useActiveQueryId).mockReturnValue('query1');
   });
 
   describe('getCompletions', () => {

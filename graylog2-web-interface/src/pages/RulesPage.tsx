@@ -56,7 +56,7 @@ const _loadRuleMetricData = (setMetricsConfig) => {
 };
 
 const RulesPage = () => {
-  const { page, pageSize: perPage, resetPage, setPage } = usePaginationQueryParameter();
+  const { page, pageSize: perPage, resetPage, setPagination } = usePaginationQueryParameter();
   const [query, setQuery] = useState('');
   const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
   const [openMetricsConfig, toggleMetricsConfig] = useState<boolean>(false);
@@ -89,7 +89,7 @@ const RulesPage = () => {
             return;
           }
 
-          setPage(Math.max(DEFAULT_PAGINATION.page, page - 1));
+          setPagination({ page: Math.max(DEFAULT_PAGINATION.page, page - 1) });
         });
       }
     };
@@ -124,7 +124,6 @@ const RulesPage = () => {
     <Flex>
       <SearchForm query={query}
                   onSearch={handleSearch}
-                  queryWidth={400}
                   queryHelpComponent={<QueryHelper entityName="Pipeline Rule" />}
                   wrapperClass="has-bm"
                   onReset={() => handleSearch('')}

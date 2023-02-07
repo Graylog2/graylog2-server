@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.DuplicateKeyException;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.PasswordAlgorithmFactory;
@@ -255,6 +256,6 @@ public class MigrationHelpersTest {
         final BCryptPasswordAlgorithm passwordAlgorithm = new BCryptPasswordAlgorithm(10);
         final PasswordAlgorithmFactory passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.emptyMap(), passwordAlgorithm);
 
-        return new UserImpl(passwordAlgorithmFactory, permissions, ImmutableMap.of());
+        return new UserImpl(passwordAlgorithmFactory, permissions, mock(ClusterConfigService.class), ImmutableMap.of());
     }
 }

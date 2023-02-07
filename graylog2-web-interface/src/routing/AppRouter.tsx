@@ -50,7 +50,7 @@ import {
   EventsPage,
   ExportExtractorsPage,
   ExtractorsPage,
-  GettingStartedPage,
+  WelcomePage,
   GrokPatternsPage,
   ImportExtractorsPage,
   IndexerFailuresPage,
@@ -155,7 +155,7 @@ const AppRouter = () => {
                     <Switch>
                       <Route exact path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage} />
                       <Redirect from={Routes.legacy_stream_search(':streamId')} to={Routes.stream_search(':streamId')} />
-                      <Route exact path={Routes.GETTING_STARTED} component={GettingStartedPage} />
+                      <Route exact path={Routes.WELCOME} component={WelcomePage} />
                       <Route exact path={Routes.STREAMS} component={StreamsPage} />
                       <Route exact path={Routes.stream_edit(':streamId')} component={StreamEditPage} />
                       {!isCloud && <Route exact path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage} />}

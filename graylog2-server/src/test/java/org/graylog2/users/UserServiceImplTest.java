@@ -33,6 +33,7 @@ import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.security.AccessTokenService;
@@ -195,10 +196,18 @@ public class UserServiceImplTest {
 
     @Test
     @MongoDBFixtures("UserServiceImplTest.json")
-    public void testDelete() throws Exception {
+    public void testDeleteByName() throws Exception {
         assertThat(userService.delete("user1")).isEqualTo(1);
         assertThat(userService.delete("user-duplicate")).isEqualTo(2);
         assertThat(userService.delete("user-does-not-exist")).isEqualTo(0);
+    }
+
+    @Test
+    @MongoDBFixtures("UserServiceImplTest.json")
+    public void testDeleteById() throws Exception {
+        assertThat(userService.deleteById("54e3deadbeefdeadbeef0001")).isEqualTo(1);
+        assertThat(userService.deleteById("54e3deadbeefdeadbeef0003")).isEqualTo(1);
+        assertThat(userService.deleteById("00000eadbeefdeadbee00000")).isEqualTo(0);
     }
 
     @Test
@@ -267,17 +276,17 @@ public class UserServiceImplTest {
 
         @Override
         public UserImpl create(Map<String, Object> fields) {
-            return new UserImpl(passwordAlgorithmFactory, permissions, fields);
+            return new UserImpl(passwordAlgorithmFactory, permissions, mock(ClusterConfigService.class), fields);
         }
 
         @Override
         public UserImpl create(ObjectId id, Map<String, Object> fields) {
-            return new UserImpl(passwordAlgorithmFactory, permissions, id, fields);
+            return new UserImpl(passwordAlgorithmFactory, permissions, mock(ClusterConfigService.class), id, fields);
         }
 
         @Override
         public UserImpl.LocalAdminUser createLocalAdminUser(String adminRoleObjectId) {
-            return new UserImpl.LocalAdminUser(passwordAlgorithmFactory, configuration, adminRoleObjectId);
+            return new UserImpl.LocalAdminUser(passwordAlgorithmFactory, configuration, mock(ClusterConfigService.class), adminRoleObjectId);
         }
     }
 

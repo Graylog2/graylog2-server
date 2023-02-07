@@ -20,21 +20,22 @@ import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget'
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
-import type { ActionHandler } from 'views/components/actions/ActionHandler';
 
-const AddMessageCountActionHandler: ActionHandler<{}> = async () => {
+export const CreateMessageCount = () => {
   const series = Series.forFunction('count()')
     .toBuilder()
     .config(new SeriesConfig('Message Count'))
     .build();
 
-  WidgetActions.create(AggregationWidget.builder()
+  return AggregationWidget.builder()
     .newId()
     .config(AggregationWidgetConfig.builder()
       .series([series])
       .visualization(NumberVisualization.type)
       .build())
-    .build());
+    .build();
 };
+
+const AddMessageCountActionHandler = async () => WidgetActions.create(CreateMessageCount());
 
 export default AddMessageCountActionHandler;

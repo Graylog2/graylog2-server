@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useState, useCallback } from 'react';
 
 import { ShareButton, IfPermitted, HoverForHelp } from 'components/common';
-import { ButtonToolbar, DropdownButton, MenuItem } from 'components/bootstrap';
+import { ButtonToolbar, MenuItem } from 'components/bootstrap';
 import type { Stream, StreamRule, StreamRuleType } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { LinkContainer } from 'components/common/router';
@@ -31,6 +31,7 @@ import EntityShareModal from 'components/permissions/EntityShareModal';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import useCurrentUser from 'hooks/useCurrentUser';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 
 import StreamModal from '../StreamModal';
 
@@ -93,6 +94,8 @@ const StreamActions = ({
         UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success');
 
         return response;
+      }).catch((error) => {
+        UserNotification.error(`An error occurred while deleting the stream. ${error}`);
       });
     }
   }, [stream.id, stream.title]);
@@ -123,11 +126,10 @@ const StreamActions = ({
                    entityType="stream"
                    onClick={toggleEntityShareModal}
                    bsSize="xsmall" />
-      <DropdownButton title="More Actions"
-                      pullRight
-                      bsSize="xsmall"
-                      id={`more-actions-dropdown-${stream.id}`}
-                      disabled={isNotEditable}>
+      <OverlayDropdownButton title="More Actions"
+                             bsSize="xsmall"
+                             disabled={isNotEditable}
+                             dropdownZIndex={1000}>
         <IfPermitted permissions={[`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`]} anyPermissions>
           <MenuItem bsStyle="success"
                     onSelect={onToggleStreamStatus}
@@ -189,7 +191,7 @@ const StreamActions = ({
             Delete this stream {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
-      </DropdownButton>
+      </OverlayDropdownButton>
       {showUpdateModal && (
         <StreamModal title="Editing Stream"
                      onSubmit={onUpdate}

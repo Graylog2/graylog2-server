@@ -41,14 +41,14 @@ public interface BucketSpecHandler<SPEC_TYPE extends BucketSpec, AGGREGATION_BUI
     default CreatedAggregations<AGGREGATION_BUILDER> createAggregation(Direction direction,
                                                                        String name,
                                                                        Pivot pivot,
-                                                                       List<BucketSpec> pivotSpec,
+                                                                       BucketSpec pivotSpec,
                                                                        GeneratedQueryContext queryContext,
                                                                        Query query) {
-        return doCreateAggregation(direction, name, pivot, (List<SPEC_TYPE>) pivotSpec, (QUERY_CONTEXT) queryContext, query);
+        return doCreateAggregation(direction, name, pivot, (SPEC_TYPE) pivotSpec, (QUERY_CONTEXT) queryContext, query);
     }
 
     @Nonnull
-    CreatedAggregations<AGGREGATION_BUILDER> doCreateAggregation(Direction direction, String name, Pivot pivot, List<SPEC_TYPE> bucketSpec, QUERY_CONTEXT queryContext, Query query);
+    CreatedAggregations<AGGREGATION_BUILDER> doCreateAggregation(Direction direction, String name, Pivot pivot, SPEC_TYPE bucketSpec, QUERY_CONTEXT queryContext, Query query);
 
     record CreatedAggregations<T>(T root, T leaf, List<T> metrics) {
         public static <T> CreatedAggregations<T> create(T singleAggregation) {
