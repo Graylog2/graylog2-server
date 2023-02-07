@@ -46,7 +46,7 @@ public interface Input extends Persisted {
     void setDesiredState(IOState.Type desiredState);
 
     default String toIdentifier() {
-        return String.format("[%s/%s/%s]", getType(), getTitle(), getId());
+        return "[" + getType() + "/" + getTitle() + "/" + getId() + "]";
     }
 
 }
