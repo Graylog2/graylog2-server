@@ -20,7 +20,8 @@ import type { ReactSliderProps } from 'react-slider';
 import styled, { css } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 
-import { Input } from 'components/bootstrap';
+import { Input, Tooltip } from 'components/bootstrap';
+import OverlayTrigger from 'components/common/OverlayTrigger';
 
 type Props = {
   id: string,
@@ -52,7 +53,17 @@ const StyledThumb = styled.div(({ theme }: { theme: DefaultTheme }) => css`
     top: -5px;
 `);
 
-const Thumb = (props, state) => <StyledThumb {...props}>{state.valueNow}</StyledThumb>;
+const Thumb = (props, state) => {
+  const tooltip = <Tooltip id={`${state.valueNow}-tooltip`} show>{state.valueNow}</Tooltip>;
+
+  return (
+    <StyledThumb {...props} className={`${state.valueNow}-tooltip`}>
+      <OverlayTrigger placement="top" trigger="hover" overlay={tooltip} rootClose>
+        <span className="value">{state.valueNow}</span>
+      </OverlayTrigger>
+    </StyledThumb>
+  );
+};
 
 const StyledTrack = styled.div(({ theme }: { theme: DefaultTheme }) => css`
     top: ${theme.spacings.xxs};
