@@ -310,21 +310,6 @@ public class ClusterAdapterES7 implements ClusterAdapter {
         return indexSummaries.stream()
                 .map(IndexSummaryResponse::health)
                 .map(HealthStatus::fromString)
-                .min((status1, status2) -> {
-                    if (status1.equals(HealthStatus.Red)) {
-                        return status2.equals(HealthStatus.Red) ? 0 : -1;
-                    }
-                    if (status1.equals(HealthStatus.Green)) {
-                        return status2.equals(HealthStatus.Green) ? 0 : 1;
-                    }
-                    if (status2.equals(HealthStatus.Green)) {
-                        return -1;
-                    }
-                    if (status2.equals(HealthStatus.Red)) {
-                        return 1;
-                    }
-
-                    return 0;
-                });
+                .min(HealthStatus::compareTo);
     }
 }
