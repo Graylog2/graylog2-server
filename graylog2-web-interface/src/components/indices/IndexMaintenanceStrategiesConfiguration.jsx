@@ -213,7 +213,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
       </Row>
       <Row>
         <Col md={12}>
-          {shouldShowTimeBasedSizeOptimizing && _getConfigurationComponent(
+          {shouldShowTimeBasedSizeOptimizing && retentionIsNotNoop && _getConfigurationComponent(
             TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY,
             PluginStore.exports('indexRotationConfig'),
             [rotationStrategy],
