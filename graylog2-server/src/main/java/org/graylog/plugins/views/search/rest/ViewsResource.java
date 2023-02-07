@@ -186,13 +186,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
 
         // Attempt to resolve the view from optional view resolvers before using the default database lookup.
         // The view resolvers must be used first, because the ID may not be a valid hex ID string.
-        ViewDTO view = resolveView(searchUser, id);
-        if (searchUser.canReadView(view)) {
-            startPageService.addLastOpenedFor(view, searchUser);
-            return view;
-        }
-
-        throw viewNotFoundException(id);
+        return resolveView(searchUser, id);
     }
 
     /**
@@ -208,13 +202,24 @@ public class ViewsResource extends RestResource implements PluginRestResource {
         if (decoder.isResolverViewId()) {
             final ViewResolver viewResolver = viewResolvers.get(decoder.getResolverName());
             if (viewResolver != null) {
-                return viewResolver.get(decoder.getViewId())
-                        .orElseThrow(() -> new NotFoundException("Failed to resolve view:" + id));
+                ViewDTO view = viewResolver.get(decoder.getViewId()).orElseThrow(() -> new NotFoundException("Failed to resolve view:" + id));
+                if (searchUser.canReadView(view)) {
+                    return view;
+                } else {
+                    throw viewNotFoundException(id);
+                }
             } else {
                 throw new NotFoundException("Failed to find view resolver: " + decoder.getResolverName());
             }
         } else {
-            return loadViewIncludingFavorite(searchUser, id);
+            ViewDTO view =  loadViewIncludingFavorite(searchUser, id);
+            if (searchUser.canReadView(view)) {
+                // Only register normal views in LastOpened, for ViewResolvers, a more global solution has to be found because of the catalog
+                startPageService.addLastOpenedFor(view, searchUser);
+                return view;
+            } else {
+                throw viewNotFoundException(id);
+            }
         }
     }
 
