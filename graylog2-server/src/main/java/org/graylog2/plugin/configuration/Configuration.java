@@ -168,6 +168,11 @@ public class Configuration implements Serializable {
         return ints.containsKey(key);
     }
 
+    public boolean encryptedValueIsSet(String key) {
+        final EncryptedValue encryptedValue = getEncryptedValue(key);
+        return encryptedValue.isSet() || encryptedValue.isKeepValue();
+    }
+
     @Nullable
     public String serializeToJson() {
         try {
