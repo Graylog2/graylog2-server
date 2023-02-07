@@ -58,7 +58,7 @@ public class NaturalDateParser {
 
         this.locale = locale;
         this.timeZone = TimeZone.getTimeZone(timeZone);
-        this.zoneId = ZoneId.of(timeZone, ZoneId.SHORT_IDS);
+        this.zoneId = ZoneId.of(timeZone);
         this.dateTimeZone = DateTimeZone.forTimeZone(this.timeZone);
     }
 
