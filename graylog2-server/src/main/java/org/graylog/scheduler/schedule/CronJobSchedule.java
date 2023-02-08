@@ -79,7 +79,7 @@ public abstract class CronJobSchedule implements JobSchedule {
     private ZonedDateTime getZonedDateTime(JobSchedulerClock clock) {
         final DateTime now = clock.nowUTC();
         Instant instant = Instant.ofEpochMilli(now.getMillis());
-        ZoneId zoneId = ZoneId.of(timezone().orElse(DEFAULT_TIMEZONE));
+        ZoneId zoneId = ZoneId.of(timezone().orElse(DEFAULT_TIMEZONE), ZoneId.SHORT_IDS);
         return ZonedDateTime.ofInstant(instant, zoneId);
     }
 
