@@ -19,6 +19,7 @@ package org.graylog.datanode.bootstrap.commands.certutil;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 /**
@@ -32,7 +33,7 @@ public class SystemConsole implements CommandLineConsole {
             return System.console().readLine(format, args);
         } else {
             printLine(String.format(Locale.ROOT, format, args));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
             return reader.readLine();
         }
     }
