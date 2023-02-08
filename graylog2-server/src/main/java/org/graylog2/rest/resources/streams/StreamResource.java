@@ -386,9 +386,6 @@ public class StreamResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
     @ApiOperation(value = "Delete a bulk of streams", response = BulkOperationResponse.class)
-    @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Could not delete at least one of the streams in the bulk.")
-    })
     @NoAuditEvent("Audit events triggered manually")
     public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
                                @Context final UserContext userContext) {
@@ -398,7 +395,7 @@ public class StreamResource extends RestResource {
                 userContext,
                 new AuditParams(AuditEventTypes.STREAM_DELETE, "streamId", Stream.class));
 
-        return Response.status(response.failures().isEmpty() ? Response.Status.OK : Response.Status.BAD_REQUEST)
+        return Response.status(Response.Status.OK)
                 .entity(response)
                 .build();
     }

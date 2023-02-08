@@ -44,6 +44,8 @@ const StyledDropdownMenu = styled.ul.attrs(() => ({
   > li {
     > a {
       color: ${theme.colors.variant.darker.default};
+      display: flex;
+      align-items: center;
       
       &:hover {
         color: ${theme.colors.variant.darkest.default};

@@ -94,6 +94,8 @@ const StreamActions = ({
         UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success');
 
         return response;
+      }).catch((error) => {
+        UserNotification.error(`An error occurred while deleting the stream. ${error}`);
       });
     }
   }, [stream.id, stream.title]);
@@ -185,7 +187,7 @@ const StreamActions = ({
           <MenuItem divider />
         </IfPermitted>
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
-          <MenuItem onSelect={onDelete}>
+          <MenuItem onSelect={onDelete} disabled={isDefaultStream}>
             Delete this stream {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
