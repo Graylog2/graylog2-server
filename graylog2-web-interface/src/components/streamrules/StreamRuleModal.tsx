@@ -34,7 +34,7 @@ import { Col, Well, Input, Modal, Row } from 'components/bootstrap';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import { useStore } from 'stores/connect';
-import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
+import { StreamRulesInputsStore, StreamRulesInputsActions } from 'stores/inputs/StreamRulesInputsStore';
 import STREAM_RULE_TYPES from 'logic/streams/streamRuleTypes';
 
 type FormValues = Partial<Pick<StreamRule, 'type' | 'field' | 'description' | 'value' | 'inverted'>>
@@ -79,10 +79,10 @@ const StreamRuleModal = ({
   onSubmit,
   initialValues,
 }: Props) => {
-  const { inputs } = useStore(InputsStore);
+  const { inputs } = useStore(StreamRulesInputsStore);
 
   useEffect(() => {
-    InputsActions.list();
+    StreamRulesInputsActions.list();
   }, []);
 
   const _onSubmit = useCallback(
@@ -115,7 +115,7 @@ const StreamRuleModal = ({
               <Modal.Title>{title}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              {(!streamRuleTypes?.length || !inputs?.length) ? <Spinner /> : (
+              {(!streamRuleTypes?.length) ? <Spinner /> : (
                 <Row>
                   <Col md={8}>
                     {shouldDisplayFieldInput(values.type) && (

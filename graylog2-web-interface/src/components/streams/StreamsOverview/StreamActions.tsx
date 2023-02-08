@@ -94,6 +94,8 @@ const StreamActions = ({
         UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success');
 
         return response;
+      }).catch((error) => {
+        UserNotification.error(`An error occurred while deleting the stream. ${error}`);
       });
     }
   }, [stream.id, stream.title]);

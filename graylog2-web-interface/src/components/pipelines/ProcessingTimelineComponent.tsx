@@ -83,7 +83,6 @@ const StreamListTD = styled.td`
 const PipelineFilter = ({ query, onSearch }: { query: string, onSearch: (query: string) => void }) => (
   <SearchForm query={query}
               onSearch={onSearch}
-              queryWidth={400}
               queryHelpComponent={<QueryHelper entityName="Pipeline" />}
               wrapperClass="has-bm"
               onReset={() => onSearch('')}

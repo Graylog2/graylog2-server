@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import styled from 'styled-components';
 import * as Immutable from 'immutable';
 import { Formik, Form } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -31,7 +32,7 @@ import { Alert, Col, Row, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { UsersActions } from 'stores/users/UsersStore';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
-import { FormSubmit } from 'components/common';
+import { FormSubmit, IfPermitted, NoSearchResult, ReadOnlyFormGroup } from 'components/common';
 
 import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';
@@ -43,6 +44,16 @@ import UsernameFormGroup from './UsernameFormGroup';
 import ServiceAccountFormGroup from './ServiceAccountFormGroup';
 
 import { Headline } from '../../common/Section/SectionComponent';
+import useIsGlobalTimeoutEnabled from '../../../hooks/useIsGlobalTimeoutEnabled';
+import { Link } from '../../common/router';
+
+const GlobalTimeoutMessage = styled(ReadOnlyFormGroup)`
+  margin-bottom: 20px;
+  
+  .read-only-value-col {
+    padding-top: 0px;
+  }
+`;
 
 const isCloud = AppConfig.isCloud();
 
@@ -143,6 +154,8 @@ const UserCreate = () => {
   const [submitError, setSubmitError] = useState<RequestError | undefined>();
   const [selectedRoles, setSelectedRoles] = useState<Immutable.Set<DescriptiveItem>>(Immutable.Set([initialRole]));
 
+  const isGlobalTimeoutEnabled = useIsGlobalTimeoutEnabled();
+
   const _onAssignRole = (roles: Immutable.Set<DescriptiveItem>) => {
     setSelectedRoles(selectedRoles.union(roles));
     const roleNames = roles.map((r) => r.name);
@@ -187,7 +200,12 @@ const UserCreate = () => {
               </div>
               <div>
                 <Headline>Settings</Headline>
-                <TimeoutFormGroup />
+                {isGlobalTimeoutEnabled ? (
+                  <GlobalTimeoutMessage label="Sessions Timeout"
+                                        value={<NoSearchResult>User session timeout is not editable because the <IfPermitted permissions={['clusterconfigentry:read']}><Link to={Routes.SYSTEM.CONFIGURATIONS}>global session timeout</Link></IfPermitted> is enabled.</NoSearchResult>} />
+                ) : (
+                  <TimeoutFormGroup />
+                )}
                 <TimezoneFormGroup />
                 <ServiceAccountFormGroup />
               </div>

@@ -80,6 +80,7 @@ import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -380,7 +381,9 @@ public abstract class AbstractTcpTransport extends NettyTransport {
 
     private static Set<String> getSecureCipherSuites() {
         final Set<String> openSslCipherSuites = OpenSsl.availableOpenSslCipherSuites();
-        return openSslCipherSuites.stream().filter(s -> !(s.contains("CBC") || s.contains("AES128-SHA") || s.contains("AES256-SHA") )).collect(Collectors.toSet());
+        final String[] disabledAlgorithms = {".*CBC.*", "AES128-SHA", "AES256-SHA", "ECDHE-RSA-AES128-SHA",
+                "ECDHE-RSA-AES256-SHA", "AES128-GCM-SHA256", "AES256-GCM-SHA384"};
+        return openSslCipherSuites.stream().filter(s -> Arrays.stream(disabledAlgorithms).noneMatch(s::matches)).collect(Collectors.toSet());
     }
 
     @ConfigClass

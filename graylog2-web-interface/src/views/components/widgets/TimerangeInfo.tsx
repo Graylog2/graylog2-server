@@ -40,8 +40,7 @@ const Wrapper = styled.div(({ theme }) => css`
   width: max-content;
 `);
 
-const getEffectiveWidgetTimerange = (result, activeQuery, searchTypeId) => result?.results[activeQuery]
-  .searchTypes[searchTypeId]?.effective_timerange;
+const getEffectiveWidgetTimerange = (result, activeQuery, searchTypeId) => result?.results?.[activeQuery]?.searchTypes[searchTypeId]?.effective_timerange;
 
 const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
   const { formatTime } = useUserDateTime();

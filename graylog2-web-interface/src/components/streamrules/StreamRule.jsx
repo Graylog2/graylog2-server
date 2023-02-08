@@ -26,7 +26,7 @@ import { Button, ListGroupItem } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import UserNotification from 'util/UserNotification';
-import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
+import { StreamRulesInputsActions, StreamRulesInputsStore } from 'stores/inputs/StreamRulesInputsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 
 const ActionButtonsWrap = styled.span`
@@ -35,10 +35,10 @@ const ActionButtonsWrap = styled.span`
 
 const StreamRule = ({ matchData, permissions, stream, streamRule, streamRuleTypes, onSubmit, onDelete }) => {
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
-  const { inputs } = useStore(InputsStore);
+  const { inputs } = useStore(StreamRulesInputsStore);
 
   useEffect(() => {
-    InputsActions.list();
+    StreamRulesInputsActions.list();
   }, []);
 
   const _onEdit = (event) => {

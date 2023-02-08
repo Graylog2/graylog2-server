@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 
 import { Link } from 'components/common/router';
 import { useStore } from 'stores/connect';
-import { ViewStore } from 'views/stores/ViewStore';
+import { ViewActions, ViewStore } from 'views/stores/ViewStore';
 import { Icon } from 'components/common';
 import { Row } from 'components/bootstrap';
 import ViewPropertiesModal from 'views/components/dashboard/DashboardPropertiesModal';
@@ -28,6 +28,7 @@ import onSaveView from 'views/logic/views/OnSaveViewAction';
 import View from 'views/logic/views/View';
 import Routes from 'routing/Routes';
 import viewTitle from 'views/logic/views/ViewTitle';
+import FavoriteIcon from 'views/components/FavoriteIcon';
 
 const links = {
   [View.Type.Dashboard]: {
@@ -80,6 +81,9 @@ const ViewHeader = () => {
 
   const typeText = view.type.toLocaleLowerCase();
   const title = viewTitle(view.title, view.type);
+  const onChangeFavorite = useCallback((newValue) => {
+    ViewActions.update(view.toBuilder().favorite(newValue).build());
+  }, [view]);
 
   return (
     <Row>
@@ -91,12 +95,15 @@ const ViewHeader = () => {
         <TitleWrapper>
           <span>{title}</span>
           {isSavedView && (
-          <EditButton onClick={toggleMetadataEdit}
-                      role="button"
-                      title={`Edit ${typeText} ${view.title} metadata`}
-                      tabIndex={0}>
-            <Icon name="pen-to-square" />
-          </EditButton>
+            <>
+              <FavoriteIcon isFavorite={view.favorite} id={view.id} onChange={onChangeFavorite} />
+              <EditButton onClick={toggleMetadataEdit}
+                          role="button"
+                          title={`Edit ${typeText} ${view.title} metadata`}
+                          tabIndex={0}>
+                <Icon name="pen-to-square" />
+              </EditButton>
+            </>
           )}
         </TitleWrapper>
         {showMetadataEdit && (

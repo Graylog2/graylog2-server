@@ -29,19 +29,26 @@ const StyledIcon = styled(Icon)(({ theme, $isFavorite }: { theme: DefaultTheme, 
 
 type Props = {
   isFavorite: boolean,
-  id: string
+  id: string,
+  onChange: (currentState: boolean) => void,
+  className?: string,
 }
 
-const FavoriteIcon = ({ isFavorite, id }: Props) => {
+const FavoriteIcon = ({ isFavorite, id, onChange, className }: Props) => {
   const { putItem, deleteItem } = useFavoriteItemMutation();
   const onClick = useCallback(() => {
     if (isFavorite) {
-      deleteItem(id);
-    } else { putItem(id); }
-  }, [isFavorite, deleteItem, id, putItem]);
+      deleteItem(id)
+        .then(() => onChange(false));
+    } else { putItem(id).then(() => onChange(true)); }
+  }, [isFavorite, deleteItem, id, onChange, putItem]);
   const title = isFavorite ? 'Remove from favorites' : 'Add to favorites';
 
-  return <StyledIcon onClick={onClick} title={title} $isFavorite={isFavorite} name="star" type={isFavorite ? 'solid' : 'regular'} />;
+  return <StyledIcon className={className} onClick={onClick} title={title} $isFavorite={isFavorite} name="star" type={isFavorite ? 'solid' : 'regular'} />;
+};
+
+FavoriteIcon.defaultProps = {
+  className: undefined,
 };
 
 export default FavoriteIcon;

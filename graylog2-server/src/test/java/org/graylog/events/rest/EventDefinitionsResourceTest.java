@@ -16,6 +16,7 @@
  */
 package org.graylog.events.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import org.graylog.events.context.EventDefinitionContextService;
 import org.graylog.events.notifications.EventNotificationSettings;
@@ -25,6 +26,7 @@ import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
+import org.graylog2.audit.AuditEventSender;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,11 +58,15 @@ public class EventDefinitionsResourceTest {
     EventProcessorConfig config1;
     @Mock
     EventProcessorConfig config2;
+    @Mock
+    AuditEventSender auditEventSender;
+    @Mock
+    ObjectMapper objectMapper;
     EventDefinitionsResource resource;
 
     @Before
     public void setup() {
-        resource = new EventDefinitionsResource(dbService, eventDefinitionHandler, contextService, engine, recentActivityService);
+        resource = new EventDefinitionsResource(dbService, eventDefinitionHandler, contextService, engine, recentActivityService, auditEventSender, objectMapper);
         when(config1.type()).thenReturn(CONFIG_TYPE_1);
         when(config2.type()).thenReturn(CONFIG_TYPE_2);
     }

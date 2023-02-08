@@ -143,7 +143,8 @@ public class DashboardV1FacadeTest {
         viewService = new ViewFacadeTest.TestViewService(mongoConnection, mapper, objectMapper,null);
         viewSummaryService = new ViewFacadeTest.TestViewSummaryService(mongoConnection, mapper, objectMapper);
         userService = mock(UserService.class);
-        final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()), ImmutableMap.of("username", "testuser"));
+        final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
+                mock(ClusterConfigService.class), ImmutableMap.of("username", "testuser"));
         when(userService.load("testuser")).thenReturn(fakeUser);
         final DashboardWidgetConverter dashboardWidgetConverter = new DashboardWidgetConverter();
         final EntityConverter entityConverter = new EntityConverter(dashboardWidgetConverter);
