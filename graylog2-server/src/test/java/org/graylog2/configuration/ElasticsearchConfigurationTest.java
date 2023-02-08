@@ -45,7 +45,7 @@ public class ElasticsearchConfigurationTest {
         assertEquals(1, configuration.getIndexOptimizationMaxNumSegments());
         assertEquals(Duration.minutes(5), configuration.getIndexFieldTypePeriodicalFullRefreshInterval());
         assertEquals("delete", configuration.getRetentionStrategy());
-        assertEquals("size", configuration.getRotationStrategy());
+        assertEquals("time-size-optimizing", configuration.getRotationStrategy());
         assertEquals(Period.days(1), configuration.getMaxTimePerIndex());
         assertFalse(configuration.isRotateEmptyIndex());
         assertEquals(20000000, configuration.getMaxDocsPerIndex());
