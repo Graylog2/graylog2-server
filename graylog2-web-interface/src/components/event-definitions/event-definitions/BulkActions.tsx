@@ -14,13 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { uniq } from 'lodash';
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
+import { ConfirmDialog } from 'components/common';
 import ApiRoutes from 'routing/ApiRoutes';
-import type FetchError from 'logic/errors/FetchError';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -28,48 +27,110 @@ import { Button } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
 
 type Props = {
-  selectedDefintions: Array<string>,
-  refetchEventDefinitions: () => void,
+  selectedDefintionsIds: Array<string>,
   setSelectedEventDefinitionsIds: (definitionIds: Array<string>) => void
 };
+const ACTION_TYPES = {
+  DELETE: 'delete',
+  DISABLE: 'disable',
+  ENABLE: 'enable',
+};
+const getDescriptor = (count: number) => StringUtils.pluralize(count, 'event definition', 'event definitions');
 
-const BulkActions = ({ selectedDefintions, refetchEventDefinitions, setSelectedEventDefinitionsIds }: Props) => {
+const ACTION_TEXT = {
+  [ACTION_TYPES.DELETE]: {
+    dialogTitle: 'Delete Event Definitions',
+    dialogBody: (count: number) => `Are you sure you want to delete ${getDescriptor(count)}"?`,
+    bulkActionUrl: ApiRoutes.EventDefinitionsApiController.bulkDelete().url,
+
+  },
+  [ACTION_TYPES.DISABLE]: {
+    dialogTitle: 'Disable Event Definitions',
+    dialogBody: (count: number) => `Are you sure you want to disable ${getDescriptor(count)}"?`,
+    bulkActionUrl: ApiRoutes.EventDefinitionsApiController.bulkUnschedule().url,
+  },
+  [ACTION_TYPES.ENABLE]: {
+    dialogTitle: 'Enable Event Definitions',
+    dialogBody: (count: number) => `Are you sure you want to enable ${getDescriptor(count)}"?`,
+    bulkActionUrl: ApiRoutes.EventDefinitionsApiController.bulkSchedule().url,
+  },
+};
+
+const BulkActions = ({ selectedDefintionsIds, setSelectedEventDefinitionsIds }: Props) => {
   const queryClient = useQueryClient();
-  const selectedItemsAmount = selectedDefintions?.length;
-  const descriptor = StringUtils.pluralize(selectedItemsAmount, 'event definition', 'event definitions');
-  const onDelete = useCallback(() => {
-    // eslint-disable-next-line no-alert
-    if (window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}?`)) {
-      const deleteCalls = selectedDefintions.map((eventDefinitionId) => fetch('DELETE', qualifyUrl(ApiRoutes.EventDefinitionsApiController.delete(eventDefinitionId).url)).then(() => eventDefinitionId));
+  const [showDialog, setShowDialog] = useState(false);
+  const [actionType, setActionType] = useState(null);
+  const selectedItemsAmount = selectedDefintionsIds?.length;
+  const refetchEventDefinitions = useCallback(() => queryClient.invalidateQueries(['eventDefinition', 'overview']), [queryClient]);
 
-      Promise.allSettled(deleteCalls).then((result) => {
-        const fulfilledRequests = result.filter((response) => response.status === 'fulfilled') as Array<{ status: 'fulfilled', value: string }>;
-        const deletedEventDefinitionIds = fulfilledRequests.map(({ value }) => value);
-        const notDeletedEventDefinitionIds = selectedDefintions?.filter((streamId) => !deletedEventDefinitionIds.includes(streamId));
+  const updateState = ({ show, type }) => {
+    setShowDialog(show);
+    setActionType(type);
+  };
 
-        if (notDeletedEventDefinitionIds.length) {
-          const rejectedRequests = result.filter((response) => response.status === 'rejected') as Array<{ status: 'rejected', reason: FetchError }>;
-          const errorMessages = uniq(rejectedRequests.map((request) => request.reason.responseMessage));
+  const handleAction = (action) => {
+    switch (action) {
+      case ACTION_TYPES.DELETE:
+        updateState({ show: true, type: ACTION_TYPES.DELETE });
 
-          if (notDeletedEventDefinitionIds.length !== selectedDefintions.length) {
-            queryClient.invalidateQueries(['eventDefinition', 'overview']);
-          }
+        break;
+      case ACTION_TYPES.ENABLE:
+        updateState({ show: true, type: ACTION_TYPES.ENABLE });
 
-          UserNotification.error(`${notDeletedEventDefinitionIds.length} out of ${selectedDefintions} selected ${descriptor} could not be deleted. Status: ${errorMessages.join()}`);
+        break;
+      case ACTION_TYPES.DISABLE:
+        updateState({ show: true, type: ACTION_TYPES.DISABLE });
 
-          return;
-        }
-
-        queryClient.invalidateQueries(['eventDefinition', 'overview']);
-        setSelectedEventDefinitionsIds(notDeletedEventDefinitionIds);
-        refetchEventDefinitions();
-        UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`, 'Success');
-      });
+        break;
+      default:
+        break;
     }
-  }, [descriptor, queryClient, refetchEventDefinitions, selectedDefintions, selectedItemsAmount, setSelectedEventDefinitionsIds]);
+  };
+
+  const handleClearState = () => {
+    updateState({ show: false, type: null });
+    refetchEventDefinitions();
+  };
+
+  const onAction = useCallback(() => {
+    fetch('POST',
+      qualifyUrl(ACTION_TEXT[actionType].bulkActionUrl),
+      { entity_ids: selectedDefintionsIds },
+    ).then(({ failures }) => {
+      if (failures?.length) {
+        const notUpdatedDefinitionIds = failures.map(({ entity_id }) => entity_id);
+        setSelectedEventDefinitionsIds(notUpdatedDefinitionIds);
+        UserNotification.error(`${notUpdatedDefinitionIds.length} out of ${selectedItemsAmount} selected ${getDescriptor(selectedItemsAmount)} could not be ${actionType}d.`);
+      } else {
+        setSelectedEventDefinitionsIds([]);
+        UserNotification.success(`${selectedItemsAmount} ${getDescriptor(selectedItemsAmount)} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} ${actionType} successfully.`, 'Success');
+      }
+    })
+      .catch((error) => {
+        UserNotification.error(`An error occurred while ${actionType} event definition. ${error}`);
+      }).finally(() => {
+        refetchEventDefinitions();
+      });
+  }, [actionType, refetchEventDefinitions, selectedDefintionsIds, selectedItemsAmount, setSelectedEventDefinitionsIds]);
+
+  const handleConfirm = () => {
+    onAction();
+  };
 
   return (
-    <Button bsSize="xsmall" bsStyle="danger" onClick={onDelete}>Delete</Button>
+    <>
+      <Button bsSize="xsmall" bsStyle="primary" onClick={() => handleAction(ACTION_TYPES.ENABLE)}>Enable</Button>
+      <Button bsSize="xsmall" bsStyle="primary" onClick={() => handleAction(ACTION_TYPES.DISABLE)}>Disable</Button>
+      <Button bsSize="xsmall" bsStyle="danger" onClick={() => handleAction(ACTION_TYPES.DELETE)}>Delete</Button>
+      {showDialog && (
+      <ConfirmDialog title={ACTION_TEXT[actionType]?.dialogTitle}
+                     show
+                     onConfirm={handleConfirm}
+                     onCancel={handleClearState}>
+        {ACTION_TEXT[actionType]?.dialogBody(selectedItemsAmount)}
+      </ConfirmDialog>
+      )}
+    </>
   );
 };
 

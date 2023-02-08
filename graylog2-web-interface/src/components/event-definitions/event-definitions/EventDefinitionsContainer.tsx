@@ -109,9 +109,8 @@ const EventDefinitionsContainer = () => {
     selectedEventDefinitionsIds: Array<string>,
     setSelectedEventDefinitionsIds: (eventDefinitionsId: Array<string>) => void,
   ) => (
-    <BulkActions selectedDefintions={selectedEventDefinitionsIds}
-                 setSelectedEventDefinitionsIds={setSelectedEventDefinitionsIds}
-                 refetchEventDefinitions={refetchEventDefinitions} />
+    <BulkActions selectedDefintionsIds={selectedEventDefinitionsIds}
+                 setSelectedEventDefinitionsIds={setSelectedEventDefinitionsIds} />
   );
 
   if (!paginatedEventDefinitions) {
