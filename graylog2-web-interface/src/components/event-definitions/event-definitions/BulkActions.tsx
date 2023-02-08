@@ -103,7 +103,7 @@ const BulkActions = ({ selectedDefintionsIds, setSelectedEventDefinitionsIds }: 
         UserNotification.error(`${notUpdatedDefinitionIds.length} out of ${selectedItemsAmount} selected ${getDescriptor(selectedItemsAmount)} could not be ${actionType}d.`);
       } else {
         setSelectedEventDefinitionsIds([]);
-        UserNotification.success(`${selectedItemsAmount} ${getDescriptor(selectedItemsAmount)} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} ${actionType} successfully.`, 'Success');
+        UserNotification.success(`${selectedItemsAmount} ${getDescriptor(selectedItemsAmount)} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} ${actionType}d successfully.`, 'Success');
       }
     })
       .catch((error) => {
