@@ -220,7 +220,10 @@ const WidgetGrid = () => {
     const widgetItems = widgets
       .filter((widget) => !!positions[widget.id])
       .map(({ id: widgetId }) => (
-        <WidgetContainer key={widgetId} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
+        <WidgetContainer key={widgetId}
+                         className="widgetFrame"
+                         data-widget-id={widgetId}
+                         isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
           <WidgetGridItem positions={positions}
                           widgetId={widgetId}
                           focusedWidget={focusedWidget}
