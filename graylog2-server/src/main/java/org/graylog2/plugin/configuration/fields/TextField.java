@@ -47,7 +47,7 @@ public class TextField extends AbstractConfigurationField {
     }
 
     public TextField(String name, String humanName, String defaultValue, String description, Optional isOptional, int position, Attribute... attrs) {
-        this(name, humanName, defaultValue, description, isOptional, DEFAULT_IS_SENSITIVE, position, attrs);
+        this(name, humanName, defaultValue, description, isOptional, DEFAULT_IS_ENCRYPTED, position, attrs);
     }
 
     public TextField(String name, String humanName, String defaultValue, String description, Optional isOptional, boolean isEncrypted, Attribute... attrs) {

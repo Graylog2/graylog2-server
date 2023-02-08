@@ -91,6 +91,7 @@ public class ConfigurationRequest {
             config.put("attributes", f.getAttributes());
             config.put("additional_info", f.getAdditionalInformation());
             config.put("position", f.getPosition());
+            config.put("is_encrypted", f.isEncrypted());
 
             configs.put(f.getName(), config);
         }

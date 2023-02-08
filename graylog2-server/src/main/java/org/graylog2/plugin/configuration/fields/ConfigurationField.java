@@ -22,7 +22,7 @@ import java.util.Map;
 public interface ConfigurationField {
     int DEFAULT_POSITION = 100;  // corresponds to ConfigurationForm.jsx
     int PLACE_AT_END_POSITION = 200;
-    boolean DEFAULT_IS_SENSITIVE = false;  // corresponds to ConfigurationForm.jsx
+    boolean DEFAULT_IS_ENCRYPTED = false;  // corresponds to ConfigurationForm.jsx
 
     enum Optional {
         OPTIONAL,
@@ -52,6 +52,6 @@ public interface ConfigurationField {
     }
 
     default boolean isEncrypted() {
-        return DEFAULT_IS_SENSITIVE;
+        return DEFAULT_IS_ENCRYPTED;
     }
 }
