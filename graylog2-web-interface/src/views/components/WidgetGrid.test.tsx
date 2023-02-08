@@ -16,18 +16,18 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { Map as MockMap } from 'immutable';
 import { mount } from 'wrappedEnzyme';
 
 import { MockStore, asMock } from 'helpers/mocking';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Widget from 'views/components/widgets/Widget';
 import _Widget from 'views/logic/widgets/Widget';
-import { WidgetStore } from 'views/stores/WidgetStore';
-import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import ViewState from 'views/logic/views/ViewState';
+import mockAction from 'helpers/mocking/MockAction';
+import { createSearch as mockCreateSearch } from 'fixtures/searches';
+import { ViewStore } from 'views/stores/ViewStore';
 
 import WidgetGrid from './WidgetGrid';
 
@@ -50,21 +50,32 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 
 jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
 
-jest.mock('views/stores/WidgetStore', () => ({
-  WidgetStore: MockStore(['getInitialState', jest.fn()]),
-}));
-
-jest.mock('views/stores/CurrentViewStateStore', () => ({
-  CurrentViewStateStore: MockStore(['getInitialState', jest.fn(() => ({ state: { widgetPositions: {} } }))]),
-}));
-
-jest.mock('views/stores/TitlesStore', () => ({
-  TitlesStore: MockStore(['getInitialState', jest.fn(() => MockMap())]),
+jest.mock('views/stores/ViewStore', () => ({
+  ViewActions: {
+    loadNew: mockAction(),
+    load: mockAction(),
+  },
+  ViewStore: MockStore(['getInitialState', jest.fn(() => ({
+    view: mockCreateSearch({ queryId: 'foobar' }),
+    activeQuery: 'foobar',
+  }))]),
 }));
 
 describe('<WidgetGrid />', () => {
   beforeEach(() => {
-    asMock(WidgetStore.getInitialState).mockReturnValue(Immutable.Map());
+    const activeQuery = 'foobar';
+    const widget = _Widget.builder().type('dummy').id('widget1').build();
+    const positions = {
+      widget1: new WidgetPosition(1, 1, 1, 1),
+    };
+    const viewState = ViewState.builder()
+      .widgets([widget])
+      .widgetPositions(positions)
+      .build();
+    const view = mockCreateSearch({ queryId: activeQuery }).toBuilder()
+      .state({ [activeQuery]: viewState })
+      .build();
+    asMock(ViewStore.getInitialState).mockReturnValue({ view, activeQuery, dirty: false, isNew: false });
   });
 
   const fieldTypes: FieldTypes = {
@@ -74,45 +85,19 @@ describe('<WidgetGrid />', () => {
   const SimpleWidgetGrid = () => <FieldTypesContext.Provider value={fieldTypes}><WidgetGrid /></FieldTypesContext.Provider>;
 
   it('should render with minimal props', () => {
-    const wrapper = mount((
-      <SimpleWidgetGrid />
-    ));
+    const wrapper = mount(<SimpleWidgetGrid />);
 
     expect(wrapper).toExist();
   });
 
   it('should render with widgets passed', () => {
-    const widgets = {
-      widget1: _Widget.builder().type('dummy').id('widget1').build(),
-    };
-    asMock(WidgetStore.getInitialState).mockReturnValue(Immutable.Map(widgets));
-    const positions = {
-      widget1: new WidgetPosition(1, 1, 1, 1),
-    };
-
-    asMock(CurrentViewStateStore.getInitialState).mockReturnValue({ state: ViewState.builder().widgetPositions(positions).build(), activeQuery: 'query1' });
-
-    const wrapper = mount((
-      <SimpleWidgetGrid />
-    ));
+    const wrapper = mount(<SimpleWidgetGrid />);
 
     expect(wrapper.find(Widget)).toHaveLength(1);
   });
 
   it('should render widget even if widget has no data', () => {
-    const widgets = {
-      widget1: _Widget.builder().type('dummy').id('widget1').build(),
-    };
-    asMock(WidgetStore.getInitialState).mockReturnValue(Immutable.Map(widgets));
-    const positions = {
-      widget1: new WidgetPosition(1, 1, 1, 1),
-    };
-
-    asMock(CurrentViewStateStore.getInitialState).mockReturnValue({ state: ViewState.builder().widgetPositions(positions).build(), activeQuery: 'query1' });
-
-    const wrapper = mount((
-      <SimpleWidgetGrid />
-    ));
+    const wrapper = mount(<SimpleWidgetGrid />);
 
     expect(wrapper.find(Widget)).toHaveLength(1);
   });

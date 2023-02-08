@@ -25,17 +25,15 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import { useStore } from 'stores/connect';
-import { WidgetStore } from 'views/stores/WidgetStore';
 import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
-import type { StoreState } from 'stores/StoreTypes';
-import { ViewStatesStore } from 'views/stores/ViewStatesStore';
 import ElementDimensions from 'components/common/ElementDimensions';
 import findGaps from 'views/components/GridGaps';
 import generateId from 'logic/generateId';
 import NewWidgetPlaceholder from 'views/components/NewWidgetPlaceholder';
 import CreateNewWidgetModal from 'views/components/CreateNewWidgetModal';
 import isDeepEqual from 'stores/isDeepEqual';
+import type { ViewStoreState } from 'views/stores/ViewStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
 
 import WidgetContainer from './WidgetContainer';
@@ -92,20 +90,6 @@ const WidgetGridItem = ({
                      position={widgetPosition}
                      widgetId={widgetId} />
   );
-};
-
-const generatePositions = (widgets: Array<{ id: string, type: string }>, positions: { [widgetId: string]: WidgetPosition }) => Object.fromEntries(
-  widgets.map<[string, WidgetPosition]>(({ id, type }) => [id, positions[id] ?? _defaultDimensions(type)]),
-);
-
-const mapWidgetPositions = (states: StoreState<typeof ViewStatesStore>) => Object.fromEntries(states.toArray().flatMap((state) => Object.entries(state.widgetPositions)));
-const mapWidgets = (state: StoreState<typeof WidgetStore>) => state.map(({ id, type }) => ({ id, type })).toArray();
-
-const useWidgetPositions = (): WidgetPositions => {
-  const initialPositions = useStore(ViewStatesStore, mapWidgetPositions);
-  const widgets = useStore(WidgetStore, mapWidgets);
-
-  return useMemo(() => generatePositions(widgets, initialPositions), [widgets, initialPositions]);
 };
 
 type GridProps = {
@@ -193,14 +177,33 @@ const renderGaps = (widgets: { id: string, type: string}[], positions: WidgetPos
   return [gapsItems, _positions] as const;
 };
 
+const generatePositions = (widgets: Array<{ id: string, type: string }>, positions: { [widgetId: string]: WidgetPosition }) => Object.fromEntries(
+  widgets.map<[string, WidgetPosition]>(({ id, type }) => [id, positions[id] ?? _defaultDimensions(type)]),
+);
+
+const mapWidgetsAndPositions = (store: ViewStoreState) => {
+  const { activeQuery, view } = store;
+  const currentViewState = view.state.get(activeQuery);
+  const { widgets, widgetPositions } = currentViewState;
+  const positions = generatePositions(widgets.toArray(), widgetPositions);
+
+  return {
+    widgets: widgets.map(({ id, type }) => ({ id, type })).toArray().reverse(),
+    positions,
+  };
+};
+
+const useWidgetsAndPositions = () => {
+  return useStore(ViewStore, mapWidgetsAndPositions);
+};
+
 const WidgetGrid = () => {
   const isInteractive = useContext(InteractiveContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
   const [lastUpdate, setLastUpdate] = useState<string>(undefined);
   const preventDoubleUpdate = useRef<BackendWidgetPosition[]>();
 
-  const widgets = useStore(WidgetStore, (state) => state.map(({ id, type }) => ({ id, type })).toArray().reverse());
-  const positions = useWidgetPositions();
+  const { widgets, positions } = useWidgetsAndPositions();
 
   const onPositionsChange = useCallback((newPositions: Array<BackendWidgetPosition>) => {
     preventDoubleUpdate.current = newPositions;
