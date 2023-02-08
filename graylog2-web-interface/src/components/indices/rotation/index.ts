@@ -47,7 +47,7 @@ PluginStore.register(new PluginManifest({}, {
     },
     {
       type: 'org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy',
-      displayName: 'Index Size Optimising Time',
+      displayName: 'Index Time Size Optimizing',
       configComponent: TimeBasedSizeOptimizingStrategyConfiguration,
       summaryComponent: TimeBasedSizeOptimizingStrategySummary,
     },
