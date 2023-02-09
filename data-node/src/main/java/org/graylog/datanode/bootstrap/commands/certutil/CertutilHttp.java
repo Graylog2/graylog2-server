@@ -79,7 +79,7 @@ public class CertutilHttp implements CliCommand {
 
             try {
                 console.printLine("Generating certificate signing request for this datanode");
-                KeyPair keyPair = CertTools.generateCertificate("localhost", Collections.emptyList(), null, false);
+                KeyPair keyPair = CertificateGenerator.generateCertificate("localhost", Collections.emptyList(), null, false);
                 PKCS10CertificationRequestBuilder p10Builder = new JcaPKCS10CertificationRequestBuilder(
                         new X500Principal("CN=Requested Test Certificate"), keyPair.publicKey());
                 JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA256withRSA");
@@ -120,7 +120,7 @@ public class CertutilHttp implements CliCommand {
                 sanValues.add(Tools.getLocalHostname());
                 sanValues.add(String.valueOf(InetAddress.getLocalHost()));
 
-                KeyPair nodePair = CertTools.generateCertificate("localhost", sanValues, caKeyPair, false);
+                KeyPair nodePair = CertificateGenerator.generateCertificate("localhost", sanValues, caKeyPair, false);
                 console.printLine("Successfully generated CA from the keystore");
 
                 KeyStore nodeKeystore = KeyStore.getInstance("PKCS12");

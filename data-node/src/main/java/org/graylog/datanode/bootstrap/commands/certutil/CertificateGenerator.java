@@ -37,7 +37,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 
-public class CertTools {
+public class CertificateGenerator {
     /**
      * @param cnName The CN={name} of the certificate. When the certificate is for a domain it should be the domain name
      * @param SAN entries (=subject alternative names)
