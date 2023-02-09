@@ -49,4 +49,8 @@ public class InputDescription {
     public ConfigurationRequest getConfigurationRequest() {
         return config.combinedRequestedConfiguration();
     }
+
+    public static String getInputDescriptionName(InputDescription description, String inputTypeFallback) {
+        return description != null ? description.getName() : "Unknown Input (" + inputTypeFallback + ")";
+    }
 }

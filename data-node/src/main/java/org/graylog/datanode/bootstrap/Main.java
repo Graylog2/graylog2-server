@@ -19,10 +19,13 @@ package org.graylog.datanode.bootstrap;
 import com.github.rvesse.airline.Cli;
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.google.common.collect.ImmutableSet;
-import org.graylog2.bootstrap.CliCommand;
-import org.graylog2.bootstrap.CliCommandsProvider;
 import org.graylog.datanode.bootstrap.commands.CliCommandHelp;
 import org.graylog.datanode.bootstrap.commands.ShowVersion;
+import org.graylog.datanode.bootstrap.commands.certutil.CertutilCa;
+import org.graylog.datanode.bootstrap.commands.certutil.CertutilCert;
+import org.graylog.datanode.bootstrap.commands.certutil.CertutilHttp;
+import org.graylog2.bootstrap.CliCommand;
+import org.graylog2.bootstrap.CliCommandsProvider;
 
 import java.util.ServiceLoader;
 
@@ -32,6 +35,9 @@ public class Main {
                 .withDescription("Open source, centralized log management")
                 .withDefaultCommand(CliCommandHelp.class)
                 .withCommands(ImmutableSet.of(
+                        CertutilCa.class,
+                        CertutilCert.class,
+                        CertutilHttp.class,
                         ShowVersion.class,
                         CliCommandHelp.class));
 

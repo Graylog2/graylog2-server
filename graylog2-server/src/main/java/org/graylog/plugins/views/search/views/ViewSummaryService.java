@@ -28,7 +28,6 @@ import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -61,7 +60,7 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> imple
 
         checkNotNull(sortField);
 
-        var sort = getSortBuilder(order, sortField);
+        var sort = getMultiFieldSortBuilder(order, List.of(sortField, ViewDTO.SECONDARY_SORT));
 
         var query = Filters.and(
                 // negation for Filters.exists() not found, so reverting to BasicDBObject for now
