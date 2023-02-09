@@ -16,19 +16,43 @@
  */
 package org.graylog2.indexer.retention;
 
+import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.indexer.retention.strategies.AbstractIndexCountBasedRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.ClosingRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.plugin.PluginModule;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 public class RetentionStrategyBindings extends PluginModule {
+
+    private final ElasticsearchConfiguration configuration;
+
+    public RetentionStrategyBindings(ElasticsearchConfiguration elasticsearchConfiguration) {
+        this.configuration = elasticsearchConfiguration;
+    }
+
     @Override
     protected void configure() {
-        addRetentionStrategy(DeletionRetentionStrategy.class);
+        List<Class<? extends AbstractIndexCountBasedRetentionStrategy>> retentionStrategies = new LinkedList<>(Arrays.asList(DeletionRetentionStrategy.class, ClosingRetentionStrategy.class, NoopRetentionStrategy.class));
+        Set<String> disabledRetentionStrategies = configuration.getDisabledRetentionStrategies();
 
-        if (!isCloud()) {
-            addRetentionStrategy(ClosingRetentionStrategy.class);
-            addRetentionStrategy(NoopRetentionStrategy.class);
+        for (String disabledStrategy : disabledRetentionStrategies) {
+            switch (disabledStrategy) {
+                case DeletionRetentionStrategy.NAME -> retentionStrategies.remove(DeletionRetentionStrategy.class);
+                case ClosingRetentionStrategy.NAME -> retentionStrategies.remove((ClosingRetentionStrategy.class));
+                case NoopRetentionStrategy.NAME -> retentionStrategies.remove((NoopRetentionStrategy.class));
+                default ->
+                        throw new IllegalArgumentException("Detected invalid retention strategy: \"%s\" in `disabled_retention_strategies` configuration value.".formatted(disabledStrategy));
+            }
+        }
+
+        for (Class<? extends AbstractIndexCountBasedRetentionStrategy> adding : retentionStrategies) {
+            addRetentionStrategy(adding);
         }
     }
 }

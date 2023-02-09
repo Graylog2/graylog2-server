@@ -18,6 +18,7 @@ package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
+import com.github.joschi.jadconfig.converters.StringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
@@ -32,8 +33,10 @@ import org.joda.time.Period;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class ElasticsearchConfiguration {
     public static final String MAX_INDEX_RETENTION_PERIOD = "max_index_retention_period";
@@ -72,6 +75,9 @@ public class ElasticsearchConfiguration {
 
     @Parameter(value = "retention_strategy", required = true)
     private String retentionStrategy = DeletionRetentionStrategy.NAME;
+
+    @Parameter(value = "disabled_retention_strategies", required = true, converter = StringSetConverter.class)
+    private Set<String> disabledRetentionStrategies = Collections.emptySet();
 
     @Parameter(value = "rotation_strategy", required = true)
     private String rotationStrategy = SizeBasedRotationStrategy.NAME;
@@ -180,6 +186,10 @@ public class ElasticsearchConfiguration {
 
     public String getRetentionStrategy() {
         return retentionStrategy;
+    }
+
+    public Set<String> getDisabledRetentionStrategies() {
+        return disabledRetentionStrategies;
     }
 
     public Period getMaxTimePerIndex() {
