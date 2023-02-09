@@ -27,6 +27,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.Key;
@@ -174,7 +175,7 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
 
 
     private static void writePem(Path path, Object object) throws IOException {
-        FileWriter writer = new FileWriter(path.toFile());
+        FileWriter writer = new FileWriter(path.toFile(), StandardCharsets.UTF_8);
         JcaPEMWriter pemWriter = new JcaPEMWriter(writer);
         pemWriter.writeObject(object);
         pemWriter.flush();
