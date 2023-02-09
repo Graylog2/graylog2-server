@@ -25,6 +25,7 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.graylog2.bootstrap.CliCommand;
+import org.graylog2.plugin.Tools;
 
 import javax.security.auth.x500.X500Principal;
 import java.io.FileInputStream;
@@ -32,6 +33,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -115,7 +117,7 @@ public class CertutilHttp implements CliCommand {
                 // TODO: validity
                 List<String> sanValues = new ArrayList<>();
                 sanValues.add("localhost");
-                sanValues.add(InetAddress.getLocalHost().getHostName());
+                sanValues.add(Tools.getLocalHostname());
                 sanValues.add(String.valueOf(InetAddress.getLocalHost()));
 
                 KeyPair nodePair = CertTools.generateCertificate("localhost", sanValues, caKeyPair, false);
@@ -148,7 +150,7 @@ public class CertutilHttp implements CliCommand {
     }
 
     private static void writePem(Path path, Object object) throws IOException {
-        FileWriter writer = new FileWriter(path.toFile());
+        FileWriter writer = new FileWriter(path.toFile(), StandardCharsets.UTF_8);
         JcaPEMWriter pemWriter = new JcaPEMWriter(writer);
         pemWriter.writeObject(object);
         pemWriter.flush();

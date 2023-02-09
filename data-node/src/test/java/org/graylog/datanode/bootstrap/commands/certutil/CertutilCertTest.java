@@ -82,6 +82,6 @@ class CertutilCertTest {
                 .hasSize(3)
                 .extracting(c ->(X509Certificate)c)
                 .extracting(c -> c.getSubjectX500Principal().getName())
-                .contains("CN=root", "CN=ca", "CN=" + InetAddress.getLocalHost().getHostName());
+                .contains("CN=root", "CN=ca", "CN=localhost");
     }
 }
