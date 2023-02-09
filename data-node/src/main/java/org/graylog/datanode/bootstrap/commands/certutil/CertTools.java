@@ -64,7 +64,7 @@ public class CertTools {
             issuerName = name;
             issuerKey = certKeyPair.getPrivate();
         } else {
-            issuerName = new X500Name(issuer.certificate().getIssuerX500Principal().getName());
+            issuerName = new X500Name(issuer.certificate().getSubjectX500Principal().getName());
             issuerKey = issuer.privateKey();
         }
 
