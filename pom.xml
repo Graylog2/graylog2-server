@@ -251,6 +251,26 @@
                 <artifactId>httpcore-nio</artifactId>
                 <version>${apache-httpcore.version}</version>
             </dependency>
+            <!-- Ensure consistent Netty versions across dependencies and transitive dependencies -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>${netty.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-tcnative-boringssl-static</artifactId>
+                <version>${netty-tcnative-boringssl-static.version}</version>
+                <classifier>osx-x86_64</classifier>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-tcnative-boringssl-static</artifactId>
+                <version>${netty-tcnative-boringssl-static.version}</version>
+                <classifier>linux-x86_64</classifier>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
