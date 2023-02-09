@@ -889,6 +889,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("lower_case")).isEqualTo(lcVal);
         assertThat(message.getField("mixed_case")).isEqualTo(mcVal);
         assertThat(message.getField("upper_case")).isEqualTo(ucVal);
+        assertThat(message.getField("mIxEd_CaSe")).isNull();
+        assertThat(message.getField("UPPER_CASE")).isNull();
 
     }
 
