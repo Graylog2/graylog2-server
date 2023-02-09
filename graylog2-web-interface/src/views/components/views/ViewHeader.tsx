@@ -93,7 +93,7 @@ const ViewHeader = () => {
         </Link>
         <StyledIcon name="chevron-right" />
         <TitleWrapper>
-          <span>{title}</span>
+          <span data-testid="view-title">{title}</span>
           {isSavedView && (
             <>
               <FavoriteIcon isFavorite={view.favorite} id={view.id} onChange={onChangeFavorite} />
