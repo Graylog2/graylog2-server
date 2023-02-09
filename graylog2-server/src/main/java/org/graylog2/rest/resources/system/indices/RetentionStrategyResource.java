@@ -46,6 +46,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -129,7 +130,7 @@ public class RetentionStrategyResource extends RestResource {
         if (Objects.nonNull(indexAction)) {
             Set<String> actionEnums = ((StringSchema) indexAction).getEnums();
             Set<String> disabledRetentionStrategies = elasticsearchConfiguration.getDisabledRetentionStrategies();
-            disabledRetentionStrategies.stream().map(String::toUpperCase).toList().forEach(actionEnums::remove);
+            disabledRetentionStrategies.stream().map(s -> s.toUpperCase(Locale.ENGLISH)).toList().forEach(actionEnums::remove);
         }
     }
 }
