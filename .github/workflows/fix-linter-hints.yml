@@ -12,9 +12,22 @@ jobs:
     defaults:
       run:
         working-directory: graylog2-web-interface
+    strategy:
+      matrix:
+        java-version: [ 17 ]
 
     steps:
+      - name: Freeing up more disk space
+        run: |
+          sudo rm -rf /usr/local/lib/android # will release about 10 GB if you don't need Android
+          sudo rm -rf /usr/share/dotnet # will release about 20GB if you don't need .NET
       - uses: actions/checkout@v2
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v2
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: temurin
+          cache: maven
       - name: Set up Yarn cache
         uses: actions/cache@v2
         with:
@@ -22,15 +35,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
           path: ~/.cache/yarn
-      - name: Install dependencies
-        run: yarn install
+      - name: Build with Maven
+        run: mvn -B --fail-fast -Pedantic -Dspotbugs.skip -Dmaven.wagon.http.retryHandler.class=standard -Dmaven.wagon.http.retryHandler.count=3 -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -DskipTests compile
+        env:
+          JAVA_OPTS: -Xmx6G
       - name: Resetting lockfile
+        working-directory: graylog2-web-interface
         run: git checkout yarn.lock
       - name: Run lint --fix
         continue-on-error: true
+        working-directory: graylog2-web-interface
         run: yarn lint --fix -o /tmp/report.json -f json
       - name: Submit Results
         continue-on-error: true
+        working-directory: graylog2-web-interface
         run: |
           PROBLEM_COUNT=`jq '. | map(.errorCount + .warningCount)|add' /tmp/report.json`
           CURRENT_REF=`git rev-parse HEAD`
