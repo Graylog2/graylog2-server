@@ -43,7 +43,7 @@ const LastOpenList = () => {
 
   return (
     <ListGroup>
-      {lastOpened.map(({ type, id, title }) => <EntityItem key={id} type={type} id={id} title={title} />)}
+      {lastOpened.map(({ type, id, title, timestamp }) => <EntityItem key={id} type={type} id={id} title={title} timestamp={timestamp} />)}
     </ListGroup>
   );
 };
