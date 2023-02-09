@@ -23,6 +23,7 @@ import org.graylog.datanode.bootstrap.commands.CliCommandHelp;
 import org.graylog.datanode.bootstrap.commands.ShowVersion;
 import org.graylog.datanode.bootstrap.commands.certutil.CertutilCa;
 import org.graylog.datanode.bootstrap.commands.certutil.CertutilCert;
+import org.graylog.datanode.bootstrap.commands.certutil.CertutilHttp;
 import org.graylog2.bootstrap.CliCommand;
 import org.graylog2.bootstrap.CliCommandsProvider;
 
@@ -36,6 +37,7 @@ public class Main {
                 .withCommands(ImmutableSet.of(
                         CertutilCa.class,
                         CertutilCert.class,
+                        CertutilHttp.class,
                         ShowVersion.class,
                         CliCommandHelp.class));
 

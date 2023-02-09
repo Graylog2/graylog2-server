@@ -43,13 +43,13 @@ public class TestableConsole implements CommandLineConsole {
     }
 
     @Override
-    public String readLine(String format, Object... args) throws IOException {
+    public String readLine(String format, Object... args) {
         final Pair<String, String> response = consumeResponse(format, args);
         return response.getValue();
     }
 
     @Override
-    public char[] readPassword(String format, Object... args) throws IOException {
+    public char[] readPassword(String format, Object... args)  {
         final Pair<String, String> response = consumeResponse(format, args);
         return response.getValue().toCharArray();
     }
@@ -64,10 +64,10 @@ public class TestableConsole implements CommandLineConsole {
         return output;
     }
 
-    private Pair<String, String> consumeResponse(String format, Object[] args) throws IOException {
+    private Pair<String, String> consumeResponse(String format, Object[] args)  {
         final String question = cleanQuestion(String.format(format, args));
         final Pair<String, String> response = providedResponses.stream().filter(r -> r.getKey().equals(question)).findFirst()
-                .orElseThrow(() -> new IOException("Unexpected input question:" + question));
+                .orElseThrow(() -> new ConsoleException("Unexpected input question:" + question));
         providedResponses.remove(response);
         return response;
     }

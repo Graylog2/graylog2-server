@@ -16,17 +16,12 @@
  */
 package org.graylog.datanode.bootstrap.commands.certutil;
 
-import java.util.Locale;
-
-public interface CommandLineConsole {
-    String readLine(String format, Object... args) throws ConsoleException;
-    char[] readPassword(String format, Object... args) throws ConsoleException;
-
-    default boolean readBoolean(String format, Object... args) {
-        final String response = readLine(format, args)
-                .trim().toLowerCase(Locale.ROOT);
-        return response.equals("y") || response.equals("yes");
+public class ConsoleException extends RuntimeException {
+    public ConsoleException(Throwable cause) {
+        super(cause);
     }
 
-    void printLine(String line);
+    public ConsoleException(String message) {
+        super(message);
+    }
 }

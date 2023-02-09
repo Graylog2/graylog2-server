@@ -16,5 +16,5 @@
  */
 package org.graylog.datanode.bootstrap.commands.certutil;
 
-public record GeneratedCert(java.security.PrivateKey privateKey, java.security.cert.X509Certificate certificate) {
+public record KeyPair(java.security.PrivateKey privateKey, java.security.PublicKey publicKey, java.security.cert.X509Certificate certificate) {
 }

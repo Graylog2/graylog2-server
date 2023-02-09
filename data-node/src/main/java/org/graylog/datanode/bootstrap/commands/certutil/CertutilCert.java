@@ -23,7 +23,7 @@ import org.graylog2.bootstrap.CliCommand;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
+import java.nio.file.Path;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -41,7 +41,7 @@ public class CertutilCert implements CliCommand {
     protected String caKeystoreFilename = "datanode-ca.p12";
 
     @Option(name = "--keystore", description = "Filename for the generated keystore")
-    protected String nodeKeystoreFilename = "datanode-certificates.p12";
+    protected String nodeKeystoreFilename = "datanode-transport-certificates.p12";
 
     private final CommandLineConsole console;
 
@@ -58,12 +58,15 @@ public class CertutilCert implements CliCommand {
     @Override
     public void run() {
         console.printLine("This tool will generate a data-node certificate signed by provided certificate authority");
-        console.printLine("Using certificate authority " + caKeystoreFilename);
+
+        final Path caKeystorePath = Path.of(caKeystoreFilename);
+
+        console.printLine("Using certificate authority " + caKeystorePath.toAbsolutePath());
 
         try {
             char[] password = console.readPassword("Enter CA password: ");
             KeyStore caKeystore = KeyStore.getInstance("PKCS12");
-            caKeystore.load(new FileInputStream(caKeystoreFilename), password);
+            caKeystore.load(new FileInputStream(caKeystorePath.toFile()), password);
 
             final Key caPrivateKey = caKeystore.getKey("ca", password);
 
@@ -72,11 +75,11 @@ public class CertutilCert implements CliCommand {
 
             console.printLine("Successfully read CA from the keystore");
 
-            final GeneratedCert intermediateCA = new GeneratedCert((PrivateKey) caPrivateKey, caCertificate);
+            final KeyPair intermediateCA = new KeyPair((PrivateKey) caPrivateKey, null, caCertificate);
 
             console.printLine("Generating private key and certificate for this datanode");
 
-            GeneratedCert nodePair = CertTools.generateCertificate(InetAddress.getLocalHost().getHostName(), null, intermediateCA, false);
+            KeyPair nodePair = CertTools.generateCertificate("localhost", null, intermediateCA, false);
 
 
             KeyStore nodeKeystore = KeyStore.getInstance("PKCS12");
@@ -86,9 +89,12 @@ public class CertutilCert implements CliCommand {
 
             nodeKeystore.setKeyEntry(DATANODE_KEY_ALIAS, nodePair.privateKey(), nodeKeystorePassword,
                     new X509Certificate[]{nodePair.certificate(), intermediateCA.certificate(), rootCertificate});
-            try (FileOutputStream store = new FileOutputStream(nodeKeystoreFilename)) {
+
+
+            final Path nodeKeystorePath = Path.of(nodeKeystoreFilename);
+            try (FileOutputStream store = new FileOutputStream(nodeKeystorePath.toFile())) {
                 nodeKeystore.store(store, nodeKeystorePassword);
-                console.printLine("Private key and certificate for this datanode successfully saved into " + nodeKeystoreFilename);
+                console.printLine("Private key and certificate for this datanode successfully saved into " + nodeKeystorePath.toAbsolutePath());
             }
 
         // TODO: provide good user-friendly error message for each exception type!

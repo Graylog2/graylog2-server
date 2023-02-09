@@ -25,6 +25,10 @@ import org.graylog.datanode.process.ProcessInfo;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.ProcessStateMachine;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
+import org.graylog.shaded.opensearch2.org.apache.http.auth.AuthScope;
+import org.graylog.shaded.opensearch2.org.apache.http.auth.UsernamePasswordCredentials;
+import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
+import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentialsProvider;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClientBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
@@ -41,7 +45,7 @@ import java.util.Queue;
 
 class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessImpl.class);
     private final OpensearchConfiguration configuration;
     private final RestHighLevelClient restClient;
 
@@ -56,12 +60,22 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         this.configuration = configuration;
         this.restClient = createRestClient(configuration);
         this.processState = ProcessStateMachine.createNew();
-        this.stdout =  new CircularFifoQueue<>(logsCacheSize);
-        this.stderr =  new CircularFifoQueue<>(logsCacheSize);
+        this.stdout = new CircularFifoQueue<>(logsCacheSize);
+        this.stderr = new CircularFifoQueue<>(logsCacheSize);
     }
 
     private static RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
-        RestClientBuilder builder = RestClient.builder(new HttpHost("localhost", configuration.httpPort(), "http"));
+        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+
+        credentialsProvider.setCredentials(AuthScope.ANY,
+                new UsernamePasswordCredentials("admin", "admin"));
+
+        final boolean sslEnabled = Boolean.parseBoolean(configuration.asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
+
+        RestClientBuilder builder = RestClient.builder(new HttpHost("localhost", configuration.httpPort(), sslEnabled ? "https" : "http"));
+        if (sslEnabled) {
+            builder.setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
+        }
         return new RestHighLevelClient(builder);
     }
 

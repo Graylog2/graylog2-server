@@ -28,18 +28,21 @@ import java.util.Locale;
  */
 public class SystemConsole implements CommandLineConsole {
 
-    public String readLine(String format, Object... args) throws IOException {
+    public String readLine(String format, Object... args) {
         if (System.console() != null) {
             return System.console().readLine(format, args);
         } else {
             printLine(String.format(Locale.ROOT, format, args));
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
-            return reader.readLine();
+            try {
+                return reader.readLine();
+            } catch (IOException e) {
+                throw new ConsoleException(e);
+            }
         }
     }
 
-    public char[] readPassword(String format, Object... args)
-            throws IOException {
+    public char[] readPassword(String format, Object... args) {
         if (System.console() != null) {
             return System.console().readPassword(format, args);
         } else {

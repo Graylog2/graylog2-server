@@ -29,25 +29,25 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 import javax.annotation.Nullable;
 import java.math.BigInteger;
-import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
 
 public class CertTools {
     /**
      * @param cnName The CN={name} of the certificate. When the certificate is for a domain it should be the domain name
-     * @param domain Nullable. The DNS domain for the certificate.
+     * @param SAN entries (=subject alternative names)
      * @param issuer Issuer who signs this certificate. Null for a self-signed certificate
      * @param isCA   Can this certificate be used to sign other certificates
      * @return Newly created certificate with its private key
      */
-    protected static GeneratedCert generateCertificate(String cnName, @Nullable String domain, GeneratedCert issuer, boolean isCA) throws Exception {
+    protected static KeyPair generateCertificate(String cnName, @Nullable List<String> SAN, @Nullable KeyPair issuer, boolean isCA) throws Exception {
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-        KeyPair certKeyPair = keyGen.generateKeyPair();
+        java.security.KeyPair certKeyPair = keyGen.generateKeyPair();
         X500Name name = new X500Name("CN=" + cnName);
 
         // TODO: cert serial number?
@@ -64,7 +64,7 @@ public class CertTools {
             issuerName = name;
             issuerKey = certKeyPair.getPrivate();
         } else {
-            issuerName = new X500Name(issuer.certificate().getSubjectDN().getName());
+            issuerName = new X500Name(issuer.certificate().getIssuerX500Principal().getName());
             issuerKey = issuer.privateKey();
         }
 
@@ -79,15 +79,17 @@ public class CertTools {
             builder.addExtension(Extension.basicConstraints, true, new BasicConstraints(isCA));
         }
 
-        // TODO: do we need this for the datanode?
-        if (domain != null) {
+        if (SAN != null) {
+            GeneralName[] generalNames = SAN.stream()
+                    .map(s -> new GeneralName(GeneralName.dNSName, s))
+                    .toArray(GeneralName[]::new);
             builder.addExtension(Extension.subjectAlternativeName, false,
-                    new GeneralNames(new GeneralName(GeneralName.dNSName, domain)));
+                    new GeneralNames(generalNames));
         }
 
         ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSA").build(issuerKey);
         X509CertificateHolder certHolder = builder.build(signer);
         X509Certificate cert = new JcaX509CertificateConverter().getCertificate(certHolder);
-        return new GeneratedCert(certKeyPair.getPrivate(), cert);
+        return new KeyPair(certKeyPair.getPrivate(), certKeyPair.getPublic(), cert);
     }
 }

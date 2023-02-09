@@ -22,7 +22,7 @@ import com.google.inject.multibindings.Multibinder;
 import org.graylog.datanode.initializers.JerseyService;
 import org.graylog.datanode.management.OpensearchProcessService;
 import org.graylog.datanode.initializers.PeriodicalsService;
-import org.graylog.datanode.management.ConfigurationProvider;
+import org.graylog.datanode.configuration.ConfigurationProvider;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.shutdown.GracefulShutdownService;

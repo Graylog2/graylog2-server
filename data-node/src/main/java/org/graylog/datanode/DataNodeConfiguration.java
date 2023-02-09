@@ -52,6 +52,9 @@ public class DataNodeConfiguration {
     @Parameter(value = "opensearch_logs_location")
     private String opensearchLogsLocation = "./data-node/bin/logs";
 
+    @Parameter(value = "opensearch_config_location")
+    private String opensearchConfigLocation = "./data-node/bin/config";
+
     @Parameter(value = "process_logs_buffer_size")
     private Integer logs = 500;
 
