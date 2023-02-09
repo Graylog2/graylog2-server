@@ -109,6 +109,12 @@ have been un-deprecated, as Graylog intends to maintain them going forward.
 |-----------------------------|-------------------------------------------------------------------|
 | `GET /system/configuration` | Key `gc_warning_threshold` has been removed from response object. |                                                                                                
 
+The following REST API endpoints were changed:
+
+| Endpoint                                                                                                   | Description                                   |
+|------------------------------------------------------------------------------------------------------------|-----------------------------------------------|
+| `PUT /plugins/org.graylog.plugins.forwarder/forwarder/profiles/{inputProfileId}/inputs/{forwarderInputId}` | Added `type` as a required request attribute. |
+
 ## Behaviour Changes
 
 - The `JSON path value from HTTP API` input will now only run on the leader node, if the `Global` option has been selected in the input configuration. Previously, the input was started on all nodes in the cluster.

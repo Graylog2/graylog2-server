@@ -16,6 +16,7 @@
  */
 package org.graylog2.inputs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
@@ -39,6 +40,7 @@ import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.inputs.extractors.events.ExtractorCreated;
 import org.graylog2.inputs.extractors.events.ExtractorDeleted;
 import org.graylog2.inputs.extractors.events.ExtractorUpdated;
+import org.graylog2.jackson.TypeReferences;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.plugin.database.Persisted;
@@ -49,6 +51,8 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
+import org.graylog2.security.encryption.EncryptedValue;
+import org.graylog2.security.encryption.EncryptedValueMapperConfig;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.slf4j.Logger;
@@ -73,19 +77,23 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     private final MessageInputFactory messageInputFactory;
     private final EventBus clusterEventBus;
     private final DBCollection dbCollection;
+    private final ObjectMapper objectMapper;
 
     @Inject
     public InputServiceImpl(MongoConnection mongoConnection,
                             ExtractorFactory extractorFactory,
                             ConverterFactory converterFactory,
                             MessageInputFactory messageInputFactory,
-                            ClusterEventBus clusterEventBus) {
+                            ClusterEventBus clusterEventBus,
+                            ObjectMapper objectMapper) {
         super(mongoConnection);
         this.extractorFactory = extractorFactory;
         this.converterFactory = converterFactory;
         this.messageInputFactory = messageInputFactory;
         this.clusterEventBus = clusterEventBus;
         this.dbCollection = collection(InputImpl.class);
+        this.objectMapper = objectMapper.copy();
+        EncryptedValueMapperConfig.enableDatabase(this.objectMapper);
     }
 
     @Override
@@ -94,7 +102,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
         final ImmutableList.Builder<Input> inputs = ImmutableList.builder();
         for (final DBObject o : ownInputs) {
-            inputs.add(new InputImpl((ObjectId) o.get(InputImpl.FIELD_ID), o.toMap()));
+            inputs.add(createFromDbObject(o));
         }
 
         return inputs.build();
@@ -109,7 +117,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
         final ImmutableList.Builder<Input> inputs = ImmutableList.builder();
         for (final DBObject o : ownInputs) {
-            inputs.add(new InputImpl((ObjectId) o.get(InputImpl.FIELD_ID), o.toMap()));
+            inputs.add(createFromDbObject(o));
         }
 
         return inputs.build();
@@ -126,7 +134,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
                 .append("$in", objectIds)
                 .get();
         final Stream<InputImpl> inputStream = query(InputImpl.class, query).stream()
-                .map(o -> new InputImpl((ObjectId) o.get(InputImpl.FIELD_ID), o.toMap()));
+                .map(o -> createFromDbObject(o));
         return inputStream
                 .collect(Collectors.toSet());
     }
@@ -136,6 +144,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         return save(model, true);
     }
 
+    @Override
     public <T extends Persisted> String saveWithoutEvents(T model) throws ValidationException {
         return save(model, false);
     }
@@ -194,7 +203,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         if (o == null) {
             throw new NotFoundException("Input <" + id + "> not found!");
         }
-        return new org.graylog2.inputs.InputImpl((ObjectId) o.get(InputImpl.FIELD_ID), o.toMap());
+        return createFromDbObject(o);
     }
 
     @Override
@@ -208,7 +217,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
                 new BasicDBObject("$or", forThisNodeOrGlobal));
 
         final DBObject o = findOne(InputImpl.class, new BasicDBObject("$and", query));
-        return new InputImpl((ObjectId) o.get(InputImpl.FIELD_ID), o.toMap());
+        return createFromDbObject(o);
     }
 
     @Override
@@ -225,7 +234,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         if (o == null) {
             throw new NotFoundException("Couldn't find input " + id + " on Graylog node " + nodeId);
         } else {
-            return new InputImpl((ObjectId) o.get(InputImpl.FIELD_ID), o.toMap());
+            return createFromDbObject(o);
         }
     }
 
@@ -325,7 +334,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
     @Override
     public Extractor getExtractor(final Input input, final String extractorId) throws NotFoundException {
-        final Optional<Extractor> extractor = Iterables.tryFind(this.getExtractors(input), new Predicate<Extractor>() {
+        final Optional<Extractor> extractor = Iterables.tryFind(this.getExtractors(input), new Predicate<>() {
             @Override
             public boolean apply(Extractor extractor) {
                 return extractor.getId().equals(extractorId);
@@ -488,5 +497,44 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
     private void publishChange(Object event) {
         this.clusterEventBus.post(event);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private InputImpl createFromDbObject(DBObject o) {
+        final Map<String, Object> inputMap = new HashMap<>(o.toMap());
+
+        final String type = (String) inputMap.get(MessageInput.FIELD_TYPE);
+        final var encryptedFields = getEncryptedFields(type);
+
+        if (encryptedFields.isEmpty()) {
+            return new InputImpl((ObjectId) inputMap.get(InputImpl.FIELD_ID), inputMap);
+        }
+
+        final Map<String, Object> config = new HashMap<>((Map) inputMap.get(MessageInput.FIELD_CONFIGURATION));
+        encryptedFields.forEach(field -> {
+            final var encryptedValue = objectMapper.convertValue(config.get(field), EncryptedValue.class);
+            config.put(field, encryptedValue);
+        });
+
+        inputMap.put(MessageInput.FIELD_CONFIGURATION, config);
+
+        return new InputImpl((ObjectId) inputMap.get(InputImpl.FIELD_ID), inputMap);
+    }
+
+    private Set<String> getEncryptedFields(String type) {
+        return messageInputFactory.getConfig(type)
+                .map(EncryptedInputConfigs::getEncryptedFields)
+                .orElse(Set.of());
+    }
+
+    @Override
+    protected void fieldTransformations(Map<String, Object> doc) {
+        for (Map.Entry<String, Object> x : doc.entrySet()) {
+            if (x.getValue() instanceof EncryptedValue encryptedValue) {
+                doc.put(x.getKey(), objectMapper.convertValue(encryptedValue, TypeReferences.MAP_STRING_OBJECT));
+                return;
+            }
+        }
+        super.fieldTransformations(doc);
     }
 }
