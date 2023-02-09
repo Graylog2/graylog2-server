@@ -25,6 +25,7 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.graylog2.bootstrap.CliCommand;
+import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.plugin.Tools;
 
 import javax.security.auth.x500.X500Principal;
@@ -69,6 +70,7 @@ public class CertutilHttp implements CliCommand {
     }
 
     @Override
+    @SuppressForbidden("DNS Lookup intentional.")
     public void run() {
         console.printLine("This tool will generate a data-node certificate for HTTP communication (REST API)");
 

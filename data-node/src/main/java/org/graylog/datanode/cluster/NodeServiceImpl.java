@@ -14,13 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster;
+package org.graylog.datanode.cluster;
 
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
-import org.graylog2.Configuration;
+import org.graylog.datanode.Configuration;
+import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeImpl;
+import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.cluster.NodeService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.Tools;
@@ -42,7 +46,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     }
 
     public Node.Type type() {
-        return Node.Type.SERVER;
+        return Node.Type.DATANODE;
     }
 
     @Override

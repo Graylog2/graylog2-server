@@ -72,8 +72,8 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
 
         config.put("cluster.initial_master_nodes", "node1");
 
-        config.put("plugins.security.disabled", "false");
-        config.put("plugins.security.ssl.http.enabled", "true");
+        config.put("plugins.security.disabled", "true");
+        config.put("plugins.security.ssl.http.enabled", "false");
 
         final Path opensearchConfigDir = Path.of(opensearchLocation).resolve("config");
 

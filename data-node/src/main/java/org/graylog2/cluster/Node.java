@@ -17,7 +17,6 @@
 package org.graylog2.cluster;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
 
@@ -49,7 +48,7 @@ public interface Node extends Persisted {
 
     String getShortNodeId();
 
-    Node.Type getType();
+    Type getType();
 
     String getHostname();
 }

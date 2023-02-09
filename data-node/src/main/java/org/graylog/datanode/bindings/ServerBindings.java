@@ -19,8 +19,10 @@ package org.graylog.datanode.bindings;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.cluster.NodeServiceImpl;
 import org.graylog.datanode.shared.system.activities.DataNodeActivityWriter;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
+import org.graylog2.cluster.NodeService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterIdFactory;
 import org.graylog2.plugin.cluster.RandomUUIDClusterIdFactory;
@@ -68,6 +70,7 @@ public class ServerBindings extends Graylog2Module {
     private void bindInterfaces() {
         bind(ActivityWriter.class).to(DataNodeActivityWriter.class);
         OptionalBinder.newOptionalBinder(binder(), ClusterIdFactory.class).setDefault().to(RandomUUIDClusterIdFactory.class);
+        bind(NodeService.class).to(NodeServiceImpl.class);
     }
 
     private void bindDynamicFeatures() {

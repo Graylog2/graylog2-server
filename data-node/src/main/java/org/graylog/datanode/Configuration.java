@@ -63,6 +63,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_logs_location")
     private String opensearchLogsLocation = "./data-node/bin/logs";
 
+    @Parameter(value = "opensearch_config_location")
+    private String opensearchConfigLocation = "./data-node/bin/config";
+
     @Parameter(value = "process_logs_buffer_size")
     private Integer logs = 500;
 
@@ -80,6 +83,12 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_discovery_seed_hosts", converter = StringListConverter.class)
     private List<String> opensearchDiscoverySeedHosts = Collections.emptyList();
 
+    @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
+    private Integer staleLeaderTimeout = 2000;
+
+    public Integer getStaleLeaderTimeout() {
+        return staleLeaderTimeout;
+    }
 
     public String getInstallationSource() {
         return installationSource;
@@ -99,6 +108,10 @@ public class Configuration extends BaseConfiguration {
 
     public boolean isLeader() {
         return isLeader;
+    }
+
+    public String getOpensearchConfigLocation() {
+        return opensearchConfigLocation;
     }
 
     public String getOpensearchLocation() {

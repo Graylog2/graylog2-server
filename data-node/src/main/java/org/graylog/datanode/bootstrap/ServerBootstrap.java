@@ -42,6 +42,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.bindings.FreshInstallDetectionModule;
 import org.graylog2.shared.bindings.IsDevelopmentBindings;
+import org.graylog2.shared.bindings.ServerStatusBindings;
 import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -295,7 +296,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         result.add(new FreshInstallDetectionModule(isFreshInstallation()));
         result.add(new GenericBindings(isMigrationCommand()));
 //        result.add(new SecurityBindings());
-//        result.add(new ServerStatusBindings(capabilities()));
+        result.add(new ServerStatusBindings(capabilities()));
 //        result.add(new ValidatorModule());
 //        result.add(new SharedPeriodicalBindings());
         result.add(new SchedulerBindings());

@@ -34,11 +34,13 @@ import org.graylog.datanode.bootstrap.ServerBootstrap;
 import org.graylog.datanode.rest.RestBindings;
 import org.graylog.datanode.shutdown.GracefulShutdown;
 import org.graylog2.bindings.MongoDBModule;
+import org.graylog2.cluster.NodeService;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.Tools;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -53,7 +55,7 @@ import java.util.List;
 import java.util.Set;
 
 
-@Command(name = "server", description = "Start the Graylog server")
+@Command(name = "datanode", description = "Start the Graylog DataNode")
 public class Server extends ServerBootstrap {
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
@@ -65,14 +67,14 @@ public class Server extends ServerBootstrap {
     private final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
 
     public Server() {
-        super("server", configuration);
+        super("datanode", configuration);
     }
 
     public Server(String commandName) {
         super(commandName, configuration);
     }
 
-    @Option(name = {"-l", "--local"}, description = "Run Graylog in local mode. Only interesting for Graylog developers.")
+    @Option(name = {"-l", "--local"}, description = "Run Graylog DataNode in local mode. Only interesting for Graylog developers.")
     private boolean local = false;
 
     public boolean isLocal() {
@@ -109,6 +111,16 @@ public class Server extends ServerBootstrap {
 
     @Override
     protected void startNodeRegistration(Injector injector) {
+        // Register this node.
+        final NodeService nodeService = injector.getInstance(NodeService.class);
+        final ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
+        final ActivityWriter activityWriter = injector.getInstance(ActivityWriter.class);
+        nodeService.registerServer(serverStatus.getNodeId().toString(),
+                // TODO: not necessary in DataNode context
+                true,
+                httpConfiguration.getHttpPublishUri(),
+                Tools.getLocalCanonicalHostname());
+        serverStatus.setLocalMode(isLocal());
     }
 
     private static class ShutdownHook implements Runnable {
