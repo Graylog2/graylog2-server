@@ -24,6 +24,7 @@ import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
+import org.graylog2.configuration.validators.RetentionStrategyValidator;
 import org.graylog2.configuration.validators.RotationStrategyValidator;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
@@ -76,7 +77,7 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "retention_strategy", required = true)
     private String retentionStrategy = DeletionRetentionStrategy.NAME;
 
-    @Parameter(value = "disabled_retention_strategies", required = true, converter = StringSetConverter.class)
+    @Parameter(value = "disabled_retention_strategies", required = true, converter = StringSetConverter.class, validators = {RetentionStrategyValidator.class})
     private Set<String> disabledRetentionStrategies = Collections.emptySet();
 
     @Parameter(value = "rotation_strategy", required = true)

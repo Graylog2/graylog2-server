@@ -47,7 +47,7 @@ public class RetentionStrategyBindings extends PluginModule {
                 case ClosingRetentionStrategy.NAME -> retentionStrategies.remove((ClosingRetentionStrategy.class));
                 case NoopRetentionStrategy.NAME -> retentionStrategies.remove((NoopRetentionStrategy.class));
                 default ->
-                        throw new IllegalArgumentException("Detected invalid retention strategy: \"%s\" in `disabled_retention_strategies` configuration value.".formatted(disabledStrategy));
+                        throw new IllegalArgumentException("Detected invalid retention strategy: " + disabledStrategy);
             }
         }
 
