@@ -21,16 +21,15 @@ import { useFormikContext } from 'formik';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Alert, Col, Input, Row } from 'components/bootstrap';
-import { Icon, Select } from 'components/common';
-
 import {
   TIME_BASED_ROTATION_STRATEGY,
   TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY,
   TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY_TYPE,
   NOOP_RETENTION_STRATEGY,
   ARCHIVE_RETENTION_STRATEGY,
-} from './Types';
+} from 'stores/indices/IndicesStore';
+import { Alert, Col, Input, Row } from 'components/bootstrap';
+import { Icon, Select } from 'components/common';
 
 const StyledH3 = styled.h3`
   margin-bottom: 10px;
@@ -44,39 +43,39 @@ const StyledAlert = styled(Alert)`
   margin-left: 15px;
 `;
 
-const _getStrategyJsonSchema = (selectedStrategy, strategies) => {
+const getStrategyJsonSchema = (selectedStrategy, strategies) => {
   const result = strategies.filter((s) => s.type === selectedStrategy)[0];
 
   return result ? result.json_schema : undefined;
 };
 
-const _getDefaultStrategyConfig = (selectedStrategy, strategies) => {
+const getDefaultStrategyConfig = (selectedStrategy, strategies) => {
   const result = strategies.filter((s) => s.type === selectedStrategy)[0];
 
   return result ? result.default_config : undefined;
 };
 
-const _getTimeBaseStrategyWithElasticLimit = (activeConfig, strategies) => {
-  const timeBasedStrategy = _getDefaultStrategyConfig(TIME_BASED_ROTATION_STRATEGY, strategies);
+const getTimeBaseStrategyWithElasticLimit = (activeConfig, strategies) => {
+  const timeBasedStrategy = getDefaultStrategyConfig(TIME_BASED_ROTATION_STRATEGY, strategies);
 
   return { ...activeConfig, max_rotation_period: timeBasedStrategy?.max_rotation_period };
 };
 
-const _getStrategyConfig = (selectedStrategy, activeStrategy, activeConfig, strategies) => {
+const getStrategyConfig = (selectedStrategy, activeStrategy, activeConfig, strategies) => {
   if (selectedStrategy === TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY) {
     return activeConfig;
   }
 
   if (activeStrategy === selectedStrategy) {
     // If the newly selected strategy is the current active strategy, we use the active configuration.
-    return activeStrategy === TIME_BASED_ROTATION_STRATEGY ? _getTimeBaseStrategyWithElasticLimit(activeConfig, strategies) : activeConfig;
+    return activeStrategy === TIME_BASED_ROTATION_STRATEGY ? getTimeBaseStrategyWithElasticLimit(activeConfig, strategies) : activeConfig;
   }
 
   // If the newly selected strategy is not the current active strategy, we use the selected strategy's default config.
-  return _getDefaultStrategyConfig(selectedStrategy, strategies);
+  return getDefaultStrategyConfig(selectedStrategy, strategies);
 };
 
-const _getConfigurationComponent = (selectedStrategy, pluginExports, strategies, strategy, config, onConfigUpdate) => {
+const getConfigurationComponent = (selectedStrategy, pluginExports, strategies, strategy, config, onConfigUpdate) => {
   if (!selectedStrategy || selectedStrategy.length < 1) {
     return null;
   }
@@ -87,10 +86,10 @@ const _getConfigurationComponent = (selectedStrategy, pluginExports, strategies,
     return null;
   }
 
-  const strategyConfig = _getStrategyConfig(selectedStrategy, strategy, config, strategies);
+  const strategyConfig = getStrategyConfig(selectedStrategy, strategy, config, strategies);
   const element = React.createElement(strategyPlugin.configComponent, {
     config: strategyConfig,
-    jsonSchema: _getStrategyJsonSchema(selectedStrategy, strategies),
+    jsonSchema: getStrategyJsonSchema(selectedStrategy, strategies),
     updateConfig: onConfigUpdate,
   });
 
@@ -123,7 +122,8 @@ const IndexMaintenanceStrategiesConfiguration = ({
   const isArchiveRetention = retentionStrategyClass !== ARCHIVE_RETENTION_STRATEGY;
   const shouldShowMaxRetentionWarning = maxRetentionPeriod && rotationStrategyClass === TIME_BASED_ROTATION_STRATEGY && retentionIsNotNoop;
   const isTimeBasedSizeOptimizing = rotationStrategyClass === TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY;
-  const shouldShowTimeBasedSizeOptimizing = isTimeBasedSizeOptimizing && name === 'retention';
+  const shouldShowTimeBasedSizeOptimizingForm = isTimeBasedSizeOptimizing && name === 'retention' && retentionIsNotNoop;
+  const shouldShowNormalRetentionForm = (!isTimeBasedSizeOptimizing || (name === 'retention' && (!retentionIsNotNoop || !isArchiveRetention)));
   const helpText = isTimeBasedSizeOptimizing && name === 'rotation'
     ? 'The Time Based Size Optimizing Rotation Strategy tries to rotate the index daily.'
     + ' It can however skip the rotation to achieve optimal sized indices by keeping the shard size between 20 and 50 GB.'
@@ -138,7 +138,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
       return;
     }
 
-    const newConfig = _getStrategyConfig(selectedStrategy, strategy, config, strategies);
+    const newConfig = getStrategyConfig(selectedStrategy, strategy, config, strategies);
 
     setNewStrategy(selectedStrategy);
     setValues({ ...values, ...getState(selectedStrategy, newConfig) });
@@ -167,7 +167,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
     }
   }, [isTimeBasedSizeOptimizing, rotationStrategyClass, setValues, values]);
 
-  const _availableSelectOptions = () => {
+  const getAvailableSelectOptions = () => {
     return pluginExports
       .filter((c) => strategies.find(({ type }) => type === c.type))
       .map((c) => {
@@ -175,39 +175,23 @@ const IndexMaintenanceStrategiesConfiguration = ({
       });
   };
 
-  const _activeSelection = () => {
+  const getActiveSelection = () => {
     return newStrategy;
   };
-
-  function getDescription() {
-    if (description) {
-      return (
-        <StyledAlert>
-          <Icon name="info-circle" />{' '} {description}
-        </StyledAlert>
-      );
-    }
-
-    return null;
-  }
-
-  function getHelpText() {
-    if (helpText) {
-      return (
-        <StyledAlert>
-          <Icon name="info-circle" />{' '} {helpText}
-        </StyledAlert>
-      );
-    }
-
-    return null;
-  }
 
   return (
     <span>
       <StyledH3>{title}</StyledH3>
-      {getDescription()}
-      {getHelpText()}
+      {description && (
+        <StyledAlert>
+          <Icon name="info-circle" />{' '} {description}
+        </StyledAlert>
+      )}
+      {helpText && (
+        <StyledAlert>
+          <Icon name="info-circle" />{' '} {helpText}
+        </StyledAlert>
+      )}
       {shouldShowMaxRetentionWarning && (
         <StyledAlert bsStyle="warning">
           <Icon name="exclamation-triangle" />{' '} The effective retention period value calculated from the
@@ -222,9 +206,9 @@ const IndexMaintenanceStrategiesConfiguration = ({
                  wrapperClassName="col-sm-9"
                  label={selectPlaceholder}>
             <StyledSelect placeholder={selectPlaceholder}
-                          options={_availableSelectOptions()}
+                          options={getAvailableSelectOptions()}
                           matchProp="label"
-                          value={_activeSelection()}
+                          value={getActiveSelection()}
                           onChange={_onSelect}
                           clearable={false} />
           </Input>
@@ -232,7 +216,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
       </Row>
       <Row>
         <Col md={12}>
-          {shouldShowTimeBasedSizeOptimizing && retentionIsNotNoop && _getConfigurationComponent(
+          {shouldShowTimeBasedSizeOptimizingForm && getConfigurationComponent(
             TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY,
             PluginStore.exports('indexRotationConfig'),
             [rotationStrategy],
@@ -240,10 +224,8 @@ const IndexMaintenanceStrategiesConfiguration = ({
             rotationStrategy,
             _onIndexTimeSizeOptimizingUpdate,
           )}
-          {(!isTimeBasedSizeOptimizing
-          || (name === 'retention' && (!retentionIsNotNoop || !isArchiveRetention)))
-          && _getConfigurationComponent(
-            _activeSelection(),
+          {shouldShowNormalRetentionForm && getConfigurationComponent(
+            getActiveSelection(),
             pluginExports,
             strategies,
             strategy,

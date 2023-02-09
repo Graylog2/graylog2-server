@@ -41,14 +41,14 @@ const getRangeInDays = (indexLifeTimeMin = 'PT1H', IndexLifeTimeMax = 'P4D') => 
   return [durationToRoundedDays(indexLifeTimeMin), durationToRoundedDays(IndexLifeTimeMax)];
 };
 
-const YEARS_DAYS = 365;
+const YEAR_IN_DAYS = 365;
 
 const getInitialMaxRange = (maxRotationPeriod: number, maxLifetime: number) => {
   if (maxRotationPeriod) {
     return maxRotationPeriod;
   }
 
-  return maxLifetime > YEARS_DAYS ? maxLifetime + YEARS_DAYS : YEARS_DAYS;
+  return maxLifetime > YEAR_IN_DAYS ? maxLifetime + YEAR_IN_DAYS : YEAR_IN_DAYS;
 };
 
 const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime_max, index_lifetime_min }, updateConfig }: Props) => {
@@ -56,12 +56,12 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime
   const maxRotationPeriod = useMaxIndexRotationLimit();
   const [maxRange, setMaxRange] = useState(getInitialMaxRange(durationToRoundedDays(maxRotationPeriod), indexLifetimeRange[1]));
 
-  const _isValidRange = useCallback((range: Array<number>) => {
+  const isValidRange = useCallback((range: Array<number>) => {
     return range[0] < range[1] && range[1] <= maxRange;
   }, [maxRange]);
 
   const validationState = (range: Array<number>): null | 'error' => {
-    if (_isValidRange(range)) {
+    if (isValidRange(range)) {
       return null;
     }
 
@@ -70,9 +70,9 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime
 
   const errorMessage = 'There needs to be at least 1 day between the minimum and maximum lifetime.';
 
-  const addYearToMaxrange = (currentMax: number, currentSelectedMax) => {
+  const addYearToMaxrange = (currentMax: number, currentSelectedMax: number) => {
     if (!maxRotationPeriod && currentMax === currentSelectedMax) {
-      setMaxRange(currentMax + YEARS_DAYS);
+      setMaxRange(currentMax + YEAR_IN_DAYS);
     }
   };
 
@@ -80,7 +80,7 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime
     setIndexLifetimeRange(range);
     addYearToMaxrange(maxRange, range[1]);
 
-    if (_isValidRange(range)) {
+    if (isValidRange(range)) {
       updateConfig({ index_lifetime_min: moment.duration(range[0], 'days').toISOString(), index_lifetime_max: moment.duration(range[1], 'days').toISOString() });
     }
   };
@@ -94,7 +94,7 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime
                   labelClassName="col-sm-3"
                   wrapperClassName="col-sm-9"
                   value={indexLifetimeRange}
-                  help={_isValidRange(indexLifetimeRange) ? `The minimum / maximum number of days the data in this index is kept before it is retained. ${maxRotationPeriodHelpText}` : errorMessage}
+                  help={isValidRange(indexLifetimeRange) ? `The minimum / maximum number of days the data in this index is kept before it is retained. ${maxRotationPeriodHelpText}` : errorMessage}
                   min={1}
                   step={1}
                   bsStyle={validationState(indexLifetimeRange)}

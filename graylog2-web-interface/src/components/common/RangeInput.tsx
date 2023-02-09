@@ -44,7 +44,7 @@ const StyledThumb = styled.div(({ theme }: { theme: DefaultTheme }) => css`
     min-height: 25px;
     line-height: 25px;
     width: auto;
-    min-width: 25px ;
+    min-width: 25px;
     text-align: center;
     background-color: #5082bc;
     color: ${theme.colors.input.color};
