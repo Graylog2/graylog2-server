@@ -22,6 +22,8 @@ import org.graylog2.indexer.retention.strategies.ClosingRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.plugin.PluginModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -29,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 public class RetentionStrategyBindings extends PluginModule {
+    private static final Logger LOG = LoggerFactory.getLogger(RetentionStrategyBindings.class);
 
     private final ElasticsearchConfiguration configuration;
 
@@ -46,8 +49,7 @@ public class RetentionStrategyBindings extends PluginModule {
                 case DeletionRetentionStrategy.NAME -> retentionStrategies.remove(DeletionRetentionStrategy.class);
                 case ClosingRetentionStrategy.NAME -> retentionStrategies.remove((ClosingRetentionStrategy.class));
                 case NoopRetentionStrategy.NAME -> retentionStrategies.remove((NoopRetentionStrategy.class));
-                default ->
-                        throw new IllegalArgumentException("Detected invalid retention strategy: " + disabledStrategy);
+                default -> LOG.debug("Detected graylog open unknown retention strategy: " + disabledStrategy);
             }
         }
 

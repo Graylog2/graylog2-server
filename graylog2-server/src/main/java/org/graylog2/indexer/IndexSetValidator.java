@@ -59,6 +59,11 @@ public class IndexSetValidator {
             return Optional.of(refreshIntervalViolation);
         }
 
+        final Violation retentionConfigViolation = validateRetentionConfig(newConfig.retentionStrategy());
+        if (retentionConfigViolation != null) {
+            return Optional.of(retentionConfigViolation);
+        }
+
         return Optional.ofNullable(validateRetentionPeriod(newConfig.rotationStrategy(),
                 newConfig.retentionStrategy()));
     }
@@ -118,6 +123,17 @@ public class IndexSetValidator {
                     StringUtils.f("Index retention setting %s=%d would result in an effective index retention period of %s. This exceeds the configured maximum of %s=%s.",
                             RetentionStrategyConfig.MAX_NUMBER_OF_INDEXES_FIELD, retentionStrategyConfig.maxNumberOfIndices(), effectiveRetentionPeriod,
                             ElasticsearchConfiguration.MAX_INDEX_RETENTION_PERIOD, maxRetentionPeriod));
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public Violation validateRetentionConfig(RetentionStrategyConfig retentionStrategyConfig) {
+        try {
+            retentionStrategyConfig.validate(elasticsearchConfiguration);
+        } catch (IllegalArgumentException exception) {
+            return Violation.create(exception.getMessage());
         }
 
         return null;

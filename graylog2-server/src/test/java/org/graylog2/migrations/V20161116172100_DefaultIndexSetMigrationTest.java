@@ -217,5 +217,10 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
         public int maxNumberOfIndices() {
             return 0;
         }
+
+        @Override
+        public void validate(ElasticsearchConfiguration elasticsearchConfiguration) throws IllegalArgumentException {
+
+        }
     }
 }

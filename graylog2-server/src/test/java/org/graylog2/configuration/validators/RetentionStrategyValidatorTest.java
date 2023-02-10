@@ -47,6 +47,7 @@ class RetentionStrategyValidatorTest {
     void validStrategy() throws ValidationException {
         assertDoesNotThrow( () -> {
             classUnderTest.validate(PARAM, Set.of("none"));
+            classUnderTest.validate(PARAM, Set.of("archive"));
             classUnderTest.validate(PARAM, Set.of("delete"));
             classUnderTest.validate(PARAM, Set.of("close"));
             classUnderTest.validate(PARAM, Set.of("none", "close"));

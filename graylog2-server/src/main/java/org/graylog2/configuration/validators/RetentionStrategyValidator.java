@@ -27,22 +27,24 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class RetentionStrategyValidator implements Validator<Set<String>> {
+    public static final String ARCHIVE_RETENTION_STRATEGY = "archive";
     Set<String> VALID_STRATEGIES = Sets.newHashSet(
-            NoopRetentionStrategy.NAME, ClosingRetentionStrategy.NAME, DeletionRetentionStrategy.NAME);
+            NoopRetentionStrategy.NAME, ClosingRetentionStrategy.NAME, DeletionRetentionStrategy.NAME, ARCHIVE_RETENTION_STRATEGY);
 
     @Override
     // The set of valid retention strategies must
     // - contain only names of supported strategies
     // - at least one must stay enabled
     public void validate(String parameter, Set<String> values) throws ValidationException {
-        if (values.containsAll(VALID_STRATEGIES)) {
-            throw new ValidationException(parameter + ":" + values + " At least one retention should stay enabled!");
-        }
 
         if (!values.stream()
                 .filter(s -> !VALID_STRATEGIES.contains(s))
                 .collect(Collectors.toSet()).isEmpty()) {
             throw new ValidationException("Parameter " + parameter + " contains invalid values: " + values);
+        }
+
+        if (VALID_STRATEGIES.remove(ARCHIVE_RETENTION_STRATEGY) && values.containsAll(VALID_STRATEGIES)) {
+            throw new ValidationException(parameter + ":" + values + " At least one retention of the following [none, close, delete], should stay enabled!");
         }
     }
 }
