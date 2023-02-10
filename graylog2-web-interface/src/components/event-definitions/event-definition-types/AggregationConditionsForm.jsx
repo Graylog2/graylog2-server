@@ -90,7 +90,6 @@ class AggregationConditionsForm extends React.Component {
     if (nextConditions) {
       // Keep series up-to-date with changes in conditions
       const seriesReferences = extractSeriesReferences(nextConditions);
-
       nextSeries = (changes.series || eventDefinition.config.series).filter((s) => seriesReferences.includes(s.id));
     } else {
       nextSeries = [];

@@ -52,6 +52,7 @@ type Props = {
 
 const EventDefinitionSummary = ({ eventDefinition, notifications, validation, currentUser }: Props) => {
   const [showValidation, setShowValidation] = useState<boolean>(false);
+  console.log({ notifications });
 
   useEffect(() => {
     const flipShowValidation = () => {
