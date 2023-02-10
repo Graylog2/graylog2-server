@@ -140,7 +140,7 @@ public class KinesisTransport extends ThrottleableTransport {
         this.kinesisConsumer = new KinesisConsumer(nodeId, this, objectMapper, kinesisCallback(input),
                                                    streamName, awsMessageType, batchSize, awsRequest);
 
-        LOG.debug("Starting Kinesis reader thread for input [{}/{}]", input.getName(), input.getId());
+        LOG.debug("Starting Kinesis reader thread for input {}", input.toIdentifier());
         executor.submit(this.kinesisConsumer);
     }
 
