@@ -64,8 +64,10 @@ public class InputConfigurationDeserializer extends BeanDeserializer {
             final var configuration = new HashMap<>(valueWithConfiguration.configuration());
 
             encryptedFields.forEach(field -> {
-                final var encryptedValue = objectMapper.convertValue(configuration.get(field), EncryptedValue.class);
-                configuration.put(field, encryptedValue);
+                if (configuration.containsKey(field)) {
+                    final var encryptedValue = objectMapper.convertValue(configuration.get(field), EncryptedValue.class);
+                    configuration.put(field, encryptedValue);
+                }
             });
 
             return valueWithConfiguration.withConfiguration(configuration);
