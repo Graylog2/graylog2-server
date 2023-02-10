@@ -75,7 +75,7 @@ const FieldComponent = ({ groupingIndex }: Props) => {
       <FieldSelect id="group-by-field-create-select"
                    onChange={onAddField}
                    clearable={false}
-                   ariaLabel={createSelectPlaceholder}
+                   ariaLabel="Fields"
                    qualifiedTypeCategory={grouping.fields?.length ? grouping.type : undefined}
                    persistSelection={false}
                    name="group-by-field-create-select"
