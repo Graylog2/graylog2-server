@@ -1,0 +1,4 @@
+type = "a"
+message = "Adds a unique `username` index to the `user` collection to prevent creation of duplicate users."
+issues = ["12963"]
+pulls = ["14649"]
