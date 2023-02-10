@@ -51,8 +51,8 @@ public class CertutilCa implements CliCommand {
 
             console.printLine("Generating datanode CA");
 
-            KeyPair rootCA = CertTools.generateCertificate("root", null, null, true);
-            KeyPair intermediateCA = CertTools.generateCertificate("ca", /*domain=*/null, rootCA, true);
+            KeyPair rootCA = CertificateGenerator.generateCertificate("root", null, null, true);
+            KeyPair intermediateCA = CertificateGenerator.generateCertificate("ca", /*domain=*/null, rootCA, true);
 
             KeyStore caKeystore = KeyStore.getInstance("PKCS12");
             caKeystore.load(null, null);

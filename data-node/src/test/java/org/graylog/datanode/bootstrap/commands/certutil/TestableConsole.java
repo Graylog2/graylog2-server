@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 public class TestableConsole implements CommandLineConsole {
@@ -65,7 +66,7 @@ public class TestableConsole implements CommandLineConsole {
     }
 
     private Pair<String, String> consumeResponse(String format, Object[] args)  {
-        final String question = cleanQuestion(String.format(format, args));
+        final String question = cleanQuestion(String.format(Locale.ROOT, format, args));
         final Pair<String, String> response = providedResponses.stream().filter(r -> r.getKey().equals(question)).findFirst()
                 .orElseThrow(() -> new ConsoleException("Unexpected input question:" + question));
         providedResponses.remove(response);

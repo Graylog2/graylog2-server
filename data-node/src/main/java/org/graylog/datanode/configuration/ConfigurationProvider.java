@@ -72,12 +72,19 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
 
         config.put("cluster.initial_master_nodes", "node1");
 
-        config.put("plugins.security.disabled", "true");
-        config.put("plugins.security.ssl.http.enabled", "false");
+        final Path transportKeystorePath = Path.of(opensearchConfigLocation).resolve("datanode-transport-certificates.p12");
+        final Path httpKeystorePath = Path.of(opensearchConfigLocation).resolve("datanode-http-certificates.p12");
+
+        if(Files.exists(transportKeystorePath) && Files.exists(httpKeystorePath)) {
+            config.put("plugins.security.disabled", "false");
+            config.put("plugins.security.ssl.http.enabled", "true");
+        } else {
+            config.put("plugins.security.disabled", "true");
+            config.put("plugins.security.ssl.http.enabled", "false");
+        }
 
         final Path opensearchConfigDir = Path.of(opensearchLocation).resolve("config");
 
-        final Path transportKeystorePath = Path.of(opensearchConfigLocation).resolve("datanode-transport-certificates.p12");
         if(Files.exists(transportKeystorePath)) {
 
             KeyStore nodeKeystore = loadKeystore(transportKeystorePath, "password");
@@ -100,7 +107,6 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
             config.put("node.max_local_storage_nodes", "3");
         }
 
-        final Path httpKeystorePath = Path.of(opensearchConfigLocation).resolve("datanode-http-certificates.p12");
         if(Files.exists(httpKeystorePath)) {
 
             KeyStore httpKeystore = loadKeystore(httpKeystorePath, "password");

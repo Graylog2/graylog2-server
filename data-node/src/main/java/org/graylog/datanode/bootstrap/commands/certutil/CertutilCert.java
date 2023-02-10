@@ -79,7 +79,7 @@ public class CertutilCert implements CliCommand {
 
             console.printLine("Generating private key and certificate for this datanode");
 
-            KeyPair nodePair = CertTools.generateCertificate("localhost", null, intermediateCA, false);
+            KeyPair nodePair = CertificateGenerator.generateCertificate("localhost", null, intermediateCA, false);
 
 
             KeyStore nodeKeystore = KeyStore.getInstance("PKCS12");
