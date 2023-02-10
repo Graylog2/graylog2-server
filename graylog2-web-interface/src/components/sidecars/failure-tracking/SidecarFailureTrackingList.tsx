@@ -47,20 +47,94 @@ const ErrorMessageCol = styled.col`
 const VerboseMessageCol = styled.col`
   width: 50%;
 `;
-
+type SortType = { field: string, order: string };
 type Props = {
-  sidecars: SidecarSummary[],
-  collectors: Collector[],
+  sidecars: Array<SidecarSummary>,
+  collectors: Array<Collector>,
   pagination: PaginationInfo,
   query: string,
-  sort: { field: string, order: string },
+  sort: SortType,
   onlyActive: boolean,
   pageSizes: number[],
   onPageChange: (page: number, pageSize: number) => void,
   onQueryChange: (query: string) => void,
   onSortChange: (sortField: string) => void,
   toggleShowInactive: () => void,
-}
+};
+
+const NoMatchingListAlert = ({ onlyActive }: {onlyActive: boolean}) => {
+  const showInactiveHint = (onlyActive ? ' and/or click on "Include inactive sidecars"' : null);
+
+  return (
+    <NoSearchResult>
+      {`There are no sidecars with failures matching the search criteria. Try adjusting your search filter${showInactiveHint}.`}
+    </NoSearchResult>
+  );
+};
+
+const SidecarTable = ({
+  rows,
+  sort,
+  onSortChange,
+} : {
+  rows: React.ReactNode[],
+  sort: SortType,
+  onSortChange:(sortField: string) => void,
+}) => {
+  const columns = {
+    node_name: 'Sidecar',
+    collector: 'Collector',
+    last_seen: 'Last Seen',
+    'node_details.status.status': 'Status',
+    message: 'Error Message',
+    verbose_message: 'Verbose Message',
+  };
+  const sortableColumns = ['node_name', 'last_seen'];
+
+  return (
+    <Table striped responsive>
+      <colgroup>
+        <StandardWidthCol />
+        <StandardWidthCol />
+        <StandardWidthCol />
+        <StandardWidthCol />
+        <ErrorMessageCol />
+        <VerboseMessageCol />
+      </colgroup>
+      <thead>
+        <tr>
+          {Object.keys(columns).map((columnKey) => (
+            <th key={columnKey}>
+              {columns[columnKey]}
+              {sortableColumns.includes(columnKey) && (
+                <StyledSortIcon activeDirection={sort.field === columnKey ? sort.order : null}
+                                onChange={() => onSortChange(columnKey)}
+                                title={columnKey}
+                                ascId="asc"
+                                descId="desc" />
+              )}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows}
+      </tbody>
+    </Table>
+  );
+};
+
+const EmptyList = ({ query, onlyActive }: {query: string, onlyActive: boolean}) => {
+  if (query) {
+    return <NoMatchingListAlert onlyActive={onlyActive} />;
+  }
+
+  return (
+    <NoEntitiesExist>
+      There are no sidecars with failures.
+    </NoEntitiesExist>
+  );
+};
 
 const SidecarFailureTrackingList = ({
   sidecars,
@@ -77,74 +151,8 @@ const SidecarFailureTrackingList = ({
 }: Props) => {
   const [collectorDetailsToShow, setCollectorDetailsToShow] = useState<{ name: string, verbose_message: string }|null>(null);
 
-  const formatSidecarList = (sidecarRows: React.ReactNode[]) => {
-    const sidecarCollection = {
-      node_name: 'Sidecar',
-      collector: 'Collector',
-      last_seen: 'Last Seen',
-      'node_details.status.status': 'Status',
-      message: 'Error Message',
-      verbose_message: 'Verbose Message',
-    };
-
-    return (
-      <Table striped responsive>
-        <colgroup>
-          <StandardWidthCol />
-          <StandardWidthCol />
-          <StandardWidthCol />
-          <StandardWidthCol />
-          <ErrorMessageCol />
-          <VerboseMessageCol />
-        </colgroup>
-        <thead>
-          <tr>
-            {Object.keys(sidecarCollection).map((sort_key) => (
-              <th key={sort_key}>
-                {sidecarCollection[sort_key]}
-                {['node_name', 'last_seen'].includes(sort_key) && (
-                  <StyledSortIcon activeDirection={sort.field === sort_key ? sort.order : null}
-                                  onChange={() => onSortChange(sort_key)}
-                                  title={sort_key}
-                                  ascId="asc"
-                                  descId="desc" />
-                )}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {sidecarRows}
-        </tbody>
-      </Table>
-    );
-  };
-
-  const formatNoMatchingListAlert = () => {
-    const showInactiveHint = (onlyActive ? ' and/or click on "Include inactive sidecars"' : null);
-
-    return (
-      <NoSearchResult>
-        {`There are no sidecars with failures matching the search criteria. Try adjusting your search filter${showInactiveHint}.`}
-      </NoSearchResult>
-    );
-  };
-
-  const renderEmptyList = () => {
-    if (query) {
-      return formatNoMatchingListAlert();
-    }
-
-    return (
-      <NoEntitiesExist>
-        There are no sidecars with failures.
-      </NoEntitiesExist>
-    );
-  };
-
   const sidecarRows = sidecars.map((sidecar) => <SidecarFailureTrackingRows key={sidecar.node_id} sidecar={sidecar} collectors={collectors} onShowDetails={setCollectorDetailsToShow} />);
-  const showOrHideInactive = (onlyActive ? 'Include' : 'Hide');
-  const sidecarList = (sidecarRows.length > 0 ? formatSidecarList(sidecarRows) : renderEmptyList());
+  const showOrHideInactive = onlyActive ? 'Include' : 'Hide';
 
   return (
     <div>
@@ -164,7 +172,9 @@ const SidecarFailureTrackingList = ({
                      onChange={onPageChange}>
         <Row>
           <Col md={12}>
-            {sidecarList}
+            {sidecarRows.length > 0
+              ? <SidecarTable rows={sidecarRows} sort={sort} onSortChange={onSortChange} />
+              : <EmptyList query={query} onlyActive={onlyActive} />}
           </Col>
         </Row>
       </PaginatedList>

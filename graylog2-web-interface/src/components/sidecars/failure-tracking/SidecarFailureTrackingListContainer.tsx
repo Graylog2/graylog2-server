@@ -46,14 +46,23 @@ const SIDECARS_DEFAULT_ARGS: SidecarsArgs = {
   onlyActive: false,
 };
 
-const fetchSidecars = (options: SidecarsArgs = SIDECARS_DEFAULT_ARGS, callback: (data: SidecarListResponse) => void = () => {}) => {
+const fetchSidecars = (options: SidecarsArgs, callback: (data: SidecarListResponse) => void) => {
+  const {
+    page = SIDECARS_DEFAULT_ARGS.page,
+    pageSize = SIDECARS_DEFAULT_ARGS.pageSize,
+    query = SIDECARS_DEFAULT_ARGS.query,
+    sortField = SIDECARS_DEFAULT_ARGS.sortField,
+    order = SIDECARS_DEFAULT_ARGS.order,
+    onlyActive = SIDECARS_DEFAULT_ARGS.onlyActive,
+  } = options;
+
   return SidecarsActions.listPaginated({
-    page: options.page || SIDECARS_DEFAULT_ARGS.page,
-    pageSize: options.pageSize || SIDECARS_DEFAULT_ARGS.pageSize,
-    query: options.query || SIDECARS_DEFAULT_ARGS.query,
-    sortField: options.sortField || SIDECARS_DEFAULT_ARGS.sortField,
-    order: options.order || SIDECARS_DEFAULT_ARGS.order,
-    onlyActive: options.onlyActive || SIDECARS_DEFAULT_ARGS.onlyActive,
+    page,
+    pageSize,
+    query,
+    sortField,
+    order,
+    onlyActive,
   }).then(callback);
 };
 

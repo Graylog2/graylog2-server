@@ -22,7 +22,6 @@ import { Link } from 'components/common/router';
 import RelativeTime from 'components/common/RelativeTime';
 import Routes from 'routing/Routes';
 import StatusIndicator from 'components/sidecars/common/StatusIndicator';
-import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 import { Button } from 'components/bootstrap';
 
 import type { Collector, SidecarSummary } from '../types';
@@ -53,68 +52,68 @@ type Props = {
 
 const SidecarFailureTrackingRows = ({ sidecar, collectors, onShowDetails }: Props) => {
   const annotation = sidecar.active ? '' : ' (inactive)';
-  let sidecarStatus = { status: null, message: null, id: null };
-
-  if (sidecar.node_details.status && SidecarStatusEnum.isValidStatusCode(sidecar.node_details.status.status)) {
-    sidecarStatus = {
-      status: sidecar.node_details.status.status,
-      message: sidecar.node_details.status.message,
-      id: sidecar.node_id,
-    };
-  }
+  const {
+    node_id = null,
+    node_name,
+    last_seen,
+    node_details: {
+      status: {
+        message = null,
+        status = undefined,
+        collectors: collectorStatusList,
+      } = {},
+    } = {},
+  } = sidecar;
 
   const getCollectorInformation = (collectorId: string) => {
     return collectors.find((collector) => collector.id === collectorId);
   };
 
-  const renderSidecarCollectorRows = () => {
-    return sidecar.node_details.status.collectors.filter((collector) => collector.status === 2).map((collector) => {
-      const collectorData = getCollectorInformation(collector.collector_id);
-
-      return (
-        <tr key={collector.collector_id + collector.configuration_id}>
-          <td>
-            <Link to={Routes.SYSTEM.SIDECARS.STATUS(sidecar.node_id)}>
-              {sidecar.node_name}
-            </Link>
-            <SecondaryText>{annotation}</SecondaryText>
-            <SecondaryText>{collectorData?.node_operating_system}</SecondaryText>
-            <SecondaryText>v{sidecar.sidecar_version}</SecondaryText>
-            <SecondaryText>{sidecar.node_id}</SecondaryText>
-          </td>
-          <td>
-            {collectorData?.name}
-          </td>
-          <td>
-            <RelativeTime dateTime={sidecar.last_seen} />
-          </td>
-          <td>
-            <StatusIndicator status={sidecarStatus.status}
-                             message={sidecarStatus.message}
-                             id={sidecarStatus.id}
-                             lastSeen={sidecar.last_seen} />
-          </td>
-          <td>
-            {collector.message}
-          </td>
-          <td>
-            <VerboseMessageContainer>
-              {collector.verbose_message}
-            </VerboseMessageContainer>
-            <ShowDetailsLink bsStyle="link"
-                             bsSize="xs"
-                             onClick={() => onShowDetails({ name: collectorData?.name, verbose_message: collector.verbose_message })}>
-              Show more
-            </ShowDetailsLink>
-          </td>
-        </tr>
-      );
-    });
-  };
-
   return (
+    // eslint-disable-next-line react/jsx-no-useless-fragment
     <>
-      {renderSidecarCollectorRows()}
+      {collectorStatusList?.filter((collector) => collector.status === 2).map((collector) => {
+        const collectorData = getCollectorInformation(collector.collector_id);
+
+        return (
+          <tr key={collector.collector_id + collector.configuration_id}>
+            <td>
+              <Link to={Routes.SYSTEM.SIDECARS.STATUS(sidecar.node_id)}>
+                {node_name}
+              </Link>
+              <SecondaryText>{annotation}</SecondaryText>
+              <SecondaryText>{collectorData?.node_operating_system}</SecondaryText>
+              <SecondaryText>v{sidecar.sidecar_version}</SecondaryText>
+              <SecondaryText>{sidecar.node_id}</SecondaryText>
+            </td>
+            <td>
+              {collectorData?.name}
+            </td>
+            <td>
+              <RelativeTime dateTime={last_seen} />
+            </td>
+            <td>
+              <StatusIndicator status={status}
+                               message={message}
+                               id={node_id}
+                               lastSeen={last_seen} />
+            </td>
+            <td>
+              {collector.message}
+            </td>
+            <td>
+              <VerboseMessageContainer>
+                {collector.verbose_message}
+              </VerboseMessageContainer>
+              <ShowDetailsLink bsStyle="link"
+                               bsSize="xs"
+                               onClick={() => onShowDetails({ name: collectorData?.name, verbose_message: collector.verbose_message })}>
+                Show more
+              </ShowDetailsLink>
+            </td>
+          </tr>
+        );
+      })}
     </>
   );
 };
