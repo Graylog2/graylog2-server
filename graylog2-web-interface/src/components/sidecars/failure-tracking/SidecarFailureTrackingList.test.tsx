@@ -95,14 +95,10 @@ describe('SidecarFailureTrackingList', () => {
 
     await screen.findByText('Sidecar');
 
-    const findButton = screen.getByRole('button', { name: 'Find' });
-    const resetButton = screen.getByRole('button', { name: 'Reset' });
+    const searchInput = await screen.findByPlaceholderText(/find sidecars/i);
+    fireEvent.change(searchInput, { target: { value: 'demo' } });
 
-    fireEvent.click(findButton);
-    await waitFor(() => expect(handleQueryChange).toHaveBeenCalledWith(query, expect.anything()));
-
-    fireEvent.click(resetButton);
-    await waitFor(() => expect(handleQueryChange).toHaveBeenCalled());
+    await waitFor(() => expect(handleQueryChange).toHaveBeenCalledWith('demo', expect.anything()));
   });
 
   it('should handle page change', async () => {
