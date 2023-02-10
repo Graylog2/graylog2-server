@@ -22,7 +22,7 @@ import org.graylog2.plugin.Version;
 
 import java.util.List;
 
-public record DataNodeStatus(@JsonIgnore Version appVersion, StatusResponse processes) {
+public record DataNodeStatus(@JsonIgnore Version appVersion, StatusResponse process) {
 
     @JsonProperty
     public String dataNodeVersion() {

@@ -71,8 +71,9 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
                 new UsernamePasswordCredentials("admin", "admin"));
 
         final boolean sslEnabled = Boolean.parseBoolean(configuration.asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
+        final HttpHost host = new HttpHost("localhost", configuration.httpPort(), sslEnabled ? "https" : "http");
 
-        RestClientBuilder builder = RestClient.builder(new HttpHost("localhost", configuration.httpPort(), sslEnabled ? "https" : "http"));
+        RestClientBuilder builder = RestClient.builder(host);
         if (sslEnabled) {
             builder.setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
         }
@@ -110,8 +111,14 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
                 process.info().startInstant().orElse(null),
                 process.info().totalCpuDuration().orElse(null),
                 process.info().user().orElse(null),
-                configuration.httpPort()
-        )).orElseGet(() -> new ProcessInfo(-1, configuration.nodeName(), processState.getState(), false, null, null, null, configuration.httpPort()));
+                getRestBaseUrl(configuration).toString()
+
+        )).orElseGet(() -> new ProcessInfo(-1, configuration.nodeName(), processState.getState(), false, null, null, null, null));
+    }
+
+    private HttpHost getRestBaseUrl(OpensearchConfiguration config) {
+        final boolean sslEnabled = Boolean.parseBoolean(config.asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
+        return new HttpHost("localhost", config.httpPort(), sslEnabled ? "https" : "http");
     }
 
     private Optional<Process> process() {
