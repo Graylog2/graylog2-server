@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 public class RetentionStrategyValidator implements Validator<Set<String>> {
     private static final String ARCHIVE_RETENTION_STRATEGY = "archive";
     Set<String> VALID_STRATEGIES = Sets.newHashSet(
-            NoopRetentionStrategy.NAME, ClosingRetentionStrategy.NAME, DeletionRetentionStrategy.NAME, ARCHIVE_RETENTION_STRATEGY);
+            NoopRetentionStrategy.NAME, ClosingRetentionStrategy.NAME, DeletionRetentionStrategy.NAME);
 
     @Override
     // The set of valid retention strategies must
