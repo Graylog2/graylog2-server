@@ -35,12 +35,8 @@ const FlexibleButtonGroup = styled(ButtonGroup)`
   }
 `;
 
-const ButtonLabel = ({ refreshConfigEnabled, naturalInterval }: {refreshConfigEnabled: boolean, naturalInterval: React.ReactNode}) => {
-  let buttonText: React.ReactNode = 'Not updating';
-
-  if (refreshConfigEnabled) {
-    buttonText = <>Every {naturalInterval}</>;
-  }
+const ButtonLabel = ({ refreshConfigEnabled, naturalInterval }: { refreshConfigEnabled: boolean, naturalInterval: React.ReactNode }) => {
+  const buttonText = refreshConfigEnabled ? <>Every {naturalInterval}</> : 'Not updating';
 
   // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{buttonText}</>;
@@ -104,7 +100,7 @@ class RefreshControls extends React.Component<Props> {
 
     return (
       <FlexibleButtonGroup aria-label="Refresh Search Controls">
-        <Button onClick={this._toggleEnable}>
+        <Button onClick={this._toggleEnable} title={refreshConfig.enabled ? 'Pause Refresh' : 'Start Refresh'}>
           {refreshConfig.enabled ? <Icon name="pause" /> : <Icon name="play" />}
         </Button>
 
