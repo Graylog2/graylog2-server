@@ -27,10 +27,10 @@ import View from 'views/logic/views/View';
 import { useStore } from 'stores/connect';
 import { TitlesStore } from 'views/stores/TitlesStore';
 import defaultTitle from 'views/components/defaultTitle';
-import { WidgetStore } from 'views/stores/WidgetStore';
 import TitleTypes from 'views/stores/TitleTypes';
 import useViewType from 'views/hooks/useViewType';
 import type WidgetType from 'views/logic/widgets/Widget';
+import { ViewStore } from 'views/stores/ViewStore';
 
 import { Position } from './widgets/WidgetPropTypes';
 import Widget from './widgets/Widget';
@@ -44,7 +44,12 @@ type Props = {
   widgetId: string,
 };
 
-const useWidget = (widgetId: string) => useStore(WidgetStore, (state) => state.get(widgetId));
+const useWidget = (widgetId: string) => useStore(ViewStore, (state) => {
+  const { view } = state;
+  const widgets = view.state.valueSeq().flatMap((s) => s.widgets).toArray();
+
+  return widgets.find((w) => w.id === widgetId);
+});
 const useTitle = (widget: WidgetType) => useStore(TitlesStore, (titles) => titles?.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget)) as string);
 
 const WidgetComponent = ({

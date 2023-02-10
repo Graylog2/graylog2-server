@@ -87,7 +87,9 @@ public class ViewService extends PaginatedDbService<ViewDTO> implements ViewUtil
                                                    DBQuery.Query grandTotalQuery,
                                                    int page,
                                                    int perPage) {
-        final PaginatedList<ViewDTO> viewsList = findPaginatedWithQueryFilterAndSortWithGrandTotal(searchUser, query, filter, getSortBuilder(order, sortField), grandTotalQuery, page, perPage);
+        final PaginatedList<ViewDTO> viewsList = findPaginatedWithQueryFilterAndSortWithGrandTotal(searchUser, query, filter,
+                getMultiFieldSortBuilder(order, List.of(sortField, ViewDTO.SECONDARY_SORT)),
+                grandTotalQuery, page, perPage);
         return viewsList.stream()
                 .map(this::requirementsForView)
                 .collect(Collectors.toCollection(() -> viewsList.grandTotal()
@@ -141,7 +143,7 @@ public class ViewService extends PaginatedDbService<ViewDTO> implements ViewUtil
                                                                  DBQuery.Query grandTotalQuery,
                                                                  int page,
                                                                  int perPage) {
-        return findPaginatedWithQueryFilterAndSortWithGrandTotal(query, filter, getSortBuilder(order, sortField), grandTotalQuery, page, perPage);
+        return findPaginatedWithQueryFilterAndSortWithGrandTotal(query, filter, getMultiFieldSortBuilder(order, List.of(sortField, ViewDTO.SECONDARY_SORT)), grandTotalQuery, page, perPage);
     }
 
     public PaginatedList<ViewDTO> searchPaginatedByType(ViewDTO.Type type,

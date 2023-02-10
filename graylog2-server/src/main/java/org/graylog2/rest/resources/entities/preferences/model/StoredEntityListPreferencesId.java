@@ -28,7 +28,9 @@ import com.google.auto.value.AutoValue;
 @JsonDeserialize(builder = StoredEntityListPreferencesId.Builder.class)
 public abstract class StoredEntityListPreferencesId {
 
-    @JsonProperty("user_id")
+    public static final String USER_ID_SUB_FIELD = "user_id";
+
+    @JsonProperty(USER_ID_SUB_FIELD)
     public abstract String userId();
 
     @JsonProperty("entity_list_id")
@@ -43,7 +45,7 @@ public abstract class StoredEntityListPreferencesId {
     @JsonPOJOBuilder(withPrefix = "")
     public abstract static class Builder {
 
-        @JsonProperty("user_id")
+        @JsonProperty(USER_ID_SUB_FIELD)
         public abstract Builder userId(final String userId);
 
         @JsonProperty("entity_list_id")

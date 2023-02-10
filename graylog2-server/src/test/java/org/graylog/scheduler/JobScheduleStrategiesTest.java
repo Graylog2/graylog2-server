@@ -79,7 +79,7 @@ public class JobScheduleStrategiesTest {
                 .jobDefinitionType("event-processor-execution-v1")
                 .schedule(CronJobSchedule.builder()
                         .cronExpression("0 0 1 * * ? *")
-                        .timezone("Europe/Vienna")
+                        .timezone("EST")
                         .build())
                 .build();
 
@@ -88,7 +88,8 @@ public class JobScheduleStrategiesTest {
         assertThat(nextTime)
                 .isNotNull()
                 .satisfies(dateTime ->  {
-                    assertThat(dateTime.getZone()).isEqualTo(DateTimeZone.forID("Europe/Vienna"));
+                    // EST is mapped to a fixed offset without daylight savings: https://docs.oracle.com/javase/8/docs/api/java/time/ZoneId.html#SHORT_IDS
+                    assertThat(dateTime.getZone()).isEqualTo(DateTimeZone.forID("-05:00"));
                     assertThat(dateTime.toString(DATE_FORMAT)).isEqualTo("14/06/2022 01:00:00");
                 });
     }

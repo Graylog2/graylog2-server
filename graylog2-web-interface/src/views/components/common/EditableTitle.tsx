@@ -122,6 +122,7 @@ export default class EditableTitle extends React.Component<Props, State> {
                        type="text"
                        value={value}
                        onBlur={this._onBlur}
+                       title="Edit title"
                        onChange={this._onChange} />
         </form>
       </span>
