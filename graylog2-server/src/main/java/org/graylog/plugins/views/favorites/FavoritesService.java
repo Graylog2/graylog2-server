@@ -16,10 +16,16 @@
  */
 package org.graylog.plugins.views.favorites;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.startpage.recentActivities.ActivityType;
+import org.graylog.plugins.views.startpage.recentActivities.RecentActivityEvent;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -27,17 +33,14 @@ import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.lookup.Catalog;
 import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.users.events.UserDeletedEvent;
 import org.mongojack.DBQuery;
 import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-/*
- * TODO: remove entity, if a user is deleted?
- */
 public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
     public static final String COLLECTION_NAME = "favorites";
 
@@ -46,12 +49,17 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
 
     @Inject
     protected FavoritesService(final MongoConnection mongoConnection,
+                               EventBus eventBus,
                                final MongoJackObjectMapperProvider mapper,
                                final EntityOwnershipService entityOwnerShipService,
                                final Catalog catalog) {
         super(mongoConnection, mapper, FavoritesForUserDTO.class, COLLECTION_NAME);
+        eventBus.register(this);
         this.entityOwnerShipService = entityOwnerShipService;
         this.catalog = catalog;
+
+        db.createIndex(new BasicDBObject(FavoritesForUserDTO.FIELD_USER_ID, 1));
+        db.createIndex(new BasicDBObject(FavoritesForUserDTO.FIELD_ITEMS + "." + FavoriteDTO.FIELD_ID, 1));
     }
 
     public PaginatedResponse<Favorite> findFavoritesFor(final SearchUser searchUser, final Optional<String> type, final int page, final int perPage) {
@@ -89,8 +97,12 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
         }
     }
 
-    protected Optional<FavoritesForUserDTO> findForUser(final SearchUser searchUser) {
-        return streamQuery(DBQuery.is(FavoritesForUserDTO.FIELD_USER_ID, searchUser.getUser().getId())).findAny();
+    Optional<FavoritesForUserDTO> findForUser(final SearchUser searchUser) {
+        return findForUser(searchUser.getUser().getId());
+    }
+
+    Optional<FavoritesForUserDTO> findForUser(final String userId) {
+        return streamQuery(DBQuery.is(FavoritesForUserDTO.FIELD_USER_ID, userId)).findAny();
     }
 
     public Optional<FavoritesForUserDTO> create(final FavoritesForUserDTO favorite, final SearchUser searchUser) {
@@ -104,5 +116,20 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
         } catch (DuplicateKeyException e) {
             throw new IllegalStateException("Unable to create a Favorites collection, collection with this id already exists : " + favorite.id());
         }
+    }
+
+    @Subscribe
+    public void removeFavoriteOnEntityDeletion(final RecentActivityEvent event) {
+        // if an entity is deleted, we can no longer see it in the favorites collection
+        if (event.activityType().equals(ActivityType.DELETE)) {
+            DBObject query = new BasicDBObject(FavoritesForUserDTO.FIELD_ITEMS + "." + FavoriteDTO.FIELD_ID, new BasicDBObject("$eq", event.grn().entity()));
+            final DBObject modifications = new BasicDBObject("$pull", new BasicDBObject(FavoritesForUserDTO.FIELD_ITEMS, new BasicDBObject(FavoriteDTO.FIELD_ID, event.grn().entity())));
+            db.updateMulti(query, modifications);
+        }
+    }
+
+    @Subscribe
+    public void removeFavoriteEntityOnUserDeletion(final UserDeletedEvent event) {
+        db.remove(DBQuery.is(FavoritesForUserDTO.FIELD_USER_ID, event.userId()));
     }
 }

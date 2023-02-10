@@ -30,6 +30,7 @@ import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.BadRequestException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class SequentialBulkExecutor<T, C extends HasUser> implements BulkExecuto
 
     private static final Logger LOG = LoggerFactory.getLogger(SequentialBulkExecutor.class);
 
-    static final BulkOperationFailure NO_ENTITY_IDS_FAILURE = new BulkOperationFailure("", "No IDs provided in the request");
+    static final String NO_ENTITY_IDS_ERROR = "No IDs provided in the request";
     private final SingleEntityOperationExecutor<T, C> singleEntityOperationExecutor;
     private final AuditEventSender auditEventSender;
     private final SuccessContextCreator<T> successAuditLogContextCreator;
@@ -81,7 +82,7 @@ public class SequentialBulkExecutor<T, C extends HasUser> implements BulkExecuto
     @Override
     public BulkOperationResponse executeBulkOperation(final BulkOperationRequest bulkOperationRequest, final C userContext, final AuditParams params) {
         if (bulkOperationRequest.entityIds() == null || bulkOperationRequest.entityIds().isEmpty()) {
-            return new BulkOperationResponse(0, List.of(NO_ENTITY_IDS_FAILURE));
+            throw new BadRequestException(NO_ENTITY_IDS_ERROR);
         }
 
         List<BulkOperationFailure> capturedFailures = new LinkedList<>();

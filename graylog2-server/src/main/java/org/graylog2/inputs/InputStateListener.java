@@ -66,12 +66,12 @@ public class InputStateListener {
                 notificationService.fixed(Notification.Type.NO_INPUT_RUNNING);
                 // fall through
             default:
-                final String msg = "Input [" + input.getName() + "/" + input.getId() + "] is now " + event.newState().toString();
+                final String msg = "Input " + input.toIdentifier() + " is now " + event.newState().toString();
                 activityWriter.write(new Activity(msg, InputStateListener.class));
                 break;
         }
 
-        LOG.debug("Input State of [{}/{}] changed: {} -> {}", input.getTitle(), input.getId(), event.oldState(), event.newState());
-        LOG.info("Input [{}/{}] is now {}", input.getName(), input.getId(), event.newState());
+        LOG.debug("Input State of {} changed: {} -> {}", input.toIdentifier(), event.oldState(), event.newState());
+        LOG.info("Input {} is now {}", input.toIdentifier(), event.newState());
     }
 }

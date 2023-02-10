@@ -236,6 +236,7 @@ const ApiRoutes = {
     index: () => { return { url: '/streams' }; },
     paginated: () => { return { url: '/streams/paginated' }; },
     get: (streamId: string) => { return { url: `/streams/${streamId}` }; },
+    bulk_delete: () => ({ url: '/streams/bulk_delete' }),
     create: () => { return { url: '/streams' }; },
     update: (streamId: string) => { return { url: `/streams/${streamId}` }; },
     cloneStream: (streamId: string) => { return { url: `/streams/${streamId}/clone` }; },
