@@ -109,6 +109,25 @@ class InputConfigurationDeserializerTest {
         assertThat(parsedValue.configuration().get("password")).isInstanceOf(EncryptedValue.class);
     }
 
+    @Test
+    void doesNotAddMissingKeys() throws Exception {
+        var value = Value.create("org.graylog2.inputs.FooInput", Map.of("username", "jane", "password", ""));
+        var json = f("""
+                {
+                  "type": "%s",
+                  "configuration": {
+                    "username": "%s"
+                  }
+                }
+                """, value.type(), value.configuration().get("username"));
+
+        var parsedValue = objectMapper.readValue(json.getBytes(StandardCharsets.UTF_8), Value.class);
+
+        assertThat(parsedValue.type()).isEqualTo(value.type());
+        assertThat(parsedValue.configuration().get("username")).isEqualTo(value.configuration().get("username"));
+        assertThat(parsedValue.configuration()).doesNotContainKey("password");
+    }
+
     @AutoValue
     public static abstract class Value implements WithInputConfiguration<Value> {
         @Override
