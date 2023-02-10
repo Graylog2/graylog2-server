@@ -41,6 +41,8 @@ class InputForm extends React.Component {
   constructor(props) {
     super(props);
 
+    this.configurationForm = React.createRef();
+
     this.state = {
       global: this.props.globalValue !== undefined ? this.props.globalValue : false,
       node: this.props.nodeValue !== undefined ? this.props.nodeValue : undefined,
@@ -62,7 +64,7 @@ class InputForm extends React.Component {
 
   // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => {
-    this.configurationForm.open();
+    this.configurationForm.current.open();
   };
 
   getValues = () => {
@@ -73,7 +75,7 @@ class InputForm extends React.Component {
     }
 
     if (this.configurationForm) {
-      return this.configurationForm.getValue().configuration;
+      return this.configurationForm.current.getValue().configuration;
     }
 
     return {};
@@ -87,7 +89,7 @@ class InputForm extends React.Component {
     }
 
     if (this.configurationForm) {
-      return this.configurationForm.getValue().titleValue;
+      return this.configurationForm.current.getValue().titleValue;
     }
 
     return '';
@@ -99,7 +101,7 @@ class InputForm extends React.Component {
 
     return (
       <ConfigurationForm {...this.props}
-                         ref={(configurationForm) => { this.configurationForm = configurationForm; }}
+                         ref={this.configurationForm}
                          values={values}
                          titleValue={titleValue}
                          submitAction={this._onSubmit}>

@@ -80,6 +80,9 @@ class AddDecoratorButton extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
+
+    this.configurationForm = React.createRef();
+
     this.state = {};
   }
 
@@ -104,7 +107,7 @@ class AddDecoratorButton extends React.Component<Props, State> {
     this.setState({ typeName: undefined });
   };
 
-  _openModal = () => this.configurationForm.open();
+  _openModal = () => this.configurationForm.current.open();
 
   _onTypeChange = (decoratorType) => {
     const { decoratorTypes } = this.props;
@@ -126,9 +129,7 @@ class AddDecoratorButton extends React.Component<Props, State> {
     const wrapperComponent = InlineForm();
     const configurationForm = (typeName !== undefined
       ? (
-        <ConfigurationForm ref={(elem) => {
-          this.configurationForm = elem;
-        }}
+        <ConfigurationForm ref={this.configurationForm}
                            key="configuration-form-output"
                            configFields={typeDefinition.requested_configuration}
                            title={`Create new ${typeDefinition.name}`}
