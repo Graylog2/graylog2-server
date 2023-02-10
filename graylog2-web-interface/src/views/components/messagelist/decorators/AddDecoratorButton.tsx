@@ -86,6 +86,7 @@ class AddDecoratorButton extends React.Component<Props, State> {
     this.state = {};
   }
 
+  // eslint-disable-next-line class-methods-use-this
   _formatDecoratorType = (typeDefinition: DecoratorType, typeName: string) => {
     return { value: typeName, label: typeDefinition.name };
   };
@@ -107,6 +108,7 @@ class AddDecoratorButton extends React.Component<Props, State> {
     this.setState({ typeName: undefined });
   };
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   _openModal = () => this.configurationForm.current.open();
 
   _onTypeChange = (decoratorType) => {
