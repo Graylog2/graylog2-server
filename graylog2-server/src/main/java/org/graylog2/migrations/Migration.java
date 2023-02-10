@@ -22,7 +22,7 @@ import java.util.Comparator;
 import java.util.Objects;
 
 public abstract class Migration implements Comparable<Migration> {
-    private static final Comparator<Migration> COMPARATOR = Comparator.comparingLong(migration -> migration.createdAt().toEpochSecond());
+    private static final Comparator<Migration> COMPARATOR = Comparator.comparing(migration -> migration.createdAt().toString() + migration.getClass().getName());
 
     public abstract ZonedDateTime createdAt();
 
@@ -35,7 +35,7 @@ public abstract class Migration implements Comparable<Migration> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(COMPARATOR);
+        return Objects.hash(createdAt(), this.getClass().getName());
     }
 
     @Override

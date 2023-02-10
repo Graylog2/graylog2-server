@@ -91,6 +91,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.CloneMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.NormalizeFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveFromStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RenameField;
@@ -160,6 +161,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(SetFields.NAME, SetFields.class);
         addMessageProcessorFunction(RenameField.NAME, RenameField.class);
         addMessageProcessorFunction(RemoveField.NAME, RemoveField.class);
+        addMessageProcessorFunction(NormalizeFields.NAME, NormalizeFields.class);
 
         addMessageProcessorFunction(DropMessage.NAME, DropMessage.class);
         addMessageProcessorFunction(CreateMessage.NAME, CreateMessage.class);
@@ -282,7 +284,7 @@ public class ProcessorFunctionsModule extends PluginModule {
     }
 
     public static MapBinder<String, Function<?>> processorFunctionBinder(Binder binder) {
-        return MapBinder.newMapBinder(binder, TypeLiteral.get(String.class), new TypeLiteral<Function<?>>() {});
+        return MapBinder.newMapBinder(binder, TypeLiteral.get(String.class), new TypeLiteral<>() {});
     }
 
     public static void addMessageProcessorFunction(Binder binder, String name, Class<? extends Function<?>> functionClass) {
