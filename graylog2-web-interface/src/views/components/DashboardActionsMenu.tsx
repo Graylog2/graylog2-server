@@ -117,7 +117,7 @@ const DashboardActionsMenu = () => {
                      disabledInfo={isNewView && 'Only saved dashboards can be shared.'} />
       )}
       {showDropDownButton && (
-        <DropdownButton title={<Icon name="ellipsis-h" />} id="query-tab-actions-dropdown" pullRight noCaret>
+        <DropdownButton title={<Icon name="ellipsis-h" title="More Actions" />} id="query-tab-actions-dropdown" pullRight noCaret>
           <MenuItem onSelect={() => setEditDashboardOpen(true)} disabled={isNewView || !allowedToEdit} icon="edit">
             Edit metadata
           </MenuItem>

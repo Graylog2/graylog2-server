@@ -37,25 +37,25 @@ const Welcome = () => {
 
   return (
     <>
-      <PageHeader title="Welcome to Graylog">
+      <PageHeader title="Welcome to Graylog!">
         <span>
-          Here you can find most used content.
+          This is your personal start page, allowing easy access to the content most relevant for you.
         </span>
       </PageHeader>
       <SectionGrid>
-        <StyledSectionComponent title="Last opened">
+        <StyledSectionComponent title="Last Opened">
           <p className="description">Overview of recently visited saved searches and dashboards.</p>
           <LastOpenList />
         </StyledSectionComponent>
-        <StyledSectionComponent title="Favorite items">
+        <StyledSectionComponent title="Favorite Items">
           <p className="description">Overview of your favorite saved searches and dashboards.</p>
           <FavoriteItemsList />
         </StyledSectionComponent>
       </SectionGrid>
-      <StyledSectionComponent title="Recent activity">
+      <StyledSectionComponent title="Recent Activity">
         <p className="description">
           {isAdmin
-            ? 'This list includes all actions graylog users performed, like creating or sharing an entity.'
+            ? 'This list includes all actions Graylog users performed, like creating or sharing an entity.'
             : 'Overview of actions you made with entities or somebody else made with entities which relates to you, like creating or sharing an entity.'}
         </p>
         <RecentActivityList />

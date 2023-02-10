@@ -57,11 +57,15 @@ const _c = (field, value, path, source) => ({ field, value, path, source });
 
 type ColumnProps = { field: string, value: any, type: FieldType, valuePath: ValuePath, source: string | undefined | null };
 
+const flattenValuePath = (valuePath: ValuePath) => valuePath.flatMap((path) => Object.entries(path))
+  .map(([key, value]) => `${key}:${value}`)
+  .join('-');
+
 const Column = ({ field, value, type, valuePath, source }: ColumnProps) => {
   const additionalContextValue = useMemo(() => ({ valuePath }), [valuePath]);
 
   return (
-    <StyledTd isNumeric={type.isNumeric()}>
+    <StyledTd isNumeric={type.isNumeric()} data-testid={`value-cell-${flattenValuePath(valuePath)}-${field}`}>
       <AdditionalContext.Provider value={additionalContextValue}>
         <CustomHighlighting field={source ?? field} value={value}>
           {value !== null && value !== undefined

@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { Field, useFormikContext, getIn } from 'formik';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import styled from 'styled-components';
 
 import { defaultCompare } from 'logic/DefaultCompare';
 import { Input } from 'components/bootstrap';
@@ -31,6 +32,8 @@ import FieldSelect from '../FieldSelect';
 type Props = {
   index: number,
 }
+
+const Wrapper = styled.div``;
 
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
 
@@ -69,7 +72,7 @@ const Metric = ({ index }: Props) => {
   }, [functionIsSettled, metricsError, index, metricFieldSelectRef]);
 
   return (
-    <>
+    <Wrapper data-testid={`metric-${index}`}>
       <Field name={`metrics.${index}.function`}>
         {({ field: { name, value }, meta: { error } }) => (
           <Input id="metric-function-select"
@@ -133,7 +136,7 @@ const Metric = ({ index }: Props) => {
                    name={`metrics.${index}.name`}
                    labelClassName="col-sm-3"
                    wrapperClassName="col-sm-9" />
-    </>
+    </Wrapper>
   );
 };
 
