@@ -1,4 +1,4 @@
-type = "fixed"
+type = "added"
 message = "Sidecar Failure Tracking View"
 
 issues = ["collector-sidecar#433"]
