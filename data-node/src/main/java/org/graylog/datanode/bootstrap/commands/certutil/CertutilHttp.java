@@ -43,9 +43,7 @@ import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.time.Duration;
 
 @Command(name = "http", description = "Manage certificates for data-node", groupNames = {"certutil"})
 public class CertutilHttp implements CliCommand {
@@ -81,7 +79,8 @@ public class CertutilHttp implements CliCommand {
 
             try {
                 console.printLine("Generating certificate signing request for this datanode");
-                KeyPair keyPair = CertificateGenerator.generateCertificate("localhost", Collections.emptyList(), null, false);
+                final CertRequest certReq = CertRequest.selfSigned("localhost");
+                KeyPair keyPair = CertificateGenerator.generate(certReq);
                 PKCS10CertificationRequestBuilder p10Builder = new JcaPKCS10CertificationRequestBuilder(
                         new X500Principal("CN=Requested Test Certificate"), keyPair.publicKey());
                 JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA256withRSA");
@@ -116,13 +115,15 @@ public class CertutilHttp implements CliCommand {
 
                 final KeyPair caKeyPair = new KeyPair(caPrivateKey, null, caCertificate);
 
-                // TODO: validity
-                List<String> sanValues = new ArrayList<>();
-                sanValues.add("localhost");
-                sanValues.add(Tools.getLocalHostname());
-                sanValues.add(String.valueOf(InetAddress.getLocalHost()));
+                final int validityDays = console.readInt("Enter certificate validity in days: ");
 
-                KeyPair nodePair = CertificateGenerator.generateCertificate("localhost", sanValues, caKeyPair, false);
+                CertRequest certificateRequest = CertRequest.signed("localhost", caKeyPair)
+                        .withSubjectAlternativeName("localhost")
+                        .withSubjectAlternativeName(Tools.getLocalHostname())
+                        .withSubjectAlternativeName(String.valueOf(InetAddress.getLocalHost()))
+                        .validity(Duration.ofDays(validityDays));
+
+                KeyPair nodePair = CertificateGenerator.generate(certificateRequest);
                 console.printLine("Successfully generated CA from the keystore");
 
                 KeyStore nodeKeystore = KeyStore.getInstance("PKCS12");

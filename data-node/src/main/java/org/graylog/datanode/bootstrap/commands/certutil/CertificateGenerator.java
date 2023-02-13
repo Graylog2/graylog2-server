@@ -27,7 +27,6 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
-import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
@@ -35,37 +34,28 @@ import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.List;
 
 public class CertificateGenerator {
-    /**
-     * @param cnName The CN={name} of the certificate. When the certificate is for a domain it should be the domain name
-     * @param SAN entries (=subject alternative names)
-     * @param issuer Issuer who signs this certificate. Null for a self-signed certificate
-     * @param isCA   Can this certificate be used to sign other certificates
-     * @return Newly created certificate with its private key
-     */
-    protected static KeyPair generateCertificate(String cnName, @Nullable List<String> SAN, @Nullable KeyPair issuer, boolean isCA) throws Exception {
+    protected static KeyPair generate(CertRequest request) throws Exception {
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         java.security.KeyPair certKeyPair = keyGen.generateKeyPair();
-        X500Name name = new X500Name("CN=" + cnName);
+        X500Name name = new X500Name("CN=" + request.cnName());
 
         // TODO: cert serial number?
         BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
         Instant validFrom = Instant.now();
 
-        // TODO: configure validity!
-        Instant validUntil = validFrom.plus(10 * 365, ChronoUnit.DAYS);
+        Instant validUntil = validFrom.plus(request.validity());
 
         // If there is no issuer, we self-sign our certificate.
         X500Name issuerName;
         PrivateKey issuerKey;
-        if (issuer == null) {
+        if (request.issuer() == null) {
             issuerName = name;
             issuerKey = certKeyPair.getPrivate();
         } else {
-            issuerName = new X500Name(issuer.certificate().getSubjectX500Principal().getName());
-            issuerKey = issuer.privateKey();
+            issuerName = new X500Name(request.issuer().certificate().getSubjectX500Principal().getName());
+            issuerKey = request.issuer().privateKey();
         }
 
         JcaX509v3CertificateBuilder builder = new JcaX509v3CertificateBuilder(
@@ -75,12 +65,12 @@ public class CertificateGenerator {
                 name, certKeyPair.getPublic());
 
         // Make the certificate to a Cert Authority to sign more certs when needed
-        if (isCA) {
-            builder.addExtension(Extension.basicConstraints, true, new BasicConstraints(isCA));
+        if (request.isCA()) {
+            builder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
         }
 
-        if (SAN != null) {
-            GeneralName[] generalNames = SAN.stream()
+        if (!request.subjectAlternativeNames().isEmpty()) {
+            GeneralName[] generalNames = request.subjectAlternativeNames().stream()
                     .map(s -> new GeneralName(GeneralName.dNSName, s))
                     .toArray(GeneralName[]::new);
             builder.addExtension(Extension.subjectAlternativeName, false,
