@@ -42,6 +42,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.streams.StreamService;
 import org.junit.Before;
@@ -69,6 +70,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
     PipelineInterpreter pipelineInterpreter;
 
     @Before
+    @SuppressForbidden("Allow using default thread factory")
     public void createPipelineInterpreter() {
         // load rule from resource file
         final RuleService ruleService = mock(RuleService.class);
