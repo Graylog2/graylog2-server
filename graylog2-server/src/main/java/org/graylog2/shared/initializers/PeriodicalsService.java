@@ -100,21 +100,27 @@ public class PeriodicalsService extends AbstractIdleService {
             LOG.warn("Skipping start of {} periodicals which have already been started.", numOfPeriodicalsToSkip);
         }
 
+        int successes = 0;
+        int failures = 0;
         for (Periodical periodical : notYetStartedPeriodicals) {
             try {
                 periodical.initialize();
 
                 if (!periodical.startOnThisNode()) {
-                    LOG.info("Not starting [{}] periodical. Not configured to run on this node.", periodical.getClass().getCanonicalName());
+                    LOG.debug("Not starting [{}] periodical. Not configured to run on this node.", periodical.getClass().getCanonicalName());
+                    successes++;
                     continue;
                 }
 
                 // Register and start.
                 periodicals.registerAndStart(periodical);
+                successes++;
             } catch (Exception e) {
                 LOG.error("Could not initialize periodical.", e);
+                failures++;
             }
         }
+        LOG.info("Started [{}/{}] periodicals successfully, {} failed.", successes, notYetStartedPeriodicals.size(), failures);
     }
 
     private synchronized void stopPeriodicals(Collection<Periodical> periodicalsToStop) {

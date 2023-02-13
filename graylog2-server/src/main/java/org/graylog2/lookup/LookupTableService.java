@@ -418,12 +418,13 @@ public class LookupTableService extends AbstractIdleService {
     }
 
     protected void addListeners(LookupDataAdapter adapter, DataAdapterDto dto) {
-
-        adapter.addListener(new LoggingServiceListener(
-                        "Data Adapter",
-                        String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(adapter)),
-                        LOG),
-                scheduler);
+        if (LOG.isDebugEnabled()) {
+            adapter.addListener(new LoggingServiceListener(
+                            "Data Adapter",
+                            String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(adapter)),
+                            LOG),
+                    scheduler);
+        }
         // Each adapter needs to be added to the refresh scheduler
         adapter.addListener(adapterRefreshService.newServiceListener(adapter), scheduler);
     }
@@ -455,11 +456,13 @@ public class LookupTableService extends AbstractIdleService {
                 return null;
             }
             final LookupCache cache = factory.create(dto.id(), dto.name(), dto.config());
-            cache.addListener(new LoggingServiceListener(
-                            "Cache",
-                            String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(cache)),
-                            LOG),
-                    scheduler);
+            if (LOG.isDebugEnabled()) {
+                cache.addListener(new LoggingServiceListener(
+                                "Cache",
+                                String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(cache)),
+                                LOG),
+                        scheduler);
+            }
             return cache;
         } catch (Exception e) {
             LOG.error("Couldn't create cache <{}/{}>", dto.name(), dto.id(), e);
@@ -522,13 +525,13 @@ public class LookupTableService extends AbstractIdleService {
                 .build();
         final LookupCache newCache = table.cache();
         final LookupDataAdapter newAdapter = table.dataAdapter();
-        LOG.info("Starting lookup table {}/{} [@{}] using cache {}/{} [@{}], data adapter {}/{} [@{}]",
+        LOG.debug("Starting lookup table {}/{} [@{}] using cache {}/{} [@{}], data adapter {}/{} [@{}]",
                 table.name(), table.id(), objectId(table),
                 newCache.name(), newCache.id(), objectId(newCache),
                 newAdapter.name(), newAdapter.id(), objectId(newAdapter));
         final LookupTable previous = liveTables.put(dto.name(), table);
         if (previous != null) {
-            LOG.info("Replaced previous lookup table {} [@{}]", previous.name(), objectId(previous));
+            LOG.debug("Replaced previous lookup table {} [@{}]", previous.name(), objectId(previous));
         }
         return table;
     }
