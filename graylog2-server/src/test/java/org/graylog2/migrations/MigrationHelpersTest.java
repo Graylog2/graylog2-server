@@ -30,6 +30,7 @@ import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.UserImpl;
+import org.graylog2.users.UserServiceImpl;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Rule;
@@ -39,7 +40,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -208,7 +211,7 @@ public class MigrationHelpersTest {
         existingUser.setPassword("password");
         existingUser.setEmail("test@example.com");
         existingUser.setTimeZone(DateTimeZone.UTC);
-        existingUser.setRoleIds(ImmutableSet.of()); // Set invalid role IDs so the use gets updated
+        existingUser.setRoleIds(ImmutableSet.of()); // Set invalid role IDs so the user gets updated
 
         when(userService.load("test-user")).thenReturn(existingUser);
         when(userService.save(any(User.class))).thenReturn("new-id");
@@ -250,6 +253,38 @@ public class MigrationHelpersTest {
                                                "test@example.com", ImmutableSet.of("54e3deadbeefdeadbeef0001",
                                                                                    "54e3deadbeefdeadbeef0002")))
                 .isNull();
+    }
+
+    @Test
+    public void ensureUserWithDuplicates() throws ValidationException {
+        final Permissions permissions = new Permissions(ImmutableSet.of());
+        final User existingUser = newUser(permissions);
+        existingUser.setName("test-user");
+        existingUser.setFirstLastFullNames("Test", "User");
+        existingUser.setPassword("password");
+        existingUser.setEmail("test@example.com");
+        existingUser.setTimeZone(DateTimeZone.UTC);
+        existingUser.setRoleIds(ImmutableSet.of()); // Set invalid role IDs so the user gets updated
+
+        when(userService.load("test-user"))
+                .thenThrow(UserServiceImpl.DuplicateUserException.class)
+                .thenReturn(existingUser);
+        when(userService.save(any(User.class))).thenReturn("new-id");
+
+        List duplicates = new ArrayList();
+        duplicates.add(existingUser);
+        duplicates.add(existingUser);
+        List single = new ArrayList();
+        single.add(existingUser);
+        when(userService.loadAllByName("test-user")).thenReturn(duplicates, single);
+
+        assertThat(migrationHelpers.ensureUser("test-user", "pass", "Test", "User",
+                "test@example.com", ImmutableSet.of("54e3deadbeefdeadbeef0001",
+                        "54e3deadbeefdeadbeef0002")))
+                .isEqualTo("new-id");
+
+        final ArgumentCaptor<User> userArg = ArgumentCaptor.forClass(User.class);
+        verify(userService, times(2)).save(userArg.capture());
     }
 
     private User newUser(Permissions permissions) {
