@@ -56,7 +56,7 @@ const QueryTitle = ({ active, allowsClosing, id, onClose, openEditModal, openCop
 
   return (
     <>
-      <TitleWrap aria-label={titleValue} active={active}>
+      <TitleWrap aria-label={titleValue} active={active} data-testid="query-tab" data-active-query-tab={active}>
         {titleValue}
       </TitleWrap>
 
