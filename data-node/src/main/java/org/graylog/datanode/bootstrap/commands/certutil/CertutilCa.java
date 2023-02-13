@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
 
 @Command(name = "ca", description = "Manage certificate authority for data-node", groupNames = {"certutil"})
 public class CertutilCa implements CliCommand {
@@ -51,8 +52,9 @@ public class CertutilCa implements CliCommand {
 
             console.printLine("Generating datanode CA");
 
-            KeyPair rootCA = CertificateGenerator.generateCertificate("root", null, null, true);
-            KeyPair intermediateCA = CertificateGenerator.generateCertificate("ca", /*domain=*/null, rootCA, true);
+            final Duration certificateValidity = Duration.ofDays(10 * 365);
+            KeyPair rootCA = CertificateGenerator.generate(CertRequest.selfSigned("root").isCA(true).validity(certificateValidity));
+            KeyPair intermediateCA = CertificateGenerator.generate(CertRequest.signed("ca", rootCA).isCA(true).validity(certificateValidity));
 
             KeyStore caKeystore = KeyStore.getInstance("PKCS12");
             caKeystore.load(null, null);

@@ -28,5 +28,11 @@ public interface CommandLineConsole {
         return response.equals("y") || response.equals("yes");
     }
 
+    default int readInt(String format, Object... args) {
+        final String response = readLine(format, args)
+                .trim().toLowerCase(Locale.ROOT);
+        return Integer.parseInt(response);
+    }
+
     void printLine(String line);
 }

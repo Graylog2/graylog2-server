@@ -32,6 +32,7 @@ import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
 
 @Command(name = "cert", description = "Manage certificates for data-node", groupNames = {"certutil"})
 public class CertutilCert implements CliCommand {
@@ -79,8 +80,9 @@ public class CertutilCert implements CliCommand {
 
             console.printLine("Generating private key and certificate for this datanode");
 
-            KeyPair nodePair = CertificateGenerator.generateCertificate("localhost", null, intermediateCA, false);
-
+            final CertRequest req = CertRequest.signed("localhost", intermediateCA)
+                    .validity(Duration.ofDays(10 * 365));
+            KeyPair nodePair = CertificateGenerator.generate(req);
 
             KeyStore nodeKeystore = KeyStore.getInstance("PKCS12");
             nodeKeystore.load(null, null);
