@@ -95,6 +95,34 @@ public class MigrationHelpers {
     @Nullable
     public String ensureUser(String userName, String password, String firstName, String lastName, String email,
                              Set<String> expectedRoles, boolean isServiceAccount) {
+        try {
+            return ensureUserHelper(userName, password, firstName, lastName, email, expectedRoles, isServiceAccount);
+        } catch (UserServiceImpl.DuplicateUserException e) {
+            // Attempt to resolve simple duplication (introduced prior to adding the unique index).
+            // This does not account for special types of users, e.g. read-only users, imported users, etc.
+            final List<User> users = userService.loadAllByName(userName);
+            User firstUser = users.remove(0);
+            for (User user : users) {
+                final String uniqueName = user.getName() + "_" + user.getId();
+                LOG.warn("Renaming duplicate users {} to {}", user.getName(), uniqueName);
+                user.setName(uniqueName);
+                try {
+                    userService.save(user);
+                } catch (ValidationException v) {
+                    final String msg = "Failed to disambiguate " + userName;
+                    LOG.error(msg);
+                    throw new IllegalArgumentException(msg);
+                }
+            }
+
+            // Call again to assign desired roles and service account flag
+            return ensureUserHelper(userName, password, firstName, lastName, email, expectedRoles, isServiceAccount);
+        }
+    }
+
+    @Nullable
+    public String ensureUserHelper(String userName, String password, String firstName, String lastName, String email,
+                             Set<String> expectedRoles, boolean isServiceAccount) {
         User previousUser = null;
         try {
             previousUser = userService.load(userName);
@@ -137,28 +165,5 @@ public class MigrationHelpers {
         }
 
         return previousUser.getId();
-    }
-
-    public String ensureUserWithRename(String userName, String password, String firstName, String lastName, String email,
-                                       Set<String> expectedRoles, boolean isServiceAccount) {
-        try {
-            return ensureUser(userName, password, firstName, lastName, email, expectedRoles, isServiceAccount);
-        } catch (UserServiceImpl.DuplicateUserException e) {
-            // Attempt to resolve simple duplication. This does not handle special cases such as
-            // read-only users, imported users, etc.
-            final List<User> users = userService.loadAllByName(userName);
-            User firstUser = users.remove(0);
-            for (User user : users) {
-                user.setName(user.getName() + "_" + user.getId());
-                try {
-                    userService.save(user);
-                } catch (ValidationException v) {
-                    final String msg = "Failed to disambiguate " + userName;
-                    LOG.error(msg);
-                    throw new IllegalArgumentException(msg);
-                }
-            }
-            return firstUser.getId();
-        }
     }
 }

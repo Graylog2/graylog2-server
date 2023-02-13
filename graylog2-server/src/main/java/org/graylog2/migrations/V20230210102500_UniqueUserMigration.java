@@ -18,7 +18,6 @@ package org.graylog2.migrations;
 
 import com.mongodb.DBCollection;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.users.UserImpl;
 import org.mongojack.DBSort;
 
@@ -26,12 +25,10 @@ import javax.inject.Inject;
 import java.time.ZonedDateTime;
 
 public class V20230210102500_UniqueUserMigration extends Migration {
-    private final IndexSetService indexSetService;
     private final MongoConnection mongoConnection;
 
     @Inject
-    public V20230210102500_UniqueUserMigration(IndexSetService indexSetService, MongoConnection mongoConnection) {
-        this.indexSetService = indexSetService;
+    public V20230210102500_UniqueUserMigration(MongoConnection mongoConnection) {
         this.mongoConnection = mongoConnection;
     }
 
@@ -43,6 +40,8 @@ public class V20230210102500_UniqueUserMigration extends Migration {
     @Override
     public void upgrade() {
         DBCollection coll = mongoConnection.getDatabase().getCollection(UserImpl.COLLECTION_NAME);
+
+        // NOOP, if index already exists
         coll.createIndex(DBSort.asc(UserImpl.USERNAME), "unique_username", true);
     }
 }
