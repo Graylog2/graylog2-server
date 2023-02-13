@@ -76,7 +76,9 @@ public class CloneMessage extends AbstractFunction<Message> {
         final Message clonedMessage = new Message(currentMessage.getMessage(), currentMessage.getSource(), currentMessage.getTimestamp());
         clonedMessage.addFields(currentMessage.getFields());
         clonedMessage.addStreams(currentMessage.getStreams());
-        clonedMessage.setMetadata(CLONE_SOURCE, rule);
+        if (rule != null) {
+            clonedMessage.setMetadata(CLONE_SOURCE, rule);
+        }
         clonedMessage.setMetadata(CLONE_NUMBER, ++cloneNumber);
 
         // register in context so the processor can inject it later on
