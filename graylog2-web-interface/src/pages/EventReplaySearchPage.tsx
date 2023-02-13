@@ -16,6 +16,9 @@
  */
 
 import React, { useEffect, useState } from 'react';
+import uniq from 'lodash/uniq';
+import mapValues from 'lodash/mapValues';
+import Immutable from 'immutable';
 
 import useParams from 'routing/useParams';
 import type { EventType } from 'hooks/useEventById';
@@ -26,6 +29,16 @@ import SearchPage from 'views/pages/SearchPage';
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 import type { EventDefinition } from 'logic/alerts/types';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
+import generateId from 'logic/generateId';
+import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
+import { TIMESTAMP_FIELD } from 'views/Constants';
+import FieldType from 'views/logic/fieldtypes/FieldType';
+import Series from 'views/logic/aggregationbuilder/Series';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+
+const NEW_WIDGET_HEIGHT = 2;
 
 const transformExpresionsToArray = ({ series, conditions }) => {
   const res = [];
@@ -40,10 +53,10 @@ const transformExpresionsToArray = ({ series, conditions }) => {
         return ({ value: expression.value });
       case 'number-ref':
         // eslint-disable-next-line no-case-declarations
-        const selectedSeries = series.find((s) => s.id === expression.ref);
+        const selectedSeriesk = series.find((s) => s.id === expression.ref);
 
-        return (selectedSeries && selectedSeries.function
-          ? { field: `${selectedSeries.function}(${selectedSeries.field})` }
+        return (selectedSeriesk && selectedSeriesk.function
+          ? { field: `${selectedSeriesk.function}(${selectedSeriesk.field})` }
           : null);
       case '&&':
       case '||':
@@ -55,6 +68,15 @@ const transformExpresionsToArray = ({ series, conditions }) => {
       case '>':
       case '>=':
       case '==':
+        console.log('!!!!!!!!', {
+          expression,
+        });
+
+        const { ref } = expression.left;
+        const selectedSeries = series.find((s) => s.id === ref);
+        const fnSeries = selectedSeries && selectedSeries?.function ? `${selectedSeries.function}(${selectedSeries.field})` : undefined;
+        res.push({ expr: expression.expr, value: expression.right.value, function: selectedSeries?.function, fnSeries, field: selectedSeries.field });
+
         return [rec(expression.left), rec(expression.right)];
       default:
         return null;
@@ -63,7 +85,9 @@ const transformExpresionsToArray = ({ series, conditions }) => {
 
   // rec(conditions.expression);
 
-  return rec(conditions.expression);
+  rec(conditions.expression);
+
+  return res;
 };
 
 const EventView = ({ eventData, EDData }: { eventData: EventType, EDData: EventDefinition }) => {
@@ -82,8 +106,56 @@ const EventView = ({ eventData, EDData }: { eventData: EventType, EDData: EventD
     // const state = initialView.state.get(queryId).toBuilder().widgets()
     const fff = transformExpresionsToArray({ series: EDData.config.series, conditions: EDData.config.conditions });
     console.log('!!!!!!$$$$$$$$$$$$$$$$$$$$$$$$!!!!!!', { groupBy, series, EDData, fff });
+    const { widgets, titles, positions } = fff.reduce((res, { field, value, expr, fnSeries }, index) => {
+      const widgetId = generateId();
+      console.log({ uniq: uniq([...groupBy, field]) });
+      const rowPivots = uniq([field, ...groupBy]).map((f) => pivotForField(f, new FieldType('value', [], [])));
+      const widget = AggregationWidget.builder()
+        .id(widgetId)
+        .config(
+          AggregationWidgetConfig.builder()
+            .columnPivots([])
+            .rowPivots(rowPivots)
+            .series([
+              Series.forFunction(fnSeries),
+            ])
+            .sort([])
+            .visualization('table')
+            .rollup(true)
+            .build(),
+        )
+        .build();
+      const title = `${fnSeries} ${expr} ${value}`;
+      const position = new WidgetPosition(1, index + NEW_WIDGET_HEIGHT + 1, NEW_WIDGET_HEIGHT, Infinity);
+      res.widgets.push(widget);
+      res.titles[widgetId] = title;
+      res.positions[widgetId] = position;
 
-    return initialView;
+      return res;
+    }, { titles: {}, widgets: [], positions: {} });
+    const curState = initialView.state;
+    const curQuery = curState.get(queryId);
+    const curWidgets = curQuery.widgets;
+    const curTitles = curQuery.titles;
+    const curPositions = curQuery.widgetPositions;
+    const rowDelta = NEW_WIDGET_HEIGHT * fff.length;
+    const updatedQuery = curQuery
+      .toBuilder()
+      .widgets(Immutable.List([...curWidgets.toArray(), ...widgets]))
+      .titles({ widget: { ...curTitles, ...titles } })
+      .widgetPositions(
+        {
+          ...mapValues(curPositions, (position: WidgetPosition) => position
+            .toBuilder()
+            .row(position.row + rowDelta)
+            .build()),
+          ...positions,
+        },
+      )
+      .build();
+    console.log({ curWidgets, curTitles, curPositions });
+
+    return initialView.toBuilder().state(curState.set(queryId, updatedQuery)).build();
   });
 
   return <SearchPage view={view} isNew />;

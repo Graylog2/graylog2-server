@@ -29,7 +29,7 @@ import View from 'views/logic/views/View';
 import Routes from 'routing/Routes';
 import viewTitle from 'views/logic/views/ViewTitle';
 import FavoriteIcon from 'views/components/FavoriteIcon';
-import useIsEventDefinitionReplaySearch from 'hooks/useIsEventDefinitionReplaySearch';
+import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 
 const links = {
   [View.Type.Dashboard]: ({ id, title }) => [{
@@ -114,7 +114,7 @@ const ViewHeader = () => {
   const isSavedView = view?.id && view?.title;
   const [showMetadataEdit, setShowMetadataEdit] = useState<boolean>(false);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), [setShowMetadataEdit]);
-  const { alertId, definitionId, definitionTitle, isAlert, isEventDefinition, isEvent } = useIsEventDefinitionReplaySearch();
+  const { alertId, definitionId, definitionTitle, isAlert, isEventDefinition, isEvent } = useAlertAndEventDefinitionData();
   const typeText = view.type.toLocaleLowerCase();
   const title = viewTitle(view.title, view.type);
   const onChangeFavorite = useCallback((newValue) => {

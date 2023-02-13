@@ -25,7 +25,7 @@ import useParams from 'routing/useParams';
 import type { EventType } from 'hooks/useEventById';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
-const useIsEventDefinitionReplaySearch = () => {
+const useAlertAndEventDefinitionData = () => {
   const { path } = useRouteMatch();
   const { alertId } = useParams<{ alertId?: string }>();
   const result = usePaginationQueryParameter();
@@ -41,7 +41,9 @@ const useIsEventDefinitionReplaySearch = () => {
     isAlert: Routes.ALERTS.replay_search(':alertId') && eventData && eventData.alert,
     isEvent: Routes.ALERTS.replay_search(':eventId') && eventData && !eventData.alert,
     isEventDefinition: Routes.ALERTS.DEFINITIONS.replay_search(':definitionId') && EDData,
+    eventData,
+    EDData,
   }), [path]);
 };
 
-export default useIsEventDefinitionReplaySearch;
+export default useAlertAndEventDefinitionData;

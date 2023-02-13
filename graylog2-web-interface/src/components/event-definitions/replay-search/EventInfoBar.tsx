@@ -17,21 +17,18 @@
 
 import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { useQueryClient } from '@tanstack/react-query';
 import lodash from 'lodash';
 
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { FlatContentRow, Icon, Timestamp } from 'components/common';
-import useParams from 'routing/useParams';
-import type { EventType } from 'hooks/useEventById';
-import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import { TIME_UNITS } from 'components/event-definitions/event-definition-types/FilterForm';
 import { useStore } from 'stores/connect';
 import { EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
 import { Link } from 'components/common/router';
+import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 
 const Header = styled.div`
   display: flex;
@@ -67,10 +64,7 @@ const EventInfoBar = () => {
       return res;
     }, {});
   });
-  const { alertId } = useParams<{ alertId?: string }>();
-  const queryClient = useQueryClient();
-  const eventData = queryClient.getQueryData(['event-by-id', alertId]) as EventType;
-  const EDData = queryClient.getQueryData(['definition', eventData?.event_definition_id]) as EventDefinition;
+  const { eventData, EDData } = useAlertAndEventDefinitionData();
 
   const toggleOpen = (e) => {
     e.stopPropagation();

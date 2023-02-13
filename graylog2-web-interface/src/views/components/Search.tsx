@@ -55,7 +55,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import SynchronizeUrl from 'views/components/SynchronizeUrl';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import EventInfoBar from 'components/event-definitions/replay-search/EventInfoBar';
-import useIsEventDefinitionReplaySearch from 'hooks/useIsEventDefinitionReplaySearch';
+import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -150,7 +150,7 @@ const Search = () => {
     StreamsActions.refresh();
   }, []);
 
-  const { isEventDefinition, isEvent, isAlert } = useIsEventDefinitionReplaySearch();
+  const { isEventDefinition, isEvent, isAlert } = useAlertAndEventDefinitionData();
   console.log({ isEventDefinition, isEvent, isAlert });
 
   return (
