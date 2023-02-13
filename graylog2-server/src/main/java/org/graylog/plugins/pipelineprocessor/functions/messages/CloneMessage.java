@@ -55,9 +55,9 @@ public class CloneMessage extends AbstractFunction<Message> {
         final Message currentMessage = messageParam.optional(args, context).orElse(context.currentMessage());
         final Optional<Boolean> preventLoops = loopDetectionParam.optional(args, context);
 
-        int cloneNumber = ObjectUtils.defaultIfNull(currentMessage.getFieldAs(Integer.class, CLONE_NUMBER), 0);
+        int cloneNumber = (int) currentMessage.getMetadataValue(CLONE_NUMBER, 0);
 
-        final Rule cloneSource = currentMessage.getFieldAs(Rule.class, CLONE_SOURCE);
+        final Rule cloneSource = (Rule) currentMessage.getMetadataValue(CLONE_SOURCE);
         final Rule rule = context.getRule();
         if (ObjectUtils.allNotNull(cloneSource, rule) && Objects.equals(cloneSource, rule)) { // message was cloned by the same rule before
 
@@ -76,8 +76,8 @@ public class CloneMessage extends AbstractFunction<Message> {
         final Message clonedMessage = new Message(currentMessage.getMessage(), currentMessage.getSource(), currentMessage.getTimestamp());
         clonedMessage.addFields(currentMessage.getFields());
         clonedMessage.addStreams(currentMessage.getStreams());
-        clonedMessage.addField(CLONE_SOURCE, rule);
-        clonedMessage.addField(CLONE_NUMBER, ++cloneNumber);
+        clonedMessage.setMetadata(CLONE_SOURCE, rule);
+        clonedMessage.setMetadata(CLONE_NUMBER, ++cloneNumber);
 
         // register in context so the processor can inject it later on
         context.addCreatedMessage(clonedMessage);
