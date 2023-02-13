@@ -21,9 +21,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 
 import javax.validation.constraints.Min;
+import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
@@ -31,6 +33,7 @@ import javax.validation.constraints.Min;
 public abstract class DeletionRetentionStrategyConfig implements RetentionStrategyConfig {
     private static final int DEFAULT_MAX_NUMBER_OF_INDICES = 20;
 
+    @Override
     @JsonProperty("max_number_of_indices")
     public abstract int maxNumberOfIndices();
 
@@ -47,5 +50,13 @@ public abstract class DeletionRetentionStrategyConfig implements RetentionStrate
 
     public static DeletionRetentionStrategyConfig createDefault() {
         return create(DEFAULT_MAX_NUMBER_OF_INDICES);
+    }
+
+    @Override
+    public void validate(ElasticsearchConfiguration elasticsearchConfiguration) throws IllegalArgumentException {
+        Set<String> disabledRetentionStrategies = elasticsearchConfiguration.getDisabledRetentionStrategies();
+        if (disabledRetentionStrategies.contains(DeletionRetentionStrategy.NAME)) {
+            throw new IllegalArgumentException("Deletion retention strategy is deactivated");
+        }
     }
 }
