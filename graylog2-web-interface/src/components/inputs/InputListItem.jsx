@@ -75,6 +75,8 @@ const InputListItem = createReactClass({
       <span>
         {this.props.input.name}
         &nbsp;
+        ({this.props.input.id})
+        &nbsp;
         <InputStateBadge input={this.props.input} />
       </span>
     );
