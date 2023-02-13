@@ -36,7 +36,13 @@ public class RecentActivityUpdatesListener {
     }
 
     @Subscribe
-    public void createRecentActivityFor(final RecentActivityEvent event) {
+    public void createUpdateRecentActivityFor(final RecentActivityEvent event) {
+        // first, if we delete an entity, we have to remove old entries from the Recent Activities collection because some info is no longer available from the catalog.
+        if(event.activityType().equals(ActivityType.DELETE)) {
+            recentActivityService.deleteAllEntriesForEntity(event.grn());
+        }
+
+        // save the new activity
         recentActivityService.save(RecentActivityDTO.builder()
                 .activityType(event.activityType())
                 .itemId(event.grn().entity())

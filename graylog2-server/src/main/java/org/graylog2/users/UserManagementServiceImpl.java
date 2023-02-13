@@ -23,9 +23,9 @@ import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.shared.users.ChangeUserRequest;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.InMemoryRolePermissionResolver;
+import org.graylog2.shared.users.ChangeUserRequest;
 import org.graylog2.shared.users.UserManagementService;
 
 import javax.inject.Inject;
@@ -43,7 +43,7 @@ public class UserManagementServiceImpl extends UserServiceImpl implements UserMa
                                      final GRNRegistry grnRegistry,
                                      final PermissionAndRoleResolver permissionAndRoleResolver) {
         super(mongoConnection, configuration, roleService, accessTokenService, userFactory,
-              inMemoryRolePermissionResolver, serverEventBus, grnRegistry, permissionAndRoleResolver);
+                inMemoryRolePermissionResolver, serverEventBus, grnRegistry, permissionAndRoleResolver);
     }
 
     @Override
