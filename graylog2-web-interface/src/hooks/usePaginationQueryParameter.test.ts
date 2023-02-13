@@ -123,4 +123,23 @@ describe('usePaginationQueryParameter custom hook', () => {
     expect(pageSize).not.toEqual(currentPageSize);
     expect(pageSize).toEqual(DEFAULT_PAGE_SIZES[0]);
   });
+
+  it('should reset current page', () => {
+    const currentPage = 3;
+    const currentPageSize = 50;
+
+    asMock(useLocation).mockReturnValue({
+      search: `?page=${currentPage}&pageSize=${currentPageSize}`,
+      pathname: 'example.org',
+    } as Location<{ search: string }>);
+
+    const { result } = renderHook(() => usePaginationQueryParameter());
+
+    expect(result.current.page).toEqual(currentPage);
+    expect(result.current.pageSize).toEqual(currentPageSize);
+
+    result.current.resetPage();
+
+    expect(mockHistoryReplace).toHaveBeenCalledWith(`example.org?page=1&pageSize=${currentPageSize}`);
+  });
 });

@@ -20,19 +20,26 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.events.event.EventDto;
+import org.graylog.events.search.EventsSearchFilter;
 import org.graylog.events.search.EventsSearchParameters;
 import org.graylog.events.search.EventsSearchResult;
 import org.graylog.events.search.EventsSearchService;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.Optional;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -54,7 +61,28 @@ public class EventsResource extends RestResource implements PluginRestResource {
     @Path("/search")
     @ApiOperation("Search events")
     @NoAuditEvent("Doesn't change any data, only searches for events")
-    public EventsSearchResult search(@ApiParam(name = "JSON body") EventsSearchParameters request) {
+    public EventsSearchResult search(@ApiParam(name = "JSON body") final EventsSearchParameters request) {
         return searchService.search(firstNonNull(request, EventsSearchParameters.empty()), getSubject());
+    }
+
+    @GET
+    @Path("{event_id}")
+    @ApiOperation("Get event by ID")
+    public Optional<EventsSearchResult.Event> getById(@ApiParam(name = "event_id") @PathParam("event_id") final String eventId) {
+
+        final EventsSearchParameters parameters = EventsSearchParameters.builder()
+                .page(1)
+                .perPage(1)
+                .timerange(RelativeRange.allTime())
+                .query(EventDto.FIELD_ID + ":" + eventId)
+                .filter(EventsSearchFilter.empty())
+                .sortBy(Message.FIELD_TIMESTAMP)
+                .sortDirection(EventsSearchParameters.SortDirection.DESC)
+                .build();
+
+        final EventsSearchResult result = searchService.search(parameters, getSubject());
+        return result.events()
+                .stream()
+                .findFirst();
     }
 }
