@@ -43,6 +43,7 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
+import java.util.Arrays;
 
 @Command(name = "http", description = "Manage certificates for data-node", groupNames = {"certutil"})
 public class CertutilHttp implements CliCommand {
@@ -120,6 +121,9 @@ public class CertutilHttp implements CliCommand {
                         .withSubjectAlternativeName(Tools.getLocalHostname())
                         .withSubjectAlternativeName(String.valueOf(InetAddress.getLocalHost()))
                         .validity(Duration.ofDays(validityDays));
+
+                final String alternativeNames = console.readLine("Enter alternative names (addresses) of this node [comma separated]: ");
+                Arrays.stream(alternativeNames.split(",")).forEach(certificateRequest::withSubjectAlternativeName);
 
                 KeyPair nodePair = CertificateGenerator.generate(certificateRequest);
                 console.printLine("Successfully generated CA from the keystore");
