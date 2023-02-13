@@ -35,6 +35,7 @@ export type TextField = {
   default_value: string,
   description: string,
   human_name: string,
+  is_encrypted: boolean,
   is_optional: boolean,
   position: number,
   type: 'text',
