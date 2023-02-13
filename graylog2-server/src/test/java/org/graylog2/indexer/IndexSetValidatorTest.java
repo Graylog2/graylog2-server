@@ -23,6 +23,7 @@ import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
+import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.junit.Before;
@@ -39,6 +40,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -67,17 +69,18 @@ public class IndexSetValidatorTest {
         final Duration fieldTypeRefreshInterval = Duration.standardSeconds(1L);
         final IndexSetConfig newConfig = mock(IndexSetConfig.class);
         final IndexSet indexSet = mock(IndexSet.class);
+        final RetentionStrategyConfig retentionStrategyConfig = mock(RetentionStrategyConfig.class);
 
         when(indexSet.getIndexPrefix()).thenReturn("foo");
         when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
         when(newConfig.indexPrefix()).thenReturn(prefix);
         when(newConfig.fieldTypeRefreshInterval()).thenReturn(fieldTypeRefreshInterval);
+        when(newConfig.retentionStrategy()).thenReturn(retentionStrategyConfig);
 
         final Optional<IndexSetValidator.Violation> violation = validator.validate(newConfig);
 
         assertThat(violation).isNotPresent();
     }
-
     @Test
     public void validateWhenAlreadyManaged() throws Exception {
         final String prefix = "graylog_index";
@@ -166,6 +169,26 @@ public class IndexSetValidatorTest {
                 .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
                 .build();
         assertThat(validator.validate(modifiedConfig)).isNotPresent();
+    }
+
+    @Test
+    public void validateIndexAction() {
+        final String prefix = "graylog_index";
+        final Duration fieldTypeRefreshInterval = Duration.standardSeconds(1L);
+        final IndexSetConfig newConfig = mock(IndexSetConfig.class);
+        final IndexSet indexSet = mock(IndexSet.class);
+        final RetentionStrategyConfig retentionStrategyConfig = mock(RetentionStrategyConfig.class);
+
+        when(indexSet.getIndexPrefix()).thenReturn("foo");
+        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+        when(newConfig.indexPrefix()).thenReturn(prefix);
+        when(newConfig.fieldTypeRefreshInterval()).thenReturn(fieldTypeRefreshInterval);
+        when(newConfig.retentionStrategy()).thenReturn(retentionStrategyConfig);
+        doThrow(new IllegalArgumentException("Error")).when(retentionStrategyConfig).validate(elasticsearchConfiguration);
+
+        final Optional<IndexSetValidator.Violation> violation = validator.validate(newConfig);
+
+        assertThat(violation).isPresent();
     }
 
     private IndexSetConfig dummyConfig() {
