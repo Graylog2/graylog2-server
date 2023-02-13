@@ -55,7 +55,7 @@ class EncryptedValueDeserializerTest {
 
     @Test
     void deserializeStringAsPassword() throws Exception {
-        final Map<String, EncryptedValue> map = objectMapper.readValue("{\"password\": \"mypass\"}", new TypeReference<Map<String, EncryptedValue>>() {});
+        final Map<String, EncryptedValue> map = objectMapper.readValue("{\"password\": \"mypass\"}", new TypeReference<>() {});
         final EncryptedValue value = map.get("password");
 
         assertThat(value).isNotNull();
@@ -76,13 +76,16 @@ class EncryptedValueDeserializerTest {
     }
 
     @Test
-    void deserializeSetValueWithInvalidValues() throws Exception {
-        assertThatThrownBy(() -> objectMapper.readValue("{\"set_value\":\"\"}", EncryptedValue.class))
-                .hasMessageContaining("set_value")
-                .isInstanceOf(JsonMappingException.class);
-        assertThatThrownBy(() -> objectMapper.readValue("{\"set_value\":\"        \"}", EncryptedValue.class))
-                .hasMessageContaining("set_value")
-                .isInstanceOf(JsonMappingException.class);
+    void deserializeEmptyValue() {
+        EncryptedValue expectedValue = EncryptedValue.createUnset();
+
+        assertThat(objectMapper.convertValue("", EncryptedValue.class)).isEqualTo(expectedValue);
+        assertThat(objectMapper.convertValue("    ", EncryptedValue.class)).isEqualTo(expectedValue);
+        assertThat(objectMapper.convertValue(Map.of("set_value", ""), EncryptedValue.class)).isEqualTo(expectedValue);
+    }
+
+    @Test
+    void deserializeSetValueWithInvalidValues() {
         assertThatThrownBy(() -> objectMapper.readValue("{\"set_value\":null}", EncryptedValue.class))
                 .hasMessageContaining("set_value")
                 .isInstanceOf(JsonMappingException.class);
@@ -181,7 +184,7 @@ class EncryptedValueDeserializerTest {
     }
 
     @Test
-    void deserializeForDatabaseAndInvalidValues() throws Exception {
+    void deserializeForDatabaseAndInvalidValues() {
         EncryptedValueMapperConfig.enableDatabase(objectMapper);
 
         assertThatThrownBy(() -> objectMapper
