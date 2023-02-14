@@ -56,7 +56,7 @@ export const updateWidgets = (newWidgets: Immutable.List<Widget>) => (dispatch: 
   return dispatch(updateViewState(activeQuery, newViewState));
 };
 
-export const addWidget = (widget: Widget) => (dispatch: AppDispatch, getState: GetState) => {
+export const addWidget = (widget: Widget, position?: WidgetPosition) => (dispatch: AppDispatch, getState: GetState) => {
   if (widget.id === undefined) {
     throw new Error('Unable to add widget without id to query.');
   }
@@ -64,7 +64,7 @@ export const addWidget = (widget: Widget) => (dispatch: AppDispatch, getState: G
   const widgets = selectWidgets(getState());
   const widgetPositions = Immutable.Map(selectWidgetPositions(getState()));
   const newWidgets = widgets.push(widget);
-  const newWidgetPositions = GenerateNextPosition(widgetPositions, newWidgets.toArray());
+  const newWidgetPositions = position ? widgetPositions.set(widget.id, position) : GenerateNextPosition(widgetPositions, newWidgets.toArray());
 
   return dispatch(updateWidgetPositions(newWidgetPositions.toObject()))
     .then(() => dispatch(updateWidgets(newWidgets)));

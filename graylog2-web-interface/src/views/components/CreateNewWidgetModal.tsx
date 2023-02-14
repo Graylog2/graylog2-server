@@ -67,10 +67,9 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
   const widgetButtons = useMemo(() => creators.map(({ title, func, icon: WidgetIcon }) => {
     const onClick = async () => {
       const newId = generateId();
-      await dispatch(updateWidgetPosition(newId, position));
       const newWidget = func({ view }).toBuilder().id(newId).build();
 
-      return dispatch(addWidget(newWidget));
+      return dispatch(addWidget(newWidget, position));
     };
 
     return (
