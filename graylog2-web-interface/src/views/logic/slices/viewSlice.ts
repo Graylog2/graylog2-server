@@ -249,5 +249,5 @@ export const setParameters = (newParameters: Array<Parameter>) => async (dispatc
 
   const newView = view.toBuilder().search(newSearch).build();
 
-  return dispatch(loadView(newView));
+  return dispatch(loadView(newView, true));
 };
