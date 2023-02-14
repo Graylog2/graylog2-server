@@ -53,7 +53,7 @@ const useStreams = () => {
   useEffect(() => {
     StreamsStore.listStreams().then((newStreams) => {
       if (newStreams) {
-        const streamsMap = newStreams.reduce((prev, stream) => ({ ...prev, [stream.id]: stream }), {});
+        const streamsMap = Object.fromEntries(newStreams.map((stream) => [stream.id, stream]));
 
         setStreams(Immutable.Map(streamsMap));
         setAllStreams(Immutable.List(newStreams));
