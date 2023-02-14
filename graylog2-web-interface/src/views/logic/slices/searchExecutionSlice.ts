@@ -37,6 +37,7 @@ import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import type { ParameterMap } from 'views/logic/parameters/Parameter';
 import type Parameter from 'views/logic/parameters/Parameter';
 import { setParameters } from 'views/logic/slices/viewSlice';
+import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 
 const searchExecutionSlice = createSlice({
   name: 'searchExecution',
@@ -137,7 +138,7 @@ export const setGlobalOverrideTimerange = (timerange: TimeRange) => async (dispa
 export const setGlobalOverride = (queryString: string, timerange: TimeRange) => (dispatch: AppDispatch, getState: () => RootState) => {
   const globalOverride = selectGlobalOverride(getState()) ?? GlobalOverride.empty();
   const newGlobalOverride = globalOverride.toBuilder()
-    .query({ type: 'elasticsearch', query_string: queryString })
+    .query(createElasticsearchQueryString(queryString))
     .timerange(timerange)
     .build();
 

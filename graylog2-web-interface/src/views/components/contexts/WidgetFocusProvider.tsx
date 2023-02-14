@@ -99,7 +99,7 @@ const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocused
       }
 
       setFocusedWidget(nextFocusedWidget);
-      const filter = nextFocusedWidget?.id ? [nextFocusedWidget.id] : null;
+      const filter = nextFocusedWidget?.id ? [nextFocusedWidget.id] : undefined;
       dispatch(setWidgetsToSearch(filter));
 
       if (focusedWidget?.focusing && filter === null) {
