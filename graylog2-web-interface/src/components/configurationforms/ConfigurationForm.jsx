@@ -70,7 +70,7 @@ class ConfigurationForm extends React.Component {
 
         defaultValues[field] = configField.default_value;
 
-        if (configField.is_encrypted && props.values[field].is_set) {
+        if (configField.is_encrypted && props.values[field] && props.values[field].is_set) {
           valueOverrides[field] = { keep_value: true };
         }
       });
