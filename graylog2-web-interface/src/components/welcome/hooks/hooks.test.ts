@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook } from 'wrappedTestingLibrary';
 import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
 import asMock from 'helpers/mocking/AsMock';

@@ -14,8 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook } from '@testing-library/react-hooks';
-import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
+import { renderHook } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -39,7 +38,7 @@ describe('useSaveViewFormControls', () => {
       'views.components.saveViewForm': [() => saveViewFromControl],
     }[entityKey]));
 
-    const { result } = renderHook(() => useSaveViewFormControls(), { wrapper: DefaultQueryClientProvider });
+    const { result } = renderHook(() => useSaveViewFormControls());
 
     expect(result.current).toEqual([saveViewFromControl]);
   });
