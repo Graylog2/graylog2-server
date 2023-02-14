@@ -55,7 +55,7 @@ const InputStateControl = createReactClass({
     return nodeIDs.some((nodeID) => {
       const nodeState = this.state.inputState[nodeID];
 
-      return nodeState.state === 'RUNNING';
+      return nodeState.state === 'RUNNING' || nodeState.state === 'STARTING' || nodeState.state === 'FAILING';
     });
   },
 

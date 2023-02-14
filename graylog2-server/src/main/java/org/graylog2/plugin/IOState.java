@@ -41,7 +41,8 @@ public class IOState<T extends Stoppable> {
         FAILED,
         STOPPING,
         STOPPED,
-        TERMINATED
+        TERMINATED,
+        FAILING
     }
 
     protected T stoppable;
@@ -86,12 +87,14 @@ public class IOState<T extends Stoppable> {
     }
 
     public void setState(Type state, String detailedMessage) {
-        final IOStateChangedEvent<T> evt = IOStateChangedEvent.create(this.state, state, this);
-
-        this.state = state;
         this.setDetailedMessage(detailedMessage);
-        this.eventbus.post(evt);
 
+        if (this.state == state) {
+            return;
+        }
+        final IOStateChangedEvent<T> evt = IOStateChangedEvent.create(this.state, state, this);
+        this.state = state;
+        this.eventbus.post(evt);
     }
 
     public void setState(Type state) {

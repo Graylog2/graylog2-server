@@ -65,14 +65,14 @@ const Notification = ({ notification }: Props) => {
 
   useEffect(() => {
     if (notification) {
-      NotificationsActions.getHtmlMessage(notification.type, NotificationsFactory.getValuesForNotification(notification));
+      NotificationsActions.getHtmlMessage(notification.type, notification.key, NotificationsFactory.getValuesForNotification(notification));
     }
   }, [messages, notification]);
 
   const _onClose = () => {
     // eslint-disable-next-line no-alert
     if (window.confirm('Really delete this notification?')) {
-      NotificationsActions.delete(notification.type);
+      NotificationsActions.delete(notification.type, notification.key);
     }
   };
 
@@ -108,6 +108,7 @@ Notification.propTypes = {
   notification: PropTypes.exact({
     severity: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
+    key: PropTypes.string.isRequired,
     timestamp: PropTypes.string.isRequired,
     node_id: PropTypes.string.isRequired,
   }).isRequired,

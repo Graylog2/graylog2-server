@@ -24,6 +24,7 @@ import { singletonStore, singletonActions } from 'logic/singleton';
 export type NotificationType = {
   severity: string,
   type: string,
+  key: string,
   timestamp: string,
   node_id: string,
 };
@@ -47,9 +48,9 @@ type NotificationMessageOptions ={
   }
 }
 type NotificationsActionType = {
-  delete: (type: string) => Promise<unknown>,
+  delete: (type: string, key: string) => Promise<unknown>,
   list: () => Promise<unknown>,
-  getHtmlMessage: (type: string, options: NotificationMessageOptions) => Promise<unknown>,
+  getHtmlMessage: (type: string, key: string, options: NotificationMessageOptions) => Promise<unknown>,
 }
 export const NotificationsActions = singletonActions(
   'core.Notifications',
@@ -101,8 +102,13 @@ export const NotificationsStore = singletonStore(
       this.total = response.total;
       this.propagateChanges();
     },
-    delete(type: string) {
-      const url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.delete(type).url);
+    delete(type: string, key: string) {
+      let url;
+      if (key) {
+        url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.deleteWithKey(type, key).url);
+      } else {
+        url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.delete(type).url);
+      }
       const promise = fetch('DELETE', url);
 
       NotificationsActions.delete.promise(promise);
@@ -111,8 +117,13 @@ export const NotificationsStore = singletonStore(
       this.list();
       this.propagateChanges();
     },
-    getHtmlMessage(type: string, options: NotificationMessageOptions = { values: {} }) {
-      const url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.getHtmlMessage(type).url);
+    getHtmlMessage(type: string, key: string, options: NotificationMessageOptions = { values: {} }) {
+      let url
+      if (key) {
+        url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.getHtmlMessageWithKey(type, key).url);
+      } else {
+        url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.getHtmlMessage(type).url);
+      }
       const promise = fetch('POST', url, options);
 
       promise.then((response) => {
