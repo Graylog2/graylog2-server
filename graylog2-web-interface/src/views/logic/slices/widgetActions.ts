@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type * as Immutable from 'immutable';
+import * as Immutable from 'immutable';
 
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { AppDispatch } from 'stores/useAppDispatch';
@@ -27,6 +27,7 @@ import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import generateId from 'logic/generateId';
 import { setTitle } from 'views/logic/slices/titlesActions';
 import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetFormattingSettings';
+import GenerateNextPosition from 'views/logic/views/GenerateNextPosition';
 
 export const updateWidgetPositions = (newWidgetPositions: WidgetPositions) => (dispatch: AppDispatch, getState: GetState) => {
   const activeQuery = selectActiveQuery(getState());
@@ -61,9 +62,12 @@ export const addWidget = (widget: Widget) => (dispatch: AppDispatch, getState: G
   }
 
   const widgets = selectWidgets(getState());
+  const widgetPositions = Immutable.Map(selectWidgetPositions(getState()));
   const newWidgets = widgets.push(widget);
+  const newWidgetPositions = GenerateNextPosition(widgetPositions, newWidgets.toArray());
 
-  return dispatch(updateWidgets(newWidgets));
+  return dispatch(updateWidgetPositions(newWidgetPositions.toObject()))
+    .then(() => dispatch(updateWidgets(newWidgets)));
 };
 
 export const updateWidget = (id: string, updatedWidget: Widget) => (dispatch: AppDispatch, getState: GetState) => {
