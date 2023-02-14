@@ -96,10 +96,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "datanode_http_certificate_password")
     private String datanodeHttpCertificatePassword = null;
 
-
-    @Parameter(value = "datanode_admin_initial_password_hash")
-    private String datanodeInitialPasswordHash = "$2y$12$hccemIPDfk5WYz0TVE9e0uRtrwgVJAkXrsUqfuIuG8.q8smnloQSO";
-
     @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
     private Integer staleLeaderTimeout = 2000;
 
@@ -160,25 +156,12 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "root_username")
     private String rootUsername = "admin";
 
-    // Required unless "root-user" is deactivated in the "deactivated_builtin_authentication_providers" setting
-    @Parameter(value = "root_password_sha2")
-    private String rootPasswordSha2;
-
     @Parameter(value = "root_timezone")
     private DateTimeZone rootTimeZone = DateTimeZone.UTC;
 
     @Parameter(value = "root_email")
     private String rootEmail = "";
 
-    @Parameter(value = "user_password_default_algorithm")
-    private String userPasswordDefaultAlgorithm = "bcrypt";
-
-    @Parameter(value = "user_password_bcrypt_salt_size", validators = PositiveIntegerValidator.class)
-    private int userPasswordBCryptSaltSize = 10;
-
-    public String getPasswordSecret() {
-        return passwordSecret.trim();
-    }
 
     public String getNodeIdFile() {
         return nodeIdFile;
@@ -186,10 +169,6 @@ public class Configuration extends BaseConfiguration {
 
     public String getRootUsername() {
         return rootUsername;
-    }
-
-    public String getRootPasswordSha2() {
-        return rootPasswordSha2;
     }
 
     public DateTimeZone getRootTimeZone() {
@@ -232,29 +211,8 @@ public class Configuration extends BaseConfiguration {
         return datanodeHttpCertificatePassword;
     }
 
-    public String getDatanodeInitialPasswordHash() {
-        return datanodeInitialPasswordHash;
-    }
-
-    @ValidatorMethod
-    @SuppressWarnings("unused")
-    public void validatePasswordSecret() throws ValidationException {
-        final String passwordSecret = getPasswordSecret();
-        if (passwordSecret == null || passwordSecret.length() < 16) {
-            throw new ValidationException("The minimum length for \"password_secret\" is 16 characters.");
-        }
-    }
-
-    @ValidatorMethod
-    @SuppressWarnings("unused")
-    public void validateRootUser() throws ValidationException {
-        if (getRootPasswordSha2() == null) {
-            throw new ValidationException("Required parameter \"root_password_sha2\" not found.");
-        }
-    }
-
     public String getAdminInitialPasswordHash() {
-        return null;
+        return passwordSecret;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {

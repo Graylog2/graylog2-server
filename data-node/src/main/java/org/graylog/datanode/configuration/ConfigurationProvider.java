@@ -86,7 +86,7 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
 
         if (Files.exists(transportKeystorePath)) {
 
-            KeyStore nodeKeystore = loadKeystore(transportKeystorePath, datanodeConfig.getDatanodeTransportCertificate());
+            KeyStore nodeKeystore = loadKeystore(transportKeystorePath, datanodeConfig.getDatanodeTransportCertificatePassword());
             extractCertificates(opensearchConfigDir, "transport", nodeKeystore, datanodeConfig.getDatanodeTransportCertificatePassword());
 
             config.put("plugins.security.ssl.transport.pemcert_filepath", "transport.pem");
