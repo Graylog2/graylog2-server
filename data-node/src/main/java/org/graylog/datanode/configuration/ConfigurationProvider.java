@@ -16,11 +16,13 @@
  */
 package org.graylog.datanode.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+import org.graylog.datanode.Configuration;
 import org.graylog.datanode.process.OpensearchConfiguration;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.io.FileInputStream;
@@ -41,7 +43,8 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Singleton
 public class ConfigurationProvider implements Provider<OpensearchConfiguration> {
@@ -49,92 +52,96 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
     private final OpensearchConfiguration configuration;
 
     @Inject
-    public ConfigurationProvider(@Named("opensearch_version") String opensearchVersion,
-                                 @Named("opensearch_location") String opensearchLocation,
-                                 @Named("opensearch_data_location") String opensearchDataLocation,
-                                 @Named("opensearch_logs_location") String opensearchLogsLocation,
-                                 @Named("opensearch_config_location") String opensearchConfigLocation,
-                                 @Named("datanode_node_name") String nodeName,
-                                 @Named("opensearch_http_port") int opensearchHttpPort,
-                                 @Named("opensearch_transport_port") int opensearchTransportPort,
-                                 @Named("opensearch_discovery_seed_hosts") List<String> discoverySeedHosts
+    public ConfigurationProvider(Configuration datanodeConfig) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, UnrecoverableKeyException {
 
-
-    ) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, UnrecoverableKeyException {
-
-
-
+        final Path opensearchConfigDir = Path.of(datanodeConfig.getOpensearchLocation()).resolve("config");
 
         final LinkedHashMap<String, String> config = new LinkedHashMap<>();
-        config.put("path.data", Path.of(opensearchDataLocation).resolve(nodeName).toAbsolutePath().toString());
-        config.put("path.logs", Path.of(opensearchLogsLocation).resolve(nodeName).toAbsolutePath().toString());
+        config.put("path.data", Path.of(datanodeConfig.getOpensearchDataLocation()).resolve(datanodeConfig.getDatanodeNodeName()).toAbsolutePath().toString());
+        config.put("path.logs", Path.of(datanodeConfig.getOpensearchLogsLocation()).resolve(datanodeConfig.getDatanodeNodeName()).toAbsolutePath().toString());
         //config.put("discovery.type", "single-node");
 
         config.put("cluster.initial_master_nodes", "node1");
 
-        final Path transportKeystorePath = Path.of(opensearchConfigLocation).resolve("datanode-transport-certificates.p12");
-        final Path httpKeystorePath = Path.of(opensearchConfigLocation).resolve("datanode-http-certificates.p12");
+        final Path transportKeystorePath = Path.of(datanodeConfig.getOpensearchConfigLocation())
+                .resolve(datanodeConfig.getDatanodeTransportCertificate());
 
-        if(Files.exists(transportKeystorePath) && Files.exists(httpKeystorePath)) {
+
+        final Path httpKeystorePath = Path.of(datanodeConfig.getOpensearchConfigLocation())
+                .resolve(datanodeConfig.getDatanodeHttpCertificate());
+
+        if (Files.exists(transportKeystorePath) && Files.exists(httpKeystorePath)) {
             config.put("plugins.security.disabled", "false");
             config.put("plugins.security.ssl.http.enabled", "true");
+
+            final Path internalUsersFile = opensearchConfigDir.resolve("opensearch-security").resolve("internal_users.yml");
+            configureAdminPassword(internalUsersFile, datanodeConfig.getAdminInitialPasswordHash());
+
         } else {
             config.put("plugins.security.disabled", "true");
             config.put("plugins.security.ssl.http.enabled", "false");
         }
 
-        final Path opensearchConfigDir = Path.of(opensearchLocation).resolve("config");
 
-        if(Files.exists(transportKeystorePath)) {
 
-            KeyStore nodeKeystore = loadKeystore(transportKeystorePath, "password");
-            extractCertificates(opensearchConfigDir, "transport", nodeKeystore, "password");
+        if (Files.exists(transportKeystorePath)) {
+
+            KeyStore nodeKeystore = loadKeystore(transportKeystorePath, datanodeConfig.getDatanodeTransportCertificate());
+            extractCertificates(opensearchConfigDir, "transport", nodeKeystore, datanodeConfig.getDatanodeTransportCertificatePassword());
 
             config.put("plugins.security.ssl.transport.pemcert_filepath", "transport.pem");
             config.put("plugins.security.ssl.transport.pemkey_filepath", "transport-key.pem");
             config.put("plugins.security.ssl.transport.pemtrustedcas_filepath", "transport-ca.pem");
 
-            config.put("plugins.security.allow_unsafe_democertificates", "true");
             config.put("plugins.security.allow_default_init_securityindex", "true");
-            config.put("plugins.security.authcz.admin_dn", "CN=kirk,OU=client,O=client,L=test,C=de");
+            //config.put("plugins.security.authcz.admin_dn", "CN=kirk,OU=client,O=client,L=test,C=de");
 
             config.put("plugins.security.audit.type", "internal_opensearch");
-            config.put("plugins.security.enable_snapshot_restore_privilege","true");
-            config.put("plugins.security.check_snapshot_restore_write_privileges","true");
+            config.put("plugins.security.enable_snapshot_restore_privilege", "true");
+            config.put("plugins.security.check_snapshot_restore_write_privileges", "true");
             config.put("plugins.security.restapi.roles_enabled", "all_access,security_rest_api_access");
             config.put("plugins.security.system_indices.enabled", "true");
             config.put("plugins.security.system_indices.indices", ".plugins-ml-model,.plugins-ml-task,.opendistro-alerting-config,.opendistro-alerting-alert*,.opendistro-anomaly-results*,.opendistro-anomaly-detector*,.opendistro-anomaly-checkpoints,.opendistro-anomaly-detection-state,.opendistro-reports-*,.opensearch-notifications-*,.opensearch-notebooks,.opensearch-observability,.opendistro-asynchronous-search-response*,.replication-metadata-store");
             config.put("node.max_local_storage_nodes", "3");
         }
 
-        if(Files.exists(httpKeystorePath)) {
+        if (Files.exists(httpKeystorePath)) {
 
-            KeyStore httpKeystore = loadKeystore(httpKeystorePath, "password");
-            final Path trustStorePath = createTruststore(httpKeystore, "password", opensearchConfigDir);
+            KeyStore httpKeystore = loadKeystore(httpKeystorePath, datanodeConfig.getDatanodeHttpCertificatePassword());
+
+            final String truststorePassword = UUID.randomUUID().toString();
+            final Path trustStorePath = createTruststore(httpKeystore, truststorePassword, opensearchConfigDir);
             System.setProperty("javax.net.ssl.trustStore", trustStorePath.toAbsolutePath().toString());
-            System.setProperty("javax.net.ssl.trustStorePassword", "password");
+            System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
 
-            extractCertificates(opensearchConfigDir, "http", httpKeystore, "password");
+            extractCertificates(opensearchConfigDir, "http", httpKeystore, datanodeConfig.getDatanodeHttpCertificatePassword());
 
             config.put("plugins.security.ssl.http.pemcert_filepath", "http.pem");
             config.put("plugins.security.ssl.http.pemkey_filepath", "http-key.pem");
             config.put("plugins.security.ssl.http.pemtrustedcas_filepath", "http-ca.pem");
         }
 
-
-
         configuration = new OpensearchConfiguration(
-                opensearchVersion,
-                Path.of(opensearchLocation),
-                opensearchHttpPort,
-                opensearchTransportPort,
+                datanodeConfig.getOpensearchVersion(),
+                Path.of(datanodeConfig.getOpensearchLocation()),
+                datanodeConfig.getOpensearchHttpPort(),
+                datanodeConfig.getOpensearchTransportPort(),
                 "datanode-cluster",
-                nodeName,
+                datanodeConfig.getDatanodeNodeName(),
                 Collections.emptyList(),
                 Collections.emptyList(),
-                discoverySeedHosts,
+                datanodeConfig.getOpensearchDiscoverySeedHosts(),
                 config
         );
+    }
+
+    private void configureAdminPassword(Path internalUsersFile, String passwordHash) throws IOException {
+        final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        final Map<String, Object> map = mapper.readValue(new FileInputStream(internalUsersFile.toFile()), Map.class);
+        final Map<String, Object> admin = (Map) map.get("admin");
+        admin.put("hash", passwordHash);
+        final FileOutputStream fos = new FileOutputStream(internalUsersFile.toFile());
+        mapper.writeValue(fos, map);
     }
 
     private Path createTruststore(KeyStore keystorePath, String password, Path opensearchConfigDir) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
@@ -144,8 +151,8 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
 
         final Certificate[] certs = keystorePath.getCertificateChain("datanode");
 
-        for(Certificate cert : certs) {
-            if(cert instanceof final X509Certificate x509Certificate) {
+        for (Certificate cert : certs) {
+            if (cert instanceof final X509Certificate x509Certificate) {
                 final String alias = x509Certificate.getSubjectX500Principal().getName();
                 trustStore.setCertificateEntry(alias, x509Certificate);
             }

@@ -76,8 +76,6 @@ public class CertutilHttp implements CliCommand {
         final boolean useOwnCertificateEntity = console.readBoolean("Do you want to use your own certificate authority? Respond with y/n?");
 
         if (useOwnCertificateEntity) {
-
-
             try {
                 console.printLine("Generating certificate signing request for this datanode");
                 final CertRequest certReq = CertRequest.selfSigned("localhost");

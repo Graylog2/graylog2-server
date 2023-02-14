@@ -20,6 +20,7 @@ import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
+import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
@@ -73,15 +74,31 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "datanode_node_name")
     private String datanodeNodeName = "node1";
 
-    @Parameter(value = "opensearch_http_port")
-    private String opensearchHttpPort = "9200";
+    @Parameter(value = "opensearch_http_port", converter = IntegerConverter.class)
+    private int opensearchHttpPort = 9200;
 
 
-    @Parameter(value = "opensearch_transport_port")
-    private String opensearchTransportPort = "9300";
+    @Parameter(value = "opensearch_transport_port", converter = IntegerConverter.class)
+    private int opensearchTransportPort = 9300;
 
     @Parameter(value = "opensearch_discovery_seed_hosts", converter = StringListConverter.class)
     private List<String> opensearchDiscoverySeedHosts = Collections.emptyList();
+
+    @Parameter(value = "datanode_transport_certificate")
+    private String datanodeTransportCertificate = "datanode-transport-certificates.p12";
+
+    @Parameter(value = "datanode_transport_certificate_password")
+    private String datanodeTransportCertificatePassword = null;
+
+    @Parameter(value = "datanode_http_certificate")
+    private String datanodeHttpCertificate = "datanode-http-certificates.p12";
+
+    @Parameter(value = "datanode_http_certificate_password")
+    private String datanodeHttpCertificatePassword = null;
+
+
+    @Parameter(value = "datanode_admin_initial_password_hash")
+    private String datanodeInitialPasswordHash = "$2y$12$hccemIPDfk5WYz0TVE9e0uRtrwgVJAkXrsUqfuIuG8.q8smnloQSO";
 
     @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
     private Integer staleLeaderTimeout = 2000;
@@ -183,6 +200,42 @@ public class Configuration extends BaseConfiguration {
         return rootEmail;
     }
 
+    public String getDatanodeNodeName() {
+        return datanodeNodeName;
+    }
+
+    public int getOpensearchHttpPort() {
+        return opensearchHttpPort;
+    }
+
+    public int getOpensearchTransportPort() {
+        return opensearchTransportPort;
+    }
+
+    public List<String> getOpensearchDiscoverySeedHosts() {
+        return opensearchDiscoverySeedHosts;
+    }
+
+    public String getDatanodeTransportCertificate() {
+        return datanodeTransportCertificate;
+    }
+
+    public String getDatanodeTransportCertificatePassword() {
+        return datanodeTransportCertificatePassword;
+    }
+
+    public String getDatanodeHttpCertificate() {
+        return datanodeHttpCertificate;
+    }
+
+    public String getDatanodeHttpCertificatePassword() {
+        return datanodeHttpCertificatePassword;
+    }
+
+    public String getDatanodeInitialPasswordHash() {
+        return datanodeInitialPasswordHash;
+    }
+
     @ValidatorMethod
     @SuppressWarnings("unused")
     public void validatePasswordSecret() throws ValidationException {
@@ -200,7 +253,11 @@ public class Configuration extends BaseConfiguration {
         }
     }
 
-     public static class NodeIdFileValidator implements Validator<String> {
+    public String getAdminInitialPasswordHash() {
+        return null;
+    }
+
+    public static class NodeIdFileValidator implements Validator<String> {
         @Override
         public void validate(String name, String path) throws ValidationException {
             if (path == null) {
