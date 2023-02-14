@@ -144,11 +144,12 @@ export const setGlobalOverride = (queryString: string, timerange: TimeRange) => 
   return dispatch(searchExecutionSlice.actions.updateGlobalOverride(newGlobalOverride));
 };
 
-export const declareParameters = (newParameters: ParameterMap) => async (dispatch: AppDispatch) => {
+export const declareParameters = (newParameters: ParameterMap) => async (dispatch: AppDispatch, getState: GetState) => {
+  const parameters = selectParameters(getState()).toArray();
   const newParametersArray = newParameters.valueSeq().toArray();
   await dispatch(searchExecutionSlice.actions.addParameterBindings(newParametersArray));
 
-  return dispatch(setParameters(newParametersArray));
+  return dispatch(setParameters([...parameters, ...newParametersArray]));
 };
 
 export const removeParameter = (parameterName: string) => async (dispatch: AppDispatch, getState: GetState) => {
