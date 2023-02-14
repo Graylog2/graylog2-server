@@ -23,8 +23,6 @@ import { TIMESTAMP_FIELD } from 'views/Constants';
 import type { ThunkActionHandler } from 'views/components/actions/ActionHandler';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
-import { widgetDefinition } from 'views/logic/Widgets';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 import duplicateCommonWidgetSettings from './DuplicateCommonWidgetSettings';
 
@@ -46,10 +44,8 @@ const ChartActionHandler: ThunkActionHandler<{ widget?: Widget }> = ({
     .config(config);
 
   const widget = duplicateCommonWidgetSettings(widgetBuilder, origWidget).build();
-  const widgetDef = widgetDefinition('AGGREGATION');
-  const position = new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth);
 
-  return dispatch(addWidget(widget, position));
+  return dispatch(addWidget(widget));
 };
 
 export default ChartActionHandler;
