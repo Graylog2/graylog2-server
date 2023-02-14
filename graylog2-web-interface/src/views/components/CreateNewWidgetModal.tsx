@@ -24,7 +24,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import generateId from 'logic/generateId';
 import useView from 'views/hooks/useView';
 import useAppDispatch from 'stores/useAppDispatch';
-import { updateWidgetPosition, addWidget } from 'views/logic/slices/widgetActions';
+import { addWidget } from 'views/logic/slices/widgetActions';
 
 const modalTitle = 'Create new widget';
 
