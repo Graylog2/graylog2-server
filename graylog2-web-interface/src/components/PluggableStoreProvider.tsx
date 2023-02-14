@@ -52,7 +52,8 @@ const PluggableStoreProvider = ({ initialQuery, children, isNew, view, execution
       isLoading: false,
       result: undefined,
     },
-  }), [activeQuery, executionState, isNew, view]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), [executionState, isNew, view]);
   const store = useMemo(() => createStore(reducers, initialState), [initialState, reducers]);
 
   return (
