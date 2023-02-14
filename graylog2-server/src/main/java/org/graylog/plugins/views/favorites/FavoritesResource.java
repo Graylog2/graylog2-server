@@ -20,6 +20,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.grn.GRN;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -63,19 +64,17 @@ public class FavoritesResource {
     }
 
     @PUT
-    @Path("/{id}")
     @ApiOperation("Add an item for inclusion on the Start Page for the user")
     @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_ADD_FAVORITE_ITEM)
-    public void addItemToFavorites(@ApiParam(name = "id", required = true) @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
-        favoritesService.addFavoriteItemFor(id, searchUser);
+    public void addItemToFavorites(@ApiParam(name = "grn", required = true) @NotEmpty GRN grn, @Context SearchUser searchUser) {
+        favoritesService.addFavoriteItemFor(grn, searchUser);
     }
 
     @DELETE
-    @Path("/{id}")
     @ApiOperation("Remove an item from inclusion on the Start Page for the user")
     @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_REMOVE_FAVORITE_ITEM)
-    public void removeItemFromFavorites(@ApiParam(name = "id", required = true) @PathParam("id") @NotEmpty String id, @Context SearchUser searchUser) {
-        favoritesService.removeFavoriteItemFor(id, searchUser);
+    public void removeItemFromFavorites(@ApiParam(name = "grn", required = true) @NotEmpty GRN grn, @Context SearchUser searchUser) {
+        favoritesService.removeFavoriteItemFor(grn, searchUser);
     }
 
 }
