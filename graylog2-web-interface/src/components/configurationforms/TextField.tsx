@@ -25,16 +25,19 @@ import type { TextField as TextFieldType } from './types';
 
 type Props = {
   autoFocus: boolean,
+  buttonAfter?: React.ReactElement | string,
   field: TextFieldType,
+  dirty: boolean,
   onChange: (title: string, value: number) => void,
   title: string,
   typeName: string,
   value?: string,
 };
 
-const TextField = ({ field, title, typeName, onChange, value, autoFocus }: Props) => {
+const TextField = ({ field, title, typeName, dirty, onChange, value, autoFocus, buttonAfter }: Props) => {
   const isRequired = !field.is_optional;
-  const fieldType = (!hasAttribute(field.attributes, 'textarea') && hasAttribute(field.attributes, 'is_password') ? 'password' : 'text');
+  const showReadOnlyEncrypted = field.is_encrypted && !dirty && value !== '';
+  const fieldType = (!hasAttribute(field.attributes, 'textarea') && (hasAttribute(field.attributes, 'is_password') || showReadOnlyEncrypted) ? 'password' : 'text');
   const fieldId = `${typeName}-${title}`;
 
   const labelContent = <>{field.human_name} {optionalMarker(field)}</>;
@@ -68,13 +71,17 @@ const TextField = ({ field, title, typeName, onChange, value, autoFocus }: Props
            required={isRequired}
            help={field.description}
            value={value || ''}
+           readOnly={showReadOnlyEncrypted}
            onChange={handleChange}
+           buttonAfter={buttonAfter}
            autoFocus={autoFocus} />
   );
 };
 
 TextField.propTypes = {
   autoFocus: PropTypes.bool,
+  buttonAfter: PropTypes.node,
+  dirty: PropTypes.bool,
   field: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
@@ -84,6 +91,8 @@ TextField.propTypes = {
 
 TextField.defaultProps = {
   autoFocus: false,
+  buttonAfter: undefined,
+  dirty: false,
   value: '',
 };
 

@@ -32,11 +32,13 @@ type Props = {
   configField: ConfigurationField,
   configKey: string,
   configValue: string | number | boolean | void,
+  dirty: boolean,
   autoFocus: boolean,
+  buttonAfter?: React.ReactElement | string,
   onChange: () => void,
 };
 
-const ConfigurationFormField = ({ typeName, configField, configKey, configValue, autoFocus, onChange }: Props) => {
+const ConfigurationFormField = ({ typeName, buttonAfter, configField, configKey, configValue, dirty, autoFocus, onChange }: Props) => {
   const elementKey = `${typeName}-${configKey}`;
 
   switch (configField.type) {
@@ -47,7 +49,9 @@ const ConfigurationFormField = ({ typeName, configField, configKey, configValue,
                    title={configKey}
                    field={configField}
                    value={configValue}
+                   dirty={dirty}
                    onChange={onChange}
+                   buttonAfter={buttonAfter}
                    autoFocus={autoFocus} />
       );
     case 'number':
@@ -97,17 +101,21 @@ const ConfigurationFormField = ({ typeName, configField, configKey, configValue,
 };
 
 ConfigurationFormField.propTypes = {
+  buttonAfter: PropTypes.node,
   typeName: PropTypes.string.isRequired,
   configField: PropTypes.object.isRequired,
   configKey: PropTypes.string.isRequired,
   configValue: PropTypes.any,
   autoFocus: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
+  dirty: PropTypes.bool,
 };
 
 ConfigurationFormField.defaultProps = {
   configValue: undefined,
+  buttonAfter: undefined,
   autoFocus: false,
+  dirty: false,
 };
 
 export default ConfigurationFormField;

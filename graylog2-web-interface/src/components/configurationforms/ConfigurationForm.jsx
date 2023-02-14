@@ -18,6 +18,7 @@ import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import { Button } from 'components/bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { ConfigurationFormField, TitleField } from 'components/configurationforms';
 
@@ -61,16 +62,23 @@ class ConfigurationForm extends React.Component {
     const { titleValue } = this.state || {};
     const effectiveTitleValue = (titleValue !== undefined ? titleValue : props.titleValue);
     const defaultValues = {};
+    const valueOverrides = {};
 
     if (props.configFields) {
       Object.keys(props.configFields).forEach((field) => {
-        defaultValues[field] = props.configFields[field].default_value;
+        const configField = props.configFields[field];
+
+        defaultValues[field] = configField.default_value;
+
+        if (configField.is_encrypted && props.values[field].is_set) {
+          valueOverrides[field] = { keep_value: true };
+        }
       });
     }
 
     return {
       configFields: $.extend({}, props.configFields),
-      values: $.extend({}, defaultValues, props.values),
+      values: $.extend({}, { ...defaultValues, ...props.values }, valueOverrides),
       titleValue: effectiveTitleValue,
     };
   };
@@ -127,24 +135,78 @@ class ConfigurationForm extends React.Component {
   };
 
   _handleChange = (field, value) => {
-    const { values } = this.state;
+    const { configFields, values } = this.state;
 
-    values[field] = value;
-    this.setState({ values: values });
+    const configField = configFields[field];
+
+    if (field.is_encrypted) {
+      values[field] = { set_value: value };
+    } else {
+      values[field] = value;
+    }
+
+    this.setState({ values: values, configFields: { ...configFields, ...{ [field]: { ...configField, ...{ dirty: true } } } } });
+  };
+
+  handleEncryptedFieldReset = (field) => {
+    const { values, configFields } = this.state;
+
+    const configField = configFields[field];
+
+    this.setState({
+      values: { ...values, ...{ [field]: { delete_value: true } } },
+      configFields: { ...configFields, ...{ [field]: { ...configField, ...{ dirty: true } } } },
+    });
+  };
+
+  // eslint-disable-next-line class-methods-use-this
+  getEncryptedInputValue = (value) => {
+    if (value.keep_value || value.is_set) {
+      return 'encrypted_value';
+    }
+
+    if (value.delete_value || value.is_set === false) {
+      return '';
+    }
+
+    if (value.set_value) {
+      return value.set_value;
+    }
+
+    return value;
   };
 
   _renderConfigField = (configField, key, autoFocus) => {
     const { values } = this.state;
     const value = values[key];
+    let fieldValue = value;
     const { typeName } = this.props;
+    const hasEncryptedValue = value && (value.is_set || value.keep_value || value.length > 0);
+
+    if (configField.is_encrypted) {
+      fieldValue = this.getEncryptedInputValue(value);
+    }
+
+    const buttonAfter = () => {
+      if (configField.dirty) return null;
+      if (!hasEncryptedValue) return null;
+
+      return (
+        <Button type="button" onClick={() => this.handleEncryptedFieldReset(key)}>
+          Reset
+        </Button>
+      );
+    };
 
     return (
       <ConfigurationFormField key={key}
                               typeName={typeName}
                               configField={configField}
                               configKey={key}
-                              configValue={value}
+                              configValue={fieldValue}
                               autoFocus={autoFocus}
+                              dirty={configField.dirty}
+                              buttonAfter={configField.is_encrypted ? buttonAfter() : undefined}
                               onChange={this._handleChange} />
     );
   };
