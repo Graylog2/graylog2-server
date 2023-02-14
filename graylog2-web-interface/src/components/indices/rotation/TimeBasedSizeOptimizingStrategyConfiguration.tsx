@@ -85,7 +85,7 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime
     }
   };
 
-  const maxRotationPeriodHelpText = maxRotationPeriod ? ` The max rotation period is set to ${durationToRoundedDays(maxRotationPeriod)} by Administrator.` : '';
+  const maxRotationPeriodHelpText = maxRotationPeriod ? ` The max rotation period is set to ${durationToRoundedDays(maxRotationPeriod)} days by the Administrator.` : '';
 
   return (
     <div>
