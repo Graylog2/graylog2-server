@@ -66,8 +66,14 @@ export const addWidget = (widget: Widget, position?: WidgetPosition) => (dispatc
   const newWidgets = widgets.push(widget);
   const newWidgetPositions = position ? widgetPositions.set(widget.id, position) : GenerateNextPosition(widgetPositions, newWidgets.toArray());
 
-  return dispatch(updateWidgetPositions(newWidgetPositions.toObject()))
-    .then(() => dispatch(updateWidgets(newWidgets)));
+  const activeQuery = selectActiveQuery(getState());
+  const activeViewState = selectActiveViewState(getState());
+  const newViewState = activeViewState.toBuilder()
+    .widgetPositions(newWidgetPositions)
+    .widgets(newWidgets)
+    .build();
+
+  return dispatch(updateViewState(activeQuery, newViewState));
 };
 
 export const updateWidget = (id: string, updatedWidget: Widget) => (dispatch: AppDispatch, getState: GetState) => {
