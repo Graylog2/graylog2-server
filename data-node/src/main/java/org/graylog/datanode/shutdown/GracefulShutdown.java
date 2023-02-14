@@ -19,7 +19,6 @@ package org.graylog.datanode.shutdown;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.initializers.JerseyService;
 import org.graylog.datanode.initializers.PeriodicalsService;
-import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -33,23 +32,18 @@ import javax.inject.Singleton;
 public class GracefulShutdown implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(GracefulShutdown.class);
 
-    private final Configuration configuration;
-    private final ServerStatus serverStatus;
     private final ActivityWriter activityWriter;
     private final PeriodicalsService periodicalsService;
     private final JerseyService jerseyService;
     private final GracefulShutdownService gracefulShutdownService;
 
     @Inject
-    public GracefulShutdown(ServerStatus serverStatus,
-                            ActivityWriter activityWriter,
+    public GracefulShutdown(ActivityWriter activityWriter,
                             Configuration configuration,
                             PeriodicalsService periodicalsService,
                             JerseyService jerseyService,
                             GracefulShutdownService gracefulShutdownService) {
-        this.serverStatus = serverStatus;
         this.activityWriter = activityWriter;
-        this.configuration = configuration;
         this.periodicalsService = periodicalsService;
         this.jerseyService = jerseyService;
         this.gracefulShutdownService = gracefulShutdownService;
@@ -68,9 +62,6 @@ public class GracefulShutdown implements Runnable {
         LOG.info("Graceful shutdown initiated.");
 
         activityWriter.write(new Activity("Graceful shutdown initiated.", GracefulShutdown.class));
-
-        // Trigger a lifecycle change. Some services are listening for those and will halt operation accordingly.
-        serverStatus.shutdown();
 
         // Stop REST API service to avoid changes from outside.
         jerseyService.stopAsync();

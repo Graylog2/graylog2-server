@@ -50,7 +50,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bootstrap.commands.MigrateCmd;
 import org.graylog.datanode.configuration.PathConfiguration;
 import org.graylog2.bootstrap.CliCommand;
@@ -58,7 +57,6 @@ import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.featureflag.FeatureFlagsFactory;
 import org.graylog2.plugin.Plugin;
-import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
 import org.graylog2.shared.UI;
@@ -101,7 +99,6 @@ public abstract class CmdLineTool implements CliCommand {
     protected static final String TMPDIR = System.getProperty("java.io.tmpdir", "/tmp");
 
     protected final JadConfig jadConfig;
-    protected final Configuration configuration;
     protected final ChainingClassLoader chainingClassLoader;
 
     @Option(name = "--dump-config", description = "Show the effective Graylog DataNode configuration and exit")
@@ -125,11 +122,11 @@ public abstract class CmdLineTool implements CliCommand {
     protected Injector coreConfigInjector;
     protected FeatureFlags featureFlags;
 
-    protected CmdLineTool(Configuration configuration) {
-        this(null, configuration);
+    protected CmdLineTool() {
+        this(null);
     }
 
-    protected CmdLineTool(String commandName, Configuration configuration) {
+    protected CmdLineTool(String commandName) {
         jadConfig = new JadConfig();
         jadConfig.addConverterFactory(new GuavaConverterFactory());
         jadConfig.addConverterFactory(new JodaTimeConverterFactory());
@@ -143,7 +140,6 @@ public abstract class CmdLineTool implements CliCommand {
         } else {
             this.commandName = commandName;
         }
-        this.configuration = configuration;
         this.chainingClassLoader = new ChainingClassLoader(this.getClass().getClassLoader());
     }
 
@@ -503,9 +499,5 @@ public abstract class CmdLineTool implements CliCommand {
                 }
             }
         }
-    }
-
-    protected Set<ServerStatus.Capability> capabilities() {
-        return Collections.emptySet();
     }
 }

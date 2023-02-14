@@ -35,12 +35,11 @@ import org.graylog.datanode.rest.RestBindings;
 import org.graylog.datanode.shutdown.GracefulShutdown;
 import org.graylog2.bindings.MongoDBModule;
 import org.graylog2.cluster.NodeService;
-import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
-import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -50,9 +49,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 
 
 @Command(name = "datanode", description = "Start the Graylog DataNode")
@@ -60,7 +57,6 @@ public class Server extends ServerBootstrap {
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
     protected static final Configuration configuration = new Configuration();
-    private final HttpConfiguration httpConfiguration = new HttpConfiguration();
     private final MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
  //   private final VersionCheckConfiguration versionCheckConfiguration = new VersionCheckConfiguration();
  //   private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration();
@@ -102,7 +98,6 @@ public class Server extends ServerBootstrap {
     @Override
     protected List<Object> getCommandConfigurationBeans() {
         return Arrays.asList(configuration,
-                httpConfiguration,
                 mongoDbConfiguration,
      ///           versionCheckConfiguration,
       //          nettyTransportConfiguration,
@@ -113,14 +108,15 @@ public class Server extends ServerBootstrap {
     protected void startNodeRegistration(Injector injector) {
         // Register this node.
         final NodeService nodeService = injector.getInstance(NodeService.class);
-        final ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
         final ActivityWriter activityWriter = injector.getInstance(ActivityWriter.class);
-        nodeService.registerServer(serverStatus.getNodeId().toString(),
+        final var nodeId = new FilePersistedNodeIdProvider(configuration.getNodeIdFile()).get();
+
+        nodeService.registerServer(nodeId.toString(),
                 // TODO: not necessary in DataNode context
                 true,
-                httpConfiguration.getHttpPublishUri(),
+                configuration.getHttpPublishUri(),
                 Tools.getLocalCanonicalHostname());
-        serverStatus.setLocalMode(isLocal());
+//        serverStatus.setLocalMode(isLocal());
     }
 
     private static class ShutdownHook implements Runnable {
@@ -168,16 +164,6 @@ public class Server extends ServerBootstrap {
                         "Details: " + e.getMessage()));
                 System.exit(-1);
             }
-        }
-    }
-
-    @Override
-    protected Set<ServerStatus.Capability> capabilities() {
-        if (configuration.isLeader()) {
-            //noinspection deprecation
-            return EnumSet.of(ServerStatus.Capability.SERVER, ServerStatus.Capability.MASTER);
-        } else {
-            return EnumSet.of(ServerStatus.Capability.SERVER);
         }
     }
 }

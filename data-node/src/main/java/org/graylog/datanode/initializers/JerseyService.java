@@ -40,9 +40,9 @@ import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.PluginRestResource;
-import org.graylog2.plugin.rest.exceptionmappers.JacksonPropertyExceptionMapper;
-import org.graylog2.plugin.rest.exceptionmappers.JsonProcessingExceptionMapper;
 import org.graylog2.rest.MoreMediaTypes;
+import org.graylog2.shared.rest.exceptionmappers.JacksonPropertyExceptionMapper;
+import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,8 +70,7 @@ public class JerseyService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(JerseyService.class);
     private static final String RESOURCE_PACKAGE_WEB = "org.graylog2.web.resources";
 
-    private final HttpConfiguration configuration;
-    private final Configuration graylogConfiguration;
+    private final Configuration configuration;
     private final Set<Class<?>> systemRestResources;
 //    private final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources;
 
@@ -87,8 +86,7 @@ public class JerseyService extends AbstractIdleService {
     private HttpServer apiHttpServer = null;
 
     @Inject
-    public JerseyService(final HttpConfiguration configuration,
-                         Configuration graylogConfiguration,
+    public JerseyService(final Configuration configuration,
                          Set<Class<? extends DynamicFeature>> dynamicFeatures,
 //                         Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
                          Set<Class<? extends ExceptionMapper>> exceptionMappers,
@@ -100,7 +98,6 @@ public class JerseyService extends AbstractIdleService {
 //                         ErrorPageGenerator errorPageGenerator,
                          TLSProtocolsConfiguration tlsConfiguration) {
         this.configuration = requireNonNull(configuration, "configuration");
-        this.graylogConfiguration = graylogConfiguration;
         this.dynamicFeatures = requireNonNull(dynamicFeatures, "dynamicFeatures");
  //       this.containerResponseFilters = requireNonNull(containerResponseFilters, "containerResponseFilters");
         this.exceptionMappers = requireNonNull(exceptionMappers, "exceptionMappers");

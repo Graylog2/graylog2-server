@@ -38,11 +38,9 @@ import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.Plugin;
-import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.bindings.FreshInstallDetectionModule;
 import org.graylog2.shared.bindings.IsDevelopmentBindings;
-import org.graylog2.shared.bindings.ServerStatusBindings;
 import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -69,10 +67,12 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public abstract class ServerBootstrap extends CmdLineTool {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
     private boolean isFreshInstallation;
+    protected Configuration configuration;
 
     protected ServerBootstrap(String commandName, Configuration configuration) {
-        super(commandName, configuration);
+        super(commandName);
         this.commandName = commandName;
+        this.configuration = configuration;
     }
 
     @Option(name = {"-p", "--pidfile"}, description = "File containing the PID of Graylog DataNode")
@@ -166,7 +166,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 new IsDevelopmentBindings(),
                 new PreflightChecksBindings(),
                 new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
-//                new ServerStatusBindings(capabilities()),
                 new ConfigurationModule(configuration),
 //                new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()),
                 new Module() {
@@ -205,20 +204,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
         LOG.info("OS: {}", os.getPlatformName());
         LOG.info("Arch: {}", os.getArch());
 
-        /*
-        try {
-            if (configuration.isLeader() && configuration.runMigrations()) {
-                runMigrations();
-            }
-        } catch (Exception e) {
-            LOG.error("Exception while running migrations", e);
-            System.exit(1);
-        }
-        */
-
-        final ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
-//        serverStatus.initialize();
-
         startNodeRegistration(injector);
 
         final ActivityWriter activityWriter;
@@ -226,7 +211,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
         try {
             activityWriter = injector.getInstance(ActivityWriter.class);
             serviceManager = injector.getInstance(ServiceManager.class);
-//            leaderElectionService = injector.getInstance(Key.get(Service.class, Names.named("LeaderElectionService")));
         } catch (ProvisionException e) {
             LOG.error("Guice error", e);
             annotateProvisionException(e);
@@ -241,10 +225,9 @@ public abstract class ServerBootstrap extends CmdLineTool {
         Runtime.getRuntime().addShutdownHook(new Thread(injector.getInstance(shutdownHook())));
 
         // Start services.
-        final ServiceManagerListener serviceManagerListener = injector.getInstance(ServiceManagerListener.class);
-        serviceManager.addListener(serviceManagerListener, MoreExecutors.directExecutor());
+//        final ServiceManagerListener serviceManagerListener = injector.getInstance(ServiceManagerListener.class);
+//        serviceManager.addListener(serviceManagerListener, MoreExecutors.directExecutor());
         try {
-//            leaderElectionService.startAsync().awaitRunning();
             serviceManager.startAsync().awaitHealthy();
         } catch (Exception e) {
             try {
@@ -296,7 +279,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
         result.add(new FreshInstallDetectionModule(isFreshInstallation()));
         result.add(new GenericBindings(isMigrationCommand()));
 //        result.add(new SecurityBindings());
-        result.add(new ServerStatusBindings(capabilities()));
 //        result.add(new ValidatorModule());
 //        result.add(new SharedPeriodicalBindings());
         result.add(new SchedulerBindings());
