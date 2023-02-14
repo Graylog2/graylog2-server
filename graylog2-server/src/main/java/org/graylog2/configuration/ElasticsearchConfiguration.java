@@ -292,5 +292,11 @@ public class ElasticsearchConfiguration {
                     TIME_SIZE_OPTIMIZING_ROTATION_MIN_LIFETIME, getTimeSizeOptimizingRotationMinLifeTime())
             );
         }
+        if (getMaxIndexRetentionPeriod() != null && getMaxIndexRetentionPeriod().toStandardSeconds().compareTo(getTimeSizeOptimizingRotationMaxLifeTime().toStandardSeconds()) < 0) {
+            throw new ValidationException(f("\"%s=%s\" cannot to be larger than \"%s=%s\"",
+                    TIME_SIZE_OPTIMIZING_ROTATION_MAX_LIFETIME, getTimeSizeOptimizingRotationMaxLifeTime(),
+                    MAX_INDEX_RETENTION_PERIOD, getMaxIndexRetentionPeriod())
+            );
+        }
     }
 }
