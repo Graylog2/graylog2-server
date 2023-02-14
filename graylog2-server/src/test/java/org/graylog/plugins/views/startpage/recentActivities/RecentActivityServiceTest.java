@@ -108,7 +108,7 @@ public class RecentActivityServiceTest {
         for(int i = 0; i <= MAXIMUM; i++) {
             var activity = RecentActivityDTO.builder()
                     .activityType(ActivityType.CREATE)
-                    .itemGrn(GRN.builder().entity("" + i).grnType(GRNTypes.DASHBOARD).build())
+                    .itemGrn(grnRegistry.newGRN(GRNTypes.DASHBOARD, "" + i))
                     .grantee("invalid")
                     .userName(searchUser.username())
                     .itemTitle("" + i)
@@ -129,7 +129,7 @@ public class RecentActivityServiceTest {
     public void testFilteringForGrantees() {
         var activity = RecentActivityDTO.builder()
                 .activityType(ActivityType.CREATE)
-                .itemGrn(GRN.builder().entity("TESTFORUSER").grnType(GRNTypes.DASHBOARD).build())
+                .itemGrn(grnRegistry.newGRN(GRNTypes.DASHBOARD, "testforuser"))
                 .grantee(grnRegistry.newGRN(GRNTypes.USER, user.getId()).toString())
                 .userName(searchAdmin.username())
                 .itemTitle("1")
@@ -140,7 +140,7 @@ public class RecentActivityServiceTest {
         assertThat(activities.grandTotal().isEmpty()).isFalse();
         assertThat(activities.grandTotal().get()).isEqualTo(1);
 
-        assertThat(activities.delegate().stream().filter(a -> Objects.equals(a.itemGrn().entity(), "TESTFORUSER")).toList().size()).isEqualTo(1);
+        assertThat(activities.delegate().stream().filter(a -> Objects.equals(a.itemGrn().entity(), "testforuser")).toList().size()).isEqualTo(1);
     }
 
     private void createActivity(final String id, final ActivityType activityType) {

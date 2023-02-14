@@ -80,8 +80,9 @@ public class LastOpenedService extends PaginatedDbService<LastOpenedForUserDTO> 
     public void removeLastOpenedOnEntityDeletion(final RecentActivityEvent event) {
         // if an entity is deleted, we can no longer see it in the lastOpened collection
         if (event.activityType().equals(ActivityType.DELETE)) {
-            DBObject query = new BasicDBObject(LastOpenedForUserDTO.FIELD_ITEMS + "." + LastOpenedDTO.FIELD_GRN, new BasicDBObject("$eq", event.grn()));
-            final DBObject modifications = new BasicDBObject("$pull", new BasicDBObject(LastOpenedForUserDTO.FIELD_ITEMS, new BasicDBObject(LastOpenedDTO.FIELD_GRN, event.grn())));
+            final var grn = event.grn().toString();
+            final var query = new BasicDBObject(LastOpenedForUserDTO.FIELD_ITEMS + "." + LastOpenedDTO.FIELD_GRN, grn);
+            final var modifications = new BasicDBObject("$pull", new BasicDBObject(LastOpenedForUserDTO.FIELD_ITEMS, new BasicDBObject(LastOpenedDTO.FIELD_GRN, grn)));
             db.updateMulti(query, modifications);
         }
     }

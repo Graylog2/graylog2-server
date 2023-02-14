@@ -96,13 +96,14 @@ public class FavoriteServiceTest {
                 new EventBus(),
                 mongoJackObjectMapperProvider,
                 null,
-                null);
+                null,
+                grnRegistry);
     }
 
     @Test
     public void testRemoveOnUserDeletion() {
-        GRN _1 = GRN.builder().entity("1").grnType(GRNTypes.DASHBOARD).build();
-        GRN _2 = GRN.builder().entity("2").grnType(GRNTypes.SEARCH).build();
+        var _1 = grnRegistry.newGRN(GRNTypes.DASHBOARD, "1");
+        var _2 = grnRegistry.newGRN(GRNTypes.SEARCH, "2");
 
         favoritesService.save(new FavoritesForUserDTO("user1", List.of(_1, _2)));
         favoritesService.save(new FavoritesForUserDTO("user2", List.of(_1, _2)));
@@ -117,18 +118,18 @@ public class FavoriteServiceTest {
 
     @Test
     public void testRemoveOnEntityDeletion() {
-        GRN _1 = GRN.builder().entity("1").grnType(GRNTypes.DASHBOARD).build();
-        GRN _2 = GRN.builder().entity("2").grnType(GRNTypes.SEARCH).build();
-        GRN _3 = GRN.builder().entity("3").grnType(GRNTypes.SEARCH).build();
-        GRN _4 = GRN.builder().entity("4").grnType(GRNTypes.DASHBOARD).build();
+        var _1 = grnRegistry.newGRN(GRNTypes.DASHBOARD, "1");
+        var _2 = grnRegistry.newGRN(GRNTypes.SEARCH, "2");
+        var _3 = grnRegistry.newGRN(GRNTypes.SEARCH, "3");
+        var _4 = grnRegistry.newGRN(GRNTypes.DASHBOARD, "4");
 
-        favoritesService.save(new FavoritesForUserDTO("user1", List.of(_1)));
+        favoritesService.save(new FavoritesForUserDTO("user1", List.of(_2)));
         favoritesService.save(new FavoritesForUserDTO("user2", List.of(_1, _2)));
         favoritesService.save(new FavoritesForUserDTO("user3", List.of(_1, _2, _3)));
         favoritesService.save(new FavoritesForUserDTO("user4", List.of(_1, _4, _3)));
 
         assertThat(favoritesService.streamAll().toList().size()).isEqualTo(4);
-        favoritesService.removeFavoriteOnEntityDeletion(new RecentActivityEvent(ActivityType.DELETE, grnRegistry.newGRN(GRNTypes.SEARCH_FILTER, "2"), "user4"));
+        favoritesService.removeFavoriteOnEntityDeletion(new RecentActivityEvent(ActivityType.DELETE, _2, "user4"));
         assertThat(favoritesService.streamAll().toList().size()).isEqualTo(4);
 
         var fav1 = favoritesService.findForUser("user1").get();

@@ -18,6 +18,7 @@ package org.graylog.plugins.views.startpage;
 
 import com.google.common.eventbus.EventBus;
 import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
@@ -40,16 +41,19 @@ import java.util.List;
 
 public class StartPageService {
     private final Catalog catalog;
+    private final GRNRegistry grnRegistry;
     private final LastOpenedService lastOpenedService;
     private final RecentActivityService recentActivityService;
     private final long MAXIMUM_LAST_OPENED_PER_USER = 100;
 
     @Inject
     public StartPageService(Catalog catalog,
+                            GRNRegistry grnRegistry,
                             LastOpenedService lastOpenedService,
                             RecentActivityService recentActivityService,
                             EventBus eventBus) {
         this.catalog = catalog;
+        this.grnRegistry = grnRegistry;
         this.lastOpenedService = lastOpenedService;
         this.recentActivityService = recentActivityService;
         eventBus.register(this);
@@ -93,7 +97,7 @@ public class StartPageService {
     public void addLastOpenedFor(final ViewDTO view, final SearchUser searchUser) {
         final var type = view.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
         final var lastOpenedItems = lastOpenedService.findForUser(searchUser);
-        final var item = new LastOpenedDTO(GRN.builder().entity(view.id()).grnType(type).build(), DateTime.now(DateTimeZone.UTC));
+        final var item = new LastOpenedDTO(grnRegistry.newGRN(type, view.id()), DateTime.now(DateTimeZone.UTC));
         if(lastOpenedItems.isPresent()) {
             var loi = lastOpenedItems.get();
             var items = filterForExistingIdAndCapAtMaximum(loi, item.grn(), MAXIMUM_LAST_OPENED_PER_USER);

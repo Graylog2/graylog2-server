@@ -101,8 +101,8 @@ public class LastOpenedServiceTest {
 
     @Test
     public void testRemoveOnUserDeletion() {
-        GRN _1 = GRN.builder().entity("1").grnType(GRNTypes.DASHBOARD).build();
-        GRN _2 = GRN.builder().entity("2").grnType(GRNTypes.SEARCH).build();
+        var _1 = grnRegistry.newGRN(GRNTypes.DASHBOARD, "1");
+        var _2 = grnRegistry.newGRN(GRNTypes.SEARCH, "2");
 
         lastOpenedService.save(new LastOpenedForUserDTO("user1", List.of(new LastOpenedDTO(_1 ,DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO(_2 ,DateTime.now(DateTimeZone.UTC)))));
         lastOpenedService.save(new LastOpenedForUserDTO("user2", List.of(new LastOpenedDTO(_1 ,DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO(_2 ,DateTime.now(DateTimeZone.UTC)))));
@@ -117,10 +117,10 @@ public class LastOpenedServiceTest {
 
     @Test
     public void testRemoveOnEntityDeletion() {
-        GRN _1 = GRN.builder().entity("1").grnType(GRNTypes.DASHBOARD).build();
-        GRN _2 = GRN.builder().entity("2").grnType(GRNTypes.SEARCH).build();
-        GRN _3 = GRN.builder().entity("3").grnType(GRNTypes.SEARCH).build();
-        GRN _4 = GRN.builder().entity("4").grnType(GRNTypes.DASHBOARD).build();
+        var _1 = grnRegistry.newGRN(GRNTypes.DASHBOARD, "1");
+        var _2 = grnRegistry.newGRN(GRNTypes.SEARCH, "2");
+        var _3 = grnRegistry.newGRN(GRNTypes.SEARCH, "3");
+        var _4 = grnRegistry.newGRN(GRNTypes.DASHBOARD, "4");
 
         lastOpenedService.save(new LastOpenedForUserDTO("user1", List.of(new LastOpenedDTO(_2 ,DateTime.now(DateTimeZone.UTC)))));
         lastOpenedService.save(new LastOpenedForUserDTO("user2", List.of(new LastOpenedDTO(_1 ,DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO(_2 , DateTime.now(DateTimeZone.UTC)))));
@@ -128,7 +128,7 @@ public class LastOpenedServiceTest {
         lastOpenedService.save(new LastOpenedForUserDTO("user4", List.of(new LastOpenedDTO(_1 ,DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO(_4 ,DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO(_3 ,DateTime.now(DateTimeZone.UTC)))));
 
         assertThat(lastOpenedService.streamAll().toList().size()).isEqualTo(4);
-        lastOpenedService.removeLastOpenedOnEntityDeletion(new RecentActivityEvent(ActivityType.DELETE, grnRegistry.newGRN(GRNTypes.SEARCH_FILTER, "2"), "user4"));
+        lastOpenedService.removeLastOpenedOnEntityDeletion(new RecentActivityEvent(ActivityType.DELETE, grnRegistry.newGRN(GRNTypes.SEARCH, "2"), "user4"));
         assertThat(lastOpenedService.streamAll().toList().size()).isEqualTo(4);
 
         var last1 = lastOpenedService.findForUser("user1").get();

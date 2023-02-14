@@ -28,6 +28,7 @@ import org.graylog2.rest.models.PaginatedResponse;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -64,16 +65,18 @@ public class FavoritesResource {
     }
 
     @PUT
+    @Path("/{grn}")
     @ApiOperation("Add an item for inclusion on the Start Page for the user")
     @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_ADD_FAVORITE_ITEM)
-    public void addItemToFavorites(@ApiParam(name = "grn", required = true) @NotEmpty GRN grn, @Context SearchUser searchUser) {
+    public void addItemToFavorites(@ApiParam(name = "grn", required = true) @PathParam("grn") @NotEmpty String grn, @Context SearchUser searchUser) {
         favoritesService.addFavoriteItemFor(grn, searchUser);
     }
 
     @DELETE
+    @Path("/{grn}")
     @ApiOperation("Remove an item from inclusion on the Start Page for the user")
     @AuditEvent(type = ViewsAuditEventTypes.DYNAMIC_STARTUP_PAGE_REMOVE_FAVORITE_ITEM)
-    public void removeItemFromFavorites(@ApiParam(name = "grn", required = true) @NotEmpty GRN grn, @Context SearchUser searchUser) {
+    public void removeItemFromFavorites(@ApiParam(name = "grn", required = true) @PathParam("grn") @NotEmpty String grn, @Context SearchUser searchUser) {
         favoritesService.removeFavoriteItemFor(grn, searchUser);
     }
 

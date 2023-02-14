@@ -66,6 +66,8 @@ public class StartPageServiceTest {
 
     private SearchUser searchUser;
 
+    private GRNRegistry grnRegistry;
+
     static class TestCatalog extends Catalog {
         public TestCatalog() {
             super(null);
@@ -94,7 +96,8 @@ public class StartPageServiceTest {
                      TestUserService testUserService) {
         var admin = TestUser.builder().withId("637748db06e1d74da0a54331").withUsername("local:admin").isLocalAdmin(true).build();
         var user = TestUser.builder().withId("637748db06e1d74da0a54330").withUsername("test").isLocalAdmin(false).build();
-        searchUser = TestSearchUser.builder().withUser(user).build();
+        this.searchUser = TestSearchUser.builder().withUser(user).build();
+        this.grnRegistry = grnRegistry;
         var searchAdmin = TestSearchUser.builder().withUser(admin).build();
 
         var permissionAndRoleResolver = new PermissionAndRoleResolver() {
@@ -119,7 +122,7 @@ public class StartPageServiceTest {
         var entityOwnerShipService = new EntityOwnershipService(dbGrantService, grnRegistry);
         var lastOpenedService = new LastOpenedService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, eventbus, entityOwnerShipService);
         var recentActivityService = new RecentActivityService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, eventbus, grnRegistry, permissionAndRoleResolver);
-        startPageService = new StartPageService(new TestCatalog(), lastOpenedService, recentActivityService, eventbus);
+        startPageService = new StartPageService(new TestCatalog(), grnRegistry, lastOpenedService, recentActivityService, eventbus);
     }
 
     @Test
@@ -148,7 +151,7 @@ public class StartPageServiceTest {
 
     @Test
     public void testRemoveIfExistsInList() {
-        var _1 = GRN.builder().entity("1").grnType(GRNTypes.DASHBOARD).build();
+        var _1 = grnRegistry.newGRN(GRNTypes.DASHBOARD, "1");
 
         LastOpenedForUserDTO dto = new LastOpenedForUserDTO("userId", List.of(new LastOpenedDTO(_1, DateTime.now(DateTimeZone.UTC))));
 
@@ -158,8 +161,8 @@ public class StartPageServiceTest {
 
     @Test
     public void testDontRemoveIfExistsInList() {
-        var _1 = GRN.builder().entity("1").grnType(GRNTypes.DASHBOARD).build();
-        var _2 = GRN.builder().entity("2").grnType(GRNTypes.DASHBOARD).build();
+        var _1 = grnRegistry.newGRN(GRNTypes.DASHBOARD, "1");
+        var _2 = grnRegistry.newGRN(GRNTypes.SEARCH, "2");
 
         LastOpenedForUserDTO dto = new LastOpenedForUserDTO("userId", List.of(new LastOpenedDTO(_1, DateTime.now(DateTimeZone.UTC))));
 
@@ -170,59 +173,59 @@ public class StartPageServiceTest {
     @Test
     public void testCapAtMaximumMinusOneSoYouCanAddANewElement() {
         var list = List.of(
-                new LastOpenedDTO(GRN.builder().entity("1").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("2").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("3").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("4").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("5").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("6").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("7").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("8").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("9").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("10").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC))
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "1"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "2"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "3"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "4"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "5"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "6"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "7"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "8"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "9"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "10"), DateTime.now(DateTimeZone.UTC))
         );
         LastOpenedForUserDTO dto = new LastOpenedForUserDTO("userId", list);
 
-        var result = StartPageService.filterForExistingIdAndCapAtMaximum(dto, GRN.builder().entity("11").grnType(GRNTypes.DASHBOARD).build(), MAX);
+        var result = StartPageService.filterForExistingIdAndCapAtMaximum(dto, grnRegistry.newGRN(GRNTypes.DASHBOARD, "11"), MAX);
         assertThat(result.size()).isEqualTo(9);
     }
 
     @Test
     public void testNotCapAtMaximumMinusOneIfYouAreAtMaxMinusOne() {
         var list = List.of(
-                new LastOpenedDTO(GRN.builder().entity("1").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("2").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("3").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("4").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("5").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("6").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("7").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("8").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("9").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC))
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "1"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "2"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "3"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "4"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "5"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "6"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "7"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "8"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "9"), DateTime.now(DateTimeZone.UTC))
         );
         assertThat(list.size()).isEqualTo(MAX-1);
         LastOpenedForUserDTO dto = new LastOpenedForUserDTO("userId", list);
 
-        var result = StartPageService.filterForExistingIdAndCapAtMaximum(dto, GRN.builder().entity("11").grnType(GRNTypes.DASHBOARD).build(), MAX);
+        var result = StartPageService.filterForExistingIdAndCapAtMaximum(dto, grnRegistry.newGRN(GRNTypes.DASHBOARD, "11"), MAX);
         assertThat(result.size()).isEqualTo(MAX-1);
     }
 
     @Test
     public void testRemoveItemFromTheMiddle() {
         var list = List.of(
-                new LastOpenedDTO(GRN.builder().entity("1").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("2").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("3").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("4").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("5").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("6").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("7").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("8").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC)),
-                new LastOpenedDTO(GRN.builder().entity("9").grnType(GRNTypes.DASHBOARD).build(), DateTime.now(DateTimeZone.UTC))
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "1"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "2"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "3"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "4"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "5"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "6"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "7"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "8"), DateTime.now(DateTimeZone.UTC)),
+                new LastOpenedDTO(grnRegistry.newGRN(GRNTypes.DASHBOARD, "9"), DateTime.now(DateTimeZone.UTC))
         );
         LastOpenedForUserDTO dto = new LastOpenedForUserDTO("userId", list);
 
-        var result = StartPageService.filterForExistingIdAndCapAtMaximum(dto, GRN.builder().entity("5").grnType(GRNTypes.DASHBOARD).build(), MAX);
+        var result = StartPageService.filterForExistingIdAndCapAtMaximum(dto, grnRegistry.newGRN(GRNTypes.DASHBOARD, "5"), MAX);
         assertThat(result.size()).isEqualTo(8);
     }
 }
