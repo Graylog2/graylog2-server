@@ -61,8 +61,8 @@ const getTimeBaseStrategyWithElasticLimit = (activeConfig, strategies) => {
   return { ...activeConfig, max_rotation_period: timeBasedStrategy?.max_rotation_period };
 };
 
-const getStrategyConfig = (selectedStrategy, activeStrategy, activeConfig, strategies) => {
-  if (selectedStrategy === TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY) {
+const getStrategyConfig = (typeName, selectedStrategy, activeStrategy, activeConfig, strategies) => {
+  if (selectedStrategy === TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY && typeName === 'retention') {
     return activeConfig;
   }
 
@@ -75,7 +75,7 @@ const getStrategyConfig = (selectedStrategy, activeStrategy, activeConfig, strat
   return getDefaultStrategyConfig(selectedStrategy, strategies);
 };
 
-const getConfigurationComponent = (selectedStrategy, pluginExports, strategies, strategy, config, onConfigUpdate) => {
+const getConfigurationComponent = (typeName, selectedStrategy, pluginExports, strategies, strategy, config, onConfigUpdate) => {
   if (!selectedStrategy || selectedStrategy.length < 1) {
     return null;
   }
@@ -86,7 +86,7 @@ const getConfigurationComponent = (selectedStrategy, pluginExports, strategies, 
     return null;
   }
 
-  const strategyConfig = getStrategyConfig(selectedStrategy, strategy, config, strategies);
+  const strategyConfig = getStrategyConfig(typeName, selectedStrategy, strategy, config, strategies);
   const element = React.createElement(strategyPlugin.configComponent, {
     config: strategyConfig,
     jsonSchema: getStrategyJsonSchema(selectedStrategy, strategies),
@@ -138,7 +138,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
       return;
     }
 
-    const newConfig = getStrategyConfig(selectedStrategy, strategy, config, strategies);
+    const newConfig = getStrategyConfig(name, selectedStrategy, strategy, config, strategies);
 
     setNewStrategy(selectedStrategy);
     setValues({ ...values, ...getState(selectedStrategy, newConfig) });
@@ -217,6 +217,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
       <Row>
         <Col md={12}>
           {shouldShowTimeBasedSizeOptimizingForm && getConfigurationComponent(
+            name,
             TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY,
             PluginStore.exports('indexRotationConfig'),
             [rotationStrategy],
@@ -225,6 +226,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
             _onIndexTimeSizeOptimizingUpdate,
           )}
           {shouldShowNormalRetentionForm && getConfigurationComponent(
+            name,
             getActiveSelection(),
             pluginExports,
             strategies,

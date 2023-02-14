@@ -37,7 +37,7 @@ export const durationToRoundedDays = (duration: string) => {
   return Math.round(moment.duration(duration).asDays());
 };
 
-const getRangeInDays = (indexLifeTimeMin = 'PT1H', IndexLifeTimeMax = 'P4D') => {
+const getInitialRangeInDays = (indexLifeTimeMin, IndexLifeTimeMax) => {
   return [durationToRoundedDays(indexLifeTimeMin), durationToRoundedDays(IndexLifeTimeMax)];
 };
 
@@ -52,7 +52,7 @@ const getInitialMaxRange = (maxRotationPeriod: number, maxLifetime: number) => {
 };
 
 const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime_max, index_lifetime_min }, updateConfig }: Props) => {
-  const [indexLifetimeRange, setIndexLifetimeRange] = useState(getRangeInDays(index_lifetime_min, index_lifetime_max));
+  const [indexLifetimeRange, setIndexLifetimeRange] = useState(getInitialRangeInDays(index_lifetime_min, index_lifetime_max));
   const maxRotationPeriod = useMaxIndexRotationLimit();
   const [maxRange, setMaxRange] = useState(getInitialMaxRange(durationToRoundedDays(maxRotationPeriod), indexLifetimeRange[1]));
 
@@ -70,7 +70,7 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime
 
   const errorMessage = 'There needs to be at least 1 day between the minimum and maximum lifetime.';
 
-  const addYearToMaxrange = (currentMax: number, currentSelectedMax: number) => {
+  const addYearToMaxRange = (currentMax: number, currentSelectedMax: number) => {
     if (!maxRotationPeriod && currentMax === currentSelectedMax) {
       setMaxRange(currentMax + YEAR_IN_DAYS);
     }
@@ -78,7 +78,7 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({ config: { index_lifetime
 
   const onRangeChange = (range: Array<number>) => {
     setIndexLifetimeRange(range);
-    addYearToMaxrange(maxRange, range[1]);
+    addYearToMaxRange(maxRange, range[1]);
 
     if (isValidRange(range)) {
       updateConfig({ index_lifetime_min: moment.duration(range[0], 'days').toISOString(), index_lifetime_max: moment.duration(range[1], 'days').toISOString() });

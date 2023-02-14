@@ -41,7 +41,7 @@ type Props = {
   retentionStrategiesContext: RetentionStrategyContext,
   rotationStrategies: Array<any>,
   submitButtonText: string,
-  submitLoadingText: string,
+  submitLoadingText?: string,
 };
 
 type Unit = 'seconds' | 'minutes';
@@ -57,13 +57,13 @@ const StyledFormSubmit = styled(FormSubmit)`
 const _validateIndexPrefix = (value) => {
   let error;
 
-  if (value.length === 0) {
+  if (value?.length === 0) {
     error = 'Invalid index prefix: cannot be empty';
-  } else if (value.indexOf('_') === 0 || value.indexOf('-') === 0 || value.indexOf('+') === 0) {
+  } else if (value?.indexOf('_') === 0 || value?.indexOf('-') === 0 || value?.indexOf('+') === 0) {
     error = 'Invalid index prefix: must start with a letter or number';
-  } else if (value.toLocaleLowerCase() !== value) {
+  } else if (value?.toLocaleLowerCase() !== value) {
     error = 'Invalid index prefix: must be lower case';
-  } else if (!value.match(/^[a-z0-9][a-z0-9_\-+]*$/)) {
+  } else if (!value?.match(/^[a-z0-9][a-z0-9_\-+]*$/)) {
     error = 'Invalid index prefix: must only contain letters, numbers, \'_\', \'-\' and \'+\'';
   }
 
