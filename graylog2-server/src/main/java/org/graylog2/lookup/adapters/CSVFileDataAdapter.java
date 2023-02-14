@@ -190,13 +190,25 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                         throw new IllegalStateException("Couldn't detect column number for key or value - check CSV file format");
                     }
                     if (next.length == 1 && StringUtils.isEmpty(next[0])) {
-                        LOG.debug("Skipping empty line in CSV adapter file [{}/{}].", name, config.path() );
+                        LOG.debug("Skipping empty line in CSV adapter file [{}/{}].", name, config.path());
                         continue;
                     }
+
+                    final String value;
+                    final String key;
+                    try {
+                        key = next[keyColumn];
+                        value = next[valueColumn];
+                    } catch (IndexOutOfBoundsException e) {
+                        final String error = f("The CSV file contains invalid lines. Please check the file and ensure " +
+                                "that both key and value columns are present in all lines.", name, config.path());
+                        throw new IllegalStateException(error, e);
+                    }
+
                     if (config.isCaseInsensitiveLookup()) {
-                        newLookupBuilder.put(next[keyColumn].toLowerCase(Locale.ENGLISH), next[valueColumn]);
+                        newLookupBuilder.put(key.toLowerCase(Locale.ENGLISH), value);
                     } else {
-                        newLookupBuilder.put(next[keyColumn], next[valueColumn]);
+                        newLookupBuilder.put(key, value);
                     }
                 }
             }
@@ -204,6 +216,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             LOG.error("Couldn't parse CSV file {} (settings separator=<{}> quotechar=<{}> key_column=<{}> value_column=<{}>)", config.path(),
                     config.separator(), config.quotechar(), config.keyColumn(), config.valueColumn(), e);
             setError(e);
+            throw new IllegalStateException(e);
         }
 
         return newLookupBuilder.build();
