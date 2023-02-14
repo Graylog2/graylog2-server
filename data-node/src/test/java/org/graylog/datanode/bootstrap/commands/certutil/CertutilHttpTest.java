@@ -17,6 +17,7 @@
 package org.graylog.datanode.bootstrap.commands.certutil;
 
 import org.assertj.core.api.Assertions;
+import org.bouncycastle.asn1.x509.Extension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -36,6 +37,8 @@ import java.security.cert.CertPathValidatorException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
+import java.util.List;
 
 class CertutilHttpTest {
 
@@ -59,6 +62,7 @@ class CertutilHttpTest {
                 .register("Do you want to use your own certificate authority? Respond with y/n?", "n")
                 .register("Enter CA password", "password")
                 .register("Enter certificate validity in days", "90")
+                .register("Enter alternative names (addresses) of this node [comma separated]", "example.com")
                 .register("Enter HTTP certificate password", "changeme");
 
         CertutilHttp certutilCert = new CertutilHttp(
@@ -75,8 +79,15 @@ class CertutilHttpTest {
         final Key nodeKey = nodeKeyStore.getKey(CertutilCert.DATANODE_KEY_ALIAS, "changeme".toCharArray());
         Assertions.assertThat(nodeKey).isNotNull();
 
-        Assertions.assertThatCode(() -> nodeKeyStore.getCertificate(CertutilCert.DATANODE_KEY_ALIAS).verify(caKeyStore.getCertificate("ca").getPublicKey()))
+        final Certificate nodeCertificate = nodeKeyStore.getCertificate(CertutilCert.DATANODE_KEY_ALIAS);
+        Assertions.assertThatCode(() -> nodeCertificate.verify(caKeyStore.getCertificate("ca").getPublicKey()))
                 .doesNotThrowAnyException();
+
+        final Collection<List<?>> alternativeNames = ((X509Certificate) nodeCertificate).getSubjectAlternativeNames();
+        Assertions.assertThat(alternativeNames)
+                .isNotEmpty()
+                .extracting(item -> (String) item.get(1))
+                .contains("localhost", "example.com");
 
         final Certificate[] certificateChain = nodeKeyStore.getCertificateChain(CertutilCert.DATANODE_KEY_ALIAS);
         Assertions.assertThat(certificateChain)
