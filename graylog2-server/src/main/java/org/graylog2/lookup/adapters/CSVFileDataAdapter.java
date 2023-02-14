@@ -126,8 +126,9 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         }
 
         if (!Files.isWritable(Paths.get(config.path()))) {
-            String error = f("The specified file [%s] does not exist. " +
-                            "Edit the adapter [%s] to specify a new path, or restore the file to resolve this error.",
+            String error = f("The specified file [%s] does not exist or is not writable. " +
+                            "To resolve this error, edit the adapter [%s] and specify a new path, or restore the file " +
+                            "or access to it.",
                     config.path(), name);
             LOG.error(error);
             setError(new IllegalStateException(error));
