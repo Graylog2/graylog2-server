@@ -29,6 +29,7 @@ import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMai
 import { Button, Col, Modal, Row } from 'components/bootstrap';
 import { IfPermitted, TimeUnitInput, Spinner } from 'components/common';
 import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
+import { TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY } from 'stores/indices/IndicesStore';
 
 import FormikInput from '../common/FormikInput';
 
@@ -83,7 +84,16 @@ const IndexSetsDefaultsConfig = ({ initialConfig, updateConfig }: Props) => {
   }, []);
 
   const saveConfig = (values, { setSubmitting }) => {
-    handleSaveConfig(values)
+    const defaultIndexValues = { ...values };
+
+    if (defaultIndexValues.rotation_strategy_class === TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY) {
+      defaultIndexValues.rotation_strategy_config = defaultIndexValues?.rotation_strategy;
+    }
+
+    delete defaultIndexValues?.rotation_strategy;
+    delete defaultIndexValues?.retention_strategy;
+
+    handleSaveConfig(defaultIndexValues)
       .then((config) => {
         setCurrentConfig(config as IndexConfig);
         setShowModal(false);

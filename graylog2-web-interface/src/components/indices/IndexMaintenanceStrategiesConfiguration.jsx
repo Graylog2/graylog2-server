@@ -61,8 +61,8 @@ const getTimeBaseStrategyWithElasticLimit = (activeConfig, strategies) => {
   return { ...activeConfig, max_rotation_period: timeBasedStrategy?.max_rotation_period };
 };
 
-const getStrategyConfig = (typeName, selectedStrategy, activeStrategy, activeConfig, strategies) => {
-  if (selectedStrategy === TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY && typeName === 'retention') {
+const getStrategyConfig = (configTypeName, selectedStrategy, activeStrategy, activeConfig, strategies) => {
+  if (selectedStrategy === TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY && configTypeName === 'retention') {
     return activeConfig;
   }
 
@@ -75,7 +75,7 @@ const getStrategyConfig = (typeName, selectedStrategy, activeStrategy, activeCon
   return getDefaultStrategyConfig(selectedStrategy, strategies);
 };
 
-const getConfigurationComponent = (typeName, selectedStrategy, pluginExports, strategies, strategy, config, onConfigUpdate) => {
+const getConfigurationComponent = (configTypeName, selectedStrategy, pluginExports, strategies, strategy, config, onConfigUpdate) => {
   if (!selectedStrategy || selectedStrategy.length < 1) {
     return null;
   }
@@ -86,7 +86,7 @@ const getConfigurationComponent = (typeName, selectedStrategy, pluginExports, st
     return null;
   }
 
-  const strategyConfig = getStrategyConfig(typeName, selectedStrategy, strategy, config, strategies);
+  const strategyConfig = getStrategyConfig(configTypeName, selectedStrategy, strategy, config, strategies);
   const element = React.createElement(strategyPlugin.configComponent, {
     config: strategyConfig,
     jsonSchema: getStrategyJsonSchema(selectedStrategy, strategies),
@@ -139,7 +139,6 @@ const IndexMaintenanceStrategiesConfiguration = ({
     }
 
     const newConfig = getStrategyConfig(name, selectedStrategy, strategy, config, strategies);
-
     setNewStrategy(selectedStrategy);
     setValues({ ...values, ...getState(selectedStrategy, newConfig) });
   };
