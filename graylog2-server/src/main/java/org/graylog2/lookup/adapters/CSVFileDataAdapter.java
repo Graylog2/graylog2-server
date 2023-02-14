@@ -145,6 +145,8 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             LOG.debug("CSV file {} has changed, updating data", config.path());
             lookupRef.set(parseCSVFile());
             cachePurge.purgeAll();
+            // If the file has been moved, then moved back, the fileInfo might have been disconnected.
+            // In this case, create a new fileInfo.
             fileInfo = fileChanged.fileInfo() != null ? fileChanged.fileInfo() : getNewFileInfo();
             clearError();
         } catch (IOException e) {
