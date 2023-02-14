@@ -18,6 +18,7 @@ package org.graylog2.lookup.adapters;
 
 import au.com.bytecode.opencsv.CSVReader;
 import com.codahale.metrics.MetricRegistry;
+import com.cronutils.utils.StringUtils;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -57,6 +58,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class CSVFileDataAdapter extends LookupDataAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(CSVFileDataAdapter.class);
@@ -76,6 +78,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     private final Config config;
     private final AllowedAuxiliaryPathChecker pathChecker;
     private final AtomicReference<Map<String, String>> lookupRef = new AtomicReference<>(ImmutableMap.of());
+    private final String name;
 
     private FileInfo fileInfo = FileInfo.empty();
 
@@ -86,6 +89,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                               MetricRegistry metricRegistry,
                               AllowedAuxiliaryPathChecker pathChecker) {
         super(id, name, config, metricRegistry);
+        this.name = name;
         this.config = (Config) config;
         this.pathChecker = pathChecker;
     }
@@ -104,7 +108,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         }
 
         // Set file info before parsing the data for the first time
-        fileInfo = FileInfo.forPath(Paths.get(config.path()));
+        fileInfo = getNewFileInfo();
         lookupRef.set(parseCSVFile());
     }
 
@@ -121,6 +125,15 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             return;
         }
 
+        if (!Files.isWritable(Paths.get(config.path()))) {
+            String error = f("The specified file [%s] does not exist. " +
+                            "Edit the adapter [%s] to specify a new path, or restore the file to resolve this error.",
+                    config.path(), name);
+            LOG.error(error);
+            setError(new IllegalStateException(error));
+            return;
+        }
+
         try {
             final FileInfo.Change fileChanged = fileInfo.checkForChange();
             if (!fileChanged.isChanged() && !getError().isPresent()) {
@@ -131,7 +144,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             LOG.debug("CSV file {} has changed, updating data", config.path());
             lookupRef.set(parseCSVFile());
             cachePurge.purgeAll();
-            fileInfo = fileChanged.fileInfo();
+            fileInfo = fileChanged.fileInfo() != null ? fileChanged.fileInfo() : getNewFileInfo();
             clearError();
         } catch (IOException e) {
             LOG.error("Couldn't check data adapter <{}> CSV file {} for updates: {} {}", name(), config.path(), e.getClass().getCanonicalName(), e.getMessage());
@@ -175,6 +188,10 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                     if (keyColumn < 0 || valueColumn < 0) {
                         throw new IllegalStateException("Couldn't detect column number for key or value - check CSV file format");
                     }
+                    if (next.length == 1 && StringUtils.isEmpty(next[0])) {
+                        LOG.debug("Skipping empty line in CSV adapter file [{}/{}].", name, config.path() );
+                        continue;
+                    }
                     if (config.isCaseInsensitiveLookup()) {
                         newLookupBuilder.put(next[keyColumn].toLowerCase(Locale.ENGLISH), next[valueColumn]);
                     } else {
@@ -189,6 +206,10 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         }
 
         return newLookupBuilder.build();
+    }
+
+    private FileInfo getNewFileInfo() {
+        return FileInfo.forPath(Paths.get(config.path()));
     }
 
     @Override

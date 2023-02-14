@@ -130,6 +130,22 @@ public class CSVFileDataAdapterTest {
         assertTrue(csvFileDataAdapter.getError().isPresent());
     }
 
+    /**
+     * Verify recovery after refresh failure due to file in disallowed location.
+     */
+    @Test
+    public void refresh_failure_success() throws Exception {
+        final Config config = baseConfig();
+        csvFileDataAdapter = spy(new CSVFileDataAdapter("id", "name", config, new MetricRegistry(), pathChecker));
+        when(pathChecker.fileIsInAllowedPath(isA(Path.class))).thenReturn(true).thenReturn(false);
+        csvFileDataAdapter.doStart();
+        csvFileDataAdapter.doRefresh(cachePurge);
+        assertTrue(csvFileDataAdapter.getError().isPresent());
+        when(pathChecker.fileIsInAllowedPath(isA(Path.class))).thenReturn(true).thenReturn(true);
+        csvFileDataAdapter.doRefresh(cachePurge);
+        assertThat(csvFileDataAdapter.doGet("foo")).isEqualTo(LookupResult.single("23"));
+    }
+
     @Test
     public void testConfigValidationSuccess() {
         final Config config = Config.builder()
