@@ -25,6 +25,8 @@ import { addWidget } from 'views/logic/slices/widgetActions';
 import { setTitle } from 'views/logic/slices/titlesActions';
 import { selectActiveQuery } from 'views/logic/slices/viewSelectors';
 import type { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
+import { widgetDefinition } from 'views/logic/Widgets';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 import duplicateCommonWidgetSettings from './DuplicateCommonWidgetSettings';
 
@@ -56,8 +58,10 @@ const handler = ({
     .config(config);
 
   const widget = duplicateCommonWidgetSettings(widgetBuilder, origWidget).build();
+  const widgetDef = widgetDefinition('AGGREGATION');
+  const position = new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth);
 
-  return dispatch(addWidget(widget))
+  return dispatch(addWidget(widget, position))
     .then(() => dispatch(setTitle(activeQuery, TitleTypes.Widget, widget.id, `Field Statistics for ${field}`)));
 };
 

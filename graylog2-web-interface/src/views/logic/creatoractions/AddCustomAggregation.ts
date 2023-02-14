@@ -24,6 +24,8 @@ import type { AppDispatch } from 'stores/useAppDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
 import type { GetState } from 'views/types';
 import { selectView } from 'views/logic/slices/viewSelectors';
+import { widgetDefinition } from 'views/logic/Widgets';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 export const CreateCustomAggregation = ({ view }: CreatorProps) => AggregationWidget.builder()
   .newId()
@@ -37,6 +39,8 @@ export const CreateCustomAggregation = ({ view }: CreatorProps) => AggregationWi
 
 export default () => (dispatch: AppDispatch, getState: GetState) => {
   const view = selectView(getState());
+  const widgetDef = widgetDefinition('AGGREGATION');
+  const position = new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth);
 
-  return dispatch(addWidget(CreateCustomAggregation({ view })));
+  return dispatch(addWidget(CreateCustomAggregation({ view }), position));
 };

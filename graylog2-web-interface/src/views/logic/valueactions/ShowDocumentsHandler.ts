@@ -22,6 +22,8 @@ import type { GetState } from 'views/types';
 import { addWidget } from 'views/logic/slices/widgetActions';
 import { setTitle } from 'views/logic/slices/titlesActions';
 import { selectActiveQuery } from 'views/logic/slices/viewSelectors';
+import { widgetDefinition } from 'views/logic/Widgets';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 import type { ValuePath } from './ValueActionHandler';
 
@@ -70,8 +72,10 @@ const ShowDocumentsHandler = ({
     .build();
 
   const title = `Messages for ${valuePathQuery}`;
+  const widgetDef = widgetDefinition('MESSAGES');
+  const position = new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth);
 
-  return dispatch(addWidget(newWidget))
+  return dispatch(addWidget(newWidget, position))
     .then(() => dispatch(setTitle(activeQuery, TitleTypes.Widget, newWidget.id, title)));
 };
 

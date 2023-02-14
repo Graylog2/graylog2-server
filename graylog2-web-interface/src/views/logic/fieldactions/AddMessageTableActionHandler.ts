@@ -17,6 +17,8 @@
 import { DEFAULT_MESSAGE_FIELDS } from 'views/Constants';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
+import { widgetDefinition } from 'views/logic/Widgets';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
@@ -31,4 +33,9 @@ export const CreateMessagesWidget = () => MessagesWidget.builder()
       .build(),
   ).build();
 
-export default () => (dispatch: AppDispatch) => dispatch(addWidget(CreateMessagesWidget()));
+export default () => (dispatch: AppDispatch) => {
+  const widgetDef = widgetDefinition('MESSAGES');
+  const position = new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth);
+
+  return dispatch(addWidget(CreateMessagesWidget(), position));
+};

@@ -23,6 +23,8 @@ import DataTable from 'views/components/datatable/DataTable';
 import type { ThunkActionHandler } from 'views/components/actions/ActionHandler';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import { widgetDefinition } from 'views/logic/Widgets';
 
 import duplicateCommonWidgetSettings from './DuplicateCommonWidgetSettings';
 
@@ -39,8 +41,10 @@ const AggregateActionHandler: ThunkActionHandler<{ widget?: Widget }> = ({
       .visualization(DataTable.type)
       .build());
   const newWidget = duplicateCommonWidgetSettings(newWidgetBuilder, widget).build();
+  const widgetDef = widgetDefinition('AGGREGATION');
+  const position = new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth);
 
-  return dispatch(addWidget(newWidget));
+  return dispatch(addWidget(newWidget, position));
 };
 
 export default AggregateActionHandler;

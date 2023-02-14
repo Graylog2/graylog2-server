@@ -55,7 +55,7 @@ export const updateWidgets = (newWidgets: Immutable.List<Widget>) => (dispatch: 
   return dispatch(updateViewState(activeQuery, newViewState));
 };
 
-export const addWidget = (widget: Widget) => (dispatch: AppDispatch, getState: GetState) => {
+export const addWidget = (widget: Widget, position: WidgetPosition) => (dispatch: AppDispatch, getState: GetState) => {
   if (widget.id === undefined) {
     throw new Error('Unable to add widget without id to query.');
   }
@@ -63,7 +63,7 @@ export const addWidget = (widget: Widget) => (dispatch: AppDispatch, getState: G
   const widgets = selectWidgets(getState());
   const newWidgets = widgets.push(widget);
 
-  return dispatch(updateWidgets(newWidgets));
+  return dispatch(updateWidgetPosition(widget.id, position)).then(() => dispatch(updateWidgets(newWidgets)));
 };
 
 export const updateWidget = (id: string, updatedWidget: Widget) => (dispatch: AppDispatch, getState: GetState) => {
@@ -90,10 +90,13 @@ export const duplicateWidget = (widgetId: string, widgetTitle: string) => async 
   }
 
   const activeQuery = selectActiveQuery(getState());
+  const positions = selectWidgetPositions(getState());
+  const oldWidgetPosition = positions[widget.id];
+  const newWidgetPosition = oldWidgetPosition.toBuilder().row(1).col(1).build();
 
   const duplicatedWidget = widget.duplicate(generateId());
 
-  return dispatch(addWidget(duplicatedWidget))
+  return dispatch(addWidget(duplicatedWidget, newWidgetPosition))
     .then(() => dispatch(setTitle(activeQuery, 'widget', duplicatedWidget.id, `${widgetTitle} (copy)`)));
 };
 
