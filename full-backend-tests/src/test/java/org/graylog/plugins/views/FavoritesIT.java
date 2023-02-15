@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeAll;
 import java.util.Collections;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -78,7 +79,7 @@ public class FavoritesIT {
                 .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
-        validatableResponse.assertThat().body("favorites[0].item_grn", equalTo(grn));
+        validatableResponse.assertThat().body("favorites[0].grn", equalTo(grn));
 
         given()
                 .spec(requestSpec)
