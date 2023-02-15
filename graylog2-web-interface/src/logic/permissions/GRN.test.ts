@@ -35,14 +35,12 @@ describe('GRN', () => {
   });
 
   describe('getShowRouteFromGRN should return correct route for', () => {
-    const createsCorrectShowEntityURL = ({ grn, entityShowURL }) => {
-      expect(getShowRouteFromGRN(grn)).toBe(entityShowURL);
-    };
-
     it.each`
       type            | grn                                 | entityShowURL
       ${'user'}       | ${'grn::::user:user-id'}            | ${Routes.SYSTEM.USERS.show('user-id')}
       ${'stream'}     | ${'grn::::stream:stream-id'}        | ${Routes.stream_search('stream-id')}
-    `('type $type with grn $grn', createsCorrectShowEntityURL);
+    `('type $type with grn $grn', ({ grn, entityShowURL }) => {
+      expect(getShowRouteFromGRN(grn)).toBe(entityShowURL);
+    });
   });
 });
