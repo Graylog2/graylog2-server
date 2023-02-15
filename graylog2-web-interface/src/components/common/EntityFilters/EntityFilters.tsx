@@ -40,7 +40,6 @@ const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRendere
   const onDeleteFilter = (attributeId: string, filterId: string) => {
     const attributeFilters = activeFilters[attributeId];
     const newAttributeFilterValues = attributeFilters.filter(({ id }) => id !== filterId);
-
     let newFilters = { ...activeFilters };
 
     if (newAttributeFilterValues.length) {
@@ -55,6 +54,20 @@ const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRendere
     onUpdateFilters(newFilters);
   };
 
+  const onChangeFilter = (attributeId: string, filterId: string, newValue: string, newTitle: string) => {
+    const attributeFilters = activeFilters[attributeId];
+    const existingFilter = attributeFilters.find(({ id }) => id === filterId);
+    const updateFilter = { id: existingFilter.id, value: newValue, title: newTitle };
+
+    onUpdateFilters({
+      ...activeFilters,
+      [attributeId]: [
+        ...attributeFilters.filter(({ id }) => id !== filterId),
+        updateFilter,
+      ],
+    });
+  };
+
   return (
     <Container>
       Filters
@@ -64,6 +77,7 @@ const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRendere
       {activeFilters && (
         <ActiveFilters filters={activeFilters}
                        attributes={attributes}
+                       onChangeFilter={onChangeFilter}
                        onDeleteFilter={onDeleteFilter}
                        filterValueRenderer={filterValueRenderer} />
       )}

@@ -30,29 +30,40 @@ const CenteredButton = styled(Button)`
 `;
 
 type Props = {
-  filters: Filters
-  attributes: Attributes
-  filterValueRenderer: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode } | undefined;
-  onDeleteFilter: (attributeId: string, filterId: string) => void
+  filters: Filters,
+  attributes: Attributes,
+  filterValueRenderer: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode } | undefined,
+  onDeleteFilter: (attributeId: string, filterId: string) => void,
+  onChangeFilter: (attributeId: string, filterId: string, newValue: string, newTitle) => void,
 }
 
-const ActiveFilters = ({ attributes = [], filters, filterValueRenderer, onDeleteFilter }: Props) => {
+const ActiveFilters = ({ attributes = [], filters, filterValueRenderer, onDeleteFilter, onChangeFilter }: Props) => {
+  const onFilterClick = (attributeId: string, curValue: string, filterId: string) => {
+    const relatedAttribute = attributes.find(({ id }) => id === attributeId);
+
+    if (relatedAttribute.type === 'boolean') {
+      const oppositeFilterOption = relatedAttribute.filter_options.find(({ value }) => value !== curValue);
+      console.log({ oppositeFilterOption });
+      onChangeFilter(attributeId, filterId, oppositeFilterOption.value, oppositeFilterOption.title);
+    }
+  };
+
   return (
     <Container>
       {Object.entries(filters).map(([attributeId, filterValues]) => {
         const relatedAttribute = attributes.find(({ id }) => id === attributeId);
 
         return (
-          <FilterGroup>
+          <FilterGroup key={attributeId}>
             <FilterGroupTitle>
               {relatedAttribute.title}:
             </FilterGroupTitle>
             {filterValues.map(({ title, value, id }) => (
               <Filter className="btn-group" key={id}>
-                <CenteredButton bsSize="xsmall">
+                <CenteredButton bsSize="xsmall" onClick={() => onFilterClick(attributeId, value, id)} title="Change value">
                   {filterValueRenderer[attributeId] ? filterValueRenderer[attributeId](value, title) : title}
                 </CenteredButton>
-                <CenteredButton bsSize="xsmall" onClick={() => onDeleteFilter(attributeId, id)}>
+                <CenteredButton bsSize="xsmall" onClick={() => onDeleteFilter(attributeId, id)} title="Delete filter">
                   <Icon name="times" />
                 </CenteredButton>
               </Filter>
