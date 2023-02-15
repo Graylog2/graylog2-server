@@ -1,0 +1,5 @@
+type = "a" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Add `normalize_fields` pipeline rule function for normalizing message field names."
+
+issues = ["6527"]
+pulls = ["14636"]
