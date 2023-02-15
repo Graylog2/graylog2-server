@@ -22,7 +22,7 @@ const StatusIndicator = styled.div<{ $disabled: 'true' | 'false' }>(({ $disabled
   border-radius: 50%;
   height: 10px;
   width: 10px;
-  background-color: ${$disabled === 'true' ? theme.colors.variant.success : theme.colors.variant.warning};
+  background-color: ${$disabled === 'true' ? theme.colors.variant.warning : theme.colors.variant.success};
   margin-right: 3px;
   border: 1px solid ${theme.colors.gray[70]};
 `);

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { Label } from 'components/bootstrap';
+import { Button } from 'components/bootstrap';
 import type { Filters } from 'components/common/EntityFilters/types';
 import type { Attributes } from 'stores/PaginationTypes';
 import { Icon } from 'components/common';
@@ -20,13 +20,13 @@ const FilterGroupTitle = styled.div`
   margin-right: 3px;
 `;
 
-const FilterValue = styled(Label)`
+const Filter = styled.div`
   display: flex;
 `;
 
-const Spacer = styled.div`
-  border-left: 1px solid currentColor;
-  height: 1em;
+const CenteredButton = styled(Button)`
+  display: flex;
+  align-items: center;
 `;
 
 type Props = {
@@ -47,13 +47,15 @@ const ActiveFilters = ({ attributes = [], filters, filterValueRenderer }: Props)
               {relatedAttribute.title}:
             </FilterGroupTitle>
             {filterValues.map(({ title, value }) => (
-              <FilterValue bsSize="xsmall">
-                {filterValueRenderer[attributeId] ? filterValueRenderer[attributeId](value, title) : title}
-                <Spacer />
-                <Icon name="times" />
-              </FilterValue>
-            ),
-            )}
+              <Filter className="btn-group">
+                <CenteredButton bsSize="xsmall">
+                  {filterValueRenderer[attributeId] ? filterValueRenderer[attributeId](value, title) : title}
+                </CenteredButton>
+                <CenteredButton bsSize="xsmall">
+                  <Icon name="times" />
+                </CenteredButton>
+              </Filter>
+            ))}
           </FilterGroup>
         );
       })}

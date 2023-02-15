@@ -37,7 +37,7 @@ const OverlayDropdownButton = ({ children, title, bsSize, disabled, dropdownZInd
   const [show, setShowDropdown] = useState(false);
 
   const _onToggle = () => {
-    if (typeof bsSize === 'function') {
+    if (typeof onToggleProp === 'function') {
       onToggleProp();
     }
 
