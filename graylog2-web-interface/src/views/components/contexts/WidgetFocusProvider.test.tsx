@@ -26,7 +26,6 @@ import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { allMessagesTable } from 'views/logic/Widgets';
 import { createViewWithWidgets } from 'fixtures/searches';
-import { execute } from 'views/logic/slices/searchExecutionSlice';
 
 const mockHistoryReplace = jest.fn();
 
