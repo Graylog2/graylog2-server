@@ -36,9 +36,13 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     private final long pingTimeout;
 
     @Inject
-    public NodeServiceImpl(final MongoConnection mongoConnection, final Configuration configuration) {
+    public NodeServiceImpl(final MongoConnection mongoConnection, Configuration configuration) {
+        this(mongoConnection, configuration.getStaleLeaderTimeout());
+    }
+
+    public NodeServiceImpl(final MongoConnection mongoConnection, final int staleLeaderTimeout) {
         super(mongoConnection);
-        this.pingTimeout = TimeUnit.MILLISECONDS.toSeconds(configuration.getStaleLeaderTimeout());
+        this.pingTimeout = TimeUnit.MILLISECONDS.toSeconds(staleLeaderTimeout);
     }
 
     public Node.Type type() {

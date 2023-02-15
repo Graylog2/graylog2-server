@@ -30,7 +30,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.HostAndPort;
 import com.google.common.net.InetAddresses;
 import org.graylog.datanode.configuration.BaseConfiguration;
-import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
