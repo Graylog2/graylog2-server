@@ -21,12 +21,14 @@ import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import { asMock } from 'helpers/mocking';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
+import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 
 import DashboardsOverview from './DashboardsOverview';
 
 jest.mock('routing/Routes', () => ({ pluginRoute: () => () => '/route' }));
-
 jest.mock('views/components/dashboard/hooks/useDashboards');
+jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
@@ -88,6 +90,10 @@ const loadDashboardsResponse = (count = 1) => {
 };
 
 describe('DashboardsOverview', () => {
+  beforeEach(() => {
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isLoading: false });
+  });
+
   it('should render empty', async () => {
     asMock(useDashboards).mockReturnValue(loadDashboardsResponse(0));
 

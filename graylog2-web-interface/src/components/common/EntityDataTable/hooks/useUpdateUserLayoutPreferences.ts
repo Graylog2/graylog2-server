@@ -46,7 +46,7 @@ const useUpdateUserLayoutPreferences = (entityTableId: string) => {
       UserNotification.error(`Updating table layout preferences failed with error: ${error}`);
     },
     onMutate: (newTableLayout: TableLayoutPreferences) => {
-      queryClient.setQueriesData(['table-layout', 'streams'], (cur: TableLayoutPreferences) => ({
+      queryClient.setQueriesData(['table-layout', entityTableId], (cur: TableLayoutPreferences) => ({
         ...(cur ?? {}),
         ...newTableLayout,
       }));

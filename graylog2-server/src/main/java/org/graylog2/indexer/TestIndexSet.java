@@ -36,7 +36,7 @@ public class TestIndexSet implements IndexSet {
     private static final String SEPARATOR = "_";
     private static final String DEFLECTOR_SUFFIX = "deflector";
 
-    private final IndexSetConfig config;
+    protected final IndexSetConfig config;
     private final Pattern indexPattern;
 
     public TestIndexSet(IndexSetConfig config) {

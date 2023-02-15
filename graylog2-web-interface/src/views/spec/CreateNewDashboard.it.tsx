@@ -18,7 +18,7 @@ import * as React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
+import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
 import history from 'util/History';
 import Routes from 'routing/Routes';
@@ -26,6 +26,8 @@ import AppRouter from 'routing/AppRouter';
 import CurrentUserProvider from 'contexts/CurrentUserProvider';
 import StreamsContext from 'contexts/StreamsContext';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 
 jest.mock('stores/users/CurrentUserStore', () => ({
   CurrentUserStore: MockStore(
@@ -47,6 +49,8 @@ jest.mock('views/components/dashboard/hooks/useDashboards', () => () => ({
     pagination: { total: 0 },
   },
 }));
+
+jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
 declare global {
   namespace NodeJS {
@@ -84,6 +88,10 @@ describe('Create a new dashboard', () => {
   beforeAll(loadViewsPlugin);
 
   afterAll(unloadViewsPlugin);
+
+  beforeEach(() => {
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isLoading: false });
+  });
 
   const SimpleAppRouter = () => (
     <CurrentUserProvider>
