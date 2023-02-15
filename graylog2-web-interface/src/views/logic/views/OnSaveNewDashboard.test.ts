@@ -15,9 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import asMock from 'helpers/mocking/AsMock';
-import { ViewActions } from 'views/stores/ViewStore';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
+import mockDispatch from 'views/test/mockDispatch';
+import type { RootState } from 'views/types';
+import { setView } from 'views/logic/slices/viewSlice';
 
 import View from './View';
 import OnSaveNewDashboard from './OnSaveNewDashboard';
@@ -26,12 +28,6 @@ import { loadDashboard } from './Actions';
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
     create: jest.fn((v) => Promise.resolve(v)).mockName('create'),
-  },
-}));
-
-jest.mock('views/stores/ViewStore', () => ({
-  ViewActions: {
-    load: jest.fn(() => Promise.resolve({ view: { id: 'deadbeef' } })).mockName('load'),
   },
 }));
 
@@ -45,8 +41,9 @@ describe('OnSaveNewDashboard', () => {
 
   it('saves a given new view', async () => {
     const view = View.create();
+    const dispatch = mockDispatch({ view: { view } } as RootState);
 
-    await OnSaveNewDashboard(view);
+    await dispatch(OnSaveNewDashboard(view));
 
     expect(ViewManagementActions.create).toHaveBeenCalled();
     expect(ViewManagementActions.create).toHaveBeenCalledWith(view);
@@ -54,25 +51,27 @@ describe('OnSaveNewDashboard', () => {
 
   it('loads saved view', async () => {
     const view = View.create();
+    const dispatch = mockDispatch({ view: { view } } as RootState);
 
-    await OnSaveNewDashboard(view);
+    await dispatch(OnSaveNewDashboard(view));
 
-    expect(ViewActions.load).toHaveBeenCalled();
-    expect(ViewActions.load).toHaveBeenCalledWith(view);
+    expect(dispatch).toHaveBeenCalledWith(setView(view));
   });
 
   it('redirects to saved view', async () => {
-    const view = View.create();
+    const view = View.create().toBuilder().id('deadbeef').build();
+    const dispatch = mockDispatch({ view: { view } } as RootState);
 
-    await OnSaveNewDashboard(view);
+    await dispatch(OnSaveNewDashboard(view));
 
     expect(loadDashboard).toHaveBeenCalledWith('deadbeef');
   });
 
   it('shows notification upon success', async () => {
     const view = View.create().toBuilder().title('Test View').build();
+    const dispatch = mockDispatch({ view: { view } } as RootState);
 
-    await OnSaveNewDashboard(view);
+    await dispatch(OnSaveNewDashboard(view));
 
     expect(UserNotification.success).toHaveBeenCalled();
     expect(UserNotification.success).toHaveBeenCalledWith(`Saving view "${view.title}" was successful!`, 'Success!');
@@ -82,10 +81,10 @@ describe('OnSaveNewDashboard', () => {
     asMock(ViewManagementActions.create).mockImplementation(() => Promise.reject(new Error('Something bad happened!')));
 
     const view = View.create();
+    const dispatch = mockDispatch({ view: { view } } as RootState);
 
-    await OnSaveNewDashboard(view);
+    await dispatch(OnSaveNewDashboard(view));
 
-    expect(ViewActions.load).not.toHaveBeenCalled();
     expect(loadDashboard).not.toHaveBeenCalled();
     expect(UserNotification.success).not.toHaveBeenCalled();
     expect(UserNotification.error).toHaveBeenCalledTimes(1);

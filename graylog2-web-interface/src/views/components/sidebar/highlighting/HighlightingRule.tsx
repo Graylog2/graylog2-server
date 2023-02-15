@@ -19,13 +19,15 @@ import { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import Rule, { ConditionLabelMap } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { ColorPickerPopover, IconButton } from 'components/common';
 import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
 import type HighlightingColor from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import useAppDispatch from 'stores/useAppDispatch';
+import { updateHighlightingRule, removeHighlightingRule } from 'views/logic/slices/highlightActions';
 
 import ColorPreview from './ColorPreview';
 
@@ -65,15 +67,17 @@ type Props = {
   rule: Rule,
 };
 
-const updateColor = (rule: Rule, newColor: HighlightingColor, hidePopover: () => void) => {
-  return HighlightingRulesActions.update(rule, { color: newColor }).then(hidePopover);
+const updateColor = (rule: Rule, newColor: HighlightingColor, hidePopover: () => void) => async (dispatch: AppDispatch) => {
+  return dispatch(updateHighlightingRule(rule, { color: newColor })).then(hidePopover);
 };
 
-const onDelete = (rule: Rule) => {
+const onDelete = (rule: Rule) => async (dispatch: AppDispatch) => {
   // eslint-disable-next-line no-alert
   if (window.confirm('Do you really want to remove this highlighting?')) {
-    HighlightingRulesActions.remove(rule);
+    return dispatch(removeHighlightingRule(rule));
   }
+
+  return Promise.resolve();
 };
 
 type RuleColorPreviewProps = {
@@ -105,19 +109,21 @@ const RuleColorPreview = ({ color, onChange }: RuleColorPreviewProps) => {
 const HighlightingRule = ({ rule }: Props) => {
   const { field, value, color, condition } = rule;
   const [showForm, setShowForm] = useState(false);
+  const dispatch = useAppDispatch();
 
-  const _onChange = useCallback((newColor: HighlightingColor, hidePopover: () => void) => updateColor(rule, newColor, hidePopover), [rule]);
+  const _onChange = useCallback((newColor: HighlightingColor, hidePopover: () => void) => dispatch(updateColor(rule, newColor, hidePopover)), [dispatch, rule]);
+  const _onDelete = useCallback(() => dispatch(onDelete(rule)), [dispatch, rule]);
 
   return (
     <>
       <HighlightingRuleGrid>
         <RuleColorPreview color={color} onChange={_onChange} />
-        <RuleContainer>
+        <RuleContainer data-testid="highlighting-rule">
           <strong>{field}</strong> {ConditionLabelMap[condition]} <i>&quot;{String(value)}&quot;</i>.
         </RuleContainer>
         <ButtonContainer>
           <IconButton title="Edit this Highlighting Rule" name="edit" onClick={() => setShowForm(true)} />
-          <IconButton title="Remove this Highlighting Rule" name="trash-alt" onClick={() => onDelete(rule)} />
+          <IconButton title="Remove this Highlighting Rule" name="trash-alt" onClick={_onDelete} />
         </ButtonContainer>
       </HighlightingRuleGrid>
       {showForm && <HighlightForm onClose={() => setShowForm(false)} rule={rule} />}

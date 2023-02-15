@@ -20,12 +20,11 @@ import styled, { css } from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
 import Query from 'views/components/Query';
-import { useStore } from 'stores/connect';
-import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import LoadingIndicator from 'components/common/LoadingIndicator';
 import { Row, Col } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import useIsLoading from 'views/hooks/useIsLoading';
 
 const StyledRow = styled(Row)(({ $hasFocusedWidget }: { $hasFocusedWidget: boolean }) => css`
   height: ${$hasFocusedWidget ? '100%' : 'auto'};
@@ -38,9 +37,9 @@ const StyledCol = styled(Col)`
 `;
 
 const SearchLoadingIndicator = () => {
-  const searchLoadingState = useStore(SearchLoadingStateStore);
+  const isLoading = useIsLoading();
 
-  return (searchLoadingState.isLoading && <LoadingIndicator text="Updating search results..." />);
+  return (isLoading && <LoadingIndicator text="Updating search results..." />);
 };
 
 const SearchResult = React.memo(() => {
