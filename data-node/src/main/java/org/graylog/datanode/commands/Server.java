@@ -40,6 +40,7 @@ import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -109,7 +110,7 @@ public class Server extends ServerBootstrap {
         // Register this node.
         final NodeService nodeService = injector.getInstance(NodeService.class);
         final ActivityWriter activityWriter = injector.getInstance(ActivityWriter.class);
-        final var nodeId = new FilePersistedNodeIdProvider(configuration.getNodeIdFile()).get();
+        final var nodeId = injector.getInstance(NodeId.class);
 
         nodeService.registerServer(nodeId.toString(),
                 // TODO: not necessary in DataNode context

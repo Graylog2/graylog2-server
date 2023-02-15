@@ -19,6 +19,8 @@ package org.graylog.datanode.bindings;
 import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
+import org.graylog.datanode.configuration.DataNodeConfigProvider;
+import org.graylog.datanode.configuration.DummyDNC;
 import org.graylog.datanode.initializers.JerseyService;
 import org.graylog.datanode.management.OpensearchProcessService;
 import org.graylog.datanode.initializers.PeriodicalsService;
@@ -26,6 +28,8 @@ import org.graylog.datanode.configuration.ConfigurationProvider;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.shutdown.GracefulShutdownService;
+import org.graylog.plugins.views.search.engine.SearchConfig;
+import org.graylog.plugins.views.search.engine.SearchConfigProvider;
 
 public class GenericInitializerBindings extends AbstractModule {
     @Override
@@ -34,6 +38,7 @@ public class GenericInitializerBindings extends AbstractModule {
 
 
         bind(OpensearchConfiguration.class).toProvider(ConfigurationProvider.class);
+        bind(DummyDNC.class).toProvider(DataNodeConfigProvider.class);
 
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
 
