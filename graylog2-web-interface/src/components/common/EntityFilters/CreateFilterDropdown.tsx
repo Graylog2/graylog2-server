@@ -5,6 +5,7 @@ import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import MenuItem from 'components/bootstrap/MenuItem';
 import { Icon } from 'components/common';
 import type { Attributes } from 'stores/PaginationTypes';
+import generateId from 'logic/generateId';
 
 const Container = styled.div`
   margin-left: 5px;
@@ -12,7 +13,7 @@ const Container = styled.div`
 
 type Props = {
   filterableAttributes: Attributes,
-  onSubmit: (attributeId: string, filter: { value: string, title: string }) => void,
+  onSubmit: (attributeId: string, filter: { value: string, title: string, id: string }) => void,
   filterValueRenderer: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode } | undefined;
 }
 
@@ -22,7 +23,7 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderer, onSub
   const onToggleDropdown = () => setSelectedFilterId(undefined);
 
   const _onSubmit = (filter: { value: string, title: string }, toggleDropdown) => {
-    onSubmit(selectedFilterId, filter);
+    onSubmit(selectedFilterId, { ...filter, id: generateId() });
     toggleDropdown();
   };
 
@@ -40,7 +41,7 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderer, onSub
                 <>
                   <MenuItem header>Create Filter</MenuItem>
                   {filterableAttributes.map(({ id, title }) => (
-                    <MenuItem onSelect={() => setSelectedFilterId(id)}>
+                    <MenuItem onSelect={() => setSelectedFilterId(id)} key={`${title}-filter`}>
                       {title}
                     </MenuItem>
                   ))}
@@ -53,7 +54,7 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderer, onSub
                   {selectedFilter.type === 'boolean' && (
                     <>
                       {selectedFilter.filter_options.map(({ title, value }) => (
-                        <MenuItem onSelect={() => _onSubmit({ value, title }, toggleDropdown)}>
+                        <MenuItem onSelect={() => _onSubmit({ value, title }, toggleDropdown)} key={`filter-value-${title}`}>
                           {filterValueRenderer[selectedFilterId] ? filterValueRenderer[selectedFilterId](value, title) : title}
                         </MenuItem>
                       ))}

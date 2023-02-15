@@ -33,9 +33,10 @@ type Props = {
   filters: Filters
   attributes: Attributes
   filterValueRenderer: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode } | undefined;
+  onDeleteFilter: (attributeId: string, filterId: string) => void
 }
 
-const ActiveFilters = ({ attributes = [], filters, filterValueRenderer }: Props) => {
+const ActiveFilters = ({ attributes = [], filters, filterValueRenderer, onDeleteFilter }: Props) => {
   return (
     <Container>
       {Object.entries(filters).map(([attributeId, filterValues]) => {
@@ -46,12 +47,12 @@ const ActiveFilters = ({ attributes = [], filters, filterValueRenderer }: Props)
             <FilterGroupTitle>
               {relatedAttribute.title}:
             </FilterGroupTitle>
-            {filterValues.map(({ title, value }) => (
-              <Filter className="btn-group">
+            {filterValues.map(({ title, value, id }) => (
+              <Filter className="btn-group" key={id}>
                 <CenteredButton bsSize="xsmall">
                   {filterValueRenderer[attributeId] ? filterValueRenderer[attributeId](value, title) : title}
                 </CenteredButton>
-                <CenteredButton bsSize="xsmall">
+                <CenteredButton bsSize="xsmall" onClick={() => onDeleteFilter(attributeId, id)}>
                   <Icon name="times" />
                 </CenteredButton>
               </Filter>

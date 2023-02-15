@@ -129,8 +129,8 @@ const StreamsOverview = ({ indexSets }: Props) => {
 
   const { elements, attributes, pagination: { total } } = paginatedStreams;
 
-  const onCreateFilter = (attributeId: string, filter: { value: string, title: string }) => {
-    setFilters((cur = {}) => ({ ...cur, [attributeId]: [...cur[attributeId] ?? [], filter] }));
+  const onUpdateFilters = (newFilters: Filters) => {
+    setFilters(newFilters);
   };
 
   return (
@@ -141,7 +141,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
         <SearchForm onSearch={onSearch}
                     onReset={onReset}
                     queryHelpComponent={<QueryHelper entityName="stream" />}>
-          <EntityFilters attributes={attributes} onCreateFilter={onCreateFilter} activeFilters={filters} filterValueRenderer={FilterValueRenderer} />
+          <EntityFilters attributes={attributes} onUpdateFilters={onUpdateFilters} activeFilters={filters} filterValueRenderer={FilterValueRenderer} />
         </SearchForm>
       </div>
       <div>
