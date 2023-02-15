@@ -117,16 +117,12 @@ const ViewHeader = () => {
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), [setShowMetadataEdit]);
 
   const { alertId, definitionId, definitionTitle, isAlert, isEventDefinition, isEvent } = useAlertAndEventDefinitionData();
-  const onChangeFavorite = useCallback((newValue) => {
-    ViewActions.update(view.toBuilder().favorite(newValue).build());
-  }, [view]);
   const dispatch = useAppDispatch();
   const _onSaveView = useCallback(() => dispatch(onSaveView(view)), [dispatch, view]);
 
   const typeText = view?.type?.toLocaleLowerCase();
   const title = useViewTitle();
   const onChangeFavorite = useCallback((newValue) => dispatch(loadView(view.toBuilder().favorite(newValue).build())), [dispatch, view]);
-
 
   const breadCrumbs = useMemo(() => {
     if (isAlert || isEvent) return links.alert({ id: alertId });

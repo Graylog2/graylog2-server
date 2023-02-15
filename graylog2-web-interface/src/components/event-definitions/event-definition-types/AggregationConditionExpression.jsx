@@ -155,7 +155,6 @@ class AggregationConditionExpression extends React.Component {
 
   render() {
     const { expression, parent, renderLabel } = this.props;
-    console.log({ AggregationConditionExpression: expression });
     let expressionComponent;
 
     switch (expression.expr) {

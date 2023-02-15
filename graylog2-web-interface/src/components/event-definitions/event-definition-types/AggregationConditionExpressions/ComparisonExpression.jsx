@@ -35,8 +35,6 @@ const ComparisonExpression = (props) => {
     onChange({ conditions: nextExpression });
   };
 
-  console.log({ expression, level, onChildChange, onChange, renderLabel, validation });
-
   return (
     <Col md={10}>
       <Row className="row-sm">

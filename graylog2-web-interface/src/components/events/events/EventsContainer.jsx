@@ -163,8 +163,6 @@ class EventsContainer extends React.Component {
       return <Spinner text="Loading Events information..." />;
     }
 
-    console.log({ eventsParameters: events.parameters });
-
     return (
       <Events events={events.events}
               parameters={events.parameters}

@@ -32,7 +32,6 @@ const useAlertAndEventDefinitionData = () => {
   const queryClient = useQueryClient();
   const eventData = queryClient.getQueryData(['event-by-id', alertId]) as EventType;
   const EDData = queryClient.getQueryData(['definition', eventData?.event_definition_id]) as EventDefinition;
-  console.log({ result });
 
   return useMemo(() => ({
     alertId,

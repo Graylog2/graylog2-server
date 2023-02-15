@@ -71,16 +71,10 @@ const EventInfoBar = () => {
     setOpen((cur) => !cur);
   };
 
-  console.log({
-    EDData,
-    eventData,
-  });
-
   // const executeEvery = extractDurationAndUnit(ev, TIME_UNITS);
   const searchWithin = extractDurationAndUnit(EDData.config.search_within_ms, TIME_UNITS);
   const executeEvery = extractDurationAndUnit(EDData.config.execute_every_ms, TIME_UNITS);
 
-  console.log({ allNotifications, g: EDData.notifications });
   const notificationList = useMemo(() => {
     return EDData.notifications.reduce((res, cur) => {
       if (allNotifications[cur.notification_id]) {
@@ -90,7 +84,6 @@ const EventInfoBar = () => {
       return res;
     }, []);
   }, [EDData, allNotifications]);
-  console.log({ notificationList });
 
   return (
     <FlatContentRow>

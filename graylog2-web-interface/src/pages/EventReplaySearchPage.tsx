@@ -33,7 +33,6 @@ import generateId from 'logic/generateId';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
-import { TIMESTAMP_FIELD } from 'views/Constants';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import Series from 'views/logic/aggregationbuilder/Series';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
@@ -68,10 +67,6 @@ const transformExpresionsToArray = ({ series, conditions }) => {
       case '>':
       case '>=':
       case '==':
-        console.log('!!!!!!!!', {
-          expression,
-        });
-
         const { ref } = expression.left;
         const selectedSeries = series.find((s) => s.id === ref);
         const fnSeries = selectedSeries && selectedSeries?.function ? `${selectedSeries.function}(${selectedSeries.field})` : undefined;
@@ -105,10 +100,8 @@ const EventView = ({ eventData, EDData }: { eventData: EventType, EDData: EventD
     const series = EDData.config.series.map(({ function: fn, field }) => `${fn}(${field})`);
     // const state = initialView.state.get(queryId).toBuilder().widgets()
     const fff = transformExpresionsToArray({ series: EDData.config.series, conditions: EDData.config.conditions });
-    console.log('!!!!!!$$$$$$$$$$$$$$$$$$$$$$$$!!!!!!', { groupBy, series, EDData, fff });
     const { widgets, titles, positions } = fff.reduce((res, { field, value, expr, fnSeries }, index) => {
       const widgetId = generateId();
-      console.log({ uniq: uniq([...groupBy, field]) });
       const rowPivots = uniq([field, ...groupBy]).map((f) => pivotForField(f, new FieldType('value', [], [])));
       const widget = AggregationWidget.builder()
         .id(widgetId)
@@ -153,7 +146,6 @@ const EventView = ({ eventData, EDData }: { eventData: EventType, EDData: EventD
         },
       )
       .build();
-    console.log({ curWidgets, curTitles, curPositions });
 
     return initialView.toBuilder().state(curState.set(queryId, updatedQuery)).build();
   });
@@ -202,6 +194,7 @@ const EventReplaySearchPage = () => {
   */
 
   // const view = useCreateSavedSearch(streams, timeRange, queryString);
+  console.log({ isLoading });
 
   return isLoading ? <Spinner /> : <EventView eventData={eventData} EDData={EDData} />;
 };
