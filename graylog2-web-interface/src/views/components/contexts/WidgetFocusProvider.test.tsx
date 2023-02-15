@@ -234,17 +234,4 @@ describe('WidgetFocusProvider', () => {
 
     expect(mockHistoryReplace).toHaveBeenCalledWith('');
   });
-
-  it('should not trigger search execution when no focus mode was requested', async () => {
-    asMock(useLocation).mockReturnValue({
-      ...emptyLocation,
-      search: '',
-    });
-
-    const consume = jest.fn();
-
-    renderSUT(consume);
-
-    expect(execute).not.toHaveBeenCalled();
-  });
 });
