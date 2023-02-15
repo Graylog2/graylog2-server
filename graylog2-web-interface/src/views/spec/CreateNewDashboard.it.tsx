@@ -29,6 +29,8 @@ import viewsBindings from 'views/bindings';
 import StreamsContext from 'contexts/StreamsContext';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import { SearchMetadataActions, SearchMetadataStore } from 'views/stores/SearchMetadataStore';
+import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 
 jest.mock('stores/users/CurrentUserStore', () => ({
   CurrentUserStore: MockStore(
@@ -57,6 +59,8 @@ jest.mock('views/components/dashboard/hooks/useDashboards', () => () => ({
     pagination: { total: 0 },
   },
 }));
+
+jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
 declare global {
   namespace NodeJS {
@@ -88,7 +92,6 @@ jest.mock('views/components/searchbar/queryinput/QueryInput', () => () => <span>
 jest.unmock('logic/rest/FetchProvider');
 
 const viewsPlugin = new PluginManifest({}, viewsBindings);
-
 const finderTimeout = applyTimeoutMultiplier(15000);
 const testTimeout = applyTimeoutMultiplier(30000);
 
@@ -97,6 +100,7 @@ describe('Create a new dashboard', () => {
 
   beforeEach(() => {
     const searchMetadata = SearchMetadata.empty();
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isLoading: false });
     asMock(SearchMetadataStore.getInitialState).mockReturnValue(searchMetadata);
     asMock(SearchMetadataActions.parseSearch).mockReturnValue(Promise.resolve(searchMetadata));
   });
