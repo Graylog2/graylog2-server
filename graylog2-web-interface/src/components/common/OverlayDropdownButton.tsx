@@ -22,7 +22,7 @@ import OverlayDropdown from 'components/common/OverlayDropdown';
 
 type Props = {
   bsSize?: string
-  children: React.ReactNode,
+  children: React.ReactNode | ((payload: { toggleDropdown: () => void }) => React.ReactNode),
   closeOnSelect?: boolean,
   disabled?: boolean
   dropdownZIndex?: number,
@@ -61,7 +61,7 @@ const OverlayDropdownButton = ({ children, title, bsSize, disabled, dropdownZInd
                      )}
                      placement="bottom"
                      onToggle={_onToggle}>
-      {children}
+      {typeof children === 'function' ? children({ toggleDropdown: _onToggle }) : children}
     </OverlayDropdown>
   );
 };

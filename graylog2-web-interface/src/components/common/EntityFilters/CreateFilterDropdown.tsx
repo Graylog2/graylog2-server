@@ -21,6 +21,11 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderer, onSub
   const selectedFilter = filterableAttributes.find(({ id }) => id === selectedFilterId);
   const onToggleDropdown = () => setSelectedFilterId(undefined);
 
+  const _onSubmit = (filter: { value: string, title: string }, toggleDropdown) => {
+    onSubmit(selectedFilterId, filter);
+    toggleDropdown();
+  };
+
   return (
     <Container>
       <OverlayDropdownButton title={<Icon name="plus" />}
@@ -28,31 +33,37 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderer, onSub
                              onToggle={onToggleDropdown}
                              closeOnSelect={false}
                              dropdownZIndex={1000}>
-        {!selectedFilterId && (
-          <>
-            <MenuItem header>Create Filter</MenuItem>
-            {filterableAttributes.map(({ id, title }) => (
-              <MenuItem onSelect={() => setSelectedFilterId(id)}>
-                {title}
-              </MenuItem>
-            ))}
-          </>
-        )}
+        {({ toggleDropdown }) => {
+          return (
+            <>
+              {!selectedFilterId && (
+                <>
+                  <MenuItem header>Create Filter</MenuItem>
+                  {filterableAttributes.map(({ id, title }) => (
+                    <MenuItem onSelect={() => setSelectedFilterId(id)}>
+                      {title}
+                    </MenuItem>
+                  ))}
+                </>
+              )}
 
-        {selectedFilterId && (
-          <>
-            <MenuItem header>Create {selectedFilter.title} Filter</MenuItem>
-            {selectedFilter.type === 'boolean' && (
-              <>
-                {selectedFilter.filter_options.map(({ title, value }) => (
-                  <MenuItem onSelect={() => onSubmit(selectedFilter.id, { value, title })}>
-                    {filterValueRenderer[selectedFilterId] ? filterValueRenderer[selectedFilterId](value, title) : title}
-                  </MenuItem>
-                ))}
-              </>
-            )}
-          </>
-        )}
+              {selectedFilterId && (
+                <>
+                  <MenuItem header>Create {selectedFilter.title} Filter</MenuItem>
+                  {selectedFilter.type === 'boolean' && (
+                    <>
+                      {selectedFilter.filter_options.map(({ title, value }) => (
+                        <MenuItem onSelect={() => _onSubmit({ value, title }, toggleDropdown)}>
+                          {filterValueRenderer[selectedFilterId] ? filterValueRenderer[selectedFilterId](value, title) : title}
+                        </MenuItem>
+                      ))}
+                    </>
+                  )}
+                </>
+              )}
+            </>
+          );
+        }}
       </OverlayDropdownButton>
     </Container>
   );
