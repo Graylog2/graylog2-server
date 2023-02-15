@@ -20,16 +20,10 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.tuple.Pair;
-import org.bson.types.ObjectId;
 import org.graylog2.rest.resources.entities.EntityAttribute;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,13 +88,6 @@ public class SearchQueryParser {
     public static final SearchQueryOperator DEFAULT_OPERATOR = SearchQueryOperators.EQUALS;
 
     private static final Logger LOG = LoggerFactory.getLogger(SearchQueryParser.class);
-
-    // We parse all date strings in UTC because we store and show all dates in UTC as well.
-    private static final ImmutableList<DateTimeFormatter> DATE_TIME_FORMATTERS = ImmutableList.of(
-            DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").withZoneUTC(),
-            DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS").withZoneUTC(),
-            ISODateTimeFormat.dateTimeParser().withOffsetParsed().withZoneUTC()
-    );
 
     @Nonnull
     private final Map<String, SearchQueryField> dbFieldMapping;
@@ -275,19 +262,6 @@ public class SearchQueryParser {
         return Pair.of(value, defaultOperator);
     }
 
-    private DateTime parseDate(String value) {
-        for (DateTimeFormatter formatter : DATE_TIME_FORMATTERS) {
-            try {
-                return formatter.parseDateTime(value);
-            } catch (IllegalArgumentException e) {
-                // Try next one
-            }
-        }
-
-        // It's probably not a date...
-        throw new IllegalArgumentException("Unable to parse date: " + value);
-    }
-
     /* Create a FieldValue for the query field from the string value.
      * We try to convert the value types according to the data type of the query field.
      */
@@ -296,21 +270,7 @@ public class SearchQueryParser {
         // Make sure there are no quotes in the value (e.g. `"foo"' --> `foo')
         final String value = quotedStringValue.replaceAll(QUOTE_REPLACE_REGEX, "");
         final Pair<String, SearchQueryOperator> pair = extractOperator(value, fieldType == STRING ? DEFAULT_STRING_OPERATOR : DEFAULT_OPERATOR);
-
-        switch (fieldType) {
-            case DATE:
-                return new FieldValue(parseDate(pair.getLeft()), pair.getRight(), negate);
-            case STRING:
-                return new FieldValue(pair.getLeft(), pair.getRight(), negate);
-            case INT:
-                return new FieldValue(Integer.parseInt(pair.getLeft()), pair.getRight(), negate);
-            case LONG:
-                return new FieldValue(Long.parseLong(pair.getLeft()), pair.getRight(), negate);
-            case OBJECT_ID:
-                return new FieldValue(new ObjectId(pair.getLeft()), pair.getRight(), negate);
-            default:
-                throw new IllegalArgumentException("Unhandled field type: " + fieldType.toString());
-        }
+        return new FieldValue(fieldType.getMongoValueConverter().apply(pair.getLeft()), pair.getRight(), negate);
     }
 
     public static class FieldValue {

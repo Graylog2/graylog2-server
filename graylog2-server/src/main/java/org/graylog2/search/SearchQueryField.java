@@ -75,10 +75,10 @@ public class SearchQueryField {
     }
 
     public static SearchQueryField create(String dbField, Type fieldType) {
-        return new SearchQueryField(dbField, fieldType);
+        return new SearchQueryField(dbField, fieldType != null ? fieldType : Type.STRING);
     }
 
-    public SearchQueryField(String dbField, Type fieldType) {
+    SearchQueryField(String dbField, Type fieldType) {
         this.dbField = dbField;
         this.fieldType = fieldType;
     }
