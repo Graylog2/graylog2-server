@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook, act } from 'wrappedTestingLibrary';
+import { renderHook } from 'wrappedTestingLibrary';
+import { act } from '@testing-library/react-hooks';
 import { useLocation } from 'react-router-dom';
 import { stringify } from 'qs';
 import type { Location } from 'history';

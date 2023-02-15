@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { act, renderHook } from 'wrappedTestingLibrary';
+import { renderHook } from 'wrappedTestingLibrary';
+import { act } from '@testing-library/react-hooks';
 
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
