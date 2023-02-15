@@ -27,6 +27,8 @@ public record OpensearchConfiguration(
         Path opensearchDir,
         int httpPort,
         int transportPort,
+        String authUsername,
+        String authPassword,
         String clusterName, String nodeName, List<String> nodeRoles, List<String> networkHost,
         List<String> discoverySeedHosts, Map<String, String> additionalConfiguration
 ) {

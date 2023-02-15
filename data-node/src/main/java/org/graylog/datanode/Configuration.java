@@ -165,8 +165,12 @@ public class Configuration extends BaseConfiguration {
         return logs;
     }
 
-    @Parameter(value = "password_secret", required = true, validators = StringNotBlankValidator.class)
-    private String passwordSecret;
+    @Parameter(value = "rest_api_username")
+    private String restApiUsername;
+
+
+    @Parameter(value = "rest_api_password")
+    private String restApiPassword;
 
     @Parameter(value = "node_id_file", validators = NodeIdFileValidator.class)
     private String nodeIdFile = "/etc/graylog/server/node-id";
@@ -229,8 +233,13 @@ public class Configuration extends BaseConfiguration {
         return datanodeHttpCertificatePassword;
     }
 
-    public String getAdminInitialPasswordHash() {
-        return passwordSecret;
+
+    public String getRestApiUsername() {
+        return restApiUsername;
+    }
+
+    public String getRestApiPassword() {
+        return restApiPassword;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {

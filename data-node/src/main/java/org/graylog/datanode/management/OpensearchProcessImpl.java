@@ -68,7 +68,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 
         credentialsProvider.setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials("admin", "admin"));
+                new UsernamePasswordCredentials(configuration.authUsername(), configuration.authPassword()));
 
         final boolean sslEnabled = Boolean.parseBoolean(configuration.asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
         final HttpHost host = new HttpHost("localhost", configuration.httpPort(), sslEnabled ? "https" : "http");

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog2.security.hashing.BCryptPasswordAlgorithm;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -75,7 +76,7 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
             config.put("plugins.security.ssl.http.enabled", "true");
 
             final Path internalUsersFile = opensearchConfigDir.resolve("opensearch-security").resolve("internal_users.yml");
-            configureAdminPassword(internalUsersFile, datanodeConfig.getAdminInitialPasswordHash());
+            configureInitialAdmin(internalUsersFile, datanodeConfig.getRestApiUsername(), datanodeConfig.getRestApiPassword());
 
         } else {
             config.put("plugins.security.disabled", "true");
@@ -126,6 +127,8 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
                 Path.of(datanodeConfig.getOpensearchLocation()),
                 datanodeConfig.getOpensearchHttpPort(),
                 datanodeConfig.getOpensearchTransportPort(),
+                datanodeConfig.getRestApiUsername(),
+                datanodeConfig.getRestApiPassword(),
                 "datanode-cluster",
                 datanodeConfig.getDatanodeNodeName(),
                 Collections.emptyList(),
@@ -135,11 +138,19 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
         );
     }
 
-    private void configureAdminPassword(Path internalUsersFile, String passwordHash) throws IOException {
+    private void configureInitialAdmin(Path internalUsersFile, String adminUsername, String adminPassword) throws IOException {
         final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         final Map<String, Object> map = mapper.readValue(new FileInputStream(internalUsersFile.toFile()), Map.class);
         final Map<String, Object> admin = (Map) map.get("admin");
-        admin.put("hash", passwordHash);
+
+        // todo: compute bcrypt hash
+
+        final BCryptPasswordAlgorithm passwordAlgorithm = new BCryptPasswordAlgorithm(12);
+        final String hashWithPrefix = passwordAlgorithm.hash(adminPassword);
+
+        // remove the prefix, we need just the hash itself
+        final String hash = hashWithPrefix.substring("{bcrypt}".length(), hashWithPrefix.indexOf("{salt}"));
+        admin.put("hash", hash);
         final FileOutputStream fos = new FileOutputStream(internalUsersFile.toFile());
         mapper.writeValue(fos, map);
     }
