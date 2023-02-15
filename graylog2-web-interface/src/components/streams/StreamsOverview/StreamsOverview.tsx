@@ -37,6 +37,8 @@ import {
   ENTITY_TABLE_ID,
   ADDITIONAL_ATTRIBUTES,
 } from 'components/streams/StreamsOverview/Constants';
+import EntityFilters from 'components/common/EntityFilters';
+import type { Filters } from 'components/common/EntityFilters/types';
 
 import CustomColumnRenderers from './ColumnRenderers';
 
@@ -57,6 +59,8 @@ type Props = {
 }
 
 const StreamsOverview = ({ indexSets }: Props) => {
+  const [filters, setFilters] = useState<Filters>();
+  console.log({ filters });
   const [query, setQuery] = useState('');
   const paginationQueryParameter = usePaginationQueryParameter(undefined, DEFAULT_LAYOUT.pageSize);
   const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
@@ -122,7 +126,11 @@ const StreamsOverview = ({ indexSets }: Props) => {
     return <Spinner />;
   }
 
-  const { elements, pagination: { total } } = paginatedStreams;
+  const { elements, attributes, pagination: { total } } = paginatedStreams;
+
+  const onCreateFilter = (attributeId: string, filter: { value: string, title: string }) => {
+    setFilters((cur = {}) => ({ ...cur, [attributeId]: [...cur[attributeId] ?? [], filter] }));
+  };
 
   return (
     <PaginatedList pageSize={layoutConfig.pageSize}
@@ -131,7 +139,9 @@ const StreamsOverview = ({ indexSets }: Props) => {
       <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
                     onReset={onReset}
-                    queryHelpComponent={<QueryHelper entityName="stream" />} />
+                    queryHelpComponent={<QueryHelper entityName="stream" />}>
+          <EntityFilters attributes={attributes} onCreateFilter={onCreateFilter} activeFilters={filters} />
+        </SearchForm>
       </div>
       <div>
         {elements?.length === 0 ? (

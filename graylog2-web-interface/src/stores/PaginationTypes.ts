@@ -73,9 +73,13 @@ export type SearchParams = {
 export type Attribute = {
   id: string,
   title: string,
+  type?: 'boolean',
   sortable: boolean,
   hidden?: boolean,
   searchable?: boolean,
+  filterable?: true,
+  filter_options?: Array<{ value: string, title: string }>
+
 }
 
 export type Attributes = Array<Attribute>
