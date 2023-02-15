@@ -64,9 +64,6 @@ public class EncryptedValueDeserializer extends StdDeserializer<EncryptedValue> 
     }
 
     private EncryptedValue parseFromDatabase(JsonParser p, JsonNode node) throws JsonProcessingException {
-        if (node.isTextual()) {
-            return isBlank(node.asText()) ? EncryptedValue.createUnset() : encryptedValueService.encrypt(node.asText());
-        }
         final JsonNode value = node.path("encrypted_value");
         final JsonNode salt = node.path("salt");
 
