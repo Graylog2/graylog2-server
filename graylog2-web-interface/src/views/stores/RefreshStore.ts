@@ -16,21 +16,23 @@
  */
 import Reflux from 'reflux';
 
-import SearchActions from 'views/actions/SearchActions';
 import { singletonActions, singletonStore } from 'logic/singleton';
+import type { SyncRefluxActions } from 'stores/StoreTypes';
 
 type RefreshActionsType = {
   enable: () => void,
   disable: () => void,
-  setInterval: (number) => void,
+  setInterval: (interval: number) => void,
+  refresh: () => void,
 };
 
-export const RefreshActions: RefreshActionsType = singletonActions(
+export const RefreshActions: SyncRefluxActions<RefreshActionsType> = singletonActions(
   'views.Refresh',
   () => Reflux.createActions([
     'enable',
     'disable',
     'setInterval',
+    'refresh',
   ] as const),
 );
 
@@ -62,7 +64,7 @@ export const RefreshStore = singletonStore(
         this.intervalId = undefined;
       }
 
-      this.intervalId = setInterval(SearchActions.executeWithCurrentState, this.refreshConfig.interval);
+      this.intervalId = setInterval(RefreshActions.refresh, this.refreshConfig.interval);
       this._trigger();
     },
 
@@ -70,7 +72,7 @@ export const RefreshStore = singletonStore(
       this.refreshConfig = { ...this.refreshConfig, enabled: true };
 
       if (!this.intervalId) {
-        this.intervalId = setInterval(SearchActions.executeWithCurrentState, this.refreshConfig.interval);
+        this.intervalId = setInterval(RefreshActions.refresh, this.refreshConfig.interval);
       }
 
       this._trigger();

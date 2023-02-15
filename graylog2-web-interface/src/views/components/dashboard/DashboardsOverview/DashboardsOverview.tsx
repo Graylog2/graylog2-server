@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback, useMemo } from 'react';
-import type { Sort } from 'src/stores/PaginationTypes';
 
+import type { Sort } from 'stores/PaginationTypes';
 import { PaginatedList, SearchForm, Spinner, NoSearchResult, NoEntitiesExist } from 'components/common';
 import QueryHelper from 'components/common/QueryHelper';
 import EntityDataTable from 'components/common/EntityDataTable';

@@ -14,30 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import asMock from 'helpers/mocking/AsMock';
-import { WidgetActions } from 'views/stores/WidgetStore';
 import Widget from 'views/logic/widgets/Widget';
-import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
+import TitleTypes from 'views/stores/TitleTypes';
+import { createViewWithWidgets } from 'fixtures/searches';
+import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
+import mockDispatch from 'views/test/mockDispatch';
+import type { RootState } from 'views/types';
+import { addWidget } from 'views/logic/slices/widgetActions';
+import { setTitle } from 'views/logic/slices/titlesActions';
 
 import handler from './FieldStatisticsHandler';
 
 import FieldType from '../fieldtypes/FieldType';
 import { createElasticsearchQueryString } from '../queries/Query';
-
-jest.mock('views/stores/WidgetStore', () => ({
-  WidgetActions: {
-    create: jest.fn((widget: Widget) => Promise.resolve(widget)),
-  },
-}));
-
-jest.mock('views/stores/TitlesStore', () => ({
-  TitlesActions: {
-    set: jest.fn(() => Promise.resolve()),
-  },
-  TitleTypes: {
-    Widget: 'widget',
-  },
-}));
 
 const numericFieldType = new FieldType('foo', ['numeric'], []);
 const nonNumericFieldType = new FieldType('foo', [], []);
@@ -45,66 +34,72 @@ const nonNumericFieldType = new FieldType('foo', [], []);
 const queryId = 'queryId';
 const fieldName = 'foo';
 
+jest.mock('views/logic/slices/widgetActions', () => ({
+  addWidget: jest.fn(async () => {}),
+}));
+
+jest.mock('views/logic/slices/titlesActions', () => ({
+  setTitle: jest.fn(async () => {}),
+}));
+
+const expectSeries = (func: string) => expect.objectContaining({ function: func });
+
+const expectWidgetWithSeries = (series: Array<string>) => expect.objectContaining({
+  config: expect.objectContaining({
+    series: series.map(expectSeries),
+  }),
+});
+
 describe('FieldStatisticsHandler', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('creates field statistics widget for given numeric field', () => {
-    return handler({ queryId, field: fieldName, type: numericFieldType, contexts: {} }).then(() => {
-      expect(WidgetActions.create).toHaveBeenCalled();
+  const widget = AggregationWidget.builder().build();
+  const view = createViewWithWidgets([widget], {});
+  const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
 
-      const widget = asMock(WidgetActions.create).mock.calls[0][0];
+  it('creates field statistics widget for given numeric field', async () => {
+    await dispatch(handler({ queryId, field: fieldName, type: numericFieldType, contexts: {} }));
 
-      expect(widget.config.series.map((s) => s.function)).toEqual([
-        `count(${fieldName})`,
-        `sum(${fieldName})`,
-        `avg(${fieldName})`,
-        `min(${fieldName})`,
-        `max(${fieldName})`,
-        `stddev(${fieldName})`,
-        `variance(${fieldName})`,
-        `card(${fieldName})`,
-        `percentile(${fieldName},95)`,
-      ]);
-    });
+    expect(addWidget).toHaveBeenCalledWith(expectWidgetWithSeries([
+      `count(${fieldName})`,
+      `sum(${fieldName})`,
+      `avg(${fieldName})`,
+      `min(${fieldName})`,
+      `max(${fieldName})`,
+      `stddev(${fieldName})`,
+      `variance(${fieldName})`,
+      `card(${fieldName})`,
+      `percentile(${fieldName},95)`,
+    ]));
   });
 
-  it('creates field statistics widget for given non-numeric field', () => {
-    return handler({ queryId, field: fieldName, type: nonNumericFieldType, contexts: {} }).then(() => {
-      expect(WidgetActions.create).toHaveBeenCalled();
+  it('creates field statistics widget for given non-numeric field', async () => {
+    await dispatch(handler({ queryId, field: fieldName, type: nonNumericFieldType, contexts: {} }));
 
-      const widget = asMock(WidgetActions.create).mock.calls[0][0];
-
-      expect(widget.config.series.map((s) => s.function)).toEqual([
-        `count(${fieldName})`,
-        `card(${fieldName})`,
-      ]);
-    });
+    expect(addWidget).toHaveBeenCalledWith(expectWidgetWithSeries([
+      `count(${fieldName})`,
+      `card(${fieldName})`,
+    ]));
   });
 
-  it('creates field statistics widget and copies the widget filter of original widget', () => {
+  it('creates field statistics widget and copies the widget filter of original widget', async () => {
     const filter = "author: 'Vanth'";
     const origWidget = Widget.builder().filter(filter).build();
 
-    return handler({ queryId, field: fieldName, type: nonNumericFieldType, contexts: { widget: origWidget } }).then(() => {
-      expect(WidgetActions.create).toHaveBeenCalled();
+    await dispatch(handler({ queryId, field: fieldName, type: nonNumericFieldType, contexts: { widget: origWidget } }));
 
-      const widget = asMock(WidgetActions.create).mock.calls[0][0];
-
-      expect(widget.filter).toEqual(filter);
-    });
+    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({ filter }));
   });
 
-  it('adds title to generated widget', () => {
-    return handler({ queryId, field: fieldName, type: nonNumericFieldType, contexts: {} }).then(() => {
-      const widget = asMock(WidgetActions.create).mock.calls[0][0];
+  it('adds title to generated widget', async () => {
+    await dispatch(handler({ queryId, field: fieldName, type: nonNumericFieldType, contexts: {} }));
 
-      expect(TitlesActions.set).toHaveBeenCalledWith(TitleTypes.Widget, widget.id, `Field Statistics for ${fieldName}`);
-    });
+    expect(setTitle).toHaveBeenCalledWith('query-id-1', TitleTypes.Widget, expect.any(String), `Field Statistics for ${fieldName}`);
   });
 
-  it('duplicates query/timerange/streams/filter of original widget', () => {
+  it('duplicates query/timerange/streams/filter of original widget', async () => {
     const origWidget = Widget.builder()
       .filter('author: "Vanth"')
       .query(createElasticsearchQueryString('foo:42'))
@@ -112,20 +107,18 @@ describe('FieldStatisticsHandler', () => {
       .timerange({ type: 'relative', range: 3600 })
       .build();
 
-    return handler({
+    await dispatch(handler({
       queryId,
       field: fieldName,
       type: nonNumericFieldType,
       contexts: { widget: origWidget },
-    }).then(() => {
-      expect(WidgetActions.create).toHaveBeenCalled();
+    }));
 
-      const { filter, query, streams, timerange } = asMock(WidgetActions.create).mock.calls[0][0];
-
-      expect(filter).toEqual('author: "Vanth"');
-      expect(query).toEqual(createElasticsearchQueryString('foo:42'));
-      expect(streams).toEqual(['stream1', 'stream23']);
-      expect(timerange).toEqual({ type: 'relative', range: 3600 });
-    });
+    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
+      filter: 'author: "Vanth"',
+      query: expect.objectContaining({ query_string: 'foo:42' }),
+      streams: ['stream1', 'stream23'],
+      timerange: { type: 'relative', range: 3600 },
+    }));
   });
 });
