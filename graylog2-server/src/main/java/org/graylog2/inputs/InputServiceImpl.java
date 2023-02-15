@@ -124,6 +124,15 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     }
 
     @Override
+    public List<Input> allByType(final String type) {
+        final ImmutableList.Builder<Input> inputs = ImmutableList.builder();
+        for (final DBObject o : query(InputImpl.class, new BasicDBObject(MessageInput.FIELD_TYPE, type))) {
+            inputs.add(new InputImpl((ObjectId) o.get(InputImpl.FIELD_ID), o.toMap()));
+        }
+        return inputs.build();
+    }
+
+    @Override
     public Set<Input> findByIds(Collection<String> ids) {
         final Set<ObjectId> objectIds = ids.stream()
                 .map(ObjectId::new)
