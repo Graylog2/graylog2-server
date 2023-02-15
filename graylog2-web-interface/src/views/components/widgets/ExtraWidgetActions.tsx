@@ -23,23 +23,21 @@ import { MenuItem } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 type Props = {
-  onSelect: (eventKey: string, e: MouseEvent) => void,
   widget: Widget,
 };
 
-const ExtraWidgetActions = ({ onSelect, widget }: Props) => {
+const ExtraWidgetActions = ({ widget }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
   const pluginWidgetActions = usePluginEntities('views.widgets.actions');
   const extraWidgetActions = useMemo(() => pluginWidgetActions
     .filter(({ isHidden = () => false }) => !isHidden(widget))
     .map(({ title, action, type, disabled = () => false }) => {
-      const _onSelect = (eventKey: string, e: MouseEvent) => {
+      const _onSelect = () => {
         action(widget, { widgetFocusContext });
-        onSelect(eventKey, e);
       };
 
       return (<MenuItem key={`${type}-${widget.id}`} disabled={disabled()} onSelect={_onSelect}>{title(widget)}</MenuItem>);
-    }), [onSelect, pluginWidgetActions, widget, widgetFocusContext]);
+    }), [pluginWidgetActions, widget, widgetFocusContext]);
 
   return extraWidgetActions.length > 0
     ? (

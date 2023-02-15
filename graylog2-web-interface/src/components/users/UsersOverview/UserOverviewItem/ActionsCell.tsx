@@ -34,16 +34,22 @@ const ActionsWrapper = styled(ButtonToolbar)`
   justify-content: flex-end;
 `;
 
+type WrapperComponentProps = {
+  id: string,
+  title: string,
+};
+
+export type WrapperComponentType = React.ComponentType<WrapperComponentProps>;
+
 const EditTokensAction = ({
   user: { fullName, id },
   wrapperComponent: WrapperComponent,
 }: {
   user: UserOverview,
-  wrapperComponent: Button | MenuItem,
+  wrapperComponent: WrapperComponentType,
 }) => (
   <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(id)}>
     <WrapperComponent id={`edit-tokens-${id}`}
-                      bsSize="xs"
                       title={`Edit tokens of user ${fullName}`}>
       Edit tokens
     </WrapperComponent>
@@ -98,7 +104,7 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
         </LinkContainer>
       </IfPermitted>
       <DropdownButton bsSize="xs" title="More actions" pullRight id={`delete-user-${id}`}>
-        <EditTokensAction user={user} wrapperComponent={MenuItem} />
+        <EditTokensAction user={user} wrapperComponent={MenuItem as WrapperComponentType} />
         <IfPermitted permissions={[`users:edit:${username}`]}>
           {showEnableDisable && (
             <MenuItem id={`set-status-user-${id}`}
@@ -108,8 +114,6 @@ const EditActions = ({ user, user: { username, id, fullName, accountStatus, exte
             </MenuItem>
           )}
           <MenuItem id={`delete-user-${id}`}
-                    bsStyle="primary"
-                    bsSize="xs"
                     title={`Delete user ${fullName}`}
                     onClick={_deleteUser}>
             Delete

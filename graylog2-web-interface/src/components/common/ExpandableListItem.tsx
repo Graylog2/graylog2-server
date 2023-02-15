@@ -126,8 +126,12 @@ type State = {
 /**
  * The ExpandableListItem is needed to render a ExpandableList.
  */
+type CheckboxType = {
+  indeterminate: boolean,
+  click: () => void,
+}
 class ExpandableListItem extends React.Component<Props, State> {
-  private _checkbox: Checkbox | undefined;
+  private _checkbox: CheckboxType | undefined;
 
   static propTypes = {
     /** Is the Item checked */
