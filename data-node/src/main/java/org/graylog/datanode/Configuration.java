@@ -173,7 +173,7 @@ public class Configuration extends BaseConfiguration {
     private String restApiPassword;
 
     @Parameter(value = "node_id_file", validators = NodeIdFileValidator.class)
-    private String nodeIdFile = "/etc/graylog/server/node-id";
+    private String nodeIdFile = "/etc/graylog/datanode/node-id";
 
     @Parameter(value = "root_username")
     private String rootUsername = "admin";

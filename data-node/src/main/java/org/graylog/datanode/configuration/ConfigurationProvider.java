@@ -53,7 +53,8 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
     private final OpensearchConfiguration configuration;
 
     @Inject
-    public ConfigurationProvider(Configuration datanodeConfig) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, UnrecoverableKeyException {
+    public ConfigurationProvider(Configuration datanodeConfig, DataNodeConfig dataNodeConfig) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, UnrecoverableKeyException {
+        final var cfg = dataNodeConfig.test();
 
         final Path opensearchConfigDir = Path.of(datanodeConfig.getOpensearchLocation()).resolve("config");
 
