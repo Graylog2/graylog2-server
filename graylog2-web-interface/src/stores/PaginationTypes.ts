@@ -18,6 +18,7 @@ import type * as Immutable from 'immutable';
 import type { $PropertyType } from 'utility-types';
 
 import type { AdditionalQueries } from 'util/PaginationURL';
+import type { Filters } from 'components/common/EntityFilters/types';
 
 export type PaginatedResponseType = {
   count: number,
@@ -68,6 +69,7 @@ export type SearchParams = {
   pageSize: number,
   query: string,
   sort: Sort
+  filters?: Filters
 }
 
 export type Attribute = {

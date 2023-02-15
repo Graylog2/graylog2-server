@@ -60,7 +60,6 @@ type Props = {
 
 const StreamsOverview = ({ indexSets }: Props) => {
   const [filters, setFilters] = useState<Filters>();
-  console.log({ filters });
   const [query, setQuery] = useState('');
   const paginationQueryParameter = usePaginationQueryParameter(undefined, DEFAULT_LAYOUT.pageSize);
   const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
@@ -75,6 +74,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
     page: paginationQueryParameter.page,
     pageSize: layoutConfig.pageSize,
     sort: layoutConfig.sort,
+    filters,
   }, { enabled: !isLoadingLayoutPreferences });
 
   useRefetchStreamsOnStoreChange(refetchStreams);
