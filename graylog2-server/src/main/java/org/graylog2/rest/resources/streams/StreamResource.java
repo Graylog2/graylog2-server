@@ -124,20 +124,15 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Api(value = "Streams", description = "Manage streams", tags = {CLOUD_VISIBLE})
 @Path("/streams")
 public class StreamResource extends RestResource {
-    protected static final Map<String, SearchQueryField> SEARCH_FIELD_MAPPING = Map.of(
-            "id", SearchQueryField.create(StreamDTO.FIELD_ID, SearchQueryField.Type.OBJECT_ID),
-            StreamDTO.FIELD_TITLE, SearchQueryField.create(StreamDTO.FIELD_TITLE),
-            StreamDTO.FIELD_DESCRIPTION, SearchQueryField.create(StreamDTO.FIELD_DESCRIPTION),
-            StreamDTO.FIELD_CREATED_AT, SearchQueryField.create(StreamDTO.FIELD_CREATED_AT),
-            "status", SearchQueryField.create(StreamDTO.FIELD_DISABLED)
-    );
     private static final String DEFAULT_SORT_FIELD = StreamDTO.FIELD_TITLE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
-            EntityAttribute.builder().id("title").title("Title").build(),
-            EntityAttribute.builder().id("description").title("Description").build(),
-            EntityAttribute.builder().id("created_at").title("Created").type("date").build(),
-            EntityAttribute.builder().id("disabled").title("Status").type("boolean").filterable(true).filterOptions(Set.of(
+            EntityAttribute.builder().id(StreamDTO.FIELD_ID).title("id").type(SearchQueryField.Type.OBJECT_ID).visible(false).searchable(true).build(),
+            EntityAttribute.builder().id(StreamDTO.FIELD_TITLE).title("Title").searchable(true).build(),
+            EntityAttribute.builder().id(StreamDTO.FIELD_DESCRIPTION).title("Description").searchable(true).build(),
+            EntityAttribute.builder().id(StreamDTO.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).build(),
+            EntityAttribute.builder().id(StreamDTO.FIELD_INDEX_SET_ID).title("Index set id").visible(false).filterable(true).build(),
+            EntityAttribute.builder().id("disabled").title("Status").type(SearchQueryField.Type.BOOLEAN).filterable(true).filterOptions(Set.of(
                     FilterOption.create("true", "Paused"),
                     FilterOption.create("false", "Running")
             )).build()
@@ -169,7 +164,7 @@ public class StreamResource extends RestResource {
         this.streamRouterEngineFactory = streamRouterEngineFactory;
         this.indexSetRegistry = indexSetRegistry;
         this.paginatedStreamService = paginatedStreamService;
-        this.searchQueryParser = new SearchQueryParser(StreamImpl.FIELD_TITLE, SEARCH_FIELD_MAPPING);
+        this.searchQueryParser = new SearchQueryParser(StreamImpl.FIELD_TITLE, attributes);
         this.recentActivityService = recentActivityService;
         this.dbFilterParser = dbFilterParser;
         this.bulkExecutor = new SequentialBulkExecutor<>(this::delete,
@@ -238,7 +233,7 @@ public class StreamResource extends RestResource {
         }
         List<Bson> dbFilters;
         try {
-            dbFilters = dbFilterParser.parse(filters);
+            dbFilters = dbFilterParser.parse(filters, attributes);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
