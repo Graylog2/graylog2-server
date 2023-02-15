@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -44,11 +45,26 @@ public class CatApi {
         this.client = client;
     }
 
+    public Map<String, String> aliases() {
+        final Request request = request("GET", "aliases");
+        request.addParameter("h", "alias,index");
+        final List<AliasSummaryResponse> response = perform(request, new TypeReference<List<AliasSummaryResponse>>() {}, "Unable to retrieve aliases");
+
+        return response.stream()
+                .collect(Collectors.toMap(AliasSummaryResponse::alias, AliasSummaryResponse::index));
+    }
+
     public List<NodeResponse> nodes() {
         final Request request = request("GET", "nodes");
         request.addParameter("h", "id,name,role,host,ip,fileDescriptorMax,diskUsed,diskTotal,diskUsedPercent");
         request.addParameter("full_id", "true");
-        return perform(request, new TypeReference<List<NodeResponse>>() {}, "Unable to retrieve nodes list");
+        return perform(request, new TypeReference<>() {}, "Unable to retrieve nodes list");
+    }
+
+    public List<IndexSummaryResponse> indices() {
+        final Request request = request("GET", "indices");
+        request.addParameter("h", "index,status,health");
+        return perform(request, new TypeReference<>() {}, "Unable to retrieve indices list");
     }
 
     public Set<String> indices(String index, Collection<String> status, String errorMessage) {
