@@ -32,9 +32,10 @@ const Spacer = styled.div`
 type Props = {
   filters: Filters
   attributes: Attributes
+  filterValueRenderer: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode } | undefined;
 }
 
-const ActiveFilters = ({ attributes = [], filters }: Props) => {
+const ActiveFilters = ({ attributes = [], filters, filterValueRenderer }: Props) => {
   return (
     <Container>
       {Object.entries(filters).map(([attributeId, filterValues]) => {
@@ -45,15 +46,14 @@ const ActiveFilters = ({ attributes = [], filters }: Props) => {
             <FilterGroupTitle>
               {relatedAttribute.title}:
             </FilterGroupTitle>
-            {filterValues.map(({ title }) => {
-              return (
-                <FilterValue bsSize="xsmall">
-                  {title}
-                  <Spacer />
-                  <Icon name="times" />
-                </FilterValue>
-              );
-            })}
+            {filterValues.map(({ title, value }) => (
+              <FilterValue bsSize="xsmall">
+                {filterValueRenderer[attributeId] ? filterValueRenderer[attributeId](value, title) : title}
+                <Spacer />
+                <Icon name="times" />
+              </FilterValue>
+            ),
+            )}
           </FilterGroup>
         );
       })}

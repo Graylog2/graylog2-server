@@ -13,9 +13,10 @@ const Container = styled.div`
 type Props = {
   filterableAttributes: Attributes,
   onSubmit: (attributeId: string, filter: { value: string, title: string }) => void,
+  filterValueRenderer: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode } | undefined;
 }
 
-const CreateFilterDropdown = ({ filterableAttributes, onSubmit }: Props) => {
+const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderer, onSubmit }: Props) => {
   const [selectedFilterId, setSelectedFilterId] = useState<string>();
   const selectedFilter = filterableAttributes.find(({ id }) => id === selectedFilterId);
   const onToggleDropdown = () => setSelectedFilterId(undefined);
@@ -31,7 +32,9 @@ const CreateFilterDropdown = ({ filterableAttributes, onSubmit }: Props) => {
           <>
             <MenuItem header>Create Filter</MenuItem>
             {filterableAttributes.map(({ id, title }) => (
-              <MenuItem onSelect={() => setSelectedFilterId(id)}>{title}</MenuItem>
+              <MenuItem onSelect={() => setSelectedFilterId(id)}>
+                {title}
+              </MenuItem>
             ))}
           </>
         )}
@@ -42,7 +45,9 @@ const CreateFilterDropdown = ({ filterableAttributes, onSubmit }: Props) => {
             {selectedFilter.type === 'boolean' && (
               <>
                 {selectedFilter.filter_options.map(({ title, value }) => (
-                  <MenuItem onSelect={() => onSubmit(selectedFilter.id, { value, title })}>{title}</MenuItem>
+                  <MenuItem onSelect={() => onSubmit(selectedFilter.id, { value, title })}>
+                    {filterValueRenderer[selectedFilterId] ? filterValueRenderer[selectedFilterId](value, title) : title}
+                  </MenuItem>
                 ))}
               </>
             )}

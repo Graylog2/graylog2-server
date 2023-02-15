@@ -16,10 +16,11 @@ const Container = styled.div`
 type Props = {
   attributes: Attributes,
   onCreateFilter: (attributeId: string, filter: { value: string, title: string }) => void,
-  activeFilters: Filters
+  activeFilters: Filters,
+  filterValueRenderer?: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode };
 }
 
-const EntityFilters = ({ attributes = [], onCreateFilter, activeFilters }: Props) => {
+const EntityFilters = ({ attributes = [], onCreateFilter, activeFilters, filterValueRenderer }: Props) => {
   const filterableAttributes = attributes.filter(({ filterable }) => filterable);
 
   if (!filterableAttributes.length) {
@@ -29,10 +30,20 @@ const EntityFilters = ({ attributes = [], onCreateFilter, activeFilters }: Props
   return (
     <Container>
       Filters
-      <CreateFilterDropdown filterableAttributes={filterableAttributes} onSubmit={onCreateFilter} />
-      {activeFilters && <ActiveFilters filters={activeFilters} attributes={attributes} />}
+      <CreateFilterDropdown filterableAttributes={filterableAttributes}
+                            onSubmit={onCreateFilter}
+                            filterValueRenderer={filterValueRenderer} />
+      {activeFilters && (
+        <ActiveFilters filters={activeFilters}
+                       attributes={attributes}
+                       filterValueRenderer={filterValueRenderer} />
+      )}
     </Container>
   );
+};
+
+EntityFilters.defaultProps = {
+  filterValueRenderer: undefined,
 };
 
 export default EntityFilters;
