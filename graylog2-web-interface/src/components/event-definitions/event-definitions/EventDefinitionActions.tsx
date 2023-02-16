@@ -159,7 +159,7 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
     }
   };
 
-  const isScheduled = eventDefinition.scheduler.is_scheduled;
+  const isScheduled = eventDefinition?.scheduler?.is_scheduled;
 
   return (
     <>
