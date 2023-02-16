@@ -63,11 +63,11 @@ type Props = {
 };
 
 const NoMatchingListAlert = ({ onlyActive, query }: {onlyActive: boolean, query: string}) => {
-  const showInactiveHint = (onlyActive ? ' and/or click on "Include inactive sidecars"' : null);
+  const showInactiveHint = onlyActive && ' and/or click on "Include inactive sidecars"';
 
   return (
     <NoSearchResult>
-      {`There are no sidecars with failures matching the search criteria. Try adjusting your search filter: ${query}.`}
+      {`There are no sidecars with failures matching the search criteria. Try adjusting your search filter: ${query} ${showInactiveHint}`}
     </NoSearchResult>
   );
 };
@@ -126,7 +126,7 @@ const SidecarTable = ({
 
 const EmptyList = ({ query, onlyActive }: {query: string, onlyActive: boolean}) => {
   if (query) {
-    return <NoMatchingListAlert onlyActive={onlyActive} query={query}/>;
+    return <NoMatchingListAlert onlyActive={onlyActive} query={query} />;
   }
 
   return (
