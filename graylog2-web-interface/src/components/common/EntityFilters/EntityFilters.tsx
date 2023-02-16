@@ -17,10 +17,10 @@ type Props = {
   attributes: Attributes,
   onUpdateFilters: (filters: Filters) => void,
   activeFilters: Filters,
-  filterValueRenderer?: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode };
+  filterValueRenderers?: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode };
 }
 
-const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRenderer, onUpdateFilters }: Props) => {
+const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRenderers, onUpdateFilters }: Props) => {
   const filterableAttributes = attributes.filter(({ filterable }) => filterable);
 
   if (!filterableAttributes.length) {
@@ -38,20 +38,20 @@ const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRendere
   };
 
   const onDeleteFilter = (attributeId: string, filterId: string) => {
-    const attributeFilters = activeFilters[attributeId];
-    const newAttributeFilterValues = attributeFilters.filter(({ id }) => id !== filterId);
-    let newFilters = { ...activeFilters };
+    const filterGroup = activeFilters[attributeId];
+    const updatedFilterGroup = filterGroup.filter(({ id }) => id !== filterId);
+    let updatedFilters = { ...activeFilters };
 
-    if (newAttributeFilterValues.length) {
-      newFilters = {
+    if (updatedFilterGroup.length) {
+      updatedFilters = {
         ...activeFilters,
-        [attributeId]: newAttributeFilterValues,
+        [attributeId]: updatedFilterGroup,
       };
     } else {
-      delete newFilters[attributeId];
+      delete updatedFilters[attributeId];
     }
 
-    onUpdateFilters(newFilters);
+    onUpdateFilters(updatedFilters);
   };
 
   const onChangeFilter = (attributeId: string, filterId: string, newValue: string, newTitle: string) => {
@@ -72,21 +72,22 @@ const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRendere
     <Container>
       Filters
       <CreateFilterDropdown filterableAttributes={filterableAttributes}
-                            onSubmit={onCreateFilter}
-                            filterValueRenderer={filterValueRenderer} />
+                            onCreateFilter={onCreateFilter}
+                            activeFilters={activeFilters}
+                            filterValueRenderers={filterValueRenderers} />
       {activeFilters && (
         <ActiveFilters filters={activeFilters}
                        attributes={attributes}
                        onChangeFilter={onChangeFilter}
                        onDeleteFilter={onDeleteFilter}
-                       filterValueRenderer={filterValueRenderer} />
+                       filterValueRenderers={filterValueRenderers} />
       )}
     </Container>
   );
 };
 
 EntityFilters.defaultProps = {
-  filterValueRenderer: undefined,
+  filterValueRenderers: undefined,
 };
 
 export default EntityFilters;

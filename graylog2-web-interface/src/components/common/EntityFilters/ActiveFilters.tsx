@@ -21,37 +21,35 @@ const FilterGroupTitle = styled.div`
 
 type Props = {
   attributes: Attributes,
-  filterValueRenderer: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode } | undefined,
+  filterValueRenderers: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode } | undefined,
   filters: Filters,
   onChangeFilter: (attributeId: string, filterId: string, newValue: string, newTitle) => void,
   onDeleteFilter: (attributeId: string, filterId: string) => void,
 }
 
-const ActiveFilters = ({ attributes = [], filters, filterValueRenderer, onDeleteFilter, onChangeFilter }: Props) => {
-  return (
-    <Container>
-      {Object.entries(filters).map(([attributeId, filterValues]) => {
-        const relatedAttribute = attributes.find(({ id }) => id === attributeId);
+const ActiveFilters = ({ attributes = [], filters, filterValueRenderers, onDeleteFilter, onChangeFilter }: Props) => (
+  <Container>
+    {Object.entries(filters).map(([attributeId, filterValues]) => {
+      const attribute = attributes.find(({ id }) => id === attributeId);
 
-        return (
-          <FilterGroup key={attributeId}>
-            <FilterGroupTitle>
-              {relatedAttribute.title}:
-            </FilterGroupTitle>
-            {filterValues.map((filter) => (
-              <ActiveFilter filter={filter}
-                            key={filter.id}
-                            attribute={relatedAttribute}
-                            filterValueRenderer={filterValueRenderer}
-                            onChangeFilter={onChangeFilter}
-                            onDeleteFilter={onDeleteFilter} />
-            ))}
-          </FilterGroup>
-        );
-      })}
+      return (
+        <FilterGroup key={attributeId}>
+          <FilterGroupTitle>
+            {attribute.title}:
+          </FilterGroupTitle>
+          {filterValues.map((filter) => (
+            <ActiveFilter filter={filter}
+                          key={filter.id}
+                          attribute={attribute}
+                          filterValueRenderer={filterValueRenderers[attributeId]}
+                          onChangeFilter={onChangeFilter}
+                          onDeleteFilter={onDeleteFilter} />
+          ))}
+        </FilterGroup>
+      );
+    })}
 
-    </Container>
-  );
-};
+  </Container>
+);
 
 export default ActiveFilters;

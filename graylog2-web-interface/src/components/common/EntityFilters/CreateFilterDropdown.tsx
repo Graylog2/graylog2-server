@@ -4,28 +4,65 @@ import styled from 'styled-components';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import MenuItem from 'components/bootstrap/MenuItem';
 import { Icon } from 'components/common';
-import type { Attributes } from 'stores/PaginationTypes';
+import type { Attribute, Attributes } from 'stores/PaginationTypes';
 import generateId from 'logic/generateId';
+import type { Filters } from 'components/common/EntityFilters/types';
 
 const Container = styled.div`
   margin-left: 5px;
 `;
 
+const FilterTypeSelect = ({
+  attributes,
+  setSelectedAttributeId,
+}: {
+  attributes: Attributes,
+  setSelectedAttributeId: React.Dispatch<React.SetStateAction<string>>
+}) => (
+  <>
+    <MenuItem header>Create Filter</MenuItem>
+    {attributes.map(({ id, title }) => (
+      <MenuItem onSelect={() => setSelectedAttributeId(id)} key={`${title}-filter`}>
+        {title}
+      </MenuItem>
+    ))}
+  </>
+);
+
+const FilterConfiguration = ({
+  attribute,
+  onSubmit,
+  filterValueRenderer,
+}: {
+  attribute: Attribute,
+  filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined,
+  onSubmit: (filter: { value: string, title: string, id: string }) => void,
+}) => (
+  <>
+    <MenuItem header>Create {attribute.title} Filter</MenuItem>
+    {attribute.type === 'boolean' && (
+      <>
+        {attribute.filter_options.map(({ title, value }) => (
+          <MenuItem onSelect={() => onSubmit({ value, title, id: generateId() })} key={`filter-value-${title}`}>
+            {filterValueRenderer ? filterValueRenderer(value, title) : title}
+          </MenuItem>
+        ))}
+      </>
+    )}
+  </>
+);
+
 type Props = {
   filterableAttributes: Attributes,
-  onSubmit: (attributeId: string, filter: { value: string, title: string, id: string }) => void,
-  filterValueRenderer: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode } | undefined;
+  activeFilters: Filters,
+  onCreateFilter: (attributeId: string, filter: { value: string, title: string, id: string }) => void,
+  filterValueRenderers: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode } | undefined;
 }
 
-const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderer, onSubmit }: Props) => {
-  const [selectedFilterId, setSelectedFilterId] = useState<string>();
-  const selectedFilter = filterableAttributes.find(({ id }) => id === selectedFilterId);
-  const onToggleDropdown = () => setSelectedFilterId(undefined);
-
-  const _onSubmit = (filter: { value: string, title: string }, toggleDropdown) => {
-    onSubmit(selectedFilterId, { ...filter, id: generateId() });
-    toggleDropdown();
-  };
+const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderers, onCreateFilter, activeFilters }: Props) => {
+  const [selectedAttributeId, setSelectedAttributeId] = useState<string>();
+  const selectedAttribute = filterableAttributes.find(({ id }) => id === selectedAttributeId);
+  const onToggleDropdown = () => setSelectedAttributeId(undefined);
 
   return (
     <Container>
@@ -35,34 +72,21 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderer, onSub
                              closeOnSelect={false}
                              dropdownZIndex={1000}>
         {({ toggleDropdown }) => {
-          return (
-            <>
-              {!selectedFilterId && (
-                <>
-                  <MenuItem header>Create Filter</MenuItem>
-                  {filterableAttributes.map(({ id, title }) => (
-                    <MenuItem onSelect={() => setSelectedFilterId(id)} key={`${title}-filter`}>
-                      {title}
-                    </MenuItem>
-                  ))}
-                </>
-              )}
+          const _onCreateFilter = (filter: { value: string, title: string, id: string }) => {
+            toggleDropdown();
+            onCreateFilter(selectedAttributeId, filter);
+          };
 
-              {selectedFilterId && (
-                <>
-                  <MenuItem header>Create {selectedFilter.title} Filter</MenuItem>
-                  {selectedFilter.type === 'boolean' && (
-                    <>
-                      {selectedFilter.filter_options.map(({ title, value }) => (
-                        <MenuItem onSelect={() => _onSubmit({ value, title }, toggleDropdown)} key={`filter-value-${title}`}>
-                          {filterValueRenderer[selectedFilterId] ? filterValueRenderer[selectedFilterId](value, title) : title}
-                        </MenuItem>
-                      ))}
-                    </>
-                  )}
-                </>
-              )}
-            </>
+          if (!selectedAttributeId) {
+            return (
+              <FilterTypeSelect attributes={filterableAttributes} setSelectedAttributeId={setSelectedAttributeId} />
+            );
+          }
+
+          return (
+            <FilterConfiguration onSubmit={_onCreateFilter}
+                                 attribute={selectedAttribute}
+                                 filterValueRenderer={filterValueRenderers[selectedAttributeId]} />
           );
         }}
       </OverlayDropdownButton>

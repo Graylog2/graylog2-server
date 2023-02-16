@@ -21,7 +21,7 @@ const CenteredButton = styled(Button)`
 type Props = {
   attribute: Attribute,
   filter: { title: string, value: string, id: string },
-  filterValueRenderer: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode } | undefined,
+  filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined,
   onChangeFilter: (attributeId: string, filterId: string, newValue: string, newTitle) => void,
   onDeleteFilter: (attributeId: string, filterId: string) => void,
 }
@@ -42,7 +42,7 @@ const ActiveFilter = ({
 
   return (
     <Container className="btn-group">
-      <CenteredButton bsSize="xsmall" onClick={() => onFilterClick(attribute.id, value, id)} title="Change value">
+      <CenteredButton bsSize="xsmall" onClick={() => onFilterClick(attribute.id, value, id)} title="Change filter value">
         {filterValueRenderer[attribute.id] ? filterValueRenderer[attribute.id](value, title) : title}
       </CenteredButton>
       <CenteredButton bsSize="xsmall" onClick={() => onDeleteFilter(attribute.id, id)} title="Delete filter">
