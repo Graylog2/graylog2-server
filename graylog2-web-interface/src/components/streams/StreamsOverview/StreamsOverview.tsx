@@ -39,7 +39,7 @@ import {
 } from 'components/streams/StreamsOverview/Constants';
 import EntityFilters from 'components/common/EntityFilters';
 import type { Filters } from 'components/common/EntityFilters/types';
-import FilterValueRenderer from 'components/streams/StreamsOverview/FilterValueRenderer';
+import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
 
 import CustomColumnRenderers from './ColumnRenderers';
 
@@ -141,7 +141,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
         <SearchForm onSearch={onSearch}
                     onReset={onReset}
                     queryHelpComponent={<QueryHelper entityName="stream" />}>
-          <EntityFilters attributes={attributes} onUpdateFilters={onUpdateFilters} activeFilters={filters} filterValueRenderer={FilterValueRenderer} />
+          <EntityFilters attributes={attributes} onUpdateFilters={onUpdateFilters} activeFilters={filters} filterValueRenderers={FilterValueRenderers} />
         </SearchForm>
       </div>
       <div>

@@ -41,7 +41,7 @@ const ActiveFilters = ({ attributes = [], filters, filterValueRenderers, onDelet
             <ActiveFilter filter={filter}
                           key={filter.id}
                           attribute={attribute}
-                          filterValueRenderer={filterValueRenderers[attributeId]}
+                          filterValueRenderer={filterValueRenderers?.[attributeId]}
                           onChangeFilter={onChangeFilter}
                           onDeleteFilter={onDeleteFilter} />
           ))}

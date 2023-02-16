@@ -27,7 +27,7 @@ const StatusIndicator = styled.div<{ $disabled: 'true' | 'false' }>(({ $disabled
   border: 1px solid ${theme.colors.gray[70]};
 `);
 
-const FilterValueRenderer = {
+const FilterValueRenderers = {
   disabled: (value: 'true' | 'false', title: string) => {
     return (
       <>
@@ -38,4 +38,4 @@ const FilterValueRenderer = {
   },
 };
 
-export default FilterValueRenderer;
+export default FilterValueRenderers;

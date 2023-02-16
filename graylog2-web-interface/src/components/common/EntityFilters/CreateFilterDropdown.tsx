@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import MenuItem from 'components/bootstrap/MenuItem';
-import { Icon } from 'components/common';
+import { HoverForHelp, Icon } from 'components/common';
 import type { Attribute, Attributes } from 'stores/PaginationTypes';
 import generateId from 'logic/generateId';
 import type { Filters } from 'components/common/EntityFilters/types';
@@ -15,17 +15,32 @@ const Container = styled.div`
 const FilterTypeSelect = ({
   attributes,
   setSelectedAttributeId,
+  activeFilters,
 }: {
   attributes: Attributes,
+  activeFilters: Filters,
   setSelectedAttributeId: React.Dispatch<React.SetStateAction<string>>
 }) => (
   <>
     <MenuItem header>Create Filter</MenuItem>
-    {attributes.map(({ id, title }) => (
-      <MenuItem onSelect={() => setSelectedAttributeId(id)} key={`${title}-filter`}>
-        {title}
-      </MenuItem>
-    ))}
+    {attributes.map(({ id, title, type }) => {
+      const hasActiveFilter = !!activeFilters[id]?.length;
+      const disabled = type === 'boolean' ? hasActiveFilter : false;
+
+      return (
+        <MenuItem onSelect={() => setSelectedAttributeId(id)}
+                  key={`${title}-filter`}
+                  disabled={disabled}>
+          {title}
+          {(type === 'boolean' && disabled) && (
+            <HoverForHelp displayLeftMargin>
+              You can only create one filter for a boolean attribute.<br />
+              If you want to change the filter value, you can update the existing one.
+            </HoverForHelp>
+          )}
+        </MenuItem>
+      );
+    })}
   </>
 );
 
@@ -79,14 +94,16 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderers, onCr
 
           if (!selectedAttributeId) {
             return (
-              <FilterTypeSelect attributes={filterableAttributes} setSelectedAttributeId={setSelectedAttributeId} />
+              <FilterTypeSelect attributes={filterableAttributes}
+                                setSelectedAttributeId={setSelectedAttributeId}
+                                activeFilters={activeFilters} />
             );
           }
 
           return (
             <FilterConfiguration onSubmit={_onCreateFilter}
                                  attribute={selectedAttribute}
-                                 filterValueRenderer={filterValueRenderers[selectedAttributeId]} />
+                                 filterValueRenderer={filterValueRenderers?.[selectedAttributeId]} />
           );
         }}
       </OverlayDropdownButton>

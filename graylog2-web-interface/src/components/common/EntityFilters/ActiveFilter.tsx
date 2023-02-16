@@ -7,9 +7,9 @@ import { Icon } from 'components/common';
 
 const Container = styled.div`
   display: flex;
-  
+
   :not(:last-child) {
-    margin-right: 3px;  
+    margin-right: 3px;
   }
 `;
 
@@ -43,7 +43,7 @@ const ActiveFilter = ({
   return (
     <Container className="btn-group">
       <CenteredButton bsSize="xsmall" onClick={() => onFilterClick(attribute.id, value, id)} title="Change filter value">
-        {filterValueRenderer[attribute.id] ? filterValueRenderer[attribute.id](value, title) : title}
+        {filterValueRenderer ? filterValueRenderer(value, title) : title}
       </CenteredButton>
       <CenteredButton bsSize="xsmall" onClick={() => onDeleteFilter(attribute.id, id)} title="Delete filter">
         <Icon name="times" />
