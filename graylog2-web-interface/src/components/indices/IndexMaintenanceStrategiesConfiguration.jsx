@@ -26,7 +26,7 @@ import {
   TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY,
   TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY_TYPE,
   NOOP_RETENTION_STRATEGY,
-  ARCHIVE_RETENTION_STRATEGY,
+  ARCHIVE_RETENTION_STRATEGY, RETENTION,
 } from 'stores/indices/IndicesStore';
 import { Alert, Col, Input, Row } from 'components/bootstrap';
 import { Icon, Select } from 'components/common';
@@ -178,6 +178,10 @@ const IndexMaintenanceStrategiesConfiguration = ({
     return newStrategy;
   };
 
+  const shouldShowInvalidRetentionWarning = () => {
+    return name === RETENTION && !getStrategyJsonSchema(getActiveSelection(), strategies);
+  }
+
   return (
     <span>
       <StyledH3>{title}</StyledH3>
@@ -196,6 +200,12 @@ const IndexMaintenanceStrategiesConfiguration = ({
           <Icon name="exclamation-triangle" />{' '} The effective retention period value calculated from the
           <b>Rotation period</b> and the <b>max number of indices</b> should not be greater than the
           <b>Max retention period </b> of <b>{maxRetentionPeriod}</b> set by the Administrator.
+        </StyledAlert>
+      )}
+      {shouldShowInvalidRetentionWarning() && (
+        <StyledAlert bsStyle="danger">
+          <Icon name="exclamation-triangle" />{' '} {strategy} strategy was deactivated.
+          Please configure a valid retention strategy.
         </StyledAlert>
       )}
       <Row>
