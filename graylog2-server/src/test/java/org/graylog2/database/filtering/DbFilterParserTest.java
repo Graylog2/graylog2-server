@@ -17,7 +17,11 @@
 package org.graylog2.database.filtering;
 
 import com.mongodb.client.model.Filters;
+import org.bson.types.ObjectId;
 import org.graylog2.rest.resources.entities.EntityAttribute;
+import org.graylog2.search.SearchQueryField;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -70,10 +74,71 @@ class DbFilterParserTest {
     }
 
     @Test
-    void parsesFilterExpressionCorrectly() {
+    void parsesFilterExpressionCorrectlyForStringType() {
 
         assertEquals(Filters.eq("owner", "baldwin"),
-                toTest.parseSingleExpression("owner:baldwin", List.of(EntityAttribute.builder().id("owner").title("Owner").filterable(true).build())));
+                toTest.parseSingleExpression("owner:baldwin",
+                        List.of(EntityAttribute.builder()
+                                .id("owner")
+                                .title("Owner")
+                                .filterable(true)
+                                .build())
+                ));
+    }
 
+    @Test
+    void parsesFilterExpressionCorrectlyForBoolType() {
+
+        assertEquals(Filters.eq("away", true),
+                toTest.parseSingleExpression("away:true",
+                        List.of(EntityAttribute.builder()
+                                .id("away")
+                                .title("Away")
+                                .type(SearchQueryField.Type.BOOLEAN)
+                                .filterable(true)
+                                .build())
+                ));
+    }
+
+    @Test
+    void parsesFilterExpressionCorrectlyForObjectIdType() {
+
+        assertEquals(Filters.eq("id", new ObjectId("5f4dfb9c69be46153b9a9a7b")),
+                toTest.parseSingleExpression("id:5f4dfb9c69be46153b9a9a7b",
+                        List.of(EntityAttribute.builder()
+                                .id("id")
+                                .title("Id")
+                                .type(SearchQueryField.Type.OBJECT_ID)
+                                .filterable(true)
+                                .build())
+                ));
+    }
+
+    @Test
+    void parsesFilterExpressionCorrectlyForDateType() {
+
+        assertEquals(Filters.eq("created_at", new DateTime(2012, 12, 12, 12, 12, 12, DateTimeZone.UTC)),
+                toTest.parseSingleExpression("created_at:2012-12-12 12:12:12",
+                        List.of(EntityAttribute.builder()
+                                .id("created_at")
+                                .title("Creation Date")
+                                .type(SearchQueryField.Type.DATE)
+                                .filterable(true)
+                                .build())
+                ));
+    }
+
+    @Test
+    void parsesFilterExpressionCorrectlyForIntType() {
+
+        assertEquals(Filters.eq("num", 42),
+                toTest.parseSingleExpression("num:42",
+                        List.of(EntityAttribute.builder()
+                                .id("num")
+                                .title("Num")
+                                .type(SearchQueryField.Type.INT)
+                                .filterable(true)
+                                .build())
+                ));
     }
 }

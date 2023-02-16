@@ -17,6 +17,7 @@
 package org.graylog2.utilities.date;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,8 +59,8 @@ class MultiFormatDateParserTest {
 
     @Test
     void usesFirstGoodFormatter() {
-        final DateTime date1 = new DateTime(2012, 12, 12, 12, 12, 12);
-        final DateTime date2 = new DateTime(2012, 12, 12, 12, 12, 12, 42);
+        final DateTime date1 = new DateTime(2012, 12, 12, 12, 12, 12, DateTimeZone.UTC);
+        final DateTime date2 = new DateTime(2012, 12, 12, 12, 12, 12, 42, DateTimeZone.UTC);
         final DateTimeFormatter formatter1 = mockGoodFormatter(date1);
         final DateTimeFormatter formatter2 = mockGoodFormatter(date2);
         toTest = new MultiFormatDateParser(List.of(
