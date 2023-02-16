@@ -14,9 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook } from 'wrappedTestingLibrary';
+import { renderHook, waitFor } from 'wrappedTestingLibrary';
 import { List } from 'immutable';
-import { waitFor } from 'wrappedTestingLibrary';
 
 import type { ViewJson } from 'views/logic/views/View';
 import { asMock } from 'helpers/mocking';
