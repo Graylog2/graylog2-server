@@ -102,7 +102,8 @@ const StreamsOverview = ({ indexSets }: Props) => {
 
   const onChangeFilters = useCallback((newFilters: Filters) => {
     setFilters(newFilters);
-  }, []);
+    paginationQueryParameter.resetPage();
+  }, [paginationQueryParameter]);
 
   const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
     updateTableLayout({ displayedAttributes });
