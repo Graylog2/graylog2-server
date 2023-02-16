@@ -28,14 +28,12 @@ const StatusIndicator = styled.div<{ $disabled: 'true' | 'false' }>(({ $disabled
 `);
 
 const FilterValueRenderers = {
-  disabled: (value: 'true' | 'false', title: string) => {
-    return (
-      <>
-        <StatusIndicator $disabled={value} />
-        {title}
-      </>
-    );
-  },
+  disabled: (value: 'true' | 'false', title: string) => (
+    <>
+      <StatusIndicator $disabled={value} />
+      {title}
+    </>
+  ),
 };
 
 export default FilterValueRenderers;

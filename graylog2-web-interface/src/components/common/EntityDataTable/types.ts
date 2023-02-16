@@ -24,6 +24,7 @@ export type EntityBase = {
 
 export type Column = {
   anyPermissions?: boolean,
+  hidden?: boolean,
   id: string,
   permissions?: Array<string>
   sortable?: boolean,
