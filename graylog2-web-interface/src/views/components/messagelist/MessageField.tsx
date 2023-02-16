@@ -73,10 +73,10 @@ const MessageField = ({ fieldName, fieldType, message, value }: Props) => {
 
   return (
     <>
-      <dt>
+      <dt data-testid={`message-field-name-${fieldName}`}>
         <Field queryId={activeQuery} name={fieldName} type={isDecoratedField ? FieldType.Decorated : fieldType}>{fieldName}</Field>
       </dt>
-      <DefinitionDescription>
+      <DefinitionDescription data-testid={`message-field-value-${fieldName}`}>
         <ValueContext>
           <Value field={fieldName} value={innerValue} type={isDecoratedField ? FieldType.Decorated : fieldType} render={DecoratedValue} />
         </ValueContext>
