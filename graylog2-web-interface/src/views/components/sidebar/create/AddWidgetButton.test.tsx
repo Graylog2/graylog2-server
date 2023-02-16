@@ -19,6 +19,12 @@ import { mount } from 'wrappedEnzyme';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { asMock } from 'helpers/mocking';
+import useAppDispatch from 'stores/useAppDispatch';
+import { createSearch } from 'fixtures/searches';
+import mockDispatch from 'views/test/mockDispatch';
+import type { RootState } from 'views/types';
+
 import AddWidgetButton from './AddWidgetButton';
 
 const mockAggregateActionHandler = jest.fn();
@@ -62,8 +68,13 @@ const plugin = {
   },
 };
 
+jest.mock('stores/useAppDispatch');
+
 describe('AddWidgetButton', () => {
   beforeEach(() => {
+    const view = createSearch();
+    const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
+    asMock(useAppDispatch).mockReturnValue(dispatch);
     PluginStore.register(plugin);
   });
 

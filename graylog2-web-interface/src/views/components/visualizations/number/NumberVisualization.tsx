@@ -18,10 +18,8 @@ import React, { useContext, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
-import connect from 'stores/connect';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import Value from 'views/components/Value';
-import { ViewStore } from 'views/stores/ViewStore';
 import DecoratedValue from 'views/components/messagelist/decoration/DecoratedValue';
 import CustomHighlighting from 'views/components/messagelist/CustomHighlighting';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
@@ -32,8 +30,6 @@ import ElementDimensions from 'components/common/ElementDimensions';
 
 import Trend from './Trend';
 import AutoFontSizer from './AutoFontSizer';
-
-import type { CurrentViewType } from '../../CustomPropTypes';
 
 const GridContainer = styled.div`
   display: grid;
@@ -84,10 +80,6 @@ const _extractValueAndField = (rows: Rows) => {
   return { value: undefined, field: undefined };
 };
 
-type Props = {
-  currentView: CurrentViewType;
-} & VisualizationComponentProps;
-
 const _extractFirstSeriesName = (config) => {
   const { series = [] } = config;
 
@@ -96,7 +88,7 @@ const _extractFirstSeriesName = (config) => {
     : series[0].function;
 };
 
-const NumberVisualization = ({ config, currentView, fields, data }: Props) => {
+const NumberVisualization = ({ config, fields, data }: VisualizationComponentProps) => {
   const targetRef = useRef();
   const onRenderComplete = useContext(RenderCompletionCallback);
   const visualizationConfig = (config.visualizationConfig as NumberVisualizationConfig) ?? NumberVisualizationConfig.create();
@@ -104,7 +96,6 @@ const NumberVisualization = ({ config, currentView, fields, data }: Props) => {
   const field = _extractFirstSeriesName(config);
 
   useEffect(onRenderComplete, [onRenderComplete]);
-  const { activeQuery } = currentView;
   const chartRows = retrieveChartData(data);
   const trendRows = data.trend;
   const { value } = _extractValueAndField(chartRows);
@@ -125,7 +116,6 @@ const NumberVisualization = ({ config, currentView, fields, data }: Props) => {
               <Value field={field}
                      type={fieldTypeFor(field, fields)}
                      value={value}
-                     queryId={activeQuery}
                      render={DecoratedValue} />
             </CustomHighlighting>
           </AutoFontSizer>
@@ -147,6 +137,6 @@ const NumberVisualization = ({ config, currentView, fields, data }: Props) => {
   );
 };
 
-const ConnectedNumberVisualization = makeVisualization(connect(NumberVisualization, { currentView: ViewStore }), 'numeric');
+const ConnectedNumberVisualization = makeVisualization(NumberVisualization, 'numeric');
 
 export default ConnectedNumberVisualization;

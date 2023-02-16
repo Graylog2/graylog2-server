@@ -21,13 +21,12 @@ import { OrderedMap } from 'immutable';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import CustomPropTypes from 'views/components/CustomPropTypes';
-import type { Widgets } from 'views/stores/WidgetStore';
 import { SortIcon } from 'components/common';
 
 type Props = {
   sortConfigMap: OrderedMap<string, SortConfig>,
   fieldName: string,
-  onSortChange: (newSortConfig: SortConfig[]) => Promise<Widgets>,
+  onSortChange: (newSortConfig: SortConfig[]) => Promise<unknown>,
   setLoadingState: (loading: boolean) => void,
   type: 'pivot' | 'series' | undefined
 };
@@ -41,7 +40,7 @@ const _tooltip = (fieldName: string, newDirection: Direction | null) => {
   return newDirection ? `Sort ${fieldName} ${newDirection.direction}` : `Remove ${fieldName} sort`;
 };
 
-const _changeSort = (nextDirection: Direction, sortConfigMap: OrderedMap<string, SortConfig>, fieldName: string, onSortChange: (newSortConfig: SortConfig[]) => Promise<Widgets>, setLoadingState: (loading: boolean) => void, type, activeSort) => {
+const _changeSort = (nextDirection: Direction, sortConfigMap: OrderedMap<string, SortConfig>, fieldName: string, onSortChange: (newSortConfig: SortConfig[]) => Promise<unknown>, setLoadingState: (loading: boolean) => void, type, activeSort) => {
   let newSortConfigSet;
 
   if (activeSort) {

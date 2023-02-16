@@ -91,7 +91,7 @@ class IndexSetConfigurationPage extends React.Component {
                                          rotationStrategies={rotationStrategies}
                                          retentionStrategies={retentionStrategies}
                                          submitButtonText="Update index set"
-                                         submitLaodingText="Updating index set..."
+                                         submitLoadingText="Updating index set..."
                                          cancelLink={this._formCancelLink()}
                                          onUpdate={_saveConfiguration} />
             </Col>

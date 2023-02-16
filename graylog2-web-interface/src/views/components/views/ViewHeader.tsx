@@ -19,16 +19,17 @@ import React, { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Link } from 'components/common/router';
-import { useStore } from 'stores/connect';
-import { ViewActions, ViewStore } from 'views/stores/ViewStore';
 import { Icon } from 'components/common';
 import { Row } from 'components/bootstrap';
 import ViewPropertiesModal from 'views/components/dashboard/DashboardPropertiesModal';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
 import View from 'views/logic/views/View';
 import Routes from 'routing/Routes';
-import viewTitle from 'views/logic/views/ViewTitle';
+import useViewTitle from 'views/hooks/useViewTitle';
+import useView from 'views/hooks/useView';
+import useAppDispatch from 'stores/useAppDispatch';
 import FavoriteIcon from 'views/components/FavoriteIcon';
+import { loadView } from 'views/logic/slices/viewSlice';
 
 const links = {
   [View.Type.Dashboard]: {
@@ -74,16 +75,16 @@ font-size: 0.50rem;
 `;
 
 const ViewHeader = () => {
-  const { view } = useStore(ViewStore);
+  const view = useView();
   const isSavedView = view?.id && view?.title;
   const [showMetadataEdit, setShowMetadataEdit] = useState<boolean>(false);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), [setShowMetadataEdit]);
+  const dispatch = useAppDispatch();
+  const _onSaveView = useCallback(() => dispatch(onSaveView(view)), [dispatch, view]);
 
-  const typeText = view.type.toLocaleLowerCase();
-  const title = viewTitle(view.title, view.type);
-  const onChangeFavorite = useCallback((newValue) => {
-    ViewActions.update(view.toBuilder().favorite(newValue).build());
-  }, [view]);
+  const typeText = view?.type?.toLocaleLowerCase();
+  const title = useViewTitle();
+  const onChangeFavorite = useCallback((newValue) => dispatch(loadView(view.toBuilder().favorite(newValue).build())), [dispatch, view]);
 
   return (
     <Row>
@@ -111,7 +112,7 @@ const ViewHeader = () => {
                              view={view}
                              title={`Editing saved ${typeText}`}
                              onClose={toggleMetadataEdit}
-                             onSave={onSaveView}
+                             onSave={_onSaveView}
                              submitButtonText={`Save ${typeText}`} />
         )}
       </Content>

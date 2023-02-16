@@ -23,6 +23,8 @@ import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy;
+import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.junit.Before;
@@ -148,27 +150,67 @@ public class IndexSetValidatorTest {
         when(indexSetRegistry.iterator()).thenReturn(Collections.emptyIterator());
 
         // no max retention period configured
-        assertThat(validator.validate(dummyConfig())).isNotPresent();
+        assertThat(validator.validate(testIndexSetConfig())).isNotPresent();
+
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
 
         // max retention period >= effective retention period
         when(elasticsearchConfiguration.getMaxIndexRetentionPeriod()).thenReturn(Period.days(10));
-        assertThat(validator.validate(dummyConfig())).isNotPresent();
+        assertThat(validator.validate(testIndexSetConfig())).isNotPresent();
 
         // max retention period < effective retention period
         when(elasticsearchConfiguration.getMaxIndexRetentionPeriod()).thenReturn(Period.days(9));
-        assertThat(validator.validate(dummyConfig())).hasValueSatisfying(v ->
+        assertThat(validator.validate(testIndexSetConfig())).hasValueSatisfying(v ->
                 assertThat(v.message()).contains("effective index retention period of P1W3D")
         );
 
         // rotation strategy is not time-based
-        final IndexSetConfig modifiedConfig = dummyConfig().toBuilder()
+        final IndexSetConfig modifiedConfig = testIndexSetConfig().toBuilder()
                 .rotationStrategy(MessageCountRotationStrategyConfig.create(Integer.MAX_VALUE))
                 .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
                 .build();
         assertThat(validator.validate(modifiedConfig)).isNotPresent();
+
+        // TimeBasedSizeOptimizingRotation validation
+        final IndexSetConfig sizeOptimizingConfig = testIndexSetConfig().toBuilder()
+                .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
+                .rotationStrategy(TimeBasedSizeOptimizingStrategyConfig.builder()
+                        .indexLifetimeMin(Period.days(2))
+                        .indexLifetimeMax(Period.days(30))
+                        .build()
+                )
+                .build();
+        assertThat(validator.validate(sizeOptimizingConfig)).hasValueSatisfying(v ->
+                assertThat(v.message()).contains(
+                        "Lifetime setting index_lifetime_max <P30D> exceeds the configured maximum of max_index_retention_period=P9D")
+        );
     }
 
-    private IndexSetConfig dummyConfig() {
+    @Test
+    public void timeBasedSizeOptimizingOnlyWithMultipleOfDays() {
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()).thenReturn(Period.days(1));
+
+        when(indexSetRegistry.iterator()).thenReturn(Collections.emptyIterator());
+        final IndexSetConfig sizeOptimizingConfig = testIndexSetConfig().toBuilder()
+                .rotationStrategyClass(TimeBasedSizeOptimizingStrategy.class.getCanonicalName())
+                .rotationStrategy(TimeBasedSizeOptimizingStrategyConfig.builder()
+                        .indexLifetimeMin(Period.days(2).withHours(2))
+                        .indexLifetimeMax(Period.days(30))
+                        .build()
+                )
+                .build();
+
+        assertThat(validator.validate(sizeOptimizingConfig)).hasValueSatisfying(v ->
+                assertThat(v.message()).contains(
+                        "Lifetime setting index_lifetime_min <P2DT2H> can only be a multiple of days")
+        );
+
+        assertThat(validator.periodOtherThanDays(Period.days(5))).isFalse();
+        assertThat(validator.periodOtherThanDays(Period.weeks(5))).isTrue();
+        assertThat(validator.periodOtherThanDays(Period.days(5).withHours(3))).isTrue();
+    }
+
+    private IndexSetConfig testIndexSetConfig() {
         return IndexSetConfig.builder()
                 .isWritable(true)
                 .title("Test 1")

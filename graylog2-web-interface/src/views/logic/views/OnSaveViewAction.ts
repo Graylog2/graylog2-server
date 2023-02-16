@@ -16,13 +16,17 @@
  */
 import UserNotification from 'util/UserNotification';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import { ViewActions } from 'views/stores/ViewStore';
 import type View from 'views/logic/views/View';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import { setIsNew, setIsDirty } from 'views/logic/slices/viewSlice';
 
-export default (newView: View) => {
-  return ViewActions.update(newView).then(({ view }) => {
-    return ViewManagementActions.update(view);
-  }).then(({ title }) => {
-    return UserNotification.success(`Saving view "${title}" was successful!`, 'Success!');
-  }).catch((error) => UserNotification.error(`Saving view failed: ${error}`, 'Error!'));
+export default (view: View) => async (dispatch: AppDispatch) => {
+  try {
+    await ViewManagementActions.update(view);
+    dispatch(setIsNew(false));
+    dispatch(setIsDirty(false));
+    UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!');
+  } catch (error) {
+    UserNotification.error(`Saving view failed: ${error}`, 'Error!');
+  }
 };

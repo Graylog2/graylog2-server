@@ -32,15 +32,12 @@ import java.util.Optional;
 public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
     public static final String NAME = "size";
 
-    private final Indices indices;
-
     @Inject
     public SizeBasedRotationStrategy(Indices indices,
                                      NodeId nodeId,
                                      AuditEventSender auditEventSender,
                                      ElasticsearchConfiguration elasticsearchConfiguration) {
-        super(auditEventSender, nodeId, elasticsearchConfiguration);
-        this.indices = indices;
+        super(auditEventSender, nodeId, elasticsearchConfiguration, indices);
     }
 
     @Override
@@ -70,25 +67,12 @@ public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
         final long sizeInBytes = storeSizeInBytes.get();
         final boolean shouldRotate = sizeInBytes > config.maxSize();
 
-        return new Result() {
-            public final MessageFormat ROTATE = new MessageFormat("Storage size for index <{0}> is {1} bytes, exceeding the maximum of {2} bytes. Rotating index.", Locale.ENGLISH);
-            public final MessageFormat NOT_ROTATE = new MessageFormat("Storage size for index <{0}> is {1} bytes, below the maximum of {2} bytes. Not doing anything.", Locale.ENGLISH);
+        final MessageFormat format = shouldRotate ?
+                new MessageFormat("Storage size for index <{0}> is {1} bytes, exceeding the maximum of {2} bytes. Rotating index.", Locale.ENGLISH) :
+                new MessageFormat("Storage size for index <{0}> is {1} bytes, below the maximum of {2} bytes. Not doing anything.", Locale.ENGLISH);
+        final String message = format.format(new Object[] { index, sizeInBytes, config.maxSize() });
 
-            @Override
-            public String getDescription() {
-                MessageFormat format = shouldRotate() ? ROTATE : NOT_ROTATE;
-                return format.format(new Object[]{
-                        index,
-                        sizeInBytes,
-                        config.maxSize()
-                });
-            }
-
-            @Override
-            public boolean shouldRotate() {
-                return shouldRotate;
-            }
-        };
+        return createResult(shouldRotate, message);
     }
 
     @Override

@@ -29,6 +29,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.delete
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.flush.FlushRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.forcemerge.ForceMergeRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.open.OpenIndexRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.refresh.RefreshRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.get.GetSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.get.GetSettingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
@@ -39,9 +40,12 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchType;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.GetAliasesResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Requests;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CloseIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteAliasRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.IndexTemplatesExistRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
@@ -171,6 +175,35 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
+    public void updateIndexMetaData(@Nonnull String index, @Nonnull Map<String, Object> metadata, boolean mergeExisting) {
+        Map<String, Object> metaUpdate = new HashMap<>();
+        if (mergeExisting) {
+            final Map<String, Object> oldMetaData = getIndexMetaData(index);
+            metaUpdate.putAll(oldMetaData);
+        }
+        metaUpdate.putAll(metadata);
+        updateIndexMapping(index, "ignored", Map.of("_meta", metaUpdate));
+    }
+
+    @Override
+    public Map<String, Object> getIndexMetaData(@Nonnull String index) {
+        final GetMappingsRequest request = new GetMappingsRequest()
+                .indices(index)
+                .indicesOptions(IndicesOptions.fromOptions(true, true, true, false));
+
+        final GetMappingsResponse result = client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions),
+                "Couldn't read mapping of index " + index);
+
+        final Object metaData = result.mappings().get(index).sourceAsMap().get("_meta");
+        //noinspection rawtypes
+        if (metaData instanceof Map map) {
+            //noinspection unchecked
+            return map;
+        }
+        return Map.of();
+    }
+
+    @Override
     public boolean ensureIndexTemplate(String templateName, Map<String, Object> template) {
         final PutIndexTemplateRequest request = new PutIndexTemplateRequest(templateName)
                 .source(template);
@@ -205,6 +238,13 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
+    public Optional<DateTime> indexClosingDate(String index) {
+        final Map<String, Object> indexMetaData = getIndexMetaData(index);
+        return Optional.ofNullable(indexMetaData.get("closing_date")).filter(Long.class::isInstance).map(Long.class::cast)
+                .map(instant -> new DateTime(instant, DateTimeZone.UTC));
+    }
+
+    @Override
     public void openIndex(String index) {
         final OpenIndexRequest request = new OpenIndexRequest(index);
 
@@ -215,6 +255,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     @Override
     public void setReadOnly(String index) {
         // https://www.elastic.co/guide/en/elasticsearch/reference/7.8/indices-update-settings.html
+        // https://www.elastic.co/guide/en/elasticsearch/reference/7.10/index-modules-blocks.html
         final Map<String, Object> settings = ImmutableMap.of(
                 "index", ImmutableMap.of("blocks",
                         ImmutableMap.of(
@@ -508,6 +549,12 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     @Override
     public boolean isClosed(String index) {
         return indexHasState(index, State.Closed);
+    }
+
+    @Override
+    public void refresh(String... indices) {
+        final RefreshRequest refreshRequest = Requests.refreshRequest(indices);
+        client.execute((c, requestOptions) -> c.indices().refresh(refreshRequest, requestOptions));
     }
 
     private Boolean indexHasState(String index, State open) {
