@@ -54,7 +54,33 @@ class DbFilterParserTest {
     }
 
     @Test
-    void throwsExceptionsOnWrongFilterFormat() {
+    void throwsExceptionOnFieldThatDoesNotExistInAttributeList() {
+
+        assertThrows(IllegalArgumentException.class, () ->
+                toTest.parseSingleExpression("strange_field:blabla",
+                        List.of(EntityAttribute.builder()
+                                .id("owner")
+                                .title("Owner")
+                                .filterable(true)
+                                .build())
+                ));
+    }
+
+    @Test
+    void throwsExceptionOnFieldThatIsNotFilterable() {
+
+        assertThrows(IllegalArgumentException.class, () ->
+                toTest.parseSingleExpression("owner:juan",
+                        List.of(EntityAttribute.builder()
+                                .id("owner")
+                                .title("Owner")
+                                .filterable(false)
+                                .build())
+                ));
+    }
+
+    @Test
+    void throwsExceptionOnWrongFilterFormat() {
         final List<EntityAttribute> attributes = List.of(
                 EntityAttribute.builder().id("good").title("Good").filterable(true).build(),
                 EntityAttribute.builder().id("another").title("Hidden and dangerous").filterable(true).build()

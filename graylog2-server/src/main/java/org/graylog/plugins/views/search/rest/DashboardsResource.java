@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -56,22 +55,17 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/dashboards")
 public class DashboardsResource extends RestResource {
-    private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
-            .put("title", SearchQueryField.create(ViewDTO.FIELD_TITLE))
-            .put("description", SearchQueryField.create(ViewDTO.FIELD_DESCRIPTION))
-            .put("summary", SearchQueryField.create(ViewDTO.FIELD_DESCRIPTION))
-            .build();
     private final ViewService dbService;
     private final SearchQueryParser searchQueryParser;
 
     private static final String DEFAULT_SORT_FIELD = ViewDTO.FIELD_TITLE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
-            EntityAttribute.builder().id(ViewDTO.FIELD_TITLE).title("Title").build(),
+            EntityAttribute.builder().id("_id").title("id").type(SearchQueryField.Type.OBJECT_ID).visible(false).searchable(true).build(),
+            EntityAttribute.builder().id(ViewDTO.FIELD_TITLE).title("Title").searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).build(),
-            EntityAttribute.builder().id(ViewDTO.FIELD_DESCRIPTION).title("Description").build(),
-            EntityAttribute.builder().id(ViewDTO.FIELD_SUMMARY).title("Summary").build(),
+            EntityAttribute.builder().id(ViewDTO.FIELD_DESCRIPTION).title("Description").searchable(true).build(),
+            EntityAttribute.builder().id(ViewDTO.FIELD_SUMMARY).title("Summary").searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_OWNER).title("Owner").build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_FAVORITE).title("Favorite").sortable(false).build()
     );
@@ -82,7 +76,7 @@ public class DashboardsResource extends RestResource {
     @Inject
     public DashboardsResource(ViewService dbService) {
         this.dbService = dbService;
-        this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, SEARCH_FIELD_MAPPING);
+        this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, attributes);
     }
 
     @GET

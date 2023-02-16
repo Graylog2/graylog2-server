@@ -31,10 +31,8 @@ import javax.annotation.Nonnull;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -139,20 +137,7 @@ public class SearchQueryParser {
 
         this.defaultField = requireNonNull(defaultField);
         this.defaultFieldKey = SearchQueryField.create(defaultField, STRING);
-        this.dbFieldMapping = new HashMap<>();
-        attributes.stream()
-                .filter(attr -> Objects.nonNull(attr.searchable()))
-                .filter(EntityAttribute::searchable)
-                .forEach(attr -> {
-                    final SearchQueryField searchQueryField = SearchQueryField.create(
-                            attr.id(),
-                            attr.type()
-                    );
-                    dbFieldMapping.put(attr.id(), searchQueryField);
-                    if (!attr.title().contains(" ")) {
-                        dbFieldMapping.put(attr.title().toLowerCase(Locale.ROOT), searchQueryField);
-                    }
-                });
+        this.dbFieldMapping = DbFieldMappingCreator.createFromEntityAttributes(attributes);
     }
 
     @VisibleForTesting

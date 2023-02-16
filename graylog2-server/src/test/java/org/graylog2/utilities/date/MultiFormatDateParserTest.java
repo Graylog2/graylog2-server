@@ -19,7 +19,6 @@ package org.graylog2.utilities.date;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -40,10 +39,6 @@ import static org.mockito.Mockito.verifyNoInteractions;
 class MultiFormatDateParserTest {
 
     private MultiFormatDateParser toTest;
-
-    @BeforeEach
-    void setUp() {
-    }
 
     @Test
     void throwsExceptionIfThereIsNoFormatter() {
