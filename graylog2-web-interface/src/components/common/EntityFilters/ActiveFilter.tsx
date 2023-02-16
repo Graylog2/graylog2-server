@@ -57,7 +57,7 @@ const ActiveFilter = ({
   };
 
   return (
-    <Container className="btn-group">
+    <Container className="btn-group" data-testid={`filter-${id}`}>
       <CenteredButton bsSize="xsmall" onClick={() => onFilterClick(attribute.id, value, id)} title="Change filter value">
         {filterValueRenderer ? filterValueRenderer(value, title) : title}
       </CenteredButton>

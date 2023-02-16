@@ -28,7 +28,7 @@ const Container = styled.div`
   margin-left: 5px;
 `;
 
-const FilterTypeSelect = ({
+const AttributeSelect = ({
   attributes,
   setSelectedAttributeId,
   activeFilters,
@@ -99,6 +99,7 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderers, onCr
     <Container>
       <OverlayDropdownButton title={<Icon name="plus" />}
                              bsSize="small"
+                             buttonTitle="Create Filter"
                              onToggle={onToggleDropdown}
                              closeOnSelect={false}
                              dropdownZIndex={1000}>
@@ -110,9 +111,9 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderers, onCr
 
           if (!selectedAttributeId) {
             return (
-              <FilterTypeSelect attributes={filterableAttributes}
-                                setSelectedAttributeId={setSelectedAttributeId}
-                                activeFilters={activeFilters} />
+              <AttributeSelect attributes={filterableAttributes}
+                               setSelectedAttributeId={setSelectedAttributeId}
+                               activeFilters={activeFilters} />
             );
           }
 

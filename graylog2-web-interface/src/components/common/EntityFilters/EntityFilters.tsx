@@ -31,12 +31,12 @@ const Container = styled.div`
 
 type Props = {
   attributes: Attributes,
-  onUpdateFilters: (filters: Filters) => void,
-  activeFilters: Filters,
+  onChangeFilters: (filters: Filters) => void,
+  activeFilters: Filters | undefined,
   filterValueRenderers?: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode };
 }
 
-const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRenderers, onUpdateFilters }: Props) => {
+const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRenderers, onChangeFilters }: Props) => {
   const filterableAttributes = attributes.filter(({ filterable }) => filterable);
 
   if (!filterableAttributes.length) {
@@ -44,7 +44,7 @@ const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRendere
   }
 
   const onCreateFilter = (attributeId, filter: { value: string, title; string, id: string}) => {
-    onUpdateFilters({
+    onChangeFilters({
       ...activeFilters,
       [attributeId]: [
         ...activeFilters[attributeId] ?? [],
@@ -67,7 +67,7 @@ const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRendere
       delete updatedFilters[attributeId];
     }
 
-    onUpdateFilters(updatedFilters);
+    onChangeFilters(updatedFilters);
   };
 
   const onChangeFilter = (attributeId: string, filterId: string, newValue: string, newTitle: string) => {
@@ -78,7 +78,7 @@ const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRendere
     const updatedFilterGroup = [...filterGroup];
     updatedFilterGroup[targetFilterIndex] = { id: targetFilter.id, value: newValue, title: newTitle };
 
-    onUpdateFilters({
+    onChangeFilters({
       ...activeFilters,
       [attributeId]: updatedFilterGroup,
     });

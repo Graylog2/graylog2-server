@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export type Filters = {
-  disabled?: [{ title: string, value: boolean }], // { value: true }
-  indexSet?: [{ title: string, value: string }], // { value: 'index-set-id' }
-  createdAt?: [{ title: string, value: { from: string, to: string } }] // { from: '2022', to '2023' }
+  disabled?: [{ id: string, title: string, value: string }], // { value: true }
+  indexSet?: [{ id: string, title: string, value: string }], // { value: 'index-set-id' }
+  createdAt?: [{ id: string, title: string, value: { from: string, to: string } }] // { from: '2022', to '2023' }
 };

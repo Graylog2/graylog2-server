@@ -21,7 +21,8 @@ import Button from 'components/bootstrap/Button';
 import OverlayDropdown from 'components/common/OverlayDropdown';
 
 type Props = {
-  bsSize?: string
+  bsSize?: string,
+  buttonTitle?: string,
   children: React.ReactNode | ((payload: { toggleDropdown: () => void }) => React.ReactNode),
   closeOnSelect?: boolean,
   disabled?: boolean
@@ -33,7 +34,16 @@ type Props = {
 /**
  * This component is an alternative to the `DropdownButton` component and displays the dropdown in a portal.
  */
-const OverlayDropdownButton = ({ children, title, bsSize, disabled, dropdownZIndex, closeOnSelect, onToggle: onToggleProp }: Props) => {
+const OverlayDropdownButton = ({
+  children,
+  title,
+  bsSize,
+  disabled,
+  dropdownZIndex,
+  closeOnSelect,
+  buttonTitle,
+  onToggle: onToggleProp,
+}: Props) => {
   const [show, setShowDropdown] = useState(false);
 
   const _onToggle = () => {
@@ -53,6 +63,7 @@ const OverlayDropdownButton = ({ children, title, bsSize, disabled, dropdownZInd
                          <Button bsSize={bsSize}
                                  className="dropdown-toggle"
                                  ref={toggleTarget}
+                                 title={buttonTitle}
                                  disabled={disabled}
                                  onClick={onToggle}>
                            {title} <span className="caret" />
@@ -68,6 +79,7 @@ const OverlayDropdownButton = ({ children, title, bsSize, disabled, dropdownZInd
 
 OverlayDropdownButton.defaultProps = {
   bsSize: undefined,
+  buttonTitle: undefined,
   closeOnSelect: false,
   disabled: false,
   dropdownZIndex: undefined,

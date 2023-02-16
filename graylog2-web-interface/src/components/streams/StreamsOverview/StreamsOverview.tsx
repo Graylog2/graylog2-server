@@ -100,6 +100,10 @@ const StreamsOverview = ({ indexSets }: Props) => {
     onSearch('');
   }, [onSearch]);
 
+  const onChangeFilters = useCallback((newFilters: Filters) => {
+    setFilters(newFilters);
+  }, []);
+
   const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
     updateTableLayout({ displayedAttributes });
   }, [updateTableLayout]);
@@ -129,10 +133,6 @@ const StreamsOverview = ({ indexSets }: Props) => {
 
   const { elements, attributes, pagination: { total } } = paginatedStreams;
 
-  const onUpdateFilters = (newFilters: Filters) => {
-    setFilters(newFilters);
-  };
-
   return (
     <PaginatedList pageSize={layoutConfig.pageSize}
                    showPageSizeSelect={false}
@@ -141,7 +141,10 @@ const StreamsOverview = ({ indexSets }: Props) => {
         <SearchForm onSearch={onSearch}
                     onReset={onReset}
                     queryHelpComponent={<QueryHelper entityName="stream" />}>
-          <EntityFilters attributes={attributes} onUpdateFilters={onUpdateFilters} activeFilters={filters} filterValueRenderers={FilterValueRenderers} />
+          <EntityFilters attributes={attributes}
+                         onChangeFilters={onChangeFilters}
+                         activeFilters={filters}
+                         filterValueRenderers={FilterValueRenderers} />
         </SearchForm>
       </div>
       <div>
