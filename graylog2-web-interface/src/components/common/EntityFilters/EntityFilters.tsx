@@ -19,7 +19,7 @@ import styled from 'styled-components';
 
 import CreateFilterDropdown from 'components/common/EntityFilters/CreateFilterDropdown';
 import type { Attributes } from 'stores/PaginationTypes';
-import type { Filters } from 'components/common/EntityFilters/types';
+import type { Filters, Filter } from 'components/common/EntityFilters/types';
 import ActiveFilters from 'components/common/EntityFilters/ActiveFilters';
 
 const Container = styled.div`
@@ -33,7 +33,7 @@ type Props = {
   attributes: Attributes,
   onChangeFilters: (filters: Filters) => void,
   activeFilters: Filters | undefined,
-  filterValueRenderers?: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode };
+  filterValueRenderers?: { [attributeId: string]: (value: Filter['value'], title: string) => React.ReactNode };
 }
 
 const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRenderers, onChangeFilters }: Props) => {
@@ -43,7 +43,7 @@ const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRendere
     return null;
   }
 
-  const onCreateFilter = (attributeId, filter: { value: string, title; string, id: string}) => {
+  const onCreateFilter = (attributeId, filter: Filter) => {
     onChangeFilters({
       ...activeFilters,
       [attributeId]: [
@@ -70,13 +70,12 @@ const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRendere
     onChangeFilters(updatedFilters);
   };
 
-  const onChangeFilter = (attributeId: string, filterId: string, newValue: string, newTitle: string) => {
+  const onChangeFilter = (attributeId: string, newFilter: Filter) => {
     const filterGroup = activeFilters[attributeId];
-    const targetFilterIndex = filterGroup.findIndex(({ id }) => id === filterId);
-    const targetFilter = filterGroup[targetFilterIndex];
+    const targetFilterIndex = filterGroup.findIndex(({ id }) => id === newFilter.id);
 
     const updatedFilterGroup = [...filterGroup];
-    updatedFilterGroup[targetFilterIndex] = { id: targetFilter.id, value: newValue, title: newTitle };
+    updatedFilterGroup[targetFilterIndex] = newFilter;
 
     onChangeFilters({
       ...activeFilters,

@@ -20,6 +20,7 @@ import styled from 'styled-components';
 import { Button } from 'components/bootstrap';
 import type { Attribute } from 'stores/PaginationTypes';
 import { Icon } from 'components/common';
+import type { Filter } from 'components/common/EntityFilters/types';
 
 const Container = styled.div`
   display: flex;
@@ -36,9 +37,9 @@ const CenteredButton = styled(Button)`
 
 type Props = {
   attribute: Attribute,
-  filter: { title: string, value: string, id: string },
-  filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined,
-  onChangeFilter: (attributeId: string, filterId: string, newValue: string, newTitle) => void,
+  filter: Filter,
+  filterValueRenderer: (value: Filter['value'], title: string) => React.ReactNode | undefined,
+  onChangeFilter: (attributeId: string, newFilter: Filter) => void,
   onDeleteFilter: (attributeId: string, filterId: string) => void,
 }
 
@@ -49,16 +50,16 @@ const ActiveFilter = ({
   onDeleteFilter,
   onChangeFilter,
 }: Props) => {
-  const onFilterClick = (attributeId: string, curValue: string, filterId: string) => {
+  const onFilterClick = () => {
     if (attribute.type === 'boolean') {
-      const oppositeFilterOption = attribute.filter_options.find(({ value: optionVal }) => optionVal !== curValue);
-      onChangeFilter(attributeId, filterId, oppositeFilterOption.value, oppositeFilterOption.title);
+      const oppositeFilterOption = attribute.filter_options.find(({ value: optionVal }) => optionVal !== value);
+      onChangeFilter(attribute.id, { id, value: oppositeFilterOption.value, title: oppositeFilterOption.title });
     }
   };
 
   return (
     <Container className="btn-group" data-testid={`filter-${id}`}>
-      <CenteredButton bsSize="xsmall" onClick={() => onFilterClick(attribute.id, value, id)} title="Change filter value">
+      <CenteredButton bsSize="xsmall" onClick={onFilterClick} title="Change filter value">
         {filterValueRenderer ? filterValueRenderer(value, title) : title}
       </CenteredButton>
       <CenteredButton bsSize="xsmall" onClick={() => onDeleteFilter(attribute.id, id)} title="Delete filter">

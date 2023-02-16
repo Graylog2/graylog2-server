@@ -17,7 +17,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import type { Filters } from 'components/common/EntityFilters/types';
+import type { Filters, Filter } from 'components/common/EntityFilters/types';
 import type { Attributes } from 'stores/PaginationTypes';
 import ActiveFilter from 'components/common/EntityFilters/ActiveFilter';
 
@@ -39,7 +39,7 @@ type Props = {
   attributes: Attributes,
   filterValueRenderers: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode } | undefined,
   filters: Filters,
-  onChangeFilter: (attributeId: string, filterId: string, newValue: string, newTitle) => void,
+  onChangeFilter: (attributeId: string, newFilter: Filter) => void,
   onDeleteFilter: (attributeId: string, filterId: string) => void,
 }
 

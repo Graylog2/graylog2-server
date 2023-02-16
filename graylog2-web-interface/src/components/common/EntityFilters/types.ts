@@ -14,8 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
+type FilterBase = {
+  id: string,
+  title: string
+}
+
+type DateFilter = FilterBase & { value: { from: string, to: string } }
+type BooleanFilter = FilterBase & { value: 'true' | 'false' }
+type ValueFilter = FilterBase & { value: string };
+export type Filter = DateFilter | BooleanFilter | ValueFilter;
+
 export type Filters = {
-  disabled?: [{ id: string, title: string, value: string }], // { value: true }
-  indexSet?: [{ id: string, title: string, value: string }], // { value: 'index-set-id' }
-  createdAt?: [{ id: string, title: string, value: { from: string, to: string } }] // { from: '2022', to '2023' }
+  [attributeId: string]: Array<Filter>
 };

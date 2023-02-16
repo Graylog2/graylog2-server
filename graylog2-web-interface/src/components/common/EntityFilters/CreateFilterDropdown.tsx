@@ -22,7 +22,7 @@ import MenuItem from 'components/bootstrap/MenuItem';
 import { HoverForHelp, Icon } from 'components/common';
 import type { Attribute, Attributes } from 'stores/PaginationTypes';
 import generateId from 'logic/generateId';
-import type { Filters } from 'components/common/EntityFilters/types';
+import type { Filters, Filter } from 'components/common/EntityFilters/types';
 
 const Container = styled.div`
   margin-left: 5px;
@@ -66,8 +66,8 @@ const FilterConfiguration = ({
   filterValueRenderer,
 }: {
   attribute: Attribute,
-  filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined,
-  onSubmit: (filter: { value: string, title: string, id: string }) => void,
+  filterValueRenderer: (value: Filter['value'], title: string) => React.ReactNode | undefined,
+  onSubmit: (filter: Filter) => void,
 }) => (
   <>
     <MenuItem header>Create {attribute.title} Filter</MenuItem>
@@ -86,8 +86,8 @@ const FilterConfiguration = ({
 type Props = {
   filterableAttributes: Attributes,
   activeFilters: Filters,
-  onCreateFilter: (attributeId: string, filter: { value: string, title: string, id: string }) => void,
-  filterValueRenderers: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode } | undefined;
+  onCreateFilter: (attributeId: string, filter: Filter) => void,
+  filterValueRenderers: { [attributeId: string]: (value: Filter['value'], title: string) => React.ReactNode } | undefined;
 }
 
 const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderers, onCreateFilter, activeFilters }: Props) => {
@@ -104,7 +104,7 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderers, onCr
                              closeOnSelect={false}
                              dropdownZIndex={1000}>
         {({ toggleDropdown }) => {
-          const _onCreateFilter = (filter: { value: string, title: string, id: string }) => {
+          const _onCreateFilter = (filter: Filter) => {
             toggleDropdown();
             onCreateFilter(selectedAttributeId, filter);
           };

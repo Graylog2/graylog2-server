@@ -50,8 +50,6 @@ describe('<EntityFilters />', () => {
                      activeFilters={undefined} />,
     );
 
-    // click on create button
-
     userEvent.click(await screen.findByRole('button', {
       name: /create filter/i,
     }));
