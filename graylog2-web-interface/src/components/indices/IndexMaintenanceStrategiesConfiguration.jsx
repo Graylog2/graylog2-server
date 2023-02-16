@@ -180,7 +180,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
 
   const shouldShowInvalidRetentionWarning = () => {
     return name === RETENTION && !getStrategyJsonSchema(getActiveSelection(), strategies);
-  }
+  };
 
   return (
     <span>
