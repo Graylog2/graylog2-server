@@ -40,11 +40,10 @@ const renderHookWithWrapper = <TProps, TResult>(
     {
       ...options,
       wrapper: ({ children }) => {
-        const CustomWrapper = options.wrapper ?? React.Fragment;
+        const CustomWrapper = options.wrapper as React.ElementType ?? React.Fragment;
 
         return (
           <DefaultQueryClientProvider options={options.queryClientOptions}>
-            {/* @ts-ignore */}
             <CustomWrapper>
               {children}
             </CustomWrapper>
