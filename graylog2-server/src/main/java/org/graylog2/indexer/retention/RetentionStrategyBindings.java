@@ -17,7 +17,7 @@
 package org.graylog2.indexer.retention;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.indexer.retention.strategies.AbstractIndexCountBasedRetentionStrategy;
+import org.graylog2.indexer.retention.strategies.AbstractIndexRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.ClosingRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
@@ -41,7 +41,7 @@ public class RetentionStrategyBindings extends PluginModule {
 
     @Override
     protected void configure() {
-        List<Class<? extends AbstractIndexCountBasedRetentionStrategy>> retentionStrategies = new LinkedList<>(Arrays.asList(DeletionRetentionStrategy.class, ClosingRetentionStrategy.class, NoopRetentionStrategy.class));
+        List<Class<? extends AbstractIndexRetentionStrategy>> retentionStrategies = new LinkedList<>(Arrays.asList(DeletionRetentionStrategy.class, ClosingRetentionStrategy.class, NoopRetentionStrategy.class));
         Set<String> disabledRetentionStrategies = configuration.getDisabledRetentionStrategies();
 
         for (String disabledStrategy : disabledRetentionStrategies) {
@@ -49,11 +49,11 @@ public class RetentionStrategyBindings extends PluginModule {
                 case DeletionRetentionStrategy.NAME -> retentionStrategies.remove(DeletionRetentionStrategy.class);
                 case ClosingRetentionStrategy.NAME -> retentionStrategies.remove((ClosingRetentionStrategy.class));
                 case NoopRetentionStrategy.NAME -> retentionStrategies.remove((NoopRetentionStrategy.class));
-                default -> LOG.debug("Detected graylog open unknown retention strategy: " + disabledStrategy);
+                default -> LOG.debug("Detected graylog open unknown retention strategy: {}", disabledStrategy);
             }
         }
 
-        for (Class<? extends AbstractIndexCountBasedRetentionStrategy> adding : retentionStrategies) {
+        for (Class<? extends AbstractIndexRetentionStrategy> adding : retentionStrategies) {
             addRetentionStrategy(adding);
         }
     }
