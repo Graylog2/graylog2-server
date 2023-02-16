@@ -41,14 +41,14 @@ const AttributeSelect = ({
     <MenuItem header>Create Filter</MenuItem>
     {attributes.map(({ id, title, type }) => {
       const hasActiveFilter = !!activeFilters[id]?.length;
-      const disabled = type === 'boolean' ? hasActiveFilter : false;
+      const disabled = type === 'BOOLEAN' ? hasActiveFilter : false;
 
       return (
         <MenuItem onSelect={() => setSelectedAttributeId(id)}
                   key={`${title}-filter`}
                   disabled={disabled}>
           {title}
-          {(type === 'boolean' && disabled) && (
+          {(type === 'BOOLEAN' && disabled) && (
             <HoverForHelp displayLeftMargin>
               You can only create one filter for a boolean attribute.<br />
               If you want to change the filter value, you can update the existing one.
@@ -71,7 +71,7 @@ const FilterConfiguration = ({
 }) => (
   <>
     <MenuItem header>Create {attribute.title} Filter</MenuItem>
-    {attribute.type === 'boolean' && (
+    {attribute.type === 'BOOLEAN' && (
       <>
         {attribute.filter_options.map(({ title, value }) => (
           <MenuItem onSelect={() => onSubmit({ value, title, id: generateId() })} key={`filter-value-${title}`}>

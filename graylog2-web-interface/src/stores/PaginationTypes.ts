@@ -75,7 +75,7 @@ export type SearchParams = {
 export type Attribute = {
   id: string,
   title: string,
-  type?: 'boolean',
+  type?: 'BOOLEAN' | 'STRING' | 'DATE' | 'OBJECT_ID',
   sortable: boolean,
   hidden?: boolean,
   searchable?: boolean,

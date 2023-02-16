@@ -28,7 +28,7 @@ export type Column = {
   permissions?: Array<string>
   sortable?: boolean,
   title: string,
-  type?: 'boolean',
+  type?: 'BOOLEAN' | 'STRING' | 'DATE' | 'OBJECT_ID',
 };
 
 // A column render should have either a `width` and optionally a `minWidth` or only a `staticWidth`.

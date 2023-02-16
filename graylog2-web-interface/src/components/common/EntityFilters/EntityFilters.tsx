@@ -37,7 +37,7 @@ type Props = {
 }
 
 const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRenderers, onChangeFilters }: Props) => {
-  const filterableAttributes = attributes.filter(({ filterable }) => filterable);
+  const filterableAttributes = attributes.filter(({ filterable, type }) => filterable && type === 'BOOLEAN');
 
   if (!filterableAttributes.length) {
     return null;

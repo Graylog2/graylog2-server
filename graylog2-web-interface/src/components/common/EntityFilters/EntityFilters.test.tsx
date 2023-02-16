@@ -31,7 +31,7 @@ describe('<EntityFilters />', () => {
     {
       id: 'disabled',
       title: 'Status',
-      type: 'boolean',
+      type: 'BOOLEAN',
       sortable: true,
       filterable: true,
       filter_options: [

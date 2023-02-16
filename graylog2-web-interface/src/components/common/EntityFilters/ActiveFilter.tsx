@@ -51,7 +51,7 @@ const ActiveFilter = ({
   onChangeFilter,
 }: Props) => {
   const onFilterClick = () => {
-    if (attribute.type === 'boolean') {
+    if (attribute.type === 'BOOLEAN') {
       const oppositeFilterOption = attribute.filter_options.find(({ value: optionVal }) => optionVal !== value);
       onChangeFilter(attribute.id, { id, value: oppositeFilterOption.value, title: oppositeFilterOption.title });
     }
