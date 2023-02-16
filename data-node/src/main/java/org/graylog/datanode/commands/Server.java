@@ -26,7 +26,6 @@ import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bindings.ConfigurationModule;
-import org.graylog.datanode.bindings.ObjectMapperModule;
 import org.graylog.datanode.bindings.PeriodicalBindings;
 import org.graylog.datanode.bindings.ServerBindings;
 import org.graylog.datanode.bootstrap.Main;
@@ -34,14 +33,15 @@ import org.graylog.datanode.bootstrap.ServerBootstrap;
 import org.graylog.datanode.rest.RestBindings;
 import org.graylog.datanode.shutdown.GracefulShutdown;
 import org.graylog2.bindings.MongoDBModule;
+import org.graylog2.bindings.PasswordAlgorithmBindings;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.UI;
+import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -89,9 +89,9 @@ public class Server extends ServerBootstrap {
                 new RestBindings(),
                 new PeriodicalBindings(),
 //               new InitializerBindings(),
-                new ObjectMapperModule(chainingClassLoader)
+                new ObjectMapperModule(chainingClassLoader),
  //               new RestApiBindings(),
- //               new PasswordAlgorithmBindings()
+                new PasswordAlgorithmBindings()
         );
         return modules.build();
     }

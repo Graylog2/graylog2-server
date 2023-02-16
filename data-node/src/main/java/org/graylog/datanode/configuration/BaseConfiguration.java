@@ -17,6 +17,7 @@
 package org.graylog.datanode.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
+import org.graylog2.configuration.PathConfiguration;
 
 public class BaseConfiguration extends PathConfiguration {
     @Parameter(value = "async_eventbus_processors")

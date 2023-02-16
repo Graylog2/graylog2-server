@@ -117,6 +117,12 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
     private Integer staleLeaderTimeout = 2000;
 
+    @Parameter(value = "user_password_default_algorithm")
+    private String userPasswordDefaultAlgorithm = "bcrypt";
+
+    @Parameter(value = "user_password_bcrypt_salt_size", validators = PositiveIntegerValidator.class)
+    private int userPasswordBCryptSaltSize = 10;
+
     public Integer getStaleLeaderTimeout() {
         return staleLeaderTimeout;
     }
@@ -168,6 +174,16 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "rest_api_username")
     private String restApiUsername;
 
+    @Parameter(value = "password_secret", required = true, validators = StringNotBlankValidator.class)
+    private String passwordSecret;
+
+    @ValidatorMethod
+    @SuppressWarnings("unused")
+    public void validatePasswordSecret() throws ValidationException {
+        if (passwordSecret == null || passwordSecret.length() < 16) {
+            throw new ValidationException("The minimum length for \"password_secret\" is 16 characters.");
+        }
+    }
 
     @Parameter(value = "rest_api_password")
     private String restApiPassword;

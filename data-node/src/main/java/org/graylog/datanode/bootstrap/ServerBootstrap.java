@@ -19,7 +19,6 @@ package org.graylog.datanode.bootstrap;
 import com.github.joschi.jadconfig.guice.NamedConfigParametersModule;
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
@@ -32,17 +31,15 @@ import org.graylog.datanode.bindings.GenericBindings;
 import org.graylog.datanode.bindings.GenericInitializerBindings;
 import org.graylog.datanode.bindings.PreflightChecksBindings;
 import org.graylog.datanode.bindings.SchedulerBindings;
-import org.graylog.datanode.configuration.PathConfiguration;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
+import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.bindings.FreshInstallDetectionModule;
 import org.graylog2.shared.bindings.IsDevelopmentBindings;
-import org.graylog2.shared.bindings.ServerStatusBindings;
-import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.jsoftbiz.utils.OS;
@@ -56,7 +53,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -129,7 +125,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
             return;
         }
 
-       // runMongoPreflightCheck();
+       runMongoPreflightCheck();
 
         final List<Module> preflightCheckModules = plugins.stream().map(Plugin::preflightCheckModules)
                 .flatMap(Collection::stream).collect(Collectors.toList());
@@ -166,10 +162,9 @@ public abstract class ServerBootstrap extends CmdLineTool {
     private Injector getPreflightInjector(List<Module> preflightCheckModules) {
         final Injector injector = Guice.createInjector(
                 new IsDevelopmentBindings(),
-                new PreflightChecksBindings(),
                 new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
                 new ConfigurationModule(configuration),
-//                new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()),
+                new PreflightChecksBindings(),
                 new Module() {
                     @Override
                     public void configure(Binder binder) {
