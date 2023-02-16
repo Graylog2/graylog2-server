@@ -17,6 +17,7 @@
 import type React from 'react';
 import type * as Immutable from 'immutable';
 import type { FormikErrors } from 'formik';
+import type { Reducer, AnyAction } from '@reduxjs/toolkit';
 
 import type Widget from 'views/logic/widgets/Widget';
 import type { ActionDefinition } from 'views/components/actions/ActionHandler';
@@ -28,7 +29,6 @@ import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import type { Completer } from 'views/components/searchbar/SearchBarAutocompletions';
 import type { Result } from 'views/components/widgets/Widget';
-import type { Widgets } from 'views/stores/WidgetStore';
 import type { OverrideProps } from 'views/components/WidgetOverrideElements';
 import type {
   VisualizationConfigDefinition,
@@ -37,7 +37,7 @@ import type {
   WidgetConfigFormValues,
 } from 'views/components/aggregationwizard';
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
-import type { TimeRange, NoTimeRangeOverride, AbsoluteTimeRange } from 'views/logic/queries/Query';
+import type { TimeRange, NoTimeRangeOverride, AbsoluteTimeRange, QueryId } from 'views/logic/queries/Query';
 import type View from 'views/logic/views/View';
 import type User from 'logic/users/User';
 import type { Message } from 'views/components/messagelist/Types';
@@ -47,6 +47,11 @@ import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig'
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import type Query from 'views/logic/queries/Query';
 import type { CustomCommand, CustomCommandContext } from 'views/components/searchbar/queryinput/types';
+import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type SearchMetadata from 'views/logic/search/SearchMetadata';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import type SearchResult from 'views/logic/SearchResult';
+import type { WidgetMapping } from 'views/logic/views/types';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -84,7 +89,7 @@ export interface WidgetComponentProps<Config extends WidgetConfig = WidgetConfig
   fields: Immutable.List<FieldTypeMapping>;
   filter: string;
   queryId: string;
-  onConfigChange: (newConfig: Config) => Promise<Widgets>;
+  onConfigChange: (newConfig: Config) => Promise<void>;
   setLoadingState: (loading: boolean) => void;
   title: string;
   toggleEdit: () => void;
@@ -97,8 +102,8 @@ export interface WidgetExport {
   displayName?: string;
   defaultHeight?: number;
   defaultWidth?: number;
-  visualizationComponent: React.ComponentType<WidgetComponentProps>;
-  editComponent: React.ComponentType<EditWidgetComponentProps>;
+  visualizationComponent: React.ComponentType<WidgetComponentProps<any, any>>;
+  editComponent: React.ComponentType<EditWidgetComponentProps<any>>;
   hasEditSubmitButton?: boolean,
   needsControlledHeight: (widget: { config: Widget['config'] }) => boolean;
   searchResultTransformer?: (data: Array<unknown>) => unknown;
@@ -256,16 +261,21 @@ export interface CombinedSearchBarFormValues {
   queryString?: string,
 }
 
+export interface HandlerContext {
+  view: View;
+  executionState: SearchExecutionState;
+}
+
 export interface SearchBarControl {
   component: React.ComponentType;
   id: string;
-  onSearchSubmit?: <T extends Query | undefined>(values: CombinedSearchBarFormValues, currentQuery?: T) => Promise<T>,
-  onDashboardWidgetSubmit: (values: CombinedSearchBarFormValues, currentWidget: Widget) => Promise<Widget | void>,
-  onValidate?: (values: CombinedSearchBarFormValues) => FormikErrors<{}>,
+  onSearchSubmit?: <T extends Query | undefined>(values: CombinedSearchBarFormValues, dispatch: AppDispatch, currentQuery?: T) => Promise<T>,
+  onDashboardWidgetSubmit: (values: CombinedSearchBarFormValues, dispatch: AppDispatch, currentWidget: Widget) => Promise<Widget | void>,
+  onValidate?: (values: CombinedSearchBarFormValues, context: HandlerContext) => FormikErrors<{}>,
   placement: 'left' | 'right';
   useInitialSearchValues?: (currentQuery?: Query) => ({ [key: string]: any }),
   useInitialDashboardWidgetValues?: (currentWidget: Widget) => ({ [key: string]: any }),
-  validationPayload?: (values: CombinedSearchBarFormValues) => ({ [key: string]: any }),
+  validationPayload?: (values: CombinedSearchBarFormValues, context: HandlerContext) => ({ [key: string]: any }),
 }
 
 export type SearchFilter = {
@@ -291,6 +301,45 @@ export type CustomCommandContextProvider<T extends keyof CustomCommandContext> =
   key: T,
   provider: () => CustomCommandContext[T],
 }
+
+export interface ViewState {
+  activeQuery: QueryId;
+  view: View;
+  isDirty: boolean;
+  isNew: boolean;
+}
+
+export type SearchExecutionResult = {
+  result: SearchResult,
+  widgetMapping: WidgetMapping,
+};
+
+export interface SearchExecution {
+  executionState: SearchExecutionState;
+  result: SearchExecutionResult;
+  isLoading: boolean;
+  widgetsToSearch: Array<string>,
+}
+
+export interface SearchMetadataState {
+  isLoading: boolean;
+  metadata: SearchMetadata;
+}
+
+export interface RootState {
+  view: ViewState;
+  searchExecution: SearchExecution;
+  searchMetadata: SearchMetadataState;
+}
+
+export type GetState = () => RootState;
+
+export type ViewsReducer = {
+  key: keyof RootState,
+  reducer: Reducer<RootState[keyof RootState], AnyAction>,
+}
+
+export type Widgets = Immutable.OrderedMap<string, Widget>;
 
 export interface WidgetCreatorArgs {
   view: View;
@@ -332,6 +381,7 @@ declare module 'graylog-web-plugin/plugin' {
     'views.hooks.removingWidget'?: Array<RemovingWidgetHook>;
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
     'views.widgets.actions'?: Array<WidgetActionType>;
+    'views.reducers'?: Array<ViewsReducer>;
     'views.requires.provided'?: Array<string>;
     'views.queryInput.commands'?: Array<CustomCommand>;
     'views.queryInput.commandContextProviders'?: Array<CustomCommandContextProvider<any>>,

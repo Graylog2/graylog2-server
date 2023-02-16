@@ -37,7 +37,7 @@ type JsonRepresentation = {
 };
 
 export default class GlobalOverride {
-  _value: InternalState;
+  private readonly _value: InternalState;
 
   constructor(timerange?: TimeRange, query?: QueryString, keepSearchTypes?: string[], searchTypes?: SearchTypeOptions) {
     this._value = { timerange, query, keepSearchTypes, searchTypes };

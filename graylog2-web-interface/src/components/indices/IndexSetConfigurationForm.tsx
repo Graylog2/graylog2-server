@@ -41,7 +41,7 @@ type Props = {
   retentionStrategiesContext: RetentionStrategyContext,
   rotationStrategies: Array<any>,
   submitButtonText: string,
-  submitLoadingText: string,
+  submitLoadingText?: string,
 };
 
 type Unit = 'seconds' | 'minutes';
@@ -57,13 +57,13 @@ const StyledFormSubmit = styled(FormSubmit)`
 const _validateIndexPrefix = (value) => {
   let error;
 
-  if (value.length === 0) {
+  if (value?.length === 0) {
     error = 'Invalid index prefix: cannot be empty';
-  } else if (value.indexOf('_') === 0 || value.indexOf('-') === 0 || value.indexOf('+') === 0) {
+  } else if (value?.indexOf('_') === 0 || value?.indexOf('-') === 0 || value?.indexOf('+') === 0) {
     error = 'Invalid index prefix: must start with a letter or number';
-  } else if (value.toLocaleLowerCase() !== value) {
+  } else if (value?.toLocaleLowerCase() !== value) {
     error = 'Invalid index prefix: must be lower case';
-  } else if (!value.match(/^[a-z0-9][a-z0-9_\-+]*$/)) {
+  } else if (!value?.match(/^[a-z0-9][a-z0-9_\-+]*$/)) {
     error = 'Invalid index prefix: must only contain letters, numbers, \'_\', \'-\' and \'+\'';
   }
 
@@ -141,7 +141,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
 
       rotationConfig = (
         <IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
-                                                 key="rotation"
+                                                 name="rotation"
                                                  description="Graylog uses multiple indices to store documents in. You can configure the strategy it uses to determine when to rotate the currently active write index."
                                                  selectPlaceholder="Select rotation strategy"
                                                  pluginExports={PluginStore.exports('indexRotationConfig')}
@@ -164,7 +164,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
 
       retentionConfig = (
         <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
-                                                 key="retention"
+                                                 name="retention"
                                                  description="Graylog uses a retention strategy to clean up old indices."
                                                  selectPlaceholder="Select retention strategy"
                                                  pluginExports={PluginStore.exports('indexRetentionConfig')}

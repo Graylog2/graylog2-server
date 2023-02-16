@@ -17,13 +17,25 @@
 import { useEffect } from 'react';
 
 import type View from 'views/logic/views/View';
-import { ViewActions } from 'views/stores/ViewStore';
+import Search from 'views/logic/search/Search';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
 
-const useLoadView = (viewPromise: Promise<View>, queryId: string, isNew: boolean) => {
+const createSearchUrl = qualifyUrl('/views/search');
+
+const createSearch = (search: Search) => fetch('POST', createSearchUrl, JSON.stringify(search))
+  .then((response) => Search.fromJSON(response));
+
+const useLoadView = (viewPromise: Promise<View>, isNew: boolean) => {
   useEffect(() => {
-    viewPromise.then((view) => (isNew ? ViewActions.loadNew(view, queryId) : ViewActions.load(view, false, queryId)));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [viewPromise]);
+    viewPromise.then((view) => {
+      if (isNew) {
+        return createSearch(view.search);
+      }
+
+      return Promise.resolve(view.search);
+    });
+  }, [isNew, viewPromise]);
 };
 
 export default useLoadView;

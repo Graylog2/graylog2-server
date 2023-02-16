@@ -67,4 +67,7 @@ public interface Client {
     void resetIndexBlock(String index);
 
     void setIndexBlock(String index);
+
+    void updateMapping(String index, Map<String, Object> mapping);
+    Map<String, Object> getMapping(String index);
 }

@@ -14,21 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useCallback } from 'react';
 import * as Immutable from 'immutable';
+import { createSelector } from '@reduxjs/toolkit';
 
 import { widgetDefinition } from 'views/logic/Widgets';
-import { useStore } from 'stores/connect';
-import type { SearchStoreState } from 'views/stores/SearchStore';
-import { SearchStore } from 'views/stores/SearchStore';
-import type { WidgetStoreState } from 'views/stores/WidgetStore';
-import { WidgetStore } from 'views/stores/WidgetStore';
 import type Widget from 'views/logic/widgets/Widget';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type QueryResult from 'views/logic/QueryResult';
-import type { ViewStoreState } from 'views/stores/ViewStore';
-import { ViewStore } from 'views/stores/ViewStore';
 import type SearchError from 'views/logic/SearchError';
+import useAppSelector from 'stores/useAppSelector';
+import { selectSearchExecutionResult } from 'views/logic/slices/searchExecutionSelectors';
+import { selectActiveQuery, selectWidget } from 'views/logic/slices/viewSelectors';
 
 const _getDataAndErrors = (widget: Widget, widgetMapping: WidgetMapping, results: QueryResult) => {
   const { searchTypes } = results;
@@ -61,24 +57,22 @@ type WidgetResults = {
   error: SearchError[],
 };
 
-const viewStoreMapper = ({ activeQuery }: ViewStoreState) => activeQuery;
-
-const useWidgetResults = (widgetId: string) => {
-  const currentQueryId = useStore(ViewStore, viewStoreMapper);
-
-  const widgetStoreMapper = useCallback((widgets: WidgetStoreState) => widgets.get(widgetId), [widgetId]);
-  const widget = useStore(WidgetStore, widgetStoreMapper);
-
-  const searchStoreMapper = useCallback(({ result, widgetMapping }: SearchStoreState) => {
-    const currentQueryResults = result?.forId(currentQueryId);
+const selectWidgetResults = (widgetId: string) => createSelector(
+  selectSearchExecutionResult,
+  selectActiveQuery,
+  selectWidget(widgetId),
+  (searchExecutionResult, currentQueryId, widget) => {
+    const { result, widgetMapping } = searchExecutionResult ?? {};
+    const currentQueryResults = result?.results?.[currentQueryId];
 
     return (currentQueryResults
       ? _getDataAndErrors(widget, widgetMapping, currentQueryResults)
-      : { widgetData: undefined, error: [] });
-  }, [currentQueryId, widget]);
-  const widgetResults = useStore(SearchStore, searchStoreMapper);
+      : { widgetData: undefined, error: [] }) as WidgetResults;
+  },
+);
 
-  return widgetResults as WidgetResults;
+const useWidgetResults = (widgetId: string) => {
+  return useAppSelector(selectWidgetResults(widgetId));
 };
 
 export default useWidgetResults;

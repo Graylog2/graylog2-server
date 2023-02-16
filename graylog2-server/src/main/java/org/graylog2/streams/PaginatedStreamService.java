@@ -21,6 +21,7 @@ import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Field;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Variable;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -44,8 +45,7 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
 
     @Inject
     public PaginatedStreamService(MongoConnection mongoConnection,
-                                  MongoJackObjectMapperProvider mapper)
-    {
+                                  MongoJackObjectMapperProvider mapper) {
         super(mongoConnection, mapper, StreamDTO.class, COLLECTION_NAME);
         this.collection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
     }
@@ -54,9 +54,15 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
         return db.count();
     }
 
-    public PaginatedList<StreamDTO> findPaginated(SearchQuery searchQuery, Predicate<StreamDTO> filter, int page,
-                                                  int perPage, String sortField, String order) {
-        final Bson dbQuery = searchQuery.toBson();
+    public PaginatedList<StreamDTO> findPaginated(SearchQuery searchQuery,
+                                                  Predicate<StreamDTO> predicate, //predicate executed on code level, AFTER data is fetched
+                                                  List<Bson> dbFilters, //filters executed on DB level
+                                                  int page,
+                                                  int perPage,
+                                                  String sortField,
+                                                  String order) {
+        Bson dbQuery = createDbQuery(searchQuery, dbFilters);
+
         var pipelineBuilder = ImmutableList.<Bson>builder()
                 .add(Aggregates.match(dbQuery));
 
@@ -83,22 +89,54 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
 
         final List<StreamDTO> streamsList = StreamSupport.stream(result.spliterator(), false)
                 .map(StreamDTO::fromDocument)
-                .filter(filter)
+                .filter(predicate)
                 .toList();
 
         final long grandTotal = db.find(DBQuery.empty()).toArray()
                 .stream()
-                .filter(filter)
+                .filter(predicate)
                 .count();
 
         final List<StreamDTO> paginatedStreams = perPage > 0
                 ? streamsList.stream()
-                    .skip((long) perPage * Math.max(0, page - 1))
-                    .limit(perPage)
-                    .toList()
+                .skip((long) perPage * Math.max(0, page - 1))
+                .limit(perPage)
+                .toList()
                 : streamsList;
 
         return new PaginatedList<>(paginatedStreams, streamsList.size(), page, perPage, grandTotal);
+
+    }
+
+    private Bson createDbQuery(final SearchQuery searchQuery,
+                               final List<Bson> dbFilters) {
+        List<Bson> filterList = searchQuery.toBsonFilterList();
+        if (dbFilters != null) {
+            filterList.addAll(dbFilters);
+        }
+        Bson dbQuery;
+        if (filterList.isEmpty()) {
+            dbQuery = new Document();
+        } else {
+            dbQuery = Filters.and(filterList);
+        }
+        return dbQuery;
+    }
+
+    public PaginatedList<StreamDTO> findPaginated(SearchQuery searchQuery,
+                                                  Predicate<StreamDTO> filter,
+                                                  int page,
+                                                  int perPage,
+                                                  String sortField,
+                                                  String order) {
+        return findPaginated(searchQuery,
+                filter,
+                List.of(),
+                page,
+                perPage,
+                sortField,
+                order
+        );
     }
 
     private boolean isStringField(String sortField) {
