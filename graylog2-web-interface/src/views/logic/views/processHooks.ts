@@ -14,42 +14,66 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import type View from './View';
 
 import type { ViewHook, ViewHookArguments } from '../hooks/ViewHook';
 
+const checkReturnType = ((result) => {
+  if (!result || !(result instanceof Array) || result.length < 2) {
+    // eslint-disable-next-line no-console
+    console.error('Return value supplied by processing hook is not array with two elements. It is: ', JSON.stringify(result, null, 2));
+  }
+
+  return result;
+});
+
 const _chainHooks = (hooks: Array<ViewHook>, args: ViewHookArguments) => {
-  return hooks.reduce((prev, cur: ViewHook) => prev.then(() => cur(args)), Promise.resolve());
+  return hooks.reduce(
+    (prev, cur: ViewHook) => prev.then(checkReturnType)
+      .then(([newView, newExecutionState]) => cur({ ...args, view: newView, executionState: newExecutionState })),
+    Promise.resolve([args.view, args.executionState] as const),
+  );
 };
 
 type Query = { [key: string]: any };
-type OnSuccess = () => void;
+type OnSuccess = (view: View, executionState: SearchExecutionState) => void;
 
-const _processViewHooks = (viewHooks: Array<ViewHook>, view: View, query: Query, onSuccess: OnSuccess) => {
-  let promise;
+const _processViewHooks = (viewHooks: Array<ViewHook>, view: View, query: Query, executionState: SearchExecutionState, onSuccess: OnSuccess) => {
+  let promise: Promise<readonly [View, SearchExecutionState]>;
 
   if (viewHooks.length > 0) {
-    const retry = () => _processViewHooks(viewHooks, view, query, onSuccess);
+    const retry: ViewHookArguments['retry'] = (args) => {
+      const _view = args.view ?? view;
+      const _executionState = args.executionState ?? executionState;
 
-    promise = _chainHooks(viewHooks, { view, retry, query });
+      return _processViewHooks(viewHooks, _view, query, _executionState, onSuccess);
+    };
+
+    promise = _chainHooks(viewHooks, { view, retry, query, executionState });
   } else {
-    promise = Promise.resolve(true);
+    promise = Promise.resolve([view, executionState] as const);
   }
 
-  return promise.then(() => view).then(onSuccess).then(() => view);
+  return promise.then(checkReturnType).then(async ([newView, newExecutionState]) => {
+    await onSuccess(newView, newExecutionState);
+
+    return [newView, newExecutionState] as const;
+  });
 };
 
 const processHooks = (
   promise: Promise<View>,
+  executionState: SearchExecutionState,
   loadingViewHooks: Array<ViewHook> = [],
   executingViewHooks: Array<ViewHook> = [],
   query: Query = {},
   onSuccess: OnSuccess = () => {},
 ) => {
   return promise
-    .then((view: View) => _processViewHooks(loadingViewHooks, view, query, onSuccess))
-    .then((view: View) => _processViewHooks(executingViewHooks, view, query, onSuccess));
+    .then((view: View) => _processViewHooks(loadingViewHooks, view, query, executionState, onSuccess))
+    .then(([newView, newExecutionState]) => _processViewHooks(executingViewHooks, newView, query, newExecutionState, onSuccess));
 };
 
 export default processHooks;

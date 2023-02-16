@@ -15,36 +15,32 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Map as MockMap } from 'immutable';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 
-import { MockStore } from 'helpers/mocking';
-import ViewHeader from 'views/components/views/ViewHeader';
+import OriginalViewHeader from 'views/components/views/ViewHeader';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import { createSearch } from 'fixtures/searches';
+import View from 'views/logic/views/View';
 
-jest.mock('views/stores/ViewStore', () => ({
-  ViewActions: {
-    selectQuery: jest.fn(() => Promise.resolve()),
-    search: jest.fn(() => Promise.resolve()),
-  },
-  ViewStore: MockStore(['getInitialState', () => ({
-    view: {
-      id: 'viewId',
-      title: 'Some view',
-      description: 'Hey There!',
-      summary: 'Very helpful summary',
-      type: 'DASHBOARD',
-    },
-  })]),
-}));
+const view = createSearch()
+  .toBuilder()
+  .id('viewId')
+  .title('Some view')
+  .type(View.Type.Dashboard)
+  .build();
 
-jest.mock('views/stores/ViewStatesStore', () => ({
-  ViewStatesActions: {
-    remove: jest.fn(() => Promise.resolve()),
-  },
-  ViewStatesStore: MockStore(['getInitialState', () => MockMap()]),
-}));
+const ViewHeader = () => (
+  <TestStoreProvider view={view}>
+    <OriginalViewHeader />
+  </TestStoreProvider>
+);
 
 describe('ViewHeader', () => {
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   it('Render view type and title', async () => {
     render(<ViewHeader />);
 

@@ -20,7 +20,7 @@ const isPhrase = (searchTerm: string | undefined | null) => {
   return String(searchTerm).indexOf(' ') !== -1;
 };
 
-const escape = (searchTerm: string | undefined | null) => {
+const escape = (searchTerm: string | number | undefined | null) => {
   let escapedTerm = String(searchTerm);
 
   // Replace newlines.
