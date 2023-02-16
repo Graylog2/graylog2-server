@@ -16,41 +16,18 @@
  */
 package org.graylog2.search;
 
-import com.google.common.collect.ImmutableList;
 import org.bson.types.ObjectId;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
+import org.graylog2.utilities.date.MultiFormatDateParser;
 
 import java.util.function.Function;
 
 public class SearchQueryField {
 
-    // We parse all date strings in UTC because we store and show all dates in UTC as well.
-    private static final ImmutableList<DateTimeFormatter> DATE_TIME_FORMATTERS = ImmutableList.of(
-            DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").withZoneUTC(),
-            DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS").withZoneUTC(),
-            ISODateTimeFormat.dateTimeParser().withOffsetParsed().withZoneUTC()
-    );
-
-    private static DateTime parseDate(String value) {
-        for (DateTimeFormatter formatter : DATE_TIME_FORMATTERS) {
-            try {
-                return formatter.parseDateTime(value);
-            } catch (IllegalArgumentException e) {
-                // Try next one
-            }
-        }
-
-        // It's probably not a date...
-        throw new IllegalArgumentException("Unable to parse date: " + value);
-    }
+    private static final MultiFormatDateParser dateParser = new MultiFormatDateParser();
 
     public enum Type {
-
         STRING(value -> value),
-        DATE(value -> SearchQueryField.parseDate(value)),
+        DATE(value -> dateParser.parseDate(value)),
         INT(value -> Integer.parseInt(value)),
         LONG(value -> Long.parseLong(value)),
         OBJECT_ID(value -> new ObjectId(value)),
