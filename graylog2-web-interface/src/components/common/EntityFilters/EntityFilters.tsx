@@ -55,16 +55,16 @@ const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRendere
   };
 
   const onChangeFilter = (attributeId: string, filterId: string, newValue: string, newTitle: string) => {
-    const attributeFilters = activeFilters[attributeId];
-    const existingFilter = attributeFilters.find(({ id }) => id === filterId);
-    const updateFilter = { id: existingFilter.id, value: newValue, title: newTitle };
+    const filterGroup = activeFilters[attributeId];
+    const targetFilterIndex = filterGroup.findIndex(({ id }) => id === filterId);
+    const targetFilter = filterGroup[targetFilterIndex];
+
+    const updatedFilterGroup = [...filterGroup];
+    updatedFilterGroup[targetFilterIndex] = { id: targetFilter.id, value: newValue, title: newTitle };
 
     onUpdateFilters({
       ...activeFilters,
-      [attributeId]: [
-        ...attributeFilters.filter(({ id }) => id !== filterId),
-        updateFilter,
-      ],
+      [attributeId]: updatedFilterGroup,
     });
   };
 

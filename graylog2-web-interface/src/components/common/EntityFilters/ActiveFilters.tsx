@@ -1,10 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { Button } from 'components/bootstrap';
 import type { Filters } from 'components/common/EntityFilters/types';
 import type { Attributes } from 'stores/PaginationTypes';
-import { Icon } from 'components/common';
+import ActiveFilter from 'components/common/EntityFilters/ActiveFilter';
 
 const Container = styled.div`
   display: flex;
@@ -20,34 +19,15 @@ const FilterGroupTitle = styled.div`
   margin-right: 3px;
 `;
 
-const Filter = styled.div`
-  display: flex;
-`;
-
-const CenteredButton = styled(Button)`
-  display: flex;
-  align-items: center;
-`;
-
 type Props = {
-  filters: Filters,
   attributes: Attributes,
   filterValueRenderer: { [attributeId: string]: (value: unknown, title: string) => React.ReactNode } | undefined,
-  onDeleteFilter: (attributeId: string, filterId: string) => void,
+  filters: Filters,
   onChangeFilter: (attributeId: string, filterId: string, newValue: string, newTitle) => void,
+  onDeleteFilter: (attributeId: string, filterId: string) => void,
 }
 
 const ActiveFilters = ({ attributes = [], filters, filterValueRenderer, onDeleteFilter, onChangeFilter }: Props) => {
-  const onFilterClick = (attributeId: string, curValue: string, filterId: string) => {
-    const relatedAttribute = attributes.find(({ id }) => id === attributeId);
-
-    if (relatedAttribute.type === 'boolean') {
-      const oppositeFilterOption = relatedAttribute.filter_options.find(({ value }) => value !== curValue);
-      console.log({ oppositeFilterOption });
-      onChangeFilter(attributeId, filterId, oppositeFilterOption.value, oppositeFilterOption.title);
-    }
-  };
-
   return (
     <Container>
       {Object.entries(filters).map(([attributeId, filterValues]) => {
@@ -58,15 +38,13 @@ const ActiveFilters = ({ attributes = [], filters, filterValueRenderer, onDelete
             <FilterGroupTitle>
               {relatedAttribute.title}:
             </FilterGroupTitle>
-            {filterValues.map(({ title, value, id }) => (
-              <Filter className="btn-group" key={id}>
-                <CenteredButton bsSize="xsmall" onClick={() => onFilterClick(attributeId, value, id)} title="Change value">
-                  {filterValueRenderer[attributeId] ? filterValueRenderer[attributeId](value, title) : title}
-                </CenteredButton>
-                <CenteredButton bsSize="xsmall" onClick={() => onDeleteFilter(attributeId, id)} title="Delete filter">
-                  <Icon name="times" />
-                </CenteredButton>
-              </Filter>
+            {filterValues.map((filter) => (
+              <ActiveFilter filter={filter}
+                            key={filter.id}
+                            attribute={relatedAttribute}
+                            filterValueRenderer={filterValueRenderer}
+                            onChangeFilter={onChangeFilter}
+                            onDeleteFilter={onDeleteFilter} />
             ))}
           </FilterGroup>
         );
