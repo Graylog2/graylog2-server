@@ -21,7 +21,7 @@ import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
 import 'jest-styled-components';
 import type { RenderHookResult, RenderHookOptions } from '@testing-library/react-hooks';
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook, act as renderHookAct } from '@testing-library/react-hooks';
 import type { QueryClientConfig } from '@tanstack/react-query';
 
 import DefaultQueryClientProvider from './DefaultQueryClientProvider';
@@ -65,6 +65,7 @@ export function asElement<T extends new(...args: any) => any> (elem: any, elemen
 
 export * from '@testing-library/react';
 export {
+  renderHookAct,
   renderWithWrapper as render,
   renderHookWithWrapper as renderHook,
 };

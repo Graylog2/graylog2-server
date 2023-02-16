@@ -14,8 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook } from 'wrappedTestingLibrary';
-import { act } from '@testing-library/react-hooks';
+import { renderHook, renderHookAct } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
@@ -50,7 +49,7 @@ describe('useFavoriteItemMutation', () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));
       const { result, waitFor } = renderHook(() => useUserSearchFilterMutation(), { queryClientOptions: { logger } });
 
-      act(() => {
+      renderHookAct(() => {
         result.current.putItem('111');
       });
 
@@ -63,7 +62,7 @@ describe('useFavoriteItemMutation', () => {
 
       const { result, waitFor } = renderHook(() => useUserSearchFilterMutation(), { queryClientOptions: { logger } });
 
-      act(() => {
+      renderHookAct(() => {
         result.current.putItem('111').catch(() => {});
       });
 
@@ -80,7 +79,7 @@ describe('useFavoriteItemMutation', () => {
       asMock(fetch).mockImplementation(() => Promise.resolve());
       const { result, waitFor } = renderHook(() => useUserSearchFilterMutation(), { queryClientOptions: { logger } });
 
-      act(() => {
+      renderHookAct(() => {
         result.current.deleteItem('111');
       });
 
@@ -92,7 +91,7 @@ describe('useFavoriteItemMutation', () => {
 
       const { result, waitFor } = renderHook(() => useUserSearchFilterMutation(), { queryClientOptions: { logger } });
 
-      act(() => {
+      renderHookAct(() => {
         result.current.deleteItem('111').catch(() => {});
       });
 

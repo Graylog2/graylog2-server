@@ -14,8 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook } from 'wrappedTestingLibrary';
-import { act } from '@testing-library/react-hooks';
+import { renderHook, renderHookAct } from 'wrappedTestingLibrary';
 import { useLocation } from 'react-router-dom';
 import type { Location } from 'history';
 
@@ -63,7 +62,7 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     const nextPage = 4;
 
-    act(() => setPagination({ page: nextPage }));
+    renderHookAct(() => setPagination({ page: nextPage }));
 
     expect(mockHistoryReplace).toHaveBeenCalledWith(`?page=${nextPage}&pageSize=10`);
   });
@@ -77,7 +76,7 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     const nextPageSize = DEFAULT_PAGE_SIZES[1];
 
-    act(() => setPagination({ pageSize: nextPageSize }));
+    renderHookAct(() => setPagination({ pageSize: nextPageSize }));
 
     expect(mockHistoryReplace).toHaveBeenCalledWith(`?page=${DEFAULT_PAGE}&pageSize=${nextPageSize}`);
   });

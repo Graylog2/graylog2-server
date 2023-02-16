@@ -15,9 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { renderHook, fireEvent, render } from 'wrappedTestingLibrary';
-import { act } from '@testing-library/react-hooks';
-/* eslint-disable testing-library/no-unnecessary-act */
+import { renderHook, fireEvent, render, renderHookAct } from 'wrappedTestingLibrary';
 
 import useIsKeyHeld from 'hooks/useIsKeyHeld';
 
@@ -26,13 +24,13 @@ describe('useIsKeyHeld custom hook', () => {
     const { container } = render(<input />);
     const { result } = renderHook(() => useIsKeyHeld('Enter'));
 
-    act(() => {
+    renderHookAct(() => {
       fireEvent.keyDown(container, { key: 'Enter', code: 13, charCode: 13 });
     });
 
     expect(result.current).toEqual(true);
 
-    act(() => {
+    renderHookAct(() => {
       fireEvent.keyUp(container, { key: 'Enter', code: 13, charCode: 13 });
     });
 
@@ -43,13 +41,13 @@ describe('useIsKeyHeld custom hook', () => {
     const { result } = renderHook(() => useIsKeyHeld('Enter'));
     const { container } = render(<input />);
 
-    act(() => {
+    renderHookAct(() => {
       fireEvent.keyDown(container, { key: 'Enter', code: 13, charCode: 13 });
     });
 
     expect(result.current).toEqual(true);
 
-    act(() => {
+    renderHookAct(() => {
       fireEvent.keyDown(container, { key: 'Shift', code: 16, charCode: 16 });
     });
 
