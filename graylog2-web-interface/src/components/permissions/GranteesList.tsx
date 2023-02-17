@@ -41,6 +41,7 @@ const List = styled.div(({ theme }) => `
   >:nth-child(even) {
     background: ${theme.colors.table.backgroundAlt};
   };
+
   >:nth-child(odd) {
     background: ${theme.colors.table.background};
   };
@@ -51,7 +52,7 @@ const PaginationWrapper = styled.ul`
   justify-content: center;
 
   .pagination {
-    margin: 10px 0 0 0;
+    margin: 10px 0;
   }
 `;
 

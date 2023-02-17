@@ -266,7 +266,8 @@ EntityDataTable.defaultProps = {
   bulkActions: undefined,
   columnRenderers: undefined,
   columnsOrder: [],
-  pageSizeSelect: undefined,
+  onPageSizeChange: undefined,
+  pageSize: undefined,
   rowActions: undefined,
 };
 

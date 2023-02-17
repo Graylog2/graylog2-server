@@ -16,7 +16,7 @@
  */
 import styled from 'styled-components';
 import * as React from 'react';
-import { useState, useRef, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { Checkbox, DropdownButton } from 'components/bootstrap';
 import type { Column } from 'components/common/EntityDataTable/types';
@@ -100,13 +100,6 @@ type Props = {
 }
 
 const ColumnsVisibilitySelect = ({ onChange, selectedColumns, allColumns }: Props) => {
-  const buttonRef = useRef();
-  const [showSelect, setShowSelect] = useState(false);
-
-  const toggleColumnSelect = () => {
-    setShowSelect((cur) => !cur);
-  };
-
   const sortedColumns = useMemo(
     () => allColumns.sort((col1, col2) => (naturalSort(col1.title, col2.title))),
     [allColumns],
