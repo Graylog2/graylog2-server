@@ -17,6 +17,7 @@
 package org.graylog2.database.filtering;
 
 import com.mongodb.client.model.Filters;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.search.SearchQueryField;
@@ -97,6 +98,33 @@ class DbFilterParserTest {
                         "single wrong one is enough to throw exception"),
                 attributes)
         );
+    }
+
+    @Test
+    void groupsMultipleFilterForTheSameFieldUsingOrLogic() {
+
+        final List<EntityAttribute> attributes = List.of(EntityAttribute.builder()
+                        .id("owner")
+                        .title("Owner")
+                        .filterable(true)
+                        .build(),
+                EntityAttribute.builder()
+                        .id("title")
+                        .title("Title")
+                        .filterable(true)
+                        .build());
+
+
+        final List<Bson> expectedResult = List.of(
+                Filters.or(
+                        Filters.eq("owner", "baldwin"),
+                        Filters.eq("owner", "beomund")
+                ),
+                Filters.eq("title", "crusade")
+
+        );
+        assertEquals(expectedResult,
+                toTest.parse(List.of("owner:baldwin", "owner:beomund", "title:crusade"), attributes));
     }
 
     @Test
