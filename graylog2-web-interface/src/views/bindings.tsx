@@ -90,6 +90,7 @@ import ScatterVisualization from 'views/components/visualizations/scatter/Scatte
 import Icon from 'components/common/Icon';
 import viewsReducers from 'views/viewsReducers';
 
+import EventReplaySearchPage from './pages/EventReplaySearchPage';
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import AreaVisualization from './components/visualizations/area/AreaVisualization';
@@ -137,6 +138,7 @@ const exports: PluginExports = {
     { path: Routes.unqualified.stream_search(':streamId'), component: StreamSearchPage, parentComponent: App },
     { path: extendedSearchPath, component: NewSearchPage, parentComponent: App },
     { path: showViewsPath, component: ShowViewPage, parentComponent: App },
+    { path: Routes.ALERTS.replay_search(':alertId'), component: EventReplaySearchPage, parentComponent: App },
   ],
   enterpriseWidgets: [
     {

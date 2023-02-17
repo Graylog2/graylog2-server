@@ -37,7 +37,7 @@ type DefaultWidgets = Record<ViewType, ViewCreator>;
 
 type Decorator = { stream: string | null };
 
-const matchesDecoratorStream = (streamId: string | string[] | undefined | null) => {
+export const matchesDecoratorStream = (streamId: string | string[] | undefined | null) => {
   if (!streamId) {
     return ({ stream }: Decorator) => stream === null;
   }

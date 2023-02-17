@@ -98,7 +98,7 @@ const EventInfoBar = () => {
         <Row>
           <Item>
             <b>Timestamp:</b>
-            <Timestamp>{eventData.timestamp}</Timestamp>
+            <Timestamp dateTime={eventData.timestamp} />
           </Item>
           <Item>
             <b>Event definition:</b>

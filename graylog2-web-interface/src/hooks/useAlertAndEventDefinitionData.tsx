@@ -20,7 +20,6 @@ import { useRouteMatch } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
 import Routes from 'routing/Routes';
-import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import useParams from 'routing/useParams';
 import type { EventType } from 'hooks/useEventById';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
@@ -28,7 +27,6 @@ import type { EventDefinition } from 'components/event-definitions/event-definit
 const useAlertAndEventDefinitionData = () => {
   const { path } = useRouteMatch();
   const { alertId } = useParams<{ alertId?: string }>();
-  const result = usePaginationQueryParameter();
   const queryClient = useQueryClient();
   const eventData = queryClient.getQueryData(['event-by-id', alertId]) as EventType;
   const EDData = queryClient.getQueryData(['definition', eventData?.event_definition_id]) as EventDefinition;
@@ -37,12 +35,12 @@ const useAlertAndEventDefinitionData = () => {
     alertId,
     definitionId: EDData?.id,
     definitionTitle: EDData?.title,
-    isAlert: Routes.ALERTS.replay_search(':alertId') && eventData && eventData.alert,
-    isEvent: Routes.ALERTS.replay_search(':eventId') && eventData && !eventData.alert,
-    isEventDefinition: Routes.ALERTS.DEFINITIONS.replay_search(':definitionId') && EDData,
+    isAlert: (path === Routes.ALERTS.replay_search(':alertId')) && eventData && eventData.alert,
+    isEvent: (path === Routes.ALERTS.replay_search(':eventId')) && eventData && !eventData.alert,
+    isEventDefinition: (path === Routes.ALERTS.DEFINITIONS.replay_search(':definitionId')) && EDData,
     eventData,
     EDData,
-  }), [path]);
+  }), [EDData, alertId, eventData, path]);
 };
 
 export default useAlertAndEventDefinitionData;
