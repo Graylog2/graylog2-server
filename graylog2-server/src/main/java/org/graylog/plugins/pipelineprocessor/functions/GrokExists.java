@@ -25,9 +25,9 @@ import org.graylog2.grok.GrokPatternRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.google.common.collect.ImmutableList.of;
-
 import javax.inject.Inject;
+
+import static com.google.common.collect.ImmutableList.of;
 
 public class GrokExists extends AbstractFunction<Boolean> {
 
@@ -61,7 +61,7 @@ public class GrokExists extends AbstractFunction<Boolean> {
 
         final boolean patternExists = grokPatternRegistry.grokPatternExists(pattern);
         if (!patternExists && logWhenNotFound) {
-           log.info("Grok Pattern " + pattern + " does not exists.");
+           log.info(context.pipelineErrorMessage("Grok Pattern " + pattern + " does not exist."));
         }
 
         return patternExists;

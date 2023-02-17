@@ -61,7 +61,7 @@ public class JsonParse extends AbstractFunction<JsonNode> {
             }
             return node;
         } catch (IOException e) {
-            log.warn("Unable to parse JSON", e);
+            log.warn(context.pipelineErrorMessage("Unable to parse JSON"), e);
         }
         return MissingNode.getInstance();
     }
