@@ -76,6 +76,7 @@ const ListBase = ({
       {showPageSizeSelect && (
         <PageSizeSelect pageSizes={pageSizes}
                         pageSize={currentPageSize}
+                        showLabel
                         onChange={_onChangePageSize}
                         className="pull-right" />
       )}

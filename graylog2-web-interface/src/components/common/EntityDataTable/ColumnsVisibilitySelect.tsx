@@ -109,6 +109,7 @@ const ColumnsVisibilitySelect = ({ onChange, selectedColumns, allColumns }: Prop
     <StyledDropdownButton title="Columns"
                           bsSize="small"
                           pullRight
+                          aria-label="Configure visible columns"
                           id="columns-visibility-select"
                           bsStyle="default">
       {sortedColumns.map((column) => (
