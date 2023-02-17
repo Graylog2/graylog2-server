@@ -48,9 +48,9 @@ public abstract class EntityAttribute {
     @Nullable
     public abstract Boolean searchable();
 
-    @JsonProperty("visible")
+    @JsonProperty("hidden")
     @Nullable
-    public abstract Boolean visible();
+    public abstract Boolean hidden();
 
     @JsonProperty("filter_options")
     @Nullable
@@ -74,7 +74,7 @@ public abstract class EntityAttribute {
 
         public abstract Builder searchable(Boolean searchable);
 
-        public abstract Builder visible(Boolean visible);
+        public abstract Builder hidden(Boolean hidden);
 
         public abstract Builder filterOptions(Set<FilterOption> filterOptions);
 
