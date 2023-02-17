@@ -17,19 +17,19 @@
 package org.graylog.plugins.pipelineprocessor.functions.messages;
 
 import com.google.common.collect.ImmutableList;
+import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog2.plugin.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 
 public class CloneMessage extends AbstractFunction<Message> {
-    private static final Logger LOG = LoggerFactory.getLogger(CloneMessage.class);
+    private static final RateLimitedLog LOG = getRateLimitedLog(CloneMessage.class);
 
     public static final String NAME = "clone_message";
 
