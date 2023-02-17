@@ -2399,10 +2399,10 @@
     d3-collection "1"
     d3-shape "^1.2.0"
 
-"@plotly/d3@3.8.0":
-  version "3.8.0"
-  resolved "https://registry.yarnpkg.com/@plotly/d3/-/d3-3.8.0.tgz#760d41985ad76de4cbabe6c0a785bc713bea8433"
-  integrity sha512-L10iHgzvw3uSic/nQpYehlNzxUQvImwms5U7S95pJAEhrllzkrdQNy1Mc5DW9ab881Yr4fh300gJztKXWZDfkQ==
+"@plotly/d3@3.8.1":
+  version "3.8.1"
+  resolved "https://registry.yarnpkg.com/@plotly/d3/-/d3-3.8.1.tgz#674bf19809ffcc359e0ab388a1051f2dac5e6877"
+  integrity sha512-x49ThEu1FRA00kTso4Jdfyf2byaCPLBGmLjAYQz5OzaPyLUhHesX3/Nfv2OHEhynhdy2UB39DLXq6thYe2L2kg==
 
 "@plotly/point-cluster@^3.1.9":
   version "3.1.9"
@@ -3013,10 +3013,10 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
-"@types/plotly.js@*", "@types/plotly.js@2.12.13":
-  version "2.12.13"
-  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-2.12.13.tgz#07e1b649245a38778480f0619004da79684f5939"
-  integrity sha512-p/xo8LuJMxSvT/szkjgUJVlopRu049NZ+p46MpcSlovmO6tIgyzldm8kLUo9p24XE/5iZzGSTtvIUQjLwIUQxw==
+"@types/plotly.js@*", "@types/plotly.js@2.12.16":
+  version "2.12.16"
+  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-2.12.16.tgz#99a7ef35052ba5ef985a036ba0ec2d549a604a3c"
+  integrity sha512-EKt30RIIOcVTxFFmrhe+hQauz/DaxoEWsiZFeAWQyeok0lPjqng1f/h6H7C5/s5EpE/vg5SxtCbG856to4LJNw==
 
 "@types/prettier@^2.1.5":
   version "2.2.3"
@@ -6441,7 +6441,7 @@ eslint-config-airbnb@19.0.4:
     eslint-plugin-jsx-a11y "6.7.1"
     eslint-plugin-react "7.32.2"
     eslint-plugin-react-hooks "4.6.0"
-    eslint-plugin-testing-library "5.10.1"
+    eslint-plugin-testing-library "5.10.2"
 
 eslint-import-resolver-node@^0.3.6:
   version "0.3.6"
@@ -6582,10 +6582,10 @@ eslint-plugin-react@7.32.2:
     semver "^6.3.0"
     string.prototype.matchall "^4.0.8"
 
-eslint-plugin-testing-library@5.10.1:
-  version "5.10.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-testing-library/-/eslint-plugin-testing-library-5.10.1.tgz#16ef8adb74d59a4dda24db1d5e750a0ee9b79471"
-  integrity sha512-GRy87AqUi2Ij69pe0YnOXm3oGBCgnFwfIv+Hu9q/kT3jL0pX1cXA7aO+oJnvdpbJy2+riOPqGsa3iAkL888NLg==
+eslint-plugin-testing-library@5.10.2:
+  version "5.10.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-testing-library/-/eslint-plugin-testing-library-5.10.2.tgz#12f231ad9b52b6aef45c801fd00aa129a932e0c2"
+  integrity sha512-f1DmDWcz5SDM+IpCkEX0lbFqrrTs8HRsEElzDEqN/EBI0hpRj8Cns5+IVANXswE8/LeybIJqPAOQIFu2j5Y5sw==
   dependencies:
     "@typescript-eslint/utils" "^5.43.0"
 
@@ -11049,12 +11049,12 @@ pkg-dir@^4.2.0:
   dependencies:
     find-up "^4.0.0"
 
-plotly.js@2.18.1:
-  version "2.18.1"
-  resolved "https://registry.yarnpkg.com/plotly.js/-/plotly.js-2.18.1.tgz#f85919699bc6f1908107e34fd63486356be6cac0"
-  integrity sha512-ZOOWAI4X8vYPrlhKnO27+NdA99GIYvj0+DHFmPXMZCkfxMT8YWUb6th0og6HKCve727tH+7vWAkb+Hg+2KgtUA==
+plotly.js@2.18.2:
+  version "2.18.2"
+  resolved "https://registry.yarnpkg.com/plotly.js/-/plotly.js-2.18.2.tgz#62c3396adac8e1dd6eb34aed4efd8982ed3f931a"
+  integrity sha512-Z8ZgWNfjeIEYxt/PCfpKZoWMxWylGYiuz28W2frUwEeTEcnnspi+JveC3IWYGmlq6dS3AWlJiZOJWJgdrJjCmA==
   dependencies:
-    "@plotly/d3" "3.8.0"
+    "@plotly/d3" "3.8.1"
     "@plotly/d3-sankey" "0.7.2"
     "@plotly/d3-sankey-circular" "0.33.1"
     "@turf/area" "^6.4.0"
