@@ -130,7 +130,7 @@ const EventDefinitionsContainer = () => {
       </div>
       <div>
         {elements?.length === 0 ? (
-          <NoSearchResult>No streams have been found</NoSearchResult>
+          <NoSearchResult>No Event Definition have been found</NoSearchResult>
         ) : (
           <EntityDataTable<EventDefinition> data={elements}
                                             visibleColumns={visibleColumns}
