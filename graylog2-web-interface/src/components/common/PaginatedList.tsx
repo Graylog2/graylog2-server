@@ -57,10 +57,7 @@ const ListBase = ({
     currentPageSize > 0 ? Math.ceil(totalItems / currentPageSize) : 0
   ), [currentPageSize, totalItems]);
 
-  const _onChangePageSize = useCallback((event: React.ChangeEvent<HTMLOptionElement>) => {
-    event.preventDefault();
-    const newPageSize = Number(event.target.value);
-
+  const _onChangePageSize = useCallback((newPageSize: number) => {
     setPagination({ page: INITIAL_PAGE, pageSize: newPageSize });
     if (onChange) onChange(INITIAL_PAGE, newPageSize);
   }, [onChange, setPagination]);

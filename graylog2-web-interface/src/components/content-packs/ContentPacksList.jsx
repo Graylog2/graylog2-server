@@ -175,8 +175,8 @@ class ContentPacksList extends React.Component {
     this.setState({ filteredContentPacks: filteredItems });
   }
 
-  _itemsShownChange(event) {
-    this.setState({ pageSize: Number(event.target.value), currentPage: 1 });
+  _itemsShownChange(pageSize) {
+    this.setState({ pageSize, currentPage: 1 });
   }
 
   _onChangePage(nextPage) {

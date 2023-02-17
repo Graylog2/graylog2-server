@@ -20,7 +20,7 @@ import { useMemo, useState, useCallback, useRef } from 'react';
 import type * as Immutable from 'immutable';
 import { merge } from 'lodash';
 
-import { Button, Table, ButtonToolbar } from 'components/bootstrap';
+import { Button, Table, ButtonGroup, ButtonToolbar } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import StringUtils from 'util/StringUtils';
@@ -62,6 +62,12 @@ const BulkActionsWrapper = styled.div`
 
 const BulkActions = styled(ButtonToolbar)`
   margin-left: 5px;
+`;
+
+const LayoutConfigRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 5px;
 `;
 
 const filterAccessibleColumns = (
@@ -146,6 +152,7 @@ const EntityDataTable = <Entity extends EntityBase>({
   columnRenderers: customColumnRenderers,
   columnDefinitions,
   columnsOrder,
+  pageSizeSelect,
   data,
   onSortChange,
   rowActions,
@@ -200,11 +207,15 @@ const EntityDataTable = <Entity extends EntityBase>({
             </BulkActionsWrapper>
           )}
         </div>
-        <div>
-          <ColumnsVisibilitySelect allColumns={accessibleColumns}
-                                   selectedColumns={visibleColumns}
-                                   onChange={onColumnsChange} />
-        </div>
+        <LayoutConfigRow>
+          Show
+          <ButtonGroup>
+            {pageSizeSelect}
+            <ColumnsVisibilitySelect allColumns={accessibleColumns}
+                                     selectedColumns={visibleColumns}
+                                     onChange={onColumnsChange} />
+          </ButtonGroup>
+        </LayoutConfigRow>
       </ActionsRow>
       <ScrollContainer ref={tableRef}>
         <StyledTable striped condensed hover>

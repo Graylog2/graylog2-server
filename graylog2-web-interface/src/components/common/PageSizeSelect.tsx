@@ -18,7 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Input } from 'components/bootstrap';
+import { Input, DropdownButton, MenuItem } from 'components/bootstrap';
 
 const Wrapper = styled.div`
   margin-bottom: 5px;
@@ -44,21 +44,16 @@ type Props = {
   className?: string,
   pageSize: number,
   pageSizes: Array<number>,
-  onChange: (event: React.ChangeEvent<HTMLOptionElement>) => void,
+  onChange: (newPageSize: number) => void,
 };
 
 const PageSizeSelect = ({ pageSizes, pageSize, onChange, className }: Props) => (
-  <Wrapper className={`${className ?? ''} form-inline page-size pull-right`}>
-    <Input id="page-size"
-           type="select"
-           bsSize="small"
-           label="Show"
-           value={pageSize}
-           onChange={onChange}
-           formGroupClassName="page-size-select">
-      {pageSizes.map((size) => <option key={`option-${size}`} value={size}>{size}</option>)}
-    </Input>
-  </Wrapper>
+  <DropdownButton className={className}
+                  title={`${pageSize} rows`}
+                  bsSize="small"
+                  bsStyle="default">
+    {pageSizes.map((size) => <MenuItem key={`option-${size}`} onSelect={() => onChange(size)}>{size}</MenuItem>)}
+  </DropdownButton>
 );
 
 PageSizeSelect.propTypes = {

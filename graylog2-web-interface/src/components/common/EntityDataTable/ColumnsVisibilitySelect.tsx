@@ -118,7 +118,7 @@ const ColumnsVisibilitySelect = ({ onChange, selectedColumns, allColumns }: Prop
   return (
     <>
       <Button onClick={toggleColumnSelect} ref={buttonRef} bsSize="small" title="Select columns to display">
-        <Icon name="cog" /> Columns
+        Columns <span className="caret" />
       </Button>
 
       {showSelect && (

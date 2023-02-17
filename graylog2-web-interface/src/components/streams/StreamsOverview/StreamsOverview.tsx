@@ -40,6 +40,8 @@ import {
 
 import CustomColumnRenderers from './ColumnRenderers';
 
+import PageSizeSelect from '../../common/PageSizeSelect';
+
 const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
   useEffect(() => {
     StreamsStore.onChange(() => refetchStreams());
@@ -87,6 +89,10 @@ const StreamsOverview = ({ indexSets }: Props) => {
     }
   }, [updateTableLayout]);
 
+  const onChangePageSize = () => {
+
+  };
+
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
     setQuery(newQuery);
@@ -128,6 +134,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
   return (
     <PaginatedList onChange={onPageChange}
                    pageSize={layoutConfig.pageSize}
+                   showPageSizeSelect={false}
                    totalItems={total}>
       <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
@@ -143,6 +150,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
                                    columnsOrder={DEFAULT_LAYOUT.columnsOrder}
                                    onColumnsChange={onColumnsChange}
                                    onSortChange={onSortChange}
+                                   pageSizeSelect={<PageSizeSelect pageSize={layoutConfig.pageSize} onChange={onChangePageSize} />}
                                    bulkActions={renderBulkActions}
                                    activeSort={layoutConfig.sort}
                                    rowActions={renderStreamActions}
