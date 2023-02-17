@@ -53,7 +53,7 @@ const SavedSearchForm = (props: Props) => {
     target,
   } = props;
   const [title, setTitle] = useState(value);
-  const onChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value);
+  const onChangeTitle = useCallback((e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value), []);
 
   const disableCreateNew = title === value;
   const disableSaveAs = !value || value === '' || disableCreateNew;
