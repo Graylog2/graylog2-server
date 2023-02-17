@@ -26,6 +26,7 @@ import type { ActiveShares, CapabilitiesList, SelectedGrantees } from 'logic/per
 import type EntityShareState from 'logic/permissions/EntityShareState';
 import type Grantee from 'logic/permissions/Grantee';
 import type Capability from 'logic/permissions/Capability';
+import { DEFAULT_PAGE_SIZES } from 'hooks/usePaginationQueryParameter';
 
 import GranteesListItem from './GranteesListItem';
 
@@ -89,7 +90,7 @@ const _paginatedGrantees = (selectedGrantees: SelectedGrantees, pageSize: number
 };
 
 const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityType, entityTypeTitle, availableCapabilities, selectedGrantees, className, title }: Props) => {
-  const initialPageSize = PageSizeSelect.defaultPageSizes[0];
+  const initialPageSize = DEFAULT_PAGE_SIZES[0];
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [currentPage, setCurrentPage] = useState(1);
   const paginatedGrantees = _paginatedGrantees(selectedGrantees, pageSize, currentPage);
@@ -102,7 +103,7 @@ const GranteesList = ({ activeShares, onDelete, onCapabilityChange, entityType, 
       <Header>
         <h5>{title}</h5>
         {showPageSizeSelect && (
-          <StyledPageSizeSelect onChange={(event) => setPageSize(Number(event.target.value))} pageSize={pageSize} />
+          <StyledPageSizeSelect onChange={(newPageSize) => setPageSize(newPageSize)} pageSize={pageSize} />
         )}
       </Header>
       {paginatedGrantees.size > 0 ? (

@@ -45,6 +45,7 @@ const PageSizeSelect = ({ pageSizes, pageSize, onChange, className, showLabel }:
   const select = (
     <StyledDropdownButton className={className}
                           title={`${pageSize} Rows`}
+                          pullRight
                           bsSize="small"
                           bsStyle="default">
       {pageSizes.map((size) => <MenuItem key={`option-${size}`} onSelect={() => onChange(size)}>{size}</MenuItem>)}
@@ -76,7 +77,5 @@ PageSizeSelect.defaultProps = {
   pageSizes: DEFAULT_PAGE_SIZES,
   showLabel: true,
 };
-
-PageSizeSelect.defaultPageSizes = PAGE_SIZES;
 
 export default PageSizeSelect;
