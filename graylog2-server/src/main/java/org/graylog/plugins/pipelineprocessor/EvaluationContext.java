@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.graylog2.shared.utilities.ExceptionUtils.getRootCause;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class EvaluationContext {
 
@@ -203,5 +204,12 @@ public class EvaluationContext {
                     .append(throwable.getMessage())
                     .toString();
         }
+    }
+
+    public String pipelineErrorMessage(String msg) {
+        if (currentRule != null) {
+            return f("Rule <%s> %s", currentRule.name(), msg);
+        }
+        return msg;
     }
 }

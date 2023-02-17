@@ -57,7 +57,7 @@ public class JsonParse extends AbstractFunction<JsonNode> {
                 JsonUtils.deleteBelow(node, depth);
             }
             if (node == null) {
-                throw new IOException("null result");
+                throw new IOException(context.pipelineErrorMessage("null result"));
             }
             return node;
         } catch (IOException e) {
