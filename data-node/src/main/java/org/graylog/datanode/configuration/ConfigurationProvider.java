@@ -63,6 +63,9 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
         config.put("path.logs", Path.of(datanodeConfig.getOpensearchLogsLocation()).resolve(datanodeConfig.getDatanodeNodeName()).toAbsolutePath().toString());
         //config.put("discovery.type", "single-node");
 
+        // listen on all interfaces
+        config.put("network.bind_host", "0.0.0.0");
+
         config.put("cluster.initial_master_nodes", "node1");
 
         final Path transportKeystorePath = Path.of(datanodeConfig.getOpensearchConfigLocation())
@@ -149,7 +152,7 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
         final BCryptPasswordAlgorithm passwordAlgorithm = new BCryptPasswordAlgorithm(12);
         final String hashWithPrefix = passwordAlgorithm.hash(adminPassword);
 
-        // remove the prefix, we need just the hash itself
+        // remove the prefix and suffix, we need just the hash itself
         final String hash = hashWithPrefix.substring("{bcrypt}".length(), hashWithPrefix.indexOf("{salt}"));
         admin.put("hash", hash);
         final FileOutputStream fos = new FileOutputStream(internalUsersFile.toFile());
