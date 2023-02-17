@@ -74,6 +74,7 @@ export type Attribute = {
   id: string,
   title: string,
   sortable: boolean,
+  hidden?: boolean,
 }
 
 export type Attributes = Array<Attribute>
