@@ -13,7 +13,7 @@
     "@jest/types": "29.4.3",
     "@testing-library/dom": "9.0.0",
     "@testing-library/jest-dom": "5.16.5",
-    "@testing-library/react": "12.1.5",
+    "@testing-library/react": "14.0.0",
     "@testing-library/react-hooks": "^8.0.0",
     "@types/enzyme": "3.10.12",
     "babel-jest": "29.4.3",
