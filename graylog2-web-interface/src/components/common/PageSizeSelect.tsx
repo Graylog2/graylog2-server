@@ -44,6 +44,7 @@ type Props = {
 const PageSizeSelect = ({ pageSizes, pageSize, onChange, className, showLabel }: Props) => {
   const select = (
     <StyledDropdownButton className={className}
+                          id="page-size-select"
                           title={`${pageSize} Rows`}
                           pullRight
                           bsSize="small"

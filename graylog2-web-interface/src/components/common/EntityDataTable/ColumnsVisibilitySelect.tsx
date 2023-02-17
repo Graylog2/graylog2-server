@@ -109,8 +109,8 @@ const ColumnsVisibilitySelect = ({ onChange, selectedColumns, allColumns }: Prop
     <StyledDropdownButton title="Columns"
                           bsSize="small"
                           pullRight
+                          id="columns-visibility-select"
                           bsStyle="default">
-
       {sortedColumns.map((column) => (
         <ColumnListItem column={column}
                         onClick={onChange}
