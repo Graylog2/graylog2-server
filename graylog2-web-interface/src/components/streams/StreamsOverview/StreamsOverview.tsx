@@ -40,8 +40,6 @@ import {
 
 import CustomColumnRenderers from './ColumnRenderers';
 
-import PageSizeSelect from '../../common/PageSizeSelect';
-
 const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
   useEffect(() => {
     StreamsStore.onChange(() => refetchStreams());
@@ -83,14 +81,9 @@ const StreamsOverview = ({ indexSets }: Props) => {
     [paginatedStreams?.attributes],
   );
 
-  const onPageChange = useCallback((_newPage: number, newPageSize: number) => {
-    if (newPageSize) {
-      updateTableLayout({ perPage: newPageSize });
-    }
-  }, [updateTableLayout]);
-
-  const onChangePageSize = () => {
-
+  const onPageSizeChange = (newPageSize: number) => {
+    paginationQueryParameter.resetPage();
+    updateTableLayout({ perPage: newPageSize });
   };
 
   const onSearch = useCallback((newQuery: string) => {
@@ -107,8 +100,8 @@ const StreamsOverview = ({ indexSets }: Props) => {
   }, [updateTableLayout]);
 
   const onSortChange = useCallback((newSort: Sort) => {
-    updateTableLayout({ sort: newSort });
     paginationQueryParameter.resetPage();
+    updateTableLayout({ sort: newSort });
   }, [paginationQueryParameter, updateTableLayout]);
 
   const renderStreamActions = useCallback((listItem: Stream) => (
@@ -132,8 +125,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
   const { elements, pagination: { total } } = paginatedStreams;
 
   return (
-    <PaginatedList onChange={onPageChange}
-                   pageSize={layoutConfig.pageSize}
+    <PaginatedList pageSize={layoutConfig.pageSize}
                    showPageSizeSelect={false}
                    totalItems={total}>
       <div style={{ marginBottom: 5 }}>
@@ -150,7 +142,8 @@ const StreamsOverview = ({ indexSets }: Props) => {
                                    columnsOrder={DEFAULT_LAYOUT.columnsOrder}
                                    onColumnsChange={onColumnsChange}
                                    onSortChange={onSortChange}
-                                   pageSizeSelect={<PageSizeSelect pageSize={layoutConfig.pageSize} onChange={onChangePageSize} />}
+                                   onPageSizeChange={onPageSizeChange}
+                                   pageSize={layoutConfig.pageSize}
                                    bulkActions={renderBulkActions}
                                    activeSort={layoutConfig.sort}
                                    rowActions={renderStreamActions}

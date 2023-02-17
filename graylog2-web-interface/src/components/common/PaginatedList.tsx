@@ -74,7 +74,10 @@ const ListBase = ({
   return (
     <>
       {showPageSizeSelect && (
-        <PageSizeSelect pageSizes={pageSizes} pageSize={currentPageSize} onChange={_onChangePageSize} />
+        <PageSizeSelect pageSizes={pageSizes}
+                        pageSize={currentPageSize}
+                        onChange={_onChangePageSize}
+                        className="pull-right" />
       )}
 
       {children}

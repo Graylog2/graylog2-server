@@ -30,6 +30,7 @@ import { CELL_PADDING, BULK_SELECT_COLUMN_WIDTH } from 'components/common/Entity
 import useColumnsWidths from 'components/common/EntityDataTable/hooks/useColumnsWidths';
 import useElementDimensions from 'hooks/useElementDimensions';
 import type { Sort } from 'stores/PaginationTypes';
+import { PageSizeSelect } from 'components/common';
 
 import TableHead from './TableHead';
 import TableRow from './TableRow';
@@ -137,6 +138,10 @@ type Props<Entity extends EntityBase> = {
   onColumnsChange: (columnIds: Array<string>) => void,
   /** Function to handle sort changes */
   onSortChange: (newSort: Sort) => void,
+  /** Function to handle page size changes */
+  onPageSizeChange?: (newPageSize: number) => void,
+  /** Active page size */
+  pageSize?: number
   /** Actions for each row. */
   rowActions?: (entity: Entity) => React.ReactNode,
   /** Which columns should be displayed. */
@@ -152,7 +157,8 @@ const EntityDataTable = <Entity extends EntityBase>({
   columnRenderers: customColumnRenderers,
   columnDefinitions,
   columnsOrder,
-  pageSizeSelect,
+  onPageSizeChange,
+  pageSize,
   data,
   onSortChange,
   rowActions,
@@ -164,6 +170,7 @@ const EntityDataTable = <Entity extends EntityBase>({
   const columnRenderers = merge(DefaultColumnRenderers, customColumnRenderers);
   const displayActionsCol = typeof rowActions === 'function';
   const displayBulkSelectCol = typeof bulkActions === 'function';
+  const displayPageSizeSelect = typeof onPageSizeChange === 'function';
 
   const accessibleColumns = useMemo(
     () => filterAccessibleColumns(columnDefinitions, currentUser.permissions),
@@ -210,7 +217,9 @@ const EntityDataTable = <Entity extends EntityBase>({
         <LayoutConfigRow>
           Show
           <ButtonGroup>
-            {pageSizeSelect}
+            {displayPageSizeSelect && (
+              <PageSizeSelect pageSize={pageSize} showLabel={false} onChange={onPageSizeChange} />
+            )}
             <ColumnsVisibilitySelect allColumns={accessibleColumns}
                                      selectedColumns={visibleColumns}
                                      onChange={onColumnsChange} />
@@ -256,8 +265,9 @@ EntityDataTable.defaultProps = {
   activeSort: undefined,
   bulkActions: undefined,
   columnRenderers: undefined,
-  rowActions: undefined,
   columnsOrder: [],
+  pageSizeSelect: undefined,
+  rowActions: undefined,
 };
 
 export default EntityDataTable;

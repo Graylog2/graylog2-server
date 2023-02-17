@@ -18,54 +18,63 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Input, DropdownButton, MenuItem } from 'components/bootstrap';
+import { DropdownButton, MenuItem } from 'components/bootstrap';
+import { DEFAULT_PAGE_SIZES } from 'hooks/usePaginationQueryParameter';
 
-const Wrapper = styled.div`
-  margin-bottom: 5px;
-
-  && .form-group {
-    margin-bottom: 0;
-  }
-
-  .control-label {
-    padding-top: 0;
-    font-weight: normal;
-  }
-
-  .page-size-select {
-    display: flex;
-    align-items: baseline;
+const StyledDropdownButton = styled(DropdownButton)`
+  ~ .dropdown-menu {
+    min-width: auto;
   }
 `;
 
-const PAGE_SIZES = [10, 50, 100];
+const Container = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 3px;
+`;
 
 type Props = {
   className?: string,
   pageSize: number,
   pageSizes: Array<number>,
   onChange: (newPageSize: number) => void,
+  showLabel?: boolean
 };
 
-const PageSizeSelect = ({ pageSizes, pageSize, onChange, className }: Props) => (
-  <DropdownButton className={className}
-                  title={`${pageSize} rows`}
-                  bsSize="small"
-                  bsStyle="default">
-    {pageSizes.map((size) => <MenuItem key={`option-${size}`} onSelect={() => onChange(size)}>{size}</MenuItem>)}
-  </DropdownButton>
-);
+const PageSizeSelect = ({ pageSizes, pageSize, onChange, className, showLabel }: Props) => {
+  const select = (
+    <StyledDropdownButton className={className}
+                          title={`${pageSize} Rows`}
+                          bsSize="small"
+                          bsStyle="default">
+      {pageSizes.map((size) => <MenuItem key={`option-${size}`} onSelect={() => onChange(size)}>{size}</MenuItem>)}
+    </StyledDropdownButton>
+  );
+
+  if (showLabel) {
+    return (
+      <Container className={className}>
+        Show
+        {select}
+      </Container>
+    );
+  }
+
+  return select;
+};
 
 PageSizeSelect.propTypes = {
   className: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   pageSize: PropTypes.number.isRequired,
   pageSizes: PropTypes.arrayOf(PropTypes.number),
+  showLabel: PropTypes.bool,
 };
 
 PageSizeSelect.defaultProps = {
   className: '',
-  pageSizes: PAGE_SIZES,
+  pageSizes: DEFAULT_PAGE_SIZES,
+  showLabel: true,
 };
 
 PageSizeSelect.defaultPageSizes = PAGE_SIZES;
