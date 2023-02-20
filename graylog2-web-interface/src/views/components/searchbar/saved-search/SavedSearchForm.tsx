@@ -55,8 +55,7 @@ const SavedSearchForm = (props: Props) => {
   const [title, setTitle] = useState(value);
   const onChangeTitle = useCallback((e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value), []);
 
-  const disableCreateNew = title === value;
-  const disableSaveAs = !value || value === '' || disableCreateNew;
+  const disableSaveAs = !title || title === '';
   const createNewTitle = isCreateNew ? 'Create new' : 'Save as';
   const pluggableSaveViewControls = useSaveViewFormControls();
   const _saveSearch = useCallback(() => saveSearch(title), [saveSearch, title]);
