@@ -21,8 +21,8 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.BeanDeserializer;
-import org.graylog2.inputs.EncryptedInputConfigs;
 import org.graylog2.inputs.WithInputConfiguration;
+import org.graylog2.inputs.encryption.EncryptedInputConfigs;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.security.encryption.EncryptedValue;
 

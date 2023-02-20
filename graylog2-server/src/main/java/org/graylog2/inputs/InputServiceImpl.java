@@ -36,6 +36,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.converters.ConverterFactory;
+import org.graylog2.inputs.encryption.EncryptedInputConfigs;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.inputs.extractors.events.ExtractorCreated;
 import org.graylog2.inputs.extractors.events.ExtractorDeleted;
