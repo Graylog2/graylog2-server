@@ -29,6 +29,7 @@ import org.graylog2.inputs.extractors.events.ExtractorUpdated;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.inputs.Extractor;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
@@ -61,8 +62,6 @@ public class ExtractorFilter implements MessageFilter {
                            @Named("daemonScheduler") ScheduledExecutorService scheduler) {
         this.inputService = inputService;
         this.scheduler = scheduler;
-
-        loadAllExtractors();
 
         // TODO: This class needs lifecycle management to avoid leaking objects in the EventBus
         serverEventBus.register(this);
@@ -125,7 +124,7 @@ public class ExtractorFilter implements MessageFilter {
     @SuppressWarnings("unused")
     public void handleExtractorDelete(final ExtractorDeleted event) {
         LOG.debug("Removing extractors for input <{}> from extractors cache", event.inputId());
-        scheduler.submit(() -> loadExtractors(event.inputId()   ));
+        scheduler.submit(() -> loadExtractors(event.inputId()));
     }
 
     @Subscribe
@@ -133,6 +132,14 @@ public class ExtractorFilter implements MessageFilter {
     public void handleExtractorUpdate(final ExtractorUpdated event) {
         LOG.debug("Updating extractors cache for input <{}>", event.inputId());
         scheduler.submit(() -> loadExtractors(event.inputId()));
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void lifecycleChanged(Lifecycle lifecycle) {
+        if (Lifecycle.STARTING.equals(lifecycle)) {
+            loadAllExtractors();
+        }
     }
 
     private void loadAllExtractors() {
