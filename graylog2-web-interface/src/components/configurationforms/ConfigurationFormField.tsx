@@ -21,6 +21,7 @@ import PropTypes from 'prop-types';
 import {
   BooleanField,
   DropdownField,
+  InlineBinaryField,
   ListField,
   NumberField,
   TextField,
@@ -92,6 +93,17 @@ const ConfigurationFormField = ({ typeName, configField, configKey, configValue,
                    value={configValue}
                    onChange={onChange}
                    autoFocus={autoFocus} />
+      );
+    case 'inline_binary':
+      return (
+        <InlineBinaryField key={elementKey}
+                           typeName={typeName}
+                           title={configKey}
+                           field={configField}
+                           value={configValue}
+                           dirty={dirty}
+                           onChange={onChange}
+                           autoFocus={autoFocus} />
       );
     default:
       return null;
