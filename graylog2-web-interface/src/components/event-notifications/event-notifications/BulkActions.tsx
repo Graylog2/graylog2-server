@@ -1,0 +1,60 @@
+import * as React from 'react';
+import { uniq } from 'lodash';
+import { useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+
+import ApiRoutes from 'routing/ApiRoutes';
+import type FetchError from 'logic/errors/FetchError';
+import fetch from 'logic/rest/FetchProvider';
+import { qualifyUrl } from 'util/URLUtils';
+import UserNotification from 'util/UserNotification';
+import { Button } from 'components/bootstrap';
+import StringUtils from 'util/StringUtils';
+
+type Props = {
+  selectedNotificationsIds: Array<string>,
+  setSelectedNotificationsIds: (definitionIds: Array<string>) => void,
+  refetchEventNotifications: () => void,
+};
+
+const BulkActions = ({ selectedNotificationsIds, setSelectedNotificationsIds, refetchEventNotifications }: Props) => {
+  const queryClient = useQueryClient();
+  const selectedItemsAmount = selectedNotificationsIds?.length;
+  const descriptor = StringUtils.pluralize(selectedItemsAmount, 'event notification', 'event notifications');
+  const onDelete = useCallback(() => {
+    // eslint-disable-next-line no-alert
+    if (window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}?`)) {
+      const deleteCalls = selectedNotificationsIds.map((notificationId) => fetch('DELETE', qualifyUrl(ApiRoutes.EventNotificationsApiController.delete(notificationId).url)).then(() => notificationId));
+
+      Promise.allSettled(deleteCalls).then((result) => {
+        const fulfilledRequests = result.filter((response) => response.status === 'fulfilled') as Array<{ status: 'fulfilled', value: string }>;
+        const deletednotificationIds = fulfilledRequests.map(({ value }) => value);
+        const notDeletednotificationIds = selectedNotificationsIds?.filter((streamId) => !deletednotificationIds.includes(streamId));
+
+        if (notDeletednotificationIds.length) {
+          const rejectedRequests = result.filter((response) => response.status === 'rejected') as Array<{ status: 'rejected', reason: FetchError }>;
+          const errorMessages = uniq(rejectedRequests.map((request) => request.reason.responseMessage));
+
+          if (notDeletednotificationIds.length !== selectedNotificationsIds.length) {
+            queryClient.invalidateQueries(['eventNotifications', 'overview']);
+          }
+
+          UserNotification.error(`${notDeletednotificationIds.length} out of ${selectedNotificationsIds} selected ${descriptor} could not be deleted. Status: ${errorMessages.join()}`);
+
+          return;
+        }
+
+        queryClient.invalidateQueries(['eventNotifications', 'overview']);
+        setSelectedNotificationsIds(notDeletednotificationIds);
+        refetchEventNotifications();
+        UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`, 'Success');
+      });
+    }
+  }, [descriptor, queryClient, refetchEventNotifications, selectedNotificationsIds, selectedItemsAmount, setSelectedNotificationsIds]);
+
+  return (
+    <Button bsSize="xsmall" bsStyle="danger" onClick={() => onDelete()}>Delete</Button>
+  );
+};
+
+export default BulkActions;

@@ -145,6 +145,17 @@ const ApiRoutes = {
     update: (definitionId: string) => { return { url: `/events/definitions/${definitionId}` }; },
     delete: (definitionId: string) => { return { url: `/events/definitions/${definitionId}` }; },
   },
+  EventNotificationsApiController: {
+    list: () => { return { url: '/events/notifications' }; },
+    paginated: () => { return { url: '/events/notifications/paginated' }; },
+    get: (definitionId: string) => { return { url: `/events/notifications/${definitionId}` }; },
+    create: () => { return { url: '/events/notifications' }; },
+    bulkDelete: () => { return { url: '/events/notifications/bulk_delete' }; },
+    bulkSchedule: () => { return { url: '/events/notifications/bulk_schedule' }; },
+    bulkUnschedule: () => { return { url: '/events/notifications/bulk_unschedule' }; },
+    update: (definitionId: string) => { return { url: `/events/notifications/${definitionId}` }; },
+    delete: (definitionId: string) => { return { url: `/events/notifications/${definitionId}` }; },
+  },
   HTTPHeaderAuthConfigController: {
     load: () => ({ url: '/system/authentication/http-header-auth-config' }),
     update: () => ({ url: '/system/authentication/http-header-auth-config' }),
