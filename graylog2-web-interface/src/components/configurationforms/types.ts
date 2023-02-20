@@ -82,4 +82,12 @@ export type BooleanField = {
   type: 'boolean',
 };
 
+export type FieldValue = string | number | boolean | void
+
+export type EncryptedFieldValue<Value> = {
+  set_value?: Value,
+  is_set?: boolean,
+  delete_value?: boolean,
+}
+
 export type ConfigurationField = BooleanField | DropdownField | ListField | NumberField | TextField;
