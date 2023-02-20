@@ -1,3 +1,19 @@
+ /*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 package org.graylog.datanode;
 
 import com.github.rholder.retry.RetryException;
@@ -14,6 +30,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy;
+import org.testcontainers.containers.wait.strategy.WaitStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.net.SocketException;
@@ -41,7 +59,8 @@ public class DatanodeStartupIT {
                 .withDockerfile(Path.of("./Dockerfile")))
                 .withExposedPorts(8999, 9200)
                 .withNetwork(network)
-                .dependsOn(mongo);
+                .dependsOn(mongo)
+                .waitingFor(new HostPortWaitStrategy());
 
         mongo.start();
         datanode.start();
