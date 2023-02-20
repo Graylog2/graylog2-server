@@ -61,5 +61,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V202211021200_CreateDefaultIndexDefaultsConfig.class);
         addMigration(V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViews.class);
         addMigration(V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearches.class);
+        addMigration(V20230220095500_MigrateStartPageObjectReferencesToGRNbyRemoval.class);
     }
 }

@@ -38,7 +38,7 @@ import javax.inject.Inject;
 import java.util.Optional;
 
 public class LastOpenedService extends PaginatedDbService<LastOpenedForUserDTO> {
-    private static final String COLLECTION_NAME = "last_opened";
+    public static final String COLLECTION_NAME = "last_opened";
 
     private final EntityOwnershipService entityOwnerShipService;
 
