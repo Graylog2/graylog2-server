@@ -16,28 +16,26 @@
  */
 package org.graylog.datanode;
 
-import com.github.rholder.retry.RetryException;
-import com.github.rholder.retry.Retryer;
-import com.github.rholder.retry.RetryerBuilder;
-import com.github.rholder.retry.StopStrategies;
-import com.github.rholder.retry.WaitStrategies;
-import io.restassured.RestAssured;
-import io.restassured.response.ValidatableResponse;
-import org.apache.http.NoHttpResponseException;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.Network;
-import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy;
-import org.testcontainers.containers.wait.strategy.WaitStrategy;
-import org.testcontainers.images.builder.ImageFromDockerfile;
+ import com.github.rholder.retry.RetryException;
+ import com.github.rholder.retry.Retryer;
+ import com.github.rholder.retry.RetryerBuilder;
+ import com.github.rholder.retry.StopStrategies;
+ import com.github.rholder.retry.WaitStrategies;
+ import io.restassured.RestAssured;
+ import io.restassured.response.ValidatableResponse;
+ import org.apache.http.NoHttpResponseException;
+ import org.hamcrest.Matchers;
+ import org.junit.jupiter.api.AfterEach;
+ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.Test;
+ import org.testcontainers.containers.GenericContainer;
+ import org.testcontainers.containers.Network;
+ import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy;
+ import org.testcontainers.images.builder.ImageFromDockerfile;
 
-import java.net.SocketException;
-import java.nio.file.Path;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
+ import java.net.SocketException;
+ import java.util.concurrent.ExecutionException;
+ import java.util.concurrent.TimeUnit;
 
 public class DatanodeStartupIT {
 
@@ -55,12 +53,35 @@ public class DatanodeStartupIT {
                 .withNetworkAliases("mongodb")
                 .withExposedPorts(27017);
 
-        datanode = new GenericContainer(new ImageFromDockerfile()
-                .withDockerfile(Path.of("./Dockerfile")))
+        final ImageFromDockerfile image = new ImageFromDockerfile("local/graylog-datanode:latest", false)
+                .withDockerfileFromBuilder(builder ->
+                        builder
+                                .from("eclipse-temurin:17-jre-jammy")
+                                .env("OPENSEARCH_VERSION", "2.4.1")
+                                .workDir("/usr/share/graylog/datanode")
+                                // TODO: download clean version of opensearch or rely on the existing one from the build step? Mount or copy?
+                                //.add("https://artifacts.opensearch.org/releases/bundle/opensearch/${OPENSEARCH_VERSION}/opensearch-${OPENSEARCH_VERSION}-linux-x64.tar.gz", "opensearch-dist/")
+                                .run("mkdir -p config")
+                                .run("mkdir -p data")
+                                .run("mkdir -p logs")
+                                .run("useradd opensearch")
+                                .run("chown -R opensearch:opensearch /usr/share/graylog/datanode")
+                                .user("opensearch")
+                                .expose(8999)
+                                .entryPoint("java", "-jar", "datanode.jar", "datanode", "-f", "datanode.conf")
+                                .build());
+
+        datanode = new GenericContainer(image)
                 .withExposedPorts(8999, 9200)
                 .withNetwork(network)
                 .dependsOn(mongo)
                 .waitingFor(new HostPortWaitStrategy());
+
+        datanode
+                .withFileSystemBind("target/datanode-5.1.0-SNAPSHOT.jar", "/usr/share/graylog/datanode/datanode.jar")
+                .withFileSystemBind("target/lib", "/usr/share/graylog/datanode/lib/")
+                .withFileSystemBind("bin/opensearch-2.4.1", "/usr/share/graylog/datanode/opensearch-dist")
+                .withFileSystemBind("datanode.conf", "/usr/share/graylog/datanode/datanode.conf");
 
         mongo.start();
         datanode.start();
