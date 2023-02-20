@@ -23,7 +23,7 @@ import type { EditWidgetComponentProps } from 'views/types';
 import usePluginEntities from 'hooks/usePluginEntities';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import { Row, Col, Checkbox } from 'components/bootstrap';
-import FieldSelect from 'views/components/widgets/FieldSelect';
+import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import FieldSortSelect from 'views/components/widgets/FieldSortSelect';
 import SortDirectionSelect from 'views/components/widgets/SortDirectionSelect';
@@ -35,6 +35,7 @@ import { HoverForHelp } from 'components/common';
 import { defaultCompare } from 'logic/DefaultCompare';
 import SaveOrCancelButtons from 'views/components/widgets/SaveOrCancelButtons';
 import StickyBottomActions from 'views/components/widgets/StickyBottomActions';
+import SelectedFieldsList from 'views/components/widgets/SelectedFieldsList';
 
 const FullHeightRow = styled(Row)`
   height: 100%;
@@ -75,7 +76,6 @@ const _onSortDirectionChange = (direction: SortConfig['direction'], config, onCh
 const EditMessageList = ({ children, config, fields, onChange, onCancel, onSubmit }: EditWidgetComponentProps<MessagesWidgetConfig>) => {
   const { sort } = config;
   const [sortDirection] = (sort || []).map((s) => s.direction);
-  const selectedFieldsForSelect = config.fields.map((fieldName) => ({ field: fieldName }));
   const onDecoratorsChange = (newDecorators) => onChange(config.toBuilder().decorators(newDecorators).build());
   const messagePreviewOptions = usePluginEntities('views.components.widgets.messageTable.previewOptions');
   const sortedMessagePreviewOptions = messagePreviewOptions.sort((o1, o2) => defaultCompare(o1.sort, o2.sort));
@@ -86,9 +86,18 @@ const EditMessageList = ({ children, config, fields, onChange, onCancel, onSubmi
         <StickyBottomActions actions={<SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />}
                              alignActionsAtBottom>
           <DescriptionBox description="Fields">
-            <FieldSelect fields={fields}
-                         onChange={(newFields) => _onFieldSelectionChanged(newFields, config, onChange)}
-                         value={selectedFieldsForSelect} />
+            <FieldSelect id="message-list-field-create-select"
+                         onChange={(newField) => _onFieldSelectionChanged([...config.fields, newField], config, onChange)}
+                         clearable={false}
+                         ariaLabel="Fields"
+                         persistSelection={false}
+                         name="message-list-field-create-select"
+                         value={undefined}
+                         excludedFields={config.fields ?? []}
+                         placeholder="Add a field"
+                         aria-label="Add a field" />
+            <SelectedFieldsList selectedFields={config.fields}
+                                onChange={(newFields) => _onFieldSelectionChanged(newFields, config, onChange)} />
           </DescriptionBox>
           <DescriptionBox description="Message Preview">
             {sortedMessagePreviewOptions.map((option) => (
