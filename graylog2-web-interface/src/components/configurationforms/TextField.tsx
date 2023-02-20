@@ -17,35 +17,60 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Input } from 'components/bootstrap';
+import { Button, Input } from 'components/bootstrap';
 import { hasAttribute, optionalMarker } from 'components/configurationforms/FieldHelpers';
 import { getValueFromInput } from 'util/FormsUtils';
 
-import type { TextField as TextFieldType } from './types';
+import type { TextField as TextFieldType, EncryptedFieldValue } from './types';
 
 type Props = {
   autoFocus: boolean,
-  buttonAfter?: React.ReactElement | string,
   field: TextFieldType,
   dirty: boolean,
-  onChange: (title: string, value: number) => void,
+  onChange: (title: string, value: string | EncryptedFieldValue<string>) => void,
   title: string,
   typeName: string,
-  value?: string,
+  value?: string | EncryptedFieldValue<string>,
 };
 
-const TextField = ({ field, title, typeName, dirty, onChange, value, autoFocus, buttonAfter }: Props) => {
+const TextField = ({ field, title, typeName, dirty, onChange, value, autoFocus }: Props) => {
   const isRequired = !field.is_optional;
-  const showReadOnlyEncrypted = field.is_encrypted && !dirty && value !== '';
+  const showReadOnlyEncrypted = field.is_encrypted && !dirty && typeof value !== 'string' && value.is_set;
   const fieldType = (!hasAttribute(field.attributes, 'textarea') && (hasAttribute(field.attributes, 'is_password') || showReadOnlyEncrypted) ? 'password' : 'text');
   const fieldId = `${typeName}-${title}`;
 
   const labelContent = <>{field.human_name} {optionalMarker(field)}</>;
 
+  const fieldValue = () => {
+    if (showReadOnlyEncrypted) return 'encrypted placeholder';
+
+    if (typeof value === 'string') return value;
+
+    if (value && value.set_value) {
+      return value.set_value;
+    }
+
+    return '';
+  };
+
   const handleChange = ({ target }) => {
     const inputValue = getValueFromInput(target);
 
-    onChange(title, inputValue);
+    if (field.is_encrypted) {
+      onChange(title, { set_value: inputValue });
+    } else {
+      onChange(title, inputValue);
+    }
+  };
+
+  const buttonAfter = () => {
+    if (!showReadOnlyEncrypted) return null;
+
+    return (
+      <Button type="button" onClick={() => onChange(title, { delete_value: true })}>
+        Reset
+      </Button>
+    );
   };
 
   if (hasAttribute(field.attributes, 'textarea')) {
@@ -57,7 +82,7 @@ const TextField = ({ field, title, typeName, dirty, onChange, value, autoFocus, 
              name={`configuration[${title}]`}
              required={isRequired}
              help={field.description}
-             value={value || ''}
+             value={fieldValue()}
              onChange={handleChange}
              autoFocus={autoFocus} />
     );
@@ -70,17 +95,16 @@ const TextField = ({ field, title, typeName, dirty, onChange, value, autoFocus, 
            label={labelContent}
            required={isRequired}
            help={field.description}
-           value={value || ''}
+           value={fieldValue()}
            readOnly={showReadOnlyEncrypted}
            onChange={handleChange}
-           buttonAfter={buttonAfter}
+           buttonAfter={buttonAfter()}
            autoFocus={autoFocus} />
   );
 };
 
 TextField.propTypes = {
   autoFocus: PropTypes.bool,
-  buttonAfter: PropTypes.node,
   dirty: PropTypes.bool,
   field: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
@@ -91,7 +115,6 @@ TextField.propTypes = {
 
 TextField.defaultProps = {
   autoFocus: false,
-  buttonAfter: undefined,
   dirty: false,
   value: '',
 };

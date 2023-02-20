@@ -25,20 +25,19 @@ import {
   NumberField,
   TextField,
 } from 'components/configurationforms';
-import type { ConfigurationField } from 'components/configurationforms/types';
+import type { ConfigurationField, FieldValue, EncryptedFieldValue } from 'components/configurationforms/types';
 
 type Props = {
   typeName: string,
   configField: ConfigurationField,
   configKey: string,
-  configValue: string | number | boolean | void,
+  configValue: FieldValue | EncryptedFieldValue<FieldValue>,
   dirty: boolean,
   autoFocus: boolean,
-  buttonAfter?: React.ReactElement | string,
   onChange: () => void,
 };
 
-const ConfigurationFormField = ({ typeName, buttonAfter, configField, configKey, configValue, dirty, autoFocus, onChange }: Props) => {
+const ConfigurationFormField = ({ typeName, configField, configKey, configValue, dirty, autoFocus, onChange }: Props) => {
   const elementKey = `${typeName}-${configKey}`;
 
   switch (configField.type) {
@@ -51,7 +50,6 @@ const ConfigurationFormField = ({ typeName, buttonAfter, configField, configKey,
                    value={configValue}
                    dirty={dirty}
                    onChange={onChange}
-                   buttonAfter={buttonAfter}
                    autoFocus={autoFocus} />
       );
     case 'number':
@@ -101,7 +99,6 @@ const ConfigurationFormField = ({ typeName, buttonAfter, configField, configKey,
 };
 
 ConfigurationFormField.propTypes = {
-  buttonAfter: PropTypes.node,
   typeName: PropTypes.string.isRequired,
   configField: PropTypes.object.isRequired,
   configKey: PropTypes.string.isRequired,
@@ -113,7 +110,6 @@ ConfigurationFormField.propTypes = {
 
 ConfigurationFormField.defaultProps = {
   configValue: undefined,
-  buttonAfter: undefined,
   autoFocus: false,
   dirty: false,
 };
