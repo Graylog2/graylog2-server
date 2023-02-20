@@ -17,7 +17,6 @@
 import Reflux from 'reflux';
 
 import { singletonActions, singletonStore } from 'logic/singleton';
-import type { SyncRefluxActions } from 'stores/StoreTypes';
 
 type RefreshActionsType = {
   enable: () => void,
@@ -26,9 +25,9 @@ type RefreshActionsType = {
   refresh: () => Promise<unknown>,
 };
 
-export const RefreshActions: SyncRefluxActions<RefreshActionsType> = singletonActions(
+export const RefreshActions = singletonActions(
   'views.Refresh',
-  () => Reflux.createActions({
+  () => Reflux.createActions<RefreshActionsType>({
     enable: { asyncResult: true },
     disable: { asyncResult: true },
     setInterval: { asyncResult: true },
@@ -67,10 +66,9 @@ export const RefreshStore = singletonStore(
       }
 
       if (this.refreshConfig.enabled) {
-        return setTimeout(() => {
-          RefreshActions.refresh().then(() => {
-            this.intervalId = this._scheduleRefresh();
-          });
+        return setTimeout(async () => {
+          await RefreshActions.refresh();
+          this.intervalId = this._scheduleRefresh();
         }, this.refreshConfig.interval);
       }
 
