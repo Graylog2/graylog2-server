@@ -16,19 +16,12 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useFormikContext } from 'formik';
-import { useState, useCallback, forwardRef, useMemo, useContext } from 'react';
+import { useState, useCallback, forwardRef, useMemo } from 'react';
 import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 
 import { IconButton, SortableList, Icon } from 'components/common';
 import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
-import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
-import {
-  onGroupingFieldsChange,
-} from 'views/components/aggregationwizard/grouping/GroupingElement';
 
 const ListItemContainer = styled.div`
   display: flex;
@@ -114,70 +107,55 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
 });
 
 type Props = {
-  groupingIndex: number,
+  onChange: (newSelectedFields: Array<string>) => void
+  selectedFields: Array<string>
+  testPrefix?: string,
 };
 
-const SelectedFieldsList = ({ groupingIndex }: Props) => {
-  const { setFieldValue, values } = useFormikContext<WidgetConfigFormValues>();
-  const fieldTypes = useContext(FieldTypesContext);
-  const activeQueryId = useActiveQueryId();
-
-  const grouping = values.groupBy.groupings[groupingIndex];
-  const groupingFieldsForList = useMemo(() => grouping.fields?.map((field) => ({ id: field, title: field })), [grouping.fields]);
+const SelectedFieldsList = ({ testPrefix, selectedFields, onChange }: Props) => {
+  const fieldsForList = useMemo(() => selectedFields?.map((field) => ({ id: field, title: field })), [selectedFields]);
 
   const onChangeField = useCallback((fieldIndex: number, newFieldName: string) => {
-    const newFields = [...grouping.fields];
+    const newFields = [...selectedFields];
     newFields[fieldIndex] = newFieldName;
 
-    onGroupingFieldsChange({
-      fieldTypes,
-      activeQueryId,
-      groupingIndex,
-      grouping,
-      newFields,
-      setFieldValue,
-    });
-  }, [activeQueryId, fieldTypes, grouping, groupingIndex, setFieldValue]);
+    onChange(newFields);
+  }, [onChange, selectedFields]);
 
   const onRemoveField = useCallback((removedFieldName: string) => {
-    const newFields = grouping.fields.filter((fieldName) => fieldName !== removedFieldName);
-
-    onGroupingFieldsChange({
-      fieldTypes,
-      activeQueryId,
-      groupingIndex,
-      grouping,
-      newFields,
-      setFieldValue,
-    });
-  }, [activeQueryId, fieldTypes, grouping, groupingIndex, setFieldValue]);
+    const newFields = selectedFields.filter((fieldName) => fieldName !== removedFieldName);
+    onChange(newFields);
+  }, [onChange, selectedFields]);
 
   const SortableListItem = useCallback(({ item, index, dragHandleProps, draggableProps, className, ref }) => (
     <ListItem onChange={(newFieldName) => onChangeField(index, newFieldName)}
               onRemove={() => onRemoveField(item.id)}
-              selectedFields={grouping.fields ?? []}
+              selectedFields={selectedFields ?? []}
               item={item}
-              testIdPrefix={`grouping-${groupingIndex}-field-${index}`}
+              testIdPrefix={`${testPrefix}-field-${index}`}
               dragHandleProps={dragHandleProps}
               draggableProps={draggableProps}
               className={className}
               ref={ref} />
-  ), [grouping.fields, groupingIndex, onChangeField, onRemoveField]);
+  ), [selectedFields, onChangeField, onRemoveField]);
 
-  const onSortChange = useCallback((newGroupings: Array<{ id: string, title: string }>) => {
-    const groupingsForForm = newGroupings.map(({ id }) => id);
-    setFieldValue(`groupBy.groupings.${groupingIndex}.fields`, groupingsForForm);
-  }, [groupingIndex, setFieldValue]);
+  const onSortChange = useCallback((newFieldsList: Array<{ id: string, title: string }>) => {
+    onChange(newFieldsList.map(({ id }) => id));
+  }, [onChange]);
 
-  if (!grouping.fields?.length) {
+  if (!selectedFields?.length) {
     return null;
   }
 
   return (
-    <SortableList items={groupingFieldsForList}
+    <SortableList items={fieldsForList}
                   onMoveItem={onSortChange}
                   customListItemRender={SortableListItem} />
   );
+};
+
+SelectedFieldsList.defaultProps = {
+  testPrefix: undefined,
 };
 
 export default SelectedFieldsList;

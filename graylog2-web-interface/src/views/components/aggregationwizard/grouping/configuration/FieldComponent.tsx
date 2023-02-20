@@ -21,13 +21,12 @@ import { useFormikContext } from 'formik';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type { GroupByFormValues, WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import Input from 'components/bootstrap/Input';
-import SelectedFieldsList from 'views/components/aggregationwizard/grouping/configuration/SelectedFieldsList';
+import SelectedFieldsList from 'views/components/widgets/SelectedFieldsList';
 import type { GroupByError } from 'views/components/aggregationwizard/grouping/GroupingElement';
 import { onGroupingFieldsChange } from 'views/components/aggregationwizard/grouping/GroupingElement';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import { DateType } from 'views/logic/aggregationbuilder/Pivot';
-
-import FieldSelect from '../../FieldSelect';
+import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 
 const placeholder = (grouping: GroupByFormValues) => {
   if (!grouping.fields?.length) {
@@ -65,13 +64,26 @@ const FieldComponent = ({ groupingIndex }: Props) => {
     });
   }, [activeQueryId, fieldTypes, grouping, groupingIndex, setFieldValue]);
 
+  const onChangeSelectedFields = (newFields: Array<string>) => {
+    onGroupingFieldsChange({
+      fieldTypes,
+      activeQueryId,
+      groupingIndex,
+      grouping,
+      newFields,
+      setFieldValue,
+    });
+  };
+
   return (
     <Input id="group-by-field-select"
            label="Fields"
            labelClassName="col-sm-3"
            error={(errors?.groupBy?.groupings?.[groupingIndex] as GroupByError)?.fields}
            wrapperClassName="col-sm-9">
-      <SelectedFieldsList groupingIndex={groupingIndex} />
+      <SelectedFieldsList testPrefix={`grouping-${groupingIndex}-`}
+                          selectedFields={grouping.fields}
+                          onChange={onChangeSelectedFields} />
       <FieldSelect id="group-by-field-create-select"
                    onChange={onAddField}
                    clearable={false}
