@@ -54,7 +54,7 @@ class ConfigurationForm extends React.Component {
       const fieldValue = values[name];
       data.configuration[name] = (fieldValue === undefined ? null : fieldValue);
 
-      if (field.is_encrypted && fieldValue && fieldValue.is_set && !field.dirty) {
+      if (field.is_encrypted && !field.dirty && fieldValue && fieldValue.is_set !== undefined) {
         data.configuration[name] = { keep_value: true };
       }
     });

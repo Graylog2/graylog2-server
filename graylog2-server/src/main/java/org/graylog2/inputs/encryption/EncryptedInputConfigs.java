@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.inputs;
+package org.graylog2.inputs.encryption;
 
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.inputs.MessageInput;
