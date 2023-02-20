@@ -107,10 +107,8 @@ const SearchActionsMenu = () => {
       .type(View.Type.Search)
       .build();
 
-    ViewManagementActions.update(newView)
-      .then(toggleFormModal)
-      .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
-      .catch((error) => UserNotification.error(`Saving view failed: ${_extractErrorMessage(error)}`, 'Error!'));
+    dispatch(onSaveView(newView))
+      .then(toggleFormModal);
   };
 
   const saveAsSearch = async () => {

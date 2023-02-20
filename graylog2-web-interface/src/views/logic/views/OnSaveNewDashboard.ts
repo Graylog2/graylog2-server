@@ -25,9 +25,9 @@ import type View from './View';
 export default (view: View) => async (dispatch: AppDispatch) => {
   try {
     const savedView = await ViewManagementActions.create(view);
-    dispatch(loadView(savedView));
-    dispatch(setIsDirty(false));
-    dispatch(setIsNew(false));
+    await dispatch(loadView(savedView));
+    await dispatch(setIsDirty(false));
+    await dispatch(setIsNew(false));
     loadDashboard(savedView.id);
     UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!');
   } catch (error) {
