@@ -22,7 +22,6 @@ import { DropdownButton, MenuItem, Button, ButtonGroup } from 'components/bootst
 import { Icon, ShareButton } from 'components/common';
 import ExportModal from 'views/components/export/ExportModal';
 import DebugOverlay from 'views/components/DebugOverlay';
-import onSaveView from 'views/logic/views/OnSaveViewAction';
 import onSaveNewDashboard from 'views/logic/views/OnSaveNewDashboard';
 import * as ViewPermissions from 'views/Permissions';
 import useSearchPageLayout from 'hooks/useSearchPageLayout';
@@ -38,6 +37,7 @@ import useView from 'views/hooks/useView';
 import useIsNew from 'views/hooks/useIsNew';
 import useHasUndeclaredParameters from 'views/logic/parameters/useHasUndeclaredParameters';
 import useAppDispatch from 'stores/useAppDispatch';
+import { updateView } from 'views/logic/slices/viewSlice';
 
 import DashboardPropertiesModal from './dashboard/DashboardPropertiesModal';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
@@ -91,7 +91,7 @@ const DashboardActionsMenu = () => {
 
     return dispatch(onSaveNewDashboard(newDashboard));
   }, [currentUser.permissions, dispatch, pluggableSaveViewControls, view.id]);
-  const _onSaveView = useCallback(() => dispatch(onSaveView(view)), [dispatch, view]);
+  const _onSaveView = useCallback((updatedView) => dispatch(updateView(updatedView)), [dispatch]);
 
   return (
     <ButtonGroup>
