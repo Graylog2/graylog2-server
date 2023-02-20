@@ -91,22 +91,11 @@ const SavedSearchesList = ({
         updateTableLayout({ perPage: newPageSize });
       }
     }, [updateTableLayout],
-  const onSearch = useCallback(
-    (newQuery: string) => setSearchParams((cur) => ({
-      ...cur,
-      query: newQuery,
-      page: DEFAULT_PAGINATION.page,
-    })),
-    [],
   );
-  const onPageSizeChange = useCallback(
-    (newPageSize: number) => setSearchParams((cur) => ({
-      ...cur,
-      page: 1,
-      pageSize: newPageSize,
-    })),
-    [],
-  );
+
+  const onPageSizeChange = useCallback((newPageSize: number) => {
+    setActivePage(newPageSize);
+  }, []);
 
   const onSortChange = useCallback((newSort: Sort) => {
     setActivePage(1);
@@ -145,15 +134,10 @@ const SavedSearchesList = ({
 
   return (
     <PaginatedList onChange={onPageChange}
-<<<<<<< HEAD
                    totalItems={pagination?.total}
                    pageSize={layoutConfig.pageSize}
                    activePage={activePage}
-=======
-                   activePage={searchParams.page}
-                   totalItems={pagination?.total}
                    showPageSizeSelect={false}
->>>>>>> a957fc3905 (Update saved searches overview.)
                    useQueryParameter={false}>
       <div style={{ marginBottom: '5px' }}>
         <SearchForm focusAfterMount
@@ -179,13 +163,9 @@ const SavedSearchesList = ({
                                onColumnsChange={onColumnsChange}
                                bulkActions={renderBulkActions}
                                onSortChange={onSortChange}
-<<<<<<< HEAD
                                activeSort={layoutConfig.sort}
-=======
                                pageSize={searchParams.pageSize}
                                onPageSizeChange={onPageSizeChange}
-                               activeSort={searchParams.sort}
->>>>>>> a957fc3905 (Update saved searches overview.)
                                rowActions={renderSavedSearchActions}
                                columnRenderers={customColumnRenderers}
                                columnDefinitions={attributes} />
