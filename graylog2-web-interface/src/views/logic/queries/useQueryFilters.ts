@@ -14,12 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useStore } from 'stores/connect';
-import { QueriesStore } from 'views/stores/QueriesStore';
-import type { StoreState } from 'stores/StoreTypes';
+import * as Immutable from 'immutable';
+import { createSelector } from '@reduxjs/toolkit';
+import { useMemo } from 'react';
 
-const queriesStoreMapper = (newQueries: StoreState<typeof QueriesStore>) => newQueries.map((q) => q.filter).toMap();
+import useAppSelector from 'stores/useAppSelector';
+import type { QueryId } from 'views/logic/queries/Query';
+import type Query from 'views/logic/queries/Query';
+import { selectSearchQueries } from 'views/logic/slices/viewSelectors';
 
-const useQueryFilters = () => useStore(QueriesStore, queriesStoreMapper);
+const selectQueriesAsMap = createSelector(selectSearchQueries, (queries) => Immutable.OrderedMap<QueryId, Query>(queries.map((q) => [q.id, q])));
+
+const useQueries = () => useAppSelector(selectQueriesAsMap);
+
+const useQueryFilters = () => {
+  const queries = useQueries();
+
+  return useMemo(() => queries.map((q) => q.filter).toMap(), [queries]);
+};
 
 export default useQueryFilters;

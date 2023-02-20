@@ -23,8 +23,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import WidgetGrid from 'views/components/WidgetGrid';
-import { useStore } from 'stores/connect';
-import { WidgetStore } from 'views/stores/WidgetStore';
+import useWidgets from 'views/hooks/useWidgets';
 
 const StyledJumbotron = styled(Jumbotron)(({ theme }) => css`
   .container-fluid & {
@@ -66,7 +65,11 @@ const NoWidgetsInfo = () => (
   </StyledJumbotron>
 );
 
-const useHasWidgets = () => useStore(WidgetStore, (widgets) => widgets?.size > 0);
+const useHasWidgets = () => {
+  const widgets = useWidgets();
+
+  return widgets?.size > 0;
+};
 
 const Query = () => {
   const hasWidgets = useHasWidgets();

@@ -29,26 +29,31 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import DataTable from 'views/components/datatable/DataTable';
 import Widget from 'views/logic/widgets/Widget';
 import WidgetContext from 'views/components/contexts/WidgetContext';
-import { WidgetActions } from 'views/stores/WidgetStore';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
+import { createViewWithWidgets } from 'fixtures/searches';
+import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
 
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
-const mockUpdateWidget = jest.fn();
+const createWidget = (config: AggregationWidgetConfig = AggregationWidgetConfig.builder().build()) => {
+  return AggregationWidget.builder()
+    .id('deadbeef')
+    .config(config)
+    .build();
+};
 
-jest.mock('views/stores/WidgetStore', () => ({
-  WidgetActions: {
-    update: mockUpdateWidget,
-    updateConfig: jest.fn(() => Promise.resolve()),
-  },
+jest.mock('views/logic/slices/widgetActions', () => ({
+  ...jest.requireActual('views/logic/slices/widgetActions'),
+  updateWidgetConfig: jest.fn(() => async () => {}),
 }));
 
 describe('DataTable', () => {
-  const currentView = { activeQuery: 'deadbeef-23' };
-
   const rows = [{
     key: ['2018-10-04T09:43:50.000Z'],
     source: 'leaf',
@@ -111,26 +116,42 @@ describe('DataTable', () => {
   const rowPivot = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1.0 } });
   const series = new Series('count()');
 
-  const SimplifiedDataTable = (props) => (
-    <Formik initialValues={{}} onSubmit={() => {}}>
-      <Form>
-        <DataTable config={AggregationWidgetConfig.builder().build()}
-                   currentView={currentView}
-                   data={{}}
-                   fields={Immutable.List([])}
-                   effectiveTimerange={{
-                     from: '2020-01-10T13:23:42.000Z',
-                     to: '2020-01-10T14:23:42.000Z',
-                     type: 'absolute',
-                   }}
-                   toggleEdit={() => {}}
-                   onChange={() => {}}
-                   height={200}
-                   width={300}
-                   {...props} />
-      </Form>
-    </Formik>
-  );
+  const SimplifiedDataTable = (props: Partial<React.ComponentProps<typeof DataTable>>) => {
+    const widget = createWidget(props.config);
+    const view = createViewWithWidgets([widget], {});
+
+    return (
+      <TestStoreProvider view={view}>
+        <WidgetContext.Provider value={widget}>
+          <Formik initialValues={{}}
+                  onSubmit={() => {
+                  }}>
+            <Form>
+              <DataTable config={AggregationWidgetConfig.builder().build()}
+                         data={{}}
+                         fields={Immutable.List([])}
+                         effectiveTimerange={{
+                           from: '2020-01-10T13:23:42.000Z',
+                           to: '2020-01-10T14:23:42.000Z',
+                           type: 'absolute',
+                         }}
+                         toggleEdit={() => {
+                         }}
+                         onChange={() => {
+                         }}
+                         height={200}
+                         width={300}
+                         {...props} />
+            </Form>
+          </Formik>
+        </WidgetContext.Provider>
+      </TestStoreProvider>
+    );
+  };
+
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
 
   it('should render with empty data', () => {
     const config = AggregationWidgetConfig.builder()
@@ -156,6 +177,7 @@ describe('DataTable', () => {
       .rollup(true)
       .build();
     const wrapper = mount(<SimplifiedDataTable config={config}
+                                               // @ts-expect-error
                                                data={data} />);
 
     expect(wrapper.children()).toExist();
@@ -172,6 +194,7 @@ describe('DataTable', () => {
       .build();
 
     const wrapper = mount(<SimplifiedDataTable config={config}
+                                               // @ts-expect-error
                                                data={{ 'd8e311db-276c-46e4-ba75-57bf1e0b4d35': rows }} />);
 
     expect(wrapper).toIncludeText('hulud.net');
@@ -187,6 +210,7 @@ describe('DataTable', () => {
       .rollup(false)
       .build();
     const wrapper = mount(<SimplifiedDataTable config={config}
+                                               // @ts-expect-error
                                                data={data} />);
 
     expect(wrapper.children()).toExist();
@@ -217,6 +241,7 @@ describe('DataTable', () => {
       .rollup(false)
       .build();
     const wrapper = mount(<SimplifiedDataTable config={config}
+                                               // @ts-expect-error
                                                data={protocolData} />);
 
     expect(wrapper.children()).toExist();
@@ -240,6 +265,7 @@ describe('DataTable', () => {
     ]);
     const wrapper = mount(<SimplifiedDataTable config={config}
                                                fields={fields}
+                                               // @ts-expect-error
                                                data={dataWithMoreSeries} />);
 
     const expectFieldType = (elem, type) => expect((wrapper.find(elem).props() as { type: FieldType }).type).toEqual(type);
@@ -301,6 +327,7 @@ describe('DataTable', () => {
         <WidgetContext.Provider value={widget}>
           <SimplifiedDataTable config={config}
                                fields={fields}
+                               // @ts-expect-error
                                data={dataWithMoreSeries} />
         </WidgetContext.Provider>);
 
@@ -309,7 +336,7 @@ describe('DataTable', () => {
         .find('button[title="Sort timestamp Ascending"]');
       sortButton.simulate('click');
 
-      expect(WidgetActions.updateConfig)
+      expect(updateWidgetConfig)
         .toHaveBeenCalledWith('deadbeef', config.toBuilder().sort([new SortConfig('pivot', 'timestamp', Direction.Ascending)]).build());
     });
 
@@ -319,6 +346,7 @@ describe('DataTable', () => {
         <WidgetContext.Provider value={widget}>
           <SimplifiedDataTable config={config}
                                fields={fields}
+                               // @ts-expect-error
                                data={dataWithMoreSeries} />
         </WidgetContext.Provider>);
 
@@ -327,7 +355,7 @@ describe('DataTable', () => {
         .find('button[title="Sort timestamp Descending"]');
       sortButton.simulate('click');
 
-      expect(WidgetActions.updateConfig)
+      expect(updateWidgetConfig)
         .toHaveBeenCalledWith('deadbeef', config.toBuilder().sort([new SortConfig('pivot', 'timestamp', Direction.Descending)]).build());
     });
 
@@ -337,6 +365,7 @@ describe('DataTable', () => {
         <WidgetContext.Provider value={widget}>
           <SimplifiedDataTable config={config}
                                fields={fields}
+                               // @ts-expect-error
                                data={dataWithMoreSeries} />
         </WidgetContext.Provider>);
 
@@ -346,7 +375,7 @@ describe('DataTable', () => {
 
       sortButton.simulate('click');
 
-      expect(WidgetActions.updateConfig)
+      expect(updateWidgetConfig)
         .toHaveBeenCalledWith('deadbeef', config.toBuilder().sort([]).build());
     });
   });
@@ -379,6 +408,7 @@ describe('DataTable', () => {
         <WidgetContext.Provider value={getWidget({ config })}>
           <SimplifiedDataTable config={config}
                                fields={fields}
+                               // @ts-expect-error
                                data={dataWithMoreSeries} />
         </WidgetContext.Provider>);
 
@@ -386,7 +416,7 @@ describe('DataTable', () => {
         .find('button[data-testid="pin-timestamp"]');
       pinnedButton.simulate('click');
 
-      expect(WidgetActions.updateConfig)
+      expect(updateWidgetConfig)
         .toHaveBeenCalledWith('deadbeef', config.toBuilder().visualizationConfig(DataTableVisualizationConfig.create(['timestamp']).toBuilder().build()).build());
     });
 
@@ -396,6 +426,7 @@ describe('DataTable', () => {
         <WidgetContext.Provider value={getWidget({ config })}>
           <SimplifiedDataTable config={config}
                                fields={fields}
+                               // @ts-expect-error
                                data={dataWithMoreSeries} />
         </WidgetContext.Provider>);
 
@@ -403,7 +434,7 @@ describe('DataTable', () => {
         .find('button[data-testid="pin-timestamp"]');
       pinnedButton.simulate('click');
 
-      expect(WidgetActions.updateConfig)
+      expect(updateWidgetConfig)
         .toHaveBeenCalledWith('deadbeef', config.toBuilder().visualizationConfig(DataTableVisualizationConfig.create(['bytes']).toBuilder().build()).build());
     });
   });

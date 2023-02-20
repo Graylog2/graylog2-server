@@ -41,8 +41,11 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexR
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexTemplatesRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexTemplatesResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.IndexTemplateMetadata;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutIndexTemplateRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.storage.opensearch2.OpenSearchClient;
@@ -130,10 +133,10 @@ public class ClientOS2 implements Client {
 
     @Override
     public String fieldType(String testIndexName, String field) {
-        return getMapping(testIndexName).get(field);
+        return getFieldMappings(testIndexName).get(field);
     }
 
-    private Map<String, String> getMapping(String index) {
+    private Map<String, String> getFieldMappings(String index) {
         final Request request = new Request("GET", "/" + index + "/_mapping");
         final JsonNode response = client.execute((c, requestOptions) -> {
             request.setOptions(requestOptions);
@@ -280,6 +283,25 @@ public class ClientOS2 implements Client {
 
         client.execute((c, requestOptions) -> c.indices().putSettings(request, requestOptions),
                 "Unable to set index block for " + index);
+    }
+
+    @Override
+    public void updateMapping(String index, Map<String, Object> mapping) {
+        final PutMappingRequest request = new PutMappingRequest(index)
+                .source(mapping);
+
+        client.execute((c, requestOptions) -> c.indices().putMapping(request, requestOptions),
+                "Unable to update index mapping " + index);
+    }
+
+    @Override
+    public Map<String, Object> getMapping(String index) {
+        final GetMappingsRequest request = new GetMappingsRequest().indices(index);
+
+        final GetMappingsResponse result = client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions),
+                "Couldn't read mapping of index " + index);
+
+        return result.mappings().get(index).sourceAsMap();
     }
 
     private void waitForResult(Callable<Boolean> task) {

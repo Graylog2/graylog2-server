@@ -20,6 +20,7 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType, { Properties } from 'views/logic/fieldtypes/FieldType';
 import type { FieldTypes } from 'views/components/searchbar/SearchBarAutocompletions';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import { createSearch } from 'fixtures/searches';
 
 import FieldValueCompletion from './FieldValueCompletion';
 
@@ -83,6 +84,7 @@ describe('FieldValueCompletion', () => {
       streams: undefined,
       fieldTypes,
       userTimezone: 'Europe/Berlin',
+      view: createSearch(),
     };
 
     it('returns empty list if inputs are empty', () => {

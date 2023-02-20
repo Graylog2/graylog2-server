@@ -117,7 +117,7 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
                                        rotationStrategies={rotationStrategies}
                                        retentionStrategies={retentionStrategies}
                                        submitButtonText="Create index set"
-                                       submitLaodingText="Creating index set..."
+                                       submitLoadingText="Creating index set..."
                                        create
                                        cancelLink={Routes.SYSTEM.INDICES.LIST}
                                        onUpdate={_saveConfiguration} />

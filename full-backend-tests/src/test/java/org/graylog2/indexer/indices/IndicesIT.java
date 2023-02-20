@@ -472,6 +472,45 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
     }
 
     @ContainerMatrixTest
+    public void canStoreAndRetrieveIndexClosingDate() {
+        final String index = createRandomIndex("foo");
+        final DateTime someDate = Tools.nowUTC();
+
+        indices.setClosingDate(index, someDate);
+
+        final Optional<DateTime> closingDate = indices.indexClosingDate(index);
+
+        assertThat(closingDate).hasValueSatisfying(dt -> {
+            assertThat(dt).isEqualTo(someDate);
+            assertThat(dt.getZone()).isEqualTo(DateTimeZone.UTC);
+        });
+    }
+
+    @ContainerMatrixTest
+    public void setClosingDateMergesExistingMetaDataEntries() {
+        final String index = createRandomIndex("foo");
+        client().updateMapping(index, Map.of("_meta", Map.of("existing", "should be kept")));
+
+        indices.setClosingDate(index, Tools.nowUTC());
+
+        final Map<String, Object> mapping = client().getMapping(index);
+        assertThat(mapping.get("_meta")).satisfies(v -> {
+            assertThat(v).isNotNull();
+            //noinspection unchecked
+            assertThat(((Map<String, Object>) v).get("existing")).isEqualTo("should be kept");
+        });
+        final Optional<DateTime> closingDate = indices.indexClosingDate(index);
+        assertThat(closingDate).isNotEmpty();
+    }
+
+    @ContainerMatrixTest
+    public void canHandleMissingIndexClosingDate() {
+        final String index = createRandomIndex("foo");
+        final Optional<DateTime> closingDate = indices.indexClosingDate(index);
+        assertThat(closingDate).isEmpty();
+    }
+
+    @ContainerMatrixTest
     public void retrievesAllAliasesForIndex() {
         final String index1 = createRandomIndex("foo-");
         final String index2 = createRandomIndex("foo-");
