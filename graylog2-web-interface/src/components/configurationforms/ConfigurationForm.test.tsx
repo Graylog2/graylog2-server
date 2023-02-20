@@ -34,7 +34,7 @@ describe('ConfigurationForm', () => {
                            ref={formRef}
                            submitButtonText="Update entity"
                            typeName="placeholder" />
-        <button type="button" role="button" onClick={openForm}>Open modal</button>
+        <button type="button" onClick={openForm}>Open modal</button>
       </>
     );
   };
