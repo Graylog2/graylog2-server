@@ -67,7 +67,11 @@ const BulkActions = styled(ButtonToolbar)`
 const filterAccessibleColumns = (
   columns: Array<Column>,
   userPermissions: Immutable.List<string>,
-) => columns.filter(({ permissions, anyPermissions }) => {
+) => columns.filter(({ permissions, anyPermissions, hidden }) => {
+  if (hidden) {
+    return false;
+  }
+
   if (permissions?.length) {
     return anyPermissions
       ? isAnyPermitted(userPermissions, permissions)

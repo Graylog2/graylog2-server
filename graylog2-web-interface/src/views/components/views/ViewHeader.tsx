@@ -31,6 +31,8 @@ import useAppDispatch from 'stores/useAppDispatch';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import { loadView } from 'views/logic/slices/viewSlice';
+import { updateView } from 'views/logic/slices/viewSlice';
+import useIsNew from 'views/hooks/useIsNew';
 
 const links = {
   [View.Type.Dashboard]: ({ id, title }) => [{
@@ -112,7 +114,8 @@ const CrumbLink = ({ label, link }: { label: string, link: string | undefined}) 
 
 const ViewHeader = () => {
   const view = useView();
-  const isSavedView = view?.id && view?.title;
+  const isNew = useIsNew();
+  const isSavedView = view?.id && view?.title && !isNew;
   const [showMetadataEdit, setShowMetadataEdit] = useState<boolean>(false);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), [setShowMetadataEdit]);
 
@@ -122,7 +125,7 @@ const ViewHeader = () => {
 
   const typeText = view?.type?.toLocaleLowerCase();
   const title = useViewTitle();
-  const onChangeFavorite = useCallback((newValue) => dispatch(loadView(view.toBuilder().favorite(newValue).build())), [dispatch, view]);
+  const onChangeFavorite = useCallback((newValue) => dispatch(updateView(view.toBuilder().favorite(newValue).build())), [dispatch, view]);
 
   const breadCrumbs = useMemo(() => {
     if (isAlert || isEvent) return links.alert({ id: alertId });

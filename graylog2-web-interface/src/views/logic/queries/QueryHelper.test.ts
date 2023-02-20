@@ -14,18 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import UserNotification from 'util/UserNotification';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import { loadDashboard } from 'views/logic/views/Actions';
+import { escape } from './QueryHelper';
 
-import type View from './View';
-
-export default (view: View) => async () => {
-  try {
-    const savedView = await ViewManagementActions.create(view);
-    loadDashboard(savedView.id);
-    UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!');
-  } catch (error) {
-    UserNotification.error(`Saving view failed: ${error}`, 'Error!');
-  }
-};
+describe('QueryHelper', () => {
+  it('quotes $ in values', () => {
+    expect(escape('foo$bar$')).toEqual('foo\\$bar\\$');
+  });
+});
