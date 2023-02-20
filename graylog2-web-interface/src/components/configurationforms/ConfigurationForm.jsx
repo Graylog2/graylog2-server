@@ -29,13 +29,11 @@ class ConfigurationForm extends React.Component {
   }
 
   UNSAFE_componentWillReceiveProps(props) {
-    console.log('===component will receive props');
     const { values = {} } = this.state || {};
     const newState = this._copyStateFromProps(props);
 
     newState.values = $.extend(newState.values, values);
     this.setState(newState);
-    console.log('===newState', newState);
   }
 
   getValue = () => {
