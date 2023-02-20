@@ -33,7 +33,7 @@ const escape = (searchTerm: string | number | undefined | null) => {
     escapedTerm = `"${escapedTerm}"`;
   } else {
     // Escape all lucene special characters from the source: && || : \ / + - ! ( ) { } [ ] ^ " ~ * ?
-    escapedTerm = String(escapedTerm).replace(/(&&|\|\||[:\\/+\-!(){}[\]^"~*?])/g, '\\$&');
+    escapedTerm = String(escapedTerm).replace(/(&&|\|\||[:\\/+\-!(){}[\]^"~*?$])/g, '\\$&');
   }
 
   return escapedTerm;

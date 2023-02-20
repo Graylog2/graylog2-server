@@ -1,0 +1,4 @@
+type = "f"
+message = "Escape $ properly when part of value that is added to query."
+
+pulls = ["14692"]
