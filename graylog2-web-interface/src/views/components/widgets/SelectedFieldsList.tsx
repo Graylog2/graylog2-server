@@ -137,7 +137,7 @@ const SelectedFieldsList = ({ testPrefix, selectedFields, onChange }: Props) => 
               draggableProps={draggableProps}
               className={className}
               ref={ref} />
-  ), [selectedFields, onChangeField, onRemoveField]);
+  ), [selectedFields, testPrefix, onChangeField, onRemoveField]);
 
   const onSortChange = useCallback((newFieldsList: Array<{ id: string, title: string }>) => {
     onChange(newFieldsList.map(({ id }) => id));

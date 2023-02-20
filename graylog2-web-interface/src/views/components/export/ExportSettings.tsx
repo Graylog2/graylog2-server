@@ -22,12 +22,14 @@ import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import type Widget from 'views/logic/widgets/Widget';
 import type View from 'views/logic/views/View';
 import { Input, HelpBlock, Row } from 'components/bootstrap';
-import FieldSelect from 'views/components/widgets/FieldSelect';
+import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import ExportFormatSelection from 'views/components/export/ExportFormatSelection';
 
 import CustomExportSettings from './CustomExportSettings';
+
+import SelectedFieldsList from '../widgets/SelectedFieldsList';
 
 type ExportSettingsType = {
   fields: List<FieldTypeMapping>,
@@ -53,7 +55,6 @@ const SelectedWidgetInfo = ({ selectedWidget, view }: { selectedWidget: Widget, 
 };
 
 const ExportSettings = ({
-  fields,
   selectedWidget,
   view,
 }: ExportSettingsType) => {
@@ -82,15 +83,22 @@ const ExportSettings = ({
           {({ field: { name, value, onChange } }) => (
             <>
               <label htmlFor={name}>Fields to export</label>
-              <FieldSelect fields={fields}
-                           onChange={(newFields) => {
-                             const newFieldsValue = newFields.map((field) => ({ field }));
-
-                             return onChange({ target: { name, value: newFieldsValue } });
-                           }}
-                           value={value}
-                           allowOptionCreation={!!selectedWidget}
-                           inputId={name} />
+              <SelectedFieldsList selectedFields={value.map(({ field }) => field)}
+                                  onChange={(newFields) => onChange({
+                                    target: {
+                                      name,
+                                      value: newFields.map((field) => ({ field })),
+                                    },
+                                  })} />
+              <FieldSelect id="export-field-create-select"
+                           onChange={(newField) => onChange({ target: { name, value: [...value, { field: newField }] } })}
+                           clearable={false}
+                           persistSelection={false}
+                           name="export-field-create-select"
+                           value={undefined}
+                           excludedFields={value.map(({ field }) => field)}
+                           placeholder="Add a field"
+                           ariaLabel="Add a field" />
             </>
           )}
         </Field>

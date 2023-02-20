@@ -86,6 +86,8 @@ const EditMessageList = ({ children, config, fields, onChange, onCancel, onSubmi
         <StickyBottomActions actions={<SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />}
                              alignActionsAtBottom>
           <DescriptionBox description="Fields">
+            <SelectedFieldsList selectedFields={config.fields}
+                                onChange={(newFields) => _onFieldSelectionChanged(newFields, config, onChange)} />
             <FieldSelect id="message-list-field-create-select"
                          onChange={(newField) => _onFieldSelectionChanged([...config.fields, newField], config, onChange)}
                          clearable={false}
@@ -96,8 +98,6 @@ const EditMessageList = ({ children, config, fields, onChange, onCancel, onSubmi
                          excludedFields={config.fields ?? []}
                          placeholder="Add a field"
                          aria-label="Add a field" />
-            <SelectedFieldsList selectedFields={config.fields}
-                                onChange={(newFields) => _onFieldSelectionChanged(newFields, config, onChange)} />
           </DescriptionBox>
           <DescriptionBox description="Message Preview">
             {sortedMessagePreviewOptions.map((option) => (
