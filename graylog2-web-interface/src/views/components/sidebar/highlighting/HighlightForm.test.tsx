@@ -21,19 +21,18 @@ import * as Immutable from 'immutable';
 
 import HighlightForm from 'views/components/sidebar/highlighting/HighlightForm';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType, { Properties } from 'views/logic/fieldtypes/FieldType';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import { updateHighlightingRule } from 'views/logic/slices/highlightActions';
 
-jest.mock('views/stores/HighlightingRulesStore', () => ({
-  HighlightingRulesActions: {
-    add: jest.fn(() => Promise.resolve()),
-    remove: jest.fn(() => Promise.resolve()),
-    update: jest.fn(() => Promise.resolve()),
-  },
+jest.mock('views/logic/slices/highlightActions', () => ({
+  addHighlightingRule: jest.fn(() => () => Promise.resolve()),
+  updateHighlightingRule: jest.fn(() => () => Promise.resolve()),
 }));
 
 const rule = HighlightingRule.builder()
@@ -55,16 +54,22 @@ describe('HighlightForm', () => {
     all: Immutable.List([FieldTypeMapping.create('foob', FieldType.create('long', [Properties.Numeric]))]),
     queryFields: Immutable.Map(),
   };
-  const HighlightFormWithContext = (props) => (
-    <FieldTypesContext.Provider value={fieldTypes}>
-      <HighlightForm {...props} />
-    </FieldTypesContext.Provider>
+  const HighlightFormWithContext = (props: React.ComponentProps<typeof HighlightForm>) => (
+    <TestStoreProvider>
+      <FieldTypesContext.Provider value={fieldTypes}>
+        <HighlightForm {...props} />
+      </FieldTypesContext.Provider>
+    </TestStoreProvider>
   );
 
   const triggerSaveButtonClick = async () => {
     const elem = await screen.findByText('Update rule');
     fireEvent.click(elem);
   };
+
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
 
   it('should render for edit', async () => {
     const { findByText } = render(<HighlightFormWithContext onClose={() => {}} rule={rule} />);
@@ -93,12 +98,12 @@ describe('HighlightForm', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('should fire remove action when saving a existing rule', async () => {
+  it('should fire update action when saving a existing rule', async () => {
     render(<HighlightFormWithContext onClose={() => {}} rule={rule} />);
 
     await triggerSaveButtonClick();
 
-    await waitFor(() => expect(HighlightingRulesActions.update)
+    await waitFor(() => expect(updateHighlightingRule)
       .toHaveBeenCalledWith(rule, { field: rule.field, value: rule.value, condition: rule.condition, color: rule.color }));
   });
 
@@ -109,7 +114,7 @@ describe('HighlightForm', () => {
 
     await triggerSaveButtonClick();
 
-    await waitFor(() => expect(HighlightingRulesActions.update)
+    await waitFor(() => expect(updateHighlightingRule)
       .toHaveBeenCalledWith(rule, expect.objectContaining({
         color: expect.objectContaining({ type: 'static', color: expect.any(String) }),
       })));
@@ -126,7 +131,7 @@ describe('HighlightForm', () => {
 
     await triggerSaveButtonClick();
 
-    await waitFor(() => expect(HighlightingRulesActions.update)
+    await waitFor(() => expect(updateHighlightingRule)
       .toHaveBeenCalledWith(rule, expect.objectContaining({
         color: expect.objectContaining({ gradient: 'Viridis' }),
       })));
@@ -137,7 +142,7 @@ describe('HighlightForm', () => {
 
     await triggerSaveButtonClick();
 
-    await waitFor(() => expect(HighlightingRulesActions.update)
+    await waitFor(() => expect(updateHighlightingRule)
       .toHaveBeenCalledWith(ruleWithValueZero, { field: ruleWithValueZero.field, value: '0', condition: ruleWithValueZero.condition, color: ruleWithValueZero.color }));
   });
 
@@ -146,7 +151,7 @@ describe('HighlightForm', () => {
 
     await triggerSaveButtonClick();
 
-    await waitFor(() => expect(HighlightingRulesActions.update)
+    await waitFor(() => expect(updateHighlightingRule)
       .toHaveBeenCalledWith(ruleWithValueFalse, { field: ruleWithValueFalse.field, value: 'false', condition: ruleWithValueFalse.condition, color: ruleWithValueFalse.color }));
   });
 });

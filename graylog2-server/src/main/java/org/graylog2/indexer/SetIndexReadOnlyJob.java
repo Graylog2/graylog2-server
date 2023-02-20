@@ -20,6 +20,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
+import org.graylog2.plugin.Tools;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJob;
@@ -80,6 +81,10 @@ public class SetIndexReadOnlyJob extends SystemJob {
 
         log.info("Flushing old index <{}>.", index);
         indices.flush(index);
+
+        // Record the time an index was set read-only.
+        // We call this the "closing date" because it denotes when we stopped writing to it.
+        indices.setClosingDate(index, Tools.nowUTC());
 
         log.info("Setting old index <{}> to read-only.", index);
         indices.setReadOnly(index);

@@ -357,6 +357,14 @@ public class Indices {
         return indicesAdapter.indexCreationDate(index);
     }
 
+    public void setClosingDate(String index, DateTime closingDate) {
+        indicesAdapter.updateIndexMetaData(index, Map.of("closing_date", closingDate.getMillis()), true);
+    }
+
+    public Optional<DateTime> indexClosingDate(String index) {
+       return indicesAdapter.indexClosingDate(index);
+    }
+
     public IndexRangeStats indexRangeStatsOfIndex(String index) {
         return indicesAdapter.indexRangeStatsOfIndex(index);
     }
@@ -366,5 +374,9 @@ public class Indices {
      */
     public String getIndexId(String indexName) {
         return indicesAdapter.getIndexId(indexName);
+    }
+
+    public void refresh(String... indices) {
+        indicesAdapter.refresh(indices);
     }
 }

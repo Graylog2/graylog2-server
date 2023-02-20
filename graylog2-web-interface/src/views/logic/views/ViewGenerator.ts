@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { TimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
+import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
 
 import View from './View';
 import ViewStateGenerator from './ViewStateGenerator';
@@ -33,11 +34,13 @@ export default async (
   const search = Search.create().toBuilder().queries([query]).build();
   const viewState = await ViewStateGenerator(type, streamId);
 
-  return View.create()
+  const view = View.create()
     .toBuilder()
     .newId()
     .type(type)
     .state({ [query.id]: viewState })
     .search(search)
     .build();
+
+  return UpdateSearchForWidgets(view);
 };

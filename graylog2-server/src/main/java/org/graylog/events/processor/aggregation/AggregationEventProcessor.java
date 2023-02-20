@@ -270,7 +270,8 @@ public class AggregationEventProcessor implements EventProcessor {
     }
 
     @VisibleForTesting
-    ImmutableList<EventWithContext> eventsFromAggregationResult(EventFactory eventFactory, AggregationEventProcessorParameters parameters, AggregationResult result) {
+    ImmutableList<EventWithContext> eventsFromAggregationResult(EventFactory eventFactory, AggregationEventProcessorParameters parameters, AggregationResult result)
+            throws EventProcessorException {
         final ImmutableList.Builder<EventWithContext> eventsWithContext = ImmutableList.builder();
         final Set<String> sourceStreams = eventStreamService.buildEventSourceStreams(getStreams(parameters),
                 result.sourceStreams());
@@ -312,7 +313,13 @@ public class AggregationEventProcessor implements EventProcessor {
             //   application_name=sshd
             //   username=jane
             for (int i = 0; i < config.groupBy().size(); i++) {
-                fields.put(config.groupBy().get(i), keyResult.key().get(i));
+                try {
+                    fields.put(config.groupBy().get(i), keyResult.key().get(i));
+                } catch (IndexOutOfBoundsException e) {
+                    throw new EventProcessorException(
+                            "Couldn't create events for: " + eventDefinition.title() + " (possibly due to non-existing grouping fields)",
+                            false, eventDefinition.id(), eventDefinition, e);
+                }
             }
 
             // Group By fields need to be saved on the event so they are available to the subsequent notification events

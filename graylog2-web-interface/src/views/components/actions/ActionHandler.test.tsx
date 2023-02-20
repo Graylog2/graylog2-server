@@ -31,7 +31,7 @@ describe('ActionHandler', () => {
       resetFocus: false,
     };
 
-    const result = createHandlerFor(actionDefinition, jest.fn());
+    const result = createHandlerFor(jest.fn(), actionDefinition, jest.fn());
 
     expect(result).toEqual(actionDefinition.handler);
   });
@@ -45,7 +45,7 @@ describe('ActionHandler', () => {
       component: () => <div>Hello world!</div>,
       resetFocus: false,
     };
-    const handler = createHandlerFor(actionDefinition, setActionComponents);
+    const handler = createHandlerFor(jest.fn(), actionDefinition, setActionComponents);
 
     expect(handler).toBeDefined();
 
@@ -78,7 +78,7 @@ describe('ActionHandler', () => {
       component: () => <div>Hello world!</div>,
       resetFocus: false,
     };
-    const handler = createHandlerFor(actionDefinition, setActionComponents);
+    const handler = createHandlerFor(jest.fn(), actionDefinition, setActionComponents);
 
     return handler({ queryId: 'foo', field: 'bar', value: 42, type: FieldType.Unknown, contexts: {} })
       .then(() => {

@@ -14,17 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { ViewStore } from 'views/stores/ViewStore';
+import type { ViewType } from 'views/logic/views/View';
 
 import QueryGenerator from './queries/QueryGenerator';
 import ViewStateGenerator from './views/ViewStateGenerator';
 
-import { QueriesActions } from '../stores/QueriesStore';
-
-export default async () => {
-  const { view } = ViewStore.getInitialState();
+export default async (type: ViewType) => {
   const query = QueryGenerator();
-  const state = await ViewStateGenerator(view.type);
+  const state = await ViewStateGenerator(type);
 
-  return QueriesActions.create(query, state).then(() => query);
+  return [query, state] as const;
 };
