@@ -36,9 +36,14 @@ export const RefreshActions: SyncRefluxActions<RefreshActionsType> = singletonAc
   ] as const),
 );
 
+type RefreshConfig = {
+  interval: number,
+  enabled: boolean,
+};
+
 export const RefreshStore = singletonStore(
   'views.Refresh',
-  () => Reflux.createStore({
+  () => Reflux.createStore<RefreshConfig>({
     listenables: [RefreshActions],
 
     refreshConfig: {},
