@@ -19,7 +19,6 @@ import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import mockDispatch from 'views/test/mockDispatch';
 import type { RootState } from 'views/types';
-import { setView } from 'views/logic/slices/viewSlice';
 
 import View from './View';
 import OnSaveNewDashboard from './OnSaveNewDashboard';
@@ -55,7 +54,7 @@ describe('OnSaveNewDashboard', () => {
 
     await dispatch(OnSaveNewDashboard(view));
 
-    expect(dispatch).toHaveBeenCalledWith(setView(view));
+    expect(loadDashboard).toHaveBeenCalled();
   });
 
   it('redirects to saved view', async () => {
