@@ -46,7 +46,7 @@ export const RefreshStore = singletonStore(
     init() {
       this.refreshConfig = {
         enabled: false,
-        interval: 1000,
+        interval: 5000,
       };
     },
 
