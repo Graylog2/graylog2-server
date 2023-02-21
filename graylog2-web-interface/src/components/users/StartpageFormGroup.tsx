@@ -108,7 +108,7 @@ const useStartPageEntities = (userId, permissions) => {
 
 const StartpageFormGroup = ({ userId, permissions }: Props) => {
   const { streams, dashboards, isLoading } = useStartPageEntities(userId, permissions);
-  const searches = [{value: "default", label: "Default"}];
+  const searches = [{ value: 'default', label: 'Default' }];
 
   if (isLoading) {
     return <Spinner />;
@@ -118,7 +118,15 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
     <Field name="startpage">
       {({ field: { name, value, onChange } }) => {
         const type = value?.type ?? 'dashboard';
-        const options = type === 'dashboard' ? dashboards : type === 'streams' ? streams : searches;
+        let options: (Option | { label: any; value: any })[];
+
+        if (type === 'dashboard') {
+          options = dashboards;
+        } else if (type === 'streams') {
+          options = streams;
+        } else {
+          options = searches;
+        }
 
         const error = value?.id && options.findIndex(({ value: v }) => v === value.id) < 0
           ? <Alert bsStyle="warning">User is missing permission for the configured page</Alert>
