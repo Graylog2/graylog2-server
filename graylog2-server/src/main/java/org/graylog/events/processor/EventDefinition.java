@@ -23,6 +23,7 @@ import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.storage.EventStorageHandler;
+import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 import java.util.Set;
@@ -34,6 +35,9 @@ public interface EventDefinition {
     String title();
 
     String description();
+
+    @Nullable
+    DateTime updatedAt();
 
     int priority();
 

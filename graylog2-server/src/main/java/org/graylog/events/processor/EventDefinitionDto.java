@@ -44,6 +44,7 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.ValidationResult;
+import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -68,6 +69,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     private static final String FIELD_NOTIFICATION_SETTINGS = "notification_settings";
     private static final String FIELD_STORAGE = "storage";
     private static final String FIELD_SCHEDULERCTX = "scheduler";
+    private static final String UPDATED_AT = "updated_at";
 
     @Override
     @Id
@@ -83,6 +85,11 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     @Override
     @JsonProperty(FIELD_DESCRIPTION)
     public abstract String description();
+
+    @Override
+    @Nullable
+    @JsonProperty(UPDATED_AT)
+    public abstract DateTime updatedAt();
 
     @Override
     @JsonProperty(FIELD_PRIORITY)
@@ -178,6 +185,9 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
         @JsonProperty(FIELD_DESCRIPTION)
         public abstract Builder description(String description);
 
+        @JsonProperty(UPDATED_AT)
+        public abstract Builder updatedAt(DateTime updatedAt);
+
         @JsonProperty(FIELD_PRIORITY)
         public abstract Builder priority(int priority);
 
@@ -244,6 +254,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
 
         return EventDefinitionEntity.builder()
                 .scope(ValueReference.of(scope()))
+                .updatedAt(updatedAt())
                 .title(ValueReference.of(title()))
                 .description(ValueReference.of(description()))
                 .priority(ValueReference.of(priority()))

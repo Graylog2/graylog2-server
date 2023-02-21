@@ -14,18 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import UserNotification from 'util/UserNotification';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import { loadDashboard } from 'views/logic/views/Actions';
 
-import type View from './View';
+import type { Sort } from 'stores/PaginationTypes';
 
-export default (view: View) => async () => {
-  try {
-    const savedView = await ViewManagementActions.create(view);
-    loadDashboard(savedView.id);
-    UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!');
-  } catch (error) {
-    UserNotification.error(`Saving view failed: ${error}`, 'Error!');
-  }
+export const ENTITY_TABLE_ID = 'saved-searches';
+export const DEFAULT_LAYOUT = {
+  pageSize: 20,
+  sort: { attributeId: 'title', direction: 'asc' } as Sort,
+  displayedColumns: ['title', 'description', 'summary', 'favorite'],
+  columnsOrder: ['title', 'summary', 'description', 'owner', 'created_at', 'favorite'],
 };
