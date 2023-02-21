@@ -24,7 +24,7 @@ import com.github.rholder.retry.WaitStrategies;
 import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
 import org.apache.http.NoHttpResponseException;
-import org.graylog.datanode.testinfra.DatanodeBackend;
+import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog.datanode.testinfra.DatanodeTestExtension;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -37,9 +37,9 @@ import java.util.concurrent.TimeUnit;
 @ExtendWith(DatanodeTestExtension.class)
 public class DatanodeStartupIT {
 
-    private final DatanodeBackend backend;
+    private final DatanodeContainerizedBackend backend;
 
-    public DatanodeStartupIT(DatanodeBackend backend) {
+    public DatanodeStartupIT(DatanodeContainerizedBackend backend) {
         this.backend = backend;
     }
 

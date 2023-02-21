@@ -27,20 +27,20 @@ import java.io.IOException;
 
 public class DatanodeTestExtension implements ParameterResolver, BeforeAllCallback, AfterAllCallback {
 
-    private final DatanodeBackend datanodeBackend;
+    private final DatanodeContainerizedBackend datanodeBackend;
 
     public DatanodeTestExtension() {
-        this.datanodeBackend = new DatanodeBackend();
+        this.datanodeBackend = new DatanodeContainerizedBackend();
     }
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return parameterContext.getParameter().getParameterizedType().equals(DatanodeBackend.class);
+        return parameterContext.getParameter().getParameterizedType().equals(DatanodeContainerizedBackend.class);
     }
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        if (parameterContext.getParameter().getParameterizedType().equals(DatanodeBackend.class)) {
+        if (parameterContext.getParameter().getParameterizedType().equals(DatanodeContainerizedBackend.class)) {
             return this.datanodeBackend;
         } else {
             throw new IllegalArgumentException("Unsupported parameter " + parameterContext.getParameter().getParameterizedType());

@@ -25,18 +25,19 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Properties;
 
-public class DatanodeBackend {
+public class DatanodeContainerizedBackend {
 
     public static final int DATANODE_REST_PORT = 8999;
     public static final int DATANODE_OPENSEARCH_PORT = 9200;
+    public static final String IMAGE_WORKING_DIR = "/usr/share/graylog/datanode";
     private final Network network;
-    private final GenericContainer mongodbContainer;
-    private final GenericContainer datanodeContainer;
+    private final GenericContainer<?> mongodbContainer;
+    private final GenericContainer<?> datanodeContainer;
 
-    public DatanodeBackend() {
+    public DatanodeContainerizedBackend() {
         network = Network.newNetwork();
 
-        mongodbContainer = new GenericContainer("mongo:5.0")
+        mongodbContainer = new GenericContainer<>("mongo:5.0")
                 .withNetwork(network)
                 .withNetworkAliases("mongodb")
                 .withExposedPorts(27017);
@@ -46,22 +47,49 @@ public class DatanodeBackend {
                         builder
                                 .from("eclipse-temurin:17-jre-jammy")
                                 .env("OPENSEARCH_VERSION", "2.4.1")
-                                .workDir("/usr/share/graylog/datanode")
+                                .workDir(IMAGE_WORKING_DIR)
                                 // TODO: download clean version of opensearch or rely on the existing one from the build step? Mount or copy?
                                 //.add("https://artifacts.opensearch.org/releases/bundle/opensearch/${OPENSEARCH_VERSION}/opensearch-${OPENSEARCH_VERSION}-linux-x64.tar.gz", "opensearch-dist/")
                                 .run("mkdir -p config")
                                 .run("mkdir -p data")
                                 .run("mkdir -p logs")
+                                .run("touch datanode.conf") // create empty configuration file, required but all config comes via env props
                                 .run("useradd opensearch")
-                                .run("chown -R opensearch:opensearch /usr/share/graylog/datanode")
+                                .run("chown -R opensearch:opensearch " + IMAGE_WORKING_DIR)
                                 .user("opensearch")
                                 .expose(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
                                 .entryPoint("java", "-jar", "datanode.jar", "datanode", "-f", "datanode.conf")
                                 .build());
 
-        datanodeContainer = new GenericContainer(image)
+        datanodeContainer = new GenericContainer<>(image)
                 .withExposedPorts(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
                 .withNetwork(network)
+
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOCATION", IMAGE_WORKING_DIR + "/opensearch-dist")
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DATA_LOCATION", IMAGE_WORKING_DIR + "/data")
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOGS_LOCATION", IMAGE_WORKING_DIR + "/logs")
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/config")
+
+                .withEnv("GRAYLOG_DATANODE_MONGODB_URI", "mongodb://mongodb/graylog")
+                .withEnv("GRAYLOG_DATANODE_NODE_NAME", "node1")
+
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_HTTP_PORT", "" + DATANODE_OPENSEARCH_PORT)
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_TRANSPORT_PORT", "9300")
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DISCOVERY_SEED_HOSTS", "127.0.0.1:9300")
+
+                //datanode_transport_certificate=datanode-transport-certificates.p12
+                //datanode_transport_certificate_password=password
+
+                //datanode_http_certificate=datanode-http-certificates.p12
+                //datanode_http_certificate_password=password
+
+                .withEnv("GRAYLOG_DATANODE_REST_API_USERNAME", "admin")
+                .withEnv("GRAYLOG_DATANODE_REST_API_PASSWORD", "admin")
+                .withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", "this_is_not_used_but_required")
+
+                .withEnv("GRAYLOG_DATANODE_NODE_ID_FILE", "./node-id")
+                .withEnv("GRAYLOG_DATANODE_HTTP_BIND_ADDRESS", "0.0.0.0:" + DATANODE_REST_PORT)
+
                 .dependsOn(mongodbContainer)
                 .waitingFor(new LogMessageWaitStrategy()
                         .withRegEx(".*Graylog DataNode datanode up and running.\n")
@@ -71,10 +99,9 @@ public class DatanodeBackend {
         String opensearchVersion = getOpensearchVersion();
 
         datanodeContainer
-                .withFileSystemBind("target/datanode-" + datanodeVersion + ".jar", "/usr/share/graylog/datanode/datanode.jar")
-                .withFileSystemBind("target/lib", "/usr/share/graylog/datanode/lib/")
-                .withFileSystemBind("bin/opensearch-" + opensearchVersion, "/usr/share/graylog/datanode/opensearch-dist")
-                .withFileSystemBind("datanode.conf", "/usr/share/graylog/datanode/datanode.conf");
+                .withFileSystemBind("target/datanode-" + datanodeVersion + ".jar", IMAGE_WORKING_DIR + "/datanode.jar")
+                .withFileSystemBind("target/lib", IMAGE_WORKING_DIR + "/lib/")
+                .withFileSystemBind("bin/opensearch-" + opensearchVersion, IMAGE_WORKING_DIR + "/opensearch-dist");
     }
 
 
@@ -93,7 +120,7 @@ public class DatanodeBackend {
         return datanodeContainer.getMappedPort(DATANODE_REST_PORT);
     }
 
-    private String getDatanodeVersion()  {
+    private String getDatanodeVersion() {
         try {
             final Properties props = new Properties();
             props.load(getClass().getResourceAsStream("/version.properties"));
