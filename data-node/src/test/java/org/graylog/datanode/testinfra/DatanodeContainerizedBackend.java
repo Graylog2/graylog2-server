@@ -116,6 +116,11 @@ public class DatanodeContainerizedBackend {
         network.close();
     }
 
+    public String getLogs() {
+        return datanodeContainer.getLogs();
+    }
+
+
     public Integer getDatanodeRestPort() {
         return datanodeContainer.getMappedPort(DATANODE_REST_PORT);
     }
