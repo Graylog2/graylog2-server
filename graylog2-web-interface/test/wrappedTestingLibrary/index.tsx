@@ -24,8 +24,8 @@ import type { RenderHookResult, RenderHookOptions } from '@testing-library/react
 import { renderHook, act as renderHookAct } from '@testing-library/react-hooks';
 import type { QueryClientConfig } from '@tanstack/react-query';
 
-import DefaultQueryClientProvider from './DefaultQueryClientProvider';
-import WrappingContainer from './WrappingContainer';
+import DefaultQueryClientProvider from '../DefaultQueryClientProvider';
+import WrappingContainer from '../WrappingContainer';
 
 export const renderWithWrapper = (Component: React.ReactElement<any>, options?: RenderOptions) => render(Component, {
   wrapper: WrappingContainer,
