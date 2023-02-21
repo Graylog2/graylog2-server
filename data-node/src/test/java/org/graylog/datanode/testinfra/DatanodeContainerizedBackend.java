@@ -57,6 +57,8 @@ public class DatanodeContainerizedBackend {
                                 .run("touch datanode.conf") // create empty configuration file, required but all config comes via env props
                                 .run("useradd opensearch")
                                 .run("chown -R opensearch:opensearch " + IMAGE_WORKING_DIR)
+                                .run("touch /etc/opensearch/opensearch.yml") // create empty configuration file, required but all config comes via env props
+                                .run("touch /etc/opensearch/jvm.options") // create empty configuration file, required but all config comes via env props
                                 .run("chown -R opensearch:opensearch /etc/opensearch")
                                 .user("opensearch")
                                 .expose(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
