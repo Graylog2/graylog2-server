@@ -35,7 +35,7 @@ type SidecarsArgs = {
   onlyActive?: boolean,
 }
 
-const PAGE_SIZES = [25, 50, 100];
+const PAGE_SIZES = [25];
 
 const SIDECARS_DEFAULT_ARGS: SidecarsArgs = {
   page: 1,
@@ -120,7 +120,6 @@ const SidecarFailureTrackingListContainer = () => {
                                 query={sidecarData.query}
                                 onlyActive={sidecarData.only_active}
                                 sort={{ field: sidecarData.sort, order: sidecarData.order }}
-                                pageSizes={PAGE_SIZES}
                                 onPageChange={handlePageChange}
                                 onQueryChange={handleQueryChange}
                                 onSortChange={handleSortChange}

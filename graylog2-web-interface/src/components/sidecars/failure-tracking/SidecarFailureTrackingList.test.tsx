@@ -61,7 +61,6 @@ const pagination = { total: 11, count: 10, page: 1, per_page: 25, query: '' };
 const query = 'query';
 const onlyActive = false;
 const sort = { field: 'last_seen', order: 'desc' };
-const pageSizes = [25, 50, 100];
 const handlePageChange = jest.fn();
 const handleQueryChange = jest.fn();
 const handleSortChange = jest.fn();
@@ -75,7 +74,6 @@ const renderSUT = (sidecarsList: Array<SidecarSummary> = [], collectorsList: Arr
                                 query={query}
                                 onlyActive={onlyActive}
                                 sort={sort}
-                                pageSizes={pageSizes}
                                 onPageChange={handlePageChange}
                                 onQueryChange={handleQueryChange}
                                 onSortChange={handleSortChange}
@@ -99,18 +97,6 @@ describe('SidecarFailureTrackingList', () => {
     fireEvent.change(searchInput, { target: { value: 'demo' } });
 
     await waitFor(() => expect(handleQueryChange).toHaveBeenCalledWith('demo', expect.anything()));
-  });
-
-  it('should handle page change', async () => {
-    renderSUT(sidecars, collectors);
-
-    await screen.findByText('Sidecar');
-
-    const pageSizeInput = screen.getByLabelText('Show');
-
-    fireEvent.change(pageSizeInput, { target: { value: 100 } });
-
-    await waitFor(() => expect(handlePageChange).toHaveBeenCalledWith(1, 100));
   });
 
   it('should toggle inactive sidecar', async () => {

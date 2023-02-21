@@ -55,7 +55,6 @@ type Props = {
   query: string,
   sort: SortType,
   onlyActive: boolean,
-  pageSizes: number[],
   onPageChange: (page: number, pageSize: number) => void,
   onQueryChange: (query: string) => void,
   onSortChange: (sortField: string) => void,
@@ -143,14 +142,12 @@ const SidecarFailureTrackingList = ({
   query,
   sort,
   onlyActive,
-  pageSizes,
   onPageChange,
   onQueryChange,
   onSortChange,
   toggleShowInactive,
 }: Props) => {
   const [collectorDetailsToShow, setCollectorDetailsToShow] = useState<{ name: string, verbose_message: string }|null>(null);
-
   const sidecarRows = sidecars.map((sidecar) => <SidecarFailureTrackingRows key={sidecar.node_id} sidecar={sidecar} collectors={collectors} onShowDetails={setCollectorDetailsToShow} />);
   const showOrHideInactive = onlyActive ? 'Include' : 'Hide';
 
@@ -167,7 +164,7 @@ const SidecarFailureTrackingList = ({
         </SidecarSearchForm>
       </div>
 
-      <PaginatedList pageSizes={pageSizes}
+      <PaginatedList showPageSizeSelect={false}
                      totalItems={pagination.total}
                      onChange={onPageChange}>
         <Row>
@@ -196,7 +193,6 @@ SidecarFailureTrackingList.propTypes = {
   query: PropTypes.string.isRequired,
   sort: PropTypes.object.isRequired,
   onlyActive: PropTypes.bool.isRequired,
-  pageSizes: PropTypes.arrayOf(PropTypes.number).isRequired,
   onPageChange: PropTypes.func.isRequired,
   onQueryChange: PropTypes.func.isRequired,
   onSortChange: PropTypes.func.isRequired,
