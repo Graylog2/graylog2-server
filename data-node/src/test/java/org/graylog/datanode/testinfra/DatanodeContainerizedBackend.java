@@ -53,9 +53,11 @@ public class DatanodeContainerizedBackend {
                                 .run("mkdir -p config")
                                 .run("mkdir -p data")
                                 .run("mkdir -p logs")
+                                .run("mkdir -p /etc/opensearch")
                                 .run("touch datanode.conf") // create empty configuration file, required but all config comes via env props
                                 .run("useradd opensearch")
                                 .run("chown -R opensearch:opensearch " + IMAGE_WORKING_DIR)
+                                .run("chown -R opensearch:opensearch /etc/opensearch")
                                 .user("opensearch")
                                 .expose(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
                                 .entryPoint("java", "-jar", "datanode.jar", "datanode", "-f", "datanode.conf")
@@ -89,6 +91,8 @@ public class DatanodeContainerizedBackend {
 
                 .withEnv("GRAYLOG_DATANODE_NODE_ID_FILE", "./node-id")
                 .withEnv("GRAYLOG_DATANODE_HTTP_BIND_ADDRESS", "0.0.0.0:" + DATANODE_REST_PORT)
+
+                .withEnv("OPENSEARCH_PATH_CONF", "/etc/opensearch")
 
                 .dependsOn(mongodbContainer)
                 .waitingFor(new LogMessageWaitStrategy()
