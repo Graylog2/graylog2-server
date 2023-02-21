@@ -122,7 +122,7 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
 
         if (type === 'dashboard') {
           options = dashboards;
-        } else if (type === 'streams') {
+        } else if (type === 'stream') {
           options = streams;
         } else {
           options = searches;
