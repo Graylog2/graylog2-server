@@ -123,22 +123,6 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
         return dbQuery;
     }
 
-    public PaginatedList<StreamDTO> findPaginated(SearchQuery searchQuery,
-                                                  Predicate<StreamDTO> filter,
-                                                  int page,
-                                                  int perPage,
-                                                  String sortField,
-                                                  String order) {
-        return findPaginated(searchQuery,
-                filter,
-                List.of(),
-                page,
-                perPage,
-                sortField,
-                order
-        );
-    }
-
     private boolean isStringField(String sortField) {
         return STRING_FIELDS.contains(sortField);
     }
