@@ -21,29 +21,54 @@ import moment from 'moment';
 import { Button, Row, Col, BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted, ISODurationInput } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
+import type { SearchesConfig as SearchesConfigType } from 'components/search/SearchConfig';
 
 import 'moment-duration-format';
 
 import TimeRangeOptionsForm from './TimeRangeOptionsForm';
 import TimeRangeOptionsSummary from './TimeRangeOptionsSummary';
 
-function _queryTimeRangeLimitValidator(milliseconds) {
+function _queryTimeRangeLimitValidator(milliseconds: number) {
   return milliseconds >= 1;
 }
 
-function _relativeTimeRangeValidator(milliseconds, duration) {
+function _relativeTimeRangeValidator(milliseconds: number, duration: string) {
   return milliseconds >= 1 || duration === 'PT0S';
 }
 
-function _surroundingTimeRangeValidator(milliseconds) {
+function _surroundingTimeRangeValidator(milliseconds: number) {
   return milliseconds >= 1;
 }
 
-function _splitStringList(stringList) {
+function _splitStringList(stringList: string) {
   return stringList.split(',').map((f) => f.trim()).filter((f) => f.length > 0);
 }
 
-class SearchesConfig extends React.Component {
+const _buildTimeRangeOptions = (options: { [x: string]: string; }) => {
+  return Object.keys(options).map((key) => {
+    return { period: key, description: options[key] };
+  });
+};
+
+type Option = { period: string, description: string };
+
+type Props = {
+  config: SearchesConfigType,
+  updateConfig: (newConfig: SearchesConfigType) => Promise<unknown>,
+};
+type State = {
+  config: SearchesConfigType,
+  showConfigModal: boolean,
+  limitEnabled: boolean,
+  relativeTimeRangeOptionsUpdate: Array<Option>,
+  surroundingTimeRangeOptionsUpdate: Array<Option>,
+  surroundingFilterFields?: string,
+  analysisDisabledFields?: string,
+};
+
+class SearchesConfig extends React.Component<Props, State> {
+  private readonly defaultState: State;
+
   static propTypes = {
     config: PropTypes.shape({
       query_time_range_limit: PropTypes.string,
@@ -55,7 +80,7 @@ class SearchesConfig extends React.Component {
     updateConfig: PropTypes.func.isRequired,
   };
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
 
     const { config } = props;
@@ -83,7 +108,7 @@ class SearchesConfig extends React.Component {
     this.defaultState = { ...this.state };
   }
 
-  _onUpdate = (field) => {
+  _onUpdate = (field: keyof SearchesConfigType) => {
     return (newOptions) => {
       const { config } = this.state;
       const update = ObjectUtils.clone(config);
@@ -94,19 +119,19 @@ class SearchesConfig extends React.Component {
     };
   };
 
-  _onRelativeTimeRangeOptionsUpdate = (data) => {
+  _onRelativeTimeRangeOptionsUpdate = (data: Array<Option>) => {
     this.setState({ relativeTimeRangeOptionsUpdate: data });
   };
 
-  _onSurroundingTimeRangeOptionsUpdate = (data) => {
+  _onSurroundingTimeRangeOptionsUpdate = (data: Array<Option>) => {
     this.setState({ surroundingTimeRangeOptionsUpdate: data });
   };
 
-  _onFilterFieldsUpdate = (e) => {
+  _onFilterFieldsUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ surroundingFilterFields: e.target.value });
   };
 
-  _onAnalysisDisabledFieldsUpdate = (e) => {
+  _onAnalysisDisabledFieldsUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ analysisDisabledFields: e.target.value });
   };
 
@@ -176,12 +201,6 @@ class SearchesConfig extends React.Component {
   };
 
   render() {
-    const _buildTimeRangeOptions = (options) => {
-      return Object.keys(options).map((key) => {
-        return { period: key, description: options[key] };
-      });
-    };
-
     const {
       showConfigModal,
       config,
