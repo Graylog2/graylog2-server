@@ -437,6 +437,20 @@ public class SyslogCodecTest {
         assertThat(message.getField("facility_num")).isEqualTo(5);
     }
 
+    @Test
+    public void testDefaultTimezoneConfig() {
+        when(configuration.getString("timezone")).thenReturn("MST");
+
+        SyslogCodec codec = new SyslogCodec(configuration, metricRegistry);
+        final Message msgWithoutTimezone = codec.decode(buildRawMessage(UNSTRUCTURED));
+        final Message msgWithUTCTimezone = codec.decode(buildRawMessage(STRUCTURED));
+        final Message msgWithTimezoneOffset = codec.decode(buildRawMessage(STRUCTURED_ISSUE_845_EMPTY));
+
+        assertEquals(new DateTime(YEAR + "-10-21T12:09:37", DateTimeZone.forID("MST")).toDate(), ((DateTime) msgWithoutTimezone.getField("timestamp")).toDate());
+        assertEquals(new DateTime("2012-12-25T22:14:15.003Z", DateTimeZone.UTC), ((DateTime) msgWithUTCTimezone.getField("timestamp")).withZone(DateTimeZone.UTC));
+        assertEquals(new DateTime("2015-01-11T16:35:21.335797", DateTimeZone.forOffsetHours(1)).toDate(), ((DateTime) msgWithTimezoneOffset.getField("timestamp")).toDate());
+    }
+
     private RawMessage buildRawMessage(String message) {
         return new RawMessage(message.getBytes(StandardCharsets.UTF_8), new InetSocketAddress("127.0.0.1", 5140));
     }
