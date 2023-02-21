@@ -1,0 +1,4 @@
+type = "f"
+message = "Scheduling next search refresh only after current one completed."
+
+pulls = ["14723"]

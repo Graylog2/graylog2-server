@@ -207,7 +207,7 @@ describe('SearchActionsMenu', () => {
     });
 
     it('should duplicate a saved search', async () => {
-      asMock(useView).mockReturnValue(defaultView.toBuilder().id('some-id-1').build());
+      asMock(useView).mockReturnValue(defaultView.toBuilder().id('some-id-1').title('title').build());
 
       asMock(useCurrentUser).mockReturnValue(
         adminUser.toBuilder()
