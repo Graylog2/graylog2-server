@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook } from 'wrappedTestingLibrary';
+import { renderHook } from 'wrappedTestingLibrary/hooks';
 
 import useColumnsWidths from './useColumnsWidths';
 

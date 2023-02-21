@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { renderHook } from 'wrappedTestingLibrary';
+import { renderHook } from 'wrappedTestingLibrary/hooks';
 
 import { adminUser } from 'fixtures/users';
 import CurrentUserContext from 'contexts/CurrentUserContext';

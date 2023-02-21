@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { renderHook } from 'wrappedTestingLibrary';
+import { renderHook } from 'wrappedTestingLibrary/hooks';
 
 import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';

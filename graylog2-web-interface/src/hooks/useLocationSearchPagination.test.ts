@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook, renderHookAct } from 'wrappedTestingLibrary';
+import { renderHook, act } from 'wrappedTestingLibrary/hooks';
 import { useLocation } from 'react-router-dom';
 import { stringify } from 'qs';
 import type { Location } from 'history';
@@ -64,7 +64,7 @@ describe('useLocationSearchPagination custom hook', () => {
 
     const nextPage = { page: 2, perPage: 10, query: 'lolwut' };
 
-    renderHookAct(() => setPagination(nextPage));
+    act(() => setPagination(nextPage));
 
     expect(mockHistoryPush).toHaveBeenCalledWith({ search: stringify(nextPage) });
   });
