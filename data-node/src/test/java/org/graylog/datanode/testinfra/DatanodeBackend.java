@@ -14,42 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode;
+package org.graylog.datanode.testinfra;
 
-import com.github.rholder.retry.RetryException;
-import com.github.rholder.retry.Retryer;
-import com.github.rholder.retry.RetryerBuilder;
-import com.github.rholder.retry.StopStrategies;
-import com.github.rholder.retry.WaitStrategies;
-import io.restassured.RestAssured;
-import io.restassured.response.ValidatableResponse;
-import org.apache.http.NoHttpResponseException;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
-import java.net.SocketException;
+import java.io.IOException;
 import java.time.Duration;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
+import java.util.Properties;
 
-public class DatanodeStartupIT {
+public class DatanodeBackend {
 
-    private Network network;
-    private GenericContainer mongo;
-    private GenericContainer datanode;
+    public static final int DATANODE_REST_PORT = 8999;
+    public static final int DATANODE_OPENSEARCH_PORT = 9200;
+    private final Network network;
+    private final GenericContainer mongodbContainer;
+    private final GenericContainer datanodeContainer;
 
-    @BeforeEach
-    void setUp() {
-
+    public DatanodeBackend() {
         network = Network.newNetwork();
 
-        mongo = new GenericContainer("mongo:5.0")
+        mongodbContainer = new GenericContainer("mongo:5.0")
                 .withNetwork(network)
                 .withNetworkAliases("mongodb")
                 .withExposedPorts(27017);
@@ -68,58 +55,61 @@ public class DatanodeStartupIT {
                                 .run("useradd opensearch")
                                 .run("chown -R opensearch:opensearch /usr/share/graylog/datanode")
                                 .user("opensearch")
-                                .expose(8999)
+                                .expose(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
                                 .entryPoint("java", "-jar", "datanode.jar", "datanode", "-f", "datanode.conf")
                                 .build());
 
-        datanode = new GenericContainer(image)
-                .withExposedPorts(8999, 9200)
+        datanodeContainer = new GenericContainer(image)
+                .withExposedPorts(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
                 .withNetwork(network)
-                .dependsOn(mongo)
+                .dependsOn(mongodbContainer)
                 .waitingFor(new LogMessageWaitStrategy()
                         .withRegEx(".*Graylog DataNode datanode up and running.\n")
                         .withStartupTimeout(Duration.ofSeconds(60)));
 
-        datanode
-                .withFileSystemBind("target/datanode-5.1.0-SNAPSHOT.jar", "/usr/share/graylog/datanode/datanode.jar")
-                .withFileSystemBind("target/lib", "/usr/share/graylog/datanode/lib/")
-                .withFileSystemBind("bin/opensearch-2.4.1", "/usr/share/graylog/datanode/opensearch-dist")
-                .withFileSystemBind("datanode.conf", "/usr/share/graylog/datanode/datanode.conf");
+        String datanodeVersion = getDatanodeVersion();
+        String opensearchVersion = getOpensearchVersion();
 
-        mongo.start();
-        datanode.start();
+        datanodeContainer
+                .withFileSystemBind("target/datanode-" + datanodeVersion + ".jar", "/usr/share/graylog/datanode/datanode.jar")
+                .withFileSystemBind("target/lib", "/usr/share/graylog/datanode/lib/")
+                .withFileSystemBind("bin/opensearch-" + opensearchVersion, "/usr/share/graylog/datanode/opensearch-dist")
+                .withFileSystemBind("datanode.conf", "/usr/share/graylog/datanode/datanode.conf");
     }
 
-    @AfterEach
-    void tearDown() {
-        datanode.stop();
-        mongo.stop();
+
+    public void start() {
+        mongodbContainer.start();
+        datanodeContainer.start();
+    }
+
+    public void stop() {
+        datanodeContainer.stop();
+        mongodbContainer.stop();
         network.close();
     }
 
-    @Test
-    void testDatanodeStartup() throws ExecutionException, RetryException {
-
-        final Retryer<ValidatableResponse> retryer = RetryerBuilder.<ValidatableResponse>newBuilder()
-                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
-                .withStopStrategy(StopStrategies.stopAfterAttempt(60))
-                .retryIfException(input -> input instanceof NoHttpResponseException)
-                .retryIfException(input -> input instanceof SocketException)
-                .retryIfResult(input -> !input.extract().body().path("process.info.status").equals("AVAILABLE"))
-                .build();
-
-        final Integer datanodeRestApiPort = datanode.getMappedPort(8999);
-
-        retryer.call(() -> this.getStatus(datanodeRestApiPort))
-                .assertThat()
-                .body("process.info.node_name", Matchers.equalTo("node1"))
-                .body("process.info.pid", Matchers.notNullValue())
-                .body("process.info.user", Matchers.equalTo("opensearch"));
+    public Integer getDatanodeRestPort() {
+        return datanodeContainer.getMappedPort(DATANODE_REST_PORT);
     }
 
-    private ValidatableResponse getStatus(Integer mappedPort) {
-        return RestAssured.given()
-                .get("http://localhost:" + mappedPort)
-                .then();
+    private String getDatanodeVersion()  {
+        try {
+            final Properties props = new Properties();
+            props.load(getClass().getResourceAsStream("/version.properties"));
+            return props.getProperty("project.version");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String getOpensearchVersion() {
+        try {
+            final Properties props = new Properties();
+            props.load(getClass().getResourceAsStream("/opensearch.properties"));
+            return props.getProperty("opensearchVersion");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

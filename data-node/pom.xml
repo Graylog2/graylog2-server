@@ -432,6 +432,13 @@
             </resource>
         </resources>
 
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -468,8 +475,7 @@
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-x64.tar.gz
                             </url>
-                            <outputFileName>opensearch-${opensearch.version}.tar.gz
-                            </outputFileName><!-- default target location, just to demonstrate the parameter -->
+                            <outputFileName>opensearch-${opensearch.version}.tar.gz</outputFileName>
                             <outputDirectory>${project.basedir}/bin</outputDirectory>
                             <unpack>true</unpack>
                         </configuration>
