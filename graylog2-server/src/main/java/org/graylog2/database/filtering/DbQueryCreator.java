@@ -24,19 +24,31 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryParser;
 
 import javax.ws.rs.BadRequestException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class DbQueryCreator {
 
-    private final DbFilterParser dbFilterParser;
+    private final DbFilterExpressionParser dbFilterParser;
     private final SearchQueryParser searchQueryParser;
     private final List<EntityAttribute> attributes;
 
+    static final Document EMPTY_QUERY = new Document();
+
     public DbQueryCreator(final String defaultField,
                           final List<EntityAttribute> attributes) {
-        this.dbFilterParser = new DbFilterParser();
+        this.dbFilterParser = new DbFilterExpressionParser();
         this.attributes = attributes;
         this.searchQueryParser = new SearchQueryParser(defaultField, attributes);
+    }
+
+    DbQueryCreator(final DbFilterExpressionParser dbFilterParser,
+                   final SearchQueryParser searchQueryParser,
+                   final List<EntityAttribute> attributes) {
+        this.dbFilterParser = dbFilterParser;
+        this.searchQueryParser = searchQueryParser;
+        this.attributes = attributes;
     }
 
     public Bson createDbQuery(final List<String> filters,
@@ -47,27 +59,31 @@ public class DbQueryCreator {
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
-        List<Bson> dbFilters;
+        List<Bson> filterExpressionFilters;
         try {
-            dbFilters = dbFilterParser.parse(filters, attributes);
+            filterExpressionFilters = dbFilterParser.parse(filters, attributes);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
-        return buildDbQuery(searchQuery, dbFilters);
+        return buildDbQuery(searchQuery, filterExpressionFilters);
     }
 
     private Bson buildDbQuery(final SearchQuery searchQuery,
-                              final List<Bson> dbFilters) {
-        List<Bson> filterList = searchQuery.toBsonFilterList();
-        if (dbFilters != null) {
-            filterList.addAll(dbFilters);
+                              final List<Bson> filterExpressionFilters) {
+        final List<Bson> searchQueryFilters = searchQuery.toBsonFilterList();
+        if (!hasItems(searchQueryFilters) && !hasItems(filterExpressionFilters)) {
+            return EMPTY_QUERY;
         }
-        Bson dbQuery;
-        if (filterList.isEmpty()) {
-            dbQuery = new Document();
+        if (hasItems(filterExpressionFilters)) {
+            List<Bson> filterList = new ArrayList<>(searchQueryFilters);
+            filterList.addAll(filterExpressionFilters);
+            return Filters.and(filterList);
         } else {
-            dbQuery = Filters.and(filterList);
+            return Filters.and(searchQueryFilters);
         }
-        return dbQuery;
+    }
+
+    private boolean hasItems(final Collection<?> collection) {
+        return collection != null && !collection.isEmpty();
     }
 }

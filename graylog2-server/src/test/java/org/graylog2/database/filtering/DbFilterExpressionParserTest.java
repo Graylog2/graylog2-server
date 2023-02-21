@@ -29,17 +29,17 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.database.filtering.DbFilterParser.FIELD_AND_VALUE_SEPARATOR;
+import static org.graylog2.database.filtering.DbFilterExpressionParser.FIELD_AND_VALUE_SEPARATOR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class DbFilterParserTest {
+class DbFilterExpressionParserTest {
 
-    private DbFilterParser toTest;
+    private DbFilterExpressionParser toTest;
 
     @BeforeEach
     void setUp() {
-        toTest = new DbFilterParser();
+        toTest = new DbFilterExpressionParser();
     }
 
     @Test

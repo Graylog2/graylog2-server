@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.groupingBy;
 
 //TODO: discuss with FE format for more complex filters as well, mainly range filters
-public class DbFilterParser {
+public class DbFilterExpressionParser {
 
     static final String FIELD_AND_VALUE_SEPARATOR = ":";
     static final String WRONG_FILTER_EXPR_FORMAT_ERROR_MSG =
