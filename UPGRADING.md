@@ -110,11 +110,12 @@ have been un-deprecated, as Graylog intends to maintain them going forward.
 | `GET /system/configuration`                                                                                | Key `gc_warning_threshold` has been removed from response object.                                                                                                                                                                                                                                                                                                                                          |                                                                                                
 | `PUT /plugins/org.graylog.plugins.forwarder/forwarder/profiles/{inputProfileId}/inputs/{forwarderInputId}` | Added `type` as a required request attribute.                                                                                                                                                                                                                                                                                                                                                              |
 
-### Change to the response format of `/system/inputs`
+### Change to the format of `Input` entities in API responses
 
-Input attributes may now contain values of type [EncryptedValue](https://github.com/Graylog2/graylog2-server/blob/f35df42e165ac570b8b27de3f8eeac85e74ed610/graylog2-server/src/main/java/org/graylog2/security/encryption/EncryptedValue.java).
-Sensitive input configuration values for various inputs may be stored encrypted from now on and will therefore be represented
-differently in the JSON response.
+This change applies to the format of input entities in responses to the resources at or beneath `/system/inputs` and `plugins/org.graylog.plugins.forwarder/forwarder/profiles`.
+
+Input configuration may now contain values of type [EncryptedValue](https://github.com/Graylog2/graylog2-server/blob/f35df42e165ac570b8b27de3f8eeac85e74ed610/graylog2-server/src/main/java/org/graylog2/security/encryption/EncryptedValue.java).
+Sensitive input configuration values for various inputs may be stored encrypted from now on and will therefore be represented differently in the JSON response.
 
 For example, an input previously rendered like this in a response:
 ```json
