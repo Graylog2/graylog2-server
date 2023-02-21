@@ -102,9 +102,7 @@ class ConfigurationForm extends React.Component {
 
     submitAction(data);
 
-    if (this.modal && this.modal.close) {
-      this.modal.close();
-    }
+    this.setState({ showConfigurationModal: false });
   };
 
   // eslint-disable-next-line react/no-unused-class-component-methods
@@ -112,7 +110,7 @@ class ConfigurationForm extends React.Component {
     this.setState({ showConfigurationModal: true });
   };
 
-  _closeModal = () => {
+  onCancel = () => {
     const { cancelAction, titleValue } = this.props;
 
     this.setState($.extend(this._copyStateFromProps(this.props), { titleValue: titleValue, showConfigurationModal: false }));
@@ -195,7 +193,7 @@ class ConfigurationForm extends React.Component {
     return (
       <WrapperComponent show={this.state.showConfigurationModal}
                         title={title}
-                        onCancel={this._closeModal}
+                        onCancel={this.onCancel}
                         onSubmitForm={this._save}
                         submitButtonText={submitButtonText}>
         <fieldset>
