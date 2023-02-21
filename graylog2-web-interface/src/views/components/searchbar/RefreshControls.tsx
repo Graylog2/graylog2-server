@@ -51,7 +51,7 @@ const durationToMS = (duration: string) => moment.duration(duration).asMilliseco
 
 const RefreshControls = () => {
   const refreshConfig = useRefreshConfig();
-  const { config: { auto_refresh_timerange_options: autoRefreshTimerangeOptions } } = useSearchConfiguration();
+  const { config: { auto_refresh_timerange_options: autoRefreshTimerangeOptions = {} } } = useSearchConfiguration();
 
   useEffect(() => () => RefreshActions.disable(), []);
 

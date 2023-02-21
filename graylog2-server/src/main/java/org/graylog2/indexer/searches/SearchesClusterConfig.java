@@ -129,6 +129,7 @@ public abstract class SearchesClusterConfig {
                 .surroundingFilterFields(DEFAULT_SURROUNDING_FILTER_FIELDS)
                 .analysisDisabledFields(DEFAULT_ANALYSIS_DISABLED_FIELDS)
                 .autoRefreshTimerangeOptions(DEFAULT_AUTO_REFRESH_TIMERANGE_OPTIONS)
+                .defaultAutoRefreshOption(DEFAULT_AUTO_REFRESH_DEFAULT_OPTION)
                 .build();
     }
 
