@@ -23,7 +23,6 @@ import type { EditWidgetComponentProps } from 'views/types';
 import usePluginEntities from 'hooks/usePluginEntities';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import { Row, Col, Checkbox } from 'components/bootstrap';
-import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import FieldSortSelect from 'views/components/widgets/FieldSortSelect';
 import SortDirectionSelect from 'views/components/widgets/SortDirectionSelect';
@@ -35,7 +34,7 @@ import { HoverForHelp } from 'components/common';
 import { defaultCompare } from 'logic/DefaultCompare';
 import SaveOrCancelButtons from 'views/components/widgets/SaveOrCancelButtons';
 import StickyBottomActions from 'views/components/widgets/StickyBottomActions';
-import SelectedFieldsList from 'views/components/widgets/SelectedFieldsList';
+import FieldsConfiguration from 'views/components/widgets/FieldsConfiguration';
 
 const FullHeightRow = styled(Row)`
   height: 100%;
@@ -86,18 +85,9 @@ const EditMessageList = ({ children, config, fields, onChange, onCancel, onSubmi
         <StickyBottomActions actions={<SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />}
                              alignActionsAtBottom>
           <DescriptionBox description="Fields">
-            <SelectedFieldsList selectedFields={config.fields}
-                                onChange={(newFields) => _onFieldSelectionChanged(newFields, config, onChange)} />
-            <FieldSelect id="message-list-field-create-select"
-                         onChange={(newField) => _onFieldSelectionChanged([...config.fields, newField], config, onChange)}
-                         clearable={false}
-                         ariaLabel="Fields"
-                         persistSelection={false}
-                         name="message-list-field-create-select"
-                         value={undefined}
-                         excludedFields={config.fields ?? []}
-                         placeholder="Add a field"
-                         aria-label="Add a field" />
+            <FieldsConfiguration onChange={(newFields) => _onFieldSelectionChanged(newFields, config, onChange)}
+                                 selectedFields={config.fields} />
+
           </DescriptionBox>
           <DescriptionBox description="Message Preview">
             {sortedMessagePreviewOptions.map((option) => (

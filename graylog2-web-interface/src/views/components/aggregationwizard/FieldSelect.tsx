@@ -115,7 +115,6 @@ const FieldSelect = ({
 }: Props) => {
   const activeQuery = useActiveQueryId();
   const fieldTypes = useContext(FieldTypesContext);
-
   const fieldOptions = useMemo(() => fieldTypes.queryFields
     .get(activeQuery, Immutable.List())
     .filter((field) => !excludedFields.includes(field.name))

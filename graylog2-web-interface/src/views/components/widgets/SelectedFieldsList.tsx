@@ -77,7 +77,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
   return (
     <ListItemContainer className={className} ref={ref} {...(draggableProps ?? {})}>
       {isEditing && (
-        <EditFieldSelect id="group-by-add-field"
+        <EditFieldSelect id="add-field-select"
                          onChange={_onChange}
                          onMenuClose={() => setIsEditing(false)}
                          autoFocus
@@ -85,7 +85,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
                          clearable={false}
                          excludedFields={selectedFields.filter((fieldName) => fieldName !== item.id)}
                          ariaLabel="Fields"
-                         name="group-by-add-field-select"
+                         name="add-field-select"
                          value={item.id}
                          aria-label={`Edit ${item.title} field`} />
       )}

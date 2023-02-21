@@ -15,24 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { List } from 'immutable';
 import { Field } from 'formik';
 
-import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import type Widget from 'views/logic/widgets/Widget';
 import type View from 'views/logic/views/View';
 import { Input, HelpBlock, Row } from 'components/bootstrap';
-import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import ExportFormatSelection from 'views/components/export/ExportFormatSelection';
+import FieldsConfiguration from 'views/components/widgets/FieldsConfiguration';
 
 import CustomExportSettings from './CustomExportSettings';
 
-import SelectedFieldsList from '../widgets/SelectedFieldsList';
-
 type ExportSettingsType = {
-  fields: List<FieldTypeMapping>,
   selectedWidget: Widget | undefined | null,
   view: View,
 };
@@ -83,22 +78,12 @@ const ExportSettings = ({
           {({ field: { name, value, onChange } }) => (
             <>
               <label htmlFor={name}>Fields to export</label>
-              <SelectedFieldsList selectedFields={value.map(({ field }) => field)}
-                                  onChange={(newFields) => onChange({
-                                    target: {
-                                      name,
-                                      value: newFields.map((field) => ({ field })),
-                                    },
-                                  })} />
-              <FieldSelect id="export-field-create-select"
-                           onChange={(newField) => onChange({ target: { name, value: [...value, { field: newField }] } })}
-                           clearable={false}
-                           persistSelection={false}
-                           name="export-field-create-select"
-                           value={undefined}
-                           excludedFields={value.map(({ field }) => field)}
-                           placeholder="Add a field"
-                           ariaLabel="Add a field" />
+              <FieldsConfiguration onChange={
+                                      (newFields) => onChange({
+                                        target: { name, value: newFields.map((field) => ({ field })) },
+                                      })
+                                   }
+                                   selectedFields={value.map(({ field }) => field)} />
             </>
           )}
         </Field>
