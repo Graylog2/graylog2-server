@@ -22,6 +22,7 @@ import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Properties;
 
@@ -35,6 +36,12 @@ public class DatanodeContainerizedBackend {
     private final GenericContainer<?> datanodeContainer;
 
     public DatanodeContainerizedBackend() {
+
+
+        String datanodeVersion = getDatanodeVersion();
+        String opensearchVersion = getOpensearchVersion();
+
+
         network = Network.newNetwork();
 
         mongodbContainer = new GenericContainer<>("mongo:5.0")
@@ -42,24 +49,23 @@ public class DatanodeContainerizedBackend {
                 .withNetworkAliases("mongodb")
                 .withExposedPorts(27017);
 
+        final String opensearchTarArchive = "opensearch-" + opensearchVersion + ".tar.gz";
+
         final ImageFromDockerfile image = new ImageFromDockerfile("local/graylog-datanode:latest", false)
+                // the following command makes the opensearch tar.gz archive accessible in the docker build context, so it can
+                // be later used by the ADD command
+                .withFileFromPath(opensearchTarArchive, Path.of("bin", "download", opensearchTarArchive))
                 .withDockerfileFromBuilder(builder ->
                         builder
                                 .from("eclipse-temurin:17-jre-jammy")
-                                .env("OPENSEARCH_VERSION", "2.4.1")
                                 .workDir(IMAGE_WORKING_DIR)
-                                // TODO: download clean version of opensearch or rely on the existing one from the build step? Mount or copy?
-                                //.add("https://artifacts.opensearch.org/releases/bundle/opensearch/${OPENSEARCH_VERSION}/opensearch-${OPENSEARCH_VERSION}-linux-x64.tar.gz", "opensearch-dist/")
                                 .run("mkdir -p config")
                                 .run("mkdir -p data")
                                 .run("mkdir -p logs")
-                                .run("mkdir -p /etc/opensearch")
+                                .add(opensearchTarArchive, ".") // this will automatically extract the tar
                                 .run("touch datanode.conf") // create empty configuration file, required but all config comes via env props
                                 .run("useradd opensearch")
                                 .run("chown -R opensearch:opensearch " + IMAGE_WORKING_DIR)
-                                .run("touch /etc/opensearch/opensearch.yml") // create empty configuration file, required but all config comes via env props
-                                .run("touch /etc/opensearch/jvm.options") // create empty configuration file, required but all config comes via env props
-                                .run("chown -R opensearch:opensearch /etc/opensearch")
                                 .user("opensearch")
                                 .expose(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
                                 .entryPoint("java", "-jar", "datanode.jar", "datanode", "-f", "datanode.conf")
@@ -69,7 +75,7 @@ public class DatanodeContainerizedBackend {
                 .withExposedPorts(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
                 .withNetwork(network)
 
-                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOCATION", IMAGE_WORKING_DIR + "/opensearch-dist")
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOCATION", IMAGE_WORKING_DIR + "/opensearch-" + opensearchVersion)
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DATA_LOCATION", IMAGE_WORKING_DIR + "/data")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOGS_LOCATION", IMAGE_WORKING_DIR + "/logs")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/config")
@@ -93,21 +99,14 @@ public class DatanodeContainerizedBackend {
 
                 .withEnv("GRAYLOG_DATANODE_NODE_ID_FILE", "./node-id")
                 .withEnv("GRAYLOG_DATANODE_HTTP_BIND_ADDRESS", "0.0.0.0:" + DATANODE_REST_PORT)
-
-                .withEnv("OPENSEARCH_PATH_CONF", "/etc/opensearch")
-
                 .dependsOn(mongodbContainer)
                 .waitingFor(new LogMessageWaitStrategy()
                         .withRegEx(".*Graylog DataNode datanode up and running.\n")
                         .withStartupTimeout(Duration.ofSeconds(60)));
 
-        String datanodeVersion = getDatanodeVersion();
-        String opensearchVersion = getOpensearchVersion();
-
         datanodeContainer
                 .withFileSystemBind("target/datanode-" + datanodeVersion + ".jar", IMAGE_WORKING_DIR + "/datanode.jar")
-                .withFileSystemBind("target/lib", IMAGE_WORKING_DIR + "/lib/")
-                .withFileSystemBind("bin/opensearch-" + opensearchVersion, IMAGE_WORKING_DIR + "/opensearch-dist");
+                .withFileSystemBind("target/lib", IMAGE_WORKING_DIR + "/lib/");
     }
 
 
