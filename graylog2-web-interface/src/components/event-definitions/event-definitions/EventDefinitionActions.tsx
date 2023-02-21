@@ -22,19 +22,17 @@ import Routes from 'routing/Routes';
 import { LinkContainer } from 'components/common/router';
 import {
   IfPermitted,
-  Icon,
   ShareButton,
   ConfirmDialog,
 } from 'components/common';
 import {
-  Button,
   ButtonToolbar,
-  DropdownButton,
   MenuItem,
 } from 'components/bootstrap';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import EntityShareModal from 'components/permissions/EntityShareModal';
+import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 
 import type { EventDefinition } from '../event-definitions-types';
 
@@ -164,34 +162,41 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
   return (
     <>
       <ButtonToolbar key={`actions-${eventDefinition.id}`}>
-        {showActions() && (
-        <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
-          <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
-            <Button data-testid="edit-button">
-              <Icon name="edit" /> Edit
-            </Button>
-          </LinkContainer>
-        </IfPermitted>
-        )}
 
-        <ShareButton entityId={eventDefinition.id} entityType="event_definition" onClick={() => setShowEntityShareModal(true)} />
-
-        {!isSystemEventDefinition() && (
-        <DropdownButton id="more-dropdown" title="More" pullRight>
-          <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
-          <MenuItem divider />
-          <MenuItem onClick={() => handleAction(isScheduled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)}>
-            {isScheduled ? 'Disable' : 'enable'}
-          </MenuItem>
-
+        <ShareButton entityId={eventDefinition.id}
+                     entityType="event_definition"
+                     onClick={() => setShowEntityShareModal(true)}
+                     bsSize="xsmall" />
+        <OverlayDropdownButton title="More Actions"
+                               bsSize="xsmall"
+                               dropdownZIndex={1000}>
           {showActions() && (
+          <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
+            <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
+              <MenuItem data-testid="edit-button">
+                Edit
+              </MenuItem>
+            </LinkContainer>
+          </IfPermitted>
+          )}
+          {!isSystemEventDefinition() && (
+          <>
+            <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
+            <MenuItem divider />
+            <MenuItem onClick={() => handleAction(isScheduled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)}>
+              {isScheduled ? 'Disable' : 'enable'}
+            </MenuItem>
+
+            {showActions() && (
             <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
               <MenuItem divider />
               <MenuItem onClick={() => handleAction(DIALOG_TYPES.DELETE, eventDefinition)} data-testid="delete-button">Delete</MenuItem>
             </IfPermitted>
+            )}
+          </>
           )}
-        </DropdownButton>
-        )}
+        </OverlayDropdownButton>
+
       </ButtonToolbar>
       {showDialog && (
       <ConfirmDialog title={DIALOG_TEXT[dialogType].dialogTitle}
