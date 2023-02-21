@@ -145,9 +145,9 @@ const Navigation = React.memo(({ pathname }: Props) => {
       <Navbar.Collapse>
         <Nav className="navbar-main">
           {currentUser?.startpage !== null ? (
-          <LinkContainer relativeActive to={Routes.WELCOME}>
-            <NavItem to="welcome">Welcome</NavItem>
-          </LinkContainer>
+            <LinkContainer relativeActive to={Routes.WELCOME}>
+              <NavItem to="welcome">Welcome</NavItem>
+            </LinkContainer>
           ) : (null)}
 
           <LinkContainer relativeActive to={Routes.SEARCH}>
