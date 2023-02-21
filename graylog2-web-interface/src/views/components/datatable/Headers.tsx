@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useLayoutEffect, useRef } from 'react';
+import { useCallback, useContext, useLayoutEffect, useRef } from 'react';
 import { flatten, get, isEqual, last } from 'lodash';
 import styled, { css } from 'styled-components';
 import type { OrderedMap } from 'immutable';
@@ -33,6 +33,7 @@ import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import type { Widgets } from 'views/stores/WidgetStore';
 import { Icon } from 'components/common';
+import InteractiveContext from 'views/components/contexts/InteractiveContext';
 
 import styles from './DataTable.css';
 
@@ -208,6 +209,7 @@ type Props = {
 const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup, actualColumnPivotFields, onSortChange, sortConfigMap, onSetColumnsWidth, pinnedColumns, togglePin }: Props) => {
   const rowFieldNames = rowPivots.flatMap((pivot) => pivot.fields);
   const columnFieldNames = columnPivots.flatMap((pivot) => pivot.fields);
+  const interactive = useContext(InteractiveContext);
 
   const headerField = ({ field, prefix = '', span = 1, title = field, sortable = false, sortType = undefined, showPinIcon = false }) => {
     return (
@@ -229,8 +231,8 @@ const Headers = ({ activeQuery, columnPivots, fields, rowPivots, series, rollup,
     );
   };
 
-  const rowPivotFields = rowFieldNames.map((fieldName) => headerField({ field: fieldName, sortable: true, sortType: SortConfig.PIVOT_TYPE, showPinIcon: true }));
-  const seriesFields = series.map((s) => headerField({ field: s.function, prefix: '', span: 1, title: s.effectiveName, sortable: true, sortType: SortConfig.SERIES_TYPE, showPinIcon: false }));
+  const rowPivotFields = rowFieldNames.map((fieldName) => headerField({ field: fieldName, sortable: interactive, sortType: SortConfig.PIVOT_TYPE, showPinIcon: interactive }));
+  const seriesFields = series.map((s) => headerField({ field: s.function, prefix: '', span: 1, title: s.effectiveName, sortable: interactive, sortType: SortConfig.SERIES_TYPE, showPinIcon: false }));
   const columnPivotFields = flatten(actualColumnPivotFields.map((key) => series.map((s) => headerField({ field: s.function, prefix: key.join('-'), span: 1, title: s.effectiveName, sortable: false, showPinIcon: false }))));
   const offset = rollup ? rowFieldNames.length + series.length : rowFieldNames.length;
 
