@@ -35,10 +35,12 @@ const StartPage = () => {
 
     // Show custom startpage if it was set
     if (startPage !== null && Object.keys(startPage).length > 0) {
-      if (startPage.type === 'stream') {
+      if (startPage.type === 'dashboard') {
+        redirect(Routes.dashboard_show(startPage.id));
+      } else if (startPage.type === 'stream') {
         redirect(Routes.stream_search(startPage.id));
       } else {
-        redirect(Routes.dashboard_show(startPage.id));
+        redirect(Routes.SEARCH);
       }
 
       return;

@@ -65,6 +65,7 @@ const _grnOptionFormatter = ({ id, title }: SharedEntity): Option => ({ value: g
 const typeOptions = [
   { value: 'dashboard', label: 'Dashboard' },
   { value: 'stream', label: 'Stream' },
+  { value: 'search', label: 'Search' },
 ];
 
 const ADMIN_PERMISSION = '*';
@@ -107,6 +108,7 @@ const useStartPageEntities = (userId, permissions) => {
 
 const StartpageFormGroup = ({ userId, permissions }: Props) => {
   const { streams, dashboards, isLoading } = useStartPageEntities(userId, permissions);
+  const searches = [{value: "default", label: "Default"}];
 
   if (isLoading) {
     return <Spinner />;
@@ -116,7 +118,7 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
     <Field name="startpage">
       {({ field: { name, value, onChange } }) => {
         const type = value?.type ?? 'dashboard';
-        const options = type === 'dashboard' ? dashboards : streams;
+        const options = type === 'dashboard' ? dashboards : type === 'streams' ? streams : searches;
 
         const error = value?.id && options.findIndex(({ value: v }) => v === value.id) < 0
           ? <Alert bsStyle="warning">User is missing permission for the configured page</Alert>
