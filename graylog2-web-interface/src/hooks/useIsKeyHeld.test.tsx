@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { renderHook, fireEvent, render, act } from 'wrappedTestingLibrary';
+import { fireEvent, render } from 'wrappedTestingLibrary';
+import { renderHook, act } from 'wrappedTestingLibrary/hooks';
 
 import useIsKeyHeld from 'hooks/useIsKeyHeld';
 
