@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Adds a welcome page link in the menu if a user has a start page set."
+
+issues = ["14668"]
+pulls = ["14736"]
