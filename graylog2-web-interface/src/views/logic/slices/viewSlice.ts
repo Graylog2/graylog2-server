@@ -183,8 +183,8 @@ export const removeQuery = (queryId: string) => async (dispatch: AppDispatch, ge
   const indexedQueryIds = search.queries.map((query) => query.id).toList();
   const newActiveQuery = FindNewActiveQueryId(indexedQueryIds, activeQuery);
 
-  await dispatch(updateView(newView, true));
   await dispatch(selectQuery(newActiveQuery));
+  await dispatch(updateView(newView, true));
 };
 
 export const createQuery = () => async (dispatch: AppDispatch, getState: () => RootState) => {
