@@ -22,6 +22,7 @@ import { Button, Row, Col, BootstrapModalForm, Input } from 'components/bootstra
 import { IfPermitted, ISODurationInput } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 import type { SearchesConfig as SearchesConfigType } from 'components/search/SearchConfig';
+import Select from 'components/common/Select/Select';
 
 import 'moment-duration-format';
 
@@ -38,6 +39,10 @@ function _relativeTimeRangeValidator(milliseconds: number, duration: string) {
 
 function _surroundingTimeRangeValidator(milliseconds: number) {
   return milliseconds >= 1;
+}
+
+function _autoRefreshTimeRangeValidator(milliseconds: number) {
+  return milliseconds >= 1000;
 }
 
 function _splitStringList(stringList: string) {
@@ -62,8 +67,10 @@ type State = {
   limitEnabled: boolean,
   relativeTimeRangeOptionsUpdate: Array<Option>,
   surroundingTimeRangeOptionsUpdate: Array<Option>,
+  autoRefreshTimeRangeOptionsUpdate: Array<Option>,
   surroundingFilterFields?: string,
   analysisDisabledFields?: string,
+  defaultAutoRefreshOptionUpdate?: string,
 };
 
 class SearchesConfig extends React.Component<Props, State> {
@@ -86,23 +93,15 @@ class SearchesConfig extends React.Component<Props, State> {
     const { config } = props;
 
     const queryTimeRangeLimit = config?.query_time_range_limit;
-    const relativeTimerangeOptions = config?.relative_timerange_options;
-    const surroundingTimerangeOptions = config?.surrounding_timerange_options;
-    const surroundingFilterFields = config?.surrounding_filter_fields;
-    const analysisDisabledFields = config?.analysis_disabled_fields;
 
     this.state = {
       showConfigModal: false,
-      config: {
-        query_time_range_limit: queryTimeRangeLimit,
-        relative_timerange_options: relativeTimerangeOptions,
-        surrounding_timerange_options: surroundingTimerangeOptions,
-        surrounding_filter_fields: surroundingFilterFields,
-        analysis_disabled_fields: analysisDisabledFields,
-      },
+      config: { ...config },
       limitEnabled: moment.duration(queryTimeRangeLimit).asMilliseconds() > 0,
       relativeTimeRangeOptionsUpdate: undefined,
       surroundingTimeRangeOptionsUpdate: undefined,
+      autoRefreshTimeRangeOptionsUpdate: undefined,
+      defaultAutoRefreshOptionUpdate: undefined,
     };
 
     this.defaultState = { ...this.state };
@@ -127,12 +126,20 @@ class SearchesConfig extends React.Component<Props, State> {
     this.setState({ surroundingTimeRangeOptionsUpdate: data });
   };
 
+  _onAutoRefreshTimeRangeOptionsUpdate = (data: Array<Option>) => {
+    this.setState({ autoRefreshTimeRangeOptionsUpdate: data });
+  };
+
   _onFilterFieldsUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ surroundingFilterFields: e.target.value });
   };
 
   _onAnalysisDisabledFieldsUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ analysisDisabledFields: e.target.value });
+  };
+
+  _onAutoRefreshDefaultOptionsUpdate = (data: string) => {
+    this.setState({ defaultAutoRefreshOptionUpdate: data });
   };
 
   _onChecked = () => {
@@ -152,7 +159,15 @@ class SearchesConfig extends React.Component<Props, State> {
 
   _saveConfig = () => {
     const { updateConfig } = this.props;
-    const { analysisDisabledFields, config, relativeTimeRangeOptionsUpdate, surroundingTimeRangeOptionsUpdate, surroundingFilterFields } = this.state;
+    const {
+      analysisDisabledFields,
+      config,
+      relativeTimeRangeOptionsUpdate,
+      surroundingTimeRangeOptionsUpdate,
+      surroundingFilterFields,
+      autoRefreshTimeRangeOptionsUpdate,
+      defaultAutoRefreshOptionUpdate,
+    } = this.state;
     const update = ObjectUtils.clone(config);
 
     if (relativeTimeRangeOptionsUpdate) {
@@ -186,6 +201,20 @@ class SearchesConfig extends React.Component<Props, State> {
       this.setState({ analysisDisabledFields: undefined });
     }
 
+    if (autoRefreshTimeRangeOptionsUpdate) {
+      update.auto_refresh_timerange_options = Object.fromEntries(autoRefreshTimeRangeOptionsUpdate.map((entry) => [entry.period, entry.description]));
+      this.setState({ autoRefreshTimeRangeOptionsUpdate: undefined });
+    }
+
+    const defaultAutoRefreshOption = defaultAutoRefreshOptionUpdate
+      ? update.auto_refresh_timerange_options[defaultAutoRefreshOptionUpdate] ?? Object.keys(update.auto_refresh_timerange_options)[0]
+      : update.auto_refresh_timerange_options[update.default_auto_refresh_option] ?? Object.keys(update.auto_refresh_timerange_options)[0];
+
+    if (update.default_auto_refresh_option !== defaultAutoRefreshOption) {
+      update.default_auto_refresh_option = defaultAutoRefreshOptionUpdate;
+      this.setState({ defaultAutoRefreshOptionUpdate: undefined });
+    }
+
     updateConfig(update).then(() => {
       this._closeModal();
     });
@@ -209,6 +238,7 @@ class SearchesConfig extends React.Component<Props, State> {
       surroundingFilterFields,
       relativeTimeRangeOptionsUpdate,
       analysisDisabledFields,
+      autoRefreshTimeRangeOptionsUpdate,
     } = this.state;
     const duration = moment.duration(config.query_time_range_limit);
     const limit = limitEnabled ? `${config.query_time_range_limit} (${duration.humanize()})` : 'disabled';
@@ -229,6 +259,12 @@ class SearchesConfig extends React.Component<Props, State> {
       analysisDisabledFieldsString = config.analysis_disabled_fields.join(', ');
     }
 
+    const autoRefreshOptions = autoRefreshTimeRangeOptionsUpdate ?? _buildTimeRangeOptions(config.auto_refresh_timerange_options);
+    const defaultAutoRefreshOptionUpdate = this.state.defaultAutoRefreshOptionUpdate ?? config.default_auto_refresh_option;
+    const defaultAutoRefreshOption = autoRefreshOptions.find((option) => option.period === defaultAutoRefreshOptionUpdate)
+      ? defaultAutoRefreshOptionUpdate
+      : autoRefreshOptions[0]?.period;
+
     return (
       <div>
         <h2>Search Configuration</h2>
@@ -245,12 +281,16 @@ class SearchesConfig extends React.Component<Props, State> {
           <Col md={6}>
             <strong>Relative time range options</strong>
             <TimeRangeOptionsSummary options={config.relative_timerange_options} />
-          </Col>
-          <Col md={6}>
             <strong>Surrounding time range options</strong>
             <TimeRangeOptionsSummary options={config.surrounding_timerange_options} />
           </Col>
+          <Col md={6} />
           <Col md={6}>
+            <strong>Auto-refresh interval options</strong>
+            <TimeRangeOptionsSummary options={config.auto_refresh_timerange_options} />
+
+            <strong>Default auto-refresh interval</strong>
+            <TimeRangeOptionsSummary options={{ [config.default_auto_refresh_option]: config.auto_refresh_timerange_options[config.default_auto_refresh_option] }} />
 
             <strong>Surrounding search filter fields</strong>
             <ul>
@@ -317,6 +357,25 @@ class SearchesConfig extends React.Component<Props, State> {
                    value={analysisDisabledFields || analysisDisabledFieldsString}
                    help="A ',' separated list of message fields for which analysis features like QuickValues will be disabled in the web UI."
                    required />
+
+            <TimeRangeOptionsForm options={autoRefreshOptions}
+                                  update={this._onAutoRefreshTimeRangeOptionsUpdate}
+                                  validator={_autoRefreshTimeRangeValidator}
+                                  title="Auto-Refresh Interval Options"
+                                  help={<span>Configure the available options for the <strong>auto-refresh</strong> interval selector as <strong>ISO8601 duration</strong></span>} />
+            <Input label="Default Auto-Refresh Option"
+                   id="default-auto-refresh-option"
+                   required
+                   help="Select the interval which is used when auto-refresh is started without explicitly selecting one">
+              <Select placeholder="Select the default interval"
+                      clearable={false}
+                      options={autoRefreshOptions}
+                      displayKey="description"
+                      valueKey="period"
+                      matchProp="label"
+                      onChange={this._onAutoRefreshDefaultOptionsUpdate}
+                      value={defaultAutoRefreshOption} />
+            </Input>
           </fieldset>
         </BootstrapModalForm>
       </div>
