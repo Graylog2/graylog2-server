@@ -22,25 +22,39 @@ import { useQueryClient } from '@tanstack/react-query';
 import Routes from 'routing/Routes';
 import useParams from 'routing/useParams';
 import type { EventType } from 'hooks/useEventById';
-import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
+import type { EventDefinition } from 'logic/alerts/types';
 
 const useAlertAndEventDefinitionData = () => {
   const { path } = useRouteMatch();
   const { alertId } = useParams<{ alertId?: string }>();
   const queryClient = useQueryClient();
   const eventData = queryClient.getQueryData(['event-by-id', alertId]) as EventType;
-  const EDData = queryClient.getQueryData(['definition', eventData?.event_definition_id]) as EventDefinition;
+  const data = queryClient.getQueryData(['definition', eventData?.event_definition_id]) as { eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation>};
+  const eventDefinition = data?.eventDefinition;
+  const aggregations = data?.aggregations;
 
-  return useMemo(() => ({
+  return useMemo<{
+    alertId: string,
+    definitionId: string,
+    definitionTitle: string,
+    isAlert: boolean,
+    isEvent: boolean,
+    isEventDefinition: boolean,
+    eventData: EventType,
+    eventDefinition: EventDefinition,
+    aggregations: Array<EventDefinitionAggregation>,
+  }>(() => ({
     alertId,
-    definitionId: EDData?.id,
-    definitionTitle: EDData?.title,
+    definitionId: eventDefinition?.id,
+    definitionTitle: eventDefinition?.title,
     isAlert: (path === Routes.ALERTS.replay_search(':alertId')) && eventData && eventData.alert,
     isEvent: (path === Routes.ALERTS.replay_search(':eventId')) && eventData && !eventData.alert,
-    isEventDefinition: (path === Routes.ALERTS.DEFINITIONS.replay_search(':definitionId')) && EDData,
+    isEventDefinition: (path === Routes.ALERTS.DEFINITIONS.replay_search(':definitionId')) && !!eventDefinition,
     eventData,
-    EDData,
-  }), [EDData, alertId, eventData, path]);
+    eventDefinition,
+    aggregations,
+  }), [eventDefinition, aggregations, alertId, eventData, path]);
 };
 
 export default useAlertAndEventDefinitionData;

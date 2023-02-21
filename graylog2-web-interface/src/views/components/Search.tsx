@@ -55,7 +55,8 @@ import useAppSelector from 'stores/useAppSelector';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import EventInfoBar from 'components/event-definitions/replay-search/EventInfoBar';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
-
+import useHighlightValuesForEventDefinition from 'hooks/useHighlightValuesForEventDefinition';
+import { createHighlightingRules } from 'views/logic/slices/highlightActions';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -139,6 +140,11 @@ const Search = () => {
   }, []);
 
   const { isEventDefinition, isEvent, isAlert } = useAlertAndEventDefinitionData();
+  const valuesToHighlight = useHighlightValuesForEventDefinition();
+
+  useEffect(() => {
+    if (valuesToHighlight.length) dispatch(createHighlightingRules(valuesToHighlight));
+  }, [dispatch, valuesToHighlight]);
 
   return (
     <>

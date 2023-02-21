@@ -36,66 +36,25 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
+import type Pivot from 'views/logic/aggregationbuilder/Pivot';
+import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import Direction from 'views/logic/aggregationbuilder/Direction';
 
 const NEW_WIDGET_HEIGHT = 2;
 
-const transformExpressionsToArray = ({ series, conditions }) => {
-  const res = [];
-
-  const rec = (expression) => {
-    if (!expression) {
-      return 'No condition configured';
-    }
-
-    switch (expression.expr) {
-      case 'number':
-        return ({ value: expression.value });
-      case 'number-ref':
-        // eslint-disable-next-line no-case-declarations
-        const selectedSeriesk = series.find((s) => s.id === expression.ref);
-
-        return (selectedSeriesk && selectedSeriesk.function
-          ? { field: `${selectedSeriesk.function}(${selectedSeriesk.field})` }
-          : null);
-      case '&&':
-      case '||':
-        return [rec(expression.left), rec(expression.right)];
-      case 'group':
-        return [rec(expression.child)];
-      case '<':
-      case '<=':
-      case '>':
-      case '>=':
-      case '==':
-        // eslint-disable-next-line no-case-declarations
-        const { ref } = expression.left;
-        // eslint-disable-next-line no-case-declarations
-        const selectedSeries = series.find((s) => s.id === ref);
-        // eslint-disable-next-line no-case-declarations
-        const fnSeries = selectedSeries && selectedSeries?.function ? `${selectedSeries.function}(${selectedSeries.field})` : undefined;
-        res.push({ expr: expression.expr, value: expression.right.value, function: selectedSeries?.function, fnSeries, field: selectedSeries.field });
-
-        return [rec(expression.left), rec(expression.right)];
-      default:
-        return null;
-    }
-  };
-
-  rec(conditions.expression);
-
-  return res;
-};
-
-const getAggregationWidget = ({ rowPivots, fnSeries }) => AggregationWidget.builder()
+const getAggregationWidget = ({ rowPivots, fnSeries, sort = [] }: {
+  rowPivots: Array<Pivot>,
+  fnSeries: Array<Series>,
+  sort?: Array<SortConfig>
+}) => AggregationWidget.builder()
   .id(generateId())
   .config(
     AggregationWidgetConfig.builder()
       .columnPivots([])
       .rowPivots(rowPivots)
-      .series([
-        Series.forFunction(fnSeries),
-      ])
-      .sort([])
+      .series(fnSeries)
+      .sort(sort)
       .visualization('table')
       .rollup(true)
       .build(),
@@ -108,18 +67,35 @@ const WidgetsGenerator = async ({ streams, aggregations, groupBy }) => {
   const streamDecorators = decorators ? decorators.filter(byStreamId) : [];
   const histogram = resultHistogram();
   const messageTable = allMessagesTable(undefined, streamDecorators);
-  const { aggregationWidgets, aggregationTitles, aggregationositions } = aggregations.reduce((res, { field, value, expr, fnSeries }, index) => {
+  const summaryAggregations = {
+    fnSeries: [],
+    rowPivots: [],
+    title: 'Summary: ',
+  };
+  const needsSummaryAggregations = aggregations.length > 1;
+  const SUMMARY_ROW_DELTA = needsSummaryAggregations ? NEW_WIDGET_HEIGHT : 0;
+  const { aggregationWidgets, aggregationTitles, aggregationPositions } = aggregations.reduce((res, { field, value, expr, fnSeries }, index) => {
     const rowPivots = uniq([field, ...groupBy]).map((f) => pivotForField(f, new FieldType('value', [], [])));
-    const widget = getAggregationWidget({ rowPivots, fnSeries });
+    const fnSeriesForFunc = Series.forFunction(fnSeries);
+    const direction = ['>', '>=', '=='].includes(expr) ? Direction.Descending : Direction.Ascending;
+    const sort = [new SortConfig(SortConfig.SERIES_TYPE, fnSeries, direction)];
+    const widget = getAggregationWidget({ rowPivots, fnSeries: [fnSeriesForFunc], sort });
     const widgetId = widget.id;
     const title = `${fnSeries} ${expr} ${value}`;
-    const position = new WidgetPosition(1, index + NEW_WIDGET_HEIGHT + 1, NEW_WIDGET_HEIGHT, Infinity);
+    const position = new WidgetPosition(1, index + NEW_WIDGET_HEIGHT + 1 + SUMMARY_ROW_DELTA, NEW_WIDGET_HEIGHT, Infinity);
     res.aggregationWidgets.push(widget);
     res.aggregationTitles[widgetId] = title;
-    res.aggregationositions[widgetId] = position;
+    res.aggregationPositions[widgetId] = position;
+
+    if (needsSummaryAggregations) {
+      summaryAggregations.fnSeries.push(fnSeries);
+      summaryAggregations.rowPivots.push(field);
+      summaryAggregations.title = `${summaryAggregations.title} ${title}`;
+    }
 
     return res;
-  }, { aggregationTitles: {}, aggregationWidgets: [], aggregationositions: {} });
+  }, { aggregationTitles: {}, aggregationWidgets: [], aggregationPositions: {} });
+
   const widgets = [
     ...aggregationWidgets,
     histogram,
@@ -135,10 +111,20 @@ const WidgetsGenerator = async ({ streams, aggregations, groupBy }) => {
   };
 
   const positions = {
-    ...aggregationositions,
-    [histogram.id]: new WidgetPosition(1, NEW_WIDGET_HEIGHT * aggregationWidgets.length + 1, 2, Infinity),
-    [messageTable.id]: new WidgetPosition(1, NEW_WIDGET_HEIGHT * aggregationWidgets.length + 3, 6, Infinity),
+    ...aggregationPositions,
+    [histogram.id]: new WidgetPosition(1, NEW_WIDGET_HEIGHT * aggregationWidgets.length + 1 + SUMMARY_ROW_DELTA, 2, Infinity),
+    [messageTable.id]: new WidgetPosition(1, NEW_WIDGET_HEIGHT * aggregationWidgets.length + 3 + SUMMARY_ROW_DELTA, 6, Infinity),
   };
+
+  if (needsSummaryAggregations) {
+    const summaryAggregationWidget = getAggregationWidget({
+      rowPivots: uniq([...summaryAggregations.rowPivots, ...groupBy]).map((f) => pivotForField(f, new FieldType('value', [], []))),
+      fnSeries: summaryAggregations.fnSeries.map((s) => Series.forFunction(s)),
+    });
+    widgets.push(summaryAggregationWidget);
+    titles.widget[summaryAggregationWidget.id] = summaryAggregations.title;
+    positions[summaryAggregationWidget.id] = new WidgetPosition(1, 1, 2, Infinity);
+  }
 
   return { titles, widgets, positions };
 };
@@ -164,7 +150,7 @@ const ViewGenerator = async ({
   streams: string | string[] | undefined | null,
   timeRange: TimeRange,
   queryString: ElasticsearchQueryString,
-  aggregations: Array<string>
+  aggregations: Array<EventDefinitionAggregation>
   groupBy: Array<string>
 },
 ) => {
@@ -184,7 +170,7 @@ const ViewGenerator = async ({
 };
 
 const useCreateViewForEvent = (
-  { eventData, EDData }: { eventData: EventType, EDData: EventDefinition },
+  { eventData, eventDefinition, aggregations }: { eventData: EventType, eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation> },
 ) => {
   const { streams } = eventData.replay_info;
   const timeRange = {
@@ -196,8 +182,7 @@ const useCreateViewForEvent = (
     type: 'elasticsearch',
     query_string: eventData?.replay_info?.query || ' ',
   };
-  const aggregations = transformExpressionsToArray({ series: EDData.config.series, conditions: EDData.config.conditions });
-  const groupBy = EDData.config.group_by;
+  const groupBy = eventDefinition.config.group_by;
 
   return useMemo(
     () => ViewGenerator({ streams, timeRange, queryString, aggregations, groupBy }),

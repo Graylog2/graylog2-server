@@ -18,17 +18,17 @@
 import React, { useEffect, useState } from 'react';
 
 import useParams from 'routing/useParams';
-import type { EventType } from 'hooks/useEventById';
 import useEventById from 'hooks/useEventById';
 import useEventDefinition from 'hooks/useEventDefinition';
 import { Spinner } from 'components/common';
 import SearchPage from 'views/pages/SearchPage';
-import type { EventDefinition } from 'logic/alerts/types';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import useCreateViewForEvent from 'views/logic/views/UseCreateViewForEvent';
+import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 
-const EventView = ({ eventData, EDData }: { eventData: EventType, EDData: EventDefinition }) => {
-  const view = useCreateViewForEvent({ eventData, EDData });
+const EventView = () => {
+  const { eventData, eventDefinition, aggregations } = useAlertAndEventDefinitionData();
+  const view = useCreateViewForEvent({ eventData, eventDefinition, aggregations });
 
   return <SearchPage view={view} isNew />;
 };
@@ -37,7 +37,7 @@ const EventReplaySearchPage = () => {
   const [isNotificationLoaded, setIsNotificationLoaded] = useState(false);
   const { alertId } = useParams<{ alertId?: string }>();
   const { data: eventData, isLoading: eventIsLoading, isFetched: eventIsFetched } = useEventById(alertId);
-  const { data: EDData, isLoading: EDIsLoading, isFetched: EDIsFetched } = useEventDefinition(eventData?.event_definition_id);
+  const { isLoading: EDIsLoading, isFetched: EDIsFetched } = useEventDefinition(eventData?.event_definition_id);
 
   useEffect(() => {
     EventNotificationsActions.listAll().then(() => setIsNotificationLoaded(true));
@@ -45,7 +45,7 @@ const EventReplaySearchPage = () => {
 
   const isLoading = eventIsLoading || EDIsLoading || !eventIsFetched || !EDIsFetched || !isNotificationLoaded;
 
-  return isLoading ? <Spinner /> : <EventView eventData={eventData} EDData={EDData} />;
+  return isLoading ? <Spinner /> : <EventView />;
 };
 
 export default EventReplaySearchPage;

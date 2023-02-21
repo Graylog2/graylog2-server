@@ -64,7 +64,7 @@ const EventInfoBar = () => {
       return res;
     }, {});
   });
-  const { eventData, EDData } = useAlertAndEventDefinitionData();
+  const { eventData, eventDefinition } = useAlertAndEventDefinitionData();
 
   const toggleOpen = (e) => {
     e.stopPropagation();
@@ -72,18 +72,18 @@ const EventInfoBar = () => {
   };
 
   // const executeEvery = extractDurationAndUnit(ev, TIME_UNITS);
-  const searchWithin = extractDurationAndUnit(EDData.config.search_within_ms, TIME_UNITS);
-  const executeEvery = extractDurationAndUnit(EDData.config.execute_every_ms, TIME_UNITS);
+  const searchWithin = extractDurationAndUnit(eventDefinition.config.search_within_ms, TIME_UNITS);
+  const executeEvery = extractDurationAndUnit(eventDefinition.config.execute_every_ms, TIME_UNITS);
 
   const notificationList = useMemo(() => {
-    return EDData.notifications.reduce((res, cur) => {
+    return eventDefinition.notifications.reduce((res, cur) => {
       if (allNotifications[cur.notification_id]) {
         res.push((allNotifications[cur.notification_id]));
       }
 
       return res;
     }, []);
-  }, [EDData, allNotifications]);
+  }, [eventDefinition, allNotifications]);
 
   return (
     <FlatContentRow>
@@ -103,12 +103,12 @@ const EventInfoBar = () => {
           <Item>
             <b>Event definition:</b>
             <span>
-              <Link target="_blank" to={Routes.ALERTS.DEFINITIONS.show(EDData.id)}>{EDData.title}</Link>
+              <Link target="_blank" to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{eventDefinition.title}</Link>
             </span>
           </Item>
           <Item>
             <b>Priority: </b>
-            <span>{lodash.upperFirst(EventDefinitionPriorityEnum.properties[EDData.priority].name)}</span>
+            <span>{lodash.upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</span>
           </Item>
           <Item>
             <b>Execute search every:</b>
@@ -120,7 +120,7 @@ const EventInfoBar = () => {
           </Item>
           <Item>
             <b>Description:</b>
-            <span>{EDData.description}</span>
+            <span>{eventDefinition.description}</span>
           </Item>
           <Item>
             <b>Notifications:</b>

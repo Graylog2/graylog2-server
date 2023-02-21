@@ -20,7 +20,7 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 
-const eventsUrl = qualifyUrl('/events/search');
+const eventsUrl = (id) => qualifyUrl(`/events/${id}`);
 
 export type EventType = {
   alert : boolean;
@@ -51,11 +51,8 @@ export type EventType = {
 }
 
 const fetchEvent = (eventId: string) => {
-  return fetch('POST', eventsUrl, {
-    query: `id:${eventId}`,
-    timerange: { type: 'relative', range: 0 },
-  }).then((data) => {
-    return data.events[0].event;
+  return fetch('GET', eventsUrl(eventId)).then((data) => {
+    return data.event;
   });
 };
 
