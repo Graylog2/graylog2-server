@@ -35,6 +35,7 @@ import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog.events.processor.EventProcessorParametersWithTimerange;
+import org.graylog.events.processor.EventResolver;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
@@ -107,6 +108,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private final SearchQueryParser searchQueryParser;
     private final RecentActivityService recentActivityService;
     private final BulkExecutor<EventDefinitionDto, UserContext> bulkExecutor;
+    private final EventResolver eventResolver;
 
     @Inject
     public EventDefinitionsResource(DBEventDefinitionService dbService,
@@ -115,7 +117,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                     EventProcessorEngine engine,
                                     RecentActivityService recentActivityService,
                                     AuditEventSender auditEventSender,
-                                    ObjectMapper objectMapper
+                                    ObjectMapper objectMapper,
+                                    EventResolver eventResolver
     ) {
         this.dbService = dbService;
         this.eventDefinitionHandler = eventDefinitionHandler;
@@ -124,6 +127,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         this.searchQueryParser = new SearchQueryParser(EventDefinitionDto.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.recentActivityService = recentActivityService;
         this.bulkExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
+        this.eventResolver = eventResolver;
     }
 
     @GET
@@ -218,10 +222,14 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                      @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_DELETE, definitionId);
         final Optional<EventDefinitionDto> eventDefinitionDto = dbService.get(definitionId);
-        eventDefinitionDto.ifPresent(d ->
-                recentActivityService.delete(d.id(), GRNTypes.EVENT_DEFINITION, d.title(), userContext.getUser())
-        );
-        eventDefinitionHandler.delete(definitionId);
+        if (eventDefinitionDto.isPresent()) {
+            eventResolver.dependentEvents(definitionId).ifPresent(
+                    dependencies -> {throw new IllegalArgumentException(dependencies.toString());});
+
+            recentActivityService.delete(
+                    eventDefinitionDto.get().id(), GRNTypes.EVENT_DEFINITION, eventDefinitionDto.get().title(), userContext.getUser());
+            eventDefinitionHandler.delete(definitionId);
+        }
         return eventDefinitionDto.orElse(null);
     }
 
