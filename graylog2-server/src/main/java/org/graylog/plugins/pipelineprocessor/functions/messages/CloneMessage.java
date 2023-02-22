@@ -90,7 +90,7 @@ public class CloneMessage extends AbstractFunction<Message> {
     public FunctionDescriptor<Message> descriptor() {
         return FunctionDescriptor.<Message>builder()
                 .name(NAME)
-                .params(ImmutableList.of(loopDetectionParam, messageParam))
+                .params(ImmutableList.of(messageParam, loopDetectionParam))
                 .returnType(Message.class)
                 .description("Clones a message")
                 .build();
