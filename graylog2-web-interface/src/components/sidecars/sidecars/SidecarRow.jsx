@@ -71,13 +71,9 @@ class SidecarRow extends React.Component {
     return (
       <SidecarTR inactive={!sidecar.active}>
         <td className={style.sidecarName}>
-          {sidecar.active
-            ? (
-              <Link to={Routes.SYSTEM.SIDECARS.STATUS(sidecar.node_id)}>
-                {sidecar.node_name}
-              </Link>
-            )
-            : sidecar.node_name}
+          <Link to={Routes.SYSTEM.SIDECARS.STATUS(sidecar.node_id)}>
+            {sidecar.node_name}
+          </Link>
         </td>
         <td>
           <StatusIndicator status={sidecarStatus.status}
