@@ -66,7 +66,7 @@ const getTimeRange = (scheduler: Scheduler) => {
 
 const detailsPopover = (title, scheduler: Scheduler, clearNotifications: () => void) => (
   <WidePopover id="event-definition-details" title={`${title} details.`}>
-    <DetailsList>
+    <dl>
       <DetailTitle>Status:</DetailTitle>
       <DetailValue>{scheduler.status}</DetailValue>
       {scheduler.triggered_at && (
@@ -90,7 +90,7 @@ const detailsPopover = (title, scheduler: Scheduler, clearNotifications: () => v
         </Button>
         )}
       </DetailValue>
-    </DetailsList>
+    </dl>
   </WidePopover>
 );
 
