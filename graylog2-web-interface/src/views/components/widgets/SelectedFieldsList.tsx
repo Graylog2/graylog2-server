@@ -48,20 +48,22 @@ const DragHandle = styled.div`
 
 type ListItemProps = {
   item: { id: string, title: string },
-  draggableProps: DraggableProvidedDraggableProps;
-  dragHandleProps: DraggableProvidedDragHandleProps;
+  draggableProps: DraggableProvidedDraggableProps,
+  dragHandleProps: DraggableProvidedDragHandleProps,
   className: string,
   onChange: (fieldName: string) => void,
   onRemove: () => void,
   selectedFields: Array<string>,
+  selectSize: 'normal' | 'small',
   testIdPrefix: string,
 }
 
 const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
-  item,
+  selectSize,
+  className,
   dragHandleProps,
   draggableProps,
-  className,
+  item,
   onChange,
   onRemove,
   selectedFields,
@@ -83,6 +85,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
                          autoFocus
                          openMenuOnFocus
                          clearable={false}
+                         size={selectSize}
                          excludedFields={selectedFields.filter((fieldName) => fieldName !== item.id)}
                          ariaLabel="Fields"
                          name="add-field-select"
@@ -110,9 +113,10 @@ type Props = {
   onChange: (newSelectedFields: Array<string>) => void
   selectedFields: Array<string>
   testPrefix?: string,
+  selectSize?: 'normal' | 'small'
 };
 
-const SelectedFieldsList = ({ testPrefix, selectedFields, onChange }: Props) => {
+const SelectedFieldsList = ({ testPrefix, selectedFields, onChange, selectSize }: Props) => {
   const fieldsForList = useMemo(() => selectedFields?.map((field) => ({ id: field, title: field })), [selectedFields]);
 
   const onChangeField = useCallback((fieldIndex: number, newFieldName: string) => {
@@ -130,6 +134,7 @@ const SelectedFieldsList = ({ testPrefix, selectedFields, onChange }: Props) => 
   const SortableListItem = useCallback(({ item, index, dragHandleProps, draggableProps, className, ref }) => (
     <ListItem onChange={(newFieldName) => onChangeField(index, newFieldName)}
               onRemove={() => onRemoveField(item.id)}
+              selectSize={selectSize}
               selectedFields={selectedFields ?? []}
               item={item}
               testIdPrefix={`${testPrefix}-field-${index}`}
@@ -137,7 +142,7 @@ const SelectedFieldsList = ({ testPrefix, selectedFields, onChange }: Props) => 
               draggableProps={draggableProps}
               className={className}
               ref={ref} />
-  ), [selectedFields, testPrefix, onChangeField, onRemoveField]);
+  ), [selectSize, selectedFields, testPrefix, onChangeField, onRemoveField]);
 
   const onSortChange = useCallback((newFieldsList: Array<{ id: string, title: string }>) => {
     onChange(newFieldsList.map(({ id }) => id));
@@ -156,6 +161,7 @@ const SelectedFieldsList = ({ testPrefix, selectedFields, onChange }: Props) => 
 
 SelectedFieldsList.defaultProps = {
   testPrefix: undefined,
+  selectSize: undefined,
 };
 
 export default SelectedFieldsList;

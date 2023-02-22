@@ -26,6 +26,7 @@ type Props = {
   createSelectPlaceholder?: string
   onChange: (newFields: Array<string>) => void,
   qualifiedTypeCategory?: FieldTypeCategory
+  selectSize?: 'normal' | 'small',
   selectedFields: Array<string>
   testPrefix?: string
 }
@@ -34,6 +35,7 @@ const FieldsConfiguration = ({
   createSelectPlaceholder,
   onChange,
   qualifiedTypeCategory,
+  selectSize,
   selectedFields,
   testPrefix,
 }: Props) => {
@@ -45,6 +47,7 @@ const FieldsConfiguration = ({
     <>
       <SelectedFieldsList testPrefix={testPrefix}
                           selectedFields={selectedFields}
+                          selectSize={selectSize}
                           onChange={onChange} />
       <FieldSelect id="field-create-select"
                    onChange={onAddField}
@@ -53,6 +56,7 @@ const FieldsConfiguration = ({
                    persistSelection={false}
                    name="field-create-select"
                    value={undefined}
+                   size={selectSize}
                    excludedFields={selectedFields ?? []}
                    placeholder={createSelectPlaceholder}
                    ariaLabel={createSelectPlaceholder} />
@@ -61,9 +65,10 @@ const FieldsConfiguration = ({
 };
 
 FieldsConfiguration.defaultProps = {
-  testPrefix: '',
   createSelectPlaceholder: 'Add a field',
   qualifiedTypeCategory: undefined,
+  selectSize: undefined,
+  testPrefix: '',
 };
 
 export default FieldsConfiguration;

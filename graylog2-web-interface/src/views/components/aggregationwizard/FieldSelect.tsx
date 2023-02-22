@@ -37,22 +37,23 @@ const FieldName = styled.span`
 `;
 
 type Props = {
-  autoFocus?: boolean,
   ariaLabel?: string,
+  autoFocus?: boolean,
+  className?: string,
   clearable?: boolean,
-  qualifiedTypeCategory?: FieldTypeCategory,
+  excludedFields?: Array<string>,
   id: string,
   name: string,
   onChange: (fieldName: string) => void,
-  placeholder?: string,
-  className?: string,
-  properties?: Array<Property>,
-  selectRef?: React.Ref<React.ComponentType>
-  value: string | undefined,
-  persistSelection?: boolean,
-  openMenuOnFocus?: boolean,
   onMenuClose?: () => void,
-  excludedFields?: Array<string>,
+  openMenuOnFocus?: boolean,
+  persistSelection?: boolean,
+  placeholder?: string,
+  properties?: Array<Property>,
+  qualifiedTypeCategory?: FieldTypeCategory,
+  selectRef?: React.Ref<React.ComponentType>,
+  size?: 'normal' | 'small',
+  value: string | undefined,
 }
 
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
@@ -111,6 +112,7 @@ const FieldSelect = ({
   placeholder,
   properties,
   selectRef,
+  size,
   value,
 }: Props) => {
   const activeQuery = useActiveQueryId();
@@ -141,7 +143,7 @@ const FieldSelect = ({
             value={value}
             aria-label={ariaLabel}
             optionRenderer={OptionRenderer}
-            size="small"
+            size={size}
             autoFocus={autoFocus}
             menuPortalTarget={document.body}
             onChange={onChange} />
@@ -162,6 +164,7 @@ FieldSelect.defaultProps = {
   placeholder: undefined,
   properties: undefined,
   selectRef: undefined,
+  size: 'small',
 };
 
 export default FieldSelect;
