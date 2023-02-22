@@ -97,3 +97,23 @@ export type SidecarCollectorPairType = {
   collector: Collector;
   sidecar: SidecarSummary;
 }
+
+export type PaginationInfo = {
+  per_page: number;
+  total: number;
+  count: number;
+  page: number;
+}
+
+export type SidecarListResponse = {
+  sidecars: SidecarSummary[];
+  total: number;
+  pagination: PaginationInfo;
+  query: string;
+  sort: string;
+  filters: {
+      [_key: string]: string;
+  };
+  only_active: boolean;
+  order: string;
+}
