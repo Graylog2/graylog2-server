@@ -44,6 +44,8 @@ public interface InputService extends PersistedService {
 
     Input find(String id) throws NotFoundException;
 
+    List<Input> allByType(String type);
+
     Set<Input> findByIds(Collection<String> ids);
 
     Input findForThisNode(String nodeId, String id) throws NotFoundException;

@@ -19,14 +19,8 @@ import { useCallback, useContext, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
-import type { BackendWidgetPosition, WidgetResults } from 'views/types';
-import { useStore } from 'stores/connect';
+import type { BackendWidgetPosition, WidgetResults, GetState } from 'views/types';
 import { widgetDefinition } from 'views/logic/Widgets';
-import type { Widgets } from 'views/stores/WidgetStore';
-import { WidgetActions } from 'views/stores/WidgetStore';
-import { TitlesActions } from 'views/stores/TitlesStore';
-import { ViewStore } from 'views/stores/ViewStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import WidgetModel from 'views/logic/widgets/Widget';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
@@ -39,6 +33,12 @@ import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useWidgetResults from 'views/components/useWidgetResults';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import useAppDispatch from 'stores/useAppDispatch';
+import { updateWidget, updateWidgetConfig } from 'views/logic/slices/widgetActions';
+import { selectActiveQuery } from 'views/logic/slices/viewSelectors';
+import { setTitle } from 'views/logic/slices/titlesActions';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -66,15 +66,15 @@ export type Result = {
   effective_timerange: AbsoluteTimeRange,
 };
 
-const _visualizationForType = (type) => {
+const _visualizationForType = (type: string) => {
   return widgetDefinition(type).visualizationComponent;
 };
 
-const _editComponentForType = (type) => {
+const _editComponentForType = (type: string) => {
   return widgetDefinition(type).editComponent;
 };
 
-const _hasOwnEditSubmitButton = (type) => {
+const _hasOwnEditSubmitButton = (type: string) => {
   return widgetDefinition(type).hasEditSubmitButton;
 };
 
@@ -95,7 +95,7 @@ type VisualizationProps = Pick<Props, 'title' | 'id' | 'widget' | 'editing'> & {
   queryId: string,
   setLoadingState: (loading: boolean) => void,
   onToggleEdit: () => void,
-  onWidgetConfigChange: (newWidgetConfig: WidgetConfig) => Promise<Widgets>,
+  onWidgetConfigChange: (newWidgetConfig: WidgetConfig) => Promise<void>,
   fields: FieldTypeMappingsList,
 };
 
@@ -161,11 +161,18 @@ const EditWrapper = ({ children, config, editing, fields, id, onToggleEdit, onCa
   ) : children;
 };
 
+const setWidgetTitle = (widgetId: string, newTitle: string) => async (dispatch: AppDispatch, getState: GetState) => {
+  const activeQuery = selectActiveQuery(getState());
+
+  return dispatch(setTitle(activeQuery, 'widget', widgetId, newTitle));
+};
+
 const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Props) => {
   const fields = useQueryFieldTypes();
   const [loading, setLoading] = useState(false);
   const [oldWidget, setOldWidget] = useState(editing ? widget : undefined);
   const { focusedWidget, setWidgetEditing, unsetWidgetEditing } = useContext(WidgetFocusContext);
+  const dispatch = useAppDispatch();
   const onToggleEdit = useCallback(() => {
     if (editing) {
       unsetWidgetEditing();
@@ -178,14 +185,14 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
   }, [editing, setWidgetEditing, unsetWidgetEditing, widget]);
   const onCancelEdit = useCallback(() => {
     if (oldWidget) {
-      WidgetActions.update(id, oldWidget).then(() => {});
+      dispatch(updateWidget(id, oldWidget));
     }
 
     onToggleEdit();
-  }, [id, oldWidget, onToggleEdit]);
-  const onRenameWidget = useCallback((newTitle: string) => TitlesActions.set('widget', id, newTitle), [id]);
-  const onWidgetConfigChange = useCallback((newWidgetConfig: WidgetConfig) => WidgetActions.updateConfig(id, newWidgetConfig), [id]);
-  const activeQuery = useStore(ViewStore, ({ activeQuery: currentQuery }) => currentQuery);
+  }, [dispatch, id, oldWidget, onToggleEdit]);
+  const onRenameWidget = useCallback((newTitle: string) => dispatch(setWidgetTitle(id, newTitle)), [dispatch, id]);
+  const onWidgetConfigChange = useCallback((newWidgetConfig: WidgetConfig) => dispatch(updateWidgetConfig(id, newWidgetConfig)).then(() => {}), [dispatch, id]);
+  const activeQuery = useActiveQueryId();
 
   const { config } = widget;
   const isFocused = focusedWidget?.id === id;

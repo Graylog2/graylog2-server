@@ -15,38 +15,51 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
+import userEvent from '@testing-library/user-event';
 
+import { execute } from 'views/logic/slices/searchExecutionSlice';
 import asMock from 'helpers/mocking/AsMock';
 import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import Query, { filtersForQuery } from 'views/logic/queries/Query';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
-import SearchActions from 'views/actions/SearchActions';
+import type { SearchExecutionResult } from 'views/types';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useAppDispatch from 'stores/useAppDispatch';
+import executeSearch from 'views/logic/slices/executeSearch';
+import generateId from 'logic/generateId';
 
+import type { FieldTypes } from './FieldTypesContext';
 import FieldTypesContext from './FieldTypesContext';
 import DefaultFieldTypesProvider from './DefaultFieldTypesProvider';
 
 jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
+jest.mock('views/logic/slices/executeSearch');
 
 const refetch = () => {};
 
 describe('DefaultFieldTypesProvider', () => {
-  const renderSUT = () => {
-    const consume = jest.fn();
-
-    render(
-      <DefaultFieldTypesProvider>
-        <FieldTypesContext.Consumer>
-          {consume}
-        </FieldTypesContext.Consumer>
-      </DefaultFieldTypesProvider>,
-    );
+  const renderSUT = (consume: (value: FieldTypes) => React.ReactNode = jest.fn()) => {
+    render((
+      <TestStoreProvider>
+        <DefaultFieldTypesProvider>
+          <FieldTypesContext.Consumer>
+            {consume}
+          </FieldTypesContext.Consumer>
+        </DefaultFieldTypesProvider>
+      </TestStoreProvider>
+    ));
 
     return consume;
   };
+
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
 
   it('provides no field types with empty store', () => {
     asMock(useCurrentQuery).mockReturnValue(Query.builder().id('foobar').build());
@@ -82,9 +95,20 @@ describe('DefaultFieldTypesProvider', () => {
       ? { data: simpleFields().toArray(), refetch: refetchMock }
       : { data: simpleQueryFields('foo').get('foo').toArray(), refetch: refetchMock }));
 
-    renderSUT();
+    const TriggerRefresh = () => {
+      const dispatch = useAppDispatch();
 
-    SearchActions.refresh();
+      return <button type="button" onClick={() => dispatch(execute())}>Refresh search</button>;
+    };
+
+    asMock(executeSearch).mockResolvedValue({ result: { result: { id: generateId() } } } as SearchExecutionResult);
+
+    const consume = () => <TriggerRefresh />;
+
+    renderSUT(consume);
+
+    const button = await screen.findByRole('button', { name: /refresh search/i });
+    userEvent.click(button);
 
     await waitFor(() => {
       expect(refetchMock).toHaveBeenCalledTimes(2);

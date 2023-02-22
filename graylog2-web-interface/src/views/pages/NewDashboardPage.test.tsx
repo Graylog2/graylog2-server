@@ -25,20 +25,17 @@ import useQuery from 'routing/useQuery';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import StreamsContext from 'contexts/StreamsContext';
 import useLoadView from 'views/hooks/useLoadView';
-import { createSearch } from 'fixtures/searches';
-import useView from 'views/hooks/useView';
-import ViewTransformer from 'views/logic/views/ViewTransformer';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import NewDashboardPage from './NewDashboardPage';
 
 jest.mock('views/components/Search', () => () => <span>Extended search page</span>);
 
-jest.mock('routing/useLocation');
 jest.mock('routing/useQuery');
+jest.mock('routing/useLocation');
 jest.mock('views/logic/views/UseProcessHooksForView');
 jest.mock('views/hooks/useLoadView');
-jest.mock('views/hooks/useView');
-jest.mock('views/logic/views/ViewTransformer');
 
 const SimpleNewDashboardPage = () => (
   <StreamsContext.Provider value={[{}]}>
@@ -53,13 +50,15 @@ describe('NewDashboardPage', () => {
     state: {},
     hash: '',
   };
-  const defaultView = createSearch();
+
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
     asMock(useLocation).mockReturnValue(mockLocation);
     asMock(useQuery).mockReturnValue({});
-    asMock(useProcessHooksForView).mockReturnValue([true, undefined]);
-    asMock(useView).mockReturnValue(defaultView);
+    asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: View.create(), executionState: SearchExecutionState.empty() });
   });
 
   afterEach(() => {
@@ -67,7 +66,7 @@ describe('NewDashboardPage', () => {
   });
 
   it('shows loading spinner before rendering page', async () => {
-    asMock(useProcessHooksForView).mockReturnValue([false, undefined]);
+    asMock(useProcessHooksForView).mockReturnValue({ status: 'loading' });
 
     const { findByText } = render(<SimpleNewDashboardPage />);
 
@@ -77,7 +76,7 @@ describe('NewDashboardPage', () => {
   it('should create new view with type dashboard on mount', async () => {
     render(<SimpleNewDashboardPage />);
 
-    await waitFor(() => expect(useLoadView).toHaveBeenCalled());
+    await waitFor(() => expect(useLoadView).toHaveBeenCalledTimes(1));
 
     await expect(asMock(useLoadView).mock.calls[0][0]).resolves.toEqual(expect.objectContaining({ type: View.Type.Dashboard }));
   });
@@ -91,15 +90,12 @@ describe('NewDashboardPage', () => {
       .build();
 
     asMock(useLocation).mockReturnValue({ ...mockLocation, state: { view } });
-    const dashboardView = view.toBuilder().newId().type(View.Type.Dashboard).build();
-    asMock(ViewTransformer).mockReturnValue(dashboardView);
-    asMock(useView).mockReturnValue(dashboardView);
 
     const { findByText } = render(<SimpleNewDashboardPage />);
 
     await findByText('Extended search page');
 
-    await waitFor(() => expect(useLoadView).toHaveBeenCalled());
+    await waitFor(() => expect(useLoadView).toHaveBeenCalledTimes(1));
 
     await expect(asMock(useLoadView).mock.calls[0][0]).resolves.toEqual(expect.objectContaining({ title: 'My Search', type: View.Type.Dashboard }));
   });
@@ -108,10 +104,6 @@ describe('NewDashboardPage', () => {
     const view = View.create().toBuilder().type(View.Type.Search).search(Search.builder().build())
       .createdAt(new Date('2019-10-16T14:38:44.681Z'))
       .build();
-
-    const dashboardView = view.toBuilder().newId().type(View.Type.Dashboard).build();
-    asMock(ViewTransformer).mockReturnValue(dashboardView);
-    asMock(useView).mockReturnValue(dashboardView);
 
     asMock(useLocation).mockReturnValue({ ...mockLocation, state: { view } });
 
@@ -129,7 +121,7 @@ describe('NewDashboardPage', () => {
 
     expect(useProcessHooksForView).toHaveBeenCalled();
 
-    expect(useProcessHooksForView).toHaveBeenCalledWith(expect.anything(), {
+    expect(useProcessHooksForView).toHaveBeenCalledWith(expect.anything(), SearchExecutionState.empty(), {
       q: '',
       rangetype: 'relative',
       relative: '300',

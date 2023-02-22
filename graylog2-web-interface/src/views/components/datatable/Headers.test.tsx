@@ -30,6 +30,8 @@ import Direction from 'views/logic/aggregationbuilder/Direction';
 import Headers from './Headers';
 
 jest.mock('components/common/Timestamp', () => 'Timestamp');
+jest.mock('views/hooks/useActiveQueryId', () => () => 'foobar');
+
 const onSortChange = jest.fn();
 const seriesWithName = (fn: string, name: string) => Series.forFunction(fn)
   .toBuilder()
@@ -63,8 +65,7 @@ describe('Headers', () => {
   }: RenderHeadersProps) => (
     <table>
       <thead>
-        <Headers activeQuery="queryId"
-                 columnPivots={columnPivots}
+        <Headers columnPivots={columnPivots}
                  rowPivots={rowPivots}
                  series={series}
                  rollup={rollup}

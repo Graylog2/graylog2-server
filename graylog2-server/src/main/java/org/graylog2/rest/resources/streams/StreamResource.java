@@ -29,6 +29,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
@@ -40,6 +41,7 @@ import org.graylog2.audit.jersey.DefaultFailureContextCreator;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.filtering.DbFilterParser;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.plugin.Message;
@@ -122,20 +124,15 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Api(value = "Streams", description = "Manage streams", tags = {CLOUD_VISIBLE})
 @Path("/streams")
 public class StreamResource extends RestResource {
-    protected static final Map<String, SearchQueryField> SEARCH_FIELD_MAPPING = Map.of(
-            "id", SearchQueryField.create(StreamDTO.FIELD_ID, SearchQueryField.Type.OBJECT_ID),
-            StreamDTO.FIELD_TITLE, SearchQueryField.create(StreamDTO.FIELD_TITLE),
-            StreamDTO.FIELD_DESCRIPTION, SearchQueryField.create(StreamDTO.FIELD_DESCRIPTION),
-            StreamDTO.FIELD_CREATED_AT, SearchQueryField.create(StreamDTO.FIELD_CREATED_AT),
-            "status", SearchQueryField.create(StreamDTO.FIELD_DISABLED)
-    );
     private static final String DEFAULT_SORT_FIELD = StreamDTO.FIELD_TITLE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
-            EntityAttribute.builder().id("title").title("Title").build(),
-            EntityAttribute.builder().id("description").title("Description").build(),
-            EntityAttribute.builder().id("created_at").title("Created").type("date").build(),
-            EntityAttribute.builder().id("disabled").title("Status").type("boolean").filterable(true).filterOptions(Set.of(
+            EntityAttribute.builder().id(StreamDTO.FIELD_ID).title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(true).build(),
+            EntityAttribute.builder().id(StreamDTO.FIELD_TITLE).title("Title").searchable(true).build(),
+            EntityAttribute.builder().id(StreamDTO.FIELD_DESCRIPTION).title("Description").searchable(true).build(),
+            EntityAttribute.builder().id(StreamDTO.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).build(),
+            EntityAttribute.builder().id(StreamDTO.FIELD_INDEX_SET_ID).title("Index set id").hidden(true).filterable(true).build(),
+            EntityAttribute.builder().id("disabled").title("Status").type(SearchQueryField.Type.BOOLEAN).filterable(true).filterOptions(Set.of(
                     FilterOption.create("true", "Paused"),
                     FilterOption.create("false", "Running")
             )).build()
@@ -151,6 +148,7 @@ public class StreamResource extends RestResource {
     private final SearchQueryParser searchQueryParser;
     private final RecentActivityService recentActivityService;
     private final BulkExecutor<Stream, UserContext> bulkExecutor;
+    private final DbFilterParser dbFilterParser;
 
     @Inject
     public StreamResource(StreamService streamService,
@@ -159,14 +157,16 @@ public class StreamResource extends RestResource {
                           StreamRouterEngine.Factory streamRouterEngineFactory,
                           IndexSetRegistry indexSetRegistry,
                           RecentActivityService recentActivityService,
-                          AuditEventSender auditEventSender) {
+                          AuditEventSender auditEventSender,
+                          DbFilterParser dbFilterParser) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
         this.indexSetRegistry = indexSetRegistry;
         this.paginatedStreamService = paginatedStreamService;
-        this.searchQueryParser = new SearchQueryParser(StreamImpl.FIELD_TITLE, SEARCH_FIELD_MAPPING);
+        this.searchQueryParser = new SearchQueryParser(StreamImpl.FIELD_TITLE, attributes);
         this.recentActivityService = recentActivityService;
+        this.dbFilterParser = dbFilterParser;
         this.bulkExecutor = new SequentialBulkExecutor<>(this::delete,
                 auditEventSender,
                 (entity, entityClass) ->
@@ -216,13 +216,14 @@ public class StreamResource extends RestResource {
     public PageListResponse<StreamDTO> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                               @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
                                                @ApiParam(name = "sort",
                                                          value = "The field to sort the result on",
                                                          required = true,
                                                          allowableValues = "title,description,created_at,updated_at,status")
-                                               @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
+                                                   @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
                                                @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                               @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order) {
+                                                   @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order) {
 
         SearchQuery searchQuery;
         try {
@@ -230,10 +231,16 @@ public class StreamResource extends RestResource {
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
+        List<Bson> dbFilters;
+        try {
+            dbFilters = dbFilterParser.parse(filters, attributes);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
+        }
 
         final Predicate<StreamDTO> permissionFilter = streamDTO -> isPermitted(RestPermissions.STREAMS_READ, streamDTO.id());
         final PaginatedList<StreamDTO> result = paginatedStreamService
-                .findPaginated(searchQuery, permissionFilter, page, perPage, sort, order);
+                .findPaginated(searchQuery, permissionFilter, dbFilters, page, perPage, sort, order);
 
         final List<String> streamIds = result.stream().map(StreamDTO::id).toList();
         final Map<String, List<StreamRule>> streamRuleMap = streamRuleService.loadForStreamIds(streamIds);

@@ -19,7 +19,7 @@ import { useState, useCallback } from 'react';
 
 import { ShareButton, IfPermitted, HoverForHelp } from 'components/common';
 import { ButtonToolbar, MenuItem } from 'components/bootstrap';
-import type { Stream, StreamRule, StreamRuleType } from 'stores/streams/StreamsStore';
+import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
@@ -40,11 +40,9 @@ const DefaultStreamHelp = () => <HoverForHelp displayLeftMargin>Action not avail
 const StreamActions = ({
   stream,
   indexSets,
-  streamRuleTypes,
 }: {
   stream: Stream,
   indexSets: Array<IndexSet>,
-  streamRuleTypes: Array<StreamRuleType> | undefined
 }) => {
   const currentUser = useCurrentUser();
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
@@ -214,8 +212,7 @@ const StreamActions = ({
                          title="New Stream Rule"
                          submitButtonText="Create Rule"
                          submitLoadingText="Creating Rule..."
-                         onSubmit={onSaveStreamRule}
-                         streamRuleTypes={streamRuleTypes} />
+                         onSubmit={onSaveStreamRule} />
       )}
       {showEntityShareModal && (
         <EntityShareModal entityId={stream.id}

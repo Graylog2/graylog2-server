@@ -64,6 +64,7 @@ public class V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViews extends 
     public void upgrade() {
         if (clusterConfigService.get(MigrationCompleted.class) != null) {
             LOG.debug("Migration already completed!");
+            return;
         }
 
         final List<ViewWidgetLimitMigration> widgetLimitMigrations = StreamSupport.stream(this.views.find().spliterator(), false)

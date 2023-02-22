@@ -15,44 +15,43 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import View from 'views/logic/views/View';
-import Query from 'views/logic/queries/Query';
-import { QueriesActions } from 'views/stores/QueriesStore';
-import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
+import mockDispatch from 'views/test/mockDispatch';
+import type { RootState } from 'views/types';
+import { updateGlobalOverride } from 'views/logic/slices/searchExecutionSlice';
+import GlobalOverride from 'views/logic/search/GlobalOverride';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import { createSearch } from 'fixtures/searches';
+import { setTimerange } from 'views/logic/slices/viewSlice';
 
 import OnZoom from './OnZoom';
 
-jest.mock('views/stores/QueriesStore', () => ({
-  QueriesActions: {
-    query: jest.fn(() => Promise.resolve()),
-    timerange: jest.fn(() => Promise.resolve()),
-  },
-}));
-
-jest.mock('views/stores/GlobalOverrideStore', () => ({
-  GlobalOverrideActions: {
-    timerange: jest.fn(() => Promise.resolve()),
-  },
+jest.mock('views/logic/slices/viewSlice', () => ({
+  setTimerange: jest.fn(),
 }));
 
 describe('OnZoom', () => {
+  const defaultView = createSearch({ queryId: 'query1' });
+
   it('sets the global override timerange if called from a dashboard', async () => {
-    const query = Query.builder().build();
+    const view = defaultView.toBuilder().type(View.Type.Dashboard).build();
 
-    OnZoom(query, '2020-01-10 13:23:42.000', '2020-01-10 14:23:42.000', View.Type.Dashboard, 'Europe/Berlin');
+    const dispatch = mockDispatch({ view: { view }, searchExecution: { executionState: SearchExecutionState.empty() } } as RootState);
+    dispatch(OnZoom('2020-01-10 13:23:42.000', '2020-01-10 14:23:42.000', 'Europe/Berlin'));
 
-    expect(GlobalOverrideActions.timerange).toHaveBeenCalledWith({
+    expect(dispatch).toHaveBeenCalledWith(updateGlobalOverride(GlobalOverride.create({
       from: '2020-01-10T12:23:42.000+00:00',
       to: '2020-01-10T13:23:42.000+00:00',
       type: 'absolute',
-    });
+    })));
   });
 
   it('sets the query timerange if called from a dashboard', async () => {
-    const query = Query.builder().id('query1').build();
+    const view = defaultView.toBuilder().type(View.Type.Search).build();
 
-    OnZoom(query, '2020-01-10 13:23:42.000', '2020-01-10 14:23:42.000', View.Type.Search, 'Europe/Berlin');
+    const dispatch = mockDispatch({ view: { view, activeQuery: 'query1' }, searchExecution: { executionState: SearchExecutionState.empty() } } as RootState);
+    dispatch(OnZoom('2020-01-10 13:23:42.000', '2020-01-10 14:23:42.000', 'Europe/Berlin'));
 
-    expect(QueriesActions.timerange).toHaveBeenCalledWith('query1', {
+    expect(setTimerange).toHaveBeenCalledWith('query1', {
       from: '2020-01-10T12:23:42.000+00:00',
       to: '2020-01-10T13:23:42.000+00:00',
       type: 'absolute',

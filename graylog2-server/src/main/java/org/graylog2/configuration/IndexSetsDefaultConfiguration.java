@@ -48,8 +48,10 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
     public static final String FIELD_TYPE_REFRESH_INTERVAL_UNIT = "field_type_refresh_interval_unit";
     public static final String ROTATION_STRATEGY_CLASS = "rotation_strategy_class";
     public static final String ROTATION_STRATEGY_CONFIG = "rotation_strategy_config";
+    public static final String ROTATION_STRATEGY = "rotation_strategy"; // alias for rotation_strategy_config
     public static final String RETENTION_STRATEGY_CLASS = "retention_strategy_class";
     public static final String RETENTION_STRATEGY_CONFIG = "retention_strategy_config";
+    public static final String RETENTION_STRATEGY = "retention_strategy"; // alias for retention_strategy_config
 
     @NotBlank
     @JsonProperty(INDEX_ANALYZER)
@@ -89,6 +91,13 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
     @JsonProperty(ROTATION_STRATEGY_CONFIG)
     public abstract RotationStrategyConfig rotationStrategyConfig();
 
+    @NotNull
+    @JsonProperty(ROTATION_STRATEGY)
+    // alias for ROTATION_STRATEGY_CONFIG
+    public RotationStrategyConfig rotationStrategy() {
+        return rotationStrategyConfig();
+    }
+
     @NotBlank
     @JsonProperty(RETENTION_STRATEGY_CLASS)
     public abstract String retentionStrategyClass();
@@ -96,6 +105,13 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
     @NotNull
     @JsonProperty(RETENTION_STRATEGY_CONFIG)
     public abstract RetentionStrategyConfig retentionStrategyConfig();
+
+    @NotNull
+    @JsonProperty(RETENTION_STRATEGY)
+    // alias for RETENTION_STRATEGY_CONFIG
+    public RetentionStrategyConfig retentionStrategy() {
+        return retentionStrategyConfig();
+    }
 
     public static Builder builder() {
         return new AutoValue_IndexSetsDefaultConfiguration.Builder();
@@ -130,11 +146,23 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
         @JsonProperty(ROTATION_STRATEGY_CONFIG)
         public abstract Builder rotationStrategyConfig(RotationStrategyConfig rotationStrategyConfig);
 
+        @JsonProperty(ROTATION_STRATEGY)
+        // alias for ROTATION_STRATEGY_CONFIG
+        public Builder rotationStrategy(RotationStrategyConfig rotationStrategyConfig) {
+            return rotationStrategyConfig(rotationStrategyConfig);
+        }
+
         @JsonProperty(RETENTION_STRATEGY_CLASS)
         public abstract Builder retentionStrategyClass(String retentionStrategyClass);
 
         @JsonProperty(RETENTION_STRATEGY_CONFIG)
         public abstract Builder retentionStrategyConfig(RetentionStrategyConfig retentionStrategyConfig);
+
+        @JsonProperty(RETENTION_STRATEGY)
+        // alias for RETENTION_STRATEGY_CONFIG
+        public Builder retentionStrategy(RetentionStrategyConfig retentionStrategyConfig) {
+            return retentionStrategyConfig(retentionStrategyConfig);
+        }
 
         public abstract IndexSetsDefaultConfiguration build();
     }
