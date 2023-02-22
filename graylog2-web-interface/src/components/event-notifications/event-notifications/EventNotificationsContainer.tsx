@@ -34,9 +34,6 @@ import BulkActions from './BulkActions';
 import useEventNotifications from '../hooks/useEventNotifications';
 import useNotificationTest from '../hooks/useNotificationTest';
 
-const CUSTOM_COLUMN_DEFINITIONS = [
-];
-
 const INITIAL_COLUMNS = ['title', 'description', 'type', 'created_at'];
 const COLUMNS_ORDER = ['title', 'description', 'type', 'created_at'];
 const customColumnRenderers = (testResults: TestResults): ColumnRenderers<EventNotification> => ({
@@ -68,7 +65,7 @@ const EventNotificationsContainer = () => {
   const { isLoadingTest, testResults, getNotificationTest } = useNotificationTest();
   const columnRenderers = useMemo(() => customColumnRenderers(testResults), [testResults]);
   const columnDefinitions = useMemo(
-    () => ([...(paginatedEventNotifications?.attributes ?? []), ...CUSTOM_COLUMN_DEFINITIONS]),
+    () => ([...(paginatedEventNotifications?.attributes ?? [])]),
     [paginatedEventNotifications?.attributes],
   );
 

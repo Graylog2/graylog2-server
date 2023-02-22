@@ -44,8 +44,8 @@ const BulkActions = ({ selectedNotificationsIds, setSelectedNotificationsIds, re
 
       Promise.allSettled(deleteCalls).then((result) => {
         const fulfilledRequests = result.filter((response) => response.status === 'fulfilled') as Array<{ status: 'fulfilled', value: string }>;
-        const deletednotificationIds = fulfilledRequests.map(({ value }) => value);
-        const notDeletednotificationIds = selectedNotificationsIds?.filter((streamId) => !deletednotificationIds.includes(streamId));
+        const deletedNotificationIds = fulfilledRequests.map(({ value }) => value);
+        const notDeletednotificationIds = selectedNotificationsIds?.filter((streamId) => !deletedNotificationIds.includes(streamId));
 
         if (notDeletednotificationIds.length) {
           const rejectedRequests = result.filter((response) => response.status === 'rejected') as Array<{ status: 'rejected', reason: FetchError }>;

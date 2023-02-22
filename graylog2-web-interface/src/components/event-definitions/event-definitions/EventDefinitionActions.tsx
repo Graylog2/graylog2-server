@@ -162,7 +162,6 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
   return (
     <>
       <ButtonToolbar key={`actions-${eventDefinition.id}`}>
-
         <ShareButton entityId={eventDefinition.id}
                      entityType="event_definition"
                      onClick={() => setShowEntityShareModal(true)}
@@ -196,7 +195,6 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
           </>
           )}
         </OverlayDropdownButton>
-
       </ButtonToolbar>
       {showDialog && (
       <ConfirmDialog title={DIALOG_TEXT[dialogType].dialogTitle}

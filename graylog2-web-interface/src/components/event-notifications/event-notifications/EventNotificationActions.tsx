@@ -106,7 +106,7 @@ const EventNotificationActions = ({ isTestLoading, notification, refetchEventNot
       {showShareNotification && (
       <EntityShareModal entityId={notification.id}
                         entityType="notification"
-                        description="Search for a User or Team to add as collaborator on this notification."
+                        description="Search for a user or team to add as collaborator on this notification."
                         entityTitle={notification.title}
                         onClose={() => setShowShareNotification(undefined)} />
       )}

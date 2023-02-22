@@ -31,8 +31,6 @@ type Props = {
 const WidePopover = styled(Popover)`
   max-width: 500px;
 `;
-const DetailsList = styled.dl`
-`;
 
 const DetailTitle = styled.dt`
   float: left;
@@ -60,7 +58,7 @@ const getTimeRange = (scheduler: Scheduler) => {
 
   return (
     <>
-      <DetailTitle>Next timerange:</DetailTitle>
+      <DetailTitle>Next time range:</DetailTitle>
       <DetailValue><Timestamp dateTime={from} /> <Icon name="arrow-circle-right" /> <Timestamp dateTime={to} /></DetailValue>
     </>
   );
