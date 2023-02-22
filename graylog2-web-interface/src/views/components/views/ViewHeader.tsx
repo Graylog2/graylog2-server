@@ -138,11 +138,13 @@ const ViewHeader = () => {
       <Content>
         {
           breadCrumbs.map(({ label, link }, index) => {
-            if (index === breadCrumbs.length - 1) {
-              return (
-                <TitleWrapper>
-                  <CrumbLink link={link} label={label} />
-                  {isSavedView && (
+            const theLast = index === breadCrumbs.length - 1;
+
+            return (
+              <TitleWrapper key={`${label}_${link}`}>
+                <CrumbLink link={link} label={label} />
+                {!theLast && <StyledIcon name="chevron-right" />}
+                {isSavedView && theLast && (
                   <>
                     <FavoriteIcon isFavorite={view.favorite} id={view.id} onChange={onChangeFavorite} />
                     <EditButton onClick={toggleMetadataEdit}
@@ -152,12 +154,9 @@ const ViewHeader = () => {
                       <Icon name="pen-to-square" />
                     </EditButton>
                   </>
-                  )}
-                </TitleWrapper>
-              );
-            }
-
-            return <><CrumbLink label={label} link={link} /><StyledIcon name="chevron-right" /></>;
+                )}
+              </TitleWrapper>
+            );
           })
         }
         {showMetadataEdit && (
