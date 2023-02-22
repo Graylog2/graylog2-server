@@ -202,8 +202,8 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                         key = next[keyColumn];
                         value = next[valueColumn];
                     } catch (IndexOutOfBoundsException e) {
-                        final String error = f("The CSV file contains invalid lines. Please check the file and ensure " +
-                                "that both key and value columns are present in all lines.", name, config.path());
+                        final String error = f("The CSV file [%s] contains invalid lines. Please check the file and ensure " +
+                                "that both key and value columns are present in all lines.", name);
                         throw new IllegalStateException(error, e);
                     }
 
