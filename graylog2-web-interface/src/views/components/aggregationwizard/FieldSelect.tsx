@@ -43,6 +43,7 @@ type Props = {
   clearable?: boolean,
   excludedFields?: Array<string>,
   id: string,
+  menuPortalTarget?: HTMLElement,
   name: string,
   onChange: (fieldName: string) => void,
   onMenuClose?: () => void,
@@ -102,8 +103,8 @@ const FieldSelect = ({
   className,
   clearable,
   excludedFields,
-  qualifiedTypeCategory,
   id,
+  menuPortalTarget,
   name,
   onChange,
   onMenuClose,
@@ -111,6 +112,7 @@ const FieldSelect = ({
   persistSelection,
   placeholder,
   properties,
+  qualifiedTypeCategory,
   selectRef,
   size,
   value,
@@ -145,7 +147,7 @@ const FieldSelect = ({
             optionRenderer={OptionRenderer}
             size={size}
             autoFocus={autoFocus}
-            menuPortalTarget={document.body}
+            menuPortalTarget={menuPortalTarget}
             onChange={onChange} />
 
   );
@@ -165,6 +167,7 @@ FieldSelect.defaultProps = {
   properties: undefined,
   selectRef: undefined,
   size: 'small',
+  menuPortalTarget: undefined,
 };
 
 export default FieldSelect;

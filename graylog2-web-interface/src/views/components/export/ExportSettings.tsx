@@ -62,7 +62,7 @@ const ExportSettings = ({
       {selectedWidget && <SelectedWidgetInfo selectedWidget={selectedWidget} view={view} />}
       <Row>
         <p>
-          Define the fields for your file. You can change the field order with drag and drop.<br />
+          Define the fields for your file.<br />
         </p>
         {selectedWidget && (
           <p>
@@ -83,6 +83,7 @@ const ExportSettings = ({
                                         target: { name, value: newFields.map((field) => ({ field })) },
                                       })
                                    }
+                                   selectSize="normal"
                                    selectedFields={value.map(({ field }) => field)} />
             </>
           )}

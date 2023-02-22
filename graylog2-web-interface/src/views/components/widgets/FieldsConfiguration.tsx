@@ -24,6 +24,7 @@ import type { FieldTypeCategory } from 'views/logic/aggregationbuilder/Pivot';
 
 type Props = {
   createSelectPlaceholder?: string
+  menuPortalTarget?: HTMLElement,
   onChange: (newFields: Array<string>) => void,
   qualifiedTypeCategory?: FieldTypeCategory
   selectSize?: 'normal' | 'small',
@@ -33,6 +34,7 @@ type Props = {
 
 const FieldsConfiguration = ({
   createSelectPlaceholder,
+  menuPortalTarget,
   onChange,
   qualifiedTypeCategory,
   selectSize,
@@ -57,6 +59,7 @@ const FieldsConfiguration = ({
                    name="field-create-select"
                    value={undefined}
                    size={selectSize}
+                   menuPortalTarget={menuPortalTarget}
                    excludedFields={selectedFields ?? []}
                    placeholder={createSelectPlaceholder}
                    ariaLabel={createSelectPlaceholder} />
@@ -68,6 +71,7 @@ FieldsConfiguration.defaultProps = {
   createSelectPlaceholder: 'Add a field',
   qualifiedTypeCategory: undefined,
   selectSize: undefined,
+  menuPortalTarget: undefined,
   testPrefix: '',
 };
 

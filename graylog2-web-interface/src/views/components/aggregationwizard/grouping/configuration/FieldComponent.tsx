@@ -69,6 +69,7 @@ const FieldComponent = ({ groupingIndex }: Props) => {
            wrapperClassName="col-sm-9">
       <FieldsConfiguration onChange={onChangeSelectedFields}
                            selectedFields={grouping.fields}
+                           menuPortalTarget={document.body}
                            createSelectPlaceholder={createSelectPlaceholder}
                            qualifiedTypeCategory={grouping.fields?.length ? grouping.type : undefined}
                            testPrefix={`grouping-${groupingIndex}-`} />
