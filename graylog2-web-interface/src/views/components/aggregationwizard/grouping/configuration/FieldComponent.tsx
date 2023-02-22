@@ -72,7 +72,7 @@ const FieldComponent = ({ groupingIndex }: Props) => {
                            menuPortalTarget={document.body}
                            createSelectPlaceholder={createSelectPlaceholder}
                            qualifiedTypeCategory={grouping.fields?.length ? grouping.type : undefined}
-                           testPrefix={`grouping-${groupingIndex}-`} />
+                           testPrefix={`grouping-${groupingIndex}`} />
     </Input>
   );
 };
