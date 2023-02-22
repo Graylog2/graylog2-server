@@ -48,9 +48,8 @@ const InputsPage = () => {
                   can run directly in the cloud. You can launch and terminate them on this page.
                 </p>
                 <p>
-                  {/* eslint-disable-next-line react/no-unescaped-entities */}
-                  If you are missing an input type on this page's list of available inputs, you can start the input on
-                  a <Link to={Routes.pluginRoute('SYSTEM_FORWARDERS')}>Forwarder</Link>.
+                  If you are missing an input type on this page&apos;s list of available inputs, you can start the input
+                  on a <Link to={Routes.pluginRoute('SYSTEM_FORWARDERS')}>Forwarder</Link>.
                 </p>
               </>
             )
