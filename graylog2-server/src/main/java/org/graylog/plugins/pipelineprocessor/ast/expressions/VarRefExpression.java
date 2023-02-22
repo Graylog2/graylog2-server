@@ -46,7 +46,7 @@ public class VarRefExpression extends BaseExpression {
         if (typedValue != null) {
             return typedValue.getValue();
         }
-        log.error("Unable to retrieve value for variable {}", identifier);
+        log.error(context.pipelineErrorMessage("Unable to retrieve value for variable " + identifier));
         return null;
     }
 
