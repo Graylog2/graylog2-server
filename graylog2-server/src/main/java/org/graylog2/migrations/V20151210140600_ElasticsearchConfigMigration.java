@@ -18,20 +18,14 @@ package org.graylog2.migrations;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.management.IndexManagementConfig;
-import org.graylog2.indexer.retention.strategies.ClosingRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.ClosingRetentionStrategyConfig;
-import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
-import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
-import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategyConfig;
-import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.indexer.retention.RetentionStrategy;
-import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,11 +37,13 @@ public class V20151210140600_ElasticsearchConfigMigration extends Migration {
 
     private final ClusterConfigService clusterConfigService;
     private final ElasticsearchConfiguration elasticsearchConfiguration;
+    private final MaintenanceStrategiesHelper maintenanceStrategiesHelper;
 
     @Inject
-    public V20151210140600_ElasticsearchConfigMigration(ClusterConfigService clusterConfigService, ElasticsearchConfiguration elasticsearchConfiguration) {
+    public V20151210140600_ElasticsearchConfigMigration(ClusterConfigService clusterConfigService, ElasticsearchConfiguration elasticsearchConfiguration, MaintenanceStrategiesHelper maintenanceStrategiesHelper) {
         this.clusterConfigService = clusterConfigService;
         this.elasticsearchConfiguration = elasticsearchConfiguration;
+        this.maintenanceStrategiesHelper = maintenanceStrategiesHelper;
     }
 
     @Override
@@ -62,6 +58,7 @@ public class V20151210140600_ElasticsearchConfigMigration extends Migration {
         final MessageCountRotationStrategyConfig messageCountRotationStrategyConfig = clusterConfigService.get(MessageCountRotationStrategyConfig.class);
         final SizeBasedRotationStrategyConfig sizeBasedRotationStrategyConfig = clusterConfigService.get(SizeBasedRotationStrategyConfig.class);
         final TimeBasedRotationStrategyConfig timeBasedRotationStrategyConfig = clusterConfigService.get(TimeBasedRotationStrategyConfig.class);
+        final TimeBasedSizeOptimizingStrategyConfig timeBasedSizeOptimizingStrategyConfig = clusterConfigService.get(TimeBasedSizeOptimizingStrategyConfig.class);
 
         if (messageCountRotationStrategyConfig == null) {
             final MessageCountRotationStrategyConfig countConfig = MessageCountRotationStrategyConfig.create(elasticsearchConfiguration.getMaxDocsPerIndex());
@@ -83,6 +80,20 @@ public class V20151210140600_ElasticsearchConfigMigration extends Migration {
             clusterConfigService.write(timeConfig);
             LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_time_per_index", timeConfig);
         }
+        if (timeBasedSizeOptimizingStrategyConfig == null) {
+            // This migration stores the current server.conf rotation/retention configuration state in the
+            // CusterConfig so that a later migration can pick up the settings and migrate them to the newer
+            // IndexSetConfig object (that backs the Index Sets page). Any default-specified rotation/retention
+            // strategy must have a corresponding config entity persisted in the cluster config in order for
+            // the org.graylog2.migrations.V20161116172100_DefaultIndexSetMigration migration to use it when
+            // creating the Default index set. Since TimeBasedSizeOptimizingStrategy is the default (at the time
+            // of writing this code), then it must also appear here and be stored in the cluster config for the
+            // Default index set to use it as the default rotation strategy.
+            final TimeBasedSizeOptimizingStrategyConfig timeSizeConfig =
+                    maintenanceStrategiesHelper.buildDefaultTimeSizeStrategy();
+            clusterConfigService.write(timeSizeConfig);
+            LOG.info("Stored legacy rotation config setting \"{}\" setting.", timeSizeConfig);
+        }
 
         // All default retention strategy settings
         final ClosingRetentionStrategyConfig closingRetentionStrategyConfig = clusterConfigService.get(ClosingRetentionStrategyConfig.class);
@@ -103,38 +114,11 @@ public class V20151210140600_ElasticsearchConfigMigration extends Migration {
         // Selected rotation and retention strategies.
         final IndexManagementConfig indexManagementConfig = clusterConfigService.get(IndexManagementConfig.class);
         if (indexManagementConfig == null) {
-            final Class<? extends RotationStrategy> rotationStrategyClass;
-            switch (elasticsearchConfiguration.getRotationStrategy()) {
-                case "size":
-                    rotationStrategyClass = SizeBasedRotationStrategy.class;
-                    break;
-                case "time":
-                    rotationStrategyClass = TimeBasedRotationStrategy.class;
-                    break;
-                case "count":
-                    rotationStrategyClass = MessageCountRotationStrategy.class;
-                    break;
-                default:
-                    LOG.warn("Unknown retention strategy \"{}\"", elasticsearchConfiguration.getRotationStrategy());
-                    rotationStrategyClass = MessageCountRotationStrategy.class;
-            }
-
-            final Class<? extends RetentionStrategy> retentionStrategyClass;
-            switch (elasticsearchConfiguration.getRetentionStrategy()) {
-                case "close":
-                    retentionStrategyClass = ClosingRetentionStrategy.class;
-                    break;
-                case "delete":
-                    retentionStrategyClass = DeletionRetentionStrategy.class;
-                    break;
-                default:
-                    LOG.warn("Unknown retention strategy \"{}\"", elasticsearchConfiguration.getRetentionStrategy());
-                    retentionStrategyClass = DeletionRetentionStrategy.class;
-            }
-
+            // If previous cluster config IndexManagementConfig entity was not defined, then rely on defaults
+            // specified in the server.conf file. This is the default scenario for new Graylog server instances.
             final IndexManagementConfig config = IndexManagementConfig.create(
-                    rotationStrategyClass.getCanonicalName(),
-                    retentionStrategyClass.getCanonicalName());
+                    maintenanceStrategiesHelper.readRotationConfigFromServerConf().left,
+                    maintenanceStrategiesHelper.readRetentionConfigFromServerConf().left);
             clusterConfigService.write(config);
             LOG.info("Migrated \"{}\" and \"{}\" setting: {}", "rotation_strategy", "retention_strategy", config);
         }

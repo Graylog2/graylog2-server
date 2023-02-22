@@ -30,31 +30,22 @@ import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
-import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
-import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.Map;
 
+/**
+ * Provides ability to read rotation and retention strategies from the Graylog server configuration file.
+ */
 public class MaintenanceStrategiesHelper {
     private static final Logger LOG = LoggerFactory.getLogger(MaintenanceStrategiesHelper.class);
-    private final Map<String, Provider<RotationStrategy>> rotationStrategies;
-    private final Map<String, Provider<RetentionStrategy>> retentionStrategies;
-    private final ClusterConfigService clusterConfigService;
     private final ElasticsearchConfiguration elasticsearchConfiguration;
 
-
     @Inject
-    public MaintenanceStrategiesHelper(Map<String, Provider<RotationStrategy>> rotationStrategies, Map<String, Provider<RetentionStrategy>> retentionStrategies, ClusterConfigService clusterConfigService, ElasticsearchConfiguration elasticsearchConfiguration) {
-        this.rotationStrategies = rotationStrategies;
-        this.retentionStrategies = retentionStrategies;
-        this.clusterConfigService = clusterConfigService;
+    public MaintenanceStrategiesHelper(ElasticsearchConfiguration elasticsearchConfiguration) {
         this.elasticsearchConfiguration = elasticsearchConfiguration;
     }
 
@@ -78,16 +69,13 @@ public class MaintenanceStrategiesHelper {
             }
             case TimeBasedSizeOptimizingStrategy.NAME -> {
                 return ImmutablePair.of(TimeBasedSizeOptimizingStrategy.class.getCanonicalName(),
-                        TimeBasedSizeOptimizingStrategyConfig.builder()
-                                .indexLifetimeMin(elasticsearchConfiguration.getTimeSizeOptimizingRotationMinLifeTime())
-                                .indexLifetimeMax(elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxLifeTime())
-                                .build());
+                        buildDefaultTimeSizeStrategy());
             }
             default -> {
-                LOG.warn("Unknown retention strategy [{}]. Defaulting to [{}]",
-                        elasticsearchConfiguration.getRotationStrategy(), MessageCountRotationStrategy.NAME);
-                return ImmutablePair.of(MessageCountRotationStrategy.class.getCanonicalName(),
-                        MessageCountRotationStrategyConfig.create(elasticsearchConfiguration.getMaxDocsPerIndex()));
+                LOG.warn("Unknown rotation strategy [{}]. Defaulting to [{}].",
+                        elasticsearchConfiguration.getRotationStrategy(), TimeBasedSizeOptimizingStrategy.NAME);
+                return ImmutablePair.of(TimeBasedSizeOptimizingStrategy.class.getCanonicalName(),
+                        buildDefaultTimeSizeStrategy());
             }
         }
     }
@@ -109,5 +97,12 @@ public class MaintenanceStrategiesHelper {
                         DeletionRetentionStrategyConfig.create(elasticsearchConfiguration.getMaxNumberOfIndices()));
             }
         }
+    }
+
+    public TimeBasedSizeOptimizingStrategyConfig buildDefaultTimeSizeStrategy() {
+        return TimeBasedSizeOptimizingStrategyConfig.builder()
+                .indexLifetimeMin(elasticsearchConfiguration.getTimeSizeOptimizingRotationMinLifeTime())
+                .indexLifetimeMax(elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxLifeTime())
+                .build();
     }
 }
