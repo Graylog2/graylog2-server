@@ -58,15 +58,18 @@ public class IndexedAccessExpression extends BaseExpression {
             } else if (indexable instanceof Iterable) {
                 return Iterables.get((Iterable) indexable, idx);
             }
-            throw new IllegalArgumentException("Object '" + indexable + "' is not an Array, List or Iterable.");
+            throw new IllegalArgumentException(
+                    context.pipelineErrorMessage("Object '" + indexable + "' is not an Array, List or Iterable."));
         } else if (idxObj instanceof String) {
             final String idx = idxObj.toString();
             if (indexable instanceof Map) {
                 return ((Map) indexable).get(idx);
             }
-            throw new IllegalArgumentException("Object '" + indexable + "' is not a Map.");
+            throw new IllegalArgumentException(
+                    context.pipelineErrorMessage("Object '" + indexable + "' is not a Map."));
         }
-        throw new IllegalArgumentException("Index '" + idxObj + "' is not a Long or String.");
+        throw new IllegalArgumentException(
+                context.pipelineErrorMessage("Index '" + idxObj + "' is not a Long or String."));
     }
 
     @Override

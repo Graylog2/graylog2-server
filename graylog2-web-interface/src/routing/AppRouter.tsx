@@ -18,12 +18,6 @@ import React from 'react';
 import { Redirect, Router, Route, Switch } from 'react-router-dom';
 import type { PluginRoute } from 'graylog-web-plugin';
 
-import App from 'routing/App';
-import PageContentLayout from 'components/layout/PageContentLayout';
-import history from 'util/History';
-import AppConfig from 'util/AppConfig';
-import Routes from 'routing/Routes';
-import { appPrefixed } from 'util/URLUtils';
 import {
   AuthenticationCreatePage,
   AuthenticationBackendCreatePage,
@@ -102,7 +96,14 @@ import {
   UserTokensEditPage,
   UsersOverviewPage,
   ViewEventDefinitionPage,
+  SidecarFailureTrackingPage,
 } from 'pages';
+import history from 'util/History';
+import AppConfig from 'util/AppConfig';
+import { appPrefixed } from 'util/URLUtils';
+import App from 'routing/App';
+import PageContentLayout from 'components/layout/PageContentLayout';
+import Routes from 'routing/Routes';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'hooks/usePluginEntities';
 
@@ -349,6 +350,9 @@ const AppRouter = () => {
                       <Route exact
                              path={Routes.SYSTEM.SIDECARS.CONFIGURATION}
                              component={SidecarConfigurationPage} />
+                      <Route exact
+                             path={Routes.SYSTEM.SIDECARS.FAILURE_TRACKING}
+                             component={SidecarFailureTrackingPage} />
                       <Route exact
                              path={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION}
                              component={SidecarNewConfigurationPage} />
