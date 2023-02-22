@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { Condition } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import HighlightingRule, { randomColor } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type { GetState } from 'views/types';
@@ -21,6 +22,7 @@ import { selectActiveViewState, selectActiveQuery } from 'views/logic/slices/vie
 import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
 import { updateViewState } from 'views/logic/slices/viewSlice';
 import { selectHighlightingRules } from 'views/logic/slices/highlightSelectors';
+import type { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 
 export const addHighlightingRule = (rule: HighlightingRule) => async (dispatch: AppDispatch, getState: GetState) => {
   const activeQuery = selectActiveQuery(getState());
@@ -64,10 +66,11 @@ export const createHighlightingRule = (field: string, value: any) => async (disp
   return dispatch(addHighlightingRule(newRule));
 };
 
-export const createHighlightingRules = (rules: Array<{field: string, value: any, color?: string}>) => async (dispatch: AppDispatch) => {
-  const newRules = rules.map(({ field, value, color }) => HighlightingRule.builder()
+export const createHighlightingRules = (rules: Array<{field: string, value: any, condition?: Condition, color?: StaticColor}>) => async (dispatch: AppDispatch) => {
+  const newRules = rules.map(({ field, value, color, condition }) => HighlightingRule.builder()
     .field(field)
     .value(value)
+    .condition(condition || 'equal')
     .color(color || randomColor())
     .build());
 

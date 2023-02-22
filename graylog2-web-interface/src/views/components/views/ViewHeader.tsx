@@ -30,7 +30,6 @@ import useView from 'views/hooks/useView';
 import useAppDispatch from 'stores/useAppDispatch';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
-import { loadView } from 'views/logic/slices/viewSlice';
 import { updateView } from 'views/logic/slices/viewSlice';
 import useIsNew from 'views/hooks/useIsNew';
 

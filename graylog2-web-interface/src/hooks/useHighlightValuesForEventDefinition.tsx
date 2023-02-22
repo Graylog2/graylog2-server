@@ -15,62 +15,46 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useMemo } from 'react';
-import uniqWith from 'lodash/uniqWith';
-import isEqual from 'lodash/isEqual';
+import { useEffect } from 'react';
 
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
-import useSearchResult from 'views/hooks/useSearchResult';
-import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
-import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
+import type { ValueExpr } from 'hooks/useEventDefinition';
+import { createHighlightingRules } from 'views/logic/slices/highlightActions';
+import useAppDispatch from 'stores/useAppDispatch';
+import type { Condition } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { randomColor } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 
-const isValuePass = ({ aggregations, key, value }: {aggregations: Array<EventDefinitionAggregation>, key: string, value: number }): boolean => {
-  return aggregations.some(({ expr, value: exprValue, fnSeries }: EventDefinitionAggregation) => {
-    if (key !== fnSeries) return false;
+const exprToConditionMapper: {[name: string]: Condition} = {
+  '<': 'less',
+  '<=': 'less_equal',
+  '>=': 'greater_equal',
+  '>': 'greater',
+  '==': 'equal',
+};
 
-    switch (expr) {
-      case '<':
-        return value < exprValue;
-      case '>':
-        return value > exprValue;
-      case '>=':
-        return value >= exprValue;
-      case '<=':
-        return value <= exprValue;
-      case '==':
-        return value === exprValue;
-      default:
-        return false;
-    }
-  });
+export const conditionToExprMapper: {[name: string]: ValueExpr} = {
+  less: '<',
+  less_equal: '<=',
+  greater_equal: '>=',
+  greater: '>',
+  equal: '==',
 };
 
 const useHighlightValuesForEventDefinition = () => {
-  const searchResult = useSearchResult();
+  const dispatch = useAppDispatch();
   const { aggregations, isEvent, isAlert, isEventDefinition } = useAlertAndEventDefinitionData();
-  const shouldRunHook = isEvent || isAlert || isEventDefinition;
-  const curQueryId = useCurrentQueryId();
-  const searchTypes: { [name: string]: { name: string, rows: Array<{ values: Array<{ key: string, value: number }> }>}} = searchResult?.result?.result?.results?.[curQueryId]?.search_types;
 
-  return useMemo<Array<{field: string, value: number, colo: string}>>(() => {
-    if (!searchTypes || !shouldRunHook) return [];
-    const color = randomColor();
-
-    return uniqWith(Object.values(searchTypes).reduce((res, { rows, name }) => {
-      if (name !== 'chart') return res;
-
-      rows.forEach((row) => {
-        row.values.forEach(({ key, value }) => {
-          if (isValuePass({ aggregations, key: key[0], value })) {
-            res.push({ field: key[0], value, color });
-          }
-        });
-      });
-
-      return res;
-    }, []), isEqual);
-  }, [aggregations, searchTypes, shouldRunHook]);
+  return useEffect(() => {
+    if (aggregations?.length && (isEvent || isAlert || isEventDefinition)) {
+      const valuesToHighlight = aggregations.map(({ fnSeries, value, expr }) => ({
+        value,
+        field: fnSeries,
+        color: randomColor(),
+        condition: exprToConditionMapper[expr],
+      }));
+      if (valuesToHighlight.length) dispatch(createHighlightingRules(valuesToHighlight));
+    }
+  }, [aggregations, dispatch, isAlert, isEvent, isEventDefinition]);
 };
 
 export default useHighlightValuesForEventDefinition;

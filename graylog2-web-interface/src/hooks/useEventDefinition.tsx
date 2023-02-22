@@ -23,7 +23,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { EventDefinition } from 'logic/alerts/types';
 
-type ValueExpr = '>' | '<' | '>=' | '<=' | '==';
+export type ValueExpr = '>' | '<' | '>=' | '<=' | '==';
 
 export type EventDefinitionAggregation = {
   expr: ValueExpr,

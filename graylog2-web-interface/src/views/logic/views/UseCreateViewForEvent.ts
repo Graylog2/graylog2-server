@@ -19,7 +19,7 @@ import * as Immutable from 'immutable';
 import uniq from 'lodash/uniq';
 
 import View from 'views/logic/views/View';
-import type { ElasticsearchQueryString, TimeRange } from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
 import type { EventType } from 'hooks/useEventById';
 import type { EventDefinition } from 'logic/alerts/types';
 import QueryGenerator from 'views/logic/queries/QueryGenerator';
@@ -41,7 +41,7 @@ import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 
-const NEW_WIDGET_HEIGHT = 2;
+const AGGREGATION_WIDGET_HEIGHT = 3;
 
 const getAggregationWidget = ({ rowPivots, fnSeries, sort = [] }: {
   rowPivots: Array<Pivot>,
@@ -73,16 +73,19 @@ const WidgetsGenerator = async ({ streams, aggregations, groupBy }) => {
     title: 'Summary: ',
   };
   const needsSummaryAggregations = aggregations.length > 1;
-  const SUMMARY_ROW_DELTA = needsSummaryAggregations ? NEW_WIDGET_HEIGHT : 0;
+  const SUMMARY_ROW_DELTA = needsSummaryAggregations ? AGGREGATION_WIDGET_HEIGHT : 0;
   const { aggregationWidgets, aggregationTitles, aggregationPositions } = aggregations.reduce((res, { field, value, expr, fnSeries }, index) => {
-    const rowPivots = uniq([field, ...groupBy]).map((f) => pivotForField(f, new FieldType('value', [], [])));
+    const rowPivots = [pivotForField(uniq([field, ...groupBy]), new FieldType('value', [], []))];
     const fnSeriesForFunc = Series.forFunction(fnSeries);
     const direction = ['>', '>=', '=='].includes(expr) ? Direction.Descending : Direction.Ascending;
     const sort = [new SortConfig(SortConfig.SERIES_TYPE, fnSeries, direction)];
     const widget = getAggregationWidget({ rowPivots, fnSeries: [fnSeriesForFunc], sort });
     const widgetId = widget.id;
     const title = `${fnSeries} ${expr} ${value}`;
-    const position = new WidgetPosition(1, index + NEW_WIDGET_HEIGHT + 1 + SUMMARY_ROW_DELTA, NEW_WIDGET_HEIGHT, Infinity);
+    const isEven = (index + 1) % 2 === 0;
+    const col = isEven ? 7 : 1;
+    const row = Math.ceil((index + 1) / 2) + AGGREGATION_WIDGET_HEIGHT + SUMMARY_ROW_DELTA;
+    const position = new WidgetPosition(col, row, AGGREGATION_WIDGET_HEIGHT, 6);
     res.aggregationWidgets.push(widget);
     res.aggregationTitles[widgetId] = title;
     res.aggregationPositions[widgetId] = position;
@@ -112,18 +115,18 @@ const WidgetsGenerator = async ({ streams, aggregations, groupBy }) => {
 
   const positions = {
     ...aggregationPositions,
-    [histogram.id]: new WidgetPosition(1, NEW_WIDGET_HEIGHT * aggregationWidgets.length + 1 + SUMMARY_ROW_DELTA, 2, Infinity),
-    [messageTable.id]: new WidgetPosition(1, NEW_WIDGET_HEIGHT * aggregationWidgets.length + 3 + SUMMARY_ROW_DELTA, 6, Infinity),
+    [histogram.id]: new WidgetPosition(1, AGGREGATION_WIDGET_HEIGHT * aggregationWidgets.length + 1 + SUMMARY_ROW_DELTA, 2, Infinity),
+    [messageTable.id]: new WidgetPosition(1, AGGREGATION_WIDGET_HEIGHT * aggregationWidgets.length + 3 + SUMMARY_ROW_DELTA, 6, Infinity),
   };
 
   if (needsSummaryAggregations) {
     const summaryAggregationWidget = getAggregationWidget({
-      rowPivots: uniq([...summaryAggregations.rowPivots, ...groupBy]).map((f) => pivotForField(f, new FieldType('value', [], []))),
+      rowPivots: [pivotForField(uniq([...summaryAggregations.rowPivots, ...groupBy]), new FieldType('value', [], []))],
       fnSeries: summaryAggregations.fnSeries.map((s) => Series.forFunction(s)),
     });
     widgets.push(summaryAggregationWidget);
     titles.widget[summaryAggregationWidget.id] = summaryAggregations.title;
-    positions[summaryAggregationWidget.id] = new WidgetPosition(1, 1, 2, Infinity);
+    positions[summaryAggregationWidget.id] = new WidgetPosition(1, 1, AGGREGATION_WIDGET_HEIGHT, Infinity);
   }
 
   return { titles, widgets, positions };
@@ -148,7 +151,7 @@ const ViewGenerator = async ({
   groupBy,
 }: {
   streams: string | string[] | undefined | null,
-  timeRange: TimeRange,
+  timeRange: AbsoluteTimeRange,
   queryString: ElasticsearchQueryString,
   aggregations: Array<EventDefinitionAggregation>
   groupBy: Array<string>
@@ -173,12 +176,12 @@ const useCreateViewForEvent = (
   { eventData, eventDefinition, aggregations }: { eventData: EventType, eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation> },
 ) => {
   const { streams } = eventData.replay_info;
-  const timeRange = {
+  const timeRange: AbsoluteTimeRange = {
     type: 'absolute',
     from: eventData?.replay_info?.timerange_start,
     to: eventData?.replay_info?.timerange_end,
   };
-  const queryString = {
+  const queryString: ElasticsearchQueryString = {
     type: 'elasticsearch',
     query_string: eventData?.replay_info?.query || ' ',
   };

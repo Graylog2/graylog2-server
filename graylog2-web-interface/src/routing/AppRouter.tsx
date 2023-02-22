@@ -48,7 +48,6 @@ import {
   EventDefinitionsPage,
   EventNotificationsPage,
   EventsPage,
-  EventReplaySearchPage,
   ExportExtractorsPage,
   ExtractorsPage,
   WelcomePage,

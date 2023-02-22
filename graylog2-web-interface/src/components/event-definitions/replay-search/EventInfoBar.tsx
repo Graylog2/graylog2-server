@@ -16,19 +16,28 @@
  */
 
 import React, { useMemo, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import lodash from 'lodash';
+import moment from 'moment';
 
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
-import { FlatContentRow, Icon, Timestamp } from 'components/common';
+import { FlatContentRow, HoverForHelp, Icon, Timestamp } from 'components/common';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import { TIME_UNITS } from 'components/event-definitions/event-definition-types/FilterForm';
 import { useStore } from 'stores/connect';
 import { EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
 import { Link } from 'components/common/router';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
+import useAppSelector from 'stores/useAppSelector';
+import { selectHighlightingRules } from 'views/logic/slices/highlightSelectors';
+import { conditionToExprMapper } from 'hooks/useHighlightValuesForEventDefinition';
+import type { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+
+const AlertTimestamp = styled(Timestamp)(({ theme }) => css`
+  color: ${theme.colors.variant.darker.warning}
+`);
 
 const Header = styled.div`
   display: flex;
@@ -40,7 +49,7 @@ const Header = styled.div`
 const Item = styled.div`
   display: flex;
   gap: 5px;
-  align-items: baseline;
+  align-items: flex-end;
 `;
 
 const Container = styled.div`
@@ -54,6 +63,7 @@ const Row = styled.div`
   gap: 8px;
   flex-wrap: wrap;
 `;
+const useHighlightingRules = () => useAppSelector(selectHighlightingRules);
 
 const EventInfoBar = () => {
   const [open, setOpen] = useState<boolean>(true);
@@ -64,7 +74,7 @@ const EventInfoBar = () => {
       return res;
     }, {});
   });
-  const { eventData, eventDefinition } = useAlertAndEventDefinitionData();
+  const { eventData, eventDefinition, aggregations } = useAlertAndEventDefinitionData();
 
   const toggleOpen = (e) => {
     e.stopPropagation();
@@ -85,6 +95,29 @@ const EventInfoBar = () => {
     }, []);
   }, [eventDefinition, allNotifications]);
 
+  const isEDUpdatedAfterEvent = moment(eventDefinition.updated_at).diff(eventData.timestamp) > 0;
+  const highlightingRules = useHighlightingRules();
+
+  const highlightingColors = useMemo(() => {
+    const aggregationsSet = new Set(aggregations.map(({ fnSeries, value, expr }) => `${fnSeries}${expr}${value}`));
+
+    return highlightingRules.reduce((res, rule) => {
+      const { field, value, condition } = rule;
+      const color = rule.color as StaticColor;
+      const expr = conditionToExprMapper?.[condition];
+
+      if (expr) {
+        const key = `${field}${expr}${value}`;
+
+        if (aggregationsSet.has(key)) {
+          res[key] = color.color;
+        }
+      }
+
+      return res;
+    }, {});
+  }, [aggregations, highlightingRules]);
+
   return (
     <FlatContentRow>
       <Header>
@@ -100,6 +133,17 @@ const EventInfoBar = () => {
             <b>Timestamp:</b>
             <Timestamp dateTime={eventData.timestamp} />
           </Item>
+          {isEDUpdatedAfterEvent && (
+          <Item>
+            <b>Event definition updated at:</b>
+            <AlertTimestamp dateTime={eventDefinition.updated_at} />
+            <HoverForHelp iconSize="xs">{
+              `Event definition ${eventDefinition.title} was edited after this event happened.
+              Some of aggregations widgets might not be representative for this event.`
+            }
+            </HoverForHelp>
+          </Item>
+          )}
           <Item>
             <b>Event definition:</b>
             <span>
@@ -139,6 +183,25 @@ const EventInfoBar = () => {
               }
             </span>
           </Item>
+          {Object.values(highlightingColors).length && (
+          <Item>
+            <b>Aggregation conditions:</b>
+            <span>
+              {
+                Object.entries(highlightingColors).map(([condition, color]: [string, string], index, array) => {
+                  const isLast = index + 1 === array.length;
+
+                  return (
+                    <>
+                      <span style={{ backgroundColor: color }}>{condition}</span>
+                      {!isLast && <span>{', '}</span>}
+                    </>
+                  );
+                })
+              }
+            </span>
+          </Item>
+          )}
         </Row>
       </Container>
       )}

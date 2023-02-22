@@ -41,11 +41,12 @@ export type EventDefinition = {
     grace_period_ms: number,
     backlog_size: number,
   },
-  notifications: string[],
+  notifications: Array<{ notification_id: string, notification_parameters: string}>,
   storage: [
     {
       type: string,
       streams: number[],
     }
-  ]
+  ],
+  updated_at: string | null
 }
