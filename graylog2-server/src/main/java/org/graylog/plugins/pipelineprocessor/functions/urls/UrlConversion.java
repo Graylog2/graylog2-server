@@ -23,7 +23,6 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 
-import java.net.MalformedURLException;
 import java.util.Optional;
 
 public class UrlConversion extends AbstractFunction<URL> {
@@ -39,7 +38,7 @@ public class UrlConversion extends AbstractFunction<URL> {
         try {
             return new URL(urlString);
         } catch (IllegalArgumentException e) {
-            log.debug("Unable to parse URL for string {}", urlString, e);
+            log.debug(context.pipelineErrorMessage("Unable to parse URL for string " + urlString), e);
 
             final Optional<String> defaultUrl = defaultParam.optional(args, context);
             if (!defaultUrl.isPresent()) {
@@ -48,7 +47,7 @@ public class UrlConversion extends AbstractFunction<URL> {
             try {
                 return new URL(defaultUrl.get());
             } catch (IllegalArgumentException e1) {
-                log.warn("Parameter `default` for to_url() is not a valid URL: {}", defaultUrl.get());
+                log.warn(context.pipelineErrorMessage("Parameter `default` for to_url() is not a valid URL: " + defaultUrl.get()));
                 throw Throwables.propagate(e1);
             }
         }

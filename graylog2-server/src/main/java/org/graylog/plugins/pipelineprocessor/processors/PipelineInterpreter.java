@@ -372,6 +372,7 @@ public class PipelineInterpreter implements MessageProcessor {
                                        Pipeline pipeline,
                                        EvaluationContext context,
                                        InterpreterListener interpreterListener) {
+        context.setRule(rule);
         rule.markExecution();
         interpreterListener.executeRule(rule, pipeline);
         try {
@@ -491,7 +492,7 @@ public class PipelineInterpreter implements MessageProcessor {
             cache = CacheBuilder.newBuilder()
                     .concurrencyLevel(processorCount)
                     .recordStats()
-                    .build(new CacheLoader<Set<Pipeline>, StageIterator.Configuration>() {
+                    .build(new CacheLoader<>() {
                         @Override
                         public StageIterator.Configuration load(@Nonnull Set<Pipeline> pipelines) {
                             return new StageIterator.Configuration(pipelines);
