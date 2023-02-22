@@ -14,20 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { WidgetActions } from 'views/stores/WidgetStore';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Widget from 'views/logic/widgets/Widget';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import Series from 'views/logic/aggregationbuilder/Series';
-import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
+import TitleTypes from 'views/stores/TitleTypes';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import type { GetState } from 'views/types';
+import { addWidget } from 'views/logic/slices/widgetActions';
+import { setTitle } from 'views/logic/slices/titlesActions';
+import { selectActiveQuery } from 'views/logic/slices/viewSelectors';
+import type { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 
-import type { FieldActionHandler } from './FieldActionHandler';
 import duplicateCommonWidgetSettings from './DuplicateCommonWidgetSettings';
 
 const NUMERIC_FIELD_SERIES = ['count', 'sum', 'avg', 'min', 'max', 'stddev', 'variance', 'card', 'percentile'];
 const NONNUMERIC_FIELD_SERIES = ['count', 'card'];
 
-const handler: FieldActionHandler<{ widget?: Widget }> = ({ field, type, contexts: { widget: origWidget = Widget.empty() } }) => {
+const handler = ({
+  field,
+  type,
+  contexts: { widget: origWidget = Widget.empty() },
+}: ActionHandlerArguments<{ widget?: Widget }>) => (dispatch: AppDispatch, getState: GetState) => {
+  const activeQuery = selectActiveQuery(getState());
   const series = ((type && type.isNumeric()) ? NUMERIC_FIELD_SERIES : NONNUMERIC_FIELD_SERIES)
     .map((f) => {
       if (f === 'percentile') {
@@ -48,7 +57,8 @@ const handler: FieldActionHandler<{ widget?: Widget }> = ({ field, type, context
 
   const widget = duplicateCommonWidgetSettings(widgetBuilder, origWidget).build();
 
-  return WidgetActions.create(widget).then((newWidget) => TitlesActions.set(TitleTypes.Widget, newWidget.id, `Field Statistics for ${field}`));
+  return dispatch(addWidget(widget))
+    .then(() => dispatch(setTitle(activeQuery, TitleTypes.Widget, widget.id, `Field Statistics for ${field}`)));
 };
 
 export default handler;

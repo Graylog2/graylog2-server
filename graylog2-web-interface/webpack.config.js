@@ -98,7 +98,7 @@ const webpackConfig = {
             target: supportedBrowsers,
           },
         },
-        exclude: /node_modules\/(?!graylog-web-plugin)|\.node_cache/,
+        exclude: /node_modules\/(?!(@react-hook|uuid|@?react-leaflet|graylog-web-plugin))|\.node_cache/,
       },
       {
         test: /\.(svg)(\?.+)?$/,

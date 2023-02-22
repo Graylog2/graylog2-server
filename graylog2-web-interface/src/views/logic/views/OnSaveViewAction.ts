@@ -16,13 +16,25 @@
  */
 import UserNotification from 'util/UserNotification';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import { ViewActions } from 'views/stores/ViewStore';
 import type View from 'views/logic/views/View';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import { setIsNew, setIsDirty } from 'views/logic/slices/viewSlice';
+import type FetchError from 'logic/errors/FetchError';
 
-export default (newView: View) => {
-  return ViewActions.update(newView).then(({ view }) => {
-    return ViewManagementActions.update(view);
-  }).then(({ title }) => {
-    return UserNotification.success(`Saving view "${title}" was successful!`, 'Success!');
-  }).catch((error) => UserNotification.error(`Saving view failed: ${error}`, 'Error!'));
+const _extractErrorMessage = (error: FetchError) => {
+  return (error
+    && error.additional
+    && error.additional.body
+    && error.additional.body.message) ? error.additional.body.message : error;
+};
+
+export default (view: View) => async (dispatch: AppDispatch) => {
+  try {
+    await ViewManagementActions.update(view);
+    dispatch(setIsNew(false));
+    dispatch(setIsDirty(false));
+    UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!');
+  } catch (error) {
+    UserNotification.error(`Saving view failed: ${_extractErrorMessage(error)}`, 'Error!');
+  }
 };

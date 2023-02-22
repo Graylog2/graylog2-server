@@ -16,15 +16,13 @@
  */
 import * as React from 'react';
 import styled, { useTheme } from 'styled-components';
-import { useState, useContext, useRef } from 'react';
+import { useCallback, useState, useContext, useRef } from 'react';
 
-import { useStore } from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import { Icon, ShareButton } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
-import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
@@ -41,6 +39,12 @@ import {
   executePluggableSearchDuplicationHandler as executePluggableDuplicationHandler,
 } from 'views/logic/views/pluggableSaveViewFormHandler';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
+import useIsDirty from 'views/hooks/useIsDirty';
+import useIsNew from 'views/hooks/useIsNew';
+import useView from 'views/hooks/useView';
+import useAppDispatch from 'stores/useAppDispatch';
+import { loadView, updateView } from 'views/logic/slices/viewSlice';
+import type FetchError from 'logic/errors/FetchError';
 
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchesModal from './SavedSearchesModal';
@@ -55,9 +59,18 @@ const _isAllowedToEdit = (view: View, currentUser: User | undefined | null) => (
   || isPermitted(currentUser?.permissions, [ViewsPermissions.View.Edit(view.id)])
 );
 
+const _extractErrorMessage = (error: FetchError) => {
+  return (error
+    && error.additional
+    && error.additional.body
+    && error.additional.body.message) ? error.additional.body.message : error;
+};
+
 const SearchActionsMenu = () => {
   const theme = useTheme();
-  const { view, dirty, isNew } = useStore(ViewStore);
+  const dirty = useIsDirty();
+  const view = useView();
+  const isNew = useIsNew();
   const viewLoaderFunc = useContext(ViewLoaderContext);
   const currentUser = useCurrentUser();
   const loadNewView = useContext(NewViewLoaderContext);
@@ -68,7 +81,10 @@ const SearchActionsMenu = () => {
   const [showExport, setShowExport] = useState(false);
   const [showMetadataEdit, setShowMetadataEdit] = useState(false);
   const [showShareSearch, setShowShareSearch] = useState(false);
-  const [newTitle, setNewTitle] = useState((view && view.title) || '');
+  const currentTitle = view?.title ?? '';
+  const dispatch = useAppDispatch();
+  const onUpdateView = useCallback((newView: View) => dispatch(updateView(newView)), [dispatch]);
+
   const loaded = isNew === false;
   const savedSearchColor = dirty ? theme.colors.variant.dark.warning : theme.colors.variant.info;
   const disableReset = !(dirty || loaded);
@@ -76,21 +92,13 @@ const SearchActionsMenu = () => {
   const title = dirty ? 'Unsaved changes' : savedViewTitle;
   const pluggableSaveViewControls = useSaveViewFormControls();
 
-  const toggleFormModal = () => setShowForm((cur) => !cur);
-  const toggleListModal = () => setShowList((cur) => !cur);
-  const toggleExport = () => setShowExport((cur) => !cur);
-  const toggleMetadataEdit = () => setShowMetadataEdit((cur) => !cur);
-  const toggleShareSearch = () => setShowShareSearch((cur) => !cur);
-  const onChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => setNewTitle(e.target.value);
+  const toggleFormModal = useCallback(() => setShowForm((cur) => !cur), []);
+  const toggleListModal = useCallback(() => setShowList((cur) => !cur), []);
+  const toggleExport = useCallback(() => setShowExport((cur) => !cur), []);
+  const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), []);
+  const toggleShareSearch = useCallback(() => setShowShareSearch((cur) => !cur), []);
 
-  const _extractErrorMessage = (error) => {
-    return (error
-      && error.additional
-      && error.additional.body
-      && error.additional.body.message) ? error.additional.body.message : error;
-  };
-
-  const saveSearch = () => {
+  const saveSearch = useCallback(async (newTitle: string) => {
     if (!view.id) {
       return;
     }
@@ -100,13 +108,12 @@ const SearchActionsMenu = () => {
       .type(View.Type.Search)
       .build();
 
-    ViewManagementActions.update(newView)
-      .then(toggleFormModal)
-      .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
-      .catch((error) => UserNotification.error(`Saving view failed: ${_extractErrorMessage(error)}`, 'Error!'));
-  };
+    await dispatch(onSaveView(newView));
+    toggleFormModal();
+    await dispatch(loadView(newView));
+  }, [dispatch, toggleFormModal, view]);
 
-  const saveAsSearch = async () => {
+  const saveAsSearch = useCallback(async (newTitle: string) => {
     if (!newTitle || newTitle === '') {
       return;
     }
@@ -130,9 +137,9 @@ const SearchActionsMenu = () => {
       })
       .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
       .catch((error) => UserNotification.error(`Saving view failed: ${_extractErrorMessage(error)}`, 'Error!'));
-  };
+  }, [currentUser.permissions, pluggableSaveViewControls, toggleFormModal, view, viewLoaderFunc]);
 
-  const deleteSavedSearch = (deletedView: View) => {
+  const deleteSavedSearch = useCallback((deletedView: View) => {
     return ViewManagementActions.delete(deletedView)
       .then(() => UserNotification.success(`Deleting view "${deletedView.title}" was successful!`, 'Success!'))
       .then(() => {
@@ -143,11 +150,11 @@ const SearchActionsMenu = () => {
         return Promise.resolve();
       })
       .catch((error) => UserNotification.error(`Deleting view failed: ${_extractErrorMessage(error)}`, 'Error!'));
-  };
+  }, [view.id]);
 
-  const _loadAsDashboard = () => {
+  const _loadAsDashboard = useCallback(() => {
     loadAsDashboard(view);
-  };
+  }, [view]);
 
   return (
     <Container aria-label="Search Meta Buttons">
@@ -155,14 +162,12 @@ const SearchActionsMenu = () => {
         <Icon style={{ color: loaded ? savedSearchColor : undefined }} name="floppy-disk" type={loaded ? 'solid' : 'regular'} /> Save
       </Button>
       {showForm && (
-        <SavedSearchForm onChangeTitle={onChangeTitle}
-                         target={formTarget.current}
+        <SavedSearchForm target={formTarget.current}
                          saveSearch={saveSearch}
                          saveAsSearch={saveAsSearch}
-                         disableCreateNew={newTitle === view.title}
                          isCreateNew={isNew || !isAllowedToEdit}
                          toggleModal={toggleFormModal}
-                         value={newTitle} />
+                         value={currentTitle} />
       )}
       <Button title="Load a previously saved search"
               onClick={toggleListModal}>
@@ -190,7 +195,7 @@ const SearchActionsMenu = () => {
           <MenuItem onSelect={_loadAsDashboard} icon="tachometer-alt">Export to dashboard</MenuItem>
         </IfPermitted>
         <MenuItem onSelect={toggleExport} icon="cloud-download-alt">Export</MenuItem>
-        <MenuItem disabled={disableReset} onSelect={() => loadNewView()} icon="eraser">
+        <MenuItem disabled={disableReset} onSelect={loadNewView} icon="eraser">
           Reset search
         </MenuItem>
         <MenuItem divider />
@@ -202,7 +207,7 @@ const SearchActionsMenu = () => {
                              title="Editing saved search"
                              submitButtonText="Update search"
                              onClose={toggleMetadataEdit}
-                             onSave={onSaveView} />
+                             onSave={onUpdateView} />
       )}
       {showShareSearch && (
         <EntityShareModal entityId={view.id}

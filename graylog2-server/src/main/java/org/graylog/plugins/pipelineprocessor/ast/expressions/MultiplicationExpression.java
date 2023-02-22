@@ -65,7 +65,8 @@ public class MultiplicationExpression extends BinaryExpression implements Numeri
                 case '%':
                     return l % r;
                 default:
-                    throw new IllegalStateException("Invalid operator, this is a bug.");
+                    throw new IllegalStateException(
+                            context.pipelineErrorMessage("Invalid operator, this is a bug."));
             }
         } else {
             final double l = (double) leftValue;
@@ -79,7 +80,8 @@ public class MultiplicationExpression extends BinaryExpression implements Numeri
                 case '%':
                     return l % r;
                 default:
-                    throw new IllegalStateException("Invalid operator, this is a bug.");
+                    throw new IllegalStateException(
+                            context.pipelineErrorMessage("Invalid operator, this is a bug."));
             }
         }
     }

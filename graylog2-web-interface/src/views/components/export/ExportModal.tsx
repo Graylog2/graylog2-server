@@ -23,9 +23,6 @@ import styled from 'styled-components';
 import { Field, Formik, Form } from 'formik';
 
 import ModalSubmit from 'components/common/ModalSubmit';
-import connect from 'stores/connect';
-import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import type View from 'views/logic/views/View';
 import type Widget from 'views/logic/widgets/Widget';
 import { Modal, Button } from 'components/bootstrap';
@@ -34,6 +31,7 @@ import ExportWidgetSelection from 'views/components/export/ExportWidgetSelection
 import { MESSAGE_FIELD, SOURCE_FIELD, TIMESTAMP_FIELD } from 'views/Constants';
 import type { ExportSettings as ExportSettingsType } from 'views/components/ExportSettingsContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import useSearchExecutionState from 'views/hooks/useSearchExecutionState';
 
 import ExportSettings from './ExportSettings';
 import ExportStrategy from './ExportStrategy';
@@ -49,7 +47,6 @@ const Content = styled.div`
 export type Props = {
   closeModal: () => void,
   directExportWidgetId?: string,
-  executionState: SearchExecutionState,
   view: View,
 };
 
@@ -75,7 +72,8 @@ type FormState = {
   format: string,
 };
 
-const ExportModal = ({ closeModal, view, directExportWidgetId, executionState }: Props) => {
+const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
+  const executionState = useSearchExecutionState();
   const { state: viewStates } = view;
   const { shouldEnableDownload, title, initialWidget, shouldShowWidgetSelection, shouldAllowWidgetSelection, downloadFile } = ExportStrategy.createExportStrategy(view.type);
   const exportableWidgets = viewStates.map((state) => state.widgets.filter((widget) => widget.isExportable).toList()).toList().flatten(true) as List<Widget>;
@@ -180,13 +178,4 @@ ExportModal.defaultProps = {
   directExportWidgetId: null,
 };
 
-export default connect(
-  ExportModal,
-  {
-    executionState: SearchExecutionStateStore,
-  },
-  ({ executionState, ...rest }) => ({
-    ...rest,
-    executionState,
-  }),
-);
+export default ExportModal;

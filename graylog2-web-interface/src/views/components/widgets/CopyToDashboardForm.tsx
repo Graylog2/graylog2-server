@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 
 import { Modal, ListGroup, ListGroupItem } from 'components/bootstrap';
 import { PaginatedList, SearchForm, ModalSubmit } from 'components/common';
@@ -32,6 +32,14 @@ type Props = {
 const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submitLoadingText, activeDashboardId }: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDashboard, setSelectedDashboard] = useState<string | null>(null);
+  const isMounted = useRef<boolean>();
+
+  useEffect(() => {
+    isMounted.current = true;
+
+    return () => { isMounted.current = false; };
+  }, []);
+
   const [searchParams, setSearchParams] = useState<SearchParams>({
     page: 1,
     pageSize: 5,
@@ -61,7 +69,9 @@ const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submitLoadi
     setIsSubmitting(true);
 
     onSubmit(selectedDashboard).then(() => {
-      setIsSubmitting(false);
+      if (isMounted.current) {
+        setIsSubmitting(false);
+      }
     });
   };
 
