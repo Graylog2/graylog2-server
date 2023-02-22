@@ -111,8 +111,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private static final List<EntityAttribute> attributes = List.of(
             EntityAttribute.builder().id("title").title("Title").build(),
             EntityAttribute.builder().id("description").title("Description").build(),
-            EntityAttribute.builder().id("priority").title("Priority").type("number").build(),
-            EntityAttribute.builder().id("alert").title("Alert").type("boolean").filterable(true).filterOptions(Set.of(
+            EntityAttribute.builder().id("priority").title("Priority").type(SearchQueryField.Type.INT).build(),
+            EntityAttribute.builder().id("alert").title("Alert").type(SearchQueryField.Type.BOOLEAN).filterable(true).filterOptions(Set.of(
                     FilterOption.create("true", "enabled"),
                     FilterOption.create("false", "disabled")
             )).build()
