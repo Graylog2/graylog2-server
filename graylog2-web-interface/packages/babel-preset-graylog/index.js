@@ -38,6 +38,7 @@ module.exports = (api) => {
           useBuiltIns: 'entry',
           corejs: '3.9',
           shippedProposals: true,
+          targets: 'defaults, chrome >=68',
         }],
         require('@babel/preset-react'),
         require('@babel/preset-typescript'),

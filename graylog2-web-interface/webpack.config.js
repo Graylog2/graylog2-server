@@ -98,7 +98,7 @@ const webpackConfig = {
             presets: [require('babel-preset-graylog')],
           },
         },
-        exclude: /node_modules|\.node_cache/,
+        exclude: /node_modules\/(?!(@react-hook|uuid|@?react-leaflet))|\.node_cache/,
       },
       {
         test: /\.(svg)(\?.+)?$/,
