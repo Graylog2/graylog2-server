@@ -50,6 +50,34 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> imple
 
     public PaginatedList<ViewSummaryDTO> searchPaginatedByType(SearchUser searchUser,
                                                                ViewDTO.Type type,
+                                                               Bson dbQuery,
+                                                               String order,
+                                                               String sortField,
+                                                               int page,
+                                                               int perPage) {
+        checkNotNull(sortField);
+
+        var sort = getMultiFieldSortBuilder(order, List.of(sortField, ViewDTO.SECONDARY_SORT));
+
+        var query = Filters.and(
+                Filters.or(
+                        Filters.eq(ViewDTO.FIELD_TYPE, type),
+                        Filters.exists(ViewDTO.FIELD_TYPE, false)
+                ),
+                dbQuery
+        );
+
+        final List<ViewSummaryDTO> pageOfViews = findViews(searchUser, query, sort, page, perPage)
+                .map(this::deserialize)
+                .toList();
+
+        final long grandTotal = db.getCount(DBQuery.or(DBQuery.is(ViewDTO.FIELD_TYPE, type), DBQuery.notExists(ViewDTO.FIELD_TYPE)));
+
+        return new PaginatedList<>(pageOfViews, pageOfViews.size(), page, perPage, grandTotal);
+    }
+
+    public PaginatedList<ViewSummaryDTO> searchPaginatedByType(SearchUser searchUser,
+                                                               ViewDTO.Type type,
                                                                Bson dbQuery, //query executed on DB level
                                                                Predicate<ViewSummaryDTO> predicate, //predicate executed on code level, AFTER data is fetched
                                                                String order,

@@ -180,6 +180,16 @@ public class ViewService extends PaginatedDbService<ViewDTO> implements ViewUtil
         return viewSummaryService.searchPaginatedByType(searchUser, type, dbQuery, predicate, order, sortField, page, perPage);
     }
 
+    public PaginatedList<ViewSummaryDTO> searchSummariesPaginatedByType(final SearchUser searchUser,
+                                                                        final ViewDTO.Type type,
+                                                                        final Bson dbQuery, //query executed on DB level
+                                                                        final String order,
+                                                                        final String sortField,
+                                                                        final int page,
+                                                                        final int perPage) {
+        return viewSummaryService.searchPaginatedByType(searchUser, type, dbQuery, order, sortField, page, perPage);
+    }
+
     public void saveDefault(ViewDTO dto) {
         if (isNullOrEmpty(dto.id())) {
             throw new IllegalArgumentException("ViewDTO needs an ID to be configured as default view");
