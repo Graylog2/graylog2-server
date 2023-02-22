@@ -76,7 +76,7 @@ const ExtractorsList = createReactClass({
     }
 
     const formattedExtractors = this.state.extractors
-      .sort((extractor1, extractor2) => String(extractor1.order).localeCompare(String(extractor2.order), undefined, { numeric: true }))
+      .sort((extractor1, extractor2) => extractor1.order - extractor2.order)
       .map(this._formatExtractor);
 
     return (
