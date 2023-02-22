@@ -20,7 +20,6 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public record OpensearchConfiguration(
         String opensearchVersion,
@@ -29,7 +28,7 @@ public record OpensearchConfiguration(
         int transportPort,
         String authUsername,
         String authPassword,
-        String clusterName, String nodeName, List<String> nodeRoles, List<String> networkHost,
+        String clusterName, String nodeName, List<String> nodeRoles,
         List<String> discoverySeedHosts, Map<String, String> additionalConfiguration
 ) {
     public Map<String, String> asMap() {
@@ -44,22 +43,16 @@ public record OpensearchConfiguration(
             config.put("node.name", nodeName);
         }
         if (nodeRoles != null && !nodeRoles.isEmpty()) {
-            config.put("node.roles", toYamlList(nodeRoles));
-        }
-        if (networkHost != null && !networkHost.isEmpty()) {
-            config.put("network.host", toYamlList(networkHost));
+            config.put("node.roles", toValuesList(nodeRoles));
         }
         if (discoverySeedHosts != null && !discoverySeedHosts.isEmpty()) {
-            config.put("discovery.seed_hosts", toYamlList(discoverySeedHosts));
+            config.put("discovery.seed_hosts", toValuesList(discoverySeedHosts));
         }
         config.putAll(additionalConfiguration);
         return config;
     }
 
-    private String toYamlList(List<String> values) {
-        return values.stream()
-                .collect(Collectors.collectingAndThen(
-                        Collectors.joining(","),
-                        list -> "" + list + ""));
+    private String toValuesList(List<String> values) {
+        return String.join(",", values);
     }
 }

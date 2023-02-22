@@ -53,34 +53,37 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
     private final OpensearchConfiguration configuration;
 
     @Inject
-    public ConfigurationProvider(Configuration datanodeConfig, DataNodeConfig dataNodeConfig) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, UnrecoverableKeyException {
-        final var cfg = dataNodeConfig.test();
+    public ConfigurationProvider(Configuration localConfiguration, DataNodeConfig sharedConfiguration) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException, UnrecoverableKeyException {
+        final var cfg = sharedConfiguration.test();
 
-        final Path opensearchConfigDir = Path.of(datanodeConfig.getOpensearchLocation()).resolve("config");
+        final Path opensearchConfigDir = Path.of(localConfiguration.getOpensearchLocation()).resolve("config");
 
         final LinkedHashMap<String, String> config = new LinkedHashMap<>();
-        config.put("path.data", Path.of(datanodeConfig.getOpensearchDataLocation()).resolve(datanodeConfig.getDatanodeNodeName()).toAbsolutePath().toString());
-        config.put("path.logs", Path.of(datanodeConfig.getOpensearchLogsLocation()).resolve(datanodeConfig.getDatanodeNodeName()).toAbsolutePath().toString());
+        config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
+        config.put("path.logs", Path.of(localConfiguration.getOpensearchLogsLocation()).resolve(localConfiguration.getDatanodeNodeName()).toAbsolutePath().toString());
         //config.put("discovery.type", "single-node");
 
         // listen on all interfaces
         config.put("network.bind_host", "0.0.0.0");
 
+        localConfiguration.getOpensearchNetworkHostHost().ifPresent(
+                networkHost -> config.put("network.host", networkHost));
+
         config.put("cluster.initial_master_nodes", "node1");
 
-        final Path transportKeystorePath = Path.of(datanodeConfig.getOpensearchConfigLocation())
-                .resolve(datanodeConfig.getDatanodeTransportCertificate());
+        final Path transportKeystorePath = Path.of(localConfiguration.getOpensearchConfigLocation())
+                .resolve(localConfiguration.getDatanodeTransportCertificate());
 
 
-        final Path httpKeystorePath = Path.of(datanodeConfig.getOpensearchConfigLocation())
-                .resolve(datanodeConfig.getDatanodeHttpCertificate());
+        final Path httpKeystorePath = Path.of(localConfiguration.getOpensearchConfigLocation())
+                .resolve(localConfiguration.getDatanodeHttpCertificate());
 
         if (Files.exists(transportKeystorePath) && Files.exists(httpKeystorePath)) {
             config.put("plugins.security.disabled", "false");
             config.put("plugins.security.ssl.http.enabled", "true");
 
             final Path internalUsersFile = opensearchConfigDir.resolve("opensearch-security").resolve("internal_users.yml");
-            configureInitialAdmin(internalUsersFile, datanodeConfig.getRestApiUsername(), datanodeConfig.getRestApiPassword());
+            configureInitialAdmin(internalUsersFile, localConfiguration.getRestApiUsername(), localConfiguration.getRestApiPassword());
 
         } else {
             config.put("plugins.security.disabled", "true");
@@ -88,11 +91,10 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
         }
 
 
-
         if (Files.exists(transportKeystorePath)) {
 
-            KeyStore nodeKeystore = loadKeystore(transportKeystorePath, datanodeConfig.getDatanodeTransportCertificatePassword());
-            extractCertificates(opensearchConfigDir, "transport", nodeKeystore, datanodeConfig.getDatanodeTransportCertificatePassword());
+            KeyStore nodeKeystore = loadKeystore(transportKeystorePath, localConfiguration.getDatanodeTransportCertificatePassword());
+            extractCertificates(opensearchConfigDir, "transport", nodeKeystore, localConfiguration.getDatanodeTransportCertificatePassword());
 
             config.put("plugins.security.ssl.transport.pemcert_filepath", "transport.pem");
             config.put("plugins.security.ssl.transport.pemkey_filepath", "transport-key.pem");
@@ -112,14 +114,14 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
 
         if (Files.exists(httpKeystorePath)) {
 
-            KeyStore httpKeystore = loadKeystore(httpKeystorePath, datanodeConfig.getDatanodeHttpCertificatePassword());
+            KeyStore httpKeystore = loadKeystore(httpKeystorePath, localConfiguration.getDatanodeHttpCertificatePassword());
 
             final String truststorePassword = UUID.randomUUID().toString();
             final Path trustStorePath = createTruststore(httpKeystore, truststorePassword, opensearchConfigDir);
             System.setProperty("javax.net.ssl.trustStore", trustStorePath.toAbsolutePath().toString());
             System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
 
-            extractCertificates(opensearchConfigDir, "http", httpKeystore, datanodeConfig.getDatanodeHttpCertificatePassword());
+            extractCertificates(opensearchConfigDir, "http", httpKeystore, localConfiguration.getDatanodeHttpCertificatePassword());
 
             config.put("plugins.security.ssl.http.pemcert_filepath", "http.pem");
             config.put("plugins.security.ssl.http.pemkey_filepath", "http-key.pem");
@@ -127,17 +129,16 @@ public class ConfigurationProvider implements Provider<OpensearchConfiguration> 
         }
 
         configuration = new OpensearchConfiguration(
-                datanodeConfig.getOpensearchVersion(),
-                Path.of(datanodeConfig.getOpensearchLocation()),
-                datanodeConfig.getOpensearchHttpPort(),
-                datanodeConfig.getOpensearchTransportPort(),
-                datanodeConfig.getRestApiUsername(),
-                datanodeConfig.getRestApiPassword(),
+                localConfiguration.getOpensearchVersion(),
+                Path.of(localConfiguration.getOpensearchLocation()),
+                localConfiguration.getOpensearchHttpPort(),
+                localConfiguration.getOpensearchTransportPort(),
+                localConfiguration.getRestApiUsername(),
+                localConfiguration.getRestApiPassword(),
                 "datanode-cluster",
-                datanodeConfig.getDatanodeNodeName(),
+                localConfiguration.getDatanodeNodeName(),
                 Collections.emptyList(),
-                Collections.emptyList(),
-                datanodeConfig.getOpensearchDiscoverySeedHosts(),
+                localConfiguration.getOpensearchDiscoverySeedHosts(),
                 config
         );
     }

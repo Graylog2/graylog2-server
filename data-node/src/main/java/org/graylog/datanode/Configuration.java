@@ -47,6 +47,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Helper class to hold configuration of Graylog
@@ -89,7 +90,7 @@ public class Configuration extends BaseConfiguration {
     private Integer logs = 500;
 
 
-    @Parameter(value = "datanode_node_name")
+    @Parameter(value = "node_name")
     private String datanodeNodeName = "node1";
 
     @Parameter(value = "opensearch_http_port", converter = IntegerConverter.class)
@@ -102,16 +103,19 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_discovery_seed_hosts", converter = StringListConverter.class)
     private List<String> opensearchDiscoverySeedHosts = Collections.emptyList();
 
-    @Parameter(value = "datanode_transport_certificate")
+    @Parameter(value = "opensearch_network_host")
+    private String opensearchNetworkHostHost = null;
+
+    @Parameter(value = "transport_certificate")
     private String datanodeTransportCertificate = "datanode-transport-certificates.p12";
 
-    @Parameter(value = "datanode_transport_certificate_password")
+    @Parameter(value = "transport_certificate_password")
     private String datanodeTransportCertificatePassword = null;
 
-    @Parameter(value = "datanode_http_certificate")
+    @Parameter(value = "http_certificate")
     private String datanodeHttpCertificate = "datanode-http-certificates.p12";
 
-    @Parameter(value = "datanode_http_certificate_password")
+    @Parameter(value = "http_certificate_password")
     private String datanodeHttpCertificatePassword = null;
 
     @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
@@ -256,6 +260,11 @@ public class Configuration extends BaseConfiguration {
 
     public String getRestApiPassword() {
         return restApiPassword;
+    }
+
+
+    public Optional<String> getOpensearchNetworkHostHost() {
+        return Optional.ofNullable(opensearchNetworkHostHost);
     }
 
     public static class NodeIdFileValidator implements Validator<String> {

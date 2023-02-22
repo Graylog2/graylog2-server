@@ -58,7 +58,7 @@ public class DatanodeStartupIT {
                     .retryIfResult(input -> !input.extract().body().path("process.info.status").equals("AVAILABLE"))
                     .build();
 
-            final Integer datanodeRestApiPort = backend.getDatanodeRestPort();
+             final Integer datanodeRestApiPort = backend.getDatanodeRestPort();
 
                     retryer.call(() -> this.getStatus(datanodeRestApiPort))
                     .assertThat()
@@ -66,7 +66,7 @@ public class DatanodeStartupIT {
                     .body("process.info.pid", Matchers.notNullValue())
                     .body("process.info.user", Matchers.equalTo("opensearch"));
         } catch (RetryException retryException) {
-            LOG.error("DataNode Container logs foolow:\n" + backend.getLogs());
+            LOG.error("DataNode Container logs follow:\n" + backend.getLogs());
             throw retryException;
         }
     }
