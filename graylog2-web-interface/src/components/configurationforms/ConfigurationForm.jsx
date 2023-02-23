@@ -78,7 +78,7 @@ class ConfigurationForm extends React.Component {
 
     return {
       configFields: $.extend({}, props.configFields),
-      values: $.extend({}, { ...defaultValues, ...props.values }, valueOverrides),
+      values: $.extend({}, defaultValues, props.values, valueOverrides),
       titleValue: effectiveTitleValue,
     };
   };
