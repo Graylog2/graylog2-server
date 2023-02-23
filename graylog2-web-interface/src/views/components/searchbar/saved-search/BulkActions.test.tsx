@@ -31,7 +31,7 @@ jest.mock('util/UserNotification', () => ({
   success: jest.fn(),
 }));
 
-describe('SavedSearches BulkActions', () => {
+describe('SavedSearches BulkActionsRow', () => {
   const deleteSavedSearch = async () => {
     userEvent.click(await screen.findByRole('button', { name: /delete/i }));
   };

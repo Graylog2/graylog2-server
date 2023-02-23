@@ -41,7 +41,7 @@ jest.mock('@graylog/server-api', () => ({
   },
 }));
 
-describe('StreamsOverview BulkActions', () => {
+describe('StreamsOverview BulkActionsRow', () => {
   const assignIndexSet = async () => {
     userEvent.click(await screen.findByRole('button', { name: /assign index set/i }));
 
