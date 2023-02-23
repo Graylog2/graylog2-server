@@ -43,11 +43,16 @@ jobs:
         continue-on-error: true
         working-directory: graylog2-web-interface
         run: yarn lint --fix -o /tmp/report.json -f json
+      - name: Run lint:styles --fix
+        continue-on-error: true
+        working-directory: graylog2-web-interface
+        run: yarn lint:styles --fix -o /tmp/report-css.json -f json
       - name: Submit Results
         continue-on-error: true
         working-directory: graylog2-web-interface
         run: |
           PROBLEM_COUNT=`jq '. | map(.errorCount + .warningCount)|add' /tmp/report.json`
+          PROBLEM_COUNT_CSS=`jq '. | map(.warnings | length)|add' /tmp/report-css.json`
           CURRENT_REF=`git rev-parse HEAD`
           TIMESTAMP=`git show --format=%at $CURRENT_REF|head -1`
           PAYLOAD=$(cat <<- EOF
@@ -55,8 +60,9 @@ jobs:
               "version": "1.1",
               "host": "developermetrics",
               "job": "fix-linter-hints",
-              "short_message": "Found ${PROBLEM_COUNT} problems in commit ${CURRENT_REF}",
+              "short_message": "Found ${PROBLEM_COUNT} JS and ${PROBLEM_COUNT_CSS} CSS problems in commit ${CURRENT_REF}",
               "_problems": ${PROBLEM_COUNT},
+              "_problems_css": ${PROBLEM_COUNT_CSS},
               "_current_ref": "${CURRENT_REF}",
               "timestamp": ${TIMESTAMP}
              }
