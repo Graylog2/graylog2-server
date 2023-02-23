@@ -33,6 +33,7 @@ const BulkActionsDropdown = ({ selectedEntities, setSelectedEntities, children }
   return (
     <DropdownButton bsSize="small"
                     title="Bulk actions"
+                    id="bulk-actions-dropdown"
                     disabled={!selectedEntities?.length}>
       {children}
       <MenuItem divider />
