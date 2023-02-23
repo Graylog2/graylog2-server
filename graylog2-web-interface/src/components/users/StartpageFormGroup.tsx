@@ -28,6 +28,7 @@ import Spinner from 'components/common/Spinner';
 import Select from 'components/common/Select';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import useStreams from 'components/streams/hooks/useStreams';
+import useSearches from 'views/components/search/useSearches';
 
 const Container = styled.div`
   display: flex;
@@ -74,12 +75,15 @@ const useStartPageEntities = (userId, permissions) => {
   const selectedUserIsAdmin = permissions.includes(ADMIN_PERMISSION);
   const [userDashboards, setUserDashboards] = useState<Option[]>([]);
   const [userStreams, setUserStreams] = useState<Option[]>([]);
+  const [userSearches, setUserSearches] = useState<Option[]>([]);
   const [isLoadingUserEntities, setIsLoadingUserEntities] = useState(false);
 
   const { data: allDashboards, isFetching: isLoadingAllDashboards } = useDashboards({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
   const { data: allStreams, isFetching: isLoadingAllStreams } = useStreams({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
+  const { data: allSearches, isFetching: isLoadingAllSearches } = useSearches({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
   const allDashboardsOptions = (allDashboards?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));
   const allStreamsOptions = (allStreams?.elements ?? []).map(({ id, title }) => ({ value: id, label: title }));
+  const allSearchesOptions = (allSearches?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));
 
   useEffect(() => {
     if (!selectedUserIsAdmin) {
@@ -93,8 +97,13 @@ const useStartPageEntities = (userId, permissions) => {
           ...UNLIMITED_ENTITY_SHARE_REQ,
           additionalQueries: { entity_type: 'stream' },
         }).then(({ list }) => {
-          setIsLoadingUserEntities(false);
           setUserStreams(list.map(_grnOptionFormatter).toArray());
+        })).then(() => EntityShareDomain.loadUserSharesPaginated(userId, {
+          ...UNLIMITED_ENTITY_SHARE_REQ,
+          additionalQueries: { entity_type: 'search' },
+        }).then(({ list }) => {
+          setIsLoadingUserEntities(false);
+          setUserSearches(list.map(_grnOptionFormatter).toArray());
         }));
     }
   }, [selectedUserIsAdmin, userId]);
@@ -102,13 +111,13 @@ const useStartPageEntities = (userId, permissions) => {
   return {
     dashboards: [...userDashboards, ...allDashboardsOptions],
     streams: [...userStreams, ...allStreamsOptions],
-    isLoading: isLoadingUserEntities || isLoadingAllDashboards || isLoadingAllStreams,
+    searches: [{ value: 'default', label: 'Default' }, ...userSearches, ...allSearchesOptions],
+    isLoading: isLoadingUserEntities || isLoadingAllDashboards || isLoadingAllSearches || isLoadingAllStreams,
   };
 };
 
 const StartpageFormGroup = ({ userId, permissions }: Props) => {
-  const { streams, dashboards, isLoading } = useStartPageEntities(userId, permissions);
-  const searches = [{ value: 'default', label: 'Default' }];
+  const { streams, dashboards, searches, isLoading } = useStartPageEntities(userId, permissions);
 
   if (isLoading) {
     return <Spinner />;
