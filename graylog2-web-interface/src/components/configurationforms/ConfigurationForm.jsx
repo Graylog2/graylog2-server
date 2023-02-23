@@ -139,7 +139,7 @@ class ConfigurationForm extends React.Component {
 
     values[field] = value;
 
-    this.setState({ values: values, configFields: { ...configFields, ...{ [field]: { ...configField, ...{ dirty: true } } } } });
+    this.setState({ values: values, configFields: { ...configFields, [field]: { ...configField, ...{ dirty: true } } } });
   };
 
   _renderConfigField = (configField, key, autoFocus) => {
