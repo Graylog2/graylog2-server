@@ -93,6 +93,10 @@ const SavedSearchesList = ({
     }, [updateTableLayout],
   );
 
+  const onPageSizeChange = useCallback((newPageSize: number) => {
+    setActivePage(newPageSize);
+  }, []);
+
   const onSortChange = useCallback((newSort: Sort) => {
     setActivePage(1);
     updateTableLayout({ sort: newSort });
@@ -133,6 +137,7 @@ const SavedSearchesList = ({
                    totalItems={pagination?.total}
                    pageSize={layoutConfig.pageSize}
                    activePage={activePage}
+                   showPageSizeSelect={false}
                    useQueryParameter={false}>
       <div style={{ marginBottom: '5px' }}>
         <SearchForm focusAfterMount
@@ -159,6 +164,8 @@ const SavedSearchesList = ({
                                bulkActions={renderBulkActions}
                                onSortChange={onSortChange}
                                activeSort={layoutConfig.sort}
+                               pageSize={searchParams.pageSize}
+                               onPageSizeChange={onPageSizeChange}
                                rowActions={renderSavedSearchActions}
                                columnRenderers={customColumnRenderers}
                                columnDefinitions={attributes} />
