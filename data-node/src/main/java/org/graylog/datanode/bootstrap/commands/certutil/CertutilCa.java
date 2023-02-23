@@ -37,7 +37,7 @@ public class CertutilCa implements CliCommand {
         this.console = new SystemConsole();
     }
 
-    CertutilCa(String keystoreFilename, CommandLineConsole console) {
+    public CertutilCa(String keystoreFilename, CommandLineConsole console) {
         this.keystoreFilename = keystoreFilename;
         this.console = console;
     }

@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Properties;
-import java.util.function.Consumer;
 
 public class DatanodeContainerizedBackend {
 
@@ -36,28 +35,33 @@ public class DatanodeContainerizedBackend {
     private final GenericContainer<?> mongodbContainer;
     private final GenericContainer<?> datanodeContainer;
 
-
     public DatanodeContainerizedBackend() {
+        this(new DatanodeDockerHooksAdapter());
+    }
+
+
+    public DatanodeContainerizedBackend(DatanodeDockerHooks hooks) {
         this.network = Network.newNetwork();
         this.mongodbContainer = createMongodbContainer();
         this.datanodeContainer = createDatanodeContainer(
                 "node1",
-                createDockerImageFile(getOpensearchVersion()),
+                hooks, createDockerImageFile(getOpensearchVersion()),
                 getDatanodeVersion(),
                 getOpensearchVersion());
     }
 
-    public DatanodeContainerizedBackend(Network network, GenericContainer<?> mongodbContainer, String nodeName) {
+    public DatanodeContainerizedBackend(Network network, GenericContainer<?> mongodbContainer, String nodeName, DatanodeDockerHooks hooks) {
         this.network = network;
         this.mongodbContainer = mongodbContainer;
         this.datanodeContainer = createDatanodeContainer(
                 nodeName,
+                hooks,
                 createDockerImageFile(getOpensearchVersion()),
                 getDatanodeVersion(),
                 getOpensearchVersion());
     }
 
-    private GenericContainer<?> createDatanodeContainer(String nodeName, ImageFromDockerfile image, String datanodeVersion, String opensearchVersion) {
+    private GenericContainer<?> createDatanodeContainer(String nodeName, DatanodeDockerHooks customizer, ImageFromDockerfile image, String datanodeVersion, String opensearchVersion) {
         GenericContainer<?> container = new GenericContainer<>(image)
                 .withExposedPorts(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
                 .withNetwork(network)
@@ -95,6 +99,7 @@ public class DatanodeContainerizedBackend {
                         .withStartupTimeout(Duration.ofSeconds(60)));
         container.withFileSystemBind("target/datanode-" + datanodeVersion + ".jar", IMAGE_WORKING_DIR + "/datanode.jar")
                 .withFileSystemBind("target/lib", IMAGE_WORKING_DIR + "/lib/");
+        customizer.onContainer(container);
         return container;
     }
 

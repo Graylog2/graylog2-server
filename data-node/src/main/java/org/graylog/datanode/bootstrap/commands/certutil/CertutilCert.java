@@ -50,7 +50,7 @@ public class CertutilCert implements CliCommand {
         this.console = new SystemConsole();
     }
 
-    CertutilCert(String caKeystoreFilename, String nodeKeystoreFilename, CommandLineConsole console) {
+    public CertutilCert(String caKeystoreFilename, String nodeKeystoreFilename, CommandLineConsole console) {
         this.caKeystoreFilename = caKeystoreFilename;
         this.nodeKeystoreFilename = nodeKeystoreFilename;
         this.console = console;

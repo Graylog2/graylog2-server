@@ -32,9 +32,15 @@ public class TestableConsole implements CommandLineConsole {
 
     private final List<Pair<String, String>> providedResponses = new LinkedList<>();
     private final List<String> output = new LinkedList<>();
+    private boolean silent = false;
 
     public static TestableConsole empty() {
         return new TestableConsole();
+    }
+
+    public TestableConsole silent() {
+        this.silent = true;
+        return this;
     }
 
     public TestableConsole register(String question, String response) {
@@ -49,14 +55,16 @@ public class TestableConsole implements CommandLineConsole {
     }
 
     @Override
-    public char[] readPassword(String format, Object... args)  {
+    public char[] readPassword(String format, Object... args) {
         final Pair<String, String> response = consumeResponse(format, args);
         return response.getValue().toCharArray();
     }
 
     @Override
     public void printLine(String line) {
-        LOG.info(line);
+        if (!silent) {
+            LOG.info(line);
+        }
         this.output.add(line);
     }
 
@@ -64,7 +72,7 @@ public class TestableConsole implements CommandLineConsole {
         return output;
     }
 
-    private Pair<String, String> consumeResponse(String format, Object[] args)  {
+    private Pair<String, String> consumeResponse(String format, Object[] args) {
         final String question = cleanQuestion(String.format(Locale.ROOT, format, args));
         final Pair<String, String> response = providedResponses.stream().filter(r -> r.getKey().equals(question)).findFirst()
                 .orElseThrow(() -> new ConsoleException("Unexpected input question:" + question));

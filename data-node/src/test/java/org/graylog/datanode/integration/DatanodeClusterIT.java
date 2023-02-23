@@ -25,6 +25,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
 import org.apache.http.NoHttpResponseException;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
+import org.graylog.datanode.testinfra.DatanodeDockerHooksAdapter;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +51,8 @@ public class DatanodeClusterIT {
         secondaryNode = new DatanodeContainerizedBackend(
                 primaryNode.getNetwork(),
                 primaryNode.getMongodbContainer(),
-                "node2"
+                "node2",
+                new DatanodeDockerHooksAdapter()
         );
         secondaryNode.start();
     }

@@ -62,7 +62,7 @@ public class CertutilHttp implements CliCommand {
         this.console = new SystemConsole();
     }
 
-    CertutilHttp(String caKeystoreFilename, String nodeKeystoreFilename, CommandLineConsole console) {
+    public CertutilHttp(String caKeystoreFilename, String nodeKeystoreFilename, CommandLineConsole console) {
         this.caKeystoreFilename = caKeystoreFilename;
         this.nodeKeystoreFilename = nodeKeystoreFilename;
         this.console = console;
