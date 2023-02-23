@@ -35,11 +35,10 @@ import useEventDefinitions from '../hooks/useEventDefinitions';
 
 const CUSTOM_COLUMN_DEFINITIONS = [
   { id: 'scheduling', title: 'Scheduling', sortable: false },
-  { id: 'status', title: 'Status', sortable: true },
 ];
 
 const INITIAL_COLUMNS = ['title', 'description', 'priority', 'scheduling', 'status'];
-const COLUMNS_ORDER = ['title', 'description', 'priority', 'status', 'scheduling', 'created_at'];
+const COLUMNS_ORDER = ['title', 'description', 'priority', 'status', 'scheduling'];
 const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
   title: {
     renderCell: (eventDefinition) => (
@@ -126,7 +125,7 @@ const EventDefinitionsContainer = () => {
       <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
                     onReset={onReset}
-                    queryHelpComponent={<QueryHelper entityName="stream" />} />
+                    queryHelpComponent={<QueryHelper entityName="event definition" />} />
       </div>
       <div>
         {elements?.length === 0 ? (

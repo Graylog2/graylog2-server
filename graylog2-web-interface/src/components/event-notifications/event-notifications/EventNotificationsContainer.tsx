@@ -125,7 +125,7 @@ const EventNotificationsContainer = () => {
       <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
                     onReset={onReset}
-                    queryHelpComponent={<QueryHelper entityName="stream" />} />
+                    queryHelpComponent={<QueryHelper entityName="notification" />} />
       </div>
       <div>
         {elements?.length === 0 ? (
