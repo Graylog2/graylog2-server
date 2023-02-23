@@ -112,7 +112,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             EntityAttribute.builder().id("title").title("Title").build(),
             EntityAttribute.builder().id("description").title("Description").build(),
             EntityAttribute.builder().id("priority").title("Priority").type(SearchQueryField.Type.INT).build(),
-            EntityAttribute.builder().id("alert").title("Alert").type(SearchQueryField.Type.BOOLEAN).filterable(true).filterOptions(Set.of(
+            EntityAttribute.builder().id("status").title("Status").type(SearchQueryField.Type.BOOLEAN).filterable(true).filterOptions(Set.of(
                     FilterOption.create("true", "enabled"),
                     FilterOption.create("false", "disabled")
             )).build()
@@ -163,7 +163,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                                         @ApiParam(name = "sort",
                                                                   value = "The field to sort the result on",
                                                                   required = true,
-                                                                  allowableValues = "title,description,priority,alert")
+                                                                  allowableValues = "title,description,priority,status")
                                                         @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
                                                         @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                         @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order) {
@@ -173,6 +173,9 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             searchQuery = searchQueryParser.parse(query);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
+        }
+        if ("status".equals(sort)) {
+            sort = "alert";
         }
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(searchQuery, event -> {
             return isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
