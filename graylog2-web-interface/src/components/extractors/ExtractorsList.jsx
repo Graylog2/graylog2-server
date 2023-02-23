@@ -94,7 +94,8 @@ const ExtractorsList = ({ input, node }) => {
       </Row>
       <ExtractorsSortModal ref={(modal) => { sortModal.current = modal; }}
                            input={input}
-                           extractors={extractors} />
+                           extractors={extractors}
+                           onSort={() => fetchExtractors(input.id, setExtractors)} />
     </div>
   );
 };

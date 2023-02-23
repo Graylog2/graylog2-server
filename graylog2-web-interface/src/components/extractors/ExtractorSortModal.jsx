@@ -26,6 +26,7 @@ class ExtractorSortModal extends React.Component {
   static propTypes = {
     input: PropTypes.object.isRequired,
     extractors: PropTypes.array.isRequired,
+    onSort: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -72,6 +73,7 @@ class ExtractorSortModal extends React.Component {
 
     await ExtractorsActions.order.triggerPromise(input.id, sortedExtractors);
 
+    this.props.onSort();
     this.close();
   };
 
