@@ -60,7 +60,7 @@ jobs:
               "version": "1.1",
               "host": "developermetrics",
               "job": "fix-linter-hints",
-              "short_message": "Found ${PROBLEM_COUNT} JS and ${PROBLEM_COUNT_CSS} CSS problems in commit ${CURRENT_REF}",
+              "short_message": "Found ${PROBLEM_COUNT} ESLint and ${PROBLEM_COUNT_CSS} Stylelint problems in commit ${CURRENT_REF}",
               "_problems": ${PROBLEM_COUNT},
               "_problems_css": ${PROBLEM_COUNT_CSS},
               "_current_ref": "${CURRENT_REF}",
