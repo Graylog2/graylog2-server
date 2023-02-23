@@ -64,7 +64,9 @@ const TextField = ({ field, title, typeName, dirty, onChange, value, autoFocus }
   };
 
   const buttonAfter = () => {
-    if (!showReadOnlyEncrypted) return null;
+    if (!showReadOnlyEncrypted) {
+      return null;
+    }
 
     return (
       <Button type="button" onClick={() => onChange(title, { delete_value: true })}>
