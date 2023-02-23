@@ -22,9 +22,11 @@ import readJsonFixture from 'helpers/readJsonFixture';
 
 import EntityShareState from './EntityShareState';
 
+const readFixture = (fixtureName: string) => readJsonFixture(__dirname, fixtureName);
+
 describe('EntityShareState', () => {
   it('should import from json', () => {
-    const entityShareState = EntityShareState.fromJSON(readJsonFixture(__dirname, 'EntityShareState.fixtures.json'));
+    const entityShareState = EntityShareState.fromJSON(readFixture('EntityShareState.fixtures.json'));
 
     expect(entityShareState.availableGrantees.size).not.toBe(undefined);
     expect(entityShareState.availableCapabilities.size).not.toBe(undefined);
@@ -37,7 +39,7 @@ describe('EntityShareState', () => {
 
   describe('order of selected grantees', () => {
     it('should order imported grantees', () => {
-      const { selectedGrantees } = EntityShareState.fromJSON(readJsonFixture(__dirname, 'EntityShareState.fixtures.json'));
+      const { selectedGrantees } = EntityShareState.fromJSON(readFixture('EntityShareState.fixtures.json'));
       const [securityImport, janeImport] = selectedGrantees.toArray();
 
       expect(securityImport.title).toBe('Security Folks');

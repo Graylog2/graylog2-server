@@ -59,14 +59,16 @@ const targetDashboard = View.builder()
   .requires({})
   .build();
 
+const readFixture = (fixtureName: string) => readJsonFixture(__dirname, fixtureName);
+
 describe('copyPageToDashboard', () => {
   beforeEach(() => {
     Parameter.registerSubtype(ValueParameter.type, ValueParameter);
   });
 
   it('should copy a page to a dashboard', () => {
-    const dashboardViewFixture = View.fromJSON(readJsonFixture(__dirname, './CopyPageToDashboard.Dashboard-View.fixture.json'));
-    const dashboardSearchFixture = Search.fromJSON(readJsonFixture(__dirname, './CopyPageToDashboard.Dashboard-Search.fixture.json'));
+    const dashboardViewFixture = View.fromJSON(readFixture('./CopyPageToDashboard.Dashboard-View.fixture.json'));
+    const dashboardSearchFixture = Search.fromJSON(readFixture('./CopyPageToDashboard.Dashboard-Search.fixture.json'));
     const sourceDashboard = dashboardViewFixture.toBuilder()
       .search(dashboardSearchFixture)
       .build();

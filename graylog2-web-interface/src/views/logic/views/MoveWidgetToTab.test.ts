@@ -50,8 +50,9 @@ jest.mock('views/logic/Widgets', () => ({
   })),
 }));
 
-const dashboardFixture = View.fromJSON(readJsonFixture(__dirname, './MoveWidgetToTab.Dashboard.fixture.json'));
-const searchFixture = Search.fromJSON(readJsonFixture(__dirname, './MoveWidgetToTab.Search.fixture.json'));
+const readFixture = (fixtureName: string) => readJsonFixture(__dirname, fixtureName);
+const dashboardFixture = View.fromJSON(readFixture('./MoveWidgetToTab.Dashboard.fixture.json'));
+const searchFixture = Search.fromJSON(readFixture('./MoveWidgetToTab.Search.fixture.json'));
 const dashboard = dashboardFixture.toBuilder()
   .search(searchFixture)
   .build();

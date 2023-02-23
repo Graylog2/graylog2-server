@@ -42,8 +42,9 @@ jest.mock('../SearchType', () => jest.fn(() => ({
 })));
 
 const searchView = () => {
-  const viewFixture = View.fromJSON(readJsonFixture(__dirname, './UpdateSearchForWidgets.View.fixture.json'));
-  const searchFixture = Search.fromJSON(readJsonFixture(__dirname, './UpdateSearchForWidgets.Search.fixture.json'));
+  const readFixture = (fixtureName: string) => readJsonFixture(__dirname, fixtureName);
+  const viewFixture = View.fromJSON(readFixture('./UpdateSearchForWidgets.View.fixture.json'));
+  const searchFixture = Search.fromJSON(readFixture('./UpdateSearchForWidgets.Search.fixture.json'));
 
   return viewFixture.toBuilder()
     .search(searchFixture)

@@ -34,6 +34,8 @@ jest.mock('stores/decorators/DecoratorsStore', () => ({
   },
 }));
 
+const readFixture = (fixtureName: string) => readJsonFixture(__dirname, fixtureName);
+
 describe('ViewTransformer', () => {
   describe('transform with missing attributes', () => {
     it('should change the type', () => {
@@ -182,8 +184,8 @@ describe('ViewTransformer', () => {
 
   describe('transform with all attributes', () => {
     it('should transform a view with search from a json fixture', () => {
-      const viewFixture = View.fromJSON(readJsonFixture(__dirname, './ViewTransformer.view.fixture.json'));
-      const searchFixture = Search.fromJSON(readJsonFixture(__dirname, './ViewTransformer.search.fixture.json'));
+      const viewFixture = View.fromJSON(readFixture('./ViewTransformer.view.fixture.json'));
+      const searchFixture = Search.fromJSON(readFixture('./ViewTransformer.search.fixture.json'));
       const searchView = viewFixture.toBuilder()
         .search(searchFixture)
         .build();

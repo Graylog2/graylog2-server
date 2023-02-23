@@ -39,14 +39,16 @@ jest.mock('../SearchType', () => jest.fn(() => ({
   defaults: {},
 })));
 
+const readFixture = (fixtureName: string) => readJsonFixture(__dirname, fixtureName);
+
 describe('copyWidgetToDashboard', () => {
   beforeEach(() => {
     Parameter.registerSubtype(ValueParameter.type, ValueParameter);
   });
 
   const generateSearchView = () => {
-    const searchViewFixture = View.fromJSON(readJsonFixture(__dirname, './CopyWidgetToDashboard.Search-View.fixture.json'));
-    const searchSearchFixture = Search.fromJSON(readJsonFixture(__dirname, './CopyWidgetToDashboard.Search-Search.fixture.json'));
+    const searchViewFixture = View.fromJSON(readFixture('./CopyWidgetToDashboard.Search-View.fixture.json'));
+    const searchSearchFixture = Search.fromJSON(readFixture('./CopyWidgetToDashboard.Search-Search.fixture.json'));
 
     return searchViewFixture.toBuilder()
       .search(searchSearchFixture)
@@ -55,8 +57,8 @@ describe('copyWidgetToDashboard', () => {
 
   it('should copy a widget to a dashboard', () => {
     const searchView = generateSearchView();
-    const dashboardViewFixture = View.fromJSON(readJsonFixture(__dirname, './CopyWidgetToDashboard.Dashboard-View.fixture.json'));
-    const dashboardSearchFixture = Search.fromJSON(readJsonFixture(__dirname, './CopyWidgetToDashboard.Dashboard-Search.fixture.json'));
+    const dashboardViewFixture = View.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-View.fixture.json'));
+    const dashboardSearchFixture = Search.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-Search.fixture.json'));
     const dashboardView = dashboardViewFixture.toBuilder()
       .search(dashboardSearchFixture)
       .build();
@@ -72,8 +74,8 @@ describe('copyWidgetToDashboard', () => {
     // The fixtures view state queries order is different than the search queries order.
     // This test ensures that we are still determining the first dashboard page (query) correctly.
     const searchView = generateSearchView();
-    const dashboardViewFixture = View.fromJSON(readJsonFixture(__dirname, './CopyWidgetToDashboard.Dashboard-View-Multiple-Queries.fixture.json'));
-    const dashboardSearchFixture = Search.fromJSON(readJsonFixture(__dirname, './CopyWidgetToDashboard.Dashboard-Search-Multiple-Queries.fixture.json'));
+    const dashboardViewFixture = View.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-View-Multiple-Queries.fixture.json'));
+    const dashboardSearchFixture = Search.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-Search-Multiple-Queries.fixture.json'));
     const dashboardView = dashboardViewFixture.toBuilder()
       .search(dashboardSearchFixture)
       .build();

@@ -25,6 +25,7 @@ import { chartData, extractSeries, formatSeries, generateChart } from '../ChartD
 import transformKeys from '../TransformKeys';
 
 const formatTime = (timestamp: string) => timestamp;
+const readFixture = (fixtureName: string) => readJsonFixture(__dirname, fixtureName);
 
 describe('Chart helper functions', () => {
   const config = AggregationWidgetConfig.builder().build();
@@ -37,7 +38,7 @@ describe('Chart helper functions', () => {
     });
 
     it('should properly extract series from simplest fixture with one series and one row pivot', () => {
-      const input = readJsonFixture(__dirname, 'ChartData.test.simplest.json');
+      const input = readFixture('ChartData.test.simplest.json');
       const result = chartData(input, { widgetConfig: config, chartType: 'dummy', formatTime });
       const expectedResult = [{
         name: 'count()',
@@ -51,7 +52,7 @@ describe('Chart helper functions', () => {
     });
 
     it('should properly extract series from simplest fixture and include provided chart type', () => {
-      const input = readJsonFixture(__dirname, 'ChartData.test.simplest.json');
+      const input = readFixture('ChartData.test.simplest.json');
       const result = chartData(input, { widgetConfig: config, chartType: 'bar', formatTime });
       const expectedResult = [{
         name: 'count()',
@@ -65,7 +66,7 @@ describe('Chart helper functions', () => {
     });
 
     it('should remove non-present data points and leave order of values intact', () => {
-      const input = readJsonFixture(__dirname, 'ChartData.test.withHoles.json');
+      const input = readFixture('ChartData.test.withHoles.json');
       const result = chartData(input, { widgetConfig: config, chartType: 'bar', formatTime });
       const expectedResult = [{
         name: 'count()',
@@ -96,7 +97,7 @@ describe('Chart helper functions', () => {
     });
 
     it('should not remove data points with a value of zero', () => {
-      const input = readJsonFixture(__dirname, 'ChartData.test.withZeros.json');
+      const input = readFixture('ChartData.test.withZeros.json');
       const result = chartData(input, { widgetConfig: config, chartType: 'bar', formatTime });
       const expectedResult = [{
         name: 'count()',
@@ -116,7 +117,7 @@ describe('Chart helper functions', () => {
     });
 
     it('should remove data points with a value of null or undefined', () => {
-      const input = readJsonFixture(__dirname, 'ChartData.test.withNullAndUndefined.json');
+      const input = readFixture('ChartData.test.withNullAndUndefined.json');
       const result = chartData(input, { widgetConfig: config, chartType: 'bar', formatTime });
       const expectedResult = [{
         name: 'count()',
@@ -133,25 +134,25 @@ describe('Chart helper functions', () => {
     });
 
     it('should properly extract series from fixture with two column pivots', () => {
-      const input = readJsonFixture(__dirname, 'ChartData.test.twoColumnPivots.json');
+      const input = readFixture('ChartData.test.twoColumnPivots.json');
       const result = chartData(input, { widgetConfig: config, chartType: 'dummy', formatTime });
-      const expectedResult = readJsonFixture(__dirname, 'ChartData.test.twoColumnPivots.result.json');
+      const expectedResult = readFixture('ChartData.test.twoColumnPivots.result.json');
 
       expect(result).toHaveLength(6);
       expect(result).toEqual(expectedResult);
     });
 
     it('should include chart type in result', () => {
-      const input = readJsonFixture(__dirname, 'ChartData.test.simple.json');
+      const input = readFixture('ChartData.test.simple.json');
       const result = chartData(input, { widgetConfig: config, chartType: 'scatter', formatTime });
-      const expectedResult = readJsonFixture(__dirname, 'ChartData.test.simple.result.json');
+      const expectedResult = readFixture('ChartData.test.simple.result.json');
 
       expect(result).toHaveLength(6);
       expect(result).toEqual(expectedResult);
     });
 
     it('should allow passing a format series function to modify the series structure', () => {
-      const input = readJsonFixture(__dirname, 'ChartData.test.oneColumOneRowPivot.json');
+      const input = readFixture('ChartData.test.oneColumOneRowPivot.json');
       const generatorFunction: Generator = (type, name, x, y, z) => ({ type, name, x, y, z });
 
       const formatSeriesCustom = ({
@@ -181,14 +182,14 @@ describe('Chart helper functions', () => {
         seriesFormatter: formatSeriesCustom,
         formatTime,
       });
-      const expectedResult = readJsonFixture(__dirname, 'ChartData.test.oneColumOneRowPivot.result.json');
+      const expectedResult = readFixture('ChartData.test.oneColumOneRowPivot.result.json');
 
       expect(result).toHaveLength(1);
       expect(result).toEqual(expectedResult);
     });
 
     it('should allow passing a leaf source matcher function to modify the resulting series', () => {
-      const input = readJsonFixture(__dirname, 'ChartData.test.simple.json');
+      const input = readFixture('ChartData.test.simple.json');
       const leafSourceMatcher = ({ source }) => source.endsWith('leaf') && source !== 'row-leaf';
       const result = chartData(input, {
         widgetConfig: config,
@@ -196,7 +197,7 @@ describe('Chart helper functions', () => {
         leafValueMatcher: leafSourceMatcher,
         formatTime,
       });
-      const expectedResult = readJsonFixture(__dirname, 'ChartData.test.simple.sourceMatcher.result.json');
+      const expectedResult = readFixture('ChartData.test.simple.sourceMatcher.result.json');
 
       expect(result).toHaveLength(4);
       expect(result).toEqual(expectedResult);
@@ -205,7 +206,7 @@ describe('Chart helper functions', () => {
 
   describe('generateChart', () => {
     it('should allow passing a generator function modelling the chart config', () => {
-      const input = readJsonFixture(__dirname, 'ChartData.test.simple.json');
+      const input = readFixture('ChartData.test.simple.json');
       const generatorFunction: Generator = (type, name, labels, values) => ({
         type: 'md5',
         name: md5(JSON.stringify({ type, name, labels, values })),
