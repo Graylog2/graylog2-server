@@ -14,13 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { readFileSync } from 'fs';
-import { dirname } from 'path';
+import readJsonFixture from 'helpers/readJsonFixture';
 
 import expandRows from './ExpandRows';
 
-const cwd = dirname(__filename);
-const readFixture = (filename) => JSON.parse(readFileSync(`${cwd}/${filename}`).toString('utf8'));
+const readFixture = (fixtureName: string) => readJsonFixture(__dirname, fixtureName);
 
 describe('ExpandRows', () => {
   it('normalizes empty array', () => {
