@@ -163,7 +163,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                                         @ApiParam(name = "sort",
                                                                   value = "The field to sort the result on",
                                                                   required = true,
-                                                                  allowableValues = "title,description,alert")
+                                                                  allowableValues = "title,description,priority,alert")
                                                         @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
                                                         @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                         @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order) {

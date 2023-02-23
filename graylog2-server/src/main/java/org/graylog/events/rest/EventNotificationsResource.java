@@ -137,14 +137,17 @@ public class EventNotificationsResource extends RestResource implements PluginRe
                                                      @ApiParam(name = "sort",
                                                                value = "The field to sort the result on",
                                                                required = true,
-                                                               allowableValues = "title,description")
+                                                               allowableValues = "title,description,type")
                                                      @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
                                                      @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                      @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
+        if ("type".equals(sort)) {
+            sort = "config.type";
+        }
         final PaginatedList<NotificationDto> result = dbNotificationService.searchPaginated(searchQuery, notification -> {
             return isPermitted(RestPermissions.EVENT_NOTIFICATIONS_READ, notification.id());
-        }, "title", page, perPage);
+        }, sort, order, page, perPage);
 
 
         return PageListResponse.create(query, result.pagination(),
@@ -160,7 +163,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         final PaginatedList<NotificationDto> result = dbNotificationService.searchPaginated(searchQuery, notification -> {
             return isPermitted(RestPermissions.EVENT_NOTIFICATIONS_READ, notification.id());
-        }, "title", page, perPage);
+        }, "title", "asc", page, perPage);
         return PaginatedResponse.create("notifications", result, query);
     }
 
