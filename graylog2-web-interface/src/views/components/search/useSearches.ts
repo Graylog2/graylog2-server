@@ -62,7 +62,7 @@ const useSearches = (searchParams: SearchParams, { enabled }: Options = { enable
   isFetching: boolean,
 } => {
   const { data, refetch, isFetching } = useQuery(
-    ['dashboards', 'overview', searchParams],
+    ['searches', 'overview', searchParams],
     () => fetchSearches(searchParams),
     {
       onError: (errorThrown) => {

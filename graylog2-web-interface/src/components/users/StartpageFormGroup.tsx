@@ -111,7 +111,7 @@ const useStartPageEntities = (userId, permissions) => {
   return {
     dashboards: [...userDashboards, ...allDashboardsOptions],
     streams: [...userStreams, ...allStreamsOptions],
-    searches: [{ value: 'default', label: 'Default' }, ...userSearches, ...allSearchesOptions],
+    searches: [{ value: 'default', label: 'New Search' }, ...userSearches, ...allSearchesOptions],
     isLoading: isLoadingUserEntities || isLoadingAllDashboards || isLoadingAllSearches || isLoadingAllStreams,
   };
 };
