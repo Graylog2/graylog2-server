@@ -31,7 +31,7 @@ jest.mock('util/UserNotification', () => ({
   success: jest.fn(),
 }));
 
-describe('DashboardsOverview BulkActions', () => {
+describe('DashboardsOverview BulkActionsRow', () => {
   const deleteDashboards = async () => {
     userEvent.click(await screen.findByRole('button', { name: /delete/i }));
   };
