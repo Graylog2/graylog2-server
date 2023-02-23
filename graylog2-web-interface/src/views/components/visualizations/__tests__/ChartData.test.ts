@@ -14,20 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { readFileSync } from 'fs';
-import { dirname } from 'path';
-
 import md5 from 'md5';
 import { flow, merge, fill } from 'lodash';
 
+import readJsonFixture from 'helpers/readJsonFixture';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import type { ExtractedSeries, ValuesBySeries, Generator } from '../ChartData';
 import { chartData, extractSeries, formatSeries, generateChart } from '../ChartData';
 import transformKeys from '../TransformKeys';
 
-const cwd = dirname(__filename);
-const readFixture = (filename: string) => JSON.parse(readFileSync(`${cwd}/${filename}`, 'utf-8'));
 const formatTime = (timestamp: string) => timestamp;
 
 describe('Chart helper functions', () => {
@@ -41,7 +37,7 @@ describe('Chart helper functions', () => {
     });
 
     it('should properly extract series from simplest fixture with one series and one row pivot', () => {
-      const input = readFixture('ChartData.test.simplest.json');
+      const input = readJsonFixture(__dirname, 'ChartData.test.simplest.json');
       const result = chartData(input, { widgetConfig: config, chartType: 'dummy', formatTime });
       const expectedResult = [{
         name: 'count()',
@@ -55,7 +51,7 @@ describe('Chart helper functions', () => {
     });
 
     it('should properly extract series from simplest fixture and include provided chart type', () => {
-      const input = readFixture('ChartData.test.simplest.json');
+      const input = readJsonFixture(__dirname, 'ChartData.test.simplest.json');
       const result = chartData(input, { widgetConfig: config, chartType: 'bar', formatTime });
       const expectedResult = [{
         name: 'count()',
@@ -69,7 +65,7 @@ describe('Chart helper functions', () => {
     });
 
     it('should remove non-present data points and leave order of values intact', () => {
-      const input = readFixture('ChartData.test.withHoles.json');
+      const input = readJsonFixture(__dirname, 'ChartData.test.withHoles.json');
       const result = chartData(input, { widgetConfig: config, chartType: 'bar', formatTime });
       const expectedResult = [{
         name: 'count()',
@@ -100,7 +96,7 @@ describe('Chart helper functions', () => {
     });
 
     it('should not remove data points with a value of zero', () => {
-      const input = readFixture('ChartData.test.withZeros.json');
+      const input = readJsonFixture(__dirname, 'ChartData.test.withZeros.json');
       const result = chartData(input, { widgetConfig: config, chartType: 'bar', formatTime });
       const expectedResult = [{
         name: 'count()',
@@ -120,7 +116,7 @@ describe('Chart helper functions', () => {
     });
 
     it('should remove data points with a value of null or undefined', () => {
-      const input = readFixture('ChartData.test.withNullAndUndefined.json');
+      const input = readJsonFixture(__dirname, 'ChartData.test.withNullAndUndefined.json');
       const result = chartData(input, { widgetConfig: config, chartType: 'bar', formatTime });
       const expectedResult = [{
         name: 'count()',
@@ -137,25 +133,25 @@ describe('Chart helper functions', () => {
     });
 
     it('should properly extract series from fixture with two column pivots', () => {
-      const input = readFixture('ChartData.test.twoColumnPivots.json');
+      const input = readJsonFixture(__dirname, 'ChartData.test.twoColumnPivots.json');
       const result = chartData(input, { widgetConfig: config, chartType: 'dummy', formatTime });
-      const expectedResult = readFixture('ChartData.test.twoColumnPivots.result.json');
+      const expectedResult = readJsonFixture(__dirname, 'ChartData.test.twoColumnPivots.result.json');
 
       expect(result).toHaveLength(6);
       expect(result).toEqual(expectedResult);
     });
 
     it('should include chart type in result', () => {
-      const input = readFixture('ChartData.test.simple.json');
+      const input = readJsonFixture(__dirname, 'ChartData.test.simple.json');
       const result = chartData(input, { widgetConfig: config, chartType: 'scatter', formatTime });
-      const expectedResult = readFixture('ChartData.test.simple.result.json');
+      const expectedResult = readJsonFixture(__dirname, 'ChartData.test.simple.result.json');
 
       expect(result).toHaveLength(6);
       expect(result).toEqual(expectedResult);
     });
 
     it('should allow passing a format series function to modify the series structure', () => {
-      const input = readFixture('ChartData.test.oneColumOneRowPivot.json');
+      const input = readJsonFixture(__dirname, 'ChartData.test.oneColumOneRowPivot.json');
       const generatorFunction: Generator = (type, name, x, y, z) => ({ type, name, x, y, z });
 
       const formatSeriesCustom = ({
@@ -185,14 +181,14 @@ describe('Chart helper functions', () => {
         seriesFormatter: formatSeriesCustom,
         formatTime,
       });
-      const expectedResult = readFixture('ChartData.test.oneColumOneRowPivot.result.json');
+      const expectedResult = readJsonFixture(__dirname, 'ChartData.test.oneColumOneRowPivot.result.json');
 
       expect(result).toHaveLength(1);
       expect(result).toEqual(expectedResult);
     });
 
     it('should allow passing a leaf source matcher function to modify the resulting series', () => {
-      const input = readFixture('ChartData.test.simple.json');
+      const input = readJsonFixture(__dirname, 'ChartData.test.simple.json');
       const leafSourceMatcher = ({ source }) => source.endsWith('leaf') && source !== 'row-leaf';
       const result = chartData(input, {
         widgetConfig: config,
@@ -200,7 +196,7 @@ describe('Chart helper functions', () => {
         leafValueMatcher: leafSourceMatcher,
         formatTime,
       });
-      const expectedResult = readFixture('ChartData.test.simple.sourceMatcher.result.json');
+      const expectedResult = readJsonFixture(__dirname, 'ChartData.test.simple.sourceMatcher.result.json');
 
       expect(result).toHaveLength(4);
       expect(result).toEqual(expectedResult);
@@ -209,7 +205,7 @@ describe('Chart helper functions', () => {
 
   describe('generateChart', () => {
     it('should allow passing a generator function modelling the chart config', () => {
-      const input = readFixture('ChartData.test.simple.json');
+      const input = readJsonFixture(__dirname, 'ChartData.test.simple.json');
       const generatorFunction: Generator = (type, name, labels, values) => ({
         type: 'md5',
         name: md5(JSON.stringify({ type, name, labels, values })),

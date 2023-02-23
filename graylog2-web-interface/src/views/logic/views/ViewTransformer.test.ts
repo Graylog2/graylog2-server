@@ -14,13 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { readFileSync } from 'fs';
-import { dirname } from 'path';
-
 import { List, Map } from 'immutable';
 
 import Search from 'views/logic/search/Search';
 import Query from 'views/logic/queries/Query';
+import readJsonFixture from 'helpers/readJsonFixture';
 
 import type { ViewStateMap } from './View';
 import View from './View';
@@ -35,10 +33,6 @@ jest.mock('stores/decorators/DecoratorsStore', () => ({
     list: () => mockList(),
   },
 }));
-
-const cwd = dirname(__filename);
-
-const readFixture = (filename) => JSON.parse(readFileSync(`${cwd}/${filename}`).toString());
 
 describe('ViewTransformer', () => {
   describe('transform with missing attributes', () => {
@@ -188,8 +182,8 @@ describe('ViewTransformer', () => {
 
   describe('transform with all attributes', () => {
     it('should transform a view with search from a json fixture', () => {
-      const viewFixture = View.fromJSON(readFixture('./ViewTransformer.view.fixture.json'));
-      const searchFixture = Search.fromJSON(readFixture('./ViewTransformer.search.fixture.json'));
+      const viewFixture = View.fromJSON(readJsonFixture(__dirname, './ViewTransformer.view.fixture.json'));
+      const searchFixture = Search.fromJSON(readJsonFixture(__dirname, './ViewTransformer.search.fixture.json'));
       const searchView = viewFixture.toBuilder()
         .search(searchFixture)
         .build();

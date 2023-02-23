@@ -15,17 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { readFileSync } from 'fs';
-import { dirname } from 'path';
 
 /**
  * This simple helper function allows reading a fixture file to be able to use its content in a test.
  *
- * @param {testFilePath} - path to the test file which executes `readJsonFixture`. Usually its value is `__filename`.
+ * @param {fixtureDir} - path of the fixture directory.
+ * Usually its value is `__dirname`, because the fixture is in the same directory as the test.
  *
- * @param {fixturePath} - path to the fixture. The fixture needs to be part of the same directory as the test.
+ * @param {fixturePath} - name of the fixture file.
  */
-const readJsonFixture = (testFilePath: string, fixturePath: string) => (
-  JSON.parse(readFileSync(`${dirname(testFilePath)}/${fixturePath}`).toString('utf8'))
+const readJsonFixture = (fixtureDir: string, fixtureName: string) => (
+  JSON.parse(readFileSync(`${fixtureDir}/${fixtureName}`).toString('utf8'))
 );
 
 export default readJsonFixture;

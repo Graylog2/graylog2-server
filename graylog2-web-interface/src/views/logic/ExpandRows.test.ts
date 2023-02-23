@@ -14,13 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { readFileSync } from 'fs';
-import { dirname } from 'path';
+import readJsonFixture from 'helpers/readJsonFixture';
 
 import expandRows from './ExpandRows';
-
-const cwd = dirname(__filename);
-const readFixture = (filename) => JSON.parse(readFileSync(`${cwd}/${filename}`).toString('utf8'));
 
 describe('ExpandRows', () => {
   it('normalizes empty array', () => {
@@ -40,7 +36,7 @@ describe('ExpandRows', () => {
   });
 
   it('properly expands a simple result from a pivot search type', () => {
-    const pivotResult = readFixture('ExpandRows.test.simple.json');
+    const pivotResult = readJsonFixture(__dirname, 'ExpandRows.test.simple.json');
     const result = expandRows(['timestamp', 'controller'], ['action'], pivotResult);
 
     expect(result).toHaveLength(2);
@@ -70,25 +66,25 @@ describe('ExpandRows', () => {
   });
 
   it('properly expands a given result from a pivot search type', () => {
-    const pivotResult = readFixture('ExpandRows.test.fixture1.json');
+    const pivotResult = readJsonFixture(__dirname, 'ExpandRows.test.fixture1.json');
     const result = expandRows(['timestamp', 'controller'], ['action'], pivotResult);
-    const expectedResult = readFixture('ExpandRows.test.fixture1.result.json');
+    const expectedResult = readJsonFixture(__dirname, 'ExpandRows.test.fixture1.result.json');
 
     expect(result).toHaveLength(25);
     expect(result).toEqual(expectedResult);
   });
 
   it('properly expands a result with two column pivots', () => {
-    const pivotResult = readFixture('ExpandRows.test.twoColumnPivots.json');
+    const pivotResult = readJsonFixture(__dirname, 'ExpandRows.test.twoColumnPivots.json');
     const result = expandRows(['timestamp'], ['action', 'controller'], pivotResult);
-    const expectedResult = readFixture('ExpandRows.test.twoColumnPivots.result.json');
+    const expectedResult = readJsonFixture(__dirname, 'ExpandRows.test.twoColumnPivots.result.json');
 
     expect(result).toHaveLength(7);
     expect(result).toEqual(expectedResult);
   });
 
   it('properly expands a result with no pivots but series', () => {
-    const pivotResult = readFixture('ExpandRows.test.noPivots.json');
+    const pivotResult = readJsonFixture(__dirname, 'ExpandRows.test.noPivots.json');
     const result = expandRows([], [], pivotResult);
 
     expect(result).toHaveLength(1);

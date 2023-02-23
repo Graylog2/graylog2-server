@@ -14,13 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { readFileSync } from 'fs';
-import { dirname } from 'path';
-
 import * as Immutable from 'immutable';
 
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
+import readJsonFixture from 'helpers/readJsonFixture';
 
 import copyPageToDashboard from './CopyPageToDashboard';
 
@@ -47,9 +45,6 @@ jest.mock('../SearchType', () => jest.fn(() => ({
   defaults: {},
 })));
 
-const cwd = dirname(__filename);
-const readFixture = (filename) => JSON.parse(readFileSync(`${cwd}/${filename}`).toString());
-
 const targetDashboard = View.builder()
   .id('foo')
   .type(View.Type.Dashboard)
@@ -70,8 +65,8 @@ describe('copyPageToDashboard', () => {
   });
 
   it('should copy a page to a dashboard', () => {
-    const dashboardViewFixture = View.fromJSON(readFixture('./CopyPageToDashboard.Dashboard-View.fixture.json'));
-    const dashboardSearchFixture = Search.fromJSON(readFixture('./CopyPageToDashboard.Dashboard-Search.fixture.json'));
+    const dashboardViewFixture = View.fromJSON(readJsonFixture(__dirname, './CopyPageToDashboard.Dashboard-View.fixture.json'));
+    const dashboardSearchFixture = Search.fromJSON(readJsonFixture(__dirname, './CopyPageToDashboard.Dashboard-Search.fixture.json'));
     const sourceDashboard = dashboardViewFixture.toBuilder()
       .search(dashboardSearchFixture)
       .build();
