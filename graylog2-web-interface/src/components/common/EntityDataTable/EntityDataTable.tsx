@@ -20,7 +20,7 @@ import { useMemo, useState, useCallback, useRef } from 'react';
 import type * as Immutable from 'immutable';
 import { merge } from 'lodash';
 
-import { Button, Table, ButtonToolbar } from 'components/bootstrap';
+import { Button, Table, ButtonGroup, ButtonToolbar } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import StringUtils from 'util/StringUtils';
@@ -30,6 +30,7 @@ import { CELL_PADDING, BULK_SELECT_COLUMN_WIDTH } from 'components/common/Entity
 import useColumnsWidths from 'components/common/EntityDataTable/hooks/useColumnsWidths';
 import useElementDimensions from 'hooks/useElementDimensions';
 import type { Sort } from 'stores/PaginationTypes';
+import { PageSizeSelect } from 'components/common';
 
 import TableHead from './TableHead';
 import TableRow from './TableRow';
@@ -64,10 +65,20 @@ const BulkActions = styled(ButtonToolbar)`
   margin-left: 5px;
 `;
 
+const LayoutConfigRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+`;
+
 const filterAccessibleColumns = (
   columns: Array<Column>,
   userPermissions: Immutable.List<string>,
-) => columns.filter(({ permissions, anyPermissions }) => {
+) => columns.filter(({ permissions, anyPermissions, hidden }) => {
+  if (hidden) {
+    return false;
+  }
+
   if (permissions?.length) {
     return anyPermissions
       ? isAnyPermitted(userPermissions, permissions)
@@ -127,6 +138,10 @@ type Props<Entity extends EntityBase> = {
   onColumnsChange: (columnIds: Array<string>) => void,
   /** Function to handle sort changes */
   onSortChange: (newSort: Sort) => void,
+  /** Function to handle page size changes */
+  onPageSizeChange?: (newPageSize: number) => void,
+  /** Active page size */
+  pageSize?: number
   /** Actions for each row. */
   rowActions?: (entity: Entity) => React.ReactNode,
   /** Which columns should be displayed. */
@@ -142,6 +157,8 @@ const EntityDataTable = <Entity extends EntityBase>({
   columnRenderers: customColumnRenderers,
   columnDefinitions,
   columnsOrder,
+  onPageSizeChange,
+  pageSize,
   data,
   onSortChange,
   rowActions,
@@ -153,6 +170,7 @@ const EntityDataTable = <Entity extends EntityBase>({
   const columnRenderers = merge(DefaultColumnRenderers, customColumnRenderers);
   const displayActionsCol = typeof rowActions === 'function';
   const displayBulkSelectCol = typeof bulkActions === 'function';
+  const displayPageSizeSelect = typeof onPageSizeChange === 'function';
 
   const accessibleColumns = useMemo(
     () => filterAccessibleColumns(columnDefinitions, currentUser.permissions),
@@ -196,11 +214,17 @@ const EntityDataTable = <Entity extends EntityBase>({
             </BulkActionsWrapper>
           )}
         </div>
-        <div>
-          <ColumnsVisibilitySelect allColumns={accessibleColumns}
-                                   selectedColumns={visibleColumns}
-                                   onChange={onColumnsChange} />
-        </div>
+        <LayoutConfigRow>
+          Show
+          <ButtonGroup>
+            {displayPageSizeSelect && (
+              <PageSizeSelect pageSize={pageSize} showLabel={false} onChange={onPageSizeChange} />
+            )}
+            <ColumnsVisibilitySelect allColumns={accessibleColumns}
+                                     selectedColumns={visibleColumns}
+                                     onChange={onColumnsChange} />
+          </ButtonGroup>
+        </LayoutConfigRow>
       </ActionsRow>
       <ScrollContainer ref={tableRef}>
         <StyledTable striped condensed hover>
@@ -241,8 +265,10 @@ EntityDataTable.defaultProps = {
   activeSort: undefined,
   bulkActions: undefined,
   columnRenderers: undefined,
-  rowActions: undefined,
   columnsOrder: [],
+  onPageSizeChange: undefined,
+  pageSize: undefined,
+  rowActions: undefined,
 };
 
 export default EntityDataTable;

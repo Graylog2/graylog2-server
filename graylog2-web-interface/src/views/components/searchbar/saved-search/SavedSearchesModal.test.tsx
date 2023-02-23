@@ -21,6 +21,8 @@ import asMock from 'helpers/mocking/AsMock';
 import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import useSavedSearches from 'views/hooks/useSavedSearches';
+import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 
 import SavedSearchesModal from './SavedSearchesModal';
 
@@ -64,6 +66,7 @@ const createPaginatedSearches = (count = 1) => {
 };
 
 jest.mock('views/hooks/useSavedSearches');
+jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
 jest.mock('routing/Routes', () => ({
   getPluginRoute: (x) => () => x,
@@ -78,6 +81,8 @@ describe('SavedSearchesModal', () => {
       refetch: () => {},
       isLoading: false,
     });
+
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isLoading: false });
   });
 
   describe('render the SavedSearchesModal', () => {

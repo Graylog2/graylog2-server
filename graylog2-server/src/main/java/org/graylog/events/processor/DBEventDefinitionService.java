@@ -27,6 +27,8 @@ import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ScopedDbService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.mongojack.DBQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,10 +64,20 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
     }
 
     public EventDefinitionDto saveWithOwnership(EventDefinitionDto eventDefinitionDto, User user) {
-        final EventDefinitionDto dto = super.save(eventDefinitionDto);
+        final EventDefinitionDto dto = save(eventDefinitionDto);
         entityOwnerShipService.registerNewEventDefinition(dto.id(), user);
         return dto;
     }
+
+    @Override
+    public EventDefinitionDto save(final EventDefinitionDto entity) {
+        EventDefinitionDto enrichedWithUpdateDate = entity
+                .toBuilder()
+                .updatedAt(DateTime.now(DateTimeZone.UTC))
+                .build();
+        return super.save(enrichedWithUpdateDate);
+    }
+
 
     public int deleteUnregister(String id) {
         // Must ensure deletability and mutability before deleting, so that de-registration is only performed if entity exists

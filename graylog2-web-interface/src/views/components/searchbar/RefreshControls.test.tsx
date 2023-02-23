@@ -15,16 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import 'helpers/mocking/react-dom_mock';
 
 import { RefreshActions } from 'views/stores/RefreshStore';
+import { asMock } from 'helpers/mocking';
+import useRefreshConfig from 'views/components/searchbar/useRefreshConfig';
 
 import RefreshControls from './RefreshControls';
 
 jest.useFakeTimers();
 
-jest.mock('stores/connect', () => (Component) => (props) => <Component {...({ ...props })} />);
+jest.mock('./useRefreshConfig');
 
 jest.mock('views/stores/RefreshStore', () => ({
   RefreshActions: {
@@ -36,12 +38,6 @@ jest.mock('views/stores/RefreshStore', () => ({
 
 describe('RefreshControls', () => {
   describe('rendering', () => {
-    const verifyRendering = ({ enabled, interval }) => {
-      const wrapper = mount(<RefreshControls refreshConfig={{ enabled, interval }} />);
-
-      expect(wrapper).toExist();
-    };
-
     it.each`
     enabled      | interval
     ${true}      | ${1000}
@@ -53,21 +49,28 @@ describe('RefreshControls', () => {
     ${true}      | ${300000}
     ${false}     | ${300000}
     ${false}     | ${1000}
-  `('renders refresh controlls with enabled: $enabled and interval: $interval', verifyRendering);
+  `('renders refresh controls with enabled: $enabled and interval: $interval', async ({ enabled, interval }) => {
+      asMock(useRefreshConfig).mockReturnValue({ enabled, interval });
+      render(<RefreshControls />);
+
+      await screen.findByLabelText(/refresh search controls/i);
+    });
   });
 
-  it('should start the interval', () => {
-    const wrapper = mount(<RefreshControls refreshConfig={{ enabled: false, interval: 1000 }} />);
+  it('should start the interval', async () => {
+    asMock(useRefreshConfig).mockReturnValue({ enabled: false, interval: 1000 });
+    render(<RefreshControls />);
 
-    wrapper.find('svg.fa-play').simulate('click');
+    fireEvent.click(await screen.findByTitle(/start refresh/i));
 
     expect(RefreshActions.enable).toHaveBeenCalled();
   });
 
-  it('should stop the interval', () => {
-    const wrapper = mount(<RefreshControls refreshConfig={{ enabled: true, interval: 1000 }} />);
+  it('should stop the interval', async () => {
+    asMock(useRefreshConfig).mockReturnValue({ enabled: true, interval: 1000 });
+    render(<RefreshControls />);
 
-    wrapper.find('svg.fa-pause').simulate('click');
+    fireEvent.click(await screen.findByTitle(/pause refresh/i));
 
     expect(RefreshActions.disable).toHaveBeenCalled();
   });

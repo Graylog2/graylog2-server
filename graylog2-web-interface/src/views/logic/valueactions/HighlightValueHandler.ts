@@ -14,28 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { HighlightingRulesActions, HighlightingRulesStore } from 'views/stores/HighlightingRulesStore';
-import HighlightingRule, { randomColor } from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import type { ActionHandlerCondition } from 'views/components/actions/ActionHandler';
+import type { ActionHandlerCondition, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import { createHighlightingRule } from 'views/logic/slices/highlightActions';
+import type { GetState } from 'views/types';
+import { selectHighlightingRules } from 'views/logic/slices/highlightSelectors';
 
-import type { ValueActionHandler } from './ValueActionHandler';
-
-const HighlightValueHandler: ValueActionHandler = ({ field, value }) => {
+const HighlightValueHandler = ({ field, value }: ActionHandlerArguments) => (dispatch: AppDispatch) => {
   if (value === undefined) {
     return Promise.reject(new Error('Unable to add highlighting for missing value.'));
   }
 
-  return HighlightingRulesActions.add(
-    HighlightingRule.builder()
-      .field(field)
-      .value(value)
-      .color(randomColor())
-      .build(),
-  );
+  return dispatch(createHighlightingRule(field, value));
 };
 
-const isEnabled: ActionHandlerCondition<{}> = ({ field, value }) => {
-  const highlightingRules = HighlightingRulesStore.getInitialState();
+const isEnabled: ActionHandlerCondition<{}> = ({ field, value }, getState: GetState) => {
+  const highlightingRules = selectHighlightingRules(getState());
 
   return highlightingRules.find(({ field: f, value: v }) => (field === f && value === v)) === undefined;
 };

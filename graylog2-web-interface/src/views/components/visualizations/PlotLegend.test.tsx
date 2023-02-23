@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
 import PlotLegend from 'views/components/visualizations/PlotLegend';
 import ColorMapper from 'views/components/visualizations/ColorMapper';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -27,16 +26,8 @@ import Series from 'views/logic/aggregationbuilder/Series';
 
 import ChartColorContext from './ChartColorContext';
 
-jest.mock('views/stores/CurrentViewStateStore', () => ({
-  CurrentViewStateStore: MockStore(
-    ['getInitialState', () => {
-      return {
-        activeQuery: 'active-query-id',
-      };
-    },
-    ],
-  ),
-}));
+jest.mock('views/logic/queries/useCurrentQueryId', () => () => 'active-query-id');
+jest.mock('stores/useAppDispatch');
 
 const colors = ColorMapper.create();
 const setColor = jest.fn();

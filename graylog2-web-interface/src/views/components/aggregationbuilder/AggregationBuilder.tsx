@@ -65,13 +65,7 @@ export type VisualizationComponent<T extends string> =
 
 export const retrieveChartData = (data: VisualizationResult): Rows => data.chart ?? data[Object.keys(data).filter((name) => name !== 'events')[0]];
 
-export const makeVisualization = <T extends string> (component: React.ComponentType<VisualizationComponentProps>, type: T): VisualizationComponent<T> => {
-  const visualizationComponent = component as VisualizationComponent<T>;
-
-  visualizationComponent.type = type;
-
-  return visualizationComponent;
-};
+export const makeVisualization = <T extends string, P extends VisualizationComponentProps> (component: React.ComponentType<P>, type: T): VisualizationComponent<T> => Object.assign(component, { type });
 
 const _visualizationForType = <T extends string> (type: T): VisualizationComponent<T> => {
   const visualizationTypes = PluginStore.exports('visualizationTypes');
