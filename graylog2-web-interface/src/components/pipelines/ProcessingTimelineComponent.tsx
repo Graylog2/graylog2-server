@@ -227,6 +227,7 @@ const ProcessingTimelineComponent = () => {
                    customFilter={searchFilter}
                    filterKeys={[]}
                    filterLabel="Filter Pipelines"
+                   noDataText="No pipelines have been found"
                    dataRowFormatter={_pipelineFormatter} />
       </StyledPaginatedList>
     </div>

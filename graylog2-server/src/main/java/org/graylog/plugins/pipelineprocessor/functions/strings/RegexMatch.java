@@ -53,7 +53,8 @@ public class RegexMatch extends AbstractFunction<RegexMatch.RegexMatchResult> {
         final String value = this.value.required(args, context);
         if (regex == null || value == null) {
             final String nullArgument = regex == null ? "pattern" : "value";
-            throw new IllegalArgumentException("Argument '" + nullArgument + "' cannot be 'null'");
+            throw new IllegalArgumentException(
+                    context.pipelineErrorMessage("Argument '" + nullArgument + "' cannot be 'null'"));
         }
         //noinspection unchecked
         final List<String> groupNames =

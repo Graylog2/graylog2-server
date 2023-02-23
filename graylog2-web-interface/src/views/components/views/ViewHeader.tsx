@@ -30,6 +30,7 @@ import useView from 'views/hooks/useView';
 import useAppDispatch from 'stores/useAppDispatch';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 import { updateView } from 'views/logic/slices/viewSlice';
+import useIsNew from 'views/hooks/useIsNew';
 
 const links = {
   [View.Type.Dashboard]: {
@@ -76,7 +77,8 @@ font-size: 0.50rem;
 
 const ViewHeader = () => {
   const view = useView();
-  const isSavedView = view?.id && view?.title;
+  const isNew = useIsNew();
+  const isSavedView = view?.id && view?.title && !isNew;
   const [showMetadataEdit, setShowMetadataEdit] = useState<boolean>(false);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), [setShowMetadataEdit]);
   const dispatch = useAppDispatch();

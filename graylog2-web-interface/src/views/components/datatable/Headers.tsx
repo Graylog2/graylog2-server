@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useLayoutEffect, useRef } from 'react';
+import { useCallback, useContext, useLayoutEffect, useRef } from 'react';
 import { flatten, get, isEqual, last } from 'lodash';
 import styled, { css } from 'styled-components';
 import type { OrderedMap } from 'immutable';
 import Immutable from 'immutable';
 
+import { VISUALIZATION_TABLE_HEADER_HEIGHT } from 'views/Constants';
 import Field from 'views/components/Field';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import Value from 'views/components/Value';
@@ -33,14 +34,23 @@ import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { Icon } from 'components/common';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import InteractiveContext from 'views/components/contexts/InteractiveContext';
 
 import styles from './DataTable.css';
 
-const StyledTh = styled.th(({ isNumeric }: { isNumeric: boolean }) => css`
+const StyledTh = styled.th`
+  && {
+    height: ${VISUALIZATION_TABLE_HEADER_HEIGHT}px;
+    padding: 0 5px;
+    vertical-align: middle;
+  }
+`;
+
+const DefaultTh = styled(StyledTh)(({ isNumeric }: { isNumeric: boolean }) => css`
   ${isNumeric ? 'text-align: right;' : ''}
 `);
 
-const CenteredTh = styled.th`
+const CenteredTh = styled(StyledTh)`
   text-align: center;
 `;
 
@@ -91,7 +101,7 @@ const HeaderField = ({ activeQuery, fields, field, prefix = '', span = 1, title 
   }, [togglePin, prefix, field]);
 
   return (
-    <StyledTh ref={thRef} isNumeric={type.isNumeric()} key={`${prefix}${field}`} colSpan={span} className={styles.leftAligned}>
+    <DefaultTh ref={thRef} isNumeric={type.isNumeric()} key={`${prefix}${field}`} colSpan={span} className={styles.leftAligned}>
       <Field name={field} queryId={activeQuery} type={type}>{title}</Field>
       {showPinIcon && <PinIcon data-testid={`pin-${prefix}${field}`} type="button" onClick={_togglePin} className={isPinned ? 'active' : ''}><Icon name="thumbtack" /></PinIcon>}
       {sortable && sortType && (
@@ -102,7 +112,7 @@ const HeaderField = ({ activeQuery, fields, field, prefix = '', span = 1, title 
                      sortConfigMap={sortConfigMap}
                      type={sortType} />
       )}
-    </StyledTh>
+    </DefaultTh>
   );
 };
 
@@ -205,6 +215,7 @@ const Headers = ({ columnPivots, fields, rowPivots, series, rollup, actualColumn
   const activeQuery = useActiveQueryId();
   const rowFieldNames = rowPivots.flatMap((pivot) => pivot.fields);
   const columnFieldNames = columnPivots.flatMap((pivot) => pivot.fields);
+  const interactive = useContext(InteractiveContext);
 
   const headerField = ({ field, prefix = '', span = 1, title = field, sortable = false, sortType = undefined, showPinIcon = false }) => {
     return (
@@ -226,8 +237,8 @@ const Headers = ({ columnPivots, fields, rowPivots, series, rollup, actualColumn
     );
   };
 
-  const rowPivotFields = rowFieldNames.map((fieldName) => headerField({ field: fieldName, sortable: true, sortType: SortConfig.PIVOT_TYPE, showPinIcon: true }));
-  const seriesFields = series.map((s) => headerField({ field: s.function, prefix: '', span: 1, title: s.effectiveName, sortable: true, sortType: SortConfig.SERIES_TYPE, showPinIcon: false }));
+  const rowPivotFields = rowFieldNames.map((fieldName) => headerField({ field: fieldName, sortable: interactive, sortType: SortConfig.PIVOT_TYPE, showPinIcon: interactive }));
+  const seriesFields = series.map((s) => headerField({ field: s.function, prefix: '', span: 1, title: s.effectiveName, sortable: interactive, sortType: SortConfig.SERIES_TYPE, showPinIcon: false }));
   const columnPivotFields = flatten(actualColumnPivotFields.map((key) => series.map((s) => headerField({ field: s.function, prefix: key.join('-'), span: 1, title: s.effectiveName, sortable: false, showPinIcon: false }))));
   const offset = rollup ? rowFieldNames.length + series.length : rowFieldNames.length;
 

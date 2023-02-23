@@ -114,8 +114,10 @@ const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
-const useAutoRefresh = (refresh: () => void) => {
-  useEffect(() => RefreshActions.refresh.listen(refresh), [refresh]);
+const useAutoRefresh = (refresh: () => Promise<unknown>) => {
+  useEffect(() => RefreshActions.refresh.listen(() => {
+    RefreshActions.refresh.promise(refresh());
+  }), [refresh]);
 };
 
 const Search = () => {
