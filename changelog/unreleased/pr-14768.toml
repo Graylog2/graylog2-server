@@ -1,0 +1,6 @@
+type = "s"
+message = "Bump version of json-path to 2.7.0 to address CVE-2021-27568."
+
+issues = ["Graylog2/graylog-plugin-enterprise#3674"]
+pulls = ["14768"]
+
