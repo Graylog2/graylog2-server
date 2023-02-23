@@ -46,13 +46,13 @@ jobs:
       - name: Run lint:styles --fix
         continue-on-error: true
         working-directory: graylog2-web-interface
-        run: yarn lint:styles --fix -o /tmp/report-css.json -f json
+        run: yarn lint:styles --fix -o /tmp/report-stylelint.json -f json
       - name: Submit Results
         continue-on-error: true
         working-directory: graylog2-web-interface
         run: |
           PROBLEM_COUNT=`jq '. | map(.errorCount + .warningCount)|add' /tmp/report.json`
-          PROBLEM_COUNT_CSS=`jq '. | map(.warnings | length)|add' /tmp/report-css.json`
+          PROBLEM_COUNT_STYLELINT=`jq '. | map(.warnings | length)|add' /tmp/report-stylelint.json`
           CURRENT_REF=`git rev-parse HEAD`
           TIMESTAMP=`git show --format=%at $CURRENT_REF|head -1`
           PAYLOAD=$(cat <<- EOF
@@ -60,9 +60,9 @@ jobs:
               "version": "1.1",
               "host": "developermetrics",
               "job": "fix-linter-hints",
-              "short_message": "Found ${PROBLEM_COUNT} ESLint and ${PROBLEM_COUNT_CSS} Stylelint problems in commit ${CURRENT_REF}",
+              "short_message": "Found ${PROBLEM_COUNT} ESLint and ${PROBLEM_COUNT_STYLELINT} Stylelint problems in commit ${CURRENT_REF}",
               "_problems": ${PROBLEM_COUNT},
-              "_problems_css": ${PROBLEM_COUNT_CSS},
+              "_problems_stylelint": ${PROBLEM_COUNT_STYLELINT},
               "_current_ref": "${CURRENT_REF}",
               "timestamp": ${TIMESTAMP}
              }
