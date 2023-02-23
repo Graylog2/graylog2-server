@@ -25,10 +25,9 @@ abstract class HighlightingColor {
 
   static fromJSON(json: HighlightingColorJson) {
     switch (json.type) {
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
       case 'gradient':
         return GradientColor.fromJSON(json);
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+
       case 'static':
         return StaticColor.fromJSON(json);
       default: // @ts-ignore

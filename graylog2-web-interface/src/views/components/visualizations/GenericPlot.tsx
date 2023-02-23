@@ -152,7 +152,6 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
   _onColorSelect = (setColor: (name: string, color: string) => Promise<unknown>, name: string, newColor: string) => setColor(name, newColor)
     .then(this._onCloseColorPopup);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _onCloseColorPopup = () => this.setState({ legendConfig: undefined });
 
   render() {

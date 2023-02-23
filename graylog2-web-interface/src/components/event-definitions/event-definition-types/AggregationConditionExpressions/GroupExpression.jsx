@@ -23,7 +23,6 @@ import { Clearfix } from 'components/bootstrap';
 import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 import { replaceBooleanExpressionOperatorInGroup } from 'logic/alerts/AggregationExpressionConfig';
 
-// eslint-disable-next-line import/no-cycle
 import BooleanOperatorSelector from './BooleanOperatorSelector';
 
 import AggregationConditionExpression from '../AggregationConditionExpression';

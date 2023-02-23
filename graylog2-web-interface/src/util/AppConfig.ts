@@ -60,7 +60,7 @@ const AppConfig = {
 
   gl2DevMode() {
     // The DEVELOPMENT variable will be set by webpack via the DefinePlugin.
-    // eslint-disable-next-line no-undef
+
     return typeof (DEVELOPMENT) !== 'undefined' && DEVELOPMENT;
   },
 
@@ -77,7 +77,7 @@ const AppConfig = {
   isCloud() {
     if (typeof IS_CLOUD !== 'undefined') {
       // The IS_CLOUD variable will be set by webpack via the DefinePlugin.
-      // eslint-disable-next-line no-undef
+
       return IS_CLOUD;
     }
 

@@ -136,7 +136,6 @@ const ProcessingTimelineComponent = () => {
     </Header>
   );
 
-  // eslint-disable-next-line react/no-unstable-nested-components
   const _headerCellFormatter = (header) => {
     let className;
 
@@ -179,7 +178,6 @@ const ProcessingTimelineComponent = () => {
     };
   };
 
-  // eslint-disable-next-line react/no-unstable-nested-components
   const _pipelineFormatter = (pipeline) => {
     const { id, title, description, stages } = pipeline;
 
