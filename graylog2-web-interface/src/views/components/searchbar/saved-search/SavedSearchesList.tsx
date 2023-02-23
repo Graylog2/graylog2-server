@@ -148,7 +148,7 @@ const SavedSearchesList = ({
       )}
       {pagination?.total === 0 && searchParams.query && (
         <NoSearchResult>
-          No saved searches found.
+          No saved searches have been found.
         </NoSearchResult>
       )}
       {!!savedSearches?.length && (
