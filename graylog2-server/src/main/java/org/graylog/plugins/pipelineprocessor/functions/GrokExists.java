@@ -61,7 +61,7 @@ public class GrokExists extends AbstractFunction<Boolean> {
 
         final boolean patternExists = grokPatternRegistry.grokPatternExists(pattern);
         if (!patternExists && logWhenNotFound) {
-           log.info("Grok Pattern " + pattern + " does not exists.");
+           log.info(context.pipelineErrorMessage("Grok Pattern " + pattern + " does not exist."));
         }
 
         return patternExists;

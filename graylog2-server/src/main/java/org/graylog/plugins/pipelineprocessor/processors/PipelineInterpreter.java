@@ -374,6 +374,7 @@ public class PipelineInterpreter implements MessageProcessor {
                                        Pipeline pipeline,
                                        EvaluationContext context,
                                        InterpreterListener interpreterListener) {
+        context.setRule(rule);
         rule.markExecution();
         interpreterListener.executeRule(rule, pipeline);
         try {

@@ -48,7 +48,7 @@ public class EqualityExpression extends BinaryExpression implements LogicalExpre
         final Object left = this.left.evaluateUnsafe(context);
         final Object right = this.right.evaluateUnsafe(context);
         if (left == null) {
-            log.warn("left expression evaluated to null, returning false: {}", this.left);
+            log.warn(context.pipelineErrorMessage("left expression evaluated to null, returning false: " + this.left));
             return false;
         }
         final boolean equals;

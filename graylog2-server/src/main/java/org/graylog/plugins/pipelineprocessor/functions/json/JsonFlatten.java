@@ -85,10 +85,10 @@ public class JsonFlatten extends AbstractFunction<JsonNode> {
                     // explode all arrays and objects into top-level key/values
                     return JsonUtils.extractJson(value, objectMapper, FLAGS_FLATTEN, stringify);
                 default:
-                    LOG.warn("Unknown parameter array_handler: {}", arrayHandler);
+                    LOG.warn(context.pipelineErrorMessage("Unknown parameter array_handler: " + arrayHandler));
             }
         } catch (IOException e) {
-            LOG.warn("Unable to parse JSON", e);
+            LOG.warn(context.pipelineErrorMessage("Unable to parse JSON"), e);
         }
         return null;
     }
