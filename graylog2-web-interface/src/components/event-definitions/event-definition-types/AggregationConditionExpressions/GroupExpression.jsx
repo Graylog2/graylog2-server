@@ -25,6 +25,7 @@ import { replaceBooleanExpressionOperatorInGroup } from 'logic/alerts/Aggregatio
 
 import BooleanOperatorSelector from './BooleanOperatorSelector';
 
+// eslint-disable-next-line import/no-cycle
 import AggregationConditionExpression from '../AggregationConditionExpression';
 
 const Group = styled.div`
