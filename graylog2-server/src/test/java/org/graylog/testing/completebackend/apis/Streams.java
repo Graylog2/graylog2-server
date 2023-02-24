@@ -95,7 +95,7 @@ public final class Streams implements GraylogRestApi {
         return given()
                 .spec(this.requestSpecification)
                 .when()
-                .get("/streams/router_engine_info")
+                .get("/system/debug/streams/router_engine_info")
                 .then()
                 .extract().body().path("fingerprint");
 

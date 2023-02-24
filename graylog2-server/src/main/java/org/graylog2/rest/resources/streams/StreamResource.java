@@ -142,7 +142,6 @@ public class StreamResource extends RestResource {
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
     private final StreamRouterEngine.Factory streamRouterEngineFactory;
-    private final StreamRouter streamRouter;
     private final IndexSetRegistry indexSetRegistry;
     private final RecentActivityService recentActivityService;
     private final BulkExecutor<Stream, UserContext> bulkExecutor;
@@ -154,13 +153,12 @@ public class StreamResource extends RestResource {
                           PaginatedStreamService paginatedStreamService,
                           StreamRuleService streamRuleService,
                           StreamRouterEngine.Factory streamRouterEngineFactory,
-                          StreamRouter streamRouter, IndexSetRegistry indexSetRegistry,
+                          IndexSetRegistry indexSetRegistry,
                           RecentActivityService recentActivityService,
                           AuditEventSender auditEventSender) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
-        this.streamRouter = streamRouter;
         this.indexSetRegistry = indexSetRegistry;
         this.paginatedStreamService = paginatedStreamService;
         this.dbQueryCreator = new DbQueryCreator(StreamImpl.FIELD_TITLE, attributes);
@@ -204,16 +202,6 @@ public class StreamResource extends RestResource {
 
         recentActivityService.create(id, GRNTypes.STREAM, userContext.getUser());
         return Response.created(streamUri).entity(result).build();
-    }
-
-    @GET
-    @Path("/router_engine_info")
-    @ApiOperation(value = "Get information about currently active stream router engine.")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getEngineFingerprint() {
-        return Response.status(Response.Status.OK)
-                .entity(streamRouter.getRouterEngineInfo())
-                .build();
     }
 
     @GET
