@@ -86,7 +86,7 @@ const searchExecutionSlice = createSlice({
       const { parameterBindings } = state.executionState;
       const newParameters = action.payload;
       const newParameterBindings = Immutable.Map<string, any>(newParameters.filter((parameter) => !!parameter.defaultValue)
-        .map((parameter) => [parameter.name, parameter.defaultValue]));
+        .map((parameter) => [parameter.name, ParameterBinding.forValue(parameter.defaultValue)]));
       const mergedParameterBindings = parameterBindings.merge(newParameterBindings);
 
       return {
