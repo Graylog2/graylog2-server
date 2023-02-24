@@ -37,7 +37,7 @@ const PipelineDl = styled.dl`
   }
 
   & > dt::after {
-    content: ":";
+    content: ':';
   }
 
   & > dd {

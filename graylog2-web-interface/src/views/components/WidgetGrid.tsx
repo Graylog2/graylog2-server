@@ -63,9 +63,9 @@ const DashboardWrap = styled(ElementDimensions)(({ theme }) => css`
 `);
 
 const StyledReactGridContainer = styled(ReactGridContainer)(({ $hasFocusedWidget }: { $hasFocusedWidget: boolean }) => css`
-  height: ${$hasFocusedWidget ? "100% !important" : "100%"};
-  max-height: ${$hasFocusedWidget ? "100%" : "auto"};
-  overflow: ${$hasFocusedWidget ? "hidden" : "visible"};
+  height: ${$hasFocusedWidget ? '100% !important' : '100%'};
+  max-height: ${$hasFocusedWidget ? '100%' : 'auto'};
+  overflow: ${$hasFocusedWidget ? 'hidden' : 'visible'};
   transition: none;
 `);
 

@@ -32,7 +32,7 @@ const Toggle = styled.a.attrs({
 })(({ theme }) => css`
   &::after {
     display: block;
-    content: " ";
+    content: ' ';
     float: right;
     width: 0;
     height: 0;
@@ -50,11 +50,11 @@ const StyledSubmenu = styled(Dropdown)(({ left, theme }: { left: boolean, theme:
 
   > .dropdown-menu {
     top: 0;
-    left: ${left ? "auto" : "100%"};
-    right: ${left ? "98%" : "auto"};
+    left: ${left ? 'auto' : '100%'};
+    right: ${left ? '98%' : 'auto'};
     margin-top: -6px;
-    margin-left: ${left ? "10px" : "-1px"};
-    border-radius: ${left ? "6px 0 6px 6px" : "0 6px 6px 6px"};
+    margin-left: ${left ? '10px' : '-1px'};
+    border-radius: ${left ? '6px 0 6px 6px' : '0 6px 6px 6px'};
   }
 
   &:hover > .dropdown-menu {

@@ -80,7 +80,7 @@ const SearchArea = styled(PageContentLayout)(() => {
         width: 100%;
 
         /* overflow auto is required to display the message table widget height correctly */
-        overflow: ${focusedWidget?.id ? "auto" : "visible"};
+        overflow: ${focusedWidget?.id ? 'auto' : 'visible'};
       }
     `}
 `;

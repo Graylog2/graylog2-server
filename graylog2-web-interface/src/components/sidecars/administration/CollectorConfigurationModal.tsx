@@ -59,8 +59,8 @@ const SecondaryText = styled.div`
 `;
 
 const TableRow = styled.tr(({ disabled = false }: {disabled?: boolean}) => css`
-  cursor: ${disabled ? "auto" : "pointer"};
-  background-color: ${disabled ? "#E8E8E8 !important" : "initial"};
+  cursor: ${disabled ? 'auto' : 'pointer'};
+  background-color: ${disabled ? '#E8E8E8 !important' : 'initial'};
   border-bottom: 1px solid lightgray;
   height: 49px;
 `);
