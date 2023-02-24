@@ -14,25 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { readFileSync } from 'fs';
 
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+/**
+ * This simple helper function allows reading a fixture file to be able to use its content in a test.
+ *
+ * @param {fixtureDir} - path of the fixture directory.
+ * Usually its value is `__dirname`, because the fixture is in the same directory as the test.
+ *
+ * @param {fixturePath} - name of the fixture file.
+ */
+const readJsonFixture = (fixtureDir: string, fixtureName: string) => (
+  JSON.parse(readFileSync(`${fixtureDir}/${fixtureName}`).toString('utf8'))
+);
 
-import useIsMountedRef from './useIsMountedRef';
-
-describe('useIsMountedRef', () => {
-  it('should be true after mount', () => {
-    const { result: { current: isMountedRef } } = renderHook(useIsMountedRef);
-
-    expect(isMountedRef.current).toEqual(true);
-  });
-
-  it('should be false after unmount', () => {
-    const { unmount, result: { current: isMountedRef } } = renderHook(useIsMountedRef);
-
-    expect(isMountedRef.current).toEqual(true);
-
-    unmount();
-
-    expect(isMountedRef.current).toEqual(false);
-  });
-});
+export default readJsonFixture;

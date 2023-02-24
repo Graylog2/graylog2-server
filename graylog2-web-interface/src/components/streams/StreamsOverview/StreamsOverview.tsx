@@ -81,11 +81,10 @@ const StreamsOverview = ({ indexSets }: Props) => {
     [paginatedStreams?.attributes],
   );
 
-  const onPageChange = useCallback((_newPage: number, newPageSize: number) => {
-    if (newPageSize) {
-      updateTableLayout({ perPage: newPageSize });
-    }
-  }, [updateTableLayout]);
+  const onPageSizeChange = (newPageSize: number) => {
+    paginationQueryParameter.resetPage();
+    updateTableLayout({ perPage: newPageSize });
+  };
 
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
@@ -101,8 +100,8 @@ const StreamsOverview = ({ indexSets }: Props) => {
   }, [updateTableLayout]);
 
   const onSortChange = useCallback((newSort: Sort) => {
-    updateTableLayout({ sort: newSort });
     paginationQueryParameter.resetPage();
+    updateTableLayout({ sort: newSort });
   }, [paginationQueryParameter, updateTableLayout]);
 
   const renderStreamActions = useCallback((listItem: Stream) => (
@@ -126,8 +125,8 @@ const StreamsOverview = ({ indexSets }: Props) => {
   const { elements, pagination: { total } } = paginatedStreams;
 
   return (
-    <PaginatedList onChange={onPageChange}
-                   pageSize={layoutConfig.pageSize}
+    <PaginatedList pageSize={layoutConfig.pageSize}
+                   showPageSizeSelect={false}
                    totalItems={total}>
       <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
@@ -143,6 +142,8 @@ const StreamsOverview = ({ indexSets }: Props) => {
                                    columnsOrder={DEFAULT_LAYOUT.columnsOrder}
                                    onColumnsChange={onColumnsChange}
                                    onSortChange={onSortChange}
+                                   onPageSizeChange={onPageSizeChange}
+                                   pageSize={layoutConfig.pageSize}
                                    bulkActions={renderBulkActions}
                                    activeSort={layoutConfig.sort}
                                    rowActions={renderStreamActions}
