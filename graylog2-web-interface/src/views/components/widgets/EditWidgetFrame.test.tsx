@@ -19,32 +19,18 @@ import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 
 import MockStore from 'helpers/mocking/StoreMock';
-import { WidgetActions } from 'views/stores/WidgetStore';
-import { SearchActions } from 'views/stores/SearchStore';
 import Widget from 'views/logic/widgets/Widget';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
-import { asMock } from 'helpers/mocking';
-import useViewType from 'views/hooks/useViewType';
-import View from 'views/logic/views/View';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import { execute } from 'views/logic/slices/searchExecutionSlice';
+import { updateWidget } from 'views/logic/slices/widgetActions';
 
 import EditWidgetFrame from './EditWidgetFrame';
 
 import WidgetContext from '../contexts/WidgetContext';
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
-
-jest.mock('views/stores/WidgetStore', () => ({
-  WidgetActions: {
-    update: jest.fn(),
-  },
-}));
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchStore: MockStore(['getInitialState', () => ({ search: { parameters: [] } })]),
-  SearchActions: {
-    refresh: jest.fn(() => Promise.resolve()),
-  },
-}));
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigActions: {
@@ -73,7 +59,15 @@ jest.mock('moment', () => {
   return Object.assign(() => mockMoment('2019-10-10T12:26:31.146Z'), mockMoment);
 });
 
-jest.mock('views/hooks/useViewType');
+jest.mock('views/logic/slices/searchExecutionSlice', () => ({
+  ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
+  execute: jest.fn(() => async () => {}),
+}));
+
+jest.mock('views/logic/slices/widgetActions', () => ({
+  ...jest.requireActual('views/logic/slices/widgetActions'),
+  updateWidget: jest.fn(() => async () => {}),
+}));
 
 describe('EditWidgetFrame', () => {
   describe('on a dashboard', () => {
@@ -85,17 +79,19 @@ describe('EditWidgetFrame', () => {
       .config({})
       .build();
     const renderSUT = (props?: Partial<React.ComponentProps<typeof EditWidgetFrame>>) => render((
-      <WidgetContext.Provider value={widget}>
-        <EditWidgetFrame onSubmit={() => {}} onCancel={() => {}} {...props}>
-          Hello World!
-          These are some buttons!
-        </EditWidgetFrame>
-      </WidgetContext.Provider>
+      <TestStoreProvider>
+        <WidgetContext.Provider value={widget}>
+          <EditWidgetFrame onSubmit={() => {}} onCancel={() => {}} {...props}>
+            Hello World!
+            These are some buttons!
+          </EditWidgetFrame>
+        </WidgetContext.Provider>
+      </TestStoreProvider>
     ));
 
-    beforeEach(() => {
-      asMock(useViewType).mockReturnValue(View.Type.Dashboard);
-    });
+    beforeAll(loadViewsPlugin);
+
+    afterAll(unloadViewsPlugin);
 
     it('refreshes search after clicking on search button, when there are no changes', async () => {
       renderSUT();
@@ -104,7 +100,7 @@ describe('EditWidgetFrame', () => {
       await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
       fireEvent.click(searchButton);
 
-      await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(execute).toHaveBeenCalledTimes(1));
     });
 
     it('changes the widget\'s streams when using stream filter', async () => {
@@ -125,7 +121,7 @@ describe('EditWidgetFrame', () => {
 
       fireEvent.click(searchButton);
 
-      await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
+      await waitFor(() => expect(updateWidget).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
         streams: ['5c2e27d6ba33a9681ad62775'],
       })));
     });

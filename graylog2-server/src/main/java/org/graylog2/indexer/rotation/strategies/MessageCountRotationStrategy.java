@@ -35,14 +35,11 @@ public class MessageCountRotationStrategy extends AbstractRotationStrategy {
     private static final Logger log = LoggerFactory.getLogger(MessageCountRotationStrategy.class);
     public static final String NAME = "count";
 
-    private final Indices indices;
-
     @Inject
     public MessageCountRotationStrategy(Indices indices, NodeId nodeId,
                                         AuditEventSender auditEventSender,
                                         ElasticsearchConfiguration elasticsearchConfiguration) {
-        super(auditEventSender, nodeId, elasticsearchConfiguration);
-        this.indices = indices;
+        super(auditEventSender, nodeId, elasticsearchConfiguration, indices);
     }
 
     @Override
@@ -66,45 +63,20 @@ public class MessageCountRotationStrategy extends AbstractRotationStrategy {
 
         try {
             final long numberOfMessages = indices.numberOfMessages(index);
-            return new Result(index,
-                    numberOfMessages,
-                    config.maxDocsPerIndex(),
-                    numberOfMessages > config.maxDocsPerIndex());
+
+            final boolean shouldRotate = numberOfMessages > config.maxDocsPerIndex();
+            final MessageFormat format = shouldRotate ?
+                    new MessageFormat(
+                    "Number of messages in <{0}> ({1}) is higher than the limit ({2}). Pointing deflector to new index now!",
+                    Locale.ENGLISH) :
+                    new MessageFormat(
+                    "Number of messages in <{0}> ({1}) is lower than the limit ({2}). Not doing anything.",
+                    Locale.ENGLISH);
+            String message = format.format(new Object[]{index, numberOfMessages, config.maxDocsPerIndex()});
+            return createResult(shouldRotate, message);
         } catch (IndexNotFoundException e) {
             log.error("Unknown index, cannot perform rotation", e);
             return null;
-        }
-    }
-
-    private static class Result implements AbstractRotationStrategy.Result {
-
-        public static final MessageFormat ROTATE_FORMAT = new MessageFormat(
-                "Number of messages in <{0}> ({1}) is higher than the limit ({2}). Pointing deflector to new index now!",
-                Locale.ENGLISH);
-        public static final MessageFormat NOT_ROTATE_FORMAT = new MessageFormat(
-                "Number of messages in <{0}> ({1}) is lower than the limit ({2}). Not doing anything.",
-                Locale.ENGLISH);
-        private final String index;
-        private final long actualCount;
-        private final long maxDocs;
-        private final boolean shouldRotate;
-
-        public Result(String index, long actualCount, long maxDocs, boolean shouldRotate) {
-            this.index = index;
-            this.actualCount = actualCount;
-            this.maxDocs = maxDocs;
-            this.shouldRotate = shouldRotate;
-        }
-
-        @Override
-        public String getDescription() {
-            final MessageFormat format = (shouldRotate ? ROTATE_FORMAT : NOT_ROTATE_FORMAT);
-            return format.format(new Object[]{index, actualCount, maxDocs});
-        }
-
-        @Override
-        public boolean shouldRotate() {
-            return shouldRotate;
         }
     }
 

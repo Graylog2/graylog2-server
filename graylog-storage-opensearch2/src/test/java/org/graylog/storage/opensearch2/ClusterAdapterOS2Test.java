@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.io.Resources;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.storage.opensearch2.cat.CatApi;
+import org.graylog.storage.opensearch2.cat.IndexSummaryResponse;
 import org.graylog.storage.opensearch2.cat.NodeResponse;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
@@ -33,7 +34,8 @@ import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -50,7 +52,7 @@ class ClusterAdapterOS2Test {
     private OpenSearchClient client;
     private CatApi catApi;
     private PlainJsonApi jsonApi;
-    private ObjectMapper objectMapper = new ObjectMapperProvider().get();
+    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     private ClusterAdapterOS2 clusterAdapter;
 
@@ -107,7 +109,7 @@ class ClusterAdapterOS2Test {
     @Test
     void returnsEmptyOptionalForHealthWhenElasticsearchExceptionThrown() {
         when(client.execute(any())).thenThrow(new OpenSearchException("Exception"));
-        final Optional<HealthStatus> healthStatus = clusterAdapter.health(Collections.singletonList("foo_index"));
+        final Optional<HealthStatus> healthStatus = clusterAdapter.health();
         assertThat(healthStatus).isEmpty();
     }
 
@@ -154,6 +156,23 @@ class ClusterAdapterOS2Test {
                         }
                 );
 
+    }
+
+    @Test
+    void testDeflectorHealth() {
+        when(catApi.aliases()).thenReturn(Map.of(
+                "foo_deflector", "foo_42",
+                "bar_deflector", "bar_17",
+                "baz_deflector", "baz_23"
+        ));
+
+        when(catApi.indices()).thenReturn(List.of(
+                new IndexSummaryResponse("foo_42", "", "RED"),
+                new IndexSummaryResponse("bar_17", "", "YELLOW"),
+                new IndexSummaryResponse("baz_23", "", "GREEN")
+        ));
+
+        assertThat(clusterAdapter.deflectorHealth(Set.of("foo_deflector", "bar_deflector", "baz_deflector"))).contains(HealthStatus.Red);
     }
 
     private void mockNodesResponse() throws IOException {

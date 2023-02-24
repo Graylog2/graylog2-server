@@ -25,9 +25,8 @@ const defaultConfirm = async () => window.confirm('Do you really want to delete 
 const ConfirmDeletingDashboardPage = async (dashboardId: string, activeQueryId: string, widgetIds: Map<string, List<string>>) => {
   const _widgetIds = widgetIds.map((ids) => ids.toArray()).toObject();
   const deletingDashboardPageHooks = PluginStore.exports('views.hooks.confirmDeletingDashboardPage');
-  const result = await iterateConfirmationHooks([...deletingDashboardPageHooks, defaultConfirm], dashboardId, activeQueryId, _widgetIds);
 
-  return result;
+  return iterateConfirmationHooks([...deletingDashboardPageHooks, defaultConfirm], dashboardId, activeQueryId, _widgetIds);
 };
 
 export default ConfirmDeletingDashboardPage;

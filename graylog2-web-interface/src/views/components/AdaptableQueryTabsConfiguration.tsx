@@ -17,20 +17,20 @@
 import * as React from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import { useCallback, useState, useContext } from 'react';
-import { OrderedSet, Map, List } from 'immutable';
+import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
 import BootstrapModalConfirm from 'components/bootstrap/BootstrapModalConfirm';
-import { QueriesActions } from 'views/actions/QueriesActions';
 import { SortableList, IconButton } from 'components/common';
-import { ViewStatesActions, ViewStatesStore } from 'views/stores/ViewStatesStore';
-import type { TitleType } from 'views/stores/TitleTypes';
+import type { TitleType, TitlesMap } from 'views/stores/TitleTypes';
 import TitleTypes from 'views/stores/TitleTypes';
 import EditableTitle from 'views/components/common/EditableTitle';
-import { useStore } from 'stores/connect';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 import FindNewActiveQueryId from 'views/logic/views/FindNewActiveQuery';
 import ConfirmDeletingDashboardPage from 'views/logic/views/ConfirmDeletingDashboardPage';
+import useWidgetIds from 'views/components/useWidgetIds';
+import useAppDispatch from 'stores/useAppDispatch';
+import { setQueriesOrder, mergeQueryTitles } from 'views/logic/slices/viewSlice';
 
 type PageListItem = {
   id: string,
@@ -59,18 +59,16 @@ const ListItem = ({
     <ListItemContainer>
       <EditableTitle key={title} disabled={!onUpdateTitle} value={title} onChange={(newTitle) => onUpdateTitle(id, newTitle)} />
       <div>
-        <IconButton title={`Remove page ${title}`} name="trash" onClick={() => onRemove(id)} disabled={disableDelete} />
+        <IconButton title={`Remove page ${title}`} name="trash-alt" onClick={() => onRemove(id)} disabled={disableDelete} />
       </div>
     </ListItemContainer>
   );
 };
 
-const useWidgetIds = () => useStore(ViewStatesStore, (states) => states.map((viewState) => viewState.widgets.map((widget) => widget.id).toList()).toMap());
-
 type Props = {
   show: boolean,
   setShow: Dispatch<SetStateAction<boolean>>,
-  queriesList: OrderedSet<PageListItem>,
+  queriesList: Immutable.OrderedSet<PageListItem>,
   dashboardId: string,
   activeQueryId: string,
 }
@@ -78,45 +76,41 @@ type Props = {
 const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, dashboardId, activeQueryId }: Props) => {
   const widgetIds = useWidgetIds();
   const { setDashboardPage } = useContext(DashboardPageContext);
-  const [orderedQueriesList, setOrderedQueriesList] = useState<OrderedSet<PageListItem>>(queriesList);
+  const [orderedQueriesList, setOrderedQueriesList] = useState<Immutable.OrderedSet<PageListItem>>(queriesList);
   const disablePageDelete = orderedQueriesList.size <= 1;
+  const dispatch = useAppDispatch();
   const onConfirmPagesConfiguration = useCallback(() => {
     const isActiveQueryDeleted = !orderedQueriesList.find(({ id }) => id === activeQueryId);
 
     if (isActiveQueryDeleted) {
       const indexedQueryIds = queriesList.map(({ id }) => id).toIndexedSeq();
-      const newActiveQueryId = FindNewActiveQueryId(List(indexedQueryIds), activeQueryId);
+      const newActiveQueryId = FindNewActiveQueryId(Immutable.List(indexedQueryIds), activeQueryId);
 
       setDashboardPage(newActiveQueryId);
     }
 
-    QueriesActions.setOrder(OrderedSet(orderedQueriesList.map(({ id }) => id))).then(() => {
-      const newTitles = orderedQueriesList.map(({ id, title }) => {
-        const titleMap = Map<string, string>({ title });
-        const titlesMap = Map<TitleType, Map<string, string>>({ [TitleTypes.Tab]: titleMap });
+    dispatch(setQueriesOrder(orderedQueriesList.map(({ id }) => id).toOrderedSet()))
+      .then(() => {
+        const newTitles = orderedQueriesList.map(({ id, title }) => {
+          const titleMap = Immutable.Map<string, string>({ title });
+          const titlesMap = Immutable.Map<TitleType, Immutable.Map<string, string>>({ [TitleTypes.Tab]: titleMap }) as TitlesMap;
 
-        return ({ queryId: id, titlesMap });
+          return ({ queryId: id, titlesMap });
+        }).toArray();
+
+        dispatch(mergeQueryTitles(newTitles));
+        setShow(false);
       });
-
-      ViewStatesActions.patchQueriesTitle(OrderedSet(newTitles));
-      setShow(false);
-    });
-  }, [orderedQueriesList, queriesList, activeQueryId, setDashboardPage, setShow]);
+  }, [dispatch, orderedQueriesList, queriesList, activeQueryId, setDashboardPage, setShow]);
   const onPagesConfigurationModalClose = useCallback(() => setShow(false), [setShow]);
   const updatePageSorting = useCallback((order: Array<PageListItem>) => {
-    setOrderedQueriesList(OrderedSet(order));
+    setOrderedQueriesList(Immutable.OrderedSet(order));
   }, [setOrderedQueriesList]);
 
   const onUpdateTitle = useCallback((id: string, title: string) => {
-    setOrderedQueriesList((currentQueries) => (
-      OrderedSet(currentQueries.map((query) => {
-        if (query.id === id) {
-          return { id, title };
-        }
-
-        return query;
-      }))),
-    );
+    setOrderedQueriesList((currentQueries) => currentQueries
+      .map((query) => (query.id === id ? { id, title } : query))
+      .toOrderedSet());
   }, []);
 
   const onRemovePage = useCallback(async (id: string) => {
@@ -125,9 +119,8 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, dashboard
     }
 
     if (await ConfirmDeletingDashboardPage(dashboardId, activeQueryId, widgetIds)) {
-      setOrderedQueriesList((currentQueries) => (
-        OrderedSet(currentQueries.filter((query) => query.id !== id))),
-      );
+      setOrderedQueriesList((currentQueries) => currentQueries
+        .filter((query) => query.id !== id).toOrderedSet());
     }
 
     return Promise.resolve();

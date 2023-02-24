@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook } from 'wrappedTestingLibrary/hooks';
 
 import useIsMountedRef from './useIsMountedRef';
 

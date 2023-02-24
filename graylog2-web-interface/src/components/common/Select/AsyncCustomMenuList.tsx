@@ -23,8 +23,8 @@ import { WindowList } from 'components/common/Select/CustomMenuList';
 
 const StyledDiv = styled.div`
   display: flex;
-  align-items: center; 
-  justify-content: center; 
+  align-items: center;
+  justify-content: center;
   height: 36px;
   width: 100%;
 `;

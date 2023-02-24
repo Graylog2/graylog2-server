@@ -19,7 +19,6 @@ import { List } from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import useParams from 'routing/useParams';
-import mockAction from 'helpers/mocking/MockAction';
 import asMock from 'helpers/mocking/AsMock';
 import StreamsContext from 'contexts/StreamsContext';
 import useQuery from 'routing/useQuery';
@@ -27,29 +26,18 @@ import useFetchView from 'views/hooks/useFetchView';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
-import useView from 'views/hooks/useView';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import ShowViewPage from './ShowViewPage';
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchActions: {
-    execute: mockAction(),
-  },
-}));
-
-jest.mock('views/stores/SearchExecutionStateStore', () => ({
-  SearchExecutionStateActions: {},
-  SearchExecutionStateStore: { listen: jest.fn() },
-}));
 
 jest.mock('actions/errors/ErrorsActions', () => ({
   report: jest.fn(),
 }));
 
-jest.mock('views/components/Search', () => () => <span>Hello from search page!</span>);
+jest.mock('views/components/Search', () => 'extended-search-page');
 jest.mock('views/hooks/useFetchView');
 jest.mock('views/hooks/useLoadView');
-jest.mock('views/hooks/useView');
 jest.mock('views/logic/views/UseProcessHooksForView');
 
 jest.mock('routing/useParams');
@@ -78,34 +66,33 @@ describe('ShowViewPage', () => {
     </StreamsContext.Provider>
   );
 
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   beforeEach(() => {
     asMock(useQuery).mockReturnValue({});
     asMock(useParams).mockReturnValue({ viewId: 'foo' });
-    asMock(useProcessHooksForView).mockReturnValue([true, undefined]);
+    asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view, executionState: SearchExecutionState.empty() });
     asMock(useFetchView).mockResolvedValue(view);
-    asMock(useView).mockReturnValue(view);
   });
 
   it('renders Spinner while loading', async () => {
-    asMock(useProcessHooksForView).mockReturnValue([false, undefined]);
+    asMock(useProcessHooksForView).mockReturnValue({ status: 'loading' });
 
     render(<SimpleShowViewPage />);
 
     await screen.findByText('Loading...');
   });
 
-  it('loads view with id passed from props', async () => {
+  it('loads view with id passed from props', () => {
     render(<SimpleShowViewPage />);
 
     expect(useFetchView).toHaveBeenCalledWith('foo');
-
-    await screen.findByText('Hello from search page!');
   });
 
-  it('fetches views again if view id prop changes', async () => {
+  it('fetches views again if view id prop changes', () => {
     const { rerender } = render(<SimpleShowViewPage />);
-
-    await screen.findByText('Hello from search page!');
 
     expect(useFetchView).toHaveBeenCalledWith('foo');
 

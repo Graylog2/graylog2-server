@@ -62,7 +62,7 @@ const StyledNav = styled(Nav)(({ theme }: { theme: DefaultTheme }) => css`
           border-color: ${theme.colors.variant.lighter.default};
           border-style: solid;
           border-width: 0 1px 1px 0;
-          content: '';
+          content: "";
           display: block;
           height: 15px;
           position: absolute;
