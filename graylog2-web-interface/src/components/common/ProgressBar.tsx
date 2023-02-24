@@ -105,7 +105,7 @@ const Bar = styled.div<StyledBarProps>(({ animated, striped, theme, value }) => 
       animation: ${animatedStripes} 2s linear infinite;
     `}
     ${progressBarVariants}
-  `;
+`;
 });
 
 const ProgressBar = ({ bars, className }: ProgressBarProps) => {

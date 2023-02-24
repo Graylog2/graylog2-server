@@ -25,14 +25,17 @@ class ConfigurationForm extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { ...this._copyStateFromProps(this.props), showConfigurationModal: false };
+    this.state = { ...this._copyStateFromProps(this.props), showConfigurationModal: false, submitted: false };
   }
 
   UNSAFE_componentWillReceiveProps(props) {
     const { values = {} } = this.state || {};
     const newState = this._copyStateFromProps(props);
 
-    newState.values = $.extend(newState.values, values);
+    if (!this.state.submitted) {
+      newState.values = $.extend(newState.values, values);
+    }
+
     this.setState(newState);
   }
 
@@ -53,10 +56,6 @@ class ConfigurationForm extends React.Component {
       // Replace undefined with null, as JSON.stringify will leave out undefined fields from the DTO sent to the server
       const fieldValue = values[name];
       data.configuration[name] = (fieldValue === undefined ? null : fieldValue);
-
-      if (field.is_encrypted && !field.dirty && fieldValue && fieldValue.is_set !== undefined) {
-        data.configuration[name] = { keep_value: true };
-      }
     });
 
     return data;
@@ -103,14 +102,32 @@ class ConfigurationForm extends React.Component {
     return diff;
   };
 
+  _handleEncryptedFieldsBeforeSubmit = (data) => {
+    const { configFields } = this.state;
+
+    const oldConfiguration = data.configuration;
+
+    const newConfiguration = {};
+
+    $.map(oldConfiguration, (fieldValue, fieldName) => {
+      const configField = configFields[fieldName];
+
+      if (configField.is_encrypted && !configField.dirty && fieldValue && fieldValue.is_set !== undefined) {
+        newConfiguration[fieldName] = { keep_value: true };
+      }
+    });
+
+    return { ...data, configuration: { ...oldConfiguration, ...newConfiguration } };
+  };
+
   _save = () => {
     const data = this.getValue();
 
     const { submitAction } = this.props;
 
-    submitAction(data);
+    submitAction(this._handleEncryptedFieldsBeforeSubmit(data));
 
-    this.setState({ showConfigurationModal: false });
+    this.setState({ showConfigurationModal: false, submitted: true });
   };
 
   // eslint-disable-next-line react/no-unused-class-component-methods
@@ -139,7 +156,7 @@ class ConfigurationForm extends React.Component {
 
     values[field] = value;
 
-    this.setState({ values: values, configFields: { ...configFields, ...{ [field]: { ...configField, ...{ dirty: true } } } } });
+    this.setState({ values: values, configFields: { ...configFields, [field]: { ...configField, ...{ dirty: true } } } });
   };
 
   _renderConfigField = (configField, key, autoFocus) => {

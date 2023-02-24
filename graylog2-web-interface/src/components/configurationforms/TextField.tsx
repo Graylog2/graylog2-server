@@ -41,7 +41,7 @@ const TextField = ({ field, title, typeName, dirty, onChange, value, autoFocus }
 
   const labelContent = <>{field.human_name} {optionalMarker(field)}</>;
 
-  const fieldValue = () => {
+  const getFieldValue = () => {
     if (showReadOnlyEncrypted) return 'encrypted placeholder';
 
     if (typeof value === 'string') return value;
@@ -64,7 +64,9 @@ const TextField = ({ field, title, typeName, dirty, onChange, value, autoFocus }
   };
 
   const buttonAfter = () => {
-    if (!showReadOnlyEncrypted) return null;
+    if (!showReadOnlyEncrypted) {
+      return null;
+    }
 
     return (
       <Button type="button" onClick={() => onChange(title, { delete_value: true })}>
@@ -82,7 +84,7 @@ const TextField = ({ field, title, typeName, dirty, onChange, value, autoFocus }
              name={`configuration[${title}]`}
              required={isRequired}
              help={field.description}
-             value={fieldValue()}
+             value={getFieldValue()}
              onChange={handleChange}
              autoFocus={autoFocus} />
     );
@@ -95,7 +97,7 @@ const TextField = ({ field, title, typeName, dirty, onChange, value, autoFocus }
            label={labelContent}
            required={isRequired}
            help={field.description}
-           value={fieldValue()}
+           value={getFieldValue()}
            readOnly={showReadOnlyEncrypted}
            onChange={handleChange}
            buttonAfter={buttonAfter()}
