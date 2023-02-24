@@ -39,20 +39,12 @@ const ExtractorsList = ({ input, node }) => {
     fetchExtractors(input.id, setExtractors);
   }, [input.id]);
 
-  const getNodeId = (_node) => {
-    if (Array.isArray(_node)) {
-      return _node[0]?.node_id || '';
-    }
-
-    return _node?.node_id || '';
-  };
-
   const _formatExtractor = (extractor) => {
     return (
       <ExtractorsListItem key={extractor.id}
                           extractor={extractor}
                           inputId={input.id}
-                          nodeId={getNodeId(node)} />
+                          nodeId={node.node_id} />
     );
   };
 
@@ -110,7 +102,7 @@ const ExtractorsList = ({ input, node }) => {
 
 ExtractorsList.propTypes = {
   input: PropTypes.object.isRequired,
-  node: PropTypes.oneOfType([PropTypes.object, PropTypes.array]).isRequired,
+  node: PropTypes.object.isRequired,
 };
 
 export default ExtractorsList;
