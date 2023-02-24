@@ -29,7 +29,7 @@ import type { WidgetConfigFormValues } from './WidgetConfigForm';
 const aggregationElementsByKey = Object.fromEntries(aggregationElements.map((element) => ([element.key, element])));
 
 const StyledButtonToolbar = styled(ButtonToolbar)`
-  margin-bottom: 10px
+  margin-bottom: 10px;
 `;
 
 const onCreateElement = (

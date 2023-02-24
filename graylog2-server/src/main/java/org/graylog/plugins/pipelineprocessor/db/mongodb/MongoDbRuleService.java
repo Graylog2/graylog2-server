@@ -19,6 +19,7 @@ package org.graylog.plugins.pipelineprocessor.db.mongodb;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
+import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
@@ -31,18 +32,18 @@ import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
 
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+
 /**
  * A RuleService backed by a MongoDB collection.
  */
 public class MongoDbRuleService implements RuleService {
-    private static final Logger log = LoggerFactory.getLogger(MongoDbRuleService.class);
+    private static final RateLimitedLog log = getRateLimitedLog(MongoDbRuleService.class);
 
     private static final String COLLECTION = "pipeline_processor_rules";
 
