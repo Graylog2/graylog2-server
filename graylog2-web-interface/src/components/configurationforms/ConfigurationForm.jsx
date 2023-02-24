@@ -65,7 +65,6 @@ class ConfigurationForm extends React.Component {
     const { titleValue } = this.state || {};
     const effectiveTitleValue = (titleValue !== undefined ? titleValue : props.titleValue);
     const defaultValues = {};
-    const valueOverrides = {};
 
     if (props.configFields) {
       Object.keys(props.configFields).forEach((field) => {
@@ -77,7 +76,7 @@ class ConfigurationForm extends React.Component {
 
     return {
       configFields: $.extend({}, props.configFields),
-      values: $.extend({}, { ...defaultValues, ...props.values }, valueOverrides),
+      values: $.extend({}, defaultValues, props.values),
       titleValue: effectiveTitleValue,
     };
   };
