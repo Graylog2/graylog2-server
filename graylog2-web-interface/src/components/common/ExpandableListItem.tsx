@@ -23,7 +23,7 @@ import { Checkbox } from 'components/bootstrap';
 import Icon from './Icon';
 
 const ItemWrap = styled.li(({ padded }: { padded: boolean }) => css`
-  padding: ${padded ? '10px 5px' : ''};
+  padding: ${padded ? "10px 5px" : ""};
 `);
 
 const Container = styled.div(({ theme }) => css`

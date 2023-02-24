@@ -53,14 +53,14 @@ const SecondaryText = styled.div`
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  color: #aaaaaa;
+  color: #aaa;
   margin-top: -4px;
   margin-bottom: -2px;
 `;
 
 const TableRow = styled.tr(({ disabled = false }: {disabled?: boolean}) => css`
-  cursor: ${disabled ? 'auto' : 'pointer'};
-  background-color: ${disabled ? '#E8E8E8 !important' : 'initial'};
+  cursor: ${disabled ? "auto" : "pointer"};
+  background-color: ${disabled ? "#E8E8E8 !important" : "initial"};
   border-bottom: 1px solid lightgray;
   height: 49px;
 `);
@@ -105,7 +105,8 @@ const ModalSubTitle = styled.div`
 `;
 
 const StyledSearchForm = styled(SearchForm)`
-  .form-group, .query {
+  .form-group,
+  .query {
     width: 100% !important;
   }
 `;

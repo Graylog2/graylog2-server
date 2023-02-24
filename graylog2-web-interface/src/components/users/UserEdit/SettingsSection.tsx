@@ -36,7 +36,7 @@ const GlobalTimeoutMessage = styled(ReadOnlyFormGroup)`
   margin-bottom: 20px;
   
   .read-only-value-col {
-    padding-top: 0px;
+    padding-top: 0;
   }
 `;
 
