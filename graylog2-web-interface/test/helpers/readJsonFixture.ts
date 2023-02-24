@@ -14,16 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import styled, { css } from 'styled-components';
+import { readFileSync } from 'fs';
 
-const SectionGrid = styled.div<{ $columns?: string } >(({ $columns, theme }) => css`
-  display: grid;
-  grid-template-columns: ${$columns ?? "1fr 1fr"};
-  grid-column-gap: 40px;
+/**
+ * This simple helper function allows reading a fixture file to be able to use its content in a test.
+ *
+ * @param {fixtureDir} - path of the fixture directory.
+ * Usually its value is `__dirname`, because the fixture is in the same directory as the test.
+ *
+ * @param {fixturePath} - name of the fixture file.
+ */
+const readJsonFixture = (fixtureDir: string, fixtureName: string) => (
+  JSON.parse(readFileSync(`${fixtureDir}/${fixtureName}`).toString('utf8'))
+);
 
-  @media (max-width: ${theme.breakpoints.max.md}) {
-    grid-template-columns: 1fr;
-  }
-`);
-
-export default SectionGrid;
+export default readJsonFixture;

@@ -62,7 +62,7 @@ const panelVariantStyles = css(({ bsStyle = 'default', theme }) => {
         border-bottom-color: ${borderColor};
       }
     }
-  `;
+`;
 });
 
 const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
@@ -127,7 +127,7 @@ const deprecatedVariantStyles = css(({ bsStyle = 'default', theme }) => {
         border-bottom-color: ${borderColor};
       }
     }
-  `;
+`;
 });
 
 const DeprecatedStyledPanel = styled(BootstrapPanel)(({ theme }) => css`

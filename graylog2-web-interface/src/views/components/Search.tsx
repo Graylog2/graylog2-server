@@ -66,9 +66,9 @@ const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => 
     > *:nth-child(2) {
       flex-grow: 1;
     }
-  ` : css`
+` : css`
     flex: 1;
-  `;
+`;
 });
 
 const SearchArea = styled(PageContentLayout)(() => {
@@ -83,10 +83,10 @@ const SearchArea = styled(PageContentLayout)(() => {
         width: 100%;
 
         /* overflow auto is required to display the message table widget height correctly */
-        overflow: ${focusedWidget?.id ? 'auto' : 'visible'};
+        overflow: ${focusedWidget?.id ? "auto" : "visible"};
       }
     `}
-  `;
+`;
 });
 
 const selectCurrentQueryResults = (queryId: string) => createSelector(selectSearchExecutionResult, (state) => state?.result?.forId(queryId));
