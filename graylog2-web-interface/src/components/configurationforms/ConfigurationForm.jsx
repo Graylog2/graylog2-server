@@ -53,10 +53,6 @@ class ConfigurationForm extends React.Component {
       // Replace undefined with null, as JSON.stringify will leave out undefined fields from the DTO sent to the server
       const fieldValue = values[name];
       data.configuration[name] = (fieldValue === undefined ? null : fieldValue);
-
-      if (field.is_encrypted && !field.dirty && fieldValue && fieldValue.is_set !== undefined) {
-        data.configuration[name] = { keep_value: true };
-      }
     });
 
     return data;
@@ -66,7 +62,6 @@ class ConfigurationForm extends React.Component {
     const { titleValue } = this.state || {};
     const effectiveTitleValue = (titleValue !== undefined ? titleValue : props.titleValue);
     const defaultValues = {};
-    const valueOverrides = {};
 
     if (props.configFields) {
       Object.keys(props.configFields).forEach((field) => {
@@ -78,7 +73,7 @@ class ConfigurationForm extends React.Component {
 
     return {
       configFields: $.extend({}, props.configFields),
-      values: $.extend({}, defaultValues, props.values, valueOverrides),
+      values: $.extend({}, defaultValues, props.values),
       titleValue: effectiveTitleValue,
     };
   };
@@ -103,14 +98,38 @@ class ConfigurationForm extends React.Component {
     return diff;
   };
 
+  _handleEncryptedFieldsBeforeSubmit = (data) => {
+    const { configFields } = this.state;
+
+    const oldConfiguration = data.configuration;
+
+    const newConfiguration = {};
+
+    $.map(oldConfiguration, (fieldValue, fieldName) => {
+      const configField = configFields[fieldName];
+
+      if (configField.is_encrypted && !configField.dirty && fieldValue && fieldValue.is_set !== undefined) {
+        newConfiguration[fieldName] = { keep_value: true };
+      }
+    });
+
+    return { ...data, configuration: { ...oldConfiguration, ...newConfiguration } };
+  };
+
   _save = () => {
     const data = this.getValue();
 
-    const { submitAction } = this.props;
+    const { titleValue, submitAction } = this.props;
 
-    submitAction(data);
+    submitAction(this._handleEncryptedFieldsBeforeSubmit(data));
 
-    this.setState({ showConfigurationModal: false });
+    // console.log('===copy state from props after submit', this._copyStateFromProps(this.props));
+
+    // this.setState(this._copyStateFromProps(this.props));
+
+    // console.log('===after submit state', this.state);
+
+    this.setState($.extend(this._copyStateFromProps(this.props), { showConfigurationModal: false }));
   };
 
   // eslint-disable-next-line react/no-unused-class-component-methods

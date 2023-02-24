@@ -73,6 +73,8 @@ class InputForm extends React.Component {
     }
 
     if (this.configurationForm) {
+      console.log('===get value', this.configurationForm.getValue().configuration);
+
       return this.configurationForm.getValue().configuration;
     }
 
