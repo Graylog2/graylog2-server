@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Row, Col, Button } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
@@ -33,7 +33,7 @@ const fetchExtractors = (inputId, callback) => {
 
 const ExtractorsList = ({ input, node }) => {
   const [extractors, setExtractors] = useState(null);
-  const sortModal = useRef(null);
+  const [showSortModal, setShowSortModal] = useState(false);
 
   useEffect(() => {
     fetchExtractors(input.id, setExtractors);
@@ -53,7 +53,7 @@ const ExtractorsList = ({ input, node }) => {
   };
 
   const _openSortModal = () => {
-    sortModal.current?.open();
+    setShowSortModal(true);
   };
 
   let sortExtractorsButton;
@@ -92,10 +92,12 @@ const ExtractorsList = ({ input, node }) => {
                       items={formattedExtractors} />
         </Col>
       </Row>
-      <ExtractorsSortModal ref={(modal) => { sortModal.current = modal; }}
-                           input={input}
-                           extractors={extractors}
-                           onSort={() => fetchExtractors(input.id, setExtractors)} />
+      {showSortModal && (
+        <ExtractorsSortModal input={input}
+                             extractors={extractors}
+                             onClose={() => setShowSortModal(false)}
+                             onSort={() => fetchExtractors(input.id, setExtractors)} />
+      )}
     </div>
   );
 };
