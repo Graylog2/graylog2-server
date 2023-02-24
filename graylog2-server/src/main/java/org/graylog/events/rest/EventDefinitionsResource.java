@@ -80,6 +80,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -163,9 +164,9 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     public Map<String, Object> getWithContext(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_READ, definitionId);
         return dbService.get(definitionId)
-                .map(evenDefinition -> ImmutableMap.of(
-                        "event_definition", evenDefinition,
-                        "context", contextService.contextFor(evenDefinition)
+                .map(eventDefinition -> ImmutableMap.of(
+                        "event_definition", eventDefinition,
+                        "context", contextService.contextFor(eventDefinition)
                 ))
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
     }
@@ -221,15 +222,18 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     public EventDefinitionDto delete(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                                      @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_DELETE, definitionId);
-        final Optional<EventDefinitionDto> eventDefinitionDto = dbService.get(definitionId);
-        if (eventDefinitionDto.isPresent()) {
-            eventResolver.dependentEvents(definitionId).ifPresent(
-                    dependencies -> {throw new IllegalArgumentException(dependencies.toString());});
-
-            recentActivityService.delete(
-                    eventDefinitionDto.get().id(), GRNTypes.EVENT_DEFINITION, eventDefinitionDto.get().title(), userContext.getUser());
-            eventDefinitionHandler.delete(definitionId);
+        final List<String> dependencies = eventResolver.dependentEvents(definitionId).stream()
+                .map(dto -> dto.title()).toList();
+        if (!dependencies.isEmpty()) {
+            throw new ForbiddenException("Unable to delete because of existing event correlation: " + dependencies.toString());
         }
+
+        final Optional<EventDefinitionDto> eventDefinitionDto = dbService.get(definitionId);
+        eventDefinitionDto.ifPresent(d ->
+                recentActivityService.delete(d.id(), GRNTypes.EVENT_DEFINITION, d.title(), userContext.getUser())
+        );
+
+        eventDefinitionHandler.delete(definitionId);
         return eventDefinitionDto.orElse(null);
     }
 

@@ -17,7 +17,6 @@
 package org.graylog.events.processor;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Resolves dependencies between events
@@ -29,5 +28,5 @@ public interface EventResolver {
      * @param definitionId an event definition ID
      * @return the dependent event definitions
      */
-    Optional<List<String>> dependentEvents(String definitionId);
+    List<EventDefinitionDto> dependentEvents(String definitionId);
 }

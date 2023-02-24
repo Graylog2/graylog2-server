@@ -16,12 +16,12 @@
  */
 package org.graylog.events.processor;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class DefaultEventResolver implements EventResolver {
     @Override
-    public Optional<List<String>> dependentEvents(String definitionId) {
-        return Optional.empty();
+    public List<EventDefinitionDto> dependentEvents(String definitionId) {
+        return new ArrayList<>();
     }
 }
