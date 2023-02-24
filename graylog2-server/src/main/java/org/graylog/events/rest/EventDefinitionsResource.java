@@ -298,7 +298,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Path("/bulk_delete")
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
-    @ApiOperation(value = "Delete a bulk of event definitions", response = BulkOperationResponse.class)
+    @ApiOperation(value = "Delete multiple event definitions", response = BulkOperationResponse.class)
     @NoAuditEvent("Audit events triggered manually")
     public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
                                @Context UserContext userContext) {
@@ -329,7 +329,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Path("/bulk_schedule")
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
-    @ApiOperation(value = "Enable a bulk of event definitions", response = BulkOperationResponse.class)
+    @ApiOperation(value = "Enable multiple event definitions", response = BulkOperationResponse.class)
     @NoAuditEvent("Audit events triggered manually")
     public Response bulkSchedule(@ApiParam(name = "Event definitions to enable", required = true) final BulkOperationRequest bulkOperationRequest,
                                  @Context UserContext userContext) {
@@ -360,7 +360,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Path("/bulk_unschedule")
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
-    @ApiOperation(value = "Disable a bulk of event definitions", response = BulkOperationResponse.class)
+    @ApiOperation(value = "Disable multiple event definitions", response = BulkOperationResponse.class)
     @NoAuditEvent("Audit events triggered manually")
     public Response bulkUnschedule(@ApiParam(name = "Event definitions to disable", required = true) final BulkOperationRequest bulkOperationRequest,
                                    @Context UserContext userContext) {
