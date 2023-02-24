@@ -21,7 +21,7 @@ import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
 import 'jest-styled-components';
 
-import WrappingContainer from './WrappingContainer';
+import WrappingContainer from '../WrappingContainer';
 
 export const renderWithWrapper = (Component: React.ReactElement<any>, options?: RenderOptions) => render(Component, {
   wrapper: WrappingContainer,

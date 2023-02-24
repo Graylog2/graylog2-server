@@ -68,9 +68,9 @@ const Thumb = (props, state) => {
 const StyledTrack = styled.div(({ theme }: { theme: DefaultTheme }) => css`
     top: ${theme.spacings.xxs};
     bottom: 0;
-    background: ${(props: any) => (props.index === 1 ? '#5082bc' : theme.colors.variant.default)};
+    background: ${(props: any) => (props.index === 1 ? "#5082bc" : theme.colors.variant.default)};
     border-radius: 999px;
-  `);
+`);
 
 const Track = (props, state) => <StyledTrack {...props} index={state.index} />;
 

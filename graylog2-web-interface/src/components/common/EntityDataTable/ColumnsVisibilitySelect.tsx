@@ -16,21 +16,18 @@
  */
 import styled from 'styled-components';
 import * as React from 'react';
-import { Overlay } from 'react-overlays';
-import { useState, useRef, useMemo } from 'react';
+import { useMemo } from 'react';
 
-import { Checkbox, Button, Popover } from 'components/bootstrap';
+import { Checkbox, DropdownButton } from 'components/bootstrap';
 import type { Column } from 'components/common/EntityDataTable/types';
-import { Icon, Portal } from 'components/common';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
+import MenuItem from 'components/bootstrap/MenuItem';
 
-const StyledPopover = styled(Popover)`
-  margin-right: 5px;
-  
-  .popover-content {
+const StyledDropdownButton = styled(DropdownButton)`
+  ~ .dropdown-menu {
+    min-width: auto;
     max-width: 180px;
-    padding: 5px 10px;
   }
 `;
 
@@ -51,7 +48,7 @@ const ColumnCheckbox = styled(Checkbox)`
   }
 `;
 
-const ListItem = styled.div`
+const ListItem = styled(MenuItem)`
   padding: 3px 0;
   cursor: pointer;
   display: flex;
@@ -89,7 +86,7 @@ const ColumnListItem = ({
   };
 
   return (
-    <ListItem role="menuitem" onClick={toggleVisibility} title={`${isSelected ? 'Hide' : 'Show'} ${column.title}`}>
+    <ListItem onSelect={toggleVisibility} title={`${isSelected ? 'Hide' : 'Show'} ${column.title}`}>
       <ColumnCheckbox checked={isSelected} onChange={toggleVisibility} />
       <ColumnTitle>{column.title}</ColumnTitle>
     </ListItem>
@@ -103,40 +100,26 @@ type Props = {
 }
 
 const ColumnsVisibilitySelect = ({ onChange, selectedColumns, allColumns }: Props) => {
-  const buttonRef = useRef();
-  const [showSelect, setShowSelect] = useState(false);
-
-  const toggleColumnSelect = () => {
-    setShowSelect((cur) => !cur);
-  };
-
   const sortedColumns = useMemo(
     () => allColumns.sort((col1, col2) => (naturalSort(col1.title, col2.title))),
     [allColumns],
   );
 
   return (
-    <>
-      <Button onClick={toggleColumnSelect} ref={buttonRef} bsSize="small" title="Select columns to display">
-        <Icon name="cog" /> Columns
-      </Button>
-
-      {showSelect && (
-        <Portal>
-          <Overlay target={buttonRef.current} placement="bottom" show onHide={toggleColumnSelect} rootClose>
-            <StyledPopover id="columns-visibility-select">
-              {sortedColumns.map((column) => (
-                <ColumnListItem column={column}
-                                onClick={onChange}
-                                key={column.id}
-                                allColumns={allColumns}
-                                selectedColumns={selectedColumns} />
-              ))}
-            </StyledPopover>
-          </Overlay>
-        </Portal>
-      )}
-    </>
+    <StyledDropdownButton title="Columns"
+                          bsSize="small"
+                          pullRight
+                          aria-label="Configure visible columns"
+                          id="columns-visibility-select"
+                          bsStyle="default">
+      {sortedColumns.map((column) => (
+        <ColumnListItem column={column}
+                        onClick={onChange}
+                        key={column.id}
+                        allColumns={allColumns}
+                        selectedColumns={selectedColumns} />
+      ))}
+    </StyledDropdownButton>
   );
 };
 

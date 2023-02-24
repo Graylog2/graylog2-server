@@ -41,7 +41,7 @@ const MatchIcon = styled(({ empty: _empty, matches: _matches, ...props }) => <Ic
     return css`
       color: ${empty ? theme.colors.variant.info : matchColor};
       margin-right: 3px;
-    `;
+`;
   },
 );
 
