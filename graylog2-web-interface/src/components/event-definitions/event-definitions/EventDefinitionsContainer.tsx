@@ -32,6 +32,11 @@ import BulkActions from './BulkActions';
 
 import type { EventDefinition } from '../event-definitions-types';
 import useEventDefinitions from '../hooks/useEventDefinitions';
+import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
+
+const isSystemEventDefinition = (eventDefinition: EventDefinition): boolean => {
+  return eventDefinition?.config?.type === SYSTEM_EVENT_DEFINITION_TYPE;
+};
 
 const CUSTOM_COLUMN_DEFINITIONS = [
   { id: 'scheduling', title: 'Scheduling', sortable: false },
@@ -51,7 +56,10 @@ const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
     ),
   },
   status: {
-    renderCell: (eventDefinition) => <StatusCell status={eventDefinition?.scheduler?.is_scheduled} />,
+    renderCell: (eventDefinition) => (
+      <StatusCell status={eventDefinition?.scheduler?.is_scheduled}
+                  isSystemEvent={isSystemEventDefinition(eventDefinition)} />
+    ),
     staticWidth: 100,
   },
   prority: {
