@@ -27,9 +27,8 @@ type Props = {
   title: string,
 };
 
-const Toggle = styled.a.attrs({
-  href: '#' /* stylelint-disable-line property-no-unknown*/
-})(({ theme }) => css`
+/* stylelint-disable-next-line property-no-unknown */
+const Toggle = styled.a.attrs({ href: '#' })(({ theme }) => css`
   &::after {
     display: block;
     content: ' ';
