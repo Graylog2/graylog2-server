@@ -28,7 +28,7 @@ import FieldForm from './FieldForm';
 import FieldsList from './FieldsList';
 
 // Import built-in Field Value Providers
-import {} from './field-value-providers';
+import './field-value-providers';
 
 import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
