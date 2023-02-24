@@ -55,22 +55,28 @@ type Props = {
   children?: React.ReactNode,
 };
 
+export const ReplaySearchButtonComponent = ({ searchLink, children }: { children?: React.ReactNode, searchLink: string }) => (
+  <NeutralLink href={searchLink} target="_blank" rel="noopener noreferrer" title="Replay search">
+    {children
+      ? <>{children} <StyledIcon name="play" /></>
+      : <IconButton name="play" focusable={false} />}
+  </NeutralLink>
+);
+
 const ReplaySearchButton = ({ queryString, timerange, streams, children }: Props) => {
   const searchLink = buildSearchLink(timerange, queryString, streams);
 
-  return (
-    <NeutralLink href={searchLink} target="_blank" rel="noopener noreferrer" title="Replay search">
-      {children
-        ? <>{children} <StyledIcon name="play" /></>
-        : <IconButton name="play" focusable={false} />}
-    </NeutralLink>
-  );
+  return <ReplaySearchButtonComponent searchLink={searchLink}>{children}</ReplaySearchButtonComponent>;
 };
 
 ReplaySearchButton.defaultProps = {
   queryString: undefined,
   timerange: undefined,
   streams: undefined,
+  children: undefined,
+};
+
+ReplaySearchButtonComponent.defaultProps = {
   children: undefined,
 };
 

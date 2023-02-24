@@ -19,7 +19,7 @@ import * as Immutable from 'immutable';
 import uniq from 'lodash/uniq';
 
 import View from 'views/logic/views/View';
-import type { AbsoluteTimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange, ElasticsearchQueryString, RelativeTimeRangeStartOnly } from 'views/logic/queries/Query';
 import type { EventType } from 'hooks/useEventById';
 import type { EventDefinition } from 'logic/alerts/types';
 import QueryGenerator from 'views/logic/queries/QueryGenerator';
@@ -151,7 +151,7 @@ const ViewGenerator = async ({
   groupBy,
 }: {
   streams: string | string[] | undefined | null,
-  timeRange: AbsoluteTimeRange,
+  timeRange: AbsoluteTimeRange | RelativeTimeRangeStartOnly,
   queryString: ElasticsearchQueryString,
   aggregations: Array<EventDefinitionAggregation>
   groupBy: Array<string>
@@ -183,7 +183,28 @@ const useCreateViewForEvent = (
   };
   const queryString: ElasticsearchQueryString = {
     type: 'elasticsearch',
-    query_string: eventData?.replay_info?.query || ' ',
+    query_string: eventData?.replay_info?.query || '',
+  };
+  const groupBy = eventDefinition.config.group_by;
+
+  return useMemo(
+    () => ViewGenerator({ streams, timeRange, queryString, aggregations, groupBy }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+};
+
+export const useCreateViewForEventDefinition = (
+  { eventDefinition, aggregations }: { eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation> },
+) => {
+  const { streams } = eventDefinition.config;
+  const timeRange: RelativeTimeRangeStartOnly = {
+    type: 'relative',
+    range: eventDefinition.config.search_within_ms / 1000,
+  };
+  const queryString: ElasticsearchQueryString = {
+    type: 'elasticsearch',
+    query_string: eventDefinition.config.query || '',
   };
   const groupBy = eventDefinition.config.group_by;
 

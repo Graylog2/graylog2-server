@@ -27,10 +27,10 @@ import type { EventDefinition } from 'logic/alerts/types';
 
 const useAlertAndEventDefinitionData = () => {
   const { path } = useRouteMatch();
-  const { alertId } = useParams<{ alertId?: string }>();
+  const { alertId, definitionId } = useParams<{ alertId?: string, definitionId?: string }>();
   const queryClient = useQueryClient();
   const eventData = queryClient.getQueryData(['event-by-id', alertId]) as EventType;
-  const data = queryClient.getQueryData(['definition', eventData?.event_definition_id]) as { eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation>};
+  const data = queryClient.getQueryData(['definition', definitionId || eventData?.event_definition_id]) as { eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation>};
   const eventDefinition = data?.eventDefinition;
   const aggregations = data?.aggregations;
 

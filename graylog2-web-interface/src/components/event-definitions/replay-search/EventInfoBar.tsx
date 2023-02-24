@@ -74,7 +74,7 @@ const EventInfoBar = () => {
       return res;
     }, {});
   });
-  const { eventData, eventDefinition, aggregations } = useAlertAndEventDefinitionData();
+  const { eventData, eventDefinition, aggregations, isEventDefinition } = useAlertAndEventDefinitionData();
 
   const toggleOpen = (e) => {
     e.stopPropagation();
@@ -95,7 +95,7 @@ const EventInfoBar = () => {
     }, []);
   }, [eventDefinition, allNotifications]);
 
-  const isEDUpdatedAfterEvent = moment(eventDefinition.updated_at).diff(eventData.timestamp) > 0;
+  const isEDUpdatedAfterEvent = !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData.timestamp) > 0;
   const highlightingRules = useHighlightingRules();
 
   const highlightingColors = useMemo(() => {
@@ -129,10 +129,12 @@ const EventInfoBar = () => {
       {open && (
       <Container>
         <Row>
+          {!isEventDefinition && (
           <Item>
             <b>Timestamp:</b>
             <Timestamp dateTime={eventData.timestamp} />
           </Item>
+          )}
           {isEDUpdatedAfterEvent && (
           <Item>
             <b>Event definition updated at:</b>
@@ -144,12 +146,16 @@ const EventInfoBar = () => {
             </HoverForHelp>
           </Item>
           )}
+          {!isEventDefinition && (
           <Item>
             <b>Event definition:</b>
             <span>
-              <Link target="_blank" to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{eventDefinition.title}</Link>
+              <Link target="_blank"
+                    to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{eventDefinition.title}
+              </Link>
             </span>
           </Item>
+          )}
           <Item>
             <b>Priority: </b>
             <span>{lodash.upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</span>

@@ -32,6 +32,8 @@ import withStreams from './withStreams';
 import { TIME_UNITS } from './FilterForm';
 import styles from './FilterAggregationSummary.css';
 
+import LinkToReplaySearch from '../replay-search/LinkToReplaySearch';
+
 class FilterAggregationSummary extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
@@ -155,6 +157,10 @@ class FilterAggregationSummary extends React.Component {
             </dd>
           </>
         )}
+        <dt>Actions</dt>
+        <dd>
+          <LinkToReplaySearch />
+        </dd>
       </dl>
     );
   }
