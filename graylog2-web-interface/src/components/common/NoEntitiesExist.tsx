@@ -22,7 +22,7 @@ import { Alert } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 
 const StyledIcon = styled(Icon)`
-  margin-right: 5px
+  margin-right: 5px;
 `;
 
 type Props = {
