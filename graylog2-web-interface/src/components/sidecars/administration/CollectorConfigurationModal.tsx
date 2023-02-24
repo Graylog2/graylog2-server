@@ -232,7 +232,7 @@ const CollectorConfigurationModal = ({
                           topMargin={0} />
         {(rows.length > 0) && (
           <InfoContainer bsStyle="info">
-            Sidecars that have a lock icon &nbsp;<Icon name="lock" size="xs" />&nbsp; have been assigned using tags and cannot be changed here.
+            Collector configurations that have a lock icon &nbsp;<Icon name="lock" size="xs" />&nbsp; have been assigned using tags and cannot be changed here.
           </InfoContainer>
         )}
         <ConfigurationContainer>
