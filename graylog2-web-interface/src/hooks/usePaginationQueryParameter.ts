@@ -29,7 +29,11 @@ export type PaginationQueryParameterResult = {
   setPagination: (payload: { page?: number, pageSize?: number }) => void;
 };
 
-const usePaginationQueryParameter = (PAGE_SIZES: number[] = DEFAULT_PAGE_SIZES, propsPageSize: number = DEFAULT_PAGE_SIZES[0], syncPageSizeFromQuery: boolean = true): PaginationQueryParameterResult => {
+const usePaginationQueryParameter = (
+  PAGE_SIZES: number[] = DEFAULT_PAGE_SIZES,
+  propsPageSize: number = DEFAULT_PAGE_SIZES[0],
+  syncPageSizeFromQuery: boolean = true,
+): PaginationQueryParameterResult => {
   const { page: pageQueryParameter, pageSize: pageSizeQueryParameter } = useQuery();
   const history = useHistory();
   const { search, pathname } = useLocation();
@@ -50,13 +54,7 @@ const usePaginationQueryParameter = (PAGE_SIZES: number[] = DEFAULT_PAGE_SIZES, 
   const pageSize = determinePageSize();
 
   const setPagination = ({ page: newPage = page, pageSize: newPageSize = pageSize }: { page?: number, pageSize?: number }) => {
-    const params: { page: string, pageSize?: string } = { page: String(newPage) };
-
-    if (syncPageSizeFromQuery) {
-      params.pageSize = String(newPageSize);
-    }
-
-    const uri = new URI(query).setSearch(params);
+    const uri = new URI(query).setSearch({ page: newPage, pageSize: syncPageSizeFromQuery ? String(newPageSize) : undefined });
     history.replace(uri.toString());
   };
 
