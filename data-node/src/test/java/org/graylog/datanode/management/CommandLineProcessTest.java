@@ -23,6 +23,7 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import org.apache.commons.exec.ExecuteException;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,13 +45,20 @@ import java.util.concurrent.TimeoutException;
 class CommandLineProcessTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandLineProcessTest.class);
+    private Path binPath;
 
-    @Test
-    void testManualStop() throws IOException, ExecutionException, InterruptedException, TimeoutException, RetryException, URISyntaxException {
+    @BeforeEach
+    void setUp() throws URISyntaxException, IOException {
         final URL bin = getClass().getResource("test-script.sh");
         assert bin != null;
-        final Path binPath = Path.of(bin.toURI());
+        binPath = Path.of(bin.toURI());
 
+        // make sure that the binary has the correct permissions before we try to run it
+        Files.setPosixFilePermissions(binPath, PosixFilePermissions.fromString("rwxr-xr-x"));
+    }
+
+    @Test
+    void testManualStop() throws IOException, ExecutionException, RetryException, URISyntaxException {
         List<String> stdout = new LinkedList<>();
         List<String> stdErr = new LinkedList<>();
 
@@ -110,11 +120,7 @@ class CommandLineProcessTest {
     }
 
     @Test
-    void testExitCode() throws IOException, URISyntaxException, ExecutionException, InterruptedException, TimeoutException {
-        final URL bin = getClass().getResource("test-script.sh");
-        assert bin != null;
-        final Path binPath = Path.of(bin.toURI());
-
+    void testExitCode() throws IOException, ExecutionException, InterruptedException, TimeoutException {
         final CompletableFuture<Integer> exitCodeFuture = new CompletableFuture<>();
 
         final ProcessListener listener = new ProcessListener() {

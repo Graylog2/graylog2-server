@@ -67,14 +67,14 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     private static RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 
-        credentialsProvider.setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(configuration.authUsername(), configuration.authPassword()));
-
         final boolean sslEnabled = Boolean.parseBoolean(configuration.asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
         final HttpHost host = new HttpHost("localhost", configuration.httpPort(), sslEnabled ? "https" : "http");
 
         RestClientBuilder builder = RestClient.builder(host);
         if (sslEnabled) {
+            if (configuration.authUsername() != null && configuration.authPassword() != null) {
+                credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(configuration.authUsername(), configuration.authPassword()));
+            }
             builder.setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
         }
         return new RestHighLevelClient(builder);
