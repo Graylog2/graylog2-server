@@ -16,6 +16,7 @@
  */
 package org.graylog.events.processor;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -28,5 +29,6 @@ public interface EventResolver {
      * @param definitionId an event definition ID
      * @return the dependent event definitions
      */
+    @NotNull
     List<EventDefinitionDto> dependentEvents(String definitionId);
 }

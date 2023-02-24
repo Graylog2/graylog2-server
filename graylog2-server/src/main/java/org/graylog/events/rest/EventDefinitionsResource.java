@@ -222,10 +222,13 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     public EventDefinitionDto delete(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                                      @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_DELETE, definitionId);
-        final List<String> dependencies = eventResolver.dependentEvents(definitionId).stream()
-                .map(dto -> dto.title()).toList();
-        if (!dependencies.isEmpty()) {
-            throw new ForbiddenException("Unable to delete because of existing event correlation: " + dependencies.toString());
+        final List<EventDefinitionDto> dependentEventDtoList = eventResolver.dependentEvents(definitionId);
+        if (!dependentEventDtoList.isEmpty()) {
+            final List<String> dependenciesTitles = dependentEventDtoList.stream().map(dto -> dto.title()).toList();
+            final List<String> dependenciesIds = dependentEventDtoList.stream().map(dto -> dto.id()).toList();
+            throw new IllegalDependencyException(
+                    "Unable to delete event definition because of existing dependencies: " + dependenciesTitles.toString(),
+                    dependenciesIds);
         }
 
         final Optional<EventDefinitionDto> eventDefinitionDto = dbService.get(definitionId);
@@ -336,6 +339,15 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             LOG.error("Not allowed to change event definition condition type from <{}> to <{}>.",
                     oldEventDefinition.config().type(), updatedEventDefinition.config().type());
             throw new ForbiddenException("Condition type not changeable");
+        }
+    }
+
+    public static class IllegalDependencyException extends RuntimeException {
+        private List<String> dependencies;
+
+        public IllegalDependencyException(String message, List<String> dependencies) {
+            super(message);
+            this.dependencies = dependencies;
         }
     }
 }
