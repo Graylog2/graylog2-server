@@ -26,6 +26,7 @@ import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { allMessagesTable } from 'views/logic/Widgets';
 import { createViewWithWidgets } from 'fixtures/searches';
+import useAppDispatch from 'stores/useAppDispatch';
 
 const mockHistoryReplace = jest.fn();
 
@@ -39,6 +40,8 @@ jest.mock('react-router-dom', () => ({
     search: '',
   })),
 }));
+
+jest.mock('stores/useAppDispatch');
 
 const emptyLocation = {
   pathname: '',
@@ -58,6 +61,8 @@ describe('WidgetFocusProvider', () => {
   afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
+    const dispatch = jest.fn();
+    asMock(useAppDispatch).mockReturnValue(dispatch);
     asMock(useLocation).mockReturnValue(emptyLocation);
   });
 
@@ -119,17 +124,11 @@ describe('WidgetFocusProvider', () => {
       search: '?focusedId=widget-id&focusing=true',
     });
 
-    let contextValue;
-
-    const consume = (value: WidgetFocusContextType) => {
-      contextValue = value;
-
-      return null;
-    };
+    const consume = jest.fn();
 
     renderSUT(consume);
 
-    expect(contextValue.focusedWidget).toEqual({ id: 'widget-id', focusing: true, editing: false });
+    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ focusedWidget: { id: 'widget-id', focusing: true, editing: false } }));
   });
 
   it('should update url on widget edit', () => {
@@ -175,17 +174,11 @@ describe('WidgetFocusProvider', () => {
       search: '?focusedId=widget-id&editing=true',
     });
 
-    let contextValue;
-
-    const consume = (value: WidgetFocusContextType) => {
-      contextValue = value;
-
-      return null;
-    };
+    const consume = jest.fn();
 
     renderSUT(consume);
 
-    expect(contextValue.focusedWidget).toEqual({ id: 'widget-id', editing: true, focusing: true });
+    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ focusedWidget: { id: 'widget-id', editing: true, focusing: true } }));
   });
 
   it('should not remove focus query param on widget edit', () => {
@@ -219,18 +212,21 @@ describe('WidgetFocusProvider', () => {
       search: '?focusedId=not-existing-widget-id',
     });
 
-    let contextValue;
-
-    const consume = (value: WidgetFocusContextType) => {
-      contextValue = value;
-
-      return null;
-    };
+    const consume = jest.fn();
 
     renderSUT(consume);
 
-    expect(contextValue.focusedWidget).toBe(undefined);
+    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ focusedWidget: undefined }));
 
     expect(mockHistoryReplace).toHaveBeenCalledWith('');
+  });
+
+  it('does not trigger setting widgets to search initially', () => {
+    const dispatch = jest.fn();
+    asMock(useAppDispatch).mockReturnValue(dispatch);
+    asMock(useLocation).mockReturnValue(emptyLocation);
+    renderSUT(jest.fn());
+
+    expect(dispatch).not.toHaveBeenCalled();
   });
 });
