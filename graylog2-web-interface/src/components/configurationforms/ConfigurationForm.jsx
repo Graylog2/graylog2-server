@@ -25,14 +25,17 @@ class ConfigurationForm extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { ...this._copyStateFromProps(this.props), showConfigurationModal: false };
+    this.state = { ...this._copyStateFromProps(this.props), showConfigurationModal: false, submitted: false };
   }
 
   UNSAFE_componentWillReceiveProps(props) {
     const { values = {} } = this.state || {};
     const newState = this._copyStateFromProps(props);
 
-    newState.values = $.extend(newState.values, values);
+    if (!this.state.submitted) {
+      newState.values = $.extend(newState.values, values);
+    }
+
     this.setState(newState);
   }
 
@@ -119,17 +122,11 @@ class ConfigurationForm extends React.Component {
   _save = () => {
     const data = this.getValue();
 
-    const { titleValue, submitAction } = this.props;
+    const { submitAction } = this.props;
 
     submitAction(this._handleEncryptedFieldsBeforeSubmit(data));
 
-    // console.log('===copy state from props after submit', this._copyStateFromProps(this.props));
-
-    // this.setState(this._copyStateFromProps(this.props));
-
-    // console.log('===after submit state', this.state);
-
-    this.setState($.extend(this._copyStateFromProps(this.props), { showConfigurationModal: false }));
+    this.setState({ showConfigurationModal: false, submitted: true });
   };
 
   // eslint-disable-next-line react/no-unused-class-component-methods
