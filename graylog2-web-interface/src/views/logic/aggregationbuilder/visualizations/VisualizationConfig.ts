@@ -39,7 +39,7 @@ export default class VisualizationConfig {
     throw new Error('Must not be called on abstract class!');
   }
 
-  // eslint-disable-next-line class-methods-use-this,@typescript-eslint/no-unused-vars
+  // eslint-disable-next-line class-methods-use-this
   equalsForSearch(_other: any) {
     return true;
   }

@@ -71,7 +71,6 @@ export default class Search {
       .filter((p) => (!p.defaultValue && (!p.optional && p.needsBinding))).toSet();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
     const { id, queries, parameters } = this._value;
 
@@ -97,7 +96,6 @@ export default class Search {
     return new Search(id, queries, parameters.map((p) => Parameter.fromJSON(p)));
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   static builder(): Builder {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder();
