@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import {
   BooleanField,
   DropdownField,
-  InlineBinaryField,
+  EncryptedInlineBinaryField,
   ListField,
   NumberField,
   TextField,
@@ -95,16 +95,21 @@ const ConfigurationFormField = ({ typeName, configField, configKey, configValue,
                    autoFocus={autoFocus} />
       );
     case 'inline_binary':
-      return (
-        <InlineBinaryField key={elementKey}
-                           typeName={typeName}
-                           title={configKey}
-                           field={configField}
-                           value={configValue}
-                           dirty={dirty}
-                           onChange={onChange}
-                           autoFocus={autoFocus} />
-      );
+      if (configField.is_encrypted) {
+        return (
+          <EncryptedInlineBinaryField key={elementKey}
+                                      typeName={typeName}
+                                      title={configKey}
+                                      field={configField}
+                                      value={configValue}
+                                      dirty={dirty}
+                                      onChange={onChange}
+                                      autoFocus={autoFocus} />
+        );
+      }
+
+      return null;
+
     default:
       return null;
   }

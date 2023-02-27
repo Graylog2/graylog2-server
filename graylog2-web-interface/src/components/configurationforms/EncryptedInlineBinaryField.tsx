@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
+import styled from 'styled-components';
 
 import { Button, Input } from 'components/bootstrap';
 import { optionalMarker } from 'components/configurationforms/FieldHelpers';
@@ -29,18 +30,21 @@ type Props = {
   onChange: (title: string, value: any) => void,
   title: string,
   typeName: string,
-  value?: string | EncryptedFieldValue<string>,
+  value?: EncryptedFieldValue<string>,
 };
 
-const InlineBinaryField = ({ field, title, typeName, dirty, onChange, value, autoFocus }: Props) => {
+const FileContent = styled.span`
+  vertical-align: middle;
+`;
+
+const EncryptedInlineBinaryField = ({ field, title, typeName, dirty, onChange, value, autoFocus }: Props) => {
   const [fileName, setFileName] = useState(undefined);
-  const isEncryptedValuePresent = typeof value !== 'string' && value.is_set;
+  const isValuePresent = value.is_set;
   const isRequired = !field.is_optional;
-  const showReadOnlyEncrypted = field.is_encrypted && !dirty && isEncryptedValuePresent;
+  const showReadOnly = !dirty && isValuePresent;
   const fieldId = `${typeName}-${title}`;
 
   const labelContent = <>{field.human_name} {optionalMarker(field)}</>;
-  const helpText = fileName ? `Currently using file: ${fileName}` : field.description;
 
   const handleFileRead = (fileReader: FileReader, file) => {
     const dataUrl = fileReader.result;
@@ -57,8 +61,8 @@ const InlineBinaryField = ({ field, title, typeName, dirty, onChange, value, aut
     }
   };
 
-  const encryptedButtonAfter = () => {
-    if (isEncryptedValuePresent) {
+  const resetButton = () => {
+    if (isValuePresent) {
       return (
         <Button type="button" onClick={() => onChange(title, { delete_value: true })}>
           Reset
@@ -69,8 +73,8 @@ const InlineBinaryField = ({ field, title, typeName, dirty, onChange, value, aut
     return null;
   };
 
-  const buttonAfter = () => {
-    if ((fileName && fileName !== '') || (typeof value === 'string' && value.length > 0)) {
+  const removeButton = () => {
+    if (fileName) {
       return (
         <Button type="button" onClick={() => { setFileName(undefined); onChange(title, ''); }}>
           Remove
@@ -91,45 +95,60 @@ const InlineBinaryField = ({ field, title, typeName, dirty, onChange, value, aut
     }
   };
 
-  return (
-    showReadOnlyEncrypted ? (
+  const readOnlyFileInput = () => (
+    <Input id={fieldId}
+           type="password"
+           name={`configuration[${title}]`}
+           label={labelContent}
+           required={isRequired}
+           readOnly
+           help={field.description}
+           value="encrypted value"
+           buttonAfter={resetButton()}
+           autoFocus={autoFocus} />
+  );
+
+  const fileInput = () => (
+    (fileName) ? (
       <Input id={fieldId}
-             type="password"
              name={`configuration[${title}]`}
              label={labelContent}
              required={isRequired}
-             readOnly
-             help={helpText}
-             value="encrypted value"
-             buttonAfter={encryptedButtonAfter()}
-             autoFocus={autoFocus} />
+             help={field.description}
+             autoFocus={autoFocus}
+             buttonAfter={removeButton()}>
+        <FileContent>{fileName}</FileContent>
+      </Input>
     ) : (
       <Input id={fieldId}
              type="file"
              name={`configuration[${title}]`}
              label={labelContent}
              required={isRequired}
-             help={helpText}
+             help={field.description}
              onChange={(e) => handleFileUpload(e.target.files[0])}
-             buttonAfter={buttonAfter()}
              autoFocus={autoFocus} />
-    ));
+    )
+  );
+
+  return (
+    showReadOnly ? readOnlyFileInput() : fileInput());
 };
 
-InlineBinaryField.propTypes = {
+EncryptedInlineBinaryField.propTypes = {
   autoFocus: PropTypes.bool,
   dirty: PropTypes.bool,
   field: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   typeName: PropTypes.string.isRequired,
-  value: PropTypes.string,
+  value: PropTypes.object,
 };
 
-InlineBinaryField.defaultProps = {
+EncryptedInlineBinaryField.defaultProps = {
   autoFocus: false,
   dirty: false,
-  value: '',
+  value: {},
 };
 
-export default InlineBinaryField;
+export default EncryptedInlineBinaryField;
