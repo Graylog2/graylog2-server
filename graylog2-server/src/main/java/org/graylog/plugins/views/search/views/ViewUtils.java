@@ -69,7 +69,7 @@ public interface ViewUtils<T> {
                                 List.of(Aggregates.unwind("$items"),
                                         Aggregates.match(
                                                 doc("$expr", doc("$and", List.of(
-                                                                doc("$eq", List.of("$items.id", "$$searchId")),
+                                                                doc("$eq", List.of("$items.grn", "$$searchId")),
                                                                 doc("$eq", List.of("$user_id", "$$userId"))
                                                         )
                                                 ))),
