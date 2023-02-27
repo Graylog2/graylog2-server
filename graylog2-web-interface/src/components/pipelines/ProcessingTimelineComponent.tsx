@@ -54,7 +54,7 @@ const Header = styled.div`
 `;
 
 const PipelineStage = styled.div<{ $idle?: boolean }>(({ $idle, theme }) => css`
-  border: 1px solid ${theme.colors.gray[$idle ? '50px' : '70px']};
+  border: 1px solid ${theme.colors.gray[$idle ? "50px" : "70px"]};
   border-radius: 4px;
   display: inline-block;
   margin-right: 15px;
@@ -227,6 +227,7 @@ const ProcessingTimelineComponent = () => {
                    customFilter={searchFilter}
                    filterKeys={[]}
                    filterLabel="Filter Pipelines"
+                   noDataText="No pipelines have been found"
                    dataRowFormatter={_pipelineFormatter} />
       </StyledPaginatedList>
     </div>

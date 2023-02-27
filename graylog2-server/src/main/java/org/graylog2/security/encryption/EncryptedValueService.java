@@ -16,12 +16,14 @@
  */
 package org.graylog2.security.encryption;
 
+import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.graylog2.security.AESTools;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.security.GeneralSecurityException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -55,5 +57,12 @@ public class EncryptedValueService {
             return null;
         }
         return AESTools.decrypt(encryptedValue.value(), encryptionKey, encryptedValue.salt());
+    }
+
+    public String tryDecrypt(EncryptedValue encryptedValue) throws InvalidCipherTextException, GeneralSecurityException {
+        if (!encryptedValue.isSet()) {
+            throw new IllegalArgumentException("Encrypted value is not set!");
+        }
+        return AESTools.tryDecrypt(encryptedValue.value(), encryptionKey, encryptedValue.salt());
     }
 }

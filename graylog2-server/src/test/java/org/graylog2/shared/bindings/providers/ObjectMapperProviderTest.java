@@ -70,5 +70,4 @@ class ObjectMapperProviderTest {
         assertThat(javaDuration).isEqualTo("\"PT10S\"");
         assertThat(jodaDuration).isEqualTo("10000");
     }
-
 }

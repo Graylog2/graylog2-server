@@ -43,6 +43,10 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.rest.models.tools.responses.PageListResponse;
+import org.graylog2.rest.resources.entities.EntityAttribute;
+import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -68,6 +72,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -85,6 +91,17 @@ public class EventNotificationsResource extends RestResource implements PluginRe
             .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put("title", SearchQueryField.create(NotificationDto.FIELD_TITLE))
             .put("description", SearchQueryField.create(NotificationDto.FIELD_DESCRIPTION))
+            .build();
+
+    private static final String DEFAULT_SORT_FIELD = "title";
+    private static final String DEFAULT_SORT_DIRECTION = "asc";
+    private static final List<EntityAttribute> attributes = List.of(
+            EntityAttribute.builder().id("title").title("Title").build(),
+            EntityAttribute.builder().id("description").title("Description").build(),
+            EntityAttribute.builder().id("type").title("Type").build()
+    );
+    private static final EntityDefaults settings = EntityDefaults.builder()
+            .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
             .build();
 
     private final DBNotificationService dbNotificationService;
@@ -110,14 +127,43 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     }
 
     @GET
+    @Timed
+    @Path("/paginated")
+    @ApiOperation(value = "Get a paginated list of event notifications")
+    @Produces(MediaType.APPLICATION_JSON)
+    public PageListResponse<NotificationDto> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                     @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                     @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                     @ApiParam(name = "sort",
+                                                               value = "The field to sort the result on",
+                                                               required = true,
+                                                               allowableValues = "title,description,type")
+                                                     @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
+                                                     @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                     @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order) {
+        final SearchQuery searchQuery = searchQueryParser.parse(query);
+        if ("type".equals(sort)) {
+            sort = "config.type";
+        }
+        final PaginatedList<NotificationDto> result = dbNotificationService.searchPaginated(searchQuery, notification -> {
+            return isPermitted(RestPermissions.EVENT_NOTIFICATIONS_READ, notification.id());
+        }, sort, order, page, perPage);
+
+
+        return PageListResponse.create(query, result.pagination(),
+                result.grandTotal().orElse(0L), sort, order, result.delegate(), attributes, settings);
+    }
+
+    @GET
     @ApiOperation("List all available notifications")
+    @Deprecated
     public PaginatedResponse<NotificationDto> listNotifications(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                                 @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                                 @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         final PaginatedList<NotificationDto> result = dbNotificationService.searchPaginated(searchQuery, notification -> {
             return isPermitted(RestPermissions.EVENT_NOTIFICATIONS_READ, notification.id());
-        }, "title", page, perPage);
+        }, "title", "asc", page, perPage);
         return PaginatedResponse.create("notifications", result, query);
     }
 

@@ -60,7 +60,7 @@ const FieldsRow = styled.tr`
   && td {
     min-width: 50px;
     word-break: break-word;
-    padding: 4px 5px 2px 5px; 
+    padding: 4px 5px 2px;
   }
 
   time {

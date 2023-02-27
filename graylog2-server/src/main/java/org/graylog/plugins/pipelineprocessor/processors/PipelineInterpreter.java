@@ -30,6 +30,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.graylog.failure.ProcessingFailureCause;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
@@ -58,6 +59,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -71,7 +73,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class PipelineInterpreter implements MessageProcessor {
-    private static final Logger log = LoggerFactory.getLogger(PipelineInterpreter.class);
+    private static final RateLimitedLog log = getRateLimitedLog(PipelineInterpreter.class);
 
     private final MessageQueueAcknowledger messageQueueAcknowledger;
     private final Meter filteredOutMessages;
@@ -466,6 +468,14 @@ public class PipelineInterpreter implements MessageProcessor {
         public String className() {
             return PipelineInterpreter.class.getCanonicalName();
         }
+    }
+
+    public static RateLimitedLog getRateLimitedLog(Class clazz) {
+        final Logger baseLog = LoggerFactory.getLogger(clazz);
+        return RateLimitedLog
+                .withRateLimit(baseLog)
+                .maxRate(5).every(Duration.ofSeconds(10))
+                .build();
     }
 
     public static class State {

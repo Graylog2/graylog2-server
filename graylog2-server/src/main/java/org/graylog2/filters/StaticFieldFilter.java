@@ -24,6 +24,7 @@ import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.filters.MessageFilter;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
@@ -60,19 +61,18 @@ public class StaticFieldFilter implements MessageFilter {
         this.inputService = inputService;
         this.scheduler = scheduler;
 
-        loadAllStaticFields();
-
         // TODO: This class needs lifecycle management to avoid leaking objects in the EventBus
         serverEventBus.register(this);
     }
 
     @Override
     public boolean filter(Message msg) {
-        if (msg.getSourceInputId() == null)
+        if (msg.getSourceInputId() == null) {
             return false;
+        }
 
-        for(final Map.Entry<String, String> field : staticFields.getOrDefault(msg.getSourceInputId(), Collections.emptyList())) {
-            if(!msg.hasField(field.getKey())) {
+        for (final Map.Entry<String, String> field : staticFields.getOrDefault(msg.getSourceInputId(), Collections.emptyList())) {
+            if (!msg.hasField(field.getKey())) {
                 msg.addField(field.getKey(), field.getValue());
             } else {
                 LOG.debug("Message already contains field [{}]. Not overwriting.", field.getKey());
@@ -100,6 +100,14 @@ public class StaticFieldFilter implements MessageFilter {
     @SuppressWarnings("unused")
     public void handleInputUpdate(final InputUpdated event) {
         scheduler.submit(() -> loadStaticFields(event.id()));
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void lifecycleChanged(Lifecycle lifecycle) {
+        if (Lifecycle.STARTING.equals(lifecycle)) {
+            loadAllStaticFields();
+        }
     }
 
     private void loadAllStaticFields() {
