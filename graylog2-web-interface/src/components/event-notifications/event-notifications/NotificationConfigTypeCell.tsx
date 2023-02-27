@@ -15,26 +15,28 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import type { Column, ColumnRenderer, EntityBase } from './types';
+import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 
-const Td = styled.td`
-  word-break: break-word;
-`;
+type Props = {
+  notification: EventNotification
+}
 
-const TableCell = <Entity extends EntityBase>({
-  column,
-  columnRenderer,
-  entity,
-}: {
-  column: Column
-  columnRenderer: ColumnRenderer<Entity> | undefined,
-  entity: Entity,
-}) => {
-  const content = typeof columnRenderer?.renderCell === 'function' ? columnRenderer.renderCell(entity, column) : entity[column.id];
+const getNotificationPlugin = (type: string) => {
+  if (type === undefined) {
+    return {};
+  }
 
-  return (<Td>{content}</Td>);
+  return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || { displayName: null };
 };
 
-export default TableCell;
+const NotificationConfigTypeCell = ({ notification }: Props) => {
+  const plugin = getNotificationPlugin(notification.config.type);
+
+  return (
+    <div>{plugin?.displayName || notification.config.type}</div>
+  );
+};
+
+export default NotificationConfigTypeCell;

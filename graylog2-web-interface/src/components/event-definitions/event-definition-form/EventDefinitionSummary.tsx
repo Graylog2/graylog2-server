@@ -40,7 +40,7 @@ import commonStyles from '../common/commonStyles.css';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
 type Props = {
-  eventDefinition: EventDefinition,
+  eventDefinition: Omit<EventDefinition, 'id'>,
   notifications: Array<any>,
   validation: {
     errors: {
