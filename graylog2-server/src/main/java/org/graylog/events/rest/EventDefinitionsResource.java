@@ -44,6 +44,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.plugin.rest.ValidationFailureException;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.bulk.AuditParams;
 import org.graylog2.rest.bulk.BulkExecutor;
@@ -226,9 +227,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         if (!dependentEventDtoList.isEmpty()) {
             final List<String> dependenciesTitles = dependentEventDtoList.stream().map(dto -> dto.title()).toList();
             final List<String> dependenciesIds = dependentEventDtoList.stream().map(dto -> dto.id()).toList();
-            throw new IllegalDependencyException(
-                    "Unable to delete event definition because of existing dependencies: " + dependenciesTitles.toString(),
-                    dependenciesIds);
+            ValidationResult validationResult = new ValidationResult()
+                .addError("dependency", "Unable to delete event definition because of existing dependencies: " + dependenciesTitles.toString())
+                .addContext("dependency_ids", dependenciesIds);
+            throw new ValidationFailureException(validationResult);
         }
 
         final Optional<EventDefinitionDto> eventDefinitionDto = dbService.get(definitionId);
