@@ -47,6 +47,7 @@ type Props<Entity extends EntityBase> = {
   isSelected: boolean,
   onToggleEntitySelect: (entityId: string) => void,
   rowActions?: (entity: Entity) => React.ReactNode,
+  entityAttributesAreCamelCase: boolean,
 };
 
 const TableRow = <Entity extends EntityBase>({
@@ -60,6 +61,7 @@ const TableRow = <Entity extends EntityBase>({
   rowActions,
   index,
   actionsRef,
+  entityAttributesAreCamelCase,
 }: Props<Entity>) => {
   const toggleRowSelect = useCallback(
     () => onToggleEntitySelect(entity.id),
@@ -82,6 +84,7 @@ const TableRow = <Entity extends EntityBase>({
 
         return (
           <TableCell columnRenderer={columnRenderer}
+                     entityAttributesAreCamelCase={entityAttributesAreCamelCase}
                      entity={entity}
                      column={column}
                      key={`${entity.id}-${column.id}`} />

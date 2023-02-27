@@ -95,6 +95,7 @@ const useElementsWidths = <Entity extends EntityBase>({
   columns: Array<Column>,
   columnRenderers: ColumnRenderers<Entity>,
   displayBulkSelectCol: boolean
+  entityAttributesAreCamelCase: boolean
 }) => {
   const tableRef = useRef<HTMLTableElement>();
   const actionsRef = useRef<HTMLDivElement>();
@@ -116,13 +117,14 @@ const useElementsWidths = <Entity extends EntityBase>({
 type Props<Entity extends EntityBase> = {
   /** Currently active sort */
   activeSort?: Sort,
-  /** Supported batch operations */
+  entityAttributesAreCamelCase?: boolean,
+  /** Supported bulk actions */
   bulkActions?: (selectedEntities: Array<string>, setSelectedEntities: (streamIds: Array<string>) => void) => React.ReactNode,
-  /** List of all available columns. */
+  /** List of all available columns. Column ids need to be snake case. */
   columnDefinitions: Array<Column>,
-  /** Custom cell and header renderer for a column */
+  /** Custom cell and header renderer for a column. Column ids need to be snake case. */
   columnRenderers?: ColumnRenderers<Entity>,
-  /** Define default columns order */
+  /** Define default columns order. Column ids need to be snake case. */
   columnsOrder?: Array<string>,
   /** The table data. */
   data: Readonly<Array<Entity>>,
@@ -145,6 +147,7 @@ type Props<Entity extends EntityBase> = {
  */
 const EntityDataTable = <Entity extends EntityBase>({
   activeSort,
+  entityAttributesAreCamelCase,
   bulkActions,
   columnRenderers: customColumnRenderers,
   columnDefinitions,
@@ -178,6 +181,7 @@ const EntityDataTable = <Entity extends EntityBase>({
     columns,
     columnRenderers,
     displayBulkSelectCol,
+    entityAttributesAreCamelCase,
   });
 
   const onToggleEntitySelect = useCallback((itemId: string) => {
@@ -231,6 +235,7 @@ const EntityDataTable = <Entity extends EntityBase>({
               <TableRow entity={entity}
                         key={entity.id}
                         index={index}
+                        entityAttributesAreCamelCase={entityAttributesAreCamelCase}
                         actionsRef={actionsRef}
                         onToggleEntitySelect={onToggleEntitySelect}
                         columnRenderers={columnRenderers}
@@ -255,6 +260,7 @@ EntityDataTable.defaultProps = {
   onPageSizeChange: undefined,
   pageSize: undefined,
   rowActions: undefined,
+  entityAttributesAreCamelCase: true,
 };
 
 export default EntityDataTable;

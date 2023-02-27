@@ -22,31 +22,31 @@ import { Timestamp } from 'components/common';
 
 const DefaultColumnRenderers = {
   created_at: {
-    renderCell: (entity: { created_at: string }) => (
-      <Timestamp dateTime={entity.created_at} />
+    renderCell: (createdAt: string) => (
+      <Timestamp dateTime={createdAt} />
     ),
     staticWidth: 160,
   },
   description: {
-    renderCell: (entity: { description: string }) => (
+    renderCell: (description: string) => (
       <TextOverflowEllipsis>
-        {entity.description}
+        {description}
       </TextOverflowEllipsis>
     ),
     width: 2,
   },
   summary: {
-    renderCell: (entity: { summary: string }) => (
+    renderCell: (summary: string) => (
       <TextOverflowEllipsis>
-        {entity.summary}
+        {summary}
       </TextOverflowEllipsis>
     ),
     width: 1.5,
   },
   owner: {
-    renderCell: (entity: { owner: string }) => (
+    renderCell: (owner: string) => (
       <TextOverflowEllipsis>
-        {entity.owner}
+        {owner}
       </TextOverflowEllipsis>
     ),
     staticWidth: 120,

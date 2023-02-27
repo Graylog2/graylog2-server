@@ -85,7 +85,7 @@ describe('<EntityDataTable />', () => {
                             onColumnsChange={() => {}}
                             columnRenderers={{
                               title: {
-                                renderCell: (listItem) => `The title: ${listItem.title}`,
+                                renderCell: (title: string) => `The title: ${title}`,
                                 renderHeader: (column) => `Custom ${column.title} Header`,
                               },
                             }}

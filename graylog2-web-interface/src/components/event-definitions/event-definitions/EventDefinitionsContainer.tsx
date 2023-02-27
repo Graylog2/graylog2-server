@@ -46,17 +46,17 @@ const INITIAL_COLUMNS = ['title', 'description', 'priority', 'scheduling', 'stat
 const COLUMNS_ORDER = ['title', 'description', 'priority', 'status', 'scheduling'];
 const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
   title: {
-    renderCell: (eventDefinition) => (
-      <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{eventDefinition.title}</Link>
+    renderCell: (title: string, eventDefinition) => (
+      <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{title}</Link>
     ),
   },
   scheduling: {
-    renderCell: (eventDefinition) => (
+    renderCell: (_scheduling: string, eventDefinition) => (
       <SchedulingCell definition={eventDefinition} />
     ),
   },
   status: {
-    renderCell: (eventDefinition) => (
+    renderCell: (_status: string, eventDefinition) => (
       <StatusCell status={eventDefinition?.scheduler?.is_scheduled}
                   isSystemEvent={isSystemEventDefinition(eventDefinition)} />
     ),
@@ -148,7 +148,8 @@ const EventDefinitionsContainer = () => {
                                             activeSort={searchParams.sort}
                                             rowActions={renderEventDefinitionActions}
                                             columnRenderers={columnRenderers}
-                                            columnDefinitions={columnDefinitions} />
+                                            columnDefinitions={columnDefinitions}
+                                            entityAttributesAreCamelCase={false} />
         )}
       </div>
     </PaginatedList>
