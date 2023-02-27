@@ -20,7 +20,7 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 
-const eventsUrl = (id) => qualifyUrl(`/events/${id}`);
+export const eventsUrl = (id) => qualifyUrl(`/events/${id}`);
 
 export type EventType = {
   alert : boolean;
@@ -57,7 +57,7 @@ const fetchEvent = (eventId: string) => {
 };
 
 const useEventById = (eventId: string): {
-  data: EventType
+  data: EventType,
   refetch: () => void,
   isLoading: boolean,
   isFetched: boolean,
@@ -67,7 +67,7 @@ const useEventById = (eventId: string): {
     () => fetchEvent(eventId),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading event or alert  failed with status: ${errorThrown}`,
+        UserNotification.error(`Loading event or alert failed with status: ${errorThrown}`,
           'Could not load event or alert');
       },
       keepPreviousData: true,
