@@ -21,6 +21,7 @@ import { StoreMock as MockStore } from 'helpers/mocking';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import View from 'views/logic/views/View';
 import _ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
+import mockAction from 'helpers/mocking/MockAction';
 
 const mockView = View.builder()
   .type(View.Type.Dashboard)
@@ -67,7 +68,7 @@ const ShowDashboardInBigDisplayMode = _ShowDashboardInBigDisplayMode as React.Co
 
 describe('ShowDashboardInBigDisplayMode', () => {
   beforeEach(() => {
-    RefreshActions.disable = jest.fn();
+    RefreshActions.disable = mockAction(jest.fn());
   });
 
   afterEach(() => {
