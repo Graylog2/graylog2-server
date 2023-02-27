@@ -73,7 +73,7 @@ public interface ViewUtils<T> {
                                                         doc("$or",
                                                                 List.of(
                                                                         doc("$eq", List.of("$items", "$$dashboardId")),
-                                                                        doc("$eq", List.of("$items", "$$dashboardId"))
+                                                                        doc("$eq", List.of("$items", "$$searchId"))
                                                                 )
                                                         ),
                                                         doc("$eq", List.of("$user_id", "$$userId"))
