@@ -197,8 +197,6 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
 
         return PageListResponse.create(query, definitionDtos.pagination(),
                 result.grandTotal().orElse(0L), sort, order, eventDefinitionDtos, attributes, settings);
-        this.bulkExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
-        this.eventResolver = eventResolver;
     }
 
     @GET
@@ -297,19 +295,20 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         if (!dependentEventDtoList.isEmpty()) {
             final List<String> dependenciesTitles = dependentEventDtoList.stream().map(dto -> dto.title()).toList();
             final List<String> dependenciesIds = dependentEventDtoList.stream().map(dto -> dto.id()).toList();
+            String msg = "Unable to delete event definition because of existing dependencies: " + dependenciesTitles.toString();
             ValidationResult validationResult = new ValidationResult()
-                .addError("dependency", "Unable to delete event definition because of existing dependencies: " + dependenciesTitles.toString())
+                .addError("dependency", msg)
                 .addContext("dependency_ids", dependenciesIds);
-            throw new ValidationFailureException(validationResult);
+            throw new ValidationFailureException(validationResult, msg);
         }
 
         final Optional<EventDefinitionDto> eventDefinitionDto = dbService.get(definitionId);
         eventDefinitionDto.ifPresent(d ->
                 recentActivityService.delete(d.id(), GRNTypes.EVENT_DEFINITION, d.title(), userContext.getUser())
         );
-
         eventDefinitionHandler.delete(definitionId);
-        return eventDefinitionDto.orElse(null);
+
+        return eventDefinitionDto.orElseThrow(() -> new IllegalStateException("Unable to find event definition: " + definitionId));
     }
 
     @POST
