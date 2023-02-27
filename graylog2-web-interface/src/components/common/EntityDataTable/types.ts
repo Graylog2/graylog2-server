@@ -16,17 +16,20 @@
  */
 import type * as React from 'react';
 
+import type { Sort } from 'stores/PaginationTypes';
+
 export type EntityBase = {
   id: string,
 }
 
 export type Column = {
   anyPermissions?: boolean,
+  hidden?: boolean,
   id: string,
   permissions?: Array<string>
   sortable?: boolean,
   title: string,
-  type?: boolean,
+  type?: 'BOOLEAN' | 'STRING' | 'DATE' | 'OBJECT_ID',
 };
 
 // A column render should have either a `width` and optionally a `minWidth` or only a `staticWidth`.
@@ -41,4 +44,19 @@ export type ColumnRenderer<Entity extends EntityBase> = {
 
 export type ColumnRenderers<Entity extends EntityBase> = {
   [columnId: string]: ColumnRenderer<Entity>
+}
+
+export type TableLayoutPreferences = {
+  displayedAttributes?: Array<string>,
+  sort?: Sort,
+  perPage?: number,
+}
+
+export type TableLayoutPreferencesJSON = {
+  displayed_attributes?: Array<string>,
+  sort?: {
+    field: string,
+    order: 'asc' | 'desc',
+  },
+  per_page?: number
 }

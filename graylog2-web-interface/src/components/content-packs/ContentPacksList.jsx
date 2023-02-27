@@ -30,7 +30,7 @@ import {
 } from 'components/bootstrap';
 import {
   Pagination, PageSizeSelect,
-  ModalSubmit,
+  ModalSubmit, NoSearchResult, NoEntitiesExist,
 } from 'components/common';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
@@ -175,8 +175,8 @@ class ContentPacksList extends React.Component {
     this.setState({ filteredContentPacks: filteredItems });
   }
 
-  _itemsShownChange(event) {
-    this.setState({ pageSize: Number(event.target.value), currentPage: 1 });
+  _itemsShownChange(pageSize) {
+    this.setState({ pageSize, currentPage: 1 });
   }
 
   _onChangePage(nextPage) {
@@ -197,10 +197,10 @@ class ContentPacksList extends React.Component {
     const pageSizeSelect = <PageSizeSelect onChange={this._itemsShownChange} pageSize={pageSize} pageSizes={[10, 25, 50, 100]} />;
 
     const noContentMessage = contentPacks.length <= 0
-      ? 'No content packs found. Please create or upload one'
-      : 'No matching content packs found';
+      ? <NoEntitiesExist>No content packs found. Please create or upload one</NoEntitiesExist>
+      : <NoSearchResult>No matching content packs have been found</NoSearchResult>;
     const content = filteredContentPacks.length <= 0
-      ? (<div>{noContentMessage}</div>)
+      ? (<div className="has-bm">{noContentMessage}</div>)
       : (
         <ControlledTableList>
           <ControlledTableList.Header />
@@ -210,7 +210,7 @@ class ContentPacksList extends React.Component {
 
     return (
       <div>
-        <Row className="row-sm">
+        <Row className="has-bm">
           <Col md={5}>
             <TypeAheadDataFilter id="content-packs-filter"
                                  label="Filter"

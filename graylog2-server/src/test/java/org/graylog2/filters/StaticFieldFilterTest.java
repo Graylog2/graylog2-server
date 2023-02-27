@@ -22,6 +22,7 @@ import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.shared.SuppressForbidden;
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,6 +59,7 @@ public class StaticFieldFilterTest {
                 .thenReturn(Collections.singletonList(Maps.immutableEntry("foo", "bar")));
 
         final StaticFieldFilter filter = new StaticFieldFilter(inputService, new EventBus(), Executors.newSingleThreadScheduledExecutor());
+        filter.lifecycleChanged(Lifecycle.STARTING);
         filter.filter(msg);
 
         assertEquals("hello", msg.getMessage());
@@ -67,11 +69,12 @@ public class StaticFieldFilterTest {
 
     @Test
     @SuppressForbidden("Executors#newSingleThreadExecutor() is okay for tests")
-    public void testFilterIsNotOverwritingExistingKeys() throws Exception {
+    public void testFilterIsNotOverwritingExistingKeys() {
         Message msg = new Message("hello", "junit", Tools.nowUTC());
         msg.addField("foo", "IWILLSURVIVE");
 
         final StaticFieldFilter filter = new StaticFieldFilter(inputService, new EventBus(), Executors.newSingleThreadScheduledExecutor());
+        filter.lifecycleChanged(Lifecycle.STARTING);
         filter.filter(msg);
 
         assertEquals("hello", msg.getMessage());

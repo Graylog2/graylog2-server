@@ -27,7 +27,7 @@ describe('GRN', () => {
     expect(getValuesFromGRN('grn::::stream:stream-id')).toStrictEqual({
       resourceNameType: 'grn',
       cluster: undefined,
-      tenent: undefined,
+      tenant: undefined,
       scope: undefined,
       type: 'stream',
       id: 'stream-id',

@@ -43,6 +43,8 @@ import org.graylog2.plugin.inputs.transports.ThrottleableTransport;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.plugin.lifecycles.Lifecycle;
+import org.graylog2.security.encryption.EncryptedValue;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,9 +55,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -64,6 +69,7 @@ public class HttpPollTransport extends ThrottleableTransport {
 
     private static final String CK_URL = "target_url";
     private static final String CK_HEADERS = "headers";
+    private static final String CK_ENCRYPTED_HEADERS = "encrypted_headers";
     private static final String CK_TIMEUNIT = "timeunit";
     private static final String CK_INTERVAL = "interval";
 
@@ -72,6 +78,7 @@ public class HttpPollTransport extends ThrottleableTransport {
     private final ServerStatus serverStatus;
     private final ScheduledExecutorService scheduler;
     private final OkHttpClient httpClient;
+    private final EncryptedValueService encryptedValueService;
 
     private volatile boolean paused = true;
     private ScheduledFuture<?> scheduledFuture;
@@ -81,13 +88,14 @@ public class HttpPollTransport extends ThrottleableTransport {
                              EventBus serverEventBus,
                              ServerStatus serverStatus,
                              @Named("daemonScheduler") ScheduledExecutorService scheduler,
-                             OkHttpClient httpClient) {
+                             OkHttpClient httpClient, EncryptedValueService encryptedValueService) {
         super(serverEventBus, configuration);
         this.configuration = configuration;
         this.serverEventBus = serverEventBus;
         this.serverStatus = serverStatus;
         this.scheduler = scheduler;
         this.httpClient = httpClient;
+        this.encryptedValueService = encryptedValueService;
     }
 
     @VisibleForTesting
@@ -131,7 +139,7 @@ public class HttpPollTransport extends ThrottleableTransport {
         // listen for lifecycle changes
         serverEventBus.register(this);
 
-        final Map<String, String> headers = parseHeaders(configuration.getString(CK_HEADERS));
+        final Map<String, String> headers = parseHeaders(getHeaderString());
 
         // figure out a reasonable remote address
         final String url = configuration.getString(CK_URL);
@@ -178,6 +186,18 @@ public class HttpPollTransport extends ThrottleableTransport {
                 TimeUnit.valueOf(configuration.getString(CK_TIMEUNIT)));
     }
 
+    private String getHeaderString() {
+        final String standardHeaders = Objects.requireNonNullElse(configuration.getString(CK_HEADERS), "");
+
+        final EncryptedValue encryptedHeaders = Objects.requireNonNullElse(configuration.getEncryptedValue(CK_ENCRYPTED_HEADERS), EncryptedValue.createUnset());
+        final String decryptedHeaders = Objects.requireNonNullElse(encryptedValueService.decrypt(encryptedHeaders), "");
+
+        return Stream.of(standardHeaders, decryptedHeaders)
+                .map(String::strip)
+                .filter(s -> !s.isBlank())
+                .collect(Collectors.joining(","));
+    }
+
     @Override
     public void doStop() {
         serverEventBus.unregister(this);
@@ -213,6 +233,15 @@ public class HttpPollTransport extends ThrottleableTransport {
                     "http://example.org/api",
                     "HTTP resource returning JSON on GET",
                     ConfigurationField.Optional.NOT_OPTIONAL
+            ));
+
+            r.addField(new TextField(
+                    CK_ENCRYPTED_HEADERS,
+                    "Additional, sensitive HTTP headers.",
+                    "",
+                    "Add a comma separated list of HTTP headers containing sensitive information, e.g. for authorization. For example: Authorization: Bearer <token>",
+                    ConfigurationField.Optional.OPTIONAL,
+                    true
             ));
 
             r.addField(new TextField(

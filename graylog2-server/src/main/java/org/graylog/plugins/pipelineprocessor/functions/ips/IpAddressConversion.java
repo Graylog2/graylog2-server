@@ -16,17 +16,18 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.ips;
 
-import static com.google.common.collect.ImmutableList.of;
-
 import com.google.common.net.InetAddresses;
-import java.net.InetAddress;
-import java.util.IllegalFormatException;
-import java.util.Optional;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+
+import java.net.InetAddress;
+import java.util.IllegalFormatException;
+import java.util.Optional;
+
+import static com.google.common.collect.ImmutableList.of;
 
 public class IpAddressConversion extends AbstractFunction<IpAddress> {
 
@@ -59,7 +60,7 @@ public class IpAddressConversion extends AbstractFunction<IpAddress> {
             try {
                 return new IpAddress(InetAddresses.forString(defaultValue.get()));
             } catch (IllegalFormatException e1) {
-                log.warn("Parameter `default` for to_ip() is not a valid IP address: {}", defaultValue.get());
+                log.warn(context.pipelineErrorMessage("Parameter `default` for to_ip() is not a valid IP address: " + defaultValue.get()));
                 throw e1;
             }
         }

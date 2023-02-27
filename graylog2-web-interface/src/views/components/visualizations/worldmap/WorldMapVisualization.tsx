@@ -54,7 +54,7 @@ const _formatSeriesForMap = (rowPivots: Array<Pivot>) => {
     const keys = x.map((k) => Object.fromEntries(k.slice(0, -1)
       .map((key, idx) => [fields[idx], key])));
     const newX = x.map(_lastKey);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const values = fromPairs(zip(newX, y).filter(([_, v]) => (v !== undefined)));
 
     return { keys, name, values };
