@@ -25,6 +25,7 @@ import { SearchForm, Icon } from 'components/common';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import { Link } from 'components/common/router';
+import Alert from 'components/bootstrap/Alert';
 
 import type { Collector, Configuration, SidecarSummary } from '../types';
 
@@ -59,8 +60,8 @@ const SecondaryText = styled.div`
 `;
 
 const TableRow = styled.tr(({ disabled = false }: {disabled?: boolean}) => css`
-  cursor: ${disabled ? "auto" : "pointer"};
-  background-color: ${disabled ? "#E8E8E8 !important" : "initial"};
+  cursor: ${disabled ? 'auto' : 'pointer'};
+  background-color: ${disabled ? '#E8E8E8 !important' : 'initial'};
   border-bottom: 1px solid lightgray;
   height: 49px;
 `);
@@ -109,6 +110,12 @@ const StyledSearchForm = styled(SearchForm)`
   .query {
     width: 100% !important;
   }
+`;
+
+const InfoContainer = styled(Alert)`
+  border: unset;
+  margin-bottom: 0px;
+  margin-top: 4px;
 `;
 
 const getFilterQuery = (_query: string) => {
@@ -224,6 +231,11 @@ const CollectorConfigurationModal = ({
         <StyledSearchForm query={searchQuery}
                           onQueryChange={(q) => setSearchQuery(q)}
                           topMargin={0} />
+        {(rows.length > 0) && (
+          <InfoContainer bsStyle="info">
+            Collector configurations that have a lock icon &nbsp;<Icon name="lock" size="xs" />&nbsp; have been assigned using tags and cannot be changed here.
+          </InfoContainer>
+        )}
         <ConfigurationContainer>
           <ConfigurationTable className="table-condensed table-hover">
             <tbody>
