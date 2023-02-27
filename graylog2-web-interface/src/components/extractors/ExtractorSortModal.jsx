@@ -39,9 +39,9 @@ class ExtractorSortModal extends React.Component {
   }
 
   _cancel = () => {
-    const { extractors } = this.props;
+    const { extractors, onClose } = this.props;
 
-    this.props.onClose();
+    onClose();
 
     this.setState({
       sortedExtractors: extractors,
@@ -55,17 +55,17 @@ class ExtractorSortModal extends React.Component {
   };
 
   _saveSorting = async () => {
-    const { input } = this.props;
+    const { input, onClose, onSort } = this.props;
     const { sortedExtractors } = this.state;
 
     if (!sortedExtractors) {
-      this.props.onClose();
+      onClose();
     }
 
     await ExtractorsActions.order.triggerPromise(input.id, sortedExtractors);
 
-    this.props.onSort();
-    this.props.onClose();
+    onSort();
+    onClose();
   };
 
   render() {
