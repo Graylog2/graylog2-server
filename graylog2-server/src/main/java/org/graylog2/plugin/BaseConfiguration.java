@@ -148,9 +148,7 @@ public abstract class BaseConfiguration extends PathConfiguration {
     public int getAsyncEventbusProcessors() {
         return asyncEventbusProcessors;
     }
-
-    public abstract String getNodeIdFile();
-
+    
     public boolean isMessageJournalEnabled() {
         return messageJournalEnabled;
     }
