@@ -92,6 +92,28 @@ class FieldTypeValidationTest {
         assertThat(fieldTypeValidation.validateFieldValueType(term("hard to say"), "boolean")).isNotPresent();
     }
 
+    @Test
+    void testDateMathExpressions() {
+        isValidTerm("now+4d", "date");
+        isValidTerm("now", "date");
+        isValidTerm("now+24m", "date");
+        isValidTerm("now+1h+1m", "date");
+        isValidTerm("2019-07-2||+1m", "date");
+        isValidTerm("2019-07-23 09:53:08.175||+1d", "date");
+
+        isNotValidTerm("now+1h+nonsence", "date");
+    }
+
+    private void isValidTerm(String term, String fieldType) {
+        assertThat(fieldTypeValidation.validateFieldValueType(term(term),fieldType))
+                .isNotPresent();
+    }
+
+    private void isNotValidTerm(String term, String fieldType) {
+        assertThat(fieldTypeValidation.validateFieldValueType(term(term),fieldType))
+                .isPresent();
+    }
+
     private ParsedTerm term(String value) {
         final Token token = Token.newToken(QueryParserConstants.TERM, "foo");
         token.beginLine = 1;
