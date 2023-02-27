@@ -58,7 +58,7 @@ const ExtractorsPage = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
   onNodesChange(nodes) {
     const { params } = this.props;
-    const newNode = params.nodeId ? nodes.nodes[params.nodeId] : Object.values(nodes.nodes).filter((node) => node.is_leader);
+    const newNode = params.nodeId ? nodes.nodes[params.nodeId] : Object.values(nodes.nodes).filter((node) => node.is_leader)[0];
 
     const { node } = this.state;
 
