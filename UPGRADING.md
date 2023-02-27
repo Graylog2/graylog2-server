@@ -107,10 +107,11 @@ The following Java Code API deprecations have been made in 5.0.
 
 The following Java Code API changes have been made in 5.0.
 
-| File                                                                                                   | Description                                              |
-|--------------------------------------------------------------------------------------------------------|----------------------------------------------------------|
-| `PaginatedPipelineService.java` | Concrete implementation has been changed to an interface |
-| `PaginatedRuleService.java`     | Concrete implementation has been changed to an interface |
+| File                                  | Description                                                                                   |
+|---------------------------------------|-----------------------------------------------------------------------------------------------|
+| `PaginatedPipelineService.java`       | Concrete implementation has been changed to an interface                                      |
+| `PaginatedRuleService.java`           | Concrete implementation has been changed to an interface                                      |
+| `InputService#allByType(String type)` | This method was introduced in Graylog 5.0.4. All implementors will need to define the method. |
 
 ## Configuration File Changes
 
