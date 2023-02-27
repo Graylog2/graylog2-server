@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/* eslint-disable react/no-unescaped-entities, no-template-curly-in-string */
+/* eslint-disable no-template-curly-in-string */
 import React from 'react';
 
 import { Alert, Col, Row } from 'components/bootstrap';

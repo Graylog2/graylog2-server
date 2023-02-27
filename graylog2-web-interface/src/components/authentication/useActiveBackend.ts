@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/* eslint-disable import/prefer-default-export */
+
 import { useState, useEffect } from 'react';
 
 import type { LoadActiveResponse } from 'stores/authentication/AuthenticationStore';

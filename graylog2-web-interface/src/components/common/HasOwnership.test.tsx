@@ -38,7 +38,6 @@ describe('HasOwnership', () => {
   const otherGrn = createGRN(otherType, otherId);
   const otherGrnPermission = `entity:own:${otherGrn}`;
 
-  // eslint-disable-next-line react/prop-types
   const DisabledComponent = ({ disabled }: { disabled: boolean}) => {
     return disabled
       ? <span>disabled</span>

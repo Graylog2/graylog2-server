@@ -19,6 +19,7 @@ import URI from 'urijs';
 import lodash from 'lodash';
 
 import * as URLUtils from 'util/URLUtils';
+import PaginationURL from 'util/PaginationURL';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
@@ -28,6 +29,7 @@ export const EventDefinitionsActions = singletonActions(
   () => Reflux.createActions({
     listAll: { asyncResult: true },
     listPaginated: { asyncResult: true },
+    searchPaginated: { asyncResult: true },
     get: { asyncResult: true },
     create: { asyncResult: true },
     copy: { asyncResult: true },
@@ -145,6 +147,38 @@ export const EventDefinitionsStore = singletonStore(
       EventDefinitionsActions.listPaginated.promise(promise);
     },
 
+    searchPaginated(newPage, newPerPage, newQuery, additional) {
+      const url = PaginationURL(`${this.sourceUrl}/paginated`, newPage, newPerPage, newQuery, additional);
+      const promise = fetch('GET', URLUtils.qualifyUrl(url)).then((response) => {
+        const {
+          elements,
+          query,
+          attributes,
+          pagination: {
+            count,
+            total,
+            page,
+            per_page: perPage,
+          },
+        } = response;
+
+        return {
+          elements,
+          attributes,
+          pagination: {
+            count,
+            total,
+            page,
+            perPage,
+            query,
+          },
+        };
+      });
+
+      EventDefinitionsActions.searchPaginated.promise(promise);
+
+      return promise;
+    },
     get(eventDefinitionId) {
       const promise = fetch('GET', this.eventDefinitionsUrl({ segments: [eventDefinitionId, 'with-context'] }));
 
@@ -203,6 +237,8 @@ export const EventDefinitionsStore = singletonStore(
       const { eventDefinition } = this.extractSchedulerInfo(eventDefinitionToCopy);
       // Remove the id from the event definition to create a new copy
       delete eventDefinition.id;
+      // Remove the scheduler from the event definition to create a new copy
+      delete eventDefinition.scheduler;
       // Modify the title to indicate a copy
       eventDefinition.title = `COPY-${eventDefinition.title}`;
       // Set the scope to DEFAULT
@@ -256,19 +292,6 @@ export const EventDefinitionsStore = singletonStore(
 
     delete(eventDefinition) {
       const promise = fetch('DELETE', this.eventDefinitionsUrl({ segments: [eventDefinition.id] }));
-
-      promise.then(
-        () => {
-          UserNotification.success('Event Definition deleted successfully',
-            `Event Definition "${eventDefinition.title}" was deleted successfully.`);
-
-          this.refresh();
-        },
-        (error) => {
-          UserNotification.error(`Deleting Event Definition "${eventDefinition.title}" failed with status: ${error}`,
-            'Could not delete Event Definition');
-        },
-      );
 
       EventDefinitionsActions.delete.promise(promise);
     },

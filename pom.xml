@@ -26,6 +26,8 @@
         <module>graylog-storage-elasticsearch7</module>
         <module>graylog-storage-opensearch2</module>
         <module>distribution</module>
+        <module>data-node</module>
+        <module>data-node-distribution</module>
     </modules>
 
     <groupId>org.graylog</groupId>
@@ -290,7 +292,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

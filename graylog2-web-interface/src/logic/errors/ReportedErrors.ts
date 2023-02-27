@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line import/no-cycle
+
 import type { $PropertyType } from 'utility-types';
 
 import type FetchError from 'logic/errors/FetchError';

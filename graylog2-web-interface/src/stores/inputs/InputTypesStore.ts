@@ -47,6 +47,7 @@ export type ConfigurationField = {
   attributes: Array<string>,
   additional_info: any,
   position: number,
+  is_encrypted: boolean,
 };
 
 export type InputDescription = {

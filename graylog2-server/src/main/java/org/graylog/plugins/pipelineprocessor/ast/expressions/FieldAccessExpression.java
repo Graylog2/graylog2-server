@@ -18,16 +18,17 @@ package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.ImmutableList;
+import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.antlr.v4.runtime.Token;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+
 public class FieldAccessExpression extends BaseExpression {
-    private static final Logger log = LoggerFactory.getLogger(FieldAccessExpression.class);
+    private static final RateLimitedLog log = getRateLimitedLog(FieldAccessExpression.class);
 
     private final Expression object;
     private final Expression field;
