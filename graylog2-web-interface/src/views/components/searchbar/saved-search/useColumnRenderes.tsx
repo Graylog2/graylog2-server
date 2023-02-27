@@ -24,6 +24,7 @@ import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 import type { SearchParams } from 'stores/PaginationTypes';
+import { createGRN } from 'logic/permissions/GRN';
 
 const onLoad = (
   onLoadSavedSearch: () => void,
@@ -70,22 +71,24 @@ const useColumnRenderers = (
     favorite: {
       renderCell: (search) => (
         <FavoriteIcon isFavorite={search.favorite}
-                      id={search.id}
+                      grn={createGRN('search', search.id)}
                       onChange={(newValue) => {
                         queryClient.setQueriesData(['saved-searches', 'overview', searchParams], (cur: {
                           list: Array<View>,
                           pagination: { total: number }
-                        }) => ({
-                          ...cur,
-                          list: cur.list.map((view) => {
-                            if (view.id === search.id) {
-                              return ({ ...view, favorite: newValue });
-                            }
+                        }) => {
+                          return ({
+                            ...cur,
+                            list: cur.list.map((view) => {
+                              if (view.id === search.id) {
+                                return view.toBuilder().favorite(newValue).build();
+                              }
 
-                            return view;
-                          }),
-                        }
-                        ));
+                              return view;
+                            }),
+                          }
+                          );
+                        });
                       }} />
       ),
     },
