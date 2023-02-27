@@ -17,24 +17,27 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import type { Column, ColumnRenderer, EntityBase } from './types';
+import { Label } from 'components/bootstrap';
 
-const Td = styled.td`
-  word-break: break-word;
+const StatusLabel = styled(Label)`
+  display: inline-flex;
+  justify-content: center;
+  gap: 4px;
 `;
 
-const TableCell = <Entity extends EntityBase>({
-  column,
-  columnRenderer,
-  entity,
-}: {
-  column: Column
-  columnRenderer: ColumnRenderer<Entity> | undefined,
-  entity: Entity,
-}) => {
-  const content = typeof columnRenderer?.renderCell === 'function' ? columnRenderer.renderCell(entity, column) : entity[column.id];
+type Props ={
+  status: boolean,
+  isSystemEvent: boolean,
+}
 
-  return (<Td>{content}</Td>);
+const StatusCell = ({ status, isSystemEvent } : Props) => {
+  const isSuccess = status || isSystemEvent;
+
+  return (
+    <StatusLabel bsStyle={isSuccess ? 'success' : 'warning'}>
+      {isSuccess ? 'enabled' : 'disabled'}
+    </StatusLabel>
+  );
 };
 
-export default TableCell;
+export default StatusCell;
