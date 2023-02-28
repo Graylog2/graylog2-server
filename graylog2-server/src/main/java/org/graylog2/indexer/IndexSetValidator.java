@@ -25,6 +25,7 @@ import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
+import org.graylog2.plugin.rest.ValidationResult;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
@@ -182,10 +183,11 @@ public class IndexSetValidator {
 
     @Nullable
     public Violation validateRetentionConfig(RetentionStrategyConfig retentionStrategyConfig) {
-        try {
-            retentionStrategyConfig.validate(elasticsearchConfiguration);
-        } catch (IllegalArgumentException exception) {
-            return Violation.create(exception.getMessage());
+        ValidationResult validationResult = retentionStrategyConfig.validate(elasticsearchConfiguration);
+
+        if (validationResult.failed()) {
+            Optional<String> error = validationResult.getErrors().keySet().stream().findFirst();
+            return Violation.create(error.orElse("Unknown retention config validation error"));
         }
 
         return null;

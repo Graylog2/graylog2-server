@@ -19,9 +19,12 @@ package org.graylog2.plugin.indexer.retention;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.plugin.rest.ValidationResult;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = RetentionStrategyConfig.TYPE_FIELD, visible = true)
 public interface RetentionStrategyConfig {
+    public static final String FIELD_NAME = "retentionStrategyConfig";
+
     String TYPE_FIELD = "type";
     String MAX_NUMBER_OF_INDEXES_FIELD = "max_number_of_indices";
 
@@ -31,7 +34,7 @@ public interface RetentionStrategyConfig {
     @JsonProperty(MAX_NUMBER_OF_INDEXES_FIELD)
     int maxNumberOfIndices();
 
-    default void validate(ElasticsearchConfiguration elasticsearchConfiguration) throws IllegalArgumentException {
-        // Implement validation when necessary in the implementing classes
+    default ValidationResult validate(ElasticsearchConfiguration elasticsearchConfiguration) {
+        return new ValidationResult();
     }
 }

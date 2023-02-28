@@ -26,6 +26,7 @@ import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
+import org.graylog2.plugin.rest.ValidationResult;
 import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.junit.Before;
@@ -42,8 +43,6 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -79,6 +78,7 @@ public class IndexSetValidatorTest {
         when(newConfig.indexPrefix()).thenReturn(prefix);
         when(newConfig.fieldTypeRefreshInterval()).thenReturn(fieldTypeRefreshInterval);
         when(newConfig.retentionStrategy()).thenReturn(retentionStrategyConfig);
+        when(retentionStrategyConfig.validate(elasticsearchConfiguration)).thenReturn(new ValidationResult());
 
         final Optional<IndexSetValidator.Violation> violation = validator.validate(newConfig);
 
@@ -228,7 +228,8 @@ public class IndexSetValidatorTest {
         when(newConfig.indexPrefix()).thenReturn(prefix);
         when(newConfig.fieldTypeRefreshInterval()).thenReturn(fieldTypeRefreshInterval);
         when(newConfig.retentionStrategy()).thenReturn(retentionStrategyConfig);
-        doThrow(new IllegalArgumentException("Error")).when(retentionStrategyConfig).validate(elasticsearchConfiguration);
+        ValidationResult validationResult = new ValidationResult().addError("fieldName", "error");
+        when(retentionStrategyConfig.validate(elasticsearchConfiguration)).thenReturn(validationResult);
 
         final Optional<IndexSetValidator.Violation> violation = validator.validate(newConfig);
 

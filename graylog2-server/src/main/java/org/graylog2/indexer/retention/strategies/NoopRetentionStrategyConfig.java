@@ -23,6 +23,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
+import org.graylog2.plugin.rest.ValidationResult;
 
 import javax.validation.constraints.Min;
 import java.util.Set;
@@ -53,10 +54,14 @@ public abstract class NoopRetentionStrategyConfig implements RetentionStrategyCo
     }
 
     @Override
-    public void validate(ElasticsearchConfiguration elasticsearchConfiguration) throws IllegalArgumentException {
+    public ValidationResult validate(ElasticsearchConfiguration elasticsearchConfiguration) {
         Set<String> disabledRetentionStrategies = elasticsearchConfiguration.getDisabledRetentionStrategies();
+        ValidationResult validationResult = new ValidationResult();
+
         if (disabledRetentionStrategies.contains(NoopRetentionStrategy.NAME)) {
-            throw new IllegalArgumentException("No operation retention strategy is deactivated");
+            validationResult.addError(RetentionStrategyConfig.FIELD_NAME, "No operation retention strategy is deactivated");
         }
+
+        return validationResult;
     }
 }

@@ -28,6 +28,7 @@ import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
+import org.graylog2.plugin.rest.ValidationResult;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -219,8 +220,9 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
         }
 
         @Override
-        public void validate(ElasticsearchConfiguration elasticsearchConfiguration) throws IllegalArgumentException {
+        public ValidationResult validate(ElasticsearchConfiguration elasticsearchConfiguration) {
 
+            return new ValidationResult();
         }
     }
 }
