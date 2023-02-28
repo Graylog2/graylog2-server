@@ -74,7 +74,7 @@ const variantRowStyles = css(({ theme }) => {
 
   return css`
     ${styles}
-  `;
+`;
 });
 
 const tableCss = css(({ theme }) => css`

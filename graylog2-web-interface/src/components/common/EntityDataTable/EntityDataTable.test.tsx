@@ -229,7 +229,7 @@ describe('<EntityDataTable />', () => {
                             bulkActions={() => <div />}
                             columnDefinitions={columnDefinitions} />);
 
-    userEvent.click(screen.getByRole('button', { name: /select columns to display/i }));
+    userEvent.click(screen.getByRole('button', { name: /configure visible columns/i }));
     userEvent.click(screen.getByRole('menuitem', { name: /show title/i }));
 
     expect(onColumnsChange).toHaveBeenCalledWith(['description', 'status', 'title']);

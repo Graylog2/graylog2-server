@@ -54,11 +54,21 @@ const viewSlice = createSlice({
       ...state,
       activeQuery: action.payload,
     }),
-    setView: (state: ViewState, action: PayloadAction<View>) => {
-      return ({
-        ...state,
-        view: action.payload,
-      });
+    setView: {
+      reducer(state: ViewState, action: PayloadAction<readonly [View, boolean | undefined]>) {
+        const [view, isDirty] = action.payload;
+
+        return ({
+          ...state,
+          view,
+          isDirty: isDirty === undefined ? state.isDirty : isDirty,
+        });
+      },
+      prepare(view: View, isDirty?: boolean) {
+        return {
+          payload: [view, isDirty] as const,
+        };
+      },
     },
     setIsNew: (state: ViewState, action: PayloadAction<boolean>) => ({
       ...state,
@@ -73,15 +83,25 @@ const viewSlice = createSlice({
 export const viewSliceReducer = viewSlice.reducer;
 export const { setView, selectQuery, setIsDirty, setIsNew } = viewSlice.actions;
 
-export const loadView = (newView: View, recreateSearch: boolean = false) => async (dispatch: AppDispatch, getState: () => RootState) => {
-  const view = selectView(getState());
+const isViewEqualForSearch = (view: View, newView: View) => {
   const oldWidgets = view?.state?.map((s) => s.widgets);
   const newWidgets = newView?.state?.map((s) => s.widgets);
 
-  if (recreateSearch || !isEqualForSearch(oldWidgets, newWidgets)) {
-    const updatedView = UpdateSearchForWidgets(newView);
-    const updatedSearch = await createSearch(updatedView.search);
-    const updatedViewWithSearch = updatedView.toBuilder().search(updatedSearch).build();
+  return isEqualForSearch(oldWidgets, newWidgets);
+};
+
+const _recreateSearch = async (newView: View) => {
+  const updatedView = UpdateSearchForWidgets(newView);
+  const updatedSearch = await createSearch(updatedView.search);
+
+  return updatedView.toBuilder().search(updatedSearch).build();
+};
+
+export const loadView = (newView: View, recreateSearch: boolean = false) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  const view = selectView(getState());
+
+  if (recreateSearch || !isViewEqualForSearch(view, newView)) {
+    const updatedViewWithSearch = await _recreateSearch(newView);
 
     await dispatch(setView(updatedViewWithSearch));
 
@@ -89,6 +109,20 @@ export const loadView = (newView: View, recreateSearch: boolean = false) => asyn
   }
 
   return dispatch(setView(newView));
+};
+
+export const updateView = (newView: View, recreateSearch: boolean = false) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  const view = selectView(getState());
+
+  if (recreateSearch || !isViewEqualForSearch(view, newView)) {
+    const updatedViewWithSearch = await _recreateSearch(newView);
+
+    await dispatch(setView(updatedViewWithSearch, true));
+
+    return dispatch(execute());
+  }
+
+  return dispatch(setView(newView, true));
 };
 
 export const updateQueries = (newQueries: Immutable.OrderedSet<Query>) => async (dispatch: AppDispatch, getState: () => RootState) => {
@@ -100,7 +134,7 @@ export const updateQueries = (newQueries: Immutable.OrderedSet<Query>) => async 
       .build())
     .build();
 
-  return dispatch(loadView(newView));
+  return dispatch(updateView(newView));
 };
 
 export const addQuery = (query: Query, viewState: ViewStateType) => async (dispatch: AppDispatch, getState: () => RootState) => {
@@ -116,7 +150,7 @@ export const addQuery = (query: Query, viewState: ViewStateType) => async (dispa
     .state(newViewStates)
     .build();
 
-  return dispatch(loadView(newView, true)).then(() => dispatch(selectQuery(query.id)));
+  return dispatch(updateView(newView, true)).then(() => dispatch(selectQuery(query.id)));
 };
 
 export const updateQuery = (queryId: QueryId, query: Query) => async (dispatch: AppDispatch, getState: () => RootState) => {
@@ -131,7 +165,7 @@ export const updateQuery = (queryId: QueryId, query: Query) => async (dispatch: 
     .search(newSearch)
     .build();
 
-  return dispatch(loadView(newView, true));
+  return dispatch(updateView(newView, true));
 };
 
 export const removeQuery = (queryId: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
@@ -149,8 +183,8 @@ export const removeQuery = (queryId: string) => async (dispatch: AppDispatch, ge
   const indexedQueryIds = search.queries.map((query) => query.id).toList();
   const newActiveQuery = FindNewActiveQueryId(indexedQueryIds, activeQuery);
 
-  await dispatch(loadView(newView, true));
   await dispatch(selectQuery(newActiveQuery));
+  await dispatch(updateView(newView, true));
 };
 
 export const createQuery = () => async (dispatch: AppDispatch, getState: () => RootState) => {
@@ -199,7 +233,7 @@ export const mergeQueryTitles = (newQueryTitles: { queryId: QueryId, titlesMap: 
     .state(newState)
     .build();
 
-  return dispatch(loadView(newView));
+  return dispatch(updateView(newView));
 };
 
 export const setQueryString = (queryId: QueryId, newQueryString: string) => (dispatch: AppDispatch, getState: () => RootState) => {
@@ -237,7 +271,7 @@ export const updateViewState = (id: QueryId, newViewState: ViewStateType) => (di
     .state(newState)
     .build();
 
-  return dispatch(loadView(newView));
+  return dispatch(updateView(newView));
 };
 
 export const setParameters = (newParameters: Array<Parameter>) => async (dispatch: AppDispatch, getState: () => RootState) => {
@@ -249,5 +283,5 @@ export const setParameters = (newParameters: Array<Parameter>) => async (dispatc
 
   const newView = view.toBuilder().search(newSearch).build();
 
-  return dispatch(loadView(newView, true));
+  return dispatch(updateView(newView, true));
 };

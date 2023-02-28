@@ -29,15 +29,15 @@ import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 import style from './SidecarRow.css';
 
 const SidecarTR = styled.tr(({ inactive, theme }) => css`
-  color: ${inactive ? theme.utils.contrastingColor(theme.colors.table.background, 'AA') : 'currentColor'};
+  color: ${inactive ? theme.utils.contrastingColor(theme.colors.table.background, "AA") : "currentColor"};
   opacity: ${inactive ? 0.9 : 1};
 
   &:nth-of-type(2n+1) {
-    color: ${inactive ? theme.utils.contrastingColor(theme.colors.table.backgroundAlt, 'AA') : 'currentColor'};
+    color: ${inactive ? theme.utils.contrastingColor(theme.colors.table.backgroundAlt, "AA") : "currentColor"};
   }
 
   td:not(:last-child) {
-    font-style: ${inactive ? 'italic' : 'normal'};
+    font-style: ${inactive ? "italic" : "normal"};
   }
 `);
 
@@ -71,13 +71,9 @@ class SidecarRow extends React.Component {
     return (
       <SidecarTR inactive={!sidecar.active}>
         <td className={style.sidecarName}>
-          {sidecar.active
-            ? (
-              <Link to={Routes.SYSTEM.SIDECARS.STATUS(sidecar.node_id)}>
-                {sidecar.node_name}
-              </Link>
-            )
-            : sidecar.node_name}
+          <Link to={Routes.SYSTEM.SIDECARS.STATUS(sidecar.node_id)}>
+            {sidecar.node_name}
+          </Link>
         </td>
         <td>
           <StatusIndicator status={sidecarStatus.status}

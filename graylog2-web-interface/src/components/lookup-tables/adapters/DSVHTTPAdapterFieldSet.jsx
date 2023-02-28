@@ -122,7 +122,7 @@ const DSVHTTPAdapterFieldSet = ({ handleFormEvent, validationState, validationMe
 
 DSVHTTPAdapterFieldSet.propTypes = {
   config: PropTypes.object.isRequired,
-  // eslint-disable-next-line react/no-unused-prop-types
+
   handleFormEvent: PropTypes.func.isRequired,
   validationState: PropTypes.func.isRequired,
   validationMessage: PropTypes.func.isRequired,

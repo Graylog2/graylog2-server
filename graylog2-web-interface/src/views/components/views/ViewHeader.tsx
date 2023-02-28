@@ -29,7 +29,8 @@ import useViewTitle from 'views/hooks/useViewTitle';
 import useView from 'views/hooks/useView';
 import useAppDispatch from 'stores/useAppDispatch';
 import FavoriteIcon from 'views/components/FavoriteIcon';
-import { loadView } from 'views/logic/slices/viewSlice';
+import { updateView } from 'views/logic/slices/viewSlice';
+import useIsNew from 'views/hooks/useIsNew';
 
 const links = {
   [View.Type.Dashboard]: {
@@ -71,12 +72,13 @@ const TitleWrapper = styled.span`
 `;
 
 const StyledIcon = styled(Icon)`
-font-size: 0.50rem;
+font-size: 0.5rem;
 `;
 
 const ViewHeader = () => {
   const view = useView();
-  const isSavedView = view?.id && view?.title;
+  const isNew = useIsNew();
+  const isSavedView = view?.id && view?.title && !isNew;
   const [showMetadataEdit, setShowMetadataEdit] = useState<boolean>(false);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), [setShowMetadataEdit]);
   const dispatch = useAppDispatch();
@@ -84,7 +86,7 @@ const ViewHeader = () => {
 
   const typeText = view?.type?.toLocaleLowerCase();
   const title = useViewTitle();
-  const onChangeFavorite = useCallback((newValue) => dispatch(loadView(view.toBuilder().favorite(newValue).build())), [dispatch, view]);
+  const onChangeFavorite = useCallback((newValue) => dispatch(updateView(view.toBuilder().favorite(newValue).build())), [dispatch, view]);
 
   return (
     <Row>

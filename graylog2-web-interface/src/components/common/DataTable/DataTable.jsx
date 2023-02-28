@@ -24,6 +24,8 @@ import { tableCss } from 'components/bootstrap/Table';
 import Filter from './Filter';
 import DataTableElement from './DataTableElement';
 
+import NoEntitiesExist from '../NoEntitiesExist';
+
 const StyledTable = styled.table`
   ${tableCss}
 `;
@@ -32,9 +34,9 @@ const StyledTable = styled.table`
 const NoData = ({ noDataText }) => {
   if (typeof noDataText === 'string') {
     return (
-      <p>
+      <NoEntitiesExist>
         {noDataText}
-      </p>
+      </NoEntitiesExist>
     );
   }
 

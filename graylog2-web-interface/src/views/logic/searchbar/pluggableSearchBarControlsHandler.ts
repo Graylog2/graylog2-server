@@ -37,7 +37,7 @@ const executeSafely = <T extends () => ReturnType<T>>(fn: T, errorMessage: strin
 
 const initialValues = <T>(currentQuery: T, initialValuesHandler: Array<(entity: T) => ({ [key: string]: any })>) => {
   const _initialValues = initialValuesHandler.map((useInitialValues) => executeSafely(
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+
     () => useInitialValues(currentQuery),
     'An error occurred when collecting initial search bar form values from a plugin',
     {},

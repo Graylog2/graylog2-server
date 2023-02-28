@@ -59,7 +59,6 @@ export default class GlobalOverride {
     return this._value.searchTypes;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
     const { timerange, query, keepSearchTypes, searchTypes } = this._value;
 

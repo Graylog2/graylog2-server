@@ -96,7 +96,7 @@ const buttonStyles = ({ colors, utils }) => {
           }
         }
       }
-    `;
+`;
   });
 };
 

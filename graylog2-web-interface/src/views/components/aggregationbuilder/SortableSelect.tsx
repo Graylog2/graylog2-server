@@ -62,7 +62,6 @@ const SortableSelect = ({ onChange, value, valueComponent, valueTransformer, inp
   const values = valueTransformer(value);
 
   const Item = useCallback((itemProps: { data: { value: string }}) => {
-    // eslint-disable-next-line react/prop-types
     const { data: { value: itemValue } } = itemProps;
     const index = findIndex(value, (v) => v.field === itemValue);
 
