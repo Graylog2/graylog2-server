@@ -27,6 +27,7 @@ import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public interface InputService extends PersistedService {
@@ -44,7 +45,9 @@ public interface InputService extends PersistedService {
 
     Input find(String id) throws NotFoundException;
 
-    List<Input> allByType(String type);
+    default List<Input> allByType(String type) {
+        return all().stream().filter(input -> Objects.equals(input.getType(), type)).toList();
+    }
 
     Set<Input> findByIds(Collection<String> ids);
 
