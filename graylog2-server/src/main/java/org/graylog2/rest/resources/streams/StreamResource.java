@@ -74,7 +74,6 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.PaginatedStreamService;
 import org.graylog2.streams.StreamDTO;
 import org.graylog2.streams.StreamImpl;
-import org.graylog2.streams.StreamRouter;
 import org.graylog2.streams.StreamRouterEngine;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
