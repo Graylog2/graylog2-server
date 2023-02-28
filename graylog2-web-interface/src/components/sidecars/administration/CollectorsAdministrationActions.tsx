@@ -28,7 +28,7 @@ import CollectorProcessControl from './CollectorProcessControl';
 import type { Collector, Configuration, SidecarCollectorPairType } from '../types';
 
 const ConfigurationButton = styled(Button)`
-  margin-right: 6px
+  margin-right: 6px;
 `;
 
 type Props = {

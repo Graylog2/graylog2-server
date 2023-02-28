@@ -63,9 +63,8 @@ const pluginManifest: PluginRegistration = {
         type: 'dummy',
         displayName: 'Some Dummy Visualization',
         visualizationComponent: () => <>dummy-visualization</>,
-        // eslint-disable-next-line react/prop-types
+
         editComponent: ({ onChange }) => {
-          // eslint-disable-next-line react/button-has-type
           return <button type="button" onClick={() => onChange({ foo: 23 })}>Click me</button>;
         },
         needsControlledHeight: () => true,
@@ -116,7 +115,7 @@ describe('<Widget />', () => {
   }: DummyWidgetProps) => (
     <TestStoreProvider>
       <FieldTypesContext.Provider value={fieldTypes}>
-        {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
+        {}
         <WidgetFocusContext.Provider value={{ focusedWidget, setWidgetFocusing, setWidgetEditing, unsetWidgetFocusing, unsetWidgetEditing }}>
           <WidgetContext.Provider value={propsWidget}>
             <Widget widget={propsWidget}

@@ -43,7 +43,8 @@ const ScrollContainer = styled.div`
 const StyledTable = styled(Table)`
   table-layout: fixed;
 
-  thead > tr > th, tbody > tr > td {
+  thead > tr > th,
+  tbody > tr > td {
     padding: ${CELL_PADDING}px;
   }
 `;

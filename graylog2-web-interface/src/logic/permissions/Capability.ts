@@ -39,7 +39,6 @@ export default class Capability {
     return this._value.title;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
     const { id, title } = this._value;
 
@@ -63,7 +62,6 @@ export default class Capability {
       .build();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   static builder(): Builder {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder();

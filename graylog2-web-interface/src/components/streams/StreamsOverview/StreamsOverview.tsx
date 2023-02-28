@@ -37,6 +37,9 @@ import {
   ENTITY_TABLE_ID,
   ADDITIONAL_ATTRIBUTES,
 } from 'components/streams/StreamsOverview/Constants';
+import EntityFilters from 'components/common/EntityFilters';
+import type { Filters } from 'components/common/EntityFilters/types';
+import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
 
 import CustomColumnRenderers from './ColumnRenderers';
 
@@ -57,6 +60,7 @@ type Props = {
 }
 
 const StreamsOverview = ({ indexSets }: Props) => {
+  const [filters, setFilters] = useState<Filters>();
   const [query, setQuery] = useState('');
   const paginationQueryParameter = usePaginationQueryParameter(undefined, DEFAULT_LAYOUT.pageSize);
   const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
@@ -71,6 +75,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
     page: paginationQueryParameter.page,
     pageSize: layoutConfig.pageSize,
     sort: layoutConfig.sort,
+    filters,
   }, { enabled: !isLoadingLayoutPreferences });
 
   useRefetchStreamsOnStoreChange(refetchStreams);
@@ -94,6 +99,11 @@ const StreamsOverview = ({ indexSets }: Props) => {
   const onReset = useCallback(() => {
     onSearch('');
   }, [onSearch]);
+
+  const onChangeFilters = useCallback((newFilters: Filters) => {
+    setFilters(newFilters);
+    paginationQueryParameter.resetPage();
+  }, [paginationQueryParameter]);
 
   const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
     updateTableLayout({ displayedAttributes });
@@ -122,7 +132,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
     return <Spinner />;
   }
 
-  const { elements, pagination: { total } } = paginatedStreams;
+  const { elements, attributes, pagination: { total } } = paginatedStreams;
 
   return (
     <PaginatedList pageSize={layoutConfig.pageSize}
@@ -131,7 +141,12 @@ const StreamsOverview = ({ indexSets }: Props) => {
       <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
                     onReset={onReset}
-                    queryHelpComponent={<QueryHelper entityName="stream" />} />
+                    queryHelpComponent={<QueryHelper entityName="stream" />}>
+          <EntityFilters attributes={attributes}
+                         onChangeFilters={onChangeFilters}
+                         activeFilters={filters}
+                         filterValueRenderers={FilterValueRenderers} />
+        </SearchForm>
       </div>
       <div>
         {elements?.length === 0 ? (

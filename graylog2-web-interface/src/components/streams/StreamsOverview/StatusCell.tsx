@@ -24,7 +24,7 @@ import { StreamsStore } from 'stores/streams/StreamsStore';
 import type { Stream } from 'stores/streams/StreamsStore';
 
 const StatusLabel = styled(Label)(({ $clickable }: { $clickable: boolean }) => css`
-  cursor: ${$clickable ? 'pointer' : 'default'};
+  cursor: ${$clickable ? "pointer" : "default"};
   display: inline-flex;
   justify-content: center;
   gap: 4px;
@@ -56,7 +56,7 @@ const StatusCell = ({ stream }: Props) => {
     <StatusLabel bsStyle={stream.disabled ? 'warning' : 'success'}
                  onClick={disableChange ? undefined : toggleStreamStatus}
                  $clickable={!disableChange}>
-      {stream.disabled ? 'Stopped' : 'Running'}
+      {stream.disabled ? 'Paused' : 'Running'}
       {!disableChange && (
         <>
           <Spacer />

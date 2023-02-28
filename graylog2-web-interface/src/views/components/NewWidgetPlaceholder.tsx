@@ -29,7 +29,7 @@ const PlaceholderBox = styled.div(({ theme }) => css`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;  
+  align-items: center;
   text-align: center;
   padding: 10px;
   

@@ -44,7 +44,6 @@ export default class Grantee {
     return this._value.capability;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
     const { grant, grantee, capability } = this._value;
 
