@@ -19,10 +19,13 @@ package org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHits;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.ParsedFilter;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.TopHits;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.TopHitsAggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortBuilders;
@@ -35,15 +38,18 @@ import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class ESLatestHandler extends ESPivotSeriesSpecHandler<Latest, TopHits> {
+public class ESLatestHandler extends ESPivotSeriesSpecHandler<Latest, ParsedFilter> {
+    private static final String AGG_NAME = "latest_aggregation";
+
     @Nonnull
     @Override
     public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Latest latestSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
-        final TopHitsAggregationBuilder latest = AggregationBuilders.topHits(name)
-                .size(1)
-                .fetchSource(latestSpec.field(), null)
-                .sort(SortBuilders.fieldSort("timestamp").order(SortOrder.DESC));
-        record(queryContext, pivot, latestSpec, name, TopHits.class);
+        final FilterAggregationBuilder latest = AggregationBuilders.filter(name, QueryBuilders.existsQuery(latestSpec.field()))
+                .subAggregation(AggregationBuilders.topHits(AGG_NAME)
+                        .size(1)
+                        .fetchSource(latestSpec.field(), null)
+                        .sort(SortBuilders.fieldSort("timestamp").order(SortOrder.DESC)));
+        record(queryContext, pivot, latestSpec, name, ParsedFilter.class);
         return Optional.of(latest);
     }
 
@@ -51,9 +57,10 @@ public class ESLatestHandler extends ESPivotSeriesSpecHandler<Latest, TopHits> {
     public Stream<Value> doHandleResult(Pivot pivot,
                                         Latest pivotSpec,
                                         SearchResponse searchResult,
-                                        TopHits latestAggregation,
+                                        ParsedFilter filterAggregation,
                                         ESSearchTypeHandler<Pivot> searchTypeHandler,
                                         ESGeneratedQueryContext esGeneratedQueryContext) {
+        final TopHits latestAggregation = filterAggregation.getAggregations().get(AGG_NAME);
         final Optional<Value> latestValue = Optional.ofNullable(latestAggregation.getHits())
                 .map(SearchHits::getHits)
                 .filter(hits -> hits.length > 0)
