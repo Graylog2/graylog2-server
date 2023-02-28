@@ -27,18 +27,24 @@ public abstract class AbstractConfigurationField implements ConfigurationField {
     protected final String description;
     protected final ConfigurationField.Optional optional;
     protected int position;
+    protected final boolean isEncrypted;
 
-    public AbstractConfigurationField(String field_type, String name, String humanName, String description, ConfigurationField.Optional optional1) {
+    public AbstractConfigurationField(String field_type, String name, String humanName, String description, ConfigurationField.Optional optional) {
+        this(field_type, name, humanName, description, optional, DEFAULT_POSITION, false);
+    }
+
+    public AbstractConfigurationField(String field_type, String name, String humanName, String description, ConfigurationField.Optional optional, int position) {
+        this(field_type, name, humanName, description, optional, position, false);
+    }
+
+    public AbstractConfigurationField(String field_type, String name, String humanName, String description, ConfigurationField.Optional optional, int position, boolean isEncrypted) {
         this.field_type = field_type;
         this.name = name;
         this.humanName = humanName;
         this.description = description;
-        this.optional = optional1;
-        this.position = DEFAULT_POSITION;
-    }
-    public AbstractConfigurationField(String field_type, String name, String humanName, String description, ConfigurationField.Optional optional1, int position) {
-        this(field_type, name, humanName, description, optional1);
+        this.optional = optional;
         this.position = position;
+        this.isEncrypted = isEncrypted;
     }
 
     @Override
@@ -79,5 +85,10 @@ public abstract class AbstractConfigurationField implements ConfigurationField {
     @Override
     public int getPosition() {
         return position;
+    }
+
+    @Override
+    public boolean isEncrypted() {
+        return isEncrypted;
     }
 }

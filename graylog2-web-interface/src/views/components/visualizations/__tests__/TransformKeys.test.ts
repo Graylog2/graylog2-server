@@ -26,7 +26,6 @@ import transformKeys from '../TransformKeys';
 const formatTime = (timestamp: string) => timestamp;
 const formatTimeForLocalTz = (timezone: string) => (timestamp: string) => moment.tz(timestamp, timezone).toISOString(true);
 
-// eslint-disable-next-line global-require
 describe('TransformKeys', () => {
   it('returns original result when no aggregations are present', () => {
     const rows: Rows = [{

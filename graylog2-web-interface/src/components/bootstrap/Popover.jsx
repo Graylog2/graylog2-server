@@ -74,7 +74,7 @@ const Popover = styled(BootstrapPopover)(({ theme }) => {
         }
       }
     }
-  `;
+`;
 });
 
 /** @component */

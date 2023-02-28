@@ -51,7 +51,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     border-top: 1px solid ${theme.colors.global.background};
   }
 
-  h1, h2 {
+  h1,
+  h2 {
     font-family: ${theme.fonts.family.navigation};
   }
 
@@ -648,7 +649,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {
-    background-color: ${theme.utils.opacify(theme.colors.variant.info, 0.70)};
+    background-color: ${theme.utils.opacify(theme.colors.variant.info, 0.7)};
     color: ${theme.colors.input.colorDisabled};
   }
 

@@ -25,18 +25,19 @@ import {
   NumberField,
   TextField,
 } from 'components/configurationforms';
-import type { ConfigurationField } from 'components/configurationforms/types';
+import type { ConfigurationField, FieldValue, EncryptedFieldValue } from 'components/configurationforms/types';
 
 type Props = {
   typeName: string,
   configField: ConfigurationField,
   configKey: string,
-  configValue: string | number | boolean | void,
+  configValue: FieldValue | EncryptedFieldValue<FieldValue>,
+  dirty: boolean,
   autoFocus: boolean,
   onChange: () => void,
 };
 
-const ConfigurationFormField = ({ typeName, configField, configKey, configValue, autoFocus, onChange }: Props) => {
+const ConfigurationFormField = ({ typeName, configField, configKey, configValue, dirty, autoFocus, onChange }: Props) => {
   const elementKey = `${typeName}-${configKey}`;
 
   switch (configField.type) {
@@ -47,6 +48,7 @@ const ConfigurationFormField = ({ typeName, configField, configKey, configValue,
                    title={configKey}
                    field={configField}
                    value={configValue}
+                   dirty={dirty}
                    onChange={onChange}
                    autoFocus={autoFocus} />
       );
@@ -103,11 +105,13 @@ ConfigurationFormField.propTypes = {
   configValue: PropTypes.any,
   autoFocus: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
+  dirty: PropTypes.bool,
 };
 
 ConfigurationFormField.defaultProps = {
   configValue: undefined,
   autoFocus: false,
+  dirty: false,
 };
 
 export default ConfigurationFormField;

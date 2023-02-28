@@ -30,7 +30,7 @@ const getColorStyles = (theme, bsStyle) => {
   return css`
     background-color: ${backgroundColor};
     color: ${textColor};
-  `;
+`;
 };
 
 const StyledLabel = styled(BootstrapLabel)(({ bsStyle, theme }) => css`

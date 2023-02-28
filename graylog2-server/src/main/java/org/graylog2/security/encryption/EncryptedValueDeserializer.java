@@ -76,7 +76,7 @@ public class EncryptedValueDeserializer extends StdDeserializer<EncryptedValue> 
                     .build();
         }
 
-        throw new JsonMappingException(p, "Couldn't deserialize value: " + node.toString() + " (encrypted_value and salt must be a strings and cannot missing)");
+        throw new JsonMappingException(p, "Couldn't deserialize value: " + node + " (encrypted_value and salt must be a strings and cannot missing)");
     }
 
     private void validateValue(JsonParser p, JsonNode node) throws JsonMappingException {
@@ -91,7 +91,7 @@ public class EncryptedValueDeserializer extends StdDeserializer<EncryptedValue> 
 
         // Only one of the keys can be used at a time to make sure we don't have to need a priority for them
         if (count > 1) {
-            throw new JsonMappingException(p, "Couldn't deserialize value: " + node.toString() + " (keep_value, delete_value and set_value are mutually exclusive)");
+            throw new JsonMappingException(p, "Couldn't deserialize value: " + node + " (keep_value, delete_value and set_value are mutually exclusive)");
         }
     }
 
@@ -101,7 +101,7 @@ public class EncryptedValueDeserializer extends StdDeserializer<EncryptedValue> 
             return EncryptedValue.createWithKeepValue();
         }
 
-        throw new JsonMappingException(p, "Couldn't deserialize value: " + node.toString() + " (keep_value must be a boolean and true)");
+        throw new JsonMappingException(p, "Couldn't deserialize value: " + node + " (keep_value must be a boolean and true)");
     }
 
     private EncryptedValue parseDeleteValue(JsonParser p, JsonNode node) throws JsonProcessingException {
@@ -110,15 +110,17 @@ public class EncryptedValueDeserializer extends StdDeserializer<EncryptedValue> 
             return EncryptedValue.createWithDeleteValue();
         }
 
-        throw new JsonMappingException(p, "Couldn't deserialize value: " + node.toString() + " (delete_value must be a boolean and true)");
+        throw new JsonMappingException(p, "Couldn't deserialize value: " + node + " (delete_value must be a boolean and true)");
     }
 
     private EncryptedValue parseSetValue(JsonParser p, JsonNode node) throws JsonProcessingException {
         final JsonNode setValue = node.isTextual() ? node : node.path("set_value");
         if (setValue.isTextual() && !isBlank(setValue.asText())) {
             return encryptedValueService.encrypt(setValue.asText());
+        } else if (setValue.isTextual() && isBlank(setValue.asText())) {
+            return EncryptedValue.createUnset();
         }
 
-        throw new JsonMappingException(p, "Couldn't deserialize value: " + node.toString() + " (set_value must be a string and cannot be empty or missing)");
+        throw new JsonMappingException(p, "Couldn't deserialize value: " + node + " (set_value must be a string and cannot be missing)");
     }
 }

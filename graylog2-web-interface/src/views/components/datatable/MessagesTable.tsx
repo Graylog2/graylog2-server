@@ -34,7 +34,7 @@ const StyledTable = styled(Table)(({ theme, $stickyHeader, $borderedHeader }: { 
   word-break: break-all;
   
   thead {
-  ${$stickyHeader
+    ${$stickyHeader
     ? `position: sticky;
     top: 0;
     z-index: 2` : ''}
@@ -64,12 +64,14 @@ const StyledTable = styled(Table)(({ theme, $stickyHeader, $borderedHeader }: { 
     color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
   }
 
-  &.table-striped>tbody>tr:nth-of-type(odd)>td {
+  &.table-striped > tbody > tr:nth-of-type(odd) > td {
     background-color: ${theme.colors.global.contentBackground};
   }
-  &.table-striped>tbody>tr:nth-of-type(even)>td {
+
+  &.table-striped > tbody > tr:nth-of-type(even) > td {
     background-color: ${theme.colors.table.background};
   }
+
   tr {
     border: 0 !important;
   }
