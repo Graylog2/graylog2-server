@@ -478,7 +478,6 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       this.setState({ value: value });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     const { onChange = () => {} } = this.props;
 
     onChange(value);

@@ -14,27 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.shared.bindings.providers;
+package org.graylog.datanode.rest;
 
-import org.graylog2.plugin.ServerStatus;
-import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.inject.Graylog2Module;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-public class NodeIdProvider implements Provider<NodeId> {
-    private final ServerStatus serverStatus;
-
-    @Inject
-    public NodeIdProvider(ServerStatus serverStatus) {
-        this.serverStatus = serverStatus;
-    }
-
+public class RestBindings extends Graylog2Module {
     @Override
-    public NodeId get() {
-        return serverStatus.getNodeId();
+    protected void configure() {
+        addSystemRestResource(StatusController.class);
+        addSystemRestResource(LogsController.class);
     }
 }

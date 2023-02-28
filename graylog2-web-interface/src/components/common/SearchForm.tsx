@@ -207,7 +207,6 @@ const SearchForm = ({
           )}
           <InputContainer>
             <StyledInput id="common-search-form-query-input"
-                         /* eslint-disable-next-line jsx-a11y/no-autofocus */
                          autoFocus={focusAfterMount}
                          onChange={onChange}
                          value={query}
