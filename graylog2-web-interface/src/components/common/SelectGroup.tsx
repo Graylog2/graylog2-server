@@ -39,7 +39,7 @@ const Container = styled.div`
     border-left: 0;
   }
 
-  > div:not(:first-child):not(:last-child) > div {
+  > div:not(:first-child, :last-child) > div {
     border-radius: 0;
   }
 `;

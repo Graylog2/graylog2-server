@@ -46,7 +46,7 @@ const Background = styled.div<{ trend: TrendDirection | undefined }>(({ theme, t
       color: ${theme.utils.contrastingColor(bgColor)} !important /* Needed for report generation */;
       color-adjust: exact !important; /* Needed for report generation */
     `}
-  `;
+`;
 });
 
 const TextContainer = styled.div<{ trend: TrendDirection | undefined, ref }>(({ theme, trend }) => {

@@ -121,7 +121,7 @@ class FilterPreviewContainer extends React.Component {
 
     if (!isLoading) {
       searchResult = filterPreview.result.forId(queryId).searchTypes[searchTypeId];
-      // eslint-disable-next-line prefer-destructuring
+
       errors = filterPreview.result.errors; // result may not always be set, so I can't use destructuring
     }
 

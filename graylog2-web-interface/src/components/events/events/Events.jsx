@@ -55,8 +55,8 @@ const ExpandedTR = styled.tr(({ theme }) => css`
 `);
 
 const EventsTbody = styled.tbody(({ expanded, theme }) => css`
-    border-left: ${expanded ? `3px solid ${theme.colors.variant.light.info}` : ''};
-    border-collapse: ${expanded ? 'separate' : 'collapse'};
+    border-left: ${expanded ? `3px solid ${theme.colors.variant.light.info}` : ""};
+    border-collapse: ${expanded ? "separate" : "collapse"};
 `);
 
 const CollapsibleTr = styled.tr`

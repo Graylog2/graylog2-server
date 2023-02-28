@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
 import styled from 'styled-components';
 
 import type { Column, ColumnRenderer, EntityBase } from './types';
@@ -33,10 +32,7 @@ const TableCell = <Entity extends EntityBase>({
   columnRenderer: ColumnRenderer<Entity> | undefined,
   entity: Entity,
 }) => {
-  const content = useMemo(
-    () => (typeof columnRenderer?.renderCell === 'function' ? columnRenderer.renderCell(entity, column) : entity[column.id]),
-    [column, columnRenderer, entity],
-  );
+  const content = typeof columnRenderer?.renderCell === 'function' ? columnRenderer.renderCell(entity, column) : entity[column.id];
 
   return (<Td>{content}</Td>);
 };

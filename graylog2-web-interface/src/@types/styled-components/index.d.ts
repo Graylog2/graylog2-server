@@ -25,7 +25,6 @@ declare module 'styled-components' {
   import type { Utils } from 'src/theme/utils';
   import type { ThemeMode } from 'src/theme/constants';
   import type { Spacings } from 'src/theme/spacings';
-  // eslint-disable-next-line import/order
   import type { Breakpoints } from 'src/theme/breakpoints';
 
   export interface DefaultTheme {
