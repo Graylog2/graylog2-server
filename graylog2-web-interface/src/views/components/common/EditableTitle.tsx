@@ -117,7 +117,7 @@ export default class EditableTitle extends React.Component<Props, State> {
     return editing ? (
       <span>
         <form onSubmit={this._onSubmit} className={styles.inlineForm}>
-          {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
+          {}
           <StyledInput autoFocus
                        type="text"
                        value={value}

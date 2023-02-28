@@ -103,7 +103,7 @@ export function createHandlerFor<T>(dispatch: AppDispatch, action: ActionDefinit
 
     return ({ queryId, field, value, type }) => {
       const id = generateId();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
       const onClose = () => setActionComponents(({ [id]: _, ...rest }) => rest);
       const renderedComponent = (
         <ActionComponent key={action.title}

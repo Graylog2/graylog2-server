@@ -32,9 +32,8 @@ export { default as CacheCreate } from './CacheCreate';
 export { default as CachePicker } from './CachePicker';
 export { default as CachesContainer } from './CachesContainer';
 
-// eslint-disable-next-line
 export { default as DataAdaptersOverview } from './DataAdaptersOverview';
-// eslint-disable-next-line
+
 export { default as DataAdapterTableEntry } from './DataAdapterTableEntry';
 export { default as DataAdapter } from './DataAdapter';
 export { default as DataAdapterForm } from './DataAdapterForm';

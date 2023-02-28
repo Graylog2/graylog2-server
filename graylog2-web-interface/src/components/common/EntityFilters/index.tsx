@@ -14,27 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.shared.bindings.providers;
+import EntityFilters from './EntityFilters';
 
-import org.graylog2.plugin.ServerStatus;
-import org.graylog2.plugin.system.NodeId;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-public class NodeIdProvider implements Provider<NodeId> {
-    private final ServerStatus serverStatus;
-
-    @Inject
-    public NodeIdProvider(ServerStatus serverStatus) {
-        this.serverStatus = serverStatus;
-    }
-
-    @Override
-    public NodeId get() {
-        return serverStatus.getNodeId();
-    }
-}
+export default EntityFilters;

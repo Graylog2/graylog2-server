@@ -142,7 +142,6 @@ const useCompleter = ({ streams, timeRange, completerFactory, userTimezone }: Pi
   }, [allFields, queryFields]);
   const view = useView();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   return useMemo(() => completerFactory(completers ?? [], timeRange, streams, fieldTypes, userTimezone, view),
     [completerFactory, completers, timeRange, streams, fieldTypes, userTimezone, view]);
 };
