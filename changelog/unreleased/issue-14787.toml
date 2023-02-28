@@ -2,4 +2,4 @@ type = "fixed"
 message = "Fix the way we display long field names in aggregation grouping configuration."
 
 issues = ["14787"]
-pulls = ["14789"]
+pulls = ["14802"]
