@@ -61,7 +61,8 @@ public class ESLatestHandler extends ESPivotSeriesSpecHandler<Latest, ParsedFilt
                                         ESSearchTypeHandler<Pivot> searchTypeHandler,
                                         ESGeneratedQueryContext esGeneratedQueryContext) {
         final TopHits latestAggregation = filterAggregation.getAggregations().get(AGG_NAME);
-        final Optional<Value> latestValue = Optional.ofNullable(latestAggregation.getHits())
+        final Optional<Value> latestValue = Optional.ofNullable(latestAggregation)
+                .map(TopHits::getHits)
                 .map(SearchHits::getHits)
                 .filter(hits -> hits.length > 0)
                 .map(hits -> hits[0])
