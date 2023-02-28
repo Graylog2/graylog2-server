@@ -25,6 +25,11 @@ public class InlineBinaryField extends AbstractConfigurationField {
 
     private String defaultValue;
 
+    /**
+     * <em> Please make sure that the UI is supporting this field appropriately. The initial UI implementation
+     * only handles fields with {@code encrypted = true}. This comment should be removed, once the UI implementation
+     * is complete. </em>
+     */
     public InlineBinaryField(String name, String humanName, String description,
                              Optional isOptional, boolean isEncrypted) {
         super(FIELD_TYPE, name, humanName, description, isOptional, DEFAULT_POSITION, isEncrypted);
