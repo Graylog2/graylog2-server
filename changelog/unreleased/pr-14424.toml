@@ -17,8 +17,8 @@ with a minimum of user input. The default settings are based on ES/OS sharding r
 do not need to be changed.
 The following configuration file settings are available, if you wish to modify the behavior
 for your requirements:
-`time_size_optimizing_rotation_min_shard_size`: index should be at least this big before rotating.
-`time_size_optimizing_rotation_max_shard_size`: rotate if index exceeds this size limit.
-`time_size_optimizing_rotation_min_lifetime`: index should be at least this old before rotating.
-`time_size_optimizing_rotation_max_lifetime`: rotate if index exceeds this age limit.
+`time_size_optimizing_rotation_min_shard_size=20g`: Shard should be at least this big before rotating.
+`time_size_optimizing_rotation_max_shard_size=50g`: Rotate if shard exceeds this size limit.
+`time_size_optimizing_retention_min_lifetime=30d`: The minimum / maximum number of days the data in the index is kept before it is retained.
+`time_size_optimizing_retention_max_lifetime=40d`: The minimum / maximum number of days the data in the index is kept before it is retained.
 """
