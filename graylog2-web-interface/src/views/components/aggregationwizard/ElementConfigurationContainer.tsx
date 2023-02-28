@@ -39,6 +39,7 @@ const ElementActions = styled.div`
 
 const ElementConfiguration = styled.div`
   flex: 1;
+  overflow: auto;
 `;
 
 const DragHandle = styled.div`
