@@ -127,7 +127,7 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
     <Field name="startpage">
       {({ field: { name, value, onChange } }) => {
         const type = value?.type ?? 'dashboard';
-        let options: (Option | { label: any; value: any })[];
+        let options: (Option | { label: string; value: string })[];
 
         if (type === 'dashboard') {
           options = dashboards;
