@@ -14,13 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { createSelector } from '@reduxjs/toolkit';
+package org.graylog2.streams;
 
-import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
-import useAppSelector from 'stores/useAppSelector';
-
-const selectCurrentSearchTypeResults = createSelector(selectCurrentQueryResults, (result) => result?.searchTypes);
-
-const useCurrentSearchTypesResults = () => useAppSelector(selectCurrentSearchTypeResults);
-
-export default useCurrentSearchTypesResults;
+public record RouterEngineInfo(String fingerprint) {
+}
