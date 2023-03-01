@@ -32,7 +32,7 @@ export type EventDefinitionAggregation = {
   fnSeries: string,
   field: string
 }
-const definitionsUrl = qualifyUrl('/events/definitions');
+export const definitionsUrl = qualifyUrl('/events/definitions');
 
 const transformExpressionsToArray = ({ series, conditions }): Array<EventDefinitionAggregation> => {
   const res = [];

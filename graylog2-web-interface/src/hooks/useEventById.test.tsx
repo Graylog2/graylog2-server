@@ -17,12 +17,12 @@
 import React from 'react';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import { mockEventData } from 'test/helpers/mocking/EventAndEventDefinitions_mock';
 
 import suppressConsole from 'helpers/suppressConsole';
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
-import type { EventType } from 'hooks/useEventById';
 import useEventById, { eventsUrl } from 'hooks/useEventById';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
@@ -44,9 +44,7 @@ const wrapper = ({ children }) => (
     {children}
   </QueryClientProvider>
 );
-const url = eventsUrl('111');
-
-const mockData = { event: { id: '111' } as EventType };
+const url = eventsUrl('event-id-1');
 
 describe('useEventById', () => {
   afterEach(() => {
@@ -54,21 +52,21 @@ describe('useEventById', () => {
   });
 
   it('should run fetch and store mapped response', async () => {
-    asMock(fetch).mockImplementation(() => Promise.resolve({ event: { id: '111' } }));
-    const { result, waitFor } = renderHook(() => useEventById('111'), { wrapper });
+    asMock(fetch).mockImplementation(() => Promise.resolve(mockEventData));
+    const { result, waitFor } = renderHook(() => useEventById('event-id-1'), { wrapper });
 
     await waitFor(() => result.current.isLoading);
     await waitFor(() => !result.current.isLoading);
 
     expect(fetch).toHaveBeenCalledWith('GET', url);
-    expect(result.current.data).toEqual(mockData.event);
+    expect(result.current.data).toEqual(mockEventData.event);
   });
 
   it('should display notification on fail', async () => {
     await suppressConsole(async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { waitFor } = renderHook(() => useEventById('111'), { wrapper });
+      const { waitFor } = renderHook(() => useEventById('event-id-1'), { wrapper });
 
       await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
         'Loading event or alert failed with status: Error: Error',
