@@ -14,20 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 import { useEffect } from 'react';
 
 import type { Location } from 'routing/withLocation';
 import withLocation from 'routing/withLocation';
 import { useSyncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
-import { ViewStore } from 'views/stores/ViewStore';
 import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import type { RootState } from 'views/types';
+import { selectView } from 'views/logic/slices/viewSelectors';
+import useAppDispatch from 'stores/useAppDispatch';
+import { selectSearchExecutionState } from 'views/logic/slices/searchExecutionSelectors';
+
+const bindSearchParamsFromQueryThunk = (query: { [key: string]: unknown; }) => (_dispatch: AppDispatch, getState: () => RootState) => {
+  const view = selectView(getState());
+  const executionState = selectSearchExecutionState(getState());
+  bindSearchParamsFromQuery({ view, query, retry: () => Promise.resolve(), executionState });
+};
 
 const useBindSearchParamsFromQuery = (query: { [key: string]: unknown }) => {
-  useEffect(() => {
-    const { view } = ViewStore.getInitialState();
+  const dispatch = useAppDispatch();
 
-    bindSearchParamsFromQuery({ view, query, retry: () => Promise.resolve() });
+  useEffect(() => {
+    dispatch(bindSearchParamsFromQueryThunk(query));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 };
 
@@ -41,7 +51,7 @@ const SynchronizeUrl = ({ location }: Props) => {
   useBindSearchParamsFromQuery(location.query);
   useSyncWithQueryParameters(query);
 
-  return <></>;
+  return null;
 };
 
 export default withLocation(SynchronizeUrl);

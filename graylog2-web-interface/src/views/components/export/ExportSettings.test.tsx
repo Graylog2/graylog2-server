@@ -25,6 +25,8 @@ import View from 'views/logic/views/View';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import viewsReducers from 'views/viewsReducers';
 
 import ExportSettings from './ExportSettings';
 import { viewWithoutWidget, stateWithOneWidget } from './Fixtures';
@@ -54,17 +56,20 @@ const pluginExports = {
         visualizationComponent: () => <>Hey!</>,
       },
     ],
+    'views.reducers': viewsReducers,
   },
 };
 
 const fields = Immutable.List([FieldTypeMapping.create('foo', FieldType.create('long'))]);
 
 const SimpleExportSettings = (props: Omit<React.ComponentProps<typeof ExportSettings>, 'fields'>) => (
-  <Formik initialValues={{ selectedFields: [] }} onSubmit={() => {}}>
-    {() => (
-      <ExportSettings fields={fields} {...props} />
-    )}
-  </Formik>
+  <TestStoreProvider>
+    <Formik initialValues={{ selectedFields: [] }} onSubmit={() => {}}>
+      {() => (
+        <ExportSettings fields={fields} {...props} />
+      )}
+    </Formik>
+  </TestStoreProvider>
 );
 const customWidget = Widget.builder()
   .id('widget-id-1')

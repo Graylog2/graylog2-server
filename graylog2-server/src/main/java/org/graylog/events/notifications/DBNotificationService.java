@@ -41,9 +41,9 @@ public class DBNotificationService extends PaginatedDbService<NotificationDto> {
     }
 
     public PaginatedList<NotificationDto> searchPaginated(SearchQuery query, Predicate<NotificationDto> filter,
-                                                          String sortByField, int page, int perPage) {
+                                                          String sortByField, String sortOrder, int page, int perPage) {
         return findPaginatedWithQueryFilterAndSort(query.toDBQuery(), filter,
-                getSortBuilder("asc", sortByField), page, perPage);
+                getSortBuilder(sortOrder, sortByField), page, perPage);
     }
 
     public NotificationDto saveWithOwnership(NotificationDto notificationDto, User user) {

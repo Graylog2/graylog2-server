@@ -18,8 +18,6 @@ import * as React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
-import mockAction from 'helpers/mocking/MockAction';
-import { SearchActions } from 'views/stores/SearchStore';
 import MockQuery from 'views/logic/queries/Query';
 import type { WidgetEditingState, WidgetFocusingState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
@@ -27,17 +25,11 @@ import validateQuery from 'views/components/searchbar/queryvalidation/validateQu
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import useAppDispatch from 'stores/useAppDispatch';
 
-import SearchBar from './SearchBar';
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchStore: MockStore(
-    ['getInitialState', () => ({ search: { parameters: [] } })],
-  ),
-  SearchActions: {
-    refresh: jest.fn(),
-  },
-}));
+import OriginalSearchBar from './SearchBar';
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 
@@ -64,6 +56,7 @@ jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest
 
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 jest.mock('views/logic/queries/useCurrentQuery');
+jest.mock('stores/useAppDispatch');
 
 const query = MockQuery.builder()
   .timerange({ type: 'relative', from: 300 })
@@ -71,9 +64,18 @@ const query = MockQuery.builder()
   .id('34efae1e-e78e-48ab-ab3f-e83c8611a683')
   .build();
 
+const SearchBar = () => (
+  <TestStoreProvider>
+    <OriginalSearchBar />
+  </TestStoreProvider>
+);
+
 describe('SearchBar', () => {
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   beforeEach(() => {
-    SearchActions.refresh = mockAction();
     SearchConfigStore.getInitialState = jest.fn(() => ({ searchesClusterConfig: mockSearchesClusterConfig }));
 
     asMock(useCurrentQuery).mockReturnValue(query);
@@ -82,31 +84,29 @@ describe('SearchBar', () => {
   it('should render the SearchBar', async () => {
     render(<SearchBar />);
 
-    const timeRangeButton = await screen.findByLabelText('Open Time Range Selector');
-    const timeRangeDisplay = await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
-    const streamsFilter = await screen.findByTestId('streams-filter');
-    const liveUpdate = await screen.findByLabelText('Refresh Search Controls');
-    const searchButton = await screen.findByRole('button', { name: /perform search/i });
-    const metaButtons = await screen.findByText('Saved Search Controls');
-
-    expect(timeRangeButton).not.toBeNull();
-    expect(timeRangeDisplay).not.toBeNull();
-    expect(streamsFilter).not.toBeNull();
-    expect(liveUpdate).not.toBeNull();
-    expect(searchButton).not.toBeNull();
-    expect(metaButtons).not.toBeNull();
+    await screen.findByLabelText('Open Time Range Selector');
+    await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
+    await screen.findByTestId('streams-filter');
+    await screen.findByLabelText('Refresh Search Controls');
+    await screen.findByRole('button', { name: /perform search/i });
+    await screen.findByText('Saved Search Controls');
   });
 
   it('should refresh search, when search is performed and there are no changes.', async () => {
+    const dispatch = jest.fn();
+    asMock(useAppDispatch).mockReturnValue(dispatch);
+
     render(<SearchBar />);
 
     const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
     await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
 
+    asMock(dispatch).mockClear();
+
     fireEvent.click(searchButton);
 
-    await waitFor(() => expect(SearchActions.refresh).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(dispatch).toHaveBeenCalled());
   });
 
   it('date exceeding limitDuration should render with error Icon & search button disabled', async () => {

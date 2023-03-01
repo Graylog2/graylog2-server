@@ -29,7 +29,6 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
-import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
 
 import javax.inject.Inject;
@@ -44,8 +43,7 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
 
     @Inject
     public PaginatedStreamService(MongoConnection mongoConnection,
-                                  MongoJackObjectMapperProvider mapper)
-    {
+                                  MongoJackObjectMapperProvider mapper) {
         super(mongoConnection, mapper, StreamDTO.class, COLLECTION_NAME);
         this.collection = mongoConnection.getMongoDatabase().getCollection(COLLECTION_NAME);
     }
@@ -54,9 +52,14 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
         return db.count();
     }
 
-    public PaginatedList<StreamDTO> findPaginated(SearchQuery searchQuery, Predicate<StreamDTO> filter, int page,
-                                                  int perPage, String sortField, String order) {
-        final Bson dbQuery = searchQuery.toBson();
+    public PaginatedList<StreamDTO> findPaginated(Bson dbQuery, //query executed on DB level
+                                                  Predicate<StreamDTO> predicate, //predicate executed on code level, AFTER data is fetched
+                                                  int page,
+                                                  int perPage,
+                                                  String sortField,
+                                                  String order) {
+
+
         var pipelineBuilder = ImmutableList.<Bson>builder()
                 .add(Aggregates.match(dbQuery));
 
@@ -83,22 +86,23 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
 
         final List<StreamDTO> streamsList = StreamSupport.stream(result.spliterator(), false)
                 .map(StreamDTO::fromDocument)
-                .filter(filter)
+                .filter(predicate)
                 .toList();
 
         final long grandTotal = db.find(DBQuery.empty()).toArray()
                 .stream()
-                .filter(filter)
+                .filter(predicate)
                 .count();
 
         final List<StreamDTO> paginatedStreams = perPage > 0
                 ? streamsList.stream()
-                    .skip((long) perPage * Math.max(0, page - 1))
-                    .limit(perPage)
-                    .toList()
+                .skip((long) perPage * Math.max(0, page - 1))
+                .limit(perPage)
+                .toList()
                 : streamsList;
 
         return new PaginatedList<>(paginatedStreams, streamsList.size(), page, perPage, grandTotal);
+
     }
 
     private boolean isStringField(String sortField) {

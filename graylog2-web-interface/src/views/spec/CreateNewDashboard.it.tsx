@@ -16,19 +16,18 @@
  */
 import * as React from 'react';
 import { render, fireEvent } from 'wrappedTestingLibrary';
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
-import { asMock, StoreMock as MockStore } from 'helpers/mocking';
+import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import mockAction from 'helpers/mocking/MockAction';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import AppRouter from 'routing/AppRouter';
 import CurrentUserProvider from 'contexts/CurrentUserProvider';
-import viewsBindings from 'views/bindings';
 import StreamsContext from 'contexts/StreamsContext';
-import SearchMetadata from 'views/logic/search/SearchMetadata';
-import { SearchMetadataActions, SearchMetadataStore } from 'views/stores/SearchMetadataStore';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 
 jest.mock('stores/users/CurrentUserStore', () => ({
   CurrentUserStore: MockStore(
@@ -44,19 +43,14 @@ jest.mock('stores/users/CurrentUserStore', () => ({
   ),
 }));
 
-jest.mock('views/stores/SearchMetadataStore', () => ({
-  SearchMetadataActions: {
-    parseSearch: jest.fn(),
-  },
-  SearchMetadataStore: MockStore(),
-}));
-
 jest.mock('views/components/dashboard/hooks/useDashboards', () => () => ({
   data: {
     list: [],
     pagination: { total: 0 },
   },
 }));
+
+jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
 declare global {
   namespace NodeJS {
@@ -87,21 +81,17 @@ jest.mock('views/components/searchbar/queryinput/QueryInput', () => () => <span>
 
 jest.unmock('logic/rest/FetchProvider');
 
-const viewsPlugin = new PluginManifest({}, viewsBindings);
-
 const finderTimeout = applyTimeoutMultiplier(15000);
 const testTimeout = applyTimeoutMultiplier(30000);
 
 describe('Create a new dashboard', () => {
-  beforeAll(() => PluginStore.register(viewsPlugin));
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
-    const searchMetadata = SearchMetadata.empty();
-    asMock(SearchMetadataStore.getInitialState).mockReturnValue(searchMetadata);
-    asMock(SearchMetadataActions.parseSearch).mockReturnValue(Promise.resolve(searchMetadata));
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isLoading: false });
   });
-
-  afterAll(() => PluginStore.unregister(viewsPlugin));
 
   const SimpleAppRouter = () => (
     <CurrentUserProvider>

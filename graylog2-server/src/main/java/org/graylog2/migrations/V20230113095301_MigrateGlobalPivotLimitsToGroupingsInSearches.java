@@ -63,6 +63,7 @@ public class V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearches exten
     public void upgrade() {
         if (clusterConfigService.get(MigrationCompleted.class) != null) {
             LOG.debug("Migration already completed!");
+            return;
         }
 
         final List<SearchPivotLimitMigration> pivotLimitMigrations = StreamSupport.stream(this.searches.find().spliterator(), false)

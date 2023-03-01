@@ -35,6 +35,9 @@ import { InputsActions } from 'stores/inputs/InputsStore';
 import { MessagesActions } from 'stores/messages/MessagesStore';
 import { NodesActions } from 'stores/nodes/NodesStore';
 import { isLocalNode } from 'views/hooks/useIsLocalNode';
+import PluggableStoreProvider from 'components/PluggableStoreProvider';
+import View from 'views/logic/views/View';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 type Props = {
   params: {
@@ -50,7 +53,7 @@ const useStreams = () => {
   useEffect(() => {
     StreamsStore.listStreams().then((newStreams) => {
       if (newStreams) {
-        const streamsMap = newStreams.reduce((prev, stream) => ({ ...prev, [stream.id]: stream }), {});
+        const streamsMap = Object.fromEntries(newStreams.map((stream) => [stream.id, stream]));
 
         setStreams(Immutable.Map(streamsMap));
         setAllStreams(Immutable.List(newStreams));
@@ -128,29 +131,34 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
     && inputs !== undefined
     && allStreams !== undefined), [message, streams, inputs, allStreams]);
 
+  const view = useMemo(() => View.create(), []);
+  const executionState = useMemo(() => SearchExecutionState.empty(), []);
+
   if (isLoaded) {
     const { streams: messageStreams, timestamp } = message.fields as MessageFields;
     const fieldTypesStreams = messageStreams.filter((streamId) => streams.has(streamId));
 
     return (
-      <DocumentTitle title={`Message ${messageId} on ${index}`}>
-        <Row className="content" id="sticky-augmentations-container">
-          <Col md={12}>
-            <WindowDimensionsContextProvider>
-              <FieldTypesProvider streams={fieldTypesStreams} timestamp={timestamp}>
-                <InteractiveContext.Provider value={false}>
-                  <MessageDetail fields={Immutable.List()}
-                                 streams={streams}
-                                 allStreams={allStreams}
-                                 disableSurroundingSearch
-                                 inputs={inputs}
-                                 message={message} />
-                </InteractiveContext.Provider>
-              </FieldTypesProvider>
-            </WindowDimensionsContextProvider>
-          </Col>
-        </Row>
-      </DocumentTitle>
+      <PluggableStoreProvider view={view} initialQuery="none" isNew={false} executionState={executionState}>
+        <DocumentTitle title={`Message ${messageId} on ${index}`}>
+          <Row className="content" id="sticky-augmentations-container">
+            <Col md={12}>
+              <WindowDimensionsContextProvider>
+                <FieldTypesProvider streams={fieldTypesStreams} timestamp={timestamp}>
+                  <InteractiveContext.Provider value={false}>
+                    <MessageDetail fields={Immutable.List()}
+                                   streams={streams}
+                                   allStreams={allStreams}
+                                   disableSurroundingSearch
+                                   inputs={inputs}
+                                   message={message} />
+                  </InteractiveContext.Provider>
+                </FieldTypesProvider>
+              </WindowDimensionsContextProvider>
+            </Col>
+          </Row>
+        </DocumentTitle>
+      </PluggableStoreProvider>
     );
   }
 

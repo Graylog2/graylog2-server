@@ -21,6 +21,8 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -43,6 +45,10 @@ public class JobSchedulerTestClock implements JobSchedulerClock {
         this.instant = instant.plus(unit.toMillis(duration));
     }
 
+    public void setTime(DateTime newTime) {
+        this.instant = newTime.toInstant();
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -55,8 +61,25 @@ public class JobSchedulerTestClock implements JobSchedulerClock {
      * {@inheritDoc}
      */
     @Override
+    public java.time.Instant instantNow() {
+        return java.time.Instant.ofEpochMilli(instant.getMillis());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public DateTime now(DateTimeZone zone) {
         return instant.toDateTime().withZone(zone);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ZonedDateTime now(ZoneId zone) {
+        final java.time.Instant javaInstant = java.time.Instant.ofEpochMilli(instant.getMillis());
+        return javaInstant.atZone(zone);
     }
 
     /**

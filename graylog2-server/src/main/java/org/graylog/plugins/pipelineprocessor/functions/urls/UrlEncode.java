@@ -55,7 +55,7 @@ public class UrlEncode extends AbstractFunction<String> {
         try {
             return URLEncoder.encode(value, charset.name());
         } catch (UnsupportedEncodingException e) {
-            throw new IllegalArgumentException("Unsupported character encoding", e);
+            throw new IllegalArgumentException(context.pipelineErrorMessage("Unsupported character encoding"), e);
         }
     }
 

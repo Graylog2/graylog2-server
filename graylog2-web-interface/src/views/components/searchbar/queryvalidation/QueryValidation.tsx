@@ -32,7 +32,7 @@ import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import usePluginEntities from 'hooks/usePluginEntities';
 
-const Container = styled.div`;
+const Container = styled.div`
   margin-left: 5px;
   width: 25px;
   min-height: 34px;
@@ -47,11 +47,11 @@ const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable
   border: 0;
   display: flex;
   align-items: center;
-  cursor: ${$clickable ? 'pointer' : 'default'};
+  cursor: ${$clickable ? "pointer" : "default"};
 `);
 
 const ErrorIcon = styled(Icon)(({ theme, $status }: { theme: DefaultTheme, $status: string }) => css`
-  color: ${$status === 'ERROR' ? theme.colors.variant.danger : theme.colors.variant.warning};
+  color: ${$status === "ERROR" ? theme.colors.variant.danger : theme.colors.variant.warning};
   font-size: 22px;
 `);
 
@@ -97,7 +97,7 @@ const shakeAnimation = keyframes`
 `;
 
 const StyledPopover = styled(Popover)(({ $shaking }) => css`
-  animation: ${$shaking ? css`${shakeAnimation} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both` : 'none'};
+  animation: ${$shaking ? css`${shakeAnimation} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both` : "none"};
 `);
 
 const ExplanationTitle = ({ title }: { title: string }) => (
