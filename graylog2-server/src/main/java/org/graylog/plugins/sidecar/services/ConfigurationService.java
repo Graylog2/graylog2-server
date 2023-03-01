@@ -17,7 +17,6 @@
 package org.graylog.plugins.sidecar.services;
 
 import com.mongodb.BasicDBObject;
-import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Template;
@@ -40,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -57,28 +57,33 @@ import static org.apache.commons.lang.CharEncoding.UTF_8;
 @Singleton
 public class ConfigurationService extends PaginatedDbService<Configuration> {
     private static final Logger LOG = LoggerFactory.getLogger(ConfigurationService.class);
-    private static final freemarker.template.Configuration templateConfiguration =
-            new freemarker.template.Configuration(freemarker.template.Configuration.VERSION_2_3_28);
-    private static final StringTemplateLoader stringTemplateLoader = new StringTemplateLoader();
-    private ConfigurationVariableService configurationVariableService;
+    private final freemarker.template.Configuration templateConfiguration;
+    private final ConfigurationVariableService configurationVariableService;
 
     private static final String COLLECTION_NAME = "sidecar_configurations";
+    private final Provider<freemarker.template.Configuration> templateConfigurationProvider;
 
     @Inject
     public ConfigurationService(MongoConnection mongoConnection,
                                 MongoJackObjectMapperProvider mapper,
-                                ConfigurationVariableService configurationVariableService) {
+                                ConfigurationVariableService configurationVariableService,
+                                Provider<freemarker.template.Configuration> templateConfigurationProvider) {
         super(mongoConnection, mapper, Configuration.class, COLLECTION_NAME);
-        MongoDbTemplateLoader mongoDbTemplateLoader = new MongoDbTemplateLoader(db);
-        MultiTemplateLoader multiTemplateLoader = new MultiTemplateLoader(new TemplateLoader[] {
-                mongoDbTemplateLoader,
-                stringTemplateLoader });
-        templateConfiguration.setTemplateLoader(multiTemplateLoader);
-        templateConfiguration.setSharedVariable("indent", new IndentTemplateDirective());
-        templateConfiguration.setDefaultEncoding(UTF_8);
-        templateConfiguration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-        templateConfiguration.setLogTemplateExceptions(false);
+        this.templateConfigurationProvider = templateConfigurationProvider;
+        this.templateConfiguration = createTemplateConfiguration(new MongoDbTemplateLoader(db));
         this.configurationVariableService = configurationVariableService;
+    }
+
+    private freemarker.template.Configuration createTemplateConfiguration(TemplateLoader templateLoader) {
+        final freemarker.template.Configuration configuration = templateConfigurationProvider.get();
+
+        configuration.setTemplateLoader(templateLoader);
+        configuration.setSharedVariable("indent", new IndentTemplateDirective());
+        configuration.setDefaultEncoding(UTF_8);
+        configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+        configuration.setLogTemplateExceptions(false);
+
+        return configuration;
     }
 
     public Configuration find(String id) {
@@ -167,7 +172,7 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
                 configuration.collectorId(),
                 configuration.name(),
                 configuration.color(),
-                renderTemplate(configuration.id(), context)
+                renderTemplate(templateConfiguration, configuration.id(), context)
         );
     }
 
@@ -179,21 +184,14 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         context.put("operatingSystem", "<operating system>");
 
         String previewName = UUID.randomUUID().toString();
+        final StringTemplateLoader stringTemplateLoader = new StringTemplateLoader();
         stringTemplateLoader.putTemplate(previewName, template);
-        String result = renderTemplate(previewName, context);
-        stringTemplateLoader.removeTemplate(previewName);
-        try {
-            templateConfiguration.removeTemplateFromCache(previewName);
-        } catch (IOException e) {
-            LOG.debug("Couldn't remove temporary template from cache: " + e.getMessage());
-        }
 
-        return result;
+        return renderTemplate(createTemplateConfiguration(stringTemplateLoader), previewName, context);
     }
 
-    private String renderTemplate(String configurationId, Map<String, Object> sidecarContext) throws RenderTemplateException {
+    private String renderTemplate(freemarker.template.Configuration config, String templateName, Map<String, Object> sidecarContext) throws RenderTemplateException {
         Writer writer = new StringWriter();
-        String template;
 
         final Map<String, Object> context = new HashMap<>();
         context.put("sidecar", sidecarContext);
@@ -203,7 +201,7 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
         context.put(ConfigurationVariable.VARIABLE_PREFIX, userContext);
 
         try {
-            Template compiledTemplate = templateConfiguration.getTemplate(configurationId);
+            Template compiledTemplate = config.getTemplate(templateName);
             compiledTemplate.process(context, writer);
         } catch (TemplateException e) {
             LOG.error("Failed to render template: " + e.getMessageWithoutStackTop());
@@ -213,7 +211,7 @@ public class ConfigurationService extends PaginatedDbService<Configuration> {
             throw new RenderTemplateException(e.getMessage(), e);
         }
 
-        template = writer.toString();
+        final String template = writer.toString();
         return template.endsWith("\n") ? template : template + "\n";
     }
 }

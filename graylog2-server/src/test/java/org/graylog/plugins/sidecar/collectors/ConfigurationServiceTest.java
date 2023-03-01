@@ -23,8 +23,10 @@ import org.graylog.plugins.sidecar.rest.models.NodeDetails;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.ConfigurationVariableService;
+import org.graylog.plugins.sidecar.template.RenderTemplateException;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
@@ -34,6 +36,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 
 public class ConfigurationServiceTest {
@@ -70,7 +73,7 @@ public class ConfigurationServiceTest {
         when(sidecar.nodeDetails()).thenReturn(nodeDetails);
 
         this.configurationVariableService = new ConfigurationVariableService(mongodb.mongoConnection(), mongoJackObjectMapperProvider);
-        this.configurationService = new ConfigurationService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, configurationVariableService);
+        this.configurationService = new ConfigurationService(mongodb.mongoConnection(), mongoJackObjectMapperProvider, configurationVariableService, new SecureFreemarkerConfigProvider());
     }
 
     @Test
@@ -83,6 +86,17 @@ public class ConfigurationServiceTest {
 
         Configuration configWithNewline = buildTestConfig(TEMPLATE_RENDERED);
         assertEquals(configWithNewline, result);
+    }
+
+    @Test
+    public void testTemplateRenderUsingForbiddenFeatures() throws Exception {
+        final String TEMPLATE = "<#assign ex=\"freemarker.template.utility.Execute\"?new()> ${ex(\"date\")}\n nodename: ${sidecar.nodeName}\n";
+
+        assertThrows("Template should not allow insecure features", RenderTemplateException.class, () -> {
+            configuration = buildTestConfig(TEMPLATE);
+            this.configurationService.save(configuration);
+            this.configurationService.renderConfigurationForCollector(sidecar, configuration);
+        });
     }
 
     @Test
