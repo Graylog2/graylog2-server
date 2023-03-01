@@ -17,8 +17,8 @@
 package org.graylog.plugins.pipelineprocessor.functions.messages;
 
 import com.google.common.collect.ImmutableList;
-import org.apache.commons.lang3.ObjectUtils;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
+import org.apache.commons.lang3.ObjectUtils;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
@@ -26,6 +26,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog2.plugin.Message;
+import org.graylog2.shared.utilities.StringUtils;
 
 import java.util.Objects;
 import java.util.Optional;
