@@ -66,9 +66,11 @@ public class CloneMessage extends AbstractFunction<Message> {
             }
 
             if (preventLoops.isEmpty() && cloneNumber >= MAX_CLONES) {
-                LOG.error("Message was cloned more than {} times by rule '{}'. Not allowing any more clones to prevent a potential endless loop. If this was intentional, please explicitly set the 'preventLoops' parameter to 'false'.",
-                        MAX_CLONES, cloneSource.name());
-                return null;
+               throw new IllegalStateException(
+                        StringUtils.f("Message was cloned more than %d times by rule '%s'. Not allowing any more " +
+                                        "clones to prevent a potential endless loop. If this was intentional, please " +
+                                        "explicitly set the 'preventLoops' parameter to 'false'.",
+                                MAX_CLONES, cloneSource.name()));
             }
 
         }
