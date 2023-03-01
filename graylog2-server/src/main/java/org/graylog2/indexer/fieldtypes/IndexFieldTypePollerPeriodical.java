@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -53,6 +54,7 @@ import java.util.stream.Collectors;
 /**
  * {@link Periodical} that creates and maintains index field type information in the database.
  */
+@Singleton
 public class IndexFieldTypePollerPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(IndexFieldTypePollerPeriodical.class);
 

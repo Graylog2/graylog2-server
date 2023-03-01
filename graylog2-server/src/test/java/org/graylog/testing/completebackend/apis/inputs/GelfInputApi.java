@@ -109,7 +109,7 @@ public final class GelfInputApi implements GraylogRestApi {
     }
 
     public void postMessage(int mappedPort,
-                            @SuppressWarnings("SameParameterValue") String messageJson) {
+                            String messageJson) {
         gelfEndpoint(mappedPort)
                 .body(messageJson)
                 .expect().response().statusCode(202)

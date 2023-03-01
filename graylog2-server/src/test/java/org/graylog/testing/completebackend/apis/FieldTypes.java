@@ -44,6 +44,7 @@ public class FieldTypes implements GraylogRestApi {
     }
 
     public Set<MappedFieldTypeDTO> waitForFieldTypeDefinitions(String... fieldName) {
+        triggerFieldTypesRefresh();
         final Set<String> expectedFields = Arrays.stream(fieldName).collect(Collectors.toSet());
         return waitForObject(() -> {
             final List<MappedFieldTypeDTO> knownTypes = getFieldTypes();
@@ -55,4 +56,13 @@ public class FieldTypes implements GraylogRestApi {
             }
         }, "Timed out waiting for field definition");
     }
+    private void triggerFieldTypesRefresh() {
+        given()
+                .spec(this.requestSpecification)
+                .when()
+                .post("/system/debug/field_types/refresh")
+                .then()
+                .statusCode(200);
+    }
+
 }
