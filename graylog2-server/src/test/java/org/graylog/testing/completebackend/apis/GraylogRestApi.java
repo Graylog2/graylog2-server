@@ -16,42 +16,29 @@
  */
 package org.graylog.testing.completebackend.apis;
 
+import org.awaitility.Awaitility;
 import org.glassfish.jersey.internal.util.Producer;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public interface GraylogRestApi {
-    int TIMEOUT_MS = 10000;
-    int SLEEP_MS = 500;
+    Duration DEFAULT_TIMEOUT = Duration.of(60, ChronoUnit.SECONDS);
 
     default void waitFor(Producer<Boolean> predicate, String timeoutErrorMessage) {
         waitForObject(() -> predicate.call() ? Optional.of(true) : Optional.empty(), timeoutErrorMessage);
     }
 
      default <T> T waitForObject(Producer<Optional<T>> predicate, String timeoutErrorMessage) {
-        return waitForObject(predicate, timeoutErrorMessage, Duration.of(TIMEOUT_MS, ChronoUnit.MILLIS));
+        return waitForObject(predicate, timeoutErrorMessage, DEFAULT_TIMEOUT);
     }
 
      default <T> T waitForObject(Producer<Optional<T>> predicate, String timeoutErrorMessage, Duration timeout) {
-        int msPassed = 0;
-        while (msPassed <= timeout.toMillis()) {
-            final Optional<T> result = predicate.call();
-            if (result != null && result.isPresent()) {
-                return result.get();
-            }
-            msPassed += SLEEP_MS;
-            sleep();
-        }
-        throw new AssertionError(timeoutErrorMessage);
-    }
-
-    private void sleep() {
-        try {
-            Thread.sleep(SLEEP_MS);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+         return Awaitility.waitAtMost(new org.awaitility.Duration(timeout.toMillis(), TimeUnit.MILLISECONDS))
+                 .pollInterval(org.awaitility.Duration.FIVE_HUNDRED_MILLISECONDS)
+                 .until(predicate, Optional::isPresent)
+                 .orElseThrow(() -> new AssertionError(timeoutErrorMessage));
     }
 }
