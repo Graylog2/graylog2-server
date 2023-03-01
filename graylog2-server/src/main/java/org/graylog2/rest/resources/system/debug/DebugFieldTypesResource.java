@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.system.debug;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerPeriodical;
 
 import javax.ws.rs.POST;
@@ -42,6 +43,7 @@ public class DebugFieldTypesResource {
     @Path("/refresh")
     @ApiOperation(value = "Get information about currently active stream router engine.")
     @Produces(MediaType.APPLICATION_JSON)
+    @NoAuditEvent("Only used for tests.")
     public Response triggerFieldTypesRefresh() {
         this.poller.doRun();
 
