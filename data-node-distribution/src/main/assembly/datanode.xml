@@ -24,6 +24,9 @@
             <includes>
                 <include>*/**</include>
             </includes>
+            <excludes>
+                <exclude>download/*</exclude>
+            </excludes>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/../data-node/target/lib</directory>
