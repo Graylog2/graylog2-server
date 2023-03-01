@@ -41,13 +41,13 @@ const renderBulkActions = (
 
 const DashboardsOverview = () => {
   const [query, setQuery] = useState('');
-  const paginationQueryParameter = usePaginationQueryParameter(undefined, DEFAULT_LAYOUT.pageSize);
   const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
-    defaultPageSize: paginationQueryParameter.pageSize,
+    defaultPageSize: DEFAULT_LAYOUT.pageSize,
     defaultDisplayedAttributes: DEFAULT_LAYOUT.displayedColumns,
     defaultSort: DEFAULT_LAYOUT.sort,
   });
+  const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
   const searchParams = useMemo(() => ({
     query,
     page: paginationQueryParameter.page,
