@@ -16,18 +16,17 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { Map as MockMap } from 'immutable';
 import { mount } from 'wrappedEnzyme';
 
-import { MockStore, asMock } from 'helpers/mocking';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Widget from 'views/components/widgets/Widget';
 import _Widget from 'views/logic/widgets/Widget';
-import { WidgetStore } from 'views/stores/WidgetStore';
-import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import ViewState from 'views/logic/views/ViewState';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import type View from 'views/logic/views/View';
+import { createViewWithWidgets } from 'fixtures/searches';
 
 import WidgetGrid from './WidgetGrid';
 
@@ -35,84 +34,55 @@ jest.mock('./widgets/Widget', () => () => 'widget');
 // eslint-disable-next-line react/prop-types
 jest.mock('components/common/ReactGridContainer', () => ({ children }) => <span>{children}</span>);
 
-jest.mock('graylog-web-plugin/plugin', () => ({
-  PluginStore: {
-    exports: (key) => (key !== 'enterpriseWidgets' ? [] : [
-      {
-        type: 'dummy',
-        displayName: 'Some Dummy Visualization',
-        defaultHeight: 5,
-        defaultWidth: 6,
-      },
-    ]),
-  },
-}));
-
 jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
 
-jest.mock('views/stores/WidgetStore', () => ({
-  WidgetStore: MockStore(['getInitialState', jest.fn()]),
-}));
+const fieldTypes: FieldTypes = {
+  all: Immutable.List(),
+  queryFields: Immutable.Map(),
+};
+const SimpleWidgetGrid = ({ view }: { view?: View }) => (
+  <TestStoreProvider view={view}>
+    <FieldTypesContext.Provider value={fieldTypes}><WidgetGrid /></FieldTypesContext.Provider>
+  </TestStoreProvider>
+);
 
-jest.mock('views/stores/CurrentViewStateStore', () => ({
-  CurrentViewStateStore: MockStore(['getInitialState', jest.fn(() => ({ state: { widgetPositions: {} } }))]),
-}));
-
-jest.mock('views/stores/TitlesStore', () => ({
-  TitlesStore: MockStore(['getInitialState', jest.fn(() => MockMap())]),
-}));
+SimpleWidgetGrid.defaultProps = {
+  view: undefined,
+};
 
 describe('<WidgetGrid />', () => {
-  beforeEach(() => {
-    asMock(WidgetStore.getInitialState).mockReturnValue(Immutable.Map());
-  });
+  beforeAll(loadViewsPlugin);
 
-  const fieldTypes: FieldTypes = {
-    all: Immutable.List(),
-    queryFields: Immutable.Map(),
-  };
-  const SimpleWidgetGrid = () => <FieldTypesContext.Provider value={fieldTypes}><WidgetGrid /></FieldTypesContext.Provider>;
+  afterAll(unloadViewsPlugin);
 
   it('should render with minimal props', () => {
-    const wrapper = mount((
-      <SimpleWidgetGrid />
-    ));
+    const wrapper = mount(<SimpleWidgetGrid />);
 
     expect(wrapper).toExist();
   });
 
   it('should render with widgets passed', () => {
-    const widgets = {
-      widget1: _Widget.builder().type('dummy').id('widget1').build(),
-    };
-    asMock(WidgetStore.getInitialState).mockReturnValue(Immutable.Map(widgets));
+    const widgets = [_Widget.builder().type('dummy').id('widget1').build()];
     const positions = {
       widget1: new WidgetPosition(1, 1, 1, 1),
     };
 
-    asMock(CurrentViewStateStore.getInitialState).mockReturnValue({ state: ViewState.builder().widgetPositions(positions).build(), activeQuery: 'query1' });
+    const viewWithWidgets = createViewWithWidgets(widgets, positions);
 
-    const wrapper = mount((
-      <SimpleWidgetGrid />
-    ));
+    const wrapper = mount(<SimpleWidgetGrid view={viewWithWidgets} />);
 
     expect(wrapper.find(Widget)).toHaveLength(1);
   });
 
   it('should render widget even if widget has no data', () => {
-    const widgets = {
-      widget1: _Widget.builder().type('dummy').id('widget1').build(),
-    };
-    asMock(WidgetStore.getInitialState).mockReturnValue(Immutable.Map(widgets));
+    const widgets = [_Widget.builder().type('dummy').id('widget1').build()];
     const positions = {
       widget1: new WidgetPosition(1, 1, 1, 1),
     };
 
-    asMock(CurrentViewStateStore.getInitialState).mockReturnValue({ state: ViewState.builder().widgetPositions(positions).build(), activeQuery: 'query1' });
+    const viewWithWidgets = createViewWithWidgets(widgets, positions);
 
-    const wrapper = mount((
-      <SimpleWidgetGrid />
-    ));
+    const wrapper = mount(<SimpleWidgetGrid view={viewWithWidgets} />);
 
     expect(wrapper.find(Widget)).toHaveLength(1);
   });

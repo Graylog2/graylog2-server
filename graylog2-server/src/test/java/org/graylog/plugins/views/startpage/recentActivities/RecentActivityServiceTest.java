@@ -129,7 +129,6 @@ public class RecentActivityServiceTest {
 
     @Test
     public void testFilteringForGrantees() {
-
         var activity = RecentActivityDTO.builder()
                 .activityType(ActivityType.CREATE)
                 .itemGrn("grn:1")
@@ -145,6 +144,43 @@ public class RecentActivityServiceTest {
         assertThat(activities.grandTotal().isEmpty()).isFalse();
         assertThat(activities.grandTotal().get()).isEqualTo(1);
 
-        assertThat(activities.delegate().stream().filter(a -> Objects.equals(activity.itemId(), "TESTFORUSER")).toList().size()).isEqualTo(1);
+        assertThat(activities.delegate().stream().filter(a -> Objects.equals(a.itemId(), "TESTFORUSER")).toList().size()).isEqualTo(1);
+    }
+
+    private void createActivity(final String id, final ActivityType activityType) {
+        recentActivityService.save(
+                RecentActivityDTO.builder()
+                        .activityType(activityType)
+                        .itemGrn(grnRegistry.newGRN(GRNTypes.SEARCH_FILTER, id).toString())
+                        .grantee(grnRegistry.newGRN(GRNTypes.USER, user.getId()).toString())
+                        .itemId(id)
+                        .userName(searchAdmin.username())
+                        .itemTitle(GRNTypes.SEARCH_FILTER.type() + " with id " + id)
+                        .itemType(GRNTypes.SEARCH_FILTER.type())
+                        .build()
+        );
+    }
+
+    @Test
+    public void testEntityWasDeleted() {
+        createActivity("1", ActivityType.CREATE);
+        createActivity("2", ActivityType.CREATE);
+        createActivity("3", ActivityType.CREATE);
+        createActivity("1", ActivityType.UPDATE);
+
+        var activities = recentActivityService.findRecentActivitiesFor(searchUser, 1, MAXIMUM + 1);
+        assertThat(activities.pagination().total()).isEqualTo(4);
+        assertThat(activities.grandTotal().isEmpty()).isFalse();
+        assertThat(activities.grandTotal().get()).isEqualTo(4);
+
+        recentActivityService.deleteAllEntriesForEntity(grnRegistry.newGRN(GRNTypes.SEARCH_FILTER, "1"));
+
+        activities = recentActivityService.findRecentActivitiesFor(searchUser, 1, MAXIMUM + 1);
+        assertThat(activities.pagination().total()).isEqualTo(2);
+        assertThat(activities.grandTotal().isEmpty()).isFalse();
+        assertThat(activities.grandTotal().get()).isEqualTo(2);
+
+        assertThat(activities.delegate().stream().filter(a -> Objects.equals(a.itemId(), "2")).toList().size()).isEqualTo(1);
+        assertThat(activities.delegate().stream().filter(a -> Objects.equals(a.itemId(), "3")).toList().size()).isEqualTo(1);
     }
 }

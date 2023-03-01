@@ -16,14 +16,15 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
+import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 
 public class EqualityExpression extends BinaryExpression implements LogicalExpression {
-    private static final Logger log = LoggerFactory.getLogger(EqualityExpression.class);
+    private static final RateLimitedLog log = getRateLimitedLog(EqualityExpression.class);
 
     private final boolean checkEquality;
 
@@ -47,7 +48,7 @@ public class EqualityExpression extends BinaryExpression implements LogicalExpre
         final Object left = this.left.evaluateUnsafe(context);
         final Object right = this.right.evaluateUnsafe(context);
         if (left == null) {
-            log.warn("left expression evaluated to null, returning false: {}", this.left);
+            log.warn(context.pipelineErrorMessage("left expression evaluated to null, returning false: " + this.left));
             return false;
         }
         final boolean equals;

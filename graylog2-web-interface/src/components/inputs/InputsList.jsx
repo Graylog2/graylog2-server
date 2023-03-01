@@ -16,6 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import styled from 'styled-components';
@@ -56,8 +57,10 @@ const InputListRow = styled(Row)`
 `;
 
 const InputsList = createReactClass({
+  // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'InputsList',
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
     permissions: PropTypes.array.isRequired,
     node: PropTypes.object,
@@ -87,6 +90,7 @@ const InputsList = createReactClass({
     SingleNodeActions.get();
   },
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   _splitInputs(state) {
     const { inputs } = state;
     const globalInputs = inputs
@@ -111,10 +115,6 @@ const InputsList = createReactClass({
   _isLoading() {
     return !(this.state.localInputs && this.state.globalInputs && this.state.node && this.state.filteredLocalInputs
       && this.state.filteredGlobalInputs);
-  },
-
-  _formatInput(input) {
-    return <InputListItem key={input.id} input={input} currentNode={this.state.node} permissions={this.props.permissions} />;
   },
 
   _nodeAffix() {
@@ -151,14 +151,11 @@ const InputsList = createReactClass({
       return regExp.test(input.title);
     };
 
-    const filteredGlobalInputs = this.state.globalInputs.filter(filterMethod);
-    const filteredLocalInputs = this.state.localInputs.filter(filterMethod);
-
-    this.setState({
-      filteredGlobalInputs: filteredGlobalInputs,
-      filteredLocalInputs: filteredLocalInputs,
+    this.setState((cur) => ({
+      filteredGlobalInputs: cur.globalInputs.filter(filterMethod),
+      filteredLocalInputs: cur.localInputs.filter(filterMethod),
       filter: filter,
-    });
+    }));
 
     if (resetLoadingState) {
       resetLoadingState();
@@ -166,13 +163,11 @@ const InputsList = createReactClass({
   },
 
   _onFilterReset() {
-    const { globalInputs, localInputs } = this.state;
-
-    this.setState({
-      filteredGlobalInputs: globalInputs,
-      filteredLocalInputs: localInputs,
+    this.setState((cur) => ({
+      filteredGlobalInputs: cur.globalInputs,
+      filteredLocalInputs: cur.localInputs,
       filter: undefined,
-    });
+    }));
   },
 
   render() {
@@ -182,11 +177,10 @@ const InputsList = createReactClass({
 
     return (
       <div>
-        {!this.props.node
-        && (
-        <IfPermitted permissions="inputs:create">
-          <CreateInputControl />
-        </IfPermitted>
+        {!this.props.node && (
+          <IfPermitted permissions="inputs:create">
+            <CreateInputControl />
+          </IfPermitted>
         )}
 
         <InputListRow id="filter-input" className="content">
@@ -194,7 +188,6 @@ const InputsList = createReactClass({
             <SearchForm onSearch={this._onFilterInputs}
                         topMargin={0}
                         onReset={this._onFilterReset}
-                        searchButtonLabel="Filter"
                         placeholder="Filter by title" />
             <br />
             <h2>
@@ -205,7 +198,12 @@ const InputsList = createReactClass({
             <EntityList bsNoItemsStyle="info"
                         noItemsText={this.state.globalInputs.length <= 0 ? 'There are no global inputs.'
                           : 'No global inputs match the filter'}
-                        items={this.state.filteredGlobalInputs.map((input) => this._formatInput(input))} />
+                        items={this.state.filteredGlobalInputs.map((input) => (
+                          <InputListItem key={input.id}
+                                         input={input}
+                                         currentNode={this.state.node}
+                                         permissions={this.props.permissions} />
+                        ))} />
             <br />
             <br />
             <h2>
@@ -216,7 +214,12 @@ const InputsList = createReactClass({
             <EntityList bsNoItemsStyle="info"
                         noItemsText={this.state.localInputs.length <= 0 ? 'There are no local inputs.'
                           : 'No local inputs match the filter'}
-                        items={this.state.filteredLocalInputs.map((input) => this._formatInput(input))} />
+                        items={this.state.filteredLocalInputs.map((input) => (
+                          <InputListItem key={input.id}
+                                         input={input}
+                                         currentNode={this.state.node}
+                                         permissions={this.props.permissions} />
+                        ))} />
           </Col>
         </InputListRow>
       </div>

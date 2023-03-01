@@ -115,7 +115,7 @@ public class InputRegistry extends HashSet<IOState<MessageInput>> {
             try {
                 input.stop();
             } catch (Exception e) {
-                LOG.warn("Stopping input <{}> failed, removing anyway: {}", input.getId(), e);
+                LOG.warn("Stopping input {} failed, removing anyway: {}", input.toIdentifier(), e);
             }
             inputState.setState(IOState.Type.STOPPED);
         }

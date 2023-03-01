@@ -16,16 +16,16 @@
  */
 import * as React from 'react';
 import { Field, useFormikContext, getIn } from 'formik';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import styled from 'styled-components';
 
 import { defaultCompare } from 'logic/DefaultCompare';
 import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
-import { useStore } from 'stores/connect';
-import AggregationFunctionsStore from 'views/stores/AggregationFunctionsStore';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { InputOptionalInfo as Opt, FormikInput } from 'components/common';
 import { Properties } from 'views/logic/fieldtypes/FieldType';
+import useAggregationFunctions from 'views/hooks/useAggregationFunctions';
 
 import FieldSelect from '../FieldSelect';
 
@@ -33,16 +33,18 @@ type Props = {
   index: number,
 }
 
+const Wrapper = styled.div``;
+
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
 
 const percentileOptions = [25.0, 50.0, 75.0, 90.0, 95.0, 99.0].map((value) => ({ label: value, value }));
 
 const Metric = ({ index }: Props) => {
   const metricFieldSelectRef = useRef(null);
-  const functions = useStore(AggregationFunctionsStore);
-  const functionOptions = Object.values(functions)
+  const { data: functions, isLoading } = useAggregationFunctions();
+  const functionOptions = useMemo(() => (isLoading ? [] : Object.values(functions)
     .map(({ type, description }) => ({ label: description, value: type }))
-    .sort(sortByLabel);
+    .sort(sortByLabel)), [functions, isLoading]);
 
   const { values: { metrics }, errors: { metrics: metricsError }, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const currentFunction = metrics[index].function;
@@ -70,7 +72,7 @@ const Metric = ({ index }: Props) => {
   }, [functionIsSettled, metricsError, index, metricFieldSelectRef]);
 
   return (
-    <>
+    <Wrapper data-testid={`metric-${index}`}>
       <Field name={`metrics.${index}.function`}>
         {({ field: { name, value }, meta: { error } }) => (
           <Input id="metric-function-select"
@@ -91,16 +93,20 @@ const Metric = ({ index }: Props) => {
       </Field>
       <Field name={`metrics.${index}.field`}>
         {({ field: { name, value, onChange }, meta: { error } }) => (
-          <FieldSelect id="metric-field-select"
-                       selectRef={metricFieldSelectRef}
-                       label="Field"
-                       onChange={onChange}
-                       error={error}
-                       clearable={!isFieldRequired}
-                       properties={requiredProperties}
-                       name={name}
-                       value={value}
-                       ariaLabel="Select a field" />
+          <Input id="metric-field"
+                 label="Field"
+                 error={error}
+                 labelClassName="col-sm-3"
+                 wrapperClassName="col-sm-9">
+            <FieldSelect id="metric-field-select"
+                         selectRef={metricFieldSelectRef}
+                         onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
+                         clearable={!isFieldRequired}
+                         properties={requiredProperties}
+                         name={name}
+                         value={value}
+                         ariaLabel="Select a field" />
+          </Input>
         )}
       </Field>
       {isPercentile && (
@@ -130,7 +136,7 @@ const Metric = ({ index }: Props) => {
                    name={`metrics.${index}.name`}
                    labelClassName="col-sm-3"
                    wrapperClassName="col-sm-9" />
-    </>
+    </Wrapper>
   );
 };
 

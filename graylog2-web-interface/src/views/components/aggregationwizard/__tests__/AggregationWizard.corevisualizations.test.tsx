@@ -31,8 +31,11 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import { createSearch } from 'fixtures/searches';
+import viewsReducers from 'views/viewsReducers';
+import TestStoreProvider from 'views/test/TestStoreProvider';
 
-const plugin: PluginRegistration = { exports: { visualizationTypes: bindings } };
+const plugin: PluginRegistration = { exports: { visualizationTypes: bindings, 'views.reducers': viewsReducers } };
 
 const widgetConfig = AggregationWidgetConfig
   .builder()
@@ -46,10 +49,26 @@ const fieldTypes: FieldTypes = {
 
 const selectEventConfig = { container: document.body };
 
-const SimpleAggregationWizard = (props) => (
-  <FieldTypesContext.Provider value={fieldTypes}>
-    <AggregationWizard config={widgetConfig} editing id="widget-id" type="AGGREGATION" fields={Immutable.List([])} onChange={() => {}} {...props} />
-  </FieldTypesContext.Provider>
+jest.mock('views/hooks/useAggregationFunctions');
+
+const view = createSearch();
+
+const SimpleAggregationWizard = (props: Partial<React.ComponentProps<typeof AggregationWizard>>) => (
+  <TestStoreProvider view={view} isNew initialQuery="query-id-1">
+    <FieldTypesContext.Provider value={fieldTypes}>
+      <AggregationWizard config={widgetConfig}
+                         editing
+                         id="widget-id"
+                         type="AGGREGATION"
+                         fields={Immutable.List([])}
+                         onCancel={() => {}}
+                         onChange={() => {}}
+                         onSubmit={() => {}}
+                         {...props}>
+        <span>The visualization</span>
+      </AggregationWizard>
+    </FieldTypesContext.Provider>
+  </TestStoreProvider>
 );
 
 const submitButton = async () => screen.findByRole('button', { name: /update preview/i });
@@ -158,7 +177,7 @@ describe('AggregationWizard/Core Visualizations', () => {
   it('allows enabling event annotations for visualizations supporting it', async () => {
     const onChange = jest.fn();
     const timelineConfig = widgetConfig.toBuilder()
-      .rowPivots([Pivot.create('timestamp', 'time', { interval: { type: 'auto', scaling: 1 } })])
+      .rowPivots([Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } })])
       .series([Series.create('count')])
       .build();
 
@@ -179,8 +198,8 @@ describe('AggregationWizard/Core Visualizations', () => {
   it('creates Heatmap config when all required fields are present', async () => {
     const onChange = jest.fn();
     const heatMapConfig = widgetConfig.toBuilder()
-      .rowPivots([Pivot.create('foo', 'values')])
-      .columnPivots([Pivot.create('bar', 'values')])
+      .rowPivots([Pivot.create(['foo'], 'values')])
+      .columnPivots([Pivot.create(['bar'], 'values')])
       .series([Series.create('count')])
       .build();
 

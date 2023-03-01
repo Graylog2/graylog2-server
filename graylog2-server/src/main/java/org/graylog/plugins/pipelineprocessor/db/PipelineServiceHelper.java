@@ -17,11 +17,10 @@
 package org.graylog.plugins.pipelineprocessor.db;
 
 import com.google.common.collect.ImmutableMap;
+import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -35,10 +34,11 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+
 @Singleton
 public class PipelineServiceHelper {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final RateLimitedLog logger = getRateLimitedLog(PipelineServiceHelper.class);
 
     private final PipelineRuleParser pipelineParser;
 

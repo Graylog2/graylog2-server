@@ -201,8 +201,7 @@ class ContentPackParameterList extends React.Component {
         {!readOnly && this._parameterModal()}
         {!readOnly && (<span><br /><br /></span>)}
         <SearchForm onSearch={this._filterParameters}
-                    onReset={() => { this._filterParameters(''); }}
-                    searchButtonLabel="Filter" />
+                    onReset={() => { this._filterParameters(''); }} />
         <DataTable id="parameter-list"
                    headers={headers}
                    className={ContentPackParameterListStyle.scrollable}

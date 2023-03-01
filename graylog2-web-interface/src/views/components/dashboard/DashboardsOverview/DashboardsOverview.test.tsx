@@ -21,16 +21,23 @@ import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import { asMock } from 'helpers/mocking';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
+import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 
 import DashboardsOverview from './DashboardsOverview';
 
 jest.mock('routing/Routes', () => ({ pluginRoute: () => () => '/route' }));
-
 jest.mock('views/components/dashboard/hooks/useDashboards');
+jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
     delete: jest.fn(),
+    update: {
+      completed: {
+        listen: () => jest.fn(),
+      },
+    },
   },
 }));
 
@@ -49,6 +56,7 @@ const loadDashboardsResponse = (count = 1) => {
         .createdAt(new Date())
         .requires({})
         .search(Search.builder().id('search.id').build())
+        .favorite(true)
         .build();
       dashboards.push(simpleView());
     }
@@ -63,6 +71,18 @@ const loadDashboardsResponse = (count = 1) => {
         count,
       },
       list: dashboards,
+      attributes: [
+        {
+          id: 'title',
+          title: 'Title',
+          sortable: true,
+        },
+        {
+          id: 'description',
+          title: 'Description',
+          sortable: true,
+        },
+      ],
     },
     refetch: () => {},
     isFetching: false,
@@ -70,6 +90,10 @@ const loadDashboardsResponse = (count = 1) => {
 };
 
 describe('DashboardsOverview', () => {
+  beforeEach(() => {
+    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isLoading: false });
+  });
+
   it('should render empty', async () => {
     asMock(useDashboards).mockReturnValue(loadDashboardsResponse(0));
 

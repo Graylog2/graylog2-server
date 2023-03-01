@@ -65,7 +65,7 @@ const Routes = {
   SECURITY: '/security',
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
-  GETTING_STARTED: '/gettingstarted',
+  WELCOME: '/welcome',
   GLOBAL_API_BROWSER_URL: '/api/api-browser/global/index.html',
   SYSTEM: {
     CONFIGURATIONS: '/system/configurations',
@@ -168,6 +168,7 @@ const Routes = {
       STATUS: (sidecarId: string) => `/system/sidecars/${sidecarId}/status`,
       ADMINISTRATION: '/system/sidecars/administration',
       CONFIGURATION: '/system/sidecars/configuration',
+      FAILURE_TRACKING: '/system/sidecars/failuretracking',
       NEW_CONFIGURATION: '/system/sidecars/configuration/new',
       EDIT_CONFIGURATION: (configurationId: string) => `/system/sidecars/configuration/edit/${configurationId}`,
       NEW_COLLECTOR: '/system/sidecars/collector/new',
@@ -268,7 +269,6 @@ const Routes = {
   edit_extractor: (nodeId: string, inputId: string, extractorId: string) => `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
 
   edit_input_extractor: (nodeId: string, inputId: string, extractorId: string) => `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
-  getting_started: (fromMenu) => `${Routes.GETTING_STARTED}?menu=${fromMenu}`,
   filtered_metrics: (nodeId: string, filter: string) => `${Routes.SYSTEM.METRICS(nodeId)}?filter=${filter}`,
   global_api_browser: () => Routes.GLOBAL_API_BROWSER_URL,
 } as const;

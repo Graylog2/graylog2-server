@@ -60,7 +60,7 @@ const FieldsRow = styled.tr`
   && td {
     min-width: 50px;
     word-break: break-word;
-    padding: 4px 5px 2px 5px; 
+    padding: 4px 5px 2px;
   }
 
   time {
@@ -147,7 +147,7 @@ const MessageTableEntry = ({
             const type = fieldType(selectedFieldName, message, fields);
 
             return (
-              <td key={selectedFieldName}>
+              <td key={selectedFieldName} data-testid={`message-summary-field-${selectedFieldName}`}>
                 {_renderStrong(
                   <CustomHighlighting field={selectedFieldName} value={message.fields[selectedFieldName]}>
                     <TypeSpecificValue value={message.fields[selectedFieldName]}

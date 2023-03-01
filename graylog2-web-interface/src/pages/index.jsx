@@ -41,7 +41,7 @@ const EventNotificationsPage = loadAsync(() => import('./EventNotificationsPage'
 const EventsPage = loadAsync(() => import('./EventsPage'));
 const ExportExtractorsPage = loadAsync(() => import('pages/ExportExtractorsPage'));
 const ExtractorsPage = loadAsync(() => import('./ExtractorsPage'));
-const GettingStartedPage = loadAsync(() => import('./GettingStartedPage'));
+const WelcomePage = loadAsync(() => import('./WelcomePage'));
 const GrokPatternsPage = loadAsync(() => import('./GrokPatternsPage'));
 const ImportExtractorsPage = loadAsync(() => import('./ImportExtractorsPage'));
 const IndexerFailuresPage = loadAsync(() => import('./IndexerFailuresPage'));
@@ -78,6 +78,7 @@ const SidecarEditCollectorPage = loadAsync(() => import('pages/SidecarEditCollec
 const SidecarEditConfigurationPage = loadAsync(() => import('pages/SidecarEditConfigurationPage'));
 const SidecarNewCollectorPage = loadAsync(() => import('pages/SidecarNewCollectorPage'));
 const SidecarNewConfigurationPage = loadAsync(() => import('pages/SidecarNewConfigurationPage'));
+const SidecarFailureTrackingPage = loadAsync(() => import('pages/SidecarFailureTrackingPage'));
 const SidecarsPage = loadAsync(() => import('pages/SidecarsPage'));
 const SidecarStatusPage = loadAsync(() => import('pages/SidecarStatusPage'));
 const SimulatorPage = loadAsync(() => import('./SimulatorPage'));
@@ -122,7 +123,7 @@ export {
   EventsPage,
   ExportExtractorsPage,
   ExtractorsPage,
-  GettingStartedPage,
+  WelcomePage,
   GrokPatternsPage,
   ImportExtractorsPage,
   IndexerFailuresPage,
@@ -160,6 +161,7 @@ export {
   SidecarEditConfigurationPage,
   SidecarNewCollectorPage,
   SidecarNewConfigurationPage,
+  SidecarFailureTrackingPage,
   SidecarsPage,
   SidecarStatusPage,
   SimulatorPage,

@@ -58,8 +58,9 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20220719130704_ImprovedDefaultProcessingOrderMigration.class);
         addMigration(V20220623125450_AddJobTypeToJobTrigger.class);
         addMigration(V20220818112023_AddStreamMatcherToProcessingOrderMigration.class);
-        addMigration(V20220929145442_MigratePivotLimitsInViews.class);
-        addMigration(V20220930095323_MigratePivotLimitsInSearches.class);
         addMigration(V202211021200_CreateDefaultIndexDefaultsConfig.class);
+        addMigration(V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViews.class);
+        addMigration(V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearches.class);
+        addMigration(V20230213160000_EncryptedInputConfigMigration.class);
     }
 }

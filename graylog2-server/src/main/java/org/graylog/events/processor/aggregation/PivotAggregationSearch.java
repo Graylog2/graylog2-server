@@ -158,7 +158,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         final PivotResult streamsResult = (PivotResult) streamQueryResult.searchTypes().get(STREAMS_PIVOT_ID);
 
         return AggregationResult.builder()
-                .keyResults(extractValues(pivotResult))
+                .keyResults( extractValues(pivotResult))
                 .effectiveTimerange(pivotResult.effectiveTimerange())
                 .totalAggregatedMessages(pivotResult.total())
                 .sourceStreams(extractSourceStreams(streamsResult))
@@ -319,7 +319,12 @@ public class PivotAggregationSearch implements AggregationSearch {
                 }
             }
 
-            DateTime resultTimestamp = DateTime.parse(timeKey).withZone(DateTimeZone.UTC);
+            DateTime resultTimestamp;
+            try{
+                resultTimestamp = DateTime.parse(timeKey).withZone(DateTimeZone.UTC);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalStateException("Failed to create event for: " + eventDefinition.title() + " (possibly due to non-existing grouping fields)", e);
+            }
             results.add(AggregationKeyResult.builder()
                     .key(groupKey)
                     .timestamp(resultTimestamp)

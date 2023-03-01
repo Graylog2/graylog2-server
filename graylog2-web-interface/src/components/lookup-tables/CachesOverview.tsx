@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
 import {
   OverlayTrigger,
@@ -34,50 +35,52 @@ import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryPar
 
 import Styles from './Overview.css';
 
-const buildHelpPopover = () => {
-  return (
-    <Popover id="search-query-help" className={Styles.popoverWide} title="Search Syntax Help">
-      <p><strong>Available search fields</strong></p>
-      <Table condensed>
-        <thead>
-          <tr>
-            <th>Field</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>id</td>
-            <td>Cache ID</td>
-          </tr>
-          <tr>
-            <td>title</td>
-            <td>The title of the cache</td>
-          </tr>
-          <tr>
-            <td>name</td>
-            <td>The reference name of the cache</td>
-          </tr>
-          <tr>
-            <td>description</td>
-            <td>The description of cache</td>
-          </tr>
-        </tbody>
-      </Table>
-      <p><strong>Examples</strong></p>
-      <p>
-        Find caches by parts of their names:<br />
-        <kbd>name:guava</kbd><br />
-        <kbd>name:gua</kbd>
-      </p>
-      <p>
-        Searching without a field name matches against the <code>title</code> field:<br />
-        <kbd>guava</kbd> <br />is the same as<br />
-        <kbd>title:guava</kbd>
-      </p>
-    </Popover>
-  );
-};
+const ScrollContainer = styled.div`
+  overflow-x: auto;
+`;
+
+const buildHelpPopover = () => (
+  <Popover id="search-query-help" className={Styles.popoverWide} title="Search Syntax Help">
+    <p><strong>Available search fields</strong></p>
+    <Table condensed>
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>id</td>
+          <td>Cache ID</td>
+        </tr>
+        <tr>
+          <td>title</td>
+          <td>The title of the cache</td>
+        </tr>
+        <tr>
+          <td>name</td>
+          <td>The reference name of the cache</td>
+        </tr>
+        <tr>
+          <td>description</td>
+          <td>The description of cache</td>
+        </tr>
+      </tbody>
+    </Table>
+    <p><strong>Examples</strong></p>
+    <p>
+      Find caches by parts of their names:<br />
+      <kbd>name:guava</kbd><br />
+      <kbd>name:gua</kbd>
+    </p>
+    <p>
+      Searching without a field name matches against the <code>title</code> field:<br />
+      <kbd>guava</kbd> <br />is the same as<br />
+      <kbd>title:guava</kbd>
+    </p>
+  </Popover>
+);
 
 const NoResults = ({ query }: { query: string }) => {
   return (
@@ -111,6 +114,15 @@ type Props = {
   pagination: PaginationType,
   paginationQueryParameter: PaginationQueryParameterResult,
 };
+
+const queryHelpComponent = (
+  <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover()}>
+    <Button bsStyle="link"
+            className={Styles.searchHelpButton}>
+      <Icon name="question-circle" fixedWidth />
+    </Button>
+  </OverlayTrigger>
+);
 
 const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props) => {
   const [loading, setLoading] = React.useState(false);
@@ -155,15 +167,8 @@ const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props)
                        pageSize={localPagination.currentPageSize}
                        onChange={onPageChange}
                        totalItems={pagination.total}>
-          <SearchForm query={localPagination.currentQuery} onSearch={onSearch} onReset={onReset}>
-            <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover()}>
-              <Button bsStyle="link"
-                      className={Styles.searchHelpButton}>
-                <Icon name="question-circle" fixedWidth />
-              </Button>
-            </OverlayTrigger>
-          </SearchForm>
-          <div style={{ overflowX: 'auto' }}>
+          <SearchForm onSearch={onSearch} onReset={onReset} queryHelpComponent={queryHelpComponent} />
+          <ScrollContainer>
             <Table condensed hover className={Styles.overviewTable}>
               <thead>
                 <tr>
@@ -180,7 +185,7 @@ const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props)
                 <DataRow caches={caches} query={localPagination.currentQuery} />
               )}
             </Table>
-          </div>
+          </ScrollContainer>
         </PaginatedList>
       </Col>
     </Row>

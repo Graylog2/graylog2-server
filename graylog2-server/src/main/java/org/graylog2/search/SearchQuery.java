@@ -88,7 +88,14 @@ public class SearchQuery {
         if (queryMap.isEmpty()) {
             return new Document();
         }
+        final List<Bson> dbQueries = toBsonFilterList();
+        return Filters.and(dbQueries);
+    }
 
+    public List<Bson> toBsonFilterList() {
+        if (queryMap.isEmpty()) {
+            return List.of();
+        }
         final List<Bson> dbQueries = new ArrayList<>();
 
         for (Map.Entry<String, Collection<SearchQueryParser.FieldValue>> entry : queryMap.asMap().entrySet()) {
@@ -106,8 +113,7 @@ public class SearchQuery {
 
             dbQueries.add(Filters.and(queries));
         }
-
-        return Filters.and(dbQueries);
+        return dbQueries;
     }
 
     private List<Bson> toBson(String field, List<SearchQueryParser.FieldValue> values) {

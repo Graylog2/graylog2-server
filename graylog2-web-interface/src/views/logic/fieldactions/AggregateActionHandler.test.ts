@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import asMock from 'helpers/mocking/AsMock';
-import mockAction from 'helpers/mocking/MockAction';
-import { WidgetActions } from 'views/stores/WidgetStore';
+import { addWidget } from 'views/logic/slices/widgetActions';
+import { createSearch } from 'fixtures/searches';
+import mockDispatch from 'views/test/mockDispatch';
+import type { RootState } from 'views/types';
 
 import AggregateActionHandler from './AggregateActionHandler';
 
@@ -25,42 +26,40 @@ import Pivot from '../aggregationbuilder/Pivot';
 import Widget from '../widgets/Widget';
 import { createElasticsearchQueryString } from '../queries/Query';
 
-jest.mock('views/stores/WidgetStore', () => ({ WidgetActions: {} }));
 jest.mock('views/components/datatable/DataTable', () => ({ type: 'table' }));
 
+jest.mock('views/logic/slices/widgetActions', () => ({
+  addWidget: jest.fn(),
+}));
+
 describe('AggregateActionHandler', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
+  const view = createSearch();
+  const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
+
+  it('uses field type when generating widget', async () => {
+    await dispatch(AggregateActionHandler({ queryId: 'queryId', field: 'foo', type: new FieldType('keyword', [], []), contexts: {} }));
+
+    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
+      config: expect.objectContaining({
+        rowPivots: [
+          Pivot.create(['foo'], 'values', { limit: 15 }),
+        ],
+      }),
+    }));
   });
 
-  it('uses field type when generating widget', () => {
-    WidgetActions.create = mockAction(jest.fn((widget: Widget) => Promise.resolve(widget)));
-    AggregateActionHandler({ queryId: 'queryId', field: 'foo', type: new FieldType('keyword', [], []), contexts: {} });
-
-    expect(WidgetActions.create).toHaveBeenCalled();
-
-    const widget = asMock(WidgetActions.create).mock.calls[0][0];
-    const { config } = widget;
-
-    expect(config.rowPivots[0]).toEqual(new Pivot('foo', 'values', { limit: 15 }));
-  });
-
-  it('uses field type when generating widget', () => {
-    WidgetActions.create = mockAction(jest.fn((widget: Widget) => Promise.resolve(widget)));
+  it('uses filter from widget', async () => {
     const filter = 'author: "Vanth"';
     const origWidget = Widget.builder().filter(filter).build();
 
-    AggregateActionHandler({ queryId: 'queryId', field: 'foo', type: new FieldType('keyword', [], []), contexts: { widget: origWidget } });
+    await dispatch(AggregateActionHandler({ queryId: 'queryId', field: 'foo', type: new FieldType('keyword', [], []), contexts: { widget: origWidget } }));
 
-    expect(WidgetActions.create).toHaveBeenCalled();
-
-    const widget = asMock(WidgetActions.create).mock.calls[0][0];
-
-    expect(widget.filter).toEqual(filter);
+    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
+      filter,
+    }));
   });
 
-  it('duplicates query/timerange/streams/filter of original widget', () => {
-    WidgetActions.create = mockAction(jest.fn((widget: Widget) => Promise.resolve(widget)));
+  it('duplicates query/timerange/streams/filter of original widget', async () => {
     const origWidget = Widget.builder()
       .filter('author: "Vanth"')
       .query(createElasticsearchQueryString('foo:42'))
@@ -68,20 +67,18 @@ describe('AggregateActionHandler', () => {
       .timerange({ type: 'relative', range: 3600 })
       .build();
 
-    AggregateActionHandler({
+    await dispatch(AggregateActionHandler({
       queryId: 'queryId',
       field: 'foo',
       type: new FieldType('keyword', [], []),
       contexts: { widget: origWidget },
-    });
+    }));
 
-    expect(WidgetActions.create).toHaveBeenCalled();
-
-    const { filter, query, streams, timerange } = asMock(WidgetActions.create).mock.calls[0][0];
-
-    expect(filter).toEqual('author: "Vanth"');
-    expect(query).toEqual(createElasticsearchQueryString('foo:42'));
-    expect(streams).toEqual(['stream1', 'stream23']);
-    expect(timerange).toEqual({ type: 'relative', range: 3600 });
+    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
+      filter: 'author: "Vanth"',
+      query: createElasticsearchQueryString('foo:42'),
+      streams: ['stream1', 'stream23'],
+      timerange: { type: 'relative', range: 3600 },
+    }));
   });
 });

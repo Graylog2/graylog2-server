@@ -63,7 +63,7 @@ public class EntityListPreferencesResource {
     @Timed
     @ApiOperation(value = "Create or update user preferences for certain entity list")
     @Consumes(MediaType.APPLICATION_JSON)
-    @NoAuditEvent("Storage details have not yet been decided") //TODO
+    @NoAuditEvent("Audit logs are not stored for entity list preferences")
     public Response create(@ApiParam(name = "JSON body", required = true) EntityListPreferences entityListPreferences,
                            @ApiParam(name = "entity_list_id", required = true) @PathParam("entity_list_id") @NotEmpty String entityListId,
                            @Context UserContext userContext) throws ValidationException {
@@ -73,9 +73,16 @@ public class EntityListPreferencesResource {
                 .userId(currentUserId)
                 .entityListId(entityListId)
                 .build();
-        final StoredEntityListPreferences storedPreferences = new StoredEntityListPreferences(complexId, entityListPreferences);
-        entityListPreferencesService.save(storedPreferences);
-        return Response.ok().build();
+        final StoredEntityListPreferences storedPreferences = StoredEntityListPreferences.builder()
+                .preferencesId(complexId)
+                .preferences(entityListPreferences)
+                .build();
+        final boolean successful = entityListPreferencesService.save(storedPreferences);
+        if (successful) {
+            return Response.ok().build();
+        } else {
+            return Response.serverError().build();
+        }
     }
 
     @GET
@@ -96,7 +103,7 @@ public class EntityListPreferencesResource {
                 .build();
         final StoredEntityListPreferences entityListPreferences = entityListPreferencesService.get(complexId);
         if (entityListPreferences == null) {
-            throw new NotFoundException("Preferences not found for user " + userContext.getUser().getName() + " and entity list id " + entityListId);
+            return null;
         }
         return entityListPreferences.preferences();
     }

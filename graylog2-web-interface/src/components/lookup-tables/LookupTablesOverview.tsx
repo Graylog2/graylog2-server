@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
 import {
   OverlayTrigger,
@@ -34,50 +35,58 @@ import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryPar
 
 import Styles from './Overview.css';
 
-const buildHelpPopover = () => {
-  return (
-    <Popover id="search-query-help" className={Styles.popoverWide} title="Search Syntax Help">
-      <p><strong>Available search fields</strong></p>
-      <Table condensed>
-        <thead>
-          <tr>
-            <th>Field</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>id</td>
-            <td>Lookup Table ID</td>
-          </tr>
-          <tr>
-            <td>title</td>
-            <td>The title of the lookup table</td>
-          </tr>
-          <tr>
-            <td>name</td>
-            <td>The reference name of the lookup table</td>
-          </tr>
-          <tr>
-            <td>description</td>
-            <td>The description of lookup table</td>
-          </tr>
-        </tbody>
-      </Table>
-      <p><strong>Examples</strong></p>
-      <p>
-        Find lookup tables by parts of their names:<br />
-        <kbd>name:geoip</kbd><br />
-        <kbd>name:geo</kbd>
-      </p>
-      <p>
-        Searching without a field name matches against the <code>title</code> field:<br />
-        <kbd>geoip</kbd> <br />is the same as<br />
-        <kbd>title:geoip</kbd>
-      </p>
-    </Popover>
-  );
-};
+const ScrollContainer = styled.div`
+  overflow-x: auto;
+`;
+
+const buildHelpPopover = () => (
+  <Popover id="search-query-help" className={Styles.popoverWide} title="Search Syntax Help">
+    <p><strong>Available search fields</strong></p>
+    <Table condensed>
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>id</td>
+          <td>Lookup Table ID</td>
+        </tr>
+        <tr>
+          <td>title</td>
+          <td>The title of the lookup table</td>
+        </tr>
+        <tr>
+          <td>name</td>
+          <td>The reference name of the lookup table</td>
+        </tr>
+        <tr>
+          <td>description</td>
+          <td>The description of lookup table</td>
+        </tr>
+      </tbody>
+    </Table>
+    <p><strong>Examples</strong></p>
+    <p>
+      Find lookup tables by parts of their names:<br />
+      <kbd>name:geoip</kbd><br />
+      <kbd>name:geo</kbd>
+    </p>
+    <p>
+      Searching without a field name matches against the <code>title</code> field:<br />
+      <kbd>geoip</kbd> <br />is the same as<br />
+      <kbd>title:geoip</kbd>
+    </p>
+  </Popover>
+);
+
+const queryHelpComponent = (
+  <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover()}>
+    <Button bsStyle="link" className={Styles.searchHelpButton}><Icon name="question-circle" fixedWidth /></Button>
+  </OverlayTrigger>
+);
 
 type ItemProps = {
   table: LookupTable,
@@ -225,12 +234,8 @@ const LookupTablesOverview = ({
                        pageSize={localPagination.currentPageSize}
                        onChange={onPageChange}
                        totalItems={pagination.total}>
-          <SearchForm query={localPagination.currentQuery} onSearch={onSearch} onReset={onReset}>
-            <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover()}>
-              <Button bsStyle="link" className={Styles.searchHelpButton}><Icon name="question-circle" fixedWidth /></Button>
-            </OverlayTrigger>
-          </SearchForm>
-          <div style={{ overflowX: 'auto' }}>
+          <SearchForm onSearch={onSearch} onReset={onReset} queryHelpComponent={queryHelpComponent} />
+          <ScrollContainer>
             <Table condensed hover className={Styles.overviewTable}>
               <thead>
                 <tr>
@@ -250,7 +255,7 @@ const LookupTablesOverview = ({
                          errorStates={errorStates} />
               )}
             </Table>
-          </div>
+          </ScrollContainer>
         </PaginatedList>
       </Col>
     </Row>

@@ -15,9 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
-import { Icon } from 'components/common';
+import Icon from 'components/common/Icon';
+
+const StyledIcon = styled(Icon)`
+  margin-right: 5px;
+`;
 
 type Props = {
   children: React.ReactNode,
@@ -30,8 +35,8 @@ type Props = {
 */
 const NoSearchResult = ({ children, className }: Props) => (
   <Alert className={`${className ?? ''} no-bm`}>
-    <Icon name="info-circle" />
-    &nbsp;{children || 'No data available.'}
+    <StyledIcon name="info-circle" />
+    {children || 'No data available.'}
   </Alert>
 );
 

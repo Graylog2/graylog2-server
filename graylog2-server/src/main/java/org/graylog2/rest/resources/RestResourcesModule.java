@@ -39,6 +39,7 @@ import org.graylog2.rest.resources.search.KeywordSearchResource;
 import org.graylog2.rest.resources.search.RelativeSearchResource;
 import org.graylog2.rest.resources.streams.StreamResource;
 import org.graylog2.rest.resources.streams.outputs.StreamOutputResource;
+import org.graylog2.rest.resources.streams.rules.StreamRuleInputsResource;
 import org.graylog2.rest.resources.streams.rules.StreamRuleResource;
 import org.graylog2.rest.resources.system.ClusterConfigResource;
 import org.graylog2.rest.resources.system.ClusterResource;
@@ -64,6 +65,7 @@ import org.graylog2.rest.resources.system.UrlWhitelistResource;
 import org.graylog2.rest.resources.system.contentpacks.CatalogResource;
 import org.graylog2.rest.resources.system.contentpacks.ContentPackResource;
 import org.graylog2.rest.resources.system.debug.DebugEventsResource;
+import org.graylog2.rest.resources.system.debug.DebugStreamsResource;
 import org.graylog2.rest.resources.system.indexer.FailuresResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetDefaultsResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetsResource;
@@ -105,6 +107,7 @@ public class RestResourcesModule extends Graylog2Module {
         addLegacySearchResources();
         addProcessingResources();
         addStreamsResources();
+        addDebugResources();
 
         addSystemRestResource(HelloWorldResource.class);
         addSystemRestResource(RolesResource.class);
@@ -125,6 +128,13 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(TrafficResource.class);
         addSystemRestResource(SearchVersionResource.class);
         addSystemRestResource(EntityListPreferencesResource.class);
+    }
+
+    private void addDebugResources() {
+        if(Boolean.parseBoolean(System.getenv("GRAYLOG_ENABLE_DEBUG_RESOURCES"))) {
+            // TODO: move the DebugEventsResource under this env property check as well?
+            addSystemRestResource(DebugStreamsResource.class);
+        }
     }
 
     private void addAuthResources() {
@@ -205,5 +215,6 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(StreamOutputResource.class);
         addSystemRestResource(StreamRuleResource.class);
         addSystemRestResource(StreamResource.class);
+        addSystemRestResource(StreamRuleInputsResource.class);
     }
 }
