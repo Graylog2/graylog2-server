@@ -36,7 +36,7 @@ import './ace/theme-graylog';
 const SourceCodeContainer = styled.div(({ resizable, theme }) => css`
   .react-resizable-handle {
     z-index: 100; /* Ensure resize handle is over text editor */
-    display: ${resizable ? 'block' : 'none'};
+    display: ${resizable ? "block" : "none"};
   }
 
   ${theme.components.aceEditor}

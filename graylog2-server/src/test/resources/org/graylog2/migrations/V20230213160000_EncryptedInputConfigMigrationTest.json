@@ -1,0 +1,141 @@
+{
+  "inputs": [
+    {
+      "_id": {
+        "$oid": "63ecb68c64c7d92c92c8eb2a"
+      },
+      "creator_user_id": "admin",
+      "configuration": {
+        "headers": "",
+        "path": "$.store.book[1].number_of_orders",
+        "throttling_allowed": false,
+        "target_url": "http://example.org/api",
+        "encrypted_headers": "X-Encrypted-Header: secret",
+        "interval": 1,
+        "override_source": null,
+        "charset_name": "UTF-8",
+        "source": "yourapi",
+        "timeunit": "MINUTES"
+      },
+      "name": "JSON path value from HTTP API",
+      "created_at": {
+        "$date": "2023-02-15T10:40:12.929Z"
+      },
+      "global": true,
+      "desired_state": "RUNNING",
+      "type": "org.graylog2.inputs.misc.jsonpath.JsonPathInput",
+      "title": "unencrypted-secret",
+      "content_pack": null
+    },
+    {
+      "_id": {
+        "$oid": "63ecb68c64c7d92c92c8eb2b"
+      },
+      "creator_user_id": "admin",
+      "configuration": {
+        "headers": "",
+        "path": "$.store.book[1].number_of_orders",
+        "throttling_allowed": false,
+        "target_url": "http://example.org/api",
+        "encrypted_headers": "",
+        "interval": 1,
+        "override_source": null,
+        "charset_name": "UTF-8",
+        "source": "yourapi",
+        "timeunit": "MINUTES"
+      },
+      "name": "JSON path value from HTTP API",
+      "created_at": {
+        "$date": "2023-02-15T10:40:12.929Z"
+      },
+      "global": true,
+      "desired_state": "RUNNING",
+      "type": "org.graylog2.inputs.misc.jsonpath.JsonPathInput",
+      "title": "empty-secret",
+      "content_pack": null
+    },
+    {
+      "_id": {
+        "$oid": "63ecb68c64c7d92c92c8eb2c"
+      },
+      "creator_user_id": "admin",
+      "configuration": {
+        "headers": "",
+        "path": "$.store.book[1].number_of_orders",
+        "throttling_allowed": false,
+        "target_url": "http://example.org/api",
+        "encrypted_headers": null,
+        "interval": 1,
+        "override_source": null,
+        "charset_name": "UTF-8",
+        "source": "yourapi",
+        "timeunit": "MINUTES"
+      },
+      "name": "JSON path value from HTTP API",
+      "created_at": {
+        "$date": "2023-02-15T10:40:12.929Z"
+      },
+      "global": true,
+      "desired_state": "RUNNING",
+      "type": "org.graylog2.inputs.misc.jsonpath.JsonPathInput",
+      "title": "null-secret",
+      "content_pack": null
+    },
+    {
+      "_id": {
+        "$oid": "63ecb68c64c7d92c92c8eb2d"
+      },
+      "creator_user_id": "admin",
+      "configuration": {
+        "headers": "",
+        "path": "$.store.book[1].number_of_orders",
+        "throttling_allowed": false,
+        "target_url": "http://example.org/api",
+        "interval": 1,
+        "override_source": null,
+        "charset_name": "UTF-8",
+        "source": "yourapi",
+        "timeunit": "MINUTES"
+      },
+      "name": "JSON path value from HTTP API",
+      "created_at": {
+        "$date": "2023-02-15T10:40:12.929Z"
+      },
+      "global": true,
+      "desired_state": "RUNNING",
+      "type": "org.graylog2.inputs.misc.jsonpath.JsonPathInput",
+      "title": "missing-secret",
+      "content_pack": null
+    },
+    {
+      "_id": {
+        "$oid": "63ecb68c64c7d92c92c8eb2e"
+      },
+      "creator_user_id": "admin",
+      "configuration": {
+        "headers": "",
+        "path": "$.store.book[1].number_of_orders",
+        "throttling_allowed": false,
+        "target_url": "http://example.org/api",
+        "encrypted_headers": {
+          "encrypted_value" : "b627201512baebbaf5b7226d916057cc1179749e095ea5de2f3981391376afde",
+          "salt" : "6f035dbbdb345b39"
+        },
+        "interval": 1,
+        "override_source": null,
+        "charset_name": "UTF-8",
+        "source": "yourapi",
+        "timeunit": "MINUTES"
+      },
+      "name": "JSON path value from HTTP API",
+      "created_at": {
+        "$date": "2023-02-15T10:40:12.929Z"
+      },
+      "global": true,
+      "desired_state": "RUNNING",
+      "type": "org.graylog2.inputs.misc.jsonpath.JsonPathInput",
+      "title": "already-encrypted",
+      "content_pack": null
+    }
+  ]
+}
