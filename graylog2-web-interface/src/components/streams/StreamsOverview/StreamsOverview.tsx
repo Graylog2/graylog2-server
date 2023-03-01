@@ -62,13 +62,13 @@ type Props = {
 const StreamsOverview = ({ indexSets }: Props) => {
   const [filters, setFilters] = useState<Filters>();
   const [query, setQuery] = useState('');
-  const paginationQueryParameter = usePaginationQueryParameter(undefined, DEFAULT_LAYOUT.pageSize);
   const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
-    defaultPageSize: paginationQueryParameter.pageSize,
+    defaultPageSize: DEFAULT_LAYOUT.pageSize,
     defaultDisplayedAttributes: DEFAULT_LAYOUT.displayedColumns,
     defaultSort: DEFAULT_LAYOUT.sort,
   });
+  const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
   const { data: paginatedStreams, refetch: refetchStreams } = useStreams({
     query,
@@ -87,7 +87,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
   );
 
   const onPageSizeChange = (newPageSize: number) => {
-    paginationQueryParameter.resetPage();
+    paginationQueryParameter.setPagination({ page: 1, pageSize: newPageSize });
     updateTableLayout({ perPage: newPageSize });
   };
 
