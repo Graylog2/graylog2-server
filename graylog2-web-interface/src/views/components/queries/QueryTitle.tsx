@@ -29,7 +29,7 @@ import { duplicateQuery } from 'views/logic/slices/viewSlice';
 import QueryActionDropdown from './QueryActionDropdown';
 
 const TitleWrap = styled.span<{ active: boolean }>(({ active }) => css`
-  padding-right: ${active ? '6px' : '0'};
+  padding-right: ${active ? "6px" : "0"};
 `);
 
 type Props = {

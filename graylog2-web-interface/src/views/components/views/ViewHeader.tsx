@@ -72,7 +72,7 @@ const TitleWrapper = styled.span`
 `;
 
 const StyledIcon = styled(Icon)`
-font-size: 0.50rem;
+font-size: 0.5rem;
 `;
 
 const ViewHeader = () => {

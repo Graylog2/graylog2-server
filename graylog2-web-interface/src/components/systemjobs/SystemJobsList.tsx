@@ -36,7 +36,7 @@ const SystemJobWrap = styled.div(({ theme }) => css`
     position: relative;
     top: -1px;
     left: 2px;
-    font-family: "Arial", sans-serif;
+    font-family: Arial, sans-serif;
     font-size: ${theme.fonts.size.small};
   }
 `);

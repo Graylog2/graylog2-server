@@ -28,7 +28,7 @@ const ColorPreviewBase = styled.div`
   margin-right: 0.4rem;
 
   border-radius: 4px;
-  border: 1px solid rgba(0, 126, 255, 0.24);
+  border: 1px solid rgb(0 126 255 / 24%);
 `;
 
 const StaticColorPreview = styled(ColorPreviewBase)(({ color }) => css`
@@ -42,8 +42,8 @@ export const GradientColorPreview = styled(ColorPreviewBase)(({ gradient }: { gr
 
   return css`
       border: none;
-      background: linear-gradient(0deg, ${colors.map((color, idx) => `${color} ${idx * (100 / colors.length)}%`).join(', ')});
-    `;
+      background: linear-gradient(0deg, ${colors.map((color, idx) => `${color} ${idx * (100 / colors.length)}%`).join(", ")});
+`;
 });
 
 type ColorPreviewProps = {

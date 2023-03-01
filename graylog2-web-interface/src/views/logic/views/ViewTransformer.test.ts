@@ -14,13 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { readFileSync } from 'fs';
-import { dirname } from 'path';
-
 import { List, Map } from 'immutable';
 
 import Search from 'views/logic/search/Search';
 import Query from 'views/logic/queries/Query';
+import readJsonFixture from 'helpers/readJsonFixture';
 
 import type { ViewStateMap } from './View';
 import View from './View';
@@ -36,9 +34,7 @@ jest.mock('stores/decorators/DecoratorsStore', () => ({
   },
 }));
 
-const cwd = dirname(__filename);
-
-const readFixture = (filename) => JSON.parse(readFileSync(`${cwd}/${filename}`).toString());
+const readFixture = (fixtureName: string) => readJsonFixture(__dirname, fixtureName);
 
 describe('ViewTransformer', () => {
   describe('transform with missing attributes', () => {

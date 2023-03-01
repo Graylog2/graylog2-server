@@ -35,6 +35,7 @@ export type TextField = {
   default_value: string,
   description: string,
   human_name: string,
+  is_encrypted: boolean,
   is_optional: boolean,
   position: number,
   type: 'text',
@@ -80,5 +81,13 @@ export type BooleanField = {
   position: number,
   type: 'boolean',
 };
+
+export type FieldValue = string | number | boolean | void
+
+export type EncryptedFieldValue<Value> = {
+  set_value?: Value,
+  is_set?: boolean,
+  delete_value?: boolean,
+}
 
 export type ConfigurationField = BooleanField | DropdownField | ListField | NumberField | TextField;

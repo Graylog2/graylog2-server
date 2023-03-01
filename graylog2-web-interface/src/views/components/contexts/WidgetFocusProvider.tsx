@@ -83,6 +83,12 @@ type SyncStateArgs = {
   focusUriParams: FocusUriParams,
 }
 
+const emptyFocusContext: FocusContextState = {
+  editing: false,
+  focusing: false,
+  id: undefined,
+};
+
 const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocusedWidget, widgetIds }: SyncStateArgs) => {
   const dispatch = useAppDispatch();
 
@@ -93,7 +99,7 @@ const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocused
       focusing: focusUriParams.focusing || focusUriParams.editing,
     } as FocusContextState;
 
-    if (!isEqual(focusedWidget, nextFocusedWidget)) {
+    if (!isEqual(focusedWidget ?? emptyFocusContext, nextFocusedWidget)) {
       if (focusUriParams.id && !widgetIds.includes(focusUriParams.id)) {
         return;
       }

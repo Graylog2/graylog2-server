@@ -296,7 +296,6 @@ public class Configuration extends BaseConfiguration {
         return skipPreflightChecks;
     }
 
-    @Override
     public String getNodeIdFile() {
         return nodeIdFile;
     }

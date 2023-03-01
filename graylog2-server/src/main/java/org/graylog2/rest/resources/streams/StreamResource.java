@@ -29,7 +29,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
@@ -41,7 +40,7 @@ import org.graylog2.audit.jersey.DefaultFailureContextCreator;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.database.filtering.DbFilterParser;
+import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.plugin.Message;
@@ -69,9 +68,7 @@ import org.graylog2.rest.resources.streams.responses.StreamCreatedResponse;
 import org.graylog2.rest.resources.streams.responses.StreamListResponse;
 import org.graylog2.rest.resources.streams.responses.StreamResponse;
 import org.graylog2.rest.resources.streams.responses.TestMatchResponse;
-import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
-import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.PaginatedStreamService;
@@ -145,10 +142,10 @@ public class StreamResource extends RestResource {
     private final StreamRuleService streamRuleService;
     private final StreamRouterEngine.Factory streamRouterEngineFactory;
     private final IndexSetRegistry indexSetRegistry;
-    private final SearchQueryParser searchQueryParser;
     private final RecentActivityService recentActivityService;
     private final BulkExecutor<Stream, UserContext> bulkExecutor;
-    private final DbFilterParser dbFilterParser;
+
+    private final DbQueryCreator dbQueryCreator;
 
     @Inject
     public StreamResource(StreamService streamService,
@@ -157,16 +154,14 @@ public class StreamResource extends RestResource {
                           StreamRouterEngine.Factory streamRouterEngineFactory,
                           IndexSetRegistry indexSetRegistry,
                           RecentActivityService recentActivityService,
-                          AuditEventSender auditEventSender,
-                          DbFilterParser dbFilterParser) {
+                          AuditEventSender auditEventSender) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
         this.indexSetRegistry = indexSetRegistry;
         this.paginatedStreamService = paginatedStreamService;
-        this.searchQueryParser = new SearchQueryParser(StreamImpl.FIELD_TITLE, attributes);
+        this.dbQueryCreator = new DbQueryCreator(StreamImpl.FIELD_TITLE, attributes);
         this.recentActivityService = recentActivityService;
-        this.dbFilterParser = dbFilterParser;
         this.bulkExecutor = new SequentialBulkExecutor<>(this::delete,
                 auditEventSender,
                 (entity, entityClass) ->
@@ -225,22 +220,9 @@ public class StreamResource extends RestResource {
                                                @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                    @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order) {
 
-        SearchQuery searchQuery;
-        try {
-            searchQuery = searchQueryParser.parse(query);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
-        }
-        List<Bson> dbFilters;
-        try {
-            dbFilters = dbFilterParser.parse(filters, attributes);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
-        }
-
         final Predicate<StreamDTO> permissionFilter = streamDTO -> isPermitted(RestPermissions.STREAMS_READ, streamDTO.id());
         final PaginatedList<StreamDTO> result = paginatedStreamService
-                .findPaginated(searchQuery, permissionFilter, dbFilters, page, perPage, sort, order);
+                .findPaginated(dbQueryCreator.createDbQuery(filters, query), permissionFilter, page, perPage, sort, order);
 
         final List<String> streamIds = result.stream().map(StreamDTO::id).toList();
         final Map<String, List<StreamRule>> streamRuleMap = streamRuleService.loadForStreamIds(streamIds);

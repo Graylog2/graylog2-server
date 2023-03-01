@@ -30,7 +30,7 @@ const StyledBadge = styled(BootstrapBadge)(({ bsStyle, theme }) => {
   return css`
     background-color: ${backgroundColor};
     color: ${textColor};
-  `;
+`;
 });
 
 const Badge = forwardRef(({ ...props }, ref) => {

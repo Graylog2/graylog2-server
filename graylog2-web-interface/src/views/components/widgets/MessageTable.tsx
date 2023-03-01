@@ -32,6 +32,7 @@ import type { BackendMessage, Message } from 'views/components/messagelist/Types
 import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 import Field from 'views/components/Field';
 import MessageTableProviders from 'views/components/messagelist/MessageTableProviders';
+import { VISUALIZATION_TABLE_HEADER_HEIGHT } from 'views/Constants';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 
@@ -87,8 +88,9 @@ const TableHead = styled.thead(({ theme }) => css`
   
   && > tr > th {
     min-width: 50px;
-    min-height: 28px;
+    height: ${VISUALIZATION_TABLE_HEADER_HEIGHT}px;
     padding: 0 5px;
+    vertical-align: center;
     border: 0;
     font-size: ${theme.fonts.size.small};
     font-weight: normal;

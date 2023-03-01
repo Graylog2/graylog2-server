@@ -14,18 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { readFileSync } from 'fs';
-import { dirname } from 'path';
-
 import * as Immutable from 'immutable';
 
 import entityShareStateFixture, { alice, bob, john, jane, everyone, security, viewer, owner, manager } from 'fixtures/entityShareState';
 import ActiveShare from 'logic/permissions/ActiveShare';
+import readJsonFixture from 'helpers/readJsonFixture';
 
 import EntityShareState from './EntityShareState';
 
-const cwd = dirname(__filename);
-const readFixture = (filename) => JSON.parse(readFileSync(`${cwd}/${filename}`).toString());
+const readFixture = (fixtureName: string) => readJsonFixture(__dirname, fixtureName);
 
 describe('EntityShareState', () => {
   it('should import from json', () => {
