@@ -52,9 +52,9 @@ const MaxmindAdapterFieldSet = ({ config, updateConfig, handleFormEvent, validat
   ];
 
   if (isCloud) {
-    databaseTypes = ipInfoDatabaseTypes;
+    databaseTypes = [...ipInfoDatabaseTypes];
   } else {
-    databaseTypes.concat(ipInfoDatabaseTypes);
+    databaseTypes = [...databaseTypes, ...ipInfoDatabaseTypes];
   }
 
   const update = (value: number, unit: string, enabled: boolean, name: string) => {
@@ -83,41 +83,41 @@ const MaxmindAdapterFieldSet = ({ config, updateConfig, handleFormEvent, validat
   return (
     <fieldset>
       {!isCloud && (
-      <Input type="text"
-             id="path"
-             name="path"
-             label="File path"
-             autoFocus
-             required
-             onChange={handleFormEvent}
-             help={validationMessage('path', 'The path to the database file.')}
-             bsStyle={validationState('path')}
-             value={config.path}
-             labelClassName="col-sm-3"
-             wrapperClassName="col-sm-9" />
+        <Input type="text"
+          id="path"
+          name="path"
+          label="File path"
+          autoFocus
+          required
+          onChange={handleFormEvent}
+          help={validationMessage('path', 'The path to the database file.')}
+          bsStyle={validationState('path')}
+          value={config.path}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9" />
       )}
       <Input id="database-type-select"
-             label="Database type"
-             required
-             autoFocus
-             help="Select the type of the database file"
-             labelClassName="col-sm-3"
-             wrapperClassName="col-sm-9">
+        label="Database type"
+        required
+        autoFocus
+        help="Select the type of the database file"
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9">
         <Select placeholder="Select the type of database file"
-                clearable={false}
-                options={databaseTypes}
-                matchProp="label"
-                onChange={onDbTypeSelect}
-                value={config.database_type} />
+          clearable={false}
+          options={databaseTypes}
+          matchProp="label"
+          onChange={onDbTypeSelect}
+          value={config.database_type} />
       </Input>
       <TimeUnitInput label="Refresh file"
-                     help="If enabled, the database file is checked for modifications and refreshed when it changed on disk."
-                     update={updateCheckInterval}
-                     value={config.check_interval}
-                     unit={config.check_interval_unit || 'MINUTES'}
-                     defaultEnabled={config.check_interval > 0}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9" />
+        help="If enabled, the database file is checked for modifications and refreshed when it changed on disk."
+        update={updateCheckInterval}
+        value={config.check_interval}
+        unit={config.check_interval_unit || 'MINUTES'}
+        defaultEnabled={config.check_interval > 0}
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9" />
     </fieldset>
   );
 };
