@@ -88,7 +88,7 @@ curl 'http://graylog-server:8080/api/system/indices/index_set_defaults' \
 Unless user-specified defaults are specified, the following new defaults will be effective for all new index sets created:
 
 - Shards: 1 (previously 4 in many cases)
-- Rotation Strategy: Index Size - 30GB (previously Index Time [1D] in many cases)
+- Rotation Strategy: Time Size Optimizing - 30-40 days (previously Index Time [1D] in many cases)
 
 # API Changes
 The following Java Code API changes have been made.

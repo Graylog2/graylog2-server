@@ -128,7 +128,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     public List<Input> allByType(final String type) {
         final ImmutableList.Builder<Input> inputs = ImmutableList.builder();
         for (final DBObject o : query(InputImpl.class, new BasicDBObject(MessageInput.FIELD_TYPE, type))) {
-            inputs.add(new InputImpl((ObjectId) o.get(InputImpl.FIELD_ID), o.toMap()));
+            inputs.add(createFromDbObject(o));
         }
         return inputs.build();
     }
