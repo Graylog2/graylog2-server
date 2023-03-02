@@ -172,7 +172,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         if (result.size() > 1) {
             final String msg = "There was more than one matching user for username " + username + ". This should never happen.";
             LOG.error(msg);
-            throw new RuntimeException(msg);
+            throw new DuplicateUserException(msg);
         }
 
         final DBObject userObject = result.get(0);
@@ -180,6 +180,26 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
         LOG.debug("Loaded user {}/{} from MongoDB", username, userId);
         return userFactory.create((ObjectId) userId, userObject.toMap());
+    }
+
+
+    @Override
+    public List<User> loadAllByName(final String username) {
+        final DBObject query = new BasicDBObject();
+        query.put(UserImpl.USERNAME, username);
+        return buildUserList(query);
+    }
+
+    private List<User> buildUserList(DBObject query) {
+        final List<DBObject> result = query(UserImpl.class, query);
+
+        final List<User> users = Lists.newArrayList();
+        for (DBObject dbObject : result) {
+            //noinspection unchecked
+            users.add(userFactory.create((ObjectId) dbObject.get("_id"), dbObject.toMap()));
+        }
+
+        return users;
     }
 
     @Override
@@ -195,7 +215,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
             return Optional.ofNullable(userFactory.createLocalAdminUser(roleService.getAdminRoleObjectId()));
         }
 
-        final DBObject query = new BasicDBObject("$or", ImmutableList.of(
+        final DBObject query = new BasicDBObject("$or", List.of(
                 new BasicDBObject(UserImpl.AUTH_SERVICE_UID, authServiceUid),
                 new BasicDBObject(UserImpl.USERNAME, username)
         ));
@@ -208,7 +228,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         if (result.size() > 1) {
             final String msg = "There was more than one matching user for auth service UID <" + authServiceUid + "> or username <" + username + ">. This should never happen.";
             LOG.error(msg);
-            throw new RuntimeException(msg);
+            throw new DuplicateUserException(msg);
         }
 
         final DBObject userObject = result.get(0);
@@ -282,14 +302,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     @Override
     public List<User> loadAll() {
         final DBObject query = new BasicDBObject();
-        final List<DBObject> result = query(UserImpl.class, query);
-
-        final List<User> users = Lists.newArrayList();
-        for (DBObject dbObject : result) {
-            users.add(userFactory.create((ObjectId) dbObject.get("_id"), dbObject.toMap()));
-        }
-
-        return users;
+        return buildUserList(query);
     }
 
     @Override
@@ -328,15 +341,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     @Override
     public List<User> loadAllForAuthServiceBackend(String authServiceBackendId) {
         final DBObject query = BasicDBObjectBuilder.start(UserImpl.AUTH_SERVICE_ID, authServiceBackendId).get();
-        final List<DBObject> result = query(UserImpl.class, query);
-
-        final List<User> users = Lists.newArrayList();
-        for (DBObject dbObject : result) {
-            //noinspection unchecked
-            users.add(userFactory.create((ObjectId) dbObject.get("_id"), dbObject.toMap()));
-        }
-
-        return users;
+        return buildUserList(query);
     }
 
     @Override
@@ -394,13 +399,13 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     @Override
     public List<WildcardPermission> getWildcardPermissionsForUser(User user) {
         return getPermissionsForUser(user).stream()
-                .filter(WildcardPermission.class::isInstance).map(WildcardPermission.class::cast).collect(Collectors.toList());
+                .filter(WildcardPermission.class::isInstance).map(WildcardPermission.class::cast).toList();
     }
 
     @Override
     public List<GRNPermission> getGRNPermissionsForUser(User user) {
         return getPermissionsForUser(user).stream()
-                .filter(GRNPermission.class::isInstance).map(GRNPermission.class::cast).collect(Collectors.toList());
+                .filter(GRNPermission.class::isInstance).map(GRNPermission.class::cast).toList();
     }
 
     @Override
@@ -433,6 +438,12 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
             } catch (ValidationException e) {
                 LOG.error("Unable to remove role {} from user {}", role.getName(), user);
             }
+        }
+    }
+
+    public static class DuplicateUserException extends RuntimeException {
+        public DuplicateUserException(String s) {
+            super(s);
         }
     }
 }

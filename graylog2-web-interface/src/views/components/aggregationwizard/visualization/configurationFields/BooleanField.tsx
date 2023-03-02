@@ -23,7 +23,7 @@ import { Input, HelpBlock } from 'components/bootstrap';
 import type { FieldComponentProps } from '../VisualizationConfigurationOptions';
 
 const StyledField = styled(Field)`
-  &&[type="checkbox"] {
+  &&[type='checkbox'] {
     margin-top: 8px;
   }
 `;
