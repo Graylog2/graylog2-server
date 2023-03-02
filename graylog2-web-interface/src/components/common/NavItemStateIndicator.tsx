@@ -40,7 +40,7 @@ const Container = styled.div`
   position: relative;
   
   ${indicatorPseudoElement} {
-    content: " ";
+    content: ' ';
     position: absolute;
     border-bottom: 1px solid transparent;
     left: 0;
