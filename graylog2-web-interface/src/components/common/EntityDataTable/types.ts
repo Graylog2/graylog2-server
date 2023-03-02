@@ -42,8 +42,13 @@ export type ColumnRenderer<Entity extends EntityBase> = {
   staticWidth?: number, // px
 }
 
+export type ColumnRenderersByAttribute<Entity extends EntityBase> = {
+  [attributeId: string]: ColumnRenderer<Entity>
+}
+
 export type ColumnRenderers<Entity extends EntityBase> = {
-  [columnId: string]: ColumnRenderer<Entity>
+  attributes?: ColumnRenderersByAttribute<Entity>,
+  types?: { [type: string]: ColumnRenderer<Entity> },
 }
 
 export type TableLayoutPreferences = {

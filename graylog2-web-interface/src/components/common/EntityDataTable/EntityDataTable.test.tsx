@@ -22,6 +22,7 @@ import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
+import type { Column } from 'components/common/EntityDataTable/types';
 
 import EntityDataTable from './EntityDataTable';
 
@@ -32,11 +33,11 @@ describe('<EntityDataTable />', () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
   });
 
-  const columnDefinitions = [
-    { id: 'title', title: 'Title', sortable: true },
-    { id: 'description', title: 'Description', sortable: true },
-    { id: 'stream', title: 'Stream', sortable: true },
-    { id: 'status', title: 'Status', sortable: true, permissions: ['status:read'] },
+  const columnDefinitions: Array<Column> = [
+    { id: 'title', title: 'Title', type: 'STRING', sortable: true },
+    { id: 'description', title: 'Description', type: 'STRING', sortable: true },
+    { id: 'stream', title: 'Stream', type: 'STRING', sortable: true },
+    { id: 'status', title: 'Status', type: 'STRING', sortable: true, permissions: ['status:read'] },
   ];
 
   const visibleColumns = ['title', 'description', 'status'];
@@ -84,15 +85,43 @@ describe('<EntityDataTable />', () => {
                             onSortChange={() => {}}
                             onColumnsChange={() => {}}
                             columnRenderers={{
-                              title: {
-                                renderCell: (title: string) => `The title: ${title}`,
-                                renderHeader: (column) => `Custom ${column.title} Header`,
+                              attributes: {
+                                title: {
+                                  renderCell: (title: string) => `The title: ${title}`,
+                                  renderHeader: (column) => `Custom ${column.title} Header`,
+                                },
                               },
                             }}
                             columnDefinitions={columnDefinitions} />);
 
     await screen.findByRole('columnheader', { name: /custom title header/i });
     await screen.findByText('The title: Row title');
+  });
+
+  it('should merge attribute and type column renderers renderer', async () => {
+    render(<EntityDataTable visibleColumns={visibleColumns}
+                            data={data}
+                            onSortChange={() => {}}
+                            onColumnsChange={() => {}}
+                            columnRenderers={{
+                              attributes: {
+                                title: {
+                                  renderCell: (title: string) => `Custom Cell For Attribute - ${title}`,
+                                },
+                              },
+                              types: {
+                                STRING: {
+                                  renderCell: (title: string) => `Custom Cell For Type - ${title}`,
+                                  renderHeader: (column: { title: string }) => `Custom Header For Type - ${column.title}`,
+                                },
+                              },
+                            }}
+                            columnDefinitions={columnDefinitions} />);
+
+    await screen.findByRole('columnheader', { name: /custom header for type - title/i });
+    await screen.findByText('Custom Cell For Attribute - Row title');
+
+    expect(screen.queryByText('Custom Cell For Type - Row title')).not.toBeInTheDocument();
   });
 
   it('should render row actions', async () => {

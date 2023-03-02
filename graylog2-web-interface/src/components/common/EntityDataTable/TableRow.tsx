@@ -21,7 +21,7 @@ import { useCallback } from 'react';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
 import TableCell from './TableCell';
-import type { ColumnRenderers, Column, EntityBase } from './types';
+import type { ColumnRenderersByAttribute, Column, EntityBase } from './types';
 import RowCheckbox from './RowCheckbox';
 
 const ActionsCell = styled.th`
@@ -39,7 +39,7 @@ const ActionsRef = styled.div`
 type Props<Entity extends EntityBase> = {
   actionsRef: React.RefObject<HTMLDivElement>
   columns: Array<Column>,
-  columnRenderers: ColumnRenderers<Entity>,
+  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>,
   displaySelect: boolean,
   displayActions: boolean,
   entity: Entity,
@@ -52,7 +52,7 @@ type Props<Entity extends EntityBase> = {
 
 const TableRow = <Entity extends EntityBase>({
   columns,
-  columnRenderers,
+  columnRenderersByAttribute,
   displaySelect,
   displayActions,
   entity,
@@ -80,7 +80,7 @@ const TableRow = <Entity extends EntityBase>({
         </td>
       )}
       {columns.map((column) => {
-        const columnRenderer = columnRenderers[column.id];
+        const columnRenderer = columnRenderersByAttribute[column.id];
 
         return (
           <TableCell columnRenderer={columnRenderer}
