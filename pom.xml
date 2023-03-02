@@ -26,8 +26,6 @@
         <module>graylog-storage-elasticsearch7</module>
         <module>graylog-storage-opensearch2</module>
         <module>distribution</module>
-        <module>data-node</module>
-        <module>data-node-distribution</module>
     </modules>
 
     <groupId>org.graylog</groupId>
@@ -585,6 +583,18 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>datanode</id>
+            <activation>
+                <property>
+                    <name>!skip.datanode</name>
+                </property>
+            </activation>
+            <modules>
+                <module>data-node</module>
+                <module>data-node-distribution</module>
+            </modules>
+        </profile>
         <profile>
             <id>release</id>
             <build>
