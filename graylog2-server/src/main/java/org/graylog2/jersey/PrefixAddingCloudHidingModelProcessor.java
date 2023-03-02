@@ -19,20 +19,22 @@ package org.graylog2.jersey;
 import com.google.common.collect.ImmutableMap;
 import org.glassfish.jersey.server.model.ModelProcessor;
 import org.glassfish.jersey.server.model.Resource;
+import org.glassfish.jersey.server.model.ResourceMethod;
 import org.glassfish.jersey.server.model.ResourceModel;
 import org.graylog2.shared.rest.HideOnCloud;
 
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.ext.Provider;
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Optional;
 
 @Provider
-public class PrefixAddingModelProcessor implements ModelProcessor {
+public class PrefixAddingCloudHidingModelProcessor implements ModelProcessor {
     private final Map<String, String> packagePrefixes;
     private final org.graylog2.Configuration configuration;
 
-    public PrefixAddingModelProcessor(Map<String, String> packagePrefixes, org.graylog2.Configuration configuration) {
+    public PrefixAddingCloudHidingModelProcessor(Map<String, String> packagePrefixes, org.graylog2.Configuration configuration) {
         this.packagePrefixes = ImmutableMap.copyOf(packagePrefixes);
         this.configuration = configuration;
     }
@@ -43,10 +45,6 @@ public class PrefixAddingModelProcessor implements ModelProcessor {
         final ResourceModel.Builder resourceModelBuilder = new ResourceModel.Builder(false);
         for (final Resource resource : model.getResources()) {
             for (Class<?> handlerClass : resource.getHandlerClasses()) {
-                final HideOnCloud hideOnCloud = handlerClass.getAnnotation(HideOnCloud.class);
-                if (hideOnCloud != null && configuration.isCloud()) {
-                    break;
-                }
                 final String packageName = handlerClass.getPackage().getName();
 
                 final Optional<String> packagePrefix = packagePrefixes.entrySet().stream()
@@ -55,21 +53,51 @@ public class PrefixAddingModelProcessor implements ModelProcessor {
                         .map(Map.Entry::getValue)
                         .findFirst();
 
-                if (packagePrefix.isPresent()) {
-                    final String prefixedPath = prefixPath(packagePrefix.get(), resource.getPath());
-                    final Resource newResource = Resource.builder(resource)
-                            .path(prefixedPath)
-                            .build();
-
-                    resourceModelBuilder.addResource(newResource);
-                } else {
-                    resourceModelBuilder.addResource(resource);
-                }
+                createResource(resource, configuration.isCloud(), packagePrefix).ifPresent(resourceModelBuilder::addResource);
             }
         }
 
         return resourceModelBuilder.build();
     }
+
+    private boolean resourceIsHideOnCloud(Resource resource) {
+        return resource.getHandlerClasses().stream().anyMatch(c -> c.getAnnotation(HideOnCloud.class) != null);
+    }
+
+    private Optional<Resource> createResource(Resource resource, boolean isCloud, Optional<String> packagePrefix) {
+        if (isCloud && resourceIsHideOnCloud(resource)) {
+            return Optional.empty();
+        }
+        final Resource.Builder resourceBuilder = Resource.builder().name(resource.getName());
+
+        // recurse into children. but don't assign them a packagePrefix
+        resource.getChildResources().forEach(childResource ->
+                createResource(childResource, isCloud, Optional.empty()).ifPresent(resourceBuilder::addChildResource)
+        );
+
+        if (packagePrefix.isPresent()) {
+            final String prefixedPath = prefixPath(packagePrefix.get(), resource.getPath());
+            resourceBuilder.path(prefixedPath);
+        } else {
+            resourceBuilder.path(resource.getPath());
+        }
+
+        boolean methodAdded = false;
+        for (final ResourceMethod resourceMethod : resource.getResourceMethods()) {
+            Method classMethod = resourceMethod.getInvocable().getDefinitionMethod();
+            if (!isCloud || !classMethod.isAnnotationPresent(HideOnCloud.class)) {
+                resourceBuilder.addMethod(resourceMethod);
+                methodAdded = true;
+            }
+        }
+        // skip empty childResources entirely
+        if (!methodAdded) {
+            return Optional.empty();
+        }
+
+        return Optional.of(resourceBuilder.build());
+    }
+
 
     private String prefixPath(String prefix, String path) {
         final String sanitizedPrefix = prefix.endsWith("/") ? prefix : prefix + "/";

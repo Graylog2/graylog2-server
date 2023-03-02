@@ -24,9 +24,12 @@ import org.graylog2.Configuration;
 import org.graylog2.shared.rest.HideOnCloud;
 import org.junit.Test;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.MediaType;
 import java.util.Locale;
 import java.util.Map;
 
@@ -34,7 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class PrefixAddingModelProcessorTest {
+public class PrefixAddingCloudHidingModelProcessorTest {
     private static final String PACKAGE_NAME = "org.graylog2.jersey";
     final Configuration configuration = mock(Configuration.class);
 
@@ -42,7 +45,7 @@ public class PrefixAddingModelProcessorTest {
     public void processResourceModelAddsPrefixToResourceClassInCorrectPackage() throws Exception {
         final ImmutableMap<String, String> packagePrefixes = ImmutableMap.of(PACKAGE_NAME, "/test/prefix");
         when(configuration.isCloud()).thenReturn(false);
-        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor(packagePrefixes, configuration);
+        final PrefixAddingCloudHidingModelProcessor modelProcessor = new PrefixAddingCloudHidingModelProcessor(packagePrefixes, configuration);
         final ResourceModel originalResourceModel = new ResourceModel.Builder(false)
                 .addResource(Resource.from(TestResource.class))
                 .addResource(Resource.from(HiddenTestResource.class)).build();
@@ -65,7 +68,7 @@ public class PrefixAddingModelProcessorTest {
                 "org.graylog2.wrong", "/wrong"
         );
         when(configuration.isCloud()).thenReturn(false);
-        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor(packagePrefixes, configuration);
+        final PrefixAddingCloudHidingModelProcessor modelProcessor = new PrefixAddingCloudHidingModelProcessor(packagePrefixes, configuration);
         final ResourceModel originalResourceModel = new ResourceModel.Builder(false)
                 .addResource(Resource.from(TestResource.class)).build();
 
@@ -81,7 +84,7 @@ public class PrefixAddingModelProcessorTest {
     public void processResourceModelDoesNotAddPrefixToResourceClassInOtherPackage() throws Exception {
         final ImmutableMap<String, String> packagePrefixes = ImmutableMap.of("org.example", "/test/prefix");
         when(configuration.isCloud()).thenReturn(false);
-        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor(packagePrefixes, configuration);
+        final PrefixAddingCloudHidingModelProcessor modelProcessor = new PrefixAddingCloudHidingModelProcessor(packagePrefixes, configuration);
         final ResourceModel originalResourceModel = new ResourceModel.Builder(false)
                 .addResource(Resource.from(TestResource.class)).build();
 
@@ -97,7 +100,7 @@ public class PrefixAddingModelProcessorTest {
     public void processSubResourceDoesNothing() throws Exception {
         final Map<String, String> packagePrefixes = ImmutableMap.of(PACKAGE_NAME, "/test/prefix");
         when(configuration.isCloud()).thenReturn(false);
-        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor(packagePrefixes, configuration);
+        final PrefixAddingCloudHidingModelProcessor modelProcessor = new PrefixAddingCloudHidingModelProcessor(packagePrefixes, configuration);
         final ResourceModel originalResourceModel = new ResourceModel.Builder(false)
                 .addResource(Resource.from(TestResource.class)).build();
 
@@ -107,20 +110,36 @@ public class PrefixAddingModelProcessorTest {
     }
 
     @Test
-    public void processResourceModelWithHideOnCloudDoesNothing() throws Exception {
+    public void processResourceModelWithHideOnCloud() throws Exception {
         final ImmutableMap<String, String> packagePrefixes = ImmutableMap.of(PACKAGE_NAME, "/test/prefix");
         when(configuration.isCloud()).thenReturn(true);
-        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor(packagePrefixes, configuration);
+        final PrefixAddingCloudHidingModelProcessor modelProcessor = new PrefixAddingCloudHidingModelProcessor(packagePrefixes, configuration);
         final ResourceModel originalResourceModel = new ResourceModel.Builder(false)
                 .addResource(Resource.from(TestResource.class))
-                .addResource(Resource.from(HiddenTestResource.class)).build();
+                .addResource(Resource.from(HiddenTestResource.class))
+                .addResource(Resource.from(PartlyHiddenTestResource.class))
+                .build();
 
         final ResourceModel resourceModel = modelProcessor.processResourceModel(originalResourceModel, new ResourceConfig());
 
-        assertThat(resourceModel.getResources()).hasSize(1);
+        assertThat(resourceModel.getResources()).hasSize(2);
 
-        final Resource resource = resourceModel.getResources().get(0);
+        Resource resource = resourceModel.getResources().get(0);
         assertThat(resource.getPath()).isEqualTo("/test/prefix/foobar/{test}");
+
+        resource = resourceModel.getResources().get(1);
+        assertThat(resource.getPath()).isEqualTo("/test/prefix/partly-hidden/{test}");
+
+        assertThat(resource.getResourceMethods()).hasSize(1);
+
+        assertThat(resource.getChildResources()).hasSize(2);
+        assertThat(resource.getChildResources().get(0).getPath()).isEqualTo("yesCloud");
+        assertThat(resource.getChildResources().get(0).getResourceMethods()).hasSize(1);
+        assertThat(resource.getChildResources().get(0).getResourceMethods().get(0).getHttpMethod()).isEqualTo("PUT");
+
+        assertThat(resource.getChildResources().get(1).getPath()).isEqualTo("noCloud");
+        assertThat(resource.getChildResources().get(1).getResourceMethods()).hasSize(1);
+        assertThat(resource.getChildResources().get(1).getResourceMethods().get(0).getConsumedTypes()).containsExactly(MediaType.APPLICATION_JSON_TYPE);
     }
 
     @Path("/foobar/{test}")
@@ -136,6 +155,35 @@ public class PrefixAddingModelProcessorTest {
     private static class HiddenTestResource {
         @GET
         public String helloWorld(@PathParam("test") String s) {
+            return String.format(Locale.ENGLISH, "Hello, %s!", s);
+        }
+    }
+
+    @Path("/partly-hidden/{test}")
+    private static class PartlyHiddenTestResource {
+        @GET
+        public String helloWorld(@PathParam("test") String s) {
+            return String.format(Locale.ENGLISH, "Hello, %s!", s);
+        }
+
+        @GET
+        @Path("noCloud")
+        @Consumes(MediaType.TEXT_XML)
+        @HideOnCloud
+        public String notOnCloudHello(@PathParam("test") String s) {
+            return String.format(Locale.ENGLISH, "Hello, %s!", s);
+        }
+
+        @GET
+        @Path("noCloud") // confusing name :-D  this adds a second resourceMethod (same path) that should be visible on cloud
+        @Consumes(MediaType.APPLICATION_JSON)
+        public String OnCloudHelloWithJSON(@PathParam("test") String s) {
+            return String.format(Locale.ENGLISH, "Hello, %s!", s);
+        }
+
+        @PUT
+        @Path("yesCloud")
+        public String yesOnCloudHello(@PathParam("test") String s) {
             return String.format(Locale.ENGLISH, "Hello, %s!", s);
         }
     }
