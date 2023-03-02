@@ -41,7 +41,7 @@
     "jest-preset-graylog": "file:../jest-preset-graylog",
     "jquery": "3.6.3",
     "moment": "2.29.4",
-    "moment-timezone": "0.5.40",
+    "moment-timezone": "0.5.41",
     "prop-types": "15.8.1",
     "react": "16.14.0",
     "react-bootstrap": "0.33.1",
