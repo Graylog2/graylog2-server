@@ -65,6 +65,7 @@ import org.graylog2.rest.resources.system.UrlWhitelistResource;
 import org.graylog2.rest.resources.system.contentpacks.CatalogResource;
 import org.graylog2.rest.resources.system.contentpacks.ContentPackResource;
 import org.graylog2.rest.resources.system.debug.DebugEventsResource;
+import org.graylog2.rest.resources.system.debug.DebugFieldTypesResource;
 import org.graylog2.rest.resources.system.debug.DebugStreamsResource;
 import org.graylog2.rest.resources.system.indexer.FailuresResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetDefaultsResource;
@@ -134,6 +135,7 @@ public class RestResourcesModule extends Graylog2Module {
         if(Boolean.parseBoolean(System.getenv("GRAYLOG_ENABLE_DEBUG_RESOURCES"))) {
             // TODO: move the DebugEventsResource under this env property check as well?
             addSystemRestResource(DebugStreamsResource.class);
+            addSystemRestResource(DebugFieldTypesResource.class);
         }
     }
 
