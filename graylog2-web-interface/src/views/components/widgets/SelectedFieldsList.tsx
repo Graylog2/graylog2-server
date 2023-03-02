@@ -110,13 +110,14 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
 });
 
 type Props = {
-  onChange: (newSelectedFields: Array<string>) => void
+  onChange: (newSelectedFields: Array<string>) => void,
+  displayOverlayInPortal?: boolean,
   selectedFields: Array<string>
   testPrefix?: string,
   selectSize?: 'normal' | 'small'
 };
 
-const SelectedFieldsList = ({ testPrefix, selectedFields, onChange, selectSize }: Props) => {
+const SelectedFieldsList = ({ testPrefix, selectedFields, onChange, selectSize, displayOverlayInPortal }: Props) => {
   const fieldsForList = useMemo(() => selectedFields?.map((field) => ({ id: field, title: field })), [selectedFields]);
 
   const onChangeField = useCallback((fieldIndex: number, newFieldName: string) => {
@@ -155,11 +156,13 @@ const SelectedFieldsList = ({ testPrefix, selectedFields, onChange, selectSize }
   return (
     <SortableList items={fieldsForList}
                   onMoveItem={onSortChange}
-                  customListItemRender={SortableListItem} />
+                  customListItemRender={SortableListItem}
+                  displayOverlayInPortal={displayOverlayInPortal} />
   );
 };
 
 SelectedFieldsList.defaultProps = {
+  displayOverlayInPortal: false,
   testPrefix: undefined,
   selectSize: undefined,
 };
