@@ -38,15 +38,16 @@ describe('<EntityDataTable />', () => {
     { id: 'description', title: 'Description', type: 'STRING', sortable: true },
     { id: 'stream', title: 'Stream', type: 'STRING', sortable: true },
     { id: 'status', title: 'Status', type: 'STRING', sortable: true, permissions: ['status:read'] },
+    { id: 'created_at', title: 'Created At', type: 'STRING', sortable: true },
   ];
 
   const visibleColumns = ['title', 'description', 'status'];
   const data = [
     {
       id: 'row-id',
-      title: 'Row title',
-      description: 'Row description',
-      stream: 'Row stream',
+      title: 'Entity title',
+      description: 'Entity description',
+      stream: 'Entity stream',
       status: 'enabled',
     },
   ];
@@ -61,7 +62,7 @@ describe('<EntityDataTable />', () => {
     await screen.findByRole('columnheader', { name: /title/i });
     await screen.findByRole('columnheader', { name: /status/i });
 
-    await screen.findByText('Row title');
+    await screen.findByText('Entity title');
     await screen.findByText('enabled');
 
     expect(screen.queryByRole('columnheader', { name: /stream/i })).not.toBeInTheDocument();
@@ -76,7 +77,7 @@ describe('<EntityDataTable />', () => {
                             columnDefinitions={columnDefinitions} />);
 
     await screen.findByRole('columnheader', { name: /description/i });
-    await screen.findByText('Row description');
+    await screen.findByText('Entity description');
   });
 
   it('should render custom cell and header renderer', async () => {
@@ -95,7 +96,7 @@ describe('<EntityDataTable />', () => {
                             columnDefinitions={columnDefinitions} />);
 
     await screen.findByRole('columnheader', { name: /custom title header/i });
-    await screen.findByText('The title: Row title');
+    await screen.findByText('The title: Entity title');
   });
 
   it('should merge attribute and type column renderers renderer', async () => {
@@ -119,9 +120,9 @@ describe('<EntityDataTable />', () => {
                             columnDefinitions={columnDefinitions} />);
 
     await screen.findByRole('columnheader', { name: /custom header for type - title/i });
-    await screen.findByText('Custom Cell For Attribute - Row title');
+    await screen.findByText('Custom Cell For Attribute - Entity title');
 
-    expect(screen.queryByText('Custom Cell For Type - Row title')).not.toBeInTheDocument();
+    expect(screen.queryByText('Custom Cell For Type - Entity title')).not.toBeInTheDocument();
   });
 
   it('should render row actions', async () => {
@@ -132,7 +133,7 @@ describe('<EntityDataTable />', () => {
                                                            rowActions={(row) => `Custom actions for ${row.title}`}
                                                            columnDefinitions={columnDefinitions} />);
 
-    await screen.findByText('Custom actions for Row title');
+    await screen.findByText('Custom actions for Entity title');
   });
 
   it('should not render column if user does not have required permissions', () => {
@@ -262,5 +263,33 @@ describe('<EntityDataTable />', () => {
     userEvent.click(screen.getByRole('menuitem', { name: /show title/i }));
 
     expect(onColumnsChange).toHaveBeenCalledWith(['description', 'status', 'title']);
+  });
+
+  it('should hande entities with camel case attributes', async () => {
+    const dataWithCamelCaseAttributes = [
+      {
+        id: 'row-id',
+        title: 'Entity title',
+        description: 'Entity description',
+        stream: 'Entity stream',
+        status: 'enabled',
+        createdAt: '2021-01-01',
+      },
+    ];
+
+    render(<EntityDataTable visibleColumns={[...visibleColumns, 'created_at']}
+                            data={dataWithCamelCaseAttributes}
+                            onSortChange={() => {}}
+                            onColumnsChange={() => {}}
+                            columnRenderers={{
+                              attributes: {
+                                created_at: {
+                                  renderCell: (createdAt: string) => `Custom Cell For Created At - ${createdAt}`,
+                                },
+                              },
+                            }}
+                            columnDefinitions={columnDefinitions} />);
+
+    await screen.findByText('Custom Cell For Created At - 2021-01-01');
   });
 });
