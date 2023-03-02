@@ -32,7 +32,7 @@ export type EventDefinitionAggregation = {
   fnSeries: string,
   field: string
 }
-export const definitionsUrl = qualifyUrl('/events/definitions');
+export const definitionsUrl = (definitionId: string) => qualifyUrl(`/events/definitions/${definitionId}`);
 
 const transformExpressionsToArray = ({ series, conditions }): Array<EventDefinitionAggregation> => {
   const res = [];
@@ -97,7 +97,7 @@ const useEventDefinition = (definitionId: string): {
   isFetched: boolean
 } => {
   const { data, refetch, isLoading, isFetched } = useQuery(
-    ['definition', definitionId],
+    ['event-definition-by-id', definitionId],
     () => fetchDefinition(definitionId),
     {
       onError: (errorThrown) => {

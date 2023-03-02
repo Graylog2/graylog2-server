@@ -25,7 +25,7 @@ import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
 import useEventDefinition, { definitionsUrl } from 'hooks/useEventDefinition';
 
-const definitionUrl = `${definitionsUrl}/111`;
+const definitionUrl = definitionsUrl('111');
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 

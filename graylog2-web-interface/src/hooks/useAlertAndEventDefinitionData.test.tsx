@@ -14,71 +14,73 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import React from 'react';
+import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import { useRouteMatch } from 'react-router-dom';
 
-import UserNotification from 'util/UserNotification';
+import { mockEventData, mockEventDefinition } from 'helpers/mocking/EventAndEventDefinitions_mock';
+import suppressConsole from 'helpers/suppressConsole';
+import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import UserNotification from 'util/UserNotification';
+import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
+import Routes from 'routing/Routes';
 
-export const eventsUrl = (id) => qualifyUrl(`/events/${id}`);
+jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
-export type EventType = {
-  alert : boolean;
-  event_definition_id: string;
-  event_definition_type: string;
-  fields: {};
-  group_by_fields: {};
-  id: string;
-  key: null;
-  key_tuple: []
-  message: string;
-  origin_context: string;
-  priority: number;
-  replay_info:
-    {
-      timerange_start: string,
-      timerange_end: string,
-      query: string,
-      streams: Array<string>
-    };
-  source: string;
-  source_streams: Array<string>;
-  streams: Array<string>;
-  timerange_end: string | null;
-  timerange_start: string | null;
-  timestamp: string;
-  timestamp_processing: string;
-}
+jest.mock('@tanstack/react-query', () => ({
+  ...jest.requireActual('@tanstack/react-query'),
+  useQueryClient: () => ({
+    // setQueryData: jest.fn(() => ({ data: [{ label: 'Blue', id: 34 }] })),
+    // cancelQueries: jest.fn(),
+    // invalidateQueries: jest.fn(),
+    ...jest.requireActual('@tanstack/react-query').useQueryClient(),
+    getQueryData: jest
+      .fn().mockImplementation(([key, id]) => {
+        if (key === 'event-by-id' && id === mockEventData.event.id) return mockEventData.event;
+        if (key === 'event-definition-by-id' && id === mockEventDefinition.id) return mockEventDefinition;
 
-const fetchEvent = (eventId: string) => {
-  return fetch('GET', eventsUrl(eventId)).then((data) => {
-    return data.event;
-  });
-};
+        return undefined;
+      }),
+  }),
+}));
 
-const useEventById = (eventId: string): {
-  data: EventType,
-  refetch: () => void,
-  isLoading: boolean,
-  isFetched: boolean,
-} => {
-  const { data, refetch, isLoading, isFetched } = useQuery<EventType>({
-    queryKey: ['event-by-id', eventId],
-    queryFn: () => fetchEvent(eventId),
-    onError: (errorThrown) => {
-      UserNotification.error(`Loading event or alert failed with status: ${errorThrown}`,
-        'Could not load event or alert');
+const eventRoute = Routes.ALERTS.replay_search(mockEventData.event.id);
+console.log({ eventRoute });
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useRouteMatch: jest.fn(() => ({
+    path: `/alerts/${mockEventData.event.id}/replaysearch`,
+  })),
+}));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
     },
-    keepPreviousData: true,
-    enabled: !!eventId,
+  },
+});
+const wrapper = ({ children }) => (
+  <QueryClientProvider client={queryClient}>
+    {children}
+  </QueryClientProvider>
+);
+
+describe('useEventById', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
-  return ({
-    data,
-    refetch,
-    isLoading,
-    isFetched,
-  });
-};
+  it('should run fetch and store mapped response', async () => {
+    asMock(useRouteMatch).mockImplementation(() => ({
+      path: `/alerts/${mockEventData.event.id}/replaysearch`,
+    }));
 
-export default useEventById;
+    const { result, waitFor } = renderHook(() => useAlertAndEventDefinitionData(), { wrapper });
+
+    expect(result.current.eventDefinition).toEqual(mockEventData.event);
+  });
+});
