@@ -22,8 +22,8 @@ import useEventDefinition from 'hooks/useEventDefinition';
 import { Spinner } from 'components/common';
 import SearchPage from 'views/pages/SearchPage';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
-import { useCreateViewForEventDefinition } from 'views/logic/views/UseCreateViewForEvent';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
+import useCreateViewForEventDefinition from 'views/logic/views/UseCreateViewForEventDefinition';
 
 const EventView = () => {
   const { eventDefinition, aggregations } = useAlertAndEventDefinitionData();

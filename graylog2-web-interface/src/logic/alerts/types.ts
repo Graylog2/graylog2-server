@@ -30,7 +30,7 @@ export type EventDefinition = {
     group_by: string[],
     series: Array<{field: string, id: string, function: string}>,
     conditions: {
-      expression: string | null,
+      expression: string | null | {},
     },
     search_within_ms: number,
     execute_every_ms: number,
@@ -45,7 +45,7 @@ export type EventDefinition = {
   storage: [
     {
       type: string,
-      streams: number[],
+      streams: number[] | string[],
     }
   ],
   updated_at: string | null

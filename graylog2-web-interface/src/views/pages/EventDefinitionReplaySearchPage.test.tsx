@@ -21,18 +21,16 @@ import MockStore from 'helpers/mocking/StoreMock';
 import asMock from 'helpers/mocking/AsMock';
 import SearchComponent from 'views/components/Search';
 import StreamsContext from 'contexts/StreamsContext';
-import UseCreateViewForEvent from 'views/logic/views/UseCreateViewForEvent';
+import UseCreateViewForEventDefinition from 'views/logic/views/UseCreateViewForEventDefinition';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
 import { createSearch } from 'fixtures/searches';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import EventReplaySearchPage from 'views/pages/EventReplaySearchPage';
-import useEventById from 'hooks/useEventById';
+import EventDefinitionReplaySearchPage from 'views/pages/EventDefinitionReplaySearchPage';
 import useEventDefinition from 'hooks/useEventDefinition';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import {
   mockedMappedAggregation,
-  mockEventData,
   mockEventDefinition,
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import useParams from 'routing/useParams';
@@ -43,10 +41,10 @@ jest.mock('views/components/Search');
 jest.mock('routing/useParams');
 
 jest.mock('views/logic/views/Actions');
-jest.mock('views/logic/views/UseCreateViewForEvent');
+jest.mock('views/logic/views/UseCreateViewForEventDefinition');
 jest.mock('views/logic/views/UseProcessHooksForView');
 jest.mock('views/hooks/useLoadView');
-jest.mock('hooks/useEventById');
+
 jest.mock('hooks/useEventDefinition');
 jest.mock('hooks/useAlertAndEventDefinitionData');
 
@@ -57,10 +55,10 @@ jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
   EventNotificationsStore: MockStore((['getInitialState', () => ({ all: [] })])),
 }));
 
-describe('EventReplaySearchPage', () => {
+describe('EventDefinitionReplaySearchPage', () => {
   const SimpleReplaySearchPage = () => (
     <StreamsContext.Provider value={[{}]}>
-      <EventReplaySearchPage />
+      <EventDefinitionReplaySearchPage />
     </StreamsContext.Provider>
   );
 
@@ -69,17 +67,10 @@ describe('EventReplaySearchPage', () => {
   afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
-    asMock(useParams).mockReturnValue({ alertId: mockEventData.event.id });
-    asMock(UseCreateViewForEvent).mockReturnValue(Promise.resolve(mockView));
+    asMock(useParams).mockReturnValue({ definitionId: mockEventDefinition.id });
+    asMock(UseCreateViewForEventDefinition).mockReturnValue(Promise.resolve(mockView));
     asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: mockView, executionState: SearchExecutionState.empty() });
     asMock(SearchComponent).mockImplementation(() => <span>Extended Search Page</span>);
-
-    asMock(useEventById).mockImplementation(() => ({
-      data: mockEventData.event,
-      isLoading: false,
-      isFetched: true,
-      refetch: () => {},
-    }));
 
     asMock(useEventDefinition).mockImplementation(() => ({
       data: { eventDefinition: mockEventDefinition, aggregations: mockedMappedAggregation },
@@ -89,15 +80,15 @@ describe('EventReplaySearchPage', () => {
     }));
   });
 
-  it('should run useEventById, useEventDefinition, UseCreateViewForEvent with correct parameters', async () => {
+  it('should run useEventDefinition, UseCreateViewForEvent with correct parameters', async () => {
     asMock(useAlertAndEventDefinitionData).mockImplementation(() => ({
-      eventData: mockEventData.event,
+      eventData: undefined,
       eventDefinition: mockEventDefinition,
       aggregations: mockedMappedAggregation,
-      isEvent: true,
-      isEventDefinition: false,
+      isEvent: false,
+      isEventDefinition: true,
       isAlert: false,
-      alertId: mockEventData.event.id,
+      alertId: undefined,
       definitionId: mockEventDefinition.id,
       definitionTitle: mockEventDefinition.title,
     }));
@@ -107,11 +98,10 @@ describe('EventReplaySearchPage', () => {
       render(<SimpleReplaySearchPage />);
     });
 
-    expect(useEventById).toHaveBeenCalledWith(mockEventData.event.id);
-    expect(useEventDefinition).toHaveBeenCalledWith(mockEventData.event.event_definition_id);
+    expect(useEventDefinition).toHaveBeenCalledWith(mockEventDefinition.id);
 
-    await expect(UseCreateViewForEvent).toHaveBeenCalledWith({
-      eventData: mockEventData.event, eventDefinition: mockEventDefinition, aggregations: mockedMappedAggregation,
+    await expect(UseCreateViewForEventDefinition).toHaveBeenCalledWith({
+      eventDefinition: mockEventDefinition, aggregations: mockedMappedAggregation,
     });
   });
 });

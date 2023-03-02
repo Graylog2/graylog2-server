@@ -43,7 +43,7 @@ import Direction from 'views/logic/aggregationbuilder/Direction';
 
 const AGGREGATION_WIDGET_HEIGHT = 3;
 
-const getAggregationWidget = ({ rowPivots, fnSeries, sort = [] }: {
+export const getAggregationWidget = ({ rowPivots, fnSeries, sort = [] }: {
   rowPivots: Array<Pivot>,
   fnSeries: Array<Series>,
   sort?: Array<SortConfig>
@@ -61,7 +61,7 @@ const getAggregationWidget = ({ rowPivots, fnSeries, sort = [] }: {
   )
   .build();
 
-const WidgetsGenerator = async ({ streams, aggregations, groupBy }) => {
+export const WidgetsGenerator = async ({ streams, aggregations, groupBy }) => {
   const decorators = await DecoratorsActions.list();
   const byStreamId = matchesDecoratorStream(streams);
   const streamDecorators = decorators ? decorators.filter(byStreamId) : [];
@@ -132,7 +132,7 @@ const WidgetsGenerator = async ({ streams, aggregations, groupBy }) => {
   return { titles, widgets, positions };
 };
 
-const ViewStateGenerator = async ({ streams, aggregations, groupBy }: {groupBy: Array<string>, streams: string | string[] | undefined, aggregations: Array<any>}) => {
+export const ViewStateGenerator = async ({ streams, aggregations, groupBy }: {groupBy: Array<string>, streams: string | string[] | undefined, aggregations: Array<any>}) => {
   const { titles, widgets, positions } = await WidgetsGenerator({ streams, aggregations, groupBy });
 
   return ViewState.create()
@@ -143,7 +143,7 @@ const ViewStateGenerator = async ({ streams, aggregations, groupBy }: {groupBy: 
     .build();
 };
 
-const ViewGenerator = async ({
+export const ViewGenerator = async ({
   streams,
   timeRange,
   queryString,
@@ -184,27 +184,6 @@ const useCreateViewForEvent = (
   const queryString: ElasticsearchQueryString = {
     type: 'elasticsearch',
     query_string: eventData?.replay_info?.query || '',
-  };
-  const groupBy = eventDefinition.config.group_by;
-
-  return useMemo(
-    () => ViewGenerator({ streams, timeRange, queryString, aggregations, groupBy }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
-};
-
-export const useCreateViewForEventDefinition = (
-  { eventDefinition, aggregations }: { eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation> },
-) => {
-  const { streams } = eventDefinition.config;
-  const timeRange: RelativeTimeRangeStartOnly = {
-    type: 'relative',
-    range: eventDefinition.config.search_within_ms / 1000,
-  };
-  const queryString: ElasticsearchQueryString = {
-    type: 'elasticsearch',
-    query_string: eventDefinition.config.query || '',
   };
   const groupBy = eventDefinition.config.group_by;
 
