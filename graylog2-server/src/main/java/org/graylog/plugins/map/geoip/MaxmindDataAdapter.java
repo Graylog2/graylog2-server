@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -338,8 +339,12 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
     }
 
     public static class Descriptor extends LookupDataAdapter.Descriptor<MaxmindDataAdapter.Config> {
-        public Descriptor() {
+        private final boolean isCloud;
+
+        @Inject
+        public Descriptor(@Named("is_cloud") boolean isCloud) {
             super(NAME, MaxmindDataAdapter.Config.class);
+            this.isCloud = isCloud;
         }
 
         @Override
@@ -349,7 +354,7 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
                     .checkInterval(1)
                     .checkIntervalUnit(TimeUnit.MINUTES)
                     .path("/etc/graylog/server/GeoLite2-City.mmdb")
-                    .dbType(DatabaseType.MAXMIND_CITY)
+                    .dbType(isCloud ? DatabaseType.IPINFO_STANDARD_LOCATION : DatabaseType.MAXMIND_CITY)
                     .build();
         }
     }
