@@ -43,7 +43,6 @@ export default class ParameterBinding {
     return this._value.value;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
     const { type, value } = this._value;
 

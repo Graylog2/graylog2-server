@@ -20,7 +20,6 @@ declare global {
   }
 }
 
-// eslint-disable-next-line arrow-parens
 const singleton = <R>(key: string, supplier: () => R): R => {
   if (!window.singletons[key]) {
     window.singletons[key] = supplier();

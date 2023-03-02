@@ -50,14 +50,17 @@ const CollectorEntry = styled.div`
   .row {
     margin-bottom: 5px;
   }
+
   .form-group {
     display: inline-block;
     margin: 0 10px 0 0;
   }
+
   .checkbox {
     margin-top: 5px;
     margin-bottom: 5px;
   }
+
   .checkbox label {
     font-size: 1rem; /* theme.fonts.size.body */
   }
@@ -82,6 +85,7 @@ const PaginatedListContainer = styled.div`
   .page-size {
     padding-top: 4px;
   }
+
   .search {
     margin-bottom: 15px;
   }

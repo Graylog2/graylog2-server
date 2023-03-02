@@ -57,6 +57,7 @@ FilterProps.defaultProps = {
 
 type Props = {
   children: React.ReactNode,
+  closeOnSelect?: boolean,
   dropdownZIndex?: number,
   menuContainer?: HTMLElement,
   onToggle: () => void,
@@ -68,6 +69,7 @@ type Props = {
 
 const OverlayDropdown = ({
   children,
+  closeOnSelect,
   dropdownZIndex,
   menuContainer,
   onToggle,
@@ -113,7 +115,7 @@ const OverlayDropdown = ({
                  onEntering={handleOverlayEntering}>
           <FilterProps>
             <DropdownMenu show={show}
-                          onMenuItemSelect={onToggle}
+                          onMenuItemSelect={closeOnSelect ? onToggle : undefined}
                           zIndex={dropdownZIndex}>
               {children}
             </DropdownMenu>
@@ -126,6 +128,7 @@ const OverlayDropdown = ({
 
 OverlayDropdown.propTypes = {
   children: PropTypes.node.isRequired,
+  closeOnSelect: PropTypes.bool,
   dropdownZIndex: PropTypes.number,
   menuContainer: PropTypes.object,
   onToggle: PropTypes.func.isRequired,
@@ -135,6 +138,7 @@ OverlayDropdown.propTypes = {
 };
 
 OverlayDropdown.defaultProps = {
+  closeOnSelect: true,
   dropdownZIndex: undefined,
   menuContainer: document.body,
   placement: 'bottom',

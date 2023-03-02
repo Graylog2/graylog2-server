@@ -1,0 +1,5 @@
+type = "c" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Changed event definitions and notifications to new paginated list and entity list ui component. This enables bulk deletion of event definitions and notifications and bulk enabling/disabling event definitions."
+
+issues = ["14285"]
+pulls = ["14502"]

@@ -25,7 +25,7 @@ import BulkSelectHead from './BulkSelectHead';
 import type { Column, ColumnRenderer, ColumnRenderers, EntityBase } from './types';
 
 const Th = styled.th<{ $width: number | undefined }>(({ $width }) => css`
-  width: ${$width ? `${$width}px` : 'auto'};
+  width: ${$width ? `${$width}px` : "auto"};
 `);
 
 const TableHeader = <Entity extends EntityBase>({
@@ -61,7 +61,7 @@ const TableHeader = <Entity extends EntityBase>({
 
 const ActionsHead = styled.th<{ $width: number | undefined }>(({ $width }) => css`
   text-align: right;
-  width: ${$width ? `${$width}px` : 'auto'};
+  width: ${$width ? `${$width}px` : "auto"};
 `);
 
 const TableHead = <Entity extends EntityBase>({

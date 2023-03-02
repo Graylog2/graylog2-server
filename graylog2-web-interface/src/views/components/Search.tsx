@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useCallback, useEffect, useContext, useMemo } from 'react';
 import styled, { css } from 'styled-components';
-import { createSelector } from '@reduxjs/toolkit';
 
 import PageContentLayout from 'components/layout/PageContentLayout';
 import { useStore } from 'stores/connect';
@@ -46,11 +45,10 @@ import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import useCurrentUser from 'hooks/useCurrentUser';
 import SynchronizeUrl from 'views/components/SynchronizeUrl';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useView from 'views/hooks/useView';
 import useAppDispatch from 'stores/useAppDispatch';
 import { execute } from 'views/logic/slices/searchExecutionSlice';
-import { selectSearchExecutionResult } from 'views/logic/slices/searchExecutionSelectors';
+import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import useAppSelector from 'stores/useAppSelector';
 import { RefreshActions } from 'views/stores/RefreshStore';
 
@@ -63,9 +61,9 @@ const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => 
     > *:nth-child(2) {
       flex-grow: 1;
     }
-  ` : css`
+` : css`
     flex: 1;
-  `;
+`;
 });
 
 const SearchArea = styled(PageContentLayout)(() => {
@@ -83,14 +81,11 @@ const SearchArea = styled(PageContentLayout)(() => {
         overflow: ${focusedWidget?.id ? 'auto' : 'visible'};
       }
     `}
-  `;
+`;
 });
 
-const selectCurrentQueryResults = (queryId: string) => createSelector(selectSearchExecutionResult, (state) => state?.result?.forId(queryId));
-
 const ConnectedSidebar = (props: Omit<React.ComponentProps<typeof Sidebar>, 'results'>) => {
-  const activeQuery = useActiveQueryId();
-  const results = useAppSelector(selectCurrentQueryResults(activeQuery));
+  const results = useAppSelector(selectCurrentQueryResults);
 
   return <Sidebar results={results} {...props} />;
 };
@@ -114,8 +109,10 @@ const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
-const useAutoRefresh = (refresh: () => void) => {
-  useEffect(() => RefreshActions.refresh.listen(refresh), [refresh]);
+const useAutoRefresh = (refresh: () => Promise<unknown>) => {
+  useEffect(() => RefreshActions.refresh.listen(() => {
+    RefreshActions.refresh.promise(refresh());
+  }), [refresh]);
 };
 
 const Search = () => {
