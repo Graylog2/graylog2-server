@@ -28,7 +28,7 @@ import Spinner from 'components/common/Spinner';
 import Select from 'components/common/Select';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import useStreams from 'components/streams/hooks/useStreams';
-import useSearches from 'views/components/search/useSearches';
+import useSavedSearches from 'views/hooks/useSavedSearches';
 
 const Container = styled.div`
   display: flex;
@@ -80,7 +80,7 @@ const useStartPageEntities = (userId, permissions) => {
 
   const { data: allDashboards, isFetching: isLoadingAllDashboards } = useDashboards({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
   const { data: allStreams, isFetching: isLoadingAllStreams } = useStreams({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
-  const { data: allSearches, isFetching: isLoadingAllSearches } = useSearches({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
+  const { data: allSearches, isLoading: isLoadingAllSearches } = useSavedSearches({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
   const allDashboardsOptions = (allDashboards?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));
   const allStreamsOptions = (allStreams?.elements ?? []).map(({ id, title }) => ({ value: id, label: title }));
   const allSearchesOptions = (allSearches?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));
