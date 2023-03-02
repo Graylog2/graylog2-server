@@ -29,7 +29,7 @@ const StyledLabel = styled.label`
 `;
 
 const HelpText = styled.span`
-  color: ${(props: any) => props.theme.colors.gray["50"]};
+  color: ${(props: any) => props.theme.colors.gray['50']};
 `;
 
 export type AutocompleteOption = {
