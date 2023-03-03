@@ -90,4 +90,8 @@ export type EncryptedFieldValue<Value> = {
   delete_value?: boolean,
 }
 
+export const FIELD_TYPES_WITH_ENCRYPTION_SUPPORT = ['text'] as const;
+
+export type ConfigurationFieldWithEncryption = TextField;
+
 export type ConfigurationField = BooleanField | DropdownField | ListField | NumberField | TextField;

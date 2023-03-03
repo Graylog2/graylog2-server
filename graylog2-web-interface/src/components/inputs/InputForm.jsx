@@ -74,7 +74,7 @@ class InputForm extends React.Component {
       return values;
     }
 
-    if (this.configurationForm) {
+    if (this.configurationForm && this.configurationForm.current) {
       return this.configurationForm.current.getValue().configuration;
     }
 
@@ -88,7 +88,7 @@ class InputForm extends React.Component {
       return titleValue;
     }
 
-    if (this.configurationForm) {
+    if (this.configurationForm && this.configurationForm.current) {
       return this.configurationForm.current.getValue().titleValue;
     }
 

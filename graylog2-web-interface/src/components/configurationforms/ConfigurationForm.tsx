@@ -22,7 +22,8 @@ import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { ConfigurationFormField, TitleField } from 'components/configurationforms';
 
-import type { ConfigurationField } from './types';
+import { FIELD_TYPES_WITH_ENCRYPTION_SUPPORT } from './types';
+import type { ConfigurationField, ConfigurationFieldWithEncryption } from './types';
 
 type Props = {
   cancelAction: () => void,
@@ -58,6 +59,8 @@ const ConfigurationForm = forwardRef<{}, Props>(({
   const [showConfigurationModal, setShowConfigurationModal] = useState(false);
   const [titleValue, setTitleValue] = useState(undefined);
   const [values, setValues] = useState<{[key:string]: any} | undefined>(undefined);
+  const [fieldStates, setFieldStates] = useState<{[key:string]: any} | undefined>({});
+  const [submitted, setSubmitted] = useState<boolean>(false);
 
   useEffect(() => {
     if (!titleValue) {
@@ -74,11 +77,22 @@ const ConfigurationForm = forwardRef<{}, Props>(({
       });
     }
 
-    setValues({ ...defaultValues, ...initialValues });
-  }, [configFields, initialValues]);
+    if (submitted) {
+      setValues({ ...defaultValues, ...initialValues });
+    } else {
+      setValues({ ...defaultValues, ...initialValues, ...values });
+    }
+  }, [configFields, initialValues, submitted, values]);
 
   const getValue = () => {
-    const data: { title?: string, type?: string, configuration?: {[key:string]: any} } = { type: typeName, configuration: { } };
+    const data: {
+      title?: string,
+      type?: string,
+      configuration?: {[key:string]: any}
+    } = {
+      type: typeName,
+      configuration: {},
+    };
 
     if (includeTitleField) {
       data.title = titleValue;
@@ -119,8 +133,36 @@ const ConfigurationForm = forwardRef<{}, Props>(({
     return diff;
   };
 
-  const closeModal = () => {
-    setTitleValue(titleValue);
+  const fieldIsEncrypted = (configField: ConfigurationField) : boolean => {
+    const fieldSupportsEncryption = FIELD_TYPES_WITH_ENCRYPTION_SUPPORT.includes(
+      (configField.type as unknown as typeof FIELD_TYPES_WITH_ENCRYPTION_SUPPORT[number]),
+    );
+
+    if (!fieldSupportsEncryption) {
+      return false;
+    }
+
+    return (configField as ConfigurationFieldWithEncryption).is_encrypted;
+  };
+
+  const handleEncryptedFieldsBeforeSubmit = (data) => {
+    const oldConfiguration = data.configuration;
+
+    const newConfiguration = {};
+
+    $.map(oldConfiguration, (fieldValue, fieldName) => {
+      const configField = configFields[fieldName as string];
+      const fieldState = fieldStates[fieldName as string];
+
+      if (fieldIsEncrypted(configField) && !fieldState.dirty && fieldValue && fieldValue.is_set !== undefined) {
+        newConfiguration[fieldName] = { keep_value: true };
+      }
+    });
+
+    return { ...data, configuration: { ...oldConfiguration, ...newConfiguration } };
+  };
+
+  const handleCancel = () => {
     setShowConfigurationModal(false);
 
     if (cancelAction) {
@@ -131,9 +173,10 @@ const ConfigurationForm = forwardRef<{}, Props>(({
   const save = () => {
     const data = getValue();
 
-    submitAction(data);
+    submitAction(handleEncryptedFieldsBeforeSubmit(data));
 
-    closeModal();
+    setSubmitted(true);
+    setShowConfigurationModal(false);
   };
 
   useImperativeHandle(ref, () => ({
@@ -148,6 +191,7 @@ const ConfigurationForm = forwardRef<{}, Props>(({
 
   const handleChange = (field: string, value) => {
     setValues({ ...values, ...{ [field]: value } });
+    setFieldStates({ ...fieldStates, ...{ [field]: { dirty: true } } });
   };
 
   const renderConfigField = (configField, key, autoFocus, buttonAfter = null) => {
@@ -162,6 +206,7 @@ const ConfigurationForm = forwardRef<{}, Props>(({
                               configValue={value}
                               autoFocus={autoFocus}
                               buttonAfter={buttonAfter}
+                              dirty={fieldStates[key].dirty}
                               onChange={handleChange} />
     );
   };
@@ -198,7 +243,7 @@ const ConfigurationForm = forwardRef<{}, Props>(({
   return (
     <WrapperComponent show={showConfigurationModal}
                       title={title}
-                      onCancel={closeModal}
+                      onCancel={handleCancel}
                       onSubmitForm={save}
                       submitButtonText={submitButtonText}>
       <fieldset>
