@@ -49,7 +49,7 @@ public class ShiroAuthorizationFilter implements ContainerRequestFilter {
             final ContextAwarePermissionAnnotationHandler annotationHandler = new ContextAwarePermissionAnnotationHandler(context);
             final String[] requiredPermissions = annotation.value();
             try {
-                LOG.debug("Checking authorization for user [{}], needs permissions: {}", userId, requiredPermissions);
+                LOG.info("Checking authorization for user [{}], needs permissions: {}", userId, requiredPermissions);
                 annotationHandler.assertAuthorized(annotation);
             } catch (AuthorizationException e) {
                 LOG.info("Not authorized. User <{}> is missing permissions {} to perform <{} {}>",

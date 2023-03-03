@@ -19,12 +19,17 @@ package org.graylog2.plugin.rest;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.auto.value.AutoValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @JsonAutoDetect
 @AutoValue
 @JsonTypeName("ApiError") // Explicitly indicates the class type to avoid AutoValue_ at the beginning
 public abstract class ApiError implements GenericError {
+    private static final Logger LOG = LoggerFactory.getLogger(ApiError.class);
+
     public static ApiError create(String message) {
+        LOG.error("STACKTRACE", new Throwable("Getting a stack trace"));
         return new AutoValue_ApiError(message);
     }
 }
