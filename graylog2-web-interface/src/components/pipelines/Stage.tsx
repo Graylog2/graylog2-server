@@ -51,7 +51,12 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete }: Props) => {
   );
 
   const actions = [
-    <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')} key={`delete-stage-${stage}`} bsStyle="primary" onClick={onDelete}>Delete</Button>,
+    <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')}
+            key={`delete-stage-${stage}`}
+            bsStyle="danger"
+            onClick={onDelete}>
+      Delete
+    </Button>,
     <StageForm key={`edit-stage-${stage}`} pipeline={pipeline} stage={stage} save={onUpdate} />,
   ];
 

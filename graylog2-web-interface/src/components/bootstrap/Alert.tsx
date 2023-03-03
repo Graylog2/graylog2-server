@@ -36,7 +36,7 @@ interface Props {
 
 const StyledAlert = styled(BootstrapAlert).attrs(({ bsStyle }: { bsStyle: ColorVariants }) => ({
   bsStyle: null,
-  $bsStyle: bsStyle || "default",
+  $bsStyle: bsStyle || 'default',
 }))(({ $bsStyle, theme }: AlertProps) => {
   const borderColor = theme.colors.variant.lighter[$bsStyle];
   const backgroundColor = theme.colors.variant.lightest[$bsStyle];
@@ -47,7 +47,7 @@ const StyledAlert = styled(BootstrapAlert).attrs(({ bsStyle }: { bsStyle: ColorV
     color: ${theme.utils.contrastingColor(backgroundColor)};
 
     a:not(.btn) {
-      color: ${theme.utils.contrastingColor(backgroundColor, "AA")};
+      color: ${theme.utils.contrastingColor(backgroundColor, 'AA')};
       font-weight: bold;
       text-decoration: underline;
 

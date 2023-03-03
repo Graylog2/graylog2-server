@@ -17,7 +17,7 @@
 import { createSelector } from '@reduxjs/toolkit';
 
 import type { RootState } from 'views/types';
-import { selectGlobalOverride } from 'views/logic/slices/searchExecutionSelectors';
+import { selectGlobalOverride, selectSearchExecutionResult } from 'views/logic/slices/searchExecutionSelectors';
 import View from 'views/logic/views/View';
 
 export const selectRootView = (state: RootState) => state.view;
@@ -60,3 +60,4 @@ export const selectCurrentQueryString = (queryId: string) => createSelector(
 );
 
 export const selectParameters = createSelector(selectSearch, (search) => search.parameters);
+export const selectCurrentQueryResults = createSelector(selectActiveQuery, selectSearchExecutionResult, (queryId, state) => state?.result?.forId(queryId));
