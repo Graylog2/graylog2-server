@@ -63,7 +63,7 @@ const StreamRule = ({ matchData, permissions, stream, streamRule, streamRuleType
   };
 
   const _onSubmit = (streamRuleId, data) => {
-    StreamRulesStore.update(stream.id, streamRuleId, data, () => {
+    return StreamRulesStore.update(stream.id, streamRuleId, data, () => {
       if (onSubmit) {
         onSubmit(streamRuleId, data);
       }

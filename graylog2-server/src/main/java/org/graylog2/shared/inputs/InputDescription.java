@@ -42,6 +42,10 @@ public class InputDescription {
         return descriptor.getLinkToDocs();
     }
 
+    public boolean isCloudCompatible() {
+        return descriptor.isCloudCompatible();
+    }
+
     public Map<String, Map<String, Object>> getRequestedConfiguration() {
         return config.combinedRequestedConfiguration().asList();
     }
