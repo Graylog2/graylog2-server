@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 @AutoValue
 @JsonTypeName(UsedSearchFilter.INLINE_QUERY_STRING_SEARCH_FILTER)
@@ -32,6 +33,9 @@ public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter,
     @JsonProperty(TITLE_FIELD)
     @Nullable
     public abstract String title();
+
+    @JsonProperty(ID_FIELD)
+    public abstract Optional<String> id();
 
     @JsonProperty(DESCRIPTION_FIELD)
     @Nullable
@@ -64,6 +68,9 @@ public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter,
 
         @JsonProperty(TITLE_FIELD)
         public abstract Builder title(String title);
+
+        @JsonProperty(ID_FIELD)
+        public abstract Builder id(@Nullable String id);
 
         @JsonProperty(DESCRIPTION_FIELD)
         public abstract Builder description(String description);
