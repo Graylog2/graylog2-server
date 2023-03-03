@@ -82,6 +82,18 @@ export type BooleanField = {
   type: 'boolean',
 };
 
+export type InlineBinaryField = {
+  additional_info: {},
+  attributes: Array<TextFieldAttributes>,
+  default_value: string,
+  description: string,
+  human_name: string,
+  is_encrypted: boolean,
+  is_optional: boolean,
+  position: number,
+  type: 'inline_binary',
+};
+
 export type FieldValue = string | number | boolean | void
 
 export type EncryptedFieldValue<Value> = {
@@ -90,4 +102,4 @@ export type EncryptedFieldValue<Value> = {
   delete_value?: boolean,
 }
 
-export type ConfigurationField = BooleanField | DropdownField | ListField | NumberField | TextField;
+export type ConfigurationField = BooleanField | DropdownField | InlineBinaryField | ListField | NumberField | TextField;
