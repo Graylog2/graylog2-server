@@ -62,5 +62,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20230113095300_MigrateGlobalPivotLimitsToGroupingsInViews.class);
         addMigration(V20230113095301_MigrateGlobalPivotLimitsToGroupingsInSearches.class);
         addMigration(V20230213160000_EncryptedInputConfigMigration.class);
+        addMigration(V20230210102500_UniqueUserMigration.class);
     }
 }

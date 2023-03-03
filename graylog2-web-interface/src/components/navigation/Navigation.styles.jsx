@@ -92,7 +92,7 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
           content: attr(aria-label);
         }
 
-        [class*="fa-"] {
+        [class*='fa-'] {
           display: none;
         }
       }
