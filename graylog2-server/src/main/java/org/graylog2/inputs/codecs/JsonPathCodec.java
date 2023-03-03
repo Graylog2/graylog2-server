@@ -16,6 +16,9 @@
  */
 package org.graylog2.inputs.codecs;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.*;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
@@ -32,41 +35,61 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.journal.RawMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
 @Codec(name = "jsonpath", displayName = "JSON Path")
 public class JsonPathCodec extends AbstractCodec {
 
+    private static final Logger LOG = LoggerFactory.getLogger(JsonPathCodec.class);
     public static final String CK_PATH = "path";
     public static final String CK_SOURCE = "source";
+    public static final String CK_MODE = "";
 
     private final JsonPath jsonPath;
+    private final String modeString;
+    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @AssistedInject
     public JsonPathCodec(@Assisted Configuration configuration) {
         super(configuration);
         final String pathString = configuration.getString(CK_PATH);
         jsonPath = pathString == null ? null : JsonPath.compile(pathString);
+        modeString = configuration.getString(CK_MODE);
     }
 
     @Nullable
     @Override
     public Message decode(@Nonnull RawMessage rawMessage) {
-        if (jsonPath == null) {
-            return null;
+        Map<String, Object> fields = new HashMap<>();
+        if (Objects.equals(modeString, "jsonpath")) {
+            if (jsonPath == null) {
+                return null;
+            }
+            final String json = new String(rawMessage.getPayload(), charset);
+            fields = read(json);
+        } else if (Objects.equals(modeString, "jsonfull")) {
+            final String json = new String(rawMessage.getPayload(), charset);
+            try {
+                fields = useFlattener(json);
+            } catch (JsonTypeException e) {
+                LOG.warn("JSON contains type not supported by JsonFlattenService.flatten.");
+                //throw new RuntimeException(e); //TODO Exception not properly handled.
+            }
+        } else {
+            LOG.warn("Message mode is empty, should be either \"jsonpath\" or \"jsonfull\".");
+            return  null;
         }
-        final String json = new String(rawMessage.getPayload(), charset);
-        final Map<String, Object> fields = read(json);
 
         final Message message = new Message(buildShortMessage(fields),
-                                            configuration.getString(CK_SOURCE),
-                                            rawMessage.getTimestamp());
+                configuration.getString(CK_SOURCE),
+                rawMessage.getTimestamp());
         message.addFields(fields);
         return message;
     }
@@ -103,6 +126,50 @@ public class JsonPathCodec extends AbstractCodec {
         }
 
         return shortMessage.toString();
+    }
+
+    public Map<String, Object> useFlattener(String json) throws JsonTypeException {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            flatten("", OBJECT_MAPPER.readTree(json), map);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+
+    private void flatten(String currentPath, JsonNode jsonNode, Map<String, Object> map) throws JsonTypeException {
+        if (jsonNode.isObject()) {
+            ObjectNode objectNode = (ObjectNode) jsonNode;
+            Iterator<Map.Entry<String, JsonNode>> iter = objectNode.fields();
+            String pathPrefix = currentPath.isEmpty() ? "" : currentPath + ".";
+
+            while (iter.hasNext()) {
+                Map.Entry<String, JsonNode> entry = iter.next();
+                flatten(pathPrefix + entry.getKey(), entry.getValue(), map);
+            }
+        } else if (jsonNode.isArray()) {
+            ArrayNode arrayNode = (ArrayNode) jsonNode;
+            for (int i = 0; i < arrayNode.size(); i++) {
+                flatten(currentPath + i, arrayNode.get(i), map);
+            }
+        } else if (jsonNode.isTextual()) {
+            TextNode textNode = (TextNode) jsonNode;
+            map.put(currentPath, textNode.toString());
+        } else if (jsonNode.isNumber()) {
+            NumericNode numericNode = (NumericNode) jsonNode;
+            map.put(currentPath, numericNode.numberValue());
+        } else if (jsonNode.isBoolean()) {
+            BooleanNode booleanNode = (BooleanNode) jsonNode;
+            map.put(currentPath, booleanNode.asBoolean());
+        } else {
+            throw new JsonTypeException("Warning: JSON contains type not supported by the flatten method.");
+        }
+    }
+    public static class JsonTypeException extends Exception {
+        public JsonTypeException(String errorMessage) {
+            super(errorMessage);
+        }
     }
 
     @Nullable
@@ -142,6 +209,14 @@ public class JsonPathCodec extends AbstractCodec {
                     "Message source",
                     "yourapi",
                     "What to use as source field of the resulting message.",
+                    ConfigurationField.Optional.NOT_OPTIONAL
+            ));
+
+            r.addField(new TextField(
+                    CK_MODE,
+                    "Message mode",
+                    "jsonpath",
+                    "Can be \"jsonpath\" or \"jsonfull\". Has to be set.",
                     ConfigurationField.Optional.NOT_OPTIONAL
             ));
 
