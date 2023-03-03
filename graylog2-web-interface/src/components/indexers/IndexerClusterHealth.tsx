@@ -92,7 +92,7 @@ const IndexerClusterHealth = ({ minimal }: Props) => {
         {!minimal && (
           <Header>
             <h2>Elasticsearch cluster</h2>
-            <DocumentationLink page={DocsHelper.PAGES.CONFIGURING_ES} text="Indexer failures documentation" displayIcon />
+            <DocumentationLink page={DocsHelper.PAGES.CONFIGURING_ES} text="Elasticsearch setup documentation" displayIcon />
           </Header>
         )}
 
