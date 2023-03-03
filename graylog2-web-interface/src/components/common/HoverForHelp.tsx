@@ -42,8 +42,8 @@ const StyledPopover = styled(Popover)(({ theme }) => css`
 `);
 
 const StyledIcon = styled(Icon)<{ $type: Type, $displayLeftMargin: boolean }>(({ theme, $type, $displayLeftMargin }) => css`
-  color: ${$type === "error" ? theme.colors.variant.danger : "inherit"};
-  margin-left: ${$displayLeftMargin ? "0.3em" : 0};
+  color: ${$type === 'error' ? theme.colors.variant.danger : 'inherit'};
+  margin-left: ${$displayLeftMargin ? '0.3em' : 0};
 `);
 
 const iconName = (type: Type) => {

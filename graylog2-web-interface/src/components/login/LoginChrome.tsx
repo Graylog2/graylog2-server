@@ -82,7 +82,7 @@ const WelcomeMessage = styled.strong(({ theme }) => css`
 `);
 
 const BrandName = styled.h3(({ theme }) => css`
-  color: ${theme.colors.gray["60"]};
+  color: ${theme.colors.gray['60']};
   font-size: 1.5rem;
   line-height: 2rem;
 `);
