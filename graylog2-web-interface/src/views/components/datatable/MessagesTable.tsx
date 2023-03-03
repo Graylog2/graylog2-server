@@ -123,7 +123,7 @@ const StyledTable = styled(Table)(({ theme, $stickyHeader, $borderedHeader }: { 
     margin-right: 0;
   }
 
-  tr.message-detail-row div[class*="col-"] {
+  tr.message-detail-row div[class*='col-'] {
     padding-right: 0;
   }
 
