@@ -17,6 +17,7 @@
 import React from 'react';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import * as Immutable from 'immutable';
 
 import {
   mockedMappedAggregation,
@@ -24,6 +25,12 @@ import {
   mockEventDefinition,
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import UseCreateViewForEvent from 'views/logic/views/UseCreateViewForEvent';
+import View from 'views/logic/views/View';
+import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
+import QueryGenerator from 'views/logic/queries/QueryGenerator';
+import Search from 'views/logic/search/Search';
+import { AbsoluteTimeRange } from 'views/logic/queries/Query';
+import ViewState from 'views/logic/views/ViewState';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -44,8 +51,33 @@ describe('useEventById', () => {
   });
 
   it('should run fetch and store mapped response', async () => {
+    const eventData = mockEventData.event;
     const { result } = renderHook(() => UseCreateViewForEvent({ eventData: mockEventData.event, eventDefinition: mockEventDefinition, aggregations: mockedMappedAggregation }), { wrapper });
+    const query = QueryGenerator(eventData.replay_info.streams, undefined, {
+      type: 'absolute',
+      from: eventData?.replay_info?.timerange_start,
+      to: eventData?.replay_info?.timerange_end,
+    }, {
+      type: 'elasticsearch',
+      query_string: eventData?.replay_info?.query || '',
+    });
+    const search = Search.create().toBuilder().queries([query]).build();
 
-    expect(result.current).toEqual({});
+    // const titles =
+
+    expect(result.current).toEqual(UpdateSearchForWidgets(View.create()
+      .toBuilder()
+      .newId()
+      .type(View.Type.Search)
+      .state({
+        [query.id]: ViewState.create()
+          .toBuilder()
+          .titles(titles)
+          .widgets(Immutable.List(widgets))
+          .widgetPositions(positions)
+          .build(),
+      })
+      .search(search)
+      .build()));
   });
 });

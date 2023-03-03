@@ -15,15 +15,51 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import { renderHook } from 'wrappedTestingLibrary/hooks';
+import * as Immutable from 'immutable';
+
 import type { EventType } from 'hooks/useEventById';
 import type { EventDefinition } from 'logic/alerts/types';
 import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
+import UseCreateViewForEvent from 'views/logic/views/UseCreateViewForEvent';
+import QueryGenerator from 'views/logic/queries/QueryGenerator';
+import Search from 'views/logic/search/Search';
+import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
+import View from 'views/logic/views/View';
+import ViewState from 'views/logic/views/ViewState';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 export const mockEventData = {
   event: {
     alert: true,
     id: 'event-id-1',
     event_definition_id: 'event-definition-id-1',
+    event_definition_type: 'aggregation-v1',
+    origin_context: null,
+    timestamp: '2023-03-02T13:43:21.266Z',
+    timestamp_processing: '2023-03-02T13:43:21.906Z',
+    timerange_start: '2023-03-02T13:42:21.266Z',
+    timerange_end: '2023-03-02T13:43:21.266Z',
+    streams: [
+      '002',
+    ],
+    source_streams: [
+      '001',
+    ],
+    message: 'message',
+    source: '',
+    key_tuple: [],
+    key: null,
+    priority: 2,
+    fields: {},
+    replay_info: {
+      timerange_start: '2023-03-02T13:42:21.266Z',
+      timerange_end: '2023-03-02T13:43:21.266Z',
+      query: 'http_method: GET',
+      streams: [
+        '001',
+      ],
+    },
 
   } as EventType,
 };
@@ -126,3 +162,45 @@ export const mockedMappedAggregation: Array<EventDefinitionAggregation> = [
     field: 'field2',
   },
 ];
+
+const eventData = mockEventData.event;
+const query = QueryGenerator(eventData.replay_info.streams, undefined, {
+  type: 'absolute',
+  from: eventData?.replay_info?.timerange_start,
+  to: eventData?.replay_info?.timerange_end,
+}, {
+  type: 'elasticsearch',
+  query_string: eventData?.replay_info?.query || '',
+});
+const search = Search.create().toBuilder().queries([query]).build();
+
+// const titles =
+
+export const mockedView = UpdateSearchForWidgets(View.create()
+  .toBuilder()
+  .newId()
+  .type(View.Type.Search)
+  .state({
+    [query.id]: ViewState.create()
+      .toBuilder()
+      .titles({
+        widget: {
+          'mc-widget-id': 'Message Count',
+          'allm-widget-id': 'All Messages',
+          'field1-widget-id': 'count(field1) > 500',
+          'field2-widget-id': 'count(field2) < 8000',
+          'summary-widget-id': 'Summary:  count(field1) > 500 count(field2) < 8000',
+        },
+      })
+      .widgets(Immutable.List(widgets))
+      .widgetPositions({
+        'mc-widget-id': new WidgetPosition(1, 10, 2, Infinity),
+        'allm-widget-id': new WidgetPosition(1, 12, 6, Infinity),
+        'field1-widget-id': new WidgetPosition(1, 7, 3, Infinity),
+        'field2-widget-id': new WidgetPosition(7, 7, 3, Infinity),
+        'summary-widget-id': new WidgetPosition(1, 1, 3, Infinity),
+      })
+      .build(),
+  })
+  .search(search)
+  .build());

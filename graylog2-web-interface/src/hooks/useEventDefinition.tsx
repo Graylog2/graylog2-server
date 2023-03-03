@@ -87,7 +87,7 @@ const eventDefinitionDataMapper = (data: EventDefinition): { eventDefinition: Ev
 });
 
 const fetchDefinition = (definitionId: string) => {
-  return fetch('GET', `${definitionsUrl}/${definitionId}`).then(eventDefinitionDataMapper);
+  return fetch('GET', definitionsUrl(definitionId)).then(eventDefinitionDataMapper);
 };
 
 const useEventDefinition = (definitionId: string): {
