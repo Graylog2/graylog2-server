@@ -82,7 +82,7 @@ export type BooleanField = {
   type: 'boolean',
 };
 
-export type FieldValue = string | number | boolean | void
+export type FieldValue = string | number | boolean | void | Array<string>
 
 export type EncryptedFieldValue<Value> = {
   set_value?: Value,
@@ -95,3 +95,11 @@ export const FIELD_TYPES_WITH_ENCRYPTION_SUPPORT = ['text'] as const;
 export type ConfigurationFieldWithEncryption = TextField;
 
 export type ConfigurationField = BooleanField | DropdownField | ListField | NumberField | TextField;
+
+export type ConfigurationFieldValue = FieldValue | EncryptedFieldValue<FieldValue>
+
+export type ConfigurationFormData<Configuration> = {
+  title?: string,
+  type?: string,
+  configuration: Configuration | {},
+}

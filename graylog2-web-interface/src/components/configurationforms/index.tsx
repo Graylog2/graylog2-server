@@ -24,3 +24,5 @@ export { default as ListField } from './ListField';
 export { default as NumberField } from './NumberField';
 export { default as TextField } from './TextField';
 export { default as TitleField } from './TitleField';
+
+export type { ConfigurationFormData, ConfigurationFieldValue } from './types';

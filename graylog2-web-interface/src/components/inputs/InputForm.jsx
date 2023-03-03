@@ -64,7 +64,9 @@ class InputForm extends React.Component {
 
   // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => {
-    this.configurationForm.current.open();
+    if (this.configurationForm.current) {
+      this.configurationForm.current.open();
+    }
   };
 
   getValues = () => {
@@ -74,7 +76,7 @@ class InputForm extends React.Component {
       return values;
     }
 
-    if (this.configurationForm && this.configurationForm.current) {
+    if (this.configurationForm.current) {
       return this.configurationForm.current.getValue().configuration;
     }
 
@@ -88,7 +90,7 @@ class InputForm extends React.Component {
       return titleValue;
     }
 
-    if (this.configurationForm && this.configurationForm.current) {
+    if (this.configurationForm.current) {
       return this.configurationForm.current.getValue().titleValue;
     }
 

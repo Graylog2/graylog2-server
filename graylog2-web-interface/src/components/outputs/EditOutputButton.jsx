@@ -50,7 +50,10 @@ class EditOutputButton extends React.Component {
 
     getTypeDefinition(output.type, (definition) => {
       this.setState({ typeDefinition: definition.requested_configuration });
-      this.configurationForm.current.open();
+
+      if (this.configurationForm.current) {
+        this.configurationForm.current.open();
+      }
     });
   };
 
@@ -72,7 +75,7 @@ class EditOutputButton extends React.Component {
                            configFields={typeDefinition}
                            title={`Editing Output ${output.title}`}
                            typeName={output.type}
-                           helpBlock="Select a name of your new output that describes it."
+                           titleHelpText="Select a name of your new output that describes it."
                            submitAction={this._handleSubmit}
                            submitButtonText="Update output"
                            values={output.configuration}

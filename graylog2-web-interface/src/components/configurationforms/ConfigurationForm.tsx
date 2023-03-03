@@ -23,30 +23,36 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { ConfigurationFormField, TitleField } from 'components/configurationforms';
 
 import { FIELD_TYPES_WITH_ENCRYPTION_SUPPORT } from './types';
-import type { ConfigurationField, ConfigurationFieldWithEncryption } from './types';
+import type { ConfigurationFormData, ConfigurationField, ConfigurationFieldValue, ConfigurationFieldWithEncryption } from './types';
 
-type Props = {
+type Props<Configuration extends object> = {
   cancelAction: () => void,
   configFields?: {
     [key: string]: ConfigurationField,
   },
-  children: React.ReactNode | null,
-  helpBlock: React.ReactNode | null,
+  children?: React.ReactNode,
+  titleHelpText?: string,
   includeTitleField: boolean,
-  submitAction: (data: any) => void,
+  submitAction: (data: ConfigurationFormData<Configuration>) => void,
   title: string | React.ReactNode | null,
   titleValue: string,
   typeName?: string,
   values: { [key:string]: any },
-  wrapperComponent: React.ComponentType<any>,
+  wrapperComponent: React.ComponentType<{
+    show: boolean,
+    title: string | React.ReactNode | null,
+    onCancel: () => void,
+    onSubmitForm: () => void,
+    submitButtonText: string
+  }>,
   submitButtonText: string,
 }
 
-const ConfigurationForm = forwardRef<{}, Props>(({
+const ConfigurationForm = forwardRef(<Configuration extends object>({
   cancelAction,
   configFields,
   children,
-  helpBlock,
+  titleHelpText,
   includeTitleField,
   submitAction,
   title,
@@ -55,18 +61,11 @@ const ConfigurationForm = forwardRef<{}, Props>(({
   values: initialValues,
   wrapperComponent: WrapperComponent,
   submitButtonText,
-} : Props, ref: typeof ConfigurationForm) => {
+} : Props<Configuration>, ref: typeof ConfigurationForm) => {
   const [showConfigurationModal, setShowConfigurationModal] = useState(false);
   const [titleValue, setTitleValue] = useState(undefined);
   const [values, setValues] = useState<{[key:string]: any} | undefined>(undefined);
   const [fieldStates, setFieldStates] = useState<{[key:string]: any} | undefined>({});
-  const [submitted, setSubmitted] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (!titleValue) {
-      setTitleValue(initialTitleValue);
-    }
-  }, [titleValue, initialTitleValue]);
 
   useEffect(() => {
     const defaultValues = {};
@@ -77,19 +76,13 @@ const ConfigurationForm = forwardRef<{}, Props>(({
       });
     }
 
-    if (submitted) {
-      setValues({ ...defaultValues, ...initialValues });
-    } else {
-      setValues({ ...defaultValues, ...initialValues, ...values });
-    }
-  }, [configFields, initialValues, submitted, values]);
+    setValues({ ...defaultValues, ...initialValues });
+    setTitleValue(initialTitleValue);
+    setFieldStates({});
+  }, [showConfigurationModal, configFields, initialValues, initialTitleValue]);
 
-  const getValue = () => {
-    const data: {
-      title?: string,
-      type?: string,
-      configuration?: {[key:string]: any}
-    } = {
+  const getFormData = (): ConfigurationFormData<Configuration> => {
+    const data: ConfigurationFormData<Configuration> = {
       type: typeName,
       configuration: {},
     };
@@ -105,12 +98,6 @@ const ConfigurationForm = forwardRef<{}, Props>(({
 
     return data;
   };
-
-  useImperativeHandle(ref, () => ({
-    getValue() {
-      getValue();
-    },
-  }));
 
   const sortByPosOrOptionality = (x1, x2) => {
     const DEFAULT_POSITION = 100; // corresponds to ConfigurationField.java
@@ -145,7 +132,7 @@ const ConfigurationForm = forwardRef<{}, Props>(({
     return (configField as ConfigurationFieldWithEncryption).is_encrypted;
   };
 
-  const handleEncryptedFieldsBeforeSubmit = (data) => {
+  const handleEncryptedFieldsBeforeSubmit = (data): ConfigurationFormData<Configuration> => {
     const oldConfiguration = data.configuration;
 
     const newConfiguration = {};
@@ -154,7 +141,7 @@ const ConfigurationForm = forwardRef<{}, Props>(({
       const configField = configFields[fieldName as string];
       const fieldState = fieldStates[fieldName as string];
 
-      if (fieldIsEncrypted(configField) && !fieldState.dirty && fieldValue && fieldValue.is_set !== undefined) {
+      if (fieldIsEncrypted(configField) && !fieldState?.dirty && fieldValue && fieldValue.is_set !== undefined) {
         newConfiguration[fieldName] = { keep_value: true };
       }
     });
@@ -171,11 +158,10 @@ const ConfigurationForm = forwardRef<{}, Props>(({
   };
 
   const save = () => {
-    const data = getValue();
+    const data = getFormData();
 
     submitAction(handleEncryptedFieldsBeforeSubmit(data));
 
-    setSubmitted(true);
     setShowConfigurationModal(false);
   };
 
@@ -183,18 +169,21 @@ const ConfigurationForm = forwardRef<{}, Props>(({
     open() {
       setShowConfigurationModal(true);
     },
+    getValue() {
+      return getFormData();
+    },
   }));
 
   const handleTitleChange = (_, value) => {
     setTitleValue(value);
   };
 
-  const handleChange = (field: string, value) => {
+  const handleChange = (field: string, value: ConfigurationFieldValue) => {
     setValues({ ...values, ...{ [field]: value } });
     setFieldStates({ ...fieldStates, ...{ [field]: { dirty: true } } });
   };
 
-  const renderConfigField = (configField, key, autoFocus, buttonAfter = null) => {
+  const renderConfigField = (configField, key, autoFocus) => {
     if (!values) return null;
     const value = values[key];
 
@@ -205,8 +194,7 @@ const ConfigurationForm = forwardRef<{}, Props>(({
                               configKey={key}
                               configValue={value}
                               autoFocus={autoFocus}
-                              buttonAfter={buttonAfter}
-                              dirty={fieldStates[key].dirty}
+                              dirty={fieldStates[key]?.dirty}
                               onChange={handleChange} />
     );
   };
@@ -220,7 +208,7 @@ const ConfigurationForm = forwardRef<{}, Props>(({
                   typeName={typeName}
                   value={titleValue}
                   onChange={handleTitleChange}
-                  helpBlock={helpBlock} />
+                  helpText={titleHelpText} />
     );
 
     shouldAutoFocus = false;
@@ -260,7 +248,7 @@ ConfigurationForm.propTypes = {
   cancelAction: PropTypes.func,
   configFields: PropTypes.object,
   children: PropTypes.node,
-  helpBlock: PropTypes.node,
+  titleHelpText: PropTypes.string,
   includeTitleField: PropTypes.bool,
   submitAction: PropTypes.func.isRequired,
   title: PropTypes.node,
@@ -275,7 +263,7 @@ ConfigurationForm.defaultProps = {
   cancelAction: () => {},
   configFields: undefined,
   children: null,
-  helpBlock: null,
+  titleHelpText: '',
   title: null,
   includeTitleField: true,
   titleValue: '',

@@ -46,7 +46,7 @@ class CreateOutputDropdown extends React.Component {
   }
 
   _openModal = () => {
-    if (this.state.typeName !== this.PLACEHOLDER && this.state.typeName !== '') {
+    if (this.state.typeName !== this.PLACEHOLDER && this.state.typeName !== '' && this.configurationForm.current) {
       this.configurationForm.current.open();
     }
   };
@@ -79,7 +79,7 @@ class CreateOutputDropdown extends React.Component {
                            key="configuration-form-output"
                            configFields={this.state.typeDefinition}
                            title="Create new Output"
-                           helpBlock="Select a name of your new output that describes it."
+                           titleHelpText="Select a name of your new output that describes it."
                            typeName={this.state.typeName}
                            submitButtonText="Create output"
                            submitAction={this.props.onSubmit} />
