@@ -145,7 +145,7 @@ const StyledTable = styled(Table)(({ theme, $stickyHeader, $borderedHeader }: { 
   
   @media print {
     tr.fields-row > td {
-      min-width: 0px;
+      min-width: 0;
     }
   }
 `);
