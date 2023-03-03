@@ -84,8 +84,7 @@ public class IndexSetConfigFactory {
                 .indexAnalyzer(elasticsearchConfiguration.getAnalyzer())
                 .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
                 .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
-                .fieldTypeRefreshInterval(Duration.millis(
-                        elasticsearchConfiguration.getIndexFieldTypePeriodicalFullRefreshInterval().toMilliseconds()));
+                .fieldTypeRefreshInterval(IndexSetConfig.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL);
     }
 
     private static ZonedDateTime getCreationDate() {

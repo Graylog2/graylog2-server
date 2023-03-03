@@ -28,7 +28,7 @@ const Wrapper = styled.div(({ theme }) => css`
     margin-bottom: 0;
   }
 
-  div[class^="col-"] {
+  div[class^='col-'] {
     padding-right: 0;
     padding-left: 0;
   }
@@ -73,17 +73,17 @@ const Header = styled.div(({ theme, $isEmpty }: { theme: DefaultTheme, $isEmpty:
   z-index: 1;
   
   ::before {
-    content: " ";
+    content: ' ';
     top: 50%;
     width: 100%;
-    border-bottom: 1px solid ${$isEmpty ? theme.colors.gray["70"] : theme.utils.contrastingColor(theme.colors.global.contentBackground, "AA")};
+    border-bottom: 1px solid ${$isEmpty ? theme.colors.gray['70'] : theme.utils.contrastingColor(theme.colors.global.contentBackground, 'AA')};
     position: absolute;
   }
 `);
 
 const ElementTitle = styled.div(({ theme, $isEmpty }: { theme: DefaultTheme, $isEmpty: boolean }) => css`
   background-color: ${theme.colors.global.contentBackground};
-  color: ${$isEmpty ? theme.colors.gray["70"] : theme.colors.global.textDefault};
+  color: ${$isEmpty ? theme.colors.gray['70'] : theme.colors.global.textDefault};
   z-index: 1;
   padding-right: 8px;
 `);

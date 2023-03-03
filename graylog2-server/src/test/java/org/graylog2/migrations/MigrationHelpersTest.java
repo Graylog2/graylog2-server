@@ -19,6 +19,9 @@ package org.graylog2.migrations;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.DuplicateKeyException;
+import org.graylog.testing.TestUserService;
+import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
@@ -30,6 +33,7 @@ import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.UserImpl;
+import org.graylog2.users.UserServiceImpl;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Rule;
@@ -40,8 +44,10 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -52,6 +58,9 @@ import static org.mockito.Mockito.when;
 public class MigrationHelpersTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
+
+    @Rule
+    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Mock
     public UserService userService;
@@ -208,7 +217,7 @@ public class MigrationHelpersTest {
         existingUser.setPassword("password");
         existingUser.setEmail("test@example.com");
         existingUser.setTimeZone(DateTimeZone.UTC);
-        existingUser.setRoleIds(ImmutableSet.of()); // Set invalid role IDs so the use gets updated
+        existingUser.setRoleIds(ImmutableSet.of()); // Set invalid role IDs so the user gets updated
 
         when(userService.load("test-user")).thenReturn(existingUser);
         when(userService.save(any(User.class))).thenReturn("new-id");
@@ -250,6 +259,24 @@ public class MigrationHelpersTest {
                                                "test@example.com", ImmutableSet.of("54e3deadbeefdeadbeef0001",
                                                                                    "54e3deadbeefdeadbeef0002")))
                 .isNull();
+    }
+
+    @Test
+    @MongoDBFixtures("duplicated-users.json")
+    public void ensureUserWithDuplicates() throws ValidationException {
+
+        final TestUserService testUserService = new TestUserService(mongodb.mongoConnection());
+        migrationHelpers = new MigrationHelpers(roleService, testUserService);
+
+        assertThat(testUserService.loadAll()).hasSize(2);
+        assertThatThrownBy(() -> testUserService.load("test-user")).isInstanceOf(UserServiceImpl.DuplicateUserException.class);
+
+        assertThat(migrationHelpers.ensureUser("test-user", "pass", "Test", "User",
+                "test@example.com", Set.of()))
+                .isEqualTo("5b8e4ef17ad37b64ee87eb57");
+
+        assertThat(testUserService.load("test-user")).isNotNull();
+        assertThat(testUserService.loadAll()).hasSize(2);
     }
 
     private User newUser(Permissions permissions) {
