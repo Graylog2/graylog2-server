@@ -93,7 +93,7 @@ public class DatanodeSecuritySetupIT {
         waitForOpensearchAvailableStatus(backend.getDatanodeRestPort());
 
         given()
-                .auth().basic("admin", "admin")
+                .auth().preemptive().basic("admin", "admin")
                 .trustStore(buildTruststore(httpCert, "password"))
                 .get("https://localhost:" + backend.getOpensearchRestPort())
                 .then().assertThat()
