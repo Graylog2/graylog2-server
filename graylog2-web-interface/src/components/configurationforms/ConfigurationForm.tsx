@@ -255,7 +255,7 @@ ConfigurationForm.propTypes = {
 
 ConfigurationForm.defaultProps = {
   cancelAction: () => {},
-  configFields: undefined,
+  configFields: {},
   children: null,
   titleHelpText: '',
   title: null,
