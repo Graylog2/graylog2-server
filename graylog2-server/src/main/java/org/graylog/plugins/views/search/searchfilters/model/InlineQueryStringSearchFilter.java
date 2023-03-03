@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.searchfilters.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -35,6 +36,7 @@ public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter,
     public abstract String title();
 
     @JsonProperty(ID_FIELD)
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
     public abstract Optional<String> id();
 
     @JsonProperty(DESCRIPTION_FIELD)
