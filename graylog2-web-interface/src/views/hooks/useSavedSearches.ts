@@ -53,7 +53,7 @@ const fetchSavedSearches = (searchParams: SearchParams) => {
 
 const useSavedSearches = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
   data: {
-    list: Array<View>,
+    list: Readonly<Array<View>>,
     pagination: { total: number },
     attributes: Array<Attribute>,
   } | undefined,
