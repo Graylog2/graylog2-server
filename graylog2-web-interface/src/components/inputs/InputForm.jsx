@@ -20,6 +20,8 @@ import jQuery from 'jquery';
 
 import { NodeOrGlobalSelect } from 'components/inputs';
 import { ConfigurationForm } from 'components/configurationforms';
+import HideOnCloud from 'util/conditional/HideOnCloud';
+import AppConfig from 'util/AppConfig';
 
 class InputForm extends React.Component {
   static propTypes = {
@@ -55,8 +57,10 @@ class InputForm extends React.Component {
   };
 
   _onSubmit = (data) => {
-    const newData = jQuery.extend(data, { global: this.state.global, node: this.state.node });
-
+    const newData = jQuery.extend(data, {
+      global: AppConfig.isCloud() || this.state.global,
+      node: this.state.node,
+    });
     this.props.submitAction(newData);
   };
 
@@ -103,7 +107,9 @@ class InputForm extends React.Component {
                          values={values}
                          titleValue={titleValue}
                          submitAction={this._onSubmit}>
-        <NodeOrGlobalSelect onChange={this._handleChange} global={this.state.global} node={this.state.node} />
+        <HideOnCloud>
+          <NodeOrGlobalSelect onChange={this._handleChange} global={this.state.global} node={this.state.node} />
+        </HideOnCloud>
       </ConfigurationForm>
     );
   }

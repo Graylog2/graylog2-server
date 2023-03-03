@@ -168,7 +168,7 @@ public class Server extends ServerBootstrap {
                 new RetentionStrategyBindings(),
                 new PeriodicalBindings(),
                 new ObjectMapperModule(chainingClassLoader),
-                new RestApiBindings(),
+                new RestApiBindings(configuration),
                 new PasswordAlgorithmBindings(),
                 new DecoratorBindings(),
                 new AuditBindings(),
