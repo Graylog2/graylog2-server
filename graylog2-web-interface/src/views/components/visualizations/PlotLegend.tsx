@@ -43,7 +43,7 @@ const ColorHint = styled.div(({ color }) => `
 const Container = styled.div`
   display: grid;
   grid-template: 4fr auto / 1fr;
-  grid-template-areas: "." ".";
+  grid-template-areas: '.' '.';
   height: 100%;
 `;
 
