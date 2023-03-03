@@ -40,8 +40,11 @@ type Props = {
     email: $PropertyType<User, 'email'>,
   }) => Promise<void>,
 };
+
 const StyledReadOnlyFormGroup = styled(ReadOnlyFormGroup)`
-  padding-bottom: 15px;
+  :not(:last-child) {
+    margin-bottom: 15px;
+  }
 `;
 
 const ProfileSection = ({
@@ -58,11 +61,11 @@ const ProfileSection = ({
 
   const _getUserNameGroup = () => {
     if (isCloud) {
-      return <ReadOnlyFormGroup label="Email" value={email} />;
+      return <StyledReadOnlyFormGroup label="Email" value={email} />;
     }
 
     return (
-      <ReadOnlyFormGroup label="Username" value={username} />
+      <StyledReadOnlyFormGroup label="Username" value={username} />
     );
   };
 

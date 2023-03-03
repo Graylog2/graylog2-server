@@ -91,6 +91,7 @@ public class ConfigurationRequest {
             config.put("attributes", f.getAttributes());
             config.put("additional_info", f.getAdditionalInformation());
             config.put("position", f.getPosition());
+            config.put("is_encrypted", f.isEncrypted());
 
             configs.put(f.getName(), config);
         }
@@ -104,6 +105,14 @@ public class ConfigurationRequest {
                 final String type = field.getFieldType();
                 final String fieldName = field.getName();
                 log.debug("Checking for mandatory field \"{}\" of type {} in configuration", fieldName, type);
+
+                if (field.isEncrypted()) {
+                    if (!configuration.encryptedValueIsSet(fieldName)) {
+                        throw new ConfigurationException("Mandatory configuration field \"" + fieldName + "\" is missing or has the wrong data type");
+                    }
+                    continue;
+                }
+
                 switch (type) {
                     case BooleanField.FIELD_TYPE:
                         if (!configuration.booleanIsSet(fieldName)) {

@@ -34,7 +34,7 @@ import VisualizationElement from './VisualizationElement';
 import ElementConfigurationContainer from '../ElementConfigurationContainer';
 
 const EventAnnotationCheckbox = styled(Checkbox)`
-  input[type="checkbox"] {
+  input[type='checkbox'] {
     margin-right: 0;
     right: 0;
   }
