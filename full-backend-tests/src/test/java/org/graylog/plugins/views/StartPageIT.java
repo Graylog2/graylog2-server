@@ -76,7 +76,7 @@ public class StartPageIT {
         final String defaultIndexSetId = api.indices().defaultIndexSetId();
         var stream1Id = api.streams().createStream("Stream #1", defaultIndexSetId, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream1", "target_stream", false));
 
-        var validatableResponse = api.get("/startpage/recentActivity", Users.LOCAL_ADMIN, Map.of(), 200).log().body();
+        var validatableResponse = api.get("/startpage/recentActivity", Users.LOCAL_ADMIN, Map.of(), 200);
         validatableResponse.assertThat().body("recentActivity[0].item_id", equalTo(stream1Id));
     }
 }

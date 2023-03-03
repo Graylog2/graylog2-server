@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources;
 
+import org.graylog2.Configuration;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.resources.cluster.ClusterDeflectorResource;
 import org.graylog2.rest.resources.cluster.ClusterInputStatesResource;
@@ -98,6 +99,12 @@ import org.graylog2.rest.resources.tools.SubstringTesterResource;
 import org.graylog2.rest.resources.users.UsersResource;
 
 public class RestResourcesModule extends Graylog2Module {
+    private final Configuration configuration;
+
+    public RestResourcesModule(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
     @Override
     protected void configure() {
         addAuthResources();
@@ -189,7 +196,6 @@ public class RestResourcesModule extends Graylog2Module {
 
     private void addProcessingResources() {
         addSystemRestResource(GrokResource.class);
-        addSystemRestResource(ExtractorsResource.class);
         addSystemRestResource(InputsResource.class);
         addSystemRestResource(InputStatesResource.class);
         addSystemRestResource(StaticFieldsResource.class);
@@ -209,6 +215,9 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(RegexTesterResource.class);
         addSystemRestResource(SplitAndIndexTesterResource.class);
         addSystemRestResource(SubstringTesterResource.class);
+        if (!configuration.isCloud()) {
+            addSystemRestResource(ExtractorsResource.class);
+        }
     }
 
     private void addStreamsResources() {

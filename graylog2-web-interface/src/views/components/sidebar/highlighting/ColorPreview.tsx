@@ -42,7 +42,7 @@ export const GradientColorPreview = styled(ColorPreviewBase)(({ gradient }: { gr
 
   return css`
       border: none;
-      background: linear-gradient(0deg, ${colors.map((color, idx) => `${color} ${idx * (100 / colors.length)}%`).join(", ")});
+      background: linear-gradient(0deg, ${colors.map((color, idx) => `${color} ${idx * (100 / colors.length)}%`).join(', ')});
 `;
 });
 
