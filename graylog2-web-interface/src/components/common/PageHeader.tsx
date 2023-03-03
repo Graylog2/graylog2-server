@@ -51,7 +51,7 @@ const LifecycleIndicatorContainer = styled.span(({ theme }) => css`
 const TopActions = styled.div<{ $hasMultipleChildren: boolean }>(({ $hasMultipleChildren }) => css`
   display: flex;
   gap: 10px;
-  align-items: ${$hasMultipleChildren ? "center" : "flex-start"};
+  align-items: ${$hasMultipleChildren ? 'center' : 'flex-start'};
 `);
 
 const Actions = styled.div`

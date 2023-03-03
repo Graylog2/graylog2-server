@@ -78,7 +78,7 @@ const MessageDetailRow = styled.tr`
     margin-right: 0;
   }
 
-  div[class*="col-"] {
+  div[class*='col-'] {
     padding-right: 0;
   }
 `;
