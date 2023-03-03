@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import $ from 'jquery';
 import PropTypes from 'prop-types';
 import * as React from 'react';
 import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
@@ -23,7 +22,7 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { ConfigurationFormField, TitleField } from 'components/configurationforms';
 
 import { FIELD_TYPES_WITH_ENCRYPTION_SUPPORT } from './types';
-import type { ConfigurationFormData, ConfigurationField, ConfigurationFieldValue, ConfigurationFieldWithEncryption } from './types';
+import type { ConfigurationFormData, ConfigurationField, ConfigurationFieldValue, EncryptedFieldValue, FieldValue, ConfigurationFieldWithEncryption } from './types';
 
 type Props<Configuration extends object> = {
   cancelAction: () => void,
@@ -91,9 +90,8 @@ const ConfigurationForm = forwardRef(<Configuration extends object>({
       data.title = titleValue;
     }
 
-    $.map(configFields, (_, name) => {
-      // Replace undefined with null, as JSON.stringify will leave out undefined fields from the DTO sent to the server
-      data.configuration[name] = (values[name] === undefined ? null : values[name]);
+    Object.keys(configFields).forEach((fieldName) => {
+      data.configuration[fieldName] = (values[fieldName] === undefined ? null : values[fieldName]);
     });
 
     return data;
@@ -133,20 +131,18 @@ const ConfigurationForm = forwardRef(<Configuration extends object>({
   };
 
   const handleEncryptedFieldsBeforeSubmit = (data): ConfigurationFormData<Configuration> => {
-    const oldConfiguration = data.configuration;
-
-    const newConfiguration = {};
-
-    $.map(oldConfiguration, (fieldValue, fieldName) => {
+    const configurationEntries = Object.entries(data.configuration).map(([fieldName, fieldValue] : [string, ConfigurationFieldValue]) => {
       const configField = configFields[fieldName as string];
       const fieldState = fieldStates[fieldName as string];
 
-      if (fieldIsEncrypted(configField) && !fieldState?.dirty && fieldValue && fieldValue.is_set !== undefined) {
-        newConfiguration[fieldName] = { keep_value: true };
+      if (fieldIsEncrypted(configField) && !fieldState?.dirty && fieldValue && (fieldValue as EncryptedFieldValue<FieldValue>).is_set !== undefined) {
+        return [fieldName, { keep_value: true }];
       }
+
+      return [fieldName, fieldValue];
     });
 
-    return { ...data, configuration: { ...oldConfiguration, ...newConfiguration } };
+    return { ...data, configuration: Object.fromEntries(configurationEntries) };
   };
 
   const handleCancel = () => {
@@ -214,11 +210,9 @@ const ConfigurationForm = forwardRef(<Configuration extends object>({
     shouldAutoFocus = false;
   }
 
-  const configFieldKeys = $.map(configFields, (_, name) => name)
-    .map((name, pos) => ({ name: name, pos: pos }))
-    .sort(sortByPosOrOptionality);
+  const sortedConfigFieldKeys = Object.keys(configFields).map((name, pos) => ({ name, pos })).sort(sortByPosOrOptionality);
 
-  const renderedConfigFields = configFieldKeys.map((key) => {
+  const renderedConfigFields = sortedConfigFieldKeys.map((key) => {
     const configField = renderConfigField(configFields[key.name], key.name, shouldAutoFocus);
 
     if (shouldAutoFocus) {
