@@ -72,12 +72,12 @@ public class AbstractInputsResource extends RestResource {
                         HashMap::new,
                         (map, entry) -> {
                             final ConfigurationField field = configurationRequest.getField(entry.getKey());
-                            if (field instanceof TextField && !Strings.isNullOrEmpty((String) entry.getValue())) {
+                            if (field instanceof TextField && entry.getValue() instanceof String s && !Strings.isNullOrEmpty(s)) {
                                 if (isPassword(field)) {
                                     map.put(entry.getKey(), "<password set>");
                                     return;
                                 }
-                                if (isSensitive(field)) {
+                                if (isEncrypted(field)) {
                                     map.put(entry.getKey(), "<value hidden>");
                                     return;
                                 }
@@ -92,7 +92,7 @@ public class AbstractInputsResource extends RestResource {
         return field.getAttributes().contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase(Locale.ENGLISH));
     }
 
-    private static boolean isSensitive(ConfigurationField field) {
+    private static boolean isEncrypted(ConfigurationField field) {
         return field.getAttributes().contains(TextField.Attribute.IS_SENSITIVE.toString().toLowerCase(Locale.ENGLISH));
     }
 }

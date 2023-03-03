@@ -21,8 +21,15 @@ import { alice } from 'fixtures/users';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import View from 'views/logic/views/View';
 import Widget from 'views/logic/widgets/Widget';
+import { createSearch } from 'fixtures/searches';
+import mockDispatch from 'views/test/mockDispatch';
+import type { RootState } from 'views/types';
+import { asMock } from 'helpers/mocking';
+import useAppDispatch from 'stores/useAppDispatch';
 
 import ActionMenuItem from './ActionMenuItem';
+
+jest.mock('stores/useAppDispatch');
 
 describe('ActionMenuItem', () => {
   const baseAction = {
@@ -53,6 +60,12 @@ describe('ActionMenuItem', () => {
     },
   };
 
+  beforeEach(() => {
+    const view = createSearch();
+    const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
+    asMock(useAppDispatch).mockReturnValue(dispatch);
+  });
+
   it('should display help text for actions with handler', () => {
     const action = {
       ...baseAction,
@@ -63,7 +76,7 @@ describe('ActionMenuItem', () => {
     render(<ActionMenuItem action={action}
                            handlerArgs={handlerArgs}
                            onMenuToggle={() => {}}
-                           overflowingComponents={<></>}
+                           overflowingComponents={{ foo: <span /> }}
                            setOverflowingComponents={() => {}}
                            type="value" />);
 
@@ -80,7 +93,7 @@ describe('ActionMenuItem', () => {
     render(<ActionMenuItem action={action}
                            handlerArgs={handlerArgs}
                            onMenuToggle={() => {}}
-                           overflowingComponents={<></>}
+                           overflowingComponents={{ foo: <span /> }}
                            setOverflowingComponents={() => {}}
                            type="value" />);
 

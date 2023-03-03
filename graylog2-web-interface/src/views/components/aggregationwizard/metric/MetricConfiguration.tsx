@@ -16,17 +16,16 @@
  */
 import * as React from 'react';
 import { Field, useFormikContext, getIn } from 'formik';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 import { defaultCompare } from 'logic/DefaultCompare';
 import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
-import { useStore } from 'stores/connect';
-import AggregationFunctionsStore from 'views/stores/AggregationFunctionsStore';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { InputOptionalInfo as Opt, FormikInput } from 'components/common';
 import { Properties } from 'views/logic/fieldtypes/FieldType';
+import useAggregationFunctions from 'views/hooks/useAggregationFunctions';
 
 import FieldSelect from '../FieldSelect';
 
@@ -42,10 +41,10 @@ const percentileOptions = [25.0, 50.0, 75.0, 90.0, 95.0, 99.0].map((value) => ({
 
 const Metric = ({ index }: Props) => {
   const metricFieldSelectRef = useRef(null);
-  const functions = useStore(AggregationFunctionsStore);
-  const functionOptions = Object.values(functions)
+  const { data: functions, isLoading } = useAggregationFunctions();
+  const functionOptions = useMemo(() => (isLoading ? [] : Object.values(functions)
     .map(({ type, description }) => ({ label: description, value: type }))
-    .sort(sortByLabel);
+    .sort(sortByLabel)), [functions, isLoading]);
 
   const { values: { metrics }, errors: { metrics: metricsError }, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
   const currentFunction = metrics[index].function;

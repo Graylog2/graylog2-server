@@ -23,12 +23,16 @@ import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
+import type _Widget from 'views/logic/widgets/Widget';
+import type { WidgetPositions } from 'views/types';
 
 export const createSearch = ({ searchId, queryId }: { searchId?: string, queryId?: string} = {}) => {
   const exampleSearchId = searchId ?? 'search-id-1';
   const exampleQueryId = queryId ?? 'query-id-1';
 
-  const viewState = ViewState.builder().build();
+  const viewState = ViewState.builder()
+    .titles(Map())
+    .build();
   const query = Query.builder().id(exampleQueryId).build();
   const searchSearch = Search.builder().queries([query]).id(exampleSearchId).build();
 
@@ -38,5 +42,19 @@ export const createSearch = ({ searchId, queryId }: { searchId?: string, queryId
     .state(Map({ [exampleQueryId]: viewState }))
     .id(exampleSearchId)
     .title('Search 1')
+    .build();
+};
+
+export const createViewWithWidgets = (widgets: Array<_Widget>, positions: WidgetPositions) => {
+  const view = createSearch();
+  const newViewState = view.state.get('query-id-1')
+    .toBuilder()
+    .widgets(widgets)
+    .widgetPositions(positions)
+    .build();
+
+  return view
+    .toBuilder()
+    .state(Map({ 'query-id-1': newViewState }))
     .build();
 };

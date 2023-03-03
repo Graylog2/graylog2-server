@@ -27,7 +27,7 @@ type Props = {
 };
 
 const StyledDropdownMenu = styled.ul.attrs(() => ({
-  className: 'dropdown-menu', /* stylelint-disable-line property-no-unknown */
+  className: 'dropdown-menu' /* stylelint-disable-line property-no-unknown*/
 }))<{ $show: boolean, $zIndex: number }>(({ $show, theme, $zIndex }) => css`
   display: ${$show ? 'block' : 'none'};
   min-width: max-content;

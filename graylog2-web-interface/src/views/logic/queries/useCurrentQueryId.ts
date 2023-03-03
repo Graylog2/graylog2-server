@@ -14,13 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useStore } from 'stores/connect';
-import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
+import useAppSelector from 'stores/useAppSelector';
+import { selectActiveQuery } from 'views/logic/slices/viewSelectors';
 
-const useCurrentQueryId = () => {
-  const { activeQuery } = useStore(CurrentViewStateStore);
-
-  return activeQuery;
-};
+const useCurrentQueryId = () => useAppSelector(selectActiveQuery);
 
 export default useCurrentQueryId;

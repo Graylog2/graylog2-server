@@ -32,7 +32,7 @@ import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import usePluginEntities from 'hooks/usePluginEntities';
 
-const Container = styled.div`;
+const Container = styled.div`
   margin-left: 5px;
   width: 25px;
   min-height: 34px;

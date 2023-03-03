@@ -24,8 +24,10 @@ import { Spinner } from 'components/common';
 
 const StyledForm: StyledComponent<'form', {}> = styled.form`
   margin-top: 10px;
+
   &.form-inline > .form-group {
     margin-right: 10px;
+
     > input {
       width: 300px;
     }

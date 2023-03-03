@@ -16,27 +16,33 @@
  */
 import Reflux from 'reflux';
 
-import SearchActions from 'views/actions/SearchActions';
 import { singletonActions, singletonStore } from 'logic/singleton';
 
 type RefreshActionsType = {
   enable: () => void,
   disable: () => void,
-  setInterval: (number) => void,
+  setInterval: (interval: number) => void,
+  refresh: () => Promise<unknown>,
 };
 
-export const RefreshActions: RefreshActionsType = singletonActions(
+export const RefreshActions = singletonActions(
   'views.Refresh',
-  () => Reflux.createActions([
-    'enable',
-    'disable',
-    'setInterval',
-  ] as const),
+  () => Reflux.createActions<RefreshActionsType>({
+    enable: { asyncResult: true },
+    disable: { asyncResult: true },
+    setInterval: { asyncResult: true },
+    refresh: { asyncResult: true },
+  }),
 );
+
+type RefreshConfig = {
+  interval: number,
+  enabled: boolean,
+};
 
 export const RefreshStore = singletonStore(
   'views.Refresh',
-  () => Reflux.createStore({
+  () => Reflux.createStore<RefreshConfig>({
     listenables: [RefreshActions],
 
     refreshConfig: {},
@@ -46,7 +52,7 @@ export const RefreshStore = singletonStore(
     init() {
       this.refreshConfig = {
         enabled: false,
-        interval: 1000,
+        interval: 5000,
       };
     },
 
@@ -54,24 +60,32 @@ export const RefreshStore = singletonStore(
       return this.refreshConfig;
     },
 
+    _scheduleRefresh() {
+      if (this.intervalId) {
+        clearInterval(this.intervalId);
+      }
+
+      if (this.refreshConfig.enabled) {
+        return setTimeout(async () => {
+          await RefreshActions.refresh();
+          this.intervalId = this._scheduleRefresh();
+        }, this.refreshConfig.interval);
+      }
+
+      return undefined;
+    },
+
     setInterval(interval: number) {
       this.refreshConfig = { interval, enabled: true };
 
-      if (this.intervalId) {
-        clearInterval(this.intervalId);
-        this.intervalId = undefined;
-      }
-
-      this.intervalId = setInterval(SearchActions.executeWithCurrentState, this.refreshConfig.interval);
+      this.intervalId = this._scheduleRefresh();
       this._trigger();
     },
 
     enable() {
       this.refreshConfig = { ...this.refreshConfig, enabled: true };
 
-      if (!this.intervalId) {
-        this.intervalId = setInterval(SearchActions.executeWithCurrentState, this.refreshConfig.interval);
-      }
+      this.intervalId = this._scheduleRefresh();
 
       this._trigger();
     },
@@ -79,10 +93,7 @@ export const RefreshStore = singletonStore(
     disable() {
       this.refreshConfig = { ...this.refreshConfig, enabled: false };
 
-      if (this.intervalId) {
-        clearInterval(this.intervalId);
-        this.intervalId = undefined;
-      }
+      this.intervalId = this._scheduleRefresh();
 
       this._trigger();
     },

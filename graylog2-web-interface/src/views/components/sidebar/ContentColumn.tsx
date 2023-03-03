@@ -67,7 +67,7 @@ const ContentGrid = styled.div(({ theme }) => css`
   height: 100%;
   overflow-y: auto;
 
-  padding: 5px 15px 0 15px;
+  padding: 5px 15px 0;
 
   color: ${theme.colors.global.textDefault};
 `);
@@ -113,7 +113,7 @@ const OverlayToggle = styled.div<{ sidebarIsPinned: boolean }>(({ theme, sidebar
 `);
 
 const HorizontalRule = styled.hr`
-  margin: 5px 0 10px 0;
+  margin: 5px 0 10px;
 `;
 
 const SectionTitle = styled.h2`

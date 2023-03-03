@@ -17,6 +17,7 @@
 package org.graylog2.configuration;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.migrations.MaintenanceStrategiesHelper;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -46,7 +47,7 @@ public class IndexSetsDefaultConfigurationFactory {
                 .replicas(elasticsearchConfiguration.getReplicas())
                 .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
                 .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
-                .fieldTypeRefreshInterval(elasticsearchConfiguration.getIndexFieldTypePeriodicalFullRefreshInterval().toSeconds())
+                .fieldTypeRefreshInterval(IndexSetConfig.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL.getStandardSeconds())
                 .fieldTypeRefreshIntervalUnit(TimeUnit.SECONDS)
                 .rotationStrategyClass(rotationConfig.left)
                 .rotationStrategyConfig(rotationConfig.right)

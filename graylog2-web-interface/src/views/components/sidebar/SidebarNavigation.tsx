@@ -66,7 +66,7 @@ const HorizontalRuleWrapper = styled.div`
 
   hr {
     border-color: currentColor;
-    margin: 5px 0 10px 0;
+    margin: 5px 0 10px;
   }
 `;
 

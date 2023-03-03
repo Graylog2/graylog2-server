@@ -18,6 +18,7 @@ import { sortBy, uniqBy } from 'lodash';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import type View from 'views/logic/views/View';
 
 import type {
   Editor,
@@ -43,6 +44,7 @@ export type CompleterContext = Readonly<{
   streams?: Array<string>,
   fieldTypes?: FieldTypes,
   userTimezone: string,
+  view: View,
 }>;
 
 export interface Completer {
@@ -67,12 +69,22 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
 
   private readonly userTimezone: string;
 
-  constructor(completers: Array<Completer>, timeRange: TimeRange | NoTimeRangeOverride | undefined, streams: Array<string>, fieldTypes: FieldTypes, userTimezone: string) {
+  private readonly view: View;
+
+  constructor(
+    completers: Array<Completer>,
+    timeRange: TimeRange | NoTimeRangeOverride | undefined,
+    streams: Array<string>,
+    fieldTypes: FieldTypes,
+    userTimezone: string,
+    view: View,
+  ) {
     this.completers = completers;
     this.timeRange = timeRange;
     this.streams = streams;
     this.fieldTypes = fieldTypes;
     this.userTimezone = userTimezone;
+    this.view = view;
   }
 
   getCompletions = async (editor: Editor, _session: Session, pos: Position, prefix: string, callback: ResultsCallback) => {
@@ -96,6 +108,7 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
               streams: this.streams,
               fieldTypes: this.fieldTypes,
               userTimezone: this.userTimezone,
+              view: this.view,
             });
           } catch (e) {
             onCompleterError(e);

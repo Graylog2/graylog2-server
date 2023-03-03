@@ -18,17 +18,28 @@ import URI from 'urijs';
 
 export type AdditionalQueries = { [key: string]: any };
 
-export default (destUrl: string, page: number, perPage: number, query: string, additional: AdditionalQueries = {}): string => {
+export default (destUrl: string, page: number, perPage: number, query?: string, additional: AdditionalQueries = {}): string => {
   let uri = new URI(destUrl).addSearch('page', page)
     .addSearch('per_page', perPage);
 
   if (additional) {
     Object.keys(additional).forEach((field) => {
-      const value = (additional[field] && typeof additional[field].toString === 'function')
-        ? additional[field].toString()
-        : additional[field];
+      const value = additional[field];
+      const processValue = (val: unknown) => (typeof val.toString === 'function' ? val.toString() : val);
 
-      uri = uri.addSearch(field, value);
+      if (value === undefined) {
+        return;
+      }
+
+      if (Array.isArray(value)) {
+        value.forEach((arrayValue) => {
+          uri = uri.addSearch(field, processValue(arrayValue));
+        });
+
+        return;
+      }
+
+      uri = uri.addSearch(field, processValue(value));
     });
   }
 

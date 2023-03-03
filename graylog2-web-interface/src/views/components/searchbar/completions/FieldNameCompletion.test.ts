@@ -17,6 +17,7 @@
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { CompletionResult } from 'views/components/searchbar/queryinput/ace-types';
+import { createSearch } from 'fixtures/searches';
 
 import FieldNameCompletion from './FieldNameCompletion';
 
@@ -29,19 +30,25 @@ const dummyFieldTypes = createFieldTypes(['source', 'message', 'timestamp'].map(
 const userTimezone = 'Europe/Berlin';
 
 describe('FieldNameCompletion', () => {
+  const requestDefaults = {
+    currentToken: null,
+    lastToken: null,
+    prefix: '',
+    tokens: [],
+    currentTokenIdx: 0,
+    fieldTypes: dummyFieldTypes,
+    userTimezone,
+    view: createSearch(),
+  };
+
   it('returns empty list if inputs are empty', () => {
     const fieldTypes = createFieldTypes([]);
 
     const completer = new FieldNameCompletion([]);
 
     expect(completer.getCompletions({
-      currentToken: null,
-      lastToken: null,
-      prefix: '',
-      tokens: [],
-      currentTokenIdx: 0,
+      ...requestDefaults,
       fieldTypes,
-      userTimezone,
     })).toEqual([]);
   });
 
@@ -49,13 +56,8 @@ describe('FieldNameCompletion', () => {
     const completer = new FieldNameCompletion();
 
     expect(completer.getCompletions({
-      currentToken: null,
-      lastToken: null,
+      ...requestDefaults,
       prefix: 'mess',
-      tokens: [],
-      currentTokenIdx: 0,
-      fieldTypes: dummyFieldTypes,
-      userTimezone,
     }).map((result) => result.name)).toEqual(['message']);
   });
 
@@ -63,13 +65,8 @@ describe('FieldNameCompletion', () => {
     const completer = new FieldNameCompletion([]);
 
     expect(completer.getCompletions({
-      currentToken: null,
-      lastToken: null,
+      ...requestDefaults,
       prefix: 'e',
-      tokens: [],
-      currentTokenIdx: 0,
-      fieldTypes: dummyFieldTypes,
-      userTimezone,
     }).map((result) => result.name)).toEqual(['source', 'message', 'timestamp']);
   });
 
@@ -77,13 +74,8 @@ describe('FieldNameCompletion', () => {
     const completer = new FieldNameCompletion([]);
 
     expect(completer.getCompletions({
-      currentToken: null,
-      lastToken: null,
+      ...requestDefaults,
       prefix: 'e',
-      tokens: [],
-      currentTokenIdx: 0,
-      fieldTypes: dummyFieldTypes,
-      userTimezone,
     }).map((result) => result.value))
       .toEqual(['source:', 'message:', 'timestamp:']);
   });
@@ -92,13 +84,8 @@ describe('FieldNameCompletion', () => {
     const completer = new FieldNameCompletion();
 
     expect(completer.getCompletions({
-      currentToken: null,
-      lastToken: null,
+      ...requestDefaults,
       prefix: '_e',
-      tokens: [],
-      currentTokenIdx: 0,
-      fieldTypes: dummyFieldTypes,
-      userTimezone,
     }).map((result) => result.value)).toEqual(['_exists_:']);
   });
 
@@ -106,16 +93,12 @@ describe('FieldNameCompletion', () => {
     const completer = new FieldNameCompletion();
 
     expect(completer.getCompletions({
-      currentToken: null,
+      ...requestDefaults,
       lastToken: {
         type: 'keyword',
         value: '_exists_:',
       },
       prefix: 'e',
-      tokens: [],
-      currentTokenIdx: 0,
-      fieldTypes: dummyFieldTypes,
-      userTimezone,
     }).map((result) => result.name)).toEqual(['source', 'message', 'timestamp']);
   });
 
@@ -123,13 +106,8 @@ describe('FieldNameCompletion', () => {
     const completer = new FieldNameCompletion();
 
     expect(completer.getCompletions({
-      currentToken: null,
-      lastToken: null,
+      ...requestDefaults,
       prefix: 'e',
-      tokens: [],
-      currentTokenIdx: 0,
-      fieldTypes: dummyFieldTypes,
-      userTimezone,
     }).map((result) => result.name)).toEqual(['_exists_', 'source', 'message', 'timestamp']);
   });
 
@@ -138,13 +116,8 @@ describe('FieldNameCompletion', () => {
     const currentToken = { type: 'keyword', value: 'http_method:', index: 0, start: 0 };
 
     expect(completer.getCompletions({
+      ...requestDefaults,
       currentToken,
-      lastToken: null,
-      prefix: '',
-      tokens: [],
-      currentTokenIdx: 0,
-      fieldTypes: dummyFieldTypes,
-      userTimezone,
     })).toEqual([]);
   });
 
@@ -165,13 +138,8 @@ describe('FieldNameCompletion', () => {
       const completer = new FieldNameCompletion([]);
 
       const completions = completer.getCompletions({
-        currentToken: null,
-        lastToken: null,
-        prefix: '',
-        tokens: [],
-        currentTokenIdx: 0,
+        ...requestDefaults,
         fieldTypes,
-        userTimezone,
       });
 
       const completion = (fieldName: string) => completionByName(fieldName, completions);

@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 type Provider = {
   type: string,
   template: string,
@@ -29,12 +30,29 @@ type FieldSpec = {
 
 type Notification = {
   notification_id: number,
-}
+};
+
+export type Scheduler = {
+  data: {
+    type: string
+    timerange_from: number,
+    timerange_to: number,
+  },
+  next_time: string,
+  triggered_at: string,
+  queued_notifications: number,
+  is_scheduled: boolean,
+  status: string
+};
 
 export type EventDefinition = {
-  id?: string,
+  id: string,
   config?: {
     type: string,
+    execute_every_ms?: number,
+    search_within_ms?: number,
+    sigma_rule_id?: string,
+    streams?: Array<string>
   },
   title: string,
   description?: string,
@@ -47,4 +65,5 @@ export type EventDefinition = {
   }
   notifications?: Array<Notification>,
   _scope?: string,
+  scheduler?: Scheduler,
 };
