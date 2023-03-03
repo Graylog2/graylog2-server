@@ -100,7 +100,7 @@ const ListBasedOnQueryParams = ({
   pageSizes,
   ...props
 }: Required<Props> & { pageSize: number }) => {
-  const { page: currentPage, pageSize: currentPageSize, setPagination } = usePaginationQueryParameter(pageSizes, props.pageSize);
+  const { page: currentPage, pageSize: currentPageSize, setPagination } = usePaginationQueryParameter(pageSizes, props.pageSize, props.showPageSizeSelect);
 
   return <ListBase {...props} currentPage={currentPage} currentPageSize={currentPageSize} setPagination={setPagination} pageSizes={pageSizes} />;
 };

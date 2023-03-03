@@ -30,15 +30,15 @@ type Props = {
 
 const Container = styled.div<{ isOpen: boolean, sidebarIsPinned: boolean }>(({ isOpen, sidebarIsPinned, theme }) => css`
   background: ${theme.colors.global.navigationBackground};
-  color: ${theme.utils.contrastingColor(theme.colors.global.navigationBackground, "AA")};
-  box-shadow: ${(sidebarIsPinned && isOpen) ? "none" : `3px 3px 3px ${theme.colors.global.navigationBoxShadow}`};
+  color: ${theme.utils.contrastingColor(theme.colors.global.navigationBackground, 'AA')};
+  box-shadow: ${(sidebarIsPinned && isOpen) ? 'none' : `3px 3px 3px ${theme.colors.global.navigationBoxShadow}`};
   width: 50px;
   height: 100%;
   position: relative;
   z-index: 1031;
 
   ::before {
-    content: "";
+    content: '';
     position: absolute;
     top: 0;
     right: -6px;

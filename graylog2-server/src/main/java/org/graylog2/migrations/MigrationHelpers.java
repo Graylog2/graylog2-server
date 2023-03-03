@@ -24,6 +24,7 @@ import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.RoleImpl;
 import org.graylog2.users.RoleService;
+import org.graylog2.users.UserServiceImpl;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Collections;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
@@ -59,7 +61,7 @@ public class MigrationHelpers {
         } catch (NotFoundException | IllegalArgumentException | NoSuchElementException ignored) {
             LOG.info("{} role is missing or invalid, re-adding it as a built-in role.", roleName);
             final RoleImpl fixedRole = new RoleImpl();
-            // copy the mongodb id over, in order to update the role instead of readding it
+            // copy the mongodb id over, in order to update the role instead of reading it
             if (previousRole != null) {
                 fixedRole._id = previousRole.getId();
             }
@@ -93,6 +95,34 @@ public class MigrationHelpers {
     @Nullable
     public String ensureUser(String userName, String password, String firstName, String lastName, String email,
                              Set<String> expectedRoles, boolean isServiceAccount) {
+        try {
+            return ensureUserHelper(userName, password, firstName, lastName, email, expectedRoles, isServiceAccount);
+        } catch (UserServiceImpl.DuplicateUserException e) {
+            // Attempt to resolve simple duplication (introduced prior to adding the unique index).
+            // This does not account for special types of users, e.g. read-only users, imported users, etc.
+            final List<User> users = userService.loadAllByName(userName);
+            User firstUser = users.remove(0);
+            for (User user : users) {
+                final String uniqueName = user.getName() + "_" + user.getId();
+                LOG.warn("Renaming duplicate users {} to {}", user.getName(), uniqueName);
+                user.setName(uniqueName);
+                try {
+                    userService.save(user);
+                } catch (ValidationException v) {
+                    final String msg = "Failed to disambiguate " + userName;
+                    LOG.error(msg);
+                    throw new IllegalArgumentException(msg);
+                }
+            }
+
+            // Call again to assign desired roles and service account flag
+            return ensureUserHelper(userName, password, firstName, lastName, email, expectedRoles, isServiceAccount);
+        }
+    }
+
+    @Nullable
+    public String ensureUserHelper(String userName, String password, String firstName, String lastName, String email,
+                             Set<String> expectedRoles, boolean isServiceAccount) {
         User previousUser = null;
         try {
             previousUser = userService.load(userName);
@@ -122,6 +152,7 @@ public class MigrationHelpers {
                 fixedUser.setServiceAccount(isServiceAccount);
             }
             try {
+                // This performs an upsert to avoid any race condition in creating the user
                 return userService.save(fixedUser);
             } catch (ValidationException e) {
                 LOG.error("Unable to save fixed '" + userName + "' user, please restart Graylog to fix this.", e);

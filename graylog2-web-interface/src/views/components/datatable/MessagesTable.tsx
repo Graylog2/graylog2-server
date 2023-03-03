@@ -123,7 +123,7 @@ const StyledTable = styled(Table)(({ theme, $stickyHeader, $borderedHeader }: { 
     margin-right: 0;
   }
 
-  tr.message-detail-row div[class*="col-"] {
+  tr.message-detail-row div[class*='col-'] {
     padding-right: 0;
   }
 
@@ -141,6 +141,12 @@ const StyledTable = styled(Table)(({ theme, $stickyHeader, $borderedHeader }: { 
   th i.sort-order-active,
   th:hover i.sort-order-item {
     color: ${theme.colors.global.textAlt};
+  }
+  
+  @media print {
+    tr.fields-row > td {
+      min-width: 0;
+    }
   }
 `);
 

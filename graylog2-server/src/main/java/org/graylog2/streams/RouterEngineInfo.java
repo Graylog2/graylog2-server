@@ -14,25 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog2.streams;
 
-type Props = {
-  group: string,
-  onSelect: (newGroup: string) => void,
-  selected: boolean,
-  text: string,
-  title: string,
-};
-
-const FieldGroup = ({ onSelect, selected, group, text, title }: Props) => (
-  // eslint-disable-next-line jsx-a11y/anchor-is-valid,jsx-a11y/click-events-have-key-events
-  <a onClick={() => onSelect(group)}
-     role="button"
-     style={{ fontWeight: selected ? 'bold' : 'normal' }}
-     tabIndex={0}
-     title={title}>
-    {text}
-  </a>
-);
-
-export default FieldGroup;
+public record RouterEngineInfo(String fingerprint) {
+}

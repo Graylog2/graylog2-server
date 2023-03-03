@@ -44,7 +44,7 @@ public class GrokExists extends AbstractFunction<Boolean> {
         this.grokPatternRegistry = grokPatternRegistry;
 
         patternParam = ParameterDescriptor.string("pattern")
-                .description("The Grok Pattern which is to be tested for existance.").build();
+                .description("The Grok Pattern which is to be tested for existence.").build();
         doLog = ParameterDescriptor.bool("log_missing").optional()
                 .description("Log if the Grok Pattern is missing. Warning: Switching on this flag can lead" +
                         " to a high volume of logs.").build();

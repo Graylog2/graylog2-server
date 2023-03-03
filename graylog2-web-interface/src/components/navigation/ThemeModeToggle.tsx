@@ -38,7 +38,7 @@ const ThemeModeToggleWrap = styled.div`
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ModeIcon = styled(({ currentMode, theme, ...props }) => <Icon {...props} />)`
-  opacity: ${({ currentMode }) => (currentMode ? "1" : "0.5")};
+  opacity: ${({ currentMode }) => (currentMode ? '1' : '0.5')};
   color: ${({ currentMode, theme }) => (currentMode ? theme.colors.brand.primary : theme.colors.variant.darkest.default)};
 `;
 
@@ -91,7 +91,7 @@ const Toggle = styled.label(({ theme }) => css`
 
     &::before {
       transition: transform 75ms ease-in-out;
-      content: "";
+      content: '';
       display: block;
       width: 18px;
       height: 18px;
