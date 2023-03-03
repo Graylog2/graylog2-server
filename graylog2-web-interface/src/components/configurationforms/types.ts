@@ -82,6 +82,18 @@ export type BooleanField = {
   type: 'boolean',
 };
 
+export type InlineBinaryField = {
+  additional_info: {},
+  attributes: Array<TextFieldAttributes>,
+  default_value: string,
+  description: string,
+  human_name: string,
+  is_encrypted: boolean,
+  is_optional: boolean,
+  position: number,
+  type: 'inline_binary',
+};
+
 export type FieldValue = string | number | boolean | void | Array<string>
 
 export type EncryptedFieldValue<Value> = {
@@ -90,11 +102,11 @@ export type EncryptedFieldValue<Value> = {
   delete_value?: boolean,
 }
 
-export const FIELD_TYPES_WITH_ENCRYPTION_SUPPORT = ['text'] as const;
+export const FIELD_TYPES_WITH_ENCRYPTION_SUPPORT = ['text', 'inline_binary'] as const;
 
-export type ConfigurationFieldWithEncryption = TextField;
+export type ConfigurationFieldWithEncryption = TextField | InlineBinaryField;
 
-export type ConfigurationField = BooleanField | DropdownField | ListField | NumberField | TextField;
+export type ConfigurationField = BooleanField | DropdownField | InlineBinaryField | ListField | NumberField | TextField;
 
 export type ConfigurationFieldValue = FieldValue | EncryptedFieldValue<FieldValue>
 
