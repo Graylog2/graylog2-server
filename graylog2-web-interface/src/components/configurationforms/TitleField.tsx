@@ -18,7 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { TextField } from 'components/configurationforms';
-import type {TextField as TextFieldType} from './types'
+
+import type { TextField as TextFieldType } from './types';
 
 type Props = {
   helpText?: string,
@@ -59,7 +60,7 @@ TitleField.propTypes = {
 };
 
 TitleField.defaultProps = {
-  helpBlock: '',
+  helpText: '',
   onChange: () => {},
   value: '',
 };
