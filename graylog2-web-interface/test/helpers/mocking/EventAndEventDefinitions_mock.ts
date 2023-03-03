@@ -19,11 +19,18 @@ import type { EventType } from 'hooks/useEventById';
 import type { EventDefinition } from 'logic/alerts/types';
 import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
 
-export const mockEventData = { event: { id: 'event-id-1', event_definition_id: 'event-definition-id-1' } as EventType };
+export const mockEventData = {
+  event: {
+    alert: true,
+    id: 'event-id-1',
+    event_definition_id: 'event-definition-id-1',
+
+  } as EventType,
+};
 
 export const mockEventDefinition:EventDefinition = {
   _scope: 'DEFAULT',
-  id: '111',
+  id: 'event-definition-id-1',
   title: 'Test',
   description: 'Test description',
   updated_at: '2023-02-21T13:28:09.296Z',

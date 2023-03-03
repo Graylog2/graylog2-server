@@ -16,44 +16,30 @@
  */
 import React from 'react';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
-import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
-import { useRouteMatch } from 'react-router-dom';
+import { QueryClientProvider, QueryClient, useQueryClient } from '@tanstack/react-query';
+import { useRouteMatch, useParams } from 'react-router-dom';
 
-import { mockEventData, mockEventDefinition } from 'helpers/mocking/EventAndEventDefinitions_mock';
-import suppressConsole from 'helpers/suppressConsole';
+import {
+  mockedMappedAggregation,
+  mockEventData,
+  mockEventDefinition,
+} from 'helpers/mocking/EventAndEventDefinitions_mock';
 import asMock from 'helpers/mocking/AsMock';
-import fetch from 'logic/rest/FetchProvider';
-import UserNotification from 'util/UserNotification';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
-import Routes from 'routing/Routes';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 jest.mock('@tanstack/react-query', () => ({
   ...jest.requireActual('@tanstack/react-query'),
-  useQueryClient: () => ({
-    // setQueryData: jest.fn(() => ({ data: [{ label: 'Blue', id: 34 }] })),
-    // cancelQueries: jest.fn(),
-    // invalidateQueries: jest.fn(),
-    ...jest.requireActual('@tanstack/react-query').useQueryClient(),
-    getQueryData: jest
-      .fn().mockImplementation(([key, id]) => {
-        if (key === 'event-by-id' && id === mockEventData.event.id) return mockEventData.event;
-        if (key === 'event-definition-by-id' && id === mockEventDefinition.id) return mockEventDefinition;
-
-        return undefined;
-      }),
-  }),
+  useQueryClient: jest.fn(),
 }));
-
-const eventRoute = Routes.ALERTS.replay_search(mockEventData.event.id);
-console.log({ eventRoute });
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useRouteMatch: jest.fn(() => ({
-    path: `/alerts/${mockEventData.event.id}/replaysearch`,
+    path: '/',
   })),
+  useParams: jest.fn(() => ({})),
 }));
 
 const queryClient = new QueryClient({
@@ -69,18 +55,108 @@ const wrapper = ({ children }) => (
   </QueryClientProvider>
 );
 
-describe('useEventById', () => {
+const mockedHookData = {
+  alertId: mockEventData.event.id,
+  definitionId: mockEventData.event.event_definition_id,
+  definitionTitle: mockEventDefinition.title,
+  isAlert: true,
+  isEvent: false,
+  isEventDefinition: false,
+  eventData: mockEventData.event,
+  eventDefinition: mockEventDefinition,
+  aggregations: mockedMappedAggregation,
+};
+
+const mockGetQueryData = ({ eventId = undefined, alert, showEventData = true }) => asMock(useQueryClient).mockImplementation(() => ({
+  ...jest.requireActual('@tanstack/react-query'),
+  getQueryData: (([key, id]) => {
+    if (showEventData && key === 'event-by-id' && id === eventId) return ({ ...mockEventData.event, id: eventId, alert });
+
+    if (key === 'event-definition-by-id' && id === mockEventDefinition.id) {
+      return ({
+        eventDefinition: mockEventDefinition,
+        aggregations: mockedMappedAggregation,
+      });
+    }
+
+    return undefined;
+  }),
+}));
+
+const mockUseRouterForEvent = (id) => asMock(useRouteMatch).mockImplementation(() => ({
+  path: '/alerts/:alertId/replaysearch',
+  url: `/alerts/${id}/replaysearch`,
+  params: {
+    alertId: id,
+  },
+  isExact: true,
+}));
+
+const mockUseRouterForEventDefinition = (id) => asMock(useRouteMatch).mockImplementation(() => ({
+  path: '/alerts/definitions/:definitionId/replaysearch',
+  url: `/alerts/definitions/${id}/replaysearch`,
+  params: {
+    definitionId: id,
+  },
+  isExact: true,
+}));
+
+describe('useAlertAndEventDefinitionData', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should run fetch and store mapped response', async () => {
-    asMock(useRouteMatch).mockImplementation(() => ({
-      path: `/alerts/${mockEventData.event.id}/replaysearch`,
+  it('should return expected data for alert page', async () => {
+    mockUseRouterForEvent('event-id-1');
+
+    asMock(useParams).mockImplementation(() => ({
+      alertId: mockEventData.event.id,
     }));
 
-    const { result, waitFor } = renderHook(() => useAlertAndEventDefinitionData(), { wrapper });
+    mockGetQueryData({ eventId: 'event-id-1', alert: true });
+    const { result } = renderHook(() => useAlertAndEventDefinitionData(), { wrapper });
 
-    expect(result.current.eventDefinition).toEqual(mockEventData.event);
+    await expect(result.current).toEqual(mockedHookData);
+  });
+
+  it('should return expected data for event page', async () => {
+    asMock(useParams).mockImplementation(() => ({
+      alertId: 'event-id-2',
+    }));
+
+    mockUseRouterForEvent('event-id-2');
+
+    mockGetQueryData({ eventId: 'event-id-2', alert: false });
+
+    const { result } = renderHook(() => useAlertAndEventDefinitionData(), { wrapper });
+
+    await expect(result.current).toEqual({
+      ...mockedHookData,
+      eventData: { ...mockEventData.event, id: 'event-id-2', alert: false },
+      alertId: 'event-id-2',
+      isAlert: false,
+      isEvent: true,
+    });
+  });
+
+  it('should return expected data for event definition', async () => {
+    asMock(useParams).mockImplementation(() => ({
+      definitionId: mockEventDefinition.id,
+    }));
+
+    mockUseRouterForEventDefinition(mockEventDefinition.id);
+
+    mockGetQueryData({ showEventData: false, alert: false });
+
+    const { result } = renderHook(() => useAlertAndEventDefinitionData(), { wrapper });
+
+    await expect(result.current).toEqual({
+      ...mockedHookData,
+      eventData: undefined,
+      alertId: undefined,
+      isAlert: false,
+      isEvent: false,
+      isEventDefinition: true,
+    });
   });
 });
