@@ -60,7 +60,7 @@ public class FavoritesIT {
     void testCreateDeleteFavorite() {
         given()
                 .spec(requestSpec)
-                .auth().basic("john.doe1", "asdfgh")
+                .auth().preemptive().basic("john.doe1", "asdfgh")
                 .when()
                 .put("/favorites/1")
                 .then()
@@ -69,7 +69,7 @@ public class FavoritesIT {
 
         var validatableResponse = given()
                 .spec(requestSpec)
-                .auth().basic("john.doe1", "asdfgh")
+                .auth().preemptive().basic("john.doe1", "asdfgh")
                 .when()
                 .get("/favorites")
                 .then()
@@ -80,7 +80,7 @@ public class FavoritesIT {
 
         given()
                 .spec(requestSpec)
-                .auth().basic("john.doe1", "asdfgh")
+                .auth().preemptive().basic("john.doe1", "asdfgh")
                 .when()
                 .delete("/favorites/1")
                 .then()
