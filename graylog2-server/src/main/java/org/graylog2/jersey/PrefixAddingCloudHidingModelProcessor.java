@@ -91,7 +91,7 @@ public class PrefixAddingCloudHidingModelProcessor implements ModelProcessor {
             }
         }
         // skip empty childResources entirely
-        if (!methodAdded) {
+        if (!methodAdded && resource.getChildResources().isEmpty()) {
             return Optional.empty();
         }
 
