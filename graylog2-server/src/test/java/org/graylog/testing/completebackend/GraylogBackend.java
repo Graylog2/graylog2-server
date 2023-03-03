@@ -55,7 +55,7 @@ public interface GraylogBackend {
                 ))
                 .failureConfig(FailureConfig.failureConfig().with().failureListeners(
                 (reqSpec, respSpec, resp) -> {
-                    if (resp.statusCode() >= 500) {
+                    if (resp.statusCode() >= 400) {
                         System.out.println("------------------------ Output from graylog docker container start ------------------------");
                         System.out.println(this.getLogs());
                         System.out.println("------------------------ Output from graylog docker container ends  ------------------------");
