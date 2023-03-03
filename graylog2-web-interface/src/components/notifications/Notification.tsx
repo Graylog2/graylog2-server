@@ -15,17 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import DOMPurify from 'dompurify';
 
 import { Alert, Button } from 'components/bootstrap';
 import { RelativeTime, Icon, Spinner } from 'components/common';
-import NotificationsFactory from 'logic/notifications/NotificationsFactory';
 import type { NotificationType } from 'stores/notifications/NotificationsStore';
-import { NotificationsActions, NotificationsStore } from 'stores/notifications/NotificationsStore';
-import { useStore } from 'stores/connect';
+import { NotificationsActions } from 'stores/notifications/NotificationsStore';
+import useNotificationMessage from 'hooks/useNotificationMessage';
 
 type Props = {
   notification: NotificationType,
@@ -61,13 +59,7 @@ const _sanitizeDescription = (description) => {
 };
 
 const Notification = ({ notification }: Props) => {
-  const { messages } = useStore(NotificationsStore);
-
-  useEffect(() => {
-    if (notification) {
-      NotificationsActions.getHtmlMessage(notification.type, notification.key, NotificationsFactory.getValuesForNotification(notification));
-    }
-  }, [messages, notification]);
+  const message = useNotificationMessage(notification);
 
   const _onClose = () => {
     // eslint-disable-next-line no-alert
@@ -76,11 +68,9 @@ const Notification = ({ notification }: Props) => {
     }
   };
 
-  if (!messages || !messages[notification.type]) {
+  if (!message) {
     return <Spinner />;
   }
-
-  const message = messages[notification.type];
 
   /* eslint-disable react/no-danger */
   return (
@@ -107,11 +97,11 @@ const Notification = ({ notification }: Props) => {
 Notification.propTypes = {
   notification: PropTypes.exact({
     severity: PropTypes.string.isRequired,
+    details: PropTypes.object,
     type: PropTypes.string.isRequired,
-    key: PropTypes.string.isRequired,
+    key: PropTypes.string,
     timestamp: PropTypes.string.isRequired,
     node_id: PropTypes.string.isRequired,
   }).isRequired,
 };
-
 export default Notification;

@@ -24,9 +24,12 @@ import { singletonStore, singletonActions } from 'logic/singleton';
 export type NotificationType = {
   severity: string,
   type: string,
-  key: string,
+  key?: string,
   timestamp: string,
   node_id: string,
+  details?: {
+    [key: string]: string,
+  },
 };
 
 export type NotificationMessage = {
@@ -128,7 +131,7 @@ export const NotificationsStore = singletonStore(
 
       promise.then((response) => {
         this.messages = { ...this.messages, [type]: response };
-        this.propagateChanges();
+        this.trigger({messages: this.messages});
       });
 
       NotificationsActions.getHtmlMessage.promise(promise);
