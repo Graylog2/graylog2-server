@@ -47,14 +47,15 @@ public class ShiroAuthenticationFilter implements ContainerRequestFilter {
                     LOG.trace("Logging in {}", subject);
                     context.loginSubject();
                 } catch (LockedAccountException e) {
-                    LOG.debug("Unable to authenticate user, account is locked.", e);
+                    LOG.info("Unable to authenticate user, account is locked.", e);
                     throw new NotAuthorizedException(e, "Basic realm=\"Graylog Server\"");
                 } catch (AuthenticationException e) {
-                    LOG.debug("Unable to authenticate user.", e);
+                    LOG.info("Unable to authenticate user.", e);
                     throw new NotAuthorizedException(e, "Basic realm=\"Graylog Server\"");
                 }
             }
         } else {
+            LOG.info("Wrong security context object.");
             throw new NotAuthorizedException("Basic realm=\"Graylog Server\"");
         }
 

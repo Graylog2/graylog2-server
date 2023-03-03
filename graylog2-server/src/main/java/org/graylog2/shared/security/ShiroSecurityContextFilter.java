@@ -24,6 +24,8 @@ import org.apache.shiro.subject.Subject;
 import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.rest.RestTools;
 import org.graylog2.utilities.IpSubnet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Priority;
 import javax.inject.Inject;
@@ -48,6 +50,7 @@ import static java.util.Objects.requireNonNull;
 // Give this a higher priority so it's run before the authentication filter
 @Priority(Priorities.AUTHENTICATION - 10)
 public class ShiroSecurityContextFilter implements ContainerRequestFilter {
+    private static final Logger LOG = LoggerFactory.getLogger(ShiroSecurityContextFilter.class);
     public static final String SESSION_COOKIE_NAME = "authentication";
 
     private final DefaultSecurityManager securityManager;
@@ -75,6 +78,7 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
 
         final SecurityContext securityContext;
         if (authHeader != null && authHeader.startsWith("Basic")) {
+            LOG.info("Creating Security Context for BasicAuth");
             final String base64UserPass = authHeader.substring(authHeader.indexOf(' ') + 1);
             final String userPass = decodeBase64(base64UserPass);
             final String[] split = userPass.split(":", 2);
@@ -93,6 +97,7 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
                     cookies);
 
         } else {
+            LOG.info("Creating Security Context with no credentials");
             securityContext = createSecurityContext(null, null, secure, null, host,
                     grizzlyRequest.getRemoteAddr(),
                     headers,
