@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.system.inputs;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.shiro.subject.Subject;
+import org.graylog2.Configuration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
@@ -66,7 +67,7 @@ public class InputsResourceMaskingPasswordsTest {
 
     class InputsTestResource extends InputsResource {
         public InputsTestResource(InputService inputService, MessageInputFactory messageInputFactory) {
-            super(inputService, messageInputFactory);
+            super(inputService, messageInputFactory, new Configuration());
         }
 
         @Override
@@ -227,7 +228,7 @@ public class InputsResourceMaskingPasswordsTest {
     }
 
     @Test
-    public void testRetrievalOfAllInputsWithPasswordFieldForUserNotAllowedToEditInput() throws NotFoundException {
+    public void testRetrievalOfAllInputsWithPasswordFieldForUserNotAllowedToEditInput() {
         final String inputId = "myinput";
         final String inputType = "dummyinput";
 
@@ -264,7 +265,7 @@ public class InputsResourceMaskingPasswordsTest {
     }
 
     @Test
-    public void testRetrievalOfAllInputsWithPasswordFieldForUserAllowedToEditInput() throws NotFoundException {
+    public void testRetrievalOfAllInputsWithPasswordFieldForUserAllowedToEditInput() {
         final String inputId = "myinput";
         final String inputType = "dummyinput";
 
