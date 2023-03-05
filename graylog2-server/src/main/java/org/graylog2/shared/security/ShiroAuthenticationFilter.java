@@ -58,6 +58,5 @@ public class ShiroAuthenticationFilter implements ContainerRequestFilter {
             LOG.info("Wrong security context object.");
             throw new NotAuthorizedException("Basic realm=\"Graylog Server\"");
         }
-
     }
 }
