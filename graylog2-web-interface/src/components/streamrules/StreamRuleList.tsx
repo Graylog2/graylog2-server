@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import type { Stream, StreamRuleType } from 'src/stores/streams/StreamsStore';
+import type { Stream } from 'src/stores/streams/StreamsStore';
 
 import StreamRule from 'components/streamrules/StreamRule';
 import { Spinner } from 'components/common';
@@ -27,10 +27,9 @@ type Props = {
     matches: boolean,
     rules: { [id: string]: false },
   },
-  onDelete: () => void,
-  onSubmit: () => void,
+  onDelete: (ruleId: string) => void,
+  onSubmit: (ruleId: string, data: unknown) => void,
   stream: Stream | undefined,
-  streamRuleTypes: Array<StreamRuleType>,
 }
 
 const StreamRuleList = ({
@@ -38,7 +37,6 @@ const StreamRuleList = ({
   onDelete,
   onSubmit,
   stream,
-  streamRuleTypes,
 }: Props) => {
   if (!stream) {
     return <Spinner />;
@@ -54,8 +52,7 @@ const StreamRuleList = ({
                     onSubmit={onSubmit}
                     onDelete={onDelete}
                     stream={stream}
-                    streamRule={streamRule}
-                    streamRuleTypes={streamRuleTypes} />
+                    streamRule={streamRule} />
       ))}
 
       {!hasStreamRules && <ListGroupItem>No rules defined.</ListGroupItem>}

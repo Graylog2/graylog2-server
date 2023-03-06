@@ -28,12 +28,27 @@ import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import UserNotification from 'util/UserNotification';
 import { StreamRulesInputsActions, StreamRulesInputsStore } from 'stores/inputs/StreamRulesInputsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
+import type { StreamRule as StreamRuleTypeDefinition, Stream } from 'stores/streams/StreamsStore';
+
+import useCurrentUser from '../../hooks/useCurrentUser';
 
 const ActionButtonsWrap = styled.span`
   margin-right: 6px;
 `;
 
-const StreamRule = ({ matchData, permissions, stream, streamRule, streamRuleTypes, onSubmit, onDelete }) => {
+type Props = {
+  matchData: {
+    matches: boolean,
+    rules: { [id: string]: false },
+  },
+  stream: Stream,
+  onDelete: (ruleId: string) => void,
+  onSubmit: (ruleId: string, data: unknown) => void,
+  streamRule: StreamRuleTypeDefinition
+}
+
+const StreamRule = ({ matchData, stream, streamRule, onSubmit, onDelete }: Props) => {
+  const { permissions } = useCurrentUser();
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
   const { inputs } = useStore(StreamRulesInputsStore);
 
@@ -97,11 +112,10 @@ const StreamRule = ({ matchData, permissions, stream, streamRule, streamRuleType
   return (
     <ListGroupItem bsStyle={listGroupStyle}>
       {actionItems}
-      <HumanReadableStreamRule streamRule={streamRule} streamRuleTypes={streamRuleTypes} inputs={inputs} />
+      <HumanReadableStreamRule streamRule={streamRule} inputs={inputs} />
       {showStreamRuleForm && (
         <StreamRuleModal initialValues={streamRule}
                          onClose={() => setShowStreamRuleForm(false)}
-                         streamRuleTypes={streamRuleTypes}
                          title="Edit Stream Rule"
                          submitButtonText="Update Rule"
                          submitLoadingText="Updating Rule..."
@@ -119,7 +133,6 @@ StreamRule.propTypes = {
   }),
   onDelete: PropTypes.func,
   onSubmit: PropTypes.func,
-  permissions: PropTypes.array.isRequired,
   stream: PropTypes.object.isRequired,
   streamRule: PropTypes.object.isRequired,
   streamRuleTypes: PropTypes.array.isRequired,

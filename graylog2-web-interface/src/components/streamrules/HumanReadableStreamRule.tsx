@@ -18,8 +18,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import type { Input } from 'components/messageloaders/Types';
-import type { StreamRule, StreamRuleType } from 'stores/streams/StreamsStore';
+import type { StreamRule } from 'stores/streams/StreamsStore';
 import STREAM_RULE_TYPES from 'logic/streams/streamRuleTypes';
+import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 
 const EMPTY_TAG = '<empty>';
 
@@ -59,11 +60,11 @@ const formatRuleField = (streamRule: Partial<StreamRule>) => {
 
 type Props = {
   streamRule: Partial<StreamRule>,
-  streamRuleTypes: Array<StreamRuleType>,
   inputs: Array<Input>,
 }
 
-const HumanReadableStreamRule = ({ streamRule, streamRuleTypes, inputs = [] }: Props) => {
+const HumanReadableStreamRule = ({ streamRule, inputs = [] }: Props) => {
+  const { data: streamRuleTypes } = useStreamRuleTypes();
   const streamRuleType = streamRuleTypes.find(({ id }) => id === streamRule.type);
   const negation = (streamRule.inverted ? 'not ' : null);
   const longDesc = (streamRuleType ? streamRuleType.long_desc : null);
@@ -83,7 +84,6 @@ const HumanReadableStreamRule = ({ streamRule, streamRuleTypes, inputs = [] }: P
 
 HumanReadableStreamRule.propTypes = {
   streamRule: PropTypes.object.isRequired,
-  streamRuleTypes: PropTypes.array.isRequired,
   inputs: PropTypes.array.isRequired,
 };
 

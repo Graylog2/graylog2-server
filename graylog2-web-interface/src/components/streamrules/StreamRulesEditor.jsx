@@ -103,9 +103,6 @@ class StreamRulesEditor extends React.Component {
     const { streamId } = this.props;
     const { message } = this.state;
 
-    StreamRulesStore.types().then((types) => {
-      this.setState({ streamRuleTypes: types });
-    });
 
     StreamsStore.get(streamId, (stream) => {
       this.setState({ stream: stream });
@@ -154,11 +151,11 @@ class StreamRulesEditor extends React.Component {
   };
 
   render() {
-    const { matchData, stream, streamRuleTypes, showStreamRuleForm } = this.state;
+    const { matchData, stream, showStreamRuleForm } = this.state;
     const { messageId, index } = this.props;
     const styles = (matchData ? getListClassName(matchData) : 'info');
 
-    if (stream && streamRuleTypes) {
+    if (stream) {
       return (
         <Row className="content">
           <Col md={12} className="streamrule-sample-message">
@@ -181,7 +178,6 @@ class StreamRulesEditor extends React.Component {
               {showStreamRuleForm && (
                 <StreamRuleModal title="New Stream Rule"
                                  onClose={() => this.setState({ showStreamRuleForm: false })}
-                                 streamRuleTypes={streamRuleTypes}
                                  submitButtonText="Create Rule"
                                  submitLoadingText="Creating Rule..."
                                  onSubmit={this._onStreamRuleFormSubmit} />
@@ -194,7 +190,6 @@ class StreamRulesEditor extends React.Component {
             <Panel bsStyle={styles}>
               <StreamAlertHeader>{this._explainMatchResult()}</StreamAlertHeader>
               <StreamRuleList stream={stream}
-                              streamRuleTypes={streamRuleTypes}
                               matchData={matchData} />
             </Panel>
 
