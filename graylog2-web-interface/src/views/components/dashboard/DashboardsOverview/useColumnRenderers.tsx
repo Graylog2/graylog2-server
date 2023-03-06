@@ -23,6 +23,7 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type View from 'views/logic/views/View';
 import TitleCell from 'views/components/dashboard/DashboardsOverview/TitleCell';
 import FavoriteIcon from 'views/components/FavoriteIcon';
+import { createGRN } from 'logic/permissions/GRN';
 
 export const useColumnRenderers = (
   { searchParams }: { searchParams: SearchParams },
@@ -36,7 +37,7 @@ export const useColumnRenderers = (
     favorite: {
       renderCell: (dashboard) => (
         <FavoriteIcon isFavorite={dashboard.favorite}
-                      id={dashboard.id}
+                      grn={createGRN('dashboard', dashboard.id)}
                       onChange={(newValue) => {
                         queryClient.setQueriesData(['dashboards', 'overview', searchParams], (cur: {
                           list: Readonly<Array<View>>,

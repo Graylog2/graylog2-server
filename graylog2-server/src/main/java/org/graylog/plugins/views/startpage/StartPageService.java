@@ -17,12 +17,11 @@
 package org.graylog.plugins.views.startpage;
 
 import com.google.common.eventbus.EventBus;
+import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
+import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
-import org.graylog.plugins.views.favorites.Favorite;
-import org.graylog.plugins.views.favorites.FavoriteDTO;
-import org.graylog.plugins.views.favorites.FavoritesForUserDTO;
-import org.graylog.plugins.views.favorites.FavoritesService;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpened;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedForUserDTO;
@@ -38,23 +37,23 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import javax.inject.Inject;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class StartPageService {
     private final Catalog catalog;
+    private final GRNRegistry grnRegistry;
     private final LastOpenedService lastOpenedService;
     private final RecentActivityService recentActivityService;
     private final long MAXIMUM_LAST_OPENED_PER_USER = 100;
 
     @Inject
     public StartPageService(Catalog catalog,
+                            GRNRegistry grnRegistry,
                             LastOpenedService lastOpenedService,
                             RecentActivityService recentActivityService,
                             EventBus eventBus) {
         this.catalog = catalog;
+        this.grnRegistry = grnRegistry;
         this.lastOpenedService = lastOpenedService;
         this.recentActivityService = recentActivityService;
         eventBus.register(this);
@@ -66,18 +65,14 @@ public class StartPageService {
                 .orElse(new LastOpenedForUserDTO(searchUser.getUser().getId(), List.of()))
                 .items()
                 .stream()
-                .map(i -> new LastOpened(i.id(), catalog.getType(i.id()), catalog.getTitle(i.id()), i.timestamp()))
+                .map(i -> new LastOpened(i.grn(), catalog.getTitle(i.grn()), i.timestamp()))
                 .toList();
 
         return PaginatedResponse.create("lastOpened", new PaginatedList<>(PaginatedDbService.getPage(items, page, perPage), items.size(), page, perPage));
     }
 
-    private String getType(RecentActivityDTO i) {
-        return i.itemType() == null ? catalog.getType(i.itemId()) : i.itemType();
-    }
-
     private String getTitle(RecentActivityDTO i) {
-        return i.itemTitle() == null ? catalog.getTitle(i.itemId()) : i.itemTitle();
+        return i.itemTitle() == null ? catalog.getTitle(i.itemGrn()) : i.itemTitle();
     }
 
     public PaginatedResponse<RecentActivity> findRecentActivityFor(final SearchUser searchUser, int page, int perPage) {
@@ -85,8 +80,7 @@ public class StartPageService {
         final var mapped = items.stream()
                  .map(i -> new RecentActivity(i.id(),
                         i.activityType(),
-                        getType(i),
-                        i.itemId(),
+                        i.itemGrn(),
                         getTitle(i),
                         i.userName(),
                         i.timestamp())).toList();
@@ -96,16 +90,17 @@ public class StartPageService {
     /*
      * filters a given Id from the middle of the list if it exists and removes one item if necessary to stay in the limit if we add another item at the top
      */
-    protected static List<LastOpenedDTO> filterForExistingIdAndCapAtMaximum(final LastOpenedForUserDTO loi, final String id, final long max) {
-        return loi.items().stream().filter(i -> !i.id().equals(id)).limit(max - 1).toList();
+    protected static List<LastOpenedDTO> filterForExistingIdAndCapAtMaximum(final LastOpenedForUserDTO loi, final GRN grn, final long max) {
+        return loi.items().stream().filter(i -> !i.grn().equals(grn)).limit(max - 1).toList();
     }
 
     public void addLastOpenedFor(final ViewDTO view, final SearchUser searchUser) {
+        final var type = view.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
         final var lastOpenedItems = lastOpenedService.findForUser(searchUser);
-        final var item = new LastOpenedDTO(view.id(), DateTime.now(DateTimeZone.UTC));
+        final var item = new LastOpenedDTO(grnRegistry.newGRN(type, view.id()), DateTime.now(DateTimeZone.UTC));
         if(lastOpenedItems.isPresent()) {
             var loi = lastOpenedItems.get();
-            var items = filterForExistingIdAndCapAtMaximum(loi, item.id(), MAXIMUM_LAST_OPENED_PER_USER);
+            var items = filterForExistingIdAndCapAtMaximum(loi, item.grn(), MAXIMUM_LAST_OPENED_PER_USER);
             loi.items().clear();
             loi.items().add(item);
             loi.items().addAll(items);

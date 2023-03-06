@@ -38,7 +38,7 @@ import javax.inject.Inject;
 import java.util.Optional;
 
 public class LastOpenedService extends PaginatedDbService<LastOpenedForUserDTO> {
-    private static final String COLLECTION_NAME = "last_opened";
+    public static final String COLLECTION_NAME = "last_opened";
 
     private final EntityOwnershipService entityOwnerShipService;
 
@@ -52,7 +52,7 @@ public class LastOpenedService extends PaginatedDbService<LastOpenedForUserDTO> 
         eventBus.register(this);
 
         db.createIndex(new BasicDBObject(LastOpenedForUserDTO.FIELD_USER_ID, 1));
-        db.createIndex(new BasicDBObject(LastOpenedForUserDTO.FIELD_ITEMS + "." + LastOpenedDTO.FIELD_ID, 1));
+        db.createIndex(new BasicDBObject(LastOpenedForUserDTO.FIELD_ITEMS + "." + LastOpenedDTO.FIELD_GRN, 1));
     }
 
     public Optional<LastOpenedForUserDTO> findForUser(final SearchUser searchUser) {
@@ -80,8 +80,9 @@ public class LastOpenedService extends PaginatedDbService<LastOpenedForUserDTO> 
     public void removeLastOpenedOnEntityDeletion(final RecentActivityEvent event) {
         // if an entity is deleted, we can no longer see it in the lastOpened collection
         if (event.activityType().equals(ActivityType.DELETE)) {
-            DBObject query = new BasicDBObject(LastOpenedForUserDTO.FIELD_ITEMS + "." + LastOpenedDTO.FIELD_ID, new BasicDBObject("$eq", event.grn().entity()));
-            final DBObject modifications = new BasicDBObject("$pull", new BasicDBObject(LastOpenedForUserDTO.FIELD_ITEMS, new BasicDBObject(LastOpenedDTO.FIELD_ID, event.grn().entity())));
+            final var grn = event.grn().toString();
+            final var query = new BasicDBObject(LastOpenedForUserDTO.FIELD_ITEMS + "." + LastOpenedDTO.FIELD_GRN, grn);
+            final var modifications = new BasicDBObject("$pull", new BasicDBObject(LastOpenedForUserDTO.FIELD_ITEMS, new BasicDBObject(LastOpenedDTO.FIELD_GRN, grn)));
             db.updateMulti(query, modifications);
         }
     }
