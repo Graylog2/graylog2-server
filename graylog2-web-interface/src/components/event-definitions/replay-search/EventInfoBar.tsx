@@ -118,6 +118,55 @@ const EventInfoBar = () => {
     }, {});
   }, [aggregations, highlightingRules]);
 
+  const items = [
+    { title: 'Timestamp', content: <Timestamp dateTime={eventData.timestamp} />, show: !isEventDefinition },
+    {
+      title: 'Event definition updated at',
+      content: (
+        <>
+          <AlertTimestamp dateTime={eventDefinition.updated_at} />
+          <HoverForHelp iconSize="xs">{
+            `Event definition ${eventDefinition.title} was edited after this event happened.
+                Some of aggregations widgets might not be representative for this event.`
+          }
+          </HoverForHelp>
+        </>
+      ),
+      show: isEDUpdatedAfterEvent,
+    },
+    { title: 'Event definition', content: <Link target="_blank" to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{eventDefinition.title}</Link>, show: !isEventDefinition },
+    { title: 'Priority', content: lodash.upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name) },
+    { title: 'Execute search every', content: `${executeEvery.duration}${executeEvery.unit.toLowerCase()}` },
+    { title: 'Search within', content: `${searchWithin.duration}${searchWithin.unit.toLowerCase()}` },
+    { title: 'Description', content: eventDefinition.description },
+    {
+      title: 'Notifications',
+      content: notificationList.map(({ id, title }, index) => {
+        const prefix = index > 0 ? ', ' : '';
+
+        return (
+          <>
+            {prefix}
+            <Link target="_blank" to={Routes.ALERTS.NOTIFICATIONS.show(id)}>{title}</Link>
+          </>
+        );
+      }),
+    },
+    {
+      title: 'Aggregation conditions',
+      content: Object.entries(highlightingColors).map(([condition, color]: [string, string], index, array) => {
+        const isLast = index + 1 === array.length;
+
+        return (
+          <>
+            <span style={{ backgroundColor: color }}>{condition}</span>
+            {!isLast && <span>{', '}</span>}
+          </>
+        );
+      }),
+    },
+  ];
+
   return (
     <FlatContentRow>
       <Header>
@@ -129,85 +178,12 @@ const EventInfoBar = () => {
       {open && (
       <Container>
         <Row>
-          {!isEventDefinition && (
-          <Item>
-            <b>Timestamp:</b>
-            <Timestamp dateTime={eventData.timestamp} />
-          </Item>
-          )}
-          {isEDUpdatedAfterEvent && (
-          <Item>
-            <b>Event definition updated at:</b>
-            <AlertTimestamp dateTime={eventDefinition.updated_at} />
-            <HoverForHelp iconSize="xs">{
-              `Event definition ${eventDefinition.title} was edited after this event happened.
-              Some of aggregations widgets might not be representative for this event.`
-            }
-            </HoverForHelp>
-          </Item>
-          )}
-          {!isEventDefinition && (
-          <Item>
-            <b>Event definition:</b>
-            <span>
-              <Link target="_blank"
-                    to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{eventDefinition.title}
-              </Link>
-            </span>
-          </Item>
-          )}
-          <Item>
-            <b>Priority: </b>
-            <span>{lodash.upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</span>
-          </Item>
-          <Item>
-            <b>Execute search every:</b>
-            <span>{executeEvery.duration} {executeEvery.unit.toLowerCase()}</span>
-          </Item>
-          <Item>
-            <b>Search within:</b>
-            <span>{searchWithin.duration} {searchWithin.unit.toLowerCase()}</span>
-          </Item>
-          <Item>
-            <b>Description:</b>
-            <span>{eventDefinition.description}</span>
-          </Item>
-          <Item>
-            <b>Notifications:</b>
-            <span>
-              {
-                notificationList.map(({ id, title }, index) => {
-                  const prefix = index > 0 ? ', ' : '';
-
-                  return (
-                    <>
-                      {prefix}
-                      <Link target="_blank" to={Routes.ALERTS.NOTIFICATIONS.show(id)}>{title}</Link>
-                    </>
-                  );
-                })
-              }
-            </span>
-          </Item>
-          {Object.values(highlightingColors).length && (
-          <Item>
-            <b>Aggregation conditions:</b>
-            <span>
-              {
-                Object.entries(highlightingColors).map(([condition, color]: [string, string], index, array) => {
-                  const isLast = index + 1 === array.length;
-
-                  return (
-                    <>
-                      <span style={{ backgroundColor: color }}>{condition}</span>
-                      {!isLast && <span>{', '}</span>}
-                    </>
-                  );
-                })
-              }
-            </span>
-          </Item>
-          )}
+          {items.map(({ title, content, show }) => show !== false && (
+            <Item key={title}>
+              <b>{title}: </b>
+              <span title={title}>{content || <i>`No ${title} provided`</i>}</span>
+            </Item>
+          ))}
         </Row>
       </Container>
       )}

@@ -48,8 +48,6 @@ export const getAggregationWidget = ({ rowPivots, fnSeries, sort = [] }: {
   fnSeries: Array<Series>,
   sort?: Array<SortConfig>
 }) => {
-  console.log({ rowPivots, fnSeries, sort });
-
   return AggregationWidget.builder()
     .id(generateId())
     .config(
@@ -68,7 +66,7 @@ export const getAggregationWidget = ({ rowPivots, fnSeries, sort = [] }: {
 export const WidgetsGenerator = async ({ streams, aggregations, groupBy }) => {
   const decorators = await DecoratorsActions.list();
   const byStreamId = matchesDecoratorStream(streams);
-  const streamDecorators = decorators ? decorators.filter(byStreamId) : [];
+  const streamDecorators = decorators?.length ? decorators.filter(byStreamId) : [];
   const histogram = resultHistogram();
   const messageTable = allMessagesTable(undefined, streamDecorators);
   const summaryAggregations = {
@@ -79,7 +77,6 @@ export const WidgetsGenerator = async ({ streams, aggregations, groupBy }) => {
   const needsSummaryAggregations = aggregations.length > 1;
   const SUMMARY_ROW_DELTA = needsSummaryAggregations ? AGGREGATION_WIDGET_HEIGHT : 0;
   const { aggregationWidgets, aggregationTitles, aggregationPositions } = aggregations.reduce((res, { field, value, expr, fnSeries }, index) => {
-    console.log({ rowPiwots: uniq([field, ...groupBy]) });
     const rowPivots = [pivotForField(uniq([field, ...groupBy]), new FieldType('value', [], []))];
     const fnSeriesForFunc = Series.forFunction(fnSeries);
     const direction = ['>', '>=', '=='].includes(expr) ? Direction.Descending : Direction.Ascending;
@@ -139,7 +136,6 @@ export const WidgetsGenerator = async ({ streams, aggregations, groupBy }) => {
 
 export const ViewStateGenerator = async ({ streams, aggregations, groupBy }: {groupBy: Array<string>, streams: string | string[] | undefined, aggregations: Array<any>}) => {
   const { titles, widgets, positions } = await WidgetsGenerator({ streams, aggregations, groupBy });
-  console.log({ titles, positions });
 
   return ViewState.create()
     .toBuilder()
@@ -178,7 +174,7 @@ export const ViewGenerator = async ({
   return UpdateSearchForWidgets(view);
 };
 
-const useCreateViewForEvent = (
+export const UseCreateViewForEvent = (
   { eventData, eventDefinition, aggregations }: { eventData: EventType, eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation> },
 ) => {
   const { streams } = eventData.replay_info;
@@ -200,4 +196,4 @@ const useCreateViewForEvent = (
   );
 };
 
-export default useCreateViewForEvent;
+export default UseCreateViewForEvent;

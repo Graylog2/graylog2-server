@@ -17,20 +17,19 @@
 import React from 'react';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
-import * as Immutable from 'immutable';
 
 import {
   mockedMappedAggregation,
+  mockedView,
   mockEventData,
   mockEventDefinition,
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
-import UseCreateViewForEvent from 'views/logic/views/UseCreateViewForEvent';
-import View from 'views/logic/views/View';
-import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
-import QueryGenerator from 'views/logic/queries/QueryGenerator';
-import Search from 'views/logic/search/Search';
-import { AbsoluteTimeRange } from 'views/logic/queries/Query';
-import ViewState from 'views/logic/views/ViewState';
+import * as UseCreateViewForEventModule from 'views/logic/views/UseCreateViewForEvent';
+import { UseCreateViewForEvent } from 'views/logic/views/UseCreateViewForEvent';
+
+jest.mock('graylog-web-plugin/plugin', () => ({
+  PluginStore: { exports: jest.fn(() => [{ type: 'aggregation', defaults: {} }]) },
+}));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,11 +38,22 @@ const queryClient = new QueryClient({
     },
   },
 });
+
 const wrapper = ({ children }) => (
   <QueryClientProvider client={queryClient}>
     {children}
   </QueryClientProvider>
 );
+
+jest.mock('views/logic/Widgets', () => ({
+  ...jest.requireActual('views/logic/Widgets'),
+  widgetDefinition: () => ({
+    searchTypes: () => [{
+      type: 'AGGREGATION',
+      typeDefinition: {},
+    }],
+  }),
+}));
 
 describe('useEventById', () => {
   afterEach(() => {
@@ -51,33 +61,14 @@ describe('useEventById', () => {
   });
 
   it('should run fetch and store mapped response', async () => {
-    const eventData = mockEventData.event;
+    // asMock(PluginStore.exports).mockReturnValue([]);
+    jest.spyOn(UseCreateViewForEventModule, 'getAggregationWidget');
     const { result } = renderHook(() => UseCreateViewForEvent({ eventData: mockEventData.event, eventDefinition: mockEventDefinition, aggregations: mockedMappedAggregation }), { wrapper });
-    const query = QueryGenerator(eventData.replay_info.streams, undefined, {
-      type: 'absolute',
-      from: eventData?.replay_info?.timerange_start,
-      to: eventData?.replay_info?.timerange_end,
-    }, {
-      type: 'elasticsearch',
-      query_string: eventData?.replay_info?.query || '',
-    });
-    const search = Search.create().toBuilder().queries([query]).build();
 
-    // const titles =
+    await expect(await result.current.then((r) => {
+      // console.log({ r: r.state.first().widgets, mockedView: mockedView.state.first().widgets });
 
-    expect(result.current).toEqual(UpdateSearchForWidgets(View.create()
-      .toBuilder()
-      .newId()
-      .type(View.Type.Search)
-      .state({
-        [query.id]: ViewState.create()
-          .toBuilder()
-          .titles(titles)
-          .widgets(Immutable.List(widgets))
-          .widgetPositions(positions)
-          .build(),
-      })
-      .search(search)
-      .build()));
+      return r;
+    })).toEqual(mockedView);
   });
 });

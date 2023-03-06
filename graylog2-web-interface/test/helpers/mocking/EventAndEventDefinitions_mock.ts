@@ -15,19 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { renderHook } from 'wrappedTestingLibrary/hooks';
 import * as Immutable from 'immutable';
 
 import type { EventType } from 'hooks/useEventById';
 import type { EventDefinition } from 'logic/alerts/types';
 import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
-import UseCreateViewForEvent from 'views/logic/views/UseCreateViewForEvent';
 import QueryGenerator from 'views/logic/queries/QueryGenerator';
 import Search from 'views/logic/search/Search';
-import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
 import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import Series from 'views/logic/aggregationbuilder/Series';
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import Direction from 'views/logic/aggregationbuilder/Direction';
+import { allMessagesTable, resultHistogram } from 'views/logic/Widgets';
 
 export const mockEventData = {
   event: {
@@ -175,8 +179,10 @@ const query = QueryGenerator(eventData.replay_info.streams, undefined, {
 const search = Search.create().toBuilder().queries([query]).build();
 
 // const titles =
+const histogram = resultHistogram('mc-widget-id');
+const messageTable = allMessagesTable('allm-widget-id', []);
 
-export const mockedView = UpdateSearchForWidgets(View.create()
+export const mockedView = View.create()
   .toBuilder()
   .newId()
   .type(View.Type.Search)
@@ -192,7 +198,49 @@ export const mockedView = UpdateSearchForWidgets(View.create()
           'summary-widget-id': 'Summary:  count(field1) > 500 count(field2) < 8000',
         },
       })
-      .widgets(Immutable.List(widgets))
+      .widgets(Immutable.List([
+        AggregationWidget.builder()
+          .id('field1-widget-id')
+          .config(
+            AggregationWidgetConfig.builder()
+              .columnPivots([])
+              .rowPivots([Pivot.create(['field1', 'field2'], 'values', { limit: 15 })])
+              .series([Series.forFunction('count(field1)')])
+              .sort([new SortConfig(SortConfig.SERIES_TYPE, 'count(field1)', Direction.Descending)])
+              .visualization('table')
+              .rollup(true)
+              .build(),
+          )
+          .build(),
+        AggregationWidget.builder()
+          .id('field1-widget-id')
+          .config(
+            AggregationWidgetConfig.builder()
+              .columnPivots([])
+              .rowPivots([Pivot.create(['field2', 'field1'], 'values', { limit: 15 })])
+              .series([Series.forFunction('count(field2)')])
+              .sort([new SortConfig(SortConfig.SERIES_TYPE, 'count(field2)', Direction.Ascending)])
+              .visualization('table')
+              .rollup(true)
+              .build(),
+          )
+          .build(),
+        histogram,
+        messageTable,
+        AggregationWidget.builder()
+          .id('summary-widget-id')
+          .config(
+            AggregationWidgetConfig.builder()
+              .columnPivots([])
+              .rowPivots([Pivot.create(['field1', 'field2'], 'values', { limit: 15 })])
+              .series([Series.forFunction('count(field1)'), Series.forFunction('count(field2)')])
+              .sort([])
+              .visualization('table')
+              .rollup(true)
+              .build(),
+          )
+          .build(),
+      ]))
       .widgetPositions({
         'mc-widget-id': new WidgetPosition(1, 10, 2, Infinity),
         'allm-widget-id': new WidgetPosition(1, 12, 6, Infinity),
@@ -203,4 +251,4 @@ export const mockedView = UpdateSearchForWidgets(View.create()
       .build(),
   })
   .search(search)
-  .build());
+  .build();
