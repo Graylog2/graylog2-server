@@ -31,7 +31,6 @@ import org.junit.jupiter.api.Test;
 
 import javax.net.ssl.SSLHandshakeException;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.StandardSocketOptions;
 import java.net.URI;
 import java.security.KeyManagementException;
@@ -49,10 +48,9 @@ public class ParameterizedHttpClientProviderTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        String localhost = InetAddress.getByName("localhost").getCanonicalHostName();
-
+        final String hostName = "localhost";
         final HeldCertificate localhostCert = new HeldCertificate.Builder()
-                .addSubjectAlternativeName(localhost)
+                .addSubjectAlternativeName(hostName)
                 .build();
 
         serverCertificates = new HandshakeCertificates.Builder()
