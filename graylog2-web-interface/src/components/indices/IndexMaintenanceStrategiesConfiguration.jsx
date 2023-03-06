@@ -26,7 +26,8 @@ import {
   TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY,
   TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY_TYPE,
   NOOP_RETENTION_STRATEGY,
-  ARCHIVE_RETENTION_STRATEGY, RETENTION,
+  ARCHIVE_RETENTION_STRATEGY,
+  RETENTION,
 } from 'stores/indices/IndicesStore';
 import { Alert, Col, Input, Row } from 'components/bootstrap';
 import { Icon, Select } from 'components/common';
@@ -178,9 +179,9 @@ const IndexMaintenanceStrategiesConfiguration = ({
     return newStrategy;
   };
 
-  const shouldShowInvalidRetentionWarning = () => {
-    return name === RETENTION && !getStrategyJsonSchema(getActiveSelection(), strategies);
-  };
+  const shouldShowInvalidRetentionWarning = () =>  (
+    name === RETENTION && !getStrategyJsonSchema(getActiveSelection(), strategies)
+  );
 
   return (
     <span>
