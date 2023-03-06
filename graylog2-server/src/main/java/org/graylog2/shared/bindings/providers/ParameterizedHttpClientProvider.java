@@ -109,6 +109,7 @@ public class ParameterizedHttpClientProvider {
     private Builder withSkipTLSVerificationAndKeepAlive(Builder builder) {
         builder.socketFactory(new TcpKeepAliveSocketFactory(SocketFactory.getDefault()));
         builder.sslSocketFactory(new TcpKeepAliveSSLSocketFactory(insecureSocketFactory), insecureTrustManager);
+        builder.hostnameVerifier((h, s) -> true);
         return builder;
     }
 

@@ -133,7 +133,7 @@ public class ParameterizedHttpClientProviderTest {
     }
 
     @Test
-    @Ignore("Don't call google by default")
+    @Ignore("Not enabled by default")
     public void testWithSystemDefaultTruststore() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
         final ParameterizedHttpClientProvider provider = new ParameterizedHttpClientProvider(client(null));
         final OkHttpClient okHttpClient = provider.get(false, false);
@@ -143,11 +143,22 @@ public class ParameterizedHttpClientProviderTest {
         }
     }
 
+    @Test
+    @Ignore("Not enabled by default")
+    public void testWithSystemDefaultTruststoreBadHostname() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
+        final ParameterizedHttpClientProvider provider = new ParameterizedHttpClientProvider(client(null));
+        final OkHttpClient okHttpClient = provider.get(true, true);
+
+        try (Response response = okHttpClient.newCall(new Request.Builder().url("https://wrong.host.badssl.com").get().build()).execute()) {
+            assertThat(response.isSuccessful()).isTrue();
+        }
+    }
+
     private OkHttpClientProvider client(URI proxyURI) {
         final OkHttpClientProvider provider = new OkHttpClientProvider(
-                Duration.milliseconds(200L),
-                Duration.milliseconds(200L),
-                Duration.milliseconds(200L),
+                Duration.milliseconds(500L),
+                Duration.milliseconds(500L),
+                Duration.milliseconds(500L),
                 proxyURI,
                 null);
 
