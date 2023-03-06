@@ -22,28 +22,21 @@ import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
 import { NoSearchResult, PaginatedList, RelativeTime, Spinner } from 'components/common';
 import { Link } from 'components/common/router';
 import { StyledLabel } from 'components/welcome/EntityListItem';
-import type { EntityItemType, RecentActivityType } from 'components/welcome/types';
+import type { RecentActivityType } from 'components/welcome/types';
 import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
-import getShowRouteForEntity from 'routing/getShowRouteForEntity';
 import getTitleForEntityType from 'util/getTitleForEntityType';
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
-import getPermissionPrefixByType from 'util/getPermissionPrefixByType';
+import { getShowRouteFromGRN, getValuesFromGRN } from 'logic/permissions/GRN';
+import useHasEntityPermissionByGRN from 'hooks/useHasEntityPermissionByGRN';
 
-type Props = { itemType: EntityItemType, itemId: string, activityType: RecentActivityType, itemTitle: string, userName?: string };
+type Props = { itemGrn: string, activityType: RecentActivityType, itemTitle: string, userName?: string };
 
-const ActionItem = ({ itemType, itemId, activityType, itemTitle, userName }: Props) => {
-  const { permissions } = useCurrentUser();
+const ActionItem = ({ itemGrn, activityType, itemTitle, userName }: Props) => {
+  const hasReadPermission = useHasEntityPermissionByGRN(itemGrn, 'read');
+  const { id: itemId, type: itemType } = getValuesFromGRN(itemGrn);
   const entityTypeTitle = useMemo(() => getTitleForEntityType(itemType, false) ?? `(unsupported type ${itemType})`, [itemType]);
-  const entityLink = useMemo(() => {
-    try {
-      return getShowRouteForEntity(itemId, itemType);
-    } catch (e) {
-      return undefined;
-    }
-  }, [itemType, itemId]);
+  const entityLink = getShowRouteFromGRN(itemGrn);
   const entityTitle = itemTitle || itemId;
-  const showLink = activityType !== 'delete' && !!entityLink && isPermitted(permissions, `${getPermissionPrefixByType(itemType)}read:${itemId}`);
+  const showLink = activityType !== 'delete' && !!entityLink && hasReadPermission;
 
   return (
     <div>
@@ -87,7 +80,7 @@ const RecentActivityList = () => {
       <Table striped>
         <tbody>
           {
-            recentActivity.map(({ id, timestamp, activityType, itemType, itemId, itemTitle, userName }) => {
+            recentActivity.map(({ id, timestamp, activityType, itemGrn, itemTitle, userName }) => {
               return (
                 <tr key={id}>
                   <td style={{ width: 110 }}>
@@ -96,7 +89,7 @@ const RecentActivityList = () => {
                     </StyledLabel>
                   </td>
                   <td>
-                    <ActionItem itemId={itemId} activityType={activityType} itemTitle={itemTitle} itemType={itemType} userName={userName} />
+                    <ActionItem itemGrn={itemGrn} activityType={activityType} itemTitle={itemTitle} userName={userName} />
                   </td>
                 </tr>
               );
