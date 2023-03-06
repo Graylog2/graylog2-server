@@ -21,37 +21,23 @@ import StreamRule from 'components/streamrules/StreamRule';
 import { Spinner } from 'components/common';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
 
-class StreamRuleList extends React.Component {
-  static propTypes = {
-    matchData: PropTypes.shape({
-      matches: PropTypes.bool,
-      rules: PropTypes.object,
-    }),
-    onSubmit: PropTypes.func,
-    onDelete: PropTypes.func,
-    permissions: PropTypes.array.isRequired,
-    stream: PropTypes.object.isRequired,
-    streamRuleTypes: PropTypes.array.isRequired,
-  };
+const StreamRuleList = ({
+  matchData,
+  onDelete,
+  onSubmit,
+  permissions,
+  stream,
+  streamRuleTypes,
+}) => {
+  if (!stream) {
+    return <Spinner />;
+  }
 
-  static defaultProps = {
-    matchData: {},
-    onSubmit: () => {},
-    onDelete: () => {},
-  };
+  const hasStreamRules = !!stream.rules.length;
 
-  _formatStreamRules = (streamRules) => {
-    if (streamRules && streamRules.length > 0) {
-      const {
-        matchData,
-        onDelete,
-        onSubmit,
-        permissions,
-        stream,
-        streamRuleTypes,
-      } = this.props;
-
-      return streamRules.map((streamRule) => (
+  return (
+    <ListGroup componentClass="ul">
+      {hasStreamRules && stream.rules.map((streamRule) => (
         <StreamRule key={streamRule.id}
                     permissions={permissions}
                     matchData={matchData}
@@ -60,27 +46,29 @@ class StreamRuleList extends React.Component {
                     stream={stream}
                     streamRule={streamRule}
                     streamRuleTypes={streamRuleTypes} />
-      ));
-    }
+      ))}
 
-    return <ListGroupItem>No rules defined.</ListGroupItem>;
-  };
+      {!hasStreamRules && <ListGroupItem>No rules defined.</ListGroupItem>}
+    </ListGroup>
+  );
+};
 
-  render() {
-    const { stream } = this.props;
+StreamRuleList.propTypes = {
+  matchData: PropTypes.shape({
+    matches: PropTypes.bool,
+    rules: PropTypes.object,
+  }),
+  onSubmit: PropTypes.func,
+  onDelete: PropTypes.func,
+  permissions: PropTypes.array.isRequired,
+  stream: PropTypes.object.isRequired,
+  streamRuleTypes: PropTypes.array.isRequired,
+};
 
-    if (stream) {
-      const streamRules = this._formatStreamRules(stream.rules);
-
-      return (
-        <ListGroup componentClass="ul">
-          {streamRules}
-        </ListGroup>
-      );
-    }
-
-    return <Spinner />;
-  }
-}
+StreamRuleList.defaultProps = {
+  matchData: {},
+  onSubmit: () => {},
+  onDelete: () => {},
+};
 
 export default StreamRuleList;
