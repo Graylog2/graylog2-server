@@ -84,7 +84,7 @@ export type BooleanField = {
 
 export type InlineBinaryField = {
   additional_info: {},
-  attributes: Array<TextFieldAttributes>,
+  attributes: Array<string>,
   default_value: string,
   description: string,
   human_name: string,
