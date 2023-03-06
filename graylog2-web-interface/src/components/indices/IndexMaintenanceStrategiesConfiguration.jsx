@@ -178,7 +178,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
     }).length > 0;
 
     if (!isSelectedItemInList) {
-      return [...availableStrategies, pluginExports.find((pluginOptions)  => {
+      return [...availableStrategies, pluginExports.find((pluginOptions) => {
         return pluginOptions.type === newStrategy;
       })].map((pluginOptions) => {
         return { value: pluginOptions.type, label: pluginOptions.displayName };
