@@ -60,23 +60,7 @@ public interface ViewUtils<T> {
         var user = searchUser.getUser().getId();
         final AggregateIterable<Document> result = collection().aggregate(List.of(
                         Aggregates.match(query),
-                        Aggregates.lookup(
-                                FavoritesService.COLLECTION_NAME,
-                                List.of(
-                                        new Variable<>("searchId", doc("$toString", "$_id")),
-                                        new Variable<>("userId", user)
-                                ),
-                                List.of(Aggregates.unwind("$items"),
-                                        Aggregates.match(
-                                                doc("$expr", doc("$and", List.of(
-                                                                doc("$eq", List.of("$items.id", "$$searchId")),
-                                                                doc("$eq", List.of("$user_id", "$$userId"))
-                                                        )
-                                                ))),
-                                        Aggregates.project(doc("_id", 1))
-                                ),
-                                "favorites"
-                        ),
+                        getLookupAggregation(user),
                         Aggregates.set(new Field<>("favorite", doc("$gt", List.of(doc("$size", "$favorites"), 0)))),
                         Aggregates.unset("favorites"),
                         Aggregates.sort(sort)
@@ -84,6 +68,46 @@ public interface ViewUtils<T> {
         ).collation(Collation.builder().locale("en").build());
 
         return StreamSupport.stream(result.spliterator(), false);
+    }
+
+    default Stream<Document> findViews(SearchUser searchUser,
+                                       Bson query,
+                                       DBSort.SortBuilder sort,
+                                       int page,
+                                       int perPage) {
+        var user = searchUser.getUser().getId();
+        final AggregateIterable<Document> result = collection().aggregate(List.of(
+                        Aggregates.match(query),
+                        getLookupAggregation(user),
+                        Aggregates.set(new Field<>("favorite", doc("$gt", List.of(doc("$size", "$favorites"), 0)))),
+                        Aggregates.unset("favorites"),
+                        Aggregates.sort(sort),
+                        Aggregates.skip(Math.max(0, (page - 1)) * perPage),
+                        Aggregates.limit(perPage)
+                )
+        ).collation(Collation.builder().locale("en").build());
+
+        return StreamSupport.stream(result.spliterator(), false);
+    }
+
+    private Bson getLookupAggregation(String user) {
+        return Aggregates.lookup(
+                FavoritesService.COLLECTION_NAME,
+                List.of(
+                        new Variable<>("searchId", doc("$toString", "$_id")),
+                        new Variable<>("userId", user)
+                ),
+                List.of(Aggregates.unwind("$items"),
+                        Aggregates.match(
+                                doc("$expr", doc("$and", List.of(
+                                                doc("$eq", List.of("$items.id", "$$searchId")),
+                                                doc("$eq", List.of("$user_id", "$$userId"))
+                                        )
+                                ))),
+                        Aggregates.project(doc("_id", 1))
+                ),
+                "favorites"
+        );
     }
 
     private Document doc(String key, Object value) {

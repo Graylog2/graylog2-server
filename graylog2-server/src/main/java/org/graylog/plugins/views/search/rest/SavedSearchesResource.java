@@ -99,17 +99,30 @@ public class SavedSearchesResource extends RestResource {
 
         try {
             final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
-            final PaginatedList<ViewSummaryDTO> result = dbService.searchSummariesPaginatedByType(
-                    searchUser,
-                    ViewDTO.Type.SEARCH,
-                    dbQuery,
-                    searchUser::canReadView,
-                    order,
-                    sortField,
-                    page,
-                    perPage);
+            if (isPermitted(ViewsRestPermissions.VIEW_READ, "*")) { //TODO: security views and different permissions?
+                final PaginatedList<ViewSummaryDTO> result = dbService.searchSummariesPaginatedByType(
+                        searchUser,
+                        ViewDTO.Type.SEARCH,
+                        dbQuery,
+                        order,
+                        sortField,
+                        page,
+                        perPage);
 
-            return PageListResponse.create(query, result.pagination(), result.pagination().total(), sortField, order, result, attributes, settings);
+                return PageListResponse.create(query, result.pagination(), result.pagination().total(), sortField, order, result, attributes, settings);
+            } else {
+                final PaginatedList<ViewSummaryDTO> result = dbService.searchSummariesPaginatedByType(
+                        searchUser,
+                        ViewDTO.Type.SEARCH,
+                        dbQuery,
+                        searchUser::canReadView,
+                        order,
+                        sortField,
+                        page,
+                        perPage);
+
+                return PageListResponse.create(query, result.pagination(), result.pagination().total(), sortField, order, result, attributes, settings);
+            }
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), e);
         }

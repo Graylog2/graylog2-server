@@ -116,6 +116,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 
 @RequiresAuthentication
 @Api(value = "Streams", description = "Manage streams", tags = {CLOUD_VISIBLE})
@@ -249,7 +250,7 @@ public class StreamResource extends RestResource {
     public StreamListResponse get() {
         final List<Stream> streams = streamService.loadAll()
                 .stream()
-                .filter(stream -> isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
+                .filter(stream -> isPermitted(STREAMS_READ, stream.getId()))
                 .toList();
 
         return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
@@ -263,7 +264,7 @@ public class StreamResource extends RestResource {
     public StreamListResponse getEnabled() {
         final List<Stream> streams = streamService.loadAllEnabled()
                 .stream()
-                .filter(stream -> isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
+                .filter(stream -> isPermitted(STREAMS_READ, stream.getId()))
                 .toList();
 
         return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
@@ -280,7 +281,7 @@ public class StreamResource extends RestResource {
     })
     public StreamResponse get(@ApiParam(name = "streamId", required = true)
                               @PathParam("streamId") @NotEmpty String streamId) throws NotFoundException {
-        checkPermission(RestPermissions.STREAMS_READ, streamId);
+        checkPermission(STREAMS_READ, streamId);
 
         return streamToResponse(streamService.load(streamId));
     }
@@ -438,7 +439,7 @@ public class StreamResource extends RestResource {
                                        @PathParam("streamId") String streamId,
                                        @ApiParam(name = "JSON body", required = true)
                                        @NotNull Map<String, Map<String, Object>> serialisedMessage) throws NotFoundException {
-        checkPermission(RestPermissions.STREAMS_READ, streamId);
+        checkPermission(STREAMS_READ, streamId);
 
         final Stream stream = streamService.load(streamId);
         // This is such a hack...
@@ -481,7 +482,7 @@ public class StreamResource extends RestResource {
                                 @ApiParam(name = "JSON body", required = true) @Valid @NotNull CloneStreamRequest cr,
                                 @Context UserContext userContext) throws ValidationException, NotFoundException {
         checkPermission(RestPermissions.STREAMS_CREATE);
-        checkPermission(RestPermissions.STREAMS_READ, streamId);
+        checkPermission(STREAMS_READ, streamId);
         checkNotEditableStream(streamId, "The stream cannot be cloned.");
 
         final Stream sourceStream = streamService.load(streamId);

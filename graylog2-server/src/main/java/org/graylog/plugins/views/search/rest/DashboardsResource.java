@@ -34,6 +34,7 @@ import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
@@ -100,17 +101,30 @@ public class DashboardsResource extends RestResource {
 
         try {
             final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
-            final PaginatedList<ViewSummaryDTO> result = dbService.searchSummariesPaginatedByType(
-                    searchUser,
-                    ViewDTO.Type.DASHBOARD,
-                    dbQuery,
-                    searchUser::canReadView,
-                    order,
-                    sortField,
-                    page,
-                    perPage);
+            if (isPermitted(RestPermissions.DASHBOARDS_READ, "*") || isPermitted(ViewsRestPermissions.VIEW_READ, "*")) { //TODO: security views and different permissions?
+                final PaginatedList<ViewSummaryDTO> result = dbService.searchSummariesPaginatedByType(
+                        searchUser,
+                        ViewDTO.Type.DASHBOARD,
+                        dbQuery,
+                        order,
+                        sortField,
+                        page,
+                        perPage);
 
-            return PageListResponse.create(query, result.pagination(), result.pagination().total(), sortField, order, result, attributes, settings);
+                return PageListResponse.create(query, result.pagination(), result.pagination().total(), sortField, order, result, attributes, settings);
+            } else {
+                final PaginatedList<ViewSummaryDTO> result = dbService.searchSummariesPaginatedByType(
+                        searchUser,
+                        ViewDTO.Type.DASHBOARD,
+                        dbQuery,
+                        searchUser::canReadView,
+                        order,
+                        sortField,
+                        page,
+                        perPage);
+
+                return PageListResponse.create(query, result.pagination(), result.pagination().total(), sortField, order, result, attributes, settings);
+            }
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), e);
         }
