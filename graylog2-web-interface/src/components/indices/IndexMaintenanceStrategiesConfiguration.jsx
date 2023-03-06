@@ -22,12 +22,12 @@ import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import {
+  ARCHIVE_RETENTION_STRATEGY,
+  NOOP_RETENTION_STRATEGY,
+  RETENTION,
   TIME_BASED_ROTATION_STRATEGY,
   TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY,
   TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY_TYPE,
-  NOOP_RETENTION_STRATEGY,
-  ARCHIVE_RETENTION_STRATEGY,
-  RETENTION,
 } from 'stores/indices/IndicesStore';
 import { Alert, Col, Input, Row } from 'components/bootstrap';
 import { Icon, Select } from 'components/common';
@@ -168,12 +168,27 @@ const IndexMaintenanceStrategiesConfiguration = ({
   }, [isTimeBasedSizeOptimizing, rotationStrategyClass, setValues, values]);
 
   const getAvailableSelectOptions = () => {
-    return pluginExports
-      .filter((c) => strategies.find(({ type }) => type === c.type))
+    const availableStrategies = pluginExports
+      .filter((c) => strategies.find(({ type }) => type === c.type));
+    const isSelectedItemInList = availableStrategies.filter(v => {
+      return v.type === newStrategy;
+    }).length > 0;
+
+    if (!isSelectedItemInList) {
+      return [...availableStrategies, pluginExports.find( c => c.type === newStrategy)].map((c) => {
+        return { value: c.type, label: c.displayName };
+      });
+    }
+
+    return availableStrategies
       .map((c) => {
         return { value: c.type, label: c.displayName };
       });
   };
+
+  const getDisplayName = () => {
+    return pluginExports.find( c => c.type === newStrategy).displayName;
+  }
 
   const getActiveSelection = () => {
     return newStrategy;
@@ -205,7 +220,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
       )}
       {shouldShowInvalidRetentionWarning() && (
         <StyledAlert bsStyle="danger">
-          <Icon name="exclamation-triangle" />{' '} {strategy} strategy was deactivated.
+          <Icon name="exclamation-triangle" />{' '} {getDisplayName()} strategy was deactivated.
           Please configure a valid retention strategy.
         </StyledAlert>
       )}
