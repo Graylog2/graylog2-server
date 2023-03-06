@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 /**
  * Annotation to not bind a REST resource annotated with @Path in Graylog Cloud.
  */
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface HideOnCloud {
 }
