@@ -169,19 +169,19 @@ const IndexMaintenanceStrategiesConfiguration = ({
 
   const getAvailableSelectOptions = () => {
     const availableStrategies = pluginExports
-      .filter((c) => {
-        return strategies.find(({ type }) => type === c.type);
+      .filter((pluginOptions) => {
+        return strategies.find(({ type }) => type === pluginOptions.type);
       });
 
-    const isSelectedItemInList = availableStrategies.filter(v => {
-      return v.type === newStrategy;
+    const isSelectedItemInList = availableStrategies.filter((availableStrategy) => {
+      return availableStrategy.type === newStrategy;
     }).length > 0;
 
     if (!isSelectedItemInList) {
-      return [...availableStrategies, pluginExports.find(c => {
-        return c.type === newStrategy;
-      })].map((c) => {
-        return { value: c.type, label: c.displayName };
+      return [...availableStrategies, pluginExports.find((pluginOptions)  => {
+        return pluginOptions.type === newStrategy;
+      })].map((pluginOptions) => {
+        return { value: pluginOptions.type, label: pluginOptions.displayName };
       });
     }
 
@@ -192,7 +192,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
   };
 
   const getDisplayName = () => {
-    return pluginExports.find(c => c.type === newStrategy).displayName;
+    return pluginExports.find((pluginOptions) => pluginOptions.type === newStrategy).displayName;
   };
 
   const getActiveSelection = () => {
