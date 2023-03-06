@@ -16,7 +16,8 @@
  */
 package org.graylog.plugins.views.startpage.lastOpened;
 
+import org.graylog.grn.GRN;
 import org.joda.time.DateTime;
 
-public record LastOpened(String id, String type, String title, DateTime timestamp) {
+public record LastOpened(GRN grn, String title, DateTime timestamp) {
 }
