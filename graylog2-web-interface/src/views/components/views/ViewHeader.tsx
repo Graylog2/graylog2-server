@@ -136,6 +136,7 @@ const ViewHeader = () => {
 
   return (
     <Row>
+      <Content>
         {
           breadCrumbs.map(({ label, link }, index) => {
             const theLast = index === breadCrumbs.length - 1;
