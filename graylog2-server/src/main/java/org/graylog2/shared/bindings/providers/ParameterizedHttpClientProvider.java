@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.bindings.providers;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -23,13 +24,12 @@ import okhttp3.OkHttpClient;
 import okhttp3.OkHttpClient.Builder;
 import org.graylog2.security.DefaultX509TrustManager;
 import org.graylog2.security.TrustAllX509TrustManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.security.KeyManagementException;
@@ -40,15 +40,33 @@ import java.util.concurrent.ExecutionException;
 
 @Singleton
 public class ParameterizedHttpClientProvider {
-    private static final Logger LOG = LoggerFactory.getLogger(ParameterizedHttpClientProvider.class);
-
     private final LoadingCache<Parameters, OkHttpClient> cache;
     private final OkHttpClientProvider okHttpClientProvider;
+    private final X509TrustManager insecureTrustManager;
+    private final SSLSocketFactory insecureSocketFactory;
+    private X509TrustManager trustManager;
+    private SSLSocketFactory sslSocketFactory;
 
     @Inject
-    public ParameterizedHttpClientProvider(OkHttpClientProvider provider) {
+    public ParameterizedHttpClientProvider(OkHttpClientProvider provider) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
         okHttpClientProvider = provider;
         cache = CacheBuilder.newBuilder().build(CacheLoader.from(this::buildHttpClient));
+
+        insecureTrustManager = new TrustAllX509TrustManager();
+        SSLContext insecureSSLContext = SSLContext.getInstance("TLS");
+        insecureSSLContext.init(null, new TrustManager[]{insecureTrustManager}, new SecureRandom());
+        insecureSocketFactory = insecureSSLContext.getSocketFactory();
+
+        sslSocketFactory = SSLContext.getDefault().getSocketFactory();
+        trustManager = new DefaultX509TrustManager("ignored");
+    }
+
+    @VisibleForTesting
+    // allows testing with a custom trustManager / sslSocketFactory
+    public ParameterizedHttpClientProvider(OkHttpClientProvider provider, SSLSocketFactory sslSocketFactory, X509TrustManager trustManager) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+        this(provider);
+        this.trustManager = trustManager;
+        this.sslSocketFactory = sslSocketFactory;
     }
 
     public OkHttpClient get(boolean keepAlive, boolean skipTLSVerify) {
@@ -63,6 +81,7 @@ public class ParameterizedHttpClientProvider {
         final Builder builder = okHttpClientProvider.get().newBuilder();
 
         switch (parameters) {
+            case NONE -> withDefaultSocketFactory(builder);
             case KEEPALIVE -> withKeepAlive(builder);
             case SKIP_TLS_VERIFY -> withSkipTLSVerification(builder);
             case SKIP_TLS_VERIFY_AND_KEEPALIVE -> withSkipTLSVerificationAndKeepAlive(builder);
@@ -70,39 +89,26 @@ public class ParameterizedHttpClientProvider {
         return builder.build();
     }
 
+    private Builder withDefaultSocketFactory(Builder builder) {
+        builder.sslSocketFactory(sslSocketFactory, trustManager);
+        return builder;
+    }
+
     private Builder withKeepAlive(Builder builder) {
         builder.socketFactory(new TcpKeepAliveSocketFactory(SocketFactory.getDefault()));
-        try {
-            builder.sslSocketFactory(new TcpKeepAliveSSLSocketFactory(SSLContext.getDefault().getSocketFactory()), new DefaultX509TrustManager("ignored"));
-        } catch (NoSuchAlgorithmException | KeyStoreException e) {
-            LOG.error("Failed to apply SSL TCP keep-alive to OkHttpClient", e);
-        }
+        builder.sslSocketFactory(new TcpKeepAliveSSLSocketFactory(sslSocketFactory), trustManager);
         return builder;
     }
 
     private Builder withSkipTLSVerification(Builder builder) {
-        try {
-            final SSLContext sslContext = SSLContext.getInstance("TLS");
-            final X509TrustManager trustManager = new TrustAllX509TrustManager();
-            sslContext.init(null, new TrustManager[]{trustManager}, new SecureRandom());
-            builder.sslSocketFactory(sslContext.getSocketFactory(), trustManager);
-            builder.hostnameVerifier((h, s) -> true);
-        } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            LOG.error("Failed to skip TLS verification on OkHttpClient", e);
-        }
+        builder.sslSocketFactory(insecureSocketFactory, insecureTrustManager);
+        builder.hostnameVerifier((h, s) -> true);
         return builder;
     }
 
     private Builder withSkipTLSVerificationAndKeepAlive(Builder builder) {
         builder.socketFactory(new TcpKeepAliveSocketFactory(SocketFactory.getDefault()));
-        try {
-            final SSLContext sslContext = SSLContext.getInstance("TLS");
-            final X509TrustManager trustManager = new TrustAllX509TrustManager();
-            sslContext.init(null, new TrustManager[]{trustManager}, new SecureRandom());
-            builder.sslSocketFactory(new TcpKeepAliveSSLSocketFactory(sslContext.getSocketFactory()), trustManager);
-        } catch (KeyManagementException | NoSuchAlgorithmException e) {
-            LOG.error("Failed to skip TLS verification / enable TCP keep-alive on OkHttpClient", e);
-        }
+        builder.sslSocketFactory(new TcpKeepAliveSSLSocketFactory(insecureSocketFactory), insecureTrustManager);
         return builder;
     }
 
