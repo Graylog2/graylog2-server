@@ -21,6 +21,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.model.Resource;
 import org.glassfish.jersey.server.model.ResourceModel;
 import org.graylog2.Configuration;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.shared.rest.HideOnCloud;
 import org.junit.Test;
@@ -119,12 +120,11 @@ public class PrefixAddingCloudHidingModelProcessorTest {
                 .addResource(Resource.from(TestResource.class))
                 .addResource(Resource.from(HiddenTestResource.class))
                 .addResource(Resource.from(PartlyHiddenTestResource.class))
-                .addResource(Resource.from(EmptyParentResource.class))
                 .build();
 
         final ResourceModel resourceModel = modelProcessor.processResourceModel(originalResourceModel, new ResourceConfig());
 
-        assertThat(resourceModel.getResources()).hasSize(3);
+        assertThat(resourceModel.getResources()).hasSize(2);
 
         Resource resource = resourceModel.getResources().get(0);
         assertThat(resource.getPath()).isEqualTo("/test/prefix/foobar/{test}");
@@ -142,10 +142,6 @@ public class PrefixAddingCloudHidingModelProcessorTest {
         assertThat(resource.getChildResources().get(1).getPath()).isEqualTo("noCloud");
         assertThat(resource.getChildResources().get(1).getResourceMethods()).hasSize(1);
         assertThat(resource.getChildResources().get(1).getResourceMethods().get(0).getConsumedTypes()).containsExactly(MediaType.APPLICATION_JSON_TYPE);
-
-        assertThat(resourceModel.getResources()).anySatisfy(r ->
-                assertThat(r.getPath()).isEqualTo("/test/prefix/emptyparent")
-        );
     }
 
     @Path("/foobar/{test}")
@@ -163,15 +159,6 @@ public class PrefixAddingCloudHidingModelProcessorTest {
         public String helloWorld(@PathParam("test") String s) {
             return String.format(Locale.ENGLISH, "Hello, %s!", s);
         }
-    }
-
-    @Path("/emptyparent")
-    private static class EmptyParentResource {
-        @GET
-        @Path("child")
-        public String childMethod() {
-            return "child";
-        };
     }
 
     @Path("/partly-hidden/{test}")
