@@ -36,7 +36,7 @@ import javax.ws.rs.core.MediaType;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Entity Suggestions", tags = {CLOUD_VISIBLE})
+@Api(value = "EntitySuggestions", tags = {CLOUD_VISIBLE})
 @Path("/entity_suggestions")
 @Produces(MediaType.APPLICATION_JSON)
 public class EntitySuggestionResource extends RestResource {
