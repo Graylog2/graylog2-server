@@ -291,18 +291,20 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     public EventDefinitionDto delete(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                                      @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_DELETE, definitionId);
+
+        final Optional<EventDefinitionDto> eventDefinitionDto = dbService.get(definitionId);
+        final String dependencyTitle = eventDefinitionDto.isPresent() ? eventDefinitionDto.get().title() : definitionId;
         final List<EventDefinitionDto> dependentEventDtoList = eventResolver.dependentEvents(definitionId);
         if (!dependentEventDtoList.isEmpty()) {
-            final List<String> dependenciesTitles = dependentEventDtoList.stream().map(dto -> dto.title()).toList();
-            final List<String> dependenciesIds = dependentEventDtoList.stream().map(dto -> dto.id()).toList();
-            String msg = "Unable to delete event definition because of existing dependencies: " + dependenciesTitles.toString();
+            final List<String> dependenciesTitles = dependentEventDtoList.stream().map(EventDefinitionDto::title).toList();
+            final List<String> dependenciesIds = dependentEventDtoList.stream().map(EventDefinitionDto::id).toList();
+            String msg = "Unable to delete event definition <" + dependencyTitle + "> because of existing dependencies: " + dependenciesTitles.toString();
             ValidationResult validationResult = new ValidationResult()
                 .addError("dependency", msg)
                 .addContext("dependency_ids", dependenciesIds);
             throw new ValidationFailureException(validationResult, msg);
         }
 
-        final Optional<EventDefinitionDto> eventDefinitionDto = dbService.get(definitionId);
         eventDefinitionDto.ifPresent(d ->
                 recentActivityService.delete(d.id(), GRNTypes.EVENT_DEFINITION, d.title(), userContext.getUser())
         );
