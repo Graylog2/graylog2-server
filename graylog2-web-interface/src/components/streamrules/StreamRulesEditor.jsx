@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { LinkContainer } from 'components/common/router';
@@ -29,6 +29,8 @@ import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import Spinner from 'components/common/Spinner';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
+
+import useStream from '../streams/hooks/useStream';
 
 const StreamAlertHeader = styled(Panel.Heading)`
   font-weight: bold;
@@ -53,162 +55,128 @@ const getListClassName = (matchData) => {
   return (matchData.matches ? 'success' : 'danger');
 };
 
-class StreamRulesEditor extends React.Component {
-  static propTypes = {
-    currentUser: PropTypes.object.isRequired,
-    streamId: PropTypes.string.isRequired,
-    messageId: PropTypes.string,
-    index: PropTypes.string,
-  };
+const StreamRulesEditor = ({ streamId, messageId, index }) => {
+  const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
+  const [message, setMessage] = useState();
+  const [matchData, setMatchData] = useState();
+  const { data: stream, refetch } = useStream(streamId);
 
-  static defaultProps = {
-    messageId: '',
-    index: '',
-  };
+  useEffect(() => {
+    const refetchStrems = () => refetch();
+    StreamsStore.onChange(refetchStrems);
+    StreamRulesStore.onChange(refetchStrems);
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      showStreamRuleForm: false,
+    return () => {
+      StreamsStore.unregister(refetchStrems);
+      StreamRulesStore.unregister(refetchStrems);
     };
-  }
+  }, [refetch]);
 
-  componentDidMount() {
-    this.loadData();
-    StreamsStore.onChange(this.loadData);
-    StreamRulesStore.onChange(this.loadData);
-  }
-
-  componentWillUnmount() {
-    StreamsStore.unregister(this.loadData);
-    StreamRulesStore.unregister(this.loadData);
-  }
-
-  onMessageLoaded = (message) => {
-    this.setState({ message: message });
+  const onMessageLoaded = (newMessage) => {
+    setMessage(newMessage);
 
     if (message !== undefined) {
-      const { streamId } = this.props;
-
       StreamsStore.testMatch(streamId, { message: message.fields }, (resultData) => {
-        this.setState({ matchData: resultData });
+        setMatchData(resultData);
       });
     } else {
-      this.setState({ matchData: undefined });
+      setMatchData(undefined);
     }
   };
 
-  loadData = () => {
-    const { streamId } = this.props;
-    const { message } = this.state;
-
-
-    StreamsStore.get(streamId, (stream) => {
-      this.setState({ stream: stream });
-    });
-
-    if (message) {
-      this.onMessageLoaded(message);
-    }
-  };
-
-  _onStreamRuleFormSubmit = (streamRuleId, data) => {
-    const { streamId } = this.props;
-
+  const _onStreamRuleFormSubmit = (streamRuleId, data) => {
     return StreamRulesStore.create(streamId, data, () => {});
   };
 
-  _onAddStreamRule = (event) => {
+  const _onAddStreamRule = (event) => {
     event.preventDefault();
-    this.setState({ showStreamRuleForm: true });
+    setShowStreamRuleForm(true);
   };
 
-  _explainMatchResult = () => {
-    const { matchData } = this.state;
+  const styles = (matchData ? getListClassName(matchData) : 'info');
 
-    if (matchData) {
-      if (matchData.matches) {
-        return (
-          <>
-            <MatchIcon matches name="check" /> This message would be routed to this stream!
-          </>
-        );
-      }
-
-      return (
-        <>
-          <MatchIcon name="times" /> This message would not be routed to this stream.
-        </>
-      );
-    }
-
-    return (
-      <>
-        <MatchIcon empty name="exclamation-circle" /> Please load a message in Step 1 above to check if it would match against these rules.
-      </>
-    );
-  };
-
-  render() {
-    const { matchData, stream, showStreamRuleForm } = this.state;
-    const { messageId, index } = this.props;
-    const styles = (matchData ? getListClassName(matchData) : 'info');
-
-    if (stream) {
-      return (
-        <Row className="content">
-          <Col md={12} className="streamrule-sample-message">
-            <h2>1. Load a message to test rules</h2>
-
-            <div className="stream-loader">
-              <LoaderTabs messageId={messageId}
-                          index={index}
-                          onMessageLoaded={this.onMessageLoaded} />
-            </div>
-
-            <hr />
-
-            <div className="buttons pull-right">
-              <Button bsStyle="success"
-                      className="show-stream-rule"
-                      onClick={this._onAddStreamRule}>
-                Add stream rule
-              </Button>
-              {showStreamRuleForm && (
-                <StreamRuleModal title="New Stream Rule"
-                                 onClose={() => this.setState({ showStreamRuleForm: false })}
-                                 submitButtonText="Create Rule"
-                                 submitLoadingText="Creating Rule..."
-                                 onSubmit={this._onStreamRuleFormSubmit} />
-              )}
-            </div>
-
-            <h2>2. Manage stream rules</h2>
-
-            <MatchingTypeSwitcher stream={stream} onChange={this.loadData} />
-            <Panel bsStyle={styles}>
-              <StreamAlertHeader>{this._explainMatchResult()}</StreamAlertHeader>
-              <StreamRuleList stream={stream}
-                              matchData={matchData} />
-            </Panel>
-
-            <p>
-              <LinkContainer to={Routes.STREAMS}>
-                <Button bsStyle="success">I&apos;m done!</Button>
-              </LinkContainer>
-            </p>
-          </Col>
-        </Row>
-      );
-    }
-
+  if (!stream) {
     return (
       <Row className="content">
         <StyledSpinner />
       </Row>
     );
   }
-}
+
+  return (
+    <Row className="content">
+      <Col md={12} className="streamrule-sample-message">
+        <h2>1. Load a message to test rules</h2>
+
+        <div className="stream-loader">
+          <LoaderTabs messageId={messageId}
+                      index={index}
+                      onMessageLoaded={onMessageLoaded} />
+        </div>
+
+        <hr />
+
+        <div className="buttons pull-right">
+          <Button bsStyle="success"
+                  className="show-stream-rule"
+                  onClick={_onAddStreamRule}>
+            Add stream rule
+          </Button>
+          {showStreamRuleForm && (
+            <StreamRuleModal title="New Stream Rule"
+                             onClose={() => setShowStreamRuleForm(false)}
+                             submitButtonText="Create Rule"
+                             submitLoadingText="Creating Rule..."
+                             onSubmit={_onStreamRuleFormSubmit} />
+          )}
+        </div>
+
+        <h2>2. Manage stream rules</h2>
+
+        <MatchingTypeSwitcher stream={stream} onChange={refetch} />
+        <Panel bsStyle={styles}>
+          <StreamAlertHeader>
+            {matchData?.matches && (
+              <>
+                <MatchIcon matches name="check" /> This message would be routed to this stream!
+              </>
+            )}
+
+            {(matchData && !matchData.matches) && (
+              <>
+                <MatchIcon name="times" /> This message would not be routed to this stream.
+              </>
+            )}
+
+            {!matchData && (
+              <>
+                <MatchIcon empty name="exclamation-circle" /> Please load a message in Step 1 above to check if it would match against these rules.
+              </>
+            )}
+          </StreamAlertHeader>
+          <StreamRuleList stream={stream}
+                          matchData={matchData} />
+        </Panel>
+
+        <p>
+          <LinkContainer to={Routes.STREAMS}>
+            <Button bsStyle="success">I&apos;m done!</Button>
+          </LinkContainer>
+        </p>
+      </Col>
+    </Row>
+  );
+};
+
+StreamRulesEditor.propTypes = {
+  streamId: PropTypes.string.isRequired,
+  messageId: PropTypes.string,
+  index: PropTypes.string,
+};
+
+StreamRulesEditor.defaultProps = {
+  messageId: '',
+  index: '',
+};
 
 export default StreamRulesEditor;
