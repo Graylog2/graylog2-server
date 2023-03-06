@@ -48,9 +48,10 @@ public class ParameterizedHttpClientProviderTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        final String hostName = "localhost";
         final HeldCertificate localhostCert = new HeldCertificate.Builder()
-                .addSubjectAlternativeName(hostName)
+                .addSubjectAlternativeName("localhost")
+                .addSubjectAlternativeName("localhost.localdomain")
+                .addSubjectAlternativeName("127.0.0.1")
                 .build();
 
         serverCertificates = new HandshakeCertificates.Builder()
