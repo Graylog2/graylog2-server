@@ -16,8 +16,10 @@
  */
 package org.junit.jupiter.engine.descriptor;
 
+import org.junit.jupiter.api.extension.ExecutableInvoker;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
+import org.junit.jupiter.engine.execution.DefaultExecutableInvoker;
 import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
 import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
 import org.junit.platform.engine.EngineExecutionListener;
@@ -56,8 +58,9 @@ public class ContainerMatrixEngineDescriptor extends EngineDescriptor implements
         MutableExtensionRegistry extensionRegistry = MutableExtensionRegistry.createRegistryWithDefaultExtensions(
                 context.getConfiguration());
         EngineExecutionListener executionListener = context.getExecutionListener();
+        ExecutableInvoker executableInvoker = new DefaultExecutableInvoker(context);
         ExtensionContext extensionContext = new ContainerMatrixExtensionContext(executionListener, this,
-                context.getConfiguration());
+                context.getConfiguration(), executableInvoker);
 
         // @formatter:off
         return context.extend()

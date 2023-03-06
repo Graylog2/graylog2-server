@@ -32,6 +32,7 @@ import FavoriteIcon from 'views/components/FavoriteIcon';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import { updateView } from 'views/logic/slices/viewSlice';
 import useIsNew from 'views/hooks/useIsNew';
+import { createGRN } from 'logic/permissions/GRN';
 
 const links = {
   [View.Type.Dashboard]: ({ id, title }) => [{
@@ -135,7 +136,6 @@ const ViewHeader = () => {
 
   return (
     <Row>
-      <Content>
         {
           breadCrumbs.map(({ label, link }, index) => {
             const theLast = index === breadCrumbs.length - 1;
@@ -146,7 +146,7 @@ const ViewHeader = () => {
                 {!theLast && <StyledIcon name="chevron-right" />}
                 {isSavedView && theLast && (
                   <>
-                    <FavoriteIcon isFavorite={view.favorite} id={view.id} onChange={onChangeFavorite} />
+                    <FavoriteIcon isFavorite={view.favorite} grn={createGRN(view.type, view.id)} onChange={onChangeFavorite} />
                     <EditButton onClick={toggleMetadataEdit}
                                 role="button"
                                 title={`Edit ${typeText} ${view.title} metadata`}
