@@ -133,6 +133,7 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
           },
           (error) => {
             const errorStatus = error?.additional?.body?.errors?.dependency.join(' ') || error;
+
             UserNotification.error(`Deleting Event Definition "${eventDefinition.title}" failed with status: ${errorStatus}`,
               'Could not delete Event Definition');
           },

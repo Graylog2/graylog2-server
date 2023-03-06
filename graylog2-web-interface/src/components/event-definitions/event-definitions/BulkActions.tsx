@@ -93,7 +93,7 @@ const BulkActions = ({ selectedDefintionsIds, setSelectedEventDefinitionsIds }: 
   };
 
   const getErrorExplanation = (failures: Array<{entity_id: string, failure_explanation: string}>) => {
-    return failures?.reduce((acc, failure) => acc + ` ${failure?.failure_explanation}`, '')
+    return failures?.reduce((acc, failure) => `${acc} ${failure?.failure_explanation}`, '');
   };
 
   const onAction = useCallback(() => {
