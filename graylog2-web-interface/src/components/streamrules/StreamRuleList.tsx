@@ -16,17 +16,14 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import type { Stream } from 'src/stores/streams/StreamsStore';
+import type { Stream, MatchData } from 'src/stores/streams/StreamsStore';
 
 import StreamRule from 'components/streamrules/StreamRule';
 import { Spinner } from 'components/common';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
 
 type Props = {
-  matchData: {
-    matches: boolean,
-    rules: { [id: string]: false },
-  },
+  matchData: MatchData,
   onDelete: (ruleId: string) => void,
   onSubmit: (ruleId: string, data: unknown) => void,
   stream: Stream | undefined,
@@ -68,7 +65,6 @@ StreamRuleList.propTypes = {
   onSubmit: PropTypes.func,
   onDelete: PropTypes.func,
   stream: PropTypes.object.isRequired,
-  streamRuleTypes: PropTypes.array.isRequired,
 };
 
 StreamRuleList.defaultProps = {

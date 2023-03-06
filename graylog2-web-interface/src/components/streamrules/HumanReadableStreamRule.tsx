@@ -65,7 +65,7 @@ type Props = {
 
 const HumanReadableStreamRule = ({ streamRule, inputs = [] }: Props) => {
   const { data: streamRuleTypes } = useStreamRuleTypes();
-  const streamRuleType = streamRuleTypes.find(({ id }) => id === streamRule.type);
+  const streamRuleType = streamRuleTypes?.find(({ id }) => id === streamRule.type);
   const negation = (streamRule.inverted ? 'not ' : null);
   const longDesc = (streamRuleType ? streamRuleType.long_desc : null);
 

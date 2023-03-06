@@ -27,6 +27,7 @@ import MatchingTypeSwitcher from 'components/streams/MatchingTypeSwitcher';
 import StreamRuleList from 'components/streamrules/StreamRuleList';
 import StreamRuleModal from 'components/streamrules/StreamRuleModal';
 import Spinner from 'components/common/Spinner';
+import type { MatchData } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 
@@ -55,10 +56,16 @@ const getListClassName = (matchData) => {
   return (matchData.matches ? 'success' : 'danger');
 };
 
-const StreamRulesEditor = ({ streamId, messageId, index }) => {
+type Props = {
+  streamId: string,
+  messageId: string | undefined,
+  index: string,
+}
+
+const StreamRulesEditor = ({ streamId, messageId, index }: Props) => {
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
-  const [message, setMessage] = useState();
-  const [matchData, setMatchData] = useState();
+  const [message, setMessage] = useState<{ [fieldName: string]: unknown } | undefined>();
+  const [matchData, setMatchData] = useState<MatchData | undefined>();
   const { data: stream, refetch } = useStream(streamId);
 
   useEffect(() => {
@@ -84,7 +91,7 @@ const StreamRulesEditor = ({ streamId, messageId, index }) => {
     }
   };
 
-  const _onStreamRuleFormSubmit = (streamRuleId, data) => {
+  const _onStreamRuleFormSubmit = (_streamRuleId: string, data) => {
     return StreamRulesStore.create(streamId, data, () => {});
   };
 

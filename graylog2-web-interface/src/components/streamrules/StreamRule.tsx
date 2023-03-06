@@ -135,7 +135,6 @@ StreamRule.propTypes = {
   onSubmit: PropTypes.func,
   stream: PropTypes.object.isRequired,
   streamRule: PropTypes.object.isRequired,
-  streamRuleTypes: PropTypes.array.isRequired,
 };
 
 StreamRule.defaultProps = {
