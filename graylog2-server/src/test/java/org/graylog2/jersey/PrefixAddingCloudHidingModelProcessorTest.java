@@ -21,8 +21,6 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.model.Resource;
 import org.glassfish.jersey.server.model.ResourceModel;
 import org.graylog2.Configuration;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.shared.rest.HideOnCloud;
 import org.junit.Test;
 
@@ -185,7 +183,6 @@ public class PrefixAddingCloudHidingModelProcessorTest {
 
         @PUT
         @Path("yesCloud")
-        @NoAuditEvent("ignore")
         public String yesOnCloudHello(@PathParam("test") String s) {
             return String.format(Locale.ENGLISH, "Hello, %s!", s);
         }
