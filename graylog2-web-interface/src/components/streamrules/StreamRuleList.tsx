@@ -16,19 +16,30 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+import type { Stream, StreamRuleType } from 'src/stores/streams/StreamsStore';
 
 import StreamRule from 'components/streamrules/StreamRule';
 import { Spinner } from 'components/common';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
 
+type Props = {
+  matchData: {
+    matches: boolean,
+    rules: { [id: string]: false },
+  },
+  onDelete: () => void,
+  onSubmit: () => void,
+  stream: Stream | undefined,
+  streamRuleTypes: Array<StreamRuleType>,
+}
+
 const StreamRuleList = ({
   matchData,
   onDelete,
   onSubmit,
-  permissions,
   stream,
   streamRuleTypes,
-}) => {
+}: Props) => {
   if (!stream) {
     return <Spinner />;
   }
@@ -39,7 +50,6 @@ const StreamRuleList = ({
     <ListGroup componentClass="ul">
       {hasStreamRules && stream.rules.map((streamRule) => (
         <StreamRule key={streamRule.id}
-                    permissions={permissions}
                     matchData={matchData}
                     onSubmit={onSubmit}
                     onDelete={onDelete}
@@ -60,7 +70,6 @@ StreamRuleList.propTypes = {
   }),
   onSubmit: PropTypes.func,
   onDelete: PropTypes.func,
-  permissions: PropTypes.array.isRequired,
   stream: PropTypes.object.isRequired,
   streamRuleTypes: PropTypes.array.isRequired,
 };

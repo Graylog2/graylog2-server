@@ -29,7 +29,6 @@ import DocsHelper from 'util/DocsHelper';
 const StreamEditPage = () => {
   const params = useParams<{ streamId: string }>();
   const query = useQuery();
-  const currentUser = useCurrentUser();
   const [stream, setStream] = useState<{ is_default: boolean, title: string } | undefined>();
 
   useEffect(() => {
@@ -38,15 +37,12 @@ const StreamEditPage = () => {
     });
   }, [params.streamId]);
 
-  const isLoading = !currentUser || !stream;
-
-  if (isLoading) {
+  if (!stream) {
     return <Spinner />;
   }
 
   let content = (
-    <StreamRulesEditor currentUser={currentUser}
-                       streamId={params.streamId}
+    <StreamRulesEditor streamId={params.streamId}
                        messageId={query.message_id}
                        index={query.index} />
   );

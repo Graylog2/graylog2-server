@@ -155,7 +155,7 @@ class StreamRulesEditor extends React.Component {
 
   render() {
     const { matchData, stream, streamRuleTypes, showStreamRuleForm } = this.state;
-    const { currentUser, messageId, index } = this.props;
+    const { messageId, index } = this.props;
     const styles = (matchData ? getListClassName(matchData) : 'info');
 
     if (stream && streamRuleTypes) {
@@ -195,7 +195,6 @@ class StreamRulesEditor extends React.Component {
               <StreamAlertHeader>{this._explainMatchResult()}</StreamAlertHeader>
               <StreamRuleList stream={stream}
                               streamRuleTypes={streamRuleTypes}
-                              permissions={currentUser.permissions}
                               matchData={matchData} />
             </Panel>
 
