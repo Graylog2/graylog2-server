@@ -138,8 +138,7 @@ class HttpNotificationForm extends React.Component {
                   label="Skip TLS verification"
                   onChange={this.handleChange}
                   value="skip_tls_verification"
-                  checked={config.skip_tls_verification}
-        >
+                  checked={config.skip_tls_verification}>
           Skip TLS verification
         </Checkbox>
         <Row>
