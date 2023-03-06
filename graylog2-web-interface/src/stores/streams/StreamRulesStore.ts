@@ -62,7 +62,7 @@ export const StreamRulesStore = singletonStore(
         description: data.description,
       };
 
-      fetch('PUT', url, request)
+      return fetch('PUT', url, request)
         .then(callback, failCallback)
         .then(this._emitChange.bind(this));
     },
