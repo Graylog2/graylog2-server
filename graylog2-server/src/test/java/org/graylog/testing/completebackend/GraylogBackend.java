@@ -62,7 +62,7 @@ public interface GraylogBackend {
                     if (resp.statusCode() >= minErrorCode) {
                         System.out.println("------------------------ Output from graylog docker container start ------------------------");
                         System.out.println(this.getLogs());
-                        System.out.println("------------------------ Output from graylog docker container ends  ------------------------");
+                        System.out.println("------------------------ Output from graylog docker container end   ------------------------");
                     }
                 })
         );
