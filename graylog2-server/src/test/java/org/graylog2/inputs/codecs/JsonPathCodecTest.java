@@ -129,7 +129,7 @@ public class JsonPathCodecTest {
         fields.put("baz", 9001);
         fields.put("foo", "bar");
 
-        JsonPathCodec selector = new JsonPathCodec(configOf(CK_PATH, "$.download_count"));
+        JsonPathCodec selector = new JsonPathCodec(configOf(CK_PATH, "$.download_count", CK_MODE, "path"));
         assertThat("JSON API poll result: $['download_count'] -> {baz=9001, foo=bar}").isEqualTo(selector.buildShortMessage(fields));
     }
 
@@ -140,7 +140,7 @@ public class JsonPathCodecTest {
         fields.put("foo", "bar");
 
         JsonPathCodec selector = new JsonPathCodec(configOf(CK_PATH, "$.download_count", CK_MODE, "full"));
-        assertThat(selector.buildShortMessage(fields)).isEqualTo("JSON API poll result: $['download_count'] -> {baz=9001, foo=bar}");
+        assertThat("JSON API poll result:  -> {baz=9001, foo=bar}").isEqualTo(selector.buildShortMessage(fields));
     }
 
     @Test
@@ -149,7 +149,7 @@ public class JsonPathCodecTest {
         fields.put("baz", 9001);
         fields.put("foo", "bargggdzrtdfgfdgldfsjgkfdlgjdflkjglfdjgljslfperitperoujglkdnfkndsbafdofhasdpfoöadjsFOO");
 
-        JsonPathCodec selector = new JsonPathCodec(configOf(CK_PATH, "$.download_count"));
+        JsonPathCodec selector = new JsonPathCodec(configOf(CK_PATH, "$.download_count", CK_MODE, "path"));
         assertThat("JSON API poll result: $['download_count'] -> {baz=9001, foo=bargggdzrtdfgfdgldfsjgkfdlgjdflkjgl[...]").isEqualTo(selector.buildShortMessage(fields));
     }
 
@@ -160,7 +160,7 @@ public class JsonPathCodecTest {
         fields.put("foo", "bargggdzrtdfgfdgldfsjgkfdlgjdflkjglfdjgljslfperitperoujglkdnfkndsbafdofhasdpfoöadjsFOO");
 
         JsonPathCodec selector = new JsonPathCodec(configOf(CK_PATH, "$.download_count", CK_MODE, "full"));
-        assertThat("JSON API poll result: $['download_count'] -> {baz=9001, foo=bargggdzrtdfgfdgldfsjgkfdlgjdflkjgl[...]").isEqualTo(selector.buildShortMessage(fields));
+        assertThat("JSON API poll result:  -> {baz=9001, foo=bargggdzrtdfgfdgldfsjgkfdlgjdflkjgl[...]").isEqualTo(selector.buildShortMessage(fields));
     }
 
 }

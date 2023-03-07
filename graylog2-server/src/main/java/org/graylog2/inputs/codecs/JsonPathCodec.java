@@ -117,8 +117,14 @@ public class JsonPathCodec extends AbstractCodec {
     @VisibleForTesting //TODO change to no longer include jsonpath string, when full is selected
     protected String buildShortMessage(Map<String, Object> fields) {
         final StringBuilder shortMessage = new StringBuilder();
-        shortMessage.append("JSON API poll result: ");
-        shortMessage.append(jsonPath.getPath()).append(" -> ");
+        if (Objects.equals(modeString, "path")) {
+            shortMessage.append("JSON API poll result: ");
+            shortMessage.append(jsonPath.getPath()).append(" -> ");
+        } else if (Objects.equals(modeString, "full")) {
+            shortMessage.append("JSON API poll result: ");
+            shortMessage.append(" -> ");
+        }
+
         if (fields.toString().length() > 50) {
             shortMessage.append(fields.toString().substring(0, 50)).append("[...]");
         } else {
