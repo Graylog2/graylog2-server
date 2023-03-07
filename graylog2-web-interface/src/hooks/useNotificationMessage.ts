@@ -29,7 +29,7 @@ const useNotificationMessage = (notification: NotificationType) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const key = notification.key || notification.type;
+  const key = `${notification.type}-${notification.key}`;
 
   return messages?.[key];
 };

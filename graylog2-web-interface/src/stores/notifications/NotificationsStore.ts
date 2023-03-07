@@ -134,7 +134,7 @@ export const NotificationsStore = singletonStore(
       const promise = fetch('POST', url, options);
 
       promise.then((response) => {
-        this.messages = { ...this.messages, [key || type]: response };
+        this.messages = { ...this.messages, [`${type}-${key}`]: response };
         this.propagateChanges();
       });
 
