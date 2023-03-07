@@ -31,6 +31,7 @@ import useAppDispatch from 'stores/useAppDispatch';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 import { updateView } from 'views/logic/slices/viewSlice';
 import useIsNew from 'views/hooks/useIsNew';
+import { createGRN } from 'logic/permissions/GRN';
 
 const links = {
   [View.Type.Dashboard]: {
@@ -99,7 +100,7 @@ const ViewHeader = () => {
           <span data-testid="view-title">{title}</span>
           {isSavedView && (
             <>
-              <FavoriteIcon isFavorite={view.favorite} id={view.id} onChange={onChangeFavorite} />
+              <FavoriteIcon isFavorite={view.favorite} grn={createGRN(view.type, view.id)} onChange={onChangeFavorite} />
               <EditButton onClick={toggleMetadataEdit}
                           role="button"
                           title={`Edit ${typeText} ${view.title} metadata`}

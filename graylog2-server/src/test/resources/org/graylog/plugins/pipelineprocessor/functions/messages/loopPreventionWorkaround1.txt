@@ -1,0 +1,8 @@
+rule "test rule"
+when
+    true
+then
+    let newmsg = clone_message();
+    route_to_stream(name: "other stream", message: newmsg);
+    remove_from_stream(name: "default stream", message: newmsg);
+end
