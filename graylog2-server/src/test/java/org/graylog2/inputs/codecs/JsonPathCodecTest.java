@@ -53,8 +53,8 @@ public class JsonPathCodecTest {
         String path = "$.download_count";
 
         Map<String, Object> result = new JsonPathCodec(configOf(CK_PATH, path)).read(json);
-        assertThat(1).isEqualTo(result.size());
-        assertThat(76185).isEqualTo(result.get("result"));
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get("result")).isEqualTo(76185);
     }
 
     @Test
@@ -63,7 +63,7 @@ public class JsonPathCodecTest {
         String path = "$.download_count";
 
         Message result = new JsonPathCodec(configOf(CK_PATH, path, CK_MODE, "full")).decode(json);
-        assertThat(76185).isEqualTo(result.getField("download_count"));
+        assertThat(result.getField("download_count")).isEqualTo(76185);
     }
 
     @Test
@@ -72,8 +72,8 @@ public class JsonPathCodecTest {
         String path = "$.state";
 
         Map<String, Object> result = new JsonPathCodec(configOf(CK_PATH, path)).read(json);
-        assertThat(1).isEqualTo(result.size());
-        assertThat("uploaded").isEqualTo(result.get("result"));
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get("result")).isEqualTo("uploaded");
     }
 
     @Test
@@ -82,7 +82,7 @@ public class JsonPathCodecTest {
         String path = "$.state";
 
         Message result = new JsonPathCodec(configOf(CK_PATH, path, CK_MODE, "full")).decode(json);
-        assertThat("\"uploaded\"").isEqualTo(result.getField("state"));
+        assertThat(result.getField("state")).isEqualTo("\"uploaded\"");
     }
 
     @Test
@@ -91,8 +91,8 @@ public class JsonPathCodecTest {
         String path = "$.store.book[?(@.category == 'fiction')].author";
 
         Map<String, Object> result = new JsonPathCodec(configOf(CK_PATH, path)).read(json);
-        assertThat(1).isEqualTo(result.size());
-        assertThat("Evelyn Waugh").isEqualTo(result.get("result"));
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get("result")).isEqualTo("Evelyn Waugh");
     }
 
     @Test
