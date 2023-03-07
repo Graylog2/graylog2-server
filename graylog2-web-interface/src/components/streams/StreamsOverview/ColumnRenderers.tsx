@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useRef } from 'react';
 
 import type { Stream } from 'stores/streams/StreamsStore';
 import { Label } from 'components/bootstrap';
@@ -25,6 +26,7 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import IndexSetCell from 'components/streams/StreamsOverview/IndexSetCell';
 import ThroughputCell from 'components/streams/StreamsOverview/ThroughputCell';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import { CountBadge } from 'components/common';
 
 import StatusCell from './StatusCell';
 
@@ -33,7 +35,35 @@ const DefaultLabel = styled(Label)`
   margin-left: 5px;
   vertical-align: inherit;
 `;
-const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stream> => ({
+
+const StreamRuleCounter = ({ stream, setExpandedStreamsSections }: { stream: Stream, setExpandedStreamsSections: React.Dispatch<React.SetStateAction<{ [streamId: string]: Array<string> }>> }) => {
+  const buttonRef = useRef();
+  const toggleRuleSection = () => setExpandedStreamsSections((cur) => {
+    const newCur = { ...cur ?? {} };
+
+    if (newCur[stream.id]?.includes('rules')) {
+      const newSections = newCur[stream.id].filter((section) => section !== 'rules');
+
+      if (newSections.length === 0) {
+        delete newCur[stream.id];
+
+        return newCur;
+      }
+
+      return { ...newCur, [stream.id]: newSections };
+    }
+
+    return { ...newCur, [stream.id]: [...newCur[stream.id] ?? [], 'rules'] };
+  });
+
+  return (
+    <CountBadge onClick={toggleRuleSection} ref={buttonRef}>
+      {stream.rules.length}
+    </CountBadge>
+  );
+};
+
+const customColumnRenderers = (indexSets: Array<IndexSet>, setExpandedStreamsSections: React.Dispatch<React.SetStateAction<{ [streamId: string]: Array<string> }>>): ColumnRenderers<Stream> => ({
   title: {
     renderCell: (stream) => (
       <>
@@ -53,6 +83,10 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
   disabled: {
     renderCell: (stream) => <StatusCell stream={stream} />,
     staticWidth: 100,
+  },
+  rules: {
+    renderCell: (stream) => <StreamRuleCounter stream={stream} setExpandedStreamsSections={setExpandedStreamsSections} />,
+    staticWidth: 50,
   },
 });
 
