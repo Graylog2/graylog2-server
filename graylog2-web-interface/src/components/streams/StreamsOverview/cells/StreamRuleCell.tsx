@@ -17,10 +17,15 @@
 
 import { useRef, useCallback } from 'react';
 import * as React from 'react';
+import styled from 'styled-components';
 
 import type { Stream } from 'stores/streams/StreamsStore';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 import { CountBadge } from 'components/common';
+
+const StyledCountBadge = styled(CountBadge)`
+  cursor: pointer;
+`;
 
 type Props = {
   stream: Stream
@@ -37,9 +42,9 @@ const StreamRuleCell = ({ stream }: Props) => {
   }
 
   return (
-    <CountBadge onClick={toggleRulesSection} ref={buttonRef}>
+    <StyledCountBadge onClick={toggleRulesSection} ref={buttonRef}>
       {stream.rules.length}
-    </CountBadge>
+    </StyledCountBadge>
   );
 };
 

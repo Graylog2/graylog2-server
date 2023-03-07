@@ -40,8 +40,8 @@ import {
 import EntityFilters from 'components/common/EntityFilters';
 import type { Filters } from 'components/common/EntityFilters/types';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
-import StreamRuleList from 'components/streamrules/StreamRuleList';
 
+import ExpandedRulesSection from './ExpandedRulesSection';
 import CustomColumnRenderers from './ColumnRenderers';
 
 const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
@@ -129,7 +129,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
                  indexSets={indexSets} />
   ), [indexSets]);
 
-  const renderExpandedRules = useCallback((stream: Stream) => (<StreamRuleList stream={stream} />), []);
+  const renderExpandedRules = useCallback((stream: Stream) => (<ExpandedRulesSection stream={stream} />), []);
   const expandedSectionsRenderer = useMemo(() => ({
     rules: {
       title: 'Rules',

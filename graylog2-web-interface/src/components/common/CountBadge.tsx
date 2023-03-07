@@ -25,14 +25,18 @@ const Badge = styled.span(({ theme }) => `
 type Props = {
   children: React.ReactNode;
   onClick?: () => void,
+  className?: string,
 };
 
-const CountBadge = forwardRef<HTMLElement, Props>(({ children, onClick }: Props, ref) => (
-  <Badge className="badge" onClick={onClick} ref={ref}>{children}</Badge>
+const CountBadge = forwardRef<HTMLElement, Props>(({ children, onClick, className }: Props, ref) => (
+  <Badge className={`badge ${className}`} onClick={onClick} ref={ref}>
+    {children}
+  </Badge>
 ));
 
 CountBadge.defaultProps = {
   onClick: undefined,
+  className: '',
 };
 
 export default CountBadge;

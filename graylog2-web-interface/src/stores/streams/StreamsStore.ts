@@ -31,7 +31,7 @@ export type Stream = {
   id: string,
   creator_user_id: string,
   outputs: any[],
-  matching_type: string,
+  matching_type: 'AND' | 'OR',
   description: string,
   created_at: string,
   disabled: boolean,

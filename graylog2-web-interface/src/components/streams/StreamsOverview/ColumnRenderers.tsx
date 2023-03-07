@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useRef, useCallback } from 'react';
 
 import type { Stream } from 'stores/streams/StreamsStore';
 import { Label } from 'components/bootstrap';
@@ -26,10 +25,9 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import IndexSetCell from 'components/streams/StreamsOverview/cells/IndexSetCell';
 import ThroughputCell from 'components/streams/StreamsOverview/cells/ThroughputCell';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import { CountBadge } from 'components/common';
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 
 import StatusCell from './cells/StatusCell';
+import StreamRuleCell from './cells/StreamRuleCell';
 
 const DefaultLabel = styled(Label)`
   display: inline-flex;
