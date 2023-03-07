@@ -42,7 +42,8 @@ public class IOState<T extends Stoppable> {
         STOPPING,
         STOPPED,
         TERMINATED,
-        FAILING
+        FAILING,
+        UNRECOGNIZED // not a real state, but this helps with forwarder compatibility (see StateReportHandler)
     }
 
     protected T stoppable;
