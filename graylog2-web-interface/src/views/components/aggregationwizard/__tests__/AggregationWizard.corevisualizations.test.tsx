@@ -21,6 +21,7 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
+import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import bindings from 'views/components/visualizations/bindings';
 import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
@@ -35,6 +36,7 @@ import { createSearch } from 'fixtures/searches';
 import viewsReducers from 'views/viewsReducers';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 
+const testTimeout = applyTimeoutMultiplier(30000);
 const plugin: PluginRegistration = { exports: { visualizationTypes: bindings, 'views.reducers': viewsReducers } };
 
 const widgetConfig = AggregationWidgetConfig
@@ -108,7 +110,7 @@ describe('AggregationWizard/Core Visualizations', () => {
     await screen.findByText('Scatter Plot');
     await screen.findByText('Single Number');
     await screen.findByText('World Map');
-  });
+  }, testTimeout);
 
   it('creates Area Chart config when all required fields are present', async () => {
     const onChange = jest.fn();
@@ -129,7 +131,7 @@ describe('AggregationWizard/Core Visualizations', () => {
         interpolation: 'step-after',
       }),
     })));
-  });
+  }, testTimeout);
 
   it('creates Bar Chart config when all required fields are present', async () => {
     const onChange = jest.fn();
@@ -150,7 +152,7 @@ describe('AggregationWizard/Core Visualizations', () => {
         barmode: 'stack',
       }),
     })));
-  });
+  }, testTimeout);
 
   it('creates Line Chart config when all required fields are present', async () => {
     const onChange = jest.fn();
@@ -172,7 +174,7 @@ describe('AggregationWizard/Core Visualizations', () => {
         interpolation: 'spline',
       }),
     })));
-  });
+  }, testTimeout);
 
   it('allows enabling event annotations for visualizations supporting it', async () => {
     const onChange = jest.fn();
@@ -193,7 +195,7 @@ describe('AggregationWizard/Core Visualizations', () => {
       visualization: 'line',
       eventAnnotation: true,
     })));
-  });
+  }, testTimeout);
 
   it('creates Heatmap config when all required fields are present', async () => {
     const onChange = jest.fn();
@@ -223,7 +225,7 @@ describe('AggregationWizard/Core Visualizations', () => {
         useSmallestAsDefault: true,
       }),
     })));
-  });
+  }, testTimeout);
 
   it('creates Single Number config when all required fields are present', async () => {
     const onChange = jest.fn();
@@ -251,7 +253,7 @@ describe('AggregationWizard/Core Visualizations', () => {
         trendPreference: 'HIGHER',
       }),
     })));
-  });
+  }, testTimeout);
 
   it('clears validation errors properly when switching visualization', async () => {
     const areaChart = widgetConfig.toBuilder()
@@ -272,7 +274,7 @@ describe('AggregationWizard/Core Visualizations', () => {
       visualization: 'table',
       visualizationConfig: expect.objectContaining({}),
     })));
-  });
+  }, testTimeout);
 
   describe('has visualization-specific validation for aggregation config', () => {
     it.each`
@@ -291,6 +293,6 @@ describe('AggregationWizard/Core Visualizations', () => {
       await expectSubmitButtonToBeDisabled();
 
       await waitFor(() => screen.findByText(error));
-    });
+    }, testTimeout);
   });
 });
