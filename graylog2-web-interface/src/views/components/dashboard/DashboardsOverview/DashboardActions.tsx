@@ -17,8 +17,9 @@
 import React, { useState, useCallback } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { ShareButton } from 'components/common';
+import { ShareButton, Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
+import { InvestigationsMenu } from 'components/security/investigations';
 import type View from 'views/logic/views/View';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
@@ -52,6 +53,11 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
 
   return (
     <>
+      <InvestigationsMenu id={dashboard.id}
+                          type="dashboards"
+                          bsSize="xsmall"
+                          title={<span><Icon name="puzzle-piece" size="xs" /> Investigations</span>}
+                          pullRight />
       <ShareButton bsSize="xsmall"
                    entityId={dashboard.id}
                    entityType="dashboard"

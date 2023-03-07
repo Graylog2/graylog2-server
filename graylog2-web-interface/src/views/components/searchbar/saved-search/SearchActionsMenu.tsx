@@ -21,6 +21,7 @@ import { useCallback, useState, useContext, useRef } from 'react';
 import { isPermitted } from 'util/PermissionsMixin';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import { Icon, ShareButton } from 'components/common';
+import { AddEvidence } from 'components/security/investigations';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import View from 'views/logic/views/View';
@@ -81,6 +82,7 @@ const SearchActionsMenu = () => {
   const [showExport, setShowExport] = useState(false);
   const [showMetadataEdit, setShowMetadataEdit] = useState(false);
   const [showShareSearch, setShowShareSearch] = useState(false);
+  const [disableAddEvidence, setDisableAddEvidence] = useState(false);
   const currentTitle = view?.title ?? '';
   const dispatch = useAppDispatch();
   const onUpdateView = useCallback((newView: View) => dispatch(updateView(newView)), [dispatch]);
@@ -199,6 +201,15 @@ const SearchActionsMenu = () => {
           Reset search
         </MenuItem>
         <MenuItem divider />
+        {loaded && (
+          <AddEvidence id={view.id}
+                       type="searches"
+                       investigationSelected={(val: boolean) => setDisableAddEvidence(!val)}>
+            <MenuItem disabled={disableAddEvidence} icon="puzzle-piece">
+              Add to investigation
+            </MenuItem>
+          </AddEvidence>
+        )}
       </DropdownButton>
       {showExport && (<ExportModal view={view} closeModal={toggleExport} />)}
       {showMetadataEdit && (
