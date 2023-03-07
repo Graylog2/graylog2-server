@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Remove undesired retention strategies in Cloud"
+
+issues = ["graylog-plugin-cloud#1081"]
+pulls = ["14616"]

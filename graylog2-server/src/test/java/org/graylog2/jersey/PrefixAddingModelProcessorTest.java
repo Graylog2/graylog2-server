@@ -42,7 +42,7 @@ public class PrefixAddingModelProcessorTest {
     public void processResourceModelAddsPrefixToResourceClassInCorrectPackage() throws Exception {
         final ImmutableMap<String, String> packagePrefixes = ImmutableMap.of(PACKAGE_NAME, "/test/prefix");
         when(configuration.isCloud()).thenReturn(false);
-        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor(packagePrefixes, configuration);
+        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor(packagePrefixes);
         final ResourceModel originalResourceModel = new ResourceModel.Builder(false)
                 .addResource(Resource.from(TestResource.class))
                 .addResource(Resource.from(HiddenTestResource.class)).build();
@@ -65,7 +65,7 @@ public class PrefixAddingModelProcessorTest {
                 "org.graylog2.wrong", "/wrong"
         );
         when(configuration.isCloud()).thenReturn(false);
-        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor(packagePrefixes, configuration);
+        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor(packagePrefixes);
         final ResourceModel originalResourceModel = new ResourceModel.Builder(false)
                 .addResource(Resource.from(TestResource.class)).build();
 
@@ -81,7 +81,7 @@ public class PrefixAddingModelProcessorTest {
     public void processResourceModelDoesNotAddPrefixToResourceClassInOtherPackage() throws Exception {
         final ImmutableMap<String, String> packagePrefixes = ImmutableMap.of("org.example", "/test/prefix");
         when(configuration.isCloud()).thenReturn(false);
-        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor(packagePrefixes, configuration);
+        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor(packagePrefixes);
         final ResourceModel originalResourceModel = new ResourceModel.Builder(false)
                 .addResource(Resource.from(TestResource.class)).build();
 
@@ -97,7 +97,7 @@ public class PrefixAddingModelProcessorTest {
     public void processSubResourceDoesNothing() throws Exception {
         final Map<String, String> packagePrefixes = ImmutableMap.of(PACKAGE_NAME, "/test/prefix");
         when(configuration.isCloud()).thenReturn(false);
-        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor(packagePrefixes, configuration);
+        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor(packagePrefixes);
         final ResourceModel originalResourceModel = new ResourceModel.Builder(false)
                 .addResource(Resource.from(TestResource.class)).build();
 
@@ -106,22 +106,6 @@ public class PrefixAddingModelProcessorTest {
         assertThat(originalResourceModel).isSameAs(resourceModel);
     }
 
-    @Test
-    public void processResourceModelWithHideOnCloudDoesNothing() throws Exception {
-        final ImmutableMap<String, String> packagePrefixes = ImmutableMap.of(PACKAGE_NAME, "/test/prefix");
-        when(configuration.isCloud()).thenReturn(true);
-        final PrefixAddingModelProcessor modelProcessor = new PrefixAddingModelProcessor(packagePrefixes, configuration);
-        final ResourceModel originalResourceModel = new ResourceModel.Builder(false)
-                .addResource(Resource.from(TestResource.class))
-                .addResource(Resource.from(HiddenTestResource.class)).build();
-
-        final ResourceModel resourceModel = modelProcessor.processResourceModel(originalResourceModel, new ResourceConfig());
-
-        assertThat(resourceModel.getResources()).hasSize(1);
-
-        final Resource resource = resourceModel.getResources().get(0);
-        assertThat(resource.getPath()).isEqualTo("/test/prefix/foobar/{test}");
-    }
 
     @Path("/foobar/{test}")
     private static class TestResource {

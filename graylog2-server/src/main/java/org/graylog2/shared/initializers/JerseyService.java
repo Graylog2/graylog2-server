@@ -244,7 +244,7 @@ public class JerseyService extends AbstractIdleService {
                 .property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true)
                 .property(ServerProperties.WADL_FEATURE_DISABLE, true)
                 .property(ServerProperties.MEDIA_TYPE_MAPPINGS, mediaTypeMappings())
-                .register(new PrefixAddingModelProcessor(packagePrefixes, graylogConfiguration))
+                .register(new PrefixAddingModelProcessor(packagePrefixes))
                 .register(new AuditEventModelProcessor(pluginAuditEventTypes))
                 .registerClasses(
                         ShiroSecurityContextFilter.class,

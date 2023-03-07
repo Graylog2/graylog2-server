@@ -14,11 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.favorites;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import { useMemo } from 'react';
 
-public record FavoriteDTO(@JsonProperty(FIELD_ID) String id, @JsonProperty(FIELD_TYPE) String type) {
-    public static final String FIELD_ID = "id";
-    public static final String FIELD_TYPE = "type";
-}
+import useCurrentUser from 'hooks/useCurrentUser';
+import getPermissionPrefixByType from 'util/getPermissionPrefixByType';
+import { isPermitted } from 'util/PermissionsMixin';
+import { getValuesFromGRN } from 'logic/permissions/GRN';
+
+const useHasEntityPermissionByGRN = (grn: string, permissionType: string = 'read') => {
+  const { id, type } = getValuesFromGRN(grn);
+  const { permissions } = useCurrentUser();
+
+  return useMemo(() => isPermitted(permissions, `${getPermissionPrefixByType(type)}${permissionType}:${id}`), [id, permissionType, permissions, type]);
+};
+
+export default useHasEntityPermissionByGRN;

@@ -44,6 +44,7 @@ import org.graylog.events.search.MoreSearch;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.errors.ParameterExpansionError;
 import org.graylog.plugins.views.search.errors.SearchException;
+import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
@@ -131,6 +132,11 @@ public class AggregationEventProcessor implements EventProcessor {
                 LOG.error(msg);
                 throw new EventProcessorPreconditionException(msg, eventDefinition, e);
             }
+        } catch (ElasticsearchException e) {
+            final String msg = String.format(Locale.ROOT, "Couldn't run aggregation <%s/%s> because of search error: %s",
+                    eventDefinition.title(), eventDefinition.id(), e.getMessage());
+            LOG.error(msg);
+            throw new EventProcessorPreconditionException(msg, eventDefinition, e);
         }
 
         // Update the state for this processor! This state will be used for dependency checks between event processors.
