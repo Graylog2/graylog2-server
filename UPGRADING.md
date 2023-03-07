@@ -90,7 +90,16 @@ Unless user-specified defaults are specified, the following new defaults will be
 - Shards: 1 (previously 4 in many cases)
 - Rotation Strategy: Time Size Optimizing - 30-40 days (previously Index Time [1D] in many cases)
 
-# API Changes
+## Removal of deprecated Inputs
+
+The following inputs are no longer available:
+- AWS Logs (deprecated)
+- AWS Flow Logs (deprecated)
+
+The inputs were marked as deprecated since Graylog version `3.2.0`.
+If you still run any of those inputs, please configure the alternative "Kinesis/CloudWatch" input instead ahead of upgrading.
+
+## Java API Changes
 The following Java Code API changes have been made.
 
 | File/method                                  | Description                                                                                                 |
