@@ -152,6 +152,7 @@ The Page permissions remain unchanged but this could affect the workflow for use
 - The `JSON path value from HTTP API` input will now only run on the leader node,
   if the `Global` option has been selected in the input configuration.
   Previously, the input was started on all nodes in the cluster.
+- Index archive names now have the index ID appended, e.g. `test_99-OFu80woKROmfgwvUGNhLMQ`.
 
 ### Changed archived default path
 On new Graylog installations, the default archiving configuration will now 
