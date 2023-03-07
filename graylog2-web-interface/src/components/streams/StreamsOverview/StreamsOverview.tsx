@@ -16,10 +16,8 @@
  */
 import PropTypes from 'prop-types';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import styled from 'styled-components';
-import { Button } from 'react-bootstrap';
 
-import { PaginatedList, SearchForm, NoSearchResult, IconButton } from 'components/common';
+import { PaginatedList, SearchForm, NoSearchResult } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';
 import type { Stream } from 'stores/streams/StreamsStore';
@@ -43,7 +41,6 @@ import EntityFilters from 'components/common/EntityFilters';
 import type { Filters } from 'components/common/EntityFilters/types';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
 import StreamRuleList from 'components/streamrules/StreamRuleList';
-import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
 import CustomColumnRenderers from './ColumnRenderers';
 
@@ -59,23 +56,11 @@ const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
   }, [refetchStreams]);
 };
 
-const ExpandedSectionHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 5px;
-`;
-
-const Actions = styled(ButtonToolbar)`
-  diplsay: flex;
-  align-items: center;
-`;
-
 type Props = {
   indexSets: Array<IndexSet>
 }
 
 const StreamsOverview = ({ indexSets }: Props) => {
-  const [expandedStreams, setExpandedStreams] = useState<{ [streamId: string]: ['rules'] }>();
   const [filters, setFilters] = useState<Filters>();
   const [query, setQuery] = useState('');
   const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
@@ -96,7 +81,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
 
   useRefetchStreamsOnStoreChange(refetchStreams);
 
-  const columnRenderers = useMemo(() => CustomColumnRenderers(indexSets, setExpandedStreams), [indexSets]);
+  const columnRenderers = useMemo(() => CustomColumnRenderers(indexSets), [indexSets]);
   const columnDefinitions = useMemo(
     () => ([...(paginatedStreams?.attributes ?? []), ...ADDITIONAL_ATTRIBUTES]),
     [paginatedStreams?.attributes],
@@ -144,30 +129,13 @@ const StreamsOverview = ({ indexSets }: Props) => {
                  indexSets={indexSets} />
   ), [indexSets]);
 
-  const renderExpandedStreamSections = useCallback((stream, expandedSections) => {
-    if (expandedSections?.includes('rules')) {
-      return (
-        <div>
-          <ExpandedSectionHeader>
-            <h3>Rules</h3>
-            <Actions>
-              <Button bsStyle="link" bsSize="xsmall">Manage rules</Button>
-              <Button bsStyle="secondary" bsSize="xsmall">Quick add rule</Button>
-              <IconButton name="times" />
-            </Actions>
-          </ExpandedSectionHeader>
-          <StreamRuleList stream={stream} />
-        </div>
-      );
-    }
-
-    return null;
-  }, []);
-
-  const expandedStreamsSections = useMemo(() => Object.entries(expandedStreams ?? {}).reduce((col, [streamId, expandedData]) => ({
-    ...col,
-    [streamId]: (stream: Stream) => renderExpandedStreamSections(stream, expandedData),
-  }), {}), [expandedStreams, renderExpandedStreamSections]);
+  const renderExpandedRules = useCallback((stream: Stream) => (<StreamRuleList stream={stream} />), []);
+  const expandedSectionsRenderer = useMemo(() => ({
+    rules: {
+      title: 'Rules',
+      content: renderExpandedRules,
+    },
+  }), [renderExpandedRules]);
 
   if (!paginatedStreams) {
     return <Spinner />;
@@ -201,7 +169,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
                                    onPageSizeChange={onPageSizeChange}
                                    pageSize={layoutConfig.pageSize}
                                    bulkActions={renderBulkActions}
-                                   expandedEntitiesSections={expandedStreamsSections}
+                                   expandedSectionsRenderer={expandedSectionsRenderer}
                                    activeSort={layoutConfig.sort}
                                    rowActions={renderStreamActions}
                                    columnRenderers={columnRenderers}
