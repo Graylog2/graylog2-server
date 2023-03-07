@@ -28,6 +28,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.DropdownField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.annotations.Codec;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
@@ -68,19 +69,18 @@ public class JsonPathCodec extends AbstractCodec {
     @Override
     public Message decode(@Nonnull RawMessage rawMessage) {
         Map<String, Object> fields = new HashMap<>();
-        if (Objects.equals(modeString, "jsonpath")) {
+        if (Objects.equals(modeString, "path")) {
             if (jsonPath == null) {
                 return null;
             }
             final String json = new String(rawMessage.getPayload(), charset);
             fields = read(json);
-        } else if (Objects.equals(modeString, "jsonfull")) {
+        } else if (Objects.equals(modeString, "full")) {
             final String json = new String(rawMessage.getPayload(), charset);
             try {
                 fields = useFlattener(json);
             } catch (JsonTypeException e) {
                 LOG.warn("JSON contains type not supported by JsonFlattenService.flatten.");
-                //throw new RuntimeException(e); //TODO Exception not properly handled.
             }
         } else {
             LOG.warn("Message mode is empty, should be either \"jsonpath\" or \"jsonfull\".");
@@ -114,7 +114,7 @@ public class JsonPathCodec extends AbstractCodec {
         return fields;
     }
 
-    @VisibleForTesting
+    @VisibleForTesting //TODO change to no longer include jsonpath string, when full is selected
     protected String buildShortMessage(Map<String, Object> fields) {
         final StringBuilder shortMessage = new StringBuilder();
         shortMessage.append("JSON API poll result: ");
@@ -190,6 +190,13 @@ public class JsonPathCodec extends AbstractCodec {
         Descriptor getDescriptor();
     }
 
+    private static Map<String, String> buildModeChoices() {
+        Map<String, String> messagemodes = Maps.newHashMap();
+        messagemodes.put("path", "path");
+        messagemodes.put("full", "full"); //TODO Rename
+        return messagemodes;
+    }
+
     @ConfigClass
     public static class Config extends AbstractCodec.Config {
         @Override
@@ -212,11 +219,13 @@ public class JsonPathCodec extends AbstractCodec {
                     ConfigurationField.Optional.NOT_OPTIONAL
             ));
 
-            r.addField(new TextField(
+            Map<String, String> messagemodes = buildModeChoices();
+            r.addField(new DropdownField(
                     CK_MODE,
                     "Message mode",
-                    "jsonpath",
-                    "Can be \"jsonpath\" or \"jsonfull\". Has to be set.",
+                    "path",
+                    messagemodes,
+                    "Select the content of the message. Path returns only whats in the jsonpath. Full returns the full json as fields in the message.",
                     ConfigurationField.Optional.NOT_OPTIONAL
             ));
 
