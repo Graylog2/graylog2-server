@@ -168,6 +168,7 @@ public abstract class MessageInput implements Stoppable {
         }
     }
 
+    @Deprecated
     public void launch(final InputBuffer buffer) throws MisfireException {
         // kept for backwards compat with inputs that overload this method
     }
