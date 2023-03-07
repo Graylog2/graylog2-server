@@ -107,11 +107,13 @@ export const NotificationsStore = singletonStore(
     },
     delete(type: string, key: string) {
       let url;
+
       if (key) {
         url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.deleteWithKey(type, key).url);
       } else {
         url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.delete(type).url);
       }
+
       const promise = fetch('DELETE', url);
 
       NotificationsActions.delete.promise(promise);
@@ -121,17 +123,19 @@ export const NotificationsStore = singletonStore(
       this.propagateChanges();
     },
     getHtmlMessage(type: string, key: string, options: NotificationMessageOptions = { values: {} }) {
-      let url
+      let url;
+
       if (key) {
         url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.getHtmlMessageWithKey(type, key).url);
       } else {
         url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.getHtmlMessage(type).url);
       }
+
       const promise = fetch('POST', url, options);
 
       promise.then((response) => {
-        this.messages = { ...this.messages, [type]: response };
-        this.trigger({messages: this.messages});
+        this.messages = { ...this.messages, [key || type]: response };
+        this.propagateChanges();
       });
 
       NotificationsActions.getHtmlMessage.promise(promise);

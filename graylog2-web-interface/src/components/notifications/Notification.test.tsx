@@ -64,7 +64,7 @@ describe('<Notification>', () => {
 
     await screen.findByText(/loading\.\.\./i);
 
-    await waitFor(() => expect(NotificationsActions.getHtmlMessage).toHaveBeenCalledWith(notificationFixture.type, "", NotificationsFactory.getValuesForNotification(notificationFixture)));
+    await waitFor(() => expect(NotificationsActions.getHtmlMessage).toHaveBeenCalledWith(notificationFixture.type, '', NotificationsFactory.getValuesForNotification(notificationFixture)));
   });
 
   test('should render notification message', async () => {

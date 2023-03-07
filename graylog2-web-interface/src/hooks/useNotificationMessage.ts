@@ -14,20 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import {useStore} from 'stores/connect';
-import {useEffect} from 'react';
+import { useEffect } from 'react';
 
+import { useStore } from 'stores/connect';
 import NotificationsFactory from 'logic/notifications/NotificationsFactory';
-import {NotificationType, NotificationsStore, NotificationsActions} from 'stores/notifications/NotificationsStore';
+import type { NotificationType } from 'stores/notifications/NotificationsStore';
+import { NotificationsStore, NotificationsActions } from 'stores/notifications/NotificationsStore';
 
 const useNotificationMessage = (notification: NotificationType) => {
   const { messages } = useStore(NotificationsStore);
 
   useEffect(() => {
     NotificationsActions.getHtmlMessage(notification.type, notification.key, NotificationsFactory.getValuesForNotification(notification));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return messages?.[notification.type];
+  const key = notification.key || notification.type;
+
+  return messages?.[key];
 };
 
 export default useNotificationMessage;

@@ -104,4 +104,5 @@ Notification.propTypes = {
     node_id: PropTypes.string.isRequired,
   }).isRequired,
 };
+
 export default Notification;
