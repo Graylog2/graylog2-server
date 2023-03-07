@@ -41,7 +41,7 @@ const StreamRuleCounter = ({ stream }: { stream: Stream }) => {
   const buttonRef = useRef();
   const { toggleSection } = useExpandedSections();
 
-  const toggleRulesSection = useCallback(() => toggleSection(stream.id, 'rules'), []);
+  const toggleRulesSection = useCallback(() => toggleSection(stream.id, 'rules'), [stream.id, toggleSection]);
 
   return (
     <CountBadge onClick={toggleRulesSection} ref={buttonRef}>

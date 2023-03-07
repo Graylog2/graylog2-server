@@ -15,9 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
-import Reflux from 'reflux';
-import createReactClass from 'create-react-class';
 
 import { Link } from 'components/common/router';
 import { Col } from 'components/bootstrap';
