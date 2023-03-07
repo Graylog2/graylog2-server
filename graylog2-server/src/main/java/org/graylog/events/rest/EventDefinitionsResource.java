@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.events.audit.EventsAuditEventTypes;
@@ -298,7 +299,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         if (!dependentEventDtoList.isEmpty()) {
             final List<String> dependenciesTitles = dependentEventDtoList.stream().map(EventDefinitionDto::title).toList();
             final List<String> dependenciesIds = dependentEventDtoList.stream().map(EventDefinitionDto::id).toList();
-            String msg = "Unable to delete event definition <" + dependencyTitle + "> because of existing dependencies: " + dependenciesTitles.toString();
+            String msg = "Unable to delete event definition <" + dependencyTitle
+                    + "> - please remove all references from event definitions: " + StringUtils.join(dependenciesTitles, ",");
             ValidationResult validationResult = new ValidationResult()
                 .addError("dependency", msg)
                 .addContext("dependency_ids", dependenciesIds);
@@ -309,8 +311,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 recentActivityService.delete(d.id(), GRNTypes.EVENT_DEFINITION, d.title(), userContext.getUser())
         );
         eventDefinitionHandler.delete(definitionId);
-
-        return eventDefinitionDto.orElseThrow(() -> new IllegalStateException("Unable to find event definition: " + definitionId));
+        return eventDefinitionDto.orElse(null);
     }
 
     @POST
