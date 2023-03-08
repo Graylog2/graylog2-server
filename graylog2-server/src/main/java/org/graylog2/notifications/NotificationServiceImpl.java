@@ -215,6 +215,7 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
         return destroyAll(NotificationImpl.class, typeAndKeyQuery(type, null));
     }
 
+    @Override
     public int destroyAllByTypeAndKey(Notification.Type type, @Nullable String key) {
         return destroyAll(NotificationImpl.class, typeAndKeyQuery(type, key));
     }
