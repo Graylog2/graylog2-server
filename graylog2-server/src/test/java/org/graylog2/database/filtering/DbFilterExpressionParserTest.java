@@ -171,7 +171,7 @@ class DbFilterExpressionParserTest {
     @Test
     void parsesFilterExpressionCorrectlyForDateType() {
 
-        assertEquals(Filters.eq("created_at", new DateTime(2012, 12, 12, 12, 12, 12, DateTimeZone.UTC)),
+        assertEquals(Filters.eq("created_at", new DateTime(2012, 12, 12, 12, 12, 12, DateTimeZone.UTC).toDate()),
                 toTest.parseSingleExpression("created_at:2012-12-12 12:12:12",
                         List.of(EntityAttribute.builder()
                                 .id("created_at")
@@ -211,9 +211,9 @@ class DbFilterExpressionParserTest {
         assertEquals(
                 Filters.and(
                         Filters.gte("created_at",
-                                new DateTime(2012, 12, 12, 12, 12, 12, DateTimeZone.UTC)),
+                                new DateTime(2012, 12, 12, 12, 12, 12, DateTimeZone.UTC).toDate()),
                         Filters.lte("created_at",
-                                new DateTime(2022, 12, 12, 12, 12, 12, DateTimeZone.UTC))
+                                new DateTime(2022, 12, 12, 12, 12, 12, DateTimeZone.UTC).toDate())
                 ),
 
                 toTest.parseSingleExpression("created_at:" + fromString + DbFilterExpressionParser.RANGE_VALUES_SEPARATOR + toString,
@@ -235,7 +235,7 @@ class DbFilterExpressionParserTest {
 
         assertEquals(
                 Filters.and(
-                        Filters.gte("created_at", dateObject)
+                        Filters.gte("created_at", dateObject.toDate())
                 ),
                 toTest.parseSingleExpression("created_at:" + dateString + DbFilterExpressionParser.RANGE_VALUES_SEPARATOR,
                         entityAttributes
@@ -243,7 +243,7 @@ class DbFilterExpressionParserTest {
 
         assertEquals(
                 Filters.and(
-                        Filters.lte("created_at", dateObject)
+                        Filters.lte("created_at", dateObject.toDate())
                 ),
                 toTest.parseSingleExpression("created_at:" + DbFilterExpressionParser.RANGE_VALUES_SEPARATOR + dateString,
                         entityAttributes

@@ -29,7 +29,7 @@ public class SearchQueryField {
 
     public enum Type {
         STRING(value -> value),
-        DATE(value -> dateParser.parseDate(value).toDate()),
+        DATE(value -> dateParser.parseDate(value)),
         INT(value -> Integer.parseInt(value)),
         LONG(value -> Long.parseLong(value)),
         OBJECT_ID(value -> new ObjectId(value)),

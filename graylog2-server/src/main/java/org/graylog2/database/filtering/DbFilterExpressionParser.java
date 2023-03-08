@@ -20,6 +20,7 @@ import com.mongodb.client.model.Filters;
 import org.bson.conversions.Bson;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.search.SearchQueryField;
+import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Map;
@@ -84,22 +85,32 @@ public class DbFilterExpressionParser {
             if (valuePart.startsWith(RANGE_VALUES_SEPARATOR)) {
                 return new RangeFilter(attributeMetaData.id(),
                         null,
-                        fieldType.getMongoValueConverter().apply(valuePart.substring(RANGE_VALUES_SEPARATOR.length()))
+                        extractValue(fieldType, valuePart.substring(RANGE_VALUES_SEPARATOR.length()))
                 );
             } else if (valuePart.endsWith(RANGE_VALUES_SEPARATOR)) {
                 return new RangeFilter(attributeMetaData.id(),
-                        fieldType.getMongoValueConverter().apply(valuePart.substring(0, valuePart.length() - RANGE_VALUES_SEPARATOR.length())),
+                        extractValue(fieldType, valuePart.substring(0, valuePart.length() - RANGE_VALUES_SEPARATOR.length())),
                         null
                 );
             } else {
                 final String[] ranges = valuePart.split(RANGE_VALUES_SEPARATOR);
                 return new RangeFilter(attributeMetaData.id(),
-                        fieldType.getMongoValueConverter().apply(ranges[0]),
-                        fieldType.getMongoValueConverter().apply(ranges[1])
+                        extractValue(fieldType, ranges[0]),
+                        extractValue(fieldType, ranges[1])
                 );
             }
         } else {
-            return new SingleValueFilter(attributeMetaData.id(), fieldType.getMongoValueConverter().apply(valuePart));
+            return new SingleValueFilter(attributeMetaData.id(), extractValue(fieldType, valuePart));
+        }
+
+    }
+
+    private Object extractValue(SearchQueryField.Type fieldType, String valuePart) {
+        final Object converted = fieldType.getMongoValueConverter().apply(valuePart);
+        if (converted instanceof DateTime && fieldType == SearchQueryField.Type.DATE) {
+            return ((DateTime) converted).toDate(); //MongoDB does not like Joda
+        } else {
+            return converted;
         }
 
     }
