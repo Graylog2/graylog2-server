@@ -146,7 +146,7 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
     }
 
     @Override
-    public Optional<Notification> getByType(Notification.Type type, String key) {
+    public Optional<Notification> getByTypeAndKey(Notification.Type type, String key) {
         DBObject dbObject = findOne(NotificationImpl.class, typeAndKeyQuery(type, key));
 
         if (dbObject != null) {

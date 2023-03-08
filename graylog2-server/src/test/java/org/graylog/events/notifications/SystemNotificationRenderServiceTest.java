@@ -61,7 +61,7 @@ class SystemNotificationRenderServiceTest {
                 .addDetail("dummy", "dummy")
                 .addDetail("exception", new Exception("My Test Exception"))
                 .addTimestamp(DateTime.now(DateTimeZone.UTC));
-        when(notificationService.getByType(any(), any())).thenReturn(Optional.of(notification));
+        when(notificationService.getByTypeAndKey(any(), any())).thenReturn(Optional.of(notification));
 
         SystemNotificationRenderService.RenderResponse renderResponse =
                 renderService.render(notification.getType(), null, SystemNotificationRenderService.Format.HTML, null);
@@ -134,7 +134,7 @@ class SystemNotificationRenderServiceTest {
                 .addDetail("description", "my description")
                 .addDetail("blockDetails", blockDetails)
                 .addTimestamp(DateTime.now(DateTimeZone.UTC));
-        when(notificationService.getByType(any(), any())).thenReturn(Optional.of(notification));
+        when(notificationService.getByTypeAndKey(any(), any())).thenReturn(Optional.of(notification));
 
         SystemNotificationRenderService.RenderResponse renderResponse =
                 renderService.render(notification, SystemNotificationRenderService.Format.HTML, null);

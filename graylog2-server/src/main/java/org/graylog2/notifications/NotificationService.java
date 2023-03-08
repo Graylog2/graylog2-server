@@ -41,7 +41,7 @@ public interface NotificationService extends PersistedService {
 
     List<Notification> all();
 
-    Optional<Notification> getByType(Notification.Type type, @Nullable String key);
+    Optional<Notification> getByTypeAndKey(Notification.Type type, @Nullable String key);
 
     boolean publishIfFirst(Notification notification);
 

@@ -71,7 +71,7 @@ public class SystemNotificationRenderService {
     }
 
     public RenderResponse render(Notification.Type type, String key, Format format, Map<String, Object> values) {
-        Notification notification = notificationService.getByType(type, key)
+        Notification notification = notificationService.getByTypeAndKey(type, key)
                 .orElseThrow(() -> new NotFoundException(f("Event type <%s/%s> is not currently active", type, key)));
         return render(notification, format, values);
     }

@@ -178,9 +178,9 @@ public class HttpPollTransport extends ThrottleableTransport2 {
                 }
 
                 input.processRawMessage(new RawMessage(r.body().bytes(), remoteAddress));
-                inputFailureRecorder.isRunning();
+                inputFailureRecorder.setRunning();
             } catch (IOException e) {
-                inputFailureRecorder.isFailing(getClass(), "Could not fetch HTTP resource at " + url, e);
+                inputFailureRecorder.setFailing(getClass(), "Could not fetch HTTP resource at " + url, e);
             }
         };
 

@@ -91,7 +91,7 @@ public class InputLauncher {
                 try {
                     input.checkConfiguration();
                     inputState.setState(IOState.Type.STARTING);
-                    input.launch(inputBuffer, new InputFailureRecorder(inputState, input));
+                    input.launch(inputBuffer, new InputFailureRecorder(inputState));
                     inputState.setState(IOState.Type.RUNNING);
                     String msg = "Completed starting [" + input.getClass().getCanonicalName() + "] input " + input.toIdentifier();
                     LOG.debug(msg);
