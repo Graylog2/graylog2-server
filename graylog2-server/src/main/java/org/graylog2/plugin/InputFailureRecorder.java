@@ -34,8 +34,7 @@ public class InputFailureRecorder {
         isFailing(clazz, error, null);
     }
 
-    @SuppressWarnings("rawtypes")
-    public void isFailing(Class clazz, String error, @Nullable Throwable e) {
+    public void isFailing(Class<?> clazz, String error, @Nullable Throwable e) {
         if (inputState.getState().equals(IOState.Type.FAILING)) {
             return;
         }
