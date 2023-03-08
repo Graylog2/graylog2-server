@@ -47,6 +47,7 @@ public abstract class ThrottleableTransport2 extends ThrottleableTransport {
     protected final void doLaunch(MessageInput input) throws MisfireException {
         throw new MisfireException("Launch without InputFailureTracker");
     }
+
     protected abstract void doLaunch(MessageInput input, InputFailureRecorder inputFailureRecorder) throws MisfireException;
 
 }
