@@ -16,7 +16,7 @@
  */
 import { useContext } from 'react';
 
-import ExpandedEntitiesSectionsContext from '../ExpandedSectionsContext';
+import ExpandedEntitiesSectionsContext from '../contexts/ExpandedSectionsContext';
 
 const useExpandedSections = () => {
   const currentUser = useContext(ExpandedEntitiesSectionsContext);

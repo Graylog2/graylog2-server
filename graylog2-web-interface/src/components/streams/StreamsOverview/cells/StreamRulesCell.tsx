@@ -31,9 +31,9 @@ type Props = {
   stream: Stream
 }
 
-const StreamRuleCell = ({ stream }: Props) => {
+const StreamRulesCell = ({ stream }: Props) => {
   const buttonRef = useRef();
-  const { toggleSection } = useExpandedSections();
+  const { toggleSection, expandedSections } = useExpandedSections();
 
   const toggleRulesSection = useCallback(() => toggleSection(stream.id, 'rules'), [stream.id, toggleSection]);
 
@@ -41,11 +41,13 @@ const StreamRuleCell = ({ stream }: Props) => {
     return null;
   }
 
+  const streamRulesSectionIsOpen = expandedSections?.[stream.id]?.includes('rules');
+
   return (
-    <StyledCountBadge onClick={toggleRulesSection} ref={buttonRef}>
+    <StyledCountBadge onClick={toggleRulesSection} ref={buttonRef} title={`${streamRulesSectionIsOpen ? 'Hide' : 'Show'} stream rules`}>
       {stream.rules.length}
     </StyledCountBadge>
   );
 };
 
-export default StreamRuleCell;
+export default StreamRulesCell;

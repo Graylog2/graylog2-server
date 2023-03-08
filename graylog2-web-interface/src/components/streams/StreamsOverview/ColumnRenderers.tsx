@@ -27,7 +27,7 @@ import ThroughputCell from 'components/streams/StreamsOverview/cells/ThroughputC
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 import StatusCell from './cells/StatusCell';
-import StreamRuleCell from './cells/StreamRuleCell';
+import StreamRulesCell from './cells/StreamRulesCell';
 
 const DefaultLabel = styled(Label)`
   display: inline-flex;
@@ -57,7 +57,7 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
     staticWidth: 100,
   },
   rules: {
-    renderCell: (stream) => <StreamRuleCell stream={stream} />,
+    renderCell: (stream) => <StreamRulesCell stream={stream} />,
     staticWidth: 50,
   },
 });

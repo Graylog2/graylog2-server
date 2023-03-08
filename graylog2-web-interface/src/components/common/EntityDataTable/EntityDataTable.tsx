@@ -36,7 +36,7 @@ import BulkActionsRow from './BulkActionsRow';
 import TableHead from './TableHead';
 import TableRow from './TableRow';
 import type { ColumnRenderers, Column, EntityBase, ExpandedSectionRenderer } from './types';
-import ExpandedSectionsProvider from './ExpandedSectionsProvider';
+import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
 
 const ScrollContainer = styled.div`
   overflow-x: auto;
@@ -235,9 +235,8 @@ const EntityDataTable = <Entity extends EntityBase>({
                      activeSort={activeSort}
                      displayActionsCol={displayActionsCol} />
           {data.map((entity, index) => (
-            <tbody>
+            <tbody key={`table-row-${entity.id}`} data-testid={`table-row-${entity.id}`}>
               <TableRow entity={entity}
-                        key={entity.id}
                         index={index}
                         actionsRef={actionsRef}
                         onToggleEntitySelect={onToggleEntitySelect}

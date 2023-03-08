@@ -26,10 +26,11 @@ type Props = {
   children: React.ReactNode;
   onClick?: () => void,
   className?: string,
+  title?: string,
 };
 
-const CountBadge = forwardRef<HTMLElement, Props>(({ children, onClick, className }: Props, ref) => (
-  <Badge className={`badge ${className}`} onClick={onClick} ref={ref}>
+const CountBadge = forwardRef<HTMLElement, Props>(({ children, onClick, className, title }: Props, ref) => (
+  <Badge className={`badge ${className}`} onClick={onClick} ref={ref} title={title}>
     {children}
   </Badge>
 ));
@@ -37,6 +38,7 @@ const CountBadge = forwardRef<HTMLElement, Props>(({ children, onClick, classNam
 CountBadge.defaultProps = {
   onClick: undefined,
   className: '',
+  title: undefined,
 };
 
 export default CountBadge;

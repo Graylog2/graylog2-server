@@ -18,10 +18,11 @@ import * as React from 'react';
 import { useContext } from 'react';
 import styled from 'styled-components';
 
-import type { EntityBase, ExpandedSectionRenderer } from 'components/common/EntityDataTable/types';
-import ExpandedEntitiesSectionsContext from 'components/common/EntityDataTable/ExpandedSectionsContext';
 import { IconButton } from 'components/common';
 import { ButtonToolbar } from 'components/bootstrap';
+
+import type { EntityBase, ExpandedSectionRenderer } from './types';
+import ExpandedEntitiesSectionsContext from './contexts/ExpandedSectionsContext';
 
 const Header = styled.div`
   display: flex;
@@ -61,7 +62,7 @@ const ExpandedSections = <Entity extends EntityBase>({
           const hideSection = () => toggleSection(entity.id, sectionName);
 
           return (
-            <div>
+            <div key={`${sectionName}-${entity.id}`}>
               <Header>
                 <h3>{section.title}</h3>
                 <Actions>

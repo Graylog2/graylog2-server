@@ -21,7 +21,7 @@ export const ENTITY_TABLE_ID = 'streams';
 export const DEFAULT_LAYOUT = {
   pageSize: 20,
   sort: { attributeId: 'title', direction: 'asc' } as Sort,
-  displayedColumns: ['title', 'description', 'index_set_title', 'throughput', 'disabled'],
+  displayedColumns: ['title', 'description', 'index_set_title', 'rules', 'throughput', 'disabled'],
   columnsOrder: ['title', 'description', 'index_set_title', 'rules', 'throughput', 'disabled', 'created_at'],
 };
 
