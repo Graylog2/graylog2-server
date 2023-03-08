@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useContext } from 'react';
 import styled from 'styled-components';
 
-import { IconButton } from 'components/common';
+import IconButton from 'components/common/IconButton';
 import { ButtonToolbar } from 'components/bootstrap';
 
 import type { EntityBase, ExpandedSectionRenderer } from './types';
@@ -33,6 +33,10 @@ const Header = styled.div`
 const Actions = styled(ButtonToolbar)`
   display: flex;
   align-items: center;
+`;
+
+const HideSectionButton = styled(IconButton)`
+  margin-left: 5px;
 `;
 
 const ExpandedSections = <Entity extends EntityBase>({
@@ -67,7 +71,7 @@ const ExpandedSections = <Entity extends EntityBase>({
                 <h3>{section.title}</h3>
                 <Actions>
                   {section.actions?.(entity)}
-                  <IconButton name="times" onClick={hideSection} />
+                  <HideSectionButton name="times" onClick={hideSection} />
                 </Actions>
               </Header>
               {section.content(entity)}

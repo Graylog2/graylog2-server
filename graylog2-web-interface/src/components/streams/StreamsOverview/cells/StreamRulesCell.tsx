@@ -37,7 +37,7 @@ const StreamRulesCell = ({ stream }: Props) => {
 
   const toggleRulesSection = useCallback(() => toggleSection(stream.id, 'rules'), [stream.id, toggleSection]);
 
-  if (stream.is_default) {
+  if (stream.is_default || !stream.is_editable) {
     return null;
   }
 

@@ -58,7 +58,7 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
   },
   rules: {
     renderCell: (stream) => <StreamRulesCell stream={stream} />,
-    staticWidth: 50,
+    staticWidth: 70,
   },
 });
 

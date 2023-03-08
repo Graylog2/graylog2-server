@@ -40,6 +40,7 @@ import {
 import EntityFilters from 'components/common/EntityFilters';
 import type { Filters } from 'components/common/EntityFilters/types';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
+import ExpandedRulesActions from 'components/streams/StreamsOverview/ExpandedRulesActions';
 
 import ExpandedRulesSection from './ExpandedRulesSection';
 import CustomColumnRenderers from './ColumnRenderers';
@@ -129,13 +130,20 @@ const StreamsOverview = ({ indexSets }: Props) => {
                  indexSets={indexSets} />
   ), [indexSets]);
 
-  const renderExpandedRules = useCallback((stream: Stream) => (<ExpandedRulesSection stream={stream} />), []);
+  const renderExpandedRules = useCallback((stream: Stream) => (
+    <ExpandedRulesSection stream={stream} />
+  ), []);
+  const renderExpandedRulesActions = useCallback((stream: Stream) => (
+    <ExpandedRulesActions stream={stream} />
+  ), []);
+
   const expandedSectionsRenderer = useMemo(() => ({
     rules: {
       title: 'Rules',
       content: renderExpandedRules,
+      actions: renderExpandedRulesActions,
     },
-  }), [renderExpandedRules]);
+  }), [renderExpandedRules, renderExpandedRulesActions]);
 
   if (!paginatedStreams) {
     return <Spinner />;
