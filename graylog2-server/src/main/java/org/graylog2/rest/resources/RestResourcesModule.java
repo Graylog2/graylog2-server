@@ -67,6 +67,8 @@ import org.graylog2.rest.resources.system.contentpacks.CatalogResource;
 import org.graylog2.rest.resources.system.contentpacks.ContentPackResource;
 import org.graylog2.rest.resources.system.debug.DebugEventsResource;
 import org.graylog2.rest.resources.system.debug.DebugStreamsResource;
+import org.graylog2.rest.resources.system.debug.bundle.SupportBundleClusterResource;
+import org.graylog2.rest.resources.system.debug.bundle.SupportBundleResource;
 import org.graylog2.rest.resources.system.indexer.FailuresResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetDefaultsResource;
 import org.graylog2.rest.resources.system.indexer.IndexSetsResource;
@@ -123,6 +125,8 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(ClusterStatsResource.class);
         addSystemRestResource(ConfigurationResource.class);
         addSystemRestResource(DebugEventsResource.class);
+        addSystemRestResource(SupportBundleResource.class);
+        addSystemRestResource(SupportBundleClusterResource.class);
         addSystemRestResource(GettingStartedResource.class);
         addSystemRestResource(ServiceManagerResource.class);
         addSystemRestResource(SystemJobResource.class);

@@ -7,6 +7,16 @@
 
         <!-- Internal Graylog log appender. Please do not disable. This makes internal log messages available via REST calls. -->
         <Memory name="graylog-internal-logs" bufferSize="500"/>
+
+        <RollingFile name="rolling-file" fileName="/tmp/server.log" filePattern="/tmp/server.log.%i.gz">
+            <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5p [%c{1}] %m%n"/>
+            <Policies>
+<!--                <SizeBasedTriggeringPolicy size="50MB"/>-->
+                <SizeBasedTriggeringPolicy size="100kB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10" fileIndex="min"/>
+        </RollingFile>
+
     </Appenders>
     <Loggers>
         <!-- Application Loggers -->
@@ -28,6 +38,7 @@
         <!-- Silence Azure SDK messages -->
         <Logger name="com.azure" level="warn"/>
         <Root level="warn">
+            <AppenderRef ref="rolling-file"/>
             <AppenderRef ref="STDOUT"/>
             <AppenderRef ref="graylog-internal-logs"/>
         </Root>
