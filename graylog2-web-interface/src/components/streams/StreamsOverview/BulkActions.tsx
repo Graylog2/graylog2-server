@@ -119,23 +119,25 @@ const BulkActions = ({ selectedStreamIds, setSelectedStreamIds, indexSets }: Pro
 
   const refetchStreams = useCallback(() => queryClient.invalidateQueries(['streams', 'overview']), [queryClient]);
 
+  const handleFailures = useCallback((failures: Array<{ entity_id: string }>, actionPastTense: string) => {
+    if (failures?.length) {
+      const notDeletedStreamIds = failures.map(({ entity_id }) => entity_id);
+      setSelectedStreamIds(notDeletedStreamIds);
+      UserNotification.error(`${notDeletedStreamIds.length} out of ${selectedItemsAmount} selected ${descriptor} could not be ${actionPastTense}.`);
+    } else {
+      setSelectedStreamIds([]);
+      UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} ${actionPastTense} successfully.`, 'Success');
+    }
+  }, [descriptor, selectedItemsAmount, setSelectedStreamIds]);
+
   const onDelete = useCallback(() => {
     // eslint-disable-next-line no-alert
-    if (window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}?`)) {
+    if (window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}? This action cannot be undone.`)) {
       fetch(
         'POST',
         qualifyUrl(ApiRoutes.StreamsApiController.bulk_delete().url),
         { entity_ids: selectedStreamIds },
-      ).then(({ failures }) => {
-        if (failures?.length) {
-          const notDeletedStreamIds = failures.map(({ entity_id }) => entity_id);
-          setSelectedStreamIds(notDeletedStreamIds);
-          UserNotification.error(`${notDeletedStreamIds.length} out of ${selectedItemsAmount} selected ${descriptor} could not be deleted.`);
-        } else {
-          setSelectedStreamIds([]);
-          UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`, 'Success');
-        }
-      }).catch((error) => {
+      ).then(({ failures }) => handleFailures(failures, 'deleted')).catch((error) => {
         UserNotification.error(`An error occurred while deleting streams. ${error}`);
       }).finally(() => {
         refetchStreams();
@@ -149,6 +151,34 @@ const BulkActions = ({ selectedStreamIds, setSelectedStreamIds, indexSets }: Pro
     setSelectedStreamIds,
   ]);
 
+  const onStartStreams = useCallback(() => {
+    fetch(
+      'POST',
+      qualifyUrl(ApiRoutes.StreamsApiController.bulk_resume().url),
+      { entity_ids: selectedStreamIds },
+    ).then(({ failures }) => handleFailures(failures, 'started'))
+      .catch((error) => {
+        UserNotification.error(`An error occurred while starting streams. ${error}`);
+      })
+      .finally(() => {
+        refetchStreams();
+      });
+  }, [handleFailures, refetchStreams, selectedStreamIds]);
+
+  const onStopStreams = useCallback(() => {
+    fetch(
+      'POST',
+      qualifyUrl(ApiRoutes.StreamsApiController.bulk_pause().url),
+      { entity_ids: selectedStreamIds },
+    ).then(({ failures }) => handleFailures(failures, 'stopped'))
+      .catch((error) => {
+        UserNotification.error(`An error occurred while stopping streams. ${error}`);
+      })
+      .finally(() => {
+        refetchStreams();
+      });
+  }, [handleFailures, refetchStreams, selectedStreamIds]);
+
   const toggleAssignIndexSetModal = useCallback(() => {
     setShowIndexSetModal((cur) => !cur);
   }, []);
@@ -159,6 +189,8 @@ const BulkActions = ({ selectedStreamIds, setSelectedStreamIds, indexSets }: Pro
         <IfPermitted permissions="indexsets:read">
           <MenuItem onSelect={toggleAssignIndexSetModal}>Assign index set</MenuItem>
         </IfPermitted>
+        <MenuItem onSelect={onStartStreams}>Start {descriptor}</MenuItem>
+        <MenuItem onSelect={onStopStreams}>Stop {descriptor}</MenuItem>
         <MenuItem onSelect={onDelete}>Delete</MenuItem>
       </BulkActionsDropdown>
       {showIndexSetModal && (
