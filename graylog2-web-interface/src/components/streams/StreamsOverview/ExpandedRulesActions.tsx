@@ -24,6 +24,7 @@ import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 import { LinkContainer } from 'components/common/router';
+import { IfPermitted } from 'components/common';
 
 type Props = {
   stream: Stream,
@@ -45,14 +46,18 @@ const RulesSectionActions = ({ stream }: Props) => {
 
   return (
     <>
-      <LinkContainer to={Routes.stream_edit(stream.id)}>
-        <Button bsStyle="link" bsSize="xsmall" disabled={isDefaultStream || isNotEditable}>
-          Manage Rules
+      <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
+        <LinkContainer to={Routes.stream_edit(stream.id)}>
+          <Button bsStyle="link" bsSize="xsmall" disabled={isDefaultStream || isNotEditable}>
+            Manage Rules
+          </Button>
+        </LinkContainer>
+      </IfPermitted>
+      <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
+        <Button bsStyle="info" bsSize="xsmall" disabled={isDefaultStream || isNotEditable} onClick={toggleAddRuleModal}>
+          Quick add rule
         </Button>
-      </LinkContainer>
-      <Button bsStyle="info" bsSize="xsmall" disabled={isDefaultStream || isNotEditable} onClick={toggleAddRuleModal}>
-        Quick add rule
-      </Button>
+      </IfPermitted>
       {showAddRuleModal && (
         <StreamRuleModal onClose={toggleAddRuleModal}
                          title="New Stream Rule"
