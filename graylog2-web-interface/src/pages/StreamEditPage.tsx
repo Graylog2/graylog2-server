@@ -28,7 +28,7 @@ import useStream from 'components/streams/hooks/useStream';
 const StreamEditPage = () => {
   const params = useParams<{ streamId: string }>();
   const query = useQuery() as { index: string, message_id: string };
-  const { data: stream } = useStream(params.streamId)
+  const { data: stream } = useStream(params.streamId);
 
   if (!stream) {
     return <Spinner />;
