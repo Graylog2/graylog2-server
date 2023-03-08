@@ -21,11 +21,14 @@ import org.graylog.plugins.pipelineprocessor.db.PaginatedRuleService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineServiceHelper;
+import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
+import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
+import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -69,12 +72,22 @@ public class RuleResourceTest {
     @Mock
     PipelineServiceHelper pipelineServiceHelper;
 
+    @Mock
+    ConfigurationStateUpdater configurationStateUpdater;
+
+    @Mock
+    StreamService streamService;
+
+    @Mock
+    PipelineStreamConnectionsService pipelineStreamConnectionsService;
+
     RuleResource underTest;
 
     @Before
     public void setup() {
         underTest = new RuleResource(ruleService, pipelineService, ruleMetricsConfigService,
-                pipelineRuleParser, paginatedRuleService, functionRegistry, pipelineServiceHelper);
+                pipelineRuleParser, paginatedRuleService, functionRegistry, pipelineServiceHelper,
+                configurationStateUpdater, streamService, pipelineStreamConnectionsService);
     }
 
     @Test

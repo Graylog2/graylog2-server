@@ -368,7 +368,7 @@ public class PipelineInterpreter implements MessageProcessor {
         interpreterListener.exitStage(stage);
     }
 
-    private boolean executeRuleActions(Rule rule,
+    public boolean executeRuleActions(Rule rule,
                                        Message message,
                                        String msgId,
                                        Pipeline pipeline,

@@ -18,18 +18,23 @@ package org.graylog.plugins.pipelineprocessor.rest;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Sets;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
+import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.db.PaginatedRuleService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineServiceHelper;
+import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
@@ -37,21 +42,32 @@ import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
+import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
+import org.graylog.plugins.pipelineprocessor.simulator.PipelineInterpreterTracer;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.messageq.noop.NoopMessageQueueAcknowledger;
+import org.graylog2.shared.metrics.MetricRegistryFactory;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
@@ -71,6 +87,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
@@ -98,6 +116,9 @@ public class RuleResource extends RestResource implements PluginRestResource {
     private final PaginatedRuleService paginatedRuleService;
     private final SearchQueryParser searchQueryParser;
     private final PipelineServiceHelper pipelineServiceHelper;
+    private final ConfigurationStateUpdater configurationStateUpdater;
+    private final StreamService streamService;
+    private final PipelineStreamConnectionsService connectionsService;
 
     @Inject
     public RuleResource(RuleService ruleService,
@@ -106,7 +127,10 @@ public class RuleResource extends RestResource implements PluginRestResource {
                         PipelineRuleParser pipelineRuleParser,
                         PaginatedRuleService paginatedRuleService,
                         FunctionRegistry functionRegistry,
-                        PipelineServiceHelper pipelineServiceHelper) {
+                        PipelineServiceHelper pipelineServiceHelper,
+                        ConfigurationStateUpdater configurationStateUpdater,
+                        StreamService streamService,
+                        PipelineStreamConnectionsService connectionsService) {
         this.ruleService = ruleService;
         this.pipelineService = pipelineService;
         this.ruleMetricsConfigService = ruleMetricsConfigService;
@@ -114,6 +138,9 @@ public class RuleResource extends RestResource implements PluginRestResource {
         this.functionRegistry = functionRegistry;
         this.paginatedRuleService = paginatedRuleService;
         this.pipelineServiceHelper = pipelineServiceHelper;
+        this.configurationStateUpdater = configurationStateUpdater;
+        this.streamService = streamService;
+        this.connectionsService = connectionsService;
 
         this.searchQueryParser = new SearchQueryParser(RuleDao.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
@@ -171,6 +198,60 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .createdAt(now)
                 .modifiedAt(now)
                 .build();
+    }
+
+    @ApiOperation(value = "Simulate a processing rule")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/simulate/{messageString}")
+    @NoAuditEvent("only used to test a rule, no changes made in the system")
+    public Messages simulate(
+            @ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource,
+            @ApiParam(name = "message", required = true) @PathParam("messageString") @NotBlank String messageString
+    ) throws NotFoundException {
+        final Rule rule;
+        try {
+            rule = pipelineRuleParser.parseRule(ruleSource.id(), ruleSource.source(), true);
+        } catch (ParseException e) {
+            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
+        }
+
+        Stage stage = Stage.builder()
+                .stage(0)
+                .ruleReferences(List.of(rule.name()))
+                .match(Stage.Match.PASS)
+                .build();
+        stage.setRules(List.of(rule));
+        Pipeline pipeline = Pipeline.builder()
+                .stages(ImmutableSortedSet.of(stage))
+                .name("dummyPipeline")
+                .id(UUID.randomUUID().toString())
+                .build();
+        stage.setPipeline(pipeline);
+
+        PipelineConnections updatedConnection = connectionsService.load(Stream.DEFAULT_STREAM_ID);
+        final Set<String> pipelines = updatedConnection.pipelineIds();
+        pipelines.add(pipeline.id());
+        updatedConnection.toBuilder().pipelineIds(pipelines).build();
+        final Set<PipelineConnections> updatedConnections = Sets.newHashSet();
+        updatedConnections.add(updatedConnection);
+        connectionsService.save(updatedConnection);
+
+
+        PipelineInterpreter pipelineInterpreter = new PipelineInterpreter(
+                new NoopMessageQueueAcknowledger(), MetricRegistryFactory.create(), configurationStateUpdater);
+        final List<ResultMessageSummary> simulationResults = new ArrayList<>();
+        final PipelineInterpreterTracer pipelineInterpreterTracer = new PipelineInterpreterTracer();
+
+        Message message = new Message(messageString, "127.0.0.1", DateTime.now());
+        final Stream stream = streamService.load(Stream.DEFAULT_STREAM_ID);
+        message.addStream(stream);
+
+        Messages processedMessages = pipelineInterpreter.process(message,
+                pipelineInterpreterTracer.getSimulatorInterpreterListener(),
+                configurationStateUpdater.getLatestState());
+
+        return  processedMessages;
     }
 
     @ApiOperation(value = "Get all processing rules")
