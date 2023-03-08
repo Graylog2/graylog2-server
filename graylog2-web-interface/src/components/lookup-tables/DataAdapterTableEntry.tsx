@@ -45,16 +45,16 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(adapter);
   const { name: adapterName, title: adapterTitle, description: adapterDescription, id: adapterId } = adapter;
 
-  const _onEdit = () => {
+  const _onEdit = React.useCallback(() => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName));
-  };
+  }, [history, adapterName]);
 
-  const _onDelete = () => {
+  const _onDelete = React.useCallback(() => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Are you sure you want to delete data adapter "${adapterTitle}"?`)) {
       LookupTableDataAdaptersActions.delete(adapter.id).then(() => LookupTableDataAdaptersActions.reloadPage());
     }
-  };
+  }, [adapterTitle, adapter.id]);
 
   return (
     <tbody>
