@@ -19,6 +19,8 @@ package org.graylog2.search;
 import org.bson.types.ObjectId;
 import org.graylog2.utilities.date.MultiFormatDateParser;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.function.Function;
 
 public class SearchQueryField {
@@ -27,11 +29,13 @@ public class SearchQueryField {
 
     public enum Type {
         STRING(value -> value),
-        DATE(value -> dateParser.parseDate(value)),
+        DATE(value -> dateParser.parseDate(value).toDate()),
         INT(value -> Integer.parseInt(value)),
         LONG(value -> Long.parseLong(value)),
         OBJECT_ID(value -> new ObjectId(value)),
         BOOLEAN(value -> Boolean.parseBoolean(value));
+
+        public static final Collection<Type> NUMERIC_TYPES = List.of(DATE, LONG, INT);
 
         private final Function<String, Object> mongoValueConverter;
 

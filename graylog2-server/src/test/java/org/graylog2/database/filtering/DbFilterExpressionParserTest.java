@@ -195,4 +195,95 @@ class DbFilterExpressionParserTest {
                                 .build())
                 ));
     }
+
+    @Test
+    void parsesFilterExpressionCorrectlyForDateRanges() {
+        final String fromString = "2012-12-12 12:12:12";
+        final String toString = "2022-12-12 12:12:12";
+
+        final List<EntityAttribute> entityAttributes = List.of(EntityAttribute.builder()
+                .id("created_at")
+                .title("Creation Date")
+                .type(SearchQueryField.Type.DATE)
+                .filterable(true)
+                .build());
+
+        assertEquals(
+                Filters.and(
+                        Filters.gte("created_at",
+                                new DateTime(2012, 12, 12, 12, 12, 12, DateTimeZone.UTC)),
+                        Filters.lte("created_at",
+                                new DateTime(2022, 12, 12, 12, 12, 12, DateTimeZone.UTC))
+                ),
+
+                toTest.parseSingleExpression("created_at:" + fromString + DbFilterExpressionParser.RANGE_VALUES_SEPARATOR + toString,
+                        entityAttributes
+                ));
+    }
+
+    @Test
+    void parsesFilterExpressionCorrectlyForOpenDateRanges() {
+        final String dateString = "2012-12-12 12:12:12";
+        final DateTime dateObject = new DateTime(2012, 12, 12, 12, 12, 12, DateTimeZone.UTC);
+
+        final List<EntityAttribute> entityAttributes = List.of(EntityAttribute.builder()
+                .id("created_at")
+                .title("Creation Date")
+                .type(SearchQueryField.Type.DATE)
+                .filterable(true)
+                .build());
+
+        assertEquals(
+                Filters.and(
+                        Filters.gte("created_at", dateObject)
+                ),
+                toTest.parseSingleExpression("created_at:" + dateString + DbFilterExpressionParser.RANGE_VALUES_SEPARATOR,
+                        entityAttributes
+                ));
+
+        assertEquals(
+                Filters.and(
+                        Filters.lte("created_at", dateObject)
+                ),
+                toTest.parseSingleExpression("created_at:" + DbFilterExpressionParser.RANGE_VALUES_SEPARATOR + dateString,
+                        entityAttributes
+                ));
+    }
+
+    @Test
+    void parsesFilterExpressionCorrectlyForIntRanges() {
+        final List<EntityAttribute> entityAttributes = List.of(EntityAttribute.builder()
+                .id("number")
+                .title("Number")
+                .type(SearchQueryField.Type.INT)
+                .filterable(true)
+                .build());
+
+        assertEquals(
+                Filters.and(
+                        Filters.gte("number", 42),
+                        Filters.lte("number", 53)
+                ),
+
+                toTest.parseSingleExpression("number:42" + DbFilterExpressionParser.RANGE_VALUES_SEPARATOR + "53",
+                        entityAttributes
+                ));
+    }
+
+    @Test
+    void parsesFilterExpressionForStringFieldsCorrectlyEvenIfValueContainsRangeSeparator() {
+        final List<EntityAttribute> entityAttributes = List.of(EntityAttribute.builder()
+                .id("text")
+                .title("Text")
+                .type(SearchQueryField.Type.STRING)
+                .filterable(true)
+                .build());
+
+        assertEquals(
+                Filters.eq("text", "42" + DbFilterExpressionParser.RANGE_VALUES_SEPARATOR + "53"),
+
+                toTest.parseSingleExpression("text:42" + DbFilterExpressionParser.RANGE_VALUES_SEPARATOR + "53",
+                        entityAttributes
+                ));
+    }
 }
