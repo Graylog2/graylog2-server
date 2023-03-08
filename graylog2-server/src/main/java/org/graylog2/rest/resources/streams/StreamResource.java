@@ -38,6 +38,7 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.DefaultFailureContextCreator;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.audit.jersey.SuccessContextCreator;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
@@ -143,7 +144,9 @@ public class StreamResource extends RestResource {
     private final StreamRouterEngine.Factory streamRouterEngineFactory;
     private final IndexSetRegistry indexSetRegistry;
     private final RecentActivityService recentActivityService;
-    private final BulkExecutor<Stream, UserContext> bulkExecutor;
+    private final BulkExecutor<Stream, UserContext> bulkStreamDeleteExecutor;
+    private final BulkExecutor<Stream, UserContext> bulkStreamStartExecutor;
+    private final BulkExecutor<Stream, UserContext> bulkStreamStopExecutor;
 
     private final DbQueryCreator dbQueryCreator;
 
@@ -162,14 +165,15 @@ public class StreamResource extends RestResource {
         this.paginatedStreamService = paginatedStreamService;
         this.dbQueryCreator = new DbQueryCreator(StreamImpl.FIELD_TITLE, attributes);
         this.recentActivityService = recentActivityService;
-        this.bulkExecutor = new SequentialBulkExecutor<>(this::delete,
-                auditEventSender,
-                (entity, entityClass) ->
-                        Map.of("response_entity",
-                                Map.of("stream_id", entity.getId(),
-                                        "title", entity.getTitle()
-                                )),
-                new DefaultFailureContextCreator());
+        final SuccessContextCreator<Stream> successAuditLogContextCreator = (entity, entityClass) ->
+                Map.of("response_entity",
+                        Map.of("stream_id", entity.getId(),
+                                "title", entity.getTitle()
+                        ));
+        final DefaultFailureContextCreator failureAuditLogContextCreator = new DefaultFailureContextCreator();
+        this.bulkStreamDeleteExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, successAuditLogContextCreator, failureAuditLogContextCreator);
+        this.bulkStreamStartExecutor = new SequentialBulkExecutor<>(this::resume, auditEventSender, successAuditLogContextCreator, failureAuditLogContextCreator);
+        this.bulkStreamStopExecutor = new SequentialBulkExecutor<>(this::pause, auditEventSender, successAuditLogContextCreator, failureAuditLogContextCreator);
 
     }
 
@@ -379,10 +383,48 @@ public class StreamResource extends RestResource {
     public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
                                @Context final UserContext userContext) {
 
-        final BulkOperationResponse response = bulkExecutor.executeBulkOperation(
+        final BulkOperationResponse response = bulkStreamDeleteExecutor.executeBulkOperation(
                 bulkOperationRequest,
                 userContext,
                 new AuditParams(AuditEventTypes.STREAM_DELETE, "streamId", Stream.class));
+
+        return Response.status(Response.Status.OK)
+                .entity(response)
+                .build();
+    }
+
+    @POST
+    @Path("/bulk_pause")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Timed
+    @ApiOperation(value = "Pause a bulk of streams", response = BulkOperationResponse.class)
+    @NoAuditEvent("Audit events triggered manually")
+    public Response bulkPause(@ApiParam(name = "Streams to pause", required = true) final BulkOperationRequest bulkOperationRequest,
+                              @Context final UserContext userContext) {
+
+        final BulkOperationResponse response = bulkStreamStopExecutor.executeBulkOperation(
+                bulkOperationRequest,
+                userContext,
+                new AuditParams(AuditEventTypes.STREAM_STOP, "streamId", Stream.class));
+
+        return Response.status(Response.Status.OK)
+                .entity(response)
+                .build();
+    }
+
+    @POST
+    @Path("/bulk_resume")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Timed
+    @ApiOperation(value = "Resume a bulk of streams", response = BulkOperationResponse.class)
+    @NoAuditEvent("Audit events triggered manually")
+    public Response bulkResume(@ApiParam(name = "Streams to resume", required = true) final BulkOperationRequest bulkOperationRequest,
+                               @Context final UserContext userContext) {
+
+        final BulkOperationResponse response = bulkStreamStartExecutor.executeBulkOperation(
+                bulkOperationRequest,
+                userContext,
+                new AuditParams(AuditEventTypes.STREAM_START, "streamId", Stream.class));
 
         return Response.status(Response.Status.OK)
                 .entity(response)
@@ -398,13 +440,15 @@ public class StreamResource extends RestResource {
             @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
     })
     @AuditEvent(type = AuditEventTypes.STREAM_STOP)
-    public void pause(@ApiParam(name = "streamId", required = true)
-                      @PathParam("streamId") @NotEmpty String streamId) throws NotFoundException, ValidationException {
+    public Stream pause(@ApiParam(name = "streamId", required = true)
+                        @PathParam("streamId") @NotEmpty String streamId,
+                        @Context UserContext userContext) throws NotFoundException, ValidationException {
         checkAnyPermission(new String[]{RestPermissions.STREAMS_CHANGESTATE, RestPermissions.STREAMS_EDIT}, streamId);
         checkNotEditableStream(streamId, "The stream cannot be paused.");
 
         final Stream stream = streamService.load(streamId);
         streamService.pause(stream);
+        return stream;
     }
 
     @POST
@@ -412,17 +456,19 @@ public class StreamResource extends RestResource {
     @Timed
     @ApiOperation(value = "Resume a stream")
     @ApiResponses(value = {
-        @ApiResponse(code = 404, message = "Stream not found."),
-        @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
+            @ApiResponse(code = 404, message = "Stream not found."),
+            @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
     })
     @AuditEvent(type = AuditEventTypes.STREAM_START)
-    public void resume(@ApiParam(name = "streamId", required = true)
-                       @PathParam("streamId") @NotEmpty String streamId) throws NotFoundException, ValidationException {
+    public Stream resume(@ApiParam(name = "streamId", required = true)
+                         @PathParam("streamId") @NotEmpty String streamId,
+                         @Context UserContext userContext) throws NotFoundException, ValidationException {
         checkAnyPermission(new String[]{RestPermissions.STREAMS_CHANGESTATE, RestPermissions.STREAMS_EDIT}, streamId);
         checkNotEditableStream(streamId, "The stream cannot be resumed.");
 
         final Stream stream = streamService.load(streamId);
         streamService.resume(stream);
+        return stream;
     }
 
     @POST
