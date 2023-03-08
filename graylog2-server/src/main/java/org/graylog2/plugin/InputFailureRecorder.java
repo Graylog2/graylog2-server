@@ -30,8 +30,7 @@ public class InputFailureRecorder {
         this.input = input;
     }
 
-    @SuppressWarnings("rawtypes")
-    public void isFailing(Class clazz, String error) {
+    public void isFailing(Class<?> clazz, String error) {
         isFailing(clazz, error, null);
     }
 
