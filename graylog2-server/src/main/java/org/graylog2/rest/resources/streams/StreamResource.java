@@ -171,9 +171,9 @@ public class StreamResource extends RestResource {
                                 "title", entity.getTitle()
                         ));
         final DefaultFailureContextCreator failureAuditLogContextCreator = new DefaultFailureContextCreator();
-        this.bulkStreamDeleteExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, successAuditLogContextCreator, failureAuditLogContextCreator);
-        this.bulkStreamStartExecutor = new SequentialBulkExecutor<>(this::resume, auditEventSender, successAuditLogContextCreator, failureAuditLogContextCreator);
-        this.bulkStreamStopExecutor = new SequentialBulkExecutor<>(this::pause, auditEventSender, successAuditLogContextCreator, failureAuditLogContextCreator);
+        this.bulkStreamDeleteExecutor = new SequentialBulkExecutor<>(this::deleteInner, auditEventSender, successAuditLogContextCreator, failureAuditLogContextCreator);
+        this.bulkStreamStartExecutor = new SequentialBulkExecutor<>(this::resumeInner, auditEventSender, successAuditLogContextCreator, failureAuditLogContextCreator);
+        this.bulkStreamStopExecutor = new SequentialBulkExecutor<>(this::pauseInner, auditEventSender, successAuditLogContextCreator, failureAuditLogContextCreator);
 
     }
 
@@ -363,8 +363,12 @@ public class StreamResource extends RestResource {
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
     @AuditEvent(type = AuditEventTypes.STREAM_DELETE)
-    public Stream delete(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId,
-                         @Context UserContext userContext) throws NotFoundException {
+    public void delete(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId,
+                       @Context UserContext userContext) throws NotFoundException {
+        deleteInner(streamId, userContext);
+    }
+
+    private Stream deleteInner(String streamId, UserContext userContext) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkNotEditableStream(streamId, "The stream cannot be deleted.");
 
@@ -440,9 +444,12 @@ public class StreamResource extends RestResource {
             @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
     })
     @AuditEvent(type = AuditEventTypes.STREAM_STOP)
-    public Stream pause(@ApiParam(name = "streamId", required = true)
-                        @PathParam("streamId") @NotEmpty String streamId,
-                        @Context UserContext userContext) throws NotFoundException, ValidationException {
+    public void pause(@ApiParam(name = "streamId", required = true)
+                      @PathParam("streamId") @NotEmpty String streamId) throws NotFoundException, ValidationException {
+        pauseInner(streamId, null);
+    }
+
+    private Stream pauseInner(String streamId, UserContext userContext) throws NotFoundException, ValidationException {
         checkAnyPermission(new String[]{RestPermissions.STREAMS_CHANGESTATE, RestPermissions.STREAMS_EDIT}, streamId);
         checkNotEditableStream(streamId, "The stream cannot be paused.");
 
@@ -460,9 +467,13 @@ public class StreamResource extends RestResource {
             @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
     })
     @AuditEvent(type = AuditEventTypes.STREAM_START)
-    public Stream resume(@ApiParam(name = "streamId", required = true)
-                         @PathParam("streamId") @NotEmpty String streamId,
-                         @Context UserContext userContext) throws NotFoundException, ValidationException {
+    public void resume(@ApiParam(name = "streamId", required = true)
+                       @PathParam("streamId") @NotEmpty String streamId,
+                       @Context UserContext userContext) throws NotFoundException, ValidationException {
+        resumeInner(streamId, null);
+    }
+
+    private Stream resumeInner(String streamId, UserContext userContext) throws NotFoundException, ValidationException {
         checkAnyPermission(new String[]{RestPermissions.STREAMS_CHANGESTATE, RestPermissions.STREAMS_EDIT}, streamId);
         checkNotEditableStream(streamId, "The stream cannot be resumed.");
 
@@ -476,8 +487,8 @@ public class StreamResource extends RestResource {
     @Timed
     @ApiOperation(value = "Test matching of a stream against a supplied message")
     @ApiResponses(value = {
-        @ApiResponse(code = 404, message = "Stream not found."),
-        @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
+            @ApiResponse(code = 404, message = "Stream not found."),
+            @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
     })
     @NoAuditEvent("only used for testing stream matches")
     public TestMatchResponse testMatch(@ApiParam(name = "streamId", required = true)
