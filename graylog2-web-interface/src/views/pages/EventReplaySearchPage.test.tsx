@@ -33,7 +33,7 @@ import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData
 import {
   mockedMappedAggregation,
   mockEventData,
-  mockEventDefinition,
+  mockEventDefinitionTwoAggregations,
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import useParams from 'routing/useParams';
 
@@ -55,6 +55,16 @@ jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
     listAll: jest.fn(async () => Promise.resolve),
   },
   EventNotificationsStore: MockStore((['getInitialState', () => ({ all: [] })])),
+}));
+
+jest.mock('views/logic/Widgets', () => ({
+  ...jest.requireActual('views/logic/Widgets'),
+  widgetDefinition: () => ({
+    searchTypes: () => [{
+      type: 'AGGREGATION',
+      typeDefinition: {},
+    }],
+  }),
 }));
 
 describe('EventReplaySearchPage', () => {
@@ -82,7 +92,7 @@ describe('EventReplaySearchPage', () => {
     }));
 
     asMock(useEventDefinition).mockImplementation(() => ({
-      data: { eventDefinition: mockEventDefinition, aggregations: mockedMappedAggregation },
+      data: { eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation },
       isLoading: false,
       isFetched: true,
       refetch: () => {},
@@ -92,14 +102,14 @@ describe('EventReplaySearchPage', () => {
   it('should run useEventById, useEventDefinition, UseCreateViewForEvent with correct parameters', async () => {
     asMock(useAlertAndEventDefinitionData).mockImplementation(() => ({
       eventData: mockEventData.event,
-      eventDefinition: mockEventDefinition,
+      eventDefinition: mockEventDefinitionTwoAggregations,
       aggregations: mockedMappedAggregation,
       isEvent: true,
       isEventDefinition: false,
       isAlert: false,
       alertId: mockEventData.event.id,
-      definitionId: mockEventDefinition.id,
-      definitionTitle: mockEventDefinition.title,
+      definitionId: mockEventDefinitionTwoAggregations.id,
+      definitionTitle: mockEventDefinitionTwoAggregations.title,
     }));
 
     // eslint-disable-next-line testing-library/no-unnecessary-act
@@ -111,7 +121,7 @@ describe('EventReplaySearchPage', () => {
     expect(useEventDefinition).toHaveBeenCalledWith(mockEventData.event.event_definition_id);
 
     await expect(UseCreateViewForEvent).toHaveBeenCalledWith({
-      eventData: mockEventData.event, eventDefinition: mockEventDefinition, aggregations: mockedMappedAggregation,
+      eventData: mockEventData.event, eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation,
     });
   });
 });

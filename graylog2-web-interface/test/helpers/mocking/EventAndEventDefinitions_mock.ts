@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import * as Immutable from 'immutable';
+// import * as Immutable from 'immutable';
 
 import type { EventType } from 'hooks/useEventById';
 import type { EventDefinition } from 'logic/alerts/types';
@@ -32,6 +32,7 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import { allMessagesTable, resultHistogram } from 'views/logic/Widgets';
+// import SearchTypesGenerator from 'views/logic/searchtypes/SearchTypesGenerator';
 
 export const mockEventData = {
   event: {
@@ -68,10 +69,10 @@ export const mockEventData = {
   } as EventType,
 };
 
-export const mockEventDefinition:EventDefinition = {
+export const mockEventDefinitionTwoAggregations:EventDefinition = {
   _scope: 'DEFAULT',
   id: 'event-definition-id-1',
-  title: 'Test',
+  title: 'Event Definition Title',
   description: 'Test description',
   updated_at: '2023-02-21T13:28:09.296Z',
   priority: 2,
@@ -137,7 +138,7 @@ export const mockEventDefinition:EventDefinition = {
   },
   notifications: [
     {
-      notification_id: '2222',
+      notification_id: 'email_notification_id',
       notification_parameters: null,
     },
   ],
@@ -149,6 +150,37 @@ export const mockEventDefinition:EventDefinition = {
       ],
     },
   ],
+};
+
+export const mockEventDefinitionOneAggregation = {
+  ...mockEventDefinitionTwoAggregations,
+  id: 'event-definition-id-1',
+  config: {
+    ...mockEventDefinitionTwoAggregations.config,
+    series: [
+      {
+        id: 'count-field1',
+        function: 'count',
+        field: 'field1',
+      },
+    ],
+    conditions: {
+      expression: {
+        expr: '||',
+        left: {
+          expr: '>',
+          left: {
+            expr: 'number-ref',
+            ref: 'count-field1',
+          },
+          right: {
+            expr: 'number',
+            value: 500.0,
+          },
+        },
+      },
+    },
+  },
 };
 export const mockedMappedAggregation: Array<EventDefinitionAggregation> = [
   {
@@ -168,7 +200,7 @@ export const mockedMappedAggregation: Array<EventDefinitionAggregation> = [
 ];
 
 const eventData = mockEventData.event;
-const query = QueryGenerator(eventData.replay_info.streams, undefined, {
+const query = QueryGenerator(eventData.replay_info.streams, 'query-id', {
   type: 'absolute',
   from: eventData?.replay_info?.timerange_start,
   to: eventData?.replay_info?.timerange_end,
@@ -176,79 +208,167 @@ const query = QueryGenerator(eventData.replay_info.streams, undefined, {
   type: 'elasticsearch',
   query_string: eventData?.replay_info?.query || '',
 });
-const search = Search.create().toBuilder().queries([query]).build();
 
-// const titles =
 const histogram = resultHistogram('mc-widget-id');
 const messageTable = allMessagesTable('allm-widget-id', []);
 
-export const mockedView = View.create()
+const field1Widget = AggregationWidget.builder()
+  .id('field1-widget-id')
+  .type('pivot')
+  .config(
+    AggregationWidgetConfig.builder()
+      .columnPivots([])
+      .rowPivots([Pivot.create(['field1', 'field2'], 'values', { limit: 15 })])
+      .series([Series.forFunction('count(field1)')])
+      .sort([new SortConfig(SortConfig.SERIES_TYPE, 'count(field1)', Direction.Descending)])
+      .visualization('table')
+      .rollup(true)
+      .build(),
+  )
+  .build();
+
+const field2Widget = AggregationWidget.builder()
+  .id('field2-widget-id')
+  .type('pivot')
+  .config(
+    AggregationWidgetConfig.builder()
+      .columnPivots([])
+      .rowPivots([Pivot.create(['field2', 'field1'], 'values', { limit: 15 })])
+      .series([Series.forFunction('count(field2)')])
+      .sort([new SortConfig(SortConfig.SERIES_TYPE, 'count(field2)', Direction.Ascending)])
+      .visualization('table')
+      .rollup(true)
+      .build(),
+  )
+  .build();
+
+const summaryWidget = AggregationWidget.builder()
+  .id('summary-widget-id')
+  .type('pivot')
+  .config(
+    AggregationWidgetConfig.builder()
+      .columnPivots([])
+      .rowPivots([Pivot.create(['field1', 'field2'], 'values', { limit: 15 })])
+      .series([Series.forFunction('count(field1)'), Series.forFunction('count(field2)')])
+      .sort([])
+      .visualization('table')
+      .rollup(true)
+      .build(),
+  )
+  .build();
+const widgetsWithOneAggregation = [
+  field1Widget,
+  histogram,
+  messageTable,
+];
+const widgetsWithTwoAggregations = [
+  field1Widget,
+  field2Widget,
+  histogram,
+  messageTable,
+  summaryWidget,
+];
+// const { searchTypes: searchTypesTwoAggregations, widgetMapping: widgetMappingTwoAggregations } = SearchTypesGenerator(widgetsWithTwoAggregations);
+const searchTwoAggregations = Search.create().toBuilder().id('search-id').queries([query.toBuilder().searchTypes([
+  {
+    filters: [],
+    type: 'AGGREGATION',
+    typeDefinition: {},
+  },
+  {
+    filters: [],
+    type: 'AGGREGATION',
+    typeDefinition: {},
+  },
+  {
+    filters: [],
+    type: 'AGGREGATION',
+    typeDefinition: {},
+  },
+  {
+    filters: [],
+    type: 'AGGREGATION',
+    typeDefinition: {},
+  },
+  {
+    filters: [],
+    type: 'AGGREGATION',
+    typeDefinition: {},
+  },
+]).build()])
+  .build();
+
+// const titles =
+
+export const mockedViewWithTwoAggregations = View.create()
   .toBuilder()
-  .newId()
+  .id('view-id')
   .type(View.Type.Search)
   .state({
-    [query.id]: ViewState.create()
+    'query-id': ViewState.create()
       .toBuilder()
       .titles({
         widget: {
-          'mc-widget-id': 'Message Count',
-          'allm-widget-id': 'All Messages',
           'field1-widget-id': 'count(field1) > 500',
           'field2-widget-id': 'count(field2) < 8000',
+          'mc-widget-id': 'Message Count',
+          'allm-widget-id': 'All Messages',
           'summary-widget-id': 'Summary:  count(field1) > 500 count(field2) < 8000',
         },
       })
-      .widgets(Immutable.List([
-        AggregationWidget.builder()
-          .id('field1-widget-id')
-          .config(
-            AggregationWidgetConfig.builder()
-              .columnPivots([])
-              .rowPivots([Pivot.create(['field1', 'field2'], 'values', { limit: 15 })])
-              .series([Series.forFunction('count(field1)')])
-              .sort([new SortConfig(SortConfig.SERIES_TYPE, 'count(field1)', Direction.Descending)])
-              .visualization('table')
-              .rollup(true)
-              .build(),
-          )
-          .build(),
-        AggregationWidget.builder()
-          .id('field1-widget-id')
-          .config(
-            AggregationWidgetConfig.builder()
-              .columnPivots([])
-              .rowPivots([Pivot.create(['field2', 'field1'], 'values', { limit: 15 })])
-              .series([Series.forFunction('count(field2)')])
-              .sort([new SortConfig(SortConfig.SERIES_TYPE, 'count(field2)', Direction.Ascending)])
-              .visualization('table')
-              .rollup(true)
-              .build(),
-          )
-          .build(),
-        histogram,
-        messageTable,
-        AggregationWidget.builder()
-          .id('summary-widget-id')
-          .config(
-            AggregationWidgetConfig.builder()
-              .columnPivots([])
-              .rowPivots([Pivot.create(['field1', 'field2'], 'values', { limit: 15 })])
-              .series([Series.forFunction('count(field1)'), Series.forFunction('count(field2)')])
-              .sort([])
-              .visualization('table')
-              .rollup(true)
-              .build(),
-          )
-          .build(),
-      ]))
+      .widgets(widgetsWithTwoAggregations)
       .widgetPositions({
+        'field1-widget-id': new WidgetPosition(1, 4, 3, 6),
+        'field2-widget-id': new WidgetPosition(7, 4, 3, 6),
         'mc-widget-id': new WidgetPosition(1, 10, 2, Infinity),
         'allm-widget-id': new WidgetPosition(1, 12, 6, Infinity),
-        'field1-widget-id': new WidgetPosition(1, 7, 3, Infinity),
-        'field2-widget-id': new WidgetPosition(7, 7, 3, Infinity),
         'summary-widget-id': new WidgetPosition(1, 1, 3, Infinity),
       })
       .build(),
   })
-  .search(search)
+  .search(searchTwoAggregations)
+  .build();
+
+// const { searchTypes: searchTypesOneAggregation, widgetMapping: widgetMappingOneAggregation } = SearchTypesGenerator(widgetsWithOneAggregation);
+const searchOneAggregation = Search.create().toBuilder().id('search-id').queries([query.toBuilder().searchTypes([
+  {
+    filters: [],
+    type: 'AGGREGATION',
+    typeDefinition: {},
+  },
+  {
+    filters: [],
+    type: 'AGGREGATION',
+    typeDefinition: {},
+  },
+  {
+    filters: [],
+    type: 'AGGREGATION',
+    typeDefinition: {},
+  },
+]).build()])
+  .build();
+export const mockedViewWithOneAggregation = View.create()
+  .toBuilder()
+  .id('view-id')
+  .type(View.Type.Search)
+  .state({
+    'query-id': ViewState.create()
+      .toBuilder()
+      .titles({
+        widget: {
+          'field1-widget-id': 'count(field1) > 500',
+          'mc-widget-id': 'Message Count',
+          'allm-widget-id': 'All Messages',
+        },
+      })
+      .widgets(widgetsWithOneAggregation)
+      .widgetPositions({
+        'field1-widget-id': new WidgetPosition(1, 1, 3, 6),
+        'mc-widget-id': new WidgetPosition(1, 4, 2, Infinity),
+        'allm-widget-id': new WidgetPosition(1, 6, 6, Infinity),
+      })
+      .build(),
+  })
+  .search(searchOneAggregation)
   .build();

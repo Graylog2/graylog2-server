@@ -17,8 +17,8 @@
 import React from 'react';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
-import { mockEventData } from 'test/helpers/mocking/EventAndEventDefinitions_mock';
 
+import { mockEventData } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import suppressConsole from 'helpers/suppressConsole';
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
@@ -44,6 +44,17 @@ const wrapper = ({ children }) => (
     {children}
   </QueryClientProvider>
 );
+
+jest.mock('views/logic/Widgets', () => ({
+  ...jest.requireActual('views/logic/Widgets'),
+  widgetDefinition: () => ({
+    searchTypes: () => [{
+      type: 'AGGREGATION',
+      typeDefinition: {},
+    }],
+  }),
+}));
+
 const url = eventsUrl('event-id-1');
 
 describe('useEventById', () => {

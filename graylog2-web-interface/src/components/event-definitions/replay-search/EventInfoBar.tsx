@@ -74,14 +74,13 @@ const EventInfoBar = () => {
       return res;
     }, {});
   });
-  const { eventData, eventDefinition, aggregations, isEventDefinition } = useAlertAndEventDefinitionData();
+  const { eventData, eventDefinition, aggregations, isEventDefinition, isEvent, isAlert } = useAlertAndEventDefinitionData();
 
   const toggleOpen = (e) => {
     e.stopPropagation();
     setOpen((cur) => !cur);
   };
 
-  // const executeEvery = extractDurationAndUnit(ev, TIME_UNITS);
   const searchWithin = extractDurationAndUnit(eventDefinition.config.search_within_ms, TIME_UNITS);
   const executeEvery = extractDurationAndUnit(eventDefinition.config.execute_every_ms, TIME_UNITS);
 
@@ -97,7 +96,6 @@ const EventInfoBar = () => {
 
   const isEDUpdatedAfterEvent = !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData.timestamp) > 0;
   const highlightingRules = useHighlightingRules();
-
   const highlightingColors = useMemo(() => {
     const aggregationsSet = new Set(aggregations.map(({ fnSeries, value, expr }) => `${fnSeries}${expr}${value}`));
 
@@ -145,10 +143,10 @@ const EventInfoBar = () => {
         const prefix = index > 0 ? ', ' : '';
 
         return (
-          <>
+          <span key={id}>
             {prefix}
             <Link target="_blank" to={Routes.ALERTS.NOTIFICATIONS.show(id)}>{title}</Link>
-          </>
+          </span>
         );
       }),
     },
@@ -158,27 +156,32 @@ const EventInfoBar = () => {
         const isLast = index + 1 === array.length;
 
         return (
-          <>
-            <span style={{ backgroundColor: color }}>{condition}</span>
-            {!isLast && <span>{', '}</span>}
-          </>
+          <span title={condition} key={condition} style={{ backgroundColor: color }}>{`${condition}${isLast ? '' : ', '}`}</span>
         );
       }),
     },
   ];
+
+  const currentTypeText = useMemo(() => {
+    if (isEventDefinition) return 'event definition';
+    if (isAlert) return 'alert';
+    if (isEvent) return 'event';
+
+    return '';
+  }, [isAlert, isEvent, isEventDefinition]);
 
   return (
     <FlatContentRow>
       <Header>
         <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleOpen}>
           <Icon name={`caret-${open ? 'down' : 'right'}`} />&nbsp;
-          {open ? 'Less details' : 'More details'}
+          {open ? `Hide ${currentTypeText} details` : `Show ${currentTypeText} details`}
         </Button>
       </Header>
       {open && (
-      <Container>
+      <Container data-testid="info-container">
         <Row>
-          {items.map(({ title, content, show }) => show !== false && (
+          {items.map(({ title, content, show }) => (show !== false) && (
             <Item key={title}>
               <b>{title}: </b>
               <span title={title}>{content || <i>`No ${title} provided`</i>}</span>

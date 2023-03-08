@@ -167,14 +167,6 @@ const EventView = () => {
   const { eventData, eventDefinition, aggregations } = useAlertAndEventDefinitionData();
   const view = useCreateViewForEvent({ eventData, eventDefinition, aggregations });
 
-  const VT = useCreateViewForEvent({
-    eventData: mockEventData.event,
-    eventDefinition: mockEventDefinition,
-    aggregations: mockedMappedAggregation,
-  });
-
-  console.log({ VT });
-
   return <SearchPage view={view} isNew />;
 };
 

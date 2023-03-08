@@ -22,7 +22,7 @@ import { useRouteMatch, useParams } from 'react-router-dom';
 import {
   mockedMappedAggregation,
   mockEventData,
-  mockEventDefinition,
+  mockEventDefinitionTwoAggregations,
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import asMock from 'helpers/mocking/AsMock';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
@@ -42,6 +42,20 @@ jest.mock('react-router-dom', () => ({
   useParams: jest.fn(() => ({})),
 }));
 
+jest.mock('graylog-web-plugin/plugin', () => ({
+  PluginStore: { exports: jest.fn(() => [{ type: 'aggregation', defaults: {} }]) },
+}));
+
+jest.mock('views/logic/Widgets', () => ({
+  ...jest.requireActual('views/logic/Widgets'),
+  widgetDefinition: () => ({
+    searchTypes: () => [{
+      type: 'AGGREGATION',
+      typeDefinition: {},
+    }],
+  }),
+}));
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -58,12 +72,12 @@ const wrapper = ({ children }) => (
 const mockedHookData = {
   alertId: mockEventData.event.id,
   definitionId: mockEventData.event.event_definition_id,
-  definitionTitle: mockEventDefinition.title,
+  definitionTitle: mockEventDefinitionTwoAggregations.title,
   isAlert: true,
   isEvent: false,
   isEventDefinition: false,
   eventData: mockEventData.event,
-  eventDefinition: mockEventDefinition,
+  eventDefinition: mockEventDefinitionTwoAggregations,
   aggregations: mockedMappedAggregation,
 };
 
@@ -72,9 +86,9 @@ const mockGetQueryData = ({ eventId = undefined, alert, showEventData = true }) 
   getQueryData: (([key, id]) => {
     if (showEventData && key === 'event-by-id' && id === eventId) return ({ ...mockEventData.event, id: eventId, alert });
 
-    if (key === 'event-definition-by-id' && id === mockEventDefinition.id) {
+    if (key === 'event-definition-by-id' && id === mockEventDefinitionTwoAggregations.id) {
       return ({
-        eventDefinition: mockEventDefinition,
+        eventDefinition: mockEventDefinitionTwoAggregations,
         aggregations: mockedMappedAggregation,
       });
     }
@@ -141,10 +155,10 @@ describe('useAlertAndEventDefinitionData', () => {
 
   it('should return expected data for event definition', async () => {
     asMock(useParams).mockImplementation(() => ({
-      definitionId: mockEventDefinition.id,
+      definitionId: mockEventDefinitionTwoAggregations.id,
     }));
 
-    mockUseRouterForEventDefinition(mockEventDefinition.id);
+    mockUseRouterForEventDefinition(mockEventDefinitionTwoAggregations.id);
 
     mockGetQueryData({ showEventData: false, alert: false });
 

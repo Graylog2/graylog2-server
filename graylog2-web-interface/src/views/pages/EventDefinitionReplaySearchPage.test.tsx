@@ -31,7 +31,7 @@ import useEventDefinition from 'hooks/useEventDefinition';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import {
   mockedMappedAggregation,
-  mockEventDefinition,
+  mockEventDefinitionTwoAggregations,
 } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import useParams from 'routing/useParams';
 
@@ -55,6 +55,16 @@ jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
   EventNotificationsStore: MockStore((['getInitialState', () => ({ all: [] })])),
 }));
 
+jest.mock('views/logic/Widgets', () => ({
+  ...jest.requireActual('views/logic/Widgets'),
+  widgetDefinition: () => ({
+    searchTypes: () => [{
+      type: 'AGGREGATION',
+      typeDefinition: {},
+    }],
+  }),
+}));
+
 describe('EventDefinitionReplaySearchPage', () => {
   const SimpleReplaySearchPage = () => (
     <StreamsContext.Provider value={[{}]}>
@@ -67,13 +77,13 @@ describe('EventDefinitionReplaySearchPage', () => {
   afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
-    asMock(useParams).mockReturnValue({ definitionId: mockEventDefinition.id });
+    asMock(useParams).mockReturnValue({ definitionId: mockEventDefinitionTwoAggregations.id });
     asMock(UseCreateViewForEventDefinition).mockReturnValue(Promise.resolve(mockView));
     asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: mockView, executionState: SearchExecutionState.empty() });
     asMock(SearchComponent).mockImplementation(() => <span>Extended Search Page</span>);
 
     asMock(useEventDefinition).mockImplementation(() => ({
-      data: { eventDefinition: mockEventDefinition, aggregations: mockedMappedAggregation },
+      data: { eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation },
       isLoading: false,
       isFetched: true,
       refetch: () => {},
@@ -83,14 +93,14 @@ describe('EventDefinitionReplaySearchPage', () => {
   it('should run useEventDefinition, UseCreateViewForEvent with correct parameters', async () => {
     asMock(useAlertAndEventDefinitionData).mockImplementation(() => ({
       eventData: undefined,
-      eventDefinition: mockEventDefinition,
+      eventDefinition: mockEventDefinitionTwoAggregations,
       aggregations: mockedMappedAggregation,
       isEvent: false,
       isEventDefinition: true,
       isAlert: false,
       alertId: undefined,
-      definitionId: mockEventDefinition.id,
-      definitionTitle: mockEventDefinition.title,
+      definitionId: mockEventDefinitionTwoAggregations.id,
+      definitionTitle: mockEventDefinitionTwoAggregations.title,
     }));
 
     // eslint-disable-next-line testing-library/no-unnecessary-act
@@ -98,10 +108,10 @@ describe('EventDefinitionReplaySearchPage', () => {
       render(<SimpleReplaySearchPage />);
     });
 
-    expect(useEventDefinition).toHaveBeenCalledWith(mockEventDefinition.id);
+    expect(useEventDefinition).toHaveBeenCalledWith(mockEventDefinitionTwoAggregations.id);
 
     await expect(UseCreateViewForEventDefinition).toHaveBeenCalledWith({
-      eventDefinition: mockEventDefinition, aggregations: mockedMappedAggregation,
+      eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation,
     });
   });
 });

@@ -17,21 +17,31 @@
 import React from 'react';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
-import { mockEventDefinition, mockedMappedAggregation } from 'test/helpers/mocking/EventAndEventDefinitions_mock';
 
+import { mockEventDefinitionTwoAggregations, mockedMappedAggregation } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import suppressConsole from 'helpers/suppressConsole';
 import UserNotification from 'util/UserNotification';
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
 import useEventDefinition, { definitionsUrl } from 'hooks/useEventDefinition';
 
-const definitionUrl = definitionsUrl('111');
+const definitionUrl = definitionsUrl(mockEventDefinitionTwoAggregations.id);
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
   success: jest.fn(),
+}));
+
+jest.mock('views/logic/Widgets', () => ({
+  ...jest.requireActual('views/logic/Widgets'),
+  widgetDefinition: () => ({
+    searchTypes: () => [{
+      type: 'AGGREGATION',
+      typeDefinition: {},
+    }],
+  }),
 }));
 
 const queryClient = new QueryClient({
@@ -53,15 +63,15 @@ describe('useEventDefinition', () => {
   });
 
   it('should run fetch and store mapped response', async () => {
-    asMock(fetch).mockImplementation(() => Promise.resolve(mockEventDefinition));
-    const { result, waitFor } = renderHook(() => useEventDefinition('111'), { wrapper });
+    asMock(fetch).mockImplementation(() => Promise.resolve(mockEventDefinitionTwoAggregations));
+    const { result, waitFor } = renderHook(() => useEventDefinition(mockEventDefinitionTwoAggregations.id), { wrapper });
 
     await waitFor(() => result.current.isLoading);
     await waitFor(() => !result.current.isLoading);
 
     expect(fetch).toHaveBeenCalledWith('GET', definitionUrl);
 
-    expect(result.current.data.eventDefinition).toEqual(mockEventDefinition);
+    expect(result.current.data.eventDefinition).toEqual(mockEventDefinitionTwoAggregations);
 
     expect(result.current.data.aggregations).toEqual(mockedMappedAggregation);
   });
@@ -70,7 +80,7 @@ describe('useEventDefinition', () => {
     await suppressConsole(async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { waitFor } = renderHook(() => useEventDefinition('111'), { wrapper });
+      const { waitFor } = renderHook(() => useEventDefinition(mockEventDefinitionTwoAggregations.id), { wrapper });
 
       await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
         'Loading event definition  failed with status: Error: Error',

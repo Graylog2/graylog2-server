@@ -86,7 +86,8 @@ export const WidgetsGenerator = async ({ streams, aggregations, groupBy }) => {
     const title = `${fnSeries} ${expr} ${value}`;
     const isEven = (index + 1) % 2 === 0;
     const col = isEven ? 7 : 1;
-    const row = Math.ceil((index + 1) / 2) + AGGREGATION_WIDGET_HEIGHT + SUMMARY_ROW_DELTA;
+    const HEIGHT_DELTA = index >= 2 ? AGGREGATION_WIDGET_HEIGHT : 0;
+    const row = Math.ceil((index + 1) / 2) + HEIGHT_DELTA + SUMMARY_ROW_DELTA;
     const position = new WidgetPosition(col, row, AGGREGATION_WIDGET_HEIGHT, 6);
     res.aggregationWidgets.push(widget);
     res.aggregationTitles[widgetId] = title;
