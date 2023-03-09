@@ -74,6 +74,9 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             if (discoveryEnabled) {
                 final Sniffer sniffer = createNodeDiscoverySniffer(client.getLowLevelClient(), discoveryFrequency, defaultSchemeForDiscoveredNodes, discoveryFilter);
                 shutdownService.register(sniffer::close);
+            } else {
+                final Sniffer nodes = createNodeListSniffer(client.getLowLevelClient(), discoveryFrequency, defaultSchemeForDiscoveredNodes);
+                shutdownService.register(nodes::close);
             }
 
             return client;
@@ -86,6 +89,18 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
                 TimeUnit.SECONDS.toMillis(5),
                 mapDefaultScheme(defaultSchemeForDiscoveredNodes),
                 discoveryFilter
+        );
+        return Sniffer.builder(restClient)
+                .setSniffIntervalMillis(Math.toIntExact(discoveryFrequency.toMilliseconds()))
+                .setNodesSniffer(new NodeListSniffer(nodesSniffer))
+                .build();
+    }
+
+    private Sniffer createNodeListSniffer(RestClient restClient, Duration discoveryFrequency, String defaultSchemeForDiscoveredNodes) {
+        final NodesSniffer nodesSniffer = NodeListSniffer.create(
+                restClient,
+                TimeUnit.SECONDS.toMillis(5),
+                mapDefaultScheme(defaultSchemeForDiscoveredNodes)
         );
         return Sniffer.builder(restClient)
                 .setSniffIntervalMillis(Math.toIntExact(discoveryFrequency.toMilliseconds()))
