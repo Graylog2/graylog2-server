@@ -26,6 +26,7 @@ import com.google.common.collect.Maps;
 import org.graylog2.plugin.AbstractDescriptor;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.IOState;
+import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Stoppable;
@@ -153,16 +154,23 @@ public abstract class MessageInput implements Stoppable {
         cr.check(getConfiguration());
     }
 
-    public void launch(final InputBuffer buffer) throws MisfireException {
+    public void launch(final InputBuffer buffer, InputFailureRecorder inputFailureRecorder) throws MisfireException {
         this.inputBuffer = buffer;
         try {
+            launch(buffer); // call this for inputs that still overload the one argument launch method
+
             transport.setMessageAggregator(codec.getAggregator());
 
-            transport.launch(this);
+            transport.launch(this, inputFailureRecorder);
         } catch (Exception e) {
             inputBuffer = null;
             throw new MisfireException(e);
         }
+    }
+
+    @Deprecated
+    public void launch(final InputBuffer buffer) throws MisfireException {
+        // kept for backwards compat with inputs that overload this method
     }
 
     @Override

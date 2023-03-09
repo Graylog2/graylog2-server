@@ -19,6 +19,7 @@ package org.graylog2.notifications;
 import org.graylog2.cluster.Node;
 import org.graylog2.plugin.database.PersistedService;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,17 +33,21 @@ public interface NotificationService extends PersistedService {
 
     boolean fixed(Notification.Type type);
 
+    boolean fixed(Notification.Type type, String key);
+
     boolean fixed(Notification.Type type, Node node);
 
     boolean isFirst(Notification.Type type);
 
     List<Notification> all();
 
-    Optional<Notification> getByType(Notification.Type type);
+    Optional<Notification> getByTypeAndKey(Notification.Type type, @Nullable String key);
 
     boolean publishIfFirst(Notification notification);
 
     boolean fixed(Notification notification);
 
     int destroyAllByType(Notification.Type type);
+
+    int destroyAllByTypeAndKey(Notification.Type type, @Nullable String key);
 }
