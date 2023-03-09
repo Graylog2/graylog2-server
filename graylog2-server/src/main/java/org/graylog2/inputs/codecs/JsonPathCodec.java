@@ -178,7 +178,7 @@ public class JsonPathCodec extends AbstractCodec {
             BooleanNode booleanNode = (BooleanNode) jsonNode;
             return Map.of(currentPath, booleanNode.asBoolean());
         } else {
-            throw new JsonFlattenException("Warning: JSON contains type not supported by the flatten method." + jsonNode);
+            throw new JsonFlattenException("Warning: JSON contains type not supported by the flatten method. JsonNode: " + jsonNode);
         }
     }
     public static class JsonFlattenException extends Exception {
