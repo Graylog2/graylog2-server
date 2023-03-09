@@ -116,7 +116,7 @@ const AssignIndexSetAction = ({ indexSets, selectedStreamIds, setSelectedStreamI
     setShowIndexSetModal((cur) => !cur);
   }, []);
 
-  if (isPermitted('indexsets:read')) {
+  if (!isPermitted('indexsets:read')) {
     return null;
   }
 
