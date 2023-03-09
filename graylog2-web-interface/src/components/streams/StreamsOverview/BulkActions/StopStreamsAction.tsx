@@ -48,7 +48,7 @@ const StopStreamsAction = ({ selectedStreamIds, handleFailures, refetchStreams, 
       .finally(() => {
         refetchStreams();
       });
-  }, [handleFailures, refetchStreams, selectedStreamIds]);
+  }, [handleFailures, onSelect, refetchStreams, selectedStreamIds]);
 
   return (
     <MenuItem onSelect={onStopStreams}>Stop {descriptor}</MenuItem>
