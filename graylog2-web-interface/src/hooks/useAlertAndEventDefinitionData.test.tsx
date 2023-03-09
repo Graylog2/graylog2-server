@@ -98,8 +98,8 @@ const mockGetQueryData = ({ eventId = undefined, alert, showEventData = true }) 
 }));
 
 const mockUseRouterForEvent = (id) => asMock(useRouteMatch).mockImplementation(() => ({
-  path: '/alerts/:alertId/replaysearch',
-  url: `/alerts/${id}/replaysearch`,
+  path: '/alerts/:alertId/replay-search',
+  url: `/alerts/${id}/replay-search`,
   params: {
     alertId: id,
   },
@@ -107,8 +107,8 @@ const mockUseRouterForEvent = (id) => asMock(useRouteMatch).mockImplementation((
 }));
 
 const mockUseRouterForEventDefinition = (id) => asMock(useRouteMatch).mockImplementation(() => ({
-  path: '/alerts/definitions/:definitionId/replaysearch',
-  url: `/alerts/definitions/${id}/replaysearch`,
+  path: '/alerts/definitions/:definitionId/replay-search',
+  url: `/alerts/definitions/${id}/replay-search`,
   params: {
     definitionId: id,
   },

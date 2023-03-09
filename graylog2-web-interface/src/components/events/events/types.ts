@@ -35,6 +35,7 @@ export type Event = {
   group_by_fields: Object[],
   source_streams: string[],
   replay_info: EventReplayInfo | undefined,
+  alert: boolean | undefined,
 };
 
 export type EventDefinitionContext = {

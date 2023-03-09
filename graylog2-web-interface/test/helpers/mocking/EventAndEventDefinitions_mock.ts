@@ -16,7 +16,7 @@
  */
 import Immutable from 'immutable';
 
-import type { EventType } from 'hooks/useEventById';
+import type { Event } from 'components/events/events/types';
 import type { EventDefinition } from 'logic/alerts/types';
 import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
 import QueryGenerator from 'views/logic/queries/QueryGenerator';
@@ -53,8 +53,8 @@ export const mockEventData = {
     source: '',
     key_tuple: [],
     key: null,
-    priority: 2,
-    fields: {},
+    priority: '2',
+    fields: [{}],
     replay_info: {
       timerange_start: '2023-03-02T13:42:21.266Z',
       timerange_end: '2023-03-02T13:43:21.266Z',
@@ -63,8 +63,9 @@ export const mockEventData = {
         '001',
       ],
     },
+    group_by_fields: [{}],
 
-  } as EventType,
+  } as Event,
 };
 
 export const mockEventDefinitionTwoAggregations:EventDefinition = {

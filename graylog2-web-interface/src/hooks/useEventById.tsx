@@ -19,36 +19,9 @@ import { useQuery } from '@tanstack/react-query';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import type { Event } from 'components/events/events/types';
 
 export const eventsUrl = (id) => qualifyUrl(`/events/${id}`);
-
-export type EventType = {
-  alert : boolean;
-  event_definition_id: string;
-  event_definition_type: string;
-  fields: {};
-  group_by_fields: {};
-  id: string;
-  key: null;
-  key_tuple: []
-  message: string;
-  origin_context: string;
-  priority: number;
-  replay_info:
-    {
-      timerange_start: string,
-      timerange_end: string,
-      query: string,
-      streams: Array<string>
-  };
-  source: string;
-  source_streams: Array<string>;
-  streams: Array<string>;
-  timerange_end: string | null;
-  timerange_start: string | null;
-  timestamp: string;
-  timestamp_processing: string;
-}
 
 const fetchEvent = (eventId: string) => {
   return fetch('GET', eventsUrl(eventId)).then((data) => {
@@ -57,12 +30,12 @@ const fetchEvent = (eventId: string) => {
 };
 
 const useEventById = (eventId: string): {
-  data: EventType,
+  data: Event,
   refetch: () => void,
   isLoading: boolean,
   isFetched: boolean,
 } => {
-  const { data, refetch, isLoading, isFetched } = useQuery<EventType>(
+  const { data, refetch, isLoading, isFetched } = useQuery<Event>(
     ['event-by-id', eventId],
     () => fetchEvent(eventId),
     {

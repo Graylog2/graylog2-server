@@ -26,9 +26,7 @@ const LinkToReplaySearch = ({ isEvent, id }: { id?: string, isEvent?: boolean })
   const searchLink = isEvent ? Routes.ALERTS.replay_search(id) : Routes.ALERTS.DEFINITIONS.replay_search(id || definitionId);
 
   return (
-    <ReplaySearchButtonComponent searchLink={searchLink}>Replay
-      search
-    </ReplaySearchButtonComponent>
+    <ReplaySearchButtonComponent searchLink={searchLink}>Replay search</ReplaySearchButtonComponent>
   );
 };
 

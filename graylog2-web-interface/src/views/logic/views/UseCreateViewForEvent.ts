@@ -20,7 +20,7 @@ import uniq from 'lodash/uniq';
 
 import View from 'views/logic/views/View';
 import type { AbsoluteTimeRange, ElasticsearchQueryString, RelativeTimeRangeStartOnly } from 'views/logic/queries/Query';
-import type { EventType } from 'hooks/useEventById';
+import type { Event } from 'components/events/events/types';
 import type { EventDefinition } from 'logic/alerts/types';
 import QueryGenerator from 'views/logic/queries/QueryGenerator';
 import Search from 'views/logic/search/Search';
@@ -176,7 +176,7 @@ export const ViewGenerator = async ({
 };
 
 export const UseCreateViewForEvent = (
-  { eventData, eventDefinition, aggregations }: { eventData: EventType, eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation> },
+  { eventData, eventDefinition, aggregations }: { eventData: Event, eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation> },
 ) => {
   const { streams } = eventData.replay_info;
   const timeRange: AbsoluteTimeRange = {

@@ -21,7 +21,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import Routes from 'routing/Routes';
 import useParams from 'routing/useParams';
-import type { EventType } from 'hooks/useEventById';
+import type { Event } from 'components/events/events/types';
 import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
 import type { EventDefinition } from 'logic/alerts/types';
 
@@ -29,7 +29,7 @@ const useAlertAndEventDefinitionData = () => {
   const { path } = useRouteMatch();
   const { alertId, definitionId } = useParams<{ alertId?: string, definitionId?: string }>();
   const queryClient = useQueryClient();
-  const eventData = queryClient.getQueryData(['event-by-id', alertId]) as EventType;
+  const eventData = queryClient.getQueryData(['event-by-id', alertId]) as Event;
   const data = queryClient.getQueryData(['event-definition-by-id', definitionId || eventData?.event_definition_id]) as { eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation>};
   const eventDefinition = data?.eventDefinition;
   const aggregations = data?.aggregations;
@@ -41,7 +41,7 @@ const useAlertAndEventDefinitionData = () => {
     isAlert: boolean,
     isEvent: boolean,
     isEventDefinition: boolean,
-    eventData: EventType,
+    eventData: Event,
     eventDefinition: EventDefinition,
     aggregations: Array<EventDefinitionAggregation>,
   }>(() => ({
