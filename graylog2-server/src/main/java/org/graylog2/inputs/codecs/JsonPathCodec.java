@@ -84,7 +84,7 @@ public class JsonPathCodec extends AbstractCodec {
             try {
                 fields = flatten(json);
             } catch (JsonTypeException e) {
-                LOG.warn("JSON contains type not supported by JsonFlattenService.flatten." + e);
+                LOG.warn("JSON contains type not supported by JsonFlattenService.flatten.", e);
             }
         } else {
             if (jsonPath == null) {
@@ -145,7 +145,7 @@ public class JsonPathCodec extends AbstractCodec {
         try {
             return flatten("", objectMapper.readTree(json));
         } catch (IOException e) {
-            LOG.warn("IOException occurred" + e);
+            LOG.warn("IOException occurred", e);
         }
         return Map.of();
     }
