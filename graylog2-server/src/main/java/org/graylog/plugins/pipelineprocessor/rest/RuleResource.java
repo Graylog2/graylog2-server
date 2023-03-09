@@ -19,7 +19,6 @@ package org.graylog.plugins.pipelineprocessor.rest;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Sets;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,7 +33,6 @@ import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTy
 import org.graylog.plugins.pipelineprocessor.db.PaginatedRuleService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineServiceHelper;
-import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
@@ -54,7 +52,6 @@ import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.PaginatedResponse;
-import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -84,10 +81,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -118,7 +116,6 @@ public class RuleResource extends RestResource implements PluginRestResource {
     private final PipelineServiceHelper pipelineServiceHelper;
     private final ConfigurationStateUpdater configurationStateUpdater;
     private final StreamService streamService;
-    private final PipelineStreamConnectionsService connectionsService;
 
     @Inject
     public RuleResource(RuleService ruleService,
@@ -129,8 +126,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                         FunctionRegistry functionRegistry,
                         PipelineServiceHelper pipelineServiceHelper,
                         ConfigurationStateUpdater configurationStateUpdater,
-                        StreamService streamService,
-                        PipelineStreamConnectionsService connectionsService) {
+                        StreamService streamService) {
         this.ruleService = ruleService;
         this.pipelineService = pipelineService;
         this.ruleMetricsConfigService = ruleMetricsConfigService;
@@ -140,7 +136,6 @@ public class RuleResource extends RestResource implements PluginRestResource {
         this.pipelineServiceHelper = pipelineServiceHelper;
         this.configurationStateUpdater = configurationStateUpdater;
         this.streamService = streamService;
-        this.connectionsService = connectionsService;
 
         this.searchQueryParser = new SearchQueryParser(RuleDao.FIELD_TITLE, SEARCH_FIELD_MAPPING);
     }
@@ -200,14 +195,14 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .build();
     }
 
-    @ApiOperation(value = "Simulate a processing rule")
+    @ApiOperation(value = "Simulate a single processing rule")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/simulate/{messageString}")
     @NoAuditEvent("only used to test a rule, no changes made in the system")
     public Messages simulate(
             @ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource,
-            @ApiParam(name = "message", required = true) @PathParam("messageString") @NotBlank String messageString
+            @ApiParam(name = "messageString", required = true) @PathParam("messageString") @NotBlank String messageString
     ) throws NotFoundException {
         final Rule rule;
         try {
@@ -218,7 +213,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
 
         Stage stage = Stage.builder()
                 .stage(0)
-                .ruleReferences(List.of(rule.name()))
+                .ruleReferences(Collections.emptyList())
                 .match(Stage.Match.PASS)
                 .build();
         stage.setRules(List.of(rule));
@@ -229,29 +224,17 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .build();
         stage.setPipeline(pipeline);
 
-        PipelineConnections updatedConnection = connectionsService.load(Stream.DEFAULT_STREAM_ID);
-        final Set<String> pipelines = updatedConnection.pipelineIds();
-        pipelines.add(pipeline.id());
-        updatedConnection.toBuilder().pipelineIds(pipelines).build();
-        final Set<PipelineConnections> updatedConnections = Sets.newHashSet();
-        updatedConnections.add(updatedConnection);
-        connectionsService.save(updatedConnection);
-
-
         PipelineInterpreter pipelineInterpreter = new PipelineInterpreter(
                 new NoopMessageQueueAcknowledger(), MetricRegistryFactory.create(), configurationStateUpdater);
-        final List<ResultMessageSummary> simulationResults = new ArrayList<>();
         final PipelineInterpreterTracer pipelineInterpreterTracer = new PipelineInterpreterTracer();
 
         Message message = new Message(messageString, "127.0.0.1", DateTime.now());
         final Stream stream = streamService.load(Stream.DEFAULT_STREAM_ID);
         message.addStream(stream);
 
-        Messages processedMessages = pipelineInterpreter.process(message,
+        return pipelineInterpreter.process(message,
                 pipelineInterpreterTracer.getSimulatorInterpreterListener(),
-                configurationStateUpdater.getLatestState());
-
-        return  processedMessages;
+                configurationStateUpdater.getLatestState(), Optional.of(pipeline));
     }
 
     @ApiOperation(value = "Get all processing rules")
@@ -261,7 +244,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
         final Collection<RuleDao> ruleDaos = ruleService.loadAll();
         return ruleDaos.stream()
                 .map(ruleDao -> RuleSource.fromDao(pipelineRuleParser, ruleDao))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @GET
@@ -290,7 +273,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .findPaginated(searchQuery, page, perPage, sort, order);
         final List<RuleSource> ruleSourceList = result.stream()
                 .map(dao -> RuleSource.fromDao(pipelineRuleParser, dao))
-                .collect(Collectors.toList());
+                .toList();
         final PaginatedList<RuleSource> rules = new PaginatedList<>(ruleSourceList,
                 result.pagination().total(), result.pagination().page(), result.pagination().perPage());
         return PaginatedResponse.create("rules", rules,
@@ -317,11 +300,11 @@ public class RuleResource extends RestResource implements PluginRestResource {
                                             .id(dao.id())
                                             .title(dao.title())
                                             .build())
-                                    .collect(Collectors.toList())
+                                    .toList()
                     );
                 });
 
-        return ImmutableMap.of("used_in_pipelines", result);
+        return Map.of("used_in_pipelines", result);
     }
 
 
@@ -344,7 +327,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
         return ruleDaos.stream()
                 .map(ruleDao -> RuleSource.fromDao(pipelineRuleParser, ruleDao))
                 .filter(rule -> isPermitted(PipelineRestPermissions.PIPELINE_RULE_READ, rule.id()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @ApiOperation(value = "Modify a processing rule", notes = "It can take up to a second until the change is applied")

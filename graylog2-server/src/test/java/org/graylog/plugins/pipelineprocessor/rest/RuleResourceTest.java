@@ -21,7 +21,6 @@ import org.graylog.plugins.pipelineprocessor.db.PaginatedRuleService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineServiceHelper;
-import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
@@ -78,16 +77,13 @@ public class RuleResourceTest {
     @Mock
     StreamService streamService;
 
-    @Mock
-    PipelineStreamConnectionsService pipelineStreamConnectionsService;
-
     RuleResource underTest;
 
     @Before
     public void setup() {
         underTest = new RuleResource(ruleService, pipelineService, ruleMetricsConfigService,
                 pipelineRuleParser, paginatedRuleService, functionRegistry, pipelineServiceHelper,
-                configurationStateUpdater, streamService, pipelineStreamConnectionsService);
+                configurationStateUpdater, streamService);
     }
 
     @Test
