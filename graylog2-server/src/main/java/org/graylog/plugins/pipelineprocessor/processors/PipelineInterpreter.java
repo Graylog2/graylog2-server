@@ -65,7 +65,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -124,10 +123,6 @@ public class PipelineInterpreter implements MessageProcessor {
      * @return the processed messages
      */
     public Messages process(Messages messages, InterpreterListener interpreterListener, State state) {
-        return process(messages, interpreterListener, state, Optional.empty());
-    }
-
-    public Messages process(Messages messages, InterpreterListener interpreterListener, State state, Optional<Pipeline> pipelineToRun) {
         interpreterListener.startProcessing();
         // message id + stream id
         final Set<Tuple2<String, String>> processingBlacklist = Sets.newHashSet();
@@ -147,16 +142,12 @@ public class PipelineInterpreter implements MessageProcessor {
                 // it serves as a worklist, to keep track of which <msg, stream> tuples need to be re-run again
                 final Set<String> initialStreamIds = message.getStreams().stream().map(Stream::getId).collect(Collectors.toSet());
 
-                Set<Pipeline> pipelinesToRun;
-                if (pipelineToRun.isPresent()) {
-                    pipelinesToRun = Set.of(pipelineToRun.get());
-                } else {
-                    pipelinesToRun = selectPipelines(interpreterListener,
-                            processingBlacklist,
-                            message,
-                            initialStreamIds,
-                            state.getStreamPipelineConnections());
-                }
+                final ImmutableSet<Pipeline> pipelinesToRun = selectPipelines(interpreterListener,
+                        processingBlacklist,
+                        message,
+                        initialStreamIds,
+                        state.getStreamPipelineConnections());
+
                 toProcess.addAll(processForResolvedPipelines(message, msgId, pipelinesToRun, interpreterListener, state));
 
                 // add each processed message-stream combination to the blacklist set and figure out if the processing
