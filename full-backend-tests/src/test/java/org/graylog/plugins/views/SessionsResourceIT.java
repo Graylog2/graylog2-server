@@ -21,7 +21,6 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.Cookie;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.SearchServer;
@@ -52,10 +51,10 @@ public class SessionsResourceIT {
 
     private final GraylogApis api;
 
-    private static RequestSpecification makeRequestSpec(GraylogBackend backend) {
+    private static RequestSpecification makeRequestSpec(GraylogApis api) {
         return new RequestSpecBuilder().build()
-                .baseUri(backend.uri())
-                .port(backend.apiPort())
+                .baseUri(api.backend().uri())
+                .port(api.backend().apiPort())
                 .basePath("/api")
                 .accept(JSON)
                 .contentType(JSON)
@@ -69,7 +68,7 @@ public class SessionsResourceIT {
     @ContainerMatrixTest
     void failingLoginShouldNotReturnCookieOrToken() {
         given()
-                .spec(makeRequestSpec(api.backend()))
+                .spec(makeRequestSpec(api))
                 .post(SESSIONS_RESOURCE)
                 .then()
                 .assertThat()
@@ -77,7 +76,7 @@ public class SessionsResourceIT {
                 .cookies(Collections.emptyMap());
 
         given()
-                .spec(makeRequestSpec(api.backend()))
+                .spec(makeRequestSpec(api))
                 .body(INVALID_CREDENTIALS)
                 .post(SESSIONS_RESOURCE)
                 .then()
@@ -89,7 +88,7 @@ public class SessionsResourceIT {
     @ContainerMatrixTest
     void successfulLoginShouldReturnCookieAndToken() {
         final Response response = given()
-                .spec(makeRequestSpec(api.backend()))
+                .spec(makeRequestSpec(api))
                 .body(VALID_CREDENTIALS)
                 .post(SESSIONS_RESOURCE);
 
@@ -103,7 +102,7 @@ public class SessionsResourceIT {
                 .isEqualTo(response.cookie(AUTHENTICATION_COOKIE));
 
         final Cookie authenticationCookie = response.getDetailedCookie(AUTHENTICATION_COOKIE);
-        final RequestSpecification authenticatedRequest = makeRequestSpec(api.backend()).cookie(authenticationCookie);
+        final RequestSpecification authenticatedRequest = makeRequestSpec(api).cookie(authenticationCookie);
 
         given()
                 .spec(authenticatedRequest)
