@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix `WARNING: sun.reflect.Reflection.getCallerClass is not supported.` on server startup."
+
+issues = ["#7223","#9802", "#11634"]
+pulls = ["14884"]
