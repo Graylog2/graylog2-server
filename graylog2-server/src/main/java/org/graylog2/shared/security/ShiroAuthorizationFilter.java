@@ -54,6 +54,7 @@ public class ShiroAuthorizationFilter implements ContainerRequestFilter {
             } catch (AuthorizationException e) {
                 LOG.info("Not authorized. User <{}> is missing permissions {} to perform <{} {}>",
                         userId, Arrays.toString(requiredPermissions), requestContext.getMethod(), requestContext.getUriInfo().getPath());
+                LOG.info("Headers: {}", requestContext.getHeaders());
                 throw new ForbiddenException("Not authorized");
             }
         } else {
