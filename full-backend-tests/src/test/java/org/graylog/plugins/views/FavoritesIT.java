@@ -63,7 +63,7 @@ public class FavoritesIT {
 
         given()
                 .spec(requestSpec)
-                .auth().preemptive().basic("john.doe1", "asdfgh")
+                .auth().basic("john.doe1", "asdfgh")
                 .when()
                 .put("/favorites/" + grn)
                 .then()
@@ -72,7 +72,7 @@ public class FavoritesIT {
 
         var validatableResponse = given()
                 .spec(requestSpec)
-                .auth().preemptive().basic("john.doe1", "asdfgh")
+                .auth().basic("john.doe1", "asdfgh")
                 .when()
                 .get("/favorites")
                 .then()
@@ -83,7 +83,7 @@ public class FavoritesIT {
 
         given()
                 .spec(requestSpec)
-                .auth().preemptive().basic("john.doe1", "asdfgh")
+                .auth().basic("john.doe1", "asdfgh")
                 .when()
                 .delete("/favorites/" + grn)
                 .then()

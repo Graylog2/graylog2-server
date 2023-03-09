@@ -49,16 +49,20 @@ public interface GraylogBackend {
     Optional<MailServerInstance> getEmailServerInstance();
 
     default RestAssuredConfig withGraylogBackendFailureConfig() {
+        return withGraylogBackendFailureConfig(500);
+    }
+
+    default RestAssuredConfig withGraylogBackendFailureConfig(int minErrorCode) {
         return RestAssured.config()
                 .objectMapperConfig(new ObjectMapperConfig().jackson2ObjectMapperFactory(
                         (type, s) -> OBJECT_MAPPER_PROVIDER.get()
                 ))
                 .failureConfig(FailureConfig.failureConfig().with().failureListeners(
                 (reqSpec, respSpec, resp) -> {
-                    if (resp.statusCode() >= 500) {
+                    if (resp.statusCode() >= minErrorCode) {
                         System.out.println("------------------------ Output from graylog docker container start ------------------------");
                         System.out.println(this.getLogs());
-                        System.out.println("------------------------ Output from graylog docker container ends  ------------------------");
+                        System.out.println("------------------------ Output from graylog docker container end   ------------------------");
                     }
                 })
         );
