@@ -30,15 +30,15 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
 
 public class Indices implements GraylogRestApi {
-    private final RequestSpecification requestSpecification;
+    private final GraylogApis api;
 
-    public Indices(RequestSpecification requestSpecification) {
-        this.requestSpecification = requestSpecification;
+    public Indices(GraylogApis api) {
+        this.api = api;
     }
 
     public String defaultIndexSetId() {
         return given()
-                .spec(this.requestSpecification)
+                .spec(api.requestSpecification())
                 .when()
                 .get("/system/indices/index_sets")
                 .then()
@@ -49,7 +49,7 @@ public class Indices implements GraylogRestApi {
 
     public String createIndexSet(IndexSetSummary indexSetSummary) {
         return given()
-                .spec(requestSpecification)
+                .spec(api.requestSpecification())
                 .log().ifValidationFails()
                 .when()
                 .body(indexSetSummary)
