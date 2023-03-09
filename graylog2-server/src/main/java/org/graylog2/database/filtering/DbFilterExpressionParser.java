@@ -140,7 +140,7 @@ public class DbFilterExpressionParser {
     }
 
     private boolean isFilterable(final EntityAttribute attr) {
-        return attr.filterable() != null && attr.filterable();
+        return Boolean.TRUE.equals(attr.filterable());
     }
 
 }
