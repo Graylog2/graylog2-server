@@ -49,14 +49,14 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
   const history = useHistory();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
 
-  const handleDelete = (inTable: LookupTable) => () => {
+  const handleDelete = () => {
     // eslint-disable-next-line no-alert
     const shouldDelete = window.confirm(
-      `Are you sure you want to delete lookup table "${inTable.title}"?`,
+      `Are you sure you want to delete lookup table "${table.title}"?`,
     );
 
     if (shouldDelete) {
-      LookupTablesActions.delete(inTable.id).then(() => LookupTablesActions.reloadPage());
+      LookupTablesActions.delete(table.id).then(() => LookupTablesActions.reloadPage());
     }
   };
 
@@ -98,7 +98,7 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
               </Button>
               <Button bsSize="xsmall"
                       bsStyle="danger"
-                      onClick={handleDelete(table)}
+                      onClick={handleDelete}
                       role="button"
                       name="delete">
                 Delete
