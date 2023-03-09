@@ -1,0 +1,5 @@
+type = "added"
+message = "Introduce ability to simulate a single pipeline rule in isolation."
+
+issues = ["14891"]
+pulls = ["14892"]

@@ -48,7 +48,6 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.PaginatedResponse;
@@ -85,7 +84,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -200,7 +198,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/simulate/{messageString}")
     @NoAuditEvent("only used to test a rule, no changes made in the system")
-    public Messages simulate(
+    public Message simulate(
             @ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource,
             @ApiParam(name = "messageString", required = true) @PathParam("messageString") @NotBlank String messageString
     ) throws NotFoundException {
@@ -232,9 +230,10 @@ public class RuleResource extends RestResource implements PluginRestResource {
         final Stream stream = streamService.load(Stream.DEFAULT_STREAM_ID);
         message.addStream(stream);
 
-        return pipelineInterpreter.process(message,
-                pipelineInterpreterTracer.getSimulatorInterpreterListener(),
-                configurationStateUpdater.getLatestState(), Optional.of(pipeline));
+        pipelineInterpreter.evaluateStage(stage, message, message.getId(),
+                new ArrayList<>(), Collections.emptySet(),
+                pipelineInterpreterTracer.getSimulatorInterpreterListener());
+        return message;
     }
 
     @ApiOperation(value = "Get all processing rules")
