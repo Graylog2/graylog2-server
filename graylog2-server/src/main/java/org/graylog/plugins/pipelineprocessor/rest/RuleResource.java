@@ -226,7 +226,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 new NoopMessageQueueAcknowledger(), MetricRegistryFactory.create(), configurationStateUpdater);
         final PipelineInterpreterTracer pipelineInterpreterTracer = new PipelineInterpreterTracer();
 
-        Message message = new Message(messageString, "127.0.0.1", DateTime.now());
+        Message message = new Message(messageString, "127.0.0.1", DateTime.now(DateTimeZone.UTC));
         final Stream stream = streamService.load(Stream.DEFAULT_STREAM_ID);
         message.addStream(stream);
 
