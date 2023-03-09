@@ -131,6 +131,10 @@ const mergeColumnsRenderers = <Entity extends EntityBase>(columns: Array<Column>
 type Props<Entity extends EntityBase> = {
   /** Currently active sort */
   activeSort?: Sort,
+  /**
+   * The column ids are always snake case. By default, entity attributes are camel case.
+   * This prop controls if the column ids need to be transformed to camel case to connect them with the entity attributes.
+   */
   entityAttributesAreCamelCase?: boolean,
   /** Supported bulk actions */
   bulkActions?: (selectedEntities: Array<string>, setSelectedEntities: (streamIds: Array<string>) => void) => React.ReactNode,
