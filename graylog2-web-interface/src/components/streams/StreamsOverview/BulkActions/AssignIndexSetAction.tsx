@@ -102,19 +102,24 @@ const AssignIndexSetModal = ({
 };
 
 type Props = {
-  indexSets: Array<IndexSet>,
-  selectedStreamIds: Array<string>
   descriptor: string,
+  indexSets: Array<IndexSet>,
+  onSelect?: () => void,
   refetchStreams: () => void,
-  setSelectedStreamIds: (streamIds: Array<string>) => void
+  selectedStreamIds: Array<string>
+  setSelectedStreamIds: (streamIds: Array<string>) => void,
 }
 
-const AssignIndexSetAction = ({ indexSets, selectedStreamIds, setSelectedStreamIds, descriptor, refetchStreams }: Props) => {
+const AssignIndexSetAction = ({ indexSets, selectedStreamIds, setSelectedStreamIds, descriptor, refetchStreams, onSelect }: Props) => {
   const [showIndexSetModal, setShowIndexSetModal] = useState(false);
 
   const toggleAssignIndexSetModal = useCallback(() => {
+    if (!showIndexSetModal && typeof onSelect === 'function') {
+      onSelect();
+    }
+
     setShowIndexSetModal((cur) => !cur);
-  }, []);
+  }, [onSelect, showIndexSetModal]);
 
   if (!isPermitted('indexsets:read')) {
     return null;
@@ -133,6 +138,10 @@ const AssignIndexSetAction = ({ indexSets, selectedStreamIds, setSelectedStreamI
       )}
     </>
   );
+};
+
+AssignIndexSetAction.defaultProps = {
+  onSelect: undefined,
 };
 
 export default AssignIndexSetAction;

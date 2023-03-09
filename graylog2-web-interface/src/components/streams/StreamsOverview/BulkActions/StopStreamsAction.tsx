@@ -24,14 +24,19 @@ import MenuItem from 'components/bootstrap/MenuItem';
 import UserNotification from 'util/UserNotification';
 
 type Props = {
-  selectedStreamIds: Array<string>,
-  refetchStreams: () => void,
-  handleFailures: (failures: Array<{ entity_id: string }>, actionPastTense: string) => void,
   descriptor: string,
+  handleFailures: (failures: Array<{ entity_id: string }>, actionPastTense: string) => void,
+  onSelect?: () => void
+  refetchStreams: () => void,
+  selectedStreamIds: Array<string>,
 }
 
-const StopStreamsAction = ({ selectedStreamIds, handleFailures, refetchStreams, descriptor }: Props) => {
+const StopStreamsAction = ({ selectedStreamIds, handleFailures, refetchStreams, descriptor, onSelect }: Props) => {
   const onStopStreams = useCallback(() => {
+    if (typeof onSelect === 'function') {
+      onSelect();
+    }
+
     fetch(
       'POST',
       qualifyUrl(ApiRoutes.StreamsApiController.bulk_pause().url),
@@ -48,6 +53,10 @@ const StopStreamsAction = ({ selectedStreamIds, handleFailures, refetchStreams, 
   return (
     <MenuItem onSelect={onStopStreams}>Stop {descriptor}</MenuItem>
   );
+};
+
+StopStreamsAction.defaultProps = {
+  onSelect: undefined,
 };
 
 export default StopStreamsAction;
