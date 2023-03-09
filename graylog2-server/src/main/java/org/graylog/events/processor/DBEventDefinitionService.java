@@ -118,16 +118,6 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
     }
 
     /**
-     * Returns the list of event definitions of the given type
-     */
-    public List<EventDefinitionDto> getByType(String notificationType) {
-        final String field = String.format(Locale.US, "%s.%s",
-                EventDefinitionDto.FIELD_CONFIG,
-                EventNotificationConfig.TYPE_FIELD);
-        return ImmutableList.copyOf((db.find(DBQuery.is(field, notificationType)).iterator()));
-    }
-
-    /**
      * Returns the list of system event definitions
      *
      * @return the matching event definitions
