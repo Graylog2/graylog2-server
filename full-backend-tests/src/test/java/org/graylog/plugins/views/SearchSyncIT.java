@@ -22,8 +22,6 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
-import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
@@ -46,19 +44,15 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class SearchSyncIT {
     static final int GELF_HTTP_PORT = 12201;
 
-    private final GraylogBackend sut;
-    private final RequestSpecification requestSpec;
     private final GraylogApis api;
 
-    public SearchSyncIT(GraylogBackend sut, RequestSpecification requestSpec, GraylogApis api) {
-        this.sut = sut;
-        this.requestSpec = requestSpec;
+    public SearchSyncIT(final GraylogApis api) {
         this.api = api;
     }
 
     @BeforeAll
     public void importMongoFixtures() {
-        this.sut.importMongoDBFixture("mongodb-stored-searches-for-execution-endpoint.json", SearchSyncIT.class);
+        this.api.backend().importMongoDBFixture("mongodb-stored-searches-for-execution-endpoint.json", SearchSyncIT.class);
 
         api.gelf().createGelfHttpInput(GELF_HTTP_PORT)
                 .postMessage("{\"short_message\":\"search-sync-test\", \"host\":\"example.org\", \"facility\":\"test\"}");
