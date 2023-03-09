@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import org.graylog.events.context.EventDefinitionContextService;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.DBEventDefinitionService;
+import org.graylog.events.processor.DefaultEventResolver;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog.events.processor.EventProcessorConfig;
@@ -62,11 +63,14 @@ public class EventDefinitionsResourceTest {
     AuditEventSender auditEventSender;
     @Mock
     ObjectMapper objectMapper;
+
     EventDefinitionsResource resource;
 
     @Before
     public void setup() {
-        resource = new EventDefinitionsResource(dbService, eventDefinitionHandler, contextService, engine, recentActivityService, auditEventSender, objectMapper);
+        resource = new EventDefinitionsResource(
+                dbService, eventDefinitionHandler, contextService, engine, recentActivityService,
+                auditEventSender, objectMapper, new DefaultEventResolver());
         when(config1.type()).thenReturn(CONFIG_TYPE_1);
         when(config2.type()).thenReturn(CONFIG_TYPE_2);
     }
