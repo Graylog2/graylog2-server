@@ -122,7 +122,7 @@ describe('StreamsOverview BulkActionsRow', () => {
       await openActionsDropdown();
       await deleteStreams();
 
-      expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 streams?');
+      expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 streams? This action cannot be undone.');
 
       await waitFor(() => expect(fetch).toHaveBeenCalledWith(
         'POST',
@@ -149,7 +149,7 @@ describe('StreamsOverview BulkActionsRow', () => {
 
       await deleteStreams();
 
-      expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 streams?');
+      expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 streams? This action cannot be undone.');
 
       await waitFor(() => expect(fetch).toHaveBeenCalledWith(
         'POST',
