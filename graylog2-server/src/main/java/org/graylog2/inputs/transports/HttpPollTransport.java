@@ -27,6 +27,7 @@ import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -40,6 +41,7 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport;
+import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.plugin.lifecycles.Lifecycle;
@@ -64,7 +66,7 @@ import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public class HttpPollTransport extends ThrottleableTransport {
+public class HttpPollTransport extends ThrottleableTransport2 {
     private static final Logger LOG = LoggerFactory.getLogger(HttpPollTransport.class);
 
     private static final String CK_URL = "target_url";
@@ -133,7 +135,7 @@ public class HttpPollTransport extends ThrottleableTransport {
     }
 
     @Override
-    public void doLaunch(final MessageInput input) throws MisfireException {
+    public void doLaunch(final MessageInput input, InputFailureRecorder inputFailureRecorder) throws MisfireException {
         serverStatus.awaitRunning(() -> lifecycleStateChange(Lifecycle.RUNNING));
 
         // listen for lifecycle changes
@@ -176,8 +178,9 @@ public class HttpPollTransport extends ThrottleableTransport {
                 }
 
                 input.processRawMessage(new RawMessage(r.body().bytes(), remoteAddress));
+                inputFailureRecorder.setRunning();
             } catch (IOException e) {
-                LOG.error("Could not fetch HTTP resource at " + url, e);
+                inputFailureRecorder.setFailing(getClass(), "Could not fetch HTTP resource at " + url, e);
             }
         };
 
