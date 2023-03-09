@@ -18,7 +18,7 @@ const useCreateViewForEventDefinition = (
   };
   const queryString: ElasticsearchQueryString = {
     type: 'elasticsearch',
-    query_string: eventDefinition.config.query || '',
+    query_string: eventDefinition?.config?.query || '',
   };
   const groupBy = eventDefinition.config.group_by;
 

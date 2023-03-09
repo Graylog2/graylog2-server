@@ -17,6 +17,8 @@
 
 // import * as Immutable from 'immutable';
 
+import Immutable from 'immutable';
+
 import type { EventType } from 'hooks/useEventById';
 import type { EventDefinition } from 'logic/alerts/types';
 import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
@@ -32,7 +34,6 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import { allMessagesTable, resultHistogram } from 'views/logic/Widgets';
-// import SearchTypesGenerator from 'views/logic/searchtypes/SearchTypesGenerator';
 
 export const mockEventData = {
   event: {
@@ -82,7 +83,7 @@ export const mockEventDefinitionTwoAggregations:EventDefinition = {
     query: 'http_method: GET',
     query_parameters: [],
     streams: [
-      '0001',
+      '001',
     ],
     group_by: [
       'field1',
@@ -269,33 +270,14 @@ const widgetsWithTwoAggregations = [
   summaryWidget,
 ];
 // const { searchTypes: searchTypesTwoAggregations, widgetMapping: widgetMappingTwoAggregations } = SearchTypesGenerator(widgetsWithTwoAggregations);
-const searchTwoAggregations = Search.create().toBuilder().id('search-id').queries([query.toBuilder().searchTypes([
-  {
-    filters: [],
-    type: 'AGGREGATION',
-    typeDefinition: {},
-  },
-  {
-    filters: [],
-    type: 'AGGREGATION',
-    typeDefinition: {},
-  },
-  {
-    filters: [],
-    type: 'AGGREGATION',
-    typeDefinition: {},
-  },
-  {
-    filters: [],
-    type: 'AGGREGATION',
-    typeDefinition: {},
-  },
-  {
-    filters: [],
-    type: 'AGGREGATION',
-    typeDefinition: {},
-  },
-]).build()])
+const searchTwoAggregations = Search.create().toBuilder().id('search-id').queries([
+  query
+    .toBuilder()
+    .searchTypes(Array(5).fill({
+      filters: [],
+      type: 'AGGREGATION',
+      typeDefinition: {},
+    })).build()])
   .build();
 
 // const titles =
@@ -316,6 +298,9 @@ export const mockedViewWithTwoAggregations = View.create()
           'summary-widget-id': 'Summary:  count(field1) > 500 count(field2) < 8000',
         },
       })
+      .widgetMapping(Immutable.Map(
+        ['field1-widget-id', 'field2-widget-id', 'mc-widget-id', 'allm-widget-id', 'summary-widget-id'].map((item) => [item, Immutable.Set([undefined])]),
+      ))
       .widgets(widgetsWithTwoAggregations)
       .widgetPositions({
         'field1-widget-id': new WidgetPosition(1, 4, 3, 6),
@@ -330,23 +315,11 @@ export const mockedViewWithTwoAggregations = View.create()
   .build();
 
 // const { searchTypes: searchTypesOneAggregation, widgetMapping: widgetMappingOneAggregation } = SearchTypesGenerator(widgetsWithOneAggregation);
-const searchOneAggregation = Search.create().toBuilder().id('search-id').queries([query.toBuilder().searchTypes([
-  {
-    filters: [],
-    type: 'AGGREGATION',
-    typeDefinition: {},
-  },
-  {
-    filters: [],
-    type: 'AGGREGATION',
-    typeDefinition: {},
-  },
-  {
-    filters: [],
-    type: 'AGGREGATION',
-    typeDefinition: {},
-  },
-]).build()])
+const searchOneAggregation = Search.create().toBuilder().id('search-id').queries([query.toBuilder().searchTypes(Array(3).fill({
+  filters: [],
+  type: 'AGGREGATION',
+  typeDefinition: {},
+})).build()])
   .build();
 export const mockedViewWithOneAggregation = View.create()
   .toBuilder()
@@ -363,6 +336,9 @@ export const mockedViewWithOneAggregation = View.create()
         },
       })
       .widgets(widgetsWithOneAggregation)
+      .widgetMapping(Immutable.Map(
+        ['field1-widget-id', 'mc-widget-id', 'allm-widget-id'].map((item) => [item, Immutable.Set([undefined])]),
+      ))
       .widgetPositions({
         'field1-widget-id': new WidgetPosition(1, 1, 3, 6),
         'mc-widget-id': new WidgetPosition(1, 4, 2, Infinity),
@@ -371,4 +347,37 @@ export const mockedViewWithOneAggregation = View.create()
       .build(),
   })
   .search(searchOneAggregation)
+  .build();
+
+const queryED = QueryGenerator(eventData.replay_info.streams, 'query-id', {
+  type: 'relative',
+  range: 60,
+}, {
+  type: 'elasticsearch',
+  query_string: mockEventDefinitionTwoAggregations?.config?.query || '',
+});
+export const mockedViewWithTwoAggregationsED = mockedViewWithTwoAggregations
+  .toBuilder()
+  .search(
+    searchTwoAggregations.toBuilder().queries([queryED.toBuilder().searchTypes(
+      Array(5).fill({
+        filters: [],
+        type: 'AGGREGATION',
+        typeDefinition: {},
+      }),
+    ).build()]).build(),
+  )
+  .build();
+
+export const mockedViewWithOneAggregationED = mockedViewWithOneAggregation
+  .toBuilder()
+  .search(
+    searchOneAggregation.toBuilder().queries([queryED.toBuilder().searchTypes(
+      Array(3).fill({
+        filters: [],
+        type: 'AGGREGATION',
+        typeDefinition: {},
+      }),
+    ).build()]).build(),
+  )
   .build();

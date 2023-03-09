@@ -117,7 +117,7 @@ const EventInfoBar = () => {
   }, [aggregations, highlightingRules]);
 
   const items = [
-    { title: 'Timestamp', content: <Timestamp dateTime={eventData.timestamp} />, show: !isEventDefinition },
+    { title: 'Timestamp', content: <Timestamp dateTime={eventData?.timestamp} />, show: !isEventDefinition },
     {
       title: 'Event definition updated at',
       content: (
