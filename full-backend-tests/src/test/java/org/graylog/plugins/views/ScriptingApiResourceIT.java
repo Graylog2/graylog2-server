@@ -19,7 +19,6 @@ package org.graylog.plugins.views;
 import io.restassured.http.Header;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
 import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiModule;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Sharing;
@@ -62,14 +61,12 @@ import static org.hamcrest.Matchers.hasEntry;
 public class ScriptingApiResourceIT {
 
     public static final String DEFAULT_STREAM = "000000000000000000000001";
-    private final RequestSpecification requestSpec;
     private final GraylogApis api;
 
     private String stream1Id;
     private String stream2Id;
 
-    public ScriptingApiResourceIT(RequestSpecification requestSpec, GraylogApis apis) {
-        this.requestSpec = requestSpec;
+    public ScriptingApiResourceIT(GraylogApis apis) {
         this.api = apis;
     }
 
@@ -138,8 +135,8 @@ public class ScriptingApiResourceIT {
     void testUserWithLimitedPermissionRequest() {
 
         final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
-                .auth().preemptive().basic("john.doe", "asdfgh")
+                .spec(api.requestSpecification())
+                .auth().basic("john.doe", "asdfgh")
                 .when()
                 .body("""
                          {
@@ -168,7 +165,7 @@ public class ScriptingApiResourceIT {
     @ContainerMatrixTest
     void testSchema() {
         final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("""
                         {
@@ -197,7 +194,7 @@ public class ScriptingApiResourceIT {
     @ContainerMatrixTest
     void testMinimalRequest() {
         final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("""
                         {
@@ -226,7 +223,7 @@ public class ScriptingApiResourceIT {
     @ContainerMatrixTest
     void testAsciiRender() {
         final String response = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .header(new Header("Accept", MediaType.TEXT_PLAIN))
                 .when()
                 .body("""
@@ -265,7 +262,7 @@ public class ScriptingApiResourceIT {
     @ContainerMatrixTest
     void testGetRequestAcii() {
         final String response = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .header(new Header("Accept", MediaType.TEXT_PLAIN))
                 .when()
                 .get("/search/aggregate?groups=facility&metrics=count:facility")
@@ -288,7 +285,7 @@ public class ScriptingApiResourceIT {
     @ContainerMatrixTest
     void testCsvRender() {
         final InputStream response = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .header(new Header("Accept", MoreMediaTypes.TEXT_CSV))
                 .when()
                 .body("""
@@ -329,7 +326,7 @@ public class ScriptingApiResourceIT {
     void testGetRequestCsv() {
 
         final InputStream response = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .header(new Header("Accept", MoreMediaTypes.TEXT_CSV))
                 .when()
                 .get("/search/aggregate?groups=facility&metrics=count:facility")
@@ -353,7 +350,7 @@ public class ScriptingApiResourceIT {
     @ContainerMatrixTest
     void testGetRequestJson() {
         final ValidatableResponse response = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .header(new Header("Accept", MediaType.APPLICATION_JSON))
                 .when()
                 .get("/search/aggregate?groups=facility&metrics=count:facility")
@@ -368,7 +365,7 @@ public class ScriptingApiResourceIT {
     @ContainerMatrixTest
     void testTwoAggregations() {
         final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("""
                         {
@@ -401,7 +398,7 @@ public class ScriptingApiResourceIT {
     @ContainerMatrixTest
     void testDuplicatedMetrics() {
         final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("""
                         {
@@ -432,7 +429,7 @@ public class ScriptingApiResourceIT {
     @ContainerMatrixTest
     void testAggregationWithoutMatchingField() {
         final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("""
                         {
@@ -461,7 +458,7 @@ public class ScriptingApiResourceIT {
     @ContainerMatrixTest
     void testMissingDataInRow() {
         final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("""
                         {
@@ -514,7 +511,7 @@ public class ScriptingApiResourceIT {
                 }
                 """;
         final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body(String.format(Locale.ROOT, req, stream2Id))
                 .post("/search/aggregate")
@@ -529,7 +526,7 @@ public class ScriptingApiResourceIT {
     @ContainerMatrixTest
     void testSorting() {
         final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("""
                         {
@@ -561,7 +558,7 @@ public class ScriptingApiResourceIT {
     @ContainerMatrixTest
     void testMetadata() {
         final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("""
                         {
@@ -600,7 +597,7 @@ public class ScriptingApiResourceIT {
     @ContainerMatrixTest
     void testErrorHandling() {
         final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("""
                         {
@@ -628,7 +625,7 @@ public class ScriptingApiResourceIT {
     @ContainerMatrixTest
     void testMessages() {
         final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("""
                         {
@@ -653,7 +650,7 @@ public class ScriptingApiResourceIT {
     @ContainerMatrixTest
     void testMessagesWithSorting() {
         ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("""
                         {
@@ -674,7 +671,7 @@ public class ScriptingApiResourceIT {
         assertThat(rows.get(2)).contains(1);
 
         validatableResponse = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("""
                         {
@@ -699,7 +696,7 @@ public class ScriptingApiResourceIT {
     @ContainerMatrixTest
     void testMessagesGetRequestAscii() {
         final List<String> response = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .header(new Header("Accept", MediaType.TEXT_PLAIN))
                 .get("/search/messages?fields=source,facility,level")

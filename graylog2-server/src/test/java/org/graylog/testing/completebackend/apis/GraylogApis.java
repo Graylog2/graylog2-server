@@ -16,11 +16,16 @@
  */
 package org.graylog.testing.completebackend.apis;
 
+import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.config.FailureConfig;
+import io.restassured.config.ObjectMapperConfig;
+import io.restassured.config.RestAssuredConfig;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.apis.inputs.GelfInputApi;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 
 import java.util.List;
 import java.util.Map;
@@ -30,6 +35,7 @@ import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.CoreMatchers.not;
 
 public class GraylogApis {
+    ObjectMapperProvider OBJECT_MAPPER_PROVIDER = new ObjectMapperProvider();
     private final GraylogBackend backend;
     private final Users users;
     private final Streams streams;
@@ -60,7 +66,7 @@ public class GraylogApis {
                 .accept(JSON)
                 .contentType(JSON)
                 .header("X-Requested-By", "peterchen")
-                .auth().preemptive().basic("admin", "admin");
+                .auth().basic("admin", "admin");
     }
 
     public GraylogBackend backend() {
@@ -101,9 +107,9 @@ public class GraylogApis {
 
     protected RequestSpecification prefix(final Users.User user) {
         return given()
-                .config(backend.withGraylogBackendFailureConfig())
+                .config(withGraylogBackendFailureConfig())
                 .spec(this.requestSpecification())
-                .auth().preemptive().basic(user.username(), user.password())
+                .auth().basic(user.username(), user.password())
                 .when();
     }
 
@@ -185,5 +191,25 @@ public class GraylogApis {
                 .then()
                 .log().ifStatusCodeMatches(not(expectedResult))
                 .statusCode(expectedResult);
+    }
+
+    public RestAssuredConfig withGraylogBackendFailureConfig() {
+        return this.withGraylogBackendFailureConfig(500);
+    }
+
+    public RestAssuredConfig withGraylogBackendFailureConfig(int minError) {
+        return RestAssured.config()
+                .objectMapperConfig(new ObjectMapperConfig().jackson2ObjectMapperFactory(
+                        (type, s) -> OBJECT_MAPPER_PROVIDER.get()
+                ))
+                .failureConfig(FailureConfig.failureConfig().with().failureListeners(
+                        (reqSpec, respSpec, resp) -> {
+                            if (resp.statusCode() >= minError) {
+                                System.out.println("------------------------ Output from graylog docker container start ------------------------");
+                                System.out.println(this.backend.getLogs());
+                                System.out.println("------------------------ Output from graylog docker container ends  ------------------------");
+                            }
+                        })
+                );
     }
 }

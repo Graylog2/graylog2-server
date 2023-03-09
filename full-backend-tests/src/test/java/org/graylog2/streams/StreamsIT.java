@@ -17,7 +17,6 @@
 package org.graylog2.streams;
 
 import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.MongodbServer;
@@ -35,11 +34,9 @@ import static org.hamcrest.Matchers.equalTo;
 public class StreamsIT {
     private static final String STREAMS_RESOURCE = "/streams";
 
-    private final RequestSpecification requestSpec;
     private final GraylogApis api;
 
-    public StreamsIT(RequestSpecification requestSpec, GraylogApis api) {
-        this.requestSpec = requestSpec;
+    public StreamsIT(GraylogApis api) {
         this.api = api;
     }
 
@@ -95,7 +92,7 @@ public class StreamsIT {
 
     private ValidatableResponse paginatedByFieldWithOrder(String query, String field, String order) {
         return given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .log().ifValidationFails()
                 .when()
                 .queryParam("query", query)

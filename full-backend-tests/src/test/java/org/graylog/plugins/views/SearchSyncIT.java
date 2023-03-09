@@ -27,8 +27,6 @@ import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.graylog.testing.utils.GelfInputUtils;
-import org.graylog.testing.utils.SearchUtils;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.io.InputStream;
@@ -70,7 +68,7 @@ public class SearchSyncIT {
     @ContainerMatrixTest
     void testEmptyBody() {
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .post("/views/search/sync")
                 .then()
@@ -81,7 +79,7 @@ public class SearchSyncIT {
     @ContainerMatrixTest
     void testMinimalisticRequest() {
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body(fixture("org/graylog/plugins/views/minimalistic-request.json"))
                 .post("/views/search/sync")
@@ -95,7 +93,7 @@ public class SearchSyncIT {
     @ContainerMatrixTest
     void testMinimalisticRequestv2() {
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .accept("application/vnd.graylog.search.v2+json")
                 .contentType("application/vnd.graylog.search.v2+json")
                 .when()
@@ -111,7 +109,7 @@ public class SearchSyncIT {
     @ContainerMatrixTest
     void testRequestWithStreamsv2() {
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .accept("application/vnd.graylog.search.v2+json")
                 .contentType("application/vnd.graylog.search.v2+json")
                 .when()
@@ -150,8 +148,8 @@ public class SearchSyncIT {
     @ContainerMatrixTest
     void testThatQueryOrderStaysConsistentInV1() {
         given()
-                .config(sut.withGraylogBackendFailureConfig())
-                .spec(requestSpec)
+                .config(api.withGraylogBackendFailureConfig())
+                .spec(api.requestSpecification())
                 .accept("application/json")
                 .contentType("application/json")
                 .when()
@@ -169,8 +167,8 @@ public class SearchSyncIT {
     @ContainerMatrixTest
     void testThatQueryOrderStaysConsistentInV2() {
         given()
-                .config(sut.withGraylogBackendFailureConfig())
-                .spec(requestSpec)
+                .config(api.withGraylogBackendFailureConfig())
+                .spec(api.requestSpecification())
                 .accept("application/vnd.graylog.search.v2+json")
                 .contentType("application/vnd.graylog.search.v2+json")
                 .when()
@@ -191,7 +189,7 @@ public class SearchSyncIT {
 
     private String executeStoredSearch(String searchId, Object body) {
         final ValidatableResponse result = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body(body)
                 .post("/views/search/{searchId}/execute", searchId)
@@ -212,7 +210,7 @@ public class SearchSyncIT {
                 .build();
 
         return retryer.call(() -> given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .get("/views/search/status/{jobId}", jobId)
                 .then()

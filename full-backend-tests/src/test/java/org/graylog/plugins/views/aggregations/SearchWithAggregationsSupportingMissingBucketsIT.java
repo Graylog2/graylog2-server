@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.aggregations;
 
 import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.rest.QueryDTO;
 import org.graylog.plugins.views.search.rest.SearchDTO;
@@ -25,7 +24,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
-import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
@@ -59,17 +58,15 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
     private static final String SEARCH_TYPE_ID = "st1";
     private static final String PIVOT_RESULTS_PATH = "results." + QUERY_ID + ".search_types." + SEARCH_TYPE_ID;
 
-    private final RequestSpecification requestSpec;
-    private final GraylogBackend backend;
+    private final GraylogApis api;
 
-    public SearchWithAggregationsSupportingMissingBucketsIT(final GraylogBackend backend, final RequestSpecification requestSpec) {
-        this.requestSpec = requestSpec;
-        this.backend = backend;
+    public SearchWithAggregationsSupportingMissingBucketsIT(GraylogApis api) {
+        this.api = api;
     }
 
     @BeforeAll
     public void setUp() {
-        backend.importElasticsearchFixture("messages-for-missing-aggregation-check.json", SearchWithAggregationsSupportingMissingBucketsIT.class);
+        this.api.backend().importElasticsearchFixture("messages-for-missing-aggregation-check.json", SearchWithAggregationsSupportingMissingBucketsIT.class);
     }
 
     private ValidatableResponse execute(Pivot pivot) {
@@ -87,7 +84,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
                 .build();
 
         return given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body(serialize(search))
                 .post("/views/search/sync")

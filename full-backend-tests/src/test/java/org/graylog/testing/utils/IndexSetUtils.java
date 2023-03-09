@@ -16,7 +16,7 @@
  */
 package org.graylog.testing.utils;
 
-import io.restassured.specification.RequestSpecification;
+import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
@@ -32,9 +32,9 @@ import static org.hamcrest.Matchers.notNullValue;
 public class IndexSetUtils {
     private IndexSetUtils() {}
 
-    public static String defaultIndexSetId(RequestSpecification requestSpec) {
+    public static String defaultIndexSetId(GraylogApis api) {
         return given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .get("/system/indices/index_sets")
                 .then()
@@ -43,9 +43,9 @@ public class IndexSetUtils {
                 .extract().body().jsonPath().getString("index_sets.find { it.default == true }.id");
     }
 
-    public static String createIndexSet(RequestSpecification requestSpec, IndexSetSummary indexSetSummary) {
+    public static String createIndexSet(GraylogApis api, IndexSetSummary indexSetSummary) {
         return given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .log().ifValidationFails()
                 .when()
                 .body(indexSetSummary)
@@ -58,7 +58,7 @@ public class IndexSetUtils {
                 .extract().body().jsonPath().getString("id");
     }
 
-    public static String createIndexSet(RequestSpecification requestSpec, String title, String description, String prefix) {
+    public static String createIndexSet(GraylogApis api, String title, String description, String prefix) {
         var indexSetSummary = IndexSetSummary.create(null,
                 title,
                 description,
@@ -83,6 +83,6 @@ public class IndexSetUtils {
                 null
         );
 
-        return createIndexSet(requestSpec, indexSetSummary);
+        return createIndexSet(api, indexSetSummary);
     }
 }
