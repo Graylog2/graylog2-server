@@ -100,7 +100,7 @@ public class JsonPathCodecTest {
         String path = "$.store.book[?(@.category == 'fiction')].author";
 
         Message result = new JsonPathCodec(configOf(CK_PATH, path, CK_FLATTEN, true), objectMapperProvider.get()).decode(json);
-        assertThat("\"Evelyn Waugh\"").isEqualTo(result.getField("store.book1.author"));
+        assertThat(result.getField("store.book1.author")).isEqualTo("\"Evelyn Waugh\"");
     }
 
     @Test
@@ -109,8 +109,8 @@ public class JsonPathCodecTest {
         String path = "$.some_double";
 
         Map<String, Object> result = new JsonPathCodec(configOf(CK_PATH, path), objectMapperProvider.get()).read(json);
-        assertThat(1).isEqualTo(result.size());
-        assertThat(0.5).isEqualTo(result.get("result"));
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get("result")).isEqualTo(0.5);
     }
 
     @Test
@@ -119,7 +119,7 @@ public class JsonPathCodecTest {
         String path = "$.store.book[?(@.category == 'fiction')].author";
 
         Message result = new JsonPathCodec(configOf(CK_PATH, path, CK_FLATTEN, true), objectMapperProvider.get()).decode(json);
-        assertThat(0.5).isEqualTo(result.getField("some_double"));
+        assertThat(result.getField("some_double")).isEqualTo(0.5);
     }
 
     @Test
@@ -129,7 +129,7 @@ public class JsonPathCodecTest {
         fields.put("foo", "bar");
 
         JsonPathCodec selector = new JsonPathCodec(configOf(CK_PATH, "$.download_count", CK_FLATTEN, false), objectMapperProvider.get());
-        assertThat("JSON API poll result: $['download_count'] -> {baz=9001, foo=bar}").isEqualTo(selector.buildShortMessage(fields));
+        assertThat(selector.buildShortMessage(fields)).isEqualTo("JSON API poll result: $['download_count'] -> {baz=9001, foo=bar}");
     }
 
     @Test
@@ -139,7 +139,7 @@ public class JsonPathCodecTest {
         fields.put("foo", "bar");
 
         JsonPathCodec selector = new JsonPathCodec(configOf(CK_PATH, "$.download_count", CK_FLATTEN, true), objectMapperProvider.get());
-        assertThat("JSON API poll result:  -> {baz=9001, foo=bar}").isEqualTo(selector.buildShortMessage(fields));
+        assertThat(selector.buildShortMessage(fields)).isEqualTo("JSON API poll result:  -> {baz=9001, foo=bar}");
     }
 
     @Test
@@ -149,7 +149,7 @@ public class JsonPathCodecTest {
         fields.put("foo", "bargggdzrtdfgfdgldfsjgkfdlgjdflkjglfdjgljslfperitperoujglkdnfkndsbafdofhasdpfoöadjsFOO");
 
         JsonPathCodec selector = new JsonPathCodec(configOf(CK_PATH, "$.download_count", CK_FLATTEN, false), objectMapperProvider.get());
-        assertThat("JSON API poll result: $['download_count'] -> {baz=9001, foo=bargggdzrtdfgfdgldfsjgkfdlgjdflkjgl[...]").isEqualTo(selector.buildShortMessage(fields));
+        assertThat(selector.buildShortMessage(fields)).isEqualTo("JSON API poll result: $['download_count'] -> {baz=9001, foo=bargggdzrtdfgfdgldfsjgkfdlgjdflkjgl[...]");
     }
 
     @Test
@@ -159,7 +159,7 @@ public class JsonPathCodecTest {
         fields.put("foo", "bargggdzrtdfgfdgldfsjgkfdlgjdflkjglfdjgljslfperitperoujglkdnfkndsbafdofhasdpfoöadjsFOO");
 
         JsonPathCodec selector = new JsonPathCodec(configOf(CK_PATH, "$.download_count", CK_FLATTEN, true), objectMapperProvider.get());
-        assertThat("JSON API poll result:  -> {baz=9001, foo=bargggdzrtdfgfdgldfsjgkfdlgjdflkjgl[...]").isEqualTo(selector.buildShortMessage(fields));
+        assertThat(selector.buildShortMessage(fields)).isEqualTo("JSON API poll result:  -> {baz=9001, foo=bargggdzrtdfgfdgldfsjgkfdlgjdflkjgl[...]");
     }
 
 }

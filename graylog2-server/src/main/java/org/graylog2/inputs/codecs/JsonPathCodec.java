@@ -34,7 +34,6 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
-import org.graylog2.plugin.configuration.fields.DropdownField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.annotations.Codec;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
@@ -60,7 +59,7 @@ public class JsonPathCodec extends AbstractCodec {
     private static final Logger LOG = LoggerFactory.getLogger(JsonPathCodec.class);
     public static final String CK_PATH = "path";
     public static final String CK_SOURCE = "source";
-    public static final String CK_FLATTEN = "modestring";
+    public static final String CK_FLATTEN = "enable_flattening";
 
     private final JsonPath jsonPath;
     private final boolean flatten;
@@ -83,8 +82,8 @@ public class JsonPathCodec extends AbstractCodec {
             final String json = new String(rawMessage.getPayload(), charset);
             try {
                 fields = flatten(json);
-            } catch (JsonTypeException e) {
-                LOG.warn("JSON contains type not supported by JsonFlattenService.flatten.", e);
+            } catch (JsonFlattenException e) {
+                LOG.warn("JSON contains type not supported by flatten method.", e);
             }
         } else {
             if (jsonPath == null) {
@@ -141,7 +140,7 @@ public class JsonPathCodec extends AbstractCodec {
         return shortMessage.toString();
     }
 
-    public Map<String, Object> flatten(String json) throws JsonTypeException {
+    public Map<String, Object> flatten(String json) throws JsonFlattenException {
         try {
             return flatten("", objectMapper.readTree(json));
         } catch (IOException e) {
@@ -150,7 +149,7 @@ public class JsonPathCodec extends AbstractCodec {
         return Map.of();
     }
 
-    private Map<String, Object> flatten(String currentPath, JsonNode jsonNode) throws JsonTypeException {
+    private Map<String, Object> flatten(String currentPath, JsonNode jsonNode) throws JsonFlattenException {
         if (jsonNode.isObject()) {
             ObjectNode objectNode = (ObjectNode) jsonNode;
             Iterator<Map.Entry<String, JsonNode>> iter = objectNode.fields();
@@ -179,11 +178,11 @@ public class JsonPathCodec extends AbstractCodec {
             BooleanNode booleanNode = (BooleanNode) jsonNode;
             return Map.of(currentPath, booleanNode.asBoolean());
         } else {
-            throw new JsonTypeException("Warning: JSON contains type not supported by the flatten method.");
+            throw new JsonFlattenException("Warning: JSON contains type not supported by the flatten method." + jsonNode);
         }
     }
-    public static class JsonTypeException extends Exception {
-        public JsonTypeException(String errorMessage) {
+    public static class JsonFlattenException extends Exception {
+        public JsonFlattenException(String errorMessage) {
             super(errorMessage);
         }
     }
@@ -204,13 +203,6 @@ public class JsonPathCodec extends AbstractCodec {
 
         @Override
         Descriptor getDescriptor();
-    }
-
-    private static Map<String, String> buildModeChoices() {
-        Map<String, String> messagemodes = Maps.newHashMap();
-        messagemodes.put("path", "path");
-        messagemodes.put("full", "full"); //TODO Rename
-        return messagemodes;
     }
 
     @ConfigClass
@@ -235,15 +227,6 @@ public class JsonPathCodec extends AbstractCodec {
                     ConfigurationField.Optional.NOT_OPTIONAL
             ));
 
-            Map<String, String> messagemodes = buildModeChoices();
-            r.addField(new DropdownField(
-                    CK_FLATTEN,
-                    "Message mode",
-                    "path",
-                    messagemodes,
-                    "Select the content of the message. Path returns only whats in the jsonpath. Full returns the full json as fields in the message.",
-                    ConfigurationField.Optional.NOT_OPTIONAL
-            ));
             r.addField(new BooleanField(
                     CK_FLATTEN,
                     "Message mode",
