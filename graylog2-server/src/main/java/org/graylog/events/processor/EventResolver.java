@@ -14,6 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as ContactUs } from './ContactUs';
-export { default as DocumentationLink } from './DocumentationLink';
-export { default as SupportLink } from './SupportLink';
+package org.graylog.events.processor;
+
+import javax.validation.constraints.NotNull;
+import java.util.List;
+
+/**
+ * Resolves dependencies between events
+ */
+public interface EventResolver {
+    /**
+     * Returns IDs of dependent event definitions
+     *
+     * @param definitionId an event definition ID
+     * @return the dependent event definitions
+     */
+    @NotNull
+    List<EventDefinitionDto> dependentEvents(String definitionId);
+}

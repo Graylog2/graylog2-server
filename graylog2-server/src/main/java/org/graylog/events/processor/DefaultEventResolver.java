@@ -14,6 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as ContactUs } from './ContactUs';
-export { default as DocumentationLink } from './DocumentationLink';
-export { default as SupportLink } from './SupportLink';
+package org.graylog.events.processor;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class DefaultEventResolver implements EventResolver {
+    @Override
+    public List<EventDefinitionDto> dependentEvents(String definitionId) {
+        return new ArrayList<>();
+    }
+}
