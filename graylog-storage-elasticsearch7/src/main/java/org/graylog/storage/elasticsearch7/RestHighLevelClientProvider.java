@@ -55,6 +55,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             @Named("elasticsearch_max_total_connections_per_route") int maxTotalConnectionsPerRoute,
             @Named("elasticsearch_max_retries") int elasticsearchMaxRetries,
             @Named("elasticsearch_discovery_enabled") boolean discoveryEnabled,
+            @Named("elasticsearch_node_activity_logger_enabled") boolean nodeActivity,
             @Named("elasticsearch_discovery_filter") @Nullable String discoveryFilter,
             @Named("elasticsearch_discovery_frequency") Duration discoveryFrequency,
             @Named("elasticsearch_discovery_default_scheme") String defaultSchemeForDiscoveredNodes,
@@ -74,7 +75,7 @@ public class RestHighLevelClientProvider implements Provider<RestHighLevelClient
             if (discoveryEnabled) {
                 final Sniffer sniffer = createNodeDiscoverySniffer(client.getLowLevelClient(), discoveryFrequency, defaultSchemeForDiscoveredNodes, discoveryFilter);
                 shutdownService.register(sniffer::close);
-            } else {
+            } else if(nodeActivity) {
                 final Sniffer nodes = createNodeListSniffer(client.getLowLevelClient(), discoveryFrequency, defaultSchemeForDiscoveredNodes);
                 shutdownService.register(nodes::close);
             }
