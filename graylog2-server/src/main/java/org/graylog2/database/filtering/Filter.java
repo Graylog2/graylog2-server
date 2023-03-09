@@ -14,18 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.database.filtering;
 
-package org.graylog2.shared.rest;
+import org.bson.conversions.Bson;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+interface Filter {
+    String field();
 
-/**
- * Annotation to not bind a REST resource annotated with @Path in Graylog Cloud.
- */
-@Target({ElementType.METHOD, ElementType.TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface HideOnCloud {
+    Bson toBson();
 }
