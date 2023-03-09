@@ -41,9 +41,15 @@ jest.mock('@graylog/server-api', () => ({
   },
 }));
 
-describe('StreamsOverview BulkActions', () => {
+describe('StreamsOverview BulkActionsRow', () => {
+  const openActionsDropdown = async () => {
+    await screen.findByRole('button', {
+      name: /bulk actions/i,
+    });
+  };
+
   const assignIndexSet = async () => {
-    userEvent.click(await screen.findByRole('button', { name: /assign index set/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /assign index set/i }));
 
     await screen.findByRole('heading', {
       name: /assign index set to 2 streams/i,
@@ -69,7 +75,7 @@ describe('StreamsOverview BulkActions', () => {
   };
 
   const deleteStreams = async () => {
-    userEvent.click(await screen.findByRole('button', { name: /delete/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
   };
 
   beforeEach(() => {
@@ -81,6 +87,7 @@ describe('StreamsOverview BulkActions', () => {
                         setSelectedStreamIds={() => {}}
                         indexSets={indexSets} />);
 
+    await openActionsDropdown();
     await assignIndexSet();
 
     await waitFor(() => expect(Streams.assignToIndexSet).toHaveBeenCalledWith('index-set-id-2', ['stream-id-1', 'stream-id-2']));
@@ -95,6 +102,7 @@ describe('StreamsOverview BulkActions', () => {
                         setSelectedStreamIds={() => {}}
                         indexSets={indexSets} />);
 
+    await openActionsDropdown();
     await assignIndexSet();
 
     await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith('Assigning index set failed with status: Error: Unexpected error!', 'Error'));
@@ -108,6 +116,7 @@ describe('StreamsOverview BulkActions', () => {
                         setSelectedStreamIds={setSelectedStreamIds}
                         indexSets={indexSets} />);
 
+    await openActionsDropdown();
     await deleteStreams();
 
     expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 streams?');
