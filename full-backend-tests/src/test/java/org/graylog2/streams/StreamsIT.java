@@ -70,7 +70,7 @@ public class StreamsIT {
 
         //test bulk pause
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .log().ifValidationFails()
                 .when()
                 .body(new BulkOperationRequest(bulkEntityIds))
@@ -87,7 +87,7 @@ public class StreamsIT {
 
         //test bulk resume
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .log().ifValidationFails()
                 .when()
                 .body(new BulkOperationRequest(bulkEntityIds))
