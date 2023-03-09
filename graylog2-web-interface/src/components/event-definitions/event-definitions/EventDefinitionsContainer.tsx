@@ -116,7 +116,7 @@ const EventDefinitionsContainer = () => {
     selectedEventDefinitionsIds: Array<string>,
     setSelectedEventDefinitionsIds: (eventDefinitionsId: Array<string>) => void,
   ) => (
-    <BulkActions selectedDefintionsIds={selectedEventDefinitionsIds}
+    <BulkActions selectedDefinitionsIds={selectedEventDefinitionsIds}
                  setSelectedEventDefinitionsIds={setSelectedEventDefinitionsIds} />
   );
 

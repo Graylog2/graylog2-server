@@ -96,7 +96,7 @@ public class GraylogApis {
         return given()
                 .config(backend.withGraylogBackendFailureConfig())
                 .spec(requestSpecification)
-                .auth().preemptive().basic(user.username(), user.password())
+                .auth().basic(user.username(), user.password())
                 .when();
     }
 

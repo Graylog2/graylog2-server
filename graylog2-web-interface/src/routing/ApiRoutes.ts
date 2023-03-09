@@ -228,8 +228,10 @@ const ApiRoutes = {
   },
   NotificationsApiController: {
     delete: (type: string) => { return { url: `/system/notifications/${type}` }; },
+    deleteWithKey: (type: string, key: string) => { return { url: `/system/notifications/${type}/${key}` }; },
     list: () => { return { url: '/system/notifications' }; },
     getHtmlMessage: (type: string) => { return { url: `/system/notification/message/html/${type.toLocaleUpperCase()}` }; },
+    getHtmlMessageWithKey: (type: string, key: string) => { return { url: `/system/notification/message/html/${type.toLocaleUpperCase()}/${key}` }; },
   },
   OutputsApiController: {
     index: () => { return { url: '/system/outputs' }; },

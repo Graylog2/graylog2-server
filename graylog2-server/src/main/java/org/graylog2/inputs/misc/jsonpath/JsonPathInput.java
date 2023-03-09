@@ -59,6 +59,11 @@ public class JsonPathInput extends MessageInput {
         public Descriptor() {
             super(NAME, false, DocsHelper.PAGE_SENDING_JSONPATH.toString());
         }
+
+        @Override
+        public boolean isCloudCompatible() {
+            return true;
+        }
     }
 
 
