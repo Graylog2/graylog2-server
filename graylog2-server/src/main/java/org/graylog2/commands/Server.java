@@ -165,7 +165,7 @@ public class Server extends ServerBootstrap {
                 new MessageInputBindings(),
                 new MessageOutputBindings(configuration, chainingClassLoader),
                 new RotationStrategyBindings(elasticsearchConfiguration),
-                new RetentionStrategyBindings(),
+                new RetentionStrategyBindings(elasticsearchConfiguration),
                 new PeriodicalBindings(),
                 new ObjectMapperModule(chainingClassLoader),
                 new RestApiBindings(configuration),

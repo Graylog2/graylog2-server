@@ -414,6 +414,10 @@ public abstract class MessageInput implements Stoppable {
         return descriptor.isCloudCompatible();
     }
 
+    public boolean isForwarderCompatible() {
+        return descriptor.isForwarderCompatible();
+    }
+
     public interface Factory<M> {
         M create(Configuration configuration);
 
@@ -451,7 +455,7 @@ public abstract class MessageInput implements Stoppable {
         }
     }
 
-    public static class Descriptor extends AbstractDescriptor {
+    public static abstract class Descriptor extends AbstractDescriptor {
         public Descriptor() {
             super();
         }
@@ -462,6 +466,10 @@ public abstract class MessageInput implements Stoppable {
 
         public boolean isCloudCompatible() {
             return false;
+        }
+
+        public boolean isForwarderCompatible() {
+            return true;
         }
     }
 

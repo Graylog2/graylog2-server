@@ -20,7 +20,7 @@ import { Formik, Form } from 'formik';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { Streams } from '@graylog/server-api';
-import { Button, Modal } from 'components/bootstrap';
+import { Modal } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -30,6 +30,8 @@ import UserNotification from 'util/UserNotification';
 import ModalSubmit from 'components/common/ModalSubmit';
 import IfPermitted from 'components/common/IfPermitted';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import MenuItem from 'components/bootstrap/MenuItem';
+import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 
 import IndexSetSelect from '../IndexSetSelect';
 
@@ -153,10 +155,12 @@ const BulkActions = ({ selectedStreamIds, setSelectedStreamIds, indexSets }: Pro
 
   return (
     <>
-      <IfPermitted permissions="indexsets:read">
-        <Button bsSize="xsmall" bsStyle="info" onClick={toggleAssignIndexSetModal}>Assign index set</Button>
-      </IfPermitted>
-      <Button bsSize="xsmall" bsStyle="danger" onClick={onDelete}>Delete</Button>
+      <BulkActionsDropdown selectedEntities={selectedStreamIds} setSelectedEntities={setSelectedStreamIds}>
+        <IfPermitted permissions="indexsets:read">
+          <MenuItem onSelect={toggleAssignIndexSetModal}>Assign index set</MenuItem>
+        </IfPermitted>
+        <MenuItem onSelect={onDelete}>Delete</MenuItem>
+      </BulkActionsDropdown>
       {showIndexSetModal && (
         <AssignIndexSetModal selectedStreamIds={selectedStreamIds}
                              setSelectedStreamIds={setSelectedStreamIds}
