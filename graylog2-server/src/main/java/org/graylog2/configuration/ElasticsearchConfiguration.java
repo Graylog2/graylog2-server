@@ -20,12 +20,14 @@ import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.StringListConverter;
+import com.github.joschi.jadconfig.converters.StringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.util.Size;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
+import org.graylog2.configuration.validators.RetentionStrategyValidator;
 import org.graylog2.configuration.validators.RotationStrategyValidator;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
@@ -37,8 +39,10 @@ import org.joda.time.Period;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -85,6 +89,9 @@ public class ElasticsearchConfiguration {
 
     @Parameter(value = "retention_strategy", required = true)
     private String retentionStrategy = DeletionRetentionStrategy.NAME;
+
+    @Parameter(value = "disabled_retention_strategies", required = true, converter = StringSetConverter.class, validators = {RetentionStrategyValidator.class})
+    private Set<String> disabledRetentionStrategies = Collections.emptySet();
 
     @Parameter(value = "rotation_strategy", required = true)
     private String rotationStrategy = TimeBasedSizeOptimizingStrategy.NAME;
@@ -211,6 +218,10 @@ public class ElasticsearchConfiguration {
 
     public String getRetentionStrategy() {
         return retentionStrategy;
+    }
+
+    public Set<String> getDisabledRetentionStrategies() {
+        return disabledRetentionStrategies;
     }
 
     public Period getMaxTimePerIndex() {
