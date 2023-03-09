@@ -16,9 +16,9 @@
  */
 package org.graylog.testing.utils;
 
-import io.restassured.specification.RequestSpecification;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog.testing.backenddriver.SearchDriver;
+import org.graylog.testing.completebackend.apis.GraylogApis;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,26 +33,26 @@ public final class SearchUtils {
     private SearchUtils() {
     }
 
-    public static List<String> searchForAllMessages(RequestSpecification requestSpecification) {
+    public static List<String> searchForAllMessages(GraylogApis api) {
         List<String> messages = new ArrayList<>();
 
-        WaitUtils.waitFor(() -> captureMessages(messages::addAll, requestSpecification), "Timed out waiting for messages to be present");
+        WaitUtils.waitFor(() -> captureMessages(messages::addAll, api), "Timed out waiting for messages to be present");
 
         return messages;
     }
 
-    public static boolean waitForMessage(RequestSpecification requestSpecification, String message) {
-        WaitUtils.waitFor(() -> captureMessage(requestSpecification, message), "Timed out waiting for message to be present");
+    public static boolean waitForMessage(GraylogApis api, String message) {
+        WaitUtils.waitFor(() -> captureMessage(api, message), "Timed out waiting for message to be present");
         return true;
     }
 
-    private static boolean captureMessage(RequestSpecification requestSpecification, String message) {
-        return SearchDriver.searchAllMessages(requestSpecification).contains(message);
+    private static boolean captureMessage(GraylogApis api, String message) {
+        return SearchDriver.searchAllMessages(api).contains(message);
     }
 
     private static boolean captureMessages(Consumer<List<String>> messagesCaptor,
-                                           RequestSpecification requestSpecification) {
-        List<String> messages = SearchDriver.searchAllMessages(requestSpecification);
+                                           GraylogApis api) {
+        List<String> messages = SearchDriver.searchAllMessages(api);
         if (!messages.isEmpty()) {
             messagesCaptor.accept(messages);
             return true;
@@ -60,10 +60,10 @@ public final class SearchUtils {
         return false;
     }
 
-    public static Set<MappedFieldTypeDTO> waitForFieldTypeDefinitions(RequestSpecification requestSpecification, String... fieldName) {
+    public static Set<MappedFieldTypeDTO> waitForFieldTypeDefinitions(GraylogApis api, String... fieldName) {
         final Set<String> expectedFields = Arrays.stream(fieldName).collect(Collectors.toSet());
         return WaitUtils.waitForObject(() -> {
-            final List<MappedFieldTypeDTO> knownTypes = SearchDriver.getFieldTypes(requestSpecification);
+            final List<MappedFieldTypeDTO> knownTypes = SearchDriver.getFieldTypes(api);
             final Set<MappedFieldTypeDTO> filtered = knownTypes.stream().filter(t -> expectedFields.contains(t.name())).collect(Collectors.toSet());
             if (filtered.size() == expectedFields.size()) {
                 return Optional.of(filtered);

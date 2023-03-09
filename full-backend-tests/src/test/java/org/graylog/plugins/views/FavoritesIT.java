@@ -17,7 +17,6 @@
 package org.graylog.plugins.views;
 
 import io.restassured.path.json.JsonPath;
-import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Users;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
@@ -27,17 +26,14 @@ import org.junit.jupiter.api.BeforeAll;
 import java.util.Collections;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 @ContainerMatrixTestsConfiguration
 public class FavoritesIT {
-    private final RequestSpecification requestSpec;
     private final GraylogApis api;
 
-    public FavoritesIT(RequestSpecification requestSpec, GraylogApis apis) {
-        this.requestSpec = requestSpec;
+    public FavoritesIT(GraylogApis apis) {
         this.api = apis;
     }
 
@@ -62,8 +58,8 @@ public class FavoritesIT {
         var grn = "grn::::search_filter:63d39fa82ba2606a6710a545";
 
         given()
-                .spec(requestSpec)
-                .auth().preemptive().basic("john.doe1", "asdfgh")
+                .spec(api.requestSpecification())
+                .auth().basic("john.doe1", "asdfgh")
                 .when()
                 .put("/favorites/" + grn)
                 .then()
@@ -71,8 +67,8 @@ public class FavoritesIT {
                 .statusCode(204);
 
         var validatableResponse = given()
-                .spec(requestSpec)
-                .auth().preemptive().basic("john.doe1", "asdfgh")
+                .spec(api.requestSpecification())
+                .auth().basic("john.doe1", "asdfgh")
                 .when()
                 .get("/favorites")
                 .then()
@@ -82,8 +78,8 @@ public class FavoritesIT {
         validatableResponse.assertThat().body("favorites[0].grn", equalTo(grn));
 
         given()
-                .spec(requestSpec)
-                .auth().preemptive().basic("john.doe1", "asdfgh")
+                .spec(api.requestSpecification())
+                .auth().basic("john.doe1", "asdfgh")
                 .when()
                 .delete("/favorites/" + grn)
                 .then()

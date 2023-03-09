@@ -16,8 +16,6 @@
  */
 package org.junit.platform.engine.support.hierarchical;
 
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.graylog.testing.completebackend.Lifecycle;
@@ -45,8 +43,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static io.restassured.http.ContentType.JSON;
-
 public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExecutionContext> implements TestEngine {
     private static final Logger LOG = LoggerFactory.getLogger(ContainerMatrixTestEngine.class);
 
@@ -63,8 +59,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
         request.getRootTestDescriptor().getChildren().forEach(descriptor -> {
             if (descriptor instanceof ContainerMatrixTestWithRunningESMongoTestsDescriptor) {
                 GraylogBackend backend = RunningGraylogBackend.createStarted();
-                RequestSpecification specification = requestSpec(backend);
-                this.execute(request, ((ContainerMatrixTestsDescriptor) descriptor).getChildren(), backend, specification);
+                this.execute(request, descriptor.getChildren(), backend);
             } else if (descriptor instanceof ContainerMatrixTestsDescriptor) {
                 ContainerMatrixTestsDescriptor containerMatrixTestsDescriptor = (ContainerMatrixTestsDescriptor) descriptor;
 
@@ -79,8 +74,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
 
                 if (Lifecycle.VM.equals(containerMatrixTestsDescriptor.getLifecycle())) {
                     try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(esVersion, mongoVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, ContainerMatrixTestsConfiguration.defaultImportLicenses, withEnabledMailServer)) {
-                        RequestSpecification specification = requestSpec(backend);
-                        this.execute(request, descriptor.getChildren(), backend, specification);
+                        this.execute(request, descriptor.getChildren(), backend);
                     } catch (Exception exception) {
                         /* Fail hard if the containerized backend failed to start. */
                         LOG.error("Failed container startup? Error executing tests for engine " + getId(), exception);
@@ -96,8 +90,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                             preImportLicense = ((ContainerMatrixTestClassDescriptor) td).isPreImportLicense();
                         }
                         try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(esVersion, mongoVersion, extraPorts, fixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, withEnabledMailServer)) {
-                            RequestSpecification specification = requestSpec(backend);
-                            this.execute(request, Collections.singleton(td), backend, specification);
+                            this.execute(request, Collections.singleton(td), backend);
                         } catch (Exception exception) {
                             /* Fail hard if the containerized backend failed to start. */
                             LOG.error("Failed container startup? Error executing tests for engine " + getId(), exception);
@@ -115,27 +108,16 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
         });
     }
 
-    public void execute(ExecutionRequest request, Collection<? extends TestDescriptor> testDescriptors, GraylogBackend backend, RequestSpecification specification) {
+    public void execute(ExecutionRequest request, Collection<? extends TestDescriptor> testDescriptors, GraylogBackend backend) {
         try (HierarchicalTestExecutorService executorService = createExecutorService(request)) {
 
             C executionContext = createExecutionContext(request);
             ThrowableCollector.Factory throwableCollectorFactory = createThrowableCollectorFactory(request);
             new ContainerMatrixHierarchicalTestExecutor<>(request, executionContext, executorService,
-                    throwableCollectorFactory, testDescriptors, backend, specification).execute().get();
+                    throwableCollectorFactory, testDescriptors, backend).execute().get();
         } catch (Exception exception) {
             throw new JUnitException("Error executing tests for engine " + getId(), exception);
         }
-    }
-
-    private RequestSpecification requestSpec(GraylogBackend backend) {
-        return new RequestSpecBuilder().build()
-                .baseUri(backend.uri())
-                .port(backend.apiPort())
-                .basePath("/api")
-                .accept(JSON)
-                .contentType(JSON)
-                .header("X-Requested-By", "peterchen")
-                .auth().preemptive().basic("admin", "admin");
     }
 
     protected HierarchicalTestExecutorService createExecutorService(ExecutionRequest request) {
