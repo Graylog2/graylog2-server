@@ -39,6 +39,23 @@ const AlertTimestamp = styled(Timestamp)(({ theme }) => css`
   color: ${theme.colors.variant.darker.warning}
 `);
 
+const ColorComponent = styled.div`
+  width: 13px;
+  height: 13px;
+  border-radius: 2px;
+`;
+
+const AggregationCondition = styled.div`
+  display: flex;
+  gap: 5px;
+  align-items: center;
+`;
+
+const AggregationsList = styled.div`
+  display: flex;
+  gap: 5px;
+`;
+
 const Header = styled.div`
   display: flex;
   align-items: center;
@@ -152,13 +169,22 @@ const EventInfoBar = () => {
     },
     {
       title: 'Aggregation conditions',
-      content: Object.entries(highlightingColors).map(([condition, color]: [string, string], index, array) => {
-        const isLast = index + 1 === array.length;
+      content: (
+        <AggregationsList>
+          {
+            Object.entries(highlightingColors).map(([condition, color]: [string, string], index, array) => {
+              const isLast = index + 1 === array.length;
 
-        return (
-          <span title={condition} key={condition} style={{ backgroundColor: color }}>{`${condition}${isLast ? '' : ', '}`}</span>
-        );
-      }),
+              return (
+                <AggregationCondition title={condition} key={condition}>
+                  <ColorComponent style={{ backgroundColor: color }} />
+                  <span>{`${condition}${isLast ? '' : ','}`}</span>
+                </AggregationCondition>
+              );
+            })
+          }
+        </AggregationsList>
+      ),
     },
   ];
 

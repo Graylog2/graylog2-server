@@ -86,20 +86,6 @@ const setMockedHookCache = ({
   definitionTitle,
 }));
 
-/*
-const commonTitles = [
-  'Priority',
-  'Execute search every',
-  'Search within',
-  'Description',
-  'Notifications',
-  'Aggregation conditions'];
-
-const timestampTitle = 'Timestamp';
-const edUpdatedTitle = 'Event definition updated at';
-const edTitle = 'Event definition';
-*/
-
 jest.mock('views/logic/slices/highlightSelectors', () => ({
   selectHighlightingRules: jest.fn(),
 }));
@@ -149,10 +135,10 @@ describe('<EventInfoBar />', () => {
     expect(searchWithin).toHaveTextContent('1minute');
     expect(description).toHaveTextContent('Test description');
     expect(notifications).toHaveTextContent('Email notification');
-    expect(aggregationConditions).toHaveTextContent('count(field1)>500, count(field2)<8000');
+    expect(aggregationConditions).toHaveTextContent('count(field1)>500,count(field2)<8000');
 
-    expect(field1Condition).toHaveStyle({ backgroundColor: 'rgb(255, 255, 255)' });
-    expect(field2Condition).toHaveStyle({ backgroundColor: 'rgb(0, 0, 0)' });
+    expect(field1Condition.children[0]).toHaveStyle({ backgroundColor: 'rgb(255, 255, 255)' });
+    expect(field2Condition.children[0]).toHaveStyle({ backgroundColor: 'rgb(0, 0, 0)' });
     // expect(aggregationConditions).toContainHTML('<span title="Aggregation conditions"><span><span style="background-color: rgb(255, 255, 255);">count(field1)&gt;500</span></span><span><span style="background-color: rgb(0, 0, 0);">count(field2)&lt;8000, </span></span></span>');
   });
 
