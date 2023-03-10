@@ -21,8 +21,10 @@ import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import MenuItem from 'components/bootstrap/MenuItem';
 import { HoverForHelp, Icon } from 'components/common';
 import type { Attribute, Attributes } from 'stores/PaginationTypes';
-import generateId from 'logic/generateId';
 import type { Filters, Filter } from 'components/common/EntityFilters/types';
+
+import SuggestionsList from './configuration/SuggestionsList';
+import StaticOptionsList from './configuration/StaticOptionsList';
 
 const Container = styled.div`
   margin-left: 5px;
@@ -71,14 +73,11 @@ const FilterConfiguration = ({
 }) => (
   <>
     <MenuItem header>Create {attribute.title} Filter</MenuItem>
-    {attribute.type === 'BOOLEAN' && (
-      <>
-        {attribute.filter_options.map(({ title, value }) => (
-          <MenuItem onSelect={() => onSubmit({ value, title, id: generateId() })} key={`filter-value-${title}`}>
-            {filterValueRenderer ? filterValueRenderer(value, title) : title}
-          </MenuItem>
-        ))}
-      </>
+    {attribute.filter_options && (
+      <StaticOptionsList attribute={attribute} filterValueRenderer={filterValueRenderer} onSubmit={onSubmit} />
+    )}
+    {!attribute.filter_options?.length && (
+      <SuggestionsList attribute={attribute} filterValueRenderer={filterValueRenderer} onSubmit={onSubmit} />
     )}
   </>
 );

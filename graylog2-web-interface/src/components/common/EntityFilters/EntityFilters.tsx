@@ -22,6 +22,8 @@ import type { Attributes } from 'stores/PaginationTypes';
 import type { Filters, Filter } from 'components/common/EntityFilters/types';
 import ActiveFilters from 'components/common/EntityFilters/ActiveFilters';
 
+const SUPPORTED_TYPES = ['STRING', 'BOOLEAN'];
+
 const Container = styled.div`
   display: inline-flex;
   height: 34px;
@@ -37,7 +39,7 @@ type Props = {
 }
 
 const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRenderers, onChangeFilters }: Props) => {
-  const filterableAttributes = attributes.filter(({ filterable, type }) => filterable && type === 'BOOLEAN');
+  const filterableAttributes = attributes.filter(({ filterable, type }) => filterable && SUPPORTED_TYPES.includes(type));
 
   if (!filterableAttributes.length) {
     return null;
