@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export { default as BooleanField } from './BooleanField';
-export { default as ConfigurationForm } from './ConfigurationForm'; // eslint-disable-line import/no-cycle
+export { default as ConfigurationForm } from './ConfigurationForm';
 export { default as ConfigurationFormField } from './ConfigurationFormField';
 export { default as ConfigurationWell } from './ConfigurationWell';
 export { default as DropdownField } from './DropdownField';
@@ -25,3 +25,5 @@ export { default as ListField } from './ListField';
 export { default as NumberField } from './NumberField';
 export { default as TextField } from './TextField';
 export { default as TitleField } from './TitleField';
+
+export type { ConfigurationFormData, ConfigurationFieldValue, ConfigurationField, ConfigurationFieldWithEncryption } from './types';
