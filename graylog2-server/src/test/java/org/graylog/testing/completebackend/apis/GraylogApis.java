@@ -29,6 +29,7 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
@@ -67,6 +68,10 @@ public class GraylogApis {
                 .contentType(JSON)
                 .header("X-Requested-By", "peterchen")
                 .auth().basic("admin", "admin");
+    }
+
+    public Supplier<RequestSpecification> requestSpecificationSupplier() {
+        return () -> this.requestSpecification();
     }
 
     public GraylogBackend backend() {

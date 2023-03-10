@@ -68,8 +68,7 @@ class BackendStartupIT {
     @ContainerMatrixTest
     void importsElasticsearchFixtures() {
         this.api.backend().importElasticsearchFixture("one-message.json", getClass());
-        var requestSpec = this.api.requestSpecification();
-        assertThat(SearchUtils.waitForMessage(this.api, "hello from es fixture")).isTrue();
+        assertThat(SearchUtils.waitForMessage(this.api.requestSpecificationSupplier(), "hello from es fixture")).isTrue();
     }
 
     @ContainerMatrixTest

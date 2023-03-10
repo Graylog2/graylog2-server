@@ -18,6 +18,7 @@ package org.graylog.testing.backenddriver;
 
 import com.google.common.collect.ImmutableSet;
 import io.restassured.path.json.JsonPath;
+import io.restassured.specification.RequestSpecification;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
@@ -50,21 +52,21 @@ public class SearchDriver {
     private static final Logger LOG = LoggerFactory.getLogger(SearchDriver.class);
 
     /**
-     * @param api to create Request Specifications
+     * @param Supplier to get the RequestSpecification from
      * @return all messages' "message" field as List<String>
      */
-    public static List<String> searchAllMessages(GraylogApis api) {
-        return searchAllMessagesInTimeRange(api, RangeUtils.allMessagesTimeRange());
+    public static List<String> searchAllMessages(Supplier<RequestSpecification> spec) {
+        return searchAllMessagesInTimeRange(spec, RangeUtils.allMessagesTimeRange());
     }
 
-    public static List<String> searchAllMessagesInTimeRange(GraylogApis api, TimeRange timeRange) {
+    public static List<String> searchAllMessagesInTimeRange(Supplier<RequestSpecification> spec, TimeRange timeRange) {
         String queryId = "query-id";
         String messageListId = "message-list-id";
 
         String body = allMessagesJson(queryId, messageListId, timeRange);
 
         final JsonPath response = given()
-                .spec(api.requestSpecification())
+                .spec(spec.get())
                 .when()
                 .body(body)
                 .post("/views/search/sync")
@@ -102,9 +104,9 @@ public class SearchDriver {
         return "results." + queryId + ".search_types." + messageListId + ".messages.message.message";
     }
 
-    public static List<MappedFieldTypeDTO> getFieldTypes(GraylogApis api) {
+    public static List<MappedFieldTypeDTO> getFieldTypes(Supplier<RequestSpecification> spec) {
         final MappedFieldTypeDTO[] as = given()
-                .spec(api.requestSpecification())
+                .spec(spec.get())
                 .get("/views/fields")
                 .as(MappedFieldTypeDTO[].class);
         return Arrays.asList(as);

@@ -45,13 +45,13 @@ public class ElasticsearchE2E {
                 "{\"short_message\":\"kram\", \"host\":\"example.org\", \"facility\":\"test\"}",
                 this.api);
 
-        List<String> messages = SearchUtils.searchForAllMessages(this.api);
+        List<String> messages = SearchUtils.searchForAllMessages(this.api.requestSpecificationSupplier());
         assertThat(messages).doesNotContain("Hello there");
 
         GelfInputUtils.postMessage(mappedPort,
                 "{\"short_message\":\"Hello there\", \"host\":\"example.org\", \"facility\":\"test\"}",
                 this.api);
 
-        assertThat(SearchUtils.waitForMessage(this.api, "Hello there")).isTrue();
+        assertThat(SearchUtils.waitForMessage(this.api.requestSpecificationSupplier(), "Hello there")).isTrue();
     }
 }
