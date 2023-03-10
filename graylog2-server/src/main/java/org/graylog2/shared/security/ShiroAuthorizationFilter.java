@@ -56,6 +56,7 @@ public class ShiroAuthorizationFilter implements ContainerRequestFilter {
                         userId, Arrays.toString(requiredPermissions), requestContext.getMethod(), requestContext.getUriInfo().getPath());
                 LOG.info("Headers: {}", requestContext.getHeaders());
                 LOG.info("Subject: {}", context.getSubject());
+                LOG.info("Current Thread ID: {}", Thread.currentThread().getId());
                 LOG.info("full Context: {}", requestContext);
                 LOG.info("full SecurityContext: {}", context);
                 LOG.error(e.getMessage(), e);
