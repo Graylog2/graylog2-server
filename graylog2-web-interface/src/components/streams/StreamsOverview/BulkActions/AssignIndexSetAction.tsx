@@ -14,26 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 import { Formik, Form } from 'formik';
-import { useQueryClient } from '@tanstack/react-query';
 
+import MenuItem from 'components/bootstrap/MenuItem';
+import { isPermitted } from 'util/PermissionsMixin';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import StringUtils from 'util/StringUtils';
+import type FetchError from 'logic/errors/FetchError';
+import IndexSetSelect from 'components/streams/IndexSetSelect';
+import UserNotification from 'util/UserNotification';
 import { Streams } from '@graylog/server-api';
 import { Modal } from 'components/bootstrap';
-import StringUtils from 'util/StringUtils';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import type FetchError from 'logic/errors/FetchError';
-import ApiRoutes from 'routing/ApiRoutes';
-import UserNotification from 'util/UserNotification';
 import ModalSubmit from 'components/common/ModalSubmit';
-import IfPermitted from 'components/common/IfPermitted';
-import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import MenuItem from 'components/bootstrap/MenuItem';
-import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 
-import IndexSetSelect from '../IndexSetSelect';
+type ModalProps = {
+  descriptor: string,
+  indexSets: Array<IndexSet>,
+  refetchStreams: () => void,
+  setSelectedStreamIds: (streamIds: Array<string>) => void
+  selectedStreamIds: Array<string>,
+  toggleShowModal: () => void,
+}
 
 type AssignIndexSetFormValues = {
   index_set_id: string | undefined,
@@ -46,14 +50,7 @@ const AssignIndexSetModal = ({
   refetchStreams,
   setSelectedStreamIds,
   descriptor,
-}: {
-  descriptor: string,
-  indexSets: Array<IndexSet>,
-  refetchStreams: () => void,
-  setSelectedStreamIds: (streamIds: Array<string>) => void
-  selectedStreamIds: Array<string>,
-  toggleShowModal: () => void,
-}) => {
+}: ModalProps) => {
   const modalTitle = `Assign Index Set To ${selectedStreamIds.length} ${StringUtils.capitalizeFirstLetter(descriptor)}`;
   const onSubmit = ({ index_set_id: indexSetId }: AssignIndexSetFormValues) => Streams.assignToIndexSet(indexSetId, selectedStreamIds).then(() => {
     refetchStreams();
@@ -105,62 +102,32 @@ const AssignIndexSetModal = ({
 };
 
 type Props = {
-  selectedStreamIds: Array<string>,
+  descriptor: string,
+  indexSets: Array<IndexSet>,
+  onSelect?: () => void,
+  refetchStreams: () => void,
+  selectedStreamIds: Array<string>
   setSelectedStreamIds: (streamIds: Array<string>) => void,
-  indexSets: Array<IndexSet>
 }
 
-const BulkActions = ({ selectedStreamIds, setSelectedStreamIds, indexSets }: Props) => {
+const AssignIndexSetAction = ({ indexSets, selectedStreamIds, setSelectedStreamIds, descriptor, refetchStreams, onSelect }: Props) => {
   const [showIndexSetModal, setShowIndexSetModal] = useState(false);
-  const queryClient = useQueryClient();
-
-  const selectedItemsAmount = selectedStreamIds?.length;
-  const descriptor = StringUtils.pluralize(selectedItemsAmount, 'stream', 'streams');
-
-  const refetchStreams = useCallback(() => queryClient.invalidateQueries(['streams', 'overview']), [queryClient]);
-
-  const onDelete = useCallback(() => {
-    // eslint-disable-next-line no-alert
-    if (window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}?`)) {
-      fetch(
-        'POST',
-        qualifyUrl(ApiRoutes.StreamsApiController.bulk_delete().url),
-        { entity_ids: selectedStreamIds },
-      ).then(({ failures }) => {
-        if (failures?.length) {
-          const notDeletedStreamIds = failures.map(({ entity_id }) => entity_id);
-          setSelectedStreamIds(notDeletedStreamIds);
-          UserNotification.error(`${notDeletedStreamIds.length} out of ${selectedItemsAmount} selected ${descriptor} could not be deleted.`);
-        } else {
-          setSelectedStreamIds([]);
-          UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`, 'Success');
-        }
-      }).catch((error) => {
-        UserNotification.error(`An error occurred while deleting streams. ${error}`);
-      }).finally(() => {
-        refetchStreams();
-      });
-    }
-  }, [
-    descriptor,
-    refetchStreams,
-    selectedItemsAmount,
-    selectedStreamIds,
-    setSelectedStreamIds,
-  ]);
 
   const toggleAssignIndexSetModal = useCallback(() => {
+    if (!showIndexSetModal && typeof onSelect === 'function') {
+      onSelect();
+    }
+
     setShowIndexSetModal((cur) => !cur);
-  }, []);
+  }, [onSelect, showIndexSetModal]);
+
+  if (!isPermitted('indexsets:read')) {
+    return null;
+  }
 
   return (
     <>
-      <BulkActionsDropdown selectedEntities={selectedStreamIds} setSelectedEntities={setSelectedStreamIds}>
-        <IfPermitted permissions="indexsets:read">
-          <MenuItem onSelect={toggleAssignIndexSetModal}>Assign index set</MenuItem>
-        </IfPermitted>
-        <MenuItem onSelect={onDelete}>Delete</MenuItem>
-      </BulkActionsDropdown>
+      <MenuItem onSelect={toggleAssignIndexSetModal}>Assign index set</MenuItem>
       {showIndexSetModal && (
         <AssignIndexSetModal selectedStreamIds={selectedStreamIds}
                              setSelectedStreamIds={setSelectedStreamIds}
@@ -173,4 +140,8 @@ const BulkActions = ({ selectedStreamIds, setSelectedStreamIds, indexSets }: Pro
   );
 };
 
-export default BulkActions;
+AssignIndexSetAction.defaultProps = {
+  onSelect: undefined,
+};
+
+export default AssignIndexSetAction;
