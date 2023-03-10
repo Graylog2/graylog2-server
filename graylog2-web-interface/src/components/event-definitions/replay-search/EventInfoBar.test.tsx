@@ -44,16 +44,6 @@ jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
 
 jest.mock('hooks/useAlertAndEventDefinitionData');
 
-/*
-jest.mock('graylog-web-plugin/plugin', () => ({
-  ...jest.requireActual('graylog-web-plugin/plugin'),
-  PluginStore: {
-    ...jest.requireActual('graylog-web-plugin/plugin').PluginStore,
-    exports: jest.fn(() => [{ type: 'aggregation', defaults: {} }]),
-  },
-}));
-*/
-
 jest.mock('views/logic/Widgets', () => ({
   ...jest.requireActual('views/logic/Widgets'),
   widgetDefinition: () => ({
