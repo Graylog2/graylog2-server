@@ -72,6 +72,8 @@ const SuggestionsList = ({ attribute, filterValueRenderer, onSubmit, allActiveFi
 
   const debounceOnSearch = debounce((value: string) => handleSearchChange(value), 1000);
 
+  console.log({ allActiveFilters });
+
   return (
     <Container>
       <SearchInput type="text"
