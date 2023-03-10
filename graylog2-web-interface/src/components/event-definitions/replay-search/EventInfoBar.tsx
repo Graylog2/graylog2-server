@@ -54,6 +54,7 @@ const ColorComponent = styled.div`
   width: 13px;
   height: 13px;
   border-radius: 2px;
+  cursor: pointer;
 `;
 
 const AggregationCondition = styled.div`
