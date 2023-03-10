@@ -41,6 +41,7 @@ class FilterAggregationSummary extends React.Component {
     streams: PropTypes.array.isRequired,
   };
 
+  // eslint-disable-next-line class-methods-use-this
   getConditionType = (config) => {
     const { group_by: groupBy, series, conditions } = config;
 
@@ -50,6 +51,7 @@ class FilterAggregationSummary extends React.Component {
       ? 'filter' : 'aggregation');
   };
 
+  // eslint-disable-next-line class-methods-use-this
   formatStreamOrId = (streamOrId) => {
     if (typeof streamOrId === 'string') {
       return <span key={streamOrId}><em>{streamOrId}</em></span>;
@@ -86,6 +88,7 @@ class FilterAggregationSummary extends React.Component {
     );
   };
 
+  // eslint-disable-next-line class-methods-use-this
   renderQueryParameters = (queryParameters) => {
     if (queryParameters.some((p) => p.embryonic)) {
       const undeclaredParameters = queryParameters.filter((p) => p.embryonic)
