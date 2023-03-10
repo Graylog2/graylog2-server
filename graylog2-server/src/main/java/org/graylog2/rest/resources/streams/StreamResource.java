@@ -44,6 +44,7 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.Persisted;
@@ -129,7 +130,11 @@ public class StreamResource extends RestResource {
             EntityAttribute.builder().id(StreamDTO.FIELD_TITLE).title("Title").searchable(true).build(),
             EntityAttribute.builder().id(StreamDTO.FIELD_DESCRIPTION).title("Description").searchable(true).build(),
             EntityAttribute.builder().id(StreamDTO.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).filterable(true).build(),
-            EntityAttribute.builder().id(StreamDTO.FIELD_INDEX_SET_ID).title("Index set id").hidden(true).filterable(true).build(),
+            EntityAttribute.builder().id(StreamDTO.FIELD_INDEX_SET_ID).title("Index set")
+                    .relatedCollection(MongoIndexSetService.COLLECTION_NAME)
+                    .hidden(true)
+                    .filterable(true)
+                    .build(),
             EntityAttribute.builder().id("disabled").title("Status").type(SearchQueryField.Type.BOOLEAN).filterable(true).filterOptions(Set.of(
                     FilterOption.create("true", "Paused"),
                     FilterOption.create("false", "Running")
