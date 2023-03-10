@@ -65,6 +65,7 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
+        ThreadContext.unbindSubject();
         final boolean secure = requestContext.getSecurityContext().isSecure();
         final MultivaluedMap<String, String> headers = requestContext.getHeaders();
         final Map<String, Cookie> cookies = requestContext.getCookies();
