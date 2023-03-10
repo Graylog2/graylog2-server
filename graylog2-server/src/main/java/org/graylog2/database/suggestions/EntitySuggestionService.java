@@ -14,13 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as BooleanField } from './BooleanField';
-export { default as ConfigurationForm } from './ConfigurationForm'; // eslint-disable-line import/no-cycle
-export { default as ConfigurationFormField } from './ConfigurationFormField';
-export { default as ConfigurationWell } from './ConfigurationWell';
-export { default as DropdownField } from './DropdownField';
-export { default as FieldHelpers } from './FieldHelpers';
-export { default as ListField } from './ListField';
-export { default as NumberField } from './NumberField';
-export { default as TextField } from './TextField';
-export { default as TitleField } from './TitleField';
+package org.graylog2.database.suggestions;
+
+import org.apache.shiro.subject.Subject;
+
+public interface EntitySuggestionService {
+
+    EntitySuggestionResponse suggest(final String collection,
+                                     final String valueColumn,
+                                     final String query,
+                                     final int page,
+                                     final int perPage,
+                                     final Subject subject);
+}

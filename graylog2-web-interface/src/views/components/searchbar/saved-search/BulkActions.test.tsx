@@ -31,9 +31,15 @@ jest.mock('util/UserNotification', () => ({
   success: jest.fn(),
 }));
 
-describe('SavedSearches BulkActions', () => {
+describe('SavedSearches BulkActionsRow', () => {
+  const openActionsDropdown = async () => {
+    await screen.findByRole('button', {
+      name: /bulk actions/i,
+    });
+  };
+
   const deleteSavedSearch = async () => {
-    userEvent.click(await screen.findByRole('button', { name: /delete/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
   };
 
   beforeEach(() => {
@@ -47,6 +53,7 @@ describe('SavedSearches BulkActions', () => {
     render(<BulkActions selectedSavedSearchIds={['saved-search-id-1', 'saved-search-id-2']}
                         setSelectedSavedSearchIds={setSelectedSavedSearchIds} />);
 
+    await openActionsDropdown();
     await deleteSavedSearch();
 
     expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 saved searches?');
@@ -73,6 +80,7 @@ describe('SavedSearches BulkActions', () => {
     render(<BulkActions selectedSavedSearchIds={['saved-search-id-1', 'saved-search-id-2']}
                         setSelectedSavedSearchIds={setSelectedSavedSearchIds} />);
 
+    await openActionsDropdown();
     await deleteSavedSearch();
 
     expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 saved searches?');

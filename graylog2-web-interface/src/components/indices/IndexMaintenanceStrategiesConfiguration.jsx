@@ -22,11 +22,12 @@ import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import {
+  ARCHIVE_RETENTION_STRATEGY,
+  NOOP_RETENTION_STRATEGY,
+  RETENTION,
   TIME_BASED_ROTATION_STRATEGY,
   TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY,
   TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY_TYPE,
-  NOOP_RETENTION_STRATEGY,
-  ARCHIVE_RETENTION_STRATEGY,
 } from 'stores/indices/IndicesStore';
 import { Alert, Col, Input, Row } from 'components/bootstrap';
 import { Icon, Select } from 'components/common';
@@ -167,16 +168,40 @@ const IndexMaintenanceStrategiesConfiguration = ({
   }, [isTimeBasedSizeOptimizing, rotationStrategyClass, setValues, values]);
 
   const getAvailableSelectOptions = () => {
-    return pluginExports
-      .filter((c) => strategies.find(({ type }) => type === c.type))
+    const availableStrategies = pluginExports
+      .filter((pluginOptions) => {
+        return strategies.find(({ type }) => type === pluginOptions.type);
+      });
+
+    const isSelectedItemInList = availableStrategies.filter((availableStrategy) => {
+      return availableStrategy.type === newStrategy;
+    }).length > 0;
+
+    if (!isSelectedItemInList) {
+      return [...availableStrategies, pluginExports.find((pluginOptions) => {
+        return pluginOptions.type === newStrategy;
+      })].map((pluginOptions) => {
+        return { value: pluginOptions.type, label: pluginOptions.displayName };
+      });
+    }
+
+    return availableStrategies
       .map((c) => {
         return { value: c.type, label: c.displayName };
       });
   };
 
+  const getDisplayName = () => {
+    return pluginExports.find((pluginOptions) => pluginOptions.type === newStrategy).displayName;
+  };
+
   const getActiveSelection = () => {
     return newStrategy;
   };
+
+  const shouldShowInvalidRetentionWarning = () => (
+    name === RETENTION && !getStrategyJsonSchema(getActiveSelection(), strategies)
+  );
 
   return (
     <span>
@@ -196,6 +221,12 @@ const IndexMaintenanceStrategiesConfiguration = ({
           <Icon name="exclamation-triangle" />{' '} The effective retention period value calculated from the
           <b>Rotation period</b> and the <b>max number of indices</b> should not be greater than the
           <b>Max retention period </b> of <b>{maxRetentionPeriod}</b> set by the Administrator.
+        </StyledAlert>
+      )}
+      {shouldShowInvalidRetentionWarning() && (
+        <StyledAlert bsStyle="danger">
+          <Icon name="exclamation-triangle" />{' '} {getDisplayName()} strategy was deactivated.
+          Please configure a valid retention strategy.
         </StyledAlert>
       )}
       <Row>

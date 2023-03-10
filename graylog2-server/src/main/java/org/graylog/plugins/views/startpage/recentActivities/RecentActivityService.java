@@ -35,7 +35,7 @@ import org.mongojack.DBQuery;
 import javax.inject.Inject;
 
 public class RecentActivityService extends PaginatedDbService<RecentActivityDTO> {
-    private static final String COLLECTION_NAME = "recent_activity";
+    public static final String COLLECTION_NAME = "recent_activity";
     private final EventBus eventBus;
     private final GRNRegistry grnRegistry;
     private final PermissionAndRoleResolver permissionAndRoleResolver;

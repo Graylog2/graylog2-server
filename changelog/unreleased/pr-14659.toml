@@ -1,0 +1,5 @@
+type = "f"
+message = "Additional `preventLoops` parameter in `clone_message()` function to prevent creation of endless loops."
+
+issues = ["5759"]
+pulls = ["14659"]

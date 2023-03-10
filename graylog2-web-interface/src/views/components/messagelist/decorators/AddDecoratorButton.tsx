@@ -21,6 +21,7 @@ import styled, { css } from 'styled-components';
 import ObjectID from 'bson-objectid';
 
 import { ConfigurationForm } from 'components/configurationforms';
+import type { ConfigurationFormData } from 'components/configurationforms';
 import { Select } from 'components/common';
 import type { DecoratorType, Decorator } from 'views/components/messagelist/decorators/Types';
 
@@ -55,11 +56,6 @@ type State = {
   typeName?: string,
 };
 
-type SubmittedDecorator = {
-  type: string,
-  configuration: Decorator['config'],
-};
-
 class AddDecoratorButton extends React.Component<Props, State> {
   static propTypes = {
     decoratorTypes: PropTypes.object.isRequired,
@@ -80,16 +76,20 @@ class AddDecoratorButton extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
+
+    this.configurationForm = React.createRef();
+
     this.state = {};
   }
 
+  // eslint-disable-next-line class-methods-use-this
   _formatDecoratorType = (typeDefinition: DecoratorType, typeName: string) => {
     return { value: typeName, label: typeDefinition.name };
   };
 
   _handleCancel = () => this.setState({ typeName: undefined, typeDefinition: undefined });
 
-  _handleSubmit = (data: SubmittedDecorator) => {
+  _handleSubmit = (data: ConfigurationFormData<Decorator['config']>) => {
     const { stream, nextOrder, onCreate } = this.props;
 
     const request = {
@@ -104,7 +104,8 @@ class AddDecoratorButton extends React.Component<Props, State> {
     this.setState({ typeName: undefined });
   };
 
-  _openModal = () => this.configurationForm.open();
+  // eslint-disable-next-line react/no-unused-class-component-methods
+  _openModal = () => this.configurationForm?.current?.open();
 
   _onTypeChange = (decoratorType) => {
     const { decoratorTypes } = this.props;
@@ -126,17 +127,15 @@ class AddDecoratorButton extends React.Component<Props, State> {
     const wrapperComponent = InlineForm();
     const configurationForm = (typeName !== undefined
       ? (
-        <ConfigurationForm ref={(elem) => {
-          this.configurationForm = elem;
-        }}
-                           key="configuration-form-output"
-                           configFields={typeDefinition.requested_configuration}
-                           title={`Create new ${typeDefinition.name}`}
-                           typeName={typeName}
-                           includeTitleField={false}
-                           wrapperComponent={wrapperComponent}
-                           submitAction={this._handleSubmit}
-                           cancelAction={this._handleCancel} />
+        <ConfigurationForm<Decorator['config']> ref={this.configurationForm}
+                                                key="configuration-form-output"
+                                                configFields={typeDefinition.requested_configuration}
+                                                title={`Create new ${typeDefinition.name}`}
+                                                typeName={typeName}
+                                                includeTitleField={false}
+                                                wrapperComponent={wrapperComponent}
+                                                submitAction={this._handleSubmit}
+                                                cancelAction={this._handleCancel} />
       ) : null);
 
     return (

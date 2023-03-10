@@ -14,11 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.favorites;
+package org.graylog2.database.suggestions;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.database.PaginatedList;
 
-public record FavoriteDTO(@JsonProperty(FIELD_ID) String id, @JsonProperty(FIELD_TYPE) String type) {
-    public static final String FIELD_ID = "id";
-    public static final String FIELD_TYPE = "type";
+import java.util.List;
+
+public record EntitySuggestionResponse(@JsonProperty("suggestions") List<EntitySuggestion> suggestions,
+                                       @JsonProperty("pagination") PaginatedList.PaginationInfo pagination) {
 }

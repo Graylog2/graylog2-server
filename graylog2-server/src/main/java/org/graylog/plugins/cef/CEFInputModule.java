@@ -49,7 +49,7 @@ public class CEFInputModule extends PluginModule {
     }
 
     private MapBinder<String, Function<?>> processorFunctionBinder(Binder binder) {
-        return MapBinder.newMapBinder(binder, TypeLiteral.get(String.class), new TypeLiteral<Function<?>>() {});
+        return MapBinder.newMapBinder(binder, TypeLiteral.get(String.class), new TypeLiteral<>() {});
     }
 
     private void addMessageProcessorFunction(Binder binder, String name, Class<? extends Function<?>> functionClass) {

@@ -17,6 +17,7 @@
 package org.graylog.events;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.events.audit.EventsAuditEventTypes;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.EmailEventNotificationConfigEntity;
@@ -39,9 +40,11 @@ import org.graylog.events.notifications.types.EmailEventNotificationConfig;
 import org.graylog.events.notifications.types.HTTPEventNotification;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
 import org.graylog.events.periodicals.EventNotificationStatusCleanUp;
+import org.graylog.events.processor.DefaultEventResolver;
 import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.EventProcessorExecutionMetrics;
+import org.graylog.events.processor.EventResolver;
 import org.graylog.events.processor.aggregation.AggregationEventProcessor;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorParameters;
@@ -84,6 +87,9 @@ public class EventsModule extends PluginModule {
         bind(EventProcessorExecutionMetrics.class).asEagerSingleton();
         bind(EventNotificationExecutionMetrics.class).asEagerSingleton();
         bind(SystemNotificationRenderService.class).asEagerSingleton();
+
+        OptionalBinder.newOptionalBinder(binder(), EventResolver.class)
+                .setDefault().to(DefaultEventResolver.class);
 
         addEntityScope(SystemNotificationEventEntityScope.class);
 
