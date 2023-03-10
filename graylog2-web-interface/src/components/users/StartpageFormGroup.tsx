@@ -17,7 +17,7 @@
 import * as React from 'react';
 import type * as Immutable from 'immutable';
 import { useState, useEffect } from 'react';
-import { Field } from 'formik';
+import { Field, useFormikContext } from 'formik';
 import styled from 'styled-components';
 
 import { getValuesFromGRN } from 'logic/permissions/GRN';
@@ -29,6 +29,7 @@ import Select from 'components/common/Select';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import useStreams from 'components/streams/hooks/useStreams';
 import useSavedSearches from 'views/hooks/useSavedSearches';
+import type { SettingsFormValues } from 'components/users/UserEdit/SettingsSection';
 
 const Container = styled.div`
   display: flex;
@@ -71,7 +72,8 @@ const typeOptions = [
 
 const ADMIN_PERMISSION = '*';
 
-const useStartPageEntities = (userId, permissions) => {
+const useStartPageOptions = (userId, permissions) => {
+  const { values: { startpage } } = useFormikContext<SettingsFormValues>();
   const selectedUserIsAdmin = permissions.includes(ADMIN_PERMISSION);
   const [userDashboards, setUserDashboards] = useState<Option[]>([]);
   const [userStreams, setUserStreams] = useState<Option[]>([]);
@@ -108,16 +110,27 @@ const useStartPageEntities = (userId, permissions) => {
     }
   }, [selectedUserIsAdmin, userId]);
 
+  const prepareOptions = () => {
+    switch (startpage?.type) {
+      case 'dashboard':
+        return [...userDashboards, ...allDashboardsOptions];
+      case 'search':
+        return [{ value: 'default', label: 'New Search' }, ...userSearches, ...allSearchesOptions];
+      case 'stream':
+        return [...userStreams, ...allStreamsOptions];
+      default:
+        return [];
+    }
+  };
+
   return {
-    dashboards: [...userDashboards, ...allDashboardsOptions],
-    streams: [...userStreams, ...allStreamsOptions],
-    searches: [{ value: 'default', label: 'New Search' }, ...userSearches, ...allSearchesOptions],
+    options: prepareOptions(),
     isLoading: isLoadingUserEntities || isLoadingAllDashboards || isLoadingAllSearches || isLoadingAllStreams,
   };
 };
 
 const StartpageFormGroup = ({ userId, permissions }: Props) => {
-  const { streams, dashboards, searches, isLoading } = useStartPageEntities(userId, permissions);
+  const { options, isLoading } = useStartPageOptions(userId, permissions);
 
   if (isLoading) {
     return <Spinner />;
@@ -127,15 +140,6 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
     <Field name="startpage">
       {({ field: { name, value, onChange } }) => {
         const type = value?.type ?? 'dashboard';
-        let options: (Option | { label: string; value: string })[];
-
-        if (type === 'dashboard') {
-          options = dashboards;
-        } else if (type === 'stream') {
-          options = streams;
-        } else {
-          options = searches;
-        }
 
         const error = value?.id && options.findIndex(({ value: v }) => v === value.id) < 0
           ? <Alert bsStyle="warning">User is missing permission for the configured page</Alert>
