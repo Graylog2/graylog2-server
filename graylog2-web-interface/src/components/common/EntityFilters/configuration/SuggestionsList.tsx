@@ -22,7 +22,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { Input, ListGroupItem } from 'components/bootstrap';
 import type { Attribute } from 'stores/PaginationTypes';
-import type { Filter } from 'components/common/EntityFilters/types';
+import type { Filter, Filters } from 'components/common/EntityFilters/types';
 import { PaginatedList } from 'components/common';
 import generateId from 'logic/generateId';
 import UserNotification from 'util/UserNotification';
@@ -69,7 +69,7 @@ const DEFAULT_QUERY = {
 
 const Container = styled.div(({ theme }) => css`
   color: ${theme.colors.global.textDefault};
-  padding: 3px 5px;
+  padding: 3px 10px;
 `);
 
 const SearchInput = styled(Input)`
@@ -113,9 +113,11 @@ type Props = {
   attribute: Attribute,
   filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined,
   onSubmit: (filter: Filter) => void,
+  allActiveFilters: Filters | undefined,
+  scenario: 'create' | 'edit'
 }
 
-const StaticOptionsList = ({ attribute, filterValueRenderer, onSubmit }: Props) => {
+const StaticOptionsList = ({ attribute, filterValueRenderer, onSubmit, allActiveFilters, scenario }: Props) => {
   const [searchParams, setSearchParams] = useState(DEFAULT_QUERY);
   const { data: { pagination, suggestions }, isFetching } = useFilterValueSuggestions(attribute.id, searchParams);
   const handleSearchChange = useCallback((newSearchQuery: string) => {
@@ -128,12 +130,14 @@ const StaticOptionsList = ({ attribute, filterValueRenderer, onSubmit }: Props) 
 
   const debounceOnSearch = debounce((value: string) => handleSearchChange(value), 1000);
 
+  console.log({ allActiveFilters });
+
   return (
     <Container>
       <SearchInput type="text"
                    id="search-filters-input"
                    formGroupClassName=""
-                   placeholder="Search for filters"
+                   placeholder="Search for entity"
                    onChange={({ target: { value } }) => debounceOnSearch(value)} />
       {(!suggestions?.length && isFetching) && <Spinner />}
 
@@ -147,19 +151,25 @@ const StaticOptionsList = ({ attribute, filterValueRenderer, onSubmit }: Props) 
                        onChange={handlePaginationChange}
                        useQueryParameter={false}>
           <StyledListGroup>
-            {suggestions.map((suggestion) => (
-              <ListGroupItem onClick={() => onSubmit({ value: suggestion.id, title: suggestion.value, id: generateId() })} key={`filter-value-${suggestion.id}`}>
-                {filterValueRenderer ? filterValueRenderer(suggestion.id, suggestion.title) : suggestion.value}
-              </ListGroupItem>
-            ))}
+            {suggestions.map((suggestion) => {
+              return (
+                <ListGroupItem onClick={() => onSubmit({ value: suggestion.id, title: suggestion.value, id: generateId() })}
+                               key={`filter-value-${suggestion.id}`}
+                               disabled={!!allActiveFilters?.[attribute.id]?.find(({ value }) => value === suggestion.id)}>
+                  {filterValueRenderer ? filterValueRenderer(suggestion.id, suggestion.value) : suggestion.value}
+                </ListGroupItem>
+              );
+            })}
           </StyledListGroup>
         </PaginatedList>
       )}
-      <Hint>
-        <i>
-          Hold Shift to select multiple
-        </i>
-      </Hint>
+      {scenario === 'create' && (
+        <Hint>
+          <i>
+            Hold Shift to select multiple
+          </i>
+        </Hint>
+      )}
     </Container>
   );
 };

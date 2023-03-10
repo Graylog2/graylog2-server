@@ -34,17 +34,16 @@ const StyledDropdownMenu = styled.ul.attrs(() => ({
   color: ${theme.colors.variant.dark.default};
   background-color: ${theme.colors.variant.lightest.default};
   box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
-  padding: 5px;
   z-index: ${$zIndex};
   
   .dropdown-header {
     color: ${theme.colors.variant.dark.default};
-    padding: 3px 5px;
+    padding: 3px 10px;
   }
   
   > li {
     > a {
-      padding: 3px 5px;
+      padding: 3px 10px;
       color: ${theme.colors.variant.darker.default};
       display: flex;
       align-items: center;

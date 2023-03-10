@@ -55,6 +55,7 @@ const ActiveFilters = ({ attributes = [], filters, filterValueRenderers, onDelet
           </FilterGroupTitle>
           {filterValues.map((filter) => (
             <ActiveFilter filter={filter}
+                          allActiveFilters={filters}
                           key={filter.id}
                           attribute={attribute}
                           filterValueRenderer={filterValueRenderers?.[attributeId]}

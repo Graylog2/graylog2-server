@@ -62,22 +62,26 @@ const AttributeSelect = ({
   </>
 );
 
-const FilterConfiguration = ({
+export const FilterConfiguration = ({
   attribute,
   onSubmit,
   filterValueRenderer,
+  allActiveFilters,
+  scenario,
 }: {
   attribute: Attribute,
   filterValueRenderer: (value: Filter['value'], title: string) => React.ReactNode | undefined,
   onSubmit: (filter: Filter) => void,
+  allActiveFilters: Filters | undefined,
+  scenario: 'create' | 'edit'
 }) => (
   <>
-    <MenuItem header>Create {attribute.title} Filter</MenuItem>
+    <MenuItem header>{scenario === 'create' ? 'Create' : 'Edit'} {attribute.title} filter</MenuItem>
     {attribute.filter_options && (
       <StaticOptionsList attribute={attribute} filterValueRenderer={filterValueRenderer} onSubmit={onSubmit} />
     )}
     {!attribute.filter_options?.length && (
-      <SuggestionsList attribute={attribute} filterValueRenderer={filterValueRenderer} onSubmit={onSubmit} />
+      <SuggestionsList attribute={attribute} filterValueRenderer={filterValueRenderer} onSubmit={onSubmit} allActiveFilters={allActiveFilters} scenario="create" />
     )}
   </>
 );
@@ -118,7 +122,9 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderers, onCr
 
           return (
             <FilterConfiguration onSubmit={_onCreateFilter}
+                                 allActiveFilters={activeFilters}
                                  attribute={selectedAttribute}
+                                 scenario="create"
                                  filterValueRenderer={filterValueRenderers?.[selectedAttributeId]} />
           );
         }}
