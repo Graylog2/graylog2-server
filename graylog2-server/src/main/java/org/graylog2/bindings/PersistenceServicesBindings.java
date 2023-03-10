@@ -20,6 +20,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
+import org.graylog2.database.suggestions.EntitySuggestionService;
+import org.graylog2.database.suggestions.MongoEntitySuggestionService;
 import org.graylog2.indexer.IndexFailureService;
 import org.graylog2.indexer.IndexFailureServiceImpl;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -59,5 +61,6 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(MongoDBSessionService.class).to(MongoDBSessionServiceImpl.class);
         bind(InputStatusService.class).to(MongoInputStatusService.class).asEagerSingleton();
         bind(EntityListPreferencesService.class).to(EntityListPreferencesServiceImpl.class);
+        bind(EntitySuggestionService.class).to(MongoEntitySuggestionService.class);
     }
 }
