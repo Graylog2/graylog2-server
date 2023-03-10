@@ -130,7 +130,7 @@ public class StreamResource extends RestResource {
             EntityAttribute.builder().id(StreamDTO.FIELD_TITLE).title("Title").searchable(true).build(),
             EntityAttribute.builder().id(StreamDTO.FIELD_DESCRIPTION).title("Description").searchable(true).build(),
             EntityAttribute.builder().id(StreamDTO.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).filterable(true).build(),
-            EntityAttribute.builder().id(StreamDTO.FIELD_INDEX_SET_ID).title("Index set id")
+            EntityAttribute.builder().id(StreamDTO.FIELD_INDEX_SET_ID).title("Index set")
                     .relatedCollection(MongoIndexSetService.COLLECTION_NAME)
                     .hidden(true)
                     .filterable(true)
