@@ -84,7 +84,7 @@ export type BooleanField = {
 
 export type InlineBinaryField = {
   additional_info: {},
-  attributes: Array<TextFieldAttributes>,
+  attributes: Array<string>,
   default_value: string,
   description: string,
   human_name: string,
@@ -94,7 +94,7 @@ export type InlineBinaryField = {
   type: 'inline_binary',
 };
 
-export type FieldValue = string | number | boolean | void
+export type FieldValue = string | number | boolean | void | Array<string>
 
 export type EncryptedFieldValue<Value> = {
   set_value?: Value,
@@ -102,4 +102,16 @@ export type EncryptedFieldValue<Value> = {
   delete_value?: boolean,
 }
 
+export const FIELD_TYPES_WITH_ENCRYPTION_SUPPORT = ['text', 'inline_binary'] as const;
+
+export type ConfigurationFieldWithEncryption = TextField | InlineBinaryField;
+
 export type ConfigurationField = BooleanField | DropdownField | InlineBinaryField | ListField | NumberField | TextField;
+
+export type ConfigurationFieldValue = FieldValue | EncryptedFieldValue<FieldValue>
+
+export type ConfigurationFormData<Configuration> = {
+  title?: string,
+  type?: string,
+  configuration: Configuration | {},
+}

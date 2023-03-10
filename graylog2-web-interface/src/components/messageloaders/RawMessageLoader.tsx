@@ -25,6 +25,7 @@ import { Select, FormSubmit } from 'components/common';
 import { Col, Row, Input } from 'components/bootstrap';
 import history from 'util/History';
 import { BooleanField, DropdownField, NumberField, TextField } from 'components/configurationforms';
+import type { ConfigurationFieldValue } from 'components/configurationforms';
 import connect from 'stores/connect';
 import type { Message } from 'views/components/messagelist/Types';
 import useForwarderMessageLoaders from 'components/messageloaders/useForwarderMessageLoaders';
@@ -231,7 +232,7 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
     setRemoteAddress(getValueFromInput(event.target));
   };
 
-  const _onCodecConfigurationChange = (field: string, value: string) => {
+  const _onCodecConfigurationChange = (field: string, value: ConfigurationFieldValue) => {
     const newConfiguration = { ...codecConfiguration, [field]: value };
     setCodecConfiguration(newConfiguration);
   };
