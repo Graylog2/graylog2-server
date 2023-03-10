@@ -21,6 +21,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.rest.RestTools;
 import org.graylog2.utilities.IpSubnet;
