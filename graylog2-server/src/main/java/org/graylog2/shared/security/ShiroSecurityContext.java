@@ -110,9 +110,6 @@ public class ShiroSecurityContext implements SecurityContext {
         final Subject newSubject = ThreadContext.getSubject();
         if (newSubject != null) {
             subject = newSubject;
-        } else {
-            LOG.info("expecting a new subject, not 'null' - old subject: {}", subject);
-            LOG.info("Current Thread ID: {}", Thread.currentThread().getId());
         }
     }
 

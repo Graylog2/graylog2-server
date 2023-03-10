@@ -45,6 +45,8 @@ public class ShiroAuthorizationFilter implements ContainerRequestFilter {
         final SecurityContext securityContext = requestContext.getSecurityContext();
         if (securityContext instanceof ShiroSecurityContext) {
             final ShiroSecurityContext context = (ShiroSecurityContext) securityContext;
+            LOG.info("logging Context for possible reuse: {}", requestContext);
+            LOG.info("logging SecurityContext for possible reuse: {}", context);
             final String userId = RestTools.getUserIdFromRequest(requestContext);
             final ContextAwarePermissionAnnotationHandler annotationHandler = new ContextAwarePermissionAnnotationHandler(context);
             final String[] requiredPermissions = annotation.value();
@@ -55,8 +57,7 @@ public class ShiroAuthorizationFilter implements ContainerRequestFilter {
                 LOG.info("Not authorized. User <{}> is missing permissions {} to perform <{} {}>",
                         userId, Arrays.toString(requiredPermissions), requestContext.getMethod(), requestContext.getUriInfo().getPath());
                 LOG.info("Headers: {}", requestContext.getHeaders());
-                LOG.info("Subject: {}", context.getSubject());
-                LOG.info("Current Thread ID: {}", Thread.currentThread().getId());
+                LOG.info("Subject/Principlal: {}", context.getSubject().getPrincipal());
                 LOG.info("full Context: {}", requestContext);
                 LOG.info("full SecurityContext: {}", context);
                 LOG.error(e.getMessage(), e);
