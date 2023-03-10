@@ -24,7 +24,7 @@ import useAppDispatch from 'stores/useAppDispatch';
 import type { Condition } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { randomColor } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 
-const exprToConditionMapper: {[name: string]: Condition} = {
+export const exprToConditionMapper: {[name: string]: Condition} = {
   '<': 'less',
   '<=': 'less_equal',
   '>=': 'greater_equal',
@@ -42,10 +42,10 @@ export const conditionToExprMapper: {[name: string]: ValueExpr} = {
 
 const useHighlightValuesForEventDefinition = () => {
   const dispatch = useAppDispatch();
-  const { aggregations, isEvent, isAlert, isEventDefinition } = useAlertAndEventDefinitionData();
+  const { aggregations } = useAlertAndEventDefinitionData();
 
   return useEffect(() => {
-    if (aggregations?.length && (isEvent || isAlert || isEventDefinition)) {
+    if (aggregations?.length) {
       const valuesToHighlight = aggregations.map(({ fnSeries, value, expr }) => ({
         value,
         field: fnSeries,
@@ -54,7 +54,7 @@ const useHighlightValuesForEventDefinition = () => {
       }));
       if (valuesToHighlight.length) dispatch(createHighlightingRules(valuesToHighlight));
     }
-  }, [aggregations, dispatch, isAlert, isEvent, isEventDefinition]);
+  }, [aggregations, dispatch]);
 };
 
 export default useHighlightValuesForEventDefinition;

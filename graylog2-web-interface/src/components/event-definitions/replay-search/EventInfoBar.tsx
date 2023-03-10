@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import lodash from 'lodash';
 import moment from 'moment';
@@ -23,7 +23,7 @@ import moment from 'moment';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
-import { FlatContentRow, HoverForHelp, Icon, Timestamp } from 'components/common';
+import { ColorPickerPopover, FlatContentRow, HoverForHelp, Icon, Timestamp } from 'components/common';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import { TIME_UNITS } from 'components/event-definitions/event-definition-types/FilterForm';
 import { useStore } from 'stores/connect';
@@ -32,8 +32,19 @@ import { Link } from 'components/common/router';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import useAppSelector from 'stores/useAppSelector';
 import { selectHighlightingRules } from 'views/logic/slices/highlightSelectors';
-import { conditionToExprMapper } from 'hooks/useHighlightValuesForEventDefinition';
-import type { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import useHighlightValuesForEventDefinition, {
+  conditionToExprMapper,
+  exprToConditionMapper,
+} from 'hooks/useHighlightValuesForEventDefinition';
+import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
+import useAppDispatch from 'stores/useAppDispatch';
+import {
+  createHighlightingRules,
+  updateHighlightingRule,
+} from 'views/logic/slices/highlightActions';
+import type HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import { randomColor } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 
 const AlertTimestamp = styled(Timestamp)(({ theme }) => css`
   color: ${theme.colors.variant.darker.warning}
@@ -83,6 +94,8 @@ const Row = styled.div`
 const useHighlightingRules = () => useAppSelector(selectHighlightingRules);
 
 const EventInfoBar = () => {
+  useHighlightValuesForEventDefinition();
+  const dispatch = useAppDispatch();
   const [open, setOpen] = useState<boolean>(true);
   const allNotifications = useStore(EventNotificationsStore, ({ all }) => {
     return all.reduce((res, cur) => {
@@ -110,28 +123,45 @@ const EventInfoBar = () => {
       return res;
     }, []);
   }, [eventDefinition, allNotifications]);
-
+  const aggregationsMap = useMemo(() => new Map(aggregations.map((agg) => [`${agg.fnSeries}${agg.expr}${agg.value}`, agg])), [aggregations]);
   const isEDUpdatedAfterEvent = !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData.timestamp) > 0;
   const highlightingRules = useHighlightingRules();
-  const highlightingColors = useMemo(() => {
-    const aggregationsSet = new Set(aggregations.map(({ fnSeries, value, expr }) => `${fnSeries}${expr}${value}`));
+  const highlightedAggregations = useMemo<Map<string, HighlightingRule>>(() => {
+    const initial = new Map<string, HighlightingRule>(aggregations.map(({ fnSeries, value, expr }) => [`${fnSeries}${expr}${value}`, undefined]));
 
-    return highlightingRules.reduce((res, rule) => {
+    return highlightingRules.reduce((acc, rule) => {
       const { field, value, condition } = rule;
-      const color = rule.color as StaticColor;
       const expr = conditionToExprMapper?.[condition];
+      let result = acc;
 
       if (expr) {
         const key = `${field}${expr}${value}`;
 
-        if (aggregationsSet.has(key)) {
-          res[key] = color.color;
+        if (acc.has(key)) {
+          result = result.set(key, rule);
         }
       }
 
-      return res;
-    }, {});
+      return result;
+    }, initial);
   }, [aggregations, highlightingRules]);
+
+  const changeColor = useCallback(({ rule, newColor, condition }) => {
+    if (rule) {
+      dispatch(updateHighlightingRule(rule, { color: StaticColor.create(newColor) }));
+    } else {
+      const { value, fnSeries, expr } = aggregationsMap.get(condition);
+
+      dispatch(createHighlightingRules([
+        {
+          value,
+          field: fnSeries,
+          color: randomColor(),
+          condition: exprToConditionMapper[expr],
+        },
+      ]));
+    }
+  }, [aggregationsMap, dispatch]);
 
   const items = [
     { title: 'Timestamp', content: <Timestamp dateTime={eventData?.timestamp} />, show: !isEventDefinition },
@@ -172,13 +202,27 @@ const EventInfoBar = () => {
       content: (
         <AggregationsList>
           {
-            Object.entries(highlightingColors).map(([condition, color]: [string, string], index, array) => {
-              const isLast = index + 1 === array.length;
+            Array.from(highlightedAggregations).map(([condition, rule]) => {
+              const color = rule?.color as StaticColor;
+              const hexColor = color?.color;
 
               return (
+                // eslint-disable-next-line react/no-array-index-key
                 <AggregationCondition title={condition} key={condition}>
-                  <ColorComponent style={{ backgroundColor: color }} />
-                  <span>{`${condition}${isLast ? '' : ','}`}</span>
+                  <ColorPickerPopover id="formatting-rule-color"
+                                      placement="right"
+                                      color={hexColor}
+                                      colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
+                                      triggerNode={(
+                                        <ColorComponent style={{ backgroundColor: hexColor }}>
+                                          {!hexColor && <Icon name="fill-drip" size="xs" />}
+                                        </ColorComponent>
+                                      )}
+                                      onChange={(newColor, _, hidePopover) => {
+                                        hidePopover();
+                                        changeColor({ newColor, rule, condition });
+                                      }} />
+                  <span>{condition}</span>
                 </AggregationCondition>
               );
             })

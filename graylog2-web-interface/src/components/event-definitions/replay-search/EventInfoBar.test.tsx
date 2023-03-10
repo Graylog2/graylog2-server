@@ -135,7 +135,7 @@ describe('<EventInfoBar />', () => {
     expect(searchWithin).toHaveTextContent('1minute');
     expect(description).toHaveTextContent('Test description');
     expect(notifications).toHaveTextContent('Email notification');
-    expect(aggregationConditions).toHaveTextContent('count(field1)>500,count(field2)<8000');
+    expect(aggregationConditions).toHaveTextContent('count(field1)>500count(field2)<8000');
 
     expect(field1Condition.children[0]).toHaveStyle({ backgroundColor: 'rgb(255, 255, 255)' });
     expect(field2Condition.children[0]).toHaveStyle({ backgroundColor: 'rgb(0, 0, 0)' });

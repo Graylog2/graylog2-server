@@ -51,9 +51,6 @@ import { execute } from 'views/logic/slices/searchExecutionSlice';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import useAppSelector from 'stores/useAppSelector';
 import { RefreshActions } from 'views/stores/RefreshStore';
-import EventInfoBar from 'components/event-definitions/replay-search/EventInfoBar';
-import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
-import useHighlightValuesForEventDefinition from 'hooks/useHighlightValuesForEventDefinition';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -118,7 +115,11 @@ const useAutoRefresh = (refresh: () => Promise<unknown>) => {
   }), [refresh]);
 };
 
-const Search = () => {
+type Props = {
+  InfoBarSlot?: React.ComponentType,
+}
+
+const Search = ({ InfoBarSlot }: Props) => {
   const dispatch = useAppDispatch();
   const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
   const { sidebar: { isShown: showSidebar } } = useSearchPageLayout();
@@ -134,9 +135,6 @@ const Search = () => {
 
     StreamsActions.refresh();
   }, []);
-
-  const { isEventDefinition, isEvent, isAlert } = useAlertAndEventDefinitionData();
-  useHighlightValuesForEventDefinition();
 
   return (
     <>
@@ -172,7 +170,7 @@ const Search = () => {
                             <SearchArea>
                               <IfInteractive>
                                 <HeaderElements />
-                                {(isEventDefinition || isEvent || isAlert) && <EventInfoBar />}
+                                {InfoBarSlot && <InfoBarSlot />}
                                 <IfDashboard>
                                   {!editingWidget && <DashboardSearchBar />}
                                 </IfDashboard>
@@ -203,6 +201,10 @@ const Search = () => {
       </WidgetFocusProvider>
     </>
   );
+};
+
+Search.defaultProps = {
+  InfoBarSlot: undefined,
 };
 
 export default Search;

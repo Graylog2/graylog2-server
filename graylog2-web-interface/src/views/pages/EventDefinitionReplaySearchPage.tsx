@@ -24,12 +24,19 @@ import SearchPage from 'views/pages/SearchPage';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import useCreateViewForEventDefinition from 'views/logic/views/UseCreateViewForEventDefinition';
+import EventInfoBar from 'components/event-definitions/replay-search/EventInfoBar';
 
 const EventView = () => {
   const { eventDefinition, aggregations } = useAlertAndEventDefinitionData();
   const view = useCreateViewForEventDefinition({ eventDefinition, aggregations });
 
-  return <SearchPage view={view} isNew />;
+  return (
+    <SearchPage view={view}
+                isNew
+                SearchComponentSlots={{
+                  InfoBarSlot: EventInfoBar,
+                }} />
+  );
 };
 
 const EventDefinitionReplaySearchPage = () => {
