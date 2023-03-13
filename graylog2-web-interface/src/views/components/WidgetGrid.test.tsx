@@ -18,16 +18,15 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { mount } from 'wrappedEnzyme';
 
-import { MockStore, asMock } from 'helpers/mocking';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Widget from 'views/components/widgets/Widget';
 import _Widget from 'views/logic/widgets/Widget';
 import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
-import ViewState from 'views/logic/views/ViewState';
-import mockAction from 'helpers/mocking/MockAction';
-import { createSearch as mockCreateSearch } from 'fixtures/searches';
-import { ViewStore } from 'views/stores/ViewStore';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import type View from 'views/logic/views/View';
+import { createViewWithWidgets } from 'fixtures/searches';
 
 import WidgetGrid from './WidgetGrid';
 
@@ -35,54 +34,26 @@ jest.mock('./widgets/Widget', () => () => 'widget');
 // eslint-disable-next-line react/prop-types
 jest.mock('components/common/ReactGridContainer', () => ({ children }) => <span>{children}</span>);
 
-jest.mock('graylog-web-plugin/plugin', () => ({
-  PluginStore: {
-    exports: (key) => (key !== 'enterpriseWidgets' ? [] : [
-      {
-        type: 'dummy',
-        displayName: 'Some Dummy Visualization',
-        defaultHeight: 5,
-        defaultWidth: 6,
-      },
-    ]),
-  },
-}));
-
 jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
 
-jest.mock('views/stores/ViewStore', () => ({
-  ViewActions: {
-    loadNew: mockAction(),
-    load: mockAction(),
-  },
-  ViewStore: MockStore(['getInitialState', jest.fn(() => ({
-    view: mockCreateSearch({ queryId: 'foobar' }),
-    activeQuery: 'foobar',
-  }))]),
-}));
+const fieldTypes: FieldTypes = {
+  all: Immutable.List(),
+  queryFields: Immutable.Map(),
+};
+const SimpleWidgetGrid = ({ view }: { view?: View }) => (
+  <TestStoreProvider view={view}>
+    <FieldTypesContext.Provider value={fieldTypes}><WidgetGrid /></FieldTypesContext.Provider>
+  </TestStoreProvider>
+);
+
+SimpleWidgetGrid.defaultProps = {
+  view: undefined,
+};
 
 describe('<WidgetGrid />', () => {
-  beforeEach(() => {
-    const activeQuery = 'foobar';
-    const widget = _Widget.builder().type('dummy').id('widget1').build();
-    const positions = {
-      widget1: new WidgetPosition(1, 1, 1, 1),
-    };
-    const viewState = ViewState.builder()
-      .widgets([widget])
-      .widgetPositions(positions)
-      .build();
-    const view = mockCreateSearch({ queryId: activeQuery }).toBuilder()
-      .state({ [activeQuery]: viewState })
-      .build();
-    asMock(ViewStore.getInitialState).mockReturnValue({ view, activeQuery, dirty: false, isNew: false });
-  });
+  beforeAll(loadViewsPlugin);
 
-  const fieldTypes: FieldTypes = {
-    all: Immutable.List(),
-    queryFields: Immutable.Map(),
-  };
-  const SimpleWidgetGrid = () => <FieldTypesContext.Provider value={fieldTypes}><WidgetGrid /></FieldTypesContext.Provider>;
+  afterAll(unloadViewsPlugin);
 
   it('should render with minimal props', () => {
     const wrapper = mount(<SimpleWidgetGrid />);
@@ -91,13 +62,27 @@ describe('<WidgetGrid />', () => {
   });
 
   it('should render with widgets passed', () => {
-    const wrapper = mount(<SimpleWidgetGrid />);
+    const widgets = [_Widget.builder().type('dummy').id('widget1').build()];
+    const positions = {
+      widget1: new WidgetPosition(1, 1, 1, 1),
+    };
+
+    const viewWithWidgets = createViewWithWidgets(widgets, positions);
+
+    const wrapper = mount(<SimpleWidgetGrid view={viewWithWidgets} />);
 
     expect(wrapper.find(Widget)).toHaveLength(1);
   });
 
   it('should render widget even if widget has no data', () => {
-    const wrapper = mount(<SimpleWidgetGrid />);
+    const widgets = [_Widget.builder().type('dummy').id('widget1').build()];
+    const positions = {
+      widget1: new WidgetPosition(1, 1, 1, 1),
+    };
+
+    const viewWithWidgets = createViewWithWidgets(widgets, positions);
+
+    const wrapper = mount(<SimpleWidgetGrid view={viewWithWidgets} />);
 
     expect(wrapper.find(Widget)).toHaveLength(1);
   });

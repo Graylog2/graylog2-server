@@ -15,12 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import View from 'views/logic/views/View';
-import { WidgetActions } from 'views/stores/WidgetStore';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import DataTable from 'views/components/datatable/DataTable';
 import type { CreatorProps } from 'views/components/sidebar/create/AddWidgetButton';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import { addWidget } from 'views/logic/slices/widgetActions';
+import type { GetState } from 'views/types';
+import { selectView } from 'views/logic/slices/viewSelectors';
 
 export const CreateCustomAggregation = ({ view }: CreatorProps) => AggregationWidget.builder()
   .newId()
@@ -32,5 +35,8 @@ export const CreateCustomAggregation = ({ view }: CreatorProps) => AggregationWi
     .build())
   .build();
 
-const AddCustomAggregation = (props: CreatorProps) => WidgetActions.create(CreateCustomAggregation(props));
-export default AddCustomAggregation;
+export default () => (dispatch: AppDispatch, getState: GetState) => {
+  const view = selectView(getState());
+
+  return dispatch(addWidget(CreateCustomAggregation({ view })));
+};

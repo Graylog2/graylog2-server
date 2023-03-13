@@ -36,8 +36,9 @@ const StyledButton = styled(Button)(({ theme }) => css`
   &&&& {
     color: ${theme.colors.variant.darker.default};
     
-    :hover, :focus {
-      text-decoration: none;  
+    :hover,
+    :focus {
+      text-decoration: none;
     }
 
     :hover {
@@ -48,7 +49,6 @@ const StyledButton = styled(Button)(({ theme }) => css`
       color: ${theme.colors.global.textDefault};
 
       ${activeIndicatorStyles(theme)}
-
       :hover, :focus {
         ${activeIndicatorStyles(theme)}
       }

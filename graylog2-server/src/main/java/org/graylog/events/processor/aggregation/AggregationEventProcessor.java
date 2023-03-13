@@ -44,6 +44,7 @@ import org.graylog.events.search.MoreSearch;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.errors.ParameterExpansionError;
 import org.graylog.plugins.views.search.errors.SearchException;
+import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
@@ -131,6 +132,11 @@ public class AggregationEventProcessor implements EventProcessor {
                 LOG.error(msg);
                 throw new EventProcessorPreconditionException(msg, eventDefinition, e);
             }
+        } catch (ElasticsearchException e) {
+            final String msg = String.format(Locale.ROOT, "Couldn't run aggregation <%s/%s> because of search error: %s",
+                    eventDefinition.title(), eventDefinition.id(), e.getMessage());
+            LOG.error(msg);
+            throw new EventProcessorPreconditionException(msg, eventDefinition, e);
         }
 
         // Update the state for this processor! This state will be used for dependency checks between event processors.
@@ -270,7 +276,8 @@ public class AggregationEventProcessor implements EventProcessor {
     }
 
     @VisibleForTesting
-    ImmutableList<EventWithContext> eventsFromAggregationResult(EventFactory eventFactory, AggregationEventProcessorParameters parameters, AggregationResult result) {
+    ImmutableList<EventWithContext> eventsFromAggregationResult(EventFactory eventFactory, AggregationEventProcessorParameters parameters, AggregationResult result)
+            throws EventProcessorException {
         final ImmutableList.Builder<EventWithContext> eventsWithContext = ImmutableList.builder();
         final Set<String> sourceStreams = eventStreamService.buildEventSourceStreams(getStreams(parameters),
                 result.sourceStreams());
@@ -312,7 +319,13 @@ public class AggregationEventProcessor implements EventProcessor {
             //   application_name=sshd
             //   username=jane
             for (int i = 0; i < config.groupBy().size(); i++) {
-                fields.put(config.groupBy().get(i), keyResult.key().get(i));
+                try {
+                    fields.put(config.groupBy().get(i), keyResult.key().get(i));
+                } catch (IndexOutOfBoundsException e) {
+                    throw new EventProcessorException(
+                            "Couldn't create events for: " + eventDefinition.title() + " (possibly due to non-existing grouping fields)",
+                            false, eventDefinition.id(), eventDefinition, e);
+                }
             }
 
             // Group By fields need to be saved on the event so they are available to the subsequent notification events

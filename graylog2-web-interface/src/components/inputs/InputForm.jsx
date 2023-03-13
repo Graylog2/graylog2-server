@@ -20,6 +20,8 @@ import jQuery from 'jquery';
 
 import { NodeOrGlobalSelect } from 'components/inputs';
 import { ConfigurationForm } from 'components/configurationforms';
+import HideOnCloud from 'util/conditional/HideOnCloud';
+import AppConfig from 'util/AppConfig';
 
 class InputForm extends React.Component {
   static propTypes = {
@@ -41,6 +43,8 @@ class InputForm extends React.Component {
   constructor(props) {
     super(props);
 
+    this.configurationForm = React.createRef();
+
     this.state = {
       global: this.props.globalValue !== undefined ? this.props.globalValue : false,
       node: this.props.nodeValue !== undefined ? this.props.nodeValue : undefined,
@@ -55,14 +59,18 @@ class InputForm extends React.Component {
   };
 
   _onSubmit = (data) => {
-    const newData = jQuery.extend(data, { global: this.state.global, node: this.state.node });
-
+    const newData = jQuery.extend(data, {
+      global: AppConfig.isCloud() || this.state.global,
+      node: this.state.node,
+    });
     this.props.submitAction(newData);
   };
 
   // eslint-disable-next-line react/no-unused-class-component-methods
   open = () => {
-    this.configurationForm.open();
+    if (this.configurationForm.current) {
+      this.configurationForm.current.open();
+    }
   };
 
   getValues = () => {
@@ -72,8 +80,8 @@ class InputForm extends React.Component {
       return values;
     }
 
-    if (this.configurationForm) {
-      return this.configurationForm.getValue().configuration;
+    if (this.configurationForm.current) {
+      return this.configurationForm.current.getValue().configuration;
     }
 
     return {};
@@ -86,8 +94,8 @@ class InputForm extends React.Component {
       return titleValue;
     }
 
-    if (this.configurationForm) {
-      return this.configurationForm.getValue().titleValue;
+    if (this.configurationForm.current) {
+      return this.configurationForm.current.getValue().titleValue;
     }
 
     return '';
@@ -99,11 +107,13 @@ class InputForm extends React.Component {
 
     return (
       <ConfigurationForm {...this.props}
-                         ref={(configurationForm) => { this.configurationForm = configurationForm; }}
+                         ref={this.configurationForm}
                          values={values}
                          titleValue={titleValue}
                          submitAction={this._onSubmit}>
-        <NodeOrGlobalSelect onChange={this._handleChange} global={this.state.global} node={this.state.node} />
+        <HideOnCloud>
+          <NodeOrGlobalSelect onChange={this._handleChange} global={this.state.global} node={this.state.node} />
+        </HideOnCloud>
       </ConfigurationForm>
     );
   }

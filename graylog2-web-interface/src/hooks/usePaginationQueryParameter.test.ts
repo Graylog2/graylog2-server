@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook, act } from '@testing-library/react-hooks';
+import { renderHook, act } from 'wrappedTestingLibrary/hooks';
 import { useLocation } from 'react-router-dom';
 import type { Location } from 'history';
 
@@ -141,5 +141,24 @@ describe('usePaginationQueryParameter custom hook', () => {
     result.current.resetPage();
 
     expect(mockHistoryReplace).toHaveBeenCalledWith(`example.org?page=1&pageSize=${currentPageSize}`);
+  });
+
+  it('should always use provided page size and not update pageSize query param, when syncPageSizeFromQuery is false', () => {
+    const queryParamsPage = 3;
+    const providedPageSize = 20;
+
+    asMock(useLocation).mockReturnValue({
+      search: `?page=${queryParamsPage}&pageSize=50`,
+      pathname: 'example.org',
+    } as Location<{ search: string }>);
+
+    const { result } = renderHook(() => usePaginationQueryParameter(undefined, providedPageSize, false));
+
+    expect(result.current.page).toEqual(queryParamsPage);
+    expect(result.current.pageSize).toEqual(providedPageSize);
+
+    result.current.setPagination({ page: 4, pageSize: 100 });
+
+    expect(mockHistoryReplace).toHaveBeenCalledWith('example.org?page=4');
   });
 });

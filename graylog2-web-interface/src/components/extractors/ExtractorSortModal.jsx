@@ -26,30 +26,22 @@ class ExtractorSortModal extends React.Component {
   static propTypes = {
     input: PropTypes.object.isRequired,
     extractors: PropTypes.array.isRequired,
+    onClose: PropTypes.func.isRequired,
+    onSort: PropTypes.func.isRequired,
   };
 
   constructor(props) {
     super(props);
 
     this.state = {
-      showModal: false,
       sortedExtractors: props.extractors,
     };
   }
 
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  open = () => {
-    this.setState({ showModal: true });
-  };
-
-  close = () => {
-    this.setState({ showModal: false });
-  };
-
   _cancel = () => {
-    const { extractors } = this.props;
+    const { extractors, onClose } = this.props;
 
-    this.close();
+    onClose();
 
     this.setState({
       sortedExtractors: extractors,
@@ -63,24 +55,25 @@ class ExtractorSortModal extends React.Component {
   };
 
   _saveSorting = async () => {
-    const { input } = this.props;
+    const { input, onClose, onSort } = this.props;
     const { sortedExtractors } = this.state;
 
     if (!sortedExtractors) {
-      this.close();
+      onClose();
     }
 
     await ExtractorsActions.order.triggerPromise(input.id, sortedExtractors);
 
-    this.close();
+    onSort();
+    onClose();
   };
 
   render() {
-    const { sortedExtractors, showModal } = this.state;
+    const { sortedExtractors } = this.state;
     const { input } = this.props;
 
     return (
-      <BootstrapModalWrapper showModal={showModal}
+      <BootstrapModalWrapper showModal
                              onHide={this._cancel}>
         <Modal.Header closeButton>
           <Modal.Title>

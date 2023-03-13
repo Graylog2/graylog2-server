@@ -40,7 +40,7 @@ const SimulationChangesWrap = styled.div`
     padding: 3px 9px 1px;
 
     &::after {
-      content: ": ";
+      content: ': ';
     }
 
     &:first-child {

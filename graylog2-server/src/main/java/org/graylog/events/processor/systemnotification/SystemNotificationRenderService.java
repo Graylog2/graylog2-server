@@ -28,6 +28,7 @@ import org.graylog2.notifications.NotificationService;
 
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.NotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -69,9 +70,9 @@ public class SystemNotificationRenderService {
                         tcHTML));
     }
 
-    public RenderResponse render(Notification.Type type, Format format, Map<String, Object> values) {
-        Notification notification = notificationService.getByType(type)
-                .orElseThrow(() -> new IllegalArgumentException(f("Event type <%s> is not currently active", type)));
+    public RenderResponse render(Notification.Type type, String key, Format format, Map<String, Object> values) {
+        Notification notification = notificationService.getByTypeAndKey(type, key)
+                .orElseThrow(() -> new NotFoundException(f("Event type <%s/%s> is not currently active", type, key)));
         return render(notification, format, values);
     }
 

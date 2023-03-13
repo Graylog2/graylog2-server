@@ -27,11 +27,11 @@ import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import * as FormsUtils from 'util/FormsUtils';
-import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import { isPermitted } from 'util/PermissionsMixin';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
 import generateId from 'logic/generateId';
+import parseSearch from 'views/logic/slices/parseSearch';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -97,7 +97,7 @@ class FilterForm extends React.Component {
       .queries([query])
       .build();
 
-    SearchMetadataActions.parseSearch(search).then((res) => {
+    parseSearch(search).then((res) => {
       this._syncParamsWithQuery(res.undeclared);
     });
   }, 250);

@@ -56,7 +56,7 @@ const StatusCell = ({ stream }: Props) => {
     <StatusLabel bsStyle={stream.disabled ? 'warning' : 'success'}
                  onClick={disableChange ? undefined : toggleStreamStatus}
                  $clickable={!disableChange}>
-      {stream.disabled ? 'Stopped' : 'Running'}
+      {stream.disabled ? 'Paused' : 'Running'}
       {!disableChange && (
         <>
           <Spacer />
