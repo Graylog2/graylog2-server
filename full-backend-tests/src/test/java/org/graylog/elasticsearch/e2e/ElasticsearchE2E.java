@@ -39,18 +39,18 @@ public class ElasticsearchE2E {
     void inputMessageCanBeSearched() {
         int mappedPort = this.api.backend().mappedPortFor(GELF_HTTP_PORT);
 
-        GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, this.api);
+        GelfInputUtils.createGelfHttpInput(mappedPort, GELF_HTTP_PORT, api.requestSpecificationSupplier());
 
         GelfInputUtils.postMessage(mappedPort,
                 "{\"short_message\":\"kram\", \"host\":\"example.org\", \"facility\":\"test\"}",
-                this.api);
+                api.requestSpecificationSupplier());
 
         List<String> messages = SearchUtils.searchForAllMessages(this.api.requestSpecificationSupplier());
         assertThat(messages).doesNotContain("Hello there");
 
         GelfInputUtils.postMessage(mappedPort,
                 "{\"short_message\":\"Hello there\", \"host\":\"example.org\", \"facility\":\"test\"}",
-                this.api);
+                api.requestSpecificationSupplier());
 
         assertThat(SearchUtils.waitForMessage(this.api.requestSpecificationSupplier(), "Hello there")).isTrue();
     }

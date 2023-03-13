@@ -18,9 +18,11 @@ package org.graylog.testing.utils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.restassured.path.json.JsonPath;
+import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import static io.restassured.RestAssured.given;
 
@@ -39,9 +41,9 @@ public class UserUtils {
                               ) {
     }
 
-    public static JsonPath createUser(GraylogApis api, User user) {
+    public static JsonPath createUser(Supplier<RequestSpecification> spec, User user) {
         given()
-                .spec(api.requestSpecification())
+                .spec(spec.get())
                 .when()
                 .body(user)
                 .post("/users")
@@ -49,12 +51,12 @@ public class UserUtils {
                 .log().ifError()
                 .statusCode(201);
 
-        return getUserInfo(api, user.username);
+        return getUserInfo(spec, user.username);
     }
 
-    public static JsonPath getUserInfo(GraylogApis api, String username) {
+    public static JsonPath getUserInfo(Supplier<RequestSpecification> spec, String username) {
         return given()
-                .spec(api.requestSpecification())
+                .spec(spec.get())
                 .when()
                 .get("/users/" + username)
                 .then()

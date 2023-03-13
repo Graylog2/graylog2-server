@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.function.Supplier;
 
 import static io.restassured.RestAssured.given;
 
@@ -35,10 +36,10 @@ public final class GelfInputUtils {
     private GelfInputUtils() {
     }
 
-    public static void createGelfHttpInput(int mappedPort, int gelfHttpPort, GraylogApis api) {
+    public static void createGelfHttpInput(int mappedPort, int gelfHttpPort, Supplier<RequestSpecification> spec) {
 
         final ArrayList<Integer> inputs = given()
-                .spec(api.requestSpecification())
+                .spec(spec.get())
                 .expect()
                 .response()
                 .statusCode(200)
@@ -55,25 +56,25 @@ public final class GelfInputUtils {
                     null);
 
             given()
-                    .spec(api.requestSpecification())
+                    .spec(spec.get())
                     .body(request)
                     .expect().response().statusCode(201)
                     .when()
                     .post("/system/inputs");
         }
 
-        waitForGelfInputOnPort(mappedPort, api);
+        waitForGelfInputOnPort(mappedPort, spec);
     }
 
-    private static void waitForGelfInputOnPort(int mappedPort, GraylogApis api) {
+    private static void waitForGelfInputOnPort(int mappedPort, Supplier<RequestSpecification> spec) {
         WaitUtils.waitFor(
-                () -> gelfInputIsListening(mappedPort, api),
+                () -> gelfInputIsListening(mappedPort, spec),
                 "Timed out waiting for GELF input listening on port " + mappedPort);
     }
 
-    private static boolean gelfInputIsListening(int mappedPort, GraylogApis api) {
+    private static boolean gelfInputIsListening(int mappedPort, Supplier<RequestSpecification> spec) {
         try {
-            gelfEndpoint(mappedPort, api)
+            gelfEndpoint(mappedPort, spec)
                     .expect().response().statusCode(200)
                     .when()
                     .options();
@@ -84,17 +85,17 @@ public final class GelfInputUtils {
         }
     }
 
-    private static RequestSpecification gelfEndpoint(int mappedPort, GraylogApis api) {
+    private static RequestSpecification gelfEndpoint(int mappedPort, Supplier<RequestSpecification> spec) {
         return given()
-                .spec(api.requestSpecification())
+                .spec(spec.get())
                 .basePath("/gelf")
                 .port(mappedPort);
     }
 
     public static void postMessage(int mappedPort,
                                    @SuppressWarnings("SameParameterValue") String messageJson,
-                                   GraylogApis api) {
-        gelfEndpoint(mappedPort, api)
+                                   Supplier<RequestSpecification> spec) {
+        gelfEndpoint(mappedPort, spec)
                 .body(messageJson)
                 .expect().response().statusCode(202)
                 .when()
