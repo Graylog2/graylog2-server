@@ -144,12 +144,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_CREATE)
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_CREATE)
     public RuleSource createFromParser(@ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
-        final Rule rule;
-        try {
-            rule = pipelineRuleParser.parseRule(ruleSource.id(), ruleSource.source(), false);
-        } catch (ParseException e) {
-            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
-        }
+        final Rule rule = parseRuleOrThrow(ruleSource.id(), ruleSource.source(), false);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final RuleDao newRuleSource = RuleDao.builder()
                 .title(rule.name()) // use the name from the parsed rule source.
@@ -171,18 +166,20 @@ public class RuleResource extends RestResource implements PluginRestResource {
         return RuleSource.fromDao(pipelineRuleParser, save);
     }
 
+    private Rule parseRuleOrThrow(String ruleId, String source, boolean silent) {
+        try {
+            return pipelineRuleParser.parseRule(ruleId, source, silent);
+        } catch (ParseException e) {
+            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
+        }
+    }
+
     @ApiOperation(value = "Parse a processing rule without saving it", notes = "")
     @POST
     @Path("/parse")
     @NoAuditEvent("only used to parse a rule, no changes made in the system")
     public RuleSource parse(@ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
-        final Rule rule;
-        try {
-            // be silent about parse errors here, many requests will result in invalid syntax
-            rule = pipelineRuleParser.parseRule(ruleSource.id(), ruleSource.source(), true);
-        } catch (ParseException e) {
-            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
-        }
+        final Rule rule = parseRuleOrThrow(ruleSource.id(), ruleSource.source(), true);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         return RuleSource.builder()
                 .title(rule.name())
@@ -202,13 +199,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
             @ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource,
             @ApiParam(name = "messageString", required = true) @PathParam("messageString") @NotBlank String messageString
     ) throws NotFoundException {
-        final Rule rule;
-        try {
-            rule = pipelineRuleParser.parseRule(ruleSource.id(), ruleSource.source(), true);
-        } catch (ParseException e) {
-            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
-        }
-
+        final Rule rule = parseRuleOrThrow(ruleSource.id(), ruleSource.source(), true);
         Stage stage = Stage.builder()
                 .stage(0)
                 .ruleReferences(Collections.emptyList())
@@ -338,12 +329,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_EDIT, id);
 
         final RuleDao ruleDao = ruleService.load(id);
-        final Rule rule;
-        try {
-            rule = pipelineRuleParser.parseRule(id, update.source(), false);
-        } catch (ParseException e) {
-            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
-        }
+        final Rule rule = parseRuleOrThrow(id, update.source(), false);
         final RuleDao toSave = ruleDao.toBuilder()
                 .title(rule.name())
                 .description(update.description())
