@@ -20,10 +20,9 @@ import { useMemo, useState, useCallback, useRef } from 'react';
 import type * as Immutable from 'immutable';
 import { merge } from 'lodash';
 
-import { Button, Table, ButtonGroup, ButtonToolbar } from 'components/bootstrap';
+import { Table, ButtonGroup } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
-import StringUtils from 'util/StringUtils';
 import ColumnsVisibilitySelect from 'components/common/EntityDataTable/ColumnsVisibilitySelect';
 import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
 import { CELL_PADDING, BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
@@ -32,6 +31,7 @@ import useElementDimensions from 'hooks/useElementDimensions';
 import type { Sort } from 'stores/PaginationTypes';
 import { PageSizeSelect } from 'components/common';
 
+import BulkActionsRow from './BulkActionsRow';
 import TableHead from './TableHead';
 import TableRow from './TableRow';
 import type { ColumnRenderers, Column, EntityBase } from './types';
@@ -55,15 +55,6 @@ const ActionsRow = styled.div`
   justify-content: space-between;
   margin-bottom: 10px;
   min-height: 22px;
-`;
-
-const BulkActionsWrapper = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const BulkActions = styled(ButtonToolbar)`
-  margin-left: 5px;
 `;
 
 const LayoutConfigRow = styled.div`
@@ -126,7 +117,7 @@ type Props<Entity extends EntityBase> = {
   /** Currently active sort */
   activeSort?: Sort,
   /** Supported batch operations */
-  bulkActions?: (selectedEntities: Array<string>, setSelectedEntities: (streamIds: Array<string>) => void) => React.ReactNode
+  bulkActions?: (selectedEntities: Array<string>, setSelectedEntities: (streamIds: Array<string>) => void) => React.ReactNode,
   /** List of all available columns. */
   columnDefinitions: Array<Column>,
   /** Custom cell and header renderer for a column */
@@ -199,20 +190,14 @@ const EntityDataTable = <Entity extends EntityBase>({
     }));
   }, []);
 
-  const unselectAllItems = useCallback(() => setSelectedEntities([]), []);
-
   return (
     <>
       <ActionsRow>
         <div>
-          {(displayBulkSelectCol && !!selectedEntities?.length) && (
-            <BulkActionsWrapper>
-              {selectedEntities.length} {StringUtils.pluralize(selectedEntities.length, 'item', 'items')} selected
-              <BulkActions>
-                {bulkActions(selectedEntities, setSelectedEntities)}
-                <Button bsSize="xsmall" onClick={unselectAllItems}>Cancel</Button>
-              </BulkActions>
-            </BulkActionsWrapper>
+          {displayBulkSelectCol && (
+            <BulkActionsRow bulkActions={bulkActions}
+                            selectedEntities={selectedEntities}
+                            setSelectedEntities={setSelectedEntities} />
           )}
         </div>
         <LayoutConfigRow>

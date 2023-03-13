@@ -23,14 +23,14 @@ import UserNotification from 'util/UserNotification';
 
 export const urlPrefix = '/favorites';
 
-const putFavoriteItem = async (id: string) => {
-  const url = `${urlPrefix}/${id}`;
+const putFavoriteItem = async (grn: string) => {
+  const url = `${urlPrefix}/${grn}`;
 
   return fetch('PUT', qualifyUrl(url));
 };
 
-const deleteFavoriteItem = (id: string) => {
-  const url = `${urlPrefix}/${id}`;
+const deleteFavoriteItem = (grn: string) => {
+  const url = `${urlPrefix}/${grn}`;
 
   return fetch('DELETE', qualifyUrl(url));
 };

@@ -42,7 +42,7 @@ import AggregationWizard from '../AggregationWizard';
 
 jest.mock('views/hooks/useAggregationFunctions');
 
-const extendedTimeout = applyTimeoutMultiplier(15000);
+const extendedTimeout = applyTimeoutMultiplier(30000);
 
 const fieldType = new FieldType('field_type', ['numeric'], []);
 const fieldTypeMapping1 = new FieldTypeMapping('took_ms', fieldType);
@@ -171,7 +171,7 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  });
+  }, extendedTimeout);
 
   it('should configure another sort element', async () => {
     const onChangeMock = jest.fn();

@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeAll;
 import java.util.Collections;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -58,31 +59,33 @@ public class FavoritesIT {
 
     @ContainerMatrixTest
     void testCreateDeleteFavorite() {
+        var grn = "grn::::search_filter:63d39fa82ba2606a6710a545";
+
         given()
                 .spec(requestSpec)
-                .auth().preemptive().basic("john.doe1", "asdfgh")
+                .auth().basic("john.doe1", "asdfgh")
                 .when()
-                .put("/favorites/1")
+                .put("/favorites/" + grn)
                 .then()
                 .log().ifStatusCodeMatches(not(204))
                 .statusCode(204);
 
         var validatableResponse = given()
                 .spec(requestSpec)
-                .auth().preemptive().basic("john.doe1", "asdfgh")
+                .auth().basic("john.doe1", "asdfgh")
                 .when()
                 .get("/favorites")
                 .then()
                 .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
-        validatableResponse.assertThat().body("favorites[0].id", equalTo("1"));
+        validatableResponse.assertThat().body("favorites[0].grn", equalTo(grn));
 
         given()
                 .spec(requestSpec)
-                .auth().preemptive().basic("john.doe1", "asdfgh")
+                .auth().basic("john.doe1", "asdfgh")
                 .when()
-                .delete("/favorites/1")
+                .delete("/favorites/" + grn)
                 .then()
                 .log().ifStatusCodeMatches(not(204))
                 .statusCode(204);

@@ -14,11 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.favorites;
+package org.graylog2.database.suggestions;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.shiro.subject.Subject;
 
-public record FavoriteDTO(@JsonProperty(FIELD_ID) String id, @JsonProperty(FIELD_TYPE) String type) {
-    public static final String FIELD_ID = "id";
-    public static final String FIELD_TYPE = "type";
+public interface EntitySuggestionService {
+
+    EntitySuggestionResponse suggest(final String collection,
+                                     final String valueColumn,
+                                     final String query,
+                                     final int page,
+                                     final int perPage,
+                                     final Subject subject);
 }

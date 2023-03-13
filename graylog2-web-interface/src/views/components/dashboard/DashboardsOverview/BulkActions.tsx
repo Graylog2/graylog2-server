@@ -18,11 +18,12 @@ import * as React from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
-import { Button } from 'components/bootstrap';
+import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import StringUtils from 'util/StringUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
+import MenuItem from 'components/bootstrap/MenuItem';
 
 const VIEWS_BULK_DELETE_API_ROUTE = '/views/bulk_delete';
 
@@ -62,7 +63,9 @@ const BulkActions = ({ selectedDashboardIds, setSelectedDashboardIds }: Props) =
   }, [descriptor, queryClient, selectedItemsAmount, selectedDashboardIds, setSelectedDashboardIds]);
 
   return (
-    <Button bsSize="xsmall" bsStyle="danger" onClick={onDelete}>Delete</Button>
+    <BulkActionsDropdown selectedEntities={selectedDashboardIds} setSelectedEntities={setSelectedDashboardIds}>
+      <MenuItem onSelect={onDelete}>Delete</MenuItem>
+    </BulkActionsDropdown>
   );
 };
 

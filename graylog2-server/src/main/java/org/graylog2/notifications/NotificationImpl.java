@@ -34,12 +34,14 @@ import java.util.Map;
 @CollectionName("notifications")
 public class NotificationImpl extends PersistedImpl implements Notification {
     static final String FIELD_TYPE = "type";
+    static final String FIELD_KEY = "key";
     static final String FIELD_SEVERITY = "severity";
     static final String FIELD_TIMESTAMP = "timestamp";
     static final String FIELD_NODE_ID = "node_id";
     static final String FIELD_DETAILS = "details";
 
     private Type type;
+    private String key;
     private Severity severity;
     private DateTime timestamp;
     private String node_id;
@@ -51,6 +53,7 @@ public class NotificationImpl extends PersistedImpl implements Notification {
         this.severity = Severity.valueOf(((String) fields.get(FIELD_SEVERITY)).toUpperCase(Locale.ENGLISH));
         this.timestamp = new DateTime(fields.get(FIELD_TIMESTAMP), DateTimeZone.UTC);
         this.node_id = (String) fields.get(FIELD_NODE_ID);
+        this.key = (String) fields.get(FIELD_KEY);
     }
 
     protected NotificationImpl(Map<String, Object> fields) {
@@ -60,6 +63,7 @@ public class NotificationImpl extends PersistedImpl implements Notification {
         this.severity = Severity.valueOf(((String) fields.get(FIELD_SEVERITY)).toUpperCase(Locale.ENGLISH));
         this.timestamp = new DateTime(fields.get(FIELD_TIMESTAMP), DateTimeZone.UTC);
         this.node_id = (String) fields.get(FIELD_NODE_ID);
+        this.key = (String) fields.get(FIELD_KEY);
     }
 
     public NotificationImpl() {
@@ -70,6 +74,13 @@ public class NotificationImpl extends PersistedImpl implements Notification {
     public Notification addType(Type type) {
         this.type = type;
         fields.put(FIELD_TYPE, type.toString().toLowerCase(Locale.ENGLISH));
+        return this;
+    }
+
+    @Override
+    public Notification addKey(String key) {
+        this.key = key;
+        fields.put(FIELD_KEY, key);
         return this;
     }
 
@@ -101,6 +112,11 @@ public class NotificationImpl extends PersistedImpl implements Notification {
     @Override
     public Type getType() {
         return type;
+    }
+
+    @Override
+    public String getKey() {
+        return key;
     }
 
     @Override

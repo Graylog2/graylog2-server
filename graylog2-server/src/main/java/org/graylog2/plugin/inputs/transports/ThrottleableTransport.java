@@ -37,13 +37,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * <br/>
  * Empty for now, since the process buffer provides natural throttling for now, but once that is async we need
  * to supply back pressure in some other way.
+ * @deprecated Please use {@link ThrottleableTransport2 } instead
  */
+@Deprecated()
 public abstract class ThrottleableTransport implements Transport {
     private static final Logger log = LoggerFactory.getLogger(ThrottleableTransport.class);
     public static final String CK_THROTTLING_ALLOWED = "throttling_allowed";
-    private final boolean throttlingAllowed;
+    protected final boolean throttlingAllowed;
     private final AtomicBoolean currentlyThrottled = new AtomicBoolean(false);
-    private final EventBus eventBus;
+    protected final EventBus eventBus;
     private volatile CountDownLatch blockLatch = null;
     private long lastUncommitted;
 
