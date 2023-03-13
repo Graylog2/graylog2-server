@@ -78,13 +78,9 @@ public class ParameterizedHttpClientProviderTest {
 
         assertThat(okHttpClient.sslSocketFactory().createSocket().getOption(StandardSocketOptions.SO_KEEPALIVE)).isTrue();
 
-        boolean gotException = false;
-        try (Response response = okHttpClient.newCall(new Request.Builder().url(server.url("/")).get().build()).execute()) {
-            fail("should not have succeeded");
-        } catch (SSLHandshakeException e) {
-            gotException = true;
-        }
-        assertThat(gotException).isTrue();
+        assertThrows(SSLHandshakeException.class,
+                () -> okHttpClient.newCall(new Request.Builder().url(server.url("/")).get().build()).execute(),
+                "should not have succeeded");
     }
 
     @Test
