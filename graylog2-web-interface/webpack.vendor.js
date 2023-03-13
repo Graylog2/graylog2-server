@@ -99,6 +99,7 @@ if (TARGET.startsWith('build')) {
       concatenateModules: false,
       sideEffects: false,
       minimizer: [new EsbuildPlugin({
+        format: 'cjs',
         target: supportedBrowsers,
       })],
     },
