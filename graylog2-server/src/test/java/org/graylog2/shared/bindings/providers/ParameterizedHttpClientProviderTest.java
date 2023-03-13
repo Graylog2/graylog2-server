@@ -38,7 +38,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ParameterizedHttpClientProviderTest {
 
