@@ -27,7 +27,7 @@ import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import EntityDataTable from 'components/common/EntityDataTable';
 import StreamActions from 'components/streams/StreamsOverview/StreamActions';
-import BulkActions from 'components/streams/StreamsOverview/BulkActions';
+import BulkActions from 'components/streams/StreamsOverview/BulkActions/BulkActions';
 import type { Sort } from 'stores/PaginationTypes';
 import useStreams from 'components/streams/hooks/useStreams';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';

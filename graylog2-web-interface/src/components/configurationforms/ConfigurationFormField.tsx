@@ -35,7 +35,7 @@ type Props = {
   configValue: FieldValue | EncryptedFieldValue<FieldValue>,
   dirty: boolean,
   autoFocus: boolean,
-  onChange: () => void,
+  onChange: (field: string, value: FieldValue | EncryptedFieldValue<FieldValue>) => void,
 };
 
 const ConfigurationFormField = ({ typeName, configField, configKey, configValue, dirty, autoFocus, onChange }: Props) => {
@@ -48,7 +48,7 @@ const ConfigurationFormField = ({ typeName, configField, configKey, configValue,
                    typeName={typeName}
                    title={configKey}
                    field={configField}
-                   value={configValue}
+                   value={configValue as string | EncryptedFieldValue<string>}
                    dirty={dirty}
                    onChange={onChange}
                    autoFocus={autoFocus} />
@@ -59,7 +59,7 @@ const ConfigurationFormField = ({ typeName, configField, configKey, configValue,
                      typeName={typeName}
                      title={configKey}
                      field={configField}
-                     value={configValue}
+                     value={configValue as number}
                      onChange={onChange}
                      autoFocus={autoFocus} />
       );
@@ -69,7 +69,7 @@ const ConfigurationFormField = ({ typeName, configField, configKey, configValue,
                       typeName={typeName}
                       title={configKey}
                       field={configField}
-                      value={configValue}
+                      value={configValue as boolean}
                       onChange={onChange}
                       autoFocus={autoFocus} />
       );
@@ -79,7 +79,7 @@ const ConfigurationFormField = ({ typeName, configField, configKey, configValue,
                        typeName={typeName}
                        title={configKey}
                        field={configField}
-                       value={configValue}
+                       value={configValue as string}
                        onChange={onChange}
                        autoFocus={autoFocus}
                        addPlaceholder />
@@ -90,7 +90,7 @@ const ConfigurationFormField = ({ typeName, configField, configKey, configValue,
                    typeName={typeName}
                    title={configKey}
                    field={configField}
-                   value={configValue}
+                   value={configValue as Array<string> | string}
                    onChange={onChange}
                    autoFocus={autoFocus} />
       );
@@ -101,7 +101,7 @@ const ConfigurationFormField = ({ typeName, configField, configKey, configValue,
                                       typeName={typeName}
                                       title={configKey}
                                       field={configField}
-                                      value={configValue}
+                                      value={configValue as EncryptedFieldValue<string>}
                                       dirty={dirty}
                                       onChange={onChange}
                                       autoFocus={autoFocus} />
