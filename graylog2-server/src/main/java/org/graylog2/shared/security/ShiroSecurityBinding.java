@@ -61,9 +61,6 @@ public class ShiroSecurityBinding implements DynamicFeature {
         }
 
         // TODO this is the wrong approach, we should have an Environment and proper request wrapping
-        context.register((ContainerResponseFilter) (requestContext, responseContext) -> {
-            LOG.info("Unbinding Subject from current thread id: {}", Thread.currentThread().getId());
-            ThreadContext.unbindSubject();
-        });
+        context.register((ContainerResponseFilter) (requestContext, responseContext) -> ThreadContext.unbindSubject());
     }
 }
