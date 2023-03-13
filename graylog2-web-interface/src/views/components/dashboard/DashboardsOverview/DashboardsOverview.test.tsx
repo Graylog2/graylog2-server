@@ -85,7 +85,7 @@ const loadDashboardsResponse = (count = 1) => {
       ],
     },
     refetch: () => {},
-    isFetching: false,
+    isInitialLoading: false,
   };
 };
 

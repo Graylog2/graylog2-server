@@ -232,7 +232,7 @@ describe('<WidgetActionsMenu />', () => {
             },
           ],
         },
-        isFetching: false,
+        isInitialLoading: false,
         refetch: () => {},
       });
 

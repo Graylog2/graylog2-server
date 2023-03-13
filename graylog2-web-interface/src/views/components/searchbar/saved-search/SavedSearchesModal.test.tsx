@@ -79,7 +79,7 @@ describe('SavedSearchesModal', () => {
     asMock(useSavedSearches).mockReturnValue({
       data: defaultPaginatedSearches,
       refetch: () => {},
-      isLoading: false,
+      isInitialLoading: false,
     });
 
     asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isLoading: false });
@@ -92,7 +92,7 @@ describe('SavedSearchesModal', () => {
       asMock(useSavedSearches).mockReturnValue({
         data: paginatedSavedSearches,
         refetch: () => {},
-        isLoading: false,
+        isInitialLoading: false,
       });
 
       render(<SavedSearchesModal toggleModal={() => {}}
@@ -108,7 +108,7 @@ describe('SavedSearchesModal', () => {
       asMock(useSavedSearches).mockReturnValue({
         data: paginatedSavedSearches,
         refetch: () => {},
-        isLoading: false,
+        isInitialLoading: false,
       });
 
       render(<SavedSearchesModal toggleModal={() => {}}

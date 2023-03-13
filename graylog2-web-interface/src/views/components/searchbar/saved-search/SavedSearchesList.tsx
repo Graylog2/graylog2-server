@@ -78,7 +78,7 @@ const SavedSearchesList = ({
     sort: layoutConfig.sort,
   }), [activePage, layoutConfig.pageSize, layoutConfig.sort, query]);
 
-  const { data: paginatedSavedSearches, isLoading, refetch } = useSavedSearches(searchParams, { enabled: !isLoadingLayoutPreferences });
+  const { data: paginatedSavedSearches, isInitialLoading: isLoadingSavedSearches, refetch } = useSavedSearches(searchParams, { enabled: !isLoadingLayoutPreferences });
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
 
   const onPageChange = useCallback(
@@ -126,7 +126,7 @@ const SavedSearchesList = ({
 
   const customColumnRenderers = useColumnRenderers(onLoadSavedSearch, searchParams);
 
-  if (isLoading) {
+  if (isLoadingSavedSearches || isLoadingLayoutPreferences) {
     return <Spinner />;
   }
 
