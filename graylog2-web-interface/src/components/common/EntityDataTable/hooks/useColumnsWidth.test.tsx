@@ -20,14 +20,14 @@ import useColumnsWidths from './useColumnsWidths';
 
 describe('useColumnsWidths hook test', () => {
   it('should calculate width for columns with flexible width', async () => {
-    const columnRenderers = {
+    const columnRenderersByAttribute = {
       title: { width: 1 },
       description: { width: 2 },
     };
     const columnsIds = ['title', 'description'];
 
     const { result } = renderHook(() => useColumnsWidths({
-      columnRenderers,
+      columnRenderersByAttribute,
       columnsIds,
       actionsColWidth: 0,
       bulkSelectColWidth: 0,
@@ -41,11 +41,15 @@ describe('useColumnsWidths hook test', () => {
   });
 
   it('should use default width for columns without column renderers', async () => {
-    const columnRenderers = { title: { width: 1 } };
+    const columnRenderersByAttribute = {
+      title: {
+        width: 1,
+      },
+    };
     const columnsIds = ['title', 'description'];
 
     const { result } = renderHook(() => useColumnsWidths({
-      columnRenderers,
+      columnRenderersByAttribute,
       columnsIds,
       actionsColWidth: 0,
       bulkSelectColWidth: 0,
@@ -59,14 +63,14 @@ describe('useColumnsWidths hook test', () => {
   });
 
   it('should consider width of bulk select and actions col', async () => {
-    const columnRenderers = {
+    const columnRenderersByAttribute = {
       title: { width: 1 },
       description: { width: 2 },
     };
     const columnsIds = ['title', 'description'];
 
     const { result } = renderHook(() => useColumnsWidths({
-      columnRenderers,
+      columnRenderersByAttribute,
       columnsIds,
       actionsColWidth: 50,
       bulkSelectColWidth: 20,

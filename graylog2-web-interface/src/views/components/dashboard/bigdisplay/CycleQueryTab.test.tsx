@@ -42,6 +42,11 @@ const CycleQueryTab = ({ view, activeQuery, ...props }: AdditionalProps & React.
 
 jest.mock('stores/useAppDispatch');
 
+jest.mock('views/logic/slices/viewSlice', () => ({
+  ...jest.requireActual('views/logic/slices/viewSlice'),
+  selectQuery: jest.fn(() => async () => {}),
+}));
+
 describe('CycleQueryTab', () => {
   const search = Search.create().toBuilder().queries([
     Query.builder().id('foo').build(),
@@ -88,7 +93,7 @@ describe('CycleQueryTab', () => {
 
     jest.advanceTimersByTime(1000);
 
-    expect(dispatch).toHaveBeenCalledWith(selectQuery('baz'));
+    expect(selectQuery).toHaveBeenCalledWith('baz');
   });
 
   it('should switch to first tab if current one is the last', () => {
@@ -99,7 +104,7 @@ describe('CycleQueryTab', () => {
 
     jest.advanceTimersByTime(1000);
 
-    expect(dispatch).toHaveBeenCalledWith(selectQuery('foo'));
+    expect(selectQuery).toHaveBeenCalledWith('foo');
   });
 
   it('should switch to next tab skipping gaps after interval', () => {
@@ -110,7 +115,7 @@ describe('CycleQueryTab', () => {
 
     jest.advanceTimersByTime(1000);
 
-    expect(dispatch).toHaveBeenCalledWith(selectQuery('baz'));
+    expect(selectQuery).toHaveBeenCalledWith('baz');
   });
 
   it('should switch to next tab defaulting to all tabs if `tabs` prop` is left out', () => {
@@ -121,7 +126,7 @@ describe('CycleQueryTab', () => {
 
     jest.advanceTimersByTime(1000);
 
-    expect(dispatch).toHaveBeenCalledWith(selectQuery('bar'));
+    expect(selectQuery).toHaveBeenCalledWith('bar');
   });
 
   it('triggers tab change after the correct interval has passed', async () => {

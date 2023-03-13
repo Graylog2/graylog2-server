@@ -27,7 +27,7 @@ import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import EntityDataTable from 'components/common/EntityDataTable';
 import StreamActions from 'components/streams/StreamsOverview/StreamActions';
-import BulkActions from 'components/streams/StreamsOverview/BulkActions';
+import BulkActions from 'components/streams/StreamsOverview/BulkActions/BulkActions';
 import type { Sort } from 'stores/PaginationTypes';
 import useStreams from 'components/streams/hooks/useStreams';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
@@ -70,7 +70,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
   });
   const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
-  const { data: paginatedStreams, refetch: refetchStreams } = useStreams({
+  const { data: paginatedStreams, isInitialLoading: isInitialLoadingStreams, refetch: refetchStreams } = useStreams({
     query,
     page: paginationQueryParameter.page,
     pageSize: layoutConfig.pageSize,
@@ -128,7 +128,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
                  indexSets={indexSets} />
   ), [indexSets]);
 
-  if (!paginatedStreams) {
+  if (isLoadingLayoutPreferences || isInitialLoadingStreams) {
     return <Spinner />;
   }
 
@@ -163,7 +163,8 @@ const StreamsOverview = ({ indexSets }: Props) => {
                                    activeSort={layoutConfig.sort}
                                    rowActions={renderStreamActions}
                                    columnRenderers={columnRenderers}
-                                   columnDefinitions={columnDefinitions} />
+                                   columnDefinitions={columnDefinitions}
+                                   entityAttributesAreCamelCase={false} />
         )}
       </div>
     </PaginatedList>

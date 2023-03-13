@@ -40,13 +40,17 @@ const executeSearch = (
   view: View,
   widgetsToSearch: string[],
   executionStateParam: SearchExecutionState,
+  keepQueries: string[] = [],
 ): Promise<SearchExecutionResult> => {
   const { widgetMapping, search } = view;
 
-  let executionStateBuilder = executionStateParam.toBuilder();
+  const globalOverride = (executionStateParam.globalOverride ?? GlobalOverride.empty()).toBuilder()
+    .keepQueries(keepQueries)
+    .build();
+
+  let executionStateBuilder = executionStateParam.toBuilder().globalOverride(globalOverride);
 
   if (widgetsToSearch) {
-    const { globalOverride = GlobalOverride.empty() } = executionStateParam;
     const keepSearchTypes = widgetsToSearch.map((widgetId) => widgetMapping.get(widgetId))
       .reduce((acc, searchTypeSet) => [...acc, ...searchTypeSet.toArray()], globalOverride.keepSearchTypes || []);
     const newGlobalOverride = globalOverride.toBuilder().keepSearchTypes(keepSearchTypes).build();

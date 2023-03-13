@@ -471,6 +471,11 @@
             <groupId>com.squareup.retrofit2</groupId>
             <artifactId>converter-jackson</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp-tls</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.graylog.repackaged</groupId>

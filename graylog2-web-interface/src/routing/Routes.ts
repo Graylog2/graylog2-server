@@ -246,6 +246,8 @@ const Routes = {
 
   dashboard_show: (dashboardId: string) => `/dashboards/${dashboardId}`,
 
+  show_saved_search: (searchId: string) => `/search/${searchId}`,
+
   node: (nodeId: string) => `/system/nodes/${nodeId}`,
 
   node_inputs: (nodeId: string) => `${Routes.SYSTEM.INPUTS}/${nodeId}`,
