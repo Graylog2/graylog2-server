@@ -103,48 +103,37 @@ jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: { exports: jest.fn(() => mockExports()) },
 }));
 
-const AddToInvestigation = ({ id, type, index }: { id: string, type: EvidenceTypes, index?: string }) => {
-  const [disableButton, setDisableButton] = React.useState<boolean>(false);
-
-  return (
-    <AddEvidence id={id}
-                 type={type}
-                 index={index}
-                 investigationSelected={(arg: boolean) => setTimeout(() => setDisableButton(!arg), 10)}>
-      <button type="button" disabled={disableButton}>Add to investigation</button>
-    </AddEvidence>
+const renderAddEvidence = (id: string, type: EvidenceTypes, index: string = undefined) => {
+  render(
+    <AddEvidence id={id} type={type} index={index}>
+      {({ investigationSelected }) => <button type="button" disabled={!investigationSelected}>Add to investigation</button>}
+    </AddEvidence>,
   );
-};
-
-AddToInvestigation.defaultProps = {
-  index: undefined,
 };
 
 describe('AddEvidence', () => {
   it('should render button', () => {
-    render(<AddToInvestigation id="dashboard-id" type="dashboards" />);
+    renderAddEvidence('dashboard-id', 'dashboards');
 
     expect(screen.getByText('Add to investigation')).toBeInTheDocument();
   });
 
   it('should not fail and render null if no plugin is registered', () => {
     mockExports.mockReturnValueOnce(undefined);
-
-    render(<AddToInvestigation id="dashboard-id" type="dashboards" />);
+    renderAddEvidence('dashboard-id', 'dashboards');
 
     expect(screen.queryByText('Add to investigation')).not.toBeInTheDocument();
   });
 
   it('should disabled button if no investigation is selected', async () => {
     mockUseInvestigationDrawer.mockReturnValueOnce({ selectedInvestigationId: undefined });
-
-    render(<AddToInvestigation id="dashboard-id" type="dashboards" />);
+    renderAddEvidence('dashboard-id', 'dashboards');
 
     await waitFor(() => expect(screen.getByText('Add to investigation')).toBeDisabled());
   });
 
   it('should add a dashboard to investigation', () => {
-    render(<AddToInvestigation id="dashboard-id" type="dashboards" />);
+    renderAddEvidence('dashboard-id', 'dashboards');
     const button = screen.getByText('Add to investigation');
 
     userEvent.click(button);
@@ -156,7 +145,7 @@ describe('AddEvidence', () => {
   });
 
   it('should add a search to investigation', () => {
-    render(<AddToInvestigation id="search-id" type="searches" />);
+    renderAddEvidence('search-id', 'searches');
     const button = screen.getByText('Add to investigation');
 
     userEvent.click(button);
@@ -168,7 +157,7 @@ describe('AddEvidence', () => {
   });
 
   it('should add a event to investigation', () => {
-    render(<AddToInvestigation id="event-id" type="events" />);
+    renderAddEvidence('event-id', 'events');
     const button = screen.getByText('Add to investigation');
 
     userEvent.click(button);
@@ -180,7 +169,7 @@ describe('AddEvidence', () => {
   });
 
   it('should add a message to investigation', () => {
-    render(<AddToInvestigation id="message-id" type="logs" index="test-index" />);
+    renderAddEvidence('message-id', 'logs', 'test-index');
     const button = screen.getByText('Add to investigation');
 
     userEvent.click(button);

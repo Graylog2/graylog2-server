@@ -55,7 +55,6 @@ type Props = {
 const EventDetails = ({ event, eventDefinitionContext }: Props) => {
   const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
   const timeRange: AbsoluteTimeRange = event.replay_info && { type: 'absolute', from: `${event.replay_info.timerange_start}`, to: `${event.replay_info.timerange_end}` };
-  const [disableAddEvidence, setDisableAddEvidence] = React.useState(false);
 
   const plugin = useMemo(() => {
     if (event.event_definition_type === undefined) {
@@ -94,14 +93,14 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
                   Replay search
                 </ReplaySearchButton>
               </dd>
-              <AddEvidence id={event.id}
-                           type="events"
-                           investigationSelected={(val: boolean) => setDisableAddEvidence(!val)}>
-                <dd>
-                  <EvidenceActionButton $disabled={disableAddEvidence}>
-                    Add to investigation <Icon name="puzzle-piece" size="sm" />
-                  </EvidenceActionButton>
-                </dd>
+              <AddEvidence id={event.id} type="events">
+                {({ investigationSelected }) => (
+                  <dd>
+                    <EvidenceActionButton $disabled={!investigationSelected}>
+                      Add to investigation <Icon name="puzzle-piece" size="sm" />
+                    </EvidenceActionButton>
+                  </dd>
+                )}
               </AddEvidence>
             </>
           )}

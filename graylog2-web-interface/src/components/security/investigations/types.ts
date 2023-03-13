@@ -21,7 +21,7 @@ export type AddEvidenceProps = {
   index?: string,
   id: string,
   type: EvidenceTypes,
-  children: React.ReactNode,
+  children: React.ReactElement,
 };
 
 export type InvestigationsPlugin = {

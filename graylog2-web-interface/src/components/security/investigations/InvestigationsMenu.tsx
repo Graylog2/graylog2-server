@@ -34,14 +34,14 @@ const InvestigationsMenu = ({ index, id, type, ...rest }: Props) => {
 
   if (!investigations || !investigations.length) return null;
 
-  const { selectedInvestigationId } = investigations[0].hooks.useInvestigationDrawer();
-
   return (
     <DropdownButton id="investigations-dropdown" {...rest}>
       <AddEvidence index={index} id={id} type={type}>
-        <MenuItem disabled={!selectedInvestigationId}>
-          Add to investigation
-        </MenuItem>
+        {({ investigationSelected }) => (
+          <MenuItem disabled={!investigationSelected}>
+            Add to investigation
+          </MenuItem>
+        )}
       </AddEvidence>
     </DropdownButton>
   );

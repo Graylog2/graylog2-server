@@ -82,7 +82,6 @@ const SearchActionsMenu = () => {
   const [showExport, setShowExport] = useState(false);
   const [showMetadataEdit, setShowMetadataEdit] = useState(false);
   const [showShareSearch, setShowShareSearch] = useState(false);
-  const [disableAddEvidence, setDisableAddEvidence] = useState(false);
   const currentTitle = view?.title ?? '';
   const dispatch = useAppDispatch();
   const onUpdateView = useCallback((newView: View) => dispatch(updateView(newView)), [dispatch]);
@@ -202,12 +201,12 @@ const SearchActionsMenu = () => {
         </MenuItem>
         <MenuItem divider />
         {loaded && (
-          <AddEvidence id={view.id}
-                       type="searches"
-                       investigationSelected={(val: boolean) => setDisableAddEvidence(!val)}>
-            <MenuItem disabled={disableAddEvidence} icon="puzzle-piece">
-              Add to investigation
-            </MenuItem>
+          <AddEvidence id={view.id} type="searches">
+            {({ investigationSelected }) => (
+              <MenuItem disabled={!investigationSelected} icon="puzzle-piece">
+                Add to investigation
+              </MenuItem>
+            )}
           </AddEvidence>
         )}
       </DropdownButton>

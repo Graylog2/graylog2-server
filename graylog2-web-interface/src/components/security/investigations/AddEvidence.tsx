@@ -18,13 +18,16 @@ import * as React from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 
-import type { AddEvidenceProps } from './types';
+import type { EvidenceTypes } from './types';
 
-type Props = AddEvidenceProps & {
-  investigationSelected?: (arg: boolean) => void,
+type Props = {
+  index?: string,
+  id: string,
+  type: EvidenceTypes,
+  children: ({ investigationSelected }: { investigationSelected: boolean }) => React.ReactElement,
 };
 
-function AddEvidence({ children, index, id, type, investigationSelected }: Props) {
+function AddEvidence({ children, index, id, type }: Props) {
   const investigations = usePluginEntities('investigationsPlugin');
 
   if (!investigations || !investigations.length) return null;
@@ -32,22 +35,20 @@ function AddEvidence({ children, index, id, type, investigationSelected }: Props
   const { selectedInvestigationId } = investigations[0].hooks.useInvestigationDrawer();
 
   if (!selectedInvestigationId) {
-    if (investigationSelected) investigationSelected(!!selectedInvestigationId);
-
-    return children as React.ReactElement;
+    return children({ investigationSelected: !!selectedInvestigationId });
   }
 
   const SecAddEvidence = investigations[0].components.AddEvidence;
 
   return (
     <SecAddEvidence id={id} index={index} type={type}>
-      {children}
+      {children({ investigationSelected: !!selectedInvestigationId })}
     </SecAddEvidence>
   );
 }
 
 AddEvidence.defaultProps = {
-  investigationSelected: undefined,
+  index: undefined,
 };
 
 export default AddEvidence;
