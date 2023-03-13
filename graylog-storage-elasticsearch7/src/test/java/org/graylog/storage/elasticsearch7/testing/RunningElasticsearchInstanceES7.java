@@ -69,6 +69,7 @@ public class RunningElasticsearchInstanceES7 implements SearchServerInstance {
                 1,
                 1,
                 false,
+                false,
                 null,
                 Duration.seconds(60),
                 "http",
