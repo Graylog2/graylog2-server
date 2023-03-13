@@ -26,6 +26,11 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface CollectionName {
-    String value();
+public @interface DbEntity {
+    String collection();
+
+    String titleField() default "title";
+
+    //use for DBEntities that does not have string representations/ titles at all
+    String NO_TITLE = "";
 }

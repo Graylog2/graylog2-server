@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
-import org.graylog2.database.CollectionName;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
@@ -45,7 +45,7 @@ import java.util.Set;
  * Representing a single stream from the streams collection. Also provides method
  * to get all streams of this collection.
  */
-@CollectionName("streams")
+@DbEntity(collection = "streams")
 public class StreamImpl extends PersistedImpl implements Stream {
     public static final String FIELD_ID = "_id";
     public static final String FIELD_TITLE = "title";

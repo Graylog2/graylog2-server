@@ -29,7 +29,7 @@ import org.apache.shiro.authz.permission.AllPermission;
 import org.bson.types.ObjectId;
 import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog2.Configuration;
-import org.graylog2.database.CollectionName;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.ObjectIdStringFunction;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.database.StringObjectIdFunction;
@@ -63,8 +63,10 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.nullToEmpty;
+import static org.graylog2.users.UserImpl.COLLECTION_NAME;
+import static org.graylog2.users.UserImpl.USERNAME;
 
-@CollectionName(UserImpl.COLLECTION_NAME)
+@DbEntity(collection = COLLECTION_NAME, titleField = USERNAME)
 public class UserImpl extends PersistedImpl implements User {
 
     public static final String FULL_NAME_FORMAT = "%s %s";

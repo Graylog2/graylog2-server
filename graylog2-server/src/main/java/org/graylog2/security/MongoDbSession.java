@@ -19,7 +19,7 @@ package org.graylog2.security;
 import com.google.common.collect.Iterables;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.bson.types.ObjectId;
-import org.graylog2.database.CollectionName;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.shared.SuppressForbidden;
@@ -36,7 +36,9 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
-@CollectionName(MongoDbSession.COLLECTION_NAME)
+import static org.graylog2.database.DbEntity.NO_TITLE;
+
+@DbEntity(collection = MongoDbSession.COLLECTION_NAME, titleField = NO_TITLE)
 public class MongoDbSession extends PersistedImpl {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDbSession.class);
     static final String COLLECTION_NAME = "sessions";

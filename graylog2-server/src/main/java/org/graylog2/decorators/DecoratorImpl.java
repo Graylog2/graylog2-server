@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.database.CollectionName;
+import org.graylog2.database.DbEntity;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -30,10 +30,12 @@ import javax.validation.constraints.NotBlank;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.graylog2.database.DbEntity.NO_TITLE;
+
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
-@CollectionName("decorators")
+@DbEntity(collection = "decorators", titleField = NO_TITLE)
 public abstract class DecoratorImpl implements Decorator, Comparable {
     static final String FIELD_ID = "id";
     static final String FIELD_TYPE = "type";

@@ -18,7 +18,7 @@ package org.graylog2.security;
 
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
-import org.graylog2.database.CollectionName;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.plugin.database.validators.Validator;
@@ -26,7 +26,10 @@ import org.joda.time.DateTime;
 
 import java.util.Map;
 
-@CollectionName(AccessTokenImpl.COLLECTION_NAME)
+import static org.graylog2.security.AccessTokenImpl.COLLECTION_NAME;
+import static org.graylog2.security.AccessTokenImpl.NAME;
+
+@DbEntity(collection = COLLECTION_NAME, titleField = NAME)
 public class AccessTokenImpl extends PersistedImpl implements AccessToken {
     public enum Type {
         PLAINTEXT(0), AES_SIV(1);
