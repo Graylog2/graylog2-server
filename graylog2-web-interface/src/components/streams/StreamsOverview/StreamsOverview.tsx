@@ -70,7 +70,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
   });
   const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
-  const { data: paginatedStreams, refetch: refetchStreams } = useStreams({
+  const { data: paginatedStreams, isInitialLoading: isInitialLoadingStreams, refetch: refetchStreams } = useStreams({
     query,
     page: paginationQueryParameter.page,
     pageSize: layoutConfig.pageSize,
@@ -128,7 +128,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
                  indexSets={indexSets} />
   ), [indexSets]);
 
-  if (!paginatedStreams) {
+  if (isLoadingLayoutPreferences || isInitialLoadingStreams) {
     return <Spinner />;
   }
 

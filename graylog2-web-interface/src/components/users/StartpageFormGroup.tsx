@@ -80,9 +80,9 @@ const useStartPageOptions = (userId, permissions) => {
   const [userSearches, setUserSearches] = useState<Option[]>([]);
   const [isLoadingUserEntities, setIsLoadingUserEntities] = useState(false);
 
-  const { data: allDashboards, isFetching: isLoadingAllDashboards } = useDashboards({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
-  const { data: allStreams, isFetching: isLoadingAllStreams } = useStreams({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
-  const { data: allSearches, isLoading: isLoadingAllSearches } = useSavedSearches({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
+  const { data: allDashboards, isInitialLoading: isLoadingAllDashboards } = useDashboards({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
+  const { data: allStreams, isInitialLoading: isLoadingAllStreams } = useStreams({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
+  const { data: allSearches, isInitialLoading: isLoadingAllSearches } = useSavedSearches({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
   const allDashboardsOptions = (allDashboards?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));
   const allStreamsOptions = (allStreams?.elements ?? []).map(({ id, title }) => ({ value: id, label: title }));
   const allSearchesOptions = (allSearches?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));

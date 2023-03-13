@@ -59,7 +59,7 @@ const DashboardsOverview = () => {
     query,
   ]);
   const customColumnRenderers = useColumnRenderers({ searchParams });
-  const { data: paginatedDashboards, refetch } = useDashboards(searchParams, { enabled: !isLoadingLayoutPreferences });
+  const { data: paginatedDashboards, isInitialLoading: isLoadingDashboards, refetch } = useDashboards(searchParams, { enabled: !isLoadingLayoutPreferences });
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
@@ -88,7 +88,7 @@ const DashboardsOverview = () => {
     paginationQueryParameter.resetPage();
   }, [paginationQueryParameter, updateTableLayout]);
 
-  if (!paginatedDashboards) {
+  if (isLoadingDashboards || isLoadingLayoutPreferences) {
     return <Spinner />;
   }
 

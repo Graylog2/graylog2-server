@@ -33,9 +33,9 @@ const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled
     attributes: Array<Attribute>
   } | undefined,
   refetch: () => void,
-  isFetching: boolean,
+  isInitialLoading: boolean,
 } => {
-  const { data, refetch, isFetching } = useQuery(
+  const { data, refetch, isLoading, isFetching, isInitialLoading } = useQuery(
     ['streams', 'overview', searchParams],
     () => StreamsStore.searchPaginated(
       searchParams.page,
@@ -53,14 +53,16 @@ const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled
           'Could not load streams');
       },
       keepPreviousData: true,
-      enabled,
+      enabled: true,
     },
   );
+
+  console.log({ isLoading, isInitialLoading, isFetching, enabled });
 
   return ({
     data,
     refetch,
-    isFetching,
+    isInitialLoading,
   });
 };
 
