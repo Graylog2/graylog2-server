@@ -16,29 +16,43 @@
  */
 package org.graylog2.database.dbcatalog;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class DbEntitiesCatalog {
 
-    private Map<String, DbEntityCatalogEntry> entitiesByCollectionName;
-    private Map<Class<?>, DbEntityCatalogEntry> entitiesByClass;
+    private static final Logger LOG = LoggerFactory.getLogger(DbEntitiesCatalog.class);
 
-    public DbEntitiesCatalog() {
-        entitiesByCollectionName = new HashMap<>();
-        entitiesByClass = new HashMap<>();
+    private final Map<String, DbEntityCatalogEntry> entitiesByCollectionName;
+    private final Map<Class<?>, DbEntityCatalogEntry> entitiesByClass;
+
+    public DbEntitiesCatalog(final Collection<DbEntityCatalogEntry> entries) {
+        entitiesByCollectionName = new HashMap<>(entries.size());
+        entitiesByClass = new HashMap<>(entries.size());
+
+        entries.forEach(this::add);
     }
 
-    public void add(final DbEntityCatalogEntry entry) {
-        entitiesByCollectionName.put(entry.collection(), entry);
+    void add(final DbEntityCatalogEntry entry) {
+        final DbEntityCatalogEntry previousEntry = entitiesByCollectionName.put(entry.collection(), entry);
+        if (previousEntry != null) {
+            final String errorMsg = "Two model classes associated with the same mongo collection : " + entry + " and " + previousEntry;
+            LOG.error(errorMsg);
+            throw new IllegalStateException(errorMsg);
+        }
         entitiesByClass.put(entry.modelClass(), entry);
     }
 
-    public DbEntityCatalogEntry getByModelClass(final Class<?> modelClass) {
-        return entitiesByClass.get(modelClass);
+    public Optional<DbEntityCatalogEntry> getByModelClass(final Class<?> modelClass) {
+        return Optional.ofNullable(entitiesByClass.get(modelClass));
     }
 
-    public DbEntityCatalogEntry getByCollectionName(final String collection) {
-        return entitiesByCollectionName.get(collection);
+    public Optional<DbEntityCatalogEntry> getByCollectionName(final String collection) {
+        return Optional.ofNullable(entitiesByCollectionName.get(collection));
     }
 }

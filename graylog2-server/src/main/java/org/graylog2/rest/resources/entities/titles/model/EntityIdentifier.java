@@ -14,23 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.database;
+package org.graylog2.rest.resources.entities.titles.model;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface DbEntity {
-    String collection();
-
-    String titleField() default "title";
-
-    //use for DBEntities that do not have string representations/ titles at all
-    String NO_TITLE = "";
+public record EntityIdentifier(@JsonProperty("id") String id,
+                               @JsonProperty("type") String type) {
 }

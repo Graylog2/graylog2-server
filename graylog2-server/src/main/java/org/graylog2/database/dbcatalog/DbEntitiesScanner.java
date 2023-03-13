@@ -21,32 +21,51 @@ import org.graylog2.database.DbEntity;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.reflections.util.ConfigurationBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DbEntitiesScanner implements Provider<DbEntitiesCatalog> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DbEntitiesScanner.class);
+
+    private final String[] packagesToScan;
+
+    @SuppressWarnings("unused")
+    public DbEntitiesScanner() {
+        this.packagesToScan = new String[]{"org.graylog2", "org.graylog"};
+    }
+
+    @SuppressWarnings("unused")
+    DbEntitiesScanner(String[] packagesToScan) {
+        this.packagesToScan = packagesToScan;
+    }
 
     @Override
     public DbEntitiesCatalog get() {
         final ConfigurationBuilder configuration = new ConfigurationBuilder()
-                .forPackages("org.graylog2", "org.graylog")
+                .forPackages(packagesToScan)
                 .setScanners(Scanners.TypesAnnotated);
 
         final Reflections reflections = new Reflections(configuration);
 
-        DbEntitiesCatalog catalog = new DbEntitiesCatalog();
+        final List<DbEntityCatalogEntry> dbEntities = reflections.getTypesAnnotatedWith(DbEntity.class).stream()
+                .map(
+                        type -> {
+                            final DbEntity annotation = type.getAnnotation(DbEntity.class);
 
-        reflections.getTypesAnnotatedWith(DbEntity.class).stream().forEach(
-                type -> {
-                    final DbEntity annotation = type.getAnnotation(DbEntity.class);
-                    catalog.add(
-                            new DbEntityCatalogEntry(
+                            return new DbEntityCatalogEntry(
                                     annotation.collection(),
                                     annotation.titleField(),
-                                    type)
-                    );
-                }
-        );
+                                    type);
 
-        return catalog;
+                        }
+                ).collect(Collectors.toList());
+
+        LOG.info(dbEntities.size() + " entities have been scanned and added to DB Entity Catalog");
+        return new DbEntitiesCatalog(dbEntities);
     }
 
 
