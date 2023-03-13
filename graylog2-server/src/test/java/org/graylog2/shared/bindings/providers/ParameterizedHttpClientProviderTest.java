@@ -90,13 +90,9 @@ public class ParameterizedHttpClientProviderTest {
 
         assertThat(okHttpClient.sslSocketFactory().createSocket().getOption(StandardSocketOptions.SO_KEEPALIVE)).isTrue();
 
-        boolean gotException = false;
         try (Response response = okHttpClient.newCall(new Request.Builder().url(server.url("/")).get().build()).execute()) {
             assertThat(response.isSuccessful()).isTrue();
-        } catch (SSLHandshakeException e) {
-            gotException = true;
         }
-        assertThat(gotException).isFalse();
     }
 
     @Test
@@ -105,13 +101,9 @@ public class ParameterizedHttpClientProviderTest {
         final OkHttpClient okHttpClient = provider.get(false, false);
         assertThat(okHttpClient.sslSocketFactory().createSocket().getOption(StandardSocketOptions.SO_KEEPALIVE)).isFalse();
 
-        boolean gotException = false;
         try (Response response = okHttpClient.newCall(new Request.Builder().url(server.url("/")).get().build()).execute()) {
             assertThat(response.isSuccessful()).isTrue();
-        } catch (SSLHandshakeException e) {
-            gotException = true;
         }
-        assertThat(gotException).isFalse();
     }
 
     @Test
@@ -120,13 +112,9 @@ public class ParameterizedHttpClientProviderTest {
         final OkHttpClient okHttpClient = provider.get(false, true);
         assertThat(okHttpClient.sslSocketFactory().createSocket().getOption(StandardSocketOptions.SO_KEEPALIVE)).isFalse();
 
-        boolean gotException = false;
         try (Response response = okHttpClient.newCall(new Request.Builder().url(server.url("/")).get().build()).execute()) {
             assertThat(response.isSuccessful()).isTrue();
-        } catch (SSLHandshakeException e) {
-            gotException = true;
         }
-        assertThat(gotException).isFalse();
     }
 
     @Test
