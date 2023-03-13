@@ -20,7 +20,7 @@ import lodash from 'lodash';
 import styled from 'styled-components';
 
 import { URLWhiteListInput } from 'components/common';
-import { Button, Col, ControlLabel, Input, Row } from 'components/bootstrap';
+import { Button, Checkbox, Col, ControlLabel, Input, Row } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
 
 const StyledButton = styled(Button)`
@@ -42,6 +42,7 @@ class HttpNotificationForm extends React.Component {
     api_key: '',
     api_secret: { keep_value: true },
     basic_auth: { keep_value: true },
+    skip_tls_verification: false,
   };
 
   constructor() {
@@ -132,6 +133,12 @@ class HttpNotificationForm extends React.Component {
                            onValidationChange={this.onValidationChange}
                            url={config.url}
                            autofocus={false} />
+        <Checkbox id="skip_tls_verification"
+                  name="skip_tls_verification"
+                  onChange={this.handleChange}
+                  checked={config.skip_tls_verification}>
+          Skip TLS verification
+        </Checkbox>
         <Row>
           <Col md={12}>
             {basic_auth?.keep_value ? (

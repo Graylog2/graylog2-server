@@ -36,7 +36,7 @@ import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.security.encryption.EncryptedValueService;
-import org.graylog2.shared.bindings.providers.TcpKeepAliveHttpClientProvider;
+import org.graylog2.shared.bindings.providers.ParameterizedHttpClientProvider;
 import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 import org.slf4j.Logger;
@@ -60,22 +60,23 @@ public class HTTPEventNotification implements EventNotification {
 
     private final EventNotificationService notificationCallbackService;
     private final ObjectMapper objectMapper;
-    private final OkHttpClient httpClient;
+    private final EventsConfigurationProvider configurationProvider;
+    private final ParameterizedHttpClientProvider parameterizedHttpClientProvider;
     private final UrlWhitelistService whitelistService;
     private final UrlWhitelistNotificationService urlWhitelistNotificationService;
     private final EncryptedValueService encryptedValueService;
 
     @Inject
     public HTTPEventNotification(EventNotificationService notificationCallbackService, ObjectMapper objectMapper,
-                                 final OkHttpClient httpClient, UrlWhitelistService whitelistService,
+                                 UrlWhitelistService whitelistService,
                                  UrlWhitelistNotificationService urlWhitelistNotificationService,
                                  EncryptedValueService encryptedValueService,
                                  EventsConfigurationProvider configurationProvider,
-                                 final TcpKeepAliveHttpClientProvider tcpKeepAliveHttpClientProvider
-                                 ) {
+                                 final ParameterizedHttpClientProvider parameterizedHttpClientProvider) {
         this.notificationCallbackService = notificationCallbackService;
         this.objectMapper = objectMapper;
-        this.httpClient = selectClient(configurationProvider, httpClient, tcpKeepAliveHttpClientProvider);
+        this.configurationProvider = configurationProvider;
+        this.parameterizedHttpClientProvider = parameterizedHttpClientProvider;
         this.whitelistService = whitelistService;
         this.urlWhitelistNotificationService = urlWhitelistNotificationService;
         this.encryptedValueService = encryptedValueService;
@@ -85,9 +86,9 @@ public class HTTPEventNotification implements EventNotification {
      * Depending on the configuration, either a default HTTP client will be returned or an instance
      * with {@link org.graylog2.shared.bindings.providers.TcpKeepAliveSocketFactory} configured.
      */
-    private OkHttpClient selectClient(EventsConfigurationProvider configurationProvider, OkHttpClient defaultHttpClient, TcpKeepAliveHttpClientProvider tcpKeepAliveHttpClientProvider) {
+    private OkHttpClient selectClient(HTTPEventNotificationConfig notificationConfig) {
         final boolean withKeepAlive = configurationProvider.get().notificationsKeepAliveProbe();
-        return withKeepAlive ? tcpKeepAliveHttpClientProvider.get() : defaultHttpClient;
+        return parameterizedHttpClientProvider.get(withKeepAlive, notificationConfig.skipTLSVerification());
     }
 
     @Override
@@ -140,6 +141,7 @@ public class HTTPEventNotification implements EventNotification {
                 config.url(),
                 ctx.notificationId());
 
+        final OkHttpClient httpClient = selectClient(config);
         try (final Response r = httpClient.newCall(request).execute()) {
             if (!r.isSuccessful()) {
                 throw new PermanentEventNotificationException(
