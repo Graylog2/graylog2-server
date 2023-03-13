@@ -113,18 +113,18 @@ const DashboardsOverview = () => {
         <NoSearchResult>No dashboards have been found.</NoSearchResult>
       )}
       {!!dashboards?.length && (
-        <EntityDataTable activeSort={layoutConfig.sort}
-                         bulkActions={renderBulkActions}
-                         columnDefinitions={attributes}
-                         columnRenderers={customColumnRenderers}
-                         columnsOrder={DEFAULT_LAYOUT.columnsOrder}
-                         data={dashboards}
-                         onColumnsChange={onColumnsChange}
-                         onPageSizeChange={onPageSizeChange}
-                         onSortChange={onSortChange}
-                         pageSize={layoutConfig.pageSize}
-                         rowActions={renderDashboardActions}
-                         visibleColumns={layoutConfig.displayedAttributes} />
+        <EntityDataTable<View> activeSort={layoutConfig.sort}
+                               bulkActions={renderBulkActions}
+                               columnDefinitions={attributes}
+                               columnRenderers={customColumnRenderers}
+                               columnsOrder={DEFAULT_LAYOUT.columnsOrder}
+                               data={dashboards}
+                               onColumnsChange={onColumnsChange}
+                               onPageSizeChange={onPageSizeChange}
+                               onSortChange={onSortChange}
+                               pageSize={layoutConfig.pageSize}
+                               rowActions={renderDashboardActions}
+                               visibleColumns={layoutConfig.displayedAttributes} />
       )}
     </PaginatedList>
   );

@@ -34,25 +34,27 @@ const DefaultLabel = styled(Label)`
   vertical-align: inherit;
 `;
 const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stream> => ({
-  title: {
-    renderCell: (stream) => (
-      <>
-        <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
-        {stream.is_default && <DefaultLabel bsStyle="primary" bsSize="xsmall">Default</DefaultLabel>}
-      </>
-    ),
-  },
-  index_set_title: {
-    renderCell: (stream) => <IndexSetCell indexSets={indexSets} stream={stream} />,
-    width: 0.7,
-  },
-  throughput: {
-    renderCell: (stream) => <ThroughputCell stream={stream} />,
-    staticWidth: 120,
-  },
-  disabled: {
-    renderCell: (stream) => <StatusCell stream={stream} />,
-    staticWidth: 100,
+  attributes: {
+    title: {
+      renderCell: (title: string, stream) => (
+        <>
+          <Link to={Routes.stream_search(stream.id)}>{title}</Link>
+          {stream.is_default && <DefaultLabel bsStyle="primary" bsSize="xsmall">Default</DefaultLabel>}
+        </>
+      ),
+    },
+    index_set_title: {
+      renderCell: (_index_set_title: string, stream) => <IndexSetCell indexSets={indexSets} stream={stream} />,
+      width: 0.7,
+    },
+    throughput: {
+      renderCell: (_throughput: string, stream) => <ThroughputCell stream={stream} />,
+      staticWidth: 120,
+    },
+    disabled: {
+      renderCell: (_disabled: string, stream) => <StatusCell stream={stream} />,
+      staticWidth: 100,
+    },
   },
 });
 

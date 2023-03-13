@@ -45,25 +45,27 @@ const CUSTOM_COLUMN_DEFINITIONS = [
 const INITIAL_COLUMNS = ['title', 'description', 'priority', 'scheduling', 'status'];
 const COLUMNS_ORDER = ['title', 'description', 'priority', 'status', 'scheduling'];
 const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
-  title: {
-    renderCell: (eventDefinition) => (
-      <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{eventDefinition.title}</Link>
-    ),
-  },
-  scheduling: {
-    renderCell: (eventDefinition) => (
-      <SchedulingCell definition={eventDefinition} />
-    ),
-  },
-  status: {
-    renderCell: (eventDefinition) => (
-      <StatusCell status={eventDefinition?.scheduler?.is_scheduled}
-                  isSystemEvent={isSystemEventDefinition(eventDefinition)} />
-    ),
-    staticWidth: 100,
-  },
-  prority: {
-    staticWidth: 50,
+  attributes: {
+    title: {
+      renderCell: (title: string, eventDefinition) => (
+        <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{title}</Link>
+      ),
+    },
+    scheduling: {
+      renderCell: (_scheduling: string, eventDefinition) => (
+        <SchedulingCell definition={eventDefinition} />
+      ),
+    },
+    status: {
+      renderCell: (_status: string, eventDefinition) => (
+        <StatusCell status={eventDefinition?.scheduler?.is_scheduled}
+                    isSystemEvent={isSystemEventDefinition(eventDefinition)} />
+      ),
+      staticWidth: 100,
+    },
+    prority: {
+      staticWidth: 50,
+    },
   },
 });
 
@@ -148,7 +150,8 @@ const EventDefinitionsContainer = () => {
                                             activeSort={searchParams.sort}
                                             rowActions={renderEventDefinitionActions}
                                             columnRenderers={columnRenderers}
-                                            columnDefinitions={columnDefinitions} />
+                                            columnDefinitions={columnDefinitions}
+                                            entityAttributesAreCamelCase={false} />
         )}
       </div>
     </PaginatedList>

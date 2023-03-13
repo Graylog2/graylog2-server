@@ -34,7 +34,7 @@ import { PageSizeSelect } from 'components/common';
 import BulkActionsRow from './BulkActionsRow';
 import TableHead from './TableHead';
 import TableRow from './TableRow';
-import type { ColumnRenderers, Column, EntityBase } from './types';
+import type { ColumnRenderers, Column, EntityBase, ColumnRenderersByAttribute } from './types';
 
 const ScrollContainer = styled.div`
   overflow-x: auto;
@@ -89,12 +89,13 @@ const filterVisibleColumns = (
 
 const useElementsWidths = <Entity extends EntityBase>({
   columns,
-  columnRenderers,
+  columnRenderersByAttribute,
   displayBulkSelectCol,
 }: {
   columns: Array<Column>,
-  columnRenderers: ColumnRenderers<Entity>,
+  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>,
   displayBulkSelectCol: boolean
+  entityAttributesAreCamelCase: boolean
 }) => {
   const tableRef = useRef<HTMLTableElement>();
   const actionsRef = useRef<HTMLDivElement>();
@@ -105,7 +106,7 @@ const useElementsWidths = <Entity extends EntityBase>({
   const columnsWidths = useColumnsWidths<Entity>({
     actionsColWidth,
     bulkSelectColWidth: displayBulkSelectCol ? BULK_SELECT_COLUMN_WIDTH : 0,
-    columnRenderers,
+    columnRenderersByAttribute,
     columnsIds,
     tableWidth,
   });
@@ -113,16 +114,35 @@ const useElementsWidths = <Entity extends EntityBase>({
   return { tableRef, actionsRef, columnsWidths, actionsColWidth };
 };
 
+const mergeColumnsRenderers = <Entity extends EntityBase>(columns: Array<Column>, customColumnRenderers: ColumnRenderers<Entity>) => {
+  const renderers = merge({}, DefaultColumnRenderers, customColumnRenderers);
+  const renderersByAttribute = Object.fromEntries(columns.map(({ id, type }) => {
+    const typeRenderer = renderers.types?.[type];
+    const attributeRenderer = renderers.attributes?.[id];
+
+    const columnRenderer = merge({}, typeRenderer, attributeRenderer);
+
+    return [id, columnRenderer];
+  }));
+
+  return renderersByAttribute;
+};
+
 type Props<Entity extends EntityBase> = {
   /** Currently active sort */
   activeSort?: Sort,
-  /** Supported batch operations */
+  /**
+   * The column ids are always snake case. By default, entity attributes are camel case.
+   * This prop controls if the column ids need to be transformed to camel case to connect them with the entity attributes.
+   */
+  entityAttributesAreCamelCase?: boolean,
+  /** Supported bulk actions */
   bulkActions?: (selectedEntities: Array<string>, setSelectedEntities: (streamIds: Array<string>) => void) => React.ReactNode,
-  /** List of all available columns. */
+  /** List of all available columns. Column ids need to be snake case. */
   columnDefinitions: Array<Column>,
-  /** Custom cell and header renderer for a column */
+  /** Custom cell and header renderer for a column. Column ids need to be snake case. */
   columnRenderers?: ColumnRenderers<Entity>,
-  /** Define default columns order */
+  /** Define default columns order. Column ids need to be snake case. */
   columnsOrder?: Array<string>,
   /** The table data. */
   data: Readonly<Array<Entity>>,
@@ -145,6 +165,7 @@ type Props<Entity extends EntityBase> = {
  */
 const EntityDataTable = <Entity extends EntityBase>({
   activeSort,
+  entityAttributesAreCamelCase,
   bulkActions,
   columnRenderers: customColumnRenderers,
   columnDefinitions,
@@ -159,7 +180,6 @@ const EntityDataTable = <Entity extends EntityBase>({
 }: Props<Entity>) => {
   const currentUser = useCurrentUser();
   const [selectedEntities, setSelectedEntities] = useState<Array<string>>([]);
-  const columnRenderers = merge(DefaultColumnRenderers, customColumnRenderers);
   const displayActionsCol = typeof rowActions === 'function';
   const displayBulkSelectCol = typeof bulkActions === 'function';
   const displayPageSizeSelect = typeof onPageSizeChange === 'function';
@@ -174,10 +194,13 @@ const EntityDataTable = <Entity extends EntityBase>({
     [accessibleColumns, visibleColumns],
   );
 
-  const { tableRef, actionsRef, actionsColWidth, columnsWidths } = useElementsWidths({
+  const columnRenderersByAttribute = useMemo(() => mergeColumnsRenderers<Entity>(columns, customColumnRenderers), [columns, customColumnRenderers]);
+
+  const { tableRef, actionsRef, actionsColWidth, columnsWidths } = useElementsWidths<Entity>({
     columns,
-    columnRenderers,
+    columnRenderersByAttribute,
     displayBulkSelectCol,
+    entityAttributesAreCamelCase,
   });
 
   const onToggleEntitySelect = useCallback((itemId: string) => {
@@ -221,7 +244,7 @@ const EntityDataTable = <Entity extends EntityBase>({
                      selectedEntities={selectedEntities}
                      setSelectedEntities={setSelectedEntities}
                      data={data}
-                     columnRenderers={columnRenderers}
+                     columnRenderersByAttribute={columnRenderersByAttribute}
                      onSortChange={onSortChange}
                      displayBulkSelectCol={displayBulkSelectCol}
                      activeSort={activeSort}
@@ -231,9 +254,10 @@ const EntityDataTable = <Entity extends EntityBase>({
               <TableRow entity={entity}
                         key={entity.id}
                         index={index}
+                        entityAttributesAreCamelCase={entityAttributesAreCamelCase}
                         actionsRef={actionsRef}
                         onToggleEntitySelect={onToggleEntitySelect}
-                        columnRenderers={columnRenderers}
+                        columnRenderersByAttribute={columnRenderersByAttribute}
                         isSelected={!!selectedEntities?.includes(entity.id)}
                         rowActions={rowActions}
                         displaySelect={displayBulkSelectCol}
@@ -255,6 +279,7 @@ EntityDataTable.defaultProps = {
   onPageSizeChange: undefined,
   pageSize: undefined,
   rowActions: undefined,
+  entityAttributesAreCamelCase: true,
 };
 
 export default EntityDataTable;

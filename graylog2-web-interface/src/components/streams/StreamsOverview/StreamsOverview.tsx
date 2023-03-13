@@ -163,7 +163,8 @@ const StreamsOverview = ({ indexSets }: Props) => {
                                    activeSort={layoutConfig.sort}
                                    rowActions={renderStreamActions}
                                    columnRenderers={columnRenderers}
-                                   columnDefinitions={columnDefinitions} />
+                                   columnDefinitions={columnDefinitions}
+                                   entityAttributesAreCamelCase={false} />
         )}
       </div>
     </PaginatedList>
