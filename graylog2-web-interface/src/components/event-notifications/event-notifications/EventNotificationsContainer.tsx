@@ -37,15 +37,17 @@ import useNotificationTest from '../hooks/useNotificationTest';
 const INITIAL_COLUMNS = ['title', 'description', 'type', 'created_at'];
 const COLUMNS_ORDER = ['title', 'description', 'type', 'created_at'];
 const customColumnRenderers = (testResults: TestResults): ColumnRenderers<EventNotification> => ({
-  title: {
-    renderCell: (notification) => {
-      return <NotificationTitle notification={notification} testResults={testResults} />;
+  attributes: {
+    title: {
+      renderCell: (_title: string, notification) => {
+        return <NotificationTitle notification={notification} testResults={testResults} />;
+      },
     },
-  },
-  type: {
-    renderCell: (notification) => (
-      <NotificationConfigTypeCell notification={notification} />
-    ),
+    type: {
+      renderCell: (_type: string, notification) => (
+        <NotificationConfigTypeCell notification={notification} />
+      ),
+    },
   },
 });
 
