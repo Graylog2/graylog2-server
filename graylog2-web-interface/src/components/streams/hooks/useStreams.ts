@@ -57,8 +57,6 @@ const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled
     },
   );
 
-  console.log({ isLoading, isInitialLoading, isFetching, enabled });
-
   return ({
     data,
     refetch,
