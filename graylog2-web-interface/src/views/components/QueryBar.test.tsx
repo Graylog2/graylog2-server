@@ -54,6 +54,7 @@ jest.mock('stores/useAppDispatch');
 jest.mock('views/logic/slices/viewSlice', () => ({
   ...jest.requireActual('views/logic/slices/viewSlice'),
   removeQuery: jest.fn(() => async () => {}),
+  selectQuery: jest.fn(() => async () => {}),
 }));
 
 const QueryBar = () => (
@@ -100,7 +101,7 @@ describe('QueryBar', () => {
 
     fireEvent.click(nextTab);
 
-    await waitFor(() => expect(dispatch).toHaveBeenCalledWith(selectQuery('baz')));
+    await waitFor(() => expect(selectQuery).toHaveBeenCalledWith('baz'));
   });
 
   it('allows closing current tab', async () => {
