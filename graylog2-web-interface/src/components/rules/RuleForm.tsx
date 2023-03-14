@@ -128,7 +128,7 @@ const RuleForm = ({ create }: Props) => {
 
         <RuleSimulationFormGroup>
           <ControlLabel>Rule Simulation <small className="text-muted">(Optional)</small></ControlLabel>
-          <FormControl.Static>
+          <div>
             <Input id="message"
                    name="message"
                    type="textarea"
@@ -149,7 +149,7 @@ const RuleForm = ({ create }: Props) => {
                 New Message
               </SimulationResult>
             )}
-          </FormControl.Static>
+          </div>
         </RuleSimulationFormGroup>
       </fieldset>
 
