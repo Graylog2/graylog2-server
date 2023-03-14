@@ -185,7 +185,7 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
             <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
             <MenuItem divider />
             <MenuItem onClick={() => handleAction(isScheduled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)}>
-              {isScheduled ? 'Disable' : 'enable'}
+              {isScheduled ? 'Disable' : 'Enable'}
             </MenuItem>
 
             {showActions() && (
