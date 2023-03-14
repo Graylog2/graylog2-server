@@ -63,41 +63,63 @@ export const getAggregationWidget = ({ rowPivots, fnSeries, sort = [] }: {
     .build();
 };
 
+const createViewPosition = ({ index, SUMMARY_ROW_DELTA }) => {
+  const isEven = (index + 1) % 2 === 0;
+  const col = isEven ? 7 : 1;
+  const HEIGHT_DELTA = index >= 2 ? AGGREGATION_WIDGET_HEIGHT : 0;
+  const row = Math.ceil((index + 1) / 2) + HEIGHT_DELTA + SUMMARY_ROW_DELTA;
+
+  return new WidgetPosition(col, row, AGGREGATION_WIDGET_HEIGHT, 6);
+};
+
+const createViewWidget = ({ field, groupBy, fnSeries, expr }) => {
+  const rowPivots = [pivotForField(uniq([field, ...groupBy]), new FieldType('value', [], []))];
+  const fnSeriesForFunc = Series.forFunction(fnSeries);
+  const direction = ['>', '>=', '=='].includes(expr) ? Direction.Descending : Direction.Ascending;
+  const sort = [new SortConfig(SortConfig.SERIES_TYPE, fnSeries, direction)];
+
+  return getAggregationWidget({ rowPivots, fnSeries: [fnSeriesForFunc], sort });
+};
+
+const getSummaryAggregation = ({ aggregations, groupBy }) => {
+  const { summaryFnSeries, summaryRowPivots, summaryTitle } = aggregations.reduce((res, { field, value, expr, fnSeries }) => {
+    const concatTitle = `${fnSeries} ${expr} ${value}`;
+    res.summaryFnSeries.push(fnSeries);
+    res.summaryRowPivots.push(field);
+    res.summaryTitle = `${res.summaryTitle} ${concatTitle}`;
+
+    return res;
+  }, {
+    summaryFnSeries: [],
+    summaryRowPivots: [],
+    summaryTitle: 'Summary: ',
+  });
+
+  const summaryWidget = getAggregationWidget({
+    rowPivots: [pivotForField(uniq([...summaryRowPivots, ...groupBy]), new FieldType('value', [], []))],
+    fnSeries: summaryFnSeries.map((s) => Series.forFunction(s)),
+  });
+
+  return ({
+    summaryTitle,
+    summaryWidget,
+    summaryPosition: new WidgetPosition(1, 1, AGGREGATION_WIDGET_HEIGHT, Infinity),
+  });
+};
+
 export const WidgetsGenerator = async ({ streams, aggregations, groupBy }) => {
   const decorators = await DecoratorsActions.list();
   const byStreamId = matchesDecoratorStream(streams);
   const streamDecorators = decorators?.length ? decorators.filter(byStreamId) : [];
   const histogram = resultHistogram();
   const messageTable = allMessagesTable(undefined, streamDecorators);
-  const summaryAggregations = {
-    fnSeries: [],
-    rowPivots: [],
-    title: 'Summary: ',
-  };
   const needsSummaryAggregations = aggregations.length > 1;
   const SUMMARY_ROW_DELTA = needsSummaryAggregations ? AGGREGATION_WIDGET_HEIGHT : 0;
   const { aggregationWidgets, aggregationTitles, aggregationPositions } = aggregations.reduce((res, { field, value, expr, fnSeries }, index) => {
-    const rowPivots = [pivotForField(uniq([field, ...groupBy]), new FieldType('value', [], []))];
-    const fnSeriesForFunc = Series.forFunction(fnSeries);
-    const direction = ['>', '>=', '=='].includes(expr) ? Direction.Descending : Direction.Ascending;
-    const sort = [new SortConfig(SortConfig.SERIES_TYPE, fnSeries, direction)];
-    const widget = getAggregationWidget({ rowPivots, fnSeries: [fnSeriesForFunc], sort });
-    const widgetId = widget.id;
-    const title = `${fnSeries} ${expr} ${value}`;
-    const isEven = (index + 1) % 2 === 0;
-    const col = isEven ? 7 : 1;
-    const HEIGHT_DELTA = index >= 2 ? AGGREGATION_WIDGET_HEIGHT : 0;
-    const row = Math.ceil((index + 1) / 2) + HEIGHT_DELTA + SUMMARY_ROW_DELTA;
-    const position = new WidgetPosition(col, row, AGGREGATION_WIDGET_HEIGHT, 6);
+    const widget = createViewWidget({ fnSeries, field, groupBy, expr });
     res.aggregationWidgets.push(widget);
-    res.aggregationTitles[widgetId] = title;
-    res.aggregationPositions[widgetId] = position;
-
-    if (needsSummaryAggregations) {
-      summaryAggregations.fnSeries.push(fnSeries);
-      summaryAggregations.rowPivots.push(field);
-      summaryAggregations.title = `${summaryAggregations.title} ${title}`;
-    }
+    res.aggregationTitles[widget.id] = `${fnSeries} ${expr} ${value}`;
+    res.aggregationPositions[widget.id] = createViewPosition({ index, SUMMARY_ROW_DELTA });
 
     return res;
   }, { aggregationTitles: {}, aggregationWidgets: [], aggregationPositions: {} });
@@ -123,13 +145,10 @@ export const WidgetsGenerator = async ({ streams, aggregations, groupBy }) => {
   };
 
   if (needsSummaryAggregations) {
-    const summaryAggregationWidget = getAggregationWidget({
-      rowPivots: [pivotForField(uniq([...summaryAggregations.rowPivots, ...groupBy]), new FieldType('value', [], []))],
-      fnSeries: summaryAggregations.fnSeries.map((s) => Series.forFunction(s)),
-    });
-    widgets.push(summaryAggregationWidget);
-    titles.widget[summaryAggregationWidget.id] = summaryAggregations.title;
-    positions[summaryAggregationWidget.id] = new WidgetPosition(1, 1, AGGREGATION_WIDGET_HEIGHT, Infinity);
+    const { summaryTitle, summaryWidget, summaryPosition } = getSummaryAggregation({ aggregations, groupBy });
+    widgets.push(summaryWidget);
+    titles.widget[summaryWidget.id] = summaryTitle;
+    positions[summaryWidget.id] = summaryPosition;
   }
 
   return { titles, widgets, positions };
