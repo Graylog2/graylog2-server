@@ -71,8 +71,8 @@ const useAttributeComponents = () => {
       title: 'Priority',
       content: lodash.upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name),
     },
-    { title: 'Execute search every', content: `${executeEvery.duration}${executeEvery.unit.toLowerCase()}` },
-    { title: 'Search within', content: `${searchWithin.duration}${searchWithin.unit.toLowerCase()}` },
+    { title: 'Execute search every', content: executeEvery?.duration && executeEvery?.unit && `${executeEvery.duration} ${executeEvery.unit.toLowerCase()}` },
+    { title: 'Search within', content: searchWithin?.duration && searchWithin?.unit && `${searchWithin.duration} ${searchWithin.unit.toLowerCase()}` },
     { title: 'Description', content: eventDefinition.description },
     {
       title: 'Notifications',
@@ -87,12 +87,12 @@ const useAttributeComponents = () => {
   ], [
     eventData?.timestamp,
     eventDefinition,
-    executeEvery.duration,
-    executeEvery.unit,
+    executeEvery?.duration,
+    executeEvery?.unit,
     isEDUpdatedAfterEvent,
     isEventDefinition,
-    searchWithin.duration,
-    searchWithin.unit,
+    searchWithin?.duration,
+    searchWithin?.unit,
   ]);
 };
 

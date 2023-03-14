@@ -83,7 +83,7 @@ const EventInfoBar = () => {
           {infoAttributes.map(({ title, content, show }) => (show !== false) && (
             <Item key={title}>
               <b>{title}: </b>
-              <span title={title}>{content || <i>`No ${title} provided`</i>}</span>
+              <span title={title}>{content || <i>No {title} provided</i>}</span>
             </Item>
           ))}
         </Row>

@@ -37,7 +37,7 @@ import ViewsBindings from 'views/bindings';
 
 jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
   EventNotificationsActions: {
-    listAll: jest.fn(async () => Promise.resolve),
+    listAll: jest.fn(async () => Promise.resolve()),
   },
   EventNotificationsStore: MockStore((['getInitialState', () => ({ all: [{ id: 'email_notification_id', title: 'Email notification' }] })])),
 }));
@@ -121,15 +121,14 @@ describe('<EventInfoBar />', () => {
     const field2Condition = await screen.findByTitle('count(field2)<8000');
 
     expect(priority).toHaveTextContent('Normal');
-    expect(execution).toHaveTextContent('1minute');
-    expect(searchWithin).toHaveTextContent('1minute');
+    expect(execution).toHaveTextContent('1 minute');
+    expect(searchWithin).toHaveTextContent('1 minute');
     expect(description).toHaveTextContent('Test description');
     expect(notifications).toHaveTextContent('Email notification');
     expect(aggregationConditions).toHaveTextContent('count(field1)>500count(field2)<8000');
 
     expect(field1Condition.children[0]).toHaveStyle({ backgroundColor: 'rgb(255, 255, 255)' });
     expect(field2Condition.children[0]).toHaveStyle({ backgroundColor: 'rgb(0, 0, 0)' });
-    // expect(aggregationConditions).toContainHTML('<span title="Aggregation conditions"><span><span style="background-color: rgb(255, 255, 255);">count(field1)&gt;500</span></span><span><span style="background-color: rgb(0, 0, 0);">count(field2)&lt;8000, </span></span></span>');
   });
 
   it('Shows event timestamp and event definition link for event', async () => {
