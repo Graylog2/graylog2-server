@@ -31,6 +31,10 @@ public @interface DbEntity {
 
     String titleField() default "title";
 
+    String readPermission() default NO_PERMISSION;
+
     //use for DBEntities that do not have string representations/ titles at all
     String NO_TITLE = "";
+
+    String NO_PERMISSION = "";
 }

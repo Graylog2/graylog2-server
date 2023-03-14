@@ -41,11 +41,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
+
 /**
  * Representing a single stream from the streams collection. Also provides method
  * to get all streams of this collection.
  */
-@DbEntity(collection = "streams")
+@DbEntity(collection = "streams",
+          readPermission = STREAMS_READ)
 public class StreamImpl extends PersistedImpl implements Stream {
     public static final String FIELD_ID = "_id";
     public static final String FIELD_TITLE = "title";

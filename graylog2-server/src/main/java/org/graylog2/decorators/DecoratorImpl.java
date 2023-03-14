@@ -31,11 +31,14 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.graylog2.database.DbEntity.NO_TITLE;
+import static org.graylog2.shared.security.RestPermissions.DEFLECTOR_READ;
 
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
-@DbEntity(collection = "decorators", titleField = NO_TITLE)
+@DbEntity(collection = "decorators",
+          titleField = NO_TITLE,
+          readPermission = DEFLECTOR_READ)
 public abstract class DecoratorImpl implements Decorator, Comparable {
     static final String FIELD_ID = "id";
     static final String FIELD_TYPE = "type";

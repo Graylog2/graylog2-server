@@ -28,9 +28,12 @@ import javax.annotation.Nullable;
 import java.util.Date;
 import java.util.Map;
 
+import static org.graylog2.shared.security.RestPermissions.OUTPUTS_READ;
+
 @AutoValue
 @JsonAutoDetect
-@DbEntity(collection = "outputs")
+@DbEntity(collection = "outputs",
+          readPermission = OUTPUTS_READ)
 public abstract class OutputImpl implements Output {
     static final String FIELD_ID = "_id";
     static final String FIELD_TITLE = "title";

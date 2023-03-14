@@ -41,8 +41,10 @@ import java.util.Collections;
 import java.util.Map;
 
 import static com.google.common.base.Strings.emptyToNull;
+import static org.graylog2.shared.security.RestPermissions.INPUTS_READ;
 
-@DbEntity(collection = "inputs")
+@DbEntity(collection = "inputs",
+          readPermission = INPUTS_READ)
 public class InputImpl extends PersistedImpl implements Input {
     private static final Logger LOG = LoggerFactory.getLogger(InputImpl.class);
 
