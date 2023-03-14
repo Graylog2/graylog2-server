@@ -25,7 +25,17 @@ import ObjectUtils from 'util/ObjectUtils';
 /**
  * Expects `this.props.options` to be an array of period/description objects. `[{period: 'PT1S', description: 'yo'}]`
  */
-class TimeRangeOptionsForm extends React.Component {
+type Option = { period: string, description: string };
+type Props = {
+  options?: Array<Option>,
+  title: string,
+  help: React.ReactNode,
+  addButtonTitle?: string,
+  update: (options: Array<Option>) => void,
+  validator: (milliseconds: number, duration: string) => boolean,
+};
+
+class TimeRangeOptionsForm extends React.Component<Props> {
   static propTypes = {
     options: PropTypes.array,
     title: PropTypes.string.isRequired,
@@ -41,7 +51,7 @@ class TimeRangeOptionsForm extends React.Component {
     validator: () => true,
   };
 
-  _update = (options) => {
+  _update = (options: { period: string; description: string; }[]) => {
     this.props.update(options);
   };
 
@@ -54,7 +64,7 @@ class TimeRangeOptionsForm extends React.Component {
     }
   };
 
-  _onRemove = (removedIdx) => {
+  _onRemove = (removedIdx: number) => {
     return () => {
       const options = ObjectUtils.clone(this.props.options);
 
@@ -65,11 +75,11 @@ class TimeRangeOptionsForm extends React.Component {
     };
   };
 
-  _onChange = (changedIdx, field) => {
+  _onChange = (changedIdx: number, field: string) => {
     return (e) => {
       const options = ObjectUtils.clone(this.props.options);
 
-      options.forEach((o, idx) => {
+      options.forEach((_o, idx) => {
         if (idx === changedIdx) {
           let { value } = e.target;
 
@@ -96,6 +106,7 @@ class TimeRangeOptionsForm extends React.Component {
       const errorStyle = ISODurationUtils.durationStyle(period, this.props.validator, 'has-error');
 
       return (
+        // eslint-disable-next-line react/no-array-index-key
         <div key={`timerange-option-${idx}`}>
           <Row>
             <Col xs={4}>

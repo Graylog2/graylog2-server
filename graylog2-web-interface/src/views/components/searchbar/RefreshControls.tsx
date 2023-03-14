@@ -23,6 +23,7 @@ import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/bootst
 import { Icon, Pluralize } from 'components/common';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import useRefreshConfig from 'views/components/searchbar/useRefreshConfig';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 const FlexibleButtonGroup = styled(ButtonGroup)`
   display: flex;
@@ -46,18 +47,11 @@ const _onChange = (interval: number) => {
   RefreshActions.setInterval(interval);
 };
 
-const INTERVAL_OPTIONS = [
-  ['1 Second', 1000],
-  ['2 Seconds', 2000],
-  ['5 Seconds', 5000],
-  ['10 Seconds', 10000],
-  ['30 Seconds', 30000],
-  ['1 Minute', 60000],
-  ['5 Minutes', 300000],
-] as const;
+const durationToMS = (duration: string) => moment.duration(duration).asMilliseconds();
 
 const RefreshControls = () => {
   const refreshConfig = useRefreshConfig();
+  const { config: { auto_refresh_timerange_options: autoRefreshTimerangeOptions = {} } } = useSearchConfiguration();
 
   useEffect(() => () => RefreshActions.disable(), []);
 
@@ -69,9 +63,9 @@ const RefreshControls = () => {
     }
   }, [refreshConfig?.enabled]);
 
-  const intervalOptions = INTERVAL_OPTIONS.map(([label, interval]) => {
-    return <MenuItem key={`RefreshControls-${label}`} onClick={() => _onChange(interval)}>{label}</MenuItem>;
-  });
+  const intervalOptions = Object.entries(autoRefreshTimerangeOptions).map(([interval, label]) => (
+    <MenuItem key={`RefreshControls-${label}`} onClick={() => _onChange(durationToMS(interval))}>{label}</MenuItem>
+  ));
   const intervalDuration = moment.duration(refreshConfig.interval);
   const naturalInterval = intervalDuration.asSeconds() < 60
     ? <span>{intervalDuration.asSeconds()} <Pluralize singular="second" plural="seconds" value={intervalDuration.asSeconds()} /></span>
