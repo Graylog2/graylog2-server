@@ -15,11 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback } from 'react';
+import styled, { css } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { ShareButton, Icon } from 'components/common';
-import { Button } from 'components/bootstrap';
-import { InvestigationsMenu } from 'components/security/investigations';
+import { ShareButton } from 'components/common';
+import { DropdownButton, MenuItem } from 'components/bootstrap';
+import AddEvidence from 'components/security/investigations/AddEvidence';
 import type View from 'views/logic/views/View';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
@@ -34,6 +36,10 @@ type Props = {
   dashboard: View,
   refetchDashboards: () => void,
 }
+
+const DeleteItem = styled.span(({ theme }: { theme: DefaultTheme }) => css`
+  color: ${theme.colors.variant.danger};
+`);
 
 const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
   const [showShareModal, setShowShareModal] = useState(false);
@@ -53,16 +59,26 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
 
   return (
     <>
-      <InvestigationsMenu id={dashboard.id}
-                          type="dashboards"
-                          bsSize="xsmall"
-                          title={<span><Icon name="puzzle-piece" size="xs" /> Investigations</span>}
-                          pullRight />
       <ShareButton bsSize="xsmall"
                    entityId={dashboard.id}
                    entityType="dashboard"
                    onClick={() => setShowShareModal(true)} />
-      <Button bsSize="xsmall" onClick={onDashboardDelete} bsStyle="danger">Delete</Button>
+      <DropdownButton bsSize="xsmall"
+                      title="More"
+                      id={`more-dropdown-${dashboard.id}`}
+                      pullRight>
+        <AddEvidence id={dashboard.id} type="dashboards">
+          {({ investigationSelected }) => (
+            <MenuItem disabled={!investigationSelected} icon="puzzle-piece">
+              Add to investigation
+            </MenuItem>
+          )}
+        </AddEvidence>
+        <MenuItem divider />
+        <MenuItem onClick={onDashboardDelete}>
+          <DeleteItem role="button">Delete</DeleteItem>
+        </MenuItem>
+      </DropdownButton>
       {showShareModal && (
         <EntityShareModal entityId={dashboard.id}
                           entityType="dashboard"

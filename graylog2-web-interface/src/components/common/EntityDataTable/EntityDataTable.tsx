@@ -37,7 +37,8 @@ import TableRow from './TableRow';
 import type { ColumnRenderers, Column, EntityBase, ColumnRenderersByAttribute } from './types';
 
 const ScrollContainer = styled.div`
-  overflow-x: auto;
+  width: 100%;
+  overflow-x: clip;
 `;
 
 const StyledTable = styled(Table)`
@@ -213,6 +214,22 @@ const EntityDataTable = <Entity extends EntityBase>({
     }));
   }, []);
 
+  /*
+  React.useEffect(() => {
+    const handleOverflow = (e: React.BaseSyntheticEvent) => {
+      console.log(e.target);
+      const scrollContainer = document.getElementById('scroll-container');
+      scrollContainer.style.overflow = scrollContainer.style.overflow !== 'visible' ? 'visible' : 'auto';
+    };
+
+    document.addEventListener('click', handleOverflow, false);
+
+    return () => {
+      document.removeEventListener('click', handleOverflow, false);
+    };
+  }, []);
+  */
+
   return (
     <>
       <ActionsRow>
@@ -235,7 +252,7 @@ const EntityDataTable = <Entity extends EntityBase>({
           </ButtonGroup>
         </LayoutConfigRow>
       </ActionsRow>
-      <ScrollContainer ref={tableRef}>
+      <ScrollContainer id="scroll-container" ref={tableRef}>
         <StyledTable striped condensed hover>
           <TableHead columns={columns}
                      columnsOrder={columnsOrder}

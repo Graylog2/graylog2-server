@@ -22,7 +22,7 @@ import type { DefaultTheme } from 'styled-components';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { Col, Row } from 'components/bootstrap';
 import { Timestamp, Icon } from 'components/common';
-import { AddEvidence } from 'components/security/investigations';
+import AddEvidence from 'components/security/investigations/AddEvidence';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type { Event, EventDefinitionContext } from 'components/events/events/types';
 import ReplaySearchButton from 'views/components/widgets/ReplaySearchButton';

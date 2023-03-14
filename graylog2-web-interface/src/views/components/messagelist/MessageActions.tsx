@@ -21,9 +21,10 @@ import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { ClipboardButton } from 'components/common';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
-import { InvestigationsMenu } from 'components/security/investigations';
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 import type { SearchesConfig } from 'components/search/SearchConfig';
+
+import InvestigationsMenu from './InvestigationsMenu';
 
 const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string, id: string) => {
   const streamList = streams.map((stream) => {

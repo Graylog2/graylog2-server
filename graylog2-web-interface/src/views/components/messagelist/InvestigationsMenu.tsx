@@ -18,9 +18,8 @@ import * as React from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import { DropdownButton, MenuItem } from 'components/bootstrap';
-
-import AddEvidence from './AddEvidence';
-import type { EvidenceTypes } from './types';
+import AddEvidence from 'components/security/investigations/AddEvidence';
+import type { EvidenceTypes } from 'components/security/investigations/types';
 
 type Props = {
   id: string,
