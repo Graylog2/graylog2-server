@@ -18,8 +18,9 @@ import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Button, Col, ControlLabel, FormControl, FormGroup, Row, Input, Alert } from 'components/bootstrap';
+import { Button, Col, ControlLabel, FormControl, FormGroup, Row, Input } from 'components/bootstrap';
 import { ConfirmLeaveDialog, SourceCodeEditor, FormSubmit } from 'components/common';
+import MessageShow from 'components/search/MessageShow';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 
@@ -27,11 +28,15 @@ import { PipelineRulesContext } from './RuleContext';
 import PipelinesUsingRule from './PipelinesUsingRule';
 
 const RuleSimulationFormGroup = styled(FormGroup)`
-  margin-bottom: 32px
+  margin-bottom: 40px;
 `;
 
-const SimulationResult = styled(Alert)`
-  margin-top: 16px
+const ResetButton = styled(Button)`
+  margin-left: 8px;
+`;
+
+const MessageShowContainer = styled.div`
+  padding: 16px;
 `;
 
 type Props = {
@@ -47,11 +52,13 @@ const RuleForm = ({ create }: Props) => {
     onAceLoaded,
     onChangeSource,
     ruleSource,
+    simulateRule,
   } = useContext(PipelineRulesContext);
 
   const [isDirty, setIsDirty] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [showRuleSimulation, setShowRuleSimulation] = useState(false);
+  const [rawMessageToSimulate, setRawMessageToSimulate] = useState('');
+  const [ruleSimulationResult, setRuleSimulationResult] = useState(null);
 
   const handleError = (error) => {
     if (error.responseMessage.includes('duplicate key error')) {
@@ -130,24 +137,30 @@ const RuleForm = ({ create }: Props) => {
           <ControlLabel>Rule Simulation <small className="text-muted">(Optional)</small></ControlLabel>
           <div>
             <Input id="message"
-                   name="message"
                    type="textarea"
                    placeholder="Raw message"
-                   value=""
-                   onChange={() => {}}
-                   rows={3}
-                   required />
+                   value={rawMessageToSimulate}
+                   onChange={(e) => setRawMessageToSimulate(e.target.value)}
+                   rows={3} />
             <Button bsStyle="info"
                     bsSize="xsmall"
                     disabled={false}
-                    onClick={() => setShowRuleSimulation(!showRuleSimulation)}>
+                    onClick={() => simulateRule(rawMessageToSimulate, setRuleSimulationResult)}>
               Run rule simulation
             </Button>
-            {showRuleSimulation && (
-              <SimulationResult bsStyle="success">
-                <b>Simulation result: </b>
-                New Message
-              </SimulationResult>
+            <ResetButton bsStyle="default"
+                         bsSize="xsmall"
+                         disabled={false}
+                         onClick={() => {
+                           setRawMessageToSimulate('');
+                           setRuleSimulationResult(null);
+                         }}>
+              Reset
+            </ResetButton>
+            {ruleSimulationResult && (
+              <MessageShowContainer>
+                <MessageShow message={ruleSimulationResult} />
+              </MessageShowContainer>
             )}
           </div>
         </RuleSimulationFormGroup>
