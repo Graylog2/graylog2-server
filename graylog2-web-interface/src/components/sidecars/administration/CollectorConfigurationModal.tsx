@@ -16,7 +16,7 @@
  */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';

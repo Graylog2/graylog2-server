@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import useGetPermissionsByScope from 'hooks/useScopePermissions';

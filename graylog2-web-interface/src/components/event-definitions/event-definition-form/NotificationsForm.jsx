@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { cloneDeep, without } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import without from 'lodash/without';
 
 import { LinkContainer } from 'components/common/router';
 import { Alert, Col, Row, Button } from 'components/bootstrap';

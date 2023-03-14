@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { find } from 'lodash';
+import find from 'lodash/find';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 

@@ -19,7 +19,8 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { cloneDeep, debounce } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import debounce from 'lodash/debounce';
 
 import { FormSubmit, Select, SourceCodeEditor } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';

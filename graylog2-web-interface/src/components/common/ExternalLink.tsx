@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { trim } from 'lodash';
+import trim from 'lodash/trim';
 
 import type { IconName } from 'components/common/Icon';
 

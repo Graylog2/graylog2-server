@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { FormSubmit, Select, Spinner } from 'components/common';

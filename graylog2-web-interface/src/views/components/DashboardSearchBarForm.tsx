@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useCallback, useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Form, Formik } from 'formik';
-import { isFunction } from 'lodash';
+import isFunction from 'lodash/isFunction';
 import type { FormikProps } from 'formik';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';

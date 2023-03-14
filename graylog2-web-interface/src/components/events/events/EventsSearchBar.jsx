@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import { max } from 'lodash';
+import max from 'lodash/max';
 
 import { ButtonGroup, ControlLabel, FormControl, FormGroup, Button } from 'components/bootstrap';
 import { SearchForm, TimeUnitInput, Icon } from 'components/common';

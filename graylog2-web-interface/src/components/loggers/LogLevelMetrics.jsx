@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { capitalize } from 'lodash';
+import capitalize from 'lodash/capitalize';
 import numeral from 'numeral';
 
 import { Col } from 'components/bootstrap';

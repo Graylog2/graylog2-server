@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { capitalize } from 'lodash';
+import capitalize from 'lodash/capitalize';
 import styled from 'styled-components';
 
 import { CounterDetails, GaugeDetails, HistogramDetails, MeterDetails, TimerDetails } from 'components/metrics';

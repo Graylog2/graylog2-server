@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { capitalize, without } from 'lodash';
+import capitalize from 'lodash/capitalize';
+import without from 'lodash/without';
 import styled, { css } from 'styled-components';
 
 import { Link, LinkContainer } from 'components/common/router';

@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defaultTo, last } from 'lodash';
+import defaultTo from 'lodash/defaultTo';
+import last from 'lodash/last';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 

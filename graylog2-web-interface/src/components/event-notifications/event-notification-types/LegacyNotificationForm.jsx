@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import { Alert, ControlLabel, FormGroup, HelpBlock } from 'components/bootstrap';
 import { Select } from 'components/common';

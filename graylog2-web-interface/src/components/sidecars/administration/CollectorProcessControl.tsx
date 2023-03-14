@@ -16,7 +16,8 @@
  */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { capitalize, uniq } from 'lodash';
+import capitalize from 'lodash/capitalize';
+import uniq from 'lodash/uniq';
 
 import { Button, Panel, BootstrapModalConfirm } from 'components/bootstrap';
 import { Pluralize, SelectPopover } from 'components/common';

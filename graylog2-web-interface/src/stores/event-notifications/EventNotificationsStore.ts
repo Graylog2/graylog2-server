@@ -16,7 +16,7 @@
  */
 import Reflux from 'reflux';
 import URI from 'urijs';
-import { concat } from 'lodash';
+import concat from 'lodash/concat';
 
 import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';

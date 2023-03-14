@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import moment from 'moment-timezone';
-import { uniq } from 'lodash';
+import uniq from 'lodash/uniq';
 
 import Select from 'components/common/Select';
 

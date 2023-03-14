@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { ExternalLink } from 'components/common';
 import { Checkbox, Col, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';

@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { remove } from 'lodash';
+import remove from 'lodash/remove';
 
 import { Row, Col, BootstrapModalConfirm } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';

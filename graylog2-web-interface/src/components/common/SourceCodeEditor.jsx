@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { isFinite } from 'lodash';
+import isFinite from 'lodash/isFinite';
 import PropTypes from 'prop-types';
 import { Resizable } from 'react-resizable';
 import AceEditor from 'react-ace';

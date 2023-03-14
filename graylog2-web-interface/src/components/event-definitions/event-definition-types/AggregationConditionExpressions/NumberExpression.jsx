@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { cloneDeep, get } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import get from 'lodash/get';
 
 import { Input, Col } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';

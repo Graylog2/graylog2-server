@@ -16,7 +16,9 @@
  */
 import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { countBy, intersection, uniq } from 'lodash';
+import countBy from 'lodash/countBy';
+import intersection from 'lodash/intersection';
+import uniq from 'lodash/uniq';
 import styled from 'styled-components';
 
 import { naturalSortIgnoreCase } from 'util/SortUtils';

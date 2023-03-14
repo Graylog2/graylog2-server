@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { capitalize } from 'lodash';
+import capitalize from 'lodash/capitalize';
 
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 import { LoggersActions, LoggersStore } from 'stores/system/LoggersStore';

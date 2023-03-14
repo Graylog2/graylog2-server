@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 import { Modal, Button, BootstrapModalWrapper } from 'components/bootstrap';
 import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';

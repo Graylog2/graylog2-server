@@ -16,7 +16,11 @@
  */
 import Reflux from 'reflux';
 import URI from 'urijs';
-import { cloneDeep, concat, defaultTo, pick, omit } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import concat from 'lodash/concat';
+import defaultTo from 'lodash/defaultTo';
+import pick from 'lodash/pick';
+import omit from 'lodash/omit';
 
 import * as URLUtils from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';

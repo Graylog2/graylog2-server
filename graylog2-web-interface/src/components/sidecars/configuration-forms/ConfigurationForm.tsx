@@ -16,7 +16,10 @@
  */
 import PropTypes from 'prop-types';
 import React, { useState, useRef, useEffect } from 'react';
-import { clone, cloneDeep, debounce, upperFirst } from 'lodash';
+import clone from 'lodash/clone';
+import cloneDeep from 'lodash/cloneDeep';
+import debounce from 'lodash/debounce';
+import upperFirst from 'lodash/upperFirst';
 
 import history from 'util/History';
 import { ColorPickerPopover, FormSubmit, Select, SourceCodeEditor } from 'components/common';

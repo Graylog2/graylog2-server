@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { forEach, forOwn } from 'lodash';
+import forEach from 'lodash/forEach';
+import forOwn from 'lodash/forOwn';
 import Immutable from 'immutable';
 
 export default {

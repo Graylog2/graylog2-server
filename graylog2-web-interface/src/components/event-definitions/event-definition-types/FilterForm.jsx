@@ -16,7 +16,16 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { camelCase, cloneDeep, debounce, defaultTo, get, isEmpty, merge, memoize, max, union } from 'lodash';
+import camelCase from 'lodash/camelCase';
+import cloneDeep from 'lodash/cloneDeep';
+import debounce from 'lodash/debounce';
+import defaultTo from 'lodash/defaultTo';
+import get from 'lodash/get';
+import isEmpty from 'lodash/isEmpty';
+import merge from 'lodash/merge';
+import memoize from 'lodash/memoize';
+import max from 'lodash/max';
+import union from 'lodash/union';
 import moment from 'moment';
 
 import { MultiSelect, TimeUnitInput } from 'components/common';

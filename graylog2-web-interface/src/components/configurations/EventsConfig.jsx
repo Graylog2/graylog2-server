@@ -18,7 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
-import { capitalize, cloneDeep } from 'lodash';
+import capitalize from 'lodash/capitalize';
+import cloneDeep from 'lodash/cloneDeep';
 import moment from 'moment';
 
 import { Button, FormGroup, HelpBlock, BootstrapModalForm } from 'components/bootstrap';

@@ -16,7 +16,7 @@
  */
 import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { uniq } from 'lodash';
+import uniq from 'lodash/uniq';
 import styled from 'styled-components';
 
 import { ButtonToolbar, Button } from 'components/bootstrap';

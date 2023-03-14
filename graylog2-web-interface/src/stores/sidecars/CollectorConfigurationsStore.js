@@ -16,7 +16,7 @@
  */
 import Reflux from 'reflux';
 import URI from 'urijs';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 
 import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';

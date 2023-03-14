@@ -16,7 +16,7 @@
  */
 import Reflux from 'reflux';
 import URI from 'urijs';
-import { concat } from 'lodash';
+import concat from 'lodash/concat';
 import Bluebird from 'bluebird';
 
 import * as URLUtils from 'util/URLUtils';

@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, isEmpty } from 'lodash';
+import get from 'lodash/get';
+import isEmpty from 'lodash/isEmpty';
 
 import { Col, ControlLabel, FormGroup, Radio, Row } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';

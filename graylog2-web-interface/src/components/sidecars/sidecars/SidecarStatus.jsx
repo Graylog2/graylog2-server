@@ -18,7 +18,8 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import { defaultTo, isNumber } from 'lodash';
+import defaultTo from 'lodash/defaultTo';
+import isNumber from 'lodash/isNumber';
 
 import { Col, Row, Button } from 'components/bootstrap';
 import { Icon } from 'components/common';

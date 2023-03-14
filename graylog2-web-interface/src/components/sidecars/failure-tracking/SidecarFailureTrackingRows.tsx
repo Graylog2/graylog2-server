@@ -71,7 +71,7 @@ const SidecarFailureTrackingRows = ({ sidecar, collectors, onShowDetails }: Prop
 
   return (
     // eslint-disable-next-line react/jsx-no-useless-fragment
-    <>
+    (<>
       {collectorStatusList?.filter((collector) => collector.status === 2).map((collector) => {
         const collectorData = getCollectorInformation(collector.collector_id);
 
@@ -114,7 +114,7 @@ const SidecarFailureTrackingRows = ({ sidecar, collectors, onShowDetails }: Prop
           </tr>
         );
       })}
-    </>
+    </>)
   );
 };
 

@@ -17,7 +17,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import { defaultTo, get } from 'lodash';
+import defaultTo from 'lodash/defaultTo';
+import get from 'lodash/get';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Select } from 'components/common';

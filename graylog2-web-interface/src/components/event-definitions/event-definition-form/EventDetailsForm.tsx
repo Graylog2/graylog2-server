@@ -16,7 +16,11 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, map, upperFirst, toNumber, toString } from 'lodash';
+import get from 'lodash/get';
+import map from 'lodash/map';
+import upperFirst from 'lodash/upperFirst';
+import toNumber from 'lodash/toNumber';
+import toString from 'lodash/toString';
 
 import { Select } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';

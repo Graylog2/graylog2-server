@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { isEmpty, upperFirst } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
+import upperFirst from 'lodash/upperFirst';
 
 import { Link } from 'components/common/router';
 import { Alert } from 'components/bootstrap';

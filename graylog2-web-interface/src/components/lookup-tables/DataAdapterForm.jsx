@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { TimeUnitInput, FormSubmit } from 'components/common';

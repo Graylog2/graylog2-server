@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { debounce, isEqual } from 'lodash';
+import debounce from 'lodash/debounce';
+import isEqual from 'lodash/isEqual';
 
 import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';

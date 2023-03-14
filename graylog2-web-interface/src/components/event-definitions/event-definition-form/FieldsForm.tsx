@@ -17,7 +17,9 @@
 import * as React from 'react';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { cloneDeep, get, omit } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import get from 'lodash/get';
+import omit from 'lodash/omit';
 
 import { OverlayTrigger, Icon } from 'components/common';
 import { Alert, Col, Row, Button } from 'components/bootstrap';

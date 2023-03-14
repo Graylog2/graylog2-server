@@ -17,7 +17,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import { get, isNumber } from 'lodash';
+import get from 'lodash/get';
+import isNumber from 'lodash/isNumber';
 
 import {
   OverlayTrigger,

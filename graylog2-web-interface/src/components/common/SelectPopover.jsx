@@ -16,7 +16,9 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { concat, isEqual, without } from 'lodash';
+import concat from 'lodash/concat';
+import isEqual from 'lodash/isEqual';
+import without from 'lodash/without';
 import IsolatedScroll from 'react-isolated-scroll';
 
 import {

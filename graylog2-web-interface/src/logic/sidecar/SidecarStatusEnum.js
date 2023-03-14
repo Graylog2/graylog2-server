@@ -14,7 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { lowerCase, toNumber } from 'lodash';
+import lowerCase from 'lodash/lowerCase';
+
+import toNumber from 'lodash/toNumber';
 
 const SidecarStatusEnum = {
   RUNNING: 0,

@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { cloneDeep, memoize } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import memoize from 'lodash/memoize';
 
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { Select } from 'components/common';

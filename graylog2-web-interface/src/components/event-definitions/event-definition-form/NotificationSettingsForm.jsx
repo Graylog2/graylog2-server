@@ -16,7 +16,10 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { camelCase, cloneDeep, defaultTo, max } from 'lodash';
+import camelCase from 'lodash/camelCase';
+import cloneDeep from 'lodash/cloneDeep';
+import defaultTo from 'lodash/defaultTo';
+import max from 'lodash/max';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
 

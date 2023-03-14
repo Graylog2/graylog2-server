@@ -17,7 +17,9 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import { find, uniq, upperFirst } from 'lodash';
+import find from 'lodash/find';
+import uniq from 'lodash/uniq';
+import upperFirst from 'lodash/upperFirst';
 
 import { SelectPopover } from 'components/common';
 import { Button, ButtonToolbar } from 'components/bootstrap';

@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { defaultTo } from 'lodash';
+import defaultTo from 'lodash/defaultTo';
 
 import { MultiSelect } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';

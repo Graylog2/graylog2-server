@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';

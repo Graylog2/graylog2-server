@@ -16,7 +16,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { Form, Formik } from 'formik';
-import { capitalize } from 'lodash';
+import capitalize from 'lodash/capitalize';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 import 'components/indices/rotation';

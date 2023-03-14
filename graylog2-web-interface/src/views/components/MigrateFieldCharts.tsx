@@ -17,7 +17,8 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 import styled from 'styled-components';
-import { values, isEmpty } from 'lodash';
+import values from 'lodash/values';
+import isEmpty from 'lodash/isEmpty';
 import * as Immutable from 'immutable';
 
 import Store from 'logic/local-storage/Store';

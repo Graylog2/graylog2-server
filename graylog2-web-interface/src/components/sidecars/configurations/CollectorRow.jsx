@@ -18,7 +18,7 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import { upperFirst } from 'lodash';
+import upperFirst from 'lodash/upperFirst';
 
 import { LinkContainer } from 'components/common/router';
 import { ButtonToolbar, DropdownButton, MenuItem, Button } from 'components/bootstrap';

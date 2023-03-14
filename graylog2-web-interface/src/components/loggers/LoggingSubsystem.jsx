@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { capitalize } from 'lodash';
+import capitalize from 'lodash/capitalize';
 
 import { ButtonGroup, Col } from 'components/bootstrap';
 import { LogLevelDropdown } from 'components/loggers';

@@ -16,7 +16,10 @@
  */
 import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { isEmpty, union, uniq, without } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
+import union from 'lodash/union';
+import uniq from 'lodash/uniq';
+import without from 'lodash/without';
 import styled, { css } from 'styled-components';
 
 import { naturalSortIgnoreCase } from 'util/SortUtils';

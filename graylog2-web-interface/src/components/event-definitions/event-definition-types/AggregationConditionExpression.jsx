@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { cloneDeep, get } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import get from 'lodash/get';
 
 import { Icon } from 'components/common';
 import { Button, ButtonToolbar, Clearfix, Col, FormGroup } from 'components/bootstrap';

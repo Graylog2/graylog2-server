@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { clone, cloneDeep } from 'lodash';
+import clone from 'lodash/clone';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { ConfirmLeaveDialog } from 'components/common';
 import history from 'util/History';

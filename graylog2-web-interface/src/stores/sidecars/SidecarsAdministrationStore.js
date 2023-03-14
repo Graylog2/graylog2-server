@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
-import { upperFirst } from 'lodash';
+import upperFirst from 'lodash/upperFirst';
 
 import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';

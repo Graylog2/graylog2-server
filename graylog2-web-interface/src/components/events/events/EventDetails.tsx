@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
-import { capitalize, isEmpty } from 'lodash';
+import capitalize from 'lodash/capitalize';
+import isEmpty from 'lodash/isEmpty';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import { Col, Row } from 'components/bootstrap';

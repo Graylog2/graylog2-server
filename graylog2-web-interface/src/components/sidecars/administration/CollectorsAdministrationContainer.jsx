@@ -19,7 +19,9 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import Reflux from 'reflux';
-import { cloneDeep, find, isEmpty } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import find from 'lodash/find';
+import isEmpty from 'lodash/isEmpty';
 
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import { Spinner } from 'components/common';

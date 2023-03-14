@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 import { Button } from 'components/bootstrap';
 import TypeAheadInput from 'components/common/TypeAheadInput';

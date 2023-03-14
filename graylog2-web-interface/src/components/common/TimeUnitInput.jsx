@@ -18,7 +18,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
-import { defaultTo, isEqual, last, isInteger } from 'lodash';
+import defaultTo from 'lodash/defaultTo';
+import isEqual from 'lodash/isEqual';
+import last from 'lodash/last';
+import isInteger from 'lodash/isInteger';
 import moment from 'moment';
 
 import {

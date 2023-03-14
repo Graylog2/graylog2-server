@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { Spinner } from 'components/common';
 import { Alert, BootstrapModalForm, Input } from 'components/bootstrap';

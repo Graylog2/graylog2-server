@@ -14,7 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { map, mapKeys, mapValues } from 'lodash';
+import map from 'lodash/map';
+import mapKeys from 'lodash/mapKeys';
+import mapValues from 'lodash/mapValues';
 import moment from 'moment';
 import crossfilter from 'crossfilter';
 

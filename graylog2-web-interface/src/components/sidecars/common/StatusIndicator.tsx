@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { upperFirst } from 'lodash';
+import upperFirst from 'lodash/upperFirst';
 
 import { Popover } from 'components/bootstrap';
 import { OverlayTrigger, Icon } from 'components/common';

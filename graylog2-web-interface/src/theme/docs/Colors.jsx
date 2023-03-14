@@ -90,14 +90,13 @@ const ColorSwatch = ({ className, color, name, copyText }) => {
   }, [copyText]);
 
   return (
-    <Wrapped className={className}>
+    (<Wrapped className={className}>
       <StyledTooltip placement="top"
                      opened={opened}
                      positionTop={-32}
                      id={`${copyText ? copyText.replace(/\./g, '-') : name}-tooltip`}>
         Copied!
       </StyledTooltip>
-
       <Swatch color={color}
               data-clipboard-button
               data-clipboard-text={copyText}
@@ -105,7 +104,7 @@ const ColorSwatch = ({ className, color, name, copyText }) => {
         <Name>{name}</Name>
         <Value>{color}</Value>
       </Swatch>
-    </Wrapped>
+    </Wrapped>)
   );
 };
 
