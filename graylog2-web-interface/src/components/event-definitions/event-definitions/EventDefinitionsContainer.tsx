@@ -18,13 +18,12 @@ import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
 
 import { EntityDataTable, NoSearchResult, PaginatedList, QueryHelper, SearchForm, Spinner } from 'components/common';
-import type { SearchParams, Sort } from 'stores/PaginationTypes';
+import type { Sort } from 'stores/PaginationTypes';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import 'components/event-definitions/event-definition-types';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
-import type { Filters } from 'components/common/EntityFilters/types';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import { ADDITIONAL_ATTRIBUTES } from 'components/streams/StreamsOverview/Constants';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
