@@ -151,7 +151,7 @@ const AppRouter = () => {
           element: <PageContentLayout />,
           children: [
             { path: RoutePaths.message_show(':index', ':messageId'), element: <ShowMessagePage /> },
-            { path: Routes.WELCOME, element: <WelcomePage /> },
+            { path: RoutePaths.WELCOME, element: <WelcomePage /> },
             { path: RoutePaths.STREAMS, element: <StreamsPage /> },
             { path: RoutePaths.stream_edit(':streamId'), element: <StreamEditPage /> },
             !isCloud && { path: RoutePaths.stream_outputs(':streamId'), element: <StreamOutputsPage /> },
@@ -282,7 +282,7 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.SIDECARS.STATUS(':sidecarId'), element: <SidecarStatusPage /> },
             { path: RoutePaths.SYSTEM.SIDECARS.ADMINISTRATION, element: <SidecarAdministrationPage /> },
             { path: RoutePaths.SYSTEM.SIDECARS.CONFIGURATION, element: <SidecarConfigurationPage /> },
-            { path: RoutePaths.SYSTEM.SIDECARS.FAILURE_TRACKING, element: <SidecarFailureTrackingPage />},
+            { path: RoutePaths.SYSTEM.SIDECARS.FAILURE_TRACKING, element: <SidecarFailureTrackingPage /> },
             { path: RoutePaths.SYSTEM.SIDECARS.NEW_CONFIGURATION, element: <SidecarNewConfigurationPage /> },
             { path: RoutePaths.SYSTEM.SIDECARS.EDIT_CONFIGURATION(':configurationId'), element: <SidecarEditConfigurationPage /> },
             { path: RoutePaths.SYSTEM.SIDECARS.NEW_COLLECTOR, element: <SidecarNewCollectorPage /> },
