@@ -40,6 +40,7 @@ class MessageDetail extends React.Component {
   static defaultProps = {
     inputs: undefined,
     nodes: undefined,
+    streams: undefined,
     customFieldActions: undefined,
   };
 
@@ -98,7 +99,7 @@ class MessageDetail extends React.Component {
   _getStreamLinks = (streamIds) => {
     const { streams, message } = this.props;
 
-    if(message.streams){
+    if (message.streams) {
       return message.streams.map((stream) => (<li key={stream.id}><StreamLink stream={stream} /></li>));
     }
 
@@ -112,7 +113,7 @@ class MessageDetail extends React.Component {
       return null;
     });
 
-    return _streams
+    return _streams;
   };
 
   render() {

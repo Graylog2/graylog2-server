@@ -34,6 +34,7 @@ class MessageShow extends React.Component {
   static defaultProps = {
     inputs: undefined,
     nodes: undefined,
+    streams: undefined,
   };
 
   constructor(props) {
@@ -46,6 +47,7 @@ class MessageShow extends React.Component {
     this.setState(this._getImmutableProps(nextProps));
   }
 
+  // eslint-disable-next-line class-methods-use-this
   _getImmutableProps = (props) => {
     return {
       streams: props.streams ? Immutable.Map(props.streams) : props.streams,

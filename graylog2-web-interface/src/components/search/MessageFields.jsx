@@ -33,19 +33,20 @@ class MessageFields extends React.Component {
 
   _formatFields = (fields) => {
     return Object.keys(fields)
-    .sort()
-    .map((key) => {
-      return (
-        <MessageField key={key}
-                      {...this.props}
-                      fieldName={key}
-                      value={fields[key]} />
-      );
-    });
+      .sort()
+      .map((key) => {
+        return (
+          <MessageField key={key}
+                        {...this.props}
+                        fieldName={key}
+                        value={fields[key]} />
+        );
+      });
   };
 
   render() {
     const { message } = this.props;
+    // eslint-disable-next-line no-unused-vars
     const { _id, ...formatted_fields } = message.fields;
     const formattedFields = message.formatted_fields || formatted_fields;
     const fields = this._formatFields(formattedFields);
