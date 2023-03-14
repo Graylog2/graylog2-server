@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -50,6 +51,7 @@ import java.util.stream.Collectors;
 import static org.graylog2.grok.GrokPatternService.ImportStrategy.ABORT_ON_CONFLICT;
 import static org.graylog2.grok.GrokPatternService.ImportStrategy.DROP_ALL_EXISTING;
 
+@Singleton
 public class MongoDbGrokPatternService extends GrokPatternServiceImpl {
     public static final String COLLECTION_NAME = "grok_patterns";
     public static final String INDEX_NAME = "idx_name_asc_unique";
