@@ -16,7 +16,7 @@
  */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { capitalize, uniq } from 'lodash';
 
 import { Button, Panel, BootstrapModalConfirm } from 'components/bootstrap';
 import { Pluralize, SelectPopover } from 'components/common';
@@ -87,7 +87,7 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
           Configuration to it and the Sidecar will start the process for you.
         </p>
         <p>
-          {lodash.capitalize(selectedAction)}ing a Collector without Configuration will have no effect.
+          {capitalize(selectedAction)}ing a Collector without Configuration will have no effect.
         </p>
         <Button bsSize="xsmall" bsStyle="primary" onClick={hideConfigurationWarning}>Understood, continue
           anyway
@@ -97,7 +97,7 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
   };
 
   const renderProcessActionSummary = () => {
-    const selectedSidecars = lodash.uniq<string>(selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name));
+    const selectedSidecars = uniq<string>(selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name));
 
     // Check if all selected collectors have assigned configurations
     const allHaveConfigurationsAssigned = selectedSidecarCollectorPairs.every(({ collector, sidecar }) => {
@@ -121,7 +121,7 @@ const CollectorProcessControl = ({ selectedSidecarCollectorPairs, onProcessActio
     );
   };
 
-  const actionFormatter = (action: string) => lodash.capitalize(action);
+  const actionFormatter = (action: string) => capitalize(action);
 
   return (
     <span>

@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { clone, cloneDeep } from 'lodash';
 
 import { ConfirmLeaveDialog } from 'components/common';
 import history from 'util/History';
@@ -86,7 +86,7 @@ class EventNotificationFormContainer extends React.Component {
 
   handleChange = (key, value) => {
     const { notification } = this.state;
-    const nextNotification = lodash.cloneDeep(notification);
+    const nextNotification = cloneDeep(notification);
 
     nextNotification[key] = value;
     this.setState({ notification: nextNotification, isDirty: true, testResult: initialTestResult });
@@ -152,7 +152,7 @@ class EventNotificationFormContainer extends React.Component {
     const { notification } = this.state;
 
     this.setState({ testResult: { isLoading: true }, validation: initialValidation });
-    const testResult = lodash.clone(initialTestResult);
+    const testResult = clone(initialTestResult);
 
     this.testPromise = EventNotificationsActions.test(notification);
 

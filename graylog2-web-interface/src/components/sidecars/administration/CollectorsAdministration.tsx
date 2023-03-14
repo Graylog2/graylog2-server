@@ -16,7 +16,7 @@
  */
 import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { isEmpty, union, uniq, without } from 'lodash';
 import styled, { css } from 'styled-components';
 
 import { naturalSortIgnoreCase } from 'util/SortUtils';
@@ -136,7 +136,7 @@ const CollectorsAdministration = ({
   const selectAllInput = useRef(null);
 
   // Filter out sidecars with no compatible collectors
-  const enabledCollectors = sidecarCollectorPairs.filter(({ collector }) => !lodash.isEmpty(collector));
+  const enabledCollectors = sidecarCollectorPairs.filter(({ collector }) => !isEmpty(collector));
 
   const sidecarCollectorId = (sidecar: SidecarSummary, collector: Collector) => {
     return `${sidecar.node_id}-${collector.name}`;
@@ -222,8 +222,8 @@ const CollectorsAdministration = ({
   const handleSidecarCollectorSelect = (collectorId: string) => {
     return (event) => {
       const newSelection = (event.target.checked
-        ? lodash.union(selected, [collectorId])
-        : lodash.without(selected, collectorId));
+        ? union(selected, [collectorId])
+        : without(selected, collectorId));
 
       setSelected(newSelection);
     };
@@ -365,13 +365,13 @@ const CollectorsAdministration = ({
       </ControlledTableList.Item>
     );
   } else {
-    const sidecars = lodash.uniq<SidecarSummary>(sidecarCollectorPairs.map(({ sidecar }) => sidecar));
+    const sidecars = uniq<SidecarSummary>(sidecarCollectorPairs.map(({ sidecar }) => sidecar));
 
     formattedCollectors = sidecars.map((sidecarToMap) => {
       const sidecarCollectors = sidecarCollectorPairs
         .filter(({ sidecar }) => sidecar.node_id === sidecarToMap.node_id)
         .map(({ collector }) => collector)
-        .filter((collector) => !lodash.isEmpty(collector));
+        .filter((collector) => !isEmpty(collector));
 
       return formatSidecar(sidecarToMap, sidecarCollectors, configurations);
     });

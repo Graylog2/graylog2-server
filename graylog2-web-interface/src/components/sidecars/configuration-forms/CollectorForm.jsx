@@ -19,7 +19,7 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import lodash from 'lodash';
+import { cloneDeep, debounce } from 'lodash';
 
 import { FormSubmit, Select, SourceCodeEditor } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
@@ -83,7 +83,7 @@ const CollectorForm = createReactClass({
   },
 
   UNSAFE_componentWillMount() {
-    this._debouncedValidateFormData = lodash.debounce(this._validateFormData, 200);
+    this._debouncedValidateFormData = debounce(this._validateFormData, 200);
   },
 
   componentDidMount() {
@@ -115,7 +115,7 @@ const CollectorForm = createReactClass({
     const { formData } = this.state;
 
     return (nextValue) => {
-      const nextFormData = lodash.cloneDeep(formData);
+      const nextFormData = cloneDeep(formData);
 
       nextFormData[key] = nextValue;
       this._debouncedValidateFormData(nextFormData);

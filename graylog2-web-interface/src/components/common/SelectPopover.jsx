@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { concat, isEqual, without } from 'lodash';
 import IsolatedScroll from 'react-isolated-scroll';
 
 import {
@@ -105,7 +105,7 @@ class SelectPopover extends React.Component {
     const { items, selectedItems } = this.props;
     const { filterText } = this.state;
 
-    if (!lodash.isEqual(selectedItems, nextProps.selectedItems)) {
+    if (!isEqual(selectedItems, nextProps.selectedItems)) {
       this.setState({ selectedItems: nextProps.selectedItems });
     }
 
@@ -133,7 +133,7 @@ class SelectPopover extends React.Component {
 
       if (multiple) {
         // Clicking on a selected value on a multiselect input will toggle the item's select status
-        nextSelectedItems = selectedItems.includes(item) ? lodash.without(selectedItems, item) : lodash.concat(selectedItems, item);
+        nextSelectedItems = selectedItems.includes(item) ? without(selectedItems, item) : concat(selectedItems, item);
       } else {
         nextSelectedItems = [item];
       }

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import lodash from 'lodash';
+import { lowerCase, toNumber } from 'lodash';
 
 const SidecarStatusEnum = {
   RUNNING: 0,
@@ -33,7 +33,7 @@ const SidecarStatusEnum = {
   },
 
   toStatusCode(stringStatus) {
-    const status = lodash.lowerCase(stringStatus);
+    const status = lowerCase(stringStatus);
 
     if (status === this.properties[this.RUNNING].name) {
       return this.RUNNING;
@@ -51,7 +51,7 @@ const SidecarStatusEnum = {
   },
 
   toString(statusCode) {
-    switch (lodash.toNumber(statusCode)) {
+    switch (toNumber(statusCode)) {
       case this.RUNNING:
         return 'running';
       case this.FAILING:

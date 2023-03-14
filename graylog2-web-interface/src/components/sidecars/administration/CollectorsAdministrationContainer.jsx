@@ -19,7 +19,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import Reflux from 'reflux';
-import lodash from 'lodash';
+import { cloneDeep, find, isEmpty } from 'lodash';
 
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import { Spinner } from 'components/common';
@@ -76,7 +76,7 @@ const CollectorsAdministrationContainer = createReactClass({
     let newFilters;
 
     if (property) {
-      newFilters = lodash.cloneDeep(filters);
+      newFilters = cloneDeep(filters);
       newFilters[property] = value;
     } else {
       newFilters = {};
@@ -145,14 +145,14 @@ const CollectorsAdministrationContainer = createReactClass({
       .forEach((sidecar) => {
         const compatibleCollectorIds = sidecar.collectors;
 
-        if (lodash.isEmpty(compatibleCollectorIds)) {
+        if (isEmpty(compatibleCollectorIds)) {
           sidecarCollectors.push({ collector: {}, sidecar: sidecar });
 
           return;
         }
 
         compatibleCollectorIds
-          .map((id) => lodash.find(collectors.collectors, { id: id }))
+          .map((id) => find(collectors.collectors, { id: id }))
           .forEach((compatibleCollector) => {
             sidecarCollectors.push({ collector: compatibleCollector, sidecar: sidecar });
           });
