@@ -21,41 +21,24 @@ import lodash from 'lodash';
 
 import { TIME_UNITS } from 'components/event-definitions/event-definition-types/FilterForm';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
-import { useStore } from 'stores/connect';
-import { EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { Timestamp, HoverForHelp } from 'components/common';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 
+import AggregationConditions from '../AggreagtionConditions';
+import Notifications from '../Notifications';
+
 const AlertTimestamp = styled(Timestamp)(({ theme }) => css`
   color: ${theme.colors.variant.darker.warning};
 `);
 
 const useAttributeComponents = () => {
-  const allNotifications = useStore(EventNotificationsStore, ({ all }) => {
-    return all.reduce((res, cur) => {
-      res[cur.id] = cur;
-
-      return res;
-    }, {});
-  });
   const { eventData, eventDefinition, isEventDefinition } = useAlertAndEventDefinitionData();
 
   const searchWithin = extractDurationAndUnit(eventDefinition.config.search_within_ms, TIME_UNITS);
   const executeEvery = extractDurationAndUnit(eventDefinition.config.execute_every_ms, TIME_UNITS);
-
-  const notificationList = useMemo(() => {
-    return eventDefinition.notifications.reduce((res, cur) => {
-      if (allNotifications[cur.notification_id]) {
-        res.push((allNotifications[cur.notification_id]));
-      }
-
-      return res;
-    }, []);
-  }, [eventDefinition, allNotifications]);
-
   const isEDUpdatedAfterEvent = !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData.timestamp) > 0;
 
   return useMemo(() => [
@@ -93,32 +76,21 @@ const useAttributeComponents = () => {
     { title: 'Description', content: eventDefinition.description },
     {
       title: 'Notifications',
-      content: notificationList.map(({ id, title }, index) => {
-        const prefix = index > 0 ? ', ' : '';
-
-        return (
-          <span key={id}>
-            {prefix}
-            <Link target="_blank" to={Routes.ALERTS.NOTIFICATIONS.show(id)}>{title}</Link>
-          </span>
-        );
-      }),
+      content: <Notifications />,
     },
     {
       title: 'Aggregation conditions',
-      content: (<AggregationCondition />
+      content: (<AggregationConditions />
 
       ),
     },
-  ], [changeColor,
+  ], [
     eventData?.timestamp,
     eventDefinition,
     executeEvery.duration,
     executeEvery.unit,
-    highlightedAggregations,
     isEDUpdatedAfterEvent,
     isEventDefinition,
-    notificationList,
     searchWithin.duration,
     searchWithin.unit,
   ]);
