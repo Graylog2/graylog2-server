@@ -130,7 +130,7 @@ const EventDefinitionsContainer = () => {
 
   return (
     <PaginatedList onChange={onPageChange}
-                   pageSize={searchParams.pageSize}
+                   showPageSizeSelect={false}
                    totalItems={total}>
       <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
