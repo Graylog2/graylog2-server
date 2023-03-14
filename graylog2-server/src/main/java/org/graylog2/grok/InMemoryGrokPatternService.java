@@ -36,7 +36,6 @@ import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 import static org.graylog2.grok.GrokPatternService.ImportStrategy.ABORT_ON_CONFLICT;
-import static org.graylog2.grok.GrokPatternService.ImportStrategy.DROP_ALL_EXISTING;
 
 public class InMemoryGrokPatternService extends GrokPatternServiceImpl {
     // poor man's id generator
@@ -133,18 +132,7 @@ public class InMemoryGrokPatternService extends GrokPatternServiceImpl {
                 }
             }
         }
-
-        try {
-            if (!validateAll(patterns)) {
-                throw new ValidationException("Patterns invalid.");
-            }
-        } catch (GrokException | PatternSyntaxException e) {
-            throw new ValidationException("Invalid patterns.\n" + e.getMessage());
-        }
-
-        if (importStrategy == DROP_ALL_EXISTING) {
-            deleteAll();
-        }
+        validateAllOrThrow(patterns, importStrategy);
 
         final List<GrokPattern> grokPatterns = patterns.stream()
                 .map(this::uncheckedSave)

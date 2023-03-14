@@ -49,7 +49,6 @@ import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 import static org.graylog2.grok.GrokPatternService.ImportStrategy.ABORT_ON_CONFLICT;
-import static org.graylog2.grok.GrokPatternService.ImportStrategy.DROP_ALL_EXISTING;
 
 @Singleton
 public class MongoDbGrokPatternService extends GrokPatternServiceImpl {
@@ -181,18 +180,7 @@ public class MongoDbGrokPatternService extends GrokPatternServiceImpl {
                         + ".");
             }
         }
-
-        try {
-            if (!validateAll(patterns)) {
-                throw new ValidationException("Invalid patterns");
-            }
-        } catch (GrokException | PatternSyntaxException e) {
-            throw new ValidationException("Invalid patterns.\n" + e.getMessage());
-        }
-
-        if (importStrategy == DROP_ALL_EXISTING) {
-            deleteAll();
-        }
+        validateAllOrThrow(patterns, importStrategy);
 
         final List<GrokPattern> savedPatterns = patterns.stream()
                 .map(newPattern -> {

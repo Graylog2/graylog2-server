@@ -20,13 +20,16 @@ import com.google.common.base.Strings;
 import io.krakens.grok.api.Grok;
 import io.krakens.grok.api.GrokCompiler;
 import io.krakens.grok.api.exception.GrokException;
+import org.graylog2.plugin.database.ValidationException;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.PatternSyntaxException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.graylog2.grok.GrokPatternService.ImportStrategy.DROP_ALL_EXISTING;
 
 abstract class GrokPatternServiceImpl implements GrokPatternService {
     @Override
@@ -76,5 +79,19 @@ abstract class GrokPatternServiceImpl implements GrokPatternService {
             grokCompiler.compile("%{" + newPattern.name() + "}");
         }
         return true;
+    }
+
+    protected void validateAllOrThrow(Collection<GrokPattern> newPatterns, ImportStrategy importStrategy) throws ValidationException {
+        try {
+            if (!validateAll(newPatterns)) {
+                throw new ValidationException("Patterns invalid.");
+            }
+        } catch (GrokException | PatternSyntaxException e) {
+            throw new ValidationException("Invalid patterns.\n" + e.getMessage());
+        }
+
+        if (importStrategy == DROP_ALL_EXISTING) {
+            deleteAll();
+        }
     }
 }
