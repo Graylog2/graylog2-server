@@ -16,14 +16,17 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import { Link, useLocation, useLinkClickHandler } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import type { Location } from 'history';
+
+export type HistoryElement = Location;
 
 // list of children which are being used for navigation and should receive the `active` class.
 const NAV_CHILDREN = ['Button', 'NavItem'];
 
-const _targetPathname = (target: string) => String(target).split(/[?#]/)[0];
+const _targetPathname = (to: string) => String(to).split(/[?#]/)[0];
 
-const _setActiveClassName = (pathname: string, to: string, currentClassName: string, displayName: string) => {
+const _setActiveClassName = (pathname: string, to: string, currentClassName: string, displayName: string, relativeActive: boolean) => {
   const targetPathname = _targetPathname(to);
   const isActive = relativeActive ? pathname.startsWith(targetPathname) : targetPathname === pathname;
   const isNavComponent = NAV_CHILDREN.includes(displayName);
@@ -48,9 +51,9 @@ type Props = {
   relativeActive?: boolean,
 };
 
-const isLeftClickEvent = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => (e.button === 0);
+const isLeftClickEvent = (e: React.MouseEvent) => (e.button === 0);
 
-const isModifiedEvent = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => !!(e.metaKey || e.altKey || e.ctrlKey || e.shiftKey);
+const isModifiedEvent = (e: React.MouseEvent) => !!(e.metaKey || e.altKey || e.ctrlKey || e.shiftKey);
 
 const LinkContainer = ({ children, onClick, to: toProp, relativeActive, ...rest }: Props) => {
   const { pathname } = useLocation();
@@ -59,9 +62,8 @@ const LinkContainer = ({ children, onClick, to: toProp, relativeActive, ...rest 
   const childrenClassName = useMemo(() => _setActiveClassName(pathname, to, className, displayName, relativeActive),
     [pathname, to, className, displayName, relativeActive],
   );
-  const handleClick = useLinkClickHandler(to);
   const navigate = useNavigate();
-  const _onClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+  const _onClick = useCallback((e: React.MouseEvent) => {
     if (!isLeftClickEvent(e) || isModifiedEvent(e) || disabled) {
       return;
     }
@@ -78,7 +80,7 @@ const LinkContainer = ({ children, onClick, to: toProp, relativeActive, ...rest 
     }
 
     if (!disabled) {
-      handleClick(to);
+      navigate(to);
     }
   }, [childrenOnClick, navigate, disabled, onClick, to]);
 
