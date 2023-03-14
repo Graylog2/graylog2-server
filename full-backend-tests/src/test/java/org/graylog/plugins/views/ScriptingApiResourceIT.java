@@ -139,7 +139,7 @@ public class ScriptingApiResourceIT {
 
         final ValidatableResponse validatableResponse = given()
                 .spec(requestSpec)
-                .auth().preemptive().basic("john.doe", "asdfgh")
+                .auth().basic("john.doe", "asdfgh")
                 .when()
                 .body("""
                          {

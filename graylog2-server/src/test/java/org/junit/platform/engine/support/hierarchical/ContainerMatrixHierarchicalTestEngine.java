@@ -135,7 +135,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                 .accept(JSON)
                 .contentType(JSON)
                 .header("X-Requested-By", "peterchen")
-                .auth().preemptive().basic("admin", "admin");
+                .auth().basic("admin", "admin");
     }
 
     protected HierarchicalTestExecutorService createExecutorService(ExecutionRequest request) {

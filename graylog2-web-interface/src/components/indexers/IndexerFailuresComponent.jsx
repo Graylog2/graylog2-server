@@ -17,17 +17,43 @@
 import React from 'react';
 import numeral from 'numeral';
 import moment from 'moment';
+import styled from 'styled-components';
 
 import { LinkContainer } from 'components/common/router';
 import { Alert, Col, Row, Button } from 'components/bootstrap';
 import { Icon, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
-import { SmallSupportLink, DocumentationLink } from 'components/support';
+import { DocumentationLink } from 'components/support';
 import { IndexerFailuresStore } from 'stores/indexers/IndexerFailuresStore';
 
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const formatTextForFailureCount = (count) => {
+  if (count === 0) {
+    return 'No failed indexing attempts in the last 24 hours.';
+  }
+
+  return <strong>There were {numeral(count).format('0,0')} failed indexing attempts in the last 24 hours.</strong>;
+};
+
+const iconForFailureCount = (count) => {
+  if (count === 0) {
+    return 'check-circle';
+  }
+
+  return 'ambulance';
+};
+
 class IndexerFailuresComponent extends React.Component {
-  state = {};
+  constructor(props) {
+    super(props);
+
+    this.state = {};
+  }
 
   componentDidMount() {
     const since = moment().subtract(24, 'hours');
@@ -40,7 +66,7 @@ class IndexerFailuresComponent extends React.Component {
   _formatFailuresSummary = () => {
     return (
       <Alert bsStyle={this.state.total === 0 ? 'success' : 'danger'}>
-        <Icon name={this._iconForFailureCount(this.state.total)} /> {this._formatTextForFailureCount(this.state.total)}
+        <Icon name={iconForFailureCount(this.state.total)} /> {formatTextForFailureCount(this.state.total)}
 
         <LinkContainer to={Routes.SYSTEM.INDICES.FAILURES}>
           <Button bsStyle="info" bsSize="xs" className="pull-right">
@@ -49,22 +75,6 @@ class IndexerFailuresComponent extends React.Component {
         </LinkContainer>
       </Alert>
     );
-  };
-
-  _formatTextForFailureCount = (count) => {
-    if (count === 0) {
-      return 'No failed indexing attempts in the last 24 hours.';
-    }
-
-    return <strong>There were {numeral(count).format('0,0')} failed indexing attempts in the last 24 hours.</strong>;
-  };
-
-  _iconForFailureCount = (count) => {
-    if (count === 0) {
-      return 'check-circle';
-    }
-
-    return 'ambulance';
   };
 
   render() {
@@ -79,13 +89,13 @@ class IndexerFailuresComponent extends React.Component {
     return (
       <Row className="content">
         <Col md={12}>
-          <h2>Indexer failures</h2>
-
-          <SmallSupportLink>
-            Every message that was not successfully indexed will be logged as an indexer failure. You can learn more about this feature in the{' '}
-            <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} text="Graylog documentation" />.
-          </SmallSupportLink>
-
+          <Header>
+            <h2>Indexer failures</h2>
+            <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} text="Indexer failures documentation" displayIcon />
+          </Header>
+          <p className="description">
+            Every message that was not successfully indexed will be logged as an indexer failure.
+          </p>
           {content}
         </Col>
       </Row>
