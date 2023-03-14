@@ -30,11 +30,13 @@ import useColumnsWidths from 'components/common/EntityDataTable/hooks/useColumns
 import useElementDimensions from 'hooks/useElementDimensions';
 import type { Sort } from 'stores/PaginationTypes';
 import { PageSizeSelect } from 'components/common';
+import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
 
 import BulkActionsRow from './BulkActionsRow';
 import TableHead from './TableHead';
 import TableRow from './TableRow';
-import type { ColumnRenderers, Column, EntityBase, ColumnRenderersByAttribute } from './types';
+import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
+import type { ColumnRenderers, Column, EntityBase, ColumnRenderersByAttribute, ExpandedSectionRenderer } from './types';
 
 const ScrollContainer = styled.div`
   width: 100%;
@@ -147,6 +149,10 @@ type Props<Entity extends EntityBase> = {
   columnsOrder?: Array<string>,
   /** The table data. */
   data: Readonly<Array<Entity>>,
+  /** Allows you to extend a row with additional information * */
+  expandedSectionsRenderer?: {
+    [sectionName: string]: ExpandedSectionRenderer<Entity>
+  },
   /** Function to handle changes of columns visibility */
   onColumnsChange: (columnIds: Array<string>) => void,
   /** Function to handle sort changes */
@@ -159,6 +165,7 @@ type Props<Entity extends EntityBase> = {
   rowActions?: (entity: Entity) => React.ReactNode,
   /** Which columns should be displayed. */
   visibleColumns: Array<string>,
+
 };
 
 /**
@@ -168,15 +175,16 @@ const EntityDataTable = <Entity extends EntityBase>({
   activeSort,
   entityAttributesAreCamelCase,
   bulkActions,
-  columnRenderers: customColumnRenderers,
   columnDefinitions,
+  columnRenderers: customColumnRenderers,
   columnsOrder,
-  onPageSizeChange,
-  pageSize,
   data,
-  onSortChange,
-  rowActions,
+  expandedSectionsRenderer,
   onColumnsChange,
+  onPageSizeChange,
+  onSortChange,
+  pageSize,
+  rowActions,
   visibleColumns,
 }: Props<Entity>) => {
   const currentUser = useCurrentUser();
@@ -231,7 +239,7 @@ const EntityDataTable = <Entity extends EntityBase>({
   */
 
   return (
-    <>
+    <ExpandedSectionsProvider>
       <ActionsRow>
         <div>
           {displayBulkSelectCol && (
@@ -266,10 +274,9 @@ const EntityDataTable = <Entity extends EntityBase>({
                      displayBulkSelectCol={displayBulkSelectCol}
                      activeSort={activeSort}
                      displayActionsCol={displayActionsCol} />
-          <tbody>
-            {data.map((entity, index) => (
+          {data.map((entity, index) => (
+            <tbody key={`table-row-${entity.id}`} data-testid={`table-row-${entity.id}`}>
               <TableRow entity={entity}
-                        key={entity.id}
                         index={index}
                         entityAttributesAreCamelCase={entityAttributesAreCamelCase}
                         actionsRef={actionsRef}
@@ -280,11 +287,14 @@ const EntityDataTable = <Entity extends EntityBase>({
                         displaySelect={displayBulkSelectCol}
                         displayActions={displayActionsCol}
                         columns={columns} />
-            ))}
-          </tbody>
+              <ExpandedSections key={`expanded-sections-${entity.id}`}
+                                expandedSectionsRenderer={expandedSectionsRenderer}
+                                entity={entity} />
+            </tbody>
+          ))}
         </StyledTable>
       </ScrollContainer>
-    </>
+    </ExpandedSectionsProvider>
   );
 };
 
@@ -293,6 +303,7 @@ EntityDataTable.defaultProps = {
   bulkActions: undefined,
   columnRenderers: undefined,
   columnsOrder: [],
+  expandedSectionsRenderer: undefined,
   onPageSizeChange: undefined,
   pageSize: undefined,
   rowActions: undefined,

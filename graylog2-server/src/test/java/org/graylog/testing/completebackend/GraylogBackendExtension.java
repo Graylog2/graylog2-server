@@ -17,7 +17,6 @@
 package org.graylog.testing.completebackend;
 
 import com.google.common.collect.ImmutableSet;
-import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -30,7 +29,7 @@ import org.junit.platform.engine.support.hierarchical.ContainerMatrixHierarchica
 public class GraylogBackendExtension implements ParameterResolver {
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        ImmutableSet<Class<?>> supportedTypes = ImmutableSet.of(GraylogBackend.class, RequestSpecification.class, SearchServerInstance.class, GraylogApis.class);
+        ImmutableSet<Class<?>> supportedTypes = ImmutableSet.of(SearchServerInstance.class, GraylogApis.class);
 
         return supportedTypes.contains(parameterContext.getParameter().getType());
     }
@@ -39,18 +38,11 @@ public class GraylogBackendExtension implements ParameterResolver {
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         Class<?> paramType = parameterContext.getParameter().getType();
 
-        if (paramType.equals(GraylogBackend.class)) {
-            return ContainerMatrixHierarchicalTestExecutor.graylogBackend.orElse(null);
-        } else if (paramType.equals(RequestSpecification.class)) {
-            return ContainerMatrixHierarchicalTestExecutor.requestSpecification.orElse(null);
-        } else if (paramType.equals(SearchServerInstance.class)) {
+        if (paramType.equals(SearchServerInstance.class)) {
             return ContainerMatrixHierarchicalTestExecutor.graylogBackend.map(GraylogBackend::searchServerInstance).orElse(null);
         } else if (paramType.equals(GraylogApis.class)) {
-            if (ContainerMatrixHierarchicalTestExecutor.requestSpecification.isPresent() && ContainerMatrixHierarchicalTestExecutor.graylogBackend.isPresent()) {
-                return new GraylogApis(
-                        ContainerMatrixHierarchicalTestExecutor.requestSpecification.get(),
-                        ContainerMatrixHierarchicalTestExecutor.graylogBackend.get()
-                );
+            if (ContainerMatrixHierarchicalTestExecutor.graylogBackend.isPresent()) {
+                return new GraylogApis(ContainerMatrixHierarchicalTestExecutor.graylogBackend.get());
             } else {
                 throw new ParameterResolutionException("Failed to obtain requestSpecification and/or graylogBackend to provide graylog APIs");
             }
