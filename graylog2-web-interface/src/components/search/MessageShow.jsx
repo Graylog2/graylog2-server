@@ -27,7 +27,7 @@ class MessageShow extends React.Component {
   static propTypes = {
     message: PropTypes.object.isRequired,
     inputs: PropTypes.object,
-    streams: PropTypes.object.isRequired,
+    streams: PropTypes.object,
     nodes: PropTypes.object,
   };
 
