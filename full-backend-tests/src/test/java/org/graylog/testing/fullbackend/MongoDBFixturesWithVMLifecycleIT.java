@@ -16,8 +16,7 @@
  */
 package org.graylog.testing.fullbackend;
 
-import io.restassured.specification.RequestSpecification;
-import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
@@ -31,17 +30,15 @@ import static org.graylog.testing.completebackend.Lifecycle.VM;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = VM, mongoVersions = {MongodbServer.MONGO5})
 class MongoDBFixturesWithVMLifecycleIT {
-    private final GraylogBackend graylogBackend;
-    private final RequestSpecification requestSpec;
+    private final GraylogApis api;
 
-    public MongoDBFixturesWithVMLifecycleIT(GraylogBackend graylogBackend, RequestSpecification requestSpec) {
-        this.graylogBackend = graylogBackend;
-        this.requestSpec = requestSpec;
+    public MongoDBFixturesWithVMLifecycleIT(GraylogApis api) {
+        this.api = api;
     }
 
     @BeforeAll
     public void importMongoFixtures() {
-        this.graylogBackend.importMongoDBFixture("access-token.json", MongoDBFixturesWithVMLifecycleIT.class);
+        this.api.backend().importMongoDBFixture("access-token.json", MongoDBFixturesWithVMLifecycleIT.class);
     }
 
     @ContainerMatrixTest
@@ -56,8 +53,8 @@ class MongoDBFixturesWithVMLifecycleIT {
 
     private void assertTokenPresent() {
         List<?> tokens = given()
-                .config(graylogBackend.withGraylogBackendFailureConfig())
-                .spec(requestSpec)
+                .config(api.withGraylogBackendFailureConfig())
+                .spec(api.requestSpecification())
                 .when()
                 .get("users/local:admin/tokens")
                 .then()

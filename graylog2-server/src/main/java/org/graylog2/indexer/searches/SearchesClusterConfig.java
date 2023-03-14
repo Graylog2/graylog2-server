@@ -69,6 +69,18 @@ public abstract class SearchesClusterConfig {
             .add("full_message")
             .build();
 
+    private static final Map<Period, String> DEFAULT_AUTO_REFRESH_TIMERANGE_OPTIONS = ImmutableMap.<Period, String>builder()
+            .put(Period.seconds(1), "1 second")
+            .put(Period.seconds(2), "2 second")
+            .put(Period.seconds(5), "5 seconds")
+            .put(Period.seconds(10), "10 seconds")
+            .put(Period.seconds(30), "30 seconds")
+            .put(Period.minutes(1), "1 minute")
+            .put(Period.minutes(5), "5 minutes")
+            .build();
+
+    private static final Period DEFAULT_AUTO_REFRESH_DEFAULT_OPTION = Period.seconds(5);
+
     @JsonProperty("query_time_range_limit")
     public abstract Period queryTimeRangeLimit();
 
@@ -84,18 +96,28 @@ public abstract class SearchesClusterConfig {
     @JsonProperty("analysis_disabled_fields")
     public abstract Set<String> analysisDisabledFields();
 
+    @JsonProperty("auto_refresh_timerange_options")
+    public abstract Map<Period, String> autoRefreshTimerangeOptions();
+
+    @JsonProperty("default_auto_refresh_option")
+    public abstract Period defaultAutoRefreshOption();
+
     @JsonCreator
     public static SearchesClusterConfig create(@JsonProperty("query_time_range_limit") Period queryTimeRangeLimit,
                                                @JsonProperty("relative_timerange_options") Map<Period, String> relativeTimerangeOptions,
                                                @JsonProperty("surrounding_timerange_options") Map<Period, String> surroundingTimerangeOptions,
                                                @JsonProperty("surrounding_filter_fields") Set<String> surroundingFilterFields,
-                                               @JsonProperty("analysis_disabled_fields") @Nullable Set<String> analysisDisabledFields) {
+                                               @JsonProperty("analysis_disabled_fields") @Nullable Set<String> analysisDisabledFields,
+                                               @JsonProperty("auto_refresh_timerange_options") @Nullable Map<Period, String> autoRefreshTimerangeOptions,
+                                               @JsonProperty("default_auto_refresh_option") Period defaultAutoRefreshOption) {
         return builder()
                 .queryTimeRangeLimit(queryTimeRangeLimit)
                 .relativeTimerangeOptions(relativeTimerangeOptions)
                 .surroundingTimerangeOptions(surroundingTimerangeOptions)
                 .surroundingFilterFields(surroundingFilterFields)
                 .analysisDisabledFields(analysisDisabledFields == null ? DEFAULT_ANALYSIS_DISABLED_FIELDS : analysisDisabledFields)
+                .autoRefreshTimerangeOptions(autoRefreshTimerangeOptions == null ? DEFAULT_AUTO_REFRESH_TIMERANGE_OPTIONS : autoRefreshTimerangeOptions)
+                .defaultAutoRefreshOption(defaultAutoRefreshOption == null ? DEFAULT_AUTO_REFRESH_DEFAULT_OPTION : defaultAutoRefreshOption)
                 .build();
     }
 
@@ -106,6 +128,8 @@ public abstract class SearchesClusterConfig {
                 .surroundingTimerangeOptions(DEFAULT_SURROUNDING_TIMERANGE_OPTIONS)
                 .surroundingFilterFields(DEFAULT_SURROUNDING_FILTER_FIELDS)
                 .analysisDisabledFields(DEFAULT_ANALYSIS_DISABLED_FIELDS)
+                .autoRefreshTimerangeOptions(DEFAULT_AUTO_REFRESH_TIMERANGE_OPTIONS)
+                .defaultAutoRefreshOption(DEFAULT_AUTO_REFRESH_DEFAULT_OPTION)
                 .build();
     }
 
@@ -122,6 +146,8 @@ public abstract class SearchesClusterConfig {
         public abstract Builder surroundingTimerangeOptions(Map<Period, String> surroundingTimerangeOptions);
         public abstract Builder surroundingFilterFields(Set<String> surroundingFilterFields);
         public abstract Builder analysisDisabledFields(Set<String> analysisDisabledFields);
+        public abstract Builder autoRefreshTimerangeOptions(Map<Period, String> autoRefreshTimerangeOptions);
+        public abstract Builder defaultAutoRefreshOption(Period defaultAutoRefreshOption);
 
         public abstract SearchesClusterConfig build();
     }

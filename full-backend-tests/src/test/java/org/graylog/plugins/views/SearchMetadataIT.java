@@ -17,10 +17,7 @@
 package org.graylog.plugins.views;
 
 import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
-import org.graylog.testing.completebackend.GraylogBackend;
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.SearchServer;
+import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.junit.jupiter.api.BeforeAll;
@@ -35,23 +32,21 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 @ContainerMatrixTestsConfiguration
 public class SearchMetadataIT {
-    private final RequestSpecification requestSpec;
-    private final GraylogBackend graylogBackend;
+    private final GraylogApis api;
 
-    public SearchMetadataIT(GraylogBackend graylogBackend, RequestSpecification requestSpec) {
-        this.requestSpec = requestSpec;
-        this.graylogBackend = graylogBackend;
+    public SearchMetadataIT(GraylogApis api) {
+        this.api = api;
     }
 
     @BeforeAll
     public void importMongoFixtures() {
-        this.graylogBackend.importMongoDBFixture("mongodb-stored-searches-for-metadata-endpoint.json", SearchMetadataIT.class);
+        this.api.backend().importMongoDBFixture("mongodb-stored-searches-for-metadata-endpoint.json", SearchMetadataIT.class);
     }
 
     @ContainerMatrixTest
     void testEmptyRequest() {
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .post("/views/search/metadata")
                 .then()
@@ -62,7 +57,7 @@ public class SearchMetadataIT {
     @ContainerMatrixTest
     void testMinimalRequestWithoutParameter() {
         final ValidatableResponse response = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body(fixture("org/graylog/plugins/views/minimalistic-request.json"))
                 .post("/views/search/metadata")
@@ -76,7 +71,7 @@ public class SearchMetadataIT {
     @ContainerMatrixTest
     void testMinimalRequestWithSingleParameter() {
         final ValidatableResponse response = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body(fixture("org/graylog/plugins/views/minimalistic-request-with-undeclared-parameter.json"))
                 .post("/views/search/metadata")
@@ -90,7 +85,7 @@ public class SearchMetadataIT {
     @ContainerMatrixTest
     void testRetrievingMetadataForStoredSearchWithoutParameter() {
         final ValidatableResponse response = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .get("/views/search/metadata/61977428c1f17d26b45c8a0b")
                 .then()
@@ -103,7 +98,7 @@ public class SearchMetadataIT {
     @ContainerMatrixTest
     void testRetrievingMetadataForStoredSearchWithParameter() {
         final ValidatableResponse response = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .get("/views/search/metadata/61977043c1f17d26b45c8a0a")
                 .then()

@@ -16,11 +16,8 @@
  */
 package org.graylog2.grok;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import io.krakens.grok.api.Grok;
-import io.krakens.grok.api.GrokCompiler;
 import io.krakens.grok.api.exception.GrokException;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
@@ -29,7 +26,6 @@ import org.graylog2.plugin.database.ValidationException;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -40,9 +36,8 @@ import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 import static org.graylog2.grok.GrokPatternService.ImportStrategy.ABORT_ON_CONFLICT;
-import static org.graylog2.grok.GrokPatternService.ImportStrategy.DROP_ALL_EXISTING;
 
-public class InMemoryGrokPatternService implements GrokPatternService {
+public class InMemoryGrokPatternService extends GrokPatternServiceImpl {
     // poor man's id generator
     private final AtomicLong idGen = new AtomicLong(0);
 
@@ -137,18 +132,7 @@ public class InMemoryGrokPatternService implements GrokPatternService {
                 }
             }
         }
-
-        try {
-            if (!validateAll(patterns)) {
-                throw new ValidationException("Patterns invalid.");
-            }
-        } catch (GrokException | PatternSyntaxException e) {
-            throw new ValidationException("Invalid patterns.\n" + e.getMessage());
-        }
-
-        if (importStrategy == DROP_ALL_EXISTING) {
-            deleteAll();
-        }
+        validateAllOrThrow(patterns, importStrategy);
 
         final List<GrokPattern> grokPatterns = patterns.stream()
                 .map(this::uncheckedSave)
@@ -163,52 +147,6 @@ public class InMemoryGrokPatternService implements GrokPatternService {
         }
 
         return grokPatterns;
-    }
-
-    @Override
-    public Map<String, Object> match(GrokPattern pattern, String sampleData) throws GrokException {
-        final Set<GrokPattern> patterns = loadAll();
-        final GrokCompiler grokCompiler = GrokCompiler.newInstance();
-        for (GrokPattern storedPattern : patterns) {
-            grokCompiler.register(storedPattern.name(), storedPattern.pattern());
-        }
-        grokCompiler.register(pattern.name(), pattern.pattern());
-        Grok grok = grokCompiler.compile("%{" + pattern.name() + "}");
-        return grok.match(sampleData).captureFlattened();
-    }
-
-    @Override
-    public boolean validate(GrokPattern pattern) throws GrokException {
-        final Set<GrokPattern> patterns = loadAll();
-        final boolean fieldsMissing = Strings.isNullOrEmpty(pattern.name()) || Strings.isNullOrEmpty(pattern.pattern());
-        final GrokCompiler grokCompiler = GrokCompiler.newInstance();
-        for (GrokPattern storedPattern : patterns) {
-            grokCompiler.register(storedPattern.name(), storedPattern.pattern());
-        }
-        grokCompiler.register(pattern.name(), pattern.pattern());
-        grokCompiler.compile("%{" + pattern.name() + "}");
-        return !fieldsMissing;
-    }
-
-    @Override
-    public boolean validateAll(Collection<GrokPattern> newPatterns) throws GrokException {
-        final Set<GrokPattern> patterns = loadAll();
-        final GrokCompiler grokCompiler = GrokCompiler.newInstance();
-
-        for (GrokPattern newPattern : newPatterns) {
-            final boolean fieldsMissing = Strings.isNullOrEmpty(newPattern.name()) || Strings.isNullOrEmpty(newPattern.pattern());
-            if (fieldsMissing) {
-                return false;
-            }
-            grokCompiler.register(newPattern.name(), newPattern.pattern());
-        }
-        for (GrokPattern storedPattern : patterns) {
-            grokCompiler.register(storedPattern.name(), storedPattern.pattern());
-        }
-        for (GrokPattern newPattern : newPatterns) {
-            grokCompiler.compile("%{" + newPattern.name() + "}");
-        }
-        return true;
     }
 
     @Override
