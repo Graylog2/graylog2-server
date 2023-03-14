@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, act } from 'wrappedTestingLibrary';
+import { render, waitFor } from 'wrappedTestingLibrary';
 
 import MockStore from 'helpers/mocking/StoreMock';
 import asMock from 'helpers/mocking/AsMock';
@@ -52,7 +52,7 @@ jest.mock('hooks/useAlertAndEventDefinitionData');
 
 jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
   EventNotificationsActions: {
-    listAll: jest.fn(async () => Promise.resolve),
+    listAll: jest.fn(async () => Promise.resolve()),
   },
   EventNotificationsStore: MockStore((['getInitialState', () => ({ all: [] })])),
 }));
@@ -112,13 +112,9 @@ describe('EventReplaySearchPage', () => {
       definitionTitle: mockEventDefinitionTwoAggregations.title,
     }));
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      render(<SimpleReplaySearchPage />);
-    });
-
-    expect(useEventById).toHaveBeenCalledWith(mockEventData.event.id);
-    expect(useEventDefinition).toHaveBeenCalledWith(mockEventData.event.event_definition_id);
+    render(<SimpleReplaySearchPage />);
+    await waitFor(() => expect(useEventById).toHaveBeenCalledWith(mockEventData.event.id));
+    await waitFor(() => expect(useEventDefinition).toHaveBeenCalledWith(mockEventData.event.event_definition_id));
 
     await expect(UseCreateViewForEvent).toHaveBeenCalledWith({
       eventData: mockEventData.event, eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation,

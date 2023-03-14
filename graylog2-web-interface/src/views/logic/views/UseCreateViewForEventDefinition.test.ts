@@ -98,10 +98,9 @@ describe('UseCreateViewForEventDefinition', () => {
   it('should create view with 2 aggregation widgets and one summary', async () => {
     asMock(generateId).mockImplementation(mockedGenerateIdTwoAggregations);
 
-    // @ts-ignore
     asMock(ObjectID).mockImplementation(() => ({
       toString: () => mockedObjectIdTwoAggregations(),
-    }));
+    }) as ObjectID);
 
     const { result } = renderHook(() => UseCreateViewForEventDefinition({ eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation }));
     const view = await result.current.then((r) => r);
@@ -112,10 +111,9 @@ describe('UseCreateViewForEventDefinition', () => {
   it('should create view with 1 aggregation widgets and without summary', async () => {
     asMock(generateId).mockImplementation(mockedGenerateIdOneAggregation);
 
-    // @ts-ignore
     asMock(ObjectID).mockImplementation(() => ({
       toString: () => mockedObjectIdOneAggregation(),
-    }));
+    }) as ObjectID);
 
     const { result } = renderHook(() => UseCreateViewForEventDefinition({ eventDefinition: mockEventDefinitionOneAggregation, aggregations: [mockedMappedAggregation[0]] }));
     const view = await result.current.then((r) => r);

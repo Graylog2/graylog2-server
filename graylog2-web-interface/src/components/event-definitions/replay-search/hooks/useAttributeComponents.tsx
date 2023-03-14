@@ -80,9 +80,7 @@ const useAttributeComponents = () => {
     },
     {
       title: 'Aggregation conditions',
-      content: (<AggregationConditions />
-
-      ),
+      content: <AggregationConditions />,
     },
   ], [
     eventData?.timestamp,

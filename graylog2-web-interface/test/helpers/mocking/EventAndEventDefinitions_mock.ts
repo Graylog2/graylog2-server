@@ -267,7 +267,6 @@ const widgetsWithTwoAggregations = [
   messageTable,
   summaryWidget,
 ];
-// const { searchTypes: searchTypesTwoAggregations, widgetMapping: widgetMappingTwoAggregations } = SearchTypesGenerator(widgetsWithTwoAggregations);
 const searchTwoAggregations = Search.create().toBuilder().id('search-id').queries([
   query
     .toBuilder()
@@ -277,9 +276,6 @@ const searchTwoAggregations = Search.create().toBuilder().id('search-id').querie
       typeDefinition: {},
     })).build()])
   .build();
-
-// const titles =
-
 export const mockedViewWithTwoAggregations = View.create()
   .toBuilder()
   .id('view-id')
@@ -312,7 +308,6 @@ export const mockedViewWithTwoAggregations = View.create()
   .search(searchTwoAggregations)
   .build();
 
-// const { searchTypes: searchTypesOneAggregation, widgetMapping: widgetMappingOneAggregation } = SearchTypesGenerator(widgetsWithOneAggregation);
 const searchOneAggregation = Search.create().toBuilder().id('search-id').queries([query.toBuilder().searchTypes(Array(3).fill({
   filters: [],
   type: 'AGGREGATION',

@@ -101,7 +101,7 @@ const useEventDefinition = (definitionId: string): {
     () => fetchDefinition(definitionId),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading event definition  failed with status: ${errorThrown}`,
+        UserNotification.error(`Loading event definition failed with status: ${errorThrown}`,
           'Could not load event definition');
       },
       keepPreviousData: true,

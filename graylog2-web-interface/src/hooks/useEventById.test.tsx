@@ -74,11 +74,11 @@ describe('useEventById', () => {
   });
 
   it('should display notification on fail', async () => {
+    asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+
+    const { waitFor } = renderHook(() => useEventById('event-id-1'), { wrapper });
+
     await suppressConsole(async () => {
-      asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
-
-      const { waitFor } = renderHook(() => useEventById('event-id-1'), { wrapper });
-
       await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
         'Loading event or alert failed with status: Error: Error',
         'Could not load event or alert'));

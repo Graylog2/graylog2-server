@@ -83,7 +83,7 @@ describe('useEventDefinition', () => {
       const { waitFor } = renderHook(() => useEventDefinition(mockEventDefinitionTwoAggregations.id), { wrapper });
 
       await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(
-        'Loading event definition  failed with status: Error: Error',
+        'Loading event definition failed with status: Error: Error',
         'Could not load event definition'));
     });
   });
