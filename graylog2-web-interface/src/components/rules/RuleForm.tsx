@@ -16,14 +16,23 @@
  */
 import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
-import { Button, Col, ControlLabel, FormControl, FormGroup, Row, Input } from 'components/bootstrap';
+import { Button, Col, ControlLabel, FormControl, FormGroup, Row, Input, Alert } from 'components/bootstrap';
 import { ConfirmLeaveDialog, SourceCodeEditor, FormSubmit } from 'components/common';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 
 import { PipelineRulesContext } from './RuleContext';
 import PipelinesUsingRule from './PipelinesUsingRule';
+
+const RuleSimulationFormGroup = styled(FormGroup)`
+  margin-bottom: 32px
+`;
+
+const SimulationResult = styled(Alert)`
+  margin-top: 16px
+`;
 
 type Props = {
   create: boolean,
@@ -42,6 +51,7 @@ const RuleForm = ({ create }: Props) => {
 
   const [isDirty, setIsDirty] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [showRuleSimulation, setShowRuleSimulation] = useState(false);
 
   const handleError = (error) => {
     if (error.responseMessage.includes('duplicate key error')) {
@@ -115,6 +125,32 @@ const RuleForm = ({ create }: Props) => {
                             value={ruleSource}
                             innerRef={ruleSourceRef} />
         </Input>
+
+        <RuleSimulationFormGroup>
+          <ControlLabel>Rule Simulation <small className="text-muted">(Optional)</small></ControlLabel>
+          <FormControl.Static>
+            <Input id="message"
+                   name="message"
+                   type="textarea"
+                   placeholder="Raw message"
+                   value=""
+                   onChange={() => {}}
+                   rows={3}
+                   required />
+            <Button bsStyle="info"
+                    bsSize="xsmall"
+                    disabled={false}
+                    onClick={() => setShowRuleSimulation(!showRuleSimulation)}>
+              Run rule simulation
+            </Button>
+            {showRuleSimulation && (
+              <SimulationResult bsStyle="success">
+                <b>Simulation result: </b>
+                New Message
+              </SimulationResult>
+            )}
+          </FormControl.Static>
+        </RuleSimulationFormGroup>
       </fieldset>
 
       <Row>
