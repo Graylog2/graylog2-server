@@ -14,19 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
-import type { Sort } from 'stores/PaginationTypes';
+import ExpandedRulesActions from 'components/streams/StreamsOverview/ExpandedRulesActions';
+import { stream } from 'fixtures/streams';
 
-export const ENTITY_TABLE_ID = 'streams';
-export const DEFAULT_LAYOUT = {
-  pageSize: 20,
-  sort: { attributeId: 'title', direction: 'asc' } as Sort,
-  displayedColumns: ['title', 'description', 'index_set_title', 'rules', 'throughput', 'disabled'],
-  columnsOrder: ['title', 'description', 'index_set_title', 'rules', 'throughput', 'disabled', 'created_at'],
-};
+jest.useFakeTimers();
 
-export const ADDITIONAL_ATTRIBUTES = [
-  { id: 'index_set_title', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },
-  { id: 'throughput', title: 'Throughput' },
-  { id: 'rules', title: 'Rules' },
-];
+describe('ExpandedRulesActions', () => {
+  it('should open add rule modal', async () => {
+    render(<ExpandedRulesActions stream={stream} />);
+
+    userEvent.click(await screen.findByRole('button', { name: /quick add rule/i }));
+
+    await screen.findByRole('heading', {
+      name: /new stream rule/i,
+      hidden: true,
+    });
+  });
+});

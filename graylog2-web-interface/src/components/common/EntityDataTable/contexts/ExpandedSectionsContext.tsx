@@ -15,30 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
-import { forwardRef } from 'react';
 
-const Badge = styled.span(({ theme }) => `
-  background-color: ${theme.colors.variant.light.info};
-`);
+import { singleton } from 'logic/singleton';
 
-type Props = {
-  children: React.ReactNode;
-  onClick?: () => void,
-  className?: string,
-  title?: string,
-};
+type ContextValue = {
+  expandedSections: { [entityId: string]: Array<string> },
+  toggleSection: (entityId: string, sectionName: string) => void
+} | undefined
 
-const CountBadge = forwardRef<HTMLElement, Props>(({ children, onClick, className, title }: Props, ref) => (
-  <Badge className={`badge ${className}`} onClick={onClick} ref={ref} title={title}>
-    {children}
-  </Badge>
-));
+const ExpandedSectionsContext = React.createContext<ContextValue>(undefined);
 
-CountBadge.defaultProps = {
-  onClick: undefined,
-  className: '',
-  title: undefined,
-};
-
-export default CountBadge;
+export default singleton('contexts.ExpandedSectionsContext', () => ExpandedSectionsContext);

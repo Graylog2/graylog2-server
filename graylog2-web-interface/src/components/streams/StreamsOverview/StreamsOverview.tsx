@@ -40,7 +40,9 @@ import {
 import EntityFilters from 'components/common/EntityFilters';
 import type { Filters } from 'components/common/EntityFilters/types';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
+import ExpandedRulesActions from 'components/streams/StreamsOverview/ExpandedRulesActions';
 
+import ExpandedRulesSection from './ExpandedRulesSection';
 import CustomColumnRenderers from './ColumnRenderers';
 
 const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
@@ -128,6 +130,21 @@ const StreamsOverview = ({ indexSets }: Props) => {
                  indexSets={indexSets} />
   ), [indexSets]);
 
+  const renderExpandedRules = useCallback((stream: Stream) => (
+    <ExpandedRulesSection stream={stream} />
+  ), []);
+  const renderExpandedRulesActions = useCallback((stream: Stream) => (
+    <ExpandedRulesActions stream={stream} />
+  ), []);
+
+  const expandedSectionsRenderer = useMemo(() => ({
+    rules: {
+      title: 'Rules',
+      content: renderExpandedRules,
+      actions: renderExpandedRulesActions,
+    },
+  }), [renderExpandedRules, renderExpandedRulesActions]);
+
   if (isLoadingLayoutPreferences || isInitialLoadingStreams) {
     return <Spinner />;
   }
@@ -160,6 +177,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
                                    onPageSizeChange={onPageSizeChange}
                                    pageSize={layoutConfig.pageSize}
                                    bulkActions={renderBulkActions}
+                                   expandedSectionsRenderer={expandedSectionsRenderer}
                                    activeSort={layoutConfig.sort}
                                    rowActions={renderStreamActions}
                                    columnRenderers={columnRenderers}
