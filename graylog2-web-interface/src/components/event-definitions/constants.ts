@@ -14,8 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { Sort } from 'stores/PaginationTypes';
+
 export const SYSTEM_EVENT_DEFINITION_TYPE = 'system-notifications-v1';
 
-export default {
-  SYSTEM_EVENT_DEFINITION_TYPE,
+export const ENTITY_TABLE_ID = 'event_definitions';
+export const DEFAULT_LAYOUT = {
+  pageSize: 20,
+  sort: { attributeId: 'title', direction: 'asc' } as Sort,
+  displayedColumns: ['title', 'description', 'priority', 'scheduling', 'status'],
+  columnsOrder: ['title', 'description', 'priority', 'status', 'scheduling'],
 };
+
+export const ADDITIONAL_ATTRIBUTES = [
+  { id: 'scheduling', title: 'Scheduling', sortable: false },
+];
