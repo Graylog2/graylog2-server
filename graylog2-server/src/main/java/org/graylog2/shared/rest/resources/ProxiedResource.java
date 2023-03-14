@@ -364,7 +364,7 @@ public abstract class ProxiedResource extends RestResource {
         return doNodeApiCall(leaderNode.getNodeId(), remoteInterfaceProvider, remoteInterfaceFunction, Function.identity(), getDefaultProxyCallTimeout().toMillis());
     }
 
-    private <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> NodeResponse<FinalResponseType> doNodeApiCall(
+    protected <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> NodeResponse<FinalResponseType> doNodeApiCall(
             String nodeId,
             Function<String, Optional<RemoteInterfaceType>> remoteInterfaceProvider,
             Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceFunction,

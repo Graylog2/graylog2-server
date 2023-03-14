@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources.system.debug.bundle;
 
+import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -38,7 +39,6 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-import java.io.IOException;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -89,11 +89,12 @@ public class SupportBundleResource extends RestResource {
 
     @POST
     @Path("/bundle/build")
+    @Timed
     @RestrictToLeader
     @RequiresPermissions(SUPPORTBUNDLE_CREATE)
     @Produces(MediaType.APPLICATION_JSON)
     @NoAuditEvent("FIXME") // TODO
-    public Response buildBundle(@Context HttpHeaders httpHeaders) throws IOException {
+    public Response buildBundle(@Context HttpHeaders httpHeaders) {
         supportBundleService.buildBundle(httpHeaders, getSubject());
         return Response.accepted().build();
     }
