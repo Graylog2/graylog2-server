@@ -72,7 +72,7 @@ type RulesActionsType = {
   save: (rule: RuleType) => Promise<unknown>,
   update: (rule: RuleType) => Promise<unknown>,
   parse: (rule: RuleType, callback: () => void) => Promise<unknown>,
-  simulate: (rule: RuleType, callback: () => void) => Promise<unknown>,
+  simulate: (messageString: string, rule: RuleType, callback: () => void) => Promise<unknown>,
   multiple: () => Promise<unknown>,
   loadFunctions: () => Promise<unknown>,
   loadMetricsConfig: () => Promise<unknown>,
@@ -288,28 +288,15 @@ export const RulesStore = singletonStore(
         },
       );
     },
-    simulate(ruleSource, callback) {
-      const url = qualifyUrl(ApiRoutes.RulesController.parse().url);
+    simulate(messageString, ruleSource, callback) {
+      const url = qualifyUrl(ApiRoutes.RulesController.simulate(messageString).url);
       const rule = {
         title: ruleSource.title,
         description: ruleSource.description,
         source: ruleSource.source,
       };
 
-      return fetch('POST', url, rule).then(
-        (response) => {
-        // call to clear the errors, the parsing was successful
-          callback([]);
-
-          return response;
-        },
-        (error) => {
-        // a Bad Request indicates a parse error, set all the returned errors in the editor
-          if (error.status === 400) {
-            callback(error.additional.body);
-          }
-        },
-      );
+      return fetch('POST', url, rule).then(callback);
     },
     multiple(ruleNames, callback) {
       const url = qualifyUrl(ApiRoutes.RulesController.multiple().url);

@@ -66,14 +66,14 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     RulesActions.parse(nextRule, callback);
   }, [rule, description]);
 
-  const simulateRule = useCallback((callback) => {
+  const simulateRule = useCallback((messageString: string, callback: () => void) => {
     const nextRule = {
       ...rule,
       source: ruleSourceRef.current.editor.getSession().getValue(),
       description,
     };
 
-    RulesActions.simulate(nextRule, callback);
+    RulesActions.simulate(messageString, nextRule, callback);
   }, [rule, description]);
 
   useEffect(() => {
