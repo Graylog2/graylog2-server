@@ -64,14 +64,15 @@ const ExpandedSections = <Entity extends EntityBase>({
           }
 
           const hideSection = () => toggleSection(entity.id, sectionName);
+          const actions = section.actions?.(entity);
 
           return (
             <div key={`${sectionName}-${entity.id}`}>
               <Header>
                 <h3>{section.title}</h3>
                 <Actions>
-                  {section.actions?.(entity)}
-                  <HideSectionButton name="times" onClick={hideSection} />
+                  {actions}
+                  <HideSectionButton name="times" onClick={hideSection} title="Hide section" />
                 </Actions>
               </Header>
               {section.content(entity)}

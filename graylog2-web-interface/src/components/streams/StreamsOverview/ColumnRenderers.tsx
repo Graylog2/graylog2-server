@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
 import { Label } from 'components/bootstrap';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
@@ -57,10 +57,10 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
       renderCell: (_disabled: string, stream) => <StatusCell stream={stream} />,
       staticWidth: 100,
     },
-  },
-  rules: {
-    renderCell: (stream) => <StreamRulesCell stream={stream} />,
-    staticWidth: 70,
+    rules: {
+      renderCell: (_rules: StreamRule[], stream) => <StreamRulesCell stream={stream} />,
+      staticWidth: 70,
+    },
   },
 });
 
