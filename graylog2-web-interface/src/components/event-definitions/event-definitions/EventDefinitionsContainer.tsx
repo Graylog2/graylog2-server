@@ -25,7 +25,6 @@ import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
-import { ADDITIONAL_ATTRIBUTES } from 'components/streams/StreamsOverview/Constants';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 
 import EventDefinitionActions from './EventDefinitionActions';
@@ -35,7 +34,7 @@ import BulkActions from './BulkActions';
 
 import type { EventDefinition } from '../event-definitions-types';
 import useEventDefinitions from '../hooks/useEventDefinitions';
-import { SYSTEM_EVENT_DEFINITION_TYPE, ENTITY_TABLE_ID, DEFAULT_LAYOUT } from '../constants';
+import { SYSTEM_EVENT_DEFINITION_TYPE, ENTITY_TABLE_ID, DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES } from '../constants';
 
 const isSystemEventDefinition = (eventDefinition: EventDefinition): boolean => {
   return eventDefinition?.config?.type === SYSTEM_EVENT_DEFINITION_TYPE;
