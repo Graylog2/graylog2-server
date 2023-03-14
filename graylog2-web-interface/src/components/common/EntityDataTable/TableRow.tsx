@@ -71,7 +71,7 @@ const TableRow = <Entity extends EntityBase>({
   const actionButtons = displayActions ? <ButtonToolbar>{rowActions(entity)}</ButtonToolbar> : null;
 
   return (
-    <tr key={entity.id}>
+    <tr>
       {displaySelect && (
         <td>
           <RowCheckbox onChange={toggleRowSelect}

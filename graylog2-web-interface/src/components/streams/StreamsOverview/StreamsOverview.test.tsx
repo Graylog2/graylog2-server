@@ -15,19 +15,34 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, within } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { indexSets } from 'fixtures/indexSets';
-import { asMock } from 'helpers/mocking';
+import { asMock, MockStore } from 'helpers/mocking';
 import useStreams from 'components/streams/hooks/useStreams';
 import { stream } from 'fixtures/streams';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
+import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
+import { streamRuleTypes } from 'fixtures/streamRuleTypes';
 
 import StreamsOverview from './StreamsOverview';
 
 jest.mock('components/streams/hooks/useStreams');
+jest.mock('components/streams/hooks/useStreamRuleTypes');
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
+
+jest.mock('stores/inputs/StreamRulesInputsStore', () => ({
+  StreamRulesInputsActions: {
+    list: jest.fn(),
+  },
+  StreamRulesInputsStore: MockStore(['getInitialState', () => ({
+    inputs: [
+      { id: 'my-id', title: 'input title', name: 'name' },
+    ],
+  })]),
+}));
 
 const attributes = [
   {
@@ -42,7 +57,7 @@ const attributes = [
   },
 ];
 
-const paginatedStreams = ({
+const paginatedStreams = (exampleStream = stream) => ({
   data: {
     pagination: {
       total: 1,
@@ -50,7 +65,7 @@ const paginatedStreams = ({
       perPage: 5,
       count: 1,
     },
-    elements: [stream],
+    elements: [exampleStream],
     attributes,
   },
   refetch: () => {},
@@ -59,7 +74,12 @@ const paginatedStreams = ({
 
 describe('StreamsOverview', () => {
   beforeEach(() => {
-    asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isLoading: false });
+    asMock(useUserLayoutPreferences).mockReturnValue({
+      data: { ...layoutPreferences, displayedAttributes: ['title', 'description', 'rules'] },
+      isLoading: false,
+    });
+
+    asMock(useStreamRuleTypes).mockReturnValue({ data: streamRuleTypes });
   });
 
   it('should render empty', async () => {
@@ -85,11 +105,51 @@ describe('StreamsOverview', () => {
   });
 
   it('should render list', async () => {
-    asMock(useStreams).mockReturnValue(paginatedStreams);
+    asMock(useStreams).mockReturnValue(paginatedStreams());
 
     render(<StreamsOverview indexSets={indexSets} />);
 
     await screen.findByText(stream.title);
     await screen.findByText(stream.description);
+  });
+
+  it('should open and close stream rules overview for a stream', async () => {
+    const streamWithRules = {
+      ...stream,
+      rules: [
+        {
+          field: 'gl2_remote_ip',
+          stream_id: stream.id,
+          description: '',
+          id: 'stream-rule-id-1',
+          type: 1,
+          inverted: false,
+          value: '127.0.0.1',
+        },
+        {
+          field: 'source',
+          stream_id: stream.id,
+          description: '',
+          id: 'stream-rule-id-2',
+          type: 1,
+          inverted: false,
+          value: 'example.org',
+        },
+      ],
+    };
+    asMock(useStreams).mockReturnValue(paginatedStreams(streamWithRules));
+
+    render(<StreamsOverview indexSets={indexSets} />);
+
+    const tableRow = await screen.findByTestId(`table-row-${streamWithRules.id}`);
+
+    userEvent.click(within(tableRow).getByTitle('Show stream rules'));
+
+    await screen.findByText(/must match all of the 2 configured stream \./i);
+    const deleteStreamRuleButtons = await screen.findAllByRole('button', { name: /delete stream rule/i });
+    const editStreamRuleButtons = await screen.findAllByRole('button', { name: /edit stream rule/i });
+
+    expect(deleteStreamRuleButtons.length).toBe(2);
+    expect(editStreamRuleButtons.length).toBe(2);
   });
 });
