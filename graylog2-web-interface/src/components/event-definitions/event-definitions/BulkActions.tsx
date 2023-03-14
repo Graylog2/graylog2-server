@@ -23,8 +23,9 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-import { Button } from 'components/bootstrap';
+import { MenuItem } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
+import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 
 type Props = {
   selectedDefinitionsIds: Array<string>,
@@ -122,19 +123,19 @@ const BulkActions = ({ selectedDefinitionsIds, setSelectedEventDefinitionsIds }:
   };
 
   return (
-    <>
-      <Button bsSize="xsmall" bsStyle="primary" onClick={() => handleAction(ACTION_TYPES.ENABLE)}>Enable</Button>
-      <Button bsSize="xsmall" bsStyle="primary" onClick={() => handleAction(ACTION_TYPES.DISABLE)}>Disable</Button>
-      <Button bsSize="xsmall" bsStyle="danger" onClick={() => handleAction(ACTION_TYPES.DELETE)}>Delete</Button>
+    <BulkActionsDropdown selectedEntities={selectedDefinitionsIds} setSelectedEntities={setSelectedEventDefinitionsIds}>
+      <MenuItem onSelect={() => handleAction(ACTION_TYPES.ENABLE)}>Enable</MenuItem>
+      <MenuItem onSelect={() => handleAction(ACTION_TYPES.DISABLE)}>Disable</MenuItem>
+      <MenuItem onSelect={() => handleAction(ACTION_TYPES.DELETE)}>Delete</MenuItem>
       {showDialog && (
-      <ConfirmDialog title={ACTION_TEXT[actionType]?.dialogTitle}
-                     show
-                     onConfirm={handleConfirm}
-                     onCancel={handleClearState}>
-        {ACTION_TEXT[actionType]?.dialogBody(selectedItemsAmount)}
-      </ConfirmDialog>
+        <ConfirmDialog title={ACTION_TEXT[actionType]?.dialogTitle}
+                       show
+                       onConfirm={handleConfirm}
+                       onCancel={handleClearState}>
+          {ACTION_TEXT[actionType]?.dialogBody(selectedItemsAmount)}
+        </ConfirmDialog>
       )}
-    </>
+    </BulkActionsDropdown>
   );
 };
 
