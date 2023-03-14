@@ -55,7 +55,7 @@ describe('CopyToDashboardForm', () => {
           },
         ],
       },
-      isFetching: false,
+      isInitialLoading: false,
       refetch: () => {},
     });
   });
@@ -91,7 +91,7 @@ describe('CopyToDashboardForm', () => {
           },
         ],
       },
-      isFetching: false,
+      isInitialLoading: false,
       refetch: () => {},
     });
 

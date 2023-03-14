@@ -33,9 +33,9 @@ const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled
     attributes: Array<Attribute>
   } | undefined,
   refetch: () => void,
-  isFetching: boolean,
+  isInitialLoading: boolean,
 } => {
-  const { data, refetch, isFetching } = useQuery(
+  const { data, refetch, isInitialLoading } = useQuery(
     ['streams', 'overview', searchParams],
     () => StreamsStore.searchPaginated(
       searchParams.page,
@@ -60,7 +60,7 @@ const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled
   return ({
     data,
     refetch,
-    isFetching,
+    isInitialLoading,
   });
 };
 

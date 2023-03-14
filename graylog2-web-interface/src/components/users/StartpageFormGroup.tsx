@@ -17,7 +17,7 @@
 import * as React from 'react';
 import type * as Immutable from 'immutable';
 import { useState, useEffect } from 'react';
-import { Field } from 'formik';
+import { Field, useFormikContext } from 'formik';
 import styled from 'styled-components';
 
 import { getValuesFromGRN } from 'logic/permissions/GRN';
@@ -28,6 +28,8 @@ import Spinner from 'components/common/Spinner';
 import Select from 'components/common/Select';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import useStreams from 'components/streams/hooks/useStreams';
+import useSavedSearches from 'views/hooks/useSavedSearches';
+import type { SettingsFormValues } from 'components/users/UserEdit/SettingsSection';
 
 const Container = styled.div`
   display: flex;
@@ -65,20 +67,25 @@ const _grnOptionFormatter = ({ id, title }: SharedEntity): Option => ({ value: g
 const typeOptions = [
   { value: 'dashboard', label: 'Dashboard' },
   { value: 'stream', label: 'Stream' },
+  { value: 'search', label: 'Search' },
 ];
 
 const ADMIN_PERMISSION = '*';
 
-const useStartPageEntities = (userId, permissions) => {
+const useStartPageOptions = (userId, permissions) => {
+  const { values: { startpage } } = useFormikContext<SettingsFormValues>();
   const selectedUserIsAdmin = permissions.includes(ADMIN_PERMISSION);
   const [userDashboards, setUserDashboards] = useState<Option[]>([]);
   const [userStreams, setUserStreams] = useState<Option[]>([]);
+  const [userSearches, setUserSearches] = useState<Option[]>([]);
   const [isLoadingUserEntities, setIsLoadingUserEntities] = useState(false);
 
-  const { data: allDashboards, isFetching: isLoadingAllDashboards } = useDashboards({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
-  const { data: allStreams, isFetching: isLoadingAllStreams } = useStreams({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
+  const { data: allDashboards, isInitialLoading: isLoadingAllDashboards } = useDashboards({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
+  const { data: allStreams, isInitialLoading: isLoadingAllStreams } = useStreams({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
+  const { data: allSearches, isInitialLoading: isLoadingAllSearches } = useSavedSearches({ query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } }, { enabled: selectedUserIsAdmin });
   const allDashboardsOptions = (allDashboards?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));
   const allStreamsOptions = (allStreams?.elements ?? []).map(({ id, title }) => ({ value: id, label: title }));
+  const allSearchesOptions = (allSearches?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));
 
   useEffect(() => {
     if (!selectedUserIsAdmin) {
@@ -92,21 +99,38 @@ const useStartPageEntities = (userId, permissions) => {
           ...UNLIMITED_ENTITY_SHARE_REQ,
           additionalQueries: { entity_type: 'stream' },
         }).then(({ list }) => {
-          setIsLoadingUserEntities(false);
           setUserStreams(list.map(_grnOptionFormatter).toArray());
+        })).then(() => EntityShareDomain.loadUserSharesPaginated(userId, {
+          ...UNLIMITED_ENTITY_SHARE_REQ,
+          additionalQueries: { entity_type: 'search' },
+        }).then(({ list }) => {
+          setIsLoadingUserEntities(false);
+          setUserSearches(list.map(_grnOptionFormatter).toArray());
         }));
     }
   }, [selectedUserIsAdmin, userId]);
 
+  const prepareOptions = () => {
+    switch (startpage?.type) {
+      case 'dashboard':
+        return [...userDashboards, ...allDashboardsOptions];
+      case 'search':
+        return [{ value: 'default', label: 'New Search' }, ...userSearches, ...allSearchesOptions];
+      case 'stream':
+        return [...userStreams, ...allStreamsOptions];
+      default:
+        return [];
+    }
+  };
+
   return {
-    dashboards: [...userDashboards, ...allDashboardsOptions],
-    streams: [...userStreams, ...allStreamsOptions],
-    isLoading: isLoadingUserEntities || isLoadingAllDashboards || isLoadingAllStreams,
+    options: prepareOptions(),
+    isLoading: isLoadingUserEntities || isLoadingAllDashboards || isLoadingAllSearches || isLoadingAllStreams,
   };
 };
 
 const StartpageFormGroup = ({ userId, permissions }: Props) => {
-  const { streams, dashboards, isLoading } = useStartPageEntities(userId, permissions);
+  const { options, isLoading } = useStartPageOptions(userId, permissions);
 
   if (isLoading) {
     return <Spinner />;
@@ -116,7 +140,6 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
     <Field name="startpage">
       {({ field: { name, value, onChange } }) => {
         const type = value?.type ?? 'dashboard';
-        const options = type === 'dashboard' ? dashboards : streams;
 
         const error = value?.id && options.findIndex(({ value: v }) => v === value.id) < 0
           ? <Alert bsStyle="warning">User is missing permission for the configured page</Alert>

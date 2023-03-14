@@ -69,7 +69,7 @@ const paginatedStreams = (exampleStream = stream) => ({
     attributes,
   },
   refetch: () => {},
-  isFetching: false,
+  isInitialLoading: false,
 });
 
 describe('StreamsOverview', () => {
@@ -95,7 +95,7 @@ describe('StreamsOverview', () => {
         attributes,
       },
       refetch: () => {},
-      isFetching: false,
+      isInitialLoading: false,
     });
     asMock(useStreams).mockReturnValue(emptyPaginatedStreams);
 

@@ -58,9 +58,9 @@ const useSavedSearches = (searchParams: SearchParams, { enabled }: Options = { e
     attributes: Array<Attribute>,
   } | undefined,
   refetch: () => void,
-  isLoading: boolean,
+  isInitialLoading: boolean,
 } => {
-  const { data, refetch, isLoading } = useQuery(
+  const { data, refetch, isInitialLoading } = useQuery(
     ['saved-searches', 'overview', searchParams],
     () => fetchSavedSearches(searchParams),
     {
@@ -76,7 +76,7 @@ const useSavedSearches = (searchParams: SearchParams, { enabled }: Options = { e
   return ({
     data,
     refetch,
-    isLoading,
+    isInitialLoading,
   });
 };
 
