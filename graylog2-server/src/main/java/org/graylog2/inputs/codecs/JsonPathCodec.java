@@ -16,6 +16,7 @@
  */
 package org.graylog2.inputs.codecs;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -84,6 +85,9 @@ public class JsonPathCodec extends AbstractCodec {
                 fields = flatten(json);
             } catch (JsonFlattenException e) {
                 LOG.warn("JSON contains type not supported by flatten method.", e);
+            } catch (JsonProcessingException e) {
+                LOG.warn("JsonProcessingException at JsonPathCodec.decode().", e);
+                //throw new RuntimeException(e);
             }
         } else {
             if (jsonPath == null) {
@@ -123,13 +127,11 @@ public class JsonPathCodec extends AbstractCodec {
     @VisibleForTesting
     protected String buildShortMessage(Map<String, Object> fields) {
         final StringBuilder shortMessage = new StringBuilder();
-        if (flatten) {
-            shortMessage.append("JSON API poll result: ");
-            shortMessage.append(" -> ");
-        } else {
-            shortMessage.append("JSON API poll result: ");
-            shortMessage.append(jsonPath.getPath()).append(" -> ");
+        shortMessage.append("JSON API poll result: ");
+        if (!flatten) {
+            shortMessage.append(jsonPath.getPath());
         }
+        shortMessage.append(" -> ");
 
         if (fields.toString().length() > 50) {
             shortMessage.append(fields.toString().substring(0, 50)).append("[...]");
@@ -140,13 +142,8 @@ public class JsonPathCodec extends AbstractCodec {
         return shortMessage.toString();
     }
 
-    public Map<String, Object> flatten(String json) throws JsonFlattenException {
-        try {
-            return flatten("", objectMapper.readTree(json));
-        } catch (IOException e) {
-            LOG.warn("IOException occurred", e);
-        }
-        return Map.of();
+    public Map<String, Object> flatten(String json) throws JsonFlattenException, JsonProcessingException {
+        return flatten("", objectMapper.readTree(json));
     }
 
     private Map<String, Object> flatten(String currentPath, JsonNode jsonNode) throws JsonFlattenException {
@@ -229,9 +226,9 @@ public class JsonPathCodec extends AbstractCodec {
 
             r.addField(new BooleanField(
                     CK_FLATTEN,
-                    "Message mode",
+                    "Flatten JSON",
                     false,
-                    "Select the content of the message. Path returns only whats in the jsonpath. Full returns the full json as fields in the message."
+                    "If set, the whole JSON will be returned as part of the message."
             ));
 
             return r;        }
