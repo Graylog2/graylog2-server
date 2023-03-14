@@ -16,5 +16,8 @@
  */
 package org.graylog2.database.dbcatalog;
 
-public record DbEntityCatalogEntry(String collection, String titleField, Class<?> modelClass) {
+public record DbEntityCatalogEntry(String collection,
+                                   String titleField,
+                                   Class<?> modelClass,
+                                   String readPermission) {
 }

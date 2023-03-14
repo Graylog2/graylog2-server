@@ -37,7 +37,7 @@ class DbEntitiesCatalogTest {
 
     @Test
     void returnsEmptyOptionalsOnEntryAbsentInCatalog() {
-        DbEntitiesCatalog catalog = new DbEntitiesCatalog(List.of(new DbEntityCatalogEntry("streams", "title", StreamImpl.class)));
+        DbEntitiesCatalog catalog = new DbEntitiesCatalog(List.of(new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read")));
 
         assertThat(catalog.getByCollectionName("Guadalajara")).isEmpty();
         assertThat(catalog.getByModelClass(Object.class)).isEmpty();
@@ -45,16 +45,16 @@ class DbEntitiesCatalogTest {
 
     @Test
     void returnsProperDataFromCatalog() {
-        DbEntitiesCatalog catalog = new DbEntitiesCatalog(List.of(new DbEntityCatalogEntry("streams", "title", StreamImpl.class)));
+        DbEntitiesCatalog catalog = new DbEntitiesCatalog(List.of(new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read")));
 
         assertThat(catalog.getByCollectionName("streams"))
                 .isEqualTo(Optional.of(
-                                new DbEntityCatalogEntry("streams", "title", StreamImpl.class)
+                        new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read")
                         )
                 );
         assertThat(catalog.getByModelClass(StreamImpl.class))
                 .isEqualTo(Optional.of(
-                        new DbEntityCatalogEntry("streams", "title", StreamImpl.class)
+                        new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read")
                         )
                 );
     }
@@ -64,8 +64,8 @@ class DbEntitiesCatalogTest {
         assertThrows(IllegalStateException.class,
                 () -> new DbEntitiesCatalog(
                         List.of(
-                                new DbEntityCatalogEntry("streams", "title", StreamImpl.class),
-                                new DbEntityCatalogEntry("streams", "title", String.class)
+                                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read"),
+                                new DbEntityCatalogEntry("streams", "title", String.class, "")
                         )
                 )
         );

@@ -20,9 +20,11 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
+import org.apache.shiro.subject.Subject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
 import org.graylog2.database.dbcatalog.DbEntityCatalogEntry;
@@ -46,6 +48,8 @@ public class EntityTitleService {
     private final MongoConnection mongoConnection;
     private final DbEntitiesCatalog entitiesCatalog;
 
+    static final String TITLE_IF_NOT_PERMITTED = "<not permitted to view>";
+
     @Inject
     public EntityTitleService(final MongoConnection mongoConnection,
                               final DbEntitiesCatalog entitiesCatalog) {
@@ -53,7 +57,7 @@ public class EntityTitleService {
         this.entitiesCatalog = entitiesCatalog;
     }
 
-    public EntitiesTitleResponse getTitles(final EntityTitleRequest request) {
+    public EntitiesTitleResponse getTitles(final Subject subject, final EntityTitleRequest request) {
 
         final Map<String, List<EntityIdentifier>> groupedByType = request.entities()
                 .stream()
@@ -61,13 +65,15 @@ public class EntityTitleService {
 
         final Optional<EntitiesTitleResponse> entitiesTitleResponse = groupedByType.entrySet()
                 .stream()
-                .map(entry -> getTitlesForEntitiesFromSingleCollection(entry.getKey(), entry.getValue()))
+                .map(entry -> getTitlesForEntitiesFromSingleCollection(subject, entry.getKey(), entry.getValue()))
                 .reduce(EntitiesTitleResponse::merge);
 
         return entitiesTitleResponse.orElse(new EntitiesTitleResponse(List.of()));
     }
 
-    public EntitiesTitleResponse getTitlesForEntitiesFromSingleCollection(final String collection, final List<EntityIdentifier> entities) {
+    public EntitiesTitleResponse getTitlesForEntitiesFromSingleCollection(final Subject subject,
+                                                                          final String collection,
+                                                                          final List<EntityIdentifier> entities) {
         final Optional<DbEntityCatalogEntry> dbEntityCatalogEntry = this.entitiesCatalog.getByCollectionName(collection);
         if (dbEntityCatalogEntry.isEmpty() || entities.isEmpty()) {
             return new EntitiesTitleResponse(List.of());
@@ -96,14 +102,29 @@ public class EntityTitleService {
 
         final List<EntityTitleResponse> titles = documents
                 .map(doc ->
-                        new EntityTitleResponse(
-                                doc.getObjectId("_id").toString(),
-                                collection,
-                                doc.getString(titleField)
-                        )
+                        {
+                            final String idAsString = doc.getObjectId("_id").toString();
+                            return new EntityTitleResponse(
+                                    idAsString,
+                                    collection,
+                                    getTitle(subject, dbEntityCatalogEntry.get().readPermission(), titleField, doc, idAsString)
+                            );
+                        }
                 )
                 .into(new ArrayList<>());
 
         return new EntitiesTitleResponse(titles);
+    }
+
+    private String getTitle(Subject subject,
+                            String readPermission,
+                            String titleField,
+                            Document doc,
+                            String idAsString) {
+        if (DbEntity.NO_PERMISSION.equals(readPermission) || subject.isPermitted(readPermission + ":" + idAsString)) {
+            return doc.getString(titleField);
+        } else {
+            return TITLE_IF_NOT_PERMITTED;
+        }
     }
 }

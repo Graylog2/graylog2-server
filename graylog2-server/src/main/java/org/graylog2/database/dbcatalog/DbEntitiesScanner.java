@@ -59,7 +59,8 @@ public class DbEntitiesScanner implements Provider<DbEntitiesCatalog> {
                             return new DbEntityCatalogEntry(
                                     annotation.collection(),
                                     annotation.titleField(),
-                                    type);
+                                    type,
+                                    annotation.readPermission());
 
                         }
                 ).collect(Collectors.toList());

@@ -54,6 +54,6 @@ public class EntityTitleResource extends RestResource {
     @ApiOperation(value = "Get titles of provided entities")
     @NoAuditEvent("This endpoint does not change any data")
     public EntitiesTitleResponse getTitles(@ApiParam(name = "JSON body", required = true) final EntityTitleRequest request) {
-        return entityTitleService.getTitles(request);
+        return entityTitleService.getTitles(getSubject(), request);
     }
 }

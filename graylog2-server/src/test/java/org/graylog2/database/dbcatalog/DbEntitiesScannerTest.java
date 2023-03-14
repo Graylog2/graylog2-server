@@ -21,6 +21,8 @@ import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.users.UserImpl;
 import org.junit.jupiter.api.Test;
 
+import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
+import static org.graylog2.shared.security.RestPermissions.USERS_READ;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
@@ -36,7 +38,7 @@ class DbEntitiesScannerTest {
 
         assertSame(entryByCollectionName, entryByModelClass);
 
-        assertEquals(new DbEntityCatalogEntry("index_sets", "title", IndexSetConfig.class), entryByCollectionName);
+        assertEquals(new DbEntityCatalogEntry("index_sets", "title", IndexSetConfig.class, INDEXSETS_READ), entryByCollectionName);
     }
 
     @Test
@@ -49,7 +51,7 @@ class DbEntitiesScannerTest {
 
         assertSame(entryByCollectionName, entryByModelClass);
 
-        assertEquals(new DbEntityCatalogEntry(UserImpl.COLLECTION_NAME, UserImpl.USERNAME, UserImpl.class), entryByCollectionName);
+        assertEquals(new DbEntityCatalogEntry(UserImpl.COLLECTION_NAME, UserImpl.USERNAME, UserImpl.class, USERS_READ), entryByCollectionName);
     }
 
 
