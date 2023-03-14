@@ -47,7 +47,8 @@ public class EntityTitleService {
     private final DbEntitiesCatalog entitiesCatalog;
 
     @Inject
-    public EntityTitleService(final MongoConnection mongoConnection, final DbEntitiesCatalog entitiesCatalog) {
+    public EntityTitleService(final MongoConnection mongoConnection,
+                              final DbEntitiesCatalog entitiesCatalog) {
         this.mongoConnection = mongoConnection;
         this.entitiesCatalog = entitiesCatalog;
     }

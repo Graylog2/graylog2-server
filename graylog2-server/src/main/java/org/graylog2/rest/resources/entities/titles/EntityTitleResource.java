@@ -21,6 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.rest.resources.entities.titles.model.EntitiesTitleResponse;
 import org.graylog2.rest.resources.entities.titles.model.EntityTitleRequest;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -51,8 +52,8 @@ public class EntityTitleResource extends RestResource {
     @POST
     @Timed
     @ApiOperation(value = "Get titles of provided entities")
+    @NoAuditEvent("This endpoint does not change any data")
     public EntitiesTitleResponse getTitles(@ApiParam(name = "JSON body", required = true) final EntityTitleRequest request) {
-
         return entityTitleService.getTitles(request);
     }
 }

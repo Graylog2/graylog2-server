@@ -44,7 +44,7 @@ class DbEntitiesCatalogTest {
     }
 
     @Test
-    void returnsProperDataFromInCatalog() {
+    void returnsProperDataFromCatalog() {
         DbEntitiesCatalog catalog = new DbEntitiesCatalog(List.of(new DbEntityCatalogEntry("streams", "title", StreamImpl.class)));
 
         assertThat(catalog.getByCollectionName("streams"))
@@ -54,7 +54,7 @@ class DbEntitiesCatalogTest {
                 );
         assertThat(catalog.getByModelClass(StreamImpl.class))
                 .isEqualTo(Optional.of(
-                                new DbEntityCatalogEntry("streams", "title", StreamImpl.class)
+                        new DbEntityCatalogEntry("streams", "title", StreamImpl.class)
                         )
                 );
     }
