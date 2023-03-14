@@ -20,7 +20,7 @@ const path = require('path');
 const webpack = require('webpack');
 const AssetsPlugin = require('assets-webpack-plugin');
 const merge = require('webpack-merge');
-const { ESBuildMinifyPlugin } = require('esbuild-loader');
+const { EsbuildPlugin } = require('esbuild-loader');
 
 const ROOT_PATH = path.resolve(__dirname);
 const BUILD_PATH = path.resolve(ROOT_PATH, 'target/web/build');
@@ -98,7 +98,8 @@ if (TARGET.startsWith('build')) {
     optimization: {
       concatenateModules: false,
       sideEffects: false,
-      minimizer: [new ESBuildMinifyPlugin({
+      minimizer: [new EsbuildPlugin({
+        format: 'cjs',
         target: supportedBrowsers,
       })],
     },

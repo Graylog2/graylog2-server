@@ -26,10 +26,10 @@ import static io.restassured.RestAssured.given;
 
 public class Users implements GraylogRestApi {
 
-    private final RequestSpecification requestSpecification;
+    private final GraylogApis api;
 
-    public Users(RequestSpecification requestSpecification) {
-        this.requestSpecification = requestSpecification;
+    public Users(GraylogApis api) {
+        this.api = api;
     }
 
     public record User(@JsonProperty("username") String username,
@@ -50,7 +50,7 @@ public class Users implements GraylogRestApi {
 
     public JsonPath createUser(User user) {
         given()
-                .spec(this.requestSpecification)
+                .spec(api.requestSpecification())
                 .when()
                 .body(user)
                 .post("/users")
@@ -63,7 +63,7 @@ public class Users implements GraylogRestApi {
 
     public JsonPath getUserInfo(String username) {
         return given()
-                .spec(this.requestSpecification)
+                .spec(api.requestSpecification())
                 .when()
                 .get("/users/" + username)
                 .then()

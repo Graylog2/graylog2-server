@@ -19,9 +19,11 @@ package org.graylog.testing.utils;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
+import org.graylog.testing.completebackend.apis.GraylogApis;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
@@ -38,10 +40,10 @@ public final class StreamUtils {
                                @JsonProperty("rules") Collection<StreamRule> streamRules,
                                @JsonProperty("index_set_id") String indexSetId) {}
 
-    public static String createStream(RequestSpecification requestSpec, String title, String indexSetId, StreamRule... streamRules) {
+    public static String createStream(Supplier<RequestSpecification> spec, String title, String indexSetId, StreamRule... streamRules) {
         final CreateStreamRequest body = new CreateStreamRequest(title, List.of(streamRules), indexSetId);
         final String streamId = given()
-                .spec(requestSpec)
+                .spec(spec.get())
                 .when()
                 .body(body)
                 .post("/streams")
@@ -52,7 +54,7 @@ public final class StreamUtils {
                 .extract().body().jsonPath().getString("stream_id");
 
         given()
-                .spec(requestSpec)
+                .spec(spec.get())
                 .when()
                 .post("/streams/" + streamId + "/resume")
                 .then()
@@ -62,9 +64,9 @@ public final class StreamUtils {
         return streamId;
     }
 
-    public static ValidatableResponse getStream(RequestSpecification requestSpec, String streamId) {
+    public static ValidatableResponse getStream(Supplier<RequestSpecification> spec, String streamId) {
         return given()
-                .spec(requestSpec)
+                .spec(spec.get())
                 .when()
                 .get("/streams/" + streamId)
                 .then()

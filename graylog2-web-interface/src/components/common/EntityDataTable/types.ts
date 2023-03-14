@@ -65,3 +65,9 @@ export type TableLayoutPreferencesJSON = {
   },
   per_page?: number
 }
+
+export type ExpandedSectionRenderer<Entity> = {
+  title: string,
+  content: (entity: Entity) => React.ReactNode,
+  actions?: (entity: Entity) => React.ReactNode,
+}

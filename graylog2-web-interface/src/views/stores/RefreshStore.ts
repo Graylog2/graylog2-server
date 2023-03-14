@@ -15,8 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
+import moment from 'moment';
 
 import { singletonActions, singletonStore } from 'logic/singleton';
+import { SearchConfigStore } from 'views/stores/SearchConfigStore';
+import type { StoreState } from 'stores/StoreTypes';
 
 type RefreshActionsType = {
   enable: () => void,
@@ -46,14 +49,22 @@ export const RefreshStore = singletonStore(
     listenables: [RefreshActions],
 
     refreshConfig: {},
+    defaultInterval: undefined,
 
     intervalId: undefined,
 
     init() {
+      this.listenTo(SearchConfigStore, this.onDefaultIntervalChange, this.onDefaultIntervalChange);
+
       this.refreshConfig = {
         enabled: false,
-        interval: 5000,
       };
+    },
+
+    onDefaultIntervalChange(newState: StoreState<typeof SearchConfigStore>) {
+      if (newState?.searchesClusterConfig?.default_auto_refresh_option !== this.defaultInterval) {
+        this.defaultInterval = newState.searchesClusterConfig.default_auto_refresh_option;
+      }
     },
 
     getInitialState() {
@@ -66,10 +77,12 @@ export const RefreshStore = singletonStore(
       }
 
       if (this.refreshConfig.enabled) {
+        const { interval } = this.refreshConfig;
+
         return setTimeout(async () => {
           await RefreshActions.refresh();
           this.intervalId = this._scheduleRefresh();
-        }, this.refreshConfig.interval);
+        }, interval);
       }
 
       return undefined;
@@ -83,7 +96,7 @@ export const RefreshStore = singletonStore(
     },
 
     enable() {
-      this.refreshConfig = { ...this.refreshConfig, enabled: true };
+      this.refreshConfig = { interval: this.refreshConfig.interval ?? moment.duration(this.defaultInterval).asMilliseconds(), enabled: true };
 
       this.intervalId = this._scheduleRefresh();
 

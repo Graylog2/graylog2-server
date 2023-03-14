@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-const searchClusterConfig = {
+import type { SearchesConfig } from 'components/search/SearchConfig';
+
+const searchClusterConfig: SearchesConfig = {
   query_time_range_limit: 'PT0S',
   relative_timerange_options: {
     PT10M: 'Search in the last 5 minutes',
@@ -52,6 +54,16 @@ const searchClusterConfig = {
     'full_message',
     'message',
   ],
+  auto_refresh_timerange_options: {
+    PT1S: '1 second',
+    PT5S: '5 seconds',
+    PT10S: '10 seconds',
+    PT30S: '30 seconds',
+    PT1M: '1 minute',
+    PT5M: '5 minutes',
+    PT3M: '3 minutes',
+  },
+  default_auto_refresh_option: 'PT5S',
 };
 
 export default searchClusterConfig;

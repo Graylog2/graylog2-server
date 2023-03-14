@@ -82,10 +82,10 @@ public class Search implements GraylogRestApi {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(Search.class);
-    private final RequestSpecification requestSpecification;
+    private final GraylogApis api;
 
-    public Search(RequestSpecification requestSpecification) {
-        this.requestSpecification = requestSpecification;
+    public Search(GraylogApis api) {
+        this.api = api;
     }
 
     /**
@@ -102,7 +102,7 @@ public class Search implements GraylogRestApi {
         String body = allMessagesJson(queryId, messageListId, timeRange);
 
         final JsonPath response = given()
-                .spec(this.requestSpecification)
+                .spec(api.requestSpecification())
                 .when()
                 .body(body)
                 .post("/views/search/sync")
