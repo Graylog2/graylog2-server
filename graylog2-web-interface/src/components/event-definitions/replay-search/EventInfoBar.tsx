@@ -23,6 +23,7 @@ import { FlatContentRow, Icon } from 'components/common';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
 import useHighlightValuesForEventDefinition from 'hooks/useHighlightValuesForEventDefinition';
 import useAttributeComponents from 'components/event-definitions/replay-search/hooks/useAttributeComponents';
+import NoAttributeProvided from 'components/event-definitions/replay-search/NoAttributeProvided';
 
 const Header = styled.div`
   display: flex;
@@ -83,7 +84,7 @@ const EventInfoBar = () => {
           {infoAttributes.map(({ title, content, show }) => (show !== false) && (
             <Item key={title}>
               <b>{title}: </b>
-              <span title={title}>{content || <i>No {title} provided</i>}</span>
+              <span title={title}>{content || <NoAttributeProvided name={title} />}</span>
             </Item>
           ))}
         </Row>

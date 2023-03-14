@@ -29,6 +29,7 @@ import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData
 import { updateHighlightingRule, createHighlightingRules } from 'views/logic/slices/highlightActions';
 import { randomColor } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import useAppDispatch from 'stores/useAppDispatch';
+import NoAttributeProvided from 'components/event-definitions/replay-search/NoAttributeProvided';
 
 const List = styled.div`
   display: flex;
@@ -100,7 +101,7 @@ const AggregationConditions = () => {
     }, initial);
   }, [aggregations, highlightingRules]);
 
-  return (
+  return highlightedAggregations?.size ? (
     <List>
       {Array.from(highlightedAggregations).map(([condition, rule]) => {
         const color = rule?.color as StaticColor;
@@ -126,7 +127,7 @@ const AggregationConditions = () => {
         );
       })}
     </List>
-  );
+  ) : <NoAttributeProvided name="Aggregation conditions" />;
 };
 
 export default AggregationConditions;

@@ -22,6 +22,7 @@ import Routes from 'routing/Routes';
 import { useStore } from 'stores/connect';
 import { EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
 import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData';
+import NoAttributeProvided from 'components/event-definitions/replay-search/NoAttributeProvided';
 
 const Notifications = () => {
   const { eventDefinition } = useAlertAndEventDefinitionData();
@@ -44,7 +45,7 @@ const Notifications = () => {
     }, []);
   }, [eventDefinition, allNotifications]);
 
-  return (
+  return notificationList.length ? (
     <>
       {notificationList.map(({ id, title }, index) => {
         const prefix = index > 0 ? ', ' : '';
@@ -57,7 +58,7 @@ const Notifications = () => {
         );
       })}
     </>
-  );
+  ) : <NoAttributeProvided name="Notifications" />;
 };
 
 export default Notifications;
