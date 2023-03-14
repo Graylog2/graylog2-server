@@ -72,6 +72,7 @@ type RulesActionsType = {
   save: (rule: RuleType) => Promise<unknown>,
   update: (rule: RuleType) => Promise<unknown>,
   parse: (rule: RuleType, callback: () => void) => Promise<unknown>,
+  simulate: (rule: RuleType, callback: () => void) => Promise<unknown>,
   multiple: () => Promise<unknown>,
   loadFunctions: () => Promise<unknown>,
   loadMetricsConfig: () => Promise<unknown>,
@@ -88,6 +89,7 @@ export const RulesActions = singletonActions(
     save: { asyncResult: true },
     update: { asyncResult: true },
     parse: { asyncResult: true },
+    simulate: { asyncResult: true },
     multiple: { asyncResult: true },
     loadFunctions: { asyncResult: true },
     loadMetricsConfig: { asyncResult: true },
@@ -264,6 +266,29 @@ export const RulesStore = singletonStore(
       return promise;
     },
     parse(ruleSource, callback) {
+      const url = qualifyUrl(ApiRoutes.RulesController.parse().url);
+      const rule = {
+        title: ruleSource.title,
+        description: ruleSource.description,
+        source: ruleSource.source,
+      };
+
+      return fetch('POST', url, rule).then(
+        (response) => {
+        // call to clear the errors, the parsing was successful
+          callback([]);
+
+          return response;
+        },
+        (error) => {
+        // a Bad Request indicates a parse error, set all the returned errors in the editor
+          if (error.status === 400) {
+            callback(error.additional.body);
+          }
+        },
+      );
+    },
+    simulate(ruleSource, callback) {
       const url = qualifyUrl(ApiRoutes.RulesController.parse().url);
       const rule = {
         title: ruleSource.title,

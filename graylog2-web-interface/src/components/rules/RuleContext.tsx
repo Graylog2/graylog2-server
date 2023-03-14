@@ -66,6 +66,16 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     RulesActions.parse(nextRule, callback);
   }, [rule, description]);
 
+  const simulateRule = useCallback((callback) => {
+    const nextRule = {
+      ...rule,
+      source: ruleSourceRef.current.editor.getSession().getValue(),
+      description,
+    };
+
+    RulesActions.simulate(nextRule, callback);
+  }, [rule, description]);
+
   useEffect(() => {
     if (ruleSourceRef.current) {
       ruleSourceRef.current.editor.session.setOption('useWorker', false);
@@ -113,6 +123,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
       onAceLoaded: () => setAceLoaded(true),
       ruleSource,
       onChangeSource,
+      simulateRule,
     });
   }, [
     description,
@@ -121,6 +132,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     ruleSource,
     usedInPipelines,
     validateNewRule,
+    simulateRule,
   ]);
 
   return (
