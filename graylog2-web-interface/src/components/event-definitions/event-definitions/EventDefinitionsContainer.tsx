@@ -61,7 +61,7 @@ const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
       staticWidth: 100,
     },
     priority: {
-      staticWidth: 50,
+      staticWidth: 100,
     },
   },
 });
