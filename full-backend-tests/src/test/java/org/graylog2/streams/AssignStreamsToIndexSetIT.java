@@ -17,7 +17,7 @@
 package org.graylog2.streams;
 
 import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
+import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
@@ -35,10 +35,10 @@ import static org.hamcrest.Matchers.equalTo;
 public class AssignStreamsToIndexSetIT {
     private static final String STREAMS_RESOURCE = "/streams";
 
-    private final RequestSpecification requestSpec;
+    private final GraylogApis api;
 
-    public AssignStreamsToIndexSetIT(RequestSpecification requestSpec) {
-        this.requestSpec = requestSpec;
+    public AssignStreamsToIndexSetIT(GraylogApis api) {
+        this.api = api;
     }
 
     private String defaultIndexSetId;
@@ -49,11 +49,11 @@ public class AssignStreamsToIndexSetIT {
 
     @BeforeAll
     void beforeAll() {
-        this.defaultIndexSetId = IndexSetUtils.defaultIndexSetId(requestSpec);
-        this.stream1Id = StreamUtils.createStream(requestSpec, "New Stream", defaultIndexSetId);
-        this.stream2Id = StreamUtils.createStream(requestSpec, "New Stream 2", defaultIndexSetId);
-        this.stream3Id = StreamUtils.createStream(requestSpec, "New Stream 3", defaultIndexSetId);
-        this.newIndexSetId = IndexSetUtils.createIndexSet(requestSpec, "Test Indices", "Some test indices", "test");
+        this.defaultIndexSetId = IndexSetUtils.defaultIndexSetId(api.requestSpecificationSupplier());
+        this.stream1Id = StreamUtils.createStream(api.requestSpecificationSupplier(), "New Stream", defaultIndexSetId);
+        this.stream2Id = StreamUtils.createStream(api.requestSpecificationSupplier(), "New Stream 2", defaultIndexSetId);
+        this.stream3Id = StreamUtils.createStream(api.requestSpecificationSupplier(), "New Stream 3", defaultIndexSetId);
+        this.newIndexSetId = IndexSetUtils.createIndexSet(api.requestSpecificationSupplier(), "Test Indices", "Some test indices", "test");
     }
 
     @ContainerMatrixTest
@@ -61,21 +61,21 @@ public class AssignStreamsToIndexSetIT {
         assignToIndexSet(List.of(stream1Id, stream2Id, stream3Id), newIndexSetId)
                 .statusCode(200);
 
-        StreamUtils.getStream(requestSpec, stream1Id)
+        StreamUtils.getStream(api.requestSpecificationSupplier(), stream1Id)
                 .assertThat().body("index_set_id", equalTo(newIndexSetId));
-        StreamUtils.getStream(requestSpec, stream2Id)
+        StreamUtils.getStream(api.requestSpecificationSupplier(), stream2Id)
                 .assertThat().body("index_set_id", equalTo(newIndexSetId));
-        StreamUtils.getStream(requestSpec, stream3Id)
+        StreamUtils.getStream(api.requestSpecificationSupplier(), stream3Id)
                 .assertThat().body("index_set_id", equalTo(newIndexSetId));
 
         assignToIndexSet(List.of(stream1Id, stream2Id, stream3Id), defaultIndexSetId)
                 .statusCode(200);
 
-        StreamUtils.getStream(requestSpec, stream1Id)
+        StreamUtils.getStream(api.requestSpecificationSupplier(), stream1Id)
                 .assertThat().body("index_set_id", equalTo(defaultIndexSetId));
-        StreamUtils.getStream(requestSpec, stream2Id)
+        StreamUtils.getStream(api.requestSpecificationSupplier(), stream2Id)
                 .assertThat().body("index_set_id", equalTo(defaultIndexSetId));
-        StreamUtils.getStream(requestSpec, stream3Id)
+        StreamUtils.getStream(api.requestSpecificationSupplier(), stream3Id)
                 .assertThat().body("index_set_id", equalTo(defaultIndexSetId));
     }
 
@@ -84,11 +84,11 @@ public class AssignStreamsToIndexSetIT {
         assignToIndexSet(List.of(stream1Id, stream2Id, stream3Id), "doesnotexist")
                 .statusCode(404);
 
-        StreamUtils.getStream(requestSpec, stream1Id)
+        StreamUtils.getStream(api.requestSpecificationSupplier(), stream1Id)
                 .assertThat().body("index_set_id", equalTo(defaultIndexSetId));
-        StreamUtils.getStream(requestSpec, stream2Id)
+        StreamUtils.getStream(api.requestSpecificationSupplier(), stream2Id)
                 .assertThat().body("index_set_id", equalTo(defaultIndexSetId));
-        StreamUtils.getStream(requestSpec, stream3Id)
+        StreamUtils.getStream(api.requestSpecificationSupplier(), stream3Id)
                 .assertThat().body("index_set_id", equalTo(defaultIndexSetId));
     }
 
@@ -97,17 +97,17 @@ public class AssignStreamsToIndexSetIT {
         assignToIndexSet(List.of(stream1Id, stream2Id, stream3Id, "6389c6a9205a90634f992bce"), newIndexSetId)
                 .statusCode(404);
 
-        StreamUtils.getStream(requestSpec, stream1Id)
+        StreamUtils.getStream(api.requestSpecificationSupplier(), stream1Id)
                 .assertThat().body("index_set_id", equalTo(defaultIndexSetId));
-        StreamUtils.getStream(requestSpec, stream2Id)
+        StreamUtils.getStream(api.requestSpecificationSupplier(), stream2Id)
                 .assertThat().body("index_set_id", equalTo(defaultIndexSetId));
-        StreamUtils.getStream(requestSpec, stream3Id)
+        StreamUtils.getStream(api.requestSpecificationSupplier(), stream3Id)
                 .assertThat().body("index_set_id", equalTo(defaultIndexSetId));
     }
 
     private ValidatableResponse assignToIndexSet(Collection<String> streamIds, String indexSetId) {
         return given()
-                .spec(requestSpec)
+                .spec(api.requestSpecificationSupplier().get())
                 .log().ifValidationFails()
                 .when()
                 .body(streamIds)
