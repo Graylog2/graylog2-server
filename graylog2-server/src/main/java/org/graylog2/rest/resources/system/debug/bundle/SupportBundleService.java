@@ -47,6 +47,7 @@ import javax.ws.rs.core.HttpHeaders;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -58,6 +59,7 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -167,7 +169,7 @@ public class SupportBundleService {
     }
 
     private String nowTimestamp() {
-        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-HHmmss");
+        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-HHmmss", Locale.US);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         return simpleDateFormat.format(Instant.now().toEpochMilli());
     }
@@ -232,7 +234,9 @@ public class SupportBundleService {
                     proxiedResourceHelper.createRemoteInterfaceProvider(RemoteSystemResource.class),
                     RemoteSystemResource::threadDump, Function.identity(), CALL_TIMEOUT.toMillis()
             );
-            threadDumpFile.write(dump.entity().get().threadDump().getBytes());
+            if (dump.entity().isPresent()) {
+                threadDumpFile.write(dump.entity().get().threadDump().getBytes(StandardCharsets.UTF_8));
+            }
         } catch (Exception e) {
             LOG.warn("Failed to get threadDump from node <{}>", nodeId, e);
         }
