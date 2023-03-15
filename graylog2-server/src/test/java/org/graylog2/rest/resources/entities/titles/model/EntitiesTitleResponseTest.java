@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.entities.titles.model;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -27,18 +28,18 @@ class EntitiesTitleResponseTest {
 
     @Test
     void testMergeWithEmptyOrNullResponse() {
-        EntitiesTitleResponse response = new EntitiesTitleResponse(List.of(new EntityTitleResponse("id", "type", "title")));
+        EntitiesTitleResponse response = new EntitiesTitleResponse(List.of(new EntityTitleResponse("id", "type", "title")), Set.of());
 
-        assertSame(response, response.merge(new EntitiesTitleResponse(List.of())));
-        assertSame(response, response.merge(new EntitiesTitleResponse(null)));
-        assertSame(response, new EntitiesTitleResponse(List.of()).merge(response));
+        assertSame(response, response.merge(new EntitiesTitleResponse(List.of(), Set.of())));
+        assertSame(response, response.merge(new EntitiesTitleResponse(null, Set.of())));
+        assertSame(response, new EntitiesTitleResponse(List.of(), Set.of()).merge(response));
     }
 
 
     @Test
     void testMergeWithNonEmptyResponse() {
-        EntitiesTitleResponse response1 = new EntitiesTitleResponse(List.of(new EntityTitleResponse("id", "type1", "title")));
-        EntitiesTitleResponse response2 = new EntitiesTitleResponse(List.of(new EntityTitleResponse("id", "type2", "title")));
+        EntitiesTitleResponse response1 = new EntitiesTitleResponse(List.of(new EntityTitleResponse("id", "type1", "title")), Set.of());
+        EntitiesTitleResponse response2 = new EntitiesTitleResponse(List.of(new EntityTitleResponse("id", "type2", "title")), Set.of());
 
         final EntitiesTitleResponse merged = response1.merge(response2);
         assertThat(merged.entities()).isEqualTo(
@@ -51,8 +52,8 @@ class EntitiesTitleResponseTest {
 
     @Test
     void testDuplicatesAreEliminatedOnMerge() {
-        EntitiesTitleResponse response1 = new EntitiesTitleResponse(List.of(new EntityTitleResponse("id", "type", "title")));
-        EntitiesTitleResponse response2 = new EntitiesTitleResponse(List.of(new EntityTitleResponse("id", "type", "title")));
+        EntitiesTitleResponse response1 = new EntitiesTitleResponse(List.of(new EntityTitleResponse("id", "type", "title")), Set.of());
+        EntitiesTitleResponse response2 = new EntitiesTitleResponse(List.of(new EntityTitleResponse("id", "type", "title")), Set.of());
 
         final EntitiesTitleResponse merged = response1.merge(response2);
         assertThat(merged.entities()).isEqualTo(

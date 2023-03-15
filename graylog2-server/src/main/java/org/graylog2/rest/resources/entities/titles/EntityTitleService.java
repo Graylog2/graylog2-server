@@ -35,9 +35,11 @@ import org.graylog2.rest.resources.entities.titles.model.EntityTitleResponse;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -48,7 +50,7 @@ public class EntityTitleService {
     private final MongoConnection mongoConnection;
     private final DbEntitiesCatalog entitiesCatalog;
 
-    static final String TITLE_IF_NOT_PERMITTED = "<not permitted to view>";
+    static final String TITLE_IF_NOT_PERMITTED = "";
 
     @Inject
     public EntityTitleService(final MongoConnection mongoConnection,
@@ -68,7 +70,7 @@ public class EntityTitleService {
                 .map(entry -> getTitlesForEntitiesFromSingleCollection(subject, entry.getKey(), entry.getValue()))
                 .reduce(EntitiesTitleResponse::merge);
 
-        return entitiesTitleResponse.orElse(new EntitiesTitleResponse(List.of()));
+        return entitiesTitleResponse.orElse(new EntitiesTitleResponse(List.of(), Set.of()));
     }
 
     public EntitiesTitleResponse getTitlesForEntitiesFromSingleCollection(final Subject subject,
@@ -76,7 +78,7 @@ public class EntityTitleService {
                                                                           final List<EntityIdentifier> entities) {
         final Optional<DbEntityCatalogEntry> dbEntityCatalogEntry = this.entitiesCatalog.getByCollectionName(collection);
         if (dbEntityCatalogEntry.isEmpty() || entities.isEmpty()) {
-            return new EntitiesTitleResponse(List.of());
+            return new EntitiesTitleResponse(List.of(), Set.of());
         }
 
         final String titleField = dbEntityCatalogEntry.get().titleField();
@@ -84,7 +86,8 @@ public class EntityTitleService {
             return new EntitiesTitleResponse(
                     entities.stream()
                             .map(e -> new EntityTitleResponse(e.id(), e.type(), ""))
-                            .collect(Collectors.toList())
+                            .collect(Collectors.toList()),
+                    Set.of()
             );
         }
 
@@ -100,31 +103,30 @@ public class EntityTitleService {
                 .find(bsonFilter)
                 .projection(Projections.include(titleField));
 
-        final List<EntityTitleResponse> titles = documents
-                .map(doc ->
-                        {
-                            final String idAsString = doc.getObjectId("_id").toString();
-                            return new EntityTitleResponse(
-                                    idAsString,
-                                    collection,
-                                    getTitle(subject, dbEntityCatalogEntry.get().readPermission(), titleField, doc, idAsString)
-                            );
-                        }
-                )
-                .into(new ArrayList<>());
+        final List<EntityTitleResponse> titles = new ArrayList<>();
+        final Set<String> notPermitted = new HashSet<>();
+        documents.forEach(doc ->
+                {
+                    final String idAsString = doc.getObjectId("_id").toString();
+                    final boolean canReadTitle = checkCanReadTitle(subject, dbEntityCatalogEntry.get().readPermission(), idAsString);
+                    titles.add(new EntityTitleResponse(
+                            idAsString,
+                            collection,
+                            canReadTitle ? doc.getString(titleField) : TITLE_IF_NOT_PERMITTED
+                    ));
+                    if (!canReadTitle) {
+                        notPermitted.add(idAsString);
+                    }
+                }
+        );
 
-        return new EntitiesTitleResponse(titles);
+        return new EntitiesTitleResponse(titles, notPermitted);
     }
 
-    private String getTitle(Subject subject,
-                            String readPermission,
-                            String titleField,
-                            Document doc,
-                            String idAsString) {
-        if (DbEntity.NO_PERMISSION.equals(readPermission) || subject.isPermitted(readPermission + ":" + idAsString)) {
-            return doc.getString(titleField);
-        } else {
-            return TITLE_IF_NOT_PERMITTED;
-        }
+    private boolean checkCanReadTitle(final Subject subject,
+                                      final String readPermission,
+                                      final String idAsString) {
+        return DbEntity.NO_PERMISSION.equals(readPermission) ||
+                subject.isPermitted(readPermission + ":" + idAsString);
     }
 }

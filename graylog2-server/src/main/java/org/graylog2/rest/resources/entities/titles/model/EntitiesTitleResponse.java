@@ -19,11 +19,13 @@ package org.graylog2.rest.resources.entities.titles.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public record EntitiesTitleResponse(@JsonProperty("entities") List<EntityTitleResponse> entities) {
+public record EntitiesTitleResponse(@JsonProperty("entities") List<EntityTitleResponse> entities,
+                                    @JsonProperty("not_permitted_to_view") Collection<String> notPermitted) {
 
     public EntitiesTitleResponse merge(final EntitiesTitleResponse other) {
         if (other == null || other.entities == null || other.entities.isEmpty()) {
@@ -32,9 +34,12 @@ public record EntitiesTitleResponse(@JsonProperty("entities") List<EntityTitleRe
         if (this.entities.isEmpty()) {
             return other;
         }
-        final Set<EntityTitleResponse> merged = new HashSet<>(entities().size() + other.entities().size());
-        merged.addAll(entities());
-        merged.addAll(other.entities());
-        return new EntitiesTitleResponse(new ArrayList<>(merged));
+        final Set<EntityTitleResponse> mergedEntities = new HashSet<>(entities().size() + other.entities().size());
+        mergedEntities.addAll(entities());
+        mergedEntities.addAll(other.entities());
+        final Set<String> mergedNotPermitted = new HashSet<>(notPermitted.size() + other.notPermitted.size());
+        mergedNotPermitted.addAll(notPermitted());
+        mergedNotPermitted.addAll(other.notPermitted());
+        return new EntitiesTitleResponse(new ArrayList<>(mergedEntities), mergedNotPermitted);
     }
 }
