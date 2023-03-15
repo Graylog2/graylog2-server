@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { renderWithDataRouter } from 'wrappedTestingLibrary';
 
 import ConfirmLeaveDialog from './ConfirmLeaveDialog';
 
@@ -37,15 +37,15 @@ describe('ConfirmLeaveDialog', () => {
   });
 
   it('registers window beforeunload handler', () => {
-    mount(<ConfirmLeaveDialog />);
+    renderWithDataRouter(<ConfirmLeaveDialog />);
 
     expect(window.addEventListener).toHaveBeenCalledWith('beforeunload', expect.any(Function));
   });
 
   it('unregisters window beforeunload handler upon unmount', () => {
-    const wrapper = mount(<ConfirmLeaveDialog />);
+    const { unmount } = renderWithDataRouter(<ConfirmLeaveDialog />);
 
-    wrapper.unmount();
+    unmount();
 
     expect(window.removeEventListener).toHaveBeenCalledWith('beforeunload', expect.any(Function));
   });
