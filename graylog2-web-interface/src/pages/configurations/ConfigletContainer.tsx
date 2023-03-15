@@ -46,7 +46,7 @@ const Boundary = ({ children, title }: BoundaryProps) => (
 );
 
 const ConfigletContainer = ({ children, title }: BoundaryProps) => (
-  <Col md={6}>
+  <Col md={12}>
     <Boundary title={title}>
       {children}
     </Boundary>

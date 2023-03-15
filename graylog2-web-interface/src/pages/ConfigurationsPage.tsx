@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
-import { Col, Row } from 'components/bootstrap';
+import { Col, Nav, NavItem, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { useStore } from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
@@ -37,7 +37,6 @@ import { ConfigurationsActions, ConfigurationsStore } from 'stores/configuration
 import useCurrentUser from 'hooks/useCurrentUser';
 
 import ConfigletContainer from './configurations/ConfigletContainer';
-import PluginConfigRows from './configurations/PluginConfigRows';
 
 import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
 import UserConfig from '../components/configurations/UserConfig';
@@ -51,9 +50,9 @@ const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
 const PERMISSIONS_CONFIG = 'org.graylog2.users.UserAndTeamsConfig';
 const USER_CONFIG = 'org.graylog2.users.UserConfiguration';
 
-const _getConfig = (configType, configuration) => configuration?.[configType] ?? null;
+const getConfig = (configType, configuration) => configuration?.[configType] ?? null;
 
-const _onUpdate = (configType: string) => {
+const onUpdate = (configType: string) => {
   return (config) => {
     switch (configType) {
       case MESSAGE_PROCESSORS_CONFIG:
@@ -73,6 +72,8 @@ const ConfigurationsPage = () => {
   const pluginSystemConfigs = usePluginEntities('systemConfigurations');
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
   const currentUser = useCurrentUser();
+  const [activeSectionKey, setActiveSectionKey] = useState(1);
+  const [activeSubSectionKey, setActiveSubSectionKey] = useState(1);
 
   useEffect(() => {
     const promises = [
@@ -95,107 +96,242 @@ const ConfigurationsPage = () => {
     Promise.allSettled([...promises, ...pluginPromises]).then(() => setLoaded(true));
   }, [currentUser.permissions, pluginSystemConfigs]);
 
-  let Output = (
-    <Col md={12}>
-      <Spinner text="Loading Configuration Panel..." />
-    </Col>
-  );
+  const handleNavSelect = (itemKey) => {
+    setActiveSectionKey(itemKey);
+    setActiveSubSectionKey(1);
+  };
 
-  if (loaded) {
-    const searchesConfig = _getConfig(SEARCHES_CLUSTER_CONFIG, configuration);
-    const messageProcessorsConfig = _getConfig(MESSAGE_PROCESSORS_CONFIG, configuration);
-    const sidecarConfig = _getConfig(SIDECAR_CONFIG, configuration);
-    const eventsConfig = _getConfig(EVENTS_CONFIG, configuration);
-    const urlWhiteListConfig = _getConfig(URL_WHITELIST_CONFIG, configuration);
-    const indexSetsDefaultsConfig = _getConfig(INDEX_SETS_DEFAULTS_CONFIG, configuration);
-    const permissionsConfig = _getConfig(PERMISSIONS_CONFIG, configuration);
-    const userConfig = _getConfig(USER_CONFIG, configuration);
+  const handleSubNavSelect = (itemKey) => {
+    setActiveSubSectionKey(itemKey);
+  };
 
-    Output = (
-      <>
-        {searchesConfig && (
-          <ConfigletContainer title="Search Configuration">
-            <SearchesConfig config={searchesConfig}
-                            updateConfig={_onUpdate(SEARCHES_CLUSTER_CONFIG)} />
-          </ConfigletContainer>
-        )}
-        {messageProcessorsConfig && (
-          <ConfigletContainer title="Message Processor Configuration">
-            <MessageProcessorsConfig config={messageProcessorsConfig}
-                                     updateConfig={_onUpdate(MESSAGE_PROCESSORS_CONFIG)} />
-          </ConfigletContainer>
-        )}
-        {sidecarConfig && (
-          <ConfigletContainer title="Sidecar Configuration">
-            <SidecarConfig config={sidecarConfig}
-                           updateConfig={_onUpdate(SIDECAR_CONFIG)} />
-          </ConfigletContainer>
-        )}
-        {eventsConfig && (
-          <ConfigletContainer title="Events Configuration">
-            <EventsConfig config={eventsConfig}
-                          updateConfig={_onUpdate(EVENTS_CONFIG)} />
-          </ConfigletContainer>
-        )}
-        {isPermitted(currentUser.permissions, ['urlwhitelist:read']) && urlWhiteListConfig && (
-          <ConfigletContainer title="URL Whitelist Configuration">
-            <UrlWhiteListConfig config={urlWhiteListConfig}
-                                updateConfig={_onUpdate(URL_WHITELIST_CONFIG)} />
-          </ConfigletContainer>
-        )}
-        <ConfigletContainer title="Decorators Configuration">
+  const searchesConfig = getConfig(SEARCHES_CLUSTER_CONFIG, configuration);
+  const messageProcessorsConfig = getConfig(MESSAGE_PROCESSORS_CONFIG, configuration);
+  const sidecarConfig = getConfig(SIDECAR_CONFIG, configuration);
+  const eventsConfig = getConfig(EVENTS_CONFIG, configuration);
+  const urlWhiteListConfig = getConfig(URL_WHITELIST_CONFIG, configuration);
+  const indexSetsDefaultsConfig = getConfig(INDEX_SETS_DEFAULTS_CONFIG, configuration);
+  const permissionsConfig = getConfig(PERMISSIONS_CONFIG, configuration);
+  const userConfig = getConfig(USER_CONFIG, configuration);
+
+  const pluginDisplayNames = [
+    {
+      configType: 'org.graylog.plugins.collector.system.CollectorSystemConfiguration',
+      displayName: 'Collectors System',
+    },
+    {
+      configType: 'org.graylog.aws.config.AWSPluginConfiguration',
+      displayName: 'AWS',
+    },
+    {
+      configType: 'org.graylog.plugins.threatintel.ThreatIntelPluginConfiguration',
+      displayName: 'Threat Intelligence Lookup',
+    },
+    {
+      configType: 'org.graylog.plugins.failure.config.EnterpriseFailureHandlingConfiguration',
+      displayName: 'Failure Processing',
+    },
+    {
+      configType: 'org.graylog.plugins.license.violations.TrafficLimitViolationSettings',
+      displayName: 'Traffic Limit Violation',
+    },
+    {
+      configType: 'org.graylog.plugins.map.config.GeoIpResolverConfig',
+      displayName: 'Geo-Location Processor',
+    },
+  ];
+
+  // 0
+  // :
+  // {configType: 'org.graylog.plugins.collector.system.CollectorSystemConfiguration', component: ƒ}
+  // 1
+  // :
+  // {configType: 'org.graylog.aws.config.AWSPluginConfiguration', component: ƒ}
+  // 2
+  // :
+  // {configType: 'org.graylog.plugins.threatintel.ThreatIntelPluginConfiguration', component: ƒ}
+  // 3
+  // :
+  // {configType: 'org.graylog.plugins.failure.config.EnterpriseFailureHandlingConfiguration', permissions: 'indices:failures', component: ƒ}
+  // 4
+  // :
+  // {configType: 'org.graylog.plugins.license.violations.TrafficLimitViolationSettings', permissions: 'clusterconfigentry:read', component: ƒ}
+  // 5
+  // :
+  // {configType: 'org.graylog.plugins.map.config.GeoIpResolverConfig', component: ƒ}
+  // length
+  // :
+  // 6
+
+  const configurationSections = [
+    {
+      name: 'Search',
+      shouldRender: searchesConfig,
+      render: (key) => (
+        <ConfigletContainer title="Search Configuration" key={key}>
+          <SearchesConfig config={searchesConfig}
+                          updateConfig={onUpdate(SEARCHES_CLUSTER_CONFIG)} />
+        </ConfigletContainer>
+      ),
+    },
+    {
+      name: 'Message Processor',
+      shouldRender: messageProcessorsConfig,
+      render: (key) => (
+        <ConfigletContainer title="Message Processor Configuration" key={key}>
+          <MessageProcessorsConfig config={messageProcessorsConfig}
+                                   updateConfig={onUpdate(MESSAGE_PROCESSORS_CONFIG)} />
+        </ConfigletContainer>
+      ),
+    },
+    {
+      name: 'Sidecar',
+      shouldRender: sidecarConfig,
+      render: (key) => (
+        <ConfigletContainer title="Sidecar Configuration" key={key}>
+          <SidecarConfig config={sidecarConfig}
+                         updateConfig={onUpdate(SIDECAR_CONFIG)} />
+        </ConfigletContainer>
+      ),
+    },
+    {
+      name: 'Events',
+      shouldRender: eventsConfig,
+      render: (key) => (
+        <ConfigletContainer title="Events Configuration" key={key}>
+          <EventsConfig config={eventsConfig}
+                        updateConfig={onUpdate(EVENTS_CONFIG)} />
+        </ConfigletContainer>
+      ),
+    },
+    {
+      name: 'URL Whitelist',
+      shouldRender: urlWhiteListConfig,
+      render: (key) => (
+        isPermitted(currentUser.permissions, ['urlwhitelist:read']) && (
+        <ConfigletContainer title="URL Whitelist Configuration" key={key}>
+          <UrlWhiteListConfig config={urlWhiteListConfig}
+                              updateConfig={onUpdate(URL_WHITELIST_CONFIG)} />
+        </ConfigletContainer>
+        )
+      ),
+    },
+    {
+      name: 'Decorators',
+      shouldRender: true,
+      render: (key) => (
+        <ConfigletContainer title="Decorators Configuration" key={key}>
           <DecoratorsConfig />
         </ConfigletContainer>
-        {permissionsConfig && (
-          <ConfigletContainer title="Permissions Configuration">
-            <PermissionsConfig config={permissionsConfig}
-                               updateConfig={_onUpdate(PERMISSIONS_CONFIG)} />
+      ),
+    },
+    {
+      name: 'Permissions',
+      shouldRender: permissionsConfig,
+      render: (key) => (
+        <ConfigletContainer title="Permissions Configuration" key={key}>
+          <PermissionsConfig config={permissionsConfig}
+                             updateConfig={onUpdate(PERMISSIONS_CONFIG)} />
+        </ConfigletContainer>
+      ),
+    },
+    {
+      name: 'Index Set Defaults',
+      shouldRender: indexSetsDefaultsConfig,
+      render: (key) => (
+        <HideOnCloud key={key}>
+          <ConfigletContainer title="Index Set Default Configuration">
+            <IndexSetsDefaultsConfig initialConfig={indexSetsDefaultsConfig}
+                                     updateConfig={onUpdate(INDEX_SETS_DEFAULTS_CONFIG)} />
           </ConfigletContainer>
-        )}
-        {indexSetsDefaultsConfig && (
-          <HideOnCloud>
-            <ConfigletContainer title="Index Set Default Configuration">
-              <IndexSetsDefaultsConfig initialConfig={indexSetsDefaultsConfig}
-                                       updateConfig={_onUpdate(INDEX_SETS_DEFAULTS_CONFIG)} />
-            </ConfigletContainer>
-          </HideOnCloud>
-        )}
-        {userConfig && (
-          <ConfigletContainer title="User Configuration">
-            <UserConfig config={userConfig}
-                        updateConfig={_onUpdate(USER_CONFIG)} />
-          </ConfigletContainer>
-        )}
-      </>
-    );
-  }
+        </HideOnCloud>
+      ),
+    },
+    {
+      name: 'Users',
+      shouldRender: userConfig,
+      render: (key) => (
+        <ConfigletContainer title="User Configuration" key={key}>
+          <UserConfig config={userConfig}
+                      updateConfig={onUpdate(USER_CONFIG)} />
+        </ConfigletContainer>
+      ),
+    },
+    {
+      name: 'Plugins',
+      shouldRender: pluginSystemConfigs.length > 0,
+      render: (key) => (
+        <Row key={key}>
+          <Col md={3}>
+            <Nav bsStyle="pills" stacked activeKey={activeSubSectionKey} onSelect={handleSubNavSelect}>
+              {pluginSystemConfigs.map(({ configType }, index) => {
+                const { displayName } = pluginDisplayNames.find((entry) => entry.configType === configType);
+
+                return (
+                  <NavItem key={`plugin-nav-${configType}`} eventKey={index + 1} title={displayName}>
+                    {displayName}
+                  </NavItem>
+                );
+              })}
+            </Nav>
+          </Col>
+          <Col md={9}>
+            {pluginSystemConfigs
+              .map(({ component: SystemConfigComponent, configType }, index) => (
+                (index + 1 === activeSubSectionKey) && (
+                <ConfigletContainer title={configType} key={`plugin-section-${configType}`}>
+                  <SystemConfigComponent key={`system-configuration-${configType}`}
+                                         config={getConfig(configType, configuration) ?? undefined}
+                                         updateConfig={onUpdate(configType)} />
+                </ConfigletContainer>
+                )
+              ))}
+          </Col>
+        </Row>
+      ),
+    },
+  ];
+
+  const isSectionActive = (configurationSection: string) : boolean => (
+    (configurationSections.findIndex((item) => item.name === configurationSection) + 1) === activeSectionKey
+  );
 
   return (
     <DocumentTitle title="Configurations">
-      <span>
-        <PageHeader title="Configurations">
-          <span>
-            You can configure system settings for different sub systems on this page.
-          </span>
-        </PageHeader>
+      <PageHeader title="Configurations">
+        <span>
+          You can configure system settings for different sub systems on this page.
+        </span>
+      </PageHeader>
 
-        <ConfigletRow className="content">
-          {Output}
-        </ConfigletRow>
+      <ConfigletRow className="content">
+        {loaded ? (
+          <>
+            <Col md={2}>
+              <Nav bsStyle="pills" stacked activeKey={activeSectionKey} onSelect={handleNavSelect}>
+                {configurationSections.map((section, index) => (
+                  section.shouldRender && (
+                  <NavItem key={`nav-${section.name}`} eventKey={index + 1} title={section.name}>
+                    {section.name}
+                  </NavItem>
+                  )
+                ))}
+              </Nav>
+            </Col>
 
-        {pluginSystemConfigs.length > 0 && (
-        <Row className="content">
+            <Col md={10}>
+              {configurationSections.map((section) => (
+                isSectionActive(section.name) && section.shouldRender && section.render(`section-${section.name}`)
+              ))}
+            </Col>
+
+          </>
+        ) : (
           <Col md={12}>
-            <h2>Plugins</h2>
-            <p className="description">Configuration for installed plugins.</p>
-            <hr className="separator" />
-            <div className="top-margin">
-              <PluginConfigRows configuration={configuration} systemConfigs={pluginSystemConfigs} />
-            </div>
+            <Spinner text="Loading Configuration Panel..." />
           </Col>
-        </Row>
         )}
-      </span>
+      </ConfigletRow>
     </DocumentTitle>
   );
 };
