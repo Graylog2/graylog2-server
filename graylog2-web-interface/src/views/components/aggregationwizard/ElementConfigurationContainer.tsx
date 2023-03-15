@@ -39,6 +39,7 @@ const ElementActions = styled.div`
 
 const ElementConfiguration = styled.div`
   flex: 1;
+  // The min-width is required to avoid an overflow problem with the parent component. 
   min-width: 0;
 `;
 
