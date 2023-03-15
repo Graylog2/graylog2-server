@@ -14,12 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import cloneDeep from 'lodash/cloneDeep';
+import lodash from 'lodash';
 
+import history from 'util/History';
 import Routes from 'routing/Routes';
-import connect from 'stores/connect';
+import { useStore } from 'stores/connect';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import { ConfirmLeaveDialog, Spinner } from 'components/common';
 import { AvailableEventDefinitionTypesStore } from 'stores/event-definitions/AvailableEventDefinitionTypesStore';
@@ -39,57 +40,54 @@ const fetchNotifications = () => {
   EventNotificationsActions.listAll();
 };
 
-const handleCancel = (history) => {
+const handleCancel = () => {
   history.push(Routes.ALERTS.DEFINITIONS.LIST);
 };
 
-class EventDefinitionFormContainer extends React.Component {
-  constructor(props) {
-    super(props);
+const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinitionInitial, onEventDefinitionChange }) => {
+  const [eventDefinition, setEventDefinition] = useState(eventDefinitionInitial);
+  const [validation, setValidation] = useState({ errors: {} });
+  const [eventsClusterConfig, setEventsClusterConfig] = useState(undefined);
+  const [isDirty, setIsDirty] = useState(false);
 
-    this.state = {
-      eventDefinition: props.eventDefinition,
-      validation: {
-        errors: {},
-      },
-      eventsClusterConfig: undefined,
-      isDirty: false,
-    };
-  }
+  const entityTypes = useStore(AvailableEventDefinitionTypesStore);
+  const notifications = useStore(EventNotificationsStore);
+  const { currentUser } = useStore(CurrentUserStore);
 
-  componentDidMount() {
-    this.fetchClusterConfig();
+  const isLoading = !entityTypes || !notifications.all || !eventsClusterConfig;
+  const defaults = { default_backlog_size: eventsClusterConfig?.events_notification_default_backlog };
+
+  const fetchClusterConfig = useCallback(() => {
+    ConfigurationsActions.listEventsClusterConfig().then((config) => setEventsClusterConfig(config));
+  }, []);
+
+  useEffect(() => {
+    fetchClusterConfig();
     fetchNotifications();
-  }
+  }, [fetchClusterConfig]);
 
-  fetchClusterConfig = () => {
-    ConfigurationsActions.listEventsClusterConfig().then((config) => this.setState({ eventsClusterConfig: config }));
-  };
-
-  handleChange = (key, value) => {
-    this.setState((state) => {
-      const nextEventDefinition = cloneDeep(state.eventDefinition);
-
+  const handleChange = useCallback((key, value) => {
+    setEventDefinition((curState) => {
+      const nextEventDefinition = lodash.cloneDeep(curState);
       nextEventDefinition[key] = value;
-      const { onEventDefinitionChange } = this.props;
-
       onEventDefinitionChange(nextEventDefinition);
+      setIsDirty(true);
 
-      return { eventDefinition: nextEventDefinition, isDirty: true };
+      return nextEventDefinition;
     });
+  }, [onEventDefinitionChange]);
+
+  const handleSubmitSuccessResponse = () => {
+    setIsDirty(false);
+    history.push(Routes.ALERTS.DEFINITIONS.LIST);
   };
 
-  handleSubmitSuccessResponse = () => {
-    const { history } = this.props;
-    this.setState({ isDirty: false }, () => history.push(Routes.ALERTS.DEFINITIONS.LIST));
-  };
-
-  handleSubmitFailureResponse = (errorResponse) => {
+  const handleSubmitFailureResponse = (errorResponse) => {
     const { body } = errorResponse.additional;
 
     if (errorResponse.status === 400) {
       if (body && body.failed) {
-        this.setState({ validation: body });
+        setValidation(body);
 
         return;
       }
@@ -98,69 +96,54 @@ class EventDefinitionFormContainer extends React.Component {
         if (body.message.includes('org.graylog.events.conditions.Expression')
           || body.message.includes('org.graylog.events.conditions.Expr')
           || body.message.includes('org.graylog.events.processor.aggregation.AggregationSeries')) {
-          this.setState({
-            validation: {
-              errors: { conditions: ['Aggregation condition is not valid'] },
-            },
+          setValidation({
+            errors: { conditions: ['Aggregation condition is not valid'] },
           });
 
           return;
         }
 
         if (body.message.includes('embryonic')) {
-          this.setState({
-            validation: {
-              errors: { query_parameters: ['Query parameters must be declared'] },
-            },
+          setValidation({
+            errors: { query_parameters: ['Query parameters must be declared'] },
           });
         }
       }
     }
   };
 
-  handleSubmit = () => {
-    const { action } = this.props;
-    const { eventDefinition } = this.state;
-
+  const handleSubmit = () => {
     if (action === 'create') {
       EventDefinitionsActions.create(eventDefinition)
-        .then(this.handleSubmitSuccessResponse, this.handleSubmitFailureResponse);
+        .then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
     } else {
       EventDefinitionsActions.update(eventDefinition.id, eventDefinition)
-        .then(this.handleSubmitSuccessResponse, this.handleSubmitFailureResponse);
+        .then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
     }
   };
 
-  render() {
-    const { action, entityTypes, notifications, currentUser } = this.props;
-    const { isDirty, eventDefinition, eventsClusterConfig, validation } = this.state;
-    const isLoading = !entityTypes || !notifications.all || !eventsClusterConfig;
-
-    if (isLoading) {
-      return <Spinner text="Loading Event information..." />;
-    }
-
-    const defaults = { default_backlog_size: eventsClusterConfig.events_notification_default_backlog };
-
-    return (
-      <>
-        {isDirty && (
-          <ConfirmLeaveDialog question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
-        )}
-        <EventDefinitionForm action={action}
-                             eventDefinition={eventDefinition}
-                             currentUser={currentUser}
-                             validation={validation}
-                             entityTypes={entityTypes}
-                             notifications={notifications.all}
-                             defaults={defaults}
-                             onChange={this.handleChange}
-                             onCancel={handleCancel}
-                             onSubmit={this.handleSubmit} />
-      </>
-    );
+  if (isLoading) {
+    return <Spinner text="Loading Event information..." />;
   }
-}
+
+  return (
+    <>
+      {isDirty && (
+        <ConfirmLeaveDialog question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
+      )}
+      <EventDefinitionForm action={action}
+                           eventDefinition={eventDefinition}
+                           currentUser={currentUser}
+                           validation={validation}
+                           entityTypes={entityTypes}
+                           notifications={notifications.all}
+                           defaults={defaults}
+                           onChange={handleChange}
+                           onCancel={handleCancel}
+                           onSubmit={handleSubmit} />
+    </>
+  );
+};
 
 EventDefinitionFormContainer.propTypes = {
   action: PropTypes.oneOf(['create', 'edit']),
@@ -169,7 +152,6 @@ EventDefinitionFormContainer.propTypes = {
   entityTypes: PropTypes.object,
   notifications: PropTypes.object.isRequired,
   onEventDefinitionChange: PropTypes.func,
-  history: PropTypes.object.isRequired,
 };
 
 EventDefinitionFormContainer.defaultProps = {
@@ -193,11 +175,4 @@ EventDefinitionFormContainer.defaultProps = {
   onEventDefinitionChange: () => {},
 };
 
-export default connect(EventDefinitionFormContainer, {
-  entityTypes: AvailableEventDefinitionTypesStore,
-  notifications: EventNotificationsStore,
-  currentUser: CurrentUserStore,
-}, ({ currentUser, ...otherProps }) => ({
-  ...otherProps,
-  currentUser: currentUser.currentUser,
-}));
+export default EventDefinitionFormContainer;
