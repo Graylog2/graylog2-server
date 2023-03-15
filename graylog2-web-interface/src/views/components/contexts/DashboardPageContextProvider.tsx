@@ -26,13 +26,9 @@ import { selectViewStates } from 'views/logic/slices/viewSelectors';
 import useAppDispatch from 'stores/useAppDispatch';
 import { selectQuery } from 'views/logic/slices/viewSlice';
 
-const _clearURI = (query) => new URI(query)
-  .removeSearch('page');
+const _clearURI = (query: string) => new URI(query).removeSearch('page');
 
-const _updateQueryParams = (
-  newPage: string | undefined,
-  query: string,
-) => {
+const _updateQueryParams = (newPage: string | undefined, query: string) => {
   const baseUri = _clearURI(query);
 
   if (newPage) {
