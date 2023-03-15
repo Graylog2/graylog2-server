@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import _ from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { TimeUnitInput, FormSubmit } from 'components/common';
@@ -83,7 +83,7 @@ class DataAdapterForm extends React.Component {
 
     const { dataAdapter } = this.props;
 
-    if (_.isEqual(dataAdapter, prevProps.dataAdapter)) {
+    if (isEqual(dataAdapter, prevProps.dataAdapter)) {
       // props haven't changed, don't update our state from them
       return;
     }

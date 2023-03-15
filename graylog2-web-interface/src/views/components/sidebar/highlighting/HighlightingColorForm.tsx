@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import styled from 'styled-components';
-import { trim } from 'lodash';
+import trim from 'lodash/trim';
 import { Field, useFormikContext } from 'formik';
 
 import { Input } from 'components/bootstrap';

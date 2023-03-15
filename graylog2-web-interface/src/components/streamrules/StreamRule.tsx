@@ -16,7 +16,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import styled from 'styled-components';
 
 import HumanReadableStreamRule from 'components/streamrules/HumanReadableStreamRule';

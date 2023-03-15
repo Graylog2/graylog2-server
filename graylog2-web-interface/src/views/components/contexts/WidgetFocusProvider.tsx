@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { useLocation, useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import URI from 'urijs';

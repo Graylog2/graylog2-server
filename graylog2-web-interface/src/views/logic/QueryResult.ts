@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { mapValues } from 'lodash';
+import mapValues from 'lodash/mapValues';
 
 import type { MessageResult, SearchTypeResults } from 'views/types';
 import searchTypeDefinition from 'views/logic/SearchType';

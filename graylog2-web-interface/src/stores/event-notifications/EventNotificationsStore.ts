@@ -16,7 +16,7 @@
  */
 import Reflux from 'reflux';
 import URI from 'urijs';
-import lodash from 'lodash';
+import concat from 'lodash/concat';
 
 import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -125,7 +125,7 @@ export const EventNotificationsStore = singletonStore(
 
     eventNotificationsUrl({ segments = [], query = {} }) {
       const uri = new URI(this.sourceUrl);
-      const nextSegments = lodash.concat(uri.segment(), segments);
+      const nextSegments = concat(uri.segment(), segments);
 
       uri.segmentCoded(nextSegments);
       uri.query(query);

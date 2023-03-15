@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import TFieldType from 'views/logic/fieldtypes/FieldType';
 import TFieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -125,5 +125,5 @@ export default ({
   FieldType,
   OneOrMoreChildren,
   TimeRangeType,
-  instanceOf,
+  instanceOf
 });

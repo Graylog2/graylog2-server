@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
-import lodash from 'lodash';
+import merge from 'lodash/merge';
 
 import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -123,7 +123,7 @@ export const ConfigurationVariableStore = singletonStore(
         content: ' ',
       };
 
-      lodash.merge(payload, configurationVariable);
+      merge(payload, configurationVariable);
 
       const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/validate`), payload);
 

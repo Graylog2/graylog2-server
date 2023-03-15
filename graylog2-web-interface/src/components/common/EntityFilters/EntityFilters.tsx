@@ -47,7 +47,7 @@ const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRendere
     onChangeFilters({
       ...activeFilters,
       [attributeId]: [
-        ...activeFilters[attributeId] ?? [],
+        ...(activeFilters[attributeId] ?? []),
         filter,
       ],
     });

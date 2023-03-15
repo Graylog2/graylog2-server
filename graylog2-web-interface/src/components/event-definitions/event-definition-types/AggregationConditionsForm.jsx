@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import { Alert, Row } from 'components/bootstrap';
 import { Icon } from 'components/common';
