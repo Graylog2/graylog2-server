@@ -17,7 +17,8 @@
 import * as React from 'react';
 import { renderUnwrapped as render, screen } from 'wrappedTestingLibrary';
 import DefaultProviders from 'DefaultProviders';
-import { MemoryRouter } from 'react-router-dom';
+import type { RouteObject } from 'react-router-dom';
+import { createBrowserRouter, createMemoryRouter } from 'react-router-dom';
 import { defaultUser } from 'defaultMockValues';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
@@ -47,15 +48,13 @@ jest.mock('util/AppConfig', () => ({
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  BrowserRouter: ({ children }) => children,
+  createBrowserRouter: jest.fn(),
 }));
 
-const AppRouterWithContext = ({ path }: { path?: string }) => (
+const AppRouterWithContext = () => (
   <DefaultProviders>
     <CurrentUserContext.Provider value={defaultUser}>
-      <MemoryRouter initialEntries={[path]}>
-        <AppRouter />
-      </MemoryRouter>
+      <AppRouter />
     </CurrentUserContext.Provider>
   </DefaultProviders>
 );
@@ -64,20 +63,28 @@ AppRouterWithContext.defaultProps = {
   path: '/',
 };
 
+const setInitialPath = (path: string) => {
+  asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) => createMemoryRouter(routes, {
+    initialEntries: [path],
+  }));
+};
+
 describe('AppRouter', () => {
   beforeEach(() => {
     asMock(usePluginEntities).mockReturnValue([]);
     AppConfig.isFeatureEnabled = jest.fn(() => false);
+    asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) => createMemoryRouter(routes));
   });
 
   it('routes to Getting Started Page for `/` or empty location', async () => {
-    render(<AppRouterWithContext path={undefined} />);
+    render(<AppRouterWithContext />);
 
     await screen.findByText('This is the start page');
   });
 
   it('renders a not found page for unknown URLs', async () => {
-    render(<AppRouterWithContext path="/this-url-is-not-registered-and-should-never-be" />);
+    setInitialPath('/this-url-is-not-registered-and-should-never-be');
+    render(<AppRouterWithContext />);
 
     await screen.findByText('Page not found');
   });
@@ -85,7 +92,8 @@ describe('AppRouter', () => {
   describe('plugin routes', () => {
     it('renders simple plugin routes', async () => {
       asMock(usePluginEntities).mockReturnValue([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route' }]);
-      const { findByText } = render(<AppRouterWithContext path="/a-plugin-route" />);
+      setInitialPath('/a-plugin-route');
+      const { findByText } = render(<AppRouterWithContext />);
 
       await findByText('Hey there!');
     });
@@ -93,7 +101,8 @@ describe('AppRouter', () => {
     it('renders null-parent component plugin routes without application chrome', async () => {
       asMock(usePluginEntities).mockReturnValue([{ parentComponent: null, component: () => <span>Hey there!</span>, path: '/without-chrome' }]);
 
-      const { findByText, queryByTitle } = render(<AppRouterWithContext path="/without-chrome" />);
+      setInitialPath('/without-chrome');
+      const { findByText, queryByTitle } = render(<AppRouterWithContext />);
 
       await findByText('Hey there!');
 
@@ -102,7 +111,8 @@ describe('AppRouter', () => {
 
     it('does not render plugin route when required feature flag is not enabled', async () => {
       asMock(usePluginEntities).mockReturnValue([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' }]);
-      render(<AppRouterWithContext path="/a-plugin-route" />);
+      setInitialPath('/a-plugin-route');
+      render(<AppRouterWithContext />);
 
       await screen.findByText('Page not found');
 
@@ -112,7 +122,8 @@ describe('AppRouter', () => {
     it('render plugin route when required feature flag is enabled', async () => {
       asMock(AppConfig.isFeatureEnabled).mockReturnValue(true);
       asMock(usePluginEntities).mockReturnValue([{ component: () => <span>Hey there!</span>, path: '/a-plugin-route', requiredFeatureFlag: 'a_feature_flag' }]);
-      const { findByText } = render(<AppRouterWithContext path="/a-plugin-route" />);
+      setInitialPath('/a-plugin-route');
+      const { findByText } = render(<AppRouterWithContext />);
 
       await findByText('Hey there!');
     });
