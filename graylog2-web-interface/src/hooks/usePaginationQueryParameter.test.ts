@@ -131,7 +131,7 @@ describe('usePaginationQueryParameter custom hook', () => {
     asMock(useLocation).mockReturnValue({
       search: `?page=${currentPage}&pageSize=${currentPageSize}`,
       pathname: 'example.org',
-    } as Location<{ search: string }>);
+    } as Location);
 
     const { result } = renderHook(() => usePaginationQueryParameter());
 
@@ -140,7 +140,7 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     result.current.resetPage();
 
-    expect(mockHistoryReplace).toHaveBeenCalledWith(`example.org?page=1&pageSize=${currentPageSize}`);
+    expect(mockNavigate).toHaveBeenCalledWith(`example.org?page=1&pageSize=${currentPageSize}`);
   });
 
   it('should always use provided page size and not update pageSize query param, when syncPageSizeFromQuery is false', () => {
@@ -150,7 +150,7 @@ describe('usePaginationQueryParameter custom hook', () => {
     asMock(useLocation).mockReturnValue({
       search: `?page=${queryParamsPage}&pageSize=50`,
       pathname: 'example.org',
-    } as Location<{ search: string }>);
+    } as Location);
 
     const { result } = renderHook(() => usePaginationQueryParameter(undefined, providedPageSize, false));
 
@@ -159,6 +159,6 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     result.current.setPagination({ page: 4, pageSize: 100 });
 
-    expect(mockHistoryReplace).toHaveBeenCalledWith('example.org?page=4');
+    expect(mockNavigate).toHaveBeenCalledWith('example.org?page=4');
   });
 });
