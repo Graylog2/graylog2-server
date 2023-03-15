@@ -15,9 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import PropTypes from 'prop-types';
-import Reflux from 'reflux';
-import createReactClass from 'create-react-class';
 
 import { Link } from 'components/common/router';
 import { Col } from 'components/bootstrap';
@@ -25,68 +22,47 @@ import { ContentHeadRow, DocumentTitle, Spinner } from 'components/common';
 import OutputsComponent from 'components/outputs/OutputsComponent';
 import SupportLink from 'components/support/SupportLink';
 import Routes from 'routing/Routes';
-import withParams from 'routing/withParams';
-import StreamsStore from 'stores/streams/StreamsStore';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import useQuery from 'routing/useQuery';
+import useCurrentUser from 'hooks/useCurrentUser';
+import useStream from 'components/streams/hooks/useStream';
 
-const StreamOutputsPage = createReactClass({
-  displayName: 'StreamOutputsPage',
-  propTypes: {
-    params: PropTypes.shape({
-      streamId: PropTypes.string.isRequired,
-    }).isRequired,
-  },
+const StreamOutputsPage = () => {
+  const currentUser = useCurrentUser();
+  const { streamsId } = useQuery();
+  const { stream } = useStream(streamsId);
 
-  mixins: [Reflux.connect(CurrentUserStore)],
+  if (!stream) {
+    return <Spinner />;
+  }
 
-  getInitialState() {
-    return { stream: undefined };
-  },
+  return (
+    <DocumentTitle title={`Outputs for Stream ${stream.title}`}>
+      <div>
+        <ContentHeadRow className="content">
+          <Col md={10}>
+            <h1>
+              Outputs for Stream &raquo;{stream.title}&laquo;
+            </h1>
 
-  componentDidMount() {
-    const { params } = this.props;
+            <p className="description">
+              Graylog nodes can forward messages of streams via outputs. Launch or terminate as many outputs as you want here.
+              You can also reuse outputs that are already running for other streams.
 
-    StreamsStore.get(params.streamId, (stream) => {
-      this.setState({ stream: stream });
-    });
-  },
+              A global view of all configured outputs is available <Link to={Routes.SYSTEM.OUTPUTS}>here</Link>.
+              You can find output plugins on <a href="https://marketplace.graylog.org/" rel="noopener noreferrer" target="_blank">the Graylog Marketplace</a>.
+            </p>
 
-  render() {
-    const { stream, currentUser } = this.state;
+            <SupportLink>
+              <i>Removing</i> an output removes it from this stream but it will still be in the list of available outputs.
+              Deleting an output <i>globally</i> will remove it from this and all other streams and terminate it.
+              You can see all defined outputs in details at the {' '} <Link to={Routes.SYSTEM.OUTPUTS}>global output list</Link>.
+            </SupportLink>
+          </Col>
+        </ContentHeadRow>
+        <OutputsComponent streamId={stream.id} permissions={currentUser.permissions} />
+      </div>
+    </DocumentTitle>
+  );
+};
 
-    if (!stream) {
-      return <Spinner />;
-    }
-
-    return (
-      <DocumentTitle title={`Outputs for Stream ${stream.title}`}>
-        <div>
-          <ContentHeadRow className="content">
-            <Col md={10}>
-              <h1>
-                Outputs for Stream &raquo;{stream.title}&laquo;
-              </h1>
-
-              <p className="description">
-                Graylog nodes can forward messages of streams via outputs. Launch or terminate as many outputs as you want here.
-                You can also reuse outputs that are already running for other streams.
-
-                A global view of all configured outputs is available <Link to={Routes.SYSTEM.OUTPUTS}>here</Link>.
-                You can find output plugins on <a href="https://marketplace.graylog.org/" rel="noopener noreferrer" target="_blank">the Graylog Marketplace</a>.
-              </p>
-
-              <SupportLink>
-                <i>Removing</i> an output removes it from this stream but it will still be in the list of available outputs.
-                Deleting an output <i>globally</i> will remove it from this and all other streams and terminate it.
-                You can see all defined outputs in details at the {' '} <Link to={Routes.SYSTEM.OUTPUTS}>global output list</Link>.
-              </SupportLink>
-            </Col>
-          </ContentHeadRow>
-          <OutputsComponent streamId={stream.id} permissions={currentUser.permissions} />
-        </div>
-      </DocumentTitle>
-    );
-  },
-});
-
-export default withParams(StreamOutputsPage);
+export default StreamOutputsPage;

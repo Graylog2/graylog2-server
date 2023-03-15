@@ -24,10 +24,10 @@ import java.util.Locale;
 import static io.restassured.RestAssured.given;
 
 public class Views implements GraylogRestApi {
-    private final RequestSpecification requestSpecification;
+    private final GraylogApis api;
 
-    public Views(RequestSpecification requestSpecification) {
-        this.requestSpecification = requestSpecification;
+    public Views(GraylogApis api) {
+        this.api = api;
     }
 
     /**
@@ -38,7 +38,7 @@ public class Views implements GraylogRestApi {
                 "/views?page=%d&per_page=%d&sort=%s&order=%s",
                 page, size, sort, order.name().toLowerCase(Locale.ROOT));
         return new GraylogApiResponse(given()
-                .spec(this.requestSpecification)
+                .spec(api.requestSpecification())
                 .when()
                 .get(path)
                 .then());
@@ -46,7 +46,7 @@ public class Views implements GraylogRestApi {
 
     public GraylogApiResponse getOne(String id) {
         return new GraylogApiResponse(given()
-                .spec(this.requestSpecification)
+                .spec(api.requestSpecification())
                 .when()
                 .get("/views/" + id)
                 .then());

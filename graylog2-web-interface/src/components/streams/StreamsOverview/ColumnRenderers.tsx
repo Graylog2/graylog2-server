@@ -17,22 +17,24 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
 import { Label } from 'components/bootstrap';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
-import IndexSetCell from 'components/streams/StreamsOverview/IndexSetCell';
-import ThroughputCell from 'components/streams/StreamsOverview/ThroughputCell';
+import IndexSetCell from 'components/streams/StreamsOverview/cells/IndexSetCell';
+import ThroughputCell from 'components/streams/StreamsOverview/cells/ThroughputCell';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
-import StatusCell from './StatusCell';
+import StatusCell from './cells/StatusCell';
+import StreamRulesCell from './cells/StreamRulesCell';
 
 const DefaultLabel = styled(Label)`
   display: inline-flex;
   margin-left: 5px;
   vertical-align: inherit;
 `;
+
 const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stream> => ({
   attributes: {
     title: {
@@ -54,6 +56,10 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
     disabled: {
       renderCell: (_disabled: string, stream) => <StatusCell stream={stream} />,
       staticWidth: 100,
+    },
+    rules: {
+      renderCell: (_rules: StreamRule[], stream) => <StreamRulesCell stream={stream} />,
+      staticWidth: 70,
     },
   },
 });

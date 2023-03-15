@@ -31,7 +31,7 @@ export type Stream = {
   id: string,
   creator_user_id: string,
   outputs: any[],
-  matching_type: string,
+  matching_type: 'AND' | 'OR',
   description: string,
   created_at: string,
   disabled: boolean,
@@ -134,6 +134,11 @@ type PaginatedResponse = {
   elements: Array<Stream>,
 };
 
+export type MatchData = {
+  matches: boolean,
+  rules: { [id: string]: false },
+}
+
 const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
   listenables: [StreamsActions],
 
@@ -192,21 +197,6 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
       .then((streams) => {
         callback(streams);
       });
-  },
-  get(streamId: string, callback: ((stream: Stream) => void)) {
-    const failCallback = (errorThrown) => {
-      UserNotification.error(`Loading Stream failed with status: ${errorThrown}`,
-        'Could not retrieve Stream');
-    };
-
-    const { url } = ApiRoutes.StreamsApiController.get(streamId);
-
-    const promise = fetch('GET', qualifyUrl(url))
-      .then(callback, failCallback);
-
-    StreamsActions.get.promise(promise);
-
-    return promise;
   },
   remove(streamId: string) {
     const url = qualifyUrl(ApiRoutes.StreamsApiController.delete(streamId).url);

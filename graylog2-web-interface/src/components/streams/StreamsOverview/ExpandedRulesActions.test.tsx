@@ -14,34 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
 import React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
-class TimeRangeOptionsSummary extends React.Component {
-  static propTypes = {
-    options: PropTypes.object.isRequired,
-  };
+import ExpandedRulesActions from 'components/streams/StreamsOverview/ExpandedRulesActions';
+import { stream } from 'fixtures/streams';
 
-  render() {
-    let timerangeOptionsSummary = null;
+jest.useFakeTimers();
 
-    if (this.props.options) {
-      timerangeOptionsSummary = Object.keys(this.props.options).map((key, idx) => {
-        return (
-          <span key={`timerange-options-summary-${idx}`}>
-            <dt>{key}</dt>
-            <dd>{this.props.options[key]}</dd>
-          </span>
-        );
-      });
-    }
+describe('ExpandedRulesActions', () => {
+  it('should open add rule modal', async () => {
+    render(<ExpandedRulesActions stream={stream} />);
 
-    return (
-      <dl className="deflist">
-        {timerangeOptionsSummary}
-      </dl>
-    );
-  }
-}
+    userEvent.click(await screen.findByRole('button', { name: /quick add rule/i }));
 
-export default TimeRangeOptionsSummary;
+    await screen.findByRole('heading', {
+      name: /new stream rule/i,
+      hidden: true,
+    });
+  });
+});

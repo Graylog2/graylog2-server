@@ -51,8 +51,12 @@ public class SearchUserFactory implements Factory<SearchUser> {
     public SearchUser provide() {
         final UserContext userContext = serviceLocator.getService(UserContext.class);
         final SecurityContext securityContext = serviceLocator.getService(SecurityContext.class);
-        return new SearchUser(userContext.getUser(), (permission) -> this.isPermitted(securityContext, permission),
-                (permission, instanceId) -> this.isPermitted(securityContext, permission, instanceId), permittedStreams,
+        final Subject subject = getSubject(securityContext);
+        return new SearchUser(
+                userContext.getUser(),
+                subject::isPermitted,
+                (perm, id) -> subject.isPermitted(perm + ":" + id),
+                permittedStreams,
                 viewResolvers);
     }
 
@@ -71,14 +75,6 @@ public class SearchUserFactory implements Factory<SearchUser> {
 
         final ShiroPrincipal principal = (ShiroPrincipal) p;
         return principal.getSubject();
-    }
-
-    protected boolean isPermitted(SecurityContext securityContext, String permission, String instanceId) {
-        return getSubject(securityContext).isPermitted(permission + ":" + instanceId);
-    }
-
-    protected boolean isPermitted(SecurityContext securityContext, String permission) {
-        return getSubject(securityContext).isPermitted(permission);
     }
 
     @Override
