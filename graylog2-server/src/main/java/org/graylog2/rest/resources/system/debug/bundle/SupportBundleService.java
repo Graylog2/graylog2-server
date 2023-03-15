@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources.system.debug.bundle;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import okhttp3.ResponseBody;
 import org.apache.commons.io.FileUtils;
@@ -25,9 +26,16 @@ import org.apache.logging.log4j.core.appender.RollingFileAppender;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.RemoteInterfaceProvider;
+import org.graylog2.rest.models.system.responses.SystemJVMResponse;
+import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
+import org.graylog2.rest.models.system.responses.SystemProcessBufferDumpResponse;
+import org.graylog2.rest.models.system.responses.SystemThreadDumpResponse;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.rest.resources.ProxiedResource.CallResult;
+import org.graylog2.shared.rest.resources.system.RemoteSystemResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
@@ -40,6 +48,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileTime;
@@ -54,7 +63,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
@@ -75,15 +83,18 @@ public class SupportBundleService {
     private final NodeService nodeService;
     private final RemoteInterfaceProvider remoteInterfaceProvider;
     private final Path bundleDir;
+    private final ObjectMapper objectMapper;
 
     @Inject
     public SupportBundleService(@Named("daemonScheduler") ScheduledExecutorService executor, // TODO what is the right ExecutorService?
                                 NodeService nodeService,
                                 RemoteInterfaceProvider remoteInterfaceProvider,
-                                @Named("data_dir") Path dataDir) {
+                                @Named("data_dir") Path dataDir,
+                                ObjectMapperProvider objectMapperProvider) {
         this.executor = executor;
         this.nodeService = nodeService;
         this.remoteInterfaceProvider = remoteInterfaceProvider;
+        objectMapper = objectMapperProvider.get();
         bundleDir = dataDir.resolve(SUPPORT_BUNDLE_DIR_NAME);
     }
 
@@ -93,32 +104,65 @@ public class SupportBundleService {
         final var manifestsResponse = proxiedResourceHelper.requestOnAllNodes(
                 proxiedResourceHelper.createRemoteInterfaceProvider(RemoteSupportBundleInterface.class),
                 RemoteSupportBundleInterface::getNodeManifest, CALL_TIMEOUT);
+        final Map<String, SupportBundleNodeManifest> nodeManifests = extractManifests(manifestsResponse);
 
-        Path tmpDir = null;
+        Path bundleSpoolDir = null;
         try {
-            tmpDir = prepareBundleTmpDir();
-            final Path finalTmpDir = tmpDir;
+            bundleSpoolDir = prepareBundleSpoolDir();
+            final Path finalSpoolDir = bundleSpoolDir; // needed for the lambda
 
-            final List<CompletableFuture<Void>> futures = extractManifests(manifestsResponse).entrySet().stream().map(entry ->
-                    CompletableFuture.runAsync(() -> processManifest(proxiedResourceHelper, entry.getKey(), entry.getValue(), finalTmpDir), executor)).toList();
+            // Fetch from all nodes in parallel
+            final List<CompletableFuture<Void>> futures = nodeManifests.entrySet().stream().map(entry ->
+                    CompletableFuture.runAsync(() -> fetchNodeInfos(proxiedResourceHelper, entry.getKey(), entry.getValue(), finalSpoolDir), executor)).toList();
             for (CompletableFuture<Void> f : futures) {
                 f.get();
             }
-
-            writeZipFile(tmpDir);
-
-        } catch (InterruptedException | IOException | ExecutionException e) {
+            fetchClusterInfos(proxiedResourceHelper, nodeManifests, bundleSpoolDir);
+            writeZipFile(bundleSpoolDir);
+        } catch (Exception e) {
             LOG.warn("Exception while trying to build support bundle", e);
             throw new BadRequestException(e);
         } finally {
             try {
-                if (tmpDir != null) {
-                    FileUtils.deleteDirectory(tmpDir.toFile());
+                if (bundleSpoolDir != null) {
+                    FileUtils.deleteDirectory(bundleSpoolDir.toFile());
                 }
             } catch (IOException e) {
-                LOG.error("Failed to cleanup temp directory <{}>", tmpDir);
+                LOG.error("Failed to cleanup temp directory <{}>", bundleSpoolDir);
             }
         }
+    }
+
+    private void fetchClusterInfos(ProxiedResourceHelper proxiedResourceHelper, Map<String, SupportBundleNodeManifest> nodeManifests, Path tmpDir) throws IOException {
+        try (FileOutputStream clusterJson = new FileOutputStream(tmpDir.resolve("cluster.json").toFile())) {
+            final Map<String, CallResult<SystemOverviewResponse>> systemOverview =
+                    proxiedResourceHelper.requestOnAllNodes(
+                            proxiedResourceHelper.createRemoteInterfaceProvider(RemoteSystemResource.class),
+                            RemoteSystemResource::system, CALL_TIMEOUT);
+
+            final Map<String, CallResult<SystemJVMResponse>> jvm = proxiedResourceHelper.requestOnAllNodes(
+                    proxiedResourceHelper.createRemoteInterfaceProvider(RemoteSystemResource.class),
+                    RemoteSystemResource::jvm, CALL_TIMEOUT);
+
+            final Map<String, CallResult<SystemProcessBufferDumpResponse>> processBuffer = proxiedResourceHelper.requestOnAllNodes(
+                    proxiedResourceHelper.createRemoteInterfaceProvider(RemoteSystemResource.class),
+                    RemoteSystemResource::processBufferDump, CALL_TIMEOUT);
+
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(clusterJson,
+                    Map.of(
+                            "manifest", nodeManifests,
+                            "cluster_system_overview", stripCallResult(systemOverview),
+                            "jvm", stripCallResult(jvm),
+                            "process_buffer_dump", stripCallResult(processBuffer)
+                    )
+            );
+        }
+    }
+
+    private <T> Map<String, T> stripCallResult(Map<String, CallResult<T>> input) {
+        return input.entrySet().stream()
+                .filter(e -> e.getValue().response() != null && e.getValue().response().entity().isPresent())
+                .collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().response().entity().get()));
     }
 
     private void writeZipFile(Path tmpDir) throws IOException {
@@ -146,7 +190,7 @@ public class SupportBundleService {
         Files.move(bundleDir.resolve(zipFile), bundleDir.resolve(Path.of(zipFile.toString().substring(1))));
     }
 
-    private Path prepareBundleTmpDir() throws IOException {
+    private Path prepareBundleSpoolDir() throws IOException {
         final FileAttribute<Set<PosixFilePermission>> userOnlyPermission =
                 PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------"));
         Files.createDirectories(bundleDir, userOnlyPermission);
@@ -168,11 +212,25 @@ public class SupportBundleService {
         }).collect(Collectors.toMap(Map.Entry::getKey, res -> Objects.requireNonNull(res.getValue().response()).entity().get()));
     }
 
-    private void processManifest(ProxiedResourceHelper proxiedResourceHelper, String nodeId, SupportBundleNodeManifest manifest, Path tmpDir) {
-        final Path nodeDir = tmpDir.resolve(nodeId);
+    private void fetchNodeInfos(ProxiedResourceHelper proxiedResourceHelper, String nodeId, SupportBundleNodeManifest manifest, Path tmpDir) {
+        final Path nodeDir = tmpDir.resolve(new SimpleNodeId(nodeId).getShortNodeId());
         var ignored = nodeDir.toFile().mkdirs();
 
         fetchLogs(proxiedResourceHelper, nodeId, manifest.entries().logfiles(), nodeDir);
+        fetchNodeInfo(proxiedResourceHelper, nodeId, nodeDir);
+    }
+
+    private void fetchNodeInfo(ProxiedResourceHelper proxiedResourceHelper, String nodeId, Path nodeDir) {
+        try (var threadDumpFile = new FileOutputStream(nodeDir.resolve("thread-dump.txt").toFile())) {
+
+            final ProxiedResource.NodeResponse<SystemThreadDumpResponse> dump = proxiedResourceHelper.doNodeApiCall(nodeId,
+                    proxiedResourceHelper.createRemoteInterfaceProvider(RemoteSystemResource.class),
+                    RemoteSystemResource::threadDump, Function.identity(), CALL_TIMEOUT.toMillis()
+            );
+            threadDumpFile.write(dump.entity().get().threadDump().getBytes());
+        } catch (Exception e) {
+            LOG.warn("Failed to get threadDump from node <{}>", nodeId, e);
+        }
     }
 
     private void fetchLogs(ProxiedResourceHelper proxiedResourceHelper, String nodeId, List<LogFile> logFiles, Path nodeDir) {
@@ -206,6 +264,7 @@ public class SupportBundleService {
         final LoggerContext context = (LoggerContext) LogManager.getContext(false);
         final Configuration config = context.getConfiguration();
 
+        // TODO get in-memory logs (e.g. when running in container environments)
         // TODO maybe try different RollingFileAppenders?
         final RollingFileAppender rollingFileAppender = (RollingFileAppender) config.getAppenders().get("rolling-file");
         if (rollingFileAppender != null) {
@@ -216,6 +275,9 @@ public class SupportBundleService {
 
             buildLogFile("0", rollingFileAppender.getFileName()).ifPresent(logFiles::add);
 
+            // TODO support filePatterns with https://logging.apache.org/log4j/2.x/manual/lookups.html#DateLookup
+            // TODO support filePatterns with SimpleDateFormat
+            // e.g: filePattern="logs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz"
             var regex = f("^%s\\.%%i\\.gz", baseFileName);
             if (filePattern.matches(regex)) {
                 final String formatString = filePattern.replace("%i", "%d");
@@ -230,13 +292,14 @@ public class SupportBundleService {
         return new SupportBundleNodeManifest(new BundleEntries(List.of()));
     }
 
-
     private Optional<LogFile> buildLogFile(String id, String fileName) {
         try {
             final Path filePath = Path.of(fileName);
             final long size = Files.size(filePath);
             final FileTime lastModifiedTime = Files.getLastModifiedTime(filePath);
             return Optional.of(new LogFile(id, fileName, size, lastModifiedTime.toInstant()));
+        } catch (NoSuchFileException ignored) {
+            return Optional.empty();
         } catch (IOException e) {
             LOG.warn("Failed to read logfile <{}>", fileName, e);
             return Optional.empty();
