@@ -14,7 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { flatten, flow, isEqual, set } from 'lodash';
+import flatten from 'lodash/flatten';
+
+import flow from 'lodash/flow';
+import isEqual from 'lodash/isEqual';
+import set from 'lodash/set';
 
 import type { Key, Leaf, Row, Rows, Value } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';

@@ -18,7 +18,7 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import upperFirst from 'lodash/upperFirst';
 
 import { LinkContainer } from 'components/common/router';
 import { ButtonToolbar, DropdownButton, MenuItem, Button } from 'components/bootstrap';
@@ -54,7 +54,7 @@ const CollectorRow = createReactClass({
           {collector.name}
         </td>
         <td>
-          <OperatingSystemIcon operatingSystem={collector.node_operating_system} /> {lodash.upperFirst(collector.node_operating_system)}
+          <OperatingSystemIcon operatingSystem={collector.node_operating_system} /> {upperFirst(collector.node_operating_system)}
         </td>
         <td>
           <ButtonToolbar>

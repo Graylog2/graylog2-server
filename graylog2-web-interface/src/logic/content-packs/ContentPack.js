@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { Map, Set } from 'immutable';
-import { concat, remove } from 'lodash';
+import concat from 'lodash/concat';
+import remove from 'lodash/remove';
 
 import generateId from 'logic/generateId';
 

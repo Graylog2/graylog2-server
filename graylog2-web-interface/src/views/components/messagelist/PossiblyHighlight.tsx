@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { last, sortBy } from 'lodash';
+import last from 'lodash/last';
+import sortBy from 'lodash/sortBy';
 import type { DefaultTheme } from 'styled-components';
 import { withTheme } from 'styled-components';
 

@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import lodash from 'lodash';
+import capitalize from 'lodash/capitalize';
 
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 import { LoggersActions, LoggersStore } from 'stores/system/LoggersStore';
@@ -53,13 +53,13 @@ const LogLevelDropdown = createReactClass({
           <MenuItem key={`${subsystem}-${nodeId}-${loglevel}`}
                     active={subsystem.level === loglevel}
                     onClick={this._menuLevelClick(loglevel)}>
-            {lodash.capitalize(loglevel)}
+            {capitalize(loglevel)}
           </MenuItem>
         );
       });
 
     return (
-      <DropdownButton id="loglevel" bsSize="xsmall" title={lodash.capitalize(subsystem.level)}>
+      <DropdownButton id="loglevel" bsSize="xsmall" title={capitalize(subsystem.level)}>
         {loglevels}
       </DropdownButton>
     );

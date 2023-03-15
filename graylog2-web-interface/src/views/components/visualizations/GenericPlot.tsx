@@ -18,7 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import type { DefaultTheme } from 'styled-components';
 import { withTheme } from 'styled-components';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
 
 import { Popover } from 'components/bootstrap';

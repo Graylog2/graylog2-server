@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
-import lodash from 'lodash';
+import capitalize from 'lodash/capitalize';
+import isEmpty from 'lodash/isEmpty';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import { Col, Row } from 'components/bootstrap';
@@ -52,7 +53,7 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
           <dd>{event.id}</dd>
           <dt>Priority</dt>
           <dd>
-            {lodash.capitalize(EventDefinitionPriorityEnum.properties[event.priority].name)}
+            {capitalize(EventDefinitionPriorityEnum.properties[event.priority].name)}
           </dd>
           <dt>Timestamp</dt>
           <dd>
@@ -93,11 +94,11 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
           <dt>Event Key</dt>
           <dd>{event.key || 'No Key set for this Event.'}</dd>
           <dt>Additional Fields</dt>
-          {lodash.isEmpty(event.fields)
+          {isEmpty(event.fields)
             ? <dd>No additional Fields added to this Event.</dd>
             : <EventFields fields={event.fields} />}
           <dt>Group-By Fields</dt>
-          {lodash.isEmpty(event.group_by_fields)
+          {isEmpty(event.group_by_fields)
             ? <dd>No group-by fields on this Event.</dd>
             : <EventFields fields={event.group_by_fields} />}
         </dl>

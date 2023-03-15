@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { trim } from 'lodash';
+import trim from 'lodash/trim';
 
 import type { Completer, CompleterContext } from '../SearchBarAutocompletions';
 import type { CompletionResult, Token } from '../queryinput/ace-types';

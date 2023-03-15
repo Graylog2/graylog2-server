@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';

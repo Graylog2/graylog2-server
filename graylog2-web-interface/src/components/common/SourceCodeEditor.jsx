@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import lodash from 'lodash';
+import isFinite from 'lodash/isFinite';
 import PropTypes from 'prop-types';
 import { Resizable } from 'react-resizable';
 import AceEditor from 'react-ace';
@@ -245,7 +245,7 @@ class SourceCodeEditor extends React.Component {
       readOnly,
       value,
     } = this.props;
-    const validCssWidth = lodash.isFinite(width) ? width : '100%';
+    const validCssWidth = isFinite(width) ? width : '100%';
     const overlay = <StyledTooltip id="paste-button-tooltip" className="in">Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</StyledTooltip>;
 
     return (

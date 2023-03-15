@@ -18,7 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
-import lodash from 'lodash';
+import capitalize from 'lodash/capitalize';
+import cloneDeep from 'lodash/cloneDeep';
 import moment from 'moment';
 
 import { Button, FormGroup, HelpBlock, BootstrapModalForm } from 'components/bootstrap';
@@ -91,7 +92,7 @@ const EventsConfig = createReactClass({
 
   _propagateChanges(key, value) {
     const { config } = this.state;
-    const nextConfig = lodash.cloneDeep(config);
+    const nextConfig = cloneDeep(config);
 
     nextConfig[key] = value;
     this.setState({ config: nextConfig });
@@ -147,7 +148,7 @@ const EventsConfig = createReactClass({
   },
 
   _titleCase(str) {
-    return lodash.capitalize(str);
+    return capitalize(str);
   },
 
   render() {

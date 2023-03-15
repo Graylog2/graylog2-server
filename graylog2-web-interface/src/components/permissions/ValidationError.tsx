@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { capitalize } from 'lodash';
+import capitalize from 'lodash/capitalize';
 
 import { Alert } from 'components/bootstrap';
 import type { GranteesList } from 'logic/permissions/EntityShareState';

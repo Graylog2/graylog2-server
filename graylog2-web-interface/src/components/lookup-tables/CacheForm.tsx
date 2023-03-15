@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import _ from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { Formik, Form } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import type { LookupTableCache, validationErrorsType } from 'src/logic/lookup-tables/types';
@@ -110,7 +110,7 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
 
     if (values.config.type !== 'none') {
       const confErrors = configRef.current?.validate() || {};
-      if (!_.isEmpty(confErrors)) errors.config = confErrors;
+      if (!isEmpty(confErrors)) errors.config = confErrors;
     }
 
     return errors;

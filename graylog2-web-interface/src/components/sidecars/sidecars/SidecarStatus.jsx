@@ -18,7 +18,8 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import defaultTo from 'lodash/defaultTo';
+import isNumber from 'lodash/isNumber';
 
 import { Col, Row, Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -50,13 +51,13 @@ const SidecarStatus = createReactClass({
     return (
       <dl className={`${commonStyles.deflist} ${commonStyles.topMargin}`}>
         <dt>IP Address</dt>
-        <dd>{lodash.defaultTo(details.ip, 'Not available')}</dd>
+        <dd>{defaultTo(details.ip, 'Not available')}</dd>
         <dt>Operating System</dt>
-        <dd>{lodash.defaultTo(details.operating_system, 'Not available')}</dd>
+        <dd>{defaultTo(details.operating_system, 'Not available')}</dd>
         <dt>CPU Idle</dt>
-        <dd>{lodash.isNumber(metrics.cpu_idle) ? `${metrics.cpu_idle}%` : 'Not available'}</dd>
+        <dd>{isNumber(metrics.cpu_idle) ? `${metrics.cpu_idle}%` : 'Not available'}</dd>
         <dt>Load</dt>
-        <dd>{lodash.defaultTo(metrics.load_1, 'Not available')}</dd>
+        <dd>{defaultTo(metrics.load_1, 'Not available')}</dd>
         <dt>Volumes &gt; 75% full</dt>
         {metrics.disks_75 === undefined
           ? <dd>Not available</dd>

@@ -196,7 +196,7 @@ const Panel = ({
 
     return (
       /* NOTE: this exists as a deprecated render for older Panel instances */
-      <DeprecatedStyledPanel expanded={isExpanded}
+      (<DeprecatedStyledPanel expanded={isExpanded}
                              onToggle={handleToggle}
                              {...props}>
         {(header || title) && (
@@ -211,7 +211,7 @@ const Panel = ({
         {footer && (
           <DeprecatedStyledPanel.Footer>{footer}</DeprecatedStyledPanel.Footer>
         )}
-      </DeprecatedStyledPanel>
+      </DeprecatedStyledPanel>)
     );
   }
 
