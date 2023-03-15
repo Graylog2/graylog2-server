@@ -39,6 +39,7 @@ import org.graylog2.bindings.ConfigurationModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
+import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
@@ -51,6 +52,7 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.FreshInstallDetectionModule;
 import org.graylog2.shared.bindings.GenericBindings;
 import org.graylog2.shared.bindings.GenericInitializerBindings;
+import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.IsDevelopmentBindings;
 import org.graylog2.shared.bindings.SchedulerBindings;
 import org.graylog2.shared.bindings.ServerStatusBindings;
@@ -150,7 +152,17 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 .flatMap(Collection::stream).collect(Collectors.toList());
         preflightCheckModules.add(new FreshInstallDetectionModule(isFreshInstallation()));
 
-        getPreflightInjector(preflightCheckModules).getInstance(PreflightCheckService.class).runChecks();
+        final Injector preflightInjector = getPreflightInjector(preflightCheckModules);
+        final ServiceManager serviceManager = preflightInjector.getInstance(ServiceManager.class);
+
+        GuiceInjectorHolder.createInjector(preflightCheckModules);
+        serviceManager.startAsync().awaitHealthy();
+
+        // blocks till the indexer is available, providing meanwhile a limited "setup" set of web resources.
+        preflightInjector.getInstance(PreflightCheckService.class).runChecks();
+
+        serviceManager.stopAsync().awaitStopped();
+        GuiceInjectorHolder.resetInjector();
     }
 
     private void runMongoPreflightCheck() {
@@ -191,7 +203,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
                     public void configure(Binder binder) {
                         preflightCheckModules.forEach(binder::install);
                     }
-                });
+                },
+                new PreflightWebModule());
         return injector;
     }
 
