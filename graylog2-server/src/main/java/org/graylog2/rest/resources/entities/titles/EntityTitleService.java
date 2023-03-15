@@ -34,7 +34,6 @@ import org.graylog2.rest.resources.entities.titles.model.EntityTitleRequest;
 import org.graylog2.rest.resources.entities.titles.model.EntityTitleResponse;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +69,7 @@ public class EntityTitleService {
                 .map(entry -> getTitlesForEntitiesFromSingleCollection(subject, entry.getKey(), entry.getValue()))
                 .reduce(EntitiesTitleResponse::merge);
 
-        return entitiesTitleResponse.orElse(new EntitiesTitleResponse(List.of(), Set.of()));
+        return entitiesTitleResponse.orElse(new EntitiesTitleResponse(Set.of(), Set.of()));
     }
 
     public EntitiesTitleResponse getTitlesForEntitiesFromSingleCollection(final Subject subject,
@@ -78,7 +77,7 @@ public class EntityTitleService {
                                                                           final List<EntityIdentifier> entities) {
         final Optional<DbEntityCatalogEntry> dbEntityCatalogEntry = this.entitiesCatalog.getByCollectionName(collection);
         if (dbEntityCatalogEntry.isEmpty() || entities.isEmpty()) {
-            return new EntitiesTitleResponse(List.of(), Set.of());
+            return new EntitiesTitleResponse(Set.of(), Set.of());
         }
 
         final String titleField = dbEntityCatalogEntry.get().titleField();
@@ -86,7 +85,7 @@ public class EntityTitleService {
             return new EntitiesTitleResponse(
                     entities.stream()
                             .map(e -> new EntityTitleResponse(e.id(), e.type(), ""))
-                            .collect(Collectors.toList()),
+                            .collect(Collectors.toSet()),
                     Set.of()
             );
         }
@@ -103,7 +102,7 @@ public class EntityTitleService {
                 .find(bsonFilter)
                 .projection(Projections.include(titleField));
 
-        final List<EntityTitleResponse> titles = new ArrayList<>();
+        final Set<EntityTitleResponse> titles = new HashSet<>();
         final Set<String> notPermitted = new HashSet<>();
         documents.forEach(doc ->
                 {
