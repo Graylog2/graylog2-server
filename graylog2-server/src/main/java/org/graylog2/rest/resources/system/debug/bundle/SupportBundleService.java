@@ -56,12 +56,13 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -165,9 +166,14 @@ public class SupportBundleService {
                 .collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().response().entity().get()));
     }
 
+    private String nowTimestamp() {
+        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd-HHmmss");
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return simpleDateFormat.format(Instant.now().toEpochMilli());
+    }
+
     private void writeZipFile(Path tmpDir) throws IOException {
-        final String now = new SimpleDateFormat("yyyy-MM-dd-HHmmss").format(new Date());
-        var zipFile = Path.of(".graylog-support-bundle-" + now + ".zip");
+        var zipFile = Path.of(".graylog-support-bundle-" + nowTimestamp() + ".zip");
 
         try (ZipOutputStream zipStream = new ZipOutputStream(new FileOutputStream(bundleDir.resolve(zipFile).toFile()))) {
             try (final Stream<Path> walk = Files.walk(tmpDir)) {
@@ -195,8 +201,7 @@ public class SupportBundleService {
                 PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------"));
         Files.createDirectories(bundleDir, userOnlyPermission);
 
-        final String now = new SimpleDateFormat("yyyy-MM-dd-HHmmss").format(new Date());
-        return Files.createTempDirectory(bundleDir, ".tmp." + now + ".", userOnlyPermission);
+        return Files.createTempDirectory(bundleDir, ".tmp." + nowTimestamp() + ".", userOnlyPermission);
     }
 
     private Map<String, SupportBundleNodeManifest> extractManifests(Map<String, CallResult<SupportBundleNodeManifest>> manifestResponse) {
