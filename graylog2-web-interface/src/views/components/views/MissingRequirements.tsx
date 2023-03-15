@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import * as PropTypes from 'prop-types';
-import { capitalize } from 'lodash';
+import capitalize from 'lodash/capitalize';
 
 import history from 'util/History';
 import type { PluginMetadata, Requirements } from 'views/logic/views/View';

@@ -163,7 +163,7 @@ const LoginPage = () => {
   && loginFormState === LOGIN_INITIALIZED_STATE;
 
   return (
-    <DocumentTitle title="Sign in">
+    (<DocumentTitle title="Sign in">
       <LoginChrome>
         <LastError />
         <PluggableLoginForm />
@@ -173,7 +173,7 @@ const LoginPage = () => {
           </StyledButton>
         )}
       </LoginChrome>
-    </DocumentTitle>
+    </DocumentTitle>)
   );
 };
 

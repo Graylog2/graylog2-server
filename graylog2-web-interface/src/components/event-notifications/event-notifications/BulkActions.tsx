@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { uniq } from 'lodash';
+import uniq from 'lodash/uniq';
 import { useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { trim } from 'lodash';
+import trim from 'lodash/trim';
 
 const isPhrase = (searchTerm: string | undefined | null) => {
   return String(searchTerm).indexOf(' ') !== -1;

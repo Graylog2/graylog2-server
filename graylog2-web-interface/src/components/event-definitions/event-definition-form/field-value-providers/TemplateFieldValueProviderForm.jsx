@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { ExternalLink } from 'components/common';
 import { Checkbox, Col, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
@@ -45,7 +45,7 @@ class TemplateFieldValueProviderForm extends React.Component {
     const { config, onChange } = this.props;
     const { name } = event.target;
     const value = FormsUtils.getValueFromInput(event.target);
-    const nextProviders = lodash.cloneDeep(config.providers);
+    const nextProviders = cloneDeep(config.providers);
     const templateProvider = nextProviders.find((provider) => provider.type === TemplateFieldValueProviderForm.type);
 
     templateProvider[name] = value;

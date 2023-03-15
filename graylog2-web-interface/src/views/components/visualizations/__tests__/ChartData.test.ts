@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import md5 from 'md5';
-import { flow, merge, fill } from 'lodash';
+import flow from 'lodash/flow';
+import merge from 'lodash/merge';
+import fill from 'lodash/fill';
 
 import readJsonFixture from 'helpers/readJsonFixture';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';

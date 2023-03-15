@@ -16,7 +16,11 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import get from 'lodash/get';
+import map from 'lodash/map';
+import upperFirst from 'lodash/upperFirst';
+import toNumber from 'lodash/toNumber';
+import toString from 'lodash/toString';
 
 import { Select } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
@@ -26,7 +30,7 @@ import * as FormsUtils from 'util/FormsUtils';
 import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 
-const priorityOptions = lodash.map(EventDefinitionPriorityEnum.properties, (value, key) => ({ value: key, label: lodash.upperFirst(value.name) }));
+const priorityOptions = map(EventDefinitionPriorityEnum.properties, (value, key) => ({ value: key, label: upperFirst(value.name) }));
 
 type Props = {
   eventDefinition: EventDefinition,
@@ -46,7 +50,7 @@ const EventDetailsForm = ({ eventDefinition, validation, onChange }: Props) => {
   };
 
   const handlePriorityChange = (nextPriority) => {
-    onChange('priority', lodash.toNumber(nextPriority));
+    onChange('priority', toNumber(nextPriority));
   };
 
   const isSystemEventDefinition = eventDefinition.config.type === 'system-notifications-v1';
@@ -61,7 +65,7 @@ const EventDetailsForm = ({ eventDefinition, validation, onChange }: Props) => {
                  label="Title"
                  type="text"
                  bsStyle={validation.errors.title ? 'error' : null}
-                 help={lodash.get(validation, 'errors.title[0]', 'Title for this Event Definition, Events and Alerts created from it.')}
+                 help={get(validation, 'errors.title[0]', 'Title for this Event Definition, Events and Alerts created from it.')}
                  value={eventDefinition.title}
                  onChange={handleChange}
                  readOnly={isSystemEventDefinition}
@@ -80,7 +84,7 @@ const EventDetailsForm = ({ eventDefinition, validation, onChange }: Props) => {
           <FormGroup controlId="event-definition-priority">
             <ControlLabel>Priority</ControlLabel>
             <Select options={priorityOptions}
-                    value={lodash.toString(eventDefinition.priority)}
+                    value={toString(eventDefinition.priority)}
                     onChange={handlePriorityChange}
                     clearable={false}
                     disabled={isSystemEventDefinition}

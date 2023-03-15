@@ -19,7 +19,8 @@ import PropTypes from 'prop-types';
 import Reflux from 'reflux';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
-import { cloneDeep, groupBy } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import groupBy from 'lodash/groupBy';
 
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';

@@ -16,7 +16,10 @@
  */
 import * as React from 'react';
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { compact, camelCase, mapKeys, mapValues } from 'lodash';
+import compact from 'lodash/compact';
+import camelCase from 'lodash/camelCase';
+import mapKeys from 'lodash/mapKeys';
+import mapValues from 'lodash/mapValues';
 import type { $PropertyType } from 'utility-types';
 import PropTypes from 'prop-types';
 import type { FormikProps } from 'formik';

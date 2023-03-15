@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useState } from 'react';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import { Modal } from 'components/bootstrap';

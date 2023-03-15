@@ -14,7 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { sortBy, uniqBy } from 'lodash';
+import sortBy from 'lodash/sortBy';
+
+import uniqBy from 'lodash/uniqBy';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';

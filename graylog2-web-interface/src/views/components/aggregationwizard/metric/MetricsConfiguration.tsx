@@ -32,22 +32,22 @@ const MetricsConfiguration = () => {
   }, [setValues, values]);
 
   return (
-    <FieldArray name="metrics"
+    (<FieldArray name="metrics"
                 validateOnChange={false}
                 render={() => (
                   <>
                     {metrics.map((_metric, index) => {
                       return (
                         // eslint-disable-next-line react/no-array-index-key
-                        <ElementConfigurationContainer key={`metrics-${index}`}
+                        (<ElementConfigurationContainer key={`metrics-${index}`}
                                                        onRemove={removeMetric(index)}
                                                        elementTitle={MetricElement.title}>
                           <MetricConfiguration index={index} />
-                        </ElementConfigurationContainer>
+                        </ElementConfigurationContainer>)
                       );
                     })}
                   </>
-                )} />
+                )} />)
   );
 };
 

@@ -14,7 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { flatten, setWith } from 'lodash';
+import flatten from 'lodash/flatten';
+
+import setWith from 'lodash/setWith';
 
 import type { ColLeaf, Leaf, NonLeaf, RowInner, RowLeaf } from 'views/logic/searchtypes/pivot/PivotHandler';
 

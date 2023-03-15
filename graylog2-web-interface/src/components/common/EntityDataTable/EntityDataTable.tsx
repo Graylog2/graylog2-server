@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useMemo, useState, useCallback, useRef } from 'react';
 import type * as Immutable from 'immutable';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 
 import { Table, ButtonGroup } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';

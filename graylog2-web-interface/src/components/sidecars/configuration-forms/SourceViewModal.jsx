@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import lodash from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 import { Modal, Button, BootstrapModalWrapper } from 'components/bootstrap';
 import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
@@ -45,7 +45,7 @@ class SourceViewModal extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (!lodash.isEqual(this.state, SourceViewModal.initialState) && !lodash.isEqual(prevProps, this.props)) {
+    if (!isEqual(this.state, SourceViewModal.initialState) && !isEqual(prevProps, this.props)) {
       this.resetState();
     }
 

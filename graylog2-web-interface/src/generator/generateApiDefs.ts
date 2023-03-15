@@ -19,7 +19,7 @@ import * as fs from 'fs';
 import { dirname } from 'path';
 
 import * as ts from 'typescript';
-import { chunk } from 'lodash';
+import chunk from 'lodash/chunk';
 
 const REQUEST_FUNCTION_NAME = '__request__';
 const REQUEST_FUNCTION_IMPORT = 'routing/request';

@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { Spinner } from 'components/common';
 import { Alert, BootstrapModalForm, Input } from 'components/bootstrap';
@@ -55,7 +55,7 @@ export default class RuleMetricsConfig extends React.Component {
 
   propagateChange = (key, value) => {
     const { config } = this.props;
-    const nextConfig = lodash.cloneDeep(config);
+    const nextConfig = cloneDeep(config);
 
     nextConfig[key] = value;
     this.setState({ nextConfig });

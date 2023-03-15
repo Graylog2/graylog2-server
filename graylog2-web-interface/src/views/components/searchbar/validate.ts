@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import validateTimeRange from 'views/components/TimeRangeValidation';

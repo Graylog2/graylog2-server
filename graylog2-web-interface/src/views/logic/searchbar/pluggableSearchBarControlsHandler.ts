@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 
 import UserNotification from 'util/UserNotification';
 import type { SearchBarControl, CombinedSearchBarFormValues, HandlerContext } from 'views/types';
