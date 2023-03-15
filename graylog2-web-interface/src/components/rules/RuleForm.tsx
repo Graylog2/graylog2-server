@@ -53,12 +53,14 @@ const RuleForm = ({ create }: Props) => {
     onChangeSource,
     ruleSource,
     simulateRule,
+    rawMessageToSimulate,
+    setRawMessageToSimulate,
+    ruleSimulationResult,
+    setRuleSimulationResult,
   } = useContext(PipelineRulesContext);
 
   const [isDirty, setIsDirty] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [rawMessageToSimulate, setRawMessageToSimulate] = useState('');
-  const [ruleSimulationResult, setRuleSimulationResult] = useState(null);
 
   const handleError = (error) => {
     if (error.responseMessage.includes('duplicate key error')) {
@@ -94,6 +96,19 @@ const RuleForm = ({ create }: Props) => {
     setErrorMessage('');
     setIsDirty(true);
     onChangeSource(newSource);
+  };
+
+  const handleRawMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRawMessageToSimulate(event.target.value);
+  };
+
+  const handleRunRuleSimulation = () => {
+    simulateRule(rawMessageToSimulate, setRuleSimulationResult);
+  };
+
+  const handleResetRuleSimulation = () => {
+    setRawMessageToSimulate('');
+    setRuleSimulationResult(null);
   };
 
   const handleCancel = () => {
@@ -140,21 +155,18 @@ const RuleForm = ({ create }: Props) => {
                    type="textarea"
                    placeholder="Raw message"
                    value={rawMessageToSimulate}
-                   onChange={(e) => setRawMessageToSimulate(e.target.value)}
+                   onChange={handleRawMessageChange}
                    rows={3} />
             <Button bsStyle="info"
                     bsSize="xsmall"
-                    disabled={false}
-                    onClick={() => simulateRule(rawMessageToSimulate, setRuleSimulationResult)}>
+                    disabled={!rawMessageToSimulate || !ruleSource}
+                    onClick={handleRunRuleSimulation}>
               Run rule simulation
             </Button>
             <ResetButton bsStyle="default"
                          bsSize="xsmall"
-                         disabled={false}
-                         onClick={() => {
-                           setRawMessageToSimulate('');
-                           setRuleSimulationResult(null);
-                         }}>
+                         disabled={!rawMessageToSimulate}
+                         onClick={handleResetRuleSimulation}>
               Reset
             </ResetButton>
             {ruleSimulationResult && (

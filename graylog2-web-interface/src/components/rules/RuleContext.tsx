@@ -47,6 +47,8 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
   const [, setAceLoaded] = useState(false);
   const [ruleSource, setRuleSource] = useState(rule.source);
   const [description, setDescription] = useState(rule.description);
+  const [rawMessageToSimulate, setRawMessageToSimulate] = useState('');
+  const [ruleSimulationResult, setRuleSimulationResult] = useState(null);
 
   const createAnnotations = useCallback((nextErrors: Array<{ line: number, position_in_line: number, reason: string }>) => {
     const nextErrorAnnotations = nextErrors.map((e) => {
@@ -124,6 +126,10 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
       ruleSource,
       onChangeSource,
       simulateRule,
+      rawMessageToSimulate,
+      setRawMessageToSimulate,
+      ruleSimulationResult,
+      setRuleSimulationResult,
     });
   }, [
     description,
@@ -133,6 +139,8 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     usedInPipelines,
     validateNewRule,
     simulateRule,
+    rawMessageToSimulate,
+    ruleSimulationResult,
   ]);
 
   return (
