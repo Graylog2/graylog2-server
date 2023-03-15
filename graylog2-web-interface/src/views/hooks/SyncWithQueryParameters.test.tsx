@@ -16,7 +16,6 @@
  */
 import * as Immutable from 'immutable';
 
-import history from 'util/History';
 import View from 'views/logic/views/View';
 import Query, { createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
 import type { TimeRange, RelativeTimeRange } from 'views/logic/queries/Query';
@@ -25,7 +24,6 @@ import { syncWithQueryParameters } from './SyncWithQueryParameters';
 
 jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('views/hooks/useViewType');
-jest.mock('util/History');
 
 const lastFiveMinutes: RelativeTimeRange = { type: 'relative', from: 300 };
 const createQuery = (timerange: TimeRange = lastFiveMinutes, streams: Array<string> = [], queryString = 'foo:42') => Query.builder()
@@ -38,80 +36,93 @@ describe('SyncWithQueryParameters', () => {
   afterEach(() => { jest.clearAllMocks(); });
 
   it('does not do anything if no view is loaded', () => {
-    syncWithQueryParameters(View.Type.Search, '', undefined);
+    const push = jest.fn();
+    syncWithQueryParameters(View.Type.Search, '', undefined, push);
 
-    expect(history.push).not.toHaveBeenCalled();
+    expect(push).not.toHaveBeenCalled();
   });
 
   it('does not do anything if current view is not a search', () => {
-    syncWithQueryParameters(View.Type.Dashboard, '', undefined);
+    const push = jest.fn();
+    syncWithQueryParameters(View.Type.Dashboard, '', undefined, push);
 
-    expect(history.push).not.toHaveBeenCalled();
+    expect(push).not.toHaveBeenCalled();
   });
 
   describe('if current view is search, adds state to history', () => {
     it('with current time range and query', () => {
-      syncWithQueryParameters(View.Type.Search, '/search', createQuery({ type: 'relative', range: 600 }));
+      const push = jest.fn();
+      syncWithQueryParameters(View.Type.Search, '/search', createQuery({ type: 'relative', range: 600 }), push);
 
-      expect(history.push).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&relative=600');
+      expect(push).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&relative=600');
     });
 
     it('preserving query parameters present before', () => {
-      syncWithQueryParameters(View.Type.Search, '/search?somevalue=23&somethingelse=foo', createQuery({ type: 'relative', range: 600 }));
+      const push = jest.fn();
+      syncWithQueryParameters(View.Type.Search, '/search?somevalue=23&somethingelse=foo', createQuery({ type: 'relative', range: 600 }), push);
 
-      expect(history.push).toHaveBeenCalledWith('/search?somevalue=23&somethingelse=foo&q=foo%3A42&rangetype=relative&relative=600');
+      expect(push).toHaveBeenCalledWith('/search?somevalue=23&somethingelse=foo&q=foo%3A42&rangetype=relative&relative=600');
     });
 
     it('if time range is relative with from and to', () => {
-      syncWithQueryParameters(View.Type.Search, '/search', createQuery({ ...lastFiveMinutes, to: 240 }));
+      const push = jest.fn();
+      syncWithQueryParameters(View.Type.Search, '/search', createQuery({ ...lastFiveMinutes, to: 240 }), push);
 
-      expect(history.push).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300&to=240');
+      expect(push).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300&to=240');
     });
 
     it('if time range is relative with from only', () => {
-      syncWithQueryParameters(View.Type.Search, '/search', createQuery(lastFiveMinutes));
+      const push = jest.fn();
+      syncWithQueryParameters(View.Type.Search, '/search', createQuery(lastFiveMinutes), push);
 
-      expect(history.push).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300');
+      expect(push).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300');
     });
 
     it('if time range is absolute', () => {
+      const push = jest.fn();
+
       syncWithQueryParameters(View.Type.Search, '/search', createQuery({
         type: 'absolute',
         from: '2019-01-12T13:42:23.000Z',
         to: '2020-01-12T13:42:23.000Z',
-      }));
+      }), push);
 
-      expect(history.push)
+      expect(push)
         .toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=absolute&from=2019-01-12T13%3A42%3A23.000Z&to=2020-01-12T13%3A42%3A23.000Z');
     });
 
     it('if time range is keyword time range', () => {
+      const push = jest.fn();
+
       syncWithQueryParameters(View.Type.Search, '/search', createQuery({
         type: 'keyword',
         keyword: 'Last five minutes',
-      }));
+      }), push);
 
-      expect(history.push)
+      expect(push)
         .toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=keyword&keyword=Last+five+minutes');
     });
 
     it('by calling the provided action', () => {
-      syncWithQueryParameters(View.Type.Search, '/search', createQuery({ type: 'relative', range: 600 }), history.replace);
+      const replace = jest.fn();
+      syncWithQueryParameters(View.Type.Search, '/search', createQuery({ type: 'relative', range: 600 }), replace);
 
-      expect(history.replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&relative=600');
+      expect(replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&relative=600');
     });
 
     it('adds list of streams to query', () => {
-      syncWithQueryParameters(View.Type.Search, '/search', createQuery(lastFiveMinutes, ['stream1', 'stream2']));
+      const push = jest.fn();
+      syncWithQueryParameters(View.Type.Search, '/search', createQuery(lastFiveMinutes, ['stream1', 'stream2']), push);
 
-      expect(history.push)
+      expect(push)
         .toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300&streams=stream1%2Cstream2');
     });
 
     it('removes list of streams to query if they become empty', () => {
-      syncWithQueryParameters(View.Type.Search, '/search?q=foo%3A42&rangetype=relative&from=300&streams=stream1%2Cstream2', createQuery(lastFiveMinutes));
+      const push = jest.fn();
+      syncWithQueryParameters(View.Type.Search, '/search?q=foo%3A42&rangetype=relative&from=300&streams=stream1%2Cstream2', createQuery(lastFiveMinutes), push);
 
-      expect(history.push)
+      expect(push)
         .toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300');
     });
   });

@@ -17,13 +17,14 @@
 import UserNotification from 'util/UserNotification';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import { loadDashboard } from 'views/logic/views/Actions';
+import type { HistoryFunction } from 'routing/useHistory';
 
 import type View from './View';
 
-export default (view: View) => async () => {
+export default (view: View, history: HistoryFunction) => async () => {
   try {
     const savedView = await ViewManagementActions.create(view);
-    loadDashboard(savedView.id);
+    loadDashboard(history, savedView.id);
     UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!');
   } catch (error) {
     UserNotification.error(`Saving view failed: ${error}`, 'Error!');

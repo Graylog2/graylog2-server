@@ -21,7 +21,6 @@ import * as Immutable from 'immutable';
 import { Formik, Form } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import history from 'util/History';
 import AppConfig from 'util/AppConfig';
 import type { DescriptiveItem } from 'components/common/PaginatedItemOverview';
 import User from 'logic/users/User';
@@ -33,6 +32,8 @@ import Routes from 'routing/Routes';
 import { UsersActions } from 'stores/users/UsersStore';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import { FormSubmit, IfPermitted, NoSearchResult, ReadOnlyFormGroup } from 'components/common';
+import type { HistoryFunction } from 'routing/useHistory';
+import useHistory from 'routing/useHistory';
 
 import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';
@@ -59,7 +60,7 @@ const isCloud = AppConfig.isCloud();
 
 const oktaUserForm = isCloud ? PluginStore.exports('cloud')[0].oktaUserForm : null;
 
-const _onSubmit = (formData, roles, setSubmitError) => {
+const _onSubmit = (history: HistoryFunction, formData, roles, setSubmitError) => {
   let data = { ...formData, roles: roles.toJS(), permissions: [] };
   delete data.password_repeat;
 
@@ -83,8 +84,9 @@ const _validateUsername = async (errors: { [name: string]: string }, username: s
   try {
     await UsersActions.loadByUsername(username);
     newErrors.username = 'Username is already taken';
-  // eslint-disable-next-line no-empty
-  } catch (error) {}
+    // eslint-disable-next-line no-empty
+  } catch (error) {
+  }
 
   return newErrors;
 };
@@ -112,7 +114,7 @@ const _validate = async (values) => {
   return errors;
 };
 
-type RequestError = { additional: { res: { text: string }}};
+type RequestError = { additional: { res: { text: string } } };
 
 const PasswordGroup = () => {
   if (isCloud && oktaUserForm) {
@@ -149,10 +151,15 @@ const EmailGroup = () => {
 };
 
 const UserCreate = () => {
-  const initialRole = { name: 'Reader', description: 'Grants basic permissions for every Graylog user (built-in)', id: '' };
+  const initialRole = {
+    name: 'Reader',
+    description: 'Grants basic permissions for every Graylog user (built-in)',
+    id: '',
+  };
   const [user, setUser] = useState(User.empty().toBuilder().roles(Immutable.Set([initialRole.name])).build());
   const [submitError, setSubmitError] = useState<RequestError | undefined>();
   const [selectedRoles, setSelectedRoles] = useState<Immutable.Set<DescriptiveItem>>(Immutable.Set([initialRole]));
+  const history = useHistory();
 
   const isGlobalTimeoutEnabled = useIsGlobalTimeoutEnabled();
 
@@ -183,10 +190,12 @@ const UserCreate = () => {
     return errors?.additional?.res?.text;
   };
 
+  const onSubmit = (data) => _onSubmit(history, data, user.roles, setSubmitError);
+
   return (
     <Row className="content">
       <Col lg={8}>
-        <Formik onSubmit={(data) => _onSubmit(data, user.roles, setSubmitError)}
+        <Formik onSubmit={onSubmit}
                 validate={_validate}
                 initialValues={{}}>
           {({ isSubmitting, isValid }) => (

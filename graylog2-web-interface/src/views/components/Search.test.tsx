@@ -31,8 +31,6 @@ import OriginalSearch from './Search';
 
 import { useSyncWithQueryParameters } from '../hooks/SyncWithQueryParameters';
 
-jest.mock('util/History');
-
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 
 jest.mock('views/stores/SearchConfigStore', () => ({

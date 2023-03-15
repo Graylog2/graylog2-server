@@ -23,7 +23,6 @@ import type { Subtract } from 'utility-types';
 import { getValueFromInput } from 'util/FormsUtils';
 import { Select, FormSubmit } from 'components/common';
 import { Col, Row, Input } from 'components/bootstrap';
-import history from 'util/History';
 import { BooleanField, DropdownField, NumberField, TextField } from 'components/configurationforms';
 import type { ConfigurationFieldValue } from 'components/configurationforms';
 import connect from 'stores/connect';
@@ -33,6 +32,7 @@ import AppConfig from 'util/AppConfig';
 import { CodecTypesStore, CodecTypesActions } from 'stores/codecs/CodecTypesStore';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 import { MessagesActions } from 'stores/messages/MessagesStore';
+import useHistory from 'routing/useHistory';
 
 import type { Input as InputType, CodecTypes } from './Types';
 
@@ -160,6 +160,7 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
   const [codec, setCodec] = useState<string>('');
   const [codecConfiguration, setCodecConfiguration] = useState({});
   const [inputId, setInputId] = useState<string | typeof undefined>();
+  const history = useHistory();
 
   useEffect(() => {
     CodecTypesActions.list();

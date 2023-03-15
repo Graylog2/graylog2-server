@@ -25,7 +25,8 @@ import { PipelineRulesProvider } from 'components/rules/RuleContext';
 import withParams from 'routing/withParams';
 import { PipelinesStore, PipelinesActions } from 'stores/pipelines/PipelinesStore';
 import { RulesActions, RulesStore } from 'stores/rules/RulesStore';
-import history from 'util/History';
+
+import useHistory from '../routing/useHistory';
 
 function filterRules(rule, ruleId) {
   return rule?.rules?.filter((r) => r.id === ruleId)[0];
@@ -40,6 +41,7 @@ function filterPipelines(pipelines = [], title = '') {
 const RuleDetailsPage = ({ params, rule, pipelines }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [filteredRule, setFilteredRule] = useState(undefined);
+  const history = useHistory();
 
   const isNewRule = params.ruleId === 'new';
   const title = filteredRule?.title || '';

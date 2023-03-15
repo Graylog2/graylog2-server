@@ -22,12 +22,12 @@ import createReactClass from 'create-react-class';
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
-import history from 'util/History';
 import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
 import CollectorForm from 'components/sidecars/configuration-forms/CollectorForm';
 import withParams from 'routing/withParams';
 import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 import DocsHelper from 'util/DocsHelper';
+import withHistory from 'routing/withHistory';
 
 const SidecarEditCollectorPage = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
@@ -35,6 +35,7 @@ const SidecarEditCollectorPage = createReactClass({
 
   // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
+    history: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
   },
 
@@ -53,6 +54,7 @@ const SidecarEditCollectorPage = createReactClass({
       (collector) => this.setState({ collector }),
       (error) => {
         if (error.status === 404) {
+          const { history } = this.props;
           history.push(Routes.SYSTEM.SIDECARS.CONFIGURATION);
         }
       },
@@ -91,4 +93,4 @@ const SidecarEditCollectorPage = createReactClass({
   },
 });
 
-export default withParams(SidecarEditCollectorPage);
+export default withHistory(withParams(SidecarEditCollectorPage));

@@ -18,7 +18,6 @@ import { useEffect } from 'react';
 import * as Immutable from 'immutable';
 import URI from 'urijs';
 
-import history from 'util/History';
 import type { ViewType } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import type { TimeRange } from 'views/logic/queries/Query';
@@ -27,6 +26,7 @@ import { filtersToStreamSet } from 'views/logic/queries/Query';
 import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import useViewType from 'views/hooks/useViewType';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
+import useHistory from 'routing/useHistory';
 
 const extractTimerangeParams = (timerange: TimeRange): [string, string | number][] => {
   const { type } = timerange;
@@ -55,7 +55,7 @@ const extractTimerangeParams = (timerange: TimeRange): [string, string | number]
   }
 };
 
-export const syncWithQueryParameters = (viewType: ViewType, query: string, searchQuery: Query, action: (string) => unknown = history.push) => {
+export const syncWithQueryParameters = (viewType: ViewType, query: string, searchQuery: Query, action: (to: string) => unknown) => {
   if (viewType !== View.Type.Search) {
     return;
   }
@@ -83,8 +83,9 @@ export const syncWithQueryParameters = (viewType: ViewType, query: string, searc
 export const useSyncWithQueryParameters = (query: string) => {
   const viewType = useViewType();
   const currentQuery = useCurrentQuery();
+  const history = useHistory();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => syncWithQueryParameters(viewType, query, currentQuery, history.replace), []);
-  useEffect(() => syncWithQueryParameters(viewType, query, currentQuery), [currentQuery, query, viewType]);
+  useEffect(() => syncWithQueryParameters(viewType, query, currentQuery, history.push), [currentQuery, history.push, query, viewType]);
 };

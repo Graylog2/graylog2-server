@@ -17,7 +17,6 @@
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 
-import history from 'util/History';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import ConfigurationForm from 'components/sidecars/configuration-forms/ConfigurationForm';
@@ -26,10 +25,12 @@ import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigu
 import type { Configuration, ConfigurationSidecarsResponse } from 'components/sidecars/types';
 import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 import DocsHelper from 'util/DocsHelper';
+import useHistory from 'routing/useHistory';
 
 const SidecarEditConfigurationPage = ({ params }) => {
   const [configuration, setConfiguration] = useState<Configuration>(null);
   const [configurationSidecars, setConfigurationSidecars] = useState<ConfigurationSidecarsResponse>(null);
+  const history = useHistory();
 
   useEffect(() => {
     const _reloadConfiguration = () => {
@@ -51,7 +52,7 @@ const SidecarEditConfigurationPage = ({ params }) => {
     };
 
     _reloadConfiguration();
-  }, [params]);
+  }, [history, params]);
 
   const _isLoading = () => {
     return !configuration || !configurationSidecars;

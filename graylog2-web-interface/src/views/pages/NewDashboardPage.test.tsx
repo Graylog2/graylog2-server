@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
+import type { Location } from 'react-router-dom';
 
 import useLocation from 'routing/useLocation';
 import asMock from 'helpers/mocking/AsMock';
@@ -49,7 +50,7 @@ describe('NewDashboardPage', () => {
     search: '',
     state: {},
     hash: '',
-  };
+  } as Location;
 
   beforeAll(loadViewsPlugin);
 
