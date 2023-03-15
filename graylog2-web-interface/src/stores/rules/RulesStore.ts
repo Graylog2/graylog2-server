@@ -296,7 +296,11 @@ export const RulesStore = singletonStore(
         source: ruleSource.source,
       };
 
-      return fetch('POST', url, rule).then(callback);
+      return fetch('POST', url, rule).then(callback,
+        (error) => {
+          UserNotification.error(`Couldn't load rule simulation result: ${error.message}`, "Couldn't load rule simulation result");
+        },
+      );
     },
     multiple(ruleNames, callback) {
       const url = qualifyUrl(ApiRoutes.RulesController.multiple().url);
