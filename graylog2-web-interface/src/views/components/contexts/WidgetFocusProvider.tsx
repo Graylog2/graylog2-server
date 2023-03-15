@@ -117,7 +117,7 @@ type CleanupArgs = {
   focusUriParams: FocusUriParams,
   widgetIds: Array<string>,
   query: string,
-  history: ReturnType<typeof useHistory>,
+  navigate: ReturnType<typeof useNavigate>,
 };
 
 const useCleanupQueryParams = ({ focusUriParams, widgetIds, query, navigate }: CleanupArgs) => {
