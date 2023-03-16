@@ -43,7 +43,7 @@ const makeOptions = (options: ReadonlyArray<string | [string, any]>):
 };
 
 const createEvent = (name: string, value: any) => (({
-  target: { name, value }
+  target: { name, value },
 }) as React.ChangeEvent<any>);
 
 const MultiSelectField = ({ name, field, title, error, value, onChange, values }: FieldComponentProps) => {

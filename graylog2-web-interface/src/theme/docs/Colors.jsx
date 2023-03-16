@@ -90,21 +90,23 @@ const ColorSwatch = ({ className, color, name, copyText }) => {
   }, [copyText]);
 
   return (
-    (<Wrapped className={className}>
-      <StyledTooltip placement="top"
-                     opened={opened}
-                     positionTop={-32}
-                     id={`${copyText ? copyText.replace(/\./g, '-') : name}-tooltip`}>
-        Copied!
-      </StyledTooltip>
-      <Swatch color={color}
-              data-clipboard-button
-              data-clipboard-text={copyText}
-              ref={swatchRef}>
-        <Name>{name}</Name>
-        <Value>{color}</Value>
-      </Swatch>
-    </Wrapped>)
+    (
+      <Wrapped className={className}>
+        <StyledTooltip placement="top"
+                       opened={opened}
+                       positionTop={-32}
+                       id={`${copyText ? copyText.replace(/\./g, '-') : name}-tooltip`}>
+          Copied!
+        </StyledTooltip>
+        <Swatch color={color}
+                data-clipboard-button
+                data-clipboard-text={copyText}
+                ref={swatchRef}>
+          <Name>{name}</Name>
+          <Value>{color}</Value>
+        </Swatch>
+      </Wrapped>
+    )
   );
 };
 

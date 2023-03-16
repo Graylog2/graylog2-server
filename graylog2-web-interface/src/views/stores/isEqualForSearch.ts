@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import isEqualWith from 'lodash/isEqualWith';
-
 import isFunction from 'lodash/isFunction';
 
 const hasFn = (obj, fn) => (obj && obj[fn] && isFunction(obj[fn]));
