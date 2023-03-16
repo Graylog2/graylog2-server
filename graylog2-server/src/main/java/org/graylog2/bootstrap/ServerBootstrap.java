@@ -38,6 +38,7 @@ import org.graylog2.bindings.ConfigurationModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
+import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
@@ -71,6 +72,7 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -150,10 +152,16 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 .flatMap(Collection::stream).collect(Collectors.toList());
         preflightCheckModules.add(new FreshInstallDetectionModule(isFreshInstallation()));
 
+        final boolean enablePreflightWeb = this.isFreshInstallation;
+
+        if(enablePreflightWeb) {
+            preflightCheckModules.add(new PreflightWebModule());
+        }
+
         final Injector preflightInjector = getPreflightInjector(preflightCheckModules);
         final PreflightCheckService preflightCheckService = preflightInjector.getInstance(PreflightCheckService.class);
 
-        if(this.isFreshInstallation) {
+        if(enablePreflightWeb) {
             LOG.info("Fresh installation detected, starting configuration webserver");
             wrapWithPreflightWebServer(preflightInjector, preflightCheckModules, preflightCheckService::runChecks);
         } else {
