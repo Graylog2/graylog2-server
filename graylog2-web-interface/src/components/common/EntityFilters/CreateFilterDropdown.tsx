@@ -20,11 +20,9 @@ import styled from 'styled-components';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import MenuItem from 'components/bootstrap/MenuItem';
 import { HoverForHelp, Icon } from 'components/common';
-import type { Attribute, Attributes } from 'stores/PaginationTypes';
+import type { Attributes } from 'stores/PaginationTypes';
 import type { Filters, Filter } from 'components/common/EntityFilters/types';
-
-import SuggestionsList from './configuration/SuggestionsList';
-import StaticOptionsList from './configuration/StaticOptionsList';
+import FilterConfiguration from 'components/common/EntityFilters/FilterConfiguration';
 
 const Container = styled.div`
   margin-left: 5px;
@@ -62,30 +60,6 @@ const AttributeSelect = ({
   </>
 );
 
-export const FilterConfiguration = ({
-  attribute,
-  onSubmit,
-  filterValueRenderer,
-  allActiveFilters,
-  scenario,
-}: {
-  attribute: Attribute,
-  filterValueRenderer: (value: Filter['value'], title: string) => React.ReactNode | undefined,
-  onSubmit: (filter: Filter) => void,
-  allActiveFilters: Filters | undefined,
-  scenario: 'create' | 'edit'
-}) => (
-  <>
-    <MenuItem header>{scenario === 'create' ? 'Create' : 'Edit'} {attribute.title} filter</MenuItem>
-    {attribute.filter_options && (
-      <StaticOptionsList attribute={attribute} filterValueRenderer={filterValueRenderer} onSubmit={onSubmit} />
-    )}
-    {!attribute.filter_options?.length && (
-      <SuggestionsList attribute={attribute} filterValueRenderer={filterValueRenderer} onSubmit={onSubmit} allActiveFilters={allActiveFilters} scenario="create" />
-    )}
-  </>
-);
-
 type Props = {
   filterableAttributes: Attributes,
   activeFilters: Filters,
@@ -107,8 +81,11 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderers, onCr
                              closeOnSelect={false}
                              dropdownZIndex={1000}>
         {({ toggleDropdown }) => {
-          const _onCreateFilter = (filter: Filter) => {
-            toggleDropdown();
+          const _onCreateFilter = (filter: Filter, closeDropdown = true) => {
+            if (closeDropdown) {
+              toggleDropdown();
+            }
+
             onCreateFilter(selectedAttributeId, filter);
           };
 

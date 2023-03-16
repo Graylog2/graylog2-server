@@ -22,7 +22,7 @@ import type { Attribute } from 'stores/PaginationTypes';
 import { Icon } from 'components/common';
 import type { Filter, Filters } from 'components/common/EntityFilters/types';
 import OverlayDropdown from 'components/common/OverlayDropdown';
-import { FilterConfiguration } from 'components/common/EntityFilters/CreateFilterDropdown';
+import FilterConfiguration from 'components/common/EntityFilters/FilterConfiguration';
 
 const Container = styled.div`
   display: flex;
@@ -67,7 +67,11 @@ const FilterValueDropdown = ({ attribute, allActiveFilters, onChangeFilter, filt
                      )}
                      placement="bottom"
                      onToggle={_onToggle}>
-      <FilterConfiguration attribute={attribute} filterValueRenderer={filterValueRenderer} onSubmit={onSubmit} allActiveFilters={allActiveFilters} />
+      <FilterConfiguration attribute={attribute}
+                           filterValueRenderer={filterValueRenderer}
+                           onSubmit={onSubmit}
+                           allActiveFilters={allActiveFilters}
+                           scenario="edit" />
     </OverlayDropdown>
   );
 };

@@ -14,9 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
-import { useCallback } from 'react';
-import { debounce } from 'lodash';
+import React, { useState, useCallback } from 'react';
+import debounce from 'lodash/debounce';
 import styled, { css } from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 
@@ -29,6 +28,7 @@ import UserNotification from 'util/UserNotification';
 import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import useIsKeyHeld from 'hooks/useIsKeyHeld';
 
 import Spinner from '../../Spinner';
 
@@ -77,7 +77,7 @@ const SearchInput = styled(Input)`
 `;
 
 const StyledListGroup = styled.div`
-  margin-bottom: 0px;
+  margin-bottom: 0;
 `;
 
 const Hint = styled.div(({ theme }) => css`
@@ -85,18 +85,22 @@ const Hint = styled.div(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
 `);
 
-const fetchFilterValueSuggestions = async (attributeId: string, { query, page, per_page }: RequestQuery): Promise<PaginatedFilterValueSuggestions> => {
+const fetchFilterValueSuggestions = async (collection: string, { query, page, per_page }: RequestQuery): Promise<PaginatedFilterValueSuggestions> => {
   const additional = {
-    collection: 'index_sets',
+    collection: 'collection',
     column: 'title',
   };
-  const url = PaginationURL('entity_suggestions', page, per_page, query, additional);
+  const url = PaginationURL(collection, page, per_page, query, additional);
 
   return fetch('GET', qualifyUrl(url));
 };
 
-const useFilterValueSuggestions = (attributeId: string, searchParams: RequestQuery):{ data: PaginatedFilterValueSuggestions, isFetching: boolean } => (
-  useQuery(['filters', 'suggestions', searchParams], () => fetchFilterValueSuggestions(attributeId, searchParams), {
+const useFilterValueSuggestions = (attributeId: string, collection: string, searchParams: RequestQuery):{ data: PaginatedFilterValueSuggestions, isFetching: boolean } => {
+  if (!collection) {
+    throw Error(`Attribute meta data for attribute "${attributeId}" is missing related collection.`);
+  }
+
+  return useQuery(['filters', 'suggestions', searchParams], () => fetchFilterValueSuggestions(attributeId, searchParams), {
     onError: (errorThrown) => {
       UserNotification.error(`Loading suggestions for filter failed with status: ${errorThrown}`,
         'Could not load filter suggestions');
@@ -106,20 +110,21 @@ const useFilterValueSuggestions = (attributeId: string, searchParams: RequestQue
     initialData: {
       pagination: DEFAULT_PAGINATION,
     },
-  })
-);
+  });
+};
 
 type Props = {
   attribute: Attribute,
   filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined,
-  onSubmit: (filter: Filter) => void,
+  onSubmit: (filter: Filter, closeDropdown: boolean) => void,
   allActiveFilters: Filters | undefined,
   scenario: 'create' | 'edit'
 }
 
-const StaticOptionsList = ({ attribute, filterValueRenderer, onSubmit, allActiveFilters, scenario }: Props) => {
+const SuggestionsList = ({ attribute, filterValueRenderer, onSubmit, allActiveFilters, scenario }: Props) => {
+  const isShiftHeld = useIsKeyHeld('Shift');
   const [searchParams, setSearchParams] = useState(DEFAULT_QUERY);
-  const { data: { pagination, suggestions }, isFetching } = useFilterValueSuggestions(attribute.id, searchParams);
+  const { data: { pagination, suggestions }, isFetching } = useFilterValueSuggestions(attribute.id, attribute.related_collection, searchParams);
   const handleSearchChange = useCallback((newSearchQuery: string) => {
     setSearchParams((cur) => ({ ...cur, page: DEFAULT_QUERY.page, query: newSearchQuery }));
   }, [setSearchParams]);
@@ -129,8 +134,6 @@ const StaticOptionsList = ({ attribute, filterValueRenderer, onSubmit, allActive
   }, []);
 
   const debounceOnSearch = debounce((value: string) => handleSearchChange(value), 1000);
-
-  console.log({ allActiveFilters });
 
   return (
     <Container>
@@ -151,15 +154,13 @@ const StaticOptionsList = ({ attribute, filterValueRenderer, onSubmit, allActive
                        onChange={handlePaginationChange}
                        useQueryParameter={false}>
           <StyledListGroup>
-            {suggestions.map((suggestion) => {
-              return (
-                <ListGroupItem onClick={() => onSubmit({ value: suggestion.id, title: suggestion.value, id: generateId() })}
-                               key={`filter-value-${suggestion.id}`}
-                               disabled={!!allActiveFilters?.[attribute.id]?.find(({ value }) => value === suggestion.id)}>
-                  {filterValueRenderer ? filterValueRenderer(suggestion.id, suggestion.value) : suggestion.value}
-                </ListGroupItem>
-              );
-            })}
+            {suggestions.map((suggestion) => (
+              <ListGroupItem onClick={() => onSubmit({ value: suggestion.id, title: suggestion.value, id: generateId() }, !isShiftHeld)}
+                             key={`filter-value-${suggestion.id}`}
+                             disabled={!!allActiveFilters?.[attribute.id]?.find(({ value }) => value === suggestion.id)}>
+                {filterValueRenderer ? filterValueRenderer(suggestion.id, suggestion.value) : suggestion.value}
+              </ListGroupItem>
+            ))}
           </StyledListGroup>
         </PaginatedList>
       )}
@@ -174,4 +175,4 @@ const StaticOptionsList = ({ attribute, filterValueRenderer, onSubmit, allActive
   );
 };
 
-export default StaticOptionsList;
+export default SuggestionsList;
