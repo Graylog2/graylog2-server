@@ -43,9 +43,10 @@ const MissingRequirements = ({ view, missingRequirements }: Props) => {
         <ul>
           {Object.entries(missingRequirements).map(([require, plugin]: [string, PluginMetadata]) => (
             <li key={require}>
-              <strong>{require}</strong> - included in <a href={plugin.url}
-                                                          target="_blank"
-                                                          rel="noopener noreferrer">{plugin.name}
+              <strong>{require}</strong> - included in
+              <a href={plugin.url}
+                 target="_blank"
+                 rel="noopener noreferrer">{plugin.name}
               </a>
             </li>
           ))}

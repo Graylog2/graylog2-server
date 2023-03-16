@@ -67,7 +67,7 @@ const RuleDetailsPage = ({ params, rule, pipelines }) => {
 
       setIsLoading(!(filteredRule && pipelines));
     }
-  }, [filteredRule, isNewRule, params.ruleId, pipelines]);
+  }, [filteredRule, history, isNewRule, params.ruleId, pipelines]);
 
   if (isLoading) {
     return <Spinner text="Loading Rule Details..." />;

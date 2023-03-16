@@ -97,7 +97,7 @@ describe('ReportedErrorBoundary', () => {
     await screen.findByText('Missing Permissions');
 
     expect(screen.queryByText('Hello World!')).toBeNull();
-    expect(screen.queryByText(/The request error message/)).toBeInTheDocument();
+    expect(screen.getByText(/The request error message/)).toBeInTheDocument();
   });
 
   it('resets error when navigation changes', async () => {

@@ -153,7 +153,7 @@ const WidgetActionsMenu = ({
   const history = useHistory();
 
   const onDuplicate = useCallback(() => dispatch(_onDuplicate(widget.id, unsetWidgetFocusing, title)), [dispatch, widget.id, unsetWidgetFocusing, title]);
-  const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId, history), [view]);
+  const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId, history), [history, view]);
   const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToPage(dispatch, view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [dispatch, view]);
   const onDelete = useCallback(() => dispatch(_onDelete(widget, view, title)), [dispatch, title, view, widget]);
   const focusWidget = useCallback(() => setWidgetFocusing(widget.id), [setWidgetFocusing, widget.id]);

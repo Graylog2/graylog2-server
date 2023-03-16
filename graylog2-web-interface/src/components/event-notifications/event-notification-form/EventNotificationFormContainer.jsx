@@ -94,7 +94,6 @@ class EventNotificationFormContainer extends React.Component {
     this.setState({ notification: nextNotification, isDirty: true, testResult: initialTestResult });
   };
 
-  // eslint-disable-next-line class-methods-use-this
   handleCancel = () => {
     const { history } = this.props;
     history.push(Routes.ALERTS.NOTIFICATIONS.LIST);

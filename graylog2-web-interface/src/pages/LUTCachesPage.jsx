@@ -150,6 +150,7 @@ LUTCachesPage.propTypes = {
   validationErrors: PropTypes.object,
   types: PropTypes.object,
   caches: PropTypes.array,
+  history: PropTypes.object.isRequired,
   location: PropTypes.object.isRequired,
   pagination: PropTypes.object.isRequired,
   action: PropTypes.string,

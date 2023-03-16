@@ -40,7 +40,7 @@ class DataAdapterForm extends React.Component {
     dataAdapter: PropTypes.object,
     validate: PropTypes.func,
     validationErrors: PropTypes.object,
-    history: PropTypes.object,
+    history: PropTypes.object.isRequired,
   };
 
   static defaultProps = {

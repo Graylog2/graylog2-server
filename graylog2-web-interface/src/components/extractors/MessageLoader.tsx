@@ -26,7 +26,7 @@ import useHistory from 'routing/useHistory';
 import { Button } from '../bootstrap';
 
 const StyledFormSubmit = styled(FormSubmit)`
-  margin-top 10px;
+  margin-top: 10px;
 `;
 
 type LoadMessageFormProps = {

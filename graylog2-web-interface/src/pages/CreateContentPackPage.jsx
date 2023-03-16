@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import Reflux from 'reflux';
+import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
@@ -34,6 +35,12 @@ import withHistory from 'routing/withHistory';
 const CreateContentPackPage = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'CreateContentPackPage',
+
+  // eslint-disable-next-line react/no-unused-class-component-methods
+  propTypes: {
+    history: PropTypes.object.isRequired,
+  },
+
   mixins: [Reflux.connect(CatalogStore)],
 
   getInitialState() {

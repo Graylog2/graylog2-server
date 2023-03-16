@@ -38,6 +38,7 @@ const CreateExtractorsPage = createReactClass({
 
   // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
+    history: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,
   },

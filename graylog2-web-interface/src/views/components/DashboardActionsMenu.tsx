@@ -93,7 +93,7 @@ const DashboardActionsMenu = () => {
     }
 
     return dispatch(onSaveNewDashboard(newDashboard, history));
-  }, [currentUser.permissions, dispatch, pluggableSaveViewControls, view.id]);
+  }, [currentUser.permissions, dispatch, history, pluggableSaveViewControls, view.id]);
   const _onSaveView = useCallback(() => dispatch(OnSaveViewAction(view)), [dispatch, view]);
   const _onUpdateView = useCallback((updatedView) => dispatch(updateView(updatedView)), [dispatch]);
 

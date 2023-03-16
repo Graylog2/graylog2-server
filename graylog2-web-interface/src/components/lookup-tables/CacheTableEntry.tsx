@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
+import useHistory from 'routing/useHistory';
 import { Link } from 'components/common/router';
 import { Spinner } from 'components/common';
 import { Button } from 'components/bootstrap';
@@ -41,7 +41,7 @@ const Actions = styled(ButtonToolbar)`
 `;
 
 const CacheTableEntry = ({ cache }: Props) => {
-  const navigate = useNavigate();
+  const history = useHistory();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
 
   const countMap = {
@@ -81,7 +81,7 @@ const CacheTableEntry = ({ cache }: Props) => {
   };
 
   const handleEdit = React.useCallback(() => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cache.name));
+    history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cache.name));
   }, [history, cache.name]);
 
   const handleDelete = React.useCallback(() => {

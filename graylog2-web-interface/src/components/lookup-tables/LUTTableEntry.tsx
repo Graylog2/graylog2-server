@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { Link } from 'components/common/router';
@@ -26,6 +25,7 @@ import { ErrorPopover } from 'components/lookup-tables';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
+import useHistory from 'routing/useHistory';
 
 type Props = {
   table: LookupTable,
@@ -46,7 +46,7 @@ const Actions = styled(ButtonToolbar)`
 `;
 
 const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
-  const navigate = useNavigate();
+  const history = useHistory();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
 
   const handleDelete = React.useCallback(() => {
@@ -61,7 +61,7 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
   }, [table.id, table.title]);
 
   const handleEdit = React.useCallback(() => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.edit(table.name));
+    history.push(Routes.SYSTEM.LOOKUPTABLES.edit(table.name));
   }, [history, table.name]);
 
   return (

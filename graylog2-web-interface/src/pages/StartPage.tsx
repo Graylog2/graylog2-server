@@ -50,7 +50,7 @@ const StartPage = () => {
     }
 
     redirect(Routes.WELCOME);
-  }, [currentUser?.startpage]);
+  }, [currentUser?.startpage, redirect]);
 
   useEffect(() => {
     CurrentUserStore.reload();

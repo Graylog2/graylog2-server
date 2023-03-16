@@ -198,6 +198,7 @@ LUTTablesPage.propTypes = {
   caches: PropTypes.object,
   dataAdapters: PropTypes.object,
   pagination: PropTypes.object,
+  history: PropTypes.object.isRequired,
   location: PropTypes.object,
   errorStates: PropTypes.object,
   action: PropTypes.string,
