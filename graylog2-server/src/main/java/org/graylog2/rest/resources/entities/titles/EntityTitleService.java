@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 import static org.graylog2.database.DbEntity.NO_TITLE;
+import static org.graylog2.rest.resources.entities.titles.model.EntitiesTitleResponse.EMPTY_RESPONSE;
 
 public class EntityTitleService {
 
@@ -59,6 +60,9 @@ public class EntityTitleService {
     }
 
     public EntitiesTitleResponse getTitles(final Subject subject, final EntityTitleRequest request) {
+        if (request == null || request.entities() == null) {
+            return EMPTY_RESPONSE;
+        }
 
         final Map<String, List<EntityIdentifier>> groupedByType = request.entities()
                 .stream()
@@ -69,22 +73,22 @@ public class EntityTitleService {
                 .map(entry -> getTitlesForEntitiesFromSingleCollection(subject, entry.getKey(), entry.getValue()))
                 .reduce(EntitiesTitleResponse::merge);
 
-        return entitiesTitleResponse.orElse(new EntitiesTitleResponse(Set.of(), Set.of()));
+        return entitiesTitleResponse.orElse(EMPTY_RESPONSE);
     }
 
-    public EntitiesTitleResponse getTitlesForEntitiesFromSingleCollection(final Subject subject,
-                                                                          final String collection,
-                                                                          final List<EntityIdentifier> entities) {
+    private EntitiesTitleResponse getTitlesForEntitiesFromSingleCollection(final Subject subject,
+                                                                           final String collection,
+                                                                           final List<EntityIdentifier> entities) {
         final Optional<DbEntityCatalogEntry> dbEntityCatalogEntry = this.entitiesCatalog.getByCollectionName(collection);
         if (dbEntityCatalogEntry.isEmpty() || entities.isEmpty()) {
-            return new EntitiesTitleResponse(Set.of(), Set.of());
+            return EMPTY_RESPONSE;
         }
 
         final String titleField = dbEntityCatalogEntry.get().titleField();
         if (titleField.equals(NO_TITLE)) {
             return new EntitiesTitleResponse(
                     entities.stream()
-                            .map(e -> new EntityTitleResponse(e.id(), e.type(), ""))
+                            .map(e -> new EntityTitleResponse(e.id(), e.type(), NO_TITLE))
                             .collect(Collectors.toSet()),
                     Set.of()
             );
@@ -108,11 +112,13 @@ public class EntityTitleService {
                 {
                     final String idAsString = doc.getObjectId("_id").toString();
                     final boolean canReadTitle = checkCanReadTitle(subject, dbEntityCatalogEntry.get().readPermission(), idAsString);
-                    titles.add(new EntityTitleResponse(
-                            idAsString,
-                            collection,
-                            canReadTitle ? doc.getString(titleField) : TITLE_IF_NOT_PERMITTED
-                    ));
+                    titles.add(
+                            new EntityTitleResponse(
+                                    idAsString,
+                                    collection,
+                                    canReadTitle ? doc.getString(titleField) : TITLE_IF_NOT_PERMITTED
+                            )
+                    );
                     if (!canReadTitle) {
                         notPermitted.add(idAsString);
                     }

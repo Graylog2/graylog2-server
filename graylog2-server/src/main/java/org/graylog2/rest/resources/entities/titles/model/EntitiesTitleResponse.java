@@ -25,6 +25,8 @@ import java.util.Set;
 public record EntitiesTitleResponse(@JsonProperty("entities") Set<EntityTitleResponse> entities,
                                     @JsonProperty("not_permitted_to_view") Collection<String> notPermitted) {
 
+    public static final EntitiesTitleResponse EMPTY_RESPONSE = new EntitiesTitleResponse(Set.of(), Set.of());
+
     public EntitiesTitleResponse merge(final EntitiesTitleResponse other) {
         if (other == null || other.entities == null || other.entities.isEmpty()) {
             return this;

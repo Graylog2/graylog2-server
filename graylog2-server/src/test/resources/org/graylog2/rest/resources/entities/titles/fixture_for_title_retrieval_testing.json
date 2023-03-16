@@ -1,0 +1,56 @@
+{
+  "streams" : [
+    {
+      "_id": {"$oid": "01020302e16f9a1d1f6b074a"},
+      "creator_user_id": "local:admin",
+      "is_default_stream": false,
+      "index_set_id": "62206e6ef5e18662444afa7b",
+      "matching_type": "AND",
+      "remove_matches_from_default_stream": false,
+      "description": "TEST, stream 1",
+      "created_at": "2022-04-11T17:24:05.541Z",
+      "disabled": false,
+      "title": "Stream 1"
+    },
+    {
+      "_id": {"$oid": "01020302e16f9a1d1f6b074b"},
+      "creator_user_id": "local:admin",
+      "is_default_stream": false,
+      "index_set_id": "62206e6ef5e18662444afa7b",
+      "matching_type": "AND",
+      "remove_matches_from_default_stream": false,
+      "description": "TEST, stream 2",
+      "created_at": "2022-04-11T17:24:05.541Z",
+      "disabled": false,
+      "title": "Stream 2"
+    },
+    {
+      "_id": {"$oid": "01020302e16f9a1d1f6b074c"},
+      "creator_user_id": "local:admin",
+      "is_default_stream": false,
+      "index_set_id": "62206e6ef5e18662444afa7b",
+      "matching_type": "AND",
+      "remove_matches_from_default_stream": false,
+      "description": "TEST, stream 3",
+      "created_at": "2022-04-11T17:24:05.541Z",
+      "disabled": false,
+      "title": "Stream 3"
+    }
+  ],
+  "nodes" : [
+    {
+      "_id": {"$oid": "01020302e16f9a1d1f6b0741"},
+      "hostname": "TEST, node 1",
+      "type": "SERVER",
+      "is_leader": true,
+      "node_id": "Node Id 1"
+    },
+    {
+      "_id": {"$oid": "01020302e16f9a1d1f6b0742"},
+      "hostname": "TEST, node 2",
+      "type": "SERVER",
+      "is_leader": true,
+      "node_id": "Node Id 2"
+    }
+  ]
+}

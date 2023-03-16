@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.entities.titles.model;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,6 +61,23 @@ class EntitiesTitleResponseTest {
                         new EntityTitleResponse("id", "type", "title")
                 )
         );
+    }
+
+    @Test
+    void testMergeWithNonPermittedSection() {
+        EntitiesTitleResponse response1 = new EntitiesTitleResponse(Set.of(new EntityTitleResponse("id", "type1", "title")), Set.of("secret1"));
+        EntitiesTitleResponse response2 = new EntitiesTitleResponse(Set.of(new EntityTitleResponse("id", "type2", "title")), Set.of("secret1", "secret2"));
+
+        final EntitiesTitleResponse merged = response1.merge(response2);
+        assertThat(merged.entities()).isEqualTo(
+                Set.of(
+                        new EntityTitleResponse("id", "type1", "title"),
+                        new EntityTitleResponse("id", "type2", "title")
+                )
+        );
+        assertThat(merged.notPermitted())
+                .containsAll(List.of("secret1", "secret2"));
+
     }
 
 }
