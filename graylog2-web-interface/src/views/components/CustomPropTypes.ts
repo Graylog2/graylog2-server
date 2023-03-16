@@ -125,5 +125,5 @@ export default ({
   FieldType,
   OneOrMoreChildren,
   TimeRangeType,
-  instanceOf
+  instanceOf,
 });
