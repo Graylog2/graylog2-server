@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import styled from 'styled-components';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';

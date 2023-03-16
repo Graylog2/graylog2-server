@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 
 type PromiseReturnType<T> = T extends (...args: any[]) => Promise<infer R> ? R : never;
 

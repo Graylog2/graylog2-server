@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import defaultTo from 'lodash/defaultTo';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Select } from 'components/common';
@@ -51,12 +52,12 @@ const NumberRefExpression = ({
   };
 
   const getSeriesId = (currentSeries, func, field) => {
-    return `${lodash.defaultTo(func, currentSeries.function)}-${lodash.defaultTo(field, currentSeries.field || '')}`;
+    return `${defaultTo(func, currentSeries.function)}-${defaultTo(field, currentSeries.field || '')}`;
   };
 
   const handleFieldChange = ({ nextFunction, nextField }) => {
-    const series = lodash.cloneDeep(eventDefinition.config.series);
-    const nextSeries = lodash.cloneDeep(getOrCreateSeries(expression.ref));
+    const series = cloneDeep(eventDefinition.config.series);
+    const nextSeries = cloneDeep(getOrCreateSeries(expression.ref));
     const nextSeriesId = getSeriesId(nextSeries, nextFunction, nextField);
 
     if (nextFunction !== undefined) {
@@ -77,7 +78,7 @@ const NumberRefExpression = ({
       series.push(nextSeries);
     }
 
-    const nextExpression = lodash.cloneDeep(expression);
+    const nextExpression = cloneDeep(expression);
 
     nextExpression.ref = nextSeriesId;
 

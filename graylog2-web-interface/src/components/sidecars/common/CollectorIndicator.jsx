@@ -17,7 +17,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import upperFirst from 'lodash/upperFirst';
 
 import OperatingSystemIcon from './OperatingSystemIcon';
 
@@ -39,7 +39,7 @@ const CollectorIndicator = createReactClass({
     return (
       <span>
         <OperatingSystemIcon operatingSystem={operatingSystem} /> {collector}
-        {operatingSystem && <span> on {lodash.upperFirst(operatingSystem)}</span>}
+        {operatingSystem && <span> on {upperFirst(operatingSystem)}</span>}
       </span>
     );
   },

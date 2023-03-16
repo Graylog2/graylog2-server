@@ -16,7 +16,7 @@
  */
 import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import uniq from 'lodash/uniq';
 import styled from 'styled-components';
 
 import { ButtonToolbar, Button } from 'components/bootstrap';
@@ -49,7 +49,7 @@ const CollectorsAdministrationActions = ({
   const [showConfigurationModal, setShowConfigurationModal] = useState(false);
   const onCancelConfigurationModal = useCallback(() => setShowConfigurationModal(false), []);
 
-  const selectedLogCollectorsNames = lodash.uniq(selectedSidecarCollectorPairs.map(({ collector }) => collector.name));
+  const selectedLogCollectorsNames = uniq(selectedSidecarCollectorPairs.map(({ collector }) => collector.name));
   const configButtonTooltip = `Cannot change configurations of ${selectedLogCollectorsNames.join(', ')} collectors simultaneously`;
 
   return (

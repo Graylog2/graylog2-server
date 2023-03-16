@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import defaultTo from 'lodash/defaultTo';
 
 import { MultiSelect } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
@@ -83,7 +83,7 @@ const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, on
                          onChange={handleGroupByChange}
                          options={formattedFields}
                          ignoreAccents={false}
-                         value={lodash.defaultTo(eventDefinition.config.group_by, []).join(',')}
+                         value={defaultTo(eventDefinition.config.group_by, []).join(',')}
                          allowCreate />
             <HelpBlock>
               Select Fields that Graylog should use to group Filter results when they have identical values.

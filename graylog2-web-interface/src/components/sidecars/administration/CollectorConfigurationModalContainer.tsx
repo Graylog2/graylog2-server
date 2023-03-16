@@ -16,7 +16,9 @@
  */
 import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import countBy from 'lodash/countBy';
+import intersection from 'lodash/intersection';
+import uniq from 'lodash/uniq';
 import styled from 'styled-components';
 
 import { naturalSortIgnoreCase } from 'util/SortUtils';
@@ -52,7 +54,7 @@ const CollectorConfigurationModalContainer = ({
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
 
   const getSelectedLogCollector = () => {
-    return (lodash.uniq<Collector>(selectedSidecarCollectorPairs.map(({ collector }) => collector)))[0];
+    return (uniq<Collector>(selectedSidecarCollectorPairs.map(({ collector }) => collector)))[0];
   };
 
   const sortConfigurationNames = (configs: Configuration[]) => {
@@ -76,11 +78,11 @@ const CollectorConfigurationModalContainer = ({
   };
 
   const getFullyAndPartiallyAssignments = (_assignedConfigurations: string[]) => {
-    const occurrences = lodash.countBy(_assignedConfigurations);
+    const occurrences = countBy(_assignedConfigurations);
 
     return [
-      lodash.uniq<string>(_assignedConfigurations.filter((config) => occurrences[config] === selectedSidecarCollectorPairs.length)),
-      lodash.uniq<string>(_assignedConfigurations.filter((config) => occurrences[config] < selectedSidecarCollectorPairs.length)),
+      uniq<string>(_assignedConfigurations.filter((config) => occurrences[config] === selectedSidecarCollectorPairs.length)),
+      uniq<string>(_assignedConfigurations.filter((config) => occurrences[config] < selectedSidecarCollectorPairs.length)),
     ];
   };
 
@@ -105,7 +107,7 @@ const CollectorConfigurationModalContainer = ({
       if (nextPartiallyAssignedConfigurations.length) {
         const selectedLogCollector = getSelectedLogCollector();
         const assignments = getAssignedConfigurations([sidecarCollectorPair], selectedLogCollector);
-        const assignmentsToKeep = lodash.intersection(assignments, nextPartiallyAssignedConfigurations);
+        const assignmentsToKeep = intersection(assignments, nextPartiallyAssignedConfigurations);
         const assignedConfigurationsToKeep = configurations.filter((config) => assignmentsToKeep.includes(config.name));
         configs = [...assignedConfigurationsToSave, ...assignedConfigurationsToKeep];
       }
@@ -140,7 +142,7 @@ const CollectorConfigurationModalContainer = ({
       );
     }, []);
 
-    return lodash.uniq(assigned_from_tags);
+    return uniq(assigned_from_tags);
   };
 
   const getRowData = (configName: string) => {

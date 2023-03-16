@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import find from 'lodash/find';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
@@ -234,7 +234,7 @@ class Wizard extends React.Component<Props, State> {
       return false;
     }
 
-    return lodash.find(steps, { key: activeStep });
+    return find(steps, { key: activeStep });
   };
 
   _getSelectedStep = () => {

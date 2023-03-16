@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import { union } from 'lodash';
+import union from 'lodash/union';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';

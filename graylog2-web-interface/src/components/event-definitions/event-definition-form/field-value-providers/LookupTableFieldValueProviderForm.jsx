@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import memoize from 'lodash/memoize';
 
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { Select } from 'components/common';
@@ -44,7 +45,7 @@ class LookupTableFieldValueProviderForm extends React.Component {
     'key_field',
   ];
 
-  formatMessageFields = lodash.memoize(
+  formatMessageFields = memoize(
     (fieldTypes) => {
       return fieldTypes
         .sort((ftA, ftB) => naturalSortIgnoreCase(ftA.name, ftB.name))
@@ -60,7 +61,7 @@ class LookupTableFieldValueProviderForm extends React.Component {
 
   propagateChanges = (key, value) => {
     const { config, onChange } = this.props;
-    const nextProviders = lodash.cloneDeep(config.providers);
+    const nextProviders = cloneDeep(config.providers);
     const lookupProvider = nextProviders.find((provider) => provider.type === LookupTableFieldValueProviderForm.type);
 
     lookupProvider[key] = value;

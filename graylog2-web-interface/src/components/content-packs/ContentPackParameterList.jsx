@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { findIndex } from 'lodash';
+import findIndex from 'lodash/findIndex';
 
 import { Badge, Button, Modal, ButtonToolbar } from 'components/bootstrap';
 import { DataTable, SearchForm, Icon, ModalSubmit } from 'components/common';

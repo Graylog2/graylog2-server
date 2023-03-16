@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { groupBy } from 'lodash';
+import groupBy from 'lodash/groupBy';
 
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 
