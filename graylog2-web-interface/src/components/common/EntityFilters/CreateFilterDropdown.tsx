@@ -79,6 +79,7 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderers, onCr
                              buttonTitle="Create Filter"
                              onToggle={onToggleDropdown}
                              closeOnSelect={false}
+                             dropdownMinWidth={120}
                              dropdownZIndex={1000}>
         {({ toggleDropdown }) => {
           const _onCreateFilter = (filter: Filter, closeDropdown = true) => {

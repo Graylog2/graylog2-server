@@ -87,10 +87,10 @@ const Hint = styled.div(({ theme }) => css`
 
 const fetchFilterValueSuggestions = async (collection: string, { query, page, per_page }: RequestQuery): Promise<PaginatedFilterValueSuggestions> => {
   const additional = {
-    collection: 'collection',
+    collection,
     column: 'title',
   };
-  const url = PaginationURL(collection, page, per_page, query, additional);
+  const url = PaginationURL('entity_suggestions', page, per_page, query, additional);
 
   return fetch('GET', qualifyUrl(url));
 };
@@ -100,7 +100,7 @@ const useFilterValueSuggestions = (attributeId: string, collection: string, sear
     throw Error(`Attribute meta data for attribute "${attributeId}" is missing related collection.`);
   }
 
-  return useQuery(['filters', 'suggestions', searchParams], () => fetchFilterValueSuggestions(attributeId, searchParams), {
+  return useQuery(['filters', 'suggestions', searchParams], () => fetchFilterValueSuggestions(collection, searchParams), {
     onError: (errorThrown) => {
       UserNotification.error(`Loading suggestions for filter failed with status: ${errorThrown}`,
         'Could not load filter suggestions');
