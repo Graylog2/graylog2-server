@@ -25,6 +25,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
+import org.graylog2.shared.rest.HideOnCloud;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 
 import javax.inject.Inject;
@@ -54,6 +55,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @Api(value = "Cluster/Debug/SupportBundle", description = "For collecting cluster wide debugging information, e.g. server logs")
 @Path("/cluster/debug/support")
 @Produces(MediaType.APPLICATION_JSON)
+@HideOnCloud
 public class SupportBundleClusterResource extends ProxiedResource {
 
     @Inject

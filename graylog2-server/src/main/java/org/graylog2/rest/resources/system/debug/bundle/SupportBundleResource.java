@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.shared.rest.HideOnCloud;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestrictToLeader;
 
@@ -52,6 +53,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @Api(value = "System/Debug/SupportBundle", description = "For collecting debugging information, e.g. server logs")
 @Path("/system/debug/support")
 @Produces(MediaType.APPLICATION_JSON)
+@HideOnCloud
 public class SupportBundleResource extends RestResource {
     private final SupportBundleService supportBundleService;
 
