@@ -22,7 +22,7 @@ import lodash from 'lodash';
 import { OverlayTrigger, Icon } from 'components/common';
 import { Alert, Col, Row, Button } from 'components/bootstrap';
 import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
-import type User from 'logic/users/User';
+import type { UserJSON } from 'logic/users/User';
 
 import FieldForm from './FieldForm';
 import FieldsList from './FieldsList';
@@ -34,11 +34,11 @@ import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 
 type Props = {
-  currentUser: User,
+  currentUser: UserJSON,
   eventDefinition: EventDefinition,
   validation: {
     errors: {
-      title: string,
+      title?: string,
     }
   },
   onChange: (name: string, value: any) => void,

@@ -23,7 +23,7 @@ import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Select } from 'components/common';
 import { Clearfix, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import { HelpPanel } from 'components/event-definitions/common/HelpPanel';
-import type User from 'logic/users/User';
+import type { UserJSON } from 'logic/users/User';
 
 import styles from './EventConditionForm.css';
 
@@ -37,11 +37,11 @@ type Props = {
   eventDefinition: EventDefinition,
   validation: {
     errors: {
-      config: any,
-      title: string,
+      config?: any,
+      title?: string,
     }
   },
-  currentUser: User,
+  currentUser: UserJSON,
   onChange: (name: string, newConfig: EventDefinition['config']) => void,
 }
 

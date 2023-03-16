@@ -17,6 +17,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import history from 'util/History';
 import Routes from 'routing/Routes';
@@ -30,11 +31,12 @@ import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitio
 import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
 
 import EventDefinitionForm from './EventDefinitionForm';
-
 // Import built-in plugins
 import 'components/event-definitions/event-definition-types';
 
 import 'components/event-notifications/event-notification-types';
+import useQuery from 'routing/useQuery';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
 const fetchNotifications = () => {
   EventNotificationsActions.listAll();
@@ -44,11 +46,23 @@ const handleCancel = () => {
   history.push(Routes.ALERTS.DEFINITIONS.LIST);
 };
 
-const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinitionInitial, onEventDefinitionChange }) => {
+type Props = {
+  action: 'edit' | 'create',
+  eventDefinition: EventDefinition,
+  onEventDefinitionChange: (nextEventDefinition: EventDefinition) => void,
+}
+
+const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinitionInitial, onEventDefinitionChange }: Props) => {
   const [eventDefinition, setEventDefinition] = useState(eventDefinitionInitial);
   const [validation, setValidation] = useState({ errors: {} });
   const [eventsClusterConfig, setEventsClusterConfig] = useState(undefined);
   const [isDirty, setIsDirty] = useState(false);
+  const {
+    type,
+    query,
+    streams,
+    search_within_ms,
+  } = useQuery();
 
   const entityTypes = useStore(AvailableEventDefinitionTypesStore);
   const notifications = useStore(EventNotificationsStore);
@@ -57,14 +71,17 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
   const isLoading = !entityTypes || !notifications.all || !eventsClusterConfig;
   const defaults = { default_backlog_size: eventsClusterConfig?.events_notification_default_backlog };
 
+  const getConditionPlugin = (edType): any => {
+    if (edType === undefined) {
+      return {};
+    }
+
+    return PluginStore.exports('eventDefinitionTypes').find((eventDefinitionType) => eventDefinitionType.type === edType) || {};
+  };
+
   const fetchClusterConfig = useCallback(() => {
     ConfigurationsActions.listEventsClusterConfig().then((config) => setEventsClusterConfig(config));
   }, []);
-
-  useEffect(() => {
-    fetchClusterConfig();
-    fetchNotifications();
-  }, [fetchClusterConfig]);
 
   const handleChange = useCallback((key, value) => {
     setEventDefinition((curState) => {
@@ -76,6 +93,33 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
       return nextEventDefinition;
     });
   }, [onEventDefinitionChange]);
+
+  useEffect(() => {
+    fetchClusterConfig();
+    fetchNotifications();
+    const hasConfigInUrl = !!type;
+
+    if (hasConfigInUrl) {
+      const conditionPlugin = getConditionPlugin(type);
+      const defaultConfig = conditionPlugin?.defaultConfig || {} as EventDefinition['config'];
+      setEventDefinition((cur) => {
+        const cloned = lodash.cloneDeep(cur);
+
+        return ({
+          ...cloned,
+          config: {
+            ...defaultConfig,
+            ...cloned.config,
+            type,
+            query,
+            streams: (streams as string)?.split(',') || [],
+            search_within_ms,
+            query_parameters: [],
+          },
+        });
+      });
+    }
+  }, [fetchClusterConfig, query, search_within_ms, streams, type]);
 
   const handleSubmitSuccessResponse = () => {
     setIsDirty(false);
@@ -148,9 +192,6 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
 EventDefinitionFormContainer.propTypes = {
   action: PropTypes.oneOf(['create', 'edit']),
   eventDefinition: PropTypes.object,
-  currentUser: PropTypes.object.isRequired,
-  entityTypes: PropTypes.object,
-  notifications: PropTypes.object.isRequired,
   onEventDefinitionChange: PropTypes.func,
 };
 
@@ -171,7 +212,6 @@ EventDefinitionFormContainer.defaultProps = {
     notifications: [],
     alert: false,
   },
-  entityTypes: undefined,
   onEventDefinitionChange: () => {},
 };
 

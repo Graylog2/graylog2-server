@@ -26,7 +26,7 @@ import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Alert, Col, Row } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
-import type User from 'logic/users/User';
+import type { UserJSON } from 'logic/users/User';
 
 // Import built-in plugins
 import 'components/event-definitions/event-definition-types';
@@ -44,10 +44,10 @@ type Props = {
   notifications: Array<any>,
   validation: {
     errors: {
-      title: string,
+      title?: string,
     }
   },
-  currentUser: User,
+  currentUser: UserJSON,
 }
 
 const EventDefinitionSummary = ({ eventDefinition, notifications, validation, currentUser }: Props) => {
