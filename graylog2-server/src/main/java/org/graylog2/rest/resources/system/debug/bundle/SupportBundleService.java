@@ -360,6 +360,12 @@ public class SupportBundleService {
         }
     }
 
+    public void deleteBundle(String filename) throws IOException {
+        ensureFileWithinBundleDir(filename);
+        final Path filePath = bundleDir.resolve(filename);
+        Files.delete(filePath);
+    }
+
     static class ProxiedResourceHelper extends ProxiedResource {
         private final Subject currentSubject;
 

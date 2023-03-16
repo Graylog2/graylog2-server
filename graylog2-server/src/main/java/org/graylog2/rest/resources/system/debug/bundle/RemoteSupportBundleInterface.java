@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.system.debug.bundle;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -42,4 +43,7 @@ public interface RemoteSupportBundleInterface {
     @GET("system/debug/support/bundle/download/{filename}")
     @Streaming
     Call<ResponseBody> downloadBundle(@Path("filename") String filename);
+
+    @DELETE("system/debug/support/bundle/delete/{filename}")
+    Call<Void> deleteBundle(@Path("filename") String filename);
 }

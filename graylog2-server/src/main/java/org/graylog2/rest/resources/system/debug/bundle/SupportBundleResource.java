@@ -27,6 +27,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestrictToLeader;
 
 import javax.inject.Inject;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
@@ -38,6 +39,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
+import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.List;
 import java.util.Optional;
 
@@ -117,5 +120,19 @@ public class SupportBundleResource extends RestResource {
         Response.ResponseBuilder response = Response.ok(streamingOutput, mediaType);
         response.header("Content-Disposition", "attachment; filename=" + filename);
         return response.build();
+    }
+
+    @DELETE
+    @Path("/bundle/delete/{filename}")
+    @ApiOperation(value = "Delete a certain support bundle")
+    @RequiresPermissions(SUPPORTBUNDLE_READ)
+    @RestrictToLeader
+    public Response delete(@PathParam("filename") @ApiParam("filename") String filename) throws IOException {
+        try {
+            supportBundleService.deleteBundle(filename);
+        } catch (NoSuchFileException e) {
+            throw new NotFoundException(e);
+        }
+        return Response.accepted().build();
     }
 }

@@ -20,7 +20,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import okhttp3.ResponseBody;
-import org.apache.http.HttpStatus;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -31,6 +30,7 @@ import org.graylog2.shared.rest.resources.ProxiedResource;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -123,9 +123,15 @@ public class SupportBundleClusterResource extends ProxiedResource {
                 responseBody.close();
             }
         }
-        if (nodeResponse.code() == HttpStatus.SC_NOT_FOUND) {
-            return Response.status(404).build();
-        }
-        throw new BadRequestException("Failed to download bundle " + nodeResponse.errorText());
+        return Response.status(nodeResponse.code()).entity(nodeResponse.body()).build();
+    }
+
+    @DELETE
+    @Path("/bundle/delete/{filename}")
+    @ApiOperation(value = "Downloads the requested bundle")
+    @RequiresPermissions(SUPPORTBUNDLE_READ)
+    public Response delete(@PathParam("filename") @ApiParam("filename") String filename) throws IOException {
+        final NodeResponse<Void> nodeResponse = requestOnLeader(c -> c.deleteBundle(filename), createRemoteInterfaceProvider(RemoteSupportBundleInterface.class));
+        return Response.status(nodeResponse.code()).entity(nodeResponse.body()).build();
     }
 }
