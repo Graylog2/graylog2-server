@@ -23,7 +23,6 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
-import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -39,7 +38,6 @@ import org.graylog2.bindings.ConfigurationModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
-import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.bootstrap.preflight.ServerPreflightChecksModule;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
@@ -153,12 +151,24 @@ public abstract class ServerBootstrap extends CmdLineTool {
         preflightCheckModules.add(new FreshInstallDetectionModule(isFreshInstallation()));
 
         final Injector preflightInjector = getPreflightInjector(preflightCheckModules);
+        final PreflightCheckService preflightCheckService = preflightInjector.getInstance(PreflightCheckService.class);
+
+        if(this.isFreshInstallation) {
+            LOG.info("Fresh installation detected, starting configuration webserver");
+            wrapWithPreflightWebServer(preflightInjector, preflightCheckModules, preflightCheckService::runChecks);
+        } else {
+            preflightCheckService.runChecks();
+        }
+    }
+
+    private void wrapWithPreflightWebServer(Injector preflightInjector, List<Module> preflightCheckModules, Runnable runnable) {
         final ServiceManager serviceManager = preflightInjector.getInstance(ServiceManager.class);
         GuiceInjectorHolder.createInjector(preflightCheckModules);
         try {
             serviceManager.startAsync().awaitHealthy();
-            // blocks till the indexer is available, providing meanwhile a limited "setup" set of web resources.
-            preflightInjector.getInstance(PreflightCheckService.class).runChecks();
+            runnable.run();
+            // all checks done. Should we block till the administrator explicitly confirms that the setup is done
+            // and the boot should continue?
         } finally {
             serviceManager.stopAsync().awaitStopped();
             GuiceInjectorHolder.resetInjector();
@@ -191,21 +201,14 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     private Injector getPreflightInjector(List<Module> preflightCheckModules) {
-        final Injector injector = Guice.createInjector(
+        return Guice.createInjector(
                 new IsDevelopmentBindings(),
                 new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
                 new ServerStatusBindings(capabilities()),
                 new ConfigurationModule(configuration),
                 new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()),
                 new ServerPreflightChecksModule(),
-                new Module() {
-                    @Override
-                    public void configure(Binder binder) {
-                        preflightCheckModules.forEach(binder::install);
-                    }
-                },
-                new PreflightWebModule());
-        return injector;
+                binder -> preflightCheckModules.forEach(binder::install));
     }
 
     private void setNettyNativeDefaults(PathConfiguration pathConfiguration) {
