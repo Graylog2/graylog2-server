@@ -288,12 +288,15 @@ export const RulesStore = singletonStore(
         },
       );
     },
-    simulate(messageString, ruleSource, callback) {
-      const url = qualifyUrl(ApiRoutes.RulesController.simulate(messageString).url);
+    simulate(message, ruleSource, callback) {
+      const url = qualifyUrl(ApiRoutes.RulesController.simulate().url);
       const rule = {
-        title: ruleSource.title,
-        description: ruleSource.description,
-        source: ruleSource.source,
+        ruleSource: {
+          title: ruleSource.title,
+          description: ruleSource.description,
+          source: ruleSource.source,
+        },
+        message,
       };
 
       return fetch('POST', url, rule).then(callback,
