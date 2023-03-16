@@ -28,6 +28,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import javax.inject.Inject;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 
 public class RemoteInterfaceProvider {
     private final ObjectMapper objectMapper;
@@ -40,18 +42,23 @@ public class RemoteInterfaceProvider {
         this.okHttpClient = okHttpClient;
     }
 
-    public <T> T get(Node node, final String authorizationToken, Class<T> interfaceClass) {
+    public <T> T get(Node node, final String authorizationToken, MultivaluedMap<String, String> requestHeaders, Class<T> interfaceClass) {
         final OkHttpClient okHttpClient = this.okHttpClient.newBuilder()
                 .addInterceptor(chain -> {
                     final Request original = chain.request();
 
-                    Request.Builder builder = original.newBuilder()
-                            .header(HttpHeaders.ACCEPT, MediaType.JSON_UTF_8.toString())
+                    final Request.Builder builder = original.newBuilder()
                             .header(CsrfProtectionFilter.HEADER_NAME, "Graylog Server")
                             .method(original.method(), original.body());
 
+                    requestHeaders.forEach((k, v) -> builder.header(k, String.join(",", v)));
+
+                    if (!requestHeaders.containsKey(HttpHeaders.ACCEPT)) {
+                        builder.header(HttpHeaders.ACCEPT, MediaType.JSON_UTF_8.toString());
+                    }
+
                     if (authorizationToken != null) {
-                        builder = builder
+                        builder
                                 // forward the authentication information of the current user
                                 .header(HttpHeaders.AUTHORIZATION, authorizationToken)
                                 // do not extend the users session with proxied requests
@@ -68,6 +75,9 @@ public class RemoteInterfaceProvider {
                 .build();
 
         return retrofit.create(interfaceClass);
+    }
+    public <T> T get(Node node, final String authorizationToken, Class<T> interfaceClass) {
+        return get(node, authorizationToken, new MultivaluedHashMap<>(), interfaceClass);
     }
 
     public <T> T get(Node node, Class<T> interfaceClass) {

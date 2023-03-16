@@ -40,6 +40,7 @@ import javax.ws.rs.container.ConnectionCallback;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MultivaluedMap;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -68,6 +69,7 @@ public abstract class ProxiedResource extends RestResource {
 
     protected final RemoteInterfaceProvider remoteInterfaceProvider;
     private final ExecutorService executor;
+    private final MultivaluedMap<String, String> httpRequestHeaders;
 
     @Inject
     @Named("proxied_requests_default_call_timeout")
@@ -81,6 +83,7 @@ public abstract class ProxiedResource extends RestResource {
         this.remoteInterfaceProvider = remoteInterfaceProvider;
         this.executor = executorService;
         this.authenticationToken = authenticationToken(httpHeaders);
+        this.httpRequestHeaders = httpHeaders.getRequestHeaders();
     }
 
     protected Duration getDefaultProxyCallTimeout() {
@@ -247,7 +250,7 @@ public abstract class ProxiedResource extends RestResource {
         return nodeId -> {
             try {
                 final Node targetNode = nodeService.byNodeId(nodeId);
-                return Optional.of(this.remoteInterfaceProvider.get(targetNode, getAuthenticationToken(), interfaceClass));
+                return Optional.of(this.remoteInterfaceProvider.get(targetNode, getAuthenticationToken(), httpRequestHeaders, interfaceClass));
             } catch (NodeNotFoundException e) {
                 LOG.warn("Node <" + nodeId + "> not found while trying to call " + interfaceClass.getName() + " on it.");
                 return Optional.empty();
