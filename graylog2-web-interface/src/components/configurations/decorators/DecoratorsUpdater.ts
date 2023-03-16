@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import difference from 'lodash/difference';
-
 import isEqual from 'lodash/isEqual';
 
 import { DecoratorsActions } from 'stores/decorators/DecoratorsStore';

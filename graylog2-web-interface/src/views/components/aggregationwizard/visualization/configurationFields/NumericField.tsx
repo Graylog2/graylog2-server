@@ -27,7 +27,7 @@ type Props = FieldComponentProps & {
 };
 
 const createEvent = (name: string, value: number) => (({
-  target: { name, value }
+  target: { name, value },
 }) as React.ChangeEvent<any>);
 
 const NumericField = ({ onChange, value, error, name, title, field }: Props) => {

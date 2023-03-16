@@ -34,7 +34,7 @@ const makeOptions = (options: ReadonlyArray<string | [string, any]>) => {
 };
 
 const createEvent = (name: string, value: any) => (({
-  target: { name, value }
+  target: { name, value },
 }) as React.ChangeEvent<any>);
 
 const SelectField = ({ name, field, title, error, value, onChange }: FieldComponentProps) => {
