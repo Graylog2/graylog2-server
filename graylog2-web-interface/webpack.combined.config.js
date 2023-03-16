@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 const fs = require('fs');
-
-const glob = require('glob');
 const path = require('path');
+
+const { globSync } = require('glob');
 const merge = require('webpack-merge');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
@@ -47,7 +47,7 @@ const configsFromGlob = () => {
     return !pluginConfig.includes('/target/') && !pluginConfig.includes('/node_modules/');
   }
 
-  return glob.sync(pluginConfigPattern, globOptions)
+  return globSync(pluginConfigPattern, globOptions)
     .map((config) => `${globCwd}/${config}`)
     .filter(isNotDependency);
 };
