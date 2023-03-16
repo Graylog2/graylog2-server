@@ -27,6 +27,7 @@ import org.graylog2.security.realm.SessionAuthenticator;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
@@ -42,7 +43,9 @@ public class RemoteInterfaceProvider {
         this.okHttpClient = okHttpClient;
     }
 
-    public <T> T get(Node node, final String authorizationToken, MultivaluedMap<String, String> requestHeaders, Class<T> interfaceClass) {
+    public <T> T get(Node node, final String authorizationToken, @Nullable MultivaluedMap<String, String> requestHeaders, Class<T> interfaceClass) {
+        final MultivaluedMap<String, String> headers = requestHeaders == null ? new MultivaluedHashMap<>() : requestHeaders;
+
         final OkHttpClient okHttpClient = this.okHttpClient.newBuilder()
                 .addInterceptor(chain -> {
                     final Request original = chain.request();
@@ -51,9 +54,9 @@ public class RemoteInterfaceProvider {
                             .header(CsrfProtectionFilter.HEADER_NAME, "Graylog Server")
                             .method(original.method(), original.body());
 
-                    requestHeaders.forEach((k, v) -> builder.header(k, String.join(",", v)));
+                    headers.forEach((k, v) -> builder.header(k, String.join(",", v)));
 
-                    if (!requestHeaders.containsKey(HttpHeaders.ACCEPT)) {
+                    if (!headers.containsKey(HttpHeaders.ACCEPT)) {
                         builder.header(HttpHeaders.ACCEPT, MediaType.JSON_UTF_8.toString());
                     }
 
@@ -77,7 +80,7 @@ public class RemoteInterfaceProvider {
         return retrofit.create(interfaceClass);
     }
     public <T> T get(Node node, final String authorizationToken, Class<T> interfaceClass) {
-        return get(node, authorizationToken, new MultivaluedHashMap<>(), interfaceClass);
+        return get(node, authorizationToken, null, interfaceClass);
     }
 
     public <T> T get(Node node, Class<T> interfaceClass) {
