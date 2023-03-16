@@ -124,7 +124,7 @@ describe('NewSearchPage', () => {
 
       await waitFor(() => expect(loadView).toHaveBeenCalled());
 
-      expect(loadView).toHaveBeenCalledWith('special-view-id');
+      expect(loadView).toHaveBeenCalledWith(expect.anything(), 'special-view-id');
     });
   });
 

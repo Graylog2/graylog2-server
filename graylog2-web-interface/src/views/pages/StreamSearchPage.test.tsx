@@ -96,7 +96,7 @@ describe('StreamSearchPage', () => {
 
   describe('loading another view', () => {
     it('should be possible with specific view id', async () => {
-      asMock(SearchComponent as React.FunctionComponent).mockImplementationOnce(() => (
+      asMock(SearchComponent as React.FunctionComponent).mockImplementation(() => (
         <ViewLoaderContext.Consumer>
           {(_loadView) => (
             <button type="button" onClick={() => _loadView && _loadView('special-view-id')}>Load
@@ -112,13 +112,13 @@ describe('StreamSearchPage', () => {
 
       await waitFor(() => expect(loadView).toHaveBeenCalled());
 
-      expect(loadView).toHaveBeenCalledWith('special-view-id');
+      expect(loadView).toHaveBeenCalledWith(expect.anything(), 'special-view-id');
     });
   });
 
   describe('loading new empty view', () => {
     beforeEach(() => {
-      asMock(SearchComponent as React.FunctionComponent).mockImplementationOnce(() => (
+      asMock(SearchComponent as React.FunctionComponent).mockImplementation(() => (
         <NewViewLoaderContext.Consumer>
           {(loadNewView) => <button type="button" onClick={() => loadNewView()}>Load new view</button>}
         </NewViewLoaderContext.Consumer>
@@ -133,7 +133,7 @@ describe('StreamSearchPage', () => {
 
       await waitFor(() => expect(loadNewViewForStream).toHaveBeenCalled());
 
-      expect(loadNewViewForStream).toHaveBeenCalledWith('stream-id-1');
+      expect(loadNewViewForStream).toHaveBeenCalledWith(expect.anything(), 'stream-id-1');
     });
 
     it('should process hooks with empty query', async () => {
