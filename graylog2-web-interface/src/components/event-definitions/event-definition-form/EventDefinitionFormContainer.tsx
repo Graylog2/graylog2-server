@@ -62,12 +62,8 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
     query,
     streams,
     search_within_ms,
-    group_by,
-    agg_function,
-    agg_field,
-    agg_value
   } = useQuery();
-  console.log({ eventDefinition })
+
   const entityTypes = useStore(AvailableEventDefinitionTypesStore);
   const notifications = useStore(EventNotificationsStore);
   const { currentUser } = useStore(CurrentUserStore);
@@ -107,16 +103,6 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
       const conditionPlugin = getConditionPlugin(type);
       const defaultConfig = conditionPlugin?.defaultConfig || {} as EventDefinition['config'];
       setEventDefinition((cur) => {
-        const aggData = (agg_function && agg_field && agg_value && group_by) ? {
-          conditions: {expression: {
-          expr: undefined,
-          left: {expr: 'number-ref', ref: `${agg_function}-${agg_field}`},
-          right: {expr: 'number', value: agg_value}
-        }},
-          series: [{id: `${agg_function}-${agg_field}`, function: agg_function, field: agg_field}],
-          group_by: (group_by as string)?.split(',') || [],
-        } : {}
-
         const cloned = lodash.cloneDeep(cur);
 
         return ({
@@ -128,7 +114,7 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
             query,
             streams: (streams as string)?.split(',') || [],
             search_within_ms,
-            ...aggData
+            query_parameters: [],
           },
         });
       });

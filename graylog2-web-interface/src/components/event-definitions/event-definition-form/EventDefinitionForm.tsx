@@ -25,7 +25,6 @@ import { ModalSubmit, Wizard } from 'components/common';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { UserJSON } from 'logic/users/User';
-import useQuery from 'routing/useQuery';
 
 import EventDetailsForm from './EventDetailsForm';
 import EventConditionForm from './EventConditionForm';
@@ -77,8 +76,7 @@ const EventDefinitionForm = ({
   onCancel,
   onSubmit,
 }: Props) => {
-  const { step } = useQuery();
-  const [activeStep, setActiveStep] = useState(step as string || STEP_KEYS[0]);
+  const [activeStep, setActiveStep] = useState(STEP_KEYS[0]);
 
   const handleStepChange = (nextStep) => {
     setActiveStep(nextStep);
