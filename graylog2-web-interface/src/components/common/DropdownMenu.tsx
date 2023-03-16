@@ -101,7 +101,6 @@ function closeOnChildrenSelect(children: React.ReactNode, updateDepth: number, o
 
 const DropdownMenu = ({ show, children, zIndex, onMenuItemSelect, minWidth, ...restProps }: Props) => {
   const mappedChildren = closeOnChildrenSelect(children, 0, onMenuItemSelect);
-  console.log({ minWidth });
 
   return (
     <StyledDropdownMenu {...restProps} $show={show} $zIndex={zIndex} $minWidth={minWidth}>
