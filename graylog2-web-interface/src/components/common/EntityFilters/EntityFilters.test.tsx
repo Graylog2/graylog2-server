@@ -170,7 +170,7 @@ describe('<EntityFilters />', () => {
       }));
 
       await waitFor(() => expect(onChangeFilters).toHaveBeenCalledWith({
-        disabled: [{ id: 'filter-id', title: 'Example index set', value: 'index-set-2' }],
+        index_set_id: [{ id: 'filter-id', title: 'Example index set', value: 'index-set-2' }],
       }));
     });
   });

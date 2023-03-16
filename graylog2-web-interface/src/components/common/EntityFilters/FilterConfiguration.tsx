@@ -40,10 +40,16 @@ export const FilterConfiguration = ({
   <>
     <MenuItem header>{scenario === 'create' ? 'Create' : 'Edit'} {attribute.title.toLowerCase()} filter</MenuItem>
     {attribute.filter_options && (
-      <StaticOptionsList attribute={attribute} filterValueRenderer={filterValueRenderer} onSubmit={onSubmit} />
+      <StaticOptionsList attribute={attribute}
+                         filterValueRenderer={filterValueRenderer}
+                         onSubmit={onSubmit} />
     )}
     {!attribute.filter_options?.length && (
-      <SuggestionsList attribute={attribute} filterValueRenderer={filterValueRenderer} onSubmit={onSubmit} allActiveFilters={allActiveFilters} scenario={scenario} />
+      <SuggestionsList attribute={attribute}
+                       filterValueRenderer={filterValueRenderer}
+                       onSubmit={onSubmit}
+                       allActiveFilters={allActiveFilters}
+                       scenario={scenario} />
     )}
   </>
 );

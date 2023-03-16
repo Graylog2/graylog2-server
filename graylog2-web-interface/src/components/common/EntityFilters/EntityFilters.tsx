@@ -22,13 +22,19 @@ import type { Attributes } from 'stores/PaginationTypes';
 import type { Filters, Filter } from 'components/common/EntityFilters/types';
 import ActiveFilters from 'components/common/EntityFilters/ActiveFilters';
 
+import { ROW_MIN_HEIGHT } from './Constants';
+
 const SUPPORTED_TYPES = ['STRING', 'BOOLEAN'];
 
-const Container = styled.div`
+const FilterCreation = styled.div`
   display: inline-flex;
-  height: 34px;
+  height: ${ROW_MIN_HEIGHT}px;
   align-items: center;
   margin-left: 5px;
+  
+  && {
+    margin-right: 10px;
+  }
 `;
 
 type Props = {
@@ -86,12 +92,15 @@ const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRendere
   };
 
   return (
-    <Container>
-      Filters
-      <CreateFilterDropdown filterableAttributes={filterableAttributes}
-                            onCreateFilter={onCreateFilter}
-                            activeFilters={activeFilters}
-                            filterValueRenderers={filterValueRenderers} />
+    <>
+      <FilterCreation>
+        Filters
+        <CreateFilterDropdown filterableAttributes={filterableAttributes}
+                              onCreateFilter={onCreateFilter}
+                              activeFilters={activeFilters}
+                              filterValueRenderers={filterValueRenderers} />
+
+      </FilterCreation>
       {activeFilters && (
         <ActiveFilters filters={activeFilters}
                        attributes={attributes}
@@ -99,7 +108,7 @@ const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRendere
                        onDeleteFilter={onDeleteFilter}
                        filterValueRenderers={filterValueRenderers} />
       )}
-    </Container>
+    </>
   );
 };
 
