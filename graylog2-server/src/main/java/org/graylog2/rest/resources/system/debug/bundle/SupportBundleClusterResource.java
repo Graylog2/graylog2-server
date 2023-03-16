@@ -18,7 +18,9 @@ package org.graylog2.rest.resources.system.debug.bundle;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import okhttp3.ResponseBody;
+import org.apache.http.HttpStatus;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -99,10 +101,10 @@ public class SupportBundleClusterResource extends ProxiedResource {
     @ApiOperation(value = "Downloads the requested bundle")
     @RequiresPermissions(SUPPORTBUNDLE_READ)
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response download(@PathParam("filename") String filename) throws IOException {
+    public Response download(@PathParam("filename") @ApiParam("filename") String filename) throws IOException {
         final NodeResponse<ResponseBody> nodeResponse = requestOnLeader(c -> c.downloadBundle(filename), createRemoteInterfaceProvider(RemoteSupportBundleInterface.class));
         if (nodeResponse.isSuccess()) {
-            // we cannot use try-with because the ReponseBody needs to stream the output
+            // we cannot use try-with because the ResponseBody needs to stream the output
             ResponseBody responseBody = nodeResponse.entity().orElseThrow();
 
             try {
@@ -120,6 +122,9 @@ public class SupportBundleClusterResource extends ProxiedResource {
             } catch (Exception e) {
                 responseBody.close();
             }
+        }
+        if (nodeResponse.code() == HttpStatus.SC_NOT_FOUND) {
+            return Response.status(404).build();
         }
         throw new BadRequestException("Failed to download bundle " + nodeResponse.errorText());
     }

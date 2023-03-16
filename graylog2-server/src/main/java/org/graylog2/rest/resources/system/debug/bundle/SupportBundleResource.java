@@ -111,7 +111,7 @@ public class SupportBundleResource extends RestResource {
     @RequiresPermissions(SUPPORTBUNDLE_READ)
     @RestrictToLeader
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response download(@PathParam("filename") String filename) {
+    public Response download(@PathParam("filename") @ApiParam("filename") String filename) {
         var mediaType = MediaType.valueOf(MediaType.APPLICATION_OCTET_STREAM);
         StreamingOutput streamingOutput = outputStream -> supportBundleService.downloadBundle(filename, outputStream);
         Response.ResponseBuilder response = Response.ok(streamingOutput, mediaType);
