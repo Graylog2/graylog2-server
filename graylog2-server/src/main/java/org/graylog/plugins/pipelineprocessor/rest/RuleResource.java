@@ -63,7 +63,6 @@ import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
@@ -193,13 +192,12 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Simulate a single processing rule")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/simulate/{messageString}")
+    @Path("/simulate")
     @NoAuditEvent("only used to test a rule, no changes made in the system")
     public Message simulate(
-            @ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource,
-            @ApiParam(name = "messageString", required = true) @PathParam("messageString") @NotBlank String messageString
+            @ApiParam(name = "request", required = true) @NotNull SimulateRuleRequest request
     ) throws NotFoundException {
-        final Rule rule = parseRuleOrThrow(ruleSource.id(), ruleSource.source(), true);
+        final Rule rule = parseRuleOrThrow(request.ruleSource().id(), request.ruleSource().source(), true);
         Stage stage = Stage.builder()
                 .stage(0)
                 .ruleReferences(Collections.emptyList())
@@ -217,7 +215,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 new NoopMessageQueueAcknowledger(), MetricRegistryFactory.create(), configurationStateUpdater);
         final PipelineInterpreterTracer pipelineInterpreterTracer = new PipelineInterpreterTracer();
 
-        Message message = new Message(messageString, "127.0.0.1", DateTime.now(DateTimeZone.UTC));
+        Message message = new Message(request.message(), "127.0.0.1", DateTime.now(DateTimeZone.UTC));
         final Stream stream = streamService.load(Stream.DEFAULT_STREAM_ID);
         message.addStream(stream);
 
