@@ -344,6 +344,11 @@ const CollectorsAdministration = ({
     onFilter();
   };
 
+  const handlePageChange = (page: number, pageSize: number) => {
+    setSelected([]);
+    onPageChange(page, pageSize);
+  };
+
   const selectedSidecarCollectorPairs = selected.map((selectedSidecarCollectorId) => {
     return sidecarCollectorPairs.find(({ sidecar, collector }) => sidecarCollectorId(sidecar, collector) === selectedSidecarCollectorId);
   });
@@ -373,7 +378,7 @@ const CollectorsAdministration = ({
     <PaginatedListContainer>
       <PaginatedList pageSizes={PAGE_SIZES}
                      totalItems={pagination.total}
-                     onChange={onPageChange}>
+                     onChange={handlePageChange}>
         <SidecarSearchForm query={query} onSearch={handleSearch} onReset={handleReset} />
         <FiltersSummary collectors={collectors}
                         configurations={configurations}
