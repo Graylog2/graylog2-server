@@ -154,15 +154,15 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         final Injector preflightInjector = getPreflightInjector(preflightCheckModules);
         final ServiceManager serviceManager = preflightInjector.getInstance(ServiceManager.class);
-
         GuiceInjectorHolder.createInjector(preflightCheckModules);
-        serviceManager.startAsync().awaitHealthy();
-
-        // blocks till the indexer is available, providing meanwhile a limited "setup" set of web resources.
-        preflightInjector.getInstance(PreflightCheckService.class).runChecks();
-
-        serviceManager.stopAsync().awaitStopped();
-        GuiceInjectorHolder.resetInjector();
+        try {
+            serviceManager.startAsync().awaitHealthy();
+            // blocks till the indexer is available, providing meanwhile a limited "setup" set of web resources.
+            preflightInjector.getInstance(PreflightCheckService.class).runChecks();
+        } finally {
+            serviceManager.stopAsync().awaitStopped();
+            GuiceInjectorHolder.resetInjector();
+        }
     }
 
     private void runMongoPreflightCheck() {
