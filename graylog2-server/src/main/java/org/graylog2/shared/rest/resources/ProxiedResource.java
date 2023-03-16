@@ -128,17 +128,28 @@ public abstract class ProxiedResource extends RestResource {
     /**
      * Gets an authentication token to be used in an Authorization header of forwarded requests by extracting
      * authentication information from the original request.
+     * <p>
+     * Only extracts an auth token from the request if the request is authenticated. This is to make sure that
+     * forwarded requests will also not be authenticated.
+     * <p>
+     * If the request is authenticated, but not by means of an authentication token, this method will fail with
+     * a {@link NotAuthorizedException} because we can't easily make up a token to use for forwarded requests in that
+     * case.
      *
-     * @return An authentication token if one could be extracted from the original requeest. Null otherwise.
+     * @return An authentication token if the request was authenticated and one could be extracted from the original
+     * request. Null otherwise.
      * @throws NotAuthorizedException if the original request was authenticated, but no authentication token could
      *                                be created from the request headers.
      */
     @Nullable
     protected String getAuthenticationToken() {
-        if (getSubject().isAuthenticated() && authenticationToken == null) {
-            throw new NotAuthorizedException("Basic realm=\"Graylog Server\"");
+        if (getSubject().isAuthenticated()) {
+            if (authenticationToken == null) {
+                throw new NotAuthorizedException("Basic realm=\"Graylog Server\"");
+            }
+            return authenticationToken;
         }
-        return authenticationToken;
+        return null;
     }
 
     /**
