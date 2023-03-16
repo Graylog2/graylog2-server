@@ -241,15 +241,17 @@ const DataTable = ({
     const valuePath = rowFieldNames.map((pivotField) => ({ [pivotField]: expandedRows[idx][pivotField] }));
 
     return (
-      // eslint-disable-next-line react/no-array-index-key
-      (<DataTableEntry key={`datatableentry-${idx}`}
-                      fields={effectiveFields}
-                      item={reducedItem}
-                      valuePath={valuePath}
-                      columnPivots={columnFieldNames}
-                      columnPivotValues={actualColumnPivotFields}
-                      types={fields}
-                      series={series} />)
+
+      (
+        <DataTableEntry key={`datatableentry-${idx}`}
+                        fields={effectiveFields}
+                        item={reducedItem}
+                        valuePath={valuePath}
+                        columnPivots={columnFieldNames}
+                        columnPivotValues={actualColumnPivotFields}
+                        types={fields}
+                        series={series} />
+      )
     );
   });
 

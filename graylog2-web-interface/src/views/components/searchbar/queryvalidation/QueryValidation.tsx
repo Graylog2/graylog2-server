@@ -196,23 +196,24 @@ const QueryValidation = () => {
   const deduplicatedExplanations = useMemo(() => deduplicateExplanations(explanations), [explanations]);
   const hasExplanations = validationState && validationState?.status !== 'OK';
 
-  return (<>
-    <Container ref={explanationTriggerRef}>
-      {hasExplanations ? (
-        <ExplanationTrigger title="Toggle validation error explanation"
-                            onClick={toggleShow}
-                            $clickable
-                            tabIndex={0}
-                            type="button">
-          <ErrorIcon $status={status} name="exclamation-circle" />
-        </ExplanationTrigger>
-      ) : (
-        <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                           title="Search query syntax documentation"
-                           text={<Icon name="lightbulb" />} />
-      )}
-    </Container>
-    {hasExplanations && showExplanation && (
+  return (
+    <>
+      <Container ref={explanationTriggerRef}>
+        {hasExplanations ? (
+          <ExplanationTrigger title="Toggle validation error explanation"
+                              onClick={toggleShow}
+                              $clickable
+                              tabIndex={0}
+                              type="button">
+            <ErrorIcon $status={status} name="exclamation-circle" />
+          </ExplanationTrigger>
+        ) : (
+          <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+                             title="Search query syntax documentation"
+                             text={<Icon name="lightbulb" />} />
+        )}
+      </Container>
+      {hasExplanations && showExplanation && (
       <Overlay show
                containerPadding={10}
                placement="bottom"
@@ -238,8 +239,9 @@ const QueryValidation = () => {
           </div>
         </StyledPopover>
       </Overlay>
-    )}
-  </>);
+      )}
+    </>
+  );
 };
 
 export default QueryValidation;

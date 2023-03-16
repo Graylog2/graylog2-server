@@ -120,17 +120,21 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
   const columns = flatten([fieldColumns, columnPivotFields]);
 
   return (
-    (<tr className={`fields-row ${classes}`}>
-      {columns.map(({ field, value, path, source }, idx) => (
-        // eslint-disable-next-line react/no-array-index-key
-        (<Column key={`${activeQuery}-${field}=${value}-${idx}`}
-                field={field}
-                value={value}
-                type={fieldTypeFor(columnNameToField(field, series), types)}
-                valuePath={path.slice()}
-                source={source} />)
-      ))}
-    </tr>)
+    (
+      <tr className={`fields-row ${classes}`}>
+        {columns.map(({ field, value, path, source }, idx) => (
+
+          (
+            <Column key={`${activeQuery}-${field}=${value}-${idx}`}
+                    field={field}
+                    value={value}
+                    type={fieldTypeFor(columnNameToField(field, series), types)}
+                    valuePath={path.slice()}
+                    source={source} />
+          )
+        ))}
+      </tr>
+    )
   );
 };
 

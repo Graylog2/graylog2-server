@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import sortBy from 'lodash/sortBy';
-
 import uniqBy from 'lodash/uniqBy';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
