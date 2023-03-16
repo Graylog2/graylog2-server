@@ -127,6 +127,7 @@ public class SupportBundleResource extends RestResource {
     @ApiOperation(value = "Delete a certain support bundle")
     @RequiresPermissions(SUPPORTBUNDLE_READ)
     @RestrictToLeader
+    @NoAuditEvent("FIXME") // TODO
     public Response delete(@PathParam("filename") @ApiParam("filename") String filename) throws IOException {
         try {
             supportBundleService.deleteBundle(filename);

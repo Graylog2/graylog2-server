@@ -130,6 +130,7 @@ public class SupportBundleClusterResource extends ProxiedResource {
     @Path("/bundle/delete/{filename}")
     @ApiOperation(value = "Downloads the requested bundle")
     @RequiresPermissions(SUPPORTBUNDLE_READ)
+    @NoAuditEvent("FIXME") // TODO
     public Response delete(@PathParam("filename") @ApiParam("filename") String filename) throws IOException {
         final NodeResponse<Void> nodeResponse = requestOnLeader(c -> c.deleteBundle(filename), createRemoteInterfaceProvider(RemoteSupportBundleInterface.class));
         return Response.status(nodeResponse.code()).entity(nodeResponse.body()).build();
