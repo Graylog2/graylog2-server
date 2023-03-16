@@ -59,6 +59,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -217,7 +218,7 @@ public class OTXDataAdapter extends LookupDataAdapter {
                 LOG.warn("OTX {} request for key <{}> failed: {}", otxIndicator, key, response);
                 httpRequestErrors.mark();
                 return LookupResult.withError(
-                        String.format("OTX %s request for key <%s> failed: %s", otxIndicator, key, response.code()));
+                        String.format(Locale.ENGLISH, "OTX %s request for key <%s> failed: %s", otxIndicator, key, response.code()));
             }
 
             return parseResponse(response.body());
