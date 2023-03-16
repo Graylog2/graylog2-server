@@ -165,7 +165,7 @@ const RuleForm = ({ create }: Props) => {
             </Button>
             <ResetButton bsStyle="default"
                          bsSize="xsmall"
-                         disabled={!rawMessageToSimulate}
+                         disabled={!rawMessageToSimulate && !ruleSimulationResult}
                          onClick={handleResetRuleSimulation}>
               Reset
             </ResetButton>

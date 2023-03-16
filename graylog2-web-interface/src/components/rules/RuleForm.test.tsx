@@ -64,4 +64,40 @@ describe('RuleForm', () => {
 
     expect(handleDescription).toHaveBeenCalledWith(ruleToUpdate.description);
   });
+
+  it('should run rule simulation using the raw message', async () => {
+    const ruleToUpdate = {
+      source: `rule "concat new_"
+      when
+      has_field("message")
+      then
+        set_field("message", concat("new_",to_string($message.message)));
+      end`,
+    };
+
+    const setRawMessageToSimulate = jest.fn();
+    const rawMessage = 'new_test';
+
+    const { getByRole, getByPlaceholderText } = render(
+      <PipelineRulesContext.Provider value={{
+        ruleSource: ruleToUpdate.source,
+        ruleSourceRef: {},
+        usedInPipelines: [],
+        rawMessageToSimulate: '',
+        setRawMessageToSimulate,
+      }}>
+        <RuleForm create={false} />
+      </PipelineRulesContext.Provider>,
+    );
+
+    const rawMessageInput = getByPlaceholderText('Raw message');
+
+    expect(rawMessageInput).toHaveValue('');
+
+    userEvent.paste(rawMessageInput, rawMessage);
+    const runSimulationButton = getByRole('button', { name: 'Run rule simulation' });
+    userEvent.click(runSimulationButton);
+
+    expect(setRawMessageToSimulate).toHaveBeenCalledWith(rawMessage);
+  });
 });
