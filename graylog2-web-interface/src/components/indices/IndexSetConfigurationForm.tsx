@@ -36,7 +36,7 @@ import type { RetentionStrategyContext } from './Types';
 
 type Props = {
   cancelLink: string,
-  create: boolean,
+  create?: boolean,
   history: HistoryFunction,
   indexSet: IndexSet,
   onUpdate: (indexSet: IndexSet) => void,
@@ -307,4 +307,5 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
   }
 }
 
+// @ts-ignore
 export default withHistory(IndexSetConfigurationForm);

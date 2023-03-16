@@ -17,15 +17,17 @@
 import * as React from 'react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import isEqual from 'lodash/isEqual';
-import { useLocation, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import URI from 'urijs';
 
+import useLocation from 'routing/useLocation';
 import useQuery from 'routing/useQuery';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useWidgets from 'views/hooks/useWidgets';
 import useAppDispatch from 'stores/useAppDispatch';
 import { execute, setWidgetsToSearch } from 'views/logic/slices/searchExecutionSlice';
+import type { HistoryFunction } from 'routing/useHistory';
+import useHistory from 'routing/useHistory';
 
 import type { FocusContextState } from './WidgetFocusContext';
 import WidgetFocusContext from './WidgetFocusContext';
@@ -117,23 +119,23 @@ type CleanupArgs = {
   focusUriParams: FocusUriParams,
   widgetIds: Array<string>,
   query: string,
-  navigate: ReturnType<typeof useNavigate>,
+  history: HistoryFunction,
 };
 
-const useCleanupQueryParams = ({ focusUriParams, widgetIds, query, navigate }: CleanupArgs) => {
+const useCleanupQueryParams = ({ focusUriParams, widgetIds, query, history }: CleanupArgs) => {
   useEffect(() => {
     if ((focusUriParams?.id && !widgetIds.includes(focusUriParams.id) && focusUriParams.isPageShown) || (focusUriParams?.id === undefined)) {
       const baseURI = _clearURI(query);
 
-      navigate(baseURI.toString(), { replace: true });
+      history.replace(baseURI.toString());
     }
-  }, [focusUriParams, widgetIds, query, navigate]);
+  }, [focusUriParams, widgetIds, query, history]);
 };
 
 const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
   const { search, pathname } = useLocation();
   const query = pathname + search;
-  const navigate = useNavigate();
+  const history = useHistory();
   const [focusedWidget, setFocusedWidget] = useState<FocusContextState | undefined>();
   const widgets = useWidgets();
   const widgetIds = useMemo(() => widgets.map((widget) => widget.id).toArray(), [widgets]);
@@ -148,7 +150,7 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
 
   useSyncStateWithQueryParams({ focusedWidget, setFocusedWidget, widgetIds, focusUriParams });
 
-  useCleanupQueryParams({ focusUriParams, widgetIds, query, navigate });
+  useCleanupQueryParams({ focusUriParams, widgetIds, query, history });
 
   const updateFocusQueryParams = useCallback((newQueryParams: WidgetFocusRequest | WidgetEditRequest | undefined) => {
     const newURI = _updateQueryParams(
@@ -156,8 +158,8 @@ const WidgetFocusProvider = ({ children }: { children: React.ReactNode }): React
       query,
     );
 
-    navigate(newURI, { replace: true });
-  }, [navigate, query]);
+    history.replace(newURI);
+  }, [history, query]);
 
   const setWidgetFocusing = useCallback((widgetId: string) => updateFocusQueryParams({
     id: widgetId,
