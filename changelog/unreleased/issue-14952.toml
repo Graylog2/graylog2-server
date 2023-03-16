@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixed bug causing input status data not to be removed when an input was deleted."
+
+issues = ["14952"]
+pulls = ["14954","Graylog2/forwarder#99"]
