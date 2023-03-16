@@ -14,17 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { Filters } from 'components/common/EntityFilters/types';
+import FiltersForQueryParams from './FiltersForQueryParams';
 
-// Transform filters, so they can be used as URL query params, for example for the PaginationURL helper.
-const FiltersForQueryParams = (filters: Filters) => {
-  if (!filters) {
-    return undefined;
-  }
-
-  return Object.entries(filters).flatMap(([attributeId, filterValues]) => (
-    filterValues.map(({ value }) => `${attributeId}:${value}`)
-  ));
+const exampleFilters = {
+  index_set_id: [
+    {
+      value: 'index-set-1',
+      title: 'Default index set',
+      id: 'filter-id-1',
+    },
+    {
+      value: 'index-set-2',
+      title: 'Example index set',
+      id: 'filter-id-2',
+    },
+  ],
 };
 
-export default FiltersForQueryParams;
+describe('FiltersForQueryParams', () => {
+  it('should transform multiple filters', () => {
+    const result = FiltersForQueryParams(exampleFilters);
+
+    expect(result).toEqual(['index_set_id:index-set-1', 'index_set_id:index-set-2']);
+  });
+});
