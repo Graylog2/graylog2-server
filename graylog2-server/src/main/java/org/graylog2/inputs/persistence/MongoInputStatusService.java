@@ -17,9 +17,9 @@
 package org.graylog2.inputs.persistence;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import org.apache.shiro.event.Subscribe;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
