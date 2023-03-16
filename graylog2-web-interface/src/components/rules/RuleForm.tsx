@@ -153,7 +153,7 @@ const RuleForm = ({ create }: Props) => {
           <div>
             <Input id="message"
                    type="textarea"
-                   placeholder="Raw message"
+                   placeholder="Rule input"
                    value={rawMessageToSimulate}
                    onChange={handleRawMessageChange}
                    rows={3} />
