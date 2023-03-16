@@ -23,7 +23,6 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestrictToLeader;
 
@@ -39,9 +38,9 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
+import java.util.List;
 import java.util.Optional;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.graylog2.shared.security.RestPermissions.SUPPORTBUNDLE_CREATE;
 import static org.graylog2.shared.security.RestPermissions.SUPPORTBUNDLE_READ;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -51,12 +50,10 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @Path("/system/debug/support")
 @Produces(MediaType.APPLICATION_JSON)
 public class SupportBundleResource extends RestResource {
-    private final NodeId nodeId;
     private final SupportBundleService supportBundleService;
 
     @Inject
-    public SupportBundleResource(NodeId nodeId, SupportBundleService supportBundleService) {
-        this.nodeId = checkNotNull(nodeId);
+    public SupportBundleResource(SupportBundleService supportBundleService) {
         this.supportBundleService = supportBundleService;
     }
 
@@ -73,7 +70,7 @@ public class SupportBundleResource extends RestResource {
     @Path("/logfile/{id}")
     @ApiOperation(value = "Retrieve the nodes' server logfile")
     @RequiresPermissions(SUPPORTBUNDLE_READ)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response getLogFile(@PathParam("id") @ApiParam(name = "id", value = "The id of the logfile as referenced from the Support Bundle Manifest") String id) {
 
         final Optional<LogFile> logFileOptional = supportBundleService.getManifest().entries().logfiles().stream().filter(l -> l.id().equals(id)).findFirst();
@@ -97,5 +94,28 @@ public class SupportBundleResource extends RestResource {
     public Response buildBundle(@Context HttpHeaders httpHeaders) {
         supportBundleService.buildBundle(httpHeaders, getSubject());
         return Response.accepted().build();
+    }
+
+    @GET
+    @Path("/bundle/list")
+    @ApiOperation(value = "Returns the list of downloadable support bundles")
+    @RequiresPermissions(SUPPORTBUNDLE_READ)
+    @RestrictToLeader
+    public List<BundleFile> listBundles() {
+        return supportBundleService.listBundles();
+    }
+
+    @GET
+    @Path("/bundle/download/{filename}")
+    @ApiOperation(value = "Downloads the requested bundle")
+    @RequiresPermissions(SUPPORTBUNDLE_READ)
+    @RestrictToLeader
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response download(@PathParam("filename") String filename) {
+        var mediaType = MediaType.valueOf(MediaType.APPLICATION_OCTET_STREAM);
+        StreamingOutput streamingOutput = outputStream -> supportBundleService.downloadBundle(filename, outputStream);
+        Response.ResponseBuilder response = Response.ok(streamingOutput, mediaType);
+        response.header("Content-Disposition", "attachment; filename=" + filename);
+        return response.build();
     }
 }

@@ -23,16 +23,23 @@ import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Streaming;
 
-import javax.ws.rs.core.Response;
+import java.util.List;
 
 public interface RemoteSupportBundleInterface {
     @GET("system/debug/support/manifest")
     Call<SupportBundleNodeManifest> getNodeManifest();
 
     @POST("system/debug/support/bundle/build")
-    Call<Response> buildSupportBundle();
+    Call<Void> buildSupportBundle();
 
     @GET("system/debug/support/logfile/{id}")
     @Streaming
     Call<ResponseBody> getLogFile(@Path("id") String id);
+
+    @GET("system/debug/support/bundle/list")
+    Call<List<BundleFile>> listBundles();
+
+    @GET("system/debug/support/bundle/download/{filename}")
+    @Streaming
+    Call<ResponseBody> downloadBundle(@Path("filename") String filename);
 }

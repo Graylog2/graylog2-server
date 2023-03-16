@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.system.debug.bundle;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import okhttp3.ResponseBody;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -27,20 +28,25 @@ import org.graylog2.shared.rest.resources.ProxiedResource;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 import static org.graylog2.shared.security.RestPermissions.SUPPORTBUNDLE_CREATE;
 import static org.graylog2.shared.security.RestPermissions.SUPPORTBUNDLE_READ;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @RequiresAuthentication
 @Api(value = "Cluster/Debug/SupportBundle", description = "For collecting cluster wide debugging information, e.g. server logs")
@@ -69,6 +75,52 @@ public class SupportBundleClusterResource extends ProxiedResource {
     @RequiresPermissions(SUPPORTBUNDLE_CREATE)
     @NoAuditEvent("FIXME") // TODO
     public Response buildBundle() throws IOException {
-        return requestOnLeader(RemoteSupportBundleInterface::buildSupportBundle, createRemoteInterfaceProvider(RemoteSupportBundleInterface.class)).entity().get();
+        final NodeResponse<Void> voidNodeResponse = requestOnLeader(RemoteSupportBundleInterface::buildSupportBundle, createRemoteInterfaceProvider(RemoteSupportBundleInterface.class));
+        if (voidNodeResponse.isSuccess()) {
+            return Response.accepted().build();
+        }
+        return Response.serverError().build();
+    }
+
+    @GET
+    @Path("/bundle/list")
+    @ApiOperation(value = "Returns the list of downloadable support bundles")
+    @RequiresPermissions(SUPPORTBUNDLE_READ)
+    public List<BundleFile> listBundles() throws IOException {
+        final NodeResponse<List<BundleFile>> listNodeResponse = requestOnLeader(RemoteSupportBundleInterface::listBundles, createRemoteInterfaceProvider(RemoteSupportBundleInterface.class));
+        if (listNodeResponse.isSuccess()) {
+            return listNodeResponse.entity().orElse(List.of());
+        }
+        throw new BadRequestException(f("Failed to retrieve bundle files <{}>", listNodeResponse.errorText()));
+    }
+
+    @GET
+    @Path("/bundle/download/{filename}")
+    @ApiOperation(value = "Downloads the requested bundle")
+    @RequiresPermissions(SUPPORTBUNDLE_READ)
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response download(@PathParam("filename") String filename) throws IOException {
+        final NodeResponse<ResponseBody> nodeResponse = requestOnLeader(c -> c.downloadBundle(filename), createRemoteInterfaceProvider(RemoteSupportBundleInterface.class));
+        if (nodeResponse.isSuccess()) {
+            // we cannot use try-with because the ReponseBody needs to stream the output
+            ResponseBody responseBody = nodeResponse.entity().orElseThrow();
+
+            try {
+                StreamingOutput streamingOutput = output -> {
+                    try {
+                        responseBody.byteStream().transferTo(output);
+                    } catch (Exception e) {
+                        responseBody.close(); // avoid leaking connections on errors
+                    }
+                };
+                var mediaType = MediaType.valueOf(MediaType.APPLICATION_OCTET_STREAM);
+                Response.ResponseBuilder response = Response.ok(streamingOutput, mediaType);
+                response.header("Content-Disposition", "attachment; filename=" + filename);
+                return response.build();
+            } catch (Exception e) {
+                responseBody.close();
+            }
+        }
+        throw new BadRequestException("Failed to download bundle " + nodeResponse.errorText());
     }
 }

@@ -43,6 +43,7 @@ import retrofit2.Call;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.HttpHeaders;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -81,6 +82,7 @@ public class SupportBundleService {
     private static final Logger LOG = LoggerFactory.getLogger(SupportBundleService.class);
     public static final String SUPPORT_BUNDLE_DIR_NAME = "support-bundle";
     public static final Duration CALL_TIMEOUT = Duration.ofSeconds(10);
+    public static final String BUNDLE_NAME_PREFIX = "graylog-support-bundle";
 
     private final ExecutorService executor;
     private final NodeService nodeService;
@@ -175,7 +177,7 @@ public class SupportBundleService {
     }
 
     private void writeZipFile(Path tmpDir) throws IOException {
-        var zipFile = Path.of(".graylog-support-bundle-" + nowTimestamp() + ".zip");
+        var zipFile = Path.of("." + BUNDLE_NAME_PREFIX + "-" + nowTimestamp() + ".zip");
 
         try (ZipOutputStream zipStream = new ZipOutputStream(new FileOutputStream(bundleDir.resolve(zipFile).toFile()))) {
             try (final Stream<Path> walk = Files.walk(tmpDir)) {
@@ -319,6 +321,42 @@ public class SupportBundleService {
         Files.copy(Path.of(logFile.name()), outputStream);
     }
 
+    public List<BundleFile> listBundles() {
+        try (var files = Files.walk(bundleDir)) {
+            return files
+                    .filter(p -> !Files.isDirectory(p))
+                    .filter(p -> p.getFileName().toString().startsWith(BUNDLE_NAME_PREFIX))
+                    .map(f -> {
+                        try {
+                            return new BundleFile(f.getFileName().toString(), Files.size(f));
+                        } catch (IOException e) {
+                            LOG.warn("Exception while trying to list support bundles", e);
+                            throw new BadRequestException(e);
+                        }
+                    })
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            LOG.warn("Exception while trying to list support bundles", e);
+            throw new BadRequestException(e);
+        }
+    }
+
+    public void downloadBundle(String filename, OutputStream outputStream) throws IOException {
+        ensureFileWithinBundleDir(filename);
+
+        try {
+            final Path filePath = bundleDir.resolve(filename);
+            Files.copy(filePath, outputStream);
+        } catch (Exception e) {
+            outputStream.close();
+        }
+    }
+
+    private void ensureFileWithinBundleDir(String filename) throws IOException {
+        if (!bundleDir.resolve(filename).toFile().getCanonicalPath().startsWith(bundleDir.toFile().getCanonicalPath())) {
+            throw new NotFoundException();
+        }
+    }
 
     static class ProxiedResourceHelper extends ProxiedResource {
         private final Subject currentSubject;
