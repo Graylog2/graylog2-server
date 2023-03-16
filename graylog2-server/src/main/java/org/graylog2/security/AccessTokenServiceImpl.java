@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.HashMap;
@@ -45,6 +46,7 @@ import java.util.stream.Collectors;
  * The token value will automatically be encrypted/decrypted when storing/loading the token object from the database.
  * That means the token value is encrypted at rest but the loaded {@link AccessToken} always contains the plain text value.
  */
+@Singleton
 public class AccessTokenServiceImpl extends PersistedServiceImpl implements AccessTokenService {
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenServiceImpl.class);
 
