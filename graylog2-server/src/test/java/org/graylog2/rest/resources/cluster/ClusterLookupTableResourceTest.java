@@ -104,7 +104,9 @@ public class ClusterLookupTableResourceTest {
 
             @Override
             protected Subject getSubject() {
-                return mock(Subject.class);
+                final Subject subject = mock(Subject.class);
+                when(subject.isAuthenticated()).thenReturn(true);
+                return subject;
             }
         };
     }
