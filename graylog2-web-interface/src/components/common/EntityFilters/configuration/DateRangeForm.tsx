@@ -23,7 +23,7 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import AbsoluteDateInput from 'views/components/searchbar/date-time-picker/AbsoluteDateInput';
 import { ModalSubmit } from 'components/common';
 import { Checkbox } from 'components/bootstrap';
-import { isValidDate } from 'util/DateTime';
+import { isValidDate, toUTCFromTz, adjustFormat } from 'util/DateTime';
 
 import type { ValueFilter } from '../types';
 
@@ -61,6 +61,10 @@ const SectionHeader = styled.div`
   margin-bottom: 3px;
 `;
 
+const StyledLabel = styled.label`
+  margin: 0;
+`;
+
 const StyledCheckbox = styled(Checkbox)`
   &.checkbox {
     margin: 0;
@@ -89,13 +93,13 @@ const DateConfiguration = ({ name: fieldName, label, allTimeLabel }: {
   return (
     <Field name={fieldName}>
       {({ field: { value, onChange, name }, meta: { error } }) => {
-        const _onChange = (newValue) => onChange({ target: { name, value: newValue } });
-        const onChangeAllTime = () => onChange({ target: { name, value: value ? undefined : formatTime(new Date()) } });
+        const _onChange = (newValue: string) => onChange({ target: { name, value: newValue } });
+        const onChangeAllTime = () => _onChange(value ? undefined : formatTime(new Date(), 'complete'));
 
         return (
           <div>
             <SectionHeader>
-              <b>{label}</b>
+              <StyledLabel htmlFor={`date-input-${name}`}>{label}</StyledLabel>
               <StyledCheckbox onChange={onChangeAllTime} checked={!value}>{allTimeLabel}</StyledCheckbox>
             </SectionHeader>
             <AbsoluteDateInput name="from"
@@ -117,13 +121,13 @@ const useInitialValues = (filter: ValueFilter | undefined) => {
     const [from, until] = filter.value.split(DATE_SEPARATOR);
 
     return ({
-      from: from || undefined,
-      until: until || undefined,
+      from: from ? formatTime(from, 'complete') : undefined,
+      until: until ? formatTime(until, 'complete') : undefined,
     });
   }
 
   return {
-    from: formatTime(moment().subtract(5, 'minutes')),
+    from: formatTime(moment().subtract(5, 'minutes'), 'complete'),
     until: undefined,
   };
 };
@@ -166,32 +170,39 @@ const DateRangeForm = ({ filter, onSubmit }: Props) => {
   const initialValues = useInitialValues(filter);
 
   const _onSubmit = (formValues: FormValues) => {
+    const toInternalTime = (date: string) => adjustFormat(toUTCFromTz(date, userTimezone), 'internal');
+    const utcFrom = formValues.from ? toInternalTime(formValues.from) : '';
+    const utcUntil = formValues.until ? toInternalTime(formValues.until) : '';
+
     onSubmit({
       title: `${formValues.from || 'All time'} - ${formValues.until || 'Now'}`,
-      value: `${formValues.from || ''}${DATE_SEPARATOR}${formValues.until || ''}`,
+      value: `${utcFrom}${DATE_SEPARATOR}${utcUntil}`,
     });
   };
 
   return (
-    <Container>
+    <Container data-testid="time-range-form">
       <Formik initialValues={initialValues} onSubmit={_onSubmit} validate={validate}>
-        <Form>
-          <Sections>
-            <Section>
-              <DateConfiguration name="from" label="From" allTimeLabel="All time" />
-            </Section>
-            <Section>
-              <DateConfiguration name="until" label="Until" allTimeLabel="Now" />
-            </Section>
-          </Sections>
-          <Info>
-            Format: <DateTimeFormat>YYYY-MM-DD [HH:mm:ss[.SSS]]</DateTimeFormat>.<br />
-            All timezones using: <b>{userTimezone}</b>.
-          </Info>
-          <ModalSubmit submitButtonText={`${filter ? 'Update' : 'Create'} filter`}
-                       bsSize="small"
-                       displayCancel={false} />
-        </Form>
+        {({ isValid }) => (
+          <Form>
+            <Sections>
+              <Section>
+                <DateConfiguration name="from" label="From" allTimeLabel="All time" />
+              </Section>
+              <Section>
+                <DateConfiguration name="until" label="Until" allTimeLabel="Now" />
+              </Section>
+            </Sections>
+            <Info>
+              Format: <DateTimeFormat>YYYY-MM-DD [HH:mm:ss[.SSS]]</DateTimeFormat>.<br />
+              All timezones using: <b>{userTimezone}</b>.
+            </Info>
+            <ModalSubmit submitButtonText={`${filter ? 'Update' : 'Create'} filter`}
+                         bsSize="small"
+                         disabledSubmit={!isValid}
+                         displayCancel={false} />
+          </Form>
+        )}
       </Formik>
     </Container>
   );
