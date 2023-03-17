@@ -48,6 +48,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRange;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
@@ -88,6 +90,7 @@ public class PivotAggregationSearch implements AggregationSearch {
     private final EventDefinition eventDefinition;
     private final MoreSearch moreSearch;
     private final PermittedStreams permittedStreams;
+    private final NotificationService notificationService;
 
     @Inject
     public PivotAggregationSearch(@Assisted AggregationEventProcessorConfig config,
@@ -98,7 +101,8 @@ public class PivotAggregationSearch implements AggregationSearch {
                                   QueryEngine queryEngine,
                                   EventsConfigurationProvider configProvider,
                                   MoreSearch moreSearch,
-                                  PermittedStreams permittedStreams) {
+                                  PermittedStreams permittedStreams,
+                                  NotificationService notificationService) {
         this.config = config;
         this.parameters = parameters;
         this.searchOwner = searchOwner;
@@ -108,6 +112,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         this.configurationProvider = configProvider;
         this.moreSearch = moreSearch;
         this.permittedStreams = permittedStreams;
+        this.notificationService = notificationService;
     }
 
     private String metricName(AggregationSeries series) {
@@ -144,9 +149,18 @@ public class PivotAggregationSearch implements AggregationSearch {
             });
 
             // If we have only EmptyParameterErrors, just return an empty Result
-            if (! (errors.stream().filter(e -> !(e instanceof EmptyParameterError)).count() > 1)) {
+            if (errors.stream().allMatch(e -> e instanceof EmptyParameterError)) {
                 return AggregationResult.empty();
             }
+
+            Notification systemNotification = notificationService.buildNow()
+                    .addType(Notification.Type.GENERIC)
+                    .addSeverity(Notification.Severity.NORMAL)
+                    .addTimestamp(DateTime.now())
+                    .addDetail("title", "Aggregation search failed")
+                    .addDetail("description", errors.stream().map(e -> e.description()).collect(Collectors.joining("\n")));
+            notificationService.publishIfFirst(systemNotification);
+
             if (errors.size() > 1) {
                 throw new EventProcessorException("Pivot search failed with multiple errors.", false, eventDefinition);
             } else {
