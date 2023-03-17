@@ -658,12 +658,6 @@
             <artifactId>auto-value-javabean</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.google.auto.service</groupId>
-            <artifactId>auto-service</artifactId>
-            <version>1.0.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>info.leadinglight</groupId>
             <artifactId>jdot</artifactId>
         </dependency>
