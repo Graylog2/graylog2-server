@@ -59,6 +59,8 @@ public class RemoteInterfaceProvider {
                     if (!headers.containsKey(HttpHeaders.ACCEPT)) {
                         builder.header(HttpHeaders.ACCEPT, MediaType.JSON_UTF_8.toString());
                     }
+                    // Don't confuse OkHttp by passing through the browsers Accept-Encoding header
+                    builder.removeHeader(HttpHeaders.ACCEPT_ENCODING);
 
                     if (authorizationToken != null) {
                         builder
