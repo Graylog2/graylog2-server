@@ -36,7 +36,6 @@ import org.graylog.plugins.map.config.GeoIpProcessorConfig;
 import org.graylog.plugins.netflow.NetFlowPluginModule;
 import org.graylog.plugins.pipelineprocessor.PipelineConfig;
 import org.graylog.plugins.sidecar.SidecarModule;
-import org.graylog.plugins.threatintel.ThreatIntelPluginModule;
 import org.graylog.plugins.views.ViewsBindings;
 import org.graylog.plugins.views.ViewsConfig;
 import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiModule;
