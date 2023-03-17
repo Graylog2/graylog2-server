@@ -158,7 +158,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                     .addSeverity(Notification.Severity.NORMAL)
                     .addTimestamp(DateTime.now())
                     .addDetail("title", "Aggregation search failed")
-                    .addDetail("description", errors.stream().map(e -> e.description()).collect(Collectors.joining("\n")));
+                    .addDetail("description", errors.stream().map(SearchError::description).collect(Collectors.joining("\n")));
             notificationService.publishIfFirst(systemNotification);
 
             if (errors.size() > 1) {
