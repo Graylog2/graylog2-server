@@ -19,11 +19,14 @@ import styled, { css } from 'styled-components';
 import { Formik, Form, Field } from 'formik';
 import moment from 'moment/moment';
 
-import type { Attribute } from 'stores/PaginationTypes';
 import useUserDateTime from 'hooks/useUserDateTime';
 import AbsoluteDateInput from 'views/components/searchbar/date-time-picker/AbsoluteDateInput';
 import { ModalSubmit } from 'components/common';
 import { Checkbox } from 'components/bootstrap';
+
+import type { ValueFilter } from '../types';
+
+const DATE_SEPARATOR = '><';
 
 type FormValues = {
   from: string | undefined,
@@ -105,31 +108,43 @@ const DateConfiguration = ({ name: fieldName, label, allTimeLabel }: {
   );
 };
 
+const useInitialValues = (filter: ValueFilter | undefined) => {
+  const { formatTime } = useUserDateTime();
+
+  if (filter) {
+    const [from, until] = filter.value.split(DATE_SEPARATOR);
+
+    return ({
+      from: from || undefined,
+      until: until || undefined,
+    });
+  }
+
+  return {
+    from: formatTime(moment().subtract(5, 'minutes')),
+    until: undefined,
+  };
+};
+
 type Props = {
-  attribute: Attribute,
   onSubmit: (filter: { title: string, value: string }) => void,
-  initialValues?: FormValues
-  scenario: 'create' | 'edit',
+  filter: ValueFilter | undefined,
 }
 
-const DateRangeForm = ({ attribute, onSubmit, initialValues, scenario }: Props) => {
-  const { userTimezone, formatTime } = useUserDateTime();
+const DateRangeForm = ({ filter, onSubmit }: Props) => {
+  const { userTimezone } = useUserDateTime();
+  const initialValues = useInitialValues(filter);
 
   const _onSubmit = (formValues: FormValues) => {
     onSubmit({
       title: `${formValues.from || 'All time'} - ${formValues.until || 'Now'}`,
-      value: `${formValues.from || ''}><${formValues.until || ''}`,
+      value: `${formValues.from || ''}${DATE_SEPARATOR}${formValues.until || ''}`,
     });
-  };
-
-  const _initialValues = initialValues ?? {
-    from: formatTime(moment().subtract(5, 'minutes')),
-    until: undefined,
   };
 
   return (
     <Container>
-      <Formik initialValues={_initialValues} onSubmit={_onSubmit}>
+      <Formik initialValues={initialValues} onSubmit={_onSubmit}>
         <Form>
           <Sections>
             <Section>
@@ -143,17 +158,13 @@ const DateRangeForm = ({ attribute, onSubmit, initialValues, scenario }: Props) 
             Format: <DateTimeFormat>YYYY-MM-DD [HH:mm:ss[.SSS]]</DateTimeFormat>.<br />
             All timezones using: <b>{userTimezone}</b>.
           </Info>
-          <ModalSubmit submitButtonText={`${scenario === 'create' ? 'Create' : 'Update'} filter`}
+          <ModalSubmit submitButtonText={`${filter ? 'Update' : 'Create'} filter`}
                        bsSize="small"
                        displayCancel={false} />
         </Form>
       </Formik>
     </Container>
   );
-};
-
-DateRangeForm.defaultProps = {
-  initialValues: undefined,
 };
 
 export default DateRangeForm;

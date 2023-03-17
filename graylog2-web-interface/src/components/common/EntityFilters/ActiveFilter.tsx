@@ -45,8 +45,9 @@ type FilterValueDropdownProps = {
   onChangeFilter: (attributeId: string, newFilter: Filter) => void,
 }
 
-const FilterValueDropdown = ({ attribute, allActiveFilters, onChangeFilter, filterValueRenderer, filter: { id, value, title } }: FilterValueDropdownProps) => {
+const FilterValueDropdown = ({ attribute, allActiveFilters, onChangeFilter, filterValueRenderer, filter }: FilterValueDropdownProps) => {
   const [show, setShowDropdown] = useState(false);
+  const { id, value, title } = filter;
 
   const _onToggle = () => {
     setShowDropdown((cur) => !cur);
@@ -70,8 +71,8 @@ const FilterValueDropdown = ({ attribute, allActiveFilters, onChangeFilter, filt
       <FilterConfiguration attribute={attribute}
                            filterValueRenderer={filterValueRenderer}
                            onSubmit={onSubmit}
-                           allActiveFilters={allActiveFilters}
-                           scenario="edit" />
+                           filter={filter}
+                           allActiveFilters={allActiveFilters} />
     </OverlayDropdown>
   );
 };

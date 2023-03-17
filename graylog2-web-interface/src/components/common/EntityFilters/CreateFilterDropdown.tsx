@@ -106,7 +106,6 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderers, onCr
             <FilterConfiguration onSubmit={_onCreateFilter}
                                  allActiveFilters={activeFilters}
                                  attribute={selectedAttribute}
-                                 scenario="create"
                                  filterValueRenderer={filterValueRenderers?.[selectedAttributeId]} />
           );
         }}
