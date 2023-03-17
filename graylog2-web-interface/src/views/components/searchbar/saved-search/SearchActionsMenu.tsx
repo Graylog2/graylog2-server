@@ -21,6 +21,7 @@ import { useCallback, useState, useContext, useRef } from 'react';
 import { isPermitted } from 'util/PermissionsMixin';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import { Icon, ShareButton } from 'components/common';
+import AddEvidence from 'components/security/investigations/AddEvidence';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import View from 'views/logic/views/View';
@@ -65,6 +66,12 @@ const _extractErrorMessage = (error: FetchError) => {
     && error.additional.body
     && error.additional.body.message) ? error.additional.body.message : error;
 };
+
+const addToInvestigation = ({ investigationSelected }) => (
+  <MenuItem disabled={!investigationSelected} icon="puzzle-piece">
+    Add to investigation
+  </MenuItem>
+);
 
 const SearchActionsMenu = () => {
   const theme = useTheme();
@@ -199,6 +206,9 @@ const SearchActionsMenu = () => {
           Reset search
         </MenuItem>
         <MenuItem divider />
+        {loaded && (
+          <AddEvidence id={view.id} type="searches" child={addToInvestigation} />
+        )}
       </DropdownButton>
       {showExport && (<ExportModal view={view} closeModal={toggleExport} />)}
       {showMetadataEdit && (
