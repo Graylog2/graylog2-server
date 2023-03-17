@@ -23,6 +23,7 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import AbsoluteDateInput from 'views/components/searchbar/date-time-picker/AbsoluteDateInput';
 import { ModalSubmit } from 'components/common';
 import { Checkbox } from 'components/bootstrap';
+import { isValidDate } from 'util/DateTime';
 
 import type { ValueFilter } from '../types';
 
@@ -57,6 +58,7 @@ const SectionHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 3px;
 `;
 
 const StyledCheckbox = styled(Checkbox)`
@@ -126,6 +128,34 @@ const useInitialValues = (filter: ValueFilter | undefined) => {
   };
 };
 
+const formatError = 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].';
+const rangeError = 'The "Until" date must come after the "From" date.';
+
+const validate = (values: FormValues) => {
+  let errors: {
+      from?: string,
+      until?: string,
+    } = {};
+
+  if (values.from && !isValidDate(values.from)) {
+    errors = { ...errors, from: formatError };
+  }
+
+  if (values.until && !isValidDate(values.until)) {
+    errors = { ...errors, until: formatError };
+  }
+
+  if (values.from >= values.until) {
+    errors = { ...errors, until: rangeError };
+  }
+
+  if (!values.from && !values.until) {
+    errors = { ...errors, from: 'Either "from" or "until" must be an actual date.' };
+  }
+
+  return errors;
+};
+
 type Props = {
   onSubmit: (filter: { title: string, value: string }) => void,
   filter: ValueFilter | undefined,
@@ -144,7 +174,7 @@ const DateRangeForm = ({ filter, onSubmit }: Props) => {
 
   return (
     <Container>
-      <Formik initialValues={initialValues} onSubmit={_onSubmit}>
+      <Formik initialValues={initialValues} onSubmit={_onSubmit} validate={validate}>
         <Form>
           <Sections>
             <Section>
