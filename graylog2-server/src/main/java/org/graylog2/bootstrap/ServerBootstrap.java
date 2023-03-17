@@ -152,7 +152,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 .flatMap(Collection::stream).collect(Collectors.toList());
         preflightCheckModules.add(new FreshInstallDetectionModule(isFreshInstallation()));
 
-        final boolean enablePreflightWeb = this.isFreshInstallation;
+        final boolean enablePreflightWeb = this.isFreshInstallation || configuration.enablePreflightWebserver();
 
         if(enablePreflightWeb) {
             preflightCheckModules.add(new PreflightWebModule());

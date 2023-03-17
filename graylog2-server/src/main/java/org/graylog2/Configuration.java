@@ -198,6 +198,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "skip_preflight_checks")
     private boolean skipPreflightChecks = false;
 
+    @Parameter(value = "enable_preflight_web")
+    private boolean enablePreflightWeb = false;
+
     @Parameter(value = "leader_election_mode", converter = LeaderElectionMode.Converter.class)
     private LeaderElectionMode leaderElectionMode = LeaderElectionMode.STATIC;
 
@@ -468,6 +471,10 @@ public class Configuration extends BaseConfiguration {
      */
     public boolean isRootUserDisabled() {
         return getDeactivatedBuiltinAuthenticationProviders().contains(RootAccountRealm.NAME);
+    }
+
+    public boolean enablePreflightWebserver() {
+        return enablePreflightWeb;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {
