@@ -192,8 +192,7 @@ public class Server extends ServerBootstrap {
                 new SearchFiltersModule(),
                 new ScopedEntitiesModule(),
                 new ScriptingApiModule(featureFlags),
-                new StreamsModule(),
-                new ThreatIntelPluginModule()
+                new StreamsModule()
         );
         return modules.build();
     }

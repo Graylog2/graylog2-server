@@ -283,7 +283,7 @@ public abstract class CmdLineTool implements CliCommand {
 
         coreConfigInjector = setupCoreConfigInjector();
 
-        final Set<Plugin> plugins = loadPlugins(getPluginPath(configFile), chainingClassLoader);
+        final Set<Plugin> plugins = Sets.union(BundledPlugins.BUNDLED_PLUGINS, loadPlugins(getPluginPath(configFile), chainingClassLoader));
 
         installPluginConfig(plugins);
         processConfiguration(jadConfig);
