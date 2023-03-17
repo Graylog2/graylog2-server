@@ -41,7 +41,7 @@ const Container = styled.div`
 
 const Info = styled.p(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
-  margin: 0 0 10px 0;
+  margin: 0 0 10px;
 `);
 
 const Sections = styled.div`
