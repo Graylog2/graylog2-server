@@ -86,8 +86,7 @@ public class JsonPathCodec extends AbstractCodec {
             } catch (JsonFlattenException e) {
                 LOG.warn("JSON contains type not supported by flatten method.", e);
             } catch (JsonProcessingException e) {
-                LOG.warn("JsonProcessingException at JsonPathCodec.decode().", e);
-                //throw new RuntimeException(e);
+                LOG.warn("Could not parse JSON.", e);
             }
         } else {
             if (jsonPath == null) {
@@ -228,7 +227,7 @@ public class JsonPathCodec extends AbstractCodec {
                     CK_FLATTEN,
                     "Flatten JSON",
                     false,
-                    "If set, the whole JSON will be returned as part of the message."
+                    "If set, the whole JSON will be flattened and returned as message fields."
             ));
 
             return r;        }
