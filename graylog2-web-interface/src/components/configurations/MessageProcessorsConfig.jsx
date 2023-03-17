@@ -119,12 +119,14 @@ const MessageProcessorsConfig = createReactClass({
       const status = config.disabled_processors.filter((p) => p === processor.class_name).length > 0 ? 'disabled' : 'active';
 
       return (
-        // eslint-disable-next-line react/no-array-index-key
-        <tr key={idx}>
-          <td>{idx + 1}</td>
-          <td>{processor.name}</td>
-          <td>{status}</td>
-        </tr>
+
+        (
+          <tr key={idx}>
+            <td>{idx + 1}</td>
+            <td>{processor.name}</td>
+            <td>{status}</td>
+          </tr>
+        )
       );
     });
   },
@@ -144,16 +146,18 @@ const MessageProcessorsConfig = createReactClass({
       const enabled = config.disabled_processors.filter((p) => p === processor.class_name).length < 1;
 
       return (
-        // eslint-disable-next-line react/no-array-index-key
-        <tr key={idx}>
-          <td>{processor.name}</td>
-          <td>
-            <input ref={(elem) => { this.inputs[processor.class_name] = elem; }}
-                   type="checkbox"
-                   checked={enabled}
-                   onChange={this._toggleStatus(processor.class_name)} />
-          </td>
-        </tr>
+
+        (
+          <tr key={idx}>
+            <td>{processor.name}</td>
+            <td>
+              <input ref={(elem) => { this.inputs[processor.class_name] = elem; }}
+                     type="checkbox"
+                     checked={enabled}
+                     onChange={this._toggleStatus(processor.class_name)} />
+            </td>
+          </tr>
+        )
       );
     });
   },

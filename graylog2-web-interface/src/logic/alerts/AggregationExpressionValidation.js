@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { union } from 'lodash';
+import union from 'lodash/union';
 
 const flattenValidationTree = (validationTree, errors = []) => {
   if (validationTree.message) {

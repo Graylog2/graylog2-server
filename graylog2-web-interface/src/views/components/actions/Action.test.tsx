@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import { noop } from 'lodash';
+import noop from 'lodash/noop';
 
 import { createSimpleExternalValueAction } from 'fixtures/externalValueActions';
 import type { ActionContexts, RootState } from 'views/types';

@@ -73,7 +73,7 @@ const useMessage = (index: string, messageId: string) => {
       const _message = await MessagesActions.loadMessage(index, messageId);
       setMessage(_message);
 
-      if (_message.source_input_id && await isLocalNode(_message.fields.gl2_source_node)) {
+      if (_message.source_input_id && (await isLocalNode(_message.fields.gl2_source_node))) {
         const input = await InputsActions.get(_message.source_input_id);
 
         if (input) {

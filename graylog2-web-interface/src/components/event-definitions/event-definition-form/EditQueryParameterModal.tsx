@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import React from 'react';
 
 import LookupTableParameterEdit from 'components/lookup-table-parameters/LookupTableParameterEdit';
@@ -117,7 +117,7 @@ class EditQueryParameterModal extends React.Component<Props, State> {
 
     this.setState({ validation: newValidation });
 
-    return lodash.isEmpty(newValidation);
+    return isEmpty(newValidation);
   };
 
   render() {

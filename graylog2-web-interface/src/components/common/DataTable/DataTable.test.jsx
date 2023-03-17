@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import DataTable from 'components/common/DataTable';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';

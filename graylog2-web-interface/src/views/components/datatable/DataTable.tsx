@@ -17,7 +17,9 @@
 import * as React from 'react';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import * as Immutable from 'immutable';
-import { flatten, isEqual, uniqWith } from 'lodash';
+import flatten from 'lodash/flatten';
+import isEqual from 'lodash/isEqual';
+import uniqWith from 'lodash/uniqWith';
 import type { OrderedMap } from 'immutable';
 import { FormikContext } from 'formik';
 import styled, { css } from 'styled-components';
@@ -239,15 +241,17 @@ const DataTable = ({
     const valuePath = rowFieldNames.map((pivotField) => ({ [pivotField]: expandedRows[idx][pivotField] }));
 
     return (
-      // eslint-disable-next-line react/no-array-index-key
-      <DataTableEntry key={`datatableentry-${idx}`}
-                      fields={effectiveFields}
-                      item={reducedItem}
-                      valuePath={valuePath}
-                      columnPivots={columnFieldNames}
-                      columnPivotValues={actualColumnPivotFields}
-                      types={fields}
-                      series={series} />
+
+      (
+        <DataTableEntry key={`datatableentry-${idx}`}
+                        fields={effectiveFields}
+                        item={reducedItem}
+                        valuePath={valuePath}
+                        columnPivots={columnFieldNames}
+                        columnPivotValues={actualColumnPivotFields}
+                        types={fields}
+                        series={series} />
+      )
     );
   });
 

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { isString } from 'lodash';
+import isString from 'lodash/isString';
 
 type Res = {
   text?: string;

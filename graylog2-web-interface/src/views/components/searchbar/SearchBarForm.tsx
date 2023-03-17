@@ -19,7 +19,7 @@ import { useCallback, useContext, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import type { FormikProps } from 'formik';
 import { Form, Formik } from 'formik';
-import { isFunction } from 'lodash';
+import isFunction from 'lodash/isFunction';
 
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import type { SearchBarFormValues } from 'views/Constants';

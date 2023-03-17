@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useCallback, useMemo, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import type { FormikErrors } from 'formik';
 
 import UserPreferencesContext from 'contexts/UserPreferencesContext';

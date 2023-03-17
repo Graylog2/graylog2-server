@@ -16,7 +16,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { Form, Formik } from 'formik';
-import lodash from 'lodash';
+import capitalize from 'lodash/capitalize';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 import 'components/indices/rotation';
@@ -150,7 +150,7 @@ const IndexSetsDefaultsConfig = ({ initialConfig, updateConfig }: Props) => {
         <dt>Max. Number of Segments:</dt>
         <dd>{currentConfig.index_optimization_max_num_segments}</dd>
         <dt>Field type refresh interval:</dt>
-        <dd>{currentConfig.field_type_refresh_interval} {lodash.capitalize(currentConfig.field_type_refresh_interval_unit)}</dd>
+        <dd>{currentConfig.field_type_refresh_interval} {capitalize(currentConfig.field_type_refresh_interval_unit)}</dd>
         <br />
         <IndexMaintenanceStrategiesSummary config={rotationConfig}
                                            pluginExports={PluginStore.exports('indexRotationConfig')} />

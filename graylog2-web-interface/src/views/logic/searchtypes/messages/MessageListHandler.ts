@@ -14,14 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import _ from 'lodash';
+import forEach from 'lodash/forEach';
+import forOwn from 'lodash/forOwn';
 import Immutable from 'immutable';
 
 export default {
   convert(result) {
     const fieldNames = Immutable.Map().withMutations((map) => {
-      _.forEach(result.messages, (msg) => {
-        _.forOwn(msg.message, (_value, field) => {
+      forEach(result.messages, (msg) => {
+        forOwn(msg.message, (_value, field) => {
           // add occurrences
           map.mergeWith((oldVal: number, newVal: number) => oldVal + newVal, Immutable.Map([[field, 1]]));
         });

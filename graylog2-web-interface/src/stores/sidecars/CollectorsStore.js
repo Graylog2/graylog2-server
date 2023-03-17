@@ -16,7 +16,7 @@
  */
 import Reflux from 'reflux';
 import URI from 'urijs';
-import lodash from 'lodash';
+import merge from 'lodash/merge';
 
 import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -239,7 +239,7 @@ export const CollectorsStore = singletonStore(
         default_template: ' ',
       };
 
-      lodash.merge(payload, collector);
+      merge(payload, collector);
 
       const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/collectors/validate`), payload);
 

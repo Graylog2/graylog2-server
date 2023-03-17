@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import type { WidgetComponentProps } from 'views/types';

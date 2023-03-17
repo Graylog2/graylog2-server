@@ -17,7 +17,9 @@
 import * as React from 'react';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import get from 'lodash/get';
+import omit from 'lodash/omit';
 
 import { OverlayTrigger, Icon } from 'components/common';
 import { Alert, Col, Row, Button } from 'components/bootstrap';
@@ -49,7 +51,7 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange }: Prop
   const [showFieldForm, setShowFieldForm] = useState<boolean>(false);
 
   const removeCustomField = (fieldName) => {
-    const nextFieldSpec = lodash.omit(eventDefinition.field_spec, fieldName);
+    const nextFieldSpec = omit(eventDefinition.field_spec, fieldName);
 
     onChange('field_spec', nextFieldSpec);
 
@@ -67,8 +69,8 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange }: Prop
 
   const addCustomField = (prevFieldName, fieldName, config, isKey, keyPosition) => {
     const nextFieldSpec = (prevFieldName === fieldName
-      ? lodash.cloneDeep(eventDefinition.field_spec)
-      : lodash.omit(eventDefinition.field_spec, prevFieldName));
+      ? cloneDeep(eventDefinition.field_spec)
+      : omit(eventDefinition.field_spec, prevFieldName));
 
     nextFieldSpec[fieldName] = config;
     onChange('field_spec', nextFieldSpec);
@@ -100,8 +102,8 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange }: Prop
     );
   }
 
-  const fieldErrors = lodash.get(validation, 'errors.field_spec', []);
-  const keyErrors = lodash.get(validation, 'errors.key_spec', []);
+  const fieldErrors = get(validation, 'errors.field_spec', []);
+  const keyErrors = get(validation, 'errors.key_spec', []);
   const errors = [...fieldErrors, ...keyErrors];
 
   return (
