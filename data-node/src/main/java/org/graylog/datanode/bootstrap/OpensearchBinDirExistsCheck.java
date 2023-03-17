@@ -16,11 +16,11 @@
  */
 package org.graylog.datanode.bootstrap;
 
+import org.graylog.datanode.Configuration;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -29,8 +29,8 @@ public class OpensearchBinDirExistsCheck implements PreflightCheck {
     private final String opensearchLocation;
 
     @Inject
-    public OpensearchBinDirExistsCheck(@Named("opensearch_location") String opensearchLocation) {
-        this.opensearchLocation = opensearchLocation;
+    public OpensearchBinDirExistsCheck(Configuration configuration) {
+        this.opensearchLocation = configuration.getOpensearchLocation();
     }
 
     @Override
