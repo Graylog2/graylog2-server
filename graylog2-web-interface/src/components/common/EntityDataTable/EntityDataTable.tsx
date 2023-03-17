@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useMemo, useState, useCallback, useRef } from 'react';
 import type * as Immutable from 'immutable';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 
 import { Table, ButtonGroup } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
@@ -40,7 +40,7 @@ import type { ColumnRenderers, Column, EntityBase, ColumnRenderersByAttribute, E
 
 const ScrollContainer = styled.div`
   width: 100%;
-  overflow-x: clip;
+  overflow-x: auto;
 `;
 
 const StyledTable = styled(Table)`
@@ -221,22 +221,6 @@ const EntityDataTable = <Entity extends EntityBase>({
       return [...cur, itemId];
     }));
   }, []);
-
-  /*
-  React.useEffect(() => {
-    const handleOverflow = (e: React.BaseSyntheticEvent) => {
-      console.log(e.target);
-      const scrollContainer = document.getElementById('scroll-container');
-      scrollContainer.style.overflow = scrollContainer.style.overflow !== 'visible' ? 'visible' : 'auto';
-    };
-
-    document.addEventListener('click', handleOverflow, false);
-
-    return () => {
-      document.removeEventListener('click', handleOverflow, false);
-    };
-  }, []);
-  */
 
   return (
     <ExpandedSectionsProvider>

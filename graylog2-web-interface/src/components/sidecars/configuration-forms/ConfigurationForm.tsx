@@ -16,7 +16,10 @@
  */
 import PropTypes from 'prop-types';
 import React, { useState, useRef, useEffect } from 'react';
-import lodash from 'lodash';
+import clone from 'lodash/clone';
+import cloneDeep from 'lodash/cloneDeep';
+import debounce from 'lodash/debounce';
+import upperFirst from 'lodash/upperFirst';
 
 import history from 'util/History';
 import { ColorPickerPopover, FormSubmit, Select, SourceCodeEditor } from 'components/common';
@@ -75,7 +78,7 @@ const ConfigurationForm = ({
 
   const _validateFormData = (nextFormData, checkForRequiredFields) => {
     CollectorConfigurationsActions.validate(nextFormData).then((validation) => {
-      const nextValidation = lodash.clone(validation);
+      const nextValidation = clone(validation);
 
       if (checkForRequiredFields && !_isTemplateSet(nextFormData.template)) {
         nextValidation.errors.template = ['Please fill out the configuration field.'];
@@ -103,11 +106,11 @@ const ConfigurationForm = ({
     }
   };
 
-  const _debouncedValidateFormData = lodash.debounce(_validateFormData, 200);
+  const _debouncedValidateFormData = debounce(_validateFormData, 200);
 
   const _formDataUpdate = (key) => {
     return (nextValue, _?: React.ChangeEvent<HTMLInputElement>, hideCallback?: () => void) => {
-      const nextFormData = lodash.cloneDeep(formData);
+      const nextFormData = cloneDeep(formData);
 
       nextFormData[key] = nextValue;
       _debouncedValidateFormData(nextFormData, false);
@@ -165,7 +168,7 @@ const ConfigurationForm = ({
     // Start loading the request to get the default template, so it is available asap.
     const defaultTemplate = await _getCollectorDefaultTemplate(nextId);
 
-    const nextFormData = lodash.cloneDeep(formData);
+    const nextFormData = cloneDeep(formData);
 
     nextFormData.collector_id = nextId;
 
@@ -179,7 +182,7 @@ const ConfigurationForm = ({
   };
 
   const _onTemplateImport = (nextTemplate) => {
-    const nextFormData = lodash.cloneDeep(formData);
+    const nextFormData = cloneDeep(formData);
 
     // eslint-disable-next-line no-alert
     if (!nextFormData.template || window.confirm('Do you want to overwrite your current work with this Configuration?')) {
@@ -205,7 +208,7 @@ const ConfigurationForm = ({
   };
 
   const _formatCollector = (collector) => {
-    return collector ? `${collector.name} on ${lodash.upperFirst(collector.node_operating_system)}` : 'Unknown collector';
+    return collector ? `${collector.name} on ${upperFirst(collector.node_operating_system)}` : 'Unknown collector';
   };
 
   const _formatCollectorOptions = () => {

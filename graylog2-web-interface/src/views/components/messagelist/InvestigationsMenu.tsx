@@ -28,6 +28,12 @@ type Props = {
   [key: string]: any,
 };
 
+const addToInvestigation = ({ investigationSelected }) => (
+  <MenuItem disabled={!investigationSelected}>
+    Add to investigation
+  </MenuItem>
+);
+
 const InvestigationsMenu = ({ index, id, type, ...rest }: Props) => {
   const investigations = usePluginEntities('investigationsPlugin');
 
@@ -35,13 +41,7 @@ const InvestigationsMenu = ({ index, id, type, ...rest }: Props) => {
 
   return (
     <DropdownButton id="investigations-dropdown" {...rest}>
-      <AddEvidence index={index} id={id} type={type}>
-        {({ investigationSelected }) => (
-          <MenuItem disabled={!investigationSelected}>
-            Add to investigation
-          </MenuItem>
-        )}
-      </AddEvidence>
+      <AddEvidence index={index} id={id} type={type} child={addToInvestigation} />
     </DropdownButton>
   );
 };

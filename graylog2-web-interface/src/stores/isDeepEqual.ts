@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { isEqualWith, isFunction } from 'lodash';
+import isEqualWith from 'lodash/isEqualWith';
+import isFunction from 'lodash/isFunction';
 import { isValidElement } from 'react';
 import isEqual from 'react-fast-compare';
 

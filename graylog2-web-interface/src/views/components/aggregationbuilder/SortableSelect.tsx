@@ -19,7 +19,7 @@ import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { components as Components } from 'react-select';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
-import { findIndex } from 'lodash';
+import findIndex from 'lodash/findIndex';
 
 import Select from 'components/common/Select';
 

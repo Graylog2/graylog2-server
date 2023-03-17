@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
-import lodash from 'lodash';
 import styled, { css } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
+import capitalize from 'lodash/capitalize';
+import isEmpty from 'lodash/isEmpty';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import { Col, Row } from 'components/bootstrap';
@@ -52,6 +53,14 @@ type Props = {
   eventDefinitionContext: EventDefinitionContext,
 };
 
+const addToInvestigation = ({ investigationSelected }) => (
+  <dd>
+    <EvidenceActionButton $disabled={!investigationSelected}>
+      Add to investigation <Icon name="puzzle-piece" size="sm" />
+    </EvidenceActionButton>
+  </dd>
+);
+
 const EventDetails = ({ event, eventDefinitionContext }: Props) => {
   const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
   const timeRange: AbsoluteTimeRange = event.replay_info && { type: 'absolute', from: `${event.replay_info.timerange_start}`, to: `${event.replay_info.timerange_end}` };
@@ -72,7 +81,7 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
           <dd>{event.id}</dd>
           <dt>Priority</dt>
           <dd>
-            {lodash.capitalize(EventDefinitionPriorityEnum.properties[event.priority].name)}
+            {capitalize(EventDefinitionPriorityEnum.properties[event.priority].name)}
           </dd>
           <dt>Timestamp</dt>
           <dd> <Timestamp dateTime={event.timestamp} />
@@ -93,15 +102,7 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
                   Replay search
                 </ReplaySearchButton>
               </dd>
-              <AddEvidence id={event.id} type="events">
-                {({ investigationSelected }) => (
-                  <dd>
-                    <EvidenceActionButton $disabled={!investigationSelected}>
-                      Add to investigation <Icon name="puzzle-piece" size="sm" />
-                    </EvidenceActionButton>
-                  </dd>
-                )}
-              </AddEvidence>
+              <AddEvidence id={event.id} type="events" child={addToInvestigation} />
             </>
           )}
         </dl>
@@ -121,11 +122,11 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
           <dt>Event Key</dt>
           <dd>{event.key || 'No Key set for this Event.'}</dd>
           <dt>Additional Fields</dt>
-          {lodash.isEmpty(event.fields)
+          {isEmpty(event.fields)
             ? <dd>No additional Fields added to this Event.</dd>
             : <EventFields fields={event.fields} />}
           <dt>Group-By Fields</dt>
-          {lodash.isEmpty(event.group_by_fields)
+          {isEmpty(event.group_by_fields)
             ? <dd>No group-by fields on this Event.</dd>
             : <EventFields fields={event.group_by_fields} />}
         </dl>

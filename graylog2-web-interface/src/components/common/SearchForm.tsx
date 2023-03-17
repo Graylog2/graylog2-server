@@ -19,7 +19,7 @@ import * as React from 'react';
 import Promise from 'bluebird';
 import styled, { css } from 'styled-components';
 import { useState, useEffect, useRef } from 'react';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 
 import Spinner from 'components/common/Spinner';
 

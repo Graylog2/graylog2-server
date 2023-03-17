@@ -105,9 +105,10 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 
 const renderAddEvidence = (id: string, type: EvidenceTypes, index: string = undefined) => {
   render(
-    <AddEvidence id={id} type={type} index={index}>
-      {({ investigationSelected }) => <button type="button" disabled={!investigationSelected}>Add to investigation</button>}
-    </AddEvidence>,
+    <AddEvidence id={id}
+                 type={type}
+                 index={index}
+                 child={({ investigationSelected }) => <button type="button" disabled={!investigationSelected}>Add to investigation</button>} />,
   );
 };
 

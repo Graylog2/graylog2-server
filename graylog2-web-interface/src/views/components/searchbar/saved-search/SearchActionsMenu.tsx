@@ -67,6 +67,12 @@ const _extractErrorMessage = (error: FetchError) => {
     && error.additional.body.message) ? error.additional.body.message : error;
 };
 
+const addToInvestigation = ({ investigationSelected }) => (
+  <MenuItem disabled={!investigationSelected} icon="puzzle-piece">
+    Add to investigation
+  </MenuItem>
+);
+
 const SearchActionsMenu = () => {
   const theme = useTheme();
   const dirty = useIsDirty();
@@ -201,13 +207,7 @@ const SearchActionsMenu = () => {
         </MenuItem>
         <MenuItem divider />
         {loaded && (
-          <AddEvidence id={view.id} type="searches">
-            {({ investigationSelected }) => (
-              <MenuItem disabled={!investigationSelected} icon="puzzle-piece">
-                Add to investigation
-              </MenuItem>
-            )}
-          </AddEvidence>
+          <AddEvidence id={view.id} type="searches" child={addToInvestigation} />
         )}
       </DropdownButton>
       {showExport && (<ExportModal view={view} closeModal={toggleExport} />)}

@@ -17,7 +17,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import lodash from 'lodash';
+import get from 'lodash/get';
+import isNumber from 'lodash/isNumber';
 
 import {
   OverlayTrigger,
@@ -83,7 +84,7 @@ class FieldForm extends React.Component {
   };
 
   getConfigProviderType = (config, defaultValue) => {
-    return lodash.get(config, 'providers[0].type', defaultValue);
+    return get(config, 'providers[0].type', defaultValue);
   };
 
   validate = () => {
@@ -100,17 +101,17 @@ class FieldForm extends React.Component {
     }
 
     requiredFields.forEach((requiredField) => {
-      if (!lodash.get(this.state, requiredField)) {
+      if (!get(this.state, requiredField)) {
         errors[requiredField] = 'Field cannot be empty.';
       }
     });
 
-    if (isKey && (!lodash.isNumber(keyPosition) || Number(keyPosition) < 1)) {
+    if (isKey && (!isNumber(keyPosition) || Number(keyPosition) < 1)) {
       errors.key_position = 'Field must be a positive number.';
     }
 
     pluginRequiredFields.forEach((requiredField) => {
-      if (!lodash.get(config, `providers[0].${requiredField}`)) {
+      if (!get(config, `providers[0].${requiredField}`)) {
         errors[requiredField] = 'Field cannot be empty.';
       }
     });

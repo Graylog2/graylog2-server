@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { findIndex } from 'lodash';
+import findIndex from 'lodash/findIndex';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Row, Col, Button, Input } from 'components/bootstrap';

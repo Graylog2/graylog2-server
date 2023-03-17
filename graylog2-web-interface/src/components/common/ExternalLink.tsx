@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
+import trim from 'lodash/trim';
 
 import type { IconName } from 'components/common/Icon';
 
@@ -43,7 +43,7 @@ const ExternalLink = ({ children, className, href, iconClass, target }: Props) =
   );
 
   // This makes the component usable as child element of a component that already renders a link (e.g. MenuItem)
-  if (_.trim(href) === '') {
+  if (trim(href) === '') {
     return content;
   }
 

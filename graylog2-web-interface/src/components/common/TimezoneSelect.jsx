@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import moment from 'moment-timezone';
-import lodash from 'lodash';
+import uniq from 'lodash/uniq';
 
 import Select from 'components/common/Select';
 
@@ -78,7 +78,7 @@ class TimezoneSelect extends React.Component {
         labels.push({ label: area, disabled: true, value: area });
 
         // Now add a label per timezone in the area
-        const effectiveTimezones = lodash.uniq(timezones[area]).sort();
+        const effectiveTimezones = uniq(timezones[area]).sort();
         const timezoneLabels = effectiveTimezones.map((location) => {
           const timezone = (area === this._UNCLASSIFIED_AREA ? location : `${area}/${location}`);
 

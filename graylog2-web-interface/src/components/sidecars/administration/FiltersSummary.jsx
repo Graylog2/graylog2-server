@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import { Button, Col, Row } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -64,7 +64,7 @@ class FiltersSummary extends React.Component {
   render() {
     const { filters, onResetFilters } = this.props;
 
-    if (lodash.isEmpty(filters)) {
+    if (isEmpty(filters)) {
       return null;
     }
 

@@ -114,6 +114,9 @@ module.exports = {
       }, {
         name: 'jest-each',
         message: 'Please use `it.each` instead.',
+      }, {
+        name: 'lodash',
+        message: 'Please use `lodash/<function>` instead for reduced bundle sizes.',
       }],
     }],
     'no-underscore-dangle': 'off',

@@ -17,7 +17,9 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import find from 'lodash/find';
+import uniq from 'lodash/uniq';
+import upperFirst from 'lodash/upperFirst';
 
 import { SelectPopover } from 'components/common';
 import { Button, ButtonToolbar } from 'components/bootstrap';
@@ -52,7 +54,7 @@ const CollectorsAdministrationFilters = createReactClass({
 
     const collectorFormatter = (collectorId) => {
       const [id] = collectorId.split(';');
-      const collector = lodash.find(collectors, { id: id });
+      const collector = find(collectors, { id: id });
 
       return <CollectorIndicator collector={collector.name} operatingSystem={collector.node_operating_system} />;
     };
@@ -94,7 +96,7 @@ const CollectorsAdministrationFilters = createReactClass({
 
     const configurationFormatter = (configurationId) => {
       const [id] = configurationId.split(';');
-      const configuration = lodash.find(configurations, { id: id });
+      const configuration = find(configurations, { id: id });
 
       return <span><ColorLabel color={configuration.color} size="xsmall" /> {configuration.name}</span>;
     };
@@ -128,8 +130,7 @@ const CollectorsAdministrationFilters = createReactClass({
   getOSFilter() {
     const { collectors, filters } = this.props;
 
-    const operatingSystems = lodash
-      .uniq(collectors.map((collector) => lodash.upperFirst(collector.node_operating_system)))
+    const operatingSystems = uniq(collectors.map((collector) => upperFirst(collector.node_operating_system)))
       .sort(naturalSortIgnoreCase);
 
     const filter = ([os], callback) => this.onFilterChange('os', os, callback);
@@ -153,7 +154,7 @@ const CollectorsAdministrationFilters = createReactClass({
     const filter = ([statusCode], callback) => this.onFilterChange('status', statusCode, callback);
 
     const statusFilter = filters.status;
-    const statusFormatter = (statusCode) => lodash.upperFirst(SidecarStatusEnum.toString(statusCode));
+    const statusFormatter = (statusCode) => upperFirst(SidecarStatusEnum.toString(statusCode));
 
     return (
       <SelectPopover id="status-filter"

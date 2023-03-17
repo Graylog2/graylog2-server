@@ -17,7 +17,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import lodash from 'lodash';
+import defaultTo from 'lodash/defaultTo';
+import get from 'lodash/get';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Select } from 'components/common';
@@ -61,7 +62,7 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
       const eventDefinitionType2Order = eventDefinitionType2.sortOrder;
 
       if (eventDefinitionType1Order !== undefined || eventDefinitionType2Order !== undefined) {
-        const sort = lodash.defaultTo(eventDefinitionType1Order, Number.MAX_SAFE_INTEGER) - lodash.defaultTo(eventDefinitionType2Order, Number.MAX_SAFE_INTEGER);
+        const sort = defaultTo(eventDefinitionType1Order, Number.MAX_SAFE_INTEGER) - defaultTo(eventDefinitionType2Order, Number.MAX_SAFE_INTEGER);
 
         if (sort !== 0) {
           return sort;
@@ -142,7 +143,7 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
                       disabled={disabledSelect()}
                       required />
               <HelpBlock>
-                {lodash.get(validation, 'errors.config[0]', 'Choose the type of Condition for this Event.')}
+                {get(validation, 'errors.config[0]', 'Choose the type of Condition for this Event.')}
               </HelpBlock>
             </FormGroup>
           </>

@@ -20,7 +20,8 @@ import type { DefaultTheme } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { ShareButton } from 'components/common';
-import { DropdownButton, MenuItem } from 'components/bootstrap';
+import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
+import { MenuItem } from 'components/bootstrap';
 import AddEvidence from 'components/security/investigations/AddEvidence';
 import type View from 'views/logic/views/View';
 import EntityShareModal from 'components/permissions/EntityShareModal';
@@ -40,6 +41,12 @@ type Props = {
 const DeleteItem = styled.span(({ theme }: { theme: DefaultTheme }) => css`
   color: ${theme.colors.variant.danger};
 `);
+
+const addToInvestigation = ({ investigationSelected }) => (
+  <MenuItem disabled={!investigationSelected} icon="puzzle-piece">
+    Add to investigation
+  </MenuItem>
+);
 
 const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
   const [showShareModal, setShowShareModal] = useState(false);
@@ -63,22 +70,13 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
                    entityId={dashboard.id}
                    entityType="dashboard"
                    onClick={() => setShowShareModal(true)} />
-      <DropdownButton bsSize="xsmall"
-                      title="More"
-                      id={`more-dropdown-${dashboard.id}`}
-                      pullRight>
-        <AddEvidence id={dashboard.id} type="dashboards">
-          {({ investigationSelected }) => (
-            <MenuItem disabled={!investigationSelected} icon="puzzle-piece">
-              Add to investigation
-            </MenuItem>
-          )}
-        </AddEvidence>
+      <OverlayDropdownButton bsSize="xsmall" title="More" closeOnSelect>
+        <AddEvidence id={dashboard.id} type="dashboards" child={addToInvestigation} />
         <MenuItem divider />
         <MenuItem onClick={onDashboardDelete}>
           <DeleteItem role="button">Delete</DeleteItem>
         </MenuItem>
-      </DropdownButton>
+      </OverlayDropdownButton>
       {showShareModal && (
         <EntityShareModal entityId={dashboard.id}
                           entityType="dashboard"

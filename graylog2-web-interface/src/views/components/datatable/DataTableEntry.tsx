@@ -17,7 +17,8 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import type * as Immutable from 'immutable';
-import { flatten, get } from 'lodash';
+import flatten from 'lodash/flatten';
+import get from 'lodash/get';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
@@ -119,17 +120,22 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
   const columns = flatten([fieldColumns, columnPivotFields]);
 
   return (
-    <tr className={`fields-row ${classes}`}>
-      {columns.map(({ field, value, path, source }, idx) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <Column key={`${activeQuery}-${field}=${value}-${idx}`}
-                field={field}
-                value={value}
-                type={fieldTypeFor(columnNameToField(field, series), types)}
-                valuePath={path.slice()}
-                source={source} />
-      ))}
-    </tr>
+    (
+      <tr className={`fields-row ${classes}`}>
+        {columns.map(({ field, value, path, source }, idx) => {
+          const key = `${activeQuery}-${field}=${value}-${idx}`;
+
+          return (
+            <Column key={key}
+                    field={field}
+                    value={value}
+                    type={fieldTypeFor(columnNameToField(field, series), types)}
+                    valuePath={path.slice()}
+                    source={source} />
+          );
+        })}
+      </tr>
+    )
   );
 };
 

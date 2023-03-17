@@ -24,25 +24,23 @@ type Props = {
   index?: string,
   id: string,
   type: EvidenceTypes,
-  children: ({ investigationSelected }: { investigationSelected: boolean }) => React.ReactElement,
+  child: ({ investigationSelected }: { investigationSelected: boolean }) => React.ReactElement,
 };
 
-function AddEvidence({ children, index, id, type }: Props) {
+function AddEvidence({ child, index, id, type }: Props) {
   const investigations = usePluginEntities('investigationsPlugin');
 
   if (!investigations || !investigations.length) return null;
 
   const { selectedInvestigationId } = investigations[0].hooks.useInvestigationDrawer();
 
-  if (!selectedInvestigationId) {
-    return children({ investigationSelected: !!selectedInvestigationId });
-  }
+  if (!selectedInvestigationId) return child({ investigationSelected: !!selectedInvestigationId });
 
   const SecAddEvidence = investigations[0].components.AddEvidence;
 
   return (
     <SecAddEvidence id={id} index={index} type={type}>
-      {children({ investigationSelected: !!selectedInvestigationId })}
+      {child({ investigationSelected: !!selectedInvestigationId })}
     </SecAddEvidence>
   );
 }
