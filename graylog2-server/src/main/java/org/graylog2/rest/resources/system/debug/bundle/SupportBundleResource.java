@@ -22,7 +22,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.shared.rest.HideOnCloud;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestrictToLeader;
@@ -95,7 +96,7 @@ public class SupportBundleResource extends RestResource {
     @RestrictToLeader
     @RequiresPermissions(SUPPORTBUNDLE_CREATE)
     @Produces(MediaType.APPLICATION_JSON)
-    @NoAuditEvent("FIXME") // TODO
+    @AuditEvent(type = AuditEventTypes.SUPPORT_BUNDLE_CREATE)
     public Response buildBundle(@Context HttpHeaders httpHeaders) {
         supportBundleService.buildBundle(httpHeaders, getSubject());
         return Response.accepted().build();
@@ -116,6 +117,7 @@ public class SupportBundleResource extends RestResource {
     @RequiresPermissions(SUPPORTBUNDLE_READ)
     @RestrictToLeader
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @AuditEvent(type = AuditEventTypes.SUPPORT_BUNDLE_DOWNLOAD)
     public Response download(@PathParam("filename") @ApiParam("filename") String filename) {
         var mediaType = MediaType.valueOf(MediaType.APPLICATION_OCTET_STREAM);
         StreamingOutput streamingOutput = outputStream -> supportBundleService.downloadBundle(filename, outputStream);
@@ -127,9 +129,9 @@ public class SupportBundleResource extends RestResource {
     @DELETE
     @Path("/bundle/delete/{filename}")
     @ApiOperation(value = "Delete a certain support bundle")
-    @RequiresPermissions(SUPPORTBUNDLE_READ)
+    @RequiresPermissions(SUPPORTBUNDLE_CREATE)
     @RestrictToLeader
-    @NoAuditEvent("FIXME") // TODO
+    @AuditEvent(type = AuditEventTypes.SUPPORT_BUNDLE_DELETE)
     public Response delete(@PathParam("filename") @ApiParam("filename") String filename) throws IOException {
         try {
             supportBundleService.deleteBundle(filename);

@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources.system.debug.bundle;
 
+import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -77,7 +78,8 @@ public class SupportBundleClusterResource extends ProxiedResource {
     @POST
     @Path("/bundle/build")
     @RequiresPermissions(SUPPORTBUNDLE_CREATE)
-    @NoAuditEvent("FIXME") // TODO
+    @Timed
+    @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
     public Response buildBundle() throws IOException {
         final NodeResponse<Void> voidNodeResponse = requestOnLeader(RemoteSupportBundleInterface::buildSupportBundle, createRemoteInterfaceProvider(RemoteSupportBundleInterface.class));
         if (voidNodeResponse.isSuccess()) {
@@ -132,7 +134,7 @@ public class SupportBundleClusterResource extends ProxiedResource {
     @Path("/bundle/delete/{filename}")
     @ApiOperation(value = "Downloads the requested bundle")
     @RequiresPermissions(SUPPORTBUNDLE_READ)
-    @NoAuditEvent("FIXME") // TODO
+    @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
     public Response delete(@PathParam("filename") @ApiParam("filename") String filename) throws IOException {
         final NodeResponse<Void> nodeResponse = requestOnLeader(c -> c.deleteBundle(filename), createRemoteInterfaceProvider(RemoteSupportBundleInterface.class));
         return Response.status(nodeResponse.code()).entity(nodeResponse.body()).build();
