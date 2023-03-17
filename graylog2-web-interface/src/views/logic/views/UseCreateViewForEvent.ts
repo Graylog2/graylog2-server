@@ -73,7 +73,7 @@ const createViewPosition = ({ index, SUMMARY_ROW_DELTA }) => {
 };
 
 const createViewWidget = ({ field, groupBy, fnSeries, expr }) => {
-  const rowPivots = [pivotForField(uniq([field, ...groupBy]), new FieldType('value', [], []))];
+  const rowPivots = [pivotForField(uniq([field, ...groupBy].filter((v) => !!v)), new FieldType('value', [], []))];
   const fnSeriesForFunc = Series.forFunction(fnSeries);
   const direction = ['>', '>=', '=='].includes(expr) ? Direction.Descending : Direction.Ascending;
   const sort = [new SortConfig(SortConfig.SERIES_TYPE, fnSeries, direction)];
@@ -85,7 +85,7 @@ const getSummaryAggregation = ({ aggregations, groupBy }) => {
   const { summaryFnSeries, summaryRowPivots, summaryTitle } = aggregations.reduce((res, { field, value, expr, fnSeries }) => {
     const concatTitle = `${fnSeries} ${expr} ${value}`;
     res.summaryFnSeries.push(fnSeries);
-    res.summaryRowPivots.push(field);
+    if (field) res.summaryRowPivots.push(field);
     res.summaryTitle = `${res.summaryTitle} ${concatTitle}`;
 
     return res;
