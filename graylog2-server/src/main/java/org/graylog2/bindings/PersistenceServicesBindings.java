@@ -56,8 +56,8 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(InputService.class).to(InputServiceImpl.class);
         bind(UserService.class).to(UserServiceImpl.class);
         OptionalBinder.newOptionalBinder(binder(), UserManagementService.class)
-                      .setDefault().to(UserManagementServiceImpl.class);
-        bind(AccessTokenService.class).to(AccessTokenServiceImpl.class);
+                .setDefault().to(UserManagementServiceImpl.class);
+        bind(AccessTokenService.class).to(AccessTokenServiceImpl.class).asEagerSingleton();
         bind(MongoDBSessionService.class).to(MongoDBSessionServiceImpl.class);
         bind(InputStatusService.class).to(MongoInputStatusService.class).asEagerSingleton();
         bind(EntityListPreferencesService.class).to(EntityListPreferencesServiceImpl.class);
