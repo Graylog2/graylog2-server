@@ -56,11 +56,6 @@ export const FilterConfiguration = ({
       <DateRangeForm onSubmit={onSubmit}
                      filter={filter} />
     )}
-    {attribute.type === 'DATE' && (
-      <DateRangeForm attribute={attribute}
-                     onSubmit={onSubmit}
-                     scenario={scenario} />
-    )}
   </>
 );
 
