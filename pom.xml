@@ -467,6 +467,7 @@
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
                     <annotationProcessors>
                         <annotationProcessor>com.google.auto.value.processor.AutoValueProcessor</annotationProcessor>
+                        <annotationProcessor>com.google.auto.service.processor.AutoServiceProcessor</annotationProcessor>
                     </annotationProcessors>
                 </configuration>
                 <dependencies>
