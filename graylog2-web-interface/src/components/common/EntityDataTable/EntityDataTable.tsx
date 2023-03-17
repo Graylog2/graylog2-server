@@ -39,6 +39,7 @@ import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
 import type { ColumnRenderers, Column, EntityBase, ColumnRenderersByAttribute, ExpandedSectionRenderer } from './types';
 
 const ScrollContainer = styled.div`
+  width: 100%;
   overflow-x: auto;
 `;
 
@@ -243,7 +244,7 @@ const EntityDataTable = <Entity extends EntityBase>({
           </ButtonGroup>
         </LayoutConfigRow>
       </ActionsRow>
-      <ScrollContainer ref={tableRef}>
+      <ScrollContainer id="scroll-container" ref={tableRef}>
         <StyledTable striped condensed hover>
           <TableHead columns={columns}
                      columnsOrder={columnsOrder}

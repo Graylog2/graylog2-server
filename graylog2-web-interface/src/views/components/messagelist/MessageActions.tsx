@@ -24,21 +24,7 @@ import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootst
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 
-type Props = {
-  index: string,
-  id: string,
-  fields: {
-    [key: string]: unknown,
-  },
-  decorationStats: any,
-  disabled: boolean,
-  disableSurroundingSearch: boolean,
-  disableTestAgainstStream: boolean,
-  showOriginal: boolean,
-  toggleShowOriginal: () => void,
-  streams: Immutable.List<any>,
-  searchConfig: SearchesConfig,
-};
+import InvestigationsMenu from './InvestigationsMenu';
 
 const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string, id: string) => {
   const streamList = streams.map((stream) => {
@@ -64,7 +50,35 @@ const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string
   );
 };
 
-const MessageActions = ({ index, id, fields, decorationStats, disabled, disableSurroundingSearch, disableTestAgainstStream, showOriginal, toggleShowOriginal, streams, searchConfig }: Props) => {
+type Props = {
+  index: string,
+  id: string,
+  fields: {
+    [key: string]: unknown,
+  },
+  decorationStats: any,
+  disabled: boolean,
+  disableSurroundingSearch: boolean,
+  disableTestAgainstStream: boolean,
+  showOriginal: boolean,
+  toggleShowOriginal: () => void,
+  streams: Immutable.List<any>,
+  searchConfig: SearchesConfig,
+};
+
+const MessageActions = ({
+  index,
+  id,
+  fields,
+  decorationStats,
+  disabled,
+  disableSurroundingSearch,
+  disableTestAgainstStream,
+  showOriginal,
+  toggleShowOriginal,
+  streams,
+  searchConfig,
+}: Props) => {
   if (disabled) {
     return <ButtonGroup className="pull-right" bsSize="small" />;
   }
@@ -86,6 +100,11 @@ const MessageActions = ({ index, id, fields, decorationStats, disabled, disableS
     <ButtonGroup className="pull-right" bsSize="small">
       {showChanges}
       <Button href={messageUrl}>Permalink</Button>
+      <InvestigationsMenu index={index}
+                          id={id}
+                          type="logs"
+                          bsSize="small"
+                          title="Investigations" />
 
       <ClipboardButton title="Copy ID" text={id} bsSize="small" />
       <ClipboardButton title="Copy message" bsSize="small" text={JSON.stringify(fields, null, 2)} />
