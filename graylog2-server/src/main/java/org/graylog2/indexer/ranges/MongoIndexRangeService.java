@@ -48,6 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
@@ -56,6 +57,7 @@ import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RANGE_CREATE;
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RANGE_DELETE;
 import static org.graylog2.indexer.indices.Indices.checkIfHealthy;
 
+@Singleton
 public class MongoIndexRangeService implements IndexRangeService {
     private static final Logger LOG = LoggerFactory.getLogger(MongoIndexRangeService.class);
     private static final String COLLECTION_NAME = "index_ranges";
@@ -79,25 +81,25 @@ public class MongoIndexRangeService implements IndexRangeService {
         this.auditEventSender = auditEventSender;
         this.nodeId = nodeId;
         this.collection = JacksonDBCollection.wrap(
-            mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
-            MongoIndexRange.class,
-            ObjectId.class,
-            objectMapperProvider.get());
+                mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
+                MongoIndexRange.class,
+                ObjectId.class,
+                objectMapperProvider.get());
 
         eventBus.register(this);
 
         collection.createIndex(new BasicDBObject(MongoIndexRange.FIELD_INDEX_NAME, 1));
         collection.createIndex(BasicDBObjectBuilder.start()
-            .add(MongoIndexRange.FIELD_BEGIN, 1)
-            .add(MongoIndexRange.FIELD_END, 1)
-            .get());
+                .add(MongoIndexRange.FIELD_BEGIN, 1)
+                .add(MongoIndexRange.FIELD_END, 1)
+                .get());
     }
 
     @Override
     public IndexRange get(String index) throws NotFoundException {
         final DBQuery.Query query = DBQuery.and(
-            DBQuery.notExists("start"),
-            DBQuery.is(IndexRange.FIELD_INDEX_NAME, index));
+                DBQuery.notExists("start"),
+                DBQuery.is(IndexRange.FIELD_INDEX_NAME, index));
         final MongoIndexRange indexRange = collection.findOne(query);
         if (indexRange == null) {
             throw new NotFoundException("Index range for index <" + index + "> not found.");
