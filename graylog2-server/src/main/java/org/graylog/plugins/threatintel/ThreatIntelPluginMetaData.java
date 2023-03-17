@@ -49,7 +49,7 @@ public class ThreatIntelPluginMetaData implements PluginMetaData {
 
     @Override
     public Version getVersion() {
-        return Version.CURRENT_CLASSPATH;;
+        return Version.CURRENT_CLASSPATH;
     }
 
     @Override
@@ -59,7 +59,7 @@ public class ThreatIntelPluginMetaData implements PluginMetaData {
 
     @Override
     public Version getRequiredVersion() {
-        return Version.CURRENT_CLASSPATH;;
+        return Version.CURRENT_CLASSPATH;
     }
 
     @Override
