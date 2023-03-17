@@ -1,0 +1,268 @@
+{
+    "description": "This content pack is part of the [Graylog Threat Intel Plugin](http://github.com/graylog-labs/graylog-plugin-threatintel).\\n\\n*Please do not delete it manually if you consider to use the Threat Intel Plugin's functions. It contains important resources required by the plugin.*\n\nThis is the lookup table for the abuse.ch ransomware Domain Tracker, listing infrastructure by domain names which are used for ransomware. For more information see https://ransomwaretracker.abuse.ch. This lookup table is used internally by Graylog's Threat Intel Plugin. Do not delete it manually.",
+    "entities": [
+        {
+            "data": {
+                "configuration": {
+                    "blocklist_type": {
+                        "@type": "string",
+                        "@value": "IPS"
+                    },
+                    "refresh_interval": {
+                        "@type": "long",
+                        "@value": 150
+                    },
+                    "refresh_interval_unit": {
+                        "@type": "string",
+                        "@value": "SECONDS"
+                    },
+                    "type": {
+                        "@type": "string",
+                        "@value": "abuse-ch-ransom"
+                    }
+                },
+                "description": {
+                    "@type": "string",
+                    "@value": "This is the data adapter for the abuse.ch ransomware IP Tracker, listing infrastructure by IP which is used for ransomware. For more information see https://ransomwaretracker.abuse.ch. This adapter is used internally by Graylog's Threat Intel Plugin. Do not delete it manually."
+                },
+                "name": {
+                    "@type": "string",
+                    "@value": "abuse-ch-ransomware-ip"
+                },
+                "title": {
+                    "@type": "string",
+                    "@value": "abuse.ch ransomware IP"
+                }
+            },
+            "id": "5ac762873d274666e34eca85",
+            "type": {
+                "name": "lookup_adapter",
+                "version": "1"
+            },
+            "v": "1",
+            "constraints": [
+                {
+                    "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
+                    "type": "plugin-version",
+                    "version": ">=3.0.0-alpha.2"
+                },
+                {
+                    "type": "server-version",
+                    "version": ">=3.0.0-alpha.2+af8d8e0"
+                }
+            ]
+        },
+        {
+            "data": {
+                "configuration": {
+                    "blocklist_type": {
+                        "@type": "string",
+                        "@value": "DOMAINS"
+                    },
+                    "refresh_interval": {
+                        "@type": "long",
+                        "@value": 150
+                    },
+                    "refresh_interval_unit": {
+                        "@type": "string",
+                        "@value": "SECONDS"
+                    },
+                    "type": {
+                        "@type": "string",
+                        "@value": "abuse-ch-ransom"
+                    }
+                },
+                "description": {
+                    "@type": "string",
+                    "@value": "This is the data adapter for the abuse.ch ransomware Domain Tracker, listing infrastructure by domain names which are used for ransomware. For more information see https://ransomwaretracker.abuse.ch. This adapter is used internally by Graylog's Threat Intel Plugin. Do not delete it manually."
+                },
+                "name": {
+                    "@type": "string",
+                    "@value": "abuse-ch-ransomware-domains"
+                },
+                "title": {
+                    "@type": "string",
+                    "@value": "abuse.ch ransomware Domains"
+                }
+            },
+            "id": "5ac762873d274666e34eca86",
+            "type": {
+                "name": "lookup_adapter",
+                "version": "1"
+            },
+            "v": "1",
+            "constraints": [
+                {
+                    "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
+                    "type": "plugin-version",
+                    "version": ">=3.0.0-alpha.2"
+                },
+                {
+                    "type": "server-version",
+                    "version": ">=3.0.0-alpha.2+af8d8e0"
+                }
+            ]
+        },
+        {
+            "data": {
+                "configuration": {
+                    "type": {
+                        "@type": "string",
+                        "@value": "none"
+                    }
+                },
+                "description": {
+                    "@type": "string",
+                    "@value": "Certain downloaded lists do not require caching because they are in memory already and use this no-op cache."
+                },
+                "name": {
+                    "@type": "string",
+                    "@value": "threat-intel-uncached-adapters"
+                },
+                "title": {
+                    "@type": "string",
+                    "@value": "Threat Intel Uncached Adapters"
+                }
+            },
+            "id": "5ac762873d274666e34eca80",
+            "type": {
+                "name": "lookup_cache",
+                "version": "1"
+            },
+            "v": "1",
+            "constraints": [
+                {
+                    "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
+                    "type": "plugin-version",
+                    "version": ">=3.0.0-alpha.2"
+                },
+                {
+                    "type": "server-version",
+                    "version": ">=3.0.0-alpha.2+af8d8e0"
+                }
+            ]
+        },
+        {
+            "data": {
+                "cache_name": {
+                    "@type": "string",
+                    "@value": "5ac762873d274666e34eca80"
+                },
+                "data_adapter_name": {
+                    "@type": "string",
+                    "@value": "5ac762873d274666e34eca86"
+                },
+                "default_multi_value": {
+                    "@type": "string",
+                    "@value": ""
+                },
+                "default_multi_value_type": {
+                    "@type": "string",
+                    "@value": "NULL"
+                },
+                "default_single_value": {
+                    "@type": "string",
+                    "@value": ""
+                },
+                "default_single_value_type": {
+                    "@type": "string",
+                    "@value": "NULL"
+                },
+                "description": {
+                    "@type": "string",
+                    "@value": "This is the lookup table for the abuse.ch ransomware Domain Tracker, listing infrastructure by domain names which are used for ransomware. For more information see https://ransomwaretracker.abuse.ch. This lookup table is used internally by Graylog's Threat Intel Plugin. Do not delete it manually."
+                },
+                "name": {
+                    "@type": "string",
+                    "@value": "abuse-ch-ransomware-domains"
+                },
+                "title": {
+                    "@type": "string",
+                    "@value": "abuse.ch Ransomware Domains"
+                }
+            },
+            "id": "5ac762873d274666e34eca8b",
+            "type": {
+                "name": "lookup_table",
+                "version": "1"
+            },
+            "v": "1",
+            "constraints": [
+                {
+                    "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
+                    "type": "plugin-version",
+                    "version": ">=3.0.0-alpha.2"
+                },
+                {
+                    "type": "server-version",
+                    "version": ">=3.0.0-alpha.2+af8d8e0"
+                }
+            ]
+        },
+        {
+            "data": {
+                "cache_name": {
+                    "@type": "string",
+                    "@value": "5ac762873d274666e34eca80"
+                },
+                "data_adapter_name": {
+                    "@type": "string",
+                    "@value": "5ac762873d274666e34eca85"
+                },
+                "default_multi_value": {
+                    "@type": "string",
+                    "@value": ""
+                },
+                "default_multi_value_type": {
+                    "@type": "string",
+                    "@value": "NULL"
+                },
+                "default_single_value": {
+                    "@type": "string",
+                    "@value": ""
+                },
+                "default_single_value_type": {
+                    "@type": "string",
+                    "@value": "NULL"
+                },
+                "description": {
+                    "@type": "string",
+                    "@value": "This is the lookup table for the abuse.ch ransomware IP Tracker, listing infrastructure by IP which is used for ransomware. For more information see https://ransomwaretracker.abuse.ch. This lookup table is used internally by Graylog's Threat Intel Plugin. Do not delete it manually."
+                },
+                "name": {
+                    "@type": "string",
+                    "@value": "abuse-ch-ransomware-ip"
+                },
+                "title": {
+                    "@type": "string",
+                    "@value": "abuse.ch Ransomware IP"
+                }
+            },
+            "id": "5ac762873d274666e34eca8a",
+            "type": {
+                "name": "lookup_table",
+                "version": "1"
+            },
+            "v": "1",
+            "constraints": [
+                {
+                    "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
+                    "type": "plugin-version",
+                    "version": ">=3.0.0-alpha.2"
+                },
+                {
+                    "type": "server-version",
+                    "version": ">=3.0.0-alpha.2+af8d8e0"
+                }
+            ]
+        }
+    ],
+    "id": "cbacd801-7824-c554-3fb1-475491b03826",
+    "name": "abuse.ch Ransomware - Threat Intel Plugin",
+    "parameters": [],
+    "rev": 1,
+    "summary": "The abuse.ch Ransomware Lookup Tables of the Threat Intel Plugin",
+    "url": "https://github.com/Graylog2/graylog2-server",
+    "v": "1",
+    "vendor": "Graylog <hello@graylog.com>"
+}
