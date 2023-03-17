@@ -21,11 +21,12 @@ import type { Filters, Filter } from 'components/common/EntityFilters/types';
 import MenuItem from 'components/bootstrap/MenuItem';
 import StaticOptionsList from 'components/common/EntityFilters/configuration/StaticOptionsList';
 import SuggestionsList from 'components/common/EntityFilters/configuration/SuggestionsList';
+import DateRangeForm from 'components/common/EntityFilters/configuration/DateRangeForm';
 
 type Props = {
   attribute: Attribute,
   filterValueRenderer: (value: Filter['value'], title: string) => React.ReactNode | undefined,
-  onSubmit: (filter: Filter, closeDropdown?: boolean) => void,
+  onSubmit: (filter: { title: string, value: string }, closeDropdown?: boolean) => void,
   allActiveFilters: Filters | undefined,
   scenario: 'create' | 'edit'
 }
@@ -44,12 +45,17 @@ export const FilterConfiguration = ({
                          filterValueRenderer={filterValueRenderer}
                          onSubmit={onSubmit} />
     )}
-    {!attribute.filter_options?.length && (
+    {(!attribute.filter_options?.length && attribute.type !== 'DATE') && (
       <SuggestionsList attribute={attribute}
                        filterValueRenderer={filterValueRenderer}
                        onSubmit={onSubmit}
                        allActiveFilters={allActiveFilters}
                        scenario={scenario} />
+    )}
+    {attribute.type === 'DATE' && (
+      <DateRangeForm attribute={attribute}
+                     onSubmit={onSubmit}
+                     scenario={scenario} />
     )}
   </>
 );

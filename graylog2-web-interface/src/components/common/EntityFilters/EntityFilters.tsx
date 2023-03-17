@@ -24,7 +24,7 @@ import ActiveFilters from 'components/common/EntityFilters/ActiveFilters';
 
 import { ROW_MIN_HEIGHT } from './Constants';
 
-const SUPPORTED_TYPES = ['STRING', 'BOOLEAN'];
+const SUPPORTED_ATTRIBUTE_TYPES = ['STRING', 'BOOLEAN', 'DATE'];
 
 const FilterCreation = styled.div`
   display: inline-flex;
@@ -45,7 +45,7 @@ type Props = {
 }
 
 const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRenderers, onChangeFilters }: Props) => {
-  const filterableAttributes = attributes.filter(({ filterable, type }) => filterable && SUPPORTED_TYPES.includes(type));
+  const filterableAttributes = attributes.filter(({ filterable, type }) => filterable && SUPPORTED_ATTRIBUTE_TYPES.includes(type));
 
   if (!filterableAttributes.length) {
     return null;

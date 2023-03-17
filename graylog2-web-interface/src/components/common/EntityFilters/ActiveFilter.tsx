@@ -52,7 +52,7 @@ const FilterValueDropdown = ({ attribute, allActiveFilters, onChangeFilter, filt
     setShowDropdown((cur) => !cur);
   };
 
-  const onSubmit = (newFilter: Filter) => {
+  const onSubmit = (newFilter: { title: string, value: string }) => {
     onChangeFilter(attribute.id, { id, value: newFilter.value, title: newFilter.title });
     _onToggle();
   };

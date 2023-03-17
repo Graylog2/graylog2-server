@@ -20,9 +20,8 @@ import styled, { css } from 'styled-components';
 
 import { Input, ListGroupItem } from 'components/bootstrap';
 import type { Attribute } from 'stores/PaginationTypes';
-import type { Filter, Filters } from 'components/common/EntityFilters/types';
+import type { Filters } from 'components/common/EntityFilters/types';
 import { PaginatedList, NoSearchResult } from 'components/common';
-import generateId from 'logic/generateId';
 import useIsKeyHeld from 'hooks/useIsKeyHeld';
 import useFilterValueSuggestions from 'components/common/EntityFilters/hooks/useFilterValueSuggestions';
 import Spinner from 'components/common/Spinner';
@@ -54,7 +53,7 @@ const Hint = styled.div(({ theme }) => css`
 type Props = {
   attribute: Attribute,
   filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined,
-  onSubmit: (filter: Filter, closeDropdown: boolean) => void,
+  onSubmit: (filter: { title: string, value: string }, closeDropdown: boolean) => void,
   allActiveFilters: Filters | undefined,
   scenario: 'create' | 'edit'
 }
@@ -103,7 +102,6 @@ const SuggestionsList = ({ attribute, filterValueRenderer, onSubmit, allActiveFi
                 onSubmit({
                   value: suggestion.id,
                   title: suggestion.value,
-                  id: generateId(),
                 }, !isShiftHeld);
               };
 
