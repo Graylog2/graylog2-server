@@ -19,14 +19,11 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/../data-node/bin</directory>
-            <outputDirectory>bin</outputDirectory>
+            <directory>${project.basedir}/../data-node/target/opensearch</directory>
+            <outputDirectory>dist</outputDirectory>
             <includes>
                 <include>*/**</include>
             </includes>
-            <excludes>
-                <exclude>download/*</exclude>
-            </excludes>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/../data-node/target/lib</directory>

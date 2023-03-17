@@ -51,7 +51,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>generate-server-artifact</id>
+                        <id>generate-data-node-artifact</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
