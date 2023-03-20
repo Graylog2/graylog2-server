@@ -50,7 +50,7 @@ public class PersistenceServicesBindings extends AbstractModule {
     @Override
     protected void configure() {
         bind(SystemMessageService.class).to(SystemMessageServiceImpl.class);
-        bind(NotificationService.class).to(NotificationServiceImpl.class);
+        bind(NotificationService.class).to(NotificationServiceImpl.class).in(Scopes.SINGLETON);
         bind(IndexFailureService.class).to(IndexFailureServiceImpl.class);
         bind(NodeService.class).to(NodeServiceImpl.class);
         bind(IndexRangeService.class).to(MongoIndexRangeService.class).asEagerSingleton();
