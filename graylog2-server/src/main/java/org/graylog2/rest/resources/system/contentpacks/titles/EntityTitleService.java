@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.resources.entities.titles;
+package org.graylog2.rest.resources.system.contentpacks.titles;
 
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
@@ -28,10 +28,10 @@ import org.graylog2.database.DbEntity;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
 import org.graylog2.database.dbcatalog.DbEntityCatalogEntry;
-import org.graylog2.rest.resources.entities.titles.model.EntitiesTitleResponse;
-import org.graylog2.rest.resources.entities.titles.model.EntityIdentifier;
-import org.graylog2.rest.resources.entities.titles.model.EntityTitleRequest;
-import org.graylog2.rest.resources.entities.titles.model.EntityTitleResponse;
+import org.graylog2.rest.resources.system.contentpacks.titles.model.EntitiesTitleResponse;
+import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityIdentifier;
+import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
+import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
 
 import javax.inject.Inject;
 import java.util.HashSet;
@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 import static org.graylog2.database.DbEntity.NO_TITLE;
-import static org.graylog2.rest.resources.entities.titles.model.EntitiesTitleResponse.EMPTY_RESPONSE;
+import static org.graylog2.rest.resources.system.contentpacks.titles.model.EntitiesTitleResponse.EMPTY_RESPONSE;
 
 public class EntityTitleService {
 

@@ -14,17 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.resources.entities.titles;
+package org.graylog2.rest.resources.system.contentpacks.titles;
 
 import org.apache.shiro.subject.Subject;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
 import org.graylog2.database.dbcatalog.DbEntityCatalogEntry;
-import org.graylog2.rest.resources.entities.titles.model.EntitiesTitleResponse;
-import org.graylog2.rest.resources.entities.titles.model.EntityIdentifier;
-import org.graylog2.rest.resources.entities.titles.model.EntityTitleRequest;
-import org.graylog2.rest.resources.entities.titles.model.EntityTitleResponse;
+import org.graylog2.rest.resources.system.contentpacks.titles.model.EntitiesTitleResponse;
+import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityIdentifier;
+import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
+import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
 import org.graylog2.streams.StreamImpl;
 import org.junit.Before;
 import org.junit.Rule;
@@ -33,7 +33,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.rest.resources.entities.titles.EntityTitleService.TITLE_IF_NOT_PERMITTED;
+import static org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleService.TITLE_IF_NOT_PERMITTED;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 

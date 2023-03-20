@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.resources.entities.titles.model;
+package org.graylog2.rest.resources.system.contentpacks.titles.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

@@ -125,7 +125,6 @@ import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesServiceImpl;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.rest.MoreMediaTypes;
-import org.graylog2.rest.resources.entities.titles.EntityTitleResource;
 import org.graylog2.rest.resources.suggestions.EntitySuggestionResource;
 
 import java.util.Set;
@@ -155,7 +154,6 @@ public class ViewsBindings extends ViewsModule {
         addSystemRestResource(SuggestionsResource.class);
         addSystemRestResource(QueryValidationResource.class);
         addSystemRestResource(EntitySuggestionResource.class);
-        addSystemRestResource(EntityTitleResource.class);
 
         addPermissions(ViewsRestPermissions.class);
 
