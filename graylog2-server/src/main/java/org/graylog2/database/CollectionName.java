@@ -21,17 +21,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * @author Dennis Oelkers <dennis@torch.sh>
+ * @deprecated Use {@link DbEntity} instead
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface DbEntity {
-    String collection();
-
-    String titleField() default "title";
-
-    String readPermission() default NO_PERMISSION;
-
-    //use for DBEntities that do not have string representations/ titles at all
-    String NO_TITLE = "";
-
-    String NO_PERMISSION = "";
+@Deprecated(forRemoval = true)
+public @interface CollectionName {
+    String value();
 }
