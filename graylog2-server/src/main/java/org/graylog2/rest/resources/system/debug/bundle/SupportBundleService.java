@@ -26,6 +26,7 @@ import org.apache.logging.log4j.core.appender.RollingFileAppender;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.log4j.MemoryAppender;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.responses.SystemJVMResponse;
@@ -271,36 +272,57 @@ public class SupportBundleService {
     }
 
     public SupportBundleNodeManifest getManifest() {
-
         final LoggerContext context = (LoggerContext) LogManager.getContext(false);
         final Configuration config = context.getConfiguration();
 
-        // TODO get in-memory logs (e.g. when running in container environments)
-        // TODO maybe try different RollingFileAppenders?
-        final RollingFileAppender rollingFileAppender = (RollingFileAppender) config.getAppenders().get("rolling-file");
-        if (rollingFileAppender != null) {
-            final String filePattern = rollingFileAppender.getFilePattern();
-            final String baseFileName = rollingFileAppender.getFileName();
+        final ImmutableList.Builder<LogFile> logFiles = ImmutableList.builder();
 
-            final ImmutableList.Builder<LogFile> logFiles = ImmutableList.builder();
+        getFileAppenders(config).forEach(fileAppender -> getRollingFileLogs(fileAppender).forEach(logFiles::add));
 
-            buildLogFile("0", rollingFileAppender.getFileName()).ifPresent(logFiles::add);
+        final Optional<MemoryAppender> memAppender = getMemoryAppender(config);
+        memAppender.ifPresent(memoryAppender -> getMemLogFiles(memoryAppender).forEach(logFiles::add));
 
-            // TODO support filePatterns with https://logging.apache.org/log4j/2.x/manual/lookups.html#DateLookup
-            // TODO support filePatterns with SimpleDateFormat
-            // e.g: filePattern="logs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz"
-            var regex = f("^%s\\.%%i\\.gz", baseFileName);
-            if (filePattern.matches(regex)) {
-                final String formatString = filePattern.replace("%i", "%d");
-                IntStream.range(1, 5).forEach(i -> {
-                    var file = f(formatString, i);
-                    buildLogFile(String.valueOf(i), file).ifPresent(logFiles::add);
-                });
-            }
-            return new SupportBundleNodeManifest(new BundleEntries(logFiles.build()));
+        return new SupportBundleNodeManifest(new BundleEntries(logFiles.build()));
+    }
+
+    private static List<RollingFileAppender> getFileAppenders(Configuration config) {
+        return config.getAppenders().values().stream().filter(RollingFileAppender.class::isInstance).map(RollingFileAppender.class::cast).toList();
+    }
+
+    private static Optional<MemoryAppender> getMemoryAppender(Configuration config) {
+        return config.getAppenders().values().stream().filter(MemoryAppender.class::isInstance).map(MemoryAppender.class::cast).findFirst();
+    }
+
+    private List<LogFile> getMemLogFiles(MemoryAppender memAppender) {
+        try {
+            memAppender.getLogMessages(1);
+            return List.of(new LogFile("memory", memAppender.getName() + ".log", -1, Instant.now()));
+        } catch (Exception e) {
+            LOG.warn("Failed to get logs from MemoryAppender <{}>", memAppender.getName(), e);
+            return List.of();
         }
+    }
 
-        return new SupportBundleNodeManifest(new BundleEntries(List.of()));
+    private List<LogFile> getRollingFileLogs(RollingFileAppender rollingFileAppender) {
+        final String filePattern = rollingFileAppender.getFilePattern();
+        final String baseFileName = rollingFileAppender.getFileName();
+
+        final ImmutableList.Builder<LogFile> logFiles = ImmutableList.builder();
+
+        buildLogFile("0", rollingFileAppender.getFileName()).ifPresent(logFiles::add);
+
+        // TODO support filePatterns with https://logging.apache.org/log4j/2.x/manual/lookups.html#DateLookup
+        // TODO support filePatterns with SimpleDateFormat
+        // e.g: filePattern="logs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz"
+        var regex = f("^%s\\.%%i\\.gz", baseFileName);
+        if (filePattern.matches(regex)) {
+            final String formatString = filePattern.replace("%i", "%d");
+            IntStream.range(1, 5).forEach(i -> {
+                var file = f(formatString, i);
+                buildLogFile(String.valueOf(i), file).ifPresent(logFiles::add);
+            });
+        }
+        return logFiles.build();
     }
 
     private Optional<LogFile> buildLogFile(String id, String fileName) {
@@ -318,7 +340,19 @@ public class SupportBundleService {
     }
 
     public void loadLogFileStream(LogFile logFile, OutputStream outputStream) throws IOException {
-        Files.copy(Path.of(logFile.name()), outputStream);
+        if (logFile.id().equals("memory")) {
+            final LoggerContext context = (LoggerContext) LogManager.getContext(false);
+            final Configuration config = context.getConfiguration();
+            final Optional<MemoryAppender> memAppender = getMemoryAppender(config);
+
+            if (memAppender.isEmpty()) {
+                throw new NotFoundException();
+            }
+            memAppender.get().streamFormattedLogMessages(outputStream);
+
+        } else {
+            Files.copy(Path.of(logFile.name()), outputStream);
+        }
     }
 
     public List<BundleFile> listBundles() {

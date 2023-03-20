@@ -29,9 +29,14 @@ import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.apache.logging.log4j.core.util.Booleans;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -40,6 +45,7 @@ import java.util.List;
  */
 @Plugin(name = "Memory", category = "Core", elementType = "appender", printObject = true)
 public class MemoryAppender extends AbstractAppender {
+    private static final Logger LOG = LoggerFactory.getLogger(MemoryAppender.class);
 
     private Buffer buffer;
     private int bufferSize;
@@ -74,7 +80,7 @@ public class MemoryAppender extends AbstractAppender {
 
     @Override
     public void append(LogEvent event) {
-        buffer.add(event);
+        buffer.add(event.toImmutable()); // only the immutable copy retains potential throwables
     }
 
     @Override
@@ -95,6 +101,16 @@ public class MemoryAppender extends AbstractAppender {
         }
 
         return result;
+    }
+
+    public void streamFormattedLogMessages(OutputStream outputStream) {
+        Arrays.stream(buffer.toArray()).filter(LogEvent.class::isInstance).map(LogEvent.class::cast).forEach(m -> {
+            try {
+                outputStream.write(getLayout().toByteArray(m));
+            } catch (IOException e) {
+                LOG.warn("Failed to stream logs", e);
+            }
+        });
     }
 
     public int getBufferSize() {

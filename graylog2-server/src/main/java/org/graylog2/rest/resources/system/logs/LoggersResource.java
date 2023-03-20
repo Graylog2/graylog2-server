@@ -32,9 +32,6 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.appender.RollingFileAppender;
-import org.apache.logging.log4j.core.appender.rolling.PatternProcessor;
-import org.apache.logging.log4j.core.appender.rolling.RollingFileManager;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.impl.ThrowableProxy;
@@ -69,9 +66,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -201,22 +195,6 @@ public class LoggersResource extends RestResource {
         LOG.debug("Successfully set log level for subsystem \"{}\" to \"{}\"", subsystem.getTitle(), newLevel);
     }
 
-    @GET
-    @Path("messages/bundle")
-    @RequiresPermissions(RestPermissions.LOGGERSMESSAGES_READ)
-    @Timed
-    @ApiOperation(value = "Get log messages for support bundle")
-    @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Memory appender is disabled."),
-            @ApiResponse(code = 500, message = "Memory appender is broken.")
-    })
-    @HideOnCloud
-    public Response messagesBundle() throws IOException {
-
-        getLogsfromRollingFiles();
-        return Response.noContent().build();
-    }
-
     @PUT
     @Timed
     @ApiOperation(value = "Set the loglevel of a single logger",
@@ -290,33 +268,7 @@ public class LoggersResource extends RestResource {
         return LogMessagesSummary.create(messages);
     }
 
-    private void getLogsfromRollingFiles() throws IOException {
-
-        final LoggerContext context = (LoggerContext) LogManager.getContext(false);
-        final Configuration config = context.getConfiguration();
-
-        final RollingFileAppender rollingFileAppender = (RollingFileAppender) config.getAppenders().get("rolling-file");
-        if (rollingFileAppender != null) {
-            rollingFileAppender.getFileName();
-            final RollingFileManager manager = rollingFileAppender.getManager();
-//            manager.rollover();
-//            final RolloverDescription rollover = manager.getRolloverStrategy().rollover(manager);
-//            rollover.getActiveFileName()
-            final PatternProcessor patternProcessor1 = rollingFileAppender.getManager().getPatternProcessor();
-            patternProcessor1.getPattern();
-            final PatternProcessor patternProcessor = new PatternProcessor(rollingFileAppender.getFilePattern());
-            // TODO get older log file.
-            var logs = Files.readString(java.nio.file.Path.of(rollingFileAppender.getFileName()));
-            LOG.debug(logs);
-        }
-        //final Optional<RollingFileAppender> rollingFile = config.getAppenders().values().stream().filter(a -> a instanceof RollingFileAppender).filter(a -> a.getName().equals("rolling-file")).map(RollingFileAppender.class::cast).findFirst();
-    }
-
-
     private Appender getAppender(final String appenderName) {
-//        final ConfigurationBuilder<BuiltConfiguration> builtConfigurationConfigurationBuilder = ConfigurationBuilderFactory.newConfigurationBuilder();
-//        Configurator.initialize(builtConfigurationConfigurationBuilder.build(true));
-
         final LoggerContext loggerContext = (LoggerContext) LogManager.getContext(false);
         final Configuration configuration = loggerContext.getConfiguration();
         return configuration.getAppender(appenderName);
