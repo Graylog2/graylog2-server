@@ -24,9 +24,11 @@ import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 const LoggedInPage = () => (
   <DefaultQueryClientProvider>
     <ThemeAndUserProvider>
-      <StreamsProvider>
-        <AppRouter />
-      </StreamsProvider>
+      <TelemetryProvider>
+        <StreamsProvider>
+          <AppRouter />
+        </StreamsProvider>
+      </TelemetryProvider>
     </ThemeAndUserProvider>
   </DefaultQueryClientProvider>
 );
