@@ -10,10 +10,6 @@
 ${if exception}
 <h2>Reason</h2>
 <p>${exception}</p>
-<h2>Stacktrace</h2>
-<p><pre>
-${stacktrace}
-</pre></p>
 ${end}
 </body>
 </html>
