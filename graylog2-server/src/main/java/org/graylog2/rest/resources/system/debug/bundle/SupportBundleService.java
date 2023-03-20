@@ -296,7 +296,7 @@ public class SupportBundleService {
     private List<LogFile> getMemLogFiles(MemoryAppender memAppender) {
         try {
             memAppender.getLogMessages(1);
-            return List.of(new LogFile("memory", memAppender.getName() + ".log", -1, Instant.now()));
+            return List.of(new LogFile("memory", "server.mem.log", -1, Instant.now()));
         } catch (Exception e) {
             LOG.warn("Failed to get logs from MemoryAppender <{}>", memAppender.getName(), e);
             return List.of();
@@ -309,6 +309,7 @@ public class SupportBundleService {
 
         final ImmutableList.Builder<LogFile> logFiles = ImmutableList.builder();
 
+        // The current open uncompressed logfile
         buildLogFile("0", rollingFileAppender.getFileName()).ifPresent(logFiles::add);
 
         // TODO support filePatterns with https://logging.apache.org/log4j/2.x/manual/lookups.html#DateLookup

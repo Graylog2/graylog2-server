@@ -10,6 +10,7 @@
             <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5p [%c{1}] %m%n"/>
         </Memory>
 
+<!--        TODO for testing only remove this -->
         <RollingFile name="rolling-file" fileName="/tmp/server.log" filePattern="/tmp/server.log.%i.gz">
             <PatternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5p [%c{1}] %m%n"/>
             <Policies>
