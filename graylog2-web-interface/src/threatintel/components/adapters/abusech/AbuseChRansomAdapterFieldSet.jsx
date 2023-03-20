@@ -16,8 +16,8 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import ObjectUtils from 'util/ObjectUtils';
 
+import ObjectUtils from 'util/ObjectUtils';
 import { Input } from 'components/bootstrap';
 import { Select, TimeUnitInput } from 'components/common';
 
@@ -51,36 +51,39 @@ class AbuseChRansomAdapterFieldSet extends React.Component {
   };
 
   render() {
-    const config = this.props.config;
+    const { config } = this.props;
     const blocklistTypes = [
       { label: 'Domain blocklist', value: 'DOMAINS' },
       { label: 'URL blocklist', value: 'URLS' },
       { label: 'IP blocklist', value: 'IPS' },
     ];
-    return (<fieldset>
-      <Input label="Blocklist type"
-             id="blocklist-type-selector"
-             required
-             autoFocus
-             help={'Select the type of the abuse.ch ransomware blocklist'}
-             labelClassName="col-sm-3"
-             wrapperClassName="col-sm-9">
-        <Select placeholder="Select the type of blocklist"
-                clearable={false}
-                options={blocklistTypes}
-                matchProp="label"
-                onChange={this._onBlocklistTypeSelect}
-                value={config.blocklist_type} />
-      </Input>
-      <TimeUnitInput label="Refresh blocklist"
-                     help={'If enabled, the abuse.ch ransomware blocklist is refreshed when it changed.'}
-                     update={this.updateRefreshInterval}
-                     value={config.refresh_interval}
-                     unit={config.refresh_interval_unit || 'MINUTES'}
-                     defaultEnabled={config.refresh_interval > 0}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9" />
-    </fieldset>);
+
+    return (
+      <fieldset>
+        <Input label="Blocklist type"
+               id="blocklist-type-selector"
+               required
+               autoFocus
+               help="Select the type of the abuse.ch ransomware blocklist"
+               labelClassName="col-sm-3"
+               wrapperClassName="col-sm-9">
+          <Select placeholder="Select the type of blocklist"
+                  clearable={false}
+                  options={blocklistTypes}
+                  matchProp="label"
+                  onChange={this._onBlocklistTypeSelect}
+                  value={config.blocklist_type} />
+        </Input>
+        <TimeUnitInput label="Refresh blocklist"
+                       help="If enabled, the abuse.ch ransomware blocklist is refreshed when it changed."
+                       update={this.updateRefreshInterval}
+                       value={config.refresh_interval}
+                       unit={config.refresh_interval_unit || 'MINUTES'}
+                       defaultEnabled={config.refresh_interval > 0}
+                       labelClassName="col-sm-3"
+                       wrapperClassName="col-sm-9" />
+      </fieldset>
+    );
   }
 }
 
