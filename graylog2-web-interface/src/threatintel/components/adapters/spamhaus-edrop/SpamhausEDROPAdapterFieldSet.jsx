@@ -17,8 +17,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const SpamhausEDROPAdapterFieldSet = ({ handleFormEvent, validationState, validationMessage, config}) => (
-  <fieldset/>
+const SpamhausEDROPAdapterFieldSet = ({ handleFormEvent, validationState, validationMessage, config }) => (
+  <fieldset />
 );
 
 SpamhausEDROPAdapterFieldSet.propTypes = {

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/* eslint-disable react/no-unescaped-entities, no-template-curly-in-string */
+/* eslint-disable react/no-unescaped-entities */
 import React from 'react';
 
 import { ExternalLink } from 'components/common';
@@ -22,6 +22,7 @@ import { ExternalLink } from 'components/common';
 class OTXAdapterDocumentation extends React.Component {
   render() {
     const style = { marginBottom: 10 };
+
     return (
       <div>
         <p style={style}>
@@ -47,7 +48,8 @@ class OTXAdapterDocumentation extends React.Component {
         <p style={style}>
           The OTX API key is used to authenticate API requests. Requests also work if you don't enter an API key, but
           you will most probably get a smaller request limit. <strong>If you use this data adapter for production traffic,
-          please register for an OTX account and get an API key.</strong>
+            please register for an OTX account and get an API key.
+                                                              </strong>
         </p>
 
         <h5 style={style}>OTX API URL</h5>
