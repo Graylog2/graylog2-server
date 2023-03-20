@@ -1,0 +1,172 @@
+{
+    "description": "This content pack is part of the [Graylog Threat Intel Plugin](http://github.com/graylog-labs/graylog-plugin-threatintel).\n\n*Please do not delete it manually if you consider to use the Threat Intel Plugin's functions. It contains important resources required by the plugin.*\n\nThis is the lookup table for Spamhaus' DROP (Don't Route Or Peer) list, containing netblocks which are \\\"hijacked\\\" or leased by professional spam or cyber-crime operations. For more information see https://www.spamhaus.org/drop. This lookup table is used internally by Graylog's Threat Intel Plugin. Do not delete it manually.\n",
+    "entities": [
+        {
+            "data": {
+                "configuration": {
+                    "refresh_interval": {
+                        "@type": "long",
+                        "@value": 43200
+                    },
+                    "type": {
+                        "@type": "string",
+                        "@value": "spamhaus-edrop"
+                    }
+                },
+                "description": {
+                    "@type": "string",
+                    "@value": "This is the data adapter for Spamhaus' DROP (Don't Route Or Peer) list, containing netblocks which are \"hijacked\" or leased by professional spam or cyber-crime operations. For more information see https://www.spamhaus.org/drop. This adapter is used internally by Graylog's Threat Intel Plugin. Do not delete it manually."
+                },
+                "name": {
+                    "@type": "string",
+                    "@value": "spamhaus-drop"
+                },
+                "title": {
+                    "@type": "string",
+                    "@value": "Spamhaus DROP"
+                }
+            },
+            "id": "5ac762873d274666e34eca82",
+            "type": {
+                "name": "lookup_adapter",
+                "version": "1"
+            },
+            "v": "1",
+            "constraints": [
+                {
+                    "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
+                    "type": "plugin-version",
+                    "version": ">=3.0.0-alpha.2"
+                },
+                {
+                    "type": "server-version",
+                    "version": ">=3.0.0-alpha.2+af8d8e0"
+                }
+            ]
+        },
+        {
+            "data": {
+                "configuration": {
+                    "expire_after_access": {
+                        "@type": "long",
+                        "@value": 0
+                    },
+                    "expire_after_access_unit": {
+                        "@type": "string",
+                        "@value": "SECONDS"
+                    },
+                    "expire_after_write": {
+                        "@type": "long",
+                        "@value": 1
+                    },
+                    "expire_after_write_unit": {
+                        "@type": "string",
+                        "@value": "DAYS"
+                    },
+                    "max_size": {
+                        "@type": "integer",
+                        "@value": 1000
+                    },
+                    "type": {
+                        "@type": "string",
+                        "@value": "guava_cache"
+                    }
+                },
+                "description": {
+                    "@type": "string",
+                    "@value": "This is the cache for Spamhaus' (E)DROP (Don't Route Or Peer) list, containing netblocks which are \"hijacked\" or leased by professional spam or cyber-crime operations. For more information see https://www.spamhaus.org/drop. This cache is used internally by Graylog's Threat Intel Plugin. Do not delete it manually."
+                },
+                "name": {
+                    "@type": "string",
+                    "@value": "spamhaus-e-drop-cache"
+                },
+                "title": {
+                    "@type": "string",
+                    "@value": "Spamhaus (E)DROP Cache"
+                }
+            },
+            "id": "5ac762873d274666e34eca7f",
+            "type": {
+                "name": "lookup_cache",
+                "version": "1"
+            },
+            "v": "1",
+            "constraints": [
+                {
+                    "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
+                    "type": "plugin-version",
+                    "version": ">=3.0.0-alpha.2"
+                },
+                {
+                    "type": "server-version",
+                    "version": ">=3.0.0-alpha.2+af8d8e0"
+                }
+            ]
+        },
+        {
+            "data": {
+                "cache_name": {
+                    "@type": "string",
+                    "@value": "5ac762873d274666e34eca7f"
+                },
+                "data_adapter_name": {
+                    "@type": "string",
+                    "@value": "5ac762873d274666e34eca82"
+                },
+                "default_multi_value": {
+                    "@type": "string",
+                    "@value": ""
+                },
+                "default_multi_value_type": {
+                    "@type": "string",
+                    "@value": "NULL"
+                },
+                "default_single_value": {
+                    "@type": "string",
+                    "@value": ""
+                },
+                "default_single_value_type": {
+                    "@type": "string",
+                    "@value": "NULL"
+                },
+                "description": {
+                    "@type": "string",
+                    "@value": "This is the lookup table for Spamhaus' DROP (Don't Route Or Peer) list, containing netblocks which are \"hijacked\" or leased by professional spam or cyber-crime operations. For more information see https://www.spamhaus.org/drop. This lookup table is used internally by Graylog's Threat Intel Plugin. Do not delete it manually."
+                },
+                "name": {
+                    "@type": "string",
+                    "@value": "spamhaus-drop"
+                },
+                "title": {
+                    "@type": "string",
+                    "@value": "Spamhaus DROP"
+                }
+            },
+            "id": "5ac762873d274666e34eca8e",
+            "type": {
+                "name": "lookup_table",
+                "version": "1"
+            },
+            "v": "1",
+            "constraints": [
+                {
+                    "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
+                    "type": "plugin-version",
+                    "version": ">=3.0.0-alpha.2"
+                },
+                {
+                    "type": "server-version",
+                    "version": ">=3.0.0-alpha.2+af8d8e0"
+                }
+            ]
+        }
+    ],
+    "id": "90be5e03-cb16-c802-6462-a244b4a342f3",
+    "name": "Spamhaus DROP - Threat Intel Plugin",
+    "parameters": [],
+    "rev": 1,
+    "summary": "The Spamhaus DROP Lookup Table of the Threat Intel Plugin",
+    "url": "https://github.com/Graylog2/graylog2-server",
+    "v": "1",
+    "vendor": "Graylog <hello@graylog.com>"
+}
