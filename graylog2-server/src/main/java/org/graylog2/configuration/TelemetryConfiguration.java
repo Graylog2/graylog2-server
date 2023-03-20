@@ -8,11 +8,14 @@ import java.util.Map;
 public class TelemetryConfiguration {
 
 
-    @Parameter(value = "analytics_api_key")
+    @Parameter(value = "api_key")
     private String telemetryApiKey;
 
-    @Parameter(value = "analytics_api_host")
+    @Parameter(value = "host")
     private String telemetryApiHost = "https://app.posthog.com";
+
+    @Parameter(value = "enabled")
+    private boolean telemetryEnabled = true;
 
 
     @Nullable
@@ -24,10 +27,15 @@ public class TelemetryConfiguration {
         return telemetryApiHost;
     }
 
+    public boolean isTelemetryEnabled() {
+        return telemetryEnabled;
+    }
+
     public Map<String, ?> toMap() {
         return Map.of(
                 "api_key", getTelemetryApiKey() != null ? getTelemetryApiKey() : "",
-                "host", getTelemetryApiHost() != null ? getTelemetryApiHost() : ""
+                "host", getTelemetryApiHost(),
+                "enabled", isTelemetryEnabled()
         );
     }
 }
