@@ -69,7 +69,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -92,7 +91,7 @@ public class SupportBundleService {
     private final ObjectMapper objectMapper;
 
     @Inject
-    public SupportBundleService(@Named("daemonScheduler") ScheduledExecutorService executor, // TODO what is the right ExecutorService?
+    public SupportBundleService(@Named("proxiedRequestsExecutorService") ExecutorService executor,
                                 NodeService nodeService,
                                 RemoteInterfaceProvider remoteInterfaceProvider,
                                 @Named("data_dir") Path dataDir,
