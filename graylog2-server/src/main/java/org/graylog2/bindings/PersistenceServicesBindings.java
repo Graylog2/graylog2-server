@@ -48,17 +48,17 @@ import org.graylog2.users.UserServiceImpl;
 public class PersistenceServicesBindings extends AbstractModule {
     @Override
     protected void configure() {
-        bind(SystemMessageService.class).to(SystemMessageServiceImpl.class);
-        bind(NotificationService.class).to(NotificationServiceImpl.class);
-        bind(IndexFailureService.class).to(IndexFailureServiceImpl.class);
+        bind(SystemMessageService.class).to(SystemMessageServiceImpl.class).asEagerSingleton();
+        bind(NotificationService.class).to(NotificationServiceImpl.class).asEagerSingleton();
+        bind(IndexFailureService.class).to(IndexFailureServiceImpl.class).asEagerSingleton();
         bind(NodeService.class).to(NodeServiceImpl.class);
         bind(IndexRangeService.class).to(MongoIndexRangeService.class).asEagerSingleton();
         bind(InputService.class).to(InputServiceImpl.class);
-        bind(UserService.class).to(UserServiceImpl.class);
+        bind(UserService.class).to(UserServiceImpl.class).asEagerSingleton();
         OptionalBinder.newOptionalBinder(binder(), UserManagementService.class)
                 .setDefault().to(UserManagementServiceImpl.class);
         bind(AccessTokenService.class).to(AccessTokenServiceImpl.class).asEagerSingleton();
-        bind(MongoDBSessionService.class).to(MongoDBSessionServiceImpl.class);
+        bind(MongoDBSessionService.class).to(MongoDBSessionServiceImpl.class).asEagerSingleton();
         bind(InputStatusService.class).to(MongoInputStatusService.class).asEagerSingleton();
         bind(EntityListPreferencesService.class).to(EntityListPreferencesServiceImpl.class);
         bind(EntitySuggestionService.class).to(MongoEntitySuggestionService.class);
