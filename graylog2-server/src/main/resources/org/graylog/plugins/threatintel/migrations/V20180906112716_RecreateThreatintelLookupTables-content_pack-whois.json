@@ -1,0 +1,180 @@
+{
+    "description": "This content pack is part of the [Graylog Threat Intel Plugin](http://github.com/graylog-labs/graylog-plugin-threatintel).\n\n*Please do not delete it manually if you consider to use the Threat Intel Plugin's functions. It contains important resources required by the plugin.*\n\nThis is the lookup table for the WHOIS database, listing registered users of Internet resources like IPs, Netblocks or Domain Names. This lookup table is used internally by Graylog's Threat Intel Plugin. Do not delete it manually.",
+    "entities": [
+        {
+            "data": {
+                "configuration": {
+                    "connect_timeout": {
+                        "@type": "integer",
+                        "@value": 1000
+                    },
+                    "read_timeout": {
+                        "@type": "integer",
+                        "@value": 1000
+                    },
+                    "registry": {
+                        "@type": "string",
+                        "@value": "ARIN"
+                    },
+                    "type": {
+                        "@type": "string",
+                        "@value": "whois"
+                    }
+                },
+                "description": {
+                    "@type": "string",
+                    "@value": "This is the data adapter for the WHOIS database, listing registered users of Internet resources like IPs, Netblocks or Domain Names. This adapter is used internally by Graylog's Threat Intel Plugin. Do not delete it manually."
+                },
+                "name": {
+                    "@type": "string",
+                    "@value": "whois"
+                },
+                "title": {
+                    "@type": "string",
+                    "@value": "Whois"
+                }
+            },
+            "id": "5ac762873d274666e34eca83",
+            "type": {
+                "name": "lookup_adapter",
+                "version": "1"
+            },
+            "v": "1",
+            "constraints": [
+                {
+                    "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
+                    "type": "plugin-version",
+                    "version": ">=3.0.0-alpha.2"
+                },
+                {
+                    "type": "server-version",
+                    "version": ">=3.0.0-alpha.2+af8d8e0"
+                }
+            ]
+        },
+        {
+            "data": {
+                "configuration": {
+                    "expire_after_access": {
+                        "@type": "long",
+                        "@value": 0
+                    },
+                    "expire_after_access_unit": {
+                        "@type": "string",
+                        "@value": "DAYS"
+                    },
+                    "expire_after_write": {
+                        "@type": "long",
+                        "@value": 1
+                    },
+                    "expire_after_write_unit": {
+                        "@type": "string",
+                        "@value": "DAYS"
+                    },
+                    "max_size": {
+                        "@type": "integer",
+                        "@value": 1000
+                    },
+                    "type": {
+                        "@type": "string",
+                        "@value": "guava_cache"
+                    }
+                },
+                "description": {
+                    "@type": "string",
+                    "@value": "This is the cache for the WHOIS database, listing registered users of Internet resources like IPs, Netblocks or Domain Names. This cache is used internally by Graylog's Threat Intel Plugin. Do not delete it manually."
+                },
+                "name": {
+                    "@type": "string",
+                    "@value": "whois-cache"
+                },
+                "title": {
+                    "@type": "string",
+                    "@value": "Whois Cache"
+                }
+            },
+            "id": "5ac762873d274666e34eca7c",
+            "type": {
+                "name": "lookup_cache",
+                "version": "1"
+            },
+            "v": "1",
+            "constraints": [
+                {
+                    "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
+                    "type": "plugin-version",
+                    "version": ">=3.0.0-alpha.2"
+                },
+                {
+                    "type": "server-version",
+                    "version": ">=3.0.0-alpha.2+af8d8e0"
+                }
+            ]
+        },
+        {
+            "data": {
+                "cache_name": {
+                    "@type": "string",
+                    "@value": "5ac762873d274666e34eca7c"
+                },
+                "data_adapter_name": {
+                    "@type": "string",
+                    "@value": "5ac762873d274666e34eca83"
+                },
+                "default_multi_value": {
+                    "@type": "string",
+                    "@value": ""
+                },
+                "default_multi_value_type": {
+                    "@type": "string",
+                    "@value": "NULL"
+                },
+                "default_single_value": {
+                    "@type": "string",
+                    "@value": ""
+                },
+                "default_single_value_type": {
+                    "@type": "string",
+                    "@value": "NULL"
+                },
+                "description": {
+                    "@type": "string",
+                    "@value": "This is the lookup table for the WHOIS database, listing registered users of Internet resources like IPs, Netblocks or Domain Names. This lookup table is used internally by Graylog's Threat Intel Plugin. Do not delete it manually."
+                },
+                "name": {
+                    "@type": "string",
+                    "@value": "whois"
+                },
+                "title": {
+                    "@type": "string",
+                    "@value": "Whois"
+                }
+            },
+            "id": "5ac762873d274666e34eca90",
+            "type": {
+                "name": "lookup_table",
+                "version": "1"
+            },
+            "v": "1",
+            "constraints": [
+                {
+                    "plugin": "org.graylog.plugins.threatintel.ThreatIntelPlugin",
+                    "type": "plugin-version",
+                    "version": ">=3.0.0-alpha.2"
+                },
+                {
+                    "type": "server-version",
+                    "version": ">=3.0.0-alpha.2+af8d8e0"
+                }
+            ]
+        }
+    ],
+    "id": "1794d39d-077f-7360-b92b-95411b05fbce",
+    "name": "Whois - Threat Intel Plugin",
+    "parameters": [],
+    "rev": 1,
+    "summary": "The Whois Lookup Table of the Threat Intel Plugin",
+    "url": "https://github.com/Graylog2/graylog2-server",
+    "v": "1",
+    "vendor": "Graylog <hello@graylog.com>"
+}
