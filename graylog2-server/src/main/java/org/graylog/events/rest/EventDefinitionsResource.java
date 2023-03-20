@@ -304,7 +304,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             ValidationResult validationResult = new ValidationResult()
                 .addError("dependency", msg)
                 .addContext("dependency_ids", dependenciesIds);
-            throw new ValidationFailureException(validationResult);
+            throw new ValidationFailureException(validationResult, msg);
         }
 
         eventDefinitionDto.ifPresent(d ->

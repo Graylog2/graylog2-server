@@ -239,11 +239,12 @@ const DataTable = ({
   }, [rowPivotColumnsWidth, rowPivots, pinnedColumns, series]);
   const formattedRows = deduplicateValues(expandedRows, rowFieldNames).map((reducedItem, idx) => {
     const valuePath = rowFieldNames.map((pivotField) => ({ [pivotField]: expandedRows[idx][pivotField] }));
+    const key = `datatableentry-${idx}`;
 
     return (
 
       (
-        <DataTableEntry key={`datatableentry-${idx}`}
+        <DataTableEntry key={key}
                         fields={effectiveFields}
                         item={reducedItem}
                         valuePath={valuePath}
