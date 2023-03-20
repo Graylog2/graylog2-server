@@ -80,7 +80,7 @@ import java.util.zip.ZipOutputStream;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class SupportBundleService {
-    public static final IntStream LOGFILE_ENUMERATION_RANGE = IntStream.range(1, 5); // how many rotated logs should we look for
+    public static final int LOGFILE_ENUMERATION_RANGE = 5; // how many rotated logs should we look for
     private static final Logger LOG = LoggerFactory.getLogger(SupportBundleService.class);
     public static final String SUPPORT_BUNDLE_DIR_NAME = "support-bundle";
     public static final Duration CALL_TIMEOUT = Duration.ofSeconds(10);
@@ -320,7 +320,7 @@ public class SupportBundleService {
         var regex = f("^%s\\.%%i\\.gz", baseFileName);
         if (filePattern.matches(regex)) {
             final String formatString = filePattern.replace("%i", "%d");
-            LOGFILE_ENUMERATION_RANGE.forEach(i -> {
+            IntStream.range(1, LOGFILE_ENUMERATION_RANGE).forEach(i -> {
                 var file = f(formatString, i);
                 buildLogFile(String.valueOf(i), file).ifPresent(logFiles::add);
             });
