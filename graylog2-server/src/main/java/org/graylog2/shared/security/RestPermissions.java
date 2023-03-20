@@ -316,7 +316,7 @@ public class RestPermissions implements PluginPermissions {
                     RestPermissions.EVENT_NOTIFICATIONS_CREATE
             )),
             BuiltinRole.create("User Inspector", "Allows listing all user accounts (built-in)", ImmutableSet.of(
-                    RestPermissions.USERS_READ
+                    RestPermissions.USERS_READ, RestPermissions.USERS_LIST
             ))
     ).build();
 
