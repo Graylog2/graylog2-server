@@ -30,6 +30,7 @@ import org.mongojack.DBQuery;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collection;
@@ -43,6 +44,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+@Singleton
 public class DBGrantService extends PaginatedDbService<GrantDTO> {
     public static final String COLLECTION_NAME = "grants";
 
@@ -194,9 +196,9 @@ public class DBGrantService extends PaginatedDbService<GrantDTO> {
 
     public Map<GRN, Set<GRN>> getOwnersForTargets(Collection<GRN> targets) {
         return db.find(DBQuery.and(
-                DBQuery.in(GrantDTO.FIELD_TARGET, targets),
-                DBQuery.is(GrantDTO.FIELD_CAPABILITY, Capability.OWN)
-        )).toArray()
+                        DBQuery.in(GrantDTO.FIELD_TARGET, targets),
+                        DBQuery.is(GrantDTO.FIELD_CAPABILITY, Capability.OWN)
+                )).toArray()
                 .stream()
                 .collect(Collectors.groupingBy(
                         GrantDTO::target,
