@@ -1,8 +1,25 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import React, { useMemo, useEffect, useState } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import reduce from 'lodash/reduce';
 import { usePostHog } from 'posthog-js/react';
 
+import type { TelemetryEventType, TelemetryEvent } from 'telemetry/TelemetryContext';
 import TelemetryContext from 'telemetry/TelemetryContext';
 import { useStore } from 'stores/connect';
 import type { CurrentUserStoreState } from 'stores/users/CurrentUserStore';
@@ -27,9 +44,9 @@ const getAverageTraffic = (traffic) => {
 const getClusterOverview = (clusterOverview, nodes) => {
   return Object.keys(nodes).reduce((acc, nodeId) => {
     acc.nodes[nodeId] = {
-      is_processing: clusterOverview[nodeId].is_processing,
-      operating_system: clusterOverview[nodeId].operating_system,
-      version: clusterOverview[nodeId].version,
+      is_processing: clusterOverview[nodeId]?.is_processing,
+      operating_system: clusterOverview[nodeId]?.operating_system,
+      version: clusterOverview[nodeId]?.version,
     };
 
     return acc;
@@ -107,7 +124,7 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
   }, [currentUser, nodes.clusterId, posthog, telemetryGroupId]);
 
   const TelemetryContextValue = useMemo(() => {
-    const sendTelemetry = (eventType: string, event: object) => {
+    const sendTelemetry = (eventType: TelemetryEventType, event: TelemetryEvent) => {
       if (posthog) {
         posthog.capture(eventType, event);
       }
