@@ -72,7 +72,7 @@ const allConfigs = [webpackConfig, ...pluginConfigs];
 
 // We need to inject webpack-hot-middleware to all entries, ensuring the app is able to reload on changes.
 if (TARGET === 'start') {
-  const webpackHotMiddlewareEntry = (name) => `webpack-hot-middleware/client?name=${name}`;
+  const webpackHotMiddlewareEntry = (name) => `webpack-hot-middleware/client?name=${name}&reload=true`;
 
   allConfigs.forEach((finalConfig) => {
     const hmrEntries = {};
