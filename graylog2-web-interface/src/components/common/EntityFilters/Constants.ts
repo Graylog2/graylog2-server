@@ -14,17 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { Filters } from 'components/common/EntityFilters/types';
 
-// Transform filters, so they can be used as URL query params, for example for the PaginationURL helper.
-const FiltersForQueryParams = (filters: Filters) => {
-  if (!filters) {
-    return undefined;
-  }
-
-  return Object.entries(filters).flatMap(([attributeId, filterValues]) => (
-    filterValues.map(({ value }) => `${attributeId}:${value}`)
-  ));
-};
-
-export default FiltersForQueryParams;
+// eslint-disable-next-line import/prefer-default-export
+export const ROW_MIN_HEIGHT = 34;
