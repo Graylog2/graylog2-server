@@ -83,10 +83,10 @@ const ErrorMessage = styled.span(({ theme }) => css`
   height: 1.5em;
 `);
 
-const DateConfiguration = ({ name: fieldName, label, allTimeLabel }: {
+const DateConfiguration = ({ name: fieldName, label, checkboxLabel }: {
   name: string,
   label: string,
-  allTimeLabel: string
+  checkboxLabel: string
 }) => {
   const { formatTime } = useUserDateTime();
 
@@ -100,7 +100,7 @@ const DateConfiguration = ({ name: fieldName, label, allTimeLabel }: {
           <div>
             <SectionHeader>
               <StyledLabel htmlFor={`date-input-${name}`}>{label}</StyledLabel>
-              <StyledCheckbox onChange={onChangeAllTime} checked={!value}>{allTimeLabel}</StyledCheckbox>
+              <StyledCheckbox onChange={onChangeAllTime} checked={!value}>{checkboxLabel}</StyledCheckbox>
             </SectionHeader>
             <AbsoluteDateInput name="from"
                                value={value}
@@ -187,10 +187,10 @@ const DateRangeForm = ({ filter, onSubmit }: Props) => {
           <Form>
             <Sections>
               <Section>
-                <DateConfiguration name="from" label="From" allTimeLabel="All time" />
+                <DateConfiguration name="from" label="From" checkboxLabel="All time" />
               </Section>
               <Section>
-                <DateConfiguration name="until" label="Until" allTimeLabel="Now" />
+                <DateConfiguration name="until" label="Until" checkboxLabel="Now" />
               </Section>
             </Sections>
             <Info>
