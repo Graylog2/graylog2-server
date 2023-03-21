@@ -21,28 +21,30 @@ import type { SyntheticEvent } from 'react';
 
 type Props = {
   children: React.ReactNode,
-  zIndex?: number,
-  show: boolean,
+  minWidth?: number
   onMenuItemSelect?: (e: SyntheticEvent) => void,
+  show: boolean,
+  zIndex?: number,
 };
 
 const StyledDropdownMenu = styled.ul.attrs(() => ({
-  className: 'dropdown-menu' /* stylelint-disable-line property-no-unknown*/
-}))<{ $show: boolean, $zIndex: number }>(({ $show, theme, $zIndex }) => css`
+  className: 'dropdown-menu', /* stylelint-disable-line property-no-unknown */
+}))<{ $show: boolean, $zIndex: number, $minWidth: number }>(({ $show, theme, $zIndex, $minWidth }) => css`
   display: ${$show ? 'block' : 'none'};
-  min-width: max-content;
   color: ${theme.colors.variant.dark.default};
   background-color: ${theme.colors.variant.lightest.default};
   box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
-  padding: 5px;
   z-index: ${$zIndex};
+  min-width: ${$minWidth ? `${$minWidth}px` : 'max-content'};
   
   .dropdown-header {
     color: ${theme.colors.variant.dark.default};
+    padding: 3px 10px;
   }
   
   > li {
     > a {
+      padding: 3px 10px;
       color: ${theme.colors.variant.darker.default};
       display: flex;
       align-items: center;
@@ -97,11 +99,11 @@ function closeOnChildrenSelect(children: React.ReactNode, updateDepth: number, o
   );
 }
 
-const DropdownMenu = ({ show, children, zIndex, onMenuItemSelect, ...restProps }: Props) => {
+const DropdownMenu = ({ show, children, zIndex, onMenuItemSelect, minWidth, ...restProps }: Props) => {
   const mappedChildren = closeOnChildrenSelect(children, 0, onMenuItemSelect);
 
   return (
-    <StyledDropdownMenu {...restProps} $show={show} $zIndex={zIndex}>
+    <StyledDropdownMenu {...restProps} $show={show} $zIndex={zIndex} $minWidth={minWidth}>
       {mappedChildren}
     </StyledDropdownMenu>
   );
@@ -111,11 +113,13 @@ DropdownMenu.propTypes = {
   children: PropTypes.node.isRequired,
   zIndex: PropTypes.number,
   show: PropTypes.bool,
+  minWidth: PropTypes.number,
 };
 
 DropdownMenu.defaultProps = {
   show: false,
   zIndex: 1050,
+  minWidth: undefined,
   onMenuItemSelect: () => {},
 };
 

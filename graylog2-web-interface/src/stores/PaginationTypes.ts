@@ -81,6 +81,7 @@ export type Attribute = {
   searchable?: boolean,
   filterable?: true,
   filter_options?: Array<{ value: string, title: string }>
+  related_collection?: string,
 
 }
 
