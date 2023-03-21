@@ -139,15 +139,15 @@ class DecoratorSummary extends React.Component<Props, State> {
 
     const content = editing
       ? (
-        <ConfigurationForm key="configuration-form-decorator"
-                           configFields={requestedConfiguration}
-                           title={`Edit ${name}`}
-                           typeName={decorator.type}
-                           includeTitleField={false}
-                           submitAction={this._handleSubmit}
-                           cancelAction={this._closeEditForm}
-                           wrapperComponent={wrapperComponent}
-                           values={decorator.config} />
+        <ConfigurationForm<Decorator['config']> key="configuration-form-decorator"
+                                                configFields={requestedConfiguration}
+                                                title={`Edit ${name}`}
+                                                typeName={decorator.type}
+                                                includeTitleField={false}
+                                                submitAction={this._handleSubmit}
+                                                cancelAction={this._closeEditForm}
+                                                wrapperComponent={wrapperComponent}
+                                                values={decorator.config} />
       )
       : (
         <ConfigurationWell key={`configuration-well-decorator-${decoratorId}`}

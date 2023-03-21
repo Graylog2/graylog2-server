@@ -18,7 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import type { Theme as SelectTheme, InputActionMeta } from 'react-select';
 import ReactSelect, { components as Components, createFilter } from 'react-select';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import type { DefaultTheme } from 'styled-components';
 import { withTheme } from 'styled-components';
 import CreatableSelect from 'react-select/creatable';
@@ -218,6 +218,7 @@ export type Props<OptionValue> = {
   addLabelText?: string,
   allowCreate?: boolean,
   autoFocus?: boolean,
+  className?: string,
   clearable?: boolean,
   components?: ComponentsProp | null | undefined,
   delimiter?: string,
@@ -232,12 +233,15 @@ export type Props<OptionValue> = {
   multi?: boolean,
   menuPortalTarget?: HTMLElement,
   name?: string,
+  openMenuOnFocus?: boolean,
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void,
   onChange: (value: OptionValue) => void,
   onReactSelectChange?: (option: Option | Option[]) => void,
+  onMenuClose?: () => void,
   optionRenderer?: (option: Option) => React.ReactElement,
   options: Array<Option>,
   placeholder: string,
+  persistSelection: boolean,
   // eslint-disable-next-line react/require-default-props
   ref?: React.Ref<React.ComponentType>,
   size?: 'normal' | 'small',
@@ -288,6 +292,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
   static propTypes = {
     /** Specifies if the user can create new entries in `multi` Selects. */
     allowCreate: PropTypes.bool,
+    className: PropTypes.string,
     /** Indicates if the Select value is clearable or not. */
     clearable: PropTypes.bool,
     /**
@@ -367,6 +372,8 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     onReactSelectChange: PropTypes.func,
     /** Select placeholder text */
     placeholder: PropTypes.string,
+    /** Specify if the select should change its state on change */
+    persistSelection: PropTypes.bool,
     /** Placement of the menu: "top", "bottom", "auto" */
     menuPlacement: PropTypes.oneOf(['top', 'bottom', 'auto']),
     /** Max height of the menu */
@@ -383,11 +390,13 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     addLabelText: undefined,
     allowCreate: false,
     autoFocus: false,
+    className: undefined,
     clearable: true,
     components: null,
     delimiter: ',',
     disabled: false,
     displayKey: 'label',
+    persistSelection: true,
     id: undefined,
     ignoreAccents: true,
     inputId: undefined,
@@ -396,7 +405,9 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     matchProp: 'any',
     multi: false,
     name: undefined,
+    openMenuOnFocus: undefined,
     onReactSelectChange: undefined,
+    onMenuClose: undefined,
     optionRenderer: undefined,
     placeholder: undefined,
     required: false,
@@ -410,7 +421,6 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     total: 0,
     onInputChange: undefined,
     loadOptions: undefined,
-    // ref: undefined,
     menuPortalTarget: undefined,
     forwardedRef: undefined,
   };
@@ -464,9 +474,10 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
   _onChange = (selectedOption: Option) => {
     const value = this._extractOptionValue(selectedOption);
 
-    this.setState({ value: value });
+    if (this.props.persistSelection) {
+      this.setState({ value: value });
+    }
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     const { onChange = () => {} } = this.props;
 
     onChange(value);

@@ -23,25 +23,28 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { FormikFormGroup, FormikInput, FormSubmit, Spinner, TimeUnitInput } from 'components/common';
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import history from 'util/History';
 import { Col, Row, Input } from 'components/bootstrap';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import 'components/indices/rotation';
 import 'components/indices/retention';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import withHistory from 'routing/withHistory';
+import type { HistoryFunction } from 'routing/useHistory';
+import { IndexSetPropType } from 'stores/indices/IndexSetsStore';
 
 import type { RetentionStrategyContext } from './Types';
 
 type Props = {
   cancelLink: string,
-  create: boolean,
+  create?: boolean,
+  history: HistoryFunction,
   indexSet: IndexSet,
   onUpdate: (indexSet: IndexSet) => void,
   retentionStrategies: Array<any>,
   retentionStrategiesContext: RetentionStrategyContext,
   rotationStrategies: Array<any>,
   submitButtonText: string,
-  submitLoadingText: string,
+  submitLoadingText?: string,
 };
 
 type Unit = 'seconds' | 'minutes';
@@ -54,16 +57,16 @@ const StyledFormSubmit = styled(FormSubmit)`
   margin-left: 0;
 `;
 
-const _validateIndexPrefix = (value) => {
+const _validateIndexPrefix = (value: string) => {
   let error;
 
-  if (value.length === 0) {
+  if (value?.length === 0) {
     error = 'Invalid index prefix: cannot be empty';
-  } else if (value.indexOf('_') === 0 || value.indexOf('-') === 0 || value.indexOf('+') === 0) {
+  } else if (value?.indexOf('_') === 0 || value?.indexOf('-') === 0 || value?.indexOf('+') === 0) {
     error = 'Invalid index prefix: must start with a letter or number';
-  } else if (value.toLocaleLowerCase() !== value) {
+  } else if (value?.toLocaleLowerCase() !== value) {
     error = 'Invalid index prefix: must be lower case';
-  } else if (!value.match(/^[a-z0-9][a-z0-9_\-+]*$/)) {
+  } else if (!value?.match(/^[a-z0-9][a-z0-9_\-+]*$/)) {
     error = 'Invalid index prefix: must only contain letters, numbers, \'_\', \'-\' and \'+\'';
   }
 
@@ -80,7 +83,7 @@ const _getRetentionConfigState = (strategy: string, data: string) => {
 
 class IndexSetConfigurationForm extends React.Component<Props, State> {
   static propTypes = {
-    indexSet: PropTypes.object.isRequired,
+    indexSet: IndexSetPropType.isRequired,
     rotationStrategies: PropTypes.array.isRequired,
     retentionStrategies: PropTypes.array.isRequired,
     retentionStrategiesContext: PropTypes.shape({
@@ -107,7 +110,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
     };
   }
 
-  _saveConfiguration = (values) => {
+  _saveConfiguration = (values: IndexSet) => {
     const { onUpdate } = this.props;
 
     return onUpdate(values);
@@ -120,6 +123,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
       retentionStrategies,
       create,
       cancelLink,
+      history,
       indexSet: {
         rotation_strategy: indexSetRotationStrategy,
         rotation_strategy_class: indexSetRotationStrategyClass,
@@ -141,7 +145,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
 
       rotationConfig = (
         <IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
-                                                 key="rotation"
+                                                 name="rotation"
                                                  description="Graylog uses multiple indices to store documents in. You can configure the strategy it uses to determine when to rotate the currently active write index."
                                                  selectPlaceholder="Select rotation strategy"
                                                  pluginExports={PluginStore.exports('indexRotationConfig')}
@@ -164,7 +168,7 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
 
       retentionConfig = (
         <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
-                                                 key="retention"
+                                                 name="retention"
                                                  description="Graylog uses a retention strategy to clean up old indices."
                                                  selectPlaceholder="Select retention strategy"
                                                  pluginExports={PluginStore.exports('indexRetentionConfig')}
@@ -303,4 +307,5 @@ class IndexSetConfigurationForm extends React.Component<Props, State> {
   }
 }
 
-export default IndexSetConfigurationForm;
+// @ts-ignore
+export default withHistory(IndexSetConfigurationForm);

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import type View from 'views/logic/views/View';
 import SearchTypesGenerator from 'views/logic/searchtypes/SearchTypesGenerator';

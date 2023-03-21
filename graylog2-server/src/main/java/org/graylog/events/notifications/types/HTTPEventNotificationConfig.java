@@ -47,6 +47,7 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
     private static final String FIELD_BASIC_AUTH = "basic_auth";
     private static final String FIELD_API_KEY = "api_key";
     private static final String FIELD_API_SECRET = "api_secret";
+    private static final String FIELD_SKIP_TLS_VERIFICATION = "skip_tls_verification";
 
     @JsonProperty(FIELD_BASIC_AUTH)
     @Nullable
@@ -62,6 +63,9 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
 
     @JsonProperty(FIELD_URL)
     public abstract String url();
+
+    @JsonProperty(FIELD_SKIP_TLS_VERIFICATION)
+    public abstract boolean skipTLSVerification();
 
     @JsonIgnore
     public JobTriggerData toJobTriggerData(EventDto dto) {
@@ -127,6 +131,7 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
                     .basicAuth(EncryptedValue.createUnset())
                     .apiSecret(EncryptedValue.createUnset())
                     .apiKey("")
+                    .skipTLSVerification(false)
                     .type(TYPE_NAME);
         }
 
@@ -141,6 +146,9 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
 
         @JsonProperty(FIELD_URL)
         public abstract Builder url(String url);
+
+        @JsonProperty(FIELD_SKIP_TLS_VERIFICATION)
+        public abstract Builder skipTLSVerification(boolean skip);
 
         public abstract HTTPEventNotificationConfig build();
     }

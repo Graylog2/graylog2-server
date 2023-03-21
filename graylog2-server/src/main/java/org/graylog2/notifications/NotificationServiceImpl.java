@@ -37,16 +37,20 @@ import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.graylog2.audit.AuditEventTypes.SYSTEM_NOTIFICATION_CREATE;
 import static org.graylog2.audit.AuditEventTypes.SYSTEM_NOTIFICATION_DELETE;
 
+@Singleton
 public class NotificationServiceImpl extends PersistedServiceImpl implements NotificationService {
     private static final Logger LOG = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
@@ -85,7 +89,22 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
 
     @Override
     public boolean fixed(Notification.Type type) {
-        return fixed(type, null);
+        return fixed(type, (Node) null);
+    }
+
+    @Override
+    public boolean fixed(Notification.Type type, String key) {
+        var qry = typeAndKeyQuery(type, key);
+        final boolean removed = destroyAll(NotificationImpl.class, qry) > 0;
+        if (removed) {
+            auditEventSender.success(AuditActor.system(nodeId), SYSTEM_NOTIFICATION_DELETE, Map.of("notification_type", type.getDeclaringClass().getCanonicalName()));
+        }
+        return removed;
+    }
+
+    @Override
+    public boolean fixed(Notification notification) {
+        return fixed(notification.getType(), (Node) null);
     }
 
     @Override
@@ -105,7 +124,12 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
 
     @Override
     public boolean isFirst(Notification.Type type) {
-        return findOne(NotificationImpl.class, new BasicDBObject(NotificationImpl.FIELD_TYPE, type.toString().toLowerCase(Locale.ENGLISH))) == null;
+        return isFirst(type, null);
+    }
+
+    private boolean isFirst(Notification.Type type, @Nullable String key) {
+        final BasicDBObject query = typeAndKeyQuery(type, key);
+        return findOne(NotificationImpl.class, query) == null;
     }
 
     @Override
@@ -124,9 +148,9 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
     }
 
     @Override
-    public Optional<Notification> getByType(Notification.Type type) {
-        DBObject dbObject = findOne(NotificationImpl.class,
-                new BasicDBObject(NotificationImpl.FIELD_TYPE, type.toString().toLowerCase(Locale.ENGLISH)));
+    public Optional<Notification> getByTypeAndKey(Notification.Type type, String key) {
+        DBObject dbObject = findOne(NotificationImpl.class, typeAndKeyQuery(type, key));
+
         if (dbObject != null) {
             return Optional.of(new NotificationImpl(new ObjectId(dbObject.get("_id").toString()), dbObject.toMap()));
         } else {
@@ -147,7 +171,7 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
         }
 
         // Write only if there is no such warning yet.
-        if (!isFirst(notification.getType())) {
+        if (!isFirst(notification.getType(), notification.getKey())) {
             return false;
         }
         try {
@@ -172,25 +196,39 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
                 dbEventDefinitionService.getSystemEventDefinitions().stream().findFirst()
                         .orElseThrow(() -> new IllegalStateException("System notification event definition not found"));
 
-        SystemNotificationRenderService.RenderResponse renderResponse = systemNotificationRenderService.render(notification);
-        notification.addDetail("message_details", renderResponse.description);
-        SystemNotificationEventProcessorParameters parameters =
-                SystemNotificationEventProcessorParameters.builder()
-                        .notificationType(notification.getType())
-                        .notificationMessage(renderResponse.title)
-                        .notificationDetails(notification.getDetails())
-                        .timestamp(notification.getTimestamp())
-                        .build();
-        eventProcessorEngine.execute(systemEventDefinition.id(), parameters);
-    }
-
-    @Override
-    public boolean fixed(Notification notification) {
-        return fixed(notification.getType(), null);
+        try {
+            SystemNotificationRenderService.RenderResponse renderResponse = systemNotificationRenderService.render(notification);
+            notification.addDetail("message_details", renderResponse.description);
+            SystemNotificationEventProcessorParameters parameters =
+                    SystemNotificationEventProcessorParameters.builder()
+                            .notificationType(notification.getType())
+                            .notificationMessage(renderResponse.title)
+                            .notificationDetails(notification.getDetails())
+                            .timestamp(notification.getTimestamp())
+                            .build();
+            eventProcessorEngine.execute(systemEventDefinition.id(), parameters);
+        } catch (Exception e) {
+            LOG.warn("Cannot render system event", e);
+        }
     }
 
     @Override
     public int destroyAllByType(Notification.Type type) {
-        return destroyAll(NotificationImpl.class, new BasicDBObject(NotificationImpl.FIELD_TYPE, type.toString().toLowerCase(Locale.ENGLISH)));
+        return destroyAll(NotificationImpl.class, typeAndKeyQuery(type, null));
     }
+
+    @Override
+    public int destroyAllByTypeAndKey(Notification.Type type, @Nullable String key) {
+        return destroyAll(NotificationImpl.class, typeAndKeyQuery(type, key));
+    }
+
+    private static BasicDBObject typeAndKeyQuery(Notification.Type type, @Nullable String key) {
+        BasicDBObject query = new BasicDBObject();
+        query.put(NotificationImpl.FIELD_TYPE, type.toString().toLowerCase(Locale.ENGLISH));
+        if (key != null) {
+            query.put(NotificationImpl.FIELD_KEY, key);
+        }
+        return query;
+    }
+
 }

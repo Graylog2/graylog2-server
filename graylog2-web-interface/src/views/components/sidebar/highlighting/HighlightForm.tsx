@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext } from 'react';
+import { useCallback, useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import { Formik, Form, Field } from 'formik';
@@ -26,7 +26,6 @@ import { Input, BootstrapModalWrapper, Modal } from 'components/bootstrap';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import Select from 'components/common/Select';
-import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import HighlightingRule, {
   ConditionLabelMap,
   StringConditionLabelMap,
@@ -42,10 +41,12 @@ import {
   StaticColor,
 } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import { ModalSubmit } from 'components/common';
+import useAppDispatch from 'stores/useAppDispatch';
+import { addHighlightingRule, updateHighlightingRule } from 'views/logic/slices/highlightActions';
 
 type Props = {
   onClose: () => void,
-  rule: HighlightingRule | null | undefined,
+  rule?: HighlightingRule | null | undefined,
 };
 
 const _isRequired = (field) => (value: string) => {
@@ -108,21 +109,20 @@ const HighlightForm = ({ onClose, rule }: Props) => {
   const fields = fieldTypes?.all
     ? fieldTypes.all
     : Immutable.List<FieldTypeMapping>();
-  const fieldOptions = fields.map(({ name }) => ({ value: name, label: name }))
+  const fieldOptions = useMemo(() => fields.map(({ name }) => ({ value: name, label: name }))
     .sort((optA, optB) => defaultCompare(optA.label, optB.label))
-    .toArray();
+    .toArray(), [fields]);
+  const dispatch = useAppDispatch();
 
-  const onSubmit = ({ field, value, color, condition }) => {
+  const onSubmit = useCallback(({ field, value, color, condition }) => {
     const newColor = colorFromObject(color);
 
     if (rule) {
-      HighlightingRulesActions.update(rule, { field, value, condition, color: newColor }).then(onClose);
-
-      return;
+      return dispatch(updateHighlightingRule(rule, { field, value, condition, color: newColor })).then(onClose);
     }
 
-    HighlightingRulesActions.add(HighlightingRule.create(field, value, condition, newColor)).then(onClose);
-  };
+    return dispatch(addHighlightingRule(HighlightingRule.create(field, value, condition, newColor))).then(onClose);
+  }, [dispatch, onClose, rule]);
 
   const headerPrefix = rule ? 'Edit' : 'Create';
   const submitButtonPrefix = rule ? 'Update' : 'Create';
@@ -143,7 +143,8 @@ const HighlightForm = ({ onClose, rule }: Props) => {
         return (
           <BootstrapModalWrapper showModal
                                  onHide={onClose}>
-            <Form className="form">
+            <Form className="form"
+                  data-testid={`${headerPrefix}-highlighting-rule-dialog`}>
               <Modal.Header>
                 <Modal.Title>{headerPrefix} Highlighting Rule</Modal.Title>
               </Modal.Header>

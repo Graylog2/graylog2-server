@@ -17,7 +17,8 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import type * as Immutable from 'immutable';
-import { flatten, get } from 'lodash';
+import flatten from 'lodash/flatten';
+import get from 'lodash/get';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
@@ -29,8 +30,8 @@ import type Series from 'views/logic/aggregationbuilder/Series';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
-import type { CurrentViewType } from '../CustomPropTypes';
 import CustomHighlighting from '../messagelist/CustomHighlighting';
 import DecoratedValue from '../messagelist/decoration/DecoratedValue';
 
@@ -46,7 +47,6 @@ type Field = {
 type Props = {
   columnPivots: Array<string>,
   columnPivotValues: Array<Array<string>>,
-  currentView: CurrentViewType,
   fields: Immutable.Set<Field>,
   item: { [key: string]: any },
   series: Array<Series>,
@@ -56,13 +56,17 @@ type Props = {
 
 const _c = (field, value, path, source) => ({ field, value, path, source });
 
-type ColumnProps = { field: string, value: any, selectedQuery: string, type: FieldType, valuePath: ValuePath, source: string | undefined | null };
+type ColumnProps = { field: string, value: any, type: FieldType, valuePath: ValuePath, source: string | undefined | null };
 
-const Column = ({ field, value, selectedQuery, type, valuePath, source }: ColumnProps) => {
+const flattenValuePath = (valuePath: ValuePath) => valuePath.flatMap((path) => Object.entries(path))
+  .map(([key, value]) => `${key}:${value}`)
+  .join('-');
+
+const Column = ({ field, value, type, valuePath, source }: ColumnProps) => {
   const additionalContextValue = useMemo(() => ({ valuePath }), [valuePath]);
 
   return (
-    <StyledTd isNumeric={type.isNumeric()}>
+    <StyledTd isNumeric={type.isNumeric()} data-testid={`value-cell-${flattenValuePath(valuePath)}-${field}`}>
       <AdditionalContext.Provider value={additionalContextValue}>
         <CustomHighlighting field={source ?? field} value={value}>
           {value !== null && value !== undefined
@@ -70,7 +74,6 @@ const Column = ({ field, value, selectedQuery, type, valuePath, source }: Column
               <Value field={source ?? field}
                      type={type}
                      value={value}
-                     queryId={selectedQuery}
                      render={DecoratedValue} />
             ) : null}
         </CustomHighlighting>
@@ -91,9 +94,9 @@ const columnNameToField = (column, series = []) => {
   return currentSeries ? currentSeries.function : column;
 };
 
-const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivotValues, valuePath, item, types }: Props) => {
+const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, valuePath, item, types }: Props) => {
   const classes = 'message-group';
-  const { activeQuery } = currentView;
+  const activeQuery = useActiveQueryId();
 
   const fieldColumns = fields.toSeq().toJS().map(({ field: fieldName, source }, i) => _c(
     fieldName,
@@ -117,18 +120,22 @@ const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivot
   const columns = flatten([fieldColumns, columnPivotFields]);
 
   return (
-    <tr className={`fields-row ${classes}`}>
-      {columns.map(({ field, value, path, source }, idx) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <Column key={`${activeQuery}-${field}=${value}-${idx}`}
-                field={field}
-                value={value}
-                selectedQuery={activeQuery}
-                type={fieldTypeFor(columnNameToField(field, series), types)}
-                valuePath={path.slice()}
-                source={source} />
-      ))}
-    </tr>
+    (
+      <tr className={`fields-row ${classes}`}>
+        {columns.map(({ field, value, path, source }, idx) => {
+          const key = `${activeQuery}-${field}=${value}-${idx}`;
+
+          return (
+            <Column key={key}
+                    field={field}
+                    value={value}
+                    type={fieldTypeFor(columnNameToField(field, series), types)}
+                    valuePath={path.slice()}
+                    source={source} />
+          );
+        })}
+      </tr>
+    )
   );
 };
 

@@ -16,32 +16,22 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Router } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 
-import history from 'util/History';
-import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
-
+import DefaultQueryClientProvider from './DefaultQueryClientProvider';
 import DefaultProviders from './DefaultProviders';
 
 type Props = {
   children: React.ReactNode,
 }
 
-const queryClientOptions = {
-  defaultOptions: {
-    queries: {
-      retry: false,
-    },
-  },
-};
-
 const WrappingContainer = ({ children }: Props) => (
-  <DefaultQueryClientProvider options={queryClientOptions}>
-    <Router history={history}>
+  <DefaultQueryClientProvider>
+    <MemoryRouter>
       <DefaultProviders>
         {children}
       </DefaultProviders>
-    </Router>
+    </MemoryRouter>
   </DefaultQueryClientProvider>
 );
 

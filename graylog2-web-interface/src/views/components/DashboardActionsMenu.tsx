@@ -15,21 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback } from 'react';
-import PropTypes from 'prop-types';
-import ImmutablePropTypes from 'react-immutable-proptypes';
 
-import connect from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
 import AppConfig from 'util/AppConfig';
 import { DropdownButton, MenuItem, Button, ButtonGroup } from 'components/bootstrap';
 import { Icon, ShareButton } from 'components/common';
 import ExportModal from 'views/components/export/ExportModal';
 import DebugOverlay from 'views/components/DebugOverlay';
-import onSaveView from 'views/logic/views/OnSaveViewAction';
 import onSaveNewDashboard from 'views/logic/views/OnSaveNewDashboard';
-import { ViewStore } from 'views/stores/ViewStore';
-import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
-import type SearchMetadata from 'views/logic/search/SearchMetadata';
 import * as ViewPermissions from 'views/Permissions';
 import useSearchPageLayout from 'hooks/useSearchPageLayout';
 import View from 'views/logic/views/View';
@@ -40,6 +33,13 @@ import {
   executePluggableDashboardDuplicationHandler as executePluggableDuplicationHandler,
 } from 'views/logic/views/pluggableSaveViewFormHandler';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
+import useView from 'views/hooks/useView';
+import useIsNew from 'views/hooks/useIsNew';
+import useHasUndeclaredParameters from 'views/logic/parameters/useHasUndeclaredParameters';
+import useAppDispatch from 'stores/useAppDispatch';
+import { updateView } from 'views/logic/slices/viewSlice';
+import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
+import useHistory from 'routing/useHistory';
 
 import DashboardPropertiesModal from './dashboard/DashboardPropertiesModal';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
@@ -47,10 +47,11 @@ import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration
 const _isAllowedToEdit = (view: View, currentUser: User | undefined | null) => isPermitted(currentUser?.permissions, [ViewPermissions.View.Edit(view.id)])
   || (view.type === View.Type.Dashboard && isPermitted(currentUser?.permissions, [`dashboards:edit:${view.id}`]));
 
-const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetadata.undeclared.size > 0;
-
-const DashboardActionsMenu = ({ view, isNewView, metadata }) => {
+const DashboardActionsMenu = () => {
+  const view = useView();
+  const isNewView = useIsNew();
   const currentUser = useCurrentUser();
+  const hasUndeclaredParameters = useHasUndeclaredParameters();
   const {
     viewActions: {
       save: {
@@ -70,7 +71,6 @@ const DashboardActionsMenu = ({ view, isNewView, metadata }) => {
   const [saveNewDashboardOpen, setSaveNewDashboardOpen] = useState(false);
   const [editDashboardOpen, setEditDashboardOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
-  const hasUndeclaredParameters = _hasUndeclaredParameters(metadata);
   const allowedToEdit = _isAllowedToEdit(view, currentUser);
   const debugOverlay = AppConfig.gl2DevMode() && (
     <>
@@ -80,6 +80,8 @@ const DashboardActionsMenu = ({ view, isNewView, metadata }) => {
       </MenuItem>
     </>
   );
+  const dispatch = useAppDispatch();
+  const history = useHistory();
 
   const _onSaveNewDashboard = useCallback(async (newDashboard: View) => {
     const isViewDuplication = !!view.id;
@@ -87,16 +89,18 @@ const DashboardActionsMenu = ({ view, isNewView, metadata }) => {
     if (isViewDuplication) {
       const dashboardWithPluginData = await executePluggableDuplicationHandler(newDashboard, currentUser.permissions, pluggableSaveViewControls);
 
-      return onSaveNewDashboard(dashboardWithPluginData);
+      return dispatch(onSaveNewDashboard(dashboardWithPluginData, history));
     }
 
-    return onSaveNewDashboard(newDashboard);
-  }, [currentUser.permissions, pluggableSaveViewControls, view.id]);
+    return dispatch(onSaveNewDashboard(newDashboard, history));
+  }, [currentUser.permissions, dispatch, history, pluggableSaveViewControls, view.id]);
+  const _onSaveView = useCallback(() => dispatch(OnSaveViewAction(view)), [dispatch, view]);
+  const _onUpdateView = useCallback((updatedView) => dispatch(updateView(updatedView)), [dispatch]);
 
   return (
     <ButtonGroup>
       {showSaveButton && (
-        <Button onClick={() => onSaveView(view)}
+        <Button onClick={_onSaveView}
                 disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}
                 title="Save dashboard">
           <Icon name="save" /> Save
@@ -117,7 +121,7 @@ const DashboardActionsMenu = ({ view, isNewView, metadata }) => {
                      disabledInfo={isNewView && 'Only saved dashboards can be shared.'} />
       )}
       {showDropDownButton && (
-        <DropdownButton title={<Icon name="ellipsis-h" />} id="query-tab-actions-dropdown" pullRight noCaret>
+        <DropdownButton title={<Icon name="ellipsis-h" title="More Actions" />} id="query-tab-actions-dropdown" pullRight noCaret>
           <MenuItem onSelect={() => setEditDashboardOpen(true)} disabled={isNewView || !allowedToEdit} icon="edit">
             Edit metadata
           </MenuItem>
@@ -142,7 +146,7 @@ const DashboardActionsMenu = ({ view, isNewView, metadata }) => {
                                   title="Editing dashboard"
                                   submitButtonText="Update dashboard"
                                   onClose={() => setEditDashboardOpen(false)}
-                                  onSave={onSaveView} />
+                                  onSave={_onUpdateView} />
       )}
 
       {shareDashboardOpen && (
@@ -157,16 +161,4 @@ const DashboardActionsMenu = ({ view, isNewView, metadata }) => {
   );
 };
 
-DashboardActionsMenu.propTypes = {
-  metadata: PropTypes.shape({
-    undeclared: ImmutablePropTypes.setOf(PropTypes.string),
-  }).isRequired,
-  view: PropTypes.object.isRequired,
-  isNewView: PropTypes.bool.isRequired,
-};
-
-export default connect(
-  DashboardActionsMenu,
-  { metadata: SearchMetadataStore, view: ViewStore },
-  ({ view: { view, isNew }, ...rest }) => ({ view, isNewView: isNew, ...rest }),
-);
+export default DashboardActionsMenu;

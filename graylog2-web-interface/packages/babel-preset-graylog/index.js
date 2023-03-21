@@ -27,7 +27,6 @@ module.exports = (api) => {
       plugins: [
         require('@babel/plugin-syntax-dynamic-import'),
         require('babel-plugin-styled-components'),
-        require('babel-plugin-dynamic-import-node'),
         require('@babel/plugin-transform-runtime'),
       ],
     }

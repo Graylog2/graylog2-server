@@ -15,7 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { values, merge, fill, find, isEmpty, get } from 'lodash';
+import values from 'lodash/values';
+import merge from 'lodash/merge';
+import fill from 'lodash/fill';
+import find from 'lodash/find';
+import isEmpty from 'lodash/isEmpty';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -40,8 +44,8 @@ const _generateSeriesTitles = (config, x, y) => {
 };
 
 const _heatmapGenerateSeries = (type, name, x, y, z, idx, _total, config, visualizationConfig): ChartDefinition => {
-  const xAxisTitle = get(config, ['rowPivots', idx, 'field']);
-  const yAxisTitle = get(config, ['columnPivots', idx, 'field']);
+  const xAxisTitle = config.rowPivots[idx].fields?.join(', ');
+  const yAxisTitle = config.columnPivots[idx].fields?.join(', ');
   const zSeriesTitles = _generateSeriesTitles(config, y, x);
   const hovertemplate = `${xAxisTitle}: %{y}<br>${yAxisTitle}: %{x}<br>%{text}: %{customdata}<extra></extra>`;
   const { colorScale, reverseScale, zMin, zMax } = visualizationConfig;
@@ -91,8 +95,8 @@ const _formatSeries = (visualizationConfig) => ({
   xLabels,
 }: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }): ExtractedSeries => {
   const valuesFoundBySeries = values(valuesBySeries);
-  // When using the hovertemplate, we need to provie a value for empty z values.
-  // Otherwise plotly would throw errors when hovering over a field.
+  // When using the hovertemplate, we need to provide a value for empty z values.
+  // Otherwise, plotly would throw errors when hovering over a field.
   // We need to transpose the z matrix, because we are changing the x and y label in the generator function
   const defaultValue = visualizationConfig.useSmallestAsDefault
     ? _findSmallestValue(valuesFoundBySeries)

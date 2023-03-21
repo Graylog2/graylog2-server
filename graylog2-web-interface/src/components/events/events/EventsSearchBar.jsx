@@ -17,7 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import lodash from 'lodash';
+import max from 'lodash/max';
 
 import { ButtonGroup, ControlLabel, FormControl, FormGroup, Button } from 'components/bootstrap';
 import { SearchForm, TimeUnitInput, Icon } from 'components/common';
@@ -54,7 +54,7 @@ class EventsSearchBar extends React.Component {
 
   updateSearchTimeRange = (nextValue, nextUnit) => {
     const { onTimeRangeChange } = this.props;
-    const durationInSeconds = moment.duration(lodash.max([nextValue, 1]), nextUnit).asSeconds();
+    const durationInSeconds = moment.duration(max([nextValue, 1]), nextUnit).asSeconds();
 
     onTimeRangeChange('relative', durationInSeconds);
     this.setState({ timeRangeDuration: nextValue, timeRangeUnit: nextUnit });
@@ -89,10 +89,7 @@ class EventsSearchBar extends React.Component {
           <div className={styles.searchForm}>
             <SearchForm query={parameters.query}
                         onSearch={onQueryChange}
-                        searchButtonLabel={<Icon name="search" />}
-                        loadingLabel=""
                         placeholder="Find Events"
-                        queryWidth="100%"
                         topMargin={0}
                         useLoadingState>
               <Button onClick={this.handleSearchReload} disabled={isReloadingResults}>

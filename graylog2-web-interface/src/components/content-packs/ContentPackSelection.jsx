@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import styled from 'styled-components';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
@@ -382,8 +382,7 @@ class ContentPackSelection extends React.Component {
           <Col smOffset={1} lg={8}>
             <SearchForm id="filter-input"
                         onSearch={this._onSetFilter}
-                        onReset={this._onClearFilter}
-                        searchButtonLabel="Filter" />
+                        onReset={this._onClearFilter} />
           </Col>
         </Row>
         <Row>

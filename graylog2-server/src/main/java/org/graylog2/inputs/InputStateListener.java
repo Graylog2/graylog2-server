@@ -18,6 +18,7 @@ package org.graylog2.inputs;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.apache.commons.lang3.ObjectUtils;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.IOState;
@@ -31,12 +32,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+import static org.graylog2.plugin.IOState.Type.FAILING;
+import static org.graylog2.shared.utilities.StringUtils.f;
+
+@Singleton
 public class InputStateListener {
     private static final Logger LOG = LoggerFactory.getLogger(InputStateListener.class);
-    private NotificationService notificationService;
-    private ActivityWriter activityWriter;
-    private ServerStatus serverStatus;
+    private final NotificationService notificationService;
+    private final ActivityWriter activityWriter;
+    private final ServerStatus serverStatus;
 
     @Inject
     public InputStateListener(EventBus eventBus,
@@ -49,29 +55,38 @@ public class InputStateListener {
         eventBus.register(this);
     }
 
-    @Subscribe public void inputStateChanged(IOStateChangedEvent<MessageInput> event) {
+    @Subscribe
+    public void inputStateChanged(IOStateChangedEvent<MessageInput> event) {
         final IOState<MessageInput> state = event.changedState();
         final MessageInput input = state.getStoppable();
+        var msg = f("Input %s is in state %s", input.toIdentifier(), event.newState());
+        if (state.getDetailedMessage() != null) {
+            msg = f("Input %s is in state %s [%s]", input.toIdentifier(), event.newState(), state.getDetailedMessage());
+        }
         switch (event.newState()) {
             case FAILED:
-                activityWriter.write(new Activity(state.getDetailedMessage(), InputRegistry.class));
+            case FAILING:
+                activityWriter.write(new Activity(msg, InputRegistry.class));
                 Notification notification = notificationService.buildNow();
-                notification.addType(Notification.Type.INPUT_FAILED_TO_START).addSeverity(Notification.Severity.NORMAL);
+                var type = event.newState().equals(FAILING) ? Notification.Type.INPUT_FAILING : Notification.Type.INPUT_FAILED_TO_START;
+                notification.addType(type).addSeverity(Notification.Severity.NORMAL);
+                notification.addKey(input.getId());
                 notification.addNode(serverStatus.getNodeId().toString());
-                notification.addDetail("input_id", input.getId());
-                notification.addDetail("reason", state.getDetailedMessage());
+                notification.addDetail("input_id", input.toIdentifier());
+                notification.addDetail("reason", ObjectUtils.defaultIfNull(state.getDetailedMessage(), ""));
                 notificationService.publishIfFirst(notification);
                 break;
             case RUNNING:
                 notificationService.fixed(Notification.Type.NO_INPUT_RUNNING);
+                notificationService.fixed(Notification.Type.INPUT_FAILING, input.getId());
+                notificationService.fixed(Notification.Type.INPUT_FAILED_TO_START, input.getId());
                 // fall through
             default:
-                final String msg = "Input [" + input.getName() + "/" + input.getId() + "] is now " + event.newState().toString();
                 activityWriter.write(new Activity(msg, InputStateListener.class));
                 break;
         }
 
-        LOG.debug("Input State of [{}/{}] changed: {} -> {}", input.getTitle(), input.getId(), event.oldState(), event.newState());
-        LOG.info("Input [{}/{}] is now {}", input.getName(), input.getId(), event.newState());
+        LOG.debug("Input State of {} changed: {} -> {}", input.toIdentifier(), event.oldState(), event.newState());
+        LOG.info("Input {} is now {}", input.toIdentifier(), event.newState());
     }
 }

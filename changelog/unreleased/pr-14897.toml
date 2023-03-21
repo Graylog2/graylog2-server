@@ -1,0 +1,5 @@
+type = "added"
+message = "Add dashboards, searches, messages and events to an open investigation."
+
+pulls = ["14897"]
+issues = ["Graylog2/graylog-plugin-enterprise#4794"]

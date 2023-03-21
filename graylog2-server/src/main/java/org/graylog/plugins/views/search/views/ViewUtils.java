@@ -63,14 +63,20 @@ public interface ViewUtils<T> {
                         Aggregates.lookup(
                                 FavoritesService.COLLECTION_NAME,
                                 List.of(
-                                        new Variable<>("searchId", doc("$toString", "$_id")),
+                                        new Variable<>("dashboardId", doc( "$concat", List.of( "grn::::dashboard:", doc("$toString",  "$_id")))),
+                                        new Variable<>("searchId", doc( "$concat", List.of( "grn::::search:", doc("$toString",  "$_id")))),
                                         new Variable<>("userId", user)
                                 ),
                                 List.of(Aggregates.unwind("$items"),
                                         Aggregates.match(
                                                 doc("$expr", doc("$and", List.of(
-                                                                doc("$eq", List.of("$items.id", "$$searchId")),
-                                                                doc("$eq", List.of("$user_id", "$$userId"))
+                                                        doc("$or",
+                                                                List.of(
+                                                                        doc("$eq", List.of("$items", "$$dashboardId")),
+                                                                        doc("$eq", List.of("$items", "$$searchId"))
+                                                                )
+                                                        ),
+                                                        doc("$eq", List.of("$user_id", "$$userId"))
                                                         )
                                                 ))),
                                         Aggregates.project(doc("_id", 1))

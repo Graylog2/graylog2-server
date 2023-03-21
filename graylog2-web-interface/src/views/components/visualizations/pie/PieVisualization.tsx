@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import { union } from 'lodash';
+import union from 'lodash/union';
 
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -88,12 +88,12 @@ const labelMapper = (data: Array<{ labels: Array<string> }>) => data.reduce((acc
 }, []);
 
 const legendField = (columnPivots: Array<Pivot>, rowPivots: Array<Pivot>, series: Array<Series>, isFunction: boolean) => {
-  if (rowPivots.length === 1 && series.length === 1 && !isFunction) {
-    return rowPivots[0].field;
+  if (rowPivots.length === 1 && series.length === 1 && rowPivots[0].fields?.length === 1 && !isFunction) {
+    return rowPivots[0].fields[0];
   }
 
-  if (columnPivots.length === 1) {
-    return columnPivots[0].field;
+  if (columnPivots.length === 1 && columnPivots[0].fields?.length === 1) {
+    return columnPivots[0].fields[0];
   }
 
   return null;

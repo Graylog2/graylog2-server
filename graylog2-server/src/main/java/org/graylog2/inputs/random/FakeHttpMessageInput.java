@@ -60,6 +60,11 @@ public class FakeHttpMessageInput extends MessageInput {
         public Descriptor() {
             super(NAME, false, "");
         }
+
+        @Override
+        public boolean isCloudCompatible() {
+            return true;
+        }
     }
 
     public static class Config extends MessageInput.Config {

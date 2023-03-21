@@ -83,7 +83,6 @@ const StreamListTD = styled.td`
 const PipelineFilter = ({ query, onSearch }: { query: string, onSearch: (query: string) => void }) => (
   <SearchForm query={query}
               onSearch={onSearch}
-              queryWidth={400}
               queryHelpComponent={<QueryHelper entityName="Pipeline" />}
               wrapperClass="has-bm"
               onReset={() => onSearch('')}
@@ -137,7 +136,6 @@ const ProcessingTimelineComponent = () => {
     </Header>
   );
 
-  // eslint-disable-next-line react/no-unstable-nested-components
   const _headerCellFormatter = (header) => {
     let className;
 
@@ -180,7 +178,6 @@ const ProcessingTimelineComponent = () => {
     };
   };
 
-  // eslint-disable-next-line react/no-unstable-nested-components
   const _pipelineFormatter = (pipeline) => {
     const { id, title, description, stages } = pipeline;
 
@@ -228,6 +225,7 @@ const ProcessingTimelineComponent = () => {
                    customFilter={searchFilter}
                    filterKeys={[]}
                    filterLabel="Filter Pipelines"
+                   noDataText="No pipelines have been found"
                    dataRowFormatter={_pipelineFormatter} />
       </StyledPaginatedList>
     </div>

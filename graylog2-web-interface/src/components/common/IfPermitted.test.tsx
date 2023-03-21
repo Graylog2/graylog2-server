@@ -237,10 +237,10 @@ describe('IfPermitted', () => {
 
     render((
       // @ts-ignore
-      <IfPermitted permissions={[]} something={42} otherProp={{ foo: 'bar!' }}>
+      (<IfPermitted permissions={[]} something={42} otherProp={{ foo: 'bar!' }}>
         <Foo />
         <Bar />
-      </IfPermitted>
+      </IfPermitted>)
     ));
 
     expect(Foo).toHaveBeenLastCalledWith({ something: 42, otherProp: { foo: 'bar!' } }, {});

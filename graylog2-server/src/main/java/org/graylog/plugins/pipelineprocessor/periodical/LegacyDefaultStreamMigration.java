@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.periodical;
 
+import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.events.LegacyDefaultStreamMigrated;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
@@ -24,12 +25,14 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.streams.Stream;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+
 public class LegacyDefaultStreamMigration extends Periodical {
-    private static final Logger LOG = LoggerFactory.getLogger(LegacyDefaultStreamMigration.class);
+    private static final RateLimitedLog LOG = getRateLimitedLog(LegacyDefaultStreamMigration.class);
+
     private final ClusterConfigService clusterConfigService;
     private final PipelineStreamConnectionsService connectionsService;
 

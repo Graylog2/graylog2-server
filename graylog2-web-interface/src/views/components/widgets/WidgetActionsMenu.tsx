@@ -19,7 +19,6 @@ import { useState, useContext, useCallback } from 'react';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import UserNotification from 'util/UserNotification';
 import type { BackendWidgetPosition } from 'views/types';
 import ExportModal from 'views/components/export/ExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
@@ -27,21 +26,24 @@ import { loadDashboard } from 'views/logic/views/Actions';
 import { IconButton } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
-import { ViewActions, ViewStore } from 'views/stores/ViewStore';
-import type { ViewStoreState } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
-import SearchActions from 'views/actions/SearchActions';
-import type { SearchJson } from 'views/logic/search/Search';
 import Search from 'views/logic/search/Search';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import { MenuItem } from 'components/bootstrap';
-import { WidgetActions } from 'views/stores/WidgetStore';
-import { useStore } from 'stores/connect';
 import type Widget from 'views/logic/widgets/Widget';
 import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 import DrilldownContext from 'views/components/contexts/DrilldownContext';
+import useView from 'views/hooks/useView';
+import createSearch from 'views/logic/slices/createSearch';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import useAppDispatch from 'stores/useAppDispatch';
+import { selectQuery, loadView } from 'views/logic/slices/viewSlice';
+import { execute } from 'views/logic/slices/searchExecutionSlice';
+import { duplicateWidget, removeWidget } from 'views/logic/slices/widgetActions';
+import fetchSearch from 'views/logic/views/fetchSearch';
+import type { HistoryFunction } from 'routing/useHistory';
+import useHistory from 'routing/useHistory';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -61,90 +63,69 @@ const Container = styled.div`
   }
 `;
 
-const _updateDashboardWithNewSearch = (dashboard: View, dashboardId: string, newSearch: Search) => {
-  const newDashboard = dashboard.toBuilder().search(newSearch).build();
-
-  ViewManagementActions.update(newDashboard).then(() => loadDashboard(dashboardId));
-};
-
-const addWidgetToDashboard = (targetDashboard: View, activeView: View, widgetId: string) => (searchJson: SearchJson) => {
-  const search = Search.fromJSON(searchJson);
-  const newDashboard = CopyWidgetToDashboard(widgetId, activeView, targetDashboard.toBuilder().search(search).build());
-
-  if (!newDashboard || !newDashboard.search) {
-    throw Error('Copying the dashboard page failed.');
-  }
-
-  return SearchActions.create(newDashboard.search).then(({ search: newSearch }) => _updateDashboardWithNewSearch(newDashboard, newDashboard.id, newSearch));
-};
-
-const _onCopyToDashboard = (
-  view: ViewStoreState,
+const _onCopyToDashboard = async (
+  view: View,
+  setShowCopyToDashboard: (show: boolean) => void,
   widgetId: string,
   dashboardId: string | undefined | null,
+  history: HistoryFunction,
 ) => {
-  const { view: activeView } = view;
+  if (!dashboardId) {
+    return;
+  }
 
-  return ViewManagementActions.get(dashboardId).then((dashboardJson) => {
-    const targetDashboard = View.fromJSON(dashboardJson);
+  const dashboardJson = await ViewManagementActions.get(dashboardId);
+  const dashboard = View.fromJSON(dashboardJson);
+  const search = await fetchSearch(dashboardJson.search_id).then((searchJson) => Search.fromJSON(searchJson));
+  const newDashboard = CopyWidgetToDashboard(widgetId, view, dashboard.toBuilder().search(search).build());
 
-    return SearchActions.get(dashboardJson.search_id).then(
-      addWidgetToDashboard(targetDashboard, activeView, widgetId),
-    ).catch((error) => {
-      UserNotification.error(`Copying dashboard page failed with error ${error}`);
-    });
-  });
+  if (newDashboard && newDashboard.search) {
+    const newSearch = await createSearch(newDashboard.search);
+    const newDashboardWithSearch = newDashboard.toBuilder().search(newSearch).build();
+    await ViewManagementActions.update(newDashboardWithSearch);
+
+    loadDashboard(history, newDashboardWithSearch.id);
+  }
+
+  setShowCopyToDashboard(false);
 };
 
-const _onMoveWidgetToPage = (
-  view: ViewStoreState,
+const _onMoveWidgetToPage = async (
+  dispatch: AppDispatch,
+  view: View,
   setShowMoveWidgetToTab: (show: boolean) => void,
   widgetId: string,
   queryId: string,
   keepCopy: boolean,
 ) => {
-  const { view: activeView } = view;
-
   if (!queryId) {
     return;
   }
 
-  const newDashboard = MoveWidgetToTab(widgetId, queryId, activeView, keepCopy);
+  const newDashboard = MoveWidgetToTab(widgetId, queryId, view, keepCopy);
 
   if (newDashboard) {
-    SearchActions.create(newDashboard.search)
-      .then((searchResponse) => {
-        const updatedDashboard = newDashboard.toBuilder().search(searchResponse.search).build();
-
-        return ViewActions.update(updatedDashboard);
-      })
-      .then(() => {
-        setShowMoveWidgetToTab(false);
-
-        return ViewActions.selectQuery(queryId);
-      })
-      .then(() => SearchActions.executeWithCurrentState());
+    const searchResponse = await createSearch(newDashboard.search);
+    const updatedDashboard = newDashboard.toBuilder().search(searchResponse).build();
+    await dispatch(loadView(updatedDashboard));
+    setShowMoveWidgetToTab(false);
+    await dispatch(selectQuery(queryId));
+    await dispatch(execute());
   }
 };
 
 // eslint-disable-next-line no-alert
 const defaultOnDeleteWidget = async (_widget: Widget, _view: View, title: string) => window.confirm(`Are you sure you want to remove the widget "${title}"?`);
 
-const _onDelete = async (widget: Widget, view: View, title: string) => {
+const _onDelete = (widget: Widget, view: View, title: string) => async (dispatch: AppDispatch) => {
   const pluggableWidgetDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingWidget');
 
   const result = await iterateConfirmationHooks([...pluggableWidgetDeletionHooks, defaultOnDeleteWidget], widget, view, title);
 
-  return result === true ? WidgetActions.remove(widget.id) : Promise.resolve();
+  return result === true ? dispatch(removeWidget(widget.id)) : Promise.resolve();
 };
 
-const _onDuplicate = (widgetId: string, unsetWidgetFocusing: () => void, title: string) => {
-  WidgetActions.duplicate(widgetId).then((newWidget) => {
-    TitlesActions.set(TitleTypes.Widget, newWidget.id, `${title} (copy)`).then(() => {
-      unsetWidgetFocusing();
-    });
-  });
-};
+const _onDuplicate = (widgetId: string, unsetWidgetFocusing: () => void, title: string) => (dispatch: AppDispatch) => dispatch(duplicateWidget(widgetId, title)).then(() => unsetWidgetFocusing());
 
 type Props = {
   isFocused: boolean,
@@ -162,17 +143,19 @@ const WidgetActionsMenu = ({
   toggleEdit,
 }: Props) => {
   const widget = useContext(WidgetContext);
-  const view = useStore(ViewStore);
+  const view = useView();
   const { query, timerange, streams } = useContext(DrilldownContext);
   const { setWidgetFocusing, unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const [showCopyToDashboard, setShowCopyToDashboard] = useState(false);
   const [showExport, setShowExport] = useState(false);
   const [showMoveWidgetToTab, setShowMoveWidgetToTab] = useState(false);
+  const dispatch = useAppDispatch();
+  const history = useHistory();
 
-  const onDuplicate = useCallback(() => _onDuplicate(widget.id, unsetWidgetFocusing, title), [unsetWidgetFocusing, title, widget.id]);
-  const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, widgetId, dashboardId), [view]);
-  const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToPage(view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [view]);
-  const onDelete = useCallback(() => _onDelete(widget, view?.view, title), [title, view?.view, widget]);
+  const onDuplicate = useCallback(() => dispatch(_onDuplicate(widget.id, unsetWidgetFocusing, title)), [dispatch, widget.id, unsetWidgetFocusing, title]);
+  const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId, history), [history, view]);
+  const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToPage(dispatch, view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [dispatch, view]);
+  const onDelete = useCallback(() => dispatch(_onDelete(widget, view, title)), [dispatch, title, view, widget]);
   const focusWidget = useCallback(() => setWidgetFocusing(widget.id), [setWidgetFocusing, widget.id]);
 
   return (
@@ -234,13 +217,13 @@ const WidgetActionsMenu = ({
         )}
 
         {showExport && (
-          <ExportModal view={view.view}
+          <ExportModal view={view}
                        directExportWidgetId={widget.id}
                        closeModal={() => setShowExport(false)} />
         )}
 
         {showMoveWidgetToTab && (
-          <MoveWidgetToTabModal view={view.view}
+          <MoveWidgetToTabModal view={view}
                                 widgetId={widget.id}
                                 onCancel={() => setShowMoveWidgetToTab(false)}
                                 onSubmit={onMoveWidgetToTab} />

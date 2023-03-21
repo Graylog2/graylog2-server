@@ -20,7 +20,6 @@ import React from 'react';
 import { LinkContainer } from 'components/common/router';
 import connect from 'stores/connect';
 import Routes from 'routing/Routes';
-import history from 'util/History';
 import { Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
@@ -29,8 +28,9 @@ import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
 import LUTPageNavigation from 'components/lookup-tables/LUTPageNavigation';
+import withHistory from 'routing/withHistory';
 
-const _saved = () => {
+const _saved = (history) => {
   // reset detail state
   history.push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
 };
@@ -123,10 +123,12 @@ class LUTTablesPage extends React.Component {
       dataAdapters,
       pagination,
       errorStates,
+      history,
     } = this.props;
     let content;
     const isShowing = action === 'show';
     const isEditing = action === 'edit';
+    const saved = () => _saved(history);
 
     if (isShowing || isEditing) {
       if (!table) {
@@ -138,7 +140,7 @@ class LUTTablesPage extends React.Component {
               <h2>Lookup Table</h2>
               <LookupTableForm table={table}
                                create={false}
-                               saved={_saved}
+                               saved={saved}
                                validate={_validateTable}
                                validationErrors={validationErrors} />
             </Col>
@@ -153,7 +155,7 @@ class LUTTablesPage extends React.Component {
       }
     } else if (_isCreating(this.props)) {
       content = (
-        <LookupTableCreate saved={_saved}
+        <LookupTableCreate saved={saved}
                            validate={_validateTable}
                            validationErrors={validationErrors} />
       );
@@ -196,6 +198,7 @@ LUTTablesPage.propTypes = {
   caches: PropTypes.object,
   dataAdapters: PropTypes.object,
   pagination: PropTypes.object,
+  history: PropTypes.object.isRequired,
   location: PropTypes.object,
   errorStates: PropTypes.object,
   action: PropTypes.string,
@@ -216,7 +219,7 @@ LUTTablesPage.defaultProps = {
   action: undefined,
 };
 
-export default connect(withParams(withLocation(withPaginationQueryParameter(LUTTablesPage))), { lookupTableStore: LookupTablesStore }, ({ lookupTableStore, ...otherProps }) => ({
+export default connect(withHistory(withParams(withLocation(withPaginationQueryParameter(LUTTablesPage)))), { lookupTableStore: LookupTablesStore }, ({ lookupTableStore, ...otherProps }) => ({
   ...otherProps,
   ...lookupTableStore,
 }));

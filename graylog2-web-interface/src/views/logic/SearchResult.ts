@@ -16,11 +16,11 @@
  */
 import type { List, Map } from 'immutable';
 import { fromJS } from 'immutable';
-import { mapValues, compact } from 'lodash';
+import mapValues from 'lodash/mapValues';
+import compact from 'lodash/compact';
 
 import type { QueryId } from 'views/logic/queries/Query';
 import type { SearchTypeId } from 'views/logic/SearchType';
-import type { SearchJobResult } from 'views/stores/SearchStore';
 
 import QueryResult from './QueryResult';
 import type { SearchErrorResponse } from './SearchError';
@@ -29,6 +29,24 @@ import type { ResultWindowLimitErrorResponse } from './ResultWindowLimitError';
 import ResultWindowLimitError, {
   isResultWindowLimitErrorResponse,
 } from './ResultWindowLimitError';
+
+type SearchId = string;
+
+type SearchJobId = string;
+type SearchExecution = {
+  cancelled: boolean,
+  completed_exceptionally: boolean,
+  done: boolean,
+};
+
+type SearchJobResult = {
+  execution: SearchExecution,
+  id: SearchJobId,
+  owner: string,
+  results: { [id: string]: any },
+  search_id: SearchId,
+  errors: Array<SearchErrorResponse>,
+};
 
 class SearchResult {
   private readonly _result: Map<string, any>;

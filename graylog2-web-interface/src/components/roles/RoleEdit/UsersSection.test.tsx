@@ -83,10 +83,7 @@ describe('UsersSection', () => {
     render(<UsersSection role={exampleRole} />);
 
     const filterInput = await screen.findByPlaceholderText('Enter query to filter');
-    const filterSubmitButton = screen.getByRole('button', { name: 'Filter' });
-
     fireEvent.change(filterInput, { target: { value: 'name of an assigned user' } });
-    fireEvent.click(filterSubmitButton);
 
     await waitFor(() => expect(AuthzRolesActions.loadUsersForRole).toHaveBeenCalledTimes(2));
 

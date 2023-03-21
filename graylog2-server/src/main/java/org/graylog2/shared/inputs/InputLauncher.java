@@ -22,6 +22,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.IOState;
+import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.utilities.ExceptionUtils;
@@ -75,8 +76,10 @@ public class InputLauncher {
             inputRegistry.add(inputState);
         } else {
             inputState = inputRegistry.getInputState(input.getId());
-            if (inputState.getState() == IOState.Type.RUNNING || inputState.getState() == IOState.Type.STARTING) {
-                return inputState;
+            switch (inputState.getState()) {
+                case RUNNING, STARTING, FAILING -> {
+                    return inputState;
+                }
             }
             inputState.setStoppable(input);
         }
@@ -84,13 +87,13 @@ public class InputLauncher {
         executor.submit(new Runnable() {
             @Override
             public void run() {
-                LOG.debug("Starting [{}] input with ID <{}>", input.getClass().getCanonicalName(), input.getId());
+                LOG.debug("Starting [{}] input {}", input.getClass().getCanonicalName(), input.toIdentifier());
                 try {
                     input.checkConfiguration();
                     inputState.setState(IOState.Type.STARTING);
-                    input.launch(inputBuffer);
+                    input.launch(inputBuffer, new InputFailureRecorder(inputState));
                     inputState.setState(IOState.Type.RUNNING);
-                    String msg = "Completed starting [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + ">";
+                    String msg = "Completed starting [" + input.getClass().getCanonicalName() + "] input " + input.toIdentifier();
                     LOG.debug(msg);
                 } catch (Exception e) {
                     handleLaunchException(e, inputState);
@@ -103,7 +106,7 @@ public class InputLauncher {
 
     protected void handleLaunchException(Throwable e, IOState<MessageInput> inputState) {
         final MessageInput input = inputState.getStoppable();
-        StringBuilder msg = new StringBuilder("The [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + "> misfired. Reason: ");
+        StringBuilder msg = new StringBuilder("The [" + input.getClass().getCanonicalName() + "] input " + input.toIdentifier() + " misfired. Reason: ");
 
         String causeMsg = ExceptionUtils.getRootCauseMessage(e);
 
@@ -120,18 +123,18 @@ public class InputLauncher {
     public void launchAllPersisted() {
         for (MessageInput input : persistedInputs) {
             if (leaderStatusInhibitsLaunch(input)) {
-                LOG.info("Not launching 'onlyOnePerCluster' input [{}/{}/{}] because this node is not the leader.",
-                        input.getName(), input.getTitle(), input.getId());
+                LOG.info("Not launching 'onlyOnePerCluster' input {} because this node is not the leader.",
+                        input.toIdentifier());
                 continue;
             }
             if (shouldStartAutomatically(input)) {
-                LOG.info("Launching input [{}/{}/{}] - desired state is {}",
-                        input.getName(), input.getTitle(), input.getId(), input.getDesiredState());
+                LOG.info("Launching input {} - desired state is {}",
+                        input.toIdentifier(), input.getDesiredState());
                 input.initialize();
                 launch(input);
             } else {
-                LOG.info("Not auto-starting input [{}/{}/{}] - desired state is {}",
-                        input.getName(), input.getTitle(), input.getId(), input.getDesiredState());
+                LOG.info("Not auto-starting input {} - desired state is {}",
+                        input.toIdentifier(), input.getDesiredState());
             }
         }
     }

@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import { findIndex } from 'lodash';
+import findIndex from 'lodash/findIndex';
 
 import { Badge, Button, Modal, ButtonToolbar } from 'components/bootstrap';
 import { DataTable, SearchForm, Icon, ModalSubmit } from 'components/common';
@@ -201,8 +201,7 @@ class ContentPackParameterList extends React.Component {
         {!readOnly && this._parameterModal()}
         {!readOnly && (<span><br /><br /></span>)}
         <SearchForm onSearch={this._filterParameters}
-                    onReset={() => { this._filterParameters(''); }}
-                    searchButtonLabel="Filter" />
+                    onReset={() => { this._filterParameters(''); }} />
         <DataTable id="parameter-list"
                    headers={headers}
                    className={ContentPackParameterListStyle.scrollable}

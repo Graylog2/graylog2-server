@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Avoid `GET` APIs for cluster/deflector health to avoid overly long requests."
+
+issues = ["14164"]
+pulls = ["14177"]

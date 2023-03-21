@@ -16,9 +16,15 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
 import Select from 'components/common/Select';
 import { Button, ListGroup, ListGroupItem } from 'components/bootstrap';
+
+const StyledListGroupItem = styled(ListGroupItem)`
+  display: flex;
+  justify-content: space-between;
+`;
 
 /**
  * Component that renders a `Select` component above a list of selected
@@ -60,9 +66,13 @@ class SelectableList extends React.Component {
   };
 
   static defaultProps = {
-    selectedOptionsType: 'string',
+    autoFocus: undefined,
     displayKey: 'label',
     idKey: 'value',
+    onChange: undefined,
+    options: undefined,
+    selectedOptions: undefined,
+    selectedOptionsType: 'string',
   };
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -108,16 +118,17 @@ class SelectableList extends React.Component {
   };
 
   render() {
-    const formattedOptions = this.props.selectedOptions.map((option, idx) => {
-      return (
-        <ListGroupItem key={`${this._getOptionId(option)}-${idx}`}>
-          <div className="pull-right">
-            <Button bsStyle="primary" bsSize="xsmall" onClick={this._onRemoveOption(idx)}>Remove</Button>
+    const formattedOptions = this.props.selectedOptions.map((option, idx) => (
+
+      (
+        <StyledListGroupItem key={`${this._getOptionId(option)}-${idx}`}>
+          <div>
+            {this._getOptionDisplayValue(option)}
           </div>
-          {this._getOptionDisplayValue(option)}
-        </ListGroupItem>
-      );
-    });
+          <Button bsStyle="danger" bsSize="xsmall" onClick={this._onRemoveOption(idx)}>Remove</Button>
+        </StyledListGroupItem>
+      )
+    ));
 
     return (
       <div>

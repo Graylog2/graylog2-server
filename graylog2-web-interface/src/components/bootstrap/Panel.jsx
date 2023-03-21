@@ -62,7 +62,7 @@ const panelVariantStyles = css(({ bsStyle = 'default', theme }) => {
         border-bottom-color: ${borderColor};
       }
     }
-  `;
+`;
 });
 
 const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
@@ -127,7 +127,7 @@ const deprecatedVariantStyles = css(({ bsStyle = 'default', theme }) => {
         border-bottom-color: ${borderColor};
       }
     }
-  `;
+`;
 });
 
 const DeprecatedStyledPanel = styled(BootstrapPanel)(({ theme }) => css`
@@ -196,22 +196,24 @@ const Panel = ({
 
     return (
       /* NOTE: this exists as a deprecated render for older Panel instances */
-      <DeprecatedStyledPanel expanded={isExpanded}
-                             onToggle={handleToggle}
-                             {...props}>
-        {(header || title) && (
+      (
+        <DeprecatedStyledPanel expanded={isExpanded}
+                               onToggle={handleToggle}
+                               {...props}>
+          {(header || title) && (
           <PanelHeading>
             {header}
             {title && <BootstrapPanel.Title toggle={collapsible}>{title}</BootstrapPanel.Title>}
           </PanelHeading>
-        )}
-        <DeprecatedStyledPanel.Body collapsible={collapsible}>
-          {children}
-        </DeprecatedStyledPanel.Body>
-        {footer && (
+          )}
+          <DeprecatedStyledPanel.Body collapsible={collapsible}>
+            {children}
+          </DeprecatedStyledPanel.Body>
+          {footer && (
           <DeprecatedStyledPanel.Footer>{footer}</DeprecatedStyledPanel.Footer>
-        )}
-      </DeprecatedStyledPanel>
+          )}
+        </DeprecatedStyledPanel>
+      )
     );
   }
 

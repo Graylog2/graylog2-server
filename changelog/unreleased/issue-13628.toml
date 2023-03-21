@@ -1,0 +1,5 @@
+type = "changed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Consistent use of message identifiers in strings. Message id visible in message list."
+
+issues = ["13628"]
+pulls = ["14562"]

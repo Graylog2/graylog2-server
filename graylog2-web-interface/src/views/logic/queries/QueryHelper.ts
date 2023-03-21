@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { trim } from 'lodash';
+import trim from 'lodash/trim';
 
 const isPhrase = (searchTerm: string | undefined | null) => {
   return String(searchTerm).indexOf(' ') !== -1;
 };
 
-const escape = (searchTerm: string | undefined | null) => {
+const escape = (searchTerm: string | number | undefined | null) => {
   let escapedTerm = String(searchTerm);
 
   // Replace newlines.
@@ -33,7 +33,7 @@ const escape = (searchTerm: string | undefined | null) => {
     escapedTerm = `"${escapedTerm}"`;
   } else {
     // Escape all lucene special characters from the source: && || : \ / + - ! ( ) { } [ ] ^ " ~ * ?
-    escapedTerm = String(escapedTerm).replace(/(&&|\|\||[:\\/+\-!(){}[\]^"~*?])/g, '\\$&');
+    escapedTerm = String(escapedTerm).replace(/(&&|\|\||[:\\/+\-!(){}[\]^"~*?$])/g, '\\$&');
   }
 
   return escapedTerm;

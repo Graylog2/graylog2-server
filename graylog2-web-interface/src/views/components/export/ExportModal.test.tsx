@@ -32,7 +32,6 @@ import ViewState from 'views/logic/views/ViewState';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import {
   messagesWidget,
   stateWithOneWidget, viewWithMultipleWidgets,
@@ -42,6 +41,10 @@ import {
 import { createWidget } from 'views/logic/WidgetTestHelpers';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useViewType from 'views/hooks/useViewType';
+import { viewSliceReducer } from 'views/logic/slices/viewSlice';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import useSearchExecutionState from 'views/hooks/useSearchExecutionState';
+import { searchExecutionSliceReducer } from 'views/logic/slices/searchExecutionSlice';
 
 import type { Props as ExportModalProps } from './ExportModal';
 import ExportModal from './ExportModal';
@@ -50,17 +53,6 @@ jest.mock('util/MessagesExportUtils', () => ({
   exportSearchMessages: jest.fn(() => Promise.resolve()),
   exportSearchTypeMessages: jest.fn(() => Promise.resolve()),
 }));
-
-const MockSearchExecutionState = new SearchExecutionState();
-
-jest.mock('views/stores/SearchExecutionStateStore', () => ({
-  SearchExecutionStateStore: {
-    getInitialState: jest.fn(() => MockSearchExecutionState),
-    listen: () => jest.fn(),
-  },
-}));
-
-jest.mock('views/hooks/useViewType');
 
 const pluginExports: PluginRegistration = {
   exports: {
@@ -71,8 +63,15 @@ const pluginExports: PluginRegistration = {
       mimeType: 'text/csv',
       fileExtension: 'csv',
     }],
+    'views.reducers': [
+      { key: 'view', reducer: viewSliceReducer },
+      { key: 'searchExecution', reducer: searchExecutionSliceReducer },
+    ],
   },
 };
+
+jest.mock('views/hooks/useSearchExecutionState');
+jest.mock('views/hooks/useViewType');
 
 describe('ExportModal', () => {
   // Prepare expected payload
@@ -103,6 +102,7 @@ describe('ExportModal', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(useViewType).mockReturnValue(View.Type.Search);
+    asMock(useSearchExecutionState).mockReturnValue(new SearchExecutionState());
   });
 
   type SimpleExportModalProps = {
@@ -110,9 +110,11 @@ describe('ExportModal', () => {
   } & Partial<ExportModalProps>;
 
   const SimpleExportModal = ({ viewType = View.Type.Search, ...props }: SimpleExportModalProps) => (
-    <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
-      <ExportModal view={viewWithoutWidget(viewType)} {...props as ExportModalProps} />
-    </FieldTypesContext.Provider>
+    <TestStoreProvider>
+      <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
+        <ExportModal view={viewWithoutWidget(viewType)} {...props as ExportModalProps} />
+      </FieldTypesContext.Provider>
+    </TestStoreProvider>
   );
 
   SimpleExportModal.defaultProps = {
@@ -130,7 +132,7 @@ describe('ExportModal', () => {
     const globalOverride = new GlobalOverride(effectiveTimeRange, globalQuery);
     const executionState = new SearchExecutionState(parameterBindings, globalOverride);
 
-    asMock(SearchExecutionStateStore.getInitialState).mockReturnValueOnce(executionState);
+    asMock(useSearchExecutionState).mockReturnValue(executionState);
     const expectedPayload = {
       ...payload,
       fields_in_order: [

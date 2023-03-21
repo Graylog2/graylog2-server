@@ -173,11 +173,9 @@ class EventNotifications extends React.Component {
             <SearchForm query={query}
                         onSearch={onQueryChange}
                         onReset={onQueryChange}
-                        searchButtonLabel="Find"
                         placeholder="Find Notifications"
                         wrapperClass={styles.inline}
                         queryHelpComponent={<QueryHelper entityName="notification" />}
-                        queryWidth={200}
                         topMargin={0}
                         useLoadingState />
 

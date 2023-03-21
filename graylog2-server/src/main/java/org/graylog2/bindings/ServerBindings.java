@@ -70,6 +70,7 @@ import org.graylog2.rest.NotFoundExceptionMapper;
 import org.graylog2.rest.QueryParsingExceptionMapper;
 import org.graylog2.rest.ScrollChunkWriter;
 import org.graylog2.rest.ValidationExceptionMapper;
+import org.graylog2.rest.resources.entities.preferences.listeners.EntityListPreferencesCleanerOnUserDeletion;
 import org.graylog2.security.realm.AuthenticatingRealmModule;
 import org.graylog2.security.realm.AuthorizationOnlyRealmModule;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
@@ -223,6 +224,7 @@ public class ServerBindings extends Graylog2Module {
         bind(ClusterDebugEventListener.class).asEagerSingleton();
         bind(StartPageCleanupListener.class).asEagerSingleton();
         bind(GrantsCleanupListener.class).asEagerSingleton();
+        bind(EntityListPreferencesCleanerOnUserDeletion.class).asEagerSingleton();
     }
 
     private void bindSearchResponseDecorators() {

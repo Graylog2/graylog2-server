@@ -17,7 +17,6 @@
 package org.graylog.plugins.views;
 
 import io.restassured.path.json.JsonPath;
-import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Users;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
@@ -32,11 +31,9 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 @ContainerMatrixTestsConfiguration
 public class FavoritesIT {
-    private final RequestSpecification requestSpec;
     private final GraylogApis api;
 
-    public FavoritesIT(RequestSpecification requestSpec, GraylogApis apis) {
-        this.requestSpec = requestSpec;
+    public FavoritesIT(GraylogApis apis) {
         this.api = apis;
     }
 
@@ -58,17 +55,19 @@ public class FavoritesIT {
 
     @ContainerMatrixTest
     void testCreateDeleteFavorite() {
+        var grn = "grn::::search_filter:63d39fa82ba2606a6710a545";
+
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .auth().basic("john.doe1", "asdfgh")
                 .when()
-                .put("/favorites/1")
+                .put("/favorites/" + grn)
                 .then()
                 .log().ifStatusCodeMatches(not(204))
                 .statusCode(204);
 
         var validatableResponse = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .auth().basic("john.doe1", "asdfgh")
                 .when()
                 .get("/favorites")
@@ -76,13 +75,13 @@ public class FavoritesIT {
                 .log().ifStatusCodeMatches(not(200))
                 .statusCode(200);
 
-        validatableResponse.assertThat().body("favorites[0].id", equalTo("1"));
+        validatableResponse.assertThat().body("favorites[0].grn", equalTo(grn));
 
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .auth().basic("john.doe1", "asdfgh")
                 .when()
-                .delete("/favorites/1")
+                .delete("/favorites/" + grn)
                 .then()
                 .log().ifStatusCodeMatches(not(204))
                 .statusCode(204);

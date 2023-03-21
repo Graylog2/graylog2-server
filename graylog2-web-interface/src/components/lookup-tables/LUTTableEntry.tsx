@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { Link } from 'components/common/router';
@@ -26,6 +25,7 @@ import { ErrorPopover } from 'components/lookup-tables';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
+import useHistory from 'routing/useHistory';
 
 type Props = {
   table: LookupTable,
@@ -49,20 +49,20 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
   const history = useHistory();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
 
-  const handleDelete = (inTable: LookupTable) => () => {
+  const handleDelete = React.useCallback(() => {
     // eslint-disable-next-line no-alert
     const shouldDelete = window.confirm(
-      `Are you sure you want to delete lookup table "${inTable.title}"?`,
+      `Are you sure you want to delete lookup table "${table.title}"?`,
     );
 
     if (shouldDelete) {
-      LookupTablesActions.delete(inTable.id).then(() => LookupTablesActions.reloadPage());
+      LookupTablesActions.delete(table.id).then(() => LookupTablesActions.reloadPage());
     }
-  };
+  }, [table.id, table.title]);
 
-  const handleEdit = (tableName: string) => () => {
-    history.push(Routes.SYSTEM.LOOKUPTABLES.edit(tableName));
-  };
+  const handleEdit = React.useCallback(() => {
+    history.push(Routes.SYSTEM.LOOKUPTABLES.edit(table.name));
+  }, [history, table.name]);
 
   return (
     <tbody>
@@ -91,14 +91,14 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
           {loadingScopePermissions ? <Spinner /> : scopePermissions.is_mutable && (
             <Actions>
               <Button bsSize="xsmall"
-                      onClick={handleEdit(table.name)}
+                      onClick={handleEdit}
                       role="button"
                       name="edit">
                 Edit
               </Button>
               <Button bsSize="xsmall"
                       bsStyle="danger"
-                      onClick={handleDelete(table)}
+                      onClick={handleDelete}
                       role="button"
                       name="delete">
                 Delete

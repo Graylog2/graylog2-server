@@ -16,7 +16,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { Form, Formik } from 'formik';
-import lodash from 'lodash';
+import capitalize from 'lodash/capitalize';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 import 'components/indices/rotation';
@@ -29,6 +29,7 @@ import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMai
 import { Button, Col, Modal, Row } from 'components/bootstrap';
 import { IfPermitted, TimeUnitInput, Spinner } from 'components/common';
 import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
+import { TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY } from 'stores/indices/IndicesStore';
 
 import FormikInput from '../common/FormikInput';
 
@@ -83,7 +84,16 @@ const IndexSetsDefaultsConfig = ({ initialConfig, updateConfig }: Props) => {
   }, []);
 
   const saveConfig = (values, { setSubmitting }) => {
-    handleSaveConfig(values)
+    const defaultIndexValues = { ...values };
+
+    if (defaultIndexValues.rotation_strategy_class === TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY) {
+      defaultIndexValues.rotation_strategy_config = defaultIndexValues?.rotation_strategy;
+    }
+
+    delete defaultIndexValues?.rotation_strategy;
+    delete defaultIndexValues?.retention_strategy;
+
+    handleSaveConfig(defaultIndexValues)
       .then((config) => {
         setCurrentConfig(config as IndexConfig);
         setShowModal(false);
@@ -140,7 +150,7 @@ const IndexSetsDefaultsConfig = ({ initialConfig, updateConfig }: Props) => {
         <dt>Max. Number of Segments:</dt>
         <dd>{currentConfig.index_optimization_max_num_segments}</dd>
         <dt>Field type refresh interval:</dt>
-        <dd>{currentConfig.field_type_refresh_interval} {lodash.capitalize(currentConfig.field_type_refresh_interval_unit)}</dd>
+        <dd>{currentConfig.field_type_refresh_interval} {capitalize(currentConfig.field_type_refresh_interval_unit)}</dd>
         <br />
         <IndexMaintenanceStrategiesSummary config={rotationConfig}
                                            pluginExports={PluginStore.exports('indexRotationConfig')} />
@@ -199,7 +209,7 @@ const IndexSetsDefaultsConfig = ({ initialConfig, updateConfig }: Props) => {
                                        hideCheckbox
                                        units={TIME_UNITS} />
                         <IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
-                                                                 key="rotation"
+                                                                 name="rotation"
                                                                  selectPlaceholder="Select rotation strategy"
                                                                  pluginExports={PluginStore.exports('indexRotationConfig')}
                                                                  strategies={rotationStrategies.strategies}
@@ -207,7 +217,7 @@ const IndexSetsDefaultsConfig = ({ initialConfig, updateConfig }: Props) => {
                                                                  getState={getRotationConfigState} />
 
                         <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
-                                                                 key="retention"
+                                                                 name="retention"
                                                                  selectPlaceholder="Select rotation strategy"
                                                                  pluginExports={PluginStore.exports('indexRetentionConfig')}
                                                                  strategies={retentionStrategies.strategies}

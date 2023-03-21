@@ -16,7 +16,11 @@
  */
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-import { flow, fromPairs, get, zip, isEmpty } from 'lodash';
+import flow from 'lodash/flow';
+import fromPairs from 'lodash/fromPairs';
+import get from 'lodash/get';
+import zip from 'lodash/zip';
+import isEmpty from 'lodash/isEmpty';
 
 import type Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import { AggregationType, AggregationResult } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
@@ -34,8 +38,7 @@ import transformKeys from '../TransformKeys';
 import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
 
 const _arrayToMap = ([name, x, y]: ChartData) => ({ name, x, y });
-const _lastKey = (keys) => keys[keys.length - 1];
-const _mergeObject = (prev, last) => ({ ...prev, ...last });
+const _lastKey = <T, >(keys: Array<T>) => keys[keys.length - 1];
 
 const _createSeriesWithoutMetric = (rows: Rows) => {
   const leafs = getLeafsFromRows(rows);
@@ -49,12 +52,13 @@ const _createSeriesWithoutMetric = (rows: Rows) => {
 };
 
 const _formatSeriesForMap = (rowPivots: Array<Pivot>) => {
+  const fields = rowPivots.flatMap((rowPivot) => rowPivot.fields);
+
   return (result: Array<ReturnType<typeof _arrayToMap>>) => result.map(({ name, x, y }) => {
-    const keys = x.map((k) => k.slice(0, -1)
-      .map((key, idx) => ({ [rowPivots[idx].field]: key }))
-      .reduce(_mergeObject, {}));
+    const keys = x.map((k) => Object.fromEntries(k.slice(0, -1)
+      .map((key, idx) => [fields[idx], key])));
     const newX = x.map(_lastKey);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const values = fromPairs(zip(newX, y).filter(([_, v]) => (v !== undefined)));
 
     return { keys, name, values };

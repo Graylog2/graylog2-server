@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useEffect, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { parse, stringify } from 'qs';
 
 import type { Pagination } from 'stores/PaginationTypes';
@@ -27,7 +27,7 @@ type UseLocationSearchPaginationType = {
 }
 
 const useLocationSearchPagination = (defaultPagination: Pagination): UseLocationSearchPaginationType => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
   const [parsedPagination, setParsedPagination] = useState<Pagination>(defaultPagination);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
@@ -55,7 +55,7 @@ const useLocationSearchPagination = (defaultPagination: Pagination): UseLocation
   }, [location.search, defaultPagination]);
 
   const setLocationSearchPagination = (nextPagination: Pagination) => {
-    history.push({
+    navigate({
       pathname: location.pathname,
       search: stringify(nextPagination),
     });

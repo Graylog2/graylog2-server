@@ -16,7 +16,6 @@
  */
 package org.junit.platform.engine.support.hierarchical;
 
-import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.GraylogBackend;
 import org.junit.jupiter.engine.descriptor.ContainerMatrixEngineDescriptor;
 import org.junit.platform.engine.EngineExecutionListener;
@@ -35,18 +34,15 @@ public class ContainerMatrixHierarchicalTestExecutor<C extends EngineExecutionCo
     private final ThrowableCollector.Factory throwableCollectorFactory;
     private final Collection<? extends TestDescriptor> testDescriptors;
     public static Optional<GraylogBackend> graylogBackend = Optional.empty();
-    public static Optional<RequestSpecification> requestSpecification = Optional.empty();
 
     ContainerMatrixHierarchicalTestExecutor(ExecutionRequest request, C rootContext, HierarchicalTestExecutorService executorService,
-                                            ThrowableCollector.Factory throwableCollectorFactory, Collection<? extends TestDescriptor> testDescriptors, GraylogBackend backend,
-                                            RequestSpecification spec) {
+                                            ThrowableCollector.Factory throwableCollectorFactory, Collection<? extends TestDescriptor> testDescriptors, GraylogBackend backend) {
         this.request = request;
         this.rootContext = rootContext;
         this.executorService = executorService;
         this.throwableCollectorFactory = throwableCollectorFactory;
         this.testDescriptors = testDescriptors;
         graylogBackend = Optional.of(backend);
-        requestSpecification = Optional.of(spec);
     }
 
     Future<Void> execute() {

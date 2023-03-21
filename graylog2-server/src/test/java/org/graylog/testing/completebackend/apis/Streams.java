@@ -17,21 +17,29 @@
 package org.graylog.testing.completebackend.apis;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 public final class Streams implements GraylogRestApi {
-    private final RequestSpecification requestSpecification;
 
-    public Streams(RequestSpecification requestSpecification) {
-        this.requestSpecification = requestSpecification;
+    private final GraylogApis api;
+
+    public Streams(GraylogApis api) {
+        this.api = api;
     }
 
     public record StreamRule(@JsonProperty("type") int type,
@@ -43,13 +51,13 @@ public final class Streams implements GraylogRestApi {
                                @JsonProperty("index_set_id") String indexSetId) {}
 
     public String createStream(String title, String indexSetId, StreamRule... streamRules) {
-        return createStream(title, indexSetId, true, streamRules);
+        return waitForStreamRouterRefresh(() -> createStream(title, indexSetId, true, streamRules));
     }
 
     public String createStream(String title, String indexSetId, boolean started, StreamRule... streamRules) {
         final CreateStreamRequest body = new CreateStreamRequest(title, List.of(streamRules), indexSetId);
         final String streamId = given()
-                .spec(this.requestSpecification)
+                .spec(api.requestSpecification())
                 .when()
                 .body(body)
                 .post("/streams")
@@ -61,7 +69,7 @@ public final class Streams implements GraylogRestApi {
 
         if (started) {
             given()
-                    .spec(this.requestSpecification)
+                    .spec(api.requestSpecification())
                     .when()
                     .post("/streams/" + streamId + "/resume")
                     .then()
@@ -72,14 +80,51 @@ public final class Streams implements GraylogRestApi {
         return streamId;
     }
 
-    public ValidatableResponse getStream(RequestSpecification requestSpec, String streamId) {
+    public ValidatableResponse getStream(String streamId) {
         return given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .get("/streams/" + streamId)
                 .then()
                 .log().ifError()
                 .statusCode(200)
                 .assertThat().body("id", equalTo(streamId));
+    }
+
+    private String getStreamRouterEngineFingerprint() {
+        return given()
+                .spec(api.requestSpecification())
+                .when()
+                .get("/system/debug/streams/router_engine_info")
+                .then()
+                .extract().body().path("fingerprint");
+
+    }
+
+
+    /**
+     * Stream creation is an async operation. The stream router engine has to be refreshed in a separated thread.
+     * This may lead to unpredictable results, when messages are persisted immediately after stream creation.
+     * This wait wrapper will check the stream router engine fingerprint before the operation and delays
+     * returning result of the operation till the fingerprint is actually changed and new rules applied.
+     */
+    private <T> T waitForStreamRouterRefresh(Supplier<T> operation) {
+        final String fingerprintBeforeOp = getStreamRouterEngineFingerprint();
+        final T result = operation.get();
+        waitForStreamRouterEngineRefresh(fingerprintBeforeOp);
+        return result;
+    }
+
+    private void waitForStreamRouterEngineRefresh(String existingEngineFingerprint) {
+        try {
+            RetryerBuilder.<String>newBuilder()
+                    .withWaitStrategy(WaitStrategies.fixedWait(100, TimeUnit.MILLISECONDS))
+                    .withStopStrategy(StopStrategies.stopAfterDelay(10, TimeUnit.SECONDS))
+                    .retryIfResult(r -> r.equals(existingEngineFingerprint))
+                    .build()
+                    .call(this::getStreamRouterEngineFingerprint);
+        } catch (ExecutionException | RetryException e) {
+            throw new RuntimeException("Failed to wait for stream router engine refresh, fingerprint hasn't changed", e);
+        }
     }
 }

@@ -23,9 +23,9 @@ export const createGRN = (type: string, id: string) => `grn::::${type}:${id}`;
 
 export const getValuesFromGRN = (grn: GRN) => {
   const grnValues = grn.split(':');
-  const [resourceNameType, cluster, tenent, scope, type, id] = grnValues.map(_convertEmptyString);
+  const [resourceNameType, cluster, tenant, scope, type, id] = grnValues.map(_convertEmptyString);
 
-  return { resourceNameType, cluster, tenent, scope, type: type as GRNType, id };
+  return { resourceNameType, cluster, tenant, scope, type: type as GRNType, id };
 };
 
 export const getShowRouteFromGRN = (grn: string) => {

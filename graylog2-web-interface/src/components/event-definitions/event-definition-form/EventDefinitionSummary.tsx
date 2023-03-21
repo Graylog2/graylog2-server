@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import upperFirst from 'lodash/upperFirst';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import moment from 'moment';
 
@@ -40,7 +40,7 @@ import commonStyles from '../common/commonStyles.css';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
 type Props = {
-  eventDefinition: EventDefinition,
+  eventDefinition: Omit<EventDefinition, 'id'>,
   notifications: Array<any>,
   validation: {
     errors: {
@@ -73,7 +73,7 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
           <dt>Description</dt>
           <dd>{eventDefinition.description || 'No description given'}</dd>
           <dt>Priority</dt>
-          <dd>{lodash.upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
+          <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
         </dl>
       </>
     );

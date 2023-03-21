@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import lodash from 'lodash';
+import remove from 'lodash/remove';
 
 import { Row, Col, BootstrapModalConfirm } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
@@ -88,7 +88,7 @@ class ContentPackParameters extends React.Component {
   _onParameterClear = (id, configKey) => {
     const newAppliedParameter = ObjectUtils.clone(this.props.appliedParameter);
 
-    lodash.remove(newAppliedParameter[id], (paramMap) => { return paramMap.configKey === configKey; });
+    remove(newAppliedParameter[id], (paramMap) => { return paramMap.configKey === configKey; });
     this.props.onStateChange({ appliedParameter: newAppliedParameter });
   };
 
@@ -98,7 +98,7 @@ class ContentPackParameters extends React.Component {
 
     /* If we delete a parameter we need to remove the reference from appliedParameter */
     Object.keys(newAppliedParameter).forEach((id) => {
-      lodash.remove(newAppliedParameter[id], (paramMap) => { return paramMap.paramName === parameter.name; });
+      remove(newAppliedParameter[id], (paramMap) => { return paramMap.paramName === parameter.name; });
 
       if (newAppliedParameter[id].length <= 0) {
         delete newAppliedParameter[id];

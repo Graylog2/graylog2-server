@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useCallback, useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Form, Formik } from 'formik';
-import { isFunction } from 'lodash';
+import isFunction from 'lodash/isFunction';
 import type { FormikProps } from 'formik';
 
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
@@ -28,6 +28,7 @@ import validate from 'views/components/searchbar/validate';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
+import useHandlerContext from 'views/components/useHandlerContext';
 
 import { onInitializingTimerange, onSubmittingTimerange } from './TimerangeForForm';
 
@@ -67,8 +68,9 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQ
     ...rest,
   };
 
-  const _validate = useCallback((values: DashboardFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime),
-    [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime]);
+  const handlerContext = useHandlerContext();
+  const _validate = useCallback((values: DashboardFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime, handlerContext),
+    [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime, handlerContext]);
 
   return (
     <Formik<DashboardFormValues> initialValues={_initialValues}

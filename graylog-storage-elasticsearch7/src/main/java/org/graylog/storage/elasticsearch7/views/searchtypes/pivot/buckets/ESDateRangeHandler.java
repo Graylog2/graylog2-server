@@ -21,7 +21,6 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
-import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
@@ -33,18 +32,17 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.PivotBucket;
 import org.joda.time.base.AbstractDateTime;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 import java.util.stream.Stream;
 
 public class ESDateRangeHandler extends ESPivotBucketSpecHandler<DateRangeBucket> {
     private static final String AGG_NAME = "agg";
     @Nonnull
     @Override
-    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, List<DateRangeBucket> bucketSpecs, ESGeneratedQueryContext queryContext, Query query) {
+    public CreatedAggregations<AggregationBuilder> doCreateAggregation(Direction direction, String name, Pivot pivot, DateRangeBucket dateRangeBucket, ESGeneratedQueryContext queryContext, Query query) {
         AggregationBuilder root = null;
         AggregationBuilder leaf = null;
-        for (DateRangeBucket dateRangeBucket : bucketSpecs) {
-            final DateRangeAggregationBuilder builder = AggregationBuilders.dateRange(name).field(dateRangeBucket.field());
+        for (String dateRangeField : dateRangeBucket.fields()) {
+            final DateRangeAggregationBuilder builder = AggregationBuilders.dateRange(name).field(dateRangeField);
             dateRangeBucket.ranges().forEach(r -> {
                 final String from = r.from().map(AbstractDateTime::toString).orElse(null);
                 final String to = r.to().map(AbstractDateTime::toString).orElse(null);
@@ -74,15 +72,11 @@ public class ESDateRangeHandler extends ESPivotBucketSpecHandler<DateRangeBucket
     }
 
     @Override
-    public Stream<PivotBucket> extractBuckets(Pivot pivot, List<BucketSpec> bucketSpecs,
-                                              PivotBucket initialBucket) {
-        if (bucketSpecs.isEmpty()) {
-            return Stream.empty();
-        }
+    public Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpec, PivotBucket initialBucket) {
         final ImmutableList<String> previousKeys = initialBucket.keys();
         final MultiBucketsAggregation.Bucket previousBucket = initialBucket.bucket();
         final ParsedDateRange aggregation = previousBucket.getAggregations().get(AGG_NAME);
-        final DateRangeBucket dateRangeBucket = (DateRangeBucket) bucketSpecs.get(0);
+        final DateRangeBucket dateRangeBucket = (DateRangeBucket) bucketSpec;
 
         return aggregation.getBuckets().stream()
                 .flatMap(bucket -> {
@@ -94,11 +88,7 @@ public class ESDateRangeHandler extends ESPivotBucketSpecHandler<DateRangeBucket
                             .add(bucketKey)
                             .build();
 
-                    if (bucketSpecs.size() == 1) {
-                        return Stream.of(PivotBucket.create(keys, bucket));
-                    }
-
-                    return extractBuckets(pivot, bucketSpecs.subList(0, bucketSpecs.size()), PivotBucket.create(keys, bucket));
+                    return Stream.of(PivotBucket.create(keys, bucket, false));
                 });
     }
 }

@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import { Field, useFormikContext } from 'formik';
 import styled from 'styled-components';
-import { isFunction } from 'lodash';
+import isFunction from 'lodash/isFunction';
 
 import { Input, Checkbox } from 'components/bootstrap';
 import Select from 'components/common/Select';
@@ -26,6 +26,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import { defaultCompare } from 'logic/DefaultCompare';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import { TIMESTAMP_FIELD } from 'views/Constants';
+import { DateType } from 'views/logic/aggregationbuilder/Pivot';
 
 import VisualizationConfigurationOptions from './VisualizationConfigurationOptions';
 import VisualizationElement from './VisualizationElement';
@@ -33,7 +34,7 @@ import VisualizationElement from './VisualizationElement';
 import ElementConfigurationContainer from '../ElementConfigurationContainer';
 
 const EventAnnotationCheckbox = styled(Checkbox)`
-  input[type="checkbox"] {
+  input[type='checkbox'] {
     margin-right: 0;
     right: 0;
   }
@@ -46,7 +47,7 @@ const isTimeline = (values: WidgetConfigFormValues) => {
 
   const firstRowGrouping = values.groupBy.groupings.find((grouping) => grouping.direction === 'row');
 
-  return firstRowGrouping?.field?.field === TIMESTAMP_FIELD;
+  return firstRowGrouping?.type === DateType && firstRowGrouping?.fields?.[0] === TIMESTAMP_FIELD;
 };
 
 const VisualizationConfiguration = () => {

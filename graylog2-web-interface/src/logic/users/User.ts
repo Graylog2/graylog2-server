@@ -21,9 +21,9 @@ import type { PreferencesMap } from 'stores/users/PreferencesStore';
 
 import type { AccountStatus } from './UserOverview';
 
-type StartPage = {
+export type StartPage = {
   id: string;
-  type: string;
+  type: 'dashboard' | 'stream' | 'search'
 };
 
 export type UserJSON = {
@@ -437,7 +437,6 @@ export default class User {
     );
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   static builder(): Builder {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder();

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, fireEvent } from 'wrappedTestingLibrary';
+import { render, fireEvent, screen } from 'wrappedTestingLibrary';
 import { useLocation } from 'react-router-dom';
 import type { Location } from 'history';
 
@@ -70,16 +70,18 @@ describe('PaginatedList', () => {
 
   it('should reset current page on page size change', () => {
     const onChangeStub = jest.fn();
-    const { getByLabelText } = render(
+    const { getByRole } = render(
       <PaginatedList totalItems={200}
                      onChange={onChangeStub}
                      activePage={3}>
         <div>The list</div>
       </PaginatedList>);
 
-    const pageSizeInput = getByLabelText('Show');
+    fireEvent.click(getByRole('button', {
+      name: /configure page size/i,
+    }));
 
-    fireEvent.change(pageSizeInput, { target: { value: 100 } });
+    fireEvent.click(screen.getByRole('menuitem', { name: /100/ }));
 
     expect(onChangeStub).toHaveBeenCalledWith(1, 100);
   });
@@ -90,7 +92,7 @@ describe('PaginatedList', () => {
 
       asMock(useLocation).mockReturnValue({
         search: `?page=${currentPage}`,
-      } as Location<{ search: string }>);
+      } as Location);
 
       const { findByTestId } = render(
         <PaginatedList totalItems={200}

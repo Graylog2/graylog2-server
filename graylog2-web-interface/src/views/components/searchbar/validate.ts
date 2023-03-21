@@ -14,12 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import validateTimeRange from 'views/components/TimeRangeValidation';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
-import type { SearchBarControl } from 'views/types';
+import type { SearchBarControl, HandlerContext } from 'views/types';
 import type { DateTime } from 'util/DateTime';
 import { validatePluggableValues } from 'views/logic/searchbar/pluggableSearchBarControlsHandler';
 
@@ -35,6 +35,7 @@ const validate = async <T extends FormValues>(
   validateQueryString: (values: T) => Promise<QueryValidationState>,
   pluggableSearchBarControls: Array<() => SearchBarControl>,
   formatTime: (dateTime: DateTime, format: string) => string,
+  context: HandlerContext,
 ) => {
   const { timerange: nextTimeRange } = values;
   let errors = {};
@@ -45,7 +46,7 @@ const validate = async <T extends FormValues>(
     errors = { ...errors, timerange: timeRangeErrors };
   }
 
-  const pluggableSearchBarControlsErrors = validatePluggableValues(values, pluggableSearchBarControls);
+  const pluggableSearchBarControlsErrors = validatePluggableValues(values, context, pluggableSearchBarControls);
 
   if (!isEmpty(pluggableSearchBarControlsErrors)) {
     errors = { ...errors, ...pluggableSearchBarControlsErrors };

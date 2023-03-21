@@ -20,7 +20,6 @@ import { asElement, fireEvent, render } from 'wrappedTestingLibrary';
 import DrilldownContext from 'views/components/contexts/DrilldownContext';
 
 import SurroundingSearchButton from './SurroundingSearchButton';
-import type { SearchesConfig } from './SearchConfig';
 
 const getOption = (optionText, getByText) => {
   const button = getByText('Show surrounding messages');
@@ -31,10 +30,7 @@ const getOption = (optionText, getByText) => {
 };
 
 describe('SurroundingSearchButton', () => {
-  const searchConfig: SearchesConfig = {
-    analysis_disabled_fields: [],
-    query_time_range_limit: 'PT0S',
-    relative_timerange_options: {},
+  const searchConfig = {
     surrounding_filter_fields: [
       'somefield',
       'someotherfield',
@@ -44,7 +40,7 @@ describe('SurroundingSearchButton', () => {
       PT1M: 'Only a minute',
     },
   };
-  const TestComponent = (props) => (
+  const TestComponent = (props: Partial<React.ComponentProps<typeof SurroundingSearchButton>>) => (
     <SurroundingSearchButton searchConfig={searchConfig}
                              timestamp="2020-02-28T09:45:31.123Z"
                              id="foo-bar"
@@ -52,7 +48,7 @@ describe('SurroundingSearchButton', () => {
                              {...props} />
   );
 
-  const renderButton = (props = {}) => render(<TestComponent {...props} />);
+  const renderButton = (props: Partial<React.ComponentProps<typeof SurroundingSearchButton>> = {}) => render(<TestComponent {...props} />);
 
   it('renders a button with a "Show surrounding messages" caption', () => {
     const { getByText } = renderButton();

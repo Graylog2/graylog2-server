@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import lodash from 'lodash';
+import get from 'lodash/get';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
@@ -72,7 +72,7 @@ const EventDefinitionEntry = ({
   onCopy,
 }: Props) => {
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
-  const isScheduled = lodash.get(context, `scheduler.${eventDefinition.id}.is_scheduled`, true);
+  const isScheduled = get(context, `scheduler.${eventDefinition.id}.is_scheduled`, true);
   const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(eventDefinition);
 
   const isSystemEventDefinition = (): boolean => {

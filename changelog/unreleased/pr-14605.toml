@@ -1,0 +1,5 @@
+type = "f"
+message = "Handle deprecated short time zone IDs in job scheduler definitions."
+
+issues = ["Graylog2/graylog-plugin-enterprise#4311"]
+pulls = ["14605"]

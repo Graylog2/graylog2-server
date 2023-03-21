@@ -16,21 +16,33 @@
  */
 import Reflux from 'reflux';
 import URI from 'urijs';
-import lodash from 'lodash';
+import concat from 'lodash/concat';
 
 import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
+import PaginationURL from 'util/PaginationURL';
 
-type EventNotification = {
+export type TestResult = {
+  isLoading: boolean,
+  id?: string,
+  error?: boolean,
+  message?: string,
+};
+export type TestResults ={
+    [key: string]: TestResult
+};
+export type EventNotification = {
   id: string,
   title: string,
   description: string,
-  config: {},
+  config: {
+    type?: string
+  },
 }
 
-type LegacyEventNotification = {
+export type LegacyEventNotification = {
   name: string,
   configuration: {}
 }
@@ -39,6 +51,7 @@ type EventNotificationsActionsType = {
   listAll: () => Promise<{ notifications: Array<EventNotification> }>,
   listAllLegacyTypes: () => Promise<{ types: { [key: string]: LegacyEventNotification } }>,
   listPaginated: () => Promise<{ notifications: Array<EventNotification> }>,
+  searchPaginated: () => Promise<{ elements: Array<EventNotification> }>,
   get: (id: string) => Promise<EventNotification>,
   create: (eventNotification: EventNotification) => Promise<void>,
   update: (id: string, eventNotification: EventNotification) => Promise<void>,
@@ -52,6 +65,7 @@ export const EventNotificationsActions = singletonActions(
     listAll: { asyncResult: true },
     listAllLegacyTypes: { asyncResult: true },
     listPaginated: { asyncResult: true },
+    searchPaginated: { asyncResult: true },
     get: { asyncResult: true },
     create: { asyncResult: true },
     update: { asyncResult: true },
@@ -111,7 +125,7 @@ export const EventNotificationsStore = singletonStore(
 
     eventNotificationsUrl({ segments = [], query = {} }) {
       const uri = new URI(this.sourceUrl);
-      const nextSegments = lodash.concat(uri.segment(), segments);
+      const nextSegments = concat(uri.segment(), segments);
 
       uri.segmentCoded(nextSegments);
       uri.query(query);
@@ -174,7 +188,40 @@ export const EventNotificationsStore = singletonStore(
 
       EventNotificationsActions.listPaginated.promise(promise);
     },
+    searchPaginated(newPage, newPerPage, newQuery, additional) {
+      const url = PaginationURL(`${this.sourceUrl}/paginated`, newPage, newPerPage, newQuery, additional);
 
+      const promise = fetch('GET', URLUtils.qualifyUrl(url))
+        .then((response) => {
+          const {
+            elements,
+            query,
+            attributes,
+            pagination: {
+              count,
+              total,
+              page,
+              per_page: perPage,
+            },
+          } = response;
+
+          return {
+            elements,
+            attributes,
+            pagination: {
+              count,
+              total,
+              page,
+              perPage,
+              query,
+            },
+          };
+        });
+
+      EventNotificationsActions.searchPaginated.promise(promise);
+
+      return promise;
+    },
     get(notificationId) {
       const promise = fetch('GET', this.eventNotificationsUrl({ segments: [notificationId] }));
 

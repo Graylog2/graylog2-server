@@ -19,14 +19,15 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import lodash from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import debounce from 'lodash/debounce';
 
 import { FormSubmit, Select, SourceCodeEditor } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
-import history from 'util/History';
 import Routes from 'routing/Routes';
 import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
 import { CollectorsActions, CollectorsStore } from 'stores/sidecars/CollectorsStore';
+import withHistory from 'routing/withHistory';
 
 const ValidationMessage = ({ validationErrors, fieldName, defaultText }) => {
   if (validationErrors[fieldName]) {
@@ -50,6 +51,7 @@ const CollectorForm = createReactClass({
   propTypes: {
     action: PropTypes.oneOf(['create', 'edit']),
     collector: PropTypes.object,
+    history: PropTypes.object.isRequired,
   },
 
   mixins: [Reflux.connect(CollectorsStore)],
@@ -83,7 +85,7 @@ const CollectorForm = createReactClass({
   },
 
   UNSAFE_componentWillMount() {
-    this._debouncedValidateFormData = lodash.debounce(this._validateFormData, 200);
+    this._debouncedValidateFormData = debounce(this._validateFormData, 200);
   },
 
   componentDidMount() {
@@ -98,7 +100,7 @@ const CollectorForm = createReactClass({
   },
 
   _save() {
-    const { action } = this.props;
+    const { action, history } = this.props;
     const { formData } = this.state;
 
     if (!this.hasErrors()) {
@@ -115,7 +117,7 @@ const CollectorForm = createReactClass({
     const { formData } = this.state;
 
     return (nextValue) => {
-      const nextFormData = lodash.cloneDeep(formData);
+      const nextFormData = cloneDeep(formData);
 
       nextFormData[key] = nextValue;
       this._debouncedValidateFormData(nextFormData);
@@ -149,6 +151,7 @@ const CollectorForm = createReactClass({
   },
 
   _onCancel() {
+    const { history } = this.props;
     history.goBack();
   },
 
@@ -296,4 +299,4 @@ const CollectorForm = createReactClass({
   },
 });
 
-export default CollectorForm;
+export default withHistory(CollectorForm);

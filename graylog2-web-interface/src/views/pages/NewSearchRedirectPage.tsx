@@ -15,27 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
-import history from 'util/History';
 import Routes from 'routing/Routes';
-import withParams from 'routing/withParams';
+import useHistory from 'routing/useHistory';
 
-type Props = {
-  params: {
-    streamId?: string,
-  },
-};
+const NewSearchRedirectPage = () => {
+  const history = useHistory();
+  const { streamId } = useParams();
 
-const NewSearchRedirectPage = ({ params: { streamId } }: Props) => {
   useEffect(() => {
     if (streamId) {
       history.push(Routes.stream_search(streamId));
     } else {
       history.push(Routes.SEARCH);
     }
-  }, [streamId]);
+  }, [history, streamId]);
 
   return null;
 };
 
-export default withParams(NewSearchRedirectPage);
+export default NewSearchRedirectPage;

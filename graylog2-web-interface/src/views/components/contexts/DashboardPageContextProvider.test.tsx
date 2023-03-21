@@ -19,30 +19,22 @@ import { render } from 'wrappedTestingLibrary';
 import { useLocation } from 'react-router-dom';
 
 import { asMock } from 'helpers/mocking';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import TestStoreProvider from 'views/test/TestStoreProvider';
 
+import type { DashboardPageContextType } from './DashboardPageContext';
 import DashboardPageContext from './DashboardPageContext';
 import DashboardPageContextProvider from './DashboardPageContextProvider';
 
-const mockHistoryReplace = jest.fn();
+const mockNavigate = jest.fn();
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useHistory: () => ({
-    replace: mockHistoryReplace,
-  }),
+  useNavigate: () => mockNavigate,
   useLocation: jest.fn(() => ({
     pathname: '',
     search: '',
   })),
-}));
-
-jest.mock('views/stores/ViewStatesStore', () => ({
-  ViewStatesStore: {
-    getInitialState: jest.fn(() => ({
-      has: jest.fn((pageId) => pageId === 'page-id' || pageId === 'page2-id'),
-    })),
-    listen: jest.fn(),
-  },
 }));
 
 const emptyLocation = {
@@ -50,33 +42,42 @@ const emptyLocation = {
   search: '',
   hash: '',
   state: undefined,
+  key: '',
 };
 
 describe('DashboardPageContextProvider', () => {
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   beforeEach(() => {
     asMock(useLocation).mockReturnValue(emptyLocation);
   });
 
-  const renderSUT = (consume) => render(
-    <DashboardPageContextProvider>
-      <DashboardPageContext.Consumer>
-        {consume}
-      </DashboardPageContext.Consumer>
-    </DashboardPageContextProvider>,
-  );
+  const renderSUT = (consume: (value: DashboardPageContextType) => React.ReactNode) => render((
+    <TestStoreProvider>
+      <DashboardPageContextProvider>
+        <DashboardPageContext.Consumer>
+          {consume}
+        </DashboardPageContext.Consumer>
+      </DashboardPageContextProvider>
+    </TestStoreProvider>
+  ));
 
   it('should update url on page set', () => {
     let contextValue;
 
-    const consume = (value) => {
+    const consume = (value: DashboardPageContextType) => {
       contextValue = value;
+
+      return null;
     };
 
     renderSUT(consume);
 
     contextValue.setDashboardPage('page-id');
 
-    expect(mockHistoryReplace).toHaveBeenCalledWith('?page=page-id');
+    expect(mockNavigate).toHaveBeenCalledWith('?page=page-id', { replace: true });
   });
 
   it('should update url on page change', () => {
@@ -87,15 +88,17 @@ describe('DashboardPageContextProvider', () => {
 
     let contextValue;
 
-    const consume = (value) => {
+    const consume = (value: DashboardPageContextType) => {
       contextValue = value;
+
+      return null;
     };
 
     renderSUT(consume);
 
     contextValue.setDashboardPage('page-id');
 
-    expect(mockHistoryReplace).toHaveBeenCalledWith('?page=page-id');
+    expect(mockNavigate).toHaveBeenCalledWith('?page=page-id', { replace: true });
   });
 
   it('should unset a page from url', () => {
@@ -106,15 +109,17 @@ describe('DashboardPageContextProvider', () => {
 
     let contextValue;
 
-    const consume = (value) => {
+    const consume = (value: DashboardPageContextType) => {
       contextValue = value;
+
+      return null;
     };
 
     renderSUT(consume);
 
     contextValue.unsetDashboardPage();
 
-    expect(mockHistoryReplace).toHaveBeenCalledWith('');
+    expect(mockNavigate).toHaveBeenCalledWith('', { replace: true });
   });
 
   it('should not set to an unknown page', () => {
@@ -125,14 +130,16 @@ describe('DashboardPageContextProvider', () => {
 
     let contextValue;
 
-    const consume = (value) => {
+    const consume = (value: DashboardPageContextType) => {
       contextValue = value;
+
+      return null;
     };
 
     renderSUT(consume);
 
     contextValue.setDashboardPage('new');
 
-    expect(mockHistoryReplace).toHaveBeenCalledWith('');
+    expect(mockNavigate).toHaveBeenCalledWith('', { replace: true });
   });
 });

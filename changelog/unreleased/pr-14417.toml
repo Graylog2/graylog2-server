@@ -1,0 +1,5 @@
+type = "a"
+message = "Graylog DataNode. Initial version."
+
+issues = []
+pulls = ["14417"]

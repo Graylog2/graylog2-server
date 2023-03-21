@@ -17,13 +17,14 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { Outlet } from 'react-router-dom';
 
 import WithGlobalAppNotifications from 'components/notifications/WithGlobalAppNotifications';
 import { Grid } from 'components/bootstrap';
 import Footer from 'components/layout/Footer';
 
 type Props = {
-  children: React.ReactNode,
+  children?: React.ReactNode,
   className?: string
 };
 
@@ -52,7 +53,7 @@ const PageContentLayout = ({ children, className }: Props) => (
   <Container className={className}>
     <WithGlobalAppNotifications>
       <StyledGrid fluid className="page-content-grid">
-        {children}
+        {children || <Outlet />}
       </StyledGrid>
       <Footer />
     </WithGlobalAppNotifications>
@@ -60,11 +61,12 @@ const PageContentLayout = ({ children, className }: Props) => (
 );
 
 PageContentLayout.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
   className: PropTypes.string,
 };
 
 PageContentLayout.defaultProps = {
+  children: undefined,
   className: undefined,
 };
 

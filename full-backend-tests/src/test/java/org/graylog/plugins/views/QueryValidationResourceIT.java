@@ -17,7 +17,6 @@
 package org.graylog.plugins.views;
 
 import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.SearchServer;
@@ -34,11 +33,9 @@ import static org.hamcrest.core.IsEqual.equalTo;
 @ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, mongoVersions = MongodbServer.MONGO5, searchVersions = SearchServer.OS1)
 public class QueryValidationResourceIT {
 
-    private final RequestSpecification requestSpec;
     private final GraylogApis api;
 
-    public QueryValidationResourceIT(RequestSpecification requestSpec, GraylogApis api) {
-        this.requestSpec = requestSpec;
+    public QueryValidationResourceIT(GraylogApis api) {
         this.api = api;
     }
 
@@ -70,7 +67,7 @@ public class QueryValidationResourceIT {
     @ContainerMatrixTest
     void testMinimalisticRequest() {
         final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("{\"query\":\"foo:bar\"}")
                 .post("/search/validate")
@@ -82,7 +79,7 @@ public class QueryValidationResourceIT {
     @ContainerMatrixTest
     void testInvalidQuery() {
         final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("{\"query\":\"foo:\"}")
                 .post("/search/validate")
@@ -95,7 +92,7 @@ public class QueryValidationResourceIT {
     @ContainerMatrixTest
     void testOrQuery() {
         final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("{\"query\":\"unknown_field:(x OR y)\"}")
                 .post("/search/validate")
@@ -115,7 +112,7 @@ public class QueryValidationResourceIT {
     @ContainerMatrixTest
     void testLowercaseNotOperator() {
         final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("{\"query\":\"not(http_response_code:200)\"}")
                 .post("/search/validate")
@@ -129,7 +126,7 @@ public class QueryValidationResourceIT {
     @ContainerMatrixTest
     void testInvalidValueType() {
         final ValidatableResponse validatableResponse = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("{\"query\":\"timestamp:AAA\"}")
                 .post("/search/validate")
@@ -194,7 +191,7 @@ public class QueryValidationResourceIT {
 
     private void verifyQueryIsValidatedSuccessfully(final String query) {
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("{\"query\": \"" + query + "\"}")
                 .post("/search/validate")
@@ -207,7 +204,7 @@ public class QueryValidationResourceIT {
 
     private void verifyQueryIsValidatedWithValidationError(final String query) {
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body("{\"query\": \"" + query + "\"}")
                 .post("/search/validate")

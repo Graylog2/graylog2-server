@@ -21,7 +21,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const { ESBuildMinifyPlugin } = require('esbuild-loader');
+const { EsbuildPlugin } = require('esbuild-loader');
 
 const UniqueChunkIdPlugin = require('./webpack/UniqueChunkIdPlugin');
 const supportedBrowsers = require('./supportedBrowsers');
@@ -94,11 +94,10 @@ const webpackConfig = {
         use: {
           loader: 'esbuild-loader',
           options: {
-            loader: 'tsx',
             target: supportedBrowsers,
           },
         },
-        exclude: /node_modules\/(?!graylog-web-plugin)|\.node_cache/,
+        exclude: /node_modules\/(?!(@react-hook|uuid|@?react-leaflet|graylog-web-plugin))|\.node_cache/,
       },
       {
         test: /\.(svg)(\?.+)?$/,
@@ -249,7 +248,7 @@ if (TARGET.startsWith('build')) {
     mode: 'production',
     optimization: {
       moduleIds: 'deterministic',
-      minimizer: [new ESBuildMinifyPlugin({
+      minimizer: [new EsbuildPlugin({
         target: supportedBrowsers,
       })],
     },

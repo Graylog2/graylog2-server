@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import _ from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import { Formik, Form } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import type { LookupTableCache, validationErrorsType } from 'src/logic/lookup-tables/types';
@@ -24,8 +24,8 @@ import { Col, Row } from 'components/bootstrap';
 import { FormikFormGroup, FormSubmit } from 'components/common';
 import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
 import useScopePermissions from 'hooks/useScopePermissions';
-import history from 'util/History';
 import Routes from 'routing/Routes';
+import useHistory from 'routing/useHistory';
 
 type TitleProps = {
   title: string,
@@ -110,7 +110,7 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
 
     if (values.config.type !== 'none') {
       const confErrors = configRef.current?.validate() || {};
-      if (!_.isEmpty(confErrors)) errors.config = confErrors;
+      if (!isEmpty(confErrors)) errors.config = confErrors;
     }
 
     return errors;
@@ -124,6 +124,7 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
     return promise.then(() => saved());
   };
 
+  const history = useHistory();
   const onCancel = () => history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
   const updatable = !create && !loadingScopePermissions && scopePermissions?.is_mutable;
 

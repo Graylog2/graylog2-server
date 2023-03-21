@@ -23,6 +23,11 @@ public class ValidationFailureException extends RuntimeException {
         this.validationResult = validationResult;
     }
 
+    public ValidationFailureException(ValidationResult validationResult, String message) {
+        super(message);
+        this.validationResult = validationResult;
+    }
+
     public ValidationResult getValidationResult() {
         return validationResult;
     }

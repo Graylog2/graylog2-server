@@ -18,40 +18,29 @@ import * as React from 'react';
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
-import mockComponent from 'helpers/mocking/MockComponent';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
-import Search from 'views/logic/search/Search';
 import SearchComponent from 'views/components/Search';
-import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import StreamsContext from 'contexts/StreamsContext';
 import { loadNewView, loadView } from 'views/logic/views/Actions';
 import useQuery from 'routing/useQuery';
 import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
-import useView from 'views/hooks/useView';
+import { createSearch } from 'fixtures/searches';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import NewSearchPage from './NewSearchPage';
 
-const mockView = View.create()
-  .toBuilder()
-  .newId()
-  .type(View.Type.Search)
-  .search(Search.builder().build())
-  .build();
+const mockView = createSearch();
 
 jest.mock('views/components/Search');
-jest.mock('components/common/PublicNotifications', () => mockComponent('PublicNotifications'));
-jest.mock('views/stores/SearchStore');
 jest.mock('routing/useQuery');
-
-jest.mock('views/hooks/SyncWithQueryParameters');
 
 jest.mock('views/logic/views/Actions');
 jest.mock('views/logic/views/UseCreateSavedSearch');
 jest.mock('views/logic/views/UseProcessHooksForView');
 jest.mock('views/hooks/useLoadView');
-jest.mock('views/hooks/useView');
 
 describe('NewSearchPage', () => {
   const query = {
@@ -65,13 +54,15 @@ describe('NewSearchPage', () => {
     </StreamsContext.Provider>
   );
 
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   beforeEach(() => {
-    jest.clearAllMocks();
     asMock(useQuery).mockReturnValue(query);
     asMock(useCreateSavedSearch).mockReturnValue(Promise.resolve(mockView));
-    asMock(useProcessHooksForView).mockReturnValue([true, undefined]);
+    asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: mockView, executionState: SearchExecutionState.empty() });
     asMock(SearchComponent).mockImplementation(() => <span>Extended Search Page</span>);
-    asMock(useView).mockReturnValue(mockView);
   });
 
   it('should render minimal', async () => {
@@ -81,7 +72,7 @@ describe('NewSearchPage', () => {
   });
 
   it('should show spinner while loading view', async () => {
-    asMock(useProcessHooksForView).mockReturnValue([false, undefined]);
+    asMock(useProcessHooksForView).mockReturnValue({ status: 'loading' });
 
     const { findByText } = render(<SimpleNewSearchPage />);
 
@@ -99,7 +90,7 @@ describe('NewSearchPage', () => {
     it('should process hooks with provided location query', async () => {
       render(<SimpleNewSearchPage />);
 
-      await waitFor(() => expect(useProcessHooksForView).toHaveBeenCalledWith(expect.anything(), {
+      await waitFor(() => expect(useProcessHooksForView).toHaveBeenCalledWith(expect.anything(), SearchExecutionState.empty(), {
         q: '',
         rangetype: 'relative',
         relative: '300',
@@ -107,7 +98,7 @@ describe('NewSearchPage', () => {
     });
 
     it('should display errors which occur when processing hooks', async () => {
-      asMock(useProcessHooksForView).mockImplementation(() => [true, <span>An unknown error has occurred.</span>]);
+      asMock(useProcessHooksForView).mockImplementation(() => ({ status: 'interrupted', component: <span>An unknown error has occurred.</span> }));
 
       render(<SimpleNewSearchPage />);
 
@@ -133,7 +124,7 @@ describe('NewSearchPage', () => {
 
       await waitFor(() => expect(loadView).toHaveBeenCalled());
 
-      expect(loadView).toHaveBeenCalledWith('special-view-id');
+      expect(loadView).toHaveBeenCalledWith(expect.anything(), 'special-view-id');
     });
   });
 
@@ -161,7 +152,7 @@ describe('NewSearchPage', () => {
 
       await waitFor(() => expect(useProcessHooksForView).toHaveBeenCalled());
 
-      expect(useProcessHooksForView).toHaveBeenCalledWith(expect.anything(), query);
+      expect(useProcessHooksForView).toHaveBeenCalledWith(expect.anything(), SearchExecutionState.empty(), query);
     });
   });
 });

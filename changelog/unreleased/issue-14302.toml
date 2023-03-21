@@ -1,0 +1,11 @@
+type = "c"
+message = "Prevent deletion of event definitions that are still referenced in other definitions."
+
+issues = ["14302"]
+pulls = ["#14792", "Graylog2/graylog-plugin-enterprise#4765"]
+
+details.user = """
+An event definition d1 may be referenced from another definition d2, specifically a correlation event.
+Deleting d1 at this time results in unexpected behavior. We now block deletion and show a warning,
+displaying the list of dependent events from which the definition must be removed, prior to deletion.
+"""

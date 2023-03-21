@@ -23,16 +23,13 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Singleton;
 import java.util.HashSet;
 import java.util.Set;
 
+@Singleton
 public class InputRegistry extends HashSet<IOState<MessageInput>> {
     private static final Logger LOG = LoggerFactory.getLogger(InputRegistry.class);
-
-    public InputRegistry() {
-        super();
-    }
-
 
     public Set<IOState<MessageInput>> getInputStates() {
         return ImmutableSet.copyOf(this);
@@ -115,7 +112,7 @@ public class InputRegistry extends HashSet<IOState<MessageInput>> {
             try {
                 input.stop();
             } catch (Exception e) {
-                LOG.warn("Stopping input <{}> failed, removing anyway: {}", input.getId(), e);
+                LOG.warn("Stopping input {} failed, removing anyway: {}", input.toIdentifier(), e);
             }
             inputState.setState(IOState.Type.STOPPED);
         }

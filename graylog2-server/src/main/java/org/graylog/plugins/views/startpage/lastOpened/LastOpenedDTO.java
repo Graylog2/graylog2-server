@@ -17,9 +17,10 @@
 package org.graylog.plugins.views.startpage.lastOpened;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog.grn.GRN;
 import org.joda.time.DateTime;
 
-public record LastOpenedDTO(@JsonProperty(FIELD_ID) String id, @JsonProperty(FIELD_TIMESTAMP) DateTime timestamp) {
-    public static final String FIELD_ID = "id";
+public record LastOpenedDTO(@JsonProperty(FIELD_GRN) GRN grn, @JsonProperty(FIELD_TIMESTAMP) DateTime timestamp) {
+    public static final String FIELD_GRN = "grn";
     public static final String FIELD_TIMESTAMP = "timestamp";
 }

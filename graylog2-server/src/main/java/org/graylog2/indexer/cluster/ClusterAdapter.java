@@ -25,11 +25,12 @@ import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 public interface ClusterAdapter {
-    Optional<HealthStatus> health(Collection<String> indices);
+    Optional<HealthStatus> health();
 
     Set<NodeFileDescriptorStats> fileDescriptorStats();
 
@@ -43,13 +44,15 @@ public interface ClusterAdapter {
 
     boolean isConnected();
 
-    Optional<String> clusterName(Collection<String> indices);
+    Optional<String> clusterName();
 
-    Optional<ClusterHealth> clusterHealthStats(Collection<String> indices);
+    Optional<ClusterHealth> clusterHealthStats();
 
     ClusterStats clusterStats();
 
     PendingTasksStats pendingTasks();
 
-    ShardStats shardStats(Collection<String> indices);
+    ShardStats shardStats();
+
+    Optional<HealthStatus> deflectorHealth(Collection<String> indices);
 }

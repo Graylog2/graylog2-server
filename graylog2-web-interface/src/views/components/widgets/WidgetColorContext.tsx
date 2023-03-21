@@ -18,37 +18,42 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 
-import connect from 'stores/connect';
-import { ChartColorRulesStore, ChartColorRulesActions } from 'views/stores/ChartColorRulesStore';
-import type { ColorRule } from 'views/stores/ChartColorRulesStore';
 import ColorMapper from 'views/components/visualizations/ColorMapper';
+import useAppDispatch from 'stores/useAppDispatch';
+import { setChartColor } from 'views/logic/slices/widgetActions';
+
+import useColorRules from './useColorRules';
 
 import ChartColorContext from '../visualizations/ChartColorContext';
 
 type Props = {
   children: React.ReactNode,
-  colorRules: Array<ColorRule>,
   id: string,
 };
 
-const WidgetColorContext = ({ children, colorRules, id }: Props) => {
-  const colorMapperBuilder = ColorMapper.builder();
-  const colorRulesForWidgetBuilder = colorRules.filter(({ widgetId }) => (widgetId === id))
-    .reduce((prev, { name, color }) => (prev.set(name, color)), colorMapperBuilder);
-  const colorRulesForWidget = colorRulesForWidgetBuilder.build();
+const WidgetColorContext = ({ children, id }: Props) => {
+  const colorRules = useColorRules();
+  const colorRulesForWidget = useMemo(() => {
+    const colorMapperBuilder = ColorMapper.builder();
+    const colorRulesForWidgetBuilder = colorRules.filter(({ widgetId }) => (widgetId === id))
+      .reduce((prev, { name, color }) => (prev.set(name, color)), colorMapperBuilder);
+
+    return colorRulesForWidgetBuilder.build();
+  }, [colorRules, id]);
+  const dispatch = useAppDispatch();
 
   const contextValue = useMemo(() => {
     const setColor = (name: string, color: string) => {
       colorRulesForWidget.set(name, color);
 
-      return ChartColorRulesActions.set(id, name, color);
+      return dispatch(setChartColor(id, name, color));
     };
 
     return ({
       colors: colorRulesForWidget,
       setColor,
     });
-  }, [colorRulesForWidget, id]);
+  }, [colorRulesForWidget, dispatch, id]);
 
   return (
     <ChartColorContext.Provider value={contextValue}>
@@ -62,4 +67,4 @@ WidgetColorContext.propTypes = {
   id: PropTypes.string.isRequired,
 };
 
-export default connect(WidgetColorContext, { colorRules: ChartColorRulesStore });
+export default WidgetColorContext;

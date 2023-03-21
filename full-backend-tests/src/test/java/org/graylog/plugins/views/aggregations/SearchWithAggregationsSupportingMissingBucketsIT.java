@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.aggregations;
 
 import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.rest.QueryDTO;
 import org.graylog.plugins.views.search.rest.SearchDTO;
@@ -25,13 +24,14 @@ import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
-import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.jupiter.api.BeforeAll;
 
+import java.util.List;
 import java.util.Set;
 
 import static io.restassured.RestAssured.given;
@@ -58,17 +58,15 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
     private static final String SEARCH_TYPE_ID = "st1";
     private static final String PIVOT_RESULTS_PATH = "results." + QUERY_ID + ".search_types." + SEARCH_TYPE_ID;
 
-    private final RequestSpecification requestSpec;
-    private final GraylogBackend backend;
+    private final GraylogApis api;
 
-    public SearchWithAggregationsSupportingMissingBucketsIT(final GraylogBackend backend, final RequestSpecification requestSpec) {
-        this.requestSpec = requestSpec;
-        this.backend = backend;
+    public SearchWithAggregationsSupportingMissingBucketsIT(GraylogApis api) {
+        this.api = api;
     }
 
     @BeforeAll
     public void setUp() {
-        backend.importElasticsearchFixture("messages-for-missing-aggregation-check.json", SearchWithAggregationsSupportingMissingBucketsIT.class);
+        this.api.backend().importElasticsearchFixture("messages-for-missing-aggregation-check.json", SearchWithAggregationsSupportingMissingBucketsIT.class);
     }
 
     private ValidatableResponse execute(Pivot pivot) {
@@ -86,7 +84,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
                 .build();
 
         return given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body(serialize(search))
                 .post("/views/search/sync")
@@ -137,13 +135,12 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
     }
 
     @ContainerMatrixTest
-    void testTwoFieldAggregationHasProperMissingBucket() {
+    void testTwoTupledFieldAggregationHasProperMissingBucket() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
                 .series(Count.builder().build(), Average.builder().field("age").build())
                 .rowGroups(
-                        Values.builder().field("firstName").limit(8).build(),
-                        Values.builder().field("lastName").limit(8).build()
+                        Values.builder().fields(List.of("firstName", "lastName")).limit(8).build()
                 )
                 .build();
         final ValidatableResponse validatableResponse = execute(pivot);
@@ -160,6 +157,33 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         //Empty buckets verification
         //We have only one entry with missing first name {(...)"lastName": "Cooper","age": 60(...)}, so both empty buckets will have the same values
         validatableResponse.body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "'] }.values.value", hasItems(2, 60.0f));
+    }
+
+    @ContainerMatrixTest
+    void testTwoNestedFieldAggregationHasProperMissingBucket() {
+        final Pivot pivot = Pivot.builder()
+                .rollup(true)
+                .series(Count.builder().build(), Average.builder().field("age").build())
+                .rowGroups(
+                        Values.builder().field("firstName").limit(8).build(),
+                        Values.builder().field("lastName").limit(8).build()
+                )
+                .build();
+        final ValidatableResponse validatableResponse = execute(pivot);
+
+        //General verification
+        validatableResponse.rootPath(PIVOT_RESULTS_PATH)
+                .body(".rows", hasSize(6))
+                .body(".rows.findAll{ it.key[0] == 'Joe' }", hasSize(2)) // Joe-Biden, Joe-Smith
+                .body(".rows.findAll{ it.key[0] == 'Jane' }", hasSize(1)) // Jane-Smith
+                .body(".rows.findAll{ it.key == ['Bob', '" + MISSING_BUCKET_NAME + "'] }", hasSize(1)) // Bob has no last name
+                .body(".rows.findAll{ it.key[0] == '" + MISSING_BUCKET_NAME + "' }", hasSize(1))
+                .body(".rows.find{ it.key == [] }", notNullValue()) //totals
+                .body(".total", equalTo(5));
+
+        //Empty buckets verification
+        //We have only one entry with missing first name {(...)"lastName": "Cooper","age": 60(...)}, so both empty buckets will have the same values
+        validatableResponse.body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "'] }.values.value", hasItems(1, 60.0f));
     }
 
     @ContainerMatrixTest

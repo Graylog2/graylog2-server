@@ -26,7 +26,10 @@ module.exports = {
     {
       files: ['*.ts', '*.tsx'],
       parser: '@typescript-eslint/parser',
-      plugins: ['@typescript-eslint/eslint-plugin'],
+      plugins: [
+        '@typescript-eslint/eslint-plugin',
+        '@tanstack/query',
+      ],
       rules: {
         'no-undef': 'off',
         'no-use-before-define': 'off',
@@ -55,6 +58,7 @@ module.exports = {
       extends: [
         'plugin:jest/recommended',
         'plugin:testing-library/react',
+        'plugin:@tanstack/eslint-plugin-query/recommended',
       ],
       rules: {
         'jest/expect-expect': ['error', { assertFunctionNames: ['expect*', '(screen.)?find(All)?By*'] }],
@@ -110,6 +114,9 @@ module.exports = {
       }, {
         name: 'jest-each',
         message: 'Please use `it.each` instead.',
+      }, {
+        name: 'lodash',
+        message: 'Please use `lodash/<function>` instead for reduced bundle sizes.',
       }],
     }],
     'no-underscore-dangle': 'off',

@@ -80,6 +80,7 @@ export const textField: TextField = {
   position: 100,
   type: 'text',
   is_optional: true,
+  is_encrypted: false,
 };
 
 export const requiredTextField: TextField = {
@@ -91,6 +92,7 @@ export const requiredTextField: TextField = {
   position: 100,
   type: 'text',
   is_optional: false,
+  is_encrypted: false,
 };
 
 export const passwordTextField: TextField = {
@@ -102,6 +104,7 @@ export const passwordTextField: TextField = {
   position: 100,
   type: 'text',
   is_optional: true,
+  is_encrypted: false,
 };
 
 export const textAreaField: TextField = {
@@ -113,6 +116,7 @@ export const textAreaField: TextField = {
   position: 100,
   type: 'text',
   is_optional: true,
+  is_encrypted: false,
 };
 
 export const listField: ListField = {

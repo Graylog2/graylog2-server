@@ -23,18 +23,19 @@ import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import connect from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
-import history from 'util/History';
 import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
 import EventNotificationActionLinks from 'components/event-notifications/event-notification-details/EventNotificationActionLinks';
 import withParams from 'routing/withParams';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
+import withHistory from 'routing/withHistory';
 
 class EditEventDefinitionPage extends React.Component {
   static propTypes = {
     params: PropTypes.object.isRequired,
     currentUser: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -54,6 +55,7 @@ class EditEventDefinitionPage extends React.Component {
           (notification) => this.setState({ notification: notification }),
           (error) => {
             if (error.status === 404) {
+              const { history } = this.props;
               history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
             }
           },
@@ -63,7 +65,7 @@ class EditEventDefinitionPage extends React.Component {
 
   render() {
     const { notification } = this.state;
-    const { params, currentUser } = this.props;
+    const { params, currentUser, history } = this.props;
 
     if (!isPermitted(currentUser.permissions, `eventnotifications:edit:${params.notificationId}`)) {
       history.push(Routes.NOTFOUND);
@@ -106,6 +108,6 @@ class EditEventDefinitionPage extends React.Component {
   }
 }
 
-export default connect(withParams(EditEventDefinitionPage), {
+export default connect(withHistory(withParams(EditEventDefinitionPage)), {
   currentUser: CurrentUserStore,
 }, ({ currentUser }) => ({ currentUser: currentUser.currentUser }));

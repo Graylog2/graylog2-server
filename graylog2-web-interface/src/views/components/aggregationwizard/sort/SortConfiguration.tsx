@@ -40,7 +40,7 @@ const formatSeries = (metric: MetricFormValues) => {
   };
 };
 
-const formatGrouping = (grouping: GroupByFormValues) => grouping.field.field;
+const formatGrouping = (grouping: GroupByFormValues) => grouping.fields;
 
 type OptionValue = {
   type: 'metric' | 'groupBy',
@@ -70,7 +70,7 @@ const Sort = React.memo(({ index }: Props) => {
     }));
   const rowPivotOptions: Array<OptionValue> = (hasGroupings || hasMetrics) ? [] : groupings
     .filter((grouping) => (grouping.direction === 'row'))
-    .map(formatGrouping).map((groupBy) => ({
+    .flatMap(formatGrouping).map((groupBy) => ({
       type: 'groupBy',
       field: groupBy,
       label: groupBy,
