@@ -24,8 +24,9 @@ import type FetchError from 'logic/errors/FetchError';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
-import { Button } from 'components/bootstrap';
+import { MenuItem } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
+import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 
 type Props = {
   selectedNotificationsIds: Array<string>,
@@ -45,23 +46,23 @@ const BulkActions = ({ selectedNotificationsIds, setSelectedNotificationsIds, re
       Promise.allSettled(deleteCalls).then((result) => {
         const fulfilledRequests = result.filter((response) => response.status === 'fulfilled') as Array<{ status: 'fulfilled', value: string }>;
         const deletedNotificationIds = fulfilledRequests.map(({ value }) => value);
-        const notDeletednotificationIds = selectedNotificationsIds?.filter((streamId) => !deletedNotificationIds.includes(streamId));
+        const notDeletedNotificationIds = selectedNotificationsIds?.filter((streamId) => !deletedNotificationIds.includes(streamId));
 
-        if (notDeletednotificationIds.length) {
+        if (notDeletedNotificationIds.length) {
           const rejectedRequests = result.filter((response) => response.status === 'rejected') as Array<{ status: 'rejected', reason: FetchError }>;
           const errorMessages = uniq(rejectedRequests.map((request) => request.reason.responseMessage));
 
-          if (notDeletednotificationIds.length !== selectedNotificationsIds.length) {
+          if (notDeletedNotificationIds.length !== selectedNotificationsIds.length) {
             queryClient.invalidateQueries(['eventNotifications', 'overview']);
           }
 
-          UserNotification.error(`${notDeletednotificationIds.length} out of ${selectedNotificationsIds} selected ${descriptor} could not be deleted. Status: ${errorMessages.join()}`);
+          UserNotification.error(`${notDeletedNotificationIds.length} out of ${selectedNotificationsIds} selected ${descriptor} could not be deleted. Status: ${errorMessages.join()}`);
 
           return;
         }
 
         queryClient.invalidateQueries(['eventNotifications', 'overview']);
-        setSelectedNotificationsIds(notDeletednotificationIds);
+        setSelectedNotificationsIds(notDeletedNotificationIds);
         refetchEventNotifications();
         UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`, 'Success');
       });
@@ -69,7 +70,9 @@ const BulkActions = ({ selectedNotificationsIds, setSelectedNotificationsIds, re
   }, [descriptor, queryClient, refetchEventNotifications, selectedNotificationsIds, selectedItemsAmount, setSelectedNotificationsIds]);
 
   return (
-    <Button bsSize="xsmall" bsStyle="danger" onClick={() => onDelete()}>Delete</Button>
+    <BulkActionsDropdown selectedEntities={selectedNotificationsIds} setSelectedEntities={setSelectedNotificationsIds}>
+      <MenuItem onSelect={() => onDelete()}>Delete</MenuItem>
+    </BulkActionsDropdown>
   );
 };
 

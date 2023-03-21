@@ -72,7 +72,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
   });
   const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
-  const { data: paginatedStreams, isInitialLoading: isInitialLoadingStreams, refetch: refetchStreams } = useStreams({
+  const { data: paginatedStreams, isInitialLoading: isLoadingStreams, refetch: refetchStreams } = useStreams({
     query,
     page: paginationQueryParameter.page,
     pageSize: layoutConfig.pageSize,
@@ -88,10 +88,10 @@ const StreamsOverview = ({ indexSets }: Props) => {
     [paginatedStreams?.attributes],
   );
 
-  const onPageSizeChange = (newPageSize: number) => {
+  const onPageSizeChange = useCallback((newPageSize: number) => {
     paginationQueryParameter.setPagination({ page: 1, pageSize: newPageSize });
     updateTableLayout({ perPage: newPageSize });
-  };
+  }, [paginationQueryParameter, updateTableLayout]);
 
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
@@ -145,7 +145,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
     },
   }), [renderExpandedRules, renderExpandedRulesActions]);
 
-  if (isLoadingLayoutPreferences || isInitialLoadingStreams) {
+  if (isLoadingLayoutPreferences || isLoadingStreams) {
     return <Spinner />;
   }
 
