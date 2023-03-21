@@ -16,7 +16,7 @@
  */
 
 import { useMemo } from 'react';
-import { useRouteMatch } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
 import Routes from 'routing/Routes';
@@ -26,7 +26,7 @@ import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
 import type { EventDefinition } from 'logic/alerts/types';
 
 const useAlertAndEventDefinitionData = () => {
-  const { path } = useRouteMatch();
+  const { pathname: path } = useLocation();
   const { alertId, definitionId } = useParams<{ alertId?: string, definitionId?: string }>();
   const queryClient = useQueryClient();
   const eventData = queryClient.getQueryData(['event-by-id', alertId]) as Event;
@@ -48,13 +48,13 @@ const useAlertAndEventDefinitionData = () => {
     alertId,
     definitionId: eventDefinition?.id,
     definitionTitle: eventDefinition?.title,
-    isAlert: (path === Routes.ALERTS.replay_search(':alertId')) && eventData && eventData?.alert,
-    isEvent: (path === Routes.ALERTS.replay_search(':alertId')) && eventData && !eventData?.alert,
-    isEventDefinition: (path === Routes.ALERTS.DEFINITIONS.replay_search(':definitionId')) && !!eventDefinition,
+    isAlert: (path === Routes.ALERTS.replay_search(alertId)) && eventData && eventData?.alert,
+    isEvent: alertId && (path === Routes.ALERTS.replay_search(alertId)) && eventData && !eventData?.alert,
+    isEventDefinition: definitionId && (path === Routes.ALERTS.DEFINITIONS.replay_search(definitionId)) && !!eventDefinition,
     eventData,
     eventDefinition,
     aggregations,
-  }), [eventDefinition, aggregations, alertId, eventData, path]);
+  }), [alertId, eventDefinition, path, eventData, definitionId, aggregations]);
 };
 
 export default useAlertAndEventDefinitionData;

@@ -17,7 +17,7 @@
 import React, { useMemo } from 'react';
 import moment from 'moment/moment';
 import styled, { css } from 'styled-components';
-import lodash from 'lodash';
+import upperFirst from 'lodash/upperFirst';
 
 import { TIME_UNITS } from 'components/event-definitions/event-definition-types/FilterForm';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
@@ -48,10 +48,9 @@ const useAttributeComponents = () => {
       content: (
         <>
           <AlertTimestamp dateTime={eventDefinition.updated_at} />
-          <HoverForHelp iconSize="xs">{
-            `Event definition ${eventDefinition.title} was edited after this event happened.
-                Some of aggregations widgets might not be representative for this event.`
-          }
+          <HoverForHelp displayLeftMargin iconSize="xs">
+            Event definition <i>{eventDefinition.title}</i> was edited after this event happened.
+            Some of aggregations widgets might not be representative for this event.
           </HoverForHelp>
         </>
       ),
@@ -69,7 +68,7 @@ const useAttributeComponents = () => {
     },
     {
       title: 'Priority',
-      content: lodash.upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name),
+      content: upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name),
     },
     { title: 'Execute search every', content: executeEvery?.duration && executeEvery?.unit && `${executeEvery.duration} ${executeEvery.unit.toLowerCase()}` },
     { title: 'Search within', content: searchWithin?.duration && searchWithin?.unit && `${searchWithin.duration} ${searchWithin.unit.toLowerCase()}` },

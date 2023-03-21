@@ -17,7 +17,7 @@
 import React from 'react';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { QueryClientProvider, QueryClient, useQueryClient } from '@tanstack/react-query';
-import { useRouteMatch, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 import {
   mockedMappedAggregation,
@@ -36,8 +36,8 @@ jest.mock('@tanstack/react-query', () => ({
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useRouteMatch: jest.fn(() => ({
-    path: '/',
+  useLocation: jest.fn(() => ({
+    pathname: '/',
   })),
   useParams: jest.fn(() => ({})),
 }));
@@ -97,22 +97,14 @@ const mockGetQueryData = ({ eventId = undefined, alert, showEventData = true }) 
   }),
 }));
 
-const mockUseRouterForEvent = (id) => asMock(useRouteMatch).mockImplementation(() => ({
-  path: '/alerts/:alertId/replay-search',
-  url: `/alerts/${id}/replay-search`,
-  params: {
-    alertId: id,
-  },
-  isExact: true,
+// @ts-ignore
+const mockUseRouterForEvent = (id) => asMock(useLocation).mockImplementation(() => ({
+  pathname: `/alerts/${id}/replay-search`,
 }));
 
-const mockUseRouterForEventDefinition = (id) => asMock(useRouteMatch).mockImplementation(() => ({
-  path: '/alerts/definitions/:definitionId/replay-search',
-  url: `/alerts/definitions/${id}/replay-search`,
-  params: {
-    definitionId: id,
-  },
-  isExact: true,
+// @ts-ignore
+const mockUseRouterForEventDefinition = (id) => asMock(useLocation).mockImplementation(() => ({
+  pathname: `/alerts/definitions/${id}/replay-search`,
 }));
 
 describe('useAlertAndEventDefinitionData', () => {
