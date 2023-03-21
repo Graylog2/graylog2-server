@@ -21,12 +21,12 @@ import styled from 'styled-components';
 
 import { MessagesActions } from 'stores/messages/MessagesStore';
 import { FormSubmit } from 'components/common';
-import history from 'util/History';
+import useHistory from 'routing/useHistory';
 
 import { Button } from '../bootstrap';
 
 const StyledFormSubmit = styled(FormSubmit)`
-  margin-top 10px;
+  margin-top: 10px;
 `;
 
 type LoadMessageFormProps = {
@@ -34,18 +34,23 @@ type LoadMessageFormProps = {
   children: React.ReactNode,
   loading: boolean,
 };
-const LoadMessageForm = ({ loadMessage, children, loading }: LoadMessageFormProps) => (
-  <div>
-    <form className="form-inline message-loader-form" onSubmit={loadMessage}>
-      {children}
-      <StyledFormSubmit submitButtonText="Load message"
-                        isSubmitting={loading}
-                        submitLoadingText="Loading message..."
-                        isAsyncSubmit
-                        onCancel={() => history.goBack()} />
-    </form>
-  </div>
-);
+
+const LoadMessageForm = ({ loadMessage, children, loading }: LoadMessageFormProps) => {
+  const history = useHistory();
+
+  return (
+    <div>
+      <form className="form-inline message-loader-form" onSubmit={loadMessage}>
+        {children}
+        <StyledFormSubmit submitButtonText="Load message"
+                          isSubmitting={loading}
+                          submitLoadingText="Loading message..."
+                          isAsyncSubmit
+                          onCancel={() => history.goBack()} />
+      </form>
+    </div>
+  );
+};
 
 type Props = {
   hidden: boolean,

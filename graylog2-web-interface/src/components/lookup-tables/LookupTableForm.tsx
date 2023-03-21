@@ -20,13 +20,13 @@ import PropTypes from 'prop-types';
 import _omit from 'lodash/omit';
 import type { LookupTable } from 'src/logic/lookup-tables/types';
 
-import history from 'util/History';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 import { Col, Row, Input } from 'components/bootstrap';
 import { FormikFormGroup, JSONValueInput, FormSubmit } from 'components/common';
 import { CachesContainer, CachePicker, DataAdaptersContainer, DataAdapterPicker } from 'components/lookup-tables';
 import useScopePermissions from 'hooks/useScopePermissions';
 import Routes from 'routing/Routes';
+import useHistory from 'routing/useHistory';
 
 type LookupTableType = LookupTable & {
   enable_single_value: boolean,
@@ -57,6 +57,7 @@ type Props = {
 
 const LookupTableForm = ({ saved, create, table }: Props) => {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
+  const history = useHistory();
 
   const validate = (values: LookupTableType) => {
     const errors = {};

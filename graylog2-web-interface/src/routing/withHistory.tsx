@@ -14,19 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import UserNotification from 'util/UserNotification';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import { loadDashboard } from 'views/logic/views/Actions';
-import type { HistoryFunction } from 'routing/useHistory';
+import * as React from 'react';
+import type { Subtract } from 'utility-types';
 
-import type View from './View';
+import type { HistoryFunction } from './useHistory';
+import useHistory from './useHistory';
 
-export default (view: View, history: HistoryFunction) => async () => {
-  try {
-    const savedView = await ViewManagementActions.create(view);
-    loadDashboard(history, savedView.id);
-    UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!');
-  } catch (error) {
-    UserNotification.error(`Saving view failed: ${error}`, 'Error!');
-  }
+type HistoryContext = {
+  history: HistoryFunction;
 };
+
+const withParams = <Props extends HistoryContext>(Component: React.ComponentType<Props>): React.ComponentType<Subtract<Props, HistoryContext>> => (props) => {
+  const history = useHistory();
+
+  return <Component {...props as Props} history={history} />;
+};
+
+export default withParams;

@@ -120,7 +120,9 @@ class IntegrationEnvironment extends TestEnvironment {
     this.global.api_url = `http://localhost:${port}${prefix}`;
 
     // eslint-disable-next-line global-require
-    this.global.window.fetch = require('node-fetch');
+    const fetch = require('node-fetch');
+    this.global.window.fetch = fetch;
+    this.global.window.Request = fetch.Request;
   }
 
   async setup() {

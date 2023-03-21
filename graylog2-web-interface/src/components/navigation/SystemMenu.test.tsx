@@ -55,7 +55,7 @@ describe('SystemMenu', () => {
 
     jest.doMock('graylog-web-plugin/plugin', () => ({ PluginStore }));
     AppConfig.gl2AppPathPrefix = jest.fn(() => '');
-    asMock(useLocation).mockReturnValue({ pathname: '/' } as Location<{ pathname: string }>);
+    asMock(useLocation).mockReturnValue({ pathname: '/' } as Location);
     asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().permissions(Immutable.List([])).build());
   });
 
@@ -179,14 +179,14 @@ describe('SystemMenu', () => {
     });
 
     it('uses a custom title if location is matched', () => {
-      asMock(useLocation).mockReturnValue({ pathname: '/system/overview' } as Location<{ pathname: string }>);
+      asMock(useLocation).mockReturnValue({ pathname: '/system/overview' } as Location);
       const wrapper = mount(<SystemMenu />);
 
       expect(getDropdownTitle(wrapper)).toBe('System / Overview');
     });
 
     it('uses a custom title for a plugin route if location is matched', () => {
-      asMock(useLocation).mockReturnValue({ pathname: '/system/licenses' } as Location<{ pathname: string }>);
+      asMock(useLocation).mockReturnValue({ pathname: '/system/licenses' } as Location);
       const wrapper = mount(<SystemMenu />);
 
       expect(getDropdownTitle(wrapper)).toBe('System / Licenses');

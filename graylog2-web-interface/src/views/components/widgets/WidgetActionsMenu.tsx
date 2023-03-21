@@ -42,6 +42,8 @@ import { selectQuery, loadView } from 'views/logic/slices/viewSlice';
 import { execute } from 'views/logic/slices/searchExecutionSlice';
 import { duplicateWidget, removeWidget } from 'views/logic/slices/widgetActions';
 import fetchSearch from 'views/logic/views/fetchSearch';
+import type { HistoryFunction } from 'routing/useHistory';
+import useHistory from 'routing/useHistory';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -66,6 +68,7 @@ const _onCopyToDashboard = async (
   setShowCopyToDashboard: (show: boolean) => void,
   widgetId: string,
   dashboardId: string | undefined | null,
+  history: HistoryFunction,
 ) => {
   if (!dashboardId) {
     return;
@@ -81,7 +84,7 @@ const _onCopyToDashboard = async (
     const newDashboardWithSearch = newDashboard.toBuilder().search(newSearch).build();
     await ViewManagementActions.update(newDashboardWithSearch);
 
-    loadDashboard(newDashboardWithSearch.id);
+    loadDashboard(history, newDashboardWithSearch.id);
   }
 
   setShowCopyToDashboard(false);
@@ -147,9 +150,10 @@ const WidgetActionsMenu = ({
   const [showExport, setShowExport] = useState(false);
   const [showMoveWidgetToTab, setShowMoveWidgetToTab] = useState(false);
   const dispatch = useAppDispatch();
+  const history = useHistory();
 
   const onDuplicate = useCallback(() => dispatch(_onDuplicate(widget.id, unsetWidgetFocusing, title)), [dispatch, widget.id, unsetWidgetFocusing, title]);
-  const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId), [view]);
+  const onCopyToDashboard = useCallback((widgetId: string, dashboardId: string) => _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId, history), [history, view]);
   const onMoveWidgetToTab = useCallback((widgetId: string, queryId: string, keepCopy: boolean) => _onMoveWidgetToPage(dispatch, view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy), [dispatch, view]);
   const onDelete = useCallback(() => dispatch(_onDelete(widget, view, title)), [dispatch, title, view, widget]);
   const focusWidget = useCallback(() => setWidgetFocusing(widget.id), [setWidgetFocusing, widget.id]);

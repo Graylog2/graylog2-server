@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { render, screen, fireEvent } from 'wrappedTestingLibrary';
 import { useLocation } from 'react-router-dom';
 
 import { asMock } from 'helpers/mocking';
@@ -27,14 +27,13 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import { allMessagesTable } from 'views/logic/Widgets';
 import { createViewWithWidgets } from 'fixtures/searches';
 import useAppDispatch from 'stores/useAppDispatch';
+import { Button } from 'components/bootstrap';
 
-const mockHistoryReplace = jest.fn();
+const mockNavigate = jest.fn();
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useHistory: () => ({
-    replace: mockHistoryReplace,
-  }),
+  useNavigate: () => mockNavigate,
   useLocation: jest.fn(() => ({
     pathname: '',
     search: '',
@@ -48,7 +47,14 @@ const emptyLocation = {
   search: '',
   hash: '',
   state: undefined,
+  key: '',
 };
+
+const ShowFocusedWidget = ({ focusedWidget }: WidgetFocusContextType) => (focusedWidget ? (
+  <span>Focused widget: {JSON.stringify(focusedWidget)}</span>
+) : (
+  <span>No focused widget</span>
+));
 
 jest.mock('views/logic/slices/searchExecutionSlice', () => ({
   ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
@@ -81,144 +87,126 @@ describe('WidgetFocusProvider', () => {
     );
   };
 
-  it('should update url on widget focus', () => {
-    let contextValue;
-
-    const consume = (value: WidgetFocusContextType) => {
-      contextValue = value;
-
-      return null;
-    };
+  it('should update url on widget focus', async () => {
+    const consume = ({ setWidgetFocusing }: WidgetFocusContextType) => (
+      <Button onClick={() => setWidgetFocusing('widget-id')}>Focus!</Button>
+    );
 
     renderSUT(consume);
 
-    contextValue.setWidgetFocusing('widget-id');
+    const button = await screen.findByRole('button', { name: 'Focus!' });
 
-    expect(mockHistoryReplace).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true');
+    fireEvent.click(button);
+
+    expect(mockNavigate).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true', { replace: true });
   });
 
-  it('should update url on widget focus close', () => {
+  it('should update url on widget focus close', async () => {
     asMock(useLocation).mockReturnValueOnce({
       ...emptyLocation,
       search: '?focusedId=widget-id&focusing=true',
     });
 
-    let contextValue;
-
-    const consume = (value: WidgetFocusContextType) => {
-      contextValue = value;
-
-      return null;
-    };
+    const consume = ({ unsetWidgetFocusing }: WidgetFocusContextType) => (
+      <Button onClick={() => unsetWidgetFocusing()}>Unfocus!</Button>
+    );
 
     renderSUT(consume);
 
-    contextValue.unsetWidgetFocusing();
+    const button = await screen.findByRole('button', { name: 'Unfocus!' });
+    fireEvent.click(button);
 
-    expect(mockHistoryReplace).toHaveBeenCalledWith('');
+    expect(mockNavigate).toHaveBeenLastCalledWith('', { replace: true });
   });
 
-  it('should set widget focus based on url', () => {
+  it('should set widget focus based on url', async () => {
     asMock(useLocation).mockReturnValue({
       ...emptyLocation,
       search: '?focusedId=widget-id&focusing=true',
     });
 
-    const consume = jest.fn();
+    renderSUT(ShowFocusedWidget);
+
+    await screen.findByText(/Focused widget: {"id":"widget-id","editing":false,"focusing":true}/);
+  });
+
+  it('should update url on widget edit', async () => {
+    const consume = ({ setWidgetEditing }: WidgetFocusContextType) => (
+      <Button onClick={() => setWidgetEditing('widget-id')}>Edit!</Button>
+    );
 
     renderSUT(consume);
 
-    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ focusedWidget: { id: 'widget-id', focusing: true, editing: false } }));
+    const button = await screen.findByRole('button', { name: 'Edit!' });
+    fireEvent.click(button);
+
+    expect(mockNavigate).toHaveBeenCalledWith('?focusedId=widget-id&editing=true', { replace: true });
   });
 
-  it('should update url on widget edit', () => {
-    let contextValue;
-
-    const consume = (value: WidgetFocusContextType) => {
-      contextValue = value;
-
-      return null;
-    };
-
-    renderSUT(consume);
-
-    contextValue.setWidgetEditing('widget-id');
-
-    expect(mockHistoryReplace).toHaveBeenCalledWith('?focusedId=widget-id&editing=true');
-  });
-
-  it('should update url on widget edit close', () => {
+  it('should update url on widget edit close', async () => {
     asMock(useLocation).mockReturnValue({
       ...emptyLocation,
       search: '?focusedId=widget-id&editing=true',
     });
 
-    let contextValue;
-
-    const consume = (value: WidgetFocusContextType) => {
-      contextValue = value;
-
-      return null;
-    };
+    const consume = ({ unsetWidgetEditing }: WidgetFocusContextType) => (
+      <Button onClick={() => unsetWidgetEditing()}>Cancel Edit!</Button>
+    );
 
     renderSUT(consume);
 
-    contextValue.unsetWidgetEditing();
+    const button = await screen.findByRole('button', { name: 'Cancel Edit!' });
+    fireEvent.click(button);
 
-    expect(mockHistoryReplace).toHaveBeenCalledWith('');
+    expect(mockNavigate).toHaveBeenCalledWith('', { replace: true });
   });
 
-  it('should set widget edit and focused based on url', () => {
+  it('should set widget edit and focused based on url', async () => {
     asMock(useLocation).mockReturnValue({
       ...emptyLocation,
       search: '?focusedId=widget-id&editing=true',
     });
 
-    const consume = jest.fn();
+    renderSUT(ShowFocusedWidget);
 
-    renderSUT(consume);
-
-    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ focusedWidget: { id: 'widget-id', editing: true, focusing: true } }));
+    await screen.findByText(/Focused widget: {"id":"widget-id","editing":true,"focusing":true}/);
   });
 
-  it('should not remove focus query param on widget edit', () => {
+  it('should not remove focus query param on widget edit', async () => {
     asMock(useLocation).mockReturnValue({
       ...emptyLocation,
       search: '?focusedId=widget-id&focusing=true',
     });
 
-    let contextValue;
-
-    const consume = (value: WidgetFocusContextType) => {
-      contextValue = value;
-
-      return null;
-    };
+    const consume = ({ setWidgetEditing, unsetWidgetEditing }: WidgetFocusContextType) => (
+      <>
+        <Button onClick={() => setWidgetEditing('widget-id')}>Edit</Button>
+        <Button onClick={() => unsetWidgetEditing()}>Cancel</Button>
+      </>
+    );
 
     renderSUT(consume);
 
-    contextValue.setWidgetEditing('widget-id');
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }));
 
-    expect(mockHistoryReplace).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true&editing=true');
+    expect(mockNavigate).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true&editing=true', { replace: true });
 
-    contextValue.unsetWidgetEditing();
+    fireEvent.click(await screen.findByRole('button', { name: 'Cancel' }));
 
-    expect(mockHistoryReplace).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true');
+    expect(mockNavigate).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true', { replace: true });
   });
 
-  it('should not set focused widget from url and cleanup url if the widget does not exist', () => {
+  it('should not set focused widget from url and cleanup url if the widget does not exist', async () => {
     asMock(useLocation).mockReturnValue({
       ...emptyLocation,
       search: '?focusedId=not-existing-widget-id',
     });
 
-    const consume = jest.fn();
+    renderSUT(ShowFocusedWidget);
 
-    renderSUT(consume);
+    await screen.findByText(/No focused widget/);
 
-    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ focusedWidget: undefined }));
-
-    expect(mockHistoryReplace).toHaveBeenCalledWith('');
+    expect(mockNavigate).toHaveBeenLastCalledWith('', { replace: true });
   });
 
   it('does not trigger setting widgets to search initially', () => {

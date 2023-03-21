@@ -16,9 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Router } from 'react-router-dom';
-
-import history from 'util/History';
+import { MemoryRouter } from 'react-router-dom';
 
 import DefaultQueryClientProvider from './DefaultQueryClientProvider';
 import DefaultProviders from './DefaultProviders';
@@ -29,11 +27,11 @@ type Props = {
 
 const WrappingContainer = ({ children }: Props) => (
   <DefaultQueryClientProvider>
-    <Router history={history}>
+    <MemoryRouter>
       <DefaultProviders>
         {children}
       </DefaultProviders>
-    </Router>
+    </MemoryRouter>
   </DefaultQueryClientProvider>
 );
 

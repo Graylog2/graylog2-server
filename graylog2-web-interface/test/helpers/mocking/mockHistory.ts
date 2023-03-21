@@ -14,14 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { createBrowserHistory } from 'history';
+import type { HistoryFunction } from 'routing/useHistory';
 
-declare global {
-  interface Window { graylogHistory: ReturnType<typeof createBrowserHistory>; }
-}
+const mockHistory = (): HistoryFunction => ({
+  goBack: jest.fn(),
+  push: jest.fn(),
+  pushWithState: jest.fn(),
+  replace: jest.fn(),
+});
 
-if (!window.graylogHistory) {
-  window.graylogHistory = createBrowserHistory();
-}
-
-export default window.graylogHistory;
+export default mockHistory;

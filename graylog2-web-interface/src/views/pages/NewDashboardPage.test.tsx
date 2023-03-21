@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, waitFor } from 'wrappedTestingLibrary';
+import type { Location } from 'react-router-dom';
 
 import useLocation from 'routing/useLocation';
 import asMock from 'helpers/mocking/AsMock';
@@ -49,7 +50,7 @@ describe('NewDashboardPage', () => {
     search: '',
     state: {},
     hash: '',
-  };
+  } as Location;
 
   beforeAll(loadViewsPlugin);
 
@@ -76,7 +77,7 @@ describe('NewDashboardPage', () => {
   it('should create new view with type dashboard on mount', async () => {
     render(<SimpleNewDashboardPage />);
 
-    await waitFor(() => expect(useLoadView).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(useLoadView).toHaveBeenCalled());
 
     await expect(asMock(useLoadView).mock.calls[0][0]).resolves.toEqual(expect.objectContaining({ type: View.Type.Dashboard }));
   });
@@ -95,7 +96,7 @@ describe('NewDashboardPage', () => {
 
     await findByText('Extended search page');
 
-    await waitFor(() => expect(useLoadView).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(useLoadView).toHaveBeenCalled());
 
     await expect(asMock(useLoadView).mock.calls[0][0]).resolves.toEqual(expect.objectContaining({ title: 'My Search', type: View.Type.Dashboard }));
   });

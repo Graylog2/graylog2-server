@@ -20,9 +20,9 @@ import clone from 'lodash/clone';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { ConfirmLeaveDialog } from 'components/common';
-import history from 'util/History';
 import Routes from 'routing/Routes';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
+import withHistory from 'routing/withHistory';
 
 import EventNotificationForm from './EventNotificationForm';
 
@@ -47,6 +47,7 @@ class EventNotificationFormContainer extends React.Component {
     /** Controls the ID of the form, so it can be controlled externally */
     formId: PropTypes.string,
     onSubmit: PropTypes.func,
+    history: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -93,13 +94,13 @@ class EventNotificationFormContainer extends React.Component {
     this.setState({ notification: nextNotification, isDirty: true, testResult: initialTestResult });
   };
 
-  // eslint-disable-next-line class-methods-use-this
   handleCancel = () => {
+    const { history } = this.props;
     history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
   };
 
   handleSubmit = () => {
-    const { action, embedded, onSubmit } = this.props;
+    const { action, embedded, onSubmit, history } = this.props;
     const { notification } = this.state;
 
     let promise;
@@ -207,4 +208,4 @@ class EventNotificationFormContainer extends React.Component {
   }
 }
 
-export default EventNotificationFormContainer;
+export default withHistory(EventNotificationFormContainer);

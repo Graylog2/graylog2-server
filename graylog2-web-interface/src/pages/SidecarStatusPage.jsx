@@ -20,16 +20,17 @@ import React from 'react';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
-import history from 'util/History';
 import SidecarStatus from 'components/sidecars/sidecars/SidecarStatus';
 import withParams from 'routing/withParams';
 import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
 import { SidecarsActions } from 'stores/sidecars/SidecarsStore';
 import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
+import withHistory from 'routing/withHistory';
 
 class SidecarStatusPage extends React.Component {
   static propTypes = {
     params: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -41,9 +42,10 @@ class SidecarStatusPage extends React.Component {
   }
 
   componentDidMount() {
-    this.reloadSidecar();
+    const reloadSidecar = () => this.reloadSidecar(this.props.history);
+    reloadSidecar();
     this.reloadCollectors();
-    this.interval = setInterval(this.reloadSidecar, 5000);
+    this.interval = setInterval(reloadSidecar, 5000);
   }
 
   componentWillUnmount() {
@@ -52,7 +54,7 @@ class SidecarStatusPage extends React.Component {
     }
   }
 
-  reloadSidecar = () => {
+  reloadSidecar = (history) => {
     SidecarsActions.getSidecar(this.props.params.sidecarId).then(
       (sidecar) => this.setState({ sidecar }),
       (error) => {
@@ -95,4 +97,4 @@ class SidecarStatusPage extends React.Component {
   }
 }
 
-export default withParams(SidecarStatusPage);
+export default withHistory(withParams(SidecarStatusPage));

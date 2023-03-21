@@ -21,11 +21,13 @@ import useCreateSavedSearch from 'views/logic/views/UseCreateSavedSearch';
 import { loadNewViewForStream } from 'views/logic/views/Actions';
 import { useSearchURLQueryParams } from 'views/logic/NormalizeSearchURLQueryParams';
 import useParams from 'routing/useParams';
+import useHistory from 'routing/useHistory';
 
 import SearchPage from './SearchPage';
 
 const StreamSearchPage = () => {
   const { streamId } = useParams<{ streamId?: string }>();
+  const history = useHistory();
 
   if (!streamId) {
     throw new Error('No stream id specified!');
@@ -34,7 +36,7 @@ const StreamSearchPage = () => {
   const { timeRange, queryString } = useSearchURLQueryParams();
   const newView = useCreateSavedSearch(streamId, timeRange, queryString);
 
-  const _loadNewView = useCallback(() => loadNewViewForStream(streamId), [streamId]);
+  const _loadNewView = useCallback(() => loadNewViewForStream(history, streamId), [history, streamId]);
 
   return <SearchPage loadNewView={_loadNewView} view={newView} isNew />;
 };

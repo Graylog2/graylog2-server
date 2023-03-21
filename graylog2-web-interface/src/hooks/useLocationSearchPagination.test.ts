@@ -17,19 +17,16 @@
 import { renderHook, act } from 'wrappedTestingLibrary/hooks';
 import { useLocation } from 'react-router-dom';
 import { stringify } from 'qs';
-import type { Location } from 'history';
 
 import { asMock } from 'helpers/mocking';
 
 import useLocationSearchPagination from './useLocationSearchPagination';
 
-const mockHistoryPush = jest.fn();
+const mockNavigate = jest.fn();
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useHistory: () => ({
-    push: mockHistoryPush,
-  }),
+  useNavigate: () => mockNavigate,
   useLocation: jest.fn(() => ({
     pathname: '',
     search: '',
@@ -53,7 +50,11 @@ describe('useLocationSearchPagination custom hook', () => {
 
     asMock(useLocation).mockReturnValue({
       search: stringify(currentPage),
-    } as Location<{ search: string }>);
+      state: {},
+      key: '',
+      hash: '',
+      pathname: '/',
+    });
 
     const { result } = renderHook(() => useLocationSearchPagination(DEFAULT_PAGINATION));
 
@@ -66,7 +67,7 @@ describe('useLocationSearchPagination custom hook', () => {
 
     act(() => setPagination(nextPage));
 
-    expect(mockHistoryPush).toHaveBeenCalledWith({ search: stringify(nextPage) });
+    expect(mockNavigate).toHaveBeenCalledWith({ pathname: '/', search: stringify(nextPage) });
   });
 
   it.each`
@@ -87,7 +88,11 @@ describe('useLocationSearchPagination custom hook', () => {
   `('uses default values when $param is $description', ({ param, value, expectedReturn }) => {
     asMock(useLocation).mockReturnValue({
       search: stringify({ ...DEFAULT_PAGINATION, [param]: value }),
-    } as Location<{ search: string }>);
+      state: {},
+      key: '',
+      hash: '',
+      pathname: '/',
+    });
 
     const { result } = renderHook(() => useLocationSearchPagination(DEFAULT_PAGINATION));
 

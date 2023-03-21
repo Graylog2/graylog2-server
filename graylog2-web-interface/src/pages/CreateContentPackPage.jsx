@@ -16,13 +16,13 @@
  */
 import React from 'react';
 import Reflux from 'reflux';
+import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
-import history from 'util/History';
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
@@ -30,10 +30,17 @@ import ContentPack from 'logic/content-packs/ContentPack';
 import Entity from 'logic/content-packs/Entity';
 import { CatalogStore, CatalogActions } from 'stores/content-packs/CatalogStore';
 import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
+import withHistory from 'routing/withHistory';
 
 const CreateContentPackPage = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
   displayName: 'CreateContentPackPage',
+
+  // eslint-disable-next-line react/no-unused-class-component-methods
+  propTypes: {
+    history: PropTypes.object.isRequired,
+  },
+
   mixins: [Reflux.connect(CatalogStore)],
 
   getInitialState() {
@@ -61,6 +68,7 @@ const CreateContentPackPage = createReactClass({
 
   _onSave() {
     const { contentPack } = this.state;
+    const { history } = this.props;
 
     ContentPacksActions.create.triggerPromise(contentPack.toJSON())
       .then(
@@ -129,4 +137,4 @@ const CreateContentPackPage = createReactClass({
   },
 });
 
-export default CreateContentPackPage;
+export default withHistory(CreateContentPackPage);

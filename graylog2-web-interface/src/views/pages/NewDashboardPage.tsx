@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
+import type { Location } from 'react-router-dom';
 
 import useLocation from 'routing/useLocation';
 import viewTransformer from 'views/logic/views/ViewTransformer';
@@ -25,12 +26,12 @@ import ViewGenerator from 'views/logic/views/ViewGenerator';
 
 import SearchPage from './SearchPage';
 
-type LocationState = {
+type LocationState = Location & { state: {
   view?: View,
-};
+} };
 
 const NewDashboardPage = () => {
-  const location = useLocation<LocationState>();
+  const location: LocationState = useLocation();
   const searchView = location?.state?.view;
 
   const view = useMemo(() => (searchView?.search
