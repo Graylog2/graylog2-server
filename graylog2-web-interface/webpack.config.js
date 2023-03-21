@@ -99,6 +99,7 @@ const webpackConfig = merge.smart(coreConfig, {
       template: path.resolve(ROOT_PATH, 'templates/index.html.template'),
       templateParameters: {
         vendorModule: () => JSON.parse(fs.readFileSync(path.resolve(BUILD_PATH, 'vendor-module.json'), 'utf8')),
+        pluginNames: () => global.pluginNames,
       },
       chunksSortMode: core.sortChunks,
     }),

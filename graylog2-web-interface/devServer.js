@@ -34,7 +34,9 @@ const DEFAULT_API_URL = 'http://127.0.0.1:9000';
 const app = express();
 // Use two compilers to avoid re-compiling the vendor config on every change.
 // We assume dependencies won't change while the server is running.
-const pluginCompilers = webpackConfigs.map((config) => webpack(config));
+const pluginCompiler = webpack(webpackConfigs);
+const pluginNames = webpackConfigs.map((config) => config.name).filter((name) => !['vendor', 'app'].includes(name));
+global.pluginNames = pluginNames;
 
 const { argv } = yargs;
 const host = argv.host || DEFAULT_HOST;
@@ -63,15 +65,11 @@ app.use('/config.js', proxy(apiUrl, {
 app.use(compress()); // Enables compression middleware
 app.use(history()); // Enables HTML5 History API middleware
 
-pluginCompilers.forEach((compiler, idx) => {
-  app.use(webpackDevMiddleware(compiler, {
-    publicPath: '/',
-  }));
+app.use(webpackDevMiddleware(pluginCompiler, {
+  publicPath: '/',
+}));
 
-  if (idx > 0) {
-    app.use(webpackHotMiddleware(compiler));
-  }
-});
+app.use(webpackHotMiddleware(pluginCompiler));
 
 const server = http.createServer(app);
 

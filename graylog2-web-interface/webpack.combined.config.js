@@ -72,14 +72,14 @@ const allConfigs = [webpackConfig, ...pluginConfigs];
 
 // We need to inject webpack-hot-middleware to all entries, ensuring the app is able to reload on changes.
 if (TARGET === 'start') {
-  const webpackHotMiddlewareEntry = 'webpack-hot-middleware/client?reload=true';
+  const webpackHotMiddlewareEntry = (name) => `webpack-hot-middleware/client?name=${name}`;
 
   allConfigs.forEach((finalConfig) => {
     const hmrEntries = {};
 
     Object.keys(finalConfig.entry).forEach((entryKey) => {
       const entryValue = finalConfig.entry[entryKey];
-      hmrEntries[entryKey] = [webpackHotMiddlewareEntry].concat(Array.isArray(entryValue) ? entryValue : [entryValue]);
+      hmrEntries[entryKey] = [webpackHotMiddlewareEntry(entryKey)].concat(Array.isArray(entryValue) ? entryValue : [entryValue]);
     });
 
     // eslint-disable-next-line no-param-reassign
