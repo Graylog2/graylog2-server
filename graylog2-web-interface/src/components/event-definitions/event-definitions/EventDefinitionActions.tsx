@@ -82,6 +82,10 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
     return eventDefinition?.config?.type === 'system-notifications-v1';
   };
 
+  const isAggregationEventDefinition = (): boolean => {
+    return eventDefinition?.config?.type === 'aggregation-v1';
+  };
+
   const updateState = ({ show, type, definition }) => {
     setShowDialog(show);
     setDialogType(type);
@@ -196,6 +200,19 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
             )}
           </>
           )}
+          {
+            isAggregationEventDefinition() && (
+              <>
+                <MenuItem divider />
+                <LinkContainer to={Routes.ALERTS.DEFINITIONS.replay_search(eventDefinition.id)}>
+                  <MenuItem>
+                    Replay search
+                  </MenuItem>
+                </LinkContainer>
+
+              </>
+            )
+          }
         </OverlayDropdownButton>
       </ButtonToolbar>
       {showDialog && (
