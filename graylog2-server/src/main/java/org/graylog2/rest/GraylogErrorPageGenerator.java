@@ -25,9 +25,8 @@ import org.glassfish.grizzly.http.server.Request;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 
@@ -55,19 +54,8 @@ public class GraylogErrorPageGenerator implements ErrorPageGenerator {
         }
 
         if (exception != null) {
-            String stacktrace = "";
-            try (final StringWriter stringWriter = new StringWriter();
-                 final PrintWriter printWriter = new PrintWriter(stringWriter)) {
-                exception.printStackTrace(printWriter);
-                printWriter.flush();
-                stringWriter.flush();
-                stacktrace = stringWriter.toString();
-            } catch (IOException ignored) {
-                // Ignore
-            }
-            modelBuilder
-                    .put("exception", StringEscapeUtils.escapeHtml4(exception.getMessage()))
-                    .put("stacktrace", StringEscapeUtils.escapeHtml4(stacktrace));
+            String exceptionString = Objects.nonNull(exception.getMessage()) ? exception.getMessage() : "Null";
+            modelBuilder.put("exception", StringEscapeUtils.escapeHtml4(exceptionString));
         }
 
         return engine.transform(template, modelBuilder.build());

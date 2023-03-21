@@ -1,0 +1,5 @@
+type = "c"
+message = "Remove stack trace from the generic server error response."
+
+pulls = ["14978"]
+issues = ["Graylog2/graylog-plugin-enterprise#4891"]
