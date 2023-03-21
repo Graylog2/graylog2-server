@@ -16,16 +16,10 @@
  */
 import type { Sort } from 'stores/PaginationTypes';
 
-export const SYSTEM_EVENT_DEFINITION_TYPE = 'system-notifications-v1';
-
-export const ENTITY_TABLE_ID = 'event_definitions';
+export const ENTITY_TABLE_ID = 'event_notifications';
 export const DEFAULT_LAYOUT = {
   pageSize: 20,
   sort: { attributeId: 'title', direction: 'asc' } as Sort,
-  displayedColumns: ['title', 'description', 'priority', 'scheduling', 'status'],
-  columnsOrder: ['title', 'description', 'priority', 'status', 'scheduling'],
+  displayedColumns: ['title', 'description', 'type', 'created_at'],
+  columnsOrder: ['title', 'description', 'type', 'created_at'],
 };
-
-export const ADDITIONAL_ATTRIBUTES = [
-  { id: 'scheduling', title: 'Scheduling', sortable: false },
-];
