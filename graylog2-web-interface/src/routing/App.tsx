@@ -18,6 +18,8 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 import { Outlet } from 'react-router-dom';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
+import { QueryParamProvider } from 'use-query-params';
 
 import { ScratchpadProvider } from 'contexts/ScratchpadProvider';
 import { Icon, Spinner } from 'components/common';
@@ -59,32 +61,34 @@ const ScrollToHint = styled.div(({ theme }) => css`
 `);
 
 const App = () => (
-  <CurrentUserContext.Consumer>
-    {(currentUser) => {
-      if (!currentUser) {
-        return <Spinner />;
-      }
+  <QueryParamProvider adapter={ReactRouter6Adapter}>
+    <CurrentUserContext.Consumer>
+      {(currentUser) => {
+        if (!currentUser) {
+          return <Spinner />;
+        }
 
-      return (
-        <ScratchpadProvider loginName={currentUser.username}>
-          <AppLayout>
-            <Navigation />
-            <ScrollToHint id="scroll-to-hint">
-              <Icon name="arrow-up" />
-            </ScrollToHint>
-            <Scratchpad />
-            <ReportedErrorBoundary>
-              <RuntimeErrorBoundary>
-                <PageContent>
-                  <Outlet />
-                </PageContent>
-              </RuntimeErrorBoundary>
-            </ReportedErrorBoundary>
-          </AppLayout>
-        </ScratchpadProvider>
-      );
-    }}
-  </CurrentUserContext.Consumer>
+        return (
+          <ScratchpadProvider loginName={currentUser.username}>
+            <AppLayout>
+              <Navigation />
+              <ScrollToHint id="scroll-to-hint">
+                <Icon name="arrow-up" />
+              </ScrollToHint>
+              <Scratchpad />
+              <ReportedErrorBoundary>
+                <RuntimeErrorBoundary>
+                  <PageContent>
+                    <Outlet />
+                  </PageContent>
+                </RuntimeErrorBoundary>
+              </ReportedErrorBoundary>
+            </AppLayout>
+          </ScratchpadProvider>
+        );
+      }}
+    </CurrentUserContext.Consumer>
+  </QueryParamProvider>
 );
 
 export default App;
