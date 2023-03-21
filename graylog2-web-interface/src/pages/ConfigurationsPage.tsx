@@ -21,6 +21,7 @@ import { Col, Nav, NavItem, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { useStore } from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
+import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
 import SidecarConfig from 'components/configurations/SidecarConfig';
@@ -41,25 +42,15 @@ import ConfigletContainer from './configurations/ConfigletContainer';
 import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
 import UserConfig from '../components/configurations/UserConfig';
 
-const SEARCHES_CLUSTER_CONFIG = 'org.graylog2.indexer.searches.SearchesClusterConfig';
-const MESSAGE_PROCESSORS_CONFIG = 'org.graylog2.messageprocessors.MessageProcessorsConfig';
-const SIDECAR_CONFIG = 'org.graylog.plugins.sidecar.system.SidecarConfiguration';
-const EVENTS_CONFIG = 'org.graylog.events.configuration.EventsConfiguration';
-const INDEX_SETS_DEFAULTS_CONFIG = 'org.graylog2.configuration.IndexSetsDefaultConfiguration';
-const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
-const PERMISSIONS_CONFIG = 'org.graylog2.users.UserAndTeamsConfig';
-const USER_CONFIG = 'org.graylog2.users.UserConfiguration';
 
 const getConfig = (configType, configuration) => configuration?.[configType] ?? null;
 
 const onUpdate = (configType: string) => {
   return (config) => {
     switch (configType) {
-      case MESSAGE_PROCESSORS_CONFIG:
-        return ConfigurationsActions.updateMessageProcessorsConfig(configType, config);
-      case URL_WHITELIST_CONFIG:
+      case ConfigurationType.URL_WHITELIST_CONFIG:
         return ConfigurationsActions.updateWhitelist(configType, config);
-      case INDEX_SETS_DEFAULTS_CONFIG:
+      case ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG:
         return ConfigurationsActions.updateIndexSetDefaults(configType, config);
       default:
         return ConfigurationsActions.update(configType, config);
@@ -77,17 +68,15 @@ const ConfigurationsPage = () => {
 
   useEffect(() => {
     const promises = [
-      ConfigurationsActions.list(SEARCHES_CLUSTER_CONFIG),
-      ConfigurationsActions.listMessageProcessorsConfig(MESSAGE_PROCESSORS_CONFIG),
-      ConfigurationsActions.list(SIDECAR_CONFIG),
-      ConfigurationsActions.list(INDEX_SETS_DEFAULTS_CONFIG),
-      ConfigurationsActions.list(EVENTS_CONFIG),
-      ConfigurationsActions.listPermissionsConfig(PERMISSIONS_CONFIG),
-      ConfigurationsActions.listUserConfig(USER_CONFIG),
+      ConfigurationsActions.list(ConfigurationType.SIDECAR_CONFIG),
+      ConfigurationsActions.list(ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG),
+      ConfigurationsActions.list(ConfigurationType.EVENTS_CONFIG),
+      ConfigurationsActions.listPermissionsConfig(ConfigurationType.PERMISSIONS_CONFIG),
+      ConfigurationsActions.listUserConfig(ConfigurationType.USER_CONFIG),
     ];
 
     if (isPermitted(currentUser.permissions, ['urlwhitelist:read'])) {
-      promises.push(ConfigurationsActions.listWhiteListConfig(URL_WHITELIST_CONFIG));
+      promises.push(ConfigurationsActions.listWhiteListConfig(ConfigurationType.URL_WHITELIST_CONFIG));
     }
 
     const pluginPromises = pluginSystemConfigs
@@ -105,14 +94,12 @@ const ConfigurationsPage = () => {
     setActiveSubSectionKey(itemKey);
   };
 
-  const searchesConfig = getConfig(SEARCHES_CLUSTER_CONFIG, configuration);
-  const messageProcessorsConfig = getConfig(MESSAGE_PROCESSORS_CONFIG, configuration);
-  const sidecarConfig = getConfig(SIDECAR_CONFIG, configuration);
-  const eventsConfig = getConfig(EVENTS_CONFIG, configuration);
-  const urlWhiteListConfig = getConfig(URL_WHITELIST_CONFIG, configuration);
-  const indexSetsDefaultsConfig = getConfig(INDEX_SETS_DEFAULTS_CONFIG, configuration);
-  const permissionsConfig = getConfig(PERMISSIONS_CONFIG, configuration);
-  const userConfig = getConfig(USER_CONFIG, configuration);
+  const sidecarConfig = getConfig(ConfigurationType.SIDECAR_CONFIG, configuration);
+  const eventsConfig = getConfig(ConfigurationType.EVENTS_CONFIG, configuration);
+  const urlWhiteListConfig = getConfig(ConfigurationType.URL_WHITELIST_CONFIG, configuration);
+  const indexSetsDefaultsConfig = getConfig(ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG, configuration);
+  const permissionsConfig = getConfig(ConfigurationType.PERMISSIONS_CONFIG, configuration);
+  const userConfig = getConfig(ConfigurationType.USER_CONFIG, configuration);
 
   const pluginDisplayNames = [
     {
@@ -141,46 +128,22 @@ const ConfigurationsPage = () => {
     },
   ];
 
-  // 0
-  // :
-  // {configType: 'org.graylog.plugins.collector.system.CollectorSystemConfiguration', component: ƒ}
-  // 1
-  // :
-  // {configType: 'org.graylog.aws.config.AWSPluginConfiguration', component: ƒ}
-  // 2
-  // :
-  // {configType: 'org.graylog.plugins.threatintel.ThreatIntelPluginConfiguration', component: ƒ}
-  // 3
-  // :
-  // {configType: 'org.graylog.plugins.failure.config.EnterpriseFailureHandlingConfiguration', permissions: 'indices:failures', component: ƒ}
-  // 4
-  // :
-  // {configType: 'org.graylog.plugins.license.violations.TrafficLimitViolationSettings', permissions: 'clusterconfigentry:read', component: ƒ}
-  // 5
-  // :
-  // {configType: 'org.graylog.plugins.map.config.GeoIpResolverConfig', component: ƒ}
-  // length
-  // :
-  // 6
-
   const configurationSections = [
     {
       name: 'Search',
-      shouldRender: searchesConfig,
+      shouldRender: true,
       render: (key) => (
         <ConfigletContainer title="Search Configuration" key={key}>
-          <SearchesConfig config={searchesConfig}
-                          updateConfig={onUpdate(SEARCHES_CLUSTER_CONFIG)} />
+          <SearchesConfig />
         </ConfigletContainer>
       ),
     },
     {
       name: 'Message Processor',
-      shouldRender: messageProcessorsConfig,
+      shouldRender: true,
       render: (key) => (
         <ConfigletContainer title="Message Processor Configuration" key={key}>
-          <MessageProcessorsConfig config={messageProcessorsConfig}
-                                   updateConfig={onUpdate(MESSAGE_PROCESSORS_CONFIG)} />
+          <MessageProcessorsConfig />
         </ConfigletContainer>
       ),
     },
@@ -190,7 +153,7 @@ const ConfigurationsPage = () => {
       render: (key) => (
         <ConfigletContainer title="Sidecar Configuration" key={key}>
           <SidecarConfig config={sidecarConfig}
-                         updateConfig={onUpdate(SIDECAR_CONFIG)} />
+                         updateConfig={onUpdate(ConfigurationType.SIDECAR_CONFIG)} />
         </ConfigletContainer>
       ),
     },
@@ -200,7 +163,7 @@ const ConfigurationsPage = () => {
       render: (key) => (
         <ConfigletContainer title="Events Configuration" key={key}>
           <EventsConfig config={eventsConfig}
-                        updateConfig={onUpdate(EVENTS_CONFIG)} />
+                        updateConfig={onUpdate(ConfigurationType.EVENTS_CONFIG)} />
         </ConfigletContainer>
       ),
     },
@@ -211,7 +174,7 @@ const ConfigurationsPage = () => {
         isPermitted(currentUser.permissions, ['urlwhitelist:read']) && (
         <ConfigletContainer title="URL Whitelist Configuration" key={key}>
           <UrlWhiteListConfig config={urlWhiteListConfig}
-                              updateConfig={onUpdate(URL_WHITELIST_CONFIG)} />
+                              updateConfig={onUpdate(ConfigurationType.URL_WHITELIST_CONFIG)} />
         </ConfigletContainer>
         )
       ),
@@ -231,7 +194,7 @@ const ConfigurationsPage = () => {
       render: (key) => (
         <ConfigletContainer title="Permissions Configuration" key={key}>
           <PermissionsConfig config={permissionsConfig}
-                             updateConfig={onUpdate(PERMISSIONS_CONFIG)} />
+                             updateConfig={onUpdate(ConfigurationType.PERMISSIONS_CONFIG)} />
         </ConfigletContainer>
       ),
     },
@@ -242,7 +205,7 @@ const ConfigurationsPage = () => {
         <HideOnCloud key={key}>
           <ConfigletContainer title="Index Set Default Configuration">
             <IndexSetsDefaultsConfig initialConfig={indexSetsDefaultsConfig}
-                                     updateConfig={onUpdate(INDEX_SETS_DEFAULTS_CONFIG)} />
+                                     updateConfig={onUpdate(ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG)} />
           </ConfigletContainer>
         </HideOnCloud>
       ),
@@ -253,7 +216,7 @@ const ConfigurationsPage = () => {
       render: (key) => (
         <ConfigletContainer title="User Configuration" key={key}>
           <UserConfig config={userConfig}
-                      updateConfig={onUpdate(USER_CONFIG)} />
+                      updateConfig={onUpdate(ConfigurationType.USER_CONFIG)} />
         </ConfigletContainer>
       ),
     },
