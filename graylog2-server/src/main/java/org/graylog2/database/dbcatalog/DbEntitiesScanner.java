@@ -16,8 +16,10 @@
  */
 package org.graylog2.database.dbcatalog;
 
+import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.graylog2.database.DbEntity;
+import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.reflections.util.ConfigurationBuilder;
@@ -33,13 +35,19 @@ public class DbEntitiesScanner implements Provider<DbEntitiesCatalog> {
 
     private final String[] packagesToScan;
 
+    private final ClassLoader chainingClassLoader;
+
     @SuppressWarnings("unused")
-    public DbEntitiesScanner() {
+    @Inject
+    public DbEntitiesScanner(final ChainingClassLoader chainingClassLoader) {
+        this.chainingClassLoader = chainingClassLoader;
         this.packagesToScan = new String[]{"org.graylog2", "org.graylog"};
     }
 
     DbEntitiesScanner(String[] packagesToScan) {
+        this.chainingClassLoader = null;
         this.packagesToScan = packagesToScan;
+
     }
 
     @Override
@@ -47,6 +55,9 @@ public class DbEntitiesScanner implements Provider<DbEntitiesCatalog> {
         final ConfigurationBuilder configuration = new ConfigurationBuilder()
                 .forPackages(packagesToScan)
                 .setScanners(Scanners.TypesAnnotated);
+        if (chainingClassLoader != null) {
+            configuration.setClassLoaders(new ClassLoader[]{chainingClassLoader});
+        }
 
         final Reflections reflections = new Reflections(configuration);
 

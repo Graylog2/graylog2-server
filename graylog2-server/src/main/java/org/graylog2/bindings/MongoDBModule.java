@@ -25,7 +25,7 @@ import org.graylog2.database.dbcatalog.DbEntitiesScanner;
 public class MongoDBModule extends AbstractModule {
     @Override
     protected void configure() {
-        bind(DbEntitiesCatalog.class).toProvider(DbEntitiesScanner.class);
+        bind(DbEntitiesCatalog.class).toProvider(DbEntitiesScanner.class).asEagerSingleton();
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
     }
 }
