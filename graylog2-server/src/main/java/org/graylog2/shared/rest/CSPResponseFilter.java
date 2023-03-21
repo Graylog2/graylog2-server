@@ -24,6 +24,6 @@ public class CSPResponseFilter implements ContainerResponseFilter {
     @Override
     public void filter(final ContainerRequestContext requestContext,
                        ContainerResponseContext responseContext) {
-        responseContext.getHeaders().add("Content-Security-Policy", "default-src 'self'");
+        responseContext.getHeaders().add("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval'; img-src 'self' data:;");
     }
 }
