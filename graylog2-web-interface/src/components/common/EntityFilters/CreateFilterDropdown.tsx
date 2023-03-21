@@ -25,9 +25,6 @@ import type { Filters, Filter } from 'components/common/EntityFilters/types';
 import FilterConfiguration from 'components/common/EntityFilters/FilterConfiguration';
 import generateId from 'logic/generateId';
 
-import SuggestionsList from './configuration/SuggestionsList';
-import StaticOptionsList from './configuration/StaticOptionsList';
-
 const Container = styled.div`
   margin-left: 5px;
 `;
