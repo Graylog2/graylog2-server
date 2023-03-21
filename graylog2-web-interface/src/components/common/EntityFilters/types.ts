@@ -27,3 +27,7 @@ export type Filter = BooleanFilter | ValueFilter;
 export type Filters = {
   [attributeId: string]: Array<Filter>
 };
+
+export type UrlQueryFilters = {
+  [attributeId: string]: Array<string>
+}
