@@ -19,19 +19,18 @@ import { screen, render, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { exampleFormDataWithKeySecretAuth } from 'aws/FormData.fixtures';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
-import history from 'util/History';
 import { FormDataProvider } from 'aws/context/FormData';
 import { ApiContext } from 'aws/context/Api';
 import { StepsContext } from 'aws/context/Steps';
 import { SidebarContext } from 'aws/context/Sidebar';
 import Routes from 'routing/Routes';
+import mockHistory from 'helpers/mocking/mockHistory';
+import { asMock } from 'helpers/mocking';
+import useHistory from 'routing/useHistory';
 
 import CloudWatch from './CloudWatch';
 
-const mockCurrentUser = { currentUser: { fullname: 'Ada Lovelace', username: 'ada' } };
-
-jest.mock('util/History');
+jest.mock('routing/useHistory');
 
 // eslint-disable-next-line react/prop-types
 const TestCommonProviders = ({ children }) => (
@@ -56,6 +55,13 @@ const TestCommonProviders = ({ children }) => (
 );
 
 describe('<CloudWatch>', () => {
+  let history;
+
+  beforeEach(() => {
+    history = mockHistory();
+    asMock(useHistory).mockReturnValue(history);
+  });
+
   it('redirects to system/inputs after input is created', async () => {
     render(
       <TestCommonProviders>

@@ -16,10 +16,11 @@
  */
 import PropTypes from 'prop-types';
 
-import history from 'util/History';
+import useHistory from 'routing/useHistory';
 import Routes from 'aws/common/Routes.js';
 
 const AWSInputConfiguration = ({ url }) => {
+  const history = useHistory();
   history.push(url);
 
   return null;
