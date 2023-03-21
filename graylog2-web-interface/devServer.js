@@ -25,19 +25,16 @@ const yargs = require('yargs');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
 
-const webpackConfig = require('./webpack.bundled');
+const webpackConfigs = require('./webpack.bundled');
 
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8080;
 const DEFAULT_API_URL = 'http://127.0.0.1:9000';
 
 const app = express();
-const vendorConfig = webpackConfig[0];
-const appConfig = webpackConfig[1];
 // Use two compilers to avoid re-compiling the vendor config on every change.
 // We assume dependencies won't change while the server is running.
-const vendorCompiler = webpack(vendorConfig);
-const appCompiler = webpack(appConfig);
+const pluginCompilers = webpackConfigs.map((config) => webpack(config));
 
 const { argv } = yargs;
 const host = argv.host || DEFAULT_HOST;
@@ -66,15 +63,15 @@ app.use('/config.js', proxy(apiUrl, {
 app.use(compress()); // Enables compression middleware
 app.use(history()); // Enables HTML5 History API middleware
 
-app.use(webpackDevMiddleware(vendorCompiler, {
-  publicPath: appConfig.output.publicPath,
-}));
+pluginCompilers.forEach((compiler, idx) => {
+  app.use(webpackDevMiddleware(compiler, {
+    publicPath: '/',
+  }));
 
-app.use(webpackDevMiddleware(appCompiler, {
-  publicPath: appConfig.output.publicPath,
-}));
-
-app.use(webpackHotMiddleware(appCompiler));
+  if (idx > 0) {
+    app.use(webpackHotMiddleware(compiler));
+  }
+});
 
 const server = http.createServer(app);
 
