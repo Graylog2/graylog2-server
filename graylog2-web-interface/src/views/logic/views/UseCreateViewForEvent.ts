@@ -40,6 +40,8 @@ import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
+import type { ParameterJson } from 'views/logic/parameters/Parameter';
+import Parameter from 'views/logic/parameters/Parameter';
 
 const AGGREGATION_WIDGET_HEIGHT = 3;
 
@@ -171,16 +173,19 @@ export const ViewGenerator = async ({
   queryString,
   aggregations,
   groupBy,
+  queryParameters,
 }: {
   streams: string | string[] | undefined | null,
   timeRange: AbsoluteTimeRange | RelativeTimeRangeStartOnly,
   queryString: ElasticsearchQueryString,
   aggregations: Array<EventDefinitionAggregation>
-  groupBy: Array<string>
+  groupBy: Array<string>,
+  queryParameters: Array<ParameterJson>,
 },
 ) => {
   const query = QueryGenerator(streams, undefined, timeRange, queryString);
-  const search = Search.create().toBuilder().queries([query]).build();
+  const search = Search.create().toBuilder().queries([query]).parameters(queryParameters.map((param) => Parameter.fromJSON(param)))
+    .build();
   const viewState = await ViewStateGenerator({ streams, aggregations, groupBy });
 
   const view = View.create()
@@ -207,10 +212,13 @@ export const UseCreateViewForEvent = (
     type: 'elasticsearch',
     query_string: eventData?.replay_info?.query || '',
   };
+
+  const queryParameters = eventDefinition?.config?.query_parameters || [];
+
   const groupBy = eventDefinition.config.group_by;
 
   return useMemo(
-    () => ViewGenerator({ streams, timeRange, queryString, aggregations, groupBy }),
+    () => ViewGenerator({ streams, timeRange, queryString, aggregations, groupBy, queryParameters }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );

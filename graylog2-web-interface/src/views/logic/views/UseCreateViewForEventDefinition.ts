@@ -37,10 +37,13 @@ const useCreateViewForEventDefinition = (
     type: 'elasticsearch',
     query_string: eventDefinition?.config?.query || '',
   };
+
+  const queryParameters = eventDefinition?.config?.query_parameters || [];
+
   const groupBy = eventDefinition.config.group_by;
 
   return useMemo(
-    () => ViewGenerator({ streams, timeRange, queryString, aggregations, groupBy }),
+    () => ViewGenerator({ streams, timeRange, queryString, aggregations, groupBy, queryParameters }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );

@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import type { ParameterJson } from 'views/logic/parameters/Parameter';
+
 export type EventDefinition = {
   _scope: string,
   id: string,
@@ -25,7 +27,7 @@ export type EventDefinition = {
   config: {
     type: string,
     query: string,
-    query_parameters: string[],
+    query_parameters: ParameterJson[],
     streams: string[],
     group_by: string[],
     series: Array<{field: string, id: string, function: string}>,
