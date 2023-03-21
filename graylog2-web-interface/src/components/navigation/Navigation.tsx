@@ -58,16 +58,16 @@ function pluginMenuItemExists(description: string): boolean {
   return !!pluginExports.find((value) => value.description?.toLowerCase() === description.toLowerCase());
 }
 
-const formatSinglePluginRoute = ({ description, path, permissions, requiredFeatureFlag }: PluginNavigationDropdownItem, currentUserPermissions: Immutable.List<string>, topLevel = false) => {
-  if (permissions && !isPermitted(currentUserPermissions, permissions)) {
-    return null;
-  }
+const formatSinglePluginRoute = ({ description, path, permissions, requiredFeatureFlag, BadgeComponent }: PluginNavigationDropdownItem, currentUserPermissions: Immutable.List<string>, topLevel = false) => {
+  if (permissions && !isPermitted(currentUserPermissions, permissions)) return null;
+  if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) return null;
 
-  if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
-    return null;
-  }
-
-  return <NavigationLink key={description} description={description} path={appPrefixed(path)} topLevel={topLevel} />;
+  return (
+    <NavigationLink key={description}
+                    description={BadgeComponent ? <BadgeComponent text={description} /> : description}
+                    path={appPrefixed(path)}
+                    topLevel={topLevel} />
+  );
 };
 
 const formatPluginRoute = (pluginRoute: PluginNavigation, currentUserPermissions: Immutable.List<string>, pathname: string) => {
@@ -80,12 +80,14 @@ const formatPluginRoute = (pluginRoute: PluginNavigation, currentUserPermissions
     const title = activeChild.length > 0 ? `${pluginRoute.description} / ${activeChild[0].description}` : pluginRoute.description;
     const isEmpty = !pluginRoute.children.some((child) => isPermitted(currentUserPermissions, child.permissions) && (child.requiredFeatureFlag ? AppConfig.isFeatureEnabled(child.requiredFeatureFlag) : true));
 
-    if (isEmpty) {
-      return null;
-    }
+    if (isEmpty) return null;
+    const { BadgeComponent } = pluginRoute;
 
     return (
-      <NavDropdown key={title} title={title} id="enterprise-dropdown" inactiveTitle={pluginRoute.description}>
+      <NavDropdown key={title}
+                   title={BadgeComponent ? <BadgeComponent text={title} /> : title}
+                   id="enterprise-dropdown"
+                   inactiveTitle={pluginRoute.description}>
         {pluginRoute.children.map((child) => formatSinglePluginRoute(child, currentUserPermissions, false))}
       </NavDropdown>
     );
