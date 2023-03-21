@@ -21,7 +21,6 @@ import { LinkContainer } from 'components/common/router';
 import connect from 'stores/connect';
 import { Col, Row, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import history from 'util/History';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { Cache, CacheCreate, CacheForm, CachesOverview } from 'components/lookup-tables';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
@@ -29,8 +28,9 @@ import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { LookupTableCachesActions, LookupTableCachesStore } from 'stores/lookup-tables/LookupTableCachesStore';
 import LUTPageNavigation from 'components/lookup-tables/LUTPageNavigation';
+import withHistory from 'routing/withHistory';
 
-const _saved = () => {
+const _saved = (history) => {
   history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
 };
 
@@ -82,6 +82,7 @@ class LUTCachesPage extends React.Component {
       types,
       caches,
       pagination,
+      history,
     } = this.props;
     let content;
     const isShowing = action === 'show';
@@ -98,7 +99,7 @@ class LUTCachesPage extends React.Component {
                          type={cache.config.type}
                          title="Data Cache"
                          create={false}
-                         saved={_saved}
+                         saved={() => _saved(history)}
                          validate={_validateCache}
                          validationErrors={validationErrors} />
             </Col>
@@ -113,7 +114,7 @@ class LUTCachesPage extends React.Component {
       } else {
         content = (
           <CacheCreate types={types}
-                       saved={_saved}
+                       saved={() => _saved(history)}
                        validate={_validateCache}
                        validationErrors={validationErrors} />
         );
@@ -149,6 +150,7 @@ LUTCachesPage.propTypes = {
   validationErrors: PropTypes.object,
   types: PropTypes.object,
   caches: PropTypes.array,
+  history: PropTypes.object.isRequired,
   location: PropTypes.object.isRequired,
   pagination: PropTypes.object.isRequired,
   action: PropTypes.string,
@@ -164,7 +166,7 @@ LUTCachesPage.defaultProps = {
 };
 
 export default connect(
-  withParams(withLocation(withPaginationQueryParameter(LUTCachesPage))),
+  withHistory(withParams(withLocation(withPaginationQueryParameter(LUTCachesPage)))),
   { cachesStore: LookupTableCachesStore },
   ({ cachesStore, ...otherProps }) => ({
     ...otherProps,

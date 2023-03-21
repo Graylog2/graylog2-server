@@ -46,6 +46,7 @@ import useView from 'views/hooks/useView';
 import useAppDispatch from 'stores/useAppDispatch';
 import { loadView, updateView } from 'views/logic/slices/viewSlice';
 import type FetchError from 'logic/errors/FetchError';
+import useHistory from 'routing/useHistory';
 
 import SavedSearchForm from './SavedSearchForm';
 import SavedSearchesModal from './SavedSearchesModal';
@@ -98,6 +99,7 @@ const SearchActionsMenu = () => {
   const savedViewTitle = loaded ? 'Saved search' : 'Save search';
   const title = dirty ? 'Unsaved changes' : savedViewTitle;
   const pluggableSaveViewControls = useSaveViewFormControls();
+  const history = useHistory();
 
   const toggleFormModal = useCallback(() => setShowForm((cur) => !cur), []);
   const toggleListModal = useCallback(() => setShowList((cur) => !cur), []);
@@ -151,17 +153,17 @@ const SearchActionsMenu = () => {
       .then(() => UserNotification.success(`Deleting view "${deletedView.title}" was successful!`, 'Success!'))
       .then(() => {
         if (deletedView.id === view.id) {
-          loadNewSearch();
+          loadNewSearch(history);
         }
 
         return Promise.resolve();
       })
       .catch((error) => UserNotification.error(`Deleting view failed: ${_extractErrorMessage(error)}`, 'Error!'));
-  }, [view.id]);
+  }, [history, view.id]);
 
   const _loadAsDashboard = useCallback(() => {
-    loadAsDashboard(view);
-  }, [view]);
+    loadAsDashboard(history, view);
+  }, [history, view]);
 
   return (
     <Container aria-label="Search Meta Buttons">
