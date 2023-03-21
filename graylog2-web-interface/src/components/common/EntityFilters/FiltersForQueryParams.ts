@@ -22,7 +22,7 @@ const FiltersForQueryParams = (filters: Filters) => {
     return undefined;
   }
 
-  return Object.entries(filters).map(([attributeId, filterValues]) => (
+  return Object.entries(filters).flatMap(([attributeId, filterValues]) => (
     filterValues.map(({ value }) => `${attributeId}:${value}`)
   ));
 };

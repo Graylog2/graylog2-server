@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import { useParams } from 'react-router-dom';
 
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -25,17 +25,19 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { isPermitted } from 'util/PermissionsMixin';
-import history from 'util/History';
-import withParams from 'routing/withParams';
 import EventNotificationDetails from 'components/event-notifications/event-notification-details/EventNotificationDetails';
 import EventNotificationActionLinks from 'components/event-notifications/event-notification-details/EventNotificationActionLinks';
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import 'components/event-notifications/event-notification-types';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 
-const ShowEventDefinitionPage = ({ params: { notificationId } }) => {
+import useHistory from '../routing/useHistory';
+
+const ShowEventDefinitionPage = () => {
   const currentUser = useCurrentUser();
   const [notification, setNotification] = useState();
+  const { notificationId } = useParams();
+  const history = useHistory();
 
   useEffect(() => {
     EventNotificationsActions.get(notificationId).then(
@@ -84,8 +86,4 @@ const ShowEventDefinitionPage = ({ params: { notificationId } }) => {
   );
 };
 
-ShowEventDefinitionPage.propTypes = {
-  params: PropTypes.object.isRequired,
-};
-
-export default withParams(ShowEventDefinitionPage);
+export default ShowEventDefinitionPage;
