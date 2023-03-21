@@ -18,12 +18,14 @@ import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
 
 import { EntityDataTable, NoSearchResult, PaginatedList, QueryHelper, SearchForm, Spinner } from 'components/common';
-import type { SearchParams, Sort } from 'stores/PaginationTypes';
+import type { Sort } from 'stores/PaginationTypes';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import 'components/event-definitions/event-definition-types';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
+import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
+import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 
 import EventDefinitionActions from './EventDefinitionActions';
 import SchedulingCell from './SchedulingCell';
@@ -32,18 +34,12 @@ import BulkActions from './BulkActions';
 
 import type { EventDefinition } from '../event-definitions-types';
 import useEventDefinitions from '../hooks/useEventDefinitions';
-import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
+import { SYSTEM_EVENT_DEFINITION_TYPE, ENTITY_TABLE_ID, DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES } from '../constants';
 
 const isSystemEventDefinition = (eventDefinition: EventDefinition): boolean => {
   return eventDefinition?.config?.type === SYSTEM_EVENT_DEFINITION_TYPE;
 };
 
-const CUSTOM_COLUMN_DEFINITIONS = [
-  { id: 'scheduling', title: 'Scheduling', sortable: false },
-];
-
-const INITIAL_COLUMNS = ['title', 'description', 'priority', 'scheduling', 'status'];
-const COLUMNS_ORDER = ['title', 'description', 'priority', 'status', 'scheduling'];
 const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
   attributes: {
     title: {
@@ -63,52 +59,56 @@ const customColumnRenderers = (): ColumnRenderers<EventDefinition> => ({
       ),
       staticWidth: 100,
     },
-    prority: {
-      staticWidth: 50,
+    priority: {
+      staticWidth: 100,
     },
   },
 });
 
 const EventDefinitionsContainer = () => {
-  const [visibleColumns, setVisibleColumns] = useState(INITIAL_COLUMNS);
-  const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
-  const [searchParams, setSearchParams] = useState<SearchParams>({
-    page: paginationQueryParameter.page,
-    pageSize: paginationQueryParameter.pageSize,
-    query: '',
-    sort: {
-      attributeId: 'title',
-      direction: 'asc',
-    },
+  const [query, setQuery] = useState('');
+  const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
+    entityTableId: ENTITY_TABLE_ID,
+    defaultPageSize: DEFAULT_LAYOUT.pageSize,
+    defaultDisplayedAttributes: DEFAULT_LAYOUT.displayedColumns,
+    defaultSort: DEFAULT_LAYOUT.sort,
   });
-  const { data: paginatedEventDefinitions, refetch: refetchEventDefinitions } = useEventDefinitions(searchParams);
+  const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
+  const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
+  const { data: paginatedEventDefinitions, refetch: refetchEventDefinitions, isInitialLoading: isLoadingEventDefinitions } = useEventDefinitions({
+    query,
+    page: paginationQueryParameter.page,
+    pageSize: layoutConfig.pageSize,
+    sort: layoutConfig.sort,
+  });
   const columnRenderers = customColumnRenderers();
   const columnDefinitions = useMemo(
-    () => ([...(paginatedEventDefinitions?.attributes ?? []), ...CUSTOM_COLUMN_DEFINITIONS]),
+    () => ([...(paginatedEventDefinitions?.attributes ?? []), ...ADDITIONAL_ATTRIBUTES]),
     [paginatedEventDefinitions?.attributes],
-  );
-
-  const onPageChange = useCallback(
-    (newPage: number, newPageSize: number) => setSearchParams((cur) => ({ ...cur, page: newPage, pageSize: newPageSize })),
-    [],
   );
 
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
-    setSearchParams((cur) => ({ ...cur, query: newQuery }));
+    setQuery(newQuery);
   }, [paginationQueryParameter]);
 
   const onReset = useCallback(() => {
     onSearch('');
   }, [onSearch]);
 
-  const onColumnsChange = useCallback((newVisibleColumns: Array<string>) => {
-    setVisibleColumns(newVisibleColumns);
-  }, []);
+  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
+    updateTableLayout({ displayedAttributes });
+  }, [updateTableLayout]);
+
+  const onPageSizeChange = useCallback((newPageSize: number) => {
+    paginationQueryParameter.setPagination({ page: 1, pageSize: newPageSize });
+    updateTableLayout({ perPage: newPageSize });
+  }, [paginationQueryParameter, updateTableLayout]);
 
   const onSortChange = useCallback((newSort: Sort) => {
-    setSearchParams((cur) => ({ ...cur, sort: newSort, page: 1 }));
-  }, []);
+    paginationQueryParameter.resetPage();
+    updateTableLayout({ sort: newSort });
+  }, [paginationQueryParameter, updateTableLayout]);
 
   const renderEventDefinitionActions = useCallback((listItem: EventDefinition) => (
     <EventDefinitionActions eventDefinition={listItem} refetchEventDefinitions={refetchEventDefinitions} />
@@ -122,15 +122,15 @@ const EventDefinitionsContainer = () => {
                  setSelectedEventDefinitionsIds={setSelectedEventDefinitionsIds} />
   );
 
-  if (!paginatedEventDefinitions) {
-    return <Spinner text="Loading Event Definitions information..." />;
+  if (isLoadingLayoutPreferences || isLoadingEventDefinitions) {
+    return <Spinner />;
   }
 
   const { elements, pagination: { total } } = paginatedEventDefinitions;
 
   return (
-    <PaginatedList onChange={onPageChange}
-                   pageSize={searchParams.pageSize}
+    <PaginatedList pageSize={layoutConfig.pageSize}
+                   showPageSizeSelect={false}
                    totalItems={total}>
       <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
@@ -142,12 +142,14 @@ const EventDefinitionsContainer = () => {
           <NoSearchResult>No Event Definition has been found</NoSearchResult>
         ) : (
           <EntityDataTable<EventDefinition> data={elements}
-                                            visibleColumns={visibleColumns}
-                                            columnsOrder={COLUMNS_ORDER}
+                                            visibleColumns={layoutConfig.displayedAttributes}
+                                            columnsOrder={DEFAULT_LAYOUT.columnsOrder}
                                             onColumnsChange={onColumnsChange}
                                             onSortChange={onSortChange}
+                                            onPageSizeChange={onPageSizeChange}
+                                            pageSize={layoutConfig.pageSize}
                                             bulkActions={renderBulkActions}
-                                            activeSort={searchParams.sort}
+                                            activeSort={layoutConfig.sort}
                                             rowActions={renderEventDefinitionActions}
                                             columnRenderers={columnRenderers}
                                             columnDefinitions={columnDefinitions}

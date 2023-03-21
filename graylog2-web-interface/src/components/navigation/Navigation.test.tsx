@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { mount, mountUnwrapped } from 'wrappedEnzyme';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import { Route, MemoryRouter, useLocation } from 'react-router-dom';
+import { Route, Routes, MemoryRouter, useLocation } from 'react-router-dom';
+import DefaultProviders from 'DefaultProviders';
 import Immutable from 'immutable';
 import type { Location } from 'history';
 import { defaultUser } from 'defaultMockValues';
@@ -25,7 +26,7 @@ import { defaultUser } from 'defaultMockValues';
 import mockComponent from 'helpers/mocking/MockComponent';
 import { adminUser } from 'fixtures/users';
 import { asMock } from 'helpers/mocking';
-import Routes from 'routing/Routes';
+import RoutePaths from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
 import Navigation from 'components/navigation/Navigation';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -60,7 +61,7 @@ describe('Navigation', () => {
 
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
-    asMock(useLocation).mockReturnValue({ pathname: '/' } as Location<{ pathname: string }>);
+    asMock(useLocation).mockReturnValue({ pathname: '/' } as Location);
   });
 
   describe('has common elements', () => {
@@ -74,7 +75,7 @@ describe('Navigation', () => {
       const brand = wrapper.find('NavbarBrand');
 
       expect(brand).toExist();
-      expect(brand.find('LinkContainer')).toHaveProp('to', Routes.STARTPAGE);
+      expect(brand.find('LinkContainer')).toHaveProp('to', RoutePaths.STARTPAGE);
       expect(brand.find('NavigationBrand')).toExist();
     });
 
@@ -223,14 +224,19 @@ describe('Navigation', () => {
         .permissions(Immutable.List(['somethingelse', 'completelydifferent']))
         .build());
 
-      asMock(useLocation).mockReturnValue({ pathname: '/somethingelse' } as Location<{ pathname: string }>);
+      asMock(useLocation).mockReturnValue({ pathname: '/somethingelse' } as Location);
 
-      const wrapper = mount((
-        <MemoryRouter initialEntries={['/somethingelse']}>
-          <Route path="/somethingelse">
-            <Navigation />
-          </Route>
-        </MemoryRouter>
+      const wrapper = mountUnwrapped((
+        <DefaultProviders>
+          <MemoryRouter initialEntries={['/somethingelse']}>
+            <Routes>
+              <Route path="/somethingelse"
+                     element={(
+                       <Navigation />
+                   )} />
+            </Routes>
+          </MemoryRouter>
+        </DefaultProviders>
       ));
 
       expect(wrapper.find('NavDropdown[title="Neat Stuff / Something Else"]')).toExist();
