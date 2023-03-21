@@ -56,7 +56,6 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
 };
 
 const SearchPage = ({ children, isNew, view: viewPromise, loadNewView: _loadNewView = defaultLoadNewView, loadView: _loadView = defaultLoadView, executionState: initialExecutionState, SearchComponentSlots }: Props) => {
-
   const query = useQuery();
   const initialQuery = query?.page as string;
   useLoadView(viewPromise, isNew);
