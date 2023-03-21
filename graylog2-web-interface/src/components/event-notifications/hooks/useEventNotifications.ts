@@ -32,9 +32,9 @@ const useEventNotifications = (searchParams: SearchParams, { enabled }: Options 
     attributes: Array<{ id: string, title: string, sortable: boolean }>
   } | undefined,
   refetch: () => void,
-  isFetching: boolean,
+  isInitialLoading: boolean,
 } => {
-  const { data, refetch, isFetching } = useQuery(
+  const { data, refetch, isInitialLoading } = useQuery(
     ['eventNotifications', 'overview', searchParams],
     () => EventNotificationsStore.searchPaginated(
       searchParams.page,
@@ -44,8 +44,8 @@ const useEventNotifications = (searchParams: SearchParams, { enabled }: Options 
     ),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading Event notifications failed with status: ${errorThrown}`,
-          'Could not load Event notifications');
+        UserNotification.error(`Loading event notifications failed with status: ${errorThrown}`,
+          'Could not load event notifications');
       },
       keepPreviousData: true,
       enabled,
@@ -55,7 +55,7 @@ const useEventNotifications = (searchParams: SearchParams, { enabled }: Options 
   return ({
     data,
     refetch,
-    isFetching,
+    isInitialLoading,
   });
 };
 

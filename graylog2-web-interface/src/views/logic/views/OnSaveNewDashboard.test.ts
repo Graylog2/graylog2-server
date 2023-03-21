@@ -19,9 +19,10 @@ import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import mockDispatch from 'views/test/mockDispatch';
 import type { RootState } from 'views/types';
+import type { HistoryFunction } from 'routing/useHistory';
 
 import View from './View';
-import OnSaveNewDashboard from './OnSaveNewDashboard';
+import OriginalOnSaveNewDashboard from './OnSaveNewDashboard';
 import { loadDashboard } from './Actions';
 
 jest.mock('views/stores/ViewManagementStore', () => ({
@@ -32,6 +33,15 @@ jest.mock('views/stores/ViewManagementStore', () => ({
 
 jest.mock('util/UserNotification');
 jest.mock('views/logic/views/Actions');
+
+const history: HistoryFunction = {
+  goBack: jest.fn(),
+  push: jest.fn(),
+  pushWithState: jest.fn(),
+  replace: jest.fn(),
+};
+
+const OnSaveNewDashboard = (view: View) => OriginalOnSaveNewDashboard(view, history);
 
 describe('OnSaveNewDashboard', () => {
   afterEach(() => {
@@ -63,7 +73,7 @@ describe('OnSaveNewDashboard', () => {
 
     await dispatch(OnSaveNewDashboard(view));
 
-    expect(loadDashboard).toHaveBeenCalledWith('deadbeef');
+    expect(loadDashboard).toHaveBeenCalledWith(expect.anything(), 'deadbeef');
   });
 
   it('shows notification upon success', async () => {

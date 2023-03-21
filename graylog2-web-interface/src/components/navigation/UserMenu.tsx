@@ -21,8 +21,8 @@ import { LinkContainer } from 'components/common/router';
 import { NavDropdown, MenuItem } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
-import history from 'util/History';
 import { SessionActions } from 'stores/sessions/SessionStore';
+import useHistory from 'routing/useHistory';
 
 import ThemeModeToggle from './ThemeModeToggle';
 
@@ -33,6 +33,7 @@ type Props = {
 };
 
 const UserMenu = ({ fullName, readOnly = true, userId }: Props) => {
+  const history = useHistory();
   const route = readOnly
     ? Routes.SYSTEM.USERS.show(userId)
     : Routes.SYSTEM.USERS.edit(userId);

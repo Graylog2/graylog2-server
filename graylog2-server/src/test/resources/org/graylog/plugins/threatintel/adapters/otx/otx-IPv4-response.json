@@ -1,0 +1,51 @@
+{
+  "sections": [
+    "general",
+    "geo",
+    "reputation",
+    "url_list",
+    "passive_dns",
+    "malware",
+    "nids_list",
+    "http_scans"
+  ],
+  "city": "Dublin",
+  "area_code": 0,
+  "pulse_info": {
+    "count": 0,
+    "references": [],
+    "pulses": []
+  },
+  "continent_code": "EU",
+  "country_name": "Ireland",
+  "postal_code": null,
+  "dma_code": 0,
+  "country_code": "IE",
+  "flag_url": "/static/img/flags/ie.png",
+  "asn": "AS16509 Amazon.com, Inc.",
+  "city_data": true,
+  "indicator": "52.19.0.7",
+  "whois": "http://whois.domaintools.com/52.19.0.7",
+  "type_title": "IPv4",
+  "region": "07",
+  "charset": 0,
+  "longitude": -6.259500026702881,
+  "country_code3": "IRL",
+  "reputation": 0,
+  "base_indicator": {},
+  "latitude": 53.33890151977539,
+  "validation": [
+    {
+      "source": "aws",
+      "message": "In IP range: region=eu-west-1 prefix=52.18.0.0/15 service=AMAZON",
+      "name": "AWS IP range"
+    },
+    {
+      "source": "suspicious",
+      "message": "suspiciously short IP (len: 9)",
+      "name": "Suspicious IP format / Possible version number"
+    }
+  ],
+  "type": "IPv4",
+  "flag_title": "Ireland"
+}
