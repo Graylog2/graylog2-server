@@ -68,7 +68,6 @@ const ConfigurationsPage = () => {
 
   useEffect(() => {
     const promises = [
-      ConfigurationsActions.list(ConfigurationType.SIDECAR_CONFIG),
       ConfigurationsActions.list(ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG),
       ConfigurationsActions.list(ConfigurationType.EVENTS_CONFIG),
       ConfigurationsActions.listPermissionsConfig(ConfigurationType.PERMISSIONS_CONFIG),
@@ -94,7 +93,6 @@ const ConfigurationsPage = () => {
     setActiveSubSectionKey(itemKey);
   };
 
-  const sidecarConfig = getConfig(ConfigurationType.SIDECAR_CONFIG, configuration);
   const eventsConfig = getConfig(ConfigurationType.EVENTS_CONFIG, configuration);
   const urlWhiteListConfig = getConfig(ConfigurationType.URL_WHITELIST_CONFIG, configuration);
   const indexSetsDefaultsConfig = getConfig(ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG, configuration);
@@ -149,11 +147,10 @@ const ConfigurationsPage = () => {
     },
     {
       name: 'Sidecar',
-      shouldRender: sidecarConfig,
+      shouldRender: true,
       render: (key) => (
         <ConfigletContainer title="Sidecar Configuration" key={key}>
-          <SidecarConfig config={sidecarConfig}
-                         updateConfig={onUpdate(ConfigurationType.SIDECAR_CONFIG)} />
+          <SidecarConfig  />
         </ConfigletContainer>
       ),
     },

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Button, Alert, Table } from 'components/bootstrap';
@@ -23,7 +23,6 @@ import { IfPermitted, SortableList } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
-import ObjectUtils from 'util/ObjectUtils';
 
 type Config = {
   disabled_processors: Array<any>,
@@ -33,7 +32,8 @@ type Config = {
 const MessageProcessorsConfig = () => {
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [config, setConfig] = useState<Config | undefined>(undefined);
-  const [inputs, setInputs] = useState<object>({});
+
+  const inputsRef = useRef({});
 
   useEffect(() => {
     ConfigurationsActions.listMessageProcessorsConfig(ConfigurationType.MESSAGE_PROCESSORS_CONFIG)
@@ -41,38 +41,6 @@ const MessageProcessorsConfig = () => {
         setConfig(configData as Config);
       });
   }, []);
-
-  // // eslint-disable-next-line react/no-unused-class-component-methods
-  // displayName: 'MessageProcessorsConfig',
-
-  // // eslint-disable-next-line react/no-unused-class-component-methods
-  // propTypes: {
-  //   config: PropTypes.object,
-  //   updateConfig: PropTypes.func.isRequired,
-  // },
-
-  // getDefaultProps() {
-  //   return {
-  //     config: {
-  //       disabled_processors: [],
-  //       processor_order: [],
-  //     },
-  //   };
-  // },
-
-  // getInitialState() {
-  //   const { config } = this.props;
-
-  //   return {
-  //     config: {
-  //       disabled_processors: config.disabled_processors,
-  //       processor_order: config.processor_order,
-  //     },
-  //     showConfigModal: false,
-  //   };
-  // },
-
-  // inputs: {},
 
   const openModal = () => {
     setShowConfigModal(true);
@@ -95,28 +63,25 @@ const MessageProcessorsConfig = () => {
   };
 
   const updateSorting = (newSorting) => {
-    const update = ObjectUtils.clone(config);
-
-    update.processor_order = newSorting.map((item) => {
+    const processorOrder = newSorting.map((item) => {
       return { class_name: item.id, name: item.title };
     });
 
-    setConfig(update);
+    setConfig({ ...config, processor_order: processorOrder });
   };
 
   const toggleStatus = (className) => {
     return () => {
-      const disabledProcessors = config.disabled_processors;
-      const update = ObjectUtils.clone(config);
-      const { checked } = inputs[className];
+      let newDisabledProcessors = config.disabled_processors;
+      const { checked } = inputsRef.current[className];
 
       if (checked) {
-        update.disabled_processors = disabledProcessors.filter((p) => p !== className);
-      } else if (disabledProcessors.indexOf(className) === -1) {
-        update.disabled_processors.push(className);
+        newDisabledProcessors = config.disabled_processors.filter((p) => p !== className);
+      } else if (config.disabled_processors.indexOf(className) === -1) {
+        newDisabledProcessors.push(className);
       }
 
-      setConfig(update);
+      setConfig({ ...config, disabled_processors: newDisabledProcessors });
     };
   };
 
@@ -142,7 +107,9 @@ const MessageProcessorsConfig = () => {
   };
 
   const statusForm = () => {
-    return ObjectUtils.clone(config.processor_order).sort((a, b) => naturalSort(a.name, b.name)).map((processor, idx) => {
+    const sortedProcessorOrder = [...config.processor_order].sort((a, b) => naturalSort(a.name, b.name));
+
+    return sortedProcessorOrder.map((processor, idx) => {
       const enabled = config.disabled_processors.filter((p) => p === processor.class_name).length < 1;
 
       return (
@@ -150,7 +117,7 @@ const MessageProcessorsConfig = () => {
         <tr key={idx}>
           <td>{processor.name}</td>
           <td>
-            <input ref={(elem) => { setInputs({ ...inputs, [processor.class_name]: elem }); }}
+            <input ref={(elem) => { inputsRef.current = ({ ...inputsRef.current, [processor.class_name]: elem }); }}
                    type="checkbox"
                    checked={enabled}
                    onChange={toggleStatus(processor.class_name)} />

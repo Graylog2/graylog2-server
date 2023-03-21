@@ -21,7 +21,6 @@ import moment from 'moment';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { Button, Row, Col, BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted, ISODurationInput } from 'components/common';
-import ObjectUtils from 'util/ObjectUtils';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 
 import 'moment-duration-format';
@@ -56,7 +55,7 @@ type Config = {
 const SearchesConfig = () => {
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [config, setConfig] = useState<Config | undefined>(undefined);
-  const [limitEnabled, setLimitEnabled] = useState(false);
+  const [limitEnabled, setLimitEnabled] = useState(moment.duration(config?.query_time_range_limit).asMilliseconds() > 0);
   const [relativeTimeRangeOptionsUpdate, setRelativeTimeRangeOptionsUpdate] = useState(undefined);
   const [surroundingTimeRangeOptionsUpdate, setSurroundingTimeRangeOptionsUpdate] = useState(undefined);
   const [surroundingFilterFields, setSurroundingFilterFields] = useState(undefined);
@@ -70,11 +69,7 @@ const SearchesConfig = () => {
 
   const onUpdate = (field) => {
     return (newOptions) => {
-      const update = ObjectUtils.clone(config);
-
-      update[field] = newOptions;
-
-      setConfig(update);
+      setConfig({ ...config, [field]: newOptions });
     };
   };
 
@@ -95,17 +90,17 @@ const SearchesConfig = () => {
   };
 
   const onChecked = () => {
-    const newConfig = ObjectUtils.clone(config);
+    let queryTimeRangeLimit;
 
     if (limitEnabled) {
       // If currently enabled, disable by setting the limit to 0 seconds.
-      newConfig.query_time_range_limit = 'PT0S';
+      queryTimeRangeLimit = 'PT0S';
     } else {
       // If currently not enabled, set a default of 30 days.
-      newConfig.query_time_range_limit = 'P30D';
+      queryTimeRangeLimit = 'P30D';
     }
 
-    setConfig(newConfig);
+    setConfig({ ...config, query_time_range_limit: queryTimeRangeLimit });
     setLimitEnabled(!limitEnabled);
   };
 
@@ -118,7 +113,7 @@ const SearchesConfig = () => {
   };
 
   const saveConfig = () => {
-    const update = ObjectUtils.clone(config);
+    const update = { ...config };
 
     if (relativeTimeRangeOptionsUpdate) {
       update.relative_timerange_options = {};

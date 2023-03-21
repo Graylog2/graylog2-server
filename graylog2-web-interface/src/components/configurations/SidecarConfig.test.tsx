@@ -17,12 +17,26 @@
 import * as React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 
+import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
+
 import SidecarConfig from './SidecarConfig';
+
+jest.mock('stores/configurations/ConfigurationsStore', () => ({
+  ConfigurationsActions: {
+    list: jest.fn(() => Promise.resolve({
+      sidecar_configuration_override: false,
+      sidecar_expiration_threshold: 'P14D',
+      sidecar_inactive_threshold: 'PT1M',
+      sidecar_send_status: true,
+      sidecar_update_interval: 'PT30S',
+    })),
+    update: jest.fn(() => Promise.resolve()),
+  },
+}));
 
 describe('SidecarConfig', () => {
   it('updates config after change', async () => {
-    const updateConfig = jest.fn(() => Promise.resolve());
-    render(<SidecarConfig updateConfig={updateConfig} />);
+    render(<SidecarConfig />);
 
     const openButton = await screen.findByRole('button', { name: /edit configuration/i });
     fireEvent.click(openButton);
@@ -37,6 +51,6 @@ describe('SidecarConfig', () => {
       hidden: true,
     }));
 
-    await waitFor(() => { expect(updateConfig).toHaveBeenCalledWith(expect.objectContaining({ sidecar_configuration_override: true })); });
+    await waitFor(() => { expect(ConfigurationsActions.update).toHaveBeenCalledWith('org.graylog.plugins.sidecar.system.SidecarConfiguration', expect.objectContaining({ sidecar_configuration_override: true })); });
   });
 });
