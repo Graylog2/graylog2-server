@@ -88,7 +88,8 @@ public interface Notification extends Persisted {
         LEGACY_LDAP_CONFIG_MIGRATION,
         MULTI_LEADER,
         NO_LEADER,
-        ARCHIVING_SUMMARY
+        ARCHIVING_SUMMARY,
+        SEARCH_ERROR
     }
 
     enum Severity {

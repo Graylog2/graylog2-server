@@ -154,9 +154,10 @@ public class PivotAggregationSearch implements AggregationSearch {
             }
 
             Notification systemNotification = notificationService.buildNow()
-                    .addType(Notification.Type.GENERIC)
+                    .addType(Notification.Type.SEARCH_ERROR)
                     .addSeverity(Notification.Severity.NORMAL)
                     .addTimestamp(DateTime.now(DateTimeZone.UTC))
+                    .addKey(searchJob.getId())
                     .addDetail("title", "Aggregation search failed")
                     .addDetail("description", errors.stream().map(SearchError::description).collect(Collectors.joining("\n")));
             notificationService.publishIfFirst(systemNotification);
