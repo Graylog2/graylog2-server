@@ -262,12 +262,13 @@ public class PaloAlto9xTemplates {
         fields.add(create(EventFields.EVENT_UID, 34, STRING));
 
         fields.add(create(PaloAlto9xFields.PAN_LOG_PANORAMA, 35, STRING));
-        fields.add(create(PaloAlto9xFields.PAN_SELECTION_TYPE, 36, STRING));
-        fields.add(create(ApplicationFields.APPLICATION_RESPONSE_TIME, 37, LONG));
-        fields.add(create(PaloAlto9xFields.PAN_GATEWAY_PRIORITY, 38, LONG));
-        fields.add(create(PaloAlto9xFields.PAN_ATTEMPTED_GATEWAYS, 39, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_HIGH_RES_TIME, 36, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_SELECTION_TYPE, 37, STRING));
+        fields.add(create(ApplicationFields.APPLICATION_RESPONSE_TIME, 38, LONG));
+        fields.add(create(PaloAlto9xFields.PAN_GATEWAY_PRIORITY, 39, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_ATTEMPTED_GATEWAYS, 40, STRING));
 
-        fields.add(create(PaloAlto9xFields.PAN_GATEWAY, 40, STRING));
+        fields.add(create(PaloAlto9xFields.PAN_GATEWAY, 41, STRING));
 
         return toTemplate(fields);
     }
