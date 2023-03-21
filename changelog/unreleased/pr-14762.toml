@@ -1,0 +1,4 @@
+type = "f"
+message = "Avoid full-page refresh when showing node details from message details."
+
+pulls = ["14762"]
