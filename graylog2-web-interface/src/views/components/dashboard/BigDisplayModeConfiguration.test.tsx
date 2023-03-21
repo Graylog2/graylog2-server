@@ -17,18 +17,22 @@
 import * as React from 'react';
 import { asElement, fireEvent, render } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
+import type { Optional } from 'utility-types';
 
-import history from 'util/History';
 import Routes from 'routing/Routes';
 import type { ViewStateMap } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import Query from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
+import mockHistory from 'helpers/mocking/mockHistory';
+import { asMock } from 'helpers/mocking';
+import useHistory from 'routing/useHistory';
 
 import BigDisplayModeConfiguration from './BigDisplayModeConfiguration';
 
 jest.mock('routing/Routes', () => ({ pluginRoute: jest.fn() }));
+jest.mock('routing/useHistory');
 
 const search = Search.create();
 const view = View.create()
@@ -60,7 +64,7 @@ const createViewWithQueries = () => {
 };
 
 describe('BigDisplayModeConfiguration', () => {
-  const SUT = (props) => (
+  const SUT = (props: Optional<React.ComponentProps<typeof BigDisplayModeConfiguration>, 'view'>) => (
     <BigDisplayModeConfiguration view={view} {...props} />
   );
 
@@ -124,8 +128,11 @@ describe('BigDisplayModeConfiguration', () => {
   });
 
   describe('redirects to tv mode page', () => {
+    let history;
+
     beforeEach(() => {
-      history.push = jest.fn();
+      history = mockHistory();
+      asMock(useHistory).mockReturnValue(history);
       Routes.pluginRoute = jest.fn(() => (viewId) => `/dashboards/tv/${viewId}`);
     });
 

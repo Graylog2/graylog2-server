@@ -18,9 +18,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Row, Col } from 'components/bootstrap';
-import history from 'util/History';
 import Routes from 'routing/Routes';
 import type { PipelineType } from 'stores/pipelines/PipelinesStore';
+import useHistory from 'routing/useHistory';
 
 import PipelineDetails from './PipelineDetails';
 
@@ -29,6 +29,8 @@ type Props = {
 };
 
 const NewPipeline = ({ onChange }: Props) => {
+  const history = useHistory();
+
   const _goToPipeline = (pipeline) => {
     history.push(Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id));
   };

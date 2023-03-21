@@ -23,7 +23,6 @@ import PropTypes from 'prop-types';
 import { LinkContainer } from 'components/common/router';
 import { Row, Col, Button, ButtonToolbar, BootstrapModalConfirm } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
-import history from 'util/History';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -33,6 +32,7 @@ import ContentPackInstallations from 'components/content-packs/ContentPackInstal
 import ContentPackInstallEntityList from 'components/content-packs/ContentPackInstallEntityList';
 import withParams from 'routing/withParams';
 import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/ContentPacksStore';
+import withHistory from 'routing/withHistory';
 
 import ShowContentPackStyle from './ShowContentPackPage.css';
 
@@ -42,6 +42,7 @@ const ShowContentPackPage = createReactClass({
 
   // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
+    history: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
   },
 
@@ -67,6 +68,7 @@ const ShowContentPackPage = createReactClass({
         UserNotification.error('An internal server error occurred. Please check your logfiles for more information');
       }
 
+      const { history } = this.props;
       history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
     });
 
@@ -88,6 +90,7 @@ const ShowContentPackPage = createReactClass({
             UserNotification.error('An internal server error occurred. Please check your logfiles for more information');
           }
 
+          const { history } = this.props;
           history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
         });
       }, (error) => {
@@ -211,4 +214,4 @@ const ShowContentPackPage = createReactClass({
   },
 });
 
-export default withParams(ShowContentPackPage);
+export default withHistory(withParams(ShowContentPackPage));

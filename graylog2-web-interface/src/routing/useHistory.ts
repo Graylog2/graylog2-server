@@ -14,19 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import UserNotification from 'util/UserNotification';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import { loadDashboard } from 'views/logic/views/Actions';
-import type { HistoryFunction } from 'routing/useHistory';
+import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import type View from './View';
+const useHistory = () => {
+  const navigate = useNavigate();
 
-export default (view: View, history: HistoryFunction) => async () => {
-  try {
-    const savedView = await ViewManagementActions.create(view);
-    loadDashboard(history, savedView.id);
-    UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!');
-  } catch (error) {
-    UserNotification.error(`Saving view failed: ${error}`, 'Error!');
-  }
+  return useMemo(() => ({
+    goBack: () => navigate(-1),
+    push: (to: string) => navigate(to),
+    pushWithState: (to: string, state: any) => navigate(to, { state }),
+    replace: (to: string) => navigate(to, { replace: true }),
+  }), [navigate]);
 };
+
+export type HistoryFunction = ReturnType<typeof useHistory>;
+
+export default useHistory;
