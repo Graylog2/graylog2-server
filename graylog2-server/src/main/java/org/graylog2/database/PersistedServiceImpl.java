@@ -101,11 +101,17 @@ public class PersistedServiceImpl implements PersistedService {
     protected <T extends Persisted> DBCollection collection(Class<T> modelClass) {
         DbEntity dbEntityAnnotation = modelClass.getAnnotation(DbEntity.class);
         if (dbEntityAnnotation == null) {
-            throw new RuntimeException("Unable to determine collection for class " + modelClass.getCanonicalName());
+            CollectionName collectionNameAnnotation = modelClass.getAnnotation(CollectionName.class);
+            if (collectionNameAnnotation == null) {
+                throw new RuntimeException("Unable to determine collection for class " + modelClass.getCanonicalName());
+            } else {
+                final String collectionName = collectionNameAnnotation.value();
+                return collection(collectionName);
+            }
+        } else {
+            final String collectionName = dbEntityAnnotation.collection();
+            return collection(collectionName);
         }
-        final String collectionName = dbEntityAnnotation.collection();
-
-        return collection(collectionName);
     }
 
     protected <T extends Persisted> DBCollection collection(T model) {

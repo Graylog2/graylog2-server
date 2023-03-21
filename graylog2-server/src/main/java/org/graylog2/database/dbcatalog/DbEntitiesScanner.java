@@ -38,7 +38,6 @@ public class DbEntitiesScanner implements Provider<DbEntitiesCatalog> {
         this.packagesToScan = new String[]{"org.graylog2", "org.graylog"};
     }
 
-    @SuppressWarnings("unused")
     DbEntitiesScanner(String[] packagesToScan) {
         this.packagesToScan = packagesToScan;
     }

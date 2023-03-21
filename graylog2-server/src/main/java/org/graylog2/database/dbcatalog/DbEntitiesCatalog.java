@@ -38,7 +38,7 @@ public class DbEntitiesCatalog {
         entries.forEach(this::add);
     }
 
-    void add(final DbEntityCatalogEntry entry) {
+    private void add(final DbEntityCatalogEntry entry) {
         final DbEntityCatalogEntry previousEntry = entitiesByCollectionName.put(entry.collection(), entry);
         if (previousEntry != null) {
             final String errorMsg = "Two model classes associated with the same mongo collection : " + entry + " and " + previousEntry;
