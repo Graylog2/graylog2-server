@@ -18,8 +18,7 @@ import React from 'react';
 import posthog from 'posthog-js';
 import { PostHogProvider } from 'posthog-js/react';
 
-import navigationTelemetry from 'telemetry/navigationTelemetry';
-import AppConfig from 'util/AppConfig';
+// import AppConfig from 'util/AppConfig';
 
 type PostHogSettings = {
   host: string;
@@ -42,10 +41,6 @@ const getPostHogSettings = (): PostHogSettings => {
   };
 };
 
-const onPostHogLoaded = (postHog) => {
-  navigationTelemetry(postHog);
-};
-
 const init = () => {
   const { host, key, debug } = getPostHogSettings();
 
@@ -56,7 +51,6 @@ const init = () => {
       api_host: host,
       capture_pageview: false,
       capture_pageleave: false,
-      loaded: onPostHogLoaded,
     },
   );
 

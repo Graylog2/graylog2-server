@@ -19,12 +19,12 @@ import * as React from 'react';
 import { singleton } from 'logic/singleton';
 
 export type TelemetryEvent = {
-  appSection: string,
+  appSection?: string,
   data?: {
     [key: string]: string
   }
 }
-export type TelemetryEventType = 'view' | 'click' | 'open' | 'close' | 'toggle';
+export type TelemetryEventType = '$pageview' | 'view' | 'click' | 'open' | 'close' | 'toggle';
 
 type ContextType = {
   sendTelemetry: (eventType: TelemetryEventType, event: TelemetryEvent) => void,
