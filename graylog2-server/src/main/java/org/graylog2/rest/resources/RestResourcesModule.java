@@ -97,6 +97,7 @@ import org.graylog2.rest.resources.tools.RegexTesterResource;
 import org.graylog2.rest.resources.tools.SplitAndIndexTesterResource;
 import org.graylog2.rest.resources.tools.SubstringTesterResource;
 import org.graylog2.rest.resources.users.UsersResource;
+import org.graylog2.telemetry.rest.TelemetryResource;
 
 public class RestResourcesModule extends Graylog2Module {
     private final Configuration configuration;
@@ -135,6 +136,7 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(TrafficResource.class);
         addSystemRestResource(SearchVersionResource.class);
         addSystemRestResource(EntityListPreferencesResource.class);
+        addSystemRestResource(TelemetryResource.class);
     }
 
     private void addDebugResources() {
