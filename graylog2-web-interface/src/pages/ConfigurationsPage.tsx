@@ -48,8 +48,6 @@ const getConfig = (configType, configuration) => configuration?.[configType] ?? 
 const onUpdate = (configType: string) => {
   return (config) => {
     switch (configType) {
-      case ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG:
-        return ConfigurationsActions.updateIndexSetDefaults(configType, config);
       default:
         return ConfigurationsActions.update(configType, config);
     }
@@ -66,7 +64,6 @@ const ConfigurationsPage = () => {
 
   useEffect(() => {
     const promises = [
-      ConfigurationsActions.list(ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG),
       ConfigurationsActions.listUserConfig(ConfigurationType.USER_CONFIG),
     ];
 
@@ -89,7 +86,6 @@ const ConfigurationsPage = () => {
     setActiveSubSectionKey(itemKey);
   };
 
-  const indexSetsDefaultsConfig = getConfig(ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG, configuration);
   const userConfig = getConfig(ConfigurationType.USER_CONFIG, configuration);
 
   const pluginDisplayNames = [
@@ -187,12 +183,11 @@ const ConfigurationsPage = () => {
     },
     {
       name: 'Index Set Defaults',
-      shouldRender: indexSetsDefaultsConfig,
+      shouldRender: true,
       render: (key) => (
         <HideOnCloud key={key}>
           <ConfigletContainer title="Index Set Default Configuration">
-            <IndexSetsDefaultsConfig initialConfig={indexSetsDefaultsConfig}
-                                     updateConfig={onUpdate(ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG)} />
+            <IndexSetsDefaultsConfig  />
           </ConfigletContainer>
         </HideOnCloud>
       ),
