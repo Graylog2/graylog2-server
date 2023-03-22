@@ -51,7 +51,7 @@ const aceEditorStyles = ({ colors }) => {
         }
 
         .ace_step {
-          background: rgb(255, 255, 0);
+          background: rgb(255 255 0);
         }
 
         .ace_bracket {
@@ -145,7 +145,7 @@ const aceEditorStyles = ({ colors }) => {
         color: ${colors.variant.dark.default};
       }
     }
-  `;
+`;
 };
 
 export default aceEditorStyles;

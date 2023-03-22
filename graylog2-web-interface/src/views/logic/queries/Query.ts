@@ -158,11 +158,9 @@ export default class Query {
     return this._value.searchTypes;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
     const { id, query, timerange, filter, filters, searchTypes } = this._value;
 
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     const builder = Query.builder()
       .id(id)
       .query(query)
@@ -208,7 +206,6 @@ export default class Query {
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   static builder(): Builder {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder()

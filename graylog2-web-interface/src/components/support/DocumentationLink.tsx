@@ -28,7 +28,7 @@ const Container = styled.a`
 `;
 
 const StyledIcon = styled(Icon)`
-  margin-left: 5px
+  margin-left: 5px;
 `;
 
 type Props = {

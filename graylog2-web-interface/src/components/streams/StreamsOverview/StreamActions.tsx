@@ -137,34 +137,26 @@ const StreamActions = ({
               : <span>{stream.disabled ? 'Start Stream' : 'Stop Stream'}</span>}
             {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
-          <MenuItem divider />
-        </IfPermitted>
-        <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
-          <LinkContainer to={Routes.stream_edit(stream.id)}>
-            <MenuItem disabled={isDefaultStream || isNotEditable}>
-              Manage Rules {isDefaultStream && <DefaultStreamHelp />}
-            </MenuItem>
-          </LinkContainer>
-        </IfPermitted>
-        <IfPermitted permissions={`streams:edit:${stream.id}`}>
-          <MenuItem onSelect={toggleUpdateModal} disabled={isDefaultStream}>
-            Edit stream {isDefaultStream && <DefaultStreamHelp />}
-          </MenuItem>
         </IfPermitted>
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
           <MenuItem onSelect={toggleStreamRuleModal} disabled={isDefaultStream}>
             Quick add rule {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
-        <IfPermitted permissions={['streams:create', `streams:read:${stream.id}`]}>
-          <MenuItem onSelect={toggleCloneModal} disabled={isDefaultStream}>
-            Clone this stream {isDefaultStream && <DefaultStreamHelp />}
+        <IfPermitted permissions={`streams:edit:${stream.id}`}>
+          <MenuItem onSelect={toggleUpdateModal} disabled={isDefaultStream}>
+            Edit stream {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
-        <IfPermitted permissions={`streams:edit:${stream.id}`}>
-          <LinkContainer to={Routes.stream_alerts(stream.id)}>
-            <MenuItem>
-              Manage Alerts
+
+        <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
+          <MenuItem divider />
+        </IfPermitted>
+
+        <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
+          <LinkContainer to={Routes.stream_edit(stream.id)}>
+            <MenuItem disabled={isDefaultStream || isNotEditable}>
+              Manage Rules {isDefaultStream && <DefaultStreamHelp />}
             </MenuItem>
           </LinkContainer>
         </IfPermitted>
@@ -177,13 +169,28 @@ const StreamActions = ({
             </LinkContainer>
           </IfPermitted>
         </HideOnCloud>
-        <MenuItem onSelect={setStartpage} disabled={currentUser.readOnly}>
-          Set as startpage
-        </MenuItem>
+        <IfPermitted permissions={`streams:edit:${stream.id}`}>
+          <LinkContainer to={Routes.stream_alerts(stream.id)}>
+            <MenuItem>
+              Manage Alerts
+            </MenuItem>
+          </LinkContainer>
+        </IfPermitted>
 
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
           <MenuItem divider />
         </IfPermitted>
+
+        <MenuItem onSelect={setStartpage} disabled={currentUser.readOnly}>
+          Set as startpage
+        </MenuItem>
+
+        <IfPermitted permissions={['streams:create', `streams:read:${stream.id}`]}>
+          <MenuItem onSelect={toggleCloneModal} disabled={isDefaultStream}>
+            Clone this stream {isDefaultStream && <DefaultStreamHelp />}
+          </MenuItem>
+        </IfPermitted>
+
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
           <MenuItem onSelect={onDelete} disabled={isDefaultStream}>
             Delete this stream {isDefaultStream && <DefaultStreamHelp />}

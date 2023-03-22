@@ -59,7 +59,8 @@ public class SignedExpression extends UnaryExpression implements NumericExpressi
             return isPlus ? +number : -number;
         }
         // nothing we could handle, the type checker should've caught it
-        throw new IllegalArgumentException("Value of '" + right.toString() + "' is not a number: " + value);
+        throw new IllegalArgumentException(
+                context.pipelineErrorMessage("Value of '" + right.toString() + "' is not a number: " + value));
     }
 
     @Override

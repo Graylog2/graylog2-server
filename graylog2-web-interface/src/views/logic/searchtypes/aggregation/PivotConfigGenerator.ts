@@ -63,7 +63,6 @@ const formatPivot = (pivot: Pivot): FormattedPivot => {
   const newConfig = { ...config } as unknown;
 
   switch (type) {
-    // eslint-disable-next-line no-case-declarations
     case 'time':
       if ((config as TimeConfigType).interval.type === 'timeunit') {
         const { interval } = config as TimeConfigType;

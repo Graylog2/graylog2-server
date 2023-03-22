@@ -20,6 +20,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
+import AppConfig from 'util/AppConfig';
 import { LinkContainer } from 'components/common/router';
 import { DropdownButton, MenuItem, Col, Button } from 'components/bootstrap';
 import { EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/common';
@@ -92,19 +93,21 @@ const InputListItem = createReactClass({
     }
 
     if (this.isPermitted(this.props.permissions, [`inputs:edit:${this.props.input.id}`])) {
-      let extractorRoute;
+      if (!AppConfig.isCloud()) {
+        let extractorRoute;
 
-      if (this.props.input.global) {
-        extractorRoute = Routes.global_input_extractors(this.props.input.id);
-      } else {
-        extractorRoute = Routes.local_input_extractors(this.props.currentNode.node_id, this.props.input.id);
+        if (this.props.input.global) {
+          extractorRoute = Routes.global_input_extractors(this.props.input.id);
+        } else {
+          extractorRoute = Routes.local_input_extractors(this.props.currentNode.node_id, this.props.input.id);
+        }
+
+        actions.push(
+          <LinkContainer key={`manage-extractors-${this.props.input.id}`} to={extractorRoute}>
+            <Button>Manage extractors</Button>
+          </LinkContainer>,
+        );
       }
-
-      actions.push(
-        <LinkContainer key={`manage-extractors-${this.props.input.id}`} to={extractorRoute}>
-          <Button>Manage extractors</Button>
-        </LinkContainer>,
-      );
 
       actions.push(<InputStateControl key={`input-state-control-${this.props.input.id}`} input={this.props.input} />);
     }

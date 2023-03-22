@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
 @JsonDeserialize(builder = ReferencedQueryStringSearchFilter.Builder.class)
 public abstract class ReferencedQueryStringSearchFilter implements ReferencedSearchFilter, QueryStringSearchFilter {
 
-    @JsonProperty
+    @JsonProperty(ID_FIELD)
     @Override
     public abstract String id();
 

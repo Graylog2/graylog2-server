@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
-import lodash from 'lodash';
+import upperFirst from 'lodash/upperFirst';
 
 import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -110,7 +110,7 @@ export const SidecarsAdministrationStore = singletonStore(
 
       promise.then(
         (response) => {
-          UserNotification.success('', `${lodash.upperFirst(action)} for ${formattedCollectors.length} collectors requested`);
+          UserNotification.success('', `${upperFirst(action)} for ${formattedCollectors.length} collectors requested`);
 
           return response;
         },

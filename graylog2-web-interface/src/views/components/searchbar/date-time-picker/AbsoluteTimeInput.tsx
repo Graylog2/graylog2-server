@@ -72,7 +72,7 @@ const StyledInputAddon = styled(InputGroup.Addon)(({ theme }) => css`
   display: flex;
   align-items: center;
 
-  &:not(:first-child):not(:last-child) {
+  &:not(:first-child, :last-child) {
     border-right: 0;
     border-left: 0;
     padding: 0 3px;

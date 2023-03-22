@@ -41,8 +41,7 @@ const fetchRecentActivities = async ({ page }: RequestQuery): Promise<PaginatedR
         itemTitle: activity.item_title,
         timestamp: activity.timestamp,
         activityType: activity.activity_type,
-        itemType: activity.item_type,
-        itemId: activity.item_id,
+        itemGrn: activity.item_grn,
         userName: activity.user_name,
       })),
     });

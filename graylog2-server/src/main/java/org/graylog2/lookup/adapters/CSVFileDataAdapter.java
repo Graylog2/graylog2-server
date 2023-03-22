@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.lookup.AllowedAuxiliaryPathChecker;
 import org.graylog2.plugin.lookup.LookupCachePurge;
@@ -57,6 +58,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class CSVFileDataAdapter extends LookupDataAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(CSVFileDataAdapter.class);
@@ -76,6 +78,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     private final Config config;
     private final AllowedAuxiliaryPathChecker pathChecker;
     private final AtomicReference<Map<String, String>> lookupRef = new AtomicReference<>(ImmutableMap.of());
+    private final String name;
 
     private FileInfo fileInfo = FileInfo.empty();
 
@@ -86,6 +89,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                               MetricRegistry metricRegistry,
                               AllowedAuxiliaryPathChecker pathChecker) {
         super(id, name, config, metricRegistry);
+        this.name = name;
         this.config = (Config) config;
         this.pathChecker = pathChecker;
     }
@@ -104,7 +108,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         }
 
         // Set file info before parsing the data for the first time
-        fileInfo = FileInfo.forPath(Paths.get(config.path()));
+        fileInfo = getNewFileInfo();
         lookupRef.set(parseCSVFile());
     }
 
@@ -121,6 +125,16 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             return;
         }
 
+        if (!Files.isWritable(Paths.get(config.path()))) {
+            String error = f("The specified file [%s] does not exist or is not writable. " +
+                            "To resolve this error, edit the adapter [%s] and specify a new path, or restore the file " +
+                            "or access to it.",
+                    config.path(), name);
+            LOG.error(error);
+            setError(new IllegalStateException(error));
+            return;
+        }
+
         try {
             final FileInfo.Change fileChanged = fileInfo.checkForChange();
             if (!fileChanged.isChanged() && !getError().isPresent()) {
@@ -131,7 +145,9 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             LOG.debug("CSV file {} has changed, updating data", config.path());
             lookupRef.set(parseCSVFile());
             cachePurge.purgeAll();
-            fileInfo = fileChanged.fileInfo();
+            // If the file has been moved, then moved back, the fileInfo might have been disconnected.
+            // In this case, create a new fileInfo.
+            fileInfo = fileChanged.fileInfo() != null ? fileChanged.fileInfo() : getNewFileInfo();
             clearError();
         } catch (IOException e) {
             LOG.error("Couldn't check data adapter <{}> CSV file {} for updates: {} {}", name(), config.path(), e.getClass().getCanonicalName(), e.getMessage());
@@ -175,10 +191,26 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                     if (keyColumn < 0 || valueColumn < 0) {
                         throw new IllegalStateException("Couldn't detect column number for key or value - check CSV file format");
                     }
+                    if (next.length == 1 && StringUtils.isEmpty(next[0])) {
+                        LOG.debug("Skipping empty line in CSV adapter file [{}/{}].", name, config.path());
+                        continue;
+                    }
+
+                    final String value;
+                    final String key;
+                    try {
+                        key = next[keyColumn];
+                        value = next[valueColumn];
+                    } catch (IndexOutOfBoundsException e) {
+                        final String error = f("The CSV file [%s] contains invalid lines. Please check the file and ensure " +
+                                "that both key and value columns are present in all lines.", name);
+                        throw new IllegalStateException(error, e);
+                    }
+
                     if (config.isCaseInsensitiveLookup()) {
-                        newLookupBuilder.put(next[keyColumn].toLowerCase(Locale.ENGLISH), next[valueColumn]);
+                        newLookupBuilder.put(key.toLowerCase(Locale.ENGLISH), value);
                     } else {
-                        newLookupBuilder.put(next[keyColumn], next[valueColumn]);
+                        newLookupBuilder.put(key, value);
                     }
                 }
             }
@@ -186,9 +218,14 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             LOG.error("Couldn't parse CSV file {} (settings separator=<{}> quotechar=<{}> key_column=<{}> value_column=<{}>)", config.path(),
                     config.separator(), config.quotechar(), config.keyColumn(), config.valueColumn(), e);
             setError(e);
+            throw new IllegalStateException(e);
         }
 
         return newLookupBuilder.build();
+    }
+
+    private FileInfo getNewFileInfo() {
+        return FileInfo.forPath(Paths.get(config.path()));
     }
 
     @Override

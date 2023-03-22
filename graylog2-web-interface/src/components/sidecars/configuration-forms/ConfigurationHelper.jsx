@@ -38,7 +38,7 @@ class ConfigurationHelper extends React.Component {
     const { onVariableRename } = this.props;
 
     return (
-      /* eslint-disable no-template-curly-in-string */
+
       <Panel header="Collector Configuration Reference">
 
         <Row className="row-sm">

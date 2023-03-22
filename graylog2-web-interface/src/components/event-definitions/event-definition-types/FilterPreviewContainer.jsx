@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import debounce from 'lodash/debounce';
+import isEqual from 'lodash/isEqual';
 
 import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
@@ -37,7 +38,7 @@ const isPermittedToSeePreview = (currentUser, config) => {
 };
 
 class FilterPreviewContainer extends React.Component {
-  fetchSearch = lodash.debounce((config) => {
+  fetchSearch = debounce((config) => {
     const { currentUser } = this.props;
 
     if (!isPermittedToSeePreview(currentUser, config)) {
@@ -107,7 +108,7 @@ class FilterPreviewContainer extends React.Component {
       search_within_ms: searchWithin,
     } = eventDefinition.config;
 
-    if (query !== prevQuery || queryParameters !== prevQueryParameters || !lodash.isEqual(streams, prevStreams) || searchWithin !== prevSearchWithin) {
+    if (query !== prevQuery || queryParameters !== prevQueryParameters || !isEqual(streams, prevStreams) || searchWithin !== prevSearchWithin) {
       this.fetchSearch(eventDefinition.config);
     }
   }
@@ -121,7 +122,7 @@ class FilterPreviewContainer extends React.Component {
 
     if (!isLoading) {
       searchResult = filterPreview.result.forId(queryId).searchTypes[searchTypeId];
-      // eslint-disable-next-line prefer-destructuring
+
       errors = filterPreview.result.errors; // result may not always be set, so I can't use destructuring
     }
 

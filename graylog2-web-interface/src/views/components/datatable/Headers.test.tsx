@@ -42,7 +42,6 @@ const seriesWithName = (fn: string, name: string) => Series.forFunction(fn)
   .build();
 
 describe('Headers', () => {
-  /* eslint-disable react/require-default-props */
   type RenderHeadersProps = {
     columnPivots?: Array<Pivot>,
     rowPivots?: Array<Pivot>,

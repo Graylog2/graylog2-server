@@ -78,7 +78,7 @@ const SavedSearchesList = ({
     sort: layoutConfig.sort,
   }), [activePage, layoutConfig.pageSize, layoutConfig.sort, query]);
 
-  const { data: paginatedSavedSearches, isLoading, refetch } = useSavedSearches(searchParams, { enabled: !isLoadingLayoutPreferences });
+  const { data: paginatedSavedSearches, isInitialLoading: isLoadingSavedSearches, refetch } = useSavedSearches(searchParams, { enabled: !isLoadingLayoutPreferences });
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
 
   const onPageChange = useCallback(
@@ -92,6 +92,10 @@ const SavedSearchesList = ({
       }
     }, [updateTableLayout],
   );
+
+  const onPageSizeChange = useCallback((newPageSize: number) => {
+    setActivePage(newPageSize);
+  }, []);
 
   const onSortChange = useCallback((newSort: Sort) => {
     setActivePage(1);
@@ -122,7 +126,7 @@ const SavedSearchesList = ({
 
   const customColumnRenderers = useColumnRenderers(onLoadSavedSearch, searchParams);
 
-  if (isLoading) {
+  if (isLoadingSavedSearches || isLoadingLayoutPreferences) {
     return <Spinner />;
   }
 
@@ -133,6 +137,7 @@ const SavedSearchesList = ({
                    totalItems={pagination?.total}
                    pageSize={layoutConfig.pageSize}
                    activePage={activePage}
+                   showPageSizeSelect={false}
                    useQueryParameter={false}>
       <div style={{ marginBottom: '5px' }}>
         <SearchForm focusAfterMount
@@ -148,7 +153,7 @@ const SavedSearchesList = ({
       )}
       {pagination?.total === 0 && searchParams.query && (
         <NoSearchResult>
-          No saved searches found.
+          No saved searches have been found.
         </NoSearchResult>
       )}
       {!!savedSearches?.length && (
@@ -159,6 +164,8 @@ const SavedSearchesList = ({
                                bulkActions={renderBulkActions}
                                onSortChange={onSortChange}
                                activeSort={layoutConfig.sort}
+                               pageSize={searchParams.pageSize}
+                               onPageSizeChange={onPageSizeChange}
                                rowActions={renderSavedSearchActions}
                                columnRenderers={customColumnRenderers}
                                columnDefinitions={attributes} />

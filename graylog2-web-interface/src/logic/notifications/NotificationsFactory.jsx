@@ -32,7 +32,8 @@ class NotificationsFactory {
 
       case 'no_input_running':
       case 'input_failure_shutdown':
-      case 'input_failed_to_start': { // eslint-disable-line no-fallthrough, padding-line-between-statements
+      case 'input_failed':
+      case 'input_failed_to_start': { // eslint-disable-line padding-line-between-statements
         return {
           values: {
             SYSTEM_INPUTS: Routes.SYSTEM.INPUTS,

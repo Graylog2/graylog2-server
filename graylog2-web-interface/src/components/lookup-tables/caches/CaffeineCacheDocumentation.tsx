@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/* eslint-disable react/no-unescaped-entities */
+
 import React from 'react';
 
 import { Alert } from 'components/bootstrap';

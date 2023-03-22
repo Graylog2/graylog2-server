@@ -241,6 +241,7 @@ class GrokPatterns extends React.Component {
                                       headerCellFormatter={_headerCellFormatter}
                                       sortByKey="name"
                                       rows={patterns}
+                                      noDataText="No grok patterns have been found."
                                       dataRowFormatter={this._patternFormatter} />
                   </PaginatedList>
                 </Col>

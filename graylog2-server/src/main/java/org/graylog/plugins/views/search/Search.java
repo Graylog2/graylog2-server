@@ -108,8 +108,10 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
             builder.parameters(parameters);
         }
 
-        if (executionState.queries() != null || executionState.globalOverride() != null) {
+        var globalOverride = executionState.globalOverride();
+        if (executionState.queries() != null || globalOverride != null) {
             final ImmutableSet<Query> queries = queries().stream()
+                    .filter(query -> globalOverride.keepQueries().isEmpty() || globalOverride.keepQueries().contains(query.id()))
                     .map(query -> query.applyExecutionState(executionState))
                     .collect(toImmutableSet());
             builder.queries(queries);

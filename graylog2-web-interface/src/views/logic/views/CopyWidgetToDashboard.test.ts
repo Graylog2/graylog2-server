@@ -14,11 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { readFileSync } from 'fs';
-import { dirname } from 'path';
-
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
+import readJsonFixture from 'helpers/readJsonFixture';
 
 import copyWidgetToDashboard from './CopyWidgetToDashboard';
 
@@ -41,8 +39,7 @@ jest.mock('../SearchType', () => jest.fn(() => ({
   defaults: {},
 })));
 
-const cwd = dirname(__filename);
-const readFixture = (filename) => JSON.parse(readFileSync(`${cwd}/${filename}`).toString());
+const readFixture = (fixtureName: string) => readJsonFixture(__dirname, fixtureName);
 
 describe('copyWidgetToDashboard', () => {
   beforeEach(() => {

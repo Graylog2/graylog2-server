@@ -36,7 +36,6 @@ export type SearchConfigStoreState = {
   searchesClusterConfig: SearchesConfig;
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export const SearchConfigStore: Store<SearchConfigStoreState> = singletonStore(
   'views.SearchConfig',
   () => Reflux.createStore({

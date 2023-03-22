@@ -143,6 +143,8 @@ public class NodeContainerFactory {
                 .withEnv("GRAYLOG_TRANSPORT_EMAIL_SUBJECT_PREFIX", "[graylog]")
                 .withEnv("GRAYLOG_TRANSPORT_EMAIL_FROM_EMAIL", "developers@graylog.com")
 
+                .withEnv("GRAYLOG_ENABLE_DEBUG_RESOURCES", "true") // see RestResourcesModule#addDebugResources
+
                 .waitingFor(new WaitAllStrategy()
                         .withStrategy(new WaitForSuccessOrFailureStrategy().withSuccessAndFailures(".*Graylog server up and running.*", ".*Exception while running migrations.*", ".*Graylog startup failed.*"))
                         // To be able to search for data we need the index ranges to be computed. Since this is an async

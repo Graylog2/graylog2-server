@@ -1,0 +1,5 @@
+type = "added"
+message = "Added a page for tracking failures in Sidecar."
+
+issues = ["collector-sidecar#433"]
+pulls = ["14435"]

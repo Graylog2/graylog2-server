@@ -25,6 +25,7 @@ import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
+import org.graylog2.plugin.rest.ValidationResult;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
@@ -70,6 +71,11 @@ public class IndexSetValidator {
         final Violation  rotationViolation = validateRotation(newConfig.rotationStrategy());
         if (rotationViolation != null) {
             return Optional.of(rotationViolation);
+        }
+
+        final Violation retentionConfigViolation = validateRetentionConfig(newConfig.retentionStrategy());
+        if (retentionConfigViolation != null) {
+            return Optional.of(retentionConfigViolation);
         }
 
         return Optional.ofNullable(validateRetentionPeriod(newConfig.rotationStrategy(),
@@ -170,6 +176,18 @@ public class IndexSetValidator {
                     f("Index retention setting %s=%d would result in an effective index retention period of %s. This exceeds the configured maximum of %s=%s.",
                             RetentionStrategyConfig.MAX_NUMBER_OF_INDEXES_FIELD, retentionStrategyConfig.maxNumberOfIndices(), effectiveRetentionPeriod,
                             ElasticsearchConfiguration.MAX_INDEX_RETENTION_PERIOD, maxRetentionPeriod));
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public Violation validateRetentionConfig(RetentionStrategyConfig retentionStrategyConfig) {
+        ValidationResult validationResult = retentionStrategyConfig.validate(elasticsearchConfiguration);
+
+        if (validationResult.failed()) {
+            Optional<String> error = validationResult.getErrors().keySet().stream().findFirst();
+            return Violation.create(error.orElse("Unknown retention config validation error"));
         }
 
         return null;

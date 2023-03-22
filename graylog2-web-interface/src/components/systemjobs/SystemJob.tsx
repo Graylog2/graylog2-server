@@ -55,7 +55,7 @@ const StatusBadge = styled(StyledBadge)(({ status, theme }) => {
     margin-left: 4px;
     background-color: ${color};
     color: ${theme.utils.readableColor(color)};
-  `;
+`;
 });
 
 const StyledProgressBar = styled(ProgressBar)`

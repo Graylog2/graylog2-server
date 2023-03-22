@@ -1,0 +1,7 @@
+type = "added"
+message = "Report runtime failures for polling Inputs."
+
+issues = [""]
+pulls = ["14726"]
+
+contributors = [""]

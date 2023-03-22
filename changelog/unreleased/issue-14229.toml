@@ -1,0 +1,5 @@
+type = "fixed"
+message = "added an info box for auto assigned configs using tags"
+
+issues = ["14229"]
+pulls = ["14565"]

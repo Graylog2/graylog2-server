@@ -16,9 +16,17 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+import styled from 'styled-components';
 
 import { Modal, Button } from 'components/bootstrap';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
+
+const VerboseMessage = styled.div`
+  word-break: break-all;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  max-height: 500px;
+`;
 
 const VerboseMessageModal = ({ showModal, onHide, collectorName, collectorVerbose }) => {
   return (
@@ -29,11 +37,11 @@ const VerboseMessageModal = ({ showModal, onHide, collectorName, collectorVerbos
         <Modal.Title><span>Error Details for <em>{collectorName}</em></span></Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <div className="configuration">
-          <pre>
+        <pre>
+          <VerboseMessage>
             {collectorVerbose || '<no messages>'}
-          </pre>
-        </div>
+          </VerboseMessage>
+        </pre>
       </Modal.Body>
       <Modal.Footer>
         <Button type="button" onClick={onHide}>Close</Button>

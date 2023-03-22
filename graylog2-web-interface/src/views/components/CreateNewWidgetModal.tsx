@@ -39,11 +39,12 @@ const CreateWidgetButton = styled(Button)`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;  
+  align-items: center;
   text-align: center;
   padding: 10px;
   width: 8rem;
   white-space: normal;
+
   && {
     background: transparent;
     border-radius: 4px;

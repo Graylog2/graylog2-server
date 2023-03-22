@@ -26,6 +26,7 @@ export const NOOP_RETENTION_STRATEGY = 'org.graylog2.indexer.retention.strategie
 export const TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY = 'org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy';
 export const ARCHIVE_RETENTION_STRATEGY = 'org.graylog.plugins.archive.indexer.retention.strategies.ArchiveRetentionStrategy';
 export const TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY_TYPE = 'org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig';
+export const RETENTION = 'retention';
 
 export type IndexTimeAndTotalStats = {
   total: number,

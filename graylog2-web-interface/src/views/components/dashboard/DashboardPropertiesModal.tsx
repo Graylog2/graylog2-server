@@ -60,7 +60,8 @@ const DashboardPropertiesModal = ({ onClose, onSave, show, view, title: modalTit
     }
   };
 
-  const _onSave = () => {
+  const _onSave = (e: React.FormEvent<HTMLFormElement>) => {
+    e.stopPropagation();
     onSave(updatedDashboard);
     onClose();
   };

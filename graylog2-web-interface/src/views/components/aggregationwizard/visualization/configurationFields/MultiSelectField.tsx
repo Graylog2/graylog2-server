@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useEffect, useMemo } from 'react';
-import { isFunction } from 'lodash';
+import isFunction from 'lodash/isFunction';
 
 import { Input } from 'components/bootstrap';
 import Select from 'components/common/Select';
@@ -42,7 +42,9 @@ const makeOptions = (options: ReadonlyArray<string | [string, any]>):
   return [mappedOptions, optionsSet];
 };
 
-const createEvent = (name: string, value: any) => ({ target: { name, value } }) as React.ChangeEvent<any>;
+const createEvent = (name: string, value: any) => (({
+  target: { name, value },
+}) as React.ChangeEvent<any>);
 
 const MultiSelectField = ({ name, field, title, error, value, onChange, values }: FieldComponentProps) => {
   if (field.type !== 'multi-select') {

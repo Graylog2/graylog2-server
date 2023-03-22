@@ -15,19 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useCallback } from 'react';
+import { useContext } from 'react';
 import { useFormikContext } from 'formik';
 
+import FieldsConfiguration from 'views/components/widgets/FieldsConfiguration';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type { GroupByFormValues, WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
 import Input from 'components/bootstrap/Input';
-import SelectedFieldsList from 'views/components/aggregationwizard/grouping/configuration/SelectedFieldsList';
 import type { GroupByError } from 'views/components/aggregationwizard/grouping/GroupingElement';
 import { onGroupingFieldsChange } from 'views/components/aggregationwizard/grouping/GroupingElement';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import { DateType } from 'views/logic/aggregationbuilder/Pivot';
-
-import FieldSelect from '../../FieldSelect';
 
 const placeholder = (grouping: GroupByFormValues) => {
   if (!grouping.fields?.length) {
@@ -52,9 +50,7 @@ const FieldComponent = ({ groupingIndex }: Props) => {
   const activeQueryId = useActiveQueryId();
   const createSelectPlaceholder = placeholder(grouping);
 
-  const onAddField = useCallback((fieldName: string) => {
-    const newFields = [...(grouping.fields ?? []), fieldName];
-
+  const onChangeSelectedFields = (newFields: Array<string>) => {
     onGroupingFieldsChange({
       fieldTypes,
       activeQueryId,
@@ -63,7 +59,7 @@ const FieldComponent = ({ groupingIndex }: Props) => {
       newFields,
       setFieldValue,
     });
-  }, [activeQueryId, fieldTypes, grouping, groupingIndex, setFieldValue]);
+  };
 
   return (
     <Input id="group-by-field-select"
@@ -71,18 +67,12 @@ const FieldComponent = ({ groupingIndex }: Props) => {
            labelClassName="col-sm-3"
            error={(errors?.groupBy?.groupings?.[groupingIndex] as GroupByError)?.fields}
            wrapperClassName="col-sm-9">
-      <SelectedFieldsList groupingIndex={groupingIndex} />
-      <FieldSelect id="group-by-field-create-select"
-                   onChange={onAddField}
-                   clearable={false}
-                   ariaLabel="Fields"
-                   qualifiedTypeCategory={grouping.fields?.length ? grouping.type : undefined}
-                   persistSelection={false}
-                   name="group-by-field-create-select"
-                   value={undefined}
-                   excludedFields={grouping.fields ?? []}
-                   placeholder={createSelectPlaceholder}
-                   aria-label={createSelectPlaceholder} />
+      <FieldsConfiguration onChange={onChangeSelectedFields}
+                           selectedFields={grouping.fields}
+                           menuPortalTarget={document.body}
+                           createSelectPlaceholder={createSelectPlaceholder}
+                           qualifiedTypeCategory={grouping.fields?.length ? grouping.type : undefined}
+                           testPrefix={`grouping-${groupingIndex}`} />
     </Input>
   );
 };

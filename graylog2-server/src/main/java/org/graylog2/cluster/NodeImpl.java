@@ -32,11 +32,11 @@ import java.util.Map;
 @CollectionName("nodes")
 public class NodeImpl extends PersistedImpl implements Node {
 
-    protected NodeImpl(Map<String, Object> fields) {
+    public NodeImpl(Map<String, Object> fields) {
         super(fields);
     }
 
-    protected NodeImpl(ObjectId id, Map<String, Object> fields) {
+    public NodeImpl(ObjectId id, Map<String, Object> fields) {
         super(id, fields);
     }
 

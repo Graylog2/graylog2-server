@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
@@ -30,12 +31,14 @@ import useQuery from 'routing/useQuery';
 import PluggableStoreProvider from 'components/PluggableStoreProvider';
 import useViewTitle from 'views/hooks/useViewTitle';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type { HistoryFunction } from 'routing/useHistory';
+import useHistory from 'routing/useHistory';
 
 type Props = React.PropsWithChildren<{
   isNew: boolean,
   view: Promise<View>,
-  loadNewView?: () => unknown,
-  loadView?: (viewId: string) => unknown,
+  loadNewView?: (history: HistoryFunction) => unknown,
+  loadView?: (history: HistoryFunction, viewId: string) => unknown,
   executionState?: SearchExecutionState,
 }>;
 
@@ -49,10 +52,13 @@ const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const SearchPage = ({ children, isNew, view: viewPromise, loadNewView = defaultLoadNewView, loadView = defaultLoadView, executionState: initialExecutionState }: Props) => {
+const SearchPage = ({ children, isNew, view: viewPromise, loadNewView: _loadNewView = defaultLoadNewView, loadView: _loadView = defaultLoadView, executionState: initialExecutionState }: Props) => {
   const query = useQuery();
   const initialQuery = query?.page as string;
   useLoadView(viewPromise, isNew);
+  const history = useHistory();
+  const loadNewView = useCallback(() => _loadNewView(history), [_loadNewView, history]);
+  const loadView = useCallback((viewId: string) => _loadView(history, viewId), [_loadView, history]);
   const result = useProcessHooksForView(viewPromise, initialExecutionState, query);
 
   if (result.status === 'loading') {

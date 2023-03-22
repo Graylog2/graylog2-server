@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.events.audit.EventsAuditEventTypes;
@@ -35,6 +36,7 @@ import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog.events.processor.EventProcessorParametersWithTimerange;
+import org.graylog.events.processor.EventResolver;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
@@ -43,6 +45,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.plugin.rest.ValidationFailureException;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.bulk.AuditParams;
 import org.graylog2.rest.bulk.BulkExecutor;
@@ -50,6 +53,10 @@ import org.graylog2.rest.bulk.SequentialBulkExecutor;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.rest.models.tools.responses.PageListResponse;
+import org.graylog2.rest.resources.entities.EntityAttribute;
+import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
@@ -79,6 +86,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -99,6 +108,17 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
             .put("title", SearchQueryField.create(EventDefinitionDto.FIELD_TITLE))
             .put("description", SearchQueryField.create(EventDefinitionDto.FIELD_DESCRIPTION))
             .build();
+    private static final String DEFAULT_SORT_FIELD = "title";
+    private static final String DEFAULT_SORT_DIRECTION = "asc";
+    private static final List<EntityAttribute> attributes = List.of(
+            EntityAttribute.builder().id("title").title("Title").build(),
+            EntityAttribute.builder().id("description").title("Description").build(),
+            EntityAttribute.builder().id("priority").title("Priority").type(SearchQueryField.Type.INT).build(),
+            EntityAttribute.builder().id("status").title("Status").type(SearchQueryField.Type.BOOLEAN).sortable(false).build()
+    );
+    private static final EntityDefaults settings = EntityDefaults.builder()
+            .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
+            .build();
 
     private final DBEventDefinitionService dbService;
     private final EventDefinitionHandler eventDefinitionHandler;
@@ -106,7 +126,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private final EventProcessorEngine engine;
     private final SearchQueryParser searchQueryParser;
     private final RecentActivityService recentActivityService;
-    private final BulkExecutor<EventDefinitionDto, UserContext> bulkExecutor;
+    private final BulkExecutor<EventDefinitionDto, UserContext> bulkDeletionExecutor;
+    private final BulkExecutor<EventDefinitionDto, UserContext> bulkScheduleExecutor;
+    private final BulkExecutor<EventDefinitionDto, UserContext> bulkUnscheduleExecutor;
+    private final EventResolver eventResolver;
 
     @Inject
     public EventDefinitionsResource(DBEventDefinitionService dbService,
@@ -115,7 +138,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                     EventProcessorEngine engine,
                                     RecentActivityService recentActivityService,
                                     AuditEventSender auditEventSender,
-                                    ObjectMapper objectMapper
+                                    ObjectMapper objectMapper,
+                                    EventResolver eventResolver
     ) {
         this.dbService = dbService;
         this.eventDefinitionHandler = eventDefinitionHandler;
@@ -123,11 +147,62 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         this.engine = engine;
         this.searchQueryParser = new SearchQueryParser(EventDefinitionDto.FIELD_TITLE, SEARCH_FIELD_MAPPING);
         this.recentActivityService = recentActivityService;
-        this.bulkExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
+        this.bulkDeletionExecutor = new SequentialBulkExecutor<>(this::delete, auditEventSender, objectMapper);
+        this.bulkScheduleExecutor = new SequentialBulkExecutor<>(this::schedule, auditEventSender, objectMapper);
+        this.bulkUnscheduleExecutor = new SequentialBulkExecutor<>(this::unschedule, auditEventSender, objectMapper);
+        this.eventResolver = eventResolver;
+    }
+
+
+    @GET
+    @Timed
+    @Path("/paginated")
+    @ApiOperation(value = "Get a paginated list of event definitions")
+    @Produces(MediaType.APPLICATION_JSON)
+    public PageListResponse<EventDefinitionDto> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                        @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                        @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                        @ApiParam(name = "sort",
+                                                                  value = "The field to sort the result on",
+                                                                  required = true,
+                                                                  allowableValues = "title,description,priority,status")
+                                                        @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
+                                                        @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                        @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order) {
+
+        SearchQuery searchQuery;
+        try {
+            searchQuery = searchQueryParser.parse(query);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
+        }
+        if ("status".equals(sort)) {
+            sort = "alert";
+        }
+        final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(searchQuery, event -> {
+            return isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
+        }, sort, order, page, perPage);
+        PaginatedList<EventDefinitionDto> definitionDtos = new PaginatedList<>(
+                result.delegate(), result.pagination().total(), result.pagination().page(), result.pagination().perPage()
+        );
+
+        final ImmutableMap<String, Object> context = contextService.contextFor(result.delegate());
+        ImmutableMap<String, EventDefinitionContextService.SchedulerCtx> schedulerCtx =
+                (ImmutableMap<String, EventDefinitionContextService.SchedulerCtx>) context.get(EventDefinitionContextService.SCHEDULER_KEY);
+
+        final List<EventDefinitionDto> eventDefinitionDtos =
+                result.delegate()
+                        .stream()
+                        .map(eventDefinition -> eventDefinition.toBuilder().schedulerCtx(schedulerCtx.get(eventDefinition.id())).build())
+                        .toList();
+
+        return PageListResponse.create(query, definitionDtos.pagination(),
+                result.grandTotal().orElse(0L), sort, order, eventDefinitionDtos, attributes, settings);
     }
 
     @GET
     @ApiOperation("List event definitions")
+    @Deprecated
     public PaginatedResponse<EventDefinitionDto> list(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                       @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                       @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query) {
@@ -139,7 +214,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         }
         final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(searchQuery, event -> {
             return isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
-        }, "title", page, perPage);
+        }, "title", "asc", page, perPage);
         final ImmutableMap<String, Object> context = contextService.contextFor(result.delegate());
         return PaginatedResponse.create("event_definitions", result, query, context);
     }
@@ -159,9 +234,9 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     public Map<String, Object> getWithContext(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_READ, definitionId);
         return dbService.get(definitionId)
-                .map(evenDefinition -> ImmutableMap.of(
-                        "event_definition", evenDefinition,
-                        "context", contextService.contextFor(evenDefinition)
+                .map(eventDefinition -> ImmutableMap.of(
+                        "event_definition", eventDefinition,
+                        "context", contextService.contextFor(eventDefinition)
                 ))
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
     }
@@ -217,7 +292,21 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     public EventDefinitionDto delete(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                                      @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_DELETE, definitionId);
+
         final Optional<EventDefinitionDto> eventDefinitionDto = dbService.get(definitionId);
+        final String dependencyTitle = eventDefinitionDto.isPresent() ? eventDefinitionDto.get().title() : definitionId;
+        final List<EventDefinitionDto> dependentEventDtoList = eventResolver.dependentEvents(definitionId);
+        if (!dependentEventDtoList.isEmpty()) {
+            final List<String> dependenciesTitles = dependentEventDtoList.stream().map(EventDefinitionDto::title).toList();
+            final List<String> dependenciesIds = dependentEventDtoList.stream().map(EventDefinitionDto::id).toList();
+            String msg = "Unable to delete event definition <" + dependencyTitle
+                    + "> - please remove all references from event definitions: " + StringUtils.join(dependenciesTitles, ",");
+            ValidationResult validationResult = new ValidationResult()
+                .addError("dependency", msg)
+                .addContext("dependency_ids", dependenciesIds);
+            throw new ValidationFailureException(validationResult, msg);
+        }
+
         eventDefinitionDto.ifPresent(d ->
                 recentActivityService.delete(d.id(), GRNTypes.EVENT_DEFINITION, d.title(), userContext.getUser())
         );
@@ -229,12 +318,12 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Path("/bulk_delete")
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
-    @ApiOperation(value = "Delete a bulk of event definitions", response = BulkOperationResponse.class)
+    @ApiOperation(value = "Delete multiple event definitions", response = BulkOperationResponse.class)
     @NoAuditEvent("Audit events triggered manually")
     public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
                                @Context UserContext userContext) {
 
-        final BulkOperationResponse response = bulkExecutor.executeBulkOperation(bulkOperationRequest,
+        final BulkOperationResponse response = bulkDeletionExecutor.executeBulkOperation(bulkOperationRequest,
                 userContext,
                 new AuditParams(EventsAuditEventTypes.EVENT_DEFINITION_DELETE, "definitionId", EventDefinitionDto.class));
 
@@ -248,9 +337,30 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Consumes(MediaType.WILDCARD)
     @ApiOperation("Enable event definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_UPDATE)
-    public void schedule(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
+    public EventDefinitionDto schedule(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
+                                       @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
+        final Optional<EventDefinitionDto> eventDefinitionDto = dbService.get(definitionId);
         eventDefinitionHandler.schedule(definitionId);
+        return eventDefinitionDto.orElse(null);
+    }
+
+    @POST
+    @Path("/bulk_schedule")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Timed
+    @ApiOperation(value = "Enable multiple event definitions", response = BulkOperationResponse.class)
+    @NoAuditEvent("Audit events triggered manually")
+    public Response bulkSchedule(@ApiParam(name = "Event definitions to enable", required = true) final BulkOperationRequest bulkOperationRequest,
+                                 @Context UserContext userContext) {
+
+        final BulkOperationResponse response = bulkScheduleExecutor.executeBulkOperation(bulkOperationRequest,
+                userContext,
+                new AuditParams(EventsAuditEventTypes.EVENT_DEFINITION_UPDATE, "definitionId", EventDefinitionDto.class));
+
+        return Response.status(Response.Status.OK)
+                .entity(response)
+                .build();
     }
 
     @PUT
@@ -258,9 +368,30 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Consumes(MediaType.WILDCARD)
     @ApiOperation("Disable event definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_UPDATE)
-    public void unschedule(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
+    public EventDefinitionDto unschedule(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
+                                         @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
+        final Optional<EventDefinitionDto> eventDefinitionDto = dbService.get(definitionId);
         eventDefinitionHandler.unschedule(definitionId);
+        return eventDefinitionDto.orElse(null);
+    }
+
+    @POST
+    @Path("/bulk_unschedule")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Timed
+    @ApiOperation(value = "Disable multiple event definitions", response = BulkOperationResponse.class)
+    @NoAuditEvent("Audit events triggered manually")
+    public Response bulkUnschedule(@ApiParam(name = "Event definitions to disable", required = true) final BulkOperationRequest bulkOperationRequest,
+                                   @Context UserContext userContext) {
+
+        final BulkOperationResponse response = bulkUnscheduleExecutor.executeBulkOperation(bulkOperationRequest,
+                userContext,
+                new AuditParams(EventsAuditEventTypes.EVENT_DEFINITION_UPDATE, "definitionId", EventDefinitionDto.class));
+
+        return Response.status(Response.Status.OK)
+                .entity(response)
+                .build();
     }
 
     @PUT

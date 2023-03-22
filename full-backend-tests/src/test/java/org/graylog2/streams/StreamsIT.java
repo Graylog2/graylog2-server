@@ -17,14 +17,15 @@
 package org.graylog2.streams;
 
 import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.junit.jupiter.api.BeforeAll;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -35,12 +36,12 @@ import static org.hamcrest.Matchers.equalTo;
 public class StreamsIT {
     private static final String STREAMS_RESOURCE = "/streams";
 
-    private final RequestSpecification requestSpec;
     private final GraylogApis api;
+    private final List<String> createdStreamsIds;
 
-    public StreamsIT(RequestSpecification requestSpec, GraylogApis api) {
-        this.requestSpec = requestSpec;
+    public StreamsIT(GraylogApis api) {
         this.api = api;
+        this.createdStreamsIds = new ArrayList<>();
     }
 
     @BeforeAll
@@ -48,13 +49,58 @@ public class StreamsIT {
         final String defaultIndexSetId = api.indices().defaultIndexSetId();
         final String newIndexSetId = api.indices().createIndexSet("Test Indices", "Some test indices", "streamstest");
         final String newIndexSetId2 = api.indices().createIndexSet("More Test Indices", "Some more test indices", "moretest");
-        api.streams().createStream("New Stream", newIndexSetId);
-        api.streams().createStream("New Stream 2", defaultIndexSetId);
-        api.streams().createStream("New Stream 3", newIndexSetId2);
+        createdStreamsIds.add(api.streams().createStream("New Stream", newIndexSetId));
+        createdStreamsIds.add(api.streams().createStream("New Stream 2", defaultIndexSetId));
+        createdStreamsIds.add(api.streams().createStream("New Stream 3", newIndexSetId2));
 
-        api.streams().createStream("sorttest: aaaaa", defaultIndexSetId);
-        api.streams().createStream("sorttest: ZZZZZZ", defaultIndexSetId, false);
-        api.streams().createStream("sorttest: 12345", defaultIndexSetId, false);
+        createdStreamsIds.add(api.streams().createStream("sorttest: aaaaa", defaultIndexSetId));
+        createdStreamsIds.add(api.streams().createStream("sorttest: ZZZZZZ", defaultIndexSetId, false));
+        createdStreamsIds.add(api.streams().createStream("sorttest: 12345", defaultIndexSetId, false));
+    }
+
+    @ContainerMatrixTest
+    void bulkPauseAndResumeWorksCorrectly() {
+        //Testing pause and resume in the same test, as other test checks sorting by status, so I want to bring back original situation
+
+        //picking "New Stream" and "sorttest: aaaaa" for test, adding one wrong ID
+        final List<String> bulkEntityIds = List.of(
+                createdStreamsIds.get(0),
+                createdStreamsIds.get(3),
+                "wrong ID!");
+
+        //test bulk pause
+        given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .body(new BulkOperationRequest(bulkEntityIds))
+                .post(STREAMS_RESOURCE + "/bulk_pause")
+                .then()
+                .log().ifValidationFails()
+                .assertThat()
+                .statusCode(200)
+                .body("successfully_performed", equalTo(2))
+                .body("failures[0].entity_id", equalTo("wrong ID!"));
+
+        api.streams().getStream(createdStreamsIds.get(0)).body("disabled", equalTo(true));
+        api.streams().getStream(createdStreamsIds.get(3)).body("disabled", equalTo(true));
+
+        //test bulk resume
+        given()
+                .spec(api.requestSpecification())
+                .log().ifValidationFails()
+                .when()
+                .body(new BulkOperationRequest(bulkEntityIds))
+                .post(STREAMS_RESOURCE + "/bulk_resume")
+                .then()
+                .log().ifValidationFails()
+                .assertThat()
+                .statusCode(200)
+                .body("successfully_performed", equalTo(2))
+                .body("failures[0].entity_id", equalTo("wrong ID!"));
+
+        api.streams().getStream(createdStreamsIds.get(0)).body("disabled", equalTo(false));
+        api.streams().getStream(createdStreamsIds.get(3)).body("disabled", equalTo(false));
     }
 
     @ContainerMatrixTest
@@ -95,7 +141,7 @@ public class StreamsIT {
 
     private ValidatableResponse paginatedByFieldWithOrder(String query, String field, String order) {
         return given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .log().ifValidationFails()
                 .when()
                 .queryParam("query", query)

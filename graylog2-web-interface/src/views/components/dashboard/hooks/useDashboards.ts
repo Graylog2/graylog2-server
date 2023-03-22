@@ -59,9 +59,9 @@ const useDashboards = (searchParams: SearchParams, { enabled }: Options = { enab
     attributes: Array<Attribute>
   } | undefined,
   refetch: () => void,
-  isFetching: boolean,
+  isInitialLoading: boolean,
 } => {
-  const { data, refetch, isFetching } = useQuery(
+  const { data, refetch, isInitialLoading } = useQuery(
     ['dashboards', 'overview', searchParams],
     () => fetchDashboards(searchParams),
     {
@@ -77,7 +77,7 @@ const useDashboards = (searchParams: SearchParams, { enabled }: Options = { enab
   return ({
     data,
     refetch,
-    isFetching,
+    isInitialLoading,
   });
 };
 

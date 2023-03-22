@@ -37,22 +37,24 @@ const FieldName = styled.span`
 `;
 
 type Props = {
-  autoFocus?: boolean,
   ariaLabel?: string,
+  autoFocus?: boolean,
+  className?: string,
   clearable?: boolean,
-  qualifiedTypeCategory?: FieldTypeCategory,
+  excludedFields?: Array<string>,
   id: string,
+  menuPortalTarget?: HTMLElement,
   name: string,
   onChange: (fieldName: string) => void,
-  placeholder?: string,
-  className?: string,
-  properties?: Array<Property>,
-  selectRef?: React.Ref<React.ComponentType>
-  value: string | undefined,
-  persistSelection?: boolean,
-  openMenuOnFocus?: boolean,
   onMenuClose?: () => void,
-  excludedFields?: Array<string>,
+  openMenuOnFocus?: boolean,
+  persistSelection?: boolean,
+  placeholder?: string,
+  properties?: Array<Property>,
+  qualifiedTypeCategory?: FieldTypeCategory,
+  selectRef?: React.Ref<React.ComponentType>,
+  size?: 'normal' | 'small',
+  value: string | undefined,
 }
 
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
@@ -101,8 +103,8 @@ const FieldSelect = ({
   className,
   clearable,
   excludedFields,
-  qualifiedTypeCategory,
   id,
+  menuPortalTarget,
   name,
   onChange,
   onMenuClose,
@@ -110,12 +112,13 @@ const FieldSelect = ({
   persistSelection,
   placeholder,
   properties,
+  qualifiedTypeCategory,
   selectRef,
+  size,
   value,
 }: Props) => {
   const activeQuery = useActiveQueryId();
   const fieldTypes = useContext(FieldTypesContext);
-
   const fieldOptions = useMemo(() => fieldTypes.queryFields
     .get(activeQuery, Immutable.List())
     .filter((field) => !excludedFields.includes(field.name))
@@ -142,9 +145,9 @@ const FieldSelect = ({
             value={value}
             aria-label={ariaLabel}
             optionRenderer={OptionRenderer}
-            size="small"
+            size={size}
             autoFocus={autoFocus}
-            menuPortalTarget={document.body}
+            menuPortalTarget={menuPortalTarget}
             onChange={onChange} />
 
   );
@@ -163,6 +166,8 @@ FieldSelect.defaultProps = {
   placeholder: undefined,
   properties: undefined,
   selectRef: undefined,
+  size: 'small',
+  menuPortalTarget: undefined,
 };
 
 export default FieldSelect;

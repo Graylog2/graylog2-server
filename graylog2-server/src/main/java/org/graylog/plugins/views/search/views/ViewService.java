@@ -21,6 +21,7 @@ import com.mongodb.DuplicateKeyException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.security.entities.EntityOwnershipService;
@@ -170,13 +171,13 @@ public class ViewService extends PaginatedDbService<ViewDTO> implements ViewUtil
 
     public PaginatedList<ViewSummaryDTO> searchSummariesPaginatedByType(final SearchUser searchUser,
                                                                         final ViewDTO.Type type,
-                                                                        final SearchQuery query,
-                                                                        final Predicate<ViewSummaryDTO> filter,
+                                                                        final Bson dbQuery, //query executed on DB level
+                                                                        final Predicate<ViewSummaryDTO> predicate, //predicate executed on code level, AFTER data is fetched
                                                                         final String order,
                                                                         final String sortField,
                                                                         final int page,
                                                                         final int perPage) {
-        return viewSummaryService.searchPaginatedByType(searchUser, type, query, filter, order, sortField, page, perPage);
+        return viewSummaryService.searchPaginatedByType(searchUser, type, dbQuery, predicate, order, sortField, page, perPage);
     }
 
     public void saveDefault(ViewDTO dto) {

@@ -17,10 +17,7 @@
 package org.graylog.plugins.views;
 
 import io.restassured.response.Response;
-import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
-import org.assertj.core.api.Assertions;
-import org.graylog.testing.completebackend.GraylogBackend;
+import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.hamcrest.Matchers;
@@ -30,28 +27,25 @@ import java.util.Arrays;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.core.IsEqual.equalTo;
 
 @ContainerMatrixTestsConfiguration
 public class MessagesResourceIT {
-    private final GraylogBackend sut;
-    private final RequestSpecification requestSpec;
+    private final GraylogApis api;
 
-    public MessagesResourceIT(GraylogBackend sut, RequestSpecification requestSpec) {
-        this.sut = sut;
-        this.requestSpec = requestSpec;
+    public MessagesResourceIT(GraylogApis api) {
+        this.api = api;
     }
 
     @BeforeAll
     public void importMessages() {
-        sut.importElasticsearchFixture("messages-for-export.json", MessagesResourceIT.class);
+        this.api.backend().importElasticsearchFixture("messages-for-export.json", MessagesResourceIT.class);
     }
 
     @ContainerMatrixTest
     void testInvalidQuery() {
         String allMessagesTimeRange = "{\"query_string\":\"foo:\", \"timerange\": {\"type\": \"absolute\", \"from\": \"2015-01-01T00:00:00\", \"to\": \"2015-01-01T23:59:59\"}}";
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .accept("text/csv")
                 .body(allMessagesTimeRange)
                 .post("/views/search/messages")
@@ -62,12 +56,12 @@ public class MessagesResourceIT {
 
     @ContainerMatrixTest
     void testInvalidQueryResponse() {
-        sut.importElasticsearchFixture("messages-for-export.json", MessagesResourceIT.class);
+        this.api.backend().importElasticsearchFixture("messages-for-export.json", MessagesResourceIT.class);
 
         String allMessagesTimeRange = "{\"timerange\": {\"type\": \"absolute\", \"from\": \"2015-01-01T00:00:00\", \"to\": \"2015-01-01T23:59:59\"}}";
 
         Response r = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .accept("text/csv")
                 .body(allMessagesTimeRange)
                 .expect().response().statusCode(200).contentType("text/csv")

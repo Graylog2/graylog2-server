@@ -1,0 +1,7 @@
+# One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+type = "added"
+message = "Add support to skip TLS verification on HTTP event notifications."
+
+issues = ["12959"]
+pulls = [""]
+

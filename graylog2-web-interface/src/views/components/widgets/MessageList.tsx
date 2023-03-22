@@ -80,7 +80,6 @@ const useResetScrollPositionOnPageChange = (currentPage: number) => {
 
   useEffect(() => {
     if (scrollContainerRef.current) {
-      // eslint-disable-next-line no-param-reassign
       scrollContainerRef.current.scrollTop = 0;
     }
   }, [currentPage, scrollContainerRef]);

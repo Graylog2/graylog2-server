@@ -22,6 +22,7 @@ import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
+import type { Column } from 'components/common/EntityDataTable/types';
 
 import EntityDataTable from './EntityDataTable';
 
@@ -32,20 +33,21 @@ describe('<EntityDataTable />', () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
   });
 
-  const columnDefinitions = [
-    { id: 'title', title: 'Title', sortable: true },
-    { id: 'description', title: 'Description', sortable: true },
-    { id: 'stream', title: 'Stream', sortable: true },
-    { id: 'status', title: 'Status', sortable: true, permissions: ['status:read'] },
+  const columnDefinitions: Array<Column> = [
+    { id: 'title', title: 'Title', type: 'STRING', sortable: true },
+    { id: 'description', title: 'Description', type: 'STRING', sortable: true },
+    { id: 'stream', title: 'Stream', type: 'STRING', sortable: true },
+    { id: 'status', title: 'Status', type: 'STRING', sortable: true, permissions: ['status:read'] },
+    { id: 'created_at', title: 'Created At', type: 'STRING', sortable: true },
   ];
 
   const visibleColumns = ['title', 'description', 'status'];
   const data = [
     {
       id: 'row-id',
-      title: 'Row title',
-      description: 'Row description',
-      stream: 'Row stream',
+      title: 'Entity title',
+      description: 'Entity description',
+      stream: 'Entity stream',
       status: 'enabled',
     },
   ];
@@ -60,7 +62,7 @@ describe('<EntityDataTable />', () => {
     await screen.findByRole('columnheader', { name: /title/i });
     await screen.findByRole('columnheader', { name: /status/i });
 
-    await screen.findByText('Row title');
+    await screen.findByText('Entity title');
     await screen.findByText('enabled');
 
     expect(screen.queryByRole('columnheader', { name: /stream/i })).not.toBeInTheDocument();
@@ -75,7 +77,7 @@ describe('<EntityDataTable />', () => {
                             columnDefinitions={columnDefinitions} />);
 
     await screen.findByRole('columnheader', { name: /description/i });
-    await screen.findByText('Row description');
+    await screen.findByText('Entity description');
   });
 
   it('should render custom cell and header renderer', async () => {
@@ -84,15 +86,43 @@ describe('<EntityDataTable />', () => {
                             onSortChange={() => {}}
                             onColumnsChange={() => {}}
                             columnRenderers={{
-                              title: {
-                                renderCell: (listItem) => `The title: ${listItem.title}`,
-                                renderHeader: (column) => `Custom ${column.title} Header`,
+                              attributes: {
+                                title: {
+                                  renderCell: (title: string) => `The title: ${title}`,
+                                  renderHeader: (column) => `Custom ${column.title} Header`,
+                                },
                               },
                             }}
                             columnDefinitions={columnDefinitions} />);
 
     await screen.findByRole('columnheader', { name: /custom title header/i });
-    await screen.findByText('The title: Row title');
+    await screen.findByText('The title: Entity title');
+  });
+
+  it('should merge attribute and type column renderers renderer', async () => {
+    render(<EntityDataTable visibleColumns={visibleColumns}
+                            data={data}
+                            onSortChange={() => {}}
+                            onColumnsChange={() => {}}
+                            columnRenderers={{
+                              attributes: {
+                                title: {
+                                  renderCell: (title: string) => `Custom Cell For Attribute - ${title}`,
+                                },
+                              },
+                              types: {
+                                STRING: {
+                                  renderCell: (title: string) => `Custom Cell For Type - ${title}`,
+                                  renderHeader: (column: { title: string }) => `Custom Header For Type - ${column.title}`,
+                                },
+                              },
+                            }}
+                            columnDefinitions={columnDefinitions} />);
+
+    await screen.findByRole('columnheader', { name: /custom header for type - title/i });
+    await screen.findByText('Custom Cell For Attribute - Entity title');
+
+    expect(screen.queryByText('Custom Cell For Type - Entity title')).not.toBeInTheDocument();
   });
 
   it('should render row actions', async () => {
@@ -103,7 +133,7 @@ describe('<EntityDataTable />', () => {
                                                            rowActions={(row) => `Custom actions for ${row.title}`}
                                                            columnDefinitions={columnDefinitions} />);
 
-    await screen.findByText('Custom actions for Row title');
+    await screen.findByText('Custom actions for Entity title');
   });
 
   it('should not render column if user does not have required permissions', () => {
@@ -229,9 +259,37 @@ describe('<EntityDataTable />', () => {
                             bulkActions={() => <div />}
                             columnDefinitions={columnDefinitions} />);
 
-    userEvent.click(screen.getByRole('button', { name: /select columns to display/i }));
+    userEvent.click(screen.getByRole('button', { name: /configure visible columns/i }));
     userEvent.click(screen.getByRole('menuitem', { name: /show title/i }));
 
     expect(onColumnsChange).toHaveBeenCalledWith(['description', 'status', 'title']);
+  });
+
+  it('should hande entities with camel case attributes', async () => {
+    const dataWithCamelCaseAttributes = [
+      {
+        id: 'row-id',
+        title: 'Entity title',
+        description: 'Entity description',
+        stream: 'Entity stream',
+        status: 'enabled',
+        createdAt: '2021-01-01',
+      },
+    ];
+
+    render(<EntityDataTable visibleColumns={[...visibleColumns, 'created_at']}
+                            data={dataWithCamelCaseAttributes}
+                            onSortChange={() => {}}
+                            onColumnsChange={() => {}}
+                            columnRenderers={{
+                              attributes: {
+                                created_at: {
+                                  renderCell: (createdAt: string) => `Custom Cell For Created At - ${createdAt}`,
+                                },
+                              },
+                            }}
+                            columnDefinitions={columnDefinitions} />);
+
+    await screen.findByText('Custom Cell For Created At - 2021-01-01');
   });
 });

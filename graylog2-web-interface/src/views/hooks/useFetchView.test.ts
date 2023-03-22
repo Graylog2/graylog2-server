@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook } from '@testing-library/react-hooks';
-import { List } from 'immutable';
 import { waitFor } from 'wrappedTestingLibrary';
+import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { List } from 'immutable';
 
 import type { ViewJson } from 'views/logic/views/View';
 import { asMock } from 'helpers/mocking';

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 
 import { SearchSuggestions } from '@graylog/server-api';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';

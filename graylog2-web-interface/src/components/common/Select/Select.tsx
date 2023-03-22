@@ -18,7 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import type { Theme as SelectTheme, InputActionMeta } from 'react-select';
 import ReactSelect, { components as Components, createFilter } from 'react-select';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import type { DefaultTheme } from 'styled-components';
 import { withTheme } from 'styled-components';
 import CreatableSelect from 'react-select/creatable';
@@ -478,7 +478,6 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       this.setState({ value: value });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     const { onChange = () => {} } = this.props;
 
     onChange(value);

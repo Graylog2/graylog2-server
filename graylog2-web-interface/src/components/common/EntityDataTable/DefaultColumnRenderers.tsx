@@ -21,40 +21,37 @@ import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import { Timestamp } from 'components/common';
 
 const DefaultColumnRenderers = {
-  created_at: {
-    renderCell: (entity: { created_at: string }) => (
-      <Timestamp dateTime={entity.created_at} />
-    ),
-    staticWidth: 160,
+  types: {
+    DATE: {
+      renderCell: (dateTime: string) => (
+        <Timestamp dateTime={dateTime} />
+      ),
+      staticWidth: 160,
+    },
+    STRING: {
+      renderCell: (text: string) => (
+        <TextOverflowEllipsis>
+          {text}
+        </TextOverflowEllipsis>
+      ),
+    },
   },
-  description: {
-    renderCell: (entity: { description: string }) => (
-      <TextOverflowEllipsis>
-        {entity.description}
-      </TextOverflowEllipsis>
-    ),
-    width: 2,
+  attributes: {
+    description: {
+      width: 2,
+    },
+    summary: {
+      width: 1.5,
+    },
+    owner: {
+      staticWidth: 120,
+    },
+    favorite: {
+      renderHeader: () => '',
+      staticWidth: 30,
+    },
   },
-  summary: {
-    renderCell: (entity: { summary: string }) => (
-      <TextOverflowEllipsis>
-        {entity.summary}
-      </TextOverflowEllipsis>
-    ),
-    width: 1.5,
-  },
-  owner: {
-    renderCell: (entity: { owner: string }) => (
-      <TextOverflowEllipsis>
-        {entity.owner}
-      </TextOverflowEllipsis>
-    ),
-    staticWidth: 120,
-  },
-  favorite: {
-    renderHeader: () => '',
-    staticWidth: 30,
-  },
+
 };
 
 export default DefaultColumnRenderers;

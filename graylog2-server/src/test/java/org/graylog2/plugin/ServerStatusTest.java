@@ -19,6 +19,7 @@ package org.graylog2.plugin;
 import com.google.common.eventbus.EventBus;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.plugin.lifecycles.Lifecycle;
+import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
 import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -62,9 +63,9 @@ public class ServerStatusTest {
     public void setUp() throws Exception {
         tempFile = temporaryFolder.newFile();
 
-        when(config.getNodeIdFile()).thenReturn(tempFile.getPath());
+        var nodeId = new FilePersistedNodeIdProvider(tempFile.getPath()).get();
 
-        status = new ServerStatus(config, Collections.singleton(ServerStatus.Capability.SERVER), eventBus, NullAuditEventSender::new);
+        status = new ServerStatus(config, Collections.singleton(ServerStatus.Capability.SERVER), eventBus, NullAuditEventSender::new, nodeId);
     }
 
     @Test

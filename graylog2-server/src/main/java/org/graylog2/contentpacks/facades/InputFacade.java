@@ -51,6 +51,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
+import org.graylog2.inputs.WithInputConfiguration;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.inputs.extractors.GrokExtractor;
@@ -213,11 +214,21 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
 
         final MessageInput messageInput;
         try {
+            final String type = inputEntity.type().asString(parameters);
+            final Map<String, Object> rawConfiguration = toValueMap(inputEntity.configuration(), parameters);
+
+            // Incoming encrypted fields from a content pack will be plain strings in the input configuration at this
+            // point.
+            // We use the object mapper to convert them into proper EncryptedValue objects. This works, because classes
+            // implementing the WithInputConfiguration interface will be converted using a specialized deserializer.
+            final var configuration = objectMapper.convertValue(
+                    new ConfigurationWrapper(type, rawConfiguration), ConfigurationWrapper.class).configuration();
+
             messageInput = createMessageInput(
                     inputEntity.title().asString(parameters),
-                    inputEntity.type().asString(parameters),
+                    type,
                     inputEntity.global().asBoolean(parameters),
-                    toValueMap(inputEntity.configuration(), parameters),
+                    configuration,
                     username);
         } catch (Exception e) {
             throw new RuntimeException("Couldn't create input", e);
@@ -599,8 +610,21 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
                 .filter(x -> {
                     EntityV1 entityV1 = (EntityV1) x.getValue();
                     LookupTableEntity lookupTableEntity = objectMapper.convertValue(entityV1.data(), LookupTableEntity.class);
-                    return  lookupTableNames.contains(lookupTableEntity.name().asString(parameters));
+                    return lookupTableNames.contains(lookupTableEntity.name().asString(parameters));
                 })
                 .forEach(x -> graph.putEdge(entity, x.getValue()));
+    }
+
+    public record ConfigurationWrapper(String type, Map<String, Object> configuration)
+            implements WithInputConfiguration<ConfigurationWrapper> {
+
+        @Override
+        public ConfigurationWrapper withConfiguration(Map<String, Object> configuration) {
+            return new ConfigurationWrapper(type(), configuration);
+        }
+
+        public Map<String, Object> toMap() {
+            return Map.of("type", type(), "configuration", configuration());
+        }
     }
 }

@@ -52,7 +52,7 @@ const QueryTitle = ({ active, allowsClosing, id, onClose, openEditModal, openCop
   }, [title]);
 
   const _onDuplicate = useCallback(() => dispatch(duplicateQuery(id))
-    .then(({ payload }) => setDashboardPage(payload)), [dispatch, id, setDashboardPage]);
+    .then((queryId) => setDashboardPage(queryId)), [dispatch, id, setDashboardPage]);
 
   return (
     <>

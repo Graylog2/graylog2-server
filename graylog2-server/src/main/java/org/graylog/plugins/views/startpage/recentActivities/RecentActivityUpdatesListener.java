@@ -45,9 +45,7 @@ public class RecentActivityUpdatesListener {
         // save the new activity
         recentActivityService.save(RecentActivityDTO.builder()
                 .activityType(event.activityType())
-                .itemId(event.grn().entity())
-                .itemGrn(event.grn().toString())
-                .itemType(event.grn().type())
+                .itemGrn(event.grn())
                 .itemTitle(event.itemTitle())
                 .userName(event.userName())
                 .build());
@@ -64,8 +62,7 @@ public class RecentActivityUpdatesListener {
         event.creates().stream().filter(distinctByKey(EntitySharesUpdateEvent.Share::grantee))
                 .forEach(e -> recentActivityService.save(RecentActivityDTO.builder()
                         .activityType(ActivityType.SHARE)
-                        .itemId(event.entity().entity())
-                        .itemGrn(event.entity().toString())
+                        .itemGrn(event.entity())
                         .userName(event.user().getFullName())
                         .grantee(e.grantee().toString())
                         .build())
@@ -75,8 +72,7 @@ public class RecentActivityUpdatesListener {
         event.deletes().stream().filter(distinctByKey(EntitySharesUpdateEvent.Share::grantee))
                 .forEach(e -> recentActivityService.save(RecentActivityDTO.builder()
                         .activityType(ActivityType.UNSHARE)
-                        .itemId(event.entity().entity())
-                        .itemGrn(event.entity().toString())
+                        .itemGrn(event.entity())
                         .userName(event.user().getFullName())
                         .grantee(e.grantee().toString())
                         .build()) );

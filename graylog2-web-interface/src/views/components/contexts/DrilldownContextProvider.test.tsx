@@ -36,7 +36,6 @@ jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('views/hooks/useGlobalOverride');
 
 describe('DrilldownContextProvider', () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const Consumer = (_props: { streams: Array<string>, timerange: TimeRange, query: ElasticsearchQueryString }) => null;
 
   const TestComponent = () => {

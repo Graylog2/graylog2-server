@@ -57,7 +57,7 @@ public class FieldTypeValidationImpl implements FieldTypeValidation {
         VALIDATION_FUNCTIONS.put("byte", wrapException(removeNumericOperandsIfNeeded(Byte::parseByte)));
         VALIDATION_FUNCTIONS.put("double", wrapException(removeNumericOperandsIfNeeded(Double::parseDouble)));
         VALIDATION_FUNCTIONS.put("float", wrapException(removeNumericOperandsIfNeeded(Float::parseFloat)));
-        VALIDATION_FUNCTIONS.put("date", FieldTypeValidationImpl::isDate);
+        VALIDATION_FUNCTIONS.put("date", term  -> isDate(term) || isDateMathExpression(term));
         VALIDATION_FUNCTIONS.put("boolean", wrapException(Boolean::parseBoolean));
         VALIDATION_FUNCTIONS.put("binary", ALWAYS_TRUE_PREDICATE);
         VALIDATION_FUNCTIONS.put("geo-point", ALWAYS_TRUE_PREDICATE);
@@ -88,6 +88,22 @@ public class FieldTypeValidationImpl implements FieldTypeValidation {
             }
         }
         return false;
+    }
+
+    private static boolean isDateMathExpression(final String dateCandidate) {
+        if (dateCandidate.startsWith("now")) {
+            return validateDateMathExpression(dateCandidate.substring("now".length()));
+        } else {
+            final String[] dateAndMath = dateCandidate.split("\\|\\|");
+            if (dateAndMath.length != 2) {
+                return false; // not in the format time||dateMathOperation, it's not a valid value
+            }
+            return isDate(dateAndMath[0]) && validateDateMathExpression(dateAndMath[1]);
+        }
+    }
+
+    private static boolean validateDateMathExpression(String dateMathExpression) {
+        return dateMathExpression.matches("([+-/](\\d+)?[yMwdhHms])*");
     }
 
 

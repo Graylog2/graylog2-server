@@ -46,6 +46,19 @@ class ConfigurationWell extends React.Component {
     return (<li key={`${id}-${key}`}><div className="key">{key}:</div> <div className="value">{finalValue}</div></li>);
   };
 
+  _formatEncryptedField = (value, key) => {
+    const { id } = this.props;
+    let finalValue;
+
+    if (!value.is_set) {
+      finalValue = <i>{'<empty>'}</i>;
+    } else {
+      finalValue = this.PASSWORD_PLACEHOLDER;
+    }
+
+    return (<li key={`${id}-${key}`}><div className="key">{key}:</div> <div className="value">{finalValue}</div></li>);
+  };
+
   _formatPasswordField = (value, key) => {
     const { id } = this.props;
 
@@ -69,6 +82,10 @@ class ConfigurationWell extends React.Component {
       if (requestedConfiguration
         && (requestedConfiguration.attributes.indexOf('is_password') > -1 || requestedConfiguration.attributes.indexOf('is_sensitive') > -1)) {
         return this._formatPasswordField(value, key);
+      }
+
+      if (requestedConfiguration && requestedConfiguration.is_encrypted) {
+        return this._formatEncryptedField(value, key);
       }
 
       return this._formatRegularField(value, key);

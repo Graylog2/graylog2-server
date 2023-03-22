@@ -1,0 +1,6 @@
+type = "fixed"
+message = "LUT - Show no results message on empty search return and fix delete cache functionality"
+
+issues = ["14234", "14238"]
+
+contributors = [""]

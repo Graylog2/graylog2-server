@@ -21,8 +21,6 @@ import org.apache.shiro.authz.Permission;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
-import org.graylog.plugins.views.favorites.FavoriteDTO;
-import org.graylog.plugins.views.favorites.FavoritesForUserDTO;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.plugins.views.search.rest.TestUser;
@@ -46,7 +44,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -104,9 +101,12 @@ public class LastOpenedServiceTest {
 
     @Test
     public void testRemoveOnUserDeletion() {
-        lastOpenedService.save(new LastOpenedForUserDTO("user1", List.of(new LastOpenedDTO("1",DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO("2",DateTime.now(DateTimeZone.UTC)))));
-        lastOpenedService.save(new LastOpenedForUserDTO("user2", List.of(new LastOpenedDTO("1",DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO("2",DateTime.now(DateTimeZone.UTC)))));
-        lastOpenedService.save(new LastOpenedForUserDTO("user3", List.of(new LastOpenedDTO("1",DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO("2",DateTime.now(DateTimeZone.UTC)))));
+        var _1 = grnRegistry.newGRN(GRNTypes.DASHBOARD, "1");
+        var _2 = grnRegistry.newGRN(GRNTypes.SEARCH, "2");
+
+        lastOpenedService.save(new LastOpenedForUserDTO("user1", List.of(new LastOpenedDTO(_1 ,DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO(_2 ,DateTime.now(DateTimeZone.UTC)))));
+        lastOpenedService.save(new LastOpenedForUserDTO("user2", List.of(new LastOpenedDTO(_1 ,DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO(_2 ,DateTime.now(DateTimeZone.UTC)))));
+        lastOpenedService.save(new LastOpenedForUserDTO("user3", List.of(new LastOpenedDTO(_1 ,DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO(_2 ,DateTime.now(DateTimeZone.UTC)))));
 
         assertThat(lastOpenedService.streamAll().toList().size()).isEqualTo(3);
         lastOpenedService.removeFavoriteEntityOnUserDeletion(UserDeletedEvent.create("user2", "user2"));
@@ -117,13 +117,18 @@ public class LastOpenedServiceTest {
 
     @Test
     public void testRemoveOnEntityDeletion() {
-        lastOpenedService.save(new LastOpenedForUserDTO("user1", List.of(new LastOpenedDTO("2",DateTime.now(DateTimeZone.UTC)))));
-        lastOpenedService.save(new LastOpenedForUserDTO("user2", List.of(new LastOpenedDTO("1",DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO("2", DateTime.now(DateTimeZone.UTC)))));
-        lastOpenedService.save(new LastOpenedForUserDTO("user3", List.of(new LastOpenedDTO("1",DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO("2",DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO("3",DateTime.now(DateTimeZone.UTC)))));
-        lastOpenedService.save(new LastOpenedForUserDTO("user4", List.of(new LastOpenedDTO("1",DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO("4",DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO("3",DateTime.now(DateTimeZone.UTC)))));
+        var _1 = grnRegistry.newGRN(GRNTypes.DASHBOARD, "1");
+        var _2 = grnRegistry.newGRN(GRNTypes.SEARCH, "2");
+        var _3 = grnRegistry.newGRN(GRNTypes.SEARCH, "3");
+        var _4 = grnRegistry.newGRN(GRNTypes.DASHBOARD, "4");
+
+        lastOpenedService.save(new LastOpenedForUserDTO("user1", List.of(new LastOpenedDTO(_2 ,DateTime.now(DateTimeZone.UTC)))));
+        lastOpenedService.save(new LastOpenedForUserDTO("user2", List.of(new LastOpenedDTO(_1 ,DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO(_2 , DateTime.now(DateTimeZone.UTC)))));
+        lastOpenedService.save(new LastOpenedForUserDTO("user3", List.of(new LastOpenedDTO(_1 ,DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO(_2 ,DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO(_3 ,DateTime.now(DateTimeZone.UTC)))));
+        lastOpenedService.save(new LastOpenedForUserDTO("user4", List.of(new LastOpenedDTO(_1 ,DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO(_4 ,DateTime.now(DateTimeZone.UTC)), new LastOpenedDTO(_3 ,DateTime.now(DateTimeZone.UTC)))));
 
         assertThat(lastOpenedService.streamAll().toList().size()).isEqualTo(4);
-        lastOpenedService.removeLastOpenedOnEntityDeletion(new RecentActivityEvent(ActivityType.DELETE, grnRegistry.newGRN(GRNTypes.SEARCH_FILTER, "2"), "user4"));
+        lastOpenedService.removeLastOpenedOnEntityDeletion(new RecentActivityEvent(ActivityType.DELETE, grnRegistry.newGRN(GRNTypes.SEARCH, "2"), "user4"));
         assertThat(lastOpenedService.streamAll().toList().size()).isEqualTo(4);
 
         var last1 = lastOpenedService.findForUser("user1").get();
@@ -131,12 +136,12 @@ public class LastOpenedServiceTest {
 
         var last2 = lastOpenedService.findForUser("user2").get();
         assertThat(last2.items().size()).isEqualTo(1);
-        assertThat(last2.items().get(0).id()).isEqualTo("1");
+        assertThat(last2.items().get(0).grn().entity()).isEqualTo("1");
 
         var last3 = lastOpenedService.findForUser("user3").get();
         assertThat(last3.items().size()).isEqualTo(2);
-        assertThat(last3.items().get(0).id()).isEqualTo("1");
-        assertThat(last3.items().get(1).id()).isEqualTo("3");
+        assertThat(last3.items().get(0).grn().entity()).isEqualTo("1");
+        assertThat(last3.items().get(1).grn().entity()).isEqualTo("3");
 
         var last4 = lastOpenedService.findForUser("user4").get();
         assertThat(last4.items().size()).isEqualTo(3);

@@ -29,6 +29,7 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
 import org.graylog.events.contentpack.entities.EventNotificationHandlerConfigEntity;
 import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
+import org.graylog.events.context.EventDefinitionContextService;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
@@ -62,11 +63,12 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     public static final String FIELD_NOTIFICATIONS = "notifications";
     private static final String FIELD_PRIORITY = "priority";
     private static final String FIELD_ALERT = "alert";
-    private static final String FIELD_CONFIG = "config";
+    public static final String FIELD_CONFIG = "config";
     private static final String FIELD_FIELD_SPEC = "field_spec";
     private static final String FIELD_KEY_SPEC = "key_spec";
     private static final String FIELD_NOTIFICATION_SETTINGS = "notification_settings";
     private static final String FIELD_STORAGE = "storage";
+    private static final String FIELD_SCHEDULERCTX = "scheduler";
     private static final String UPDATED_AT = "updated_at";
 
     @Override
@@ -120,6 +122,11 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     @Override
     @JsonProperty(FIELD_STORAGE)
     public abstract ImmutableList<EventStorageHandler.Config> storage();
+
+    @Override
+    @JsonProperty(value = FIELD_SCHEDULERCTX, access = JsonProperty.Access.READ_ONLY)
+    @Nullable
+    public abstract EventDefinitionContextService.SchedulerCtx schedulerCtx();
 
     public static Builder builder() {
         return Builder.create();
@@ -204,6 +211,9 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
 
         @JsonProperty(FIELD_STORAGE)
         public abstract Builder storage(ImmutableList<EventStorageHandler.Config> storageHandlers);
+
+        @JsonProperty(value = FIELD_SCHEDULERCTX, access = JsonProperty.Access.READ_ONLY)
+        public abstract Builder schedulerCtx(EventDefinitionContextService.SchedulerCtx schedulerCtx);
 
         abstract EventDefinitionDto autoBuild();
 

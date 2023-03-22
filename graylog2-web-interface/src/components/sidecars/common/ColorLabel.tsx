@@ -43,7 +43,7 @@ const ColorLabelWrap = styled.span(({ size, theme }: ColorLabelWrapProps) => {
   return css`
     vertical-align: middle;
     font-size: ${size === 'xsmall' ? tiny : fontSize};
-  `;
+`;
 });
 
 const ColorLabel = ({ color, size, text, theme }: ColorLabelProps) => {

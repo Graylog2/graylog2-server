@@ -36,9 +36,17 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     private final long pingTimeout;
 
     @Inject
-    public NodeServiceImpl(final MongoConnection mongoConnection, final Configuration configuration) {
+    public NodeServiceImpl(final MongoConnection mongoConnection, Configuration configuration) {
+        this(mongoConnection, configuration.getStaleLeaderTimeout());
+    }
+
+    public NodeServiceImpl(final MongoConnection mongoConnection, final int staleLeaderTimeout) {
         super(mongoConnection);
-        this.pingTimeout = TimeUnit.MILLISECONDS.toSeconds(configuration.getStaleLeaderTimeout());
+        this.pingTimeout = TimeUnit.MILLISECONDS.toSeconds(staleLeaderTimeout);
+    }
+
+    public Node.Type type() {
+        return Node.Type.SERVER;
     }
 
     @Override
@@ -46,7 +54,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
         Map<String, Object> fields = Maps.newHashMap();
         fields.put("last_seen", Tools.getUTCTimestamp());
         fields.put("node_id", nodeId);
-        fields.put("type", Node.Type.SERVER.toString());
+        fields.put("type", type().toString());
         fields.put("is_leader", isLeader);
         fields.put("transport_address", httpPublishUri.toString());
         fields.put("hostname", hostname);

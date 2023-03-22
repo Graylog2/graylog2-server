@@ -17,6 +17,7 @@
 package org.graylog.events.processor;
 
 import org.graylog.events.notifications.EventNotificationExecutionJob;
+import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
@@ -184,6 +185,10 @@ public class EventDefinitionHandler {
      */
     public void unschedule(String eventDefinitionId) {
         final EventDefinitionDto eventDefinition = getEventDefinitionOrThrowIAE(eventDefinitionId);
+
+        if (SystemNotificationEventEntityScope.NAME.equals(eventDefinition.scope())) {
+            throw new IllegalArgumentException("Cannot disable system notification events");
+        }
 
         getJobDefinition(eventDefinition)
                 .ifPresent(jobDefinition -> deleteJobDefinitionAndTrigger(jobDefinition, eventDefinition));

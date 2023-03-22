@@ -56,7 +56,8 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
       color: ${theme.colors.global.textDefault};
       background-color: transparent;
       
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         color: ${theme.colors.variant.darkest.default};
         background-color: transparent;
       }

@@ -18,6 +18,8 @@ package org.graylog2.contentpacks.model.entities.references;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog2.security.encryption.EncryptedValue;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.json.JSONException;
 import org.junit.Ignore;
@@ -26,6 +28,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -98,6 +101,14 @@ public class ValueReferenceTest {
         assertThatThrownBy(() -> ValueReference.of(false).asString(Collections.emptyMap()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Expected value reference of type STRING but got BOOLEAN");
+    }
+
+    @Test
+    public void asEncryptedValue() {
+        assertThat(ValueReference.of(EncryptedValue.createUnset())).isNull();
+
+        final EncryptedValue encryptedValue = new EncryptedValueService(UUID.randomUUID().toString()).encrypt("secret");
+        assertThat(ValueReference.of(encryptedValue).asString()).startsWith("<Encrypted value was replaced");
     }
 
     @Test

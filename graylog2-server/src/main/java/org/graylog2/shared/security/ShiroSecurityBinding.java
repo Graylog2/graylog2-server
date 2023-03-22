@@ -59,8 +59,5 @@ public class ShiroSecurityBinding implements DynamicFeature {
             LOG.debug("Resource method {}#{} requires an authorization checks.", resourceClass.getCanonicalName(), resourceMethod.getName());
             context.register(new ShiroAuthorizationFilter(requiresPermissions));
         }
-
-        // TODO this is the wrong approach, we should have an Environment and proper request wrapping
-        context.register((ContainerResponseFilter) (requestContext, responseContext) -> ThreadContext.unbindSubject());
     }
 }

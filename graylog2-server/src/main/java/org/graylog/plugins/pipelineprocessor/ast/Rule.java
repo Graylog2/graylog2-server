@@ -21,21 +21,22 @@ import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.Sets;
+import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.antlr.v4.runtime.CommonToken;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+
 @AutoValue
 public abstract class Rule {
-    private static final Logger LOG = LoggerFactory.getLogger(Rule.class);
+    private static final RateLimitedLog LOG = getRateLimitedLog(Rule.class);
 
     private transient Set<String> metricNames = Sets.newHashSet();
 

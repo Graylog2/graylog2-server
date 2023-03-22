@@ -1,0 +1,4 @@
+type = "a"
+message = "Allow user-configurable auto-refresh settings & default interval."
+
+pulls = ["14742"]

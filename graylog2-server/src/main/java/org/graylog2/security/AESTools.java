@@ -83,6 +83,26 @@ public class AESTools {
      */
     @Nullable
     public static String decrypt(String cipherText, String encryptionKey, String salt) {
+        try {
+            return tryDecrypt(cipherText, encryptionKey, salt);
+        } catch (Exception ex) {
+            LOG.error("Could not decrypt (legacy) value.", ex);
+            return null;
+        }
+    }
+
+    /**
+     * Decrypt the given cipher text value with the given encryption key and the same salt used for encryption using AES
+     * CBC.
+     * If the supplied encryption key is not of 16, 24 or 32 bytes length, it will be truncated or padded to the next
+     * largest key size before encryption.
+     *
+     * @param cipherText    the hexadecimal cipher text value to decrypt
+     * @param encryptionKey the encryption key
+     * @param salt          the salt used for encrypting this cipherText
+     * @return the decrypted cipher text
+     */
+    public static String tryDecrypt(String cipherText, String encryptionKey, String salt) throws InvalidCipherTextException, GeneralSecurityException {
         checkNotNull(cipherText, "Cipher text must not be null.");
         checkNotNull(encryptionKey, "Encryption key must not be null.");
         checkNotNull(salt, "Salt must not be null.");
@@ -94,12 +114,7 @@ public class AESTools {
             return new String(cipher.doFinal(Hex.decode(cipherText)), UTF_8);
         } catch (Exception ignored) {
             // This is likely a BadPaddingException, but try to decrypt legacy secrets in any case
-            try {
-                return decryptLegacy(cipherText, encryptionKey, salt);
-            } catch (Exception ex) {
-                LOG.error("Could not decrypt (legacy) value.", ex);
-                return null;
-            }
+            return decryptLegacy(cipherText, encryptionKey, salt);
         }
     }
 

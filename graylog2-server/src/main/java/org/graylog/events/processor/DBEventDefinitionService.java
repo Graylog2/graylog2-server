@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Predicate;
@@ -58,9 +59,9 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
     }
 
     public PaginatedList<EventDefinitionDto> searchPaginated(SearchQuery query, Predicate<EventDefinitionDto> filter,
-                                                             String sortByField, int page, int perPage) {
+                                                             String sortByField, String sortOrder, int page, int perPage) {
         return findPaginatedWithQueryFilterAndSort(query.toDBQuery(), filter,
-                getSortBuilder("asc", sortByField), page, perPage);
+                getSortBuilder(sortOrder, sortByField), page, perPage);
     }
 
     public EventDefinitionDto saveWithOwnership(EventDefinitionDto eventDefinitionDto, User user) {
@@ -123,5 +124,13 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
      */
     public List<EventDefinitionDto> getSystemEventDefinitions() {
         return ImmutableList.copyOf((db.find(DBQuery.is(EventDefinitionDto.FIELD_SCOPE, SystemNotificationEventEntityScope.NAME)).iterator()));
+    }
+
+    /**
+     * Returns the list of event definitions that contain the given value in the specified array field
+     */
+    @NotNull
+    public List<EventDefinitionDto> getByArrayValue(String arrayField, String field, String value) {
+        return ImmutableList.copyOf((db.find(DBQuery.elemMatch(arrayField, DBQuery.is(field, value))).iterator()));
     }
 }

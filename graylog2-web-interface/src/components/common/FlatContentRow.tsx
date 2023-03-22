@@ -22,7 +22,7 @@ import { RowContentStyles } from 'components/bootstrap/Row';
  * Component with the same styling as the bootstrap `Row` but with a smaller padding.
  */
 const FlatContentRow = styled.div`
-  ${RowContentStyles};
+  ${RowContentStyles}
   
   padding: 9px;
   margin-left: -15px;

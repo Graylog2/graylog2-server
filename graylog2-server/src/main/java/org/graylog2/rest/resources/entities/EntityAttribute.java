@@ -52,6 +52,10 @@ public abstract class EntityAttribute {
     @Nullable
     public abstract Boolean hidden();
 
+    @JsonProperty("related_collection")
+    @Nullable
+    public abstract String relatedCollection();
+
     @JsonProperty("filter_options")
     @Nullable
     public abstract Set<FilterOption> filterOptions();
@@ -75,6 +79,8 @@ public abstract class EntityAttribute {
         public abstract Builder searchable(Boolean searchable);
 
         public abstract Builder hidden(Boolean hidden);
+
+        public abstract Builder relatedCollection(String relatedCollection);
 
         public abstract Builder filterOptions(Set<FilterOption> filterOptions);
 

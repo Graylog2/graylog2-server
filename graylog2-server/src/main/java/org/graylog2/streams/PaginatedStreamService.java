@@ -21,7 +21,6 @@ import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Field;
-import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Variable;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -30,7 +29,6 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
-import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
 
 import javax.inject.Inject;
@@ -54,14 +52,13 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
         return db.count();
     }
 
-    public PaginatedList<StreamDTO> findPaginated(SearchQuery searchQuery,
+    public PaginatedList<StreamDTO> findPaginated(Bson dbQuery, //query executed on DB level
                                                   Predicate<StreamDTO> predicate, //predicate executed on code level, AFTER data is fetched
-                                                  List<Bson> dbFilters, //filters executed on DB level
                                                   int page,
                                                   int perPage,
                                                   String sortField,
                                                   String order) {
-        Bson dbQuery = createDbQuery(searchQuery, dbFilters);
+
 
         var pipelineBuilder = ImmutableList.<Bson>builder()
                 .add(Aggregates.match(dbQuery));
@@ -106,37 +103,6 @@ public class PaginatedStreamService extends PaginatedDbService<StreamDTO> {
 
         return new PaginatedList<>(paginatedStreams, streamsList.size(), page, perPage, grandTotal);
 
-    }
-
-    private Bson createDbQuery(final SearchQuery searchQuery,
-                               final List<Bson> dbFilters) {
-        List<Bson> filterList = searchQuery.toBsonFilterList();
-        if (dbFilters != null) {
-            filterList.addAll(dbFilters);
-        }
-        Bson dbQuery;
-        if (filterList.isEmpty()) {
-            dbQuery = new Document();
-        } else {
-            dbQuery = Filters.and(filterList);
-        }
-        return dbQuery;
-    }
-
-    public PaginatedList<StreamDTO> findPaginated(SearchQuery searchQuery,
-                                                  Predicate<StreamDTO> filter,
-                                                  int page,
-                                                  int perPage,
-                                                  String sortField,
-                                                  String order) {
-        return findPaginated(searchQuery,
-                filter,
-                List.of(),
-                page,
-                perPage,
-                sortField,
-                order
-        );
     }
 
     private boolean isStringField(String sortField) {

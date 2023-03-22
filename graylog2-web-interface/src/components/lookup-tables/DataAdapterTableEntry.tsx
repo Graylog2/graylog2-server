@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { Link } from 'components/common/router';
@@ -27,6 +26,7 @@ import { MetricContainer, CounterRate } from 'components/metrics';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 import useScopePermissions from 'hooks/useScopePermissions';
+import useHistory from 'routing/useHistory';
 
 const Actions = styled(ButtonToolbar)`
   display: flex;
@@ -45,16 +45,16 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(adapter);
   const { name: adapterName, title: adapterTitle, description: adapterDescription, id: adapterId } = adapter;
 
-  const _onEdit = () => {
+  const _onEdit = React.useCallback(() => {
     history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName));
-  };
+  }, [history, adapterName]);
 
-  const _onDelete = () => {
+  const _onDelete = React.useCallback(() => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Are you sure you want to delete data adapter "${adapterTitle}"?`)) {
       LookupTableDataAdaptersActions.delete(adapter.id).then(() => LookupTableDataAdaptersActions.reloadPage());
     }
-  };
+  }, [adapterTitle, adapter.id]);
 
   return (
     <tbody>

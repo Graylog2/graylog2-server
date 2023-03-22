@@ -18,21 +18,21 @@ package org.graylog.plugins.pipelineprocessor.functions.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
 
 import static com.google.common.collect.ImmutableList.of;
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 
 public class JsonFlatten extends AbstractFunction<JsonNode> {
-    private static final Logger LOG = LoggerFactory.getLogger(JsonFlatten.class);
+    private static final RateLimitedLog LOG = getRateLimitedLog(JsonFlatten.class);
     public static final String NAME = "flatten_json";
     private static final String OPTION_JSON = "json";
     private static final String OPTION_FLATTEN = "flatten";
@@ -85,10 +85,10 @@ public class JsonFlatten extends AbstractFunction<JsonNode> {
                     // explode all arrays and objects into top-level key/values
                     return JsonUtils.extractJson(value, objectMapper, FLAGS_FLATTEN, stringify);
                 default:
-                    LOG.warn("Unknown parameter array_handler: {}", arrayHandler);
+                    LOG.warn(context.pipelineErrorMessage("Unknown parameter array_handler: " + arrayHandler));
             }
         } catch (IOException e) {
-            LOG.warn("Unable to parse JSON", e);
+            LOG.warn(context.pipelineErrorMessage("Unable to parse JSON"), e);
         }
         return null;
     }

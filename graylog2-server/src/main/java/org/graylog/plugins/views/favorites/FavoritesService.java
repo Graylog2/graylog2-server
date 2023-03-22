@@ -22,6 +22,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;
+import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.startpage.recentActivities.ActivityType;
@@ -38,6 +40,7 @@ import org.mongojack.DBQuery;
 import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,20 +49,23 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
 
     private final EntityOwnershipService entityOwnerShipService;
     private final Catalog catalog;
+    private final GRNRegistry grnRegistry;
 
     @Inject
     protected FavoritesService(final MongoConnection mongoConnection,
                                EventBus eventBus,
                                final MongoJackObjectMapperProvider mapper,
                                final EntityOwnershipService entityOwnerShipService,
-                               final Catalog catalog) {
+                               final Catalog catalog,
+                               final GRNRegistry grnRegistry) {
         super(mongoConnection, mapper, FavoritesForUserDTO.class, COLLECTION_NAME);
         eventBus.register(this);
         this.entityOwnerShipService = entityOwnerShipService;
         this.catalog = catalog;
+        this.grnRegistry = grnRegistry;
 
         db.createIndex(new BasicDBObject(FavoritesForUserDTO.FIELD_USER_ID, 1));
-        db.createIndex(new BasicDBObject(FavoritesForUserDTO.FIELD_ITEMS + "." + FavoriteDTO.FIELD_ID, 1));
+        db.createIndex(new BasicDBObject(FavoritesForUserDTO.FIELD_ITEMS, 1));
     }
 
     public PaginatedResponse<Favorite> findFavoritesFor(final SearchUser searchUser, final Optional<String> type, final int page, final int perPage) {
@@ -67,30 +73,31 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
                 .orElse(new FavoritesForUserDTO(searchUser.getUser().getId(), List.of()))
                 .items()
                 .stream().filter(i -> type.isPresent() ? i.type().equals(type.get()) : true)
-                .map(i -> new Favorite(i.id(), i.type(), catalog.getTitle(i.id())))
+                .map(i -> new Favorite(i, catalog.getTitle(i)))
                 .toList();
 
         return PaginatedResponse.create("favorites", new PaginatedList<>(getPage(items, page, perPage), items.size(), page, perPage));
     }
 
-    public void addFavoriteItemFor(final String id, final SearchUser searchUser) {
+    public void addFavoriteItemFor(final String in, final SearchUser searchUser) {
+        var grn = grnRegistry.parse(in);
         final var favorites = this.findForUser(searchUser);
-        final var item = new FavoriteDTO(id, catalog.getType(id));
         if(favorites.isPresent()) {
             var fi = favorites.get();
-            fi.items().add(item);
+            fi.items().add(grn);
             this.save(fi);
         } else {
-            var items = new FavoritesForUserDTO(searchUser.getUser().getId(), List.of(item));
+            var items = new FavoritesForUserDTO(searchUser.getUser().getId(), List.of(grn));
             this.create(items, searchUser);
         }
     }
 
-    public void removeFavoriteItemFor(final String id, final SearchUser searchUser) {
+    public void removeFavoriteItemFor(final String in, final SearchUser searchUser) {
+        var grn = grnRegistry.parse(in);
         var favorites = this.findForUser(searchUser);
         if(favorites.isPresent() && favorites.get().items() != null) {
             var fi = favorites.get();
-            var items = fi.items().stream().filter(i -> !i.id().equals(id)).toList();
+            var items = fi.items().stream().filter(i -> !i.equals(grn)).toList();
             fi.items().clear();
             fi.items().addAll(items);
             this.save(fi);
@@ -122,8 +129,9 @@ public class FavoritesService extends PaginatedDbService<FavoritesForUserDTO> {
     public void removeFavoriteOnEntityDeletion(final RecentActivityEvent event) {
         // if an entity is deleted, we can no longer see it in the favorites collection
         if (event.activityType().equals(ActivityType.DELETE)) {
-            DBObject query = new BasicDBObject(FavoritesForUserDTO.FIELD_ITEMS + "." + FavoriteDTO.FIELD_ID, new BasicDBObject("$eq", event.grn().entity()));
-            final DBObject modifications = new BasicDBObject("$pull", new BasicDBObject(FavoritesForUserDTO.FIELD_ITEMS, new BasicDBObject(FavoriteDTO.FIELD_ID, event.grn().entity())));
+            final var grn = event.grn().toString();
+            final var query = new BasicDBObject(FavoritesForUserDTO.FIELD_ITEMS, grn);
+            final var modifications = new BasicDBObject("$pull", new BasicDBObject(FavoritesForUserDTO.FIELD_ITEMS, grn));
             db.updateMulti(query, modifications);
         }
     }

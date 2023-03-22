@@ -137,7 +137,7 @@ XYPlot.propTypes = {
   chartData: PropTypes.array.isRequired,
   config: CustomPropTypes.instanceOf(AggregationWidgetConfig).isRequired,
   effectiveTimerange: PropTypes.exact({
-    // eslint-disable-next-line react/no-unused-prop-types
+
     type: PropTypes.string.isRequired,
     from: PropTypes.string.isRequired,
     to: PropTypes.string.isRequired,

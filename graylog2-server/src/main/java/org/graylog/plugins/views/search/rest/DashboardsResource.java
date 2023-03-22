@@ -21,18 +21,18 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.bson.conversions.Bson;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
-import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
-import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
@@ -56,14 +56,13 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Path("/dashboards")
 public class DashboardsResource extends RestResource {
     private final ViewService dbService;
-    private final SearchQueryParser searchQueryParser;
 
     private static final String DEFAULT_SORT_FIELD = ViewDTO.FIELD_TITLE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
             EntityAttribute.builder().id("_id").title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_TITLE).title("Title").searchable(true).build(),
-            EntityAttribute.builder().id(ViewDTO.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).build(),
+            EntityAttribute.builder().id(ViewDTO.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).filterable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_DESCRIPTION).title("Description").searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_SUMMARY).title("Summary").searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_OWNER).title("Owner").build(),
@@ -73,10 +72,12 @@ public class DashboardsResource extends RestResource {
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
             .build();
 
+    private final DbQueryCreator dbQueryCreator;
+
     @Inject
-    public DashboardsResource(ViewService dbService) {
+    public DashboardsResource(final ViewService dbService) {
         this.dbService = dbService;
-        this.searchQueryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, attributes);
+        this.dbQueryCreator = new DbQueryCreator(ViewDTO.FIELD_TITLE, attributes);
     }
 
     @GET
@@ -90,6 +91,7 @@ public class DashboardsResource extends RestResource {
                                                             allowableValues = "id,title,created_at,description,summary,owner") @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
                                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") String order,
                                                   @ApiParam(name = "query") @QueryParam("query") String query,
+                                                  @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
                                                   @Context SearchUser searchUser) {
 
         if (!ViewDTO.SORT_FIELDS.contains(sortField.toLowerCase(ENGLISH))) {
@@ -97,11 +99,11 @@ public class DashboardsResource extends RestResource {
         }
 
         try {
-            final SearchQuery searchQuery = searchQueryParser.parse(query);
+            final Bson dbQuery = dbQueryCreator.createDbQuery(filters, query);
             final PaginatedList<ViewSummaryDTO> result = dbService.searchSummariesPaginatedByType(
                     searchUser,
                     ViewDTO.Type.DASHBOARD,
-                    searchQuery,
+                    dbQuery,
                     searchUser::canReadView,
                     order,
                     sortField,

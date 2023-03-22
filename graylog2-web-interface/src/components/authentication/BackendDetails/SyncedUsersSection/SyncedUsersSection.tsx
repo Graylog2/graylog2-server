@@ -71,7 +71,6 @@ const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
     return <Spinner />;
   }
 
-  // eslint-disable-next-line react/no-unstable-nested-components
   const _userOverviewItem = (user) => <SyncedUsersOverviewItem user={user} roles={roles} />;
 
   return (

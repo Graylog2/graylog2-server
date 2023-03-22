@@ -16,16 +16,18 @@
  */
 import * as React from 'react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { isEqual } from 'lodash';
-import { useLocation, useHistory } from 'react-router-dom';
+import isEqual from 'lodash/isEqual';
 import PropTypes from 'prop-types';
 import URI from 'urijs';
 
+import useLocation from 'routing/useLocation';
 import useQuery from 'routing/useQuery';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useWidgets from 'views/hooks/useWidgets';
 import useAppDispatch from 'stores/useAppDispatch';
 import { execute, setWidgetsToSearch } from 'views/logic/slices/searchExecutionSlice';
+import type { HistoryFunction } from 'routing/useHistory';
+import useHistory from 'routing/useHistory';
 
 import type { FocusContextState } from './WidgetFocusContext';
 import WidgetFocusContext from './WidgetFocusContext';
@@ -83,6 +85,12 @@ type SyncStateArgs = {
   focusUriParams: FocusUriParams,
 }
 
+const emptyFocusContext: FocusContextState = {
+  editing: false,
+  focusing: false,
+  id: undefined,
+};
+
 const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocusedWidget, widgetIds }: SyncStateArgs) => {
   const dispatch = useAppDispatch();
 
@@ -93,7 +101,7 @@ const useSyncStateWithQueryParams = ({ focusedWidget, focusUriParams, setFocused
       focusing: focusUriParams.focusing || focusUriParams.editing,
     } as FocusContextState;
 
-    if (!isEqual(focusedWidget, nextFocusedWidget)) {
+    if (!isEqual(focusedWidget ?? emptyFocusContext, nextFocusedWidget)) {
       if (focusUriParams.id && !widgetIds.includes(focusUriParams.id)) {
         return;
       }
@@ -111,7 +119,7 @@ type CleanupArgs = {
   focusUriParams: FocusUriParams,
   widgetIds: Array<string>,
   query: string,
-  history: ReturnType<typeof useHistory>,
+  history: HistoryFunction,
 };
 
 const useCleanupQueryParams = ({ focusUriParams, widgetIds, query, history }: CleanupArgs) => {

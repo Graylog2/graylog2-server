@@ -60,7 +60,7 @@ import java.util.Set;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.utilities.StringUtils.splitByComma;
 
-@Api(value = "ScriptingApi", tags = {CLOUD_VISIBLE})
+@Api(value = "Search/Simple", description = "Simple search API for aggregating and messages retrieval", tags = {CLOUD_VISIBLE})
 @Path("/search")
 @Consumes({MediaType.APPLICATION_JSON})
 @RequiresAuthentication

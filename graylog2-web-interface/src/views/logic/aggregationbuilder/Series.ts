@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { get } from 'lodash';
+import get from 'lodash/get';
 import * as Immutable from 'immutable';
 
 import SeriesConfig from './SeriesConfig';
@@ -41,7 +41,6 @@ const funcNameRegex = /(\w+)\(/;
 const testSeriesRegex = /^(\w+)\((.*)(,(\w+))*\)$/;
 
 const definitionFor = (type: string, parameters: Array<string>): Definition => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [field, parameter] = parameters;
 
   if (type === 'percentile') {

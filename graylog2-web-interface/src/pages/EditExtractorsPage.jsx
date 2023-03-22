@@ -23,12 +23,12 @@ import Reflux from 'reflux';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import EditExtractor from 'components/extractors/EditExtractor';
 import DocsHelper from 'util/DocsHelper';
-import history from 'util/History';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
 import { ExtractorsActions, ExtractorsStore } from 'stores/extractors/ExtractorsStore';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 import { UniversalSearchStore } from 'stores/search/UniversalSearchStore';
+import withHistory from 'routing/withHistory';
 
 const EditExtractorsPage = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
@@ -36,6 +36,7 @@ const EditExtractorsPage = createReactClass({
 
   // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
+    history: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
   },
 
@@ -79,6 +80,7 @@ const EditExtractorsPage = createReactClass({
       url = Routes.local_input_extractors(params.nodeId, params.inputId);
     }
 
+    const { history } = this.props;
     history.push(url);
   },
 
@@ -115,4 +117,4 @@ const EditExtractorsPage = createReactClass({
   },
 });
 
-export default withParams(EditExtractorsPage);
+export default withHistory(withParams(EditExtractorsPage));

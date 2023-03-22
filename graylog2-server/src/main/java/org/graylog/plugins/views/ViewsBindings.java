@@ -55,7 +55,6 @@ import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.DashboardsResource;
-import org.graylog.plugins.views.startpage.StartPageResource;
 import org.graylog.plugins.views.search.rest.ExportJobsResource;
 import org.graylog.plugins.views.search.rest.FieldTypesResource;
 import org.graylog.plugins.views.search.rest.MessageExportFormatFilter;
@@ -102,7 +101,6 @@ import org.graylog.plugins.views.search.validation.validators.InvalidOperatorsVa
 import org.graylog.plugins.views.search.validation.validators.UnknownFieldsValidator;
 import org.graylog.plugins.views.search.views.RequiresParameterSupport;
 import org.graylog.plugins.views.search.views.ViewRequirements;
-import org.graylog.plugins.views.startpage.recentActivities.RecentActivityUpdatesListener;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AreaVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
@@ -119,12 +117,15 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.WorldMapVisual
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SeriesSortConfig;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
+import org.graylog.plugins.views.startpage.StartPageResource;
+import org.graylog.plugins.views.startpage.recentActivities.RecentActivityUpdatesListener;
 import org.graylog2.contentpacks.facades.DashboardEntityCreator;
 import org.graylog2.contentpacks.facades.DashboardFacade;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesServiceImpl;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.rest.MoreMediaTypes;
+import org.graylog2.rest.resources.suggestions.EntitySuggestionResource;
 
 import java.util.Set;
 
@@ -152,6 +153,7 @@ public class ViewsBindings extends ViewsModule {
         addSystemRestResource(ViewsResource.class);
         addSystemRestResource(SuggestionsResource.class);
         addSystemRestResource(QueryValidationResource.class);
+        addSystemRestResource(EntitySuggestionResource.class);
 
         addPermissions(ViewsRestPermissions.class);
 

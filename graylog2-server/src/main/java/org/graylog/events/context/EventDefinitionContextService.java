@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
  * their DTOs.
  */
 public class EventDefinitionContextService {
+    public static final String SCHEDULER_KEY = "scheduler";
     private final DBJobDefinitionService jobDefinitionService;
     private final DBJobTriggerService jobTriggerService;
 
@@ -56,12 +57,12 @@ public class EventDefinitionContextService {
     }
 
     public ImmutableMap<String, Object> contextFor(List<EventDefinitionDto> eventDefinitions) {
-        return ImmutableMap.of("scheduler", schedulerContext(eventDefinitions));
+        return ImmutableMap.of(SCHEDULER_KEY, schedulerContext(eventDefinitions));
     }
 
     public ImmutableMap<String, Object> contextFor(EventDefinitionDto eventDefinition) {
         final ImmutableMap<String, SchedulerCtx> schedulerContext = schedulerContext(Collections.singletonList(eventDefinition));
-        return ImmutableMap.of("scheduler", schedulerContext.get(eventDefinition.id()));
+        return ImmutableMap.of(SCHEDULER_KEY, schedulerContext.get(eventDefinition.id()));
     }
 
     private Map<String, List<JobDefinitionDto>> getJobDefinitions(List<EventDefinitionDto> eventDefinitions) {

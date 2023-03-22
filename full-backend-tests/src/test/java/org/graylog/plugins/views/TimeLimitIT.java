@@ -17,9 +17,7 @@
 package org.graylog.plugins.views;
 
 import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.SearchServer;
+import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.junit.jupiter.api.AfterEach;
@@ -30,16 +28,16 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 @ContainerMatrixTestsConfiguration
 public class TimeLimitIT {
-    private final RequestSpecification requestSpec;
+    private final GraylogApis api;
 
-    public TimeLimitIT(RequestSpecification requestSpec) {
-        this.requestSpec = requestSpec;
+    public TimeLimitIT(GraylogApis api) {
+        this.api = api;
     }
 
     @AfterEach
     public void resetConfig() {
         final ValidatableResponse response = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body(getClass().getClassLoader().getResourceAsStream("org/graylog/plugins/views/cluster-search-config-reset.json"))
                 .put("/system/cluster_config/org.graylog2.indexer.searches.SearchesClusterConfig")
@@ -50,7 +48,7 @@ public class TimeLimitIT {
     @ContainerMatrixTest
     void testQueryTimeRangeLimit() {
         given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body(getClass().getClassLoader().getResourceAsStream("org/graylog/plugins/views/cluster-search-config.json"))
                 .put("/system/cluster_config/org.graylog2.indexer.searches.SearchesClusterConfig")
@@ -59,7 +57,7 @@ public class TimeLimitIT {
                 .body("query_time_range_limit", equalTo("PT2M"));
 
         final String body = given()
-                .spec(requestSpec)
+                .spec(api.requestSpecification())
                 .when()
                 .body(getClass().getClassLoader().getResourceAsStream("org/graylog/plugins/views/minimalistic-request.json"))
                 .post("/views/search/sync")

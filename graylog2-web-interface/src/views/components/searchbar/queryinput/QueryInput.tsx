@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useCallback, useMemo, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { isEmpty } from 'lodash';
+import isEmpty from 'lodash/isEmpty';
 import type { FormikErrors } from 'formik';
 
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
@@ -142,7 +142,6 @@ const useCompleter = ({ streams, timeRange, completerFactory, userTimezone }: Pi
   }, [allFields, queryFields]);
   const view = useView();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   return useMemo(() => completerFactory(completers ?? [], timeRange, streams, fieldTypes, userTimezone, view),
     [completerFactory, completers, timeRange, streams, fieldTypes, userTimezone, view]);
 };

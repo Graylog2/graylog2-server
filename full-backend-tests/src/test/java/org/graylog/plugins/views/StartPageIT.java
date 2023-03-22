@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.StringContains.containsString;
 
 @ContainerMatrixTestsConfiguration
 public class StartPageIT {
@@ -63,11 +63,11 @@ public class StartPageIT {
         api.postWithResource("/views", user,"org/graylog/plugins/views/startpage-views-request.json", 200);
 
         var validatableResponse = api.get("/views", user, Map.of(), 200);
-        var id = validatableResponse.extract().jsonPath().get("views[0].id");
+        var id = validatableResponse.extract().jsonPath().get("views[0].id").toString();
 
         api.get("/views/" + id, user, Map.of(), 200);
         validatableResponse = api.get("/startpage/lastOpened", user, Map.of(), 200);
-        validatableResponse.assertThat().body("lastOpened[0].id", equalTo(id));
+        validatableResponse.assertThat().body("lastOpened[0].grn", containsString(id));
     }
 
 
@@ -76,7 +76,7 @@ public class StartPageIT {
         final String defaultIndexSetId = api.indices().defaultIndexSetId();
         var stream1Id = api.streams().createStream("Stream #1", defaultIndexSetId, new Streams.StreamRule(StreamRuleType.EXACT.toInteger(), "stream1", "target_stream", false));
 
-        var validatableResponse = api.get("/startpage/recentActivity", Users.LOCAL_ADMIN, Map.of(), 200).log().body();
-        validatableResponse.assertThat().body("recentActivity[0].item_id", equalTo(stream1Id));
+        var validatableResponse = api.get("/startpage/recentActivity", Users.LOCAL_ADMIN, Map.of(), 200);
+        validatableResponse.assertThat().body("recentActivity[0].item_grn", containsString(stream1Id));
     }
 }

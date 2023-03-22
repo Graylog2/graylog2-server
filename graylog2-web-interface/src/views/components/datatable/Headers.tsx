@@ -16,11 +16,15 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useLayoutEffect, useRef } from 'react';
-import { flatten, get, isEqual, last } from 'lodash';
+import flatten from 'lodash/flatten';
+import get from 'lodash/get';
+import isEqual from 'lodash/isEqual';
+import last from 'lodash/last';
 import styled, { css } from 'styled-components';
 import type { OrderedMap } from 'immutable';
 import Immutable from 'immutable';
 
+import { VISUALIZATION_TABLE_HEADER_HEIGHT } from 'views/Constants';
 import Field from 'views/components/Field';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import Value from 'views/components/Value';
@@ -37,11 +41,19 @@ import InteractiveContext from 'views/components/contexts/InteractiveContext';
 
 import styles from './DataTable.css';
 
-const StyledTh = styled.th(({ isNumeric }: { isNumeric: boolean }) => css`
+const StyledTh = styled.th`
+  && {
+    height: ${VISUALIZATION_TABLE_HEADER_HEIGHT}px;
+    padding: 0 5px;
+    vertical-align: middle;
+  }
+`;
+
+const DefaultTh = styled(StyledTh)(({ isNumeric }: { isNumeric: boolean }) => css`
   ${isNumeric ? 'text-align: right;' : ''}
 `);
 
-const CenteredTh = styled.th`
+const CenteredTh = styled(StyledTh)`
   text-align: center;
 `;
 
@@ -92,7 +104,7 @@ const HeaderField = ({ activeQuery, fields, field, prefix = '', span = 1, title 
   }, [togglePin, prefix, field]);
 
   return (
-    <StyledTh ref={thRef} isNumeric={type.isNumeric()} key={`${prefix}${field}`} colSpan={span} className={styles.leftAligned}>
+    <DefaultTh ref={thRef} isNumeric={type.isNumeric()} key={`${prefix}${field}`} colSpan={span} className={styles.leftAligned}>
       <Field name={field} queryId={activeQuery} type={type}>{title}</Field>
       {showPinIcon && <PinIcon data-testid={`pin-${prefix}${field}`} type="button" onClick={_togglePin} className={isPinned ? 'active' : ''}><Icon name="thumbtack" /></PinIcon>}
       {sortable && sortType && (
@@ -103,7 +115,7 @@ const HeaderField = ({ activeQuery, fields, field, prefix = '', span = 1, title 
                      sortConfigMap={sortConfigMap}
                      type={sortType} />
       )}
-    </StyledTh>
+    </DefaultTh>
   );
 };
 

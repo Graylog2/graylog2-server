@@ -94,7 +94,7 @@ public class SearchQuery {
 
     public List<Bson> toBsonFilterList() {
         if (queryMap.isEmpty()) {
-            return new ArrayList<>();
+            return List.of();
         }
         final List<Bson> dbQueries = new ArrayList<>();
 

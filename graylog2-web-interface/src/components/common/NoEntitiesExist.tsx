@@ -16,9 +16,14 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
-import { Icon } from 'components/common';
+import Icon from 'components/common/Icon';
+
+const StyledIcon = styled(Icon)`
+  margin-right: 5px;
+`;
 
 type Props = {
   children: React.ReactNode,
@@ -30,7 +35,7 @@ type Props = {
  * explain what that entity is and a link to create a new one please use <EmptyEntity>
 */
 const NoEntitiesExist = ({ children, className }: Props) => (
-  <Alert className={`${className ?? ''} no-bm`}><Icon name="info-circle" />&nbsp;{children}</Alert>
+  <Alert className={`${className ?? ''} no-bm`}><StyledIcon name="info-circle" />{children}</Alert>
 );
 
 NoEntitiesExist.propTypes = {

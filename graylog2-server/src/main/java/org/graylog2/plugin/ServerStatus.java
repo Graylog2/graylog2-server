@@ -75,9 +75,9 @@ public class ServerStatus {
     private volatile Lifecycle lifecycle = Lifecycle.UNINITIALIZED;
 
     @Inject
-    public ServerStatus(BaseConfiguration configuration, Set<Capability> capabilities, EventBus eventBus, Provider<AuditEventSender> auditEventSenderProvider) {
+    public ServerStatus(BaseConfiguration configuration, Set<Capability> capabilities, EventBus eventBus, Provider<AuditEventSender> auditEventSenderProvider, final NodeId nodeId) {
         this.eventBus = eventBus;
-        this.nodeId = new FilePersistedNodeIdProvider(configuration.getNodeIdFile()).get();
+        this.nodeId = nodeId;
         this.auditEventSenderProvider = auditEventSenderProvider;
         this.clusterId = "";
         this.startedAt = Tools.nowUTC();

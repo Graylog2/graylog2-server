@@ -26,6 +26,7 @@ type InternalState = {
   timerange?: TimeRange,
   query?: QueryString,
   keepSearchTypes?: string[],
+  keepQueries?: string[],
   searchTypes?: SearchTypeOptions,
 };
 
@@ -33,14 +34,15 @@ type JsonRepresentation = {
   timerange?: TimeRange,
   query?: QueryString,
   keep_search_types?: string[],
+  keep_queries?: string[],
   search_types?: SearchTypeOptions,
 };
 
 export default class GlobalOverride {
   private readonly _value: InternalState;
 
-  constructor(timerange?: TimeRange, query?: QueryString, keepSearchTypes?: string[], searchTypes?: SearchTypeOptions) {
-    this._value = { timerange, query, keepSearchTypes, searchTypes };
+  constructor(timerange?: TimeRange, query?: QueryString, keepSearchTypes?: string[], searchTypes?: SearchTypeOptions, keepQueries?: string[]) {
+    this._value = { timerange, query, keepSearchTypes, searchTypes, keepQueries };
   }
 
   get timerange(): TimeRange | undefined | null {
@@ -55,20 +57,23 @@ export default class GlobalOverride {
     return this._value.keepSearchTypes;
   }
 
+  get keepQueries(): string[] | undefined | null {
+    return this._value.keepQueries;
+  }
+
   get searchTypes(): SearchTypeOptions | undefined | null {
     return this._value.searchTypes;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
-    const { timerange, query, keepSearchTypes, searchTypes } = this._value;
+    const { timerange, query, keepSearchTypes, searchTypes, keepQueries } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map({ timerange, query, keepSearchTypes, searchTypes }));
+    return new Builder(Immutable.Map({ timerange, query, keepSearchTypes, searchTypes, keepQueries }));
   }
 
-  static create(timerange?: TimeRange, query?: QueryString, keepSearchTypes?: string[], searchTypes?: SearchTypeOptions): GlobalOverride {
-    return new GlobalOverride(timerange, query, keepSearchTypes, searchTypes);
+  static create(timerange?: TimeRange, query?: QueryString, keepSearchTypes?: string[], searchTypes?: SearchTypeOptions, keepQueries?: string[]): GlobalOverride {
+    return new GlobalOverride(timerange, query, keepSearchTypes, searchTypes, keepQueries);
   }
 
   static empty(): GlobalOverride {
@@ -76,20 +81,21 @@ export default class GlobalOverride {
   }
 
   toJSON(): JsonRepresentation {
-    const { timerange, query, keepSearchTypes, searchTypes } = this._value;
+    const { timerange, query, keepSearchTypes, keepQueries, searchTypes } = this._value;
 
     return {
       timerange,
       query,
       keep_search_types: keepSearchTypes,
+      keep_queries: keepQueries,
       search_types: searchTypes,
     };
   }
 
   static fromJSON(value: JsonRepresentation): GlobalOverride {
-    const { timerange, query, keep_search_types, search_types } = value;
+    const { timerange, query, keep_search_types, search_types, keep_queries } = value;
 
-    return GlobalOverride.create(timerange, query, keep_search_types, search_types);
+    return GlobalOverride.create(timerange, query, keep_search_types, search_types, keep_queries);
   }
 }
 
@@ -114,13 +120,17 @@ class Builder {
     return new Builder(this.value.set('keepSearchTypes', keepSearchTypes));
   }
 
+  keepQueries(keepQueries: string[]): Builder {
+    return new Builder(this.value.set('keepQueries', keepQueries));
+  }
+
   searchTypes(searchTypes: SearchTypeOptions): Builder {
     return new Builder(this.value.set('searchTypes', searchTypes));
   }
 
   build(): GlobalOverride {
-    const { timerange, query, keepSearchTypes, searchTypes } = this.value.toObject();
+    const { timerange, query, keepSearchTypes, searchTypes, keepQueries } = this.value.toObject();
 
-    return new GlobalOverride(timerange, query, keepSearchTypes, searchTypes);
+    return new GlobalOverride(timerange, query, keepSearchTypes, searchTypes, keepQueries);
   }
 }

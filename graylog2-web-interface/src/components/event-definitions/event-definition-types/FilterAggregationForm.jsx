@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import get from 'lodash/get';
+import isEmpty from 'lodash/isEmpty';
 
 import { Col, ControlLabel, FormGroup, Radio, Row } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
@@ -63,8 +64,8 @@ class FilterAggregationForm extends React.Component {
     super(props);
 
     const { group_by, series, conditions } = props.eventDefinition.config;
-    const expression = lodash.get(conditions, 'expression', {});
-    const defaultConditionType = (lodash.isEmpty(group_by) && lodash.isEmpty(series) && lodash.isEmpty(expression)
+    const expression = get(conditions, 'expression', {});
+    const defaultConditionType = (isEmpty(group_by) && isEmpty(series) && isEmpty(expression)
       ? conditionTypes.FILTER : conditionTypes.AGGREGATION);
 
     this.state = {
