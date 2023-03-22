@@ -56,7 +56,7 @@ jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('views/hooks/useQueryTitles');
 
 const mockWidgetEditing = () => {
-  asMock(WidgetFocusProvider as React.FunctionComponent).mockImplementation(({ children }) => (
+  asMock(WidgetFocusProvider as React.FunctionComponent).mockImplementation(({ children }: React.PropsWithChildren<{}>) => (
     <WidgetFocusContext.Provider value={{
       focusedWidget: {
         id: 'widget-id',
@@ -89,7 +89,7 @@ describe('Dashboard Search', () => {
     StreamsActions.refresh = mockAction();
     SearchConfigActions.refresh = mockAction();
 
-    asMock(WidgetFocusProvider as React.FunctionComponent).mockImplementation(({ children }) => (
+    asMock(WidgetFocusProvider as React.FunctionComponent).mockImplementation(({ children }: React.PropsWithChildren<{}>) => (
       <WidgetFocusContext.Provider value={{
         focusedWidget: undefined,
         setWidgetFocusing: () => {},

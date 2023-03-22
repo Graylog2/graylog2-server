@@ -39,7 +39,7 @@ const MessageMetadata = ({ timestamp, receivedBy, index, streams }: Props) => (
         <dt>Routed into streams</dt>
         <dd className="stream-list">
           <ul>
-            {streams}
+            {streams.toArray()}
           </ul>
         </dd>
       </>

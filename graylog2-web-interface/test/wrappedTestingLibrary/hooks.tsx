@@ -31,7 +31,7 @@ const renderHookWithWrapper = <TProps, TResult>(
     callback,
     {
       ...options,
-      wrapper: ({ children }) => {
+      wrapper: ({ children }: React.PropsWithChildren<{}>) => {
         const CustomWrapper = options.wrapper as React.ElementType ?? React.Fragment;
 
         return (
