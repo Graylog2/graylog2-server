@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
 import java.util.Set;
 
 @AutoValue
@@ -36,10 +37,6 @@ public abstract class SlackMessage {
     private static final String FIELD_ATTACHMENTS = "attachments";
     private static final String FIELD_COLOR = "color";
     private static final String FIELD_ATTACHMENT_TEXT = "text";
-    private static final String FIELD_FALLBACK = "fallback";
-    private static final String FIELD_PRETEXT = "pretext";
-    static final String VALUE_FALLBACK = "Custom Message";
-    static final String VALUE_PRETEXT = "Custom Message:";
 
     @JsonProperty(FIELD_ICON_EMOJI)
     public abstract String iconEmoji();
@@ -56,6 +53,7 @@ public abstract class SlackMessage {
     @JsonProperty(FIELD_LINK_NAMES)
     public abstract boolean linkNames();
 
+    @Nullable
     @JsonProperty(FIELD_TEXT)
     public abstract String text();
 
@@ -100,14 +98,9 @@ public abstract class SlackMessage {
     @AutoValue
     @JsonDeserialize(builder = AutoValue_SlackMessage_Attachment.Builder.class)
     public static abstract class Attachment {
-        @JsonProperty(FIELD_FALLBACK)
-        public abstract String fallback();
-
+        @Nullable
         @JsonProperty(FIELD_ATTACHMENT_TEXT)
         public abstract String text();
-
-        @JsonProperty(FIELD_PRETEXT)
-        public abstract String pretext();
 
         @JsonProperty(FIELD_COLOR)
         public abstract String color();
@@ -120,14 +113,8 @@ public abstract class SlackMessage {
 
         @AutoValue.Builder
         public static abstract class Builder {
-            @JsonProperty(FIELD_FALLBACK)
-            public abstract Builder fallback(String fallback);
-
             @JsonProperty(FIELD_ATTACHMENT_TEXT)
             public abstract Builder text(String fallback);
-
-            @JsonProperty(FIELD_PRETEXT)
-            public abstract Builder pretext(String pretext);
 
             @JsonProperty(FIELD_COLOR)
             public abstract Builder color(String color);
@@ -136,10 +123,8 @@ public abstract class SlackMessage {
 
             @JsonCreator
             public static Builder create() {
-                // Set the pretext and fallback values
-                return new AutoValue_SlackMessage_Attachment.Builder()
-                        .pretext(VALUE_PRETEXT)
-                        .fallback(VALUE_FALLBACK);
+                // Set the fallback values
+                return new AutoValue_SlackMessage_Attachment.Builder();
             }
         }
     }

@@ -17,7 +17,6 @@
 package org.graylog.integrations.notifications.types;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.floreysoft.jmte.Engine;
 import com.google.common.annotations.VisibleForTesting;
 import org.graylog.events.notifications.EventNotification;
@@ -33,6 +32,9 @@ import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.utilities.StringUtils;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,18 +54,18 @@ public class SlackEventNotification implements EventNotification {
     private final EventNotificationService notificationCallbackService;
     private final Engine templateEngine;
     private final NotificationService notificationService;
-    private final ObjectMapper objectMapper;
+    private final ObjectMapperProvider objectMapperProvider;
     private final NodeId nodeId;
     private final SlackClient slackClient;
 
     @Inject
     public SlackEventNotification(EventNotificationService notificationCallbackService,
-                                  ObjectMapper objectMapper,
+                                  ObjectMapperProvider objectMapperProvider,
                                   Engine templateEngine,
                                   NotificationService notificationService,
                                   NodeId nodeId, SlackClient slackClient) {
         this.notificationCallbackService = notificationCallbackService;
-        this.objectMapper = requireNonNull(objectMapper);
+        this.objectMapperProvider = requireNonNull(objectMapperProvider);
         this.templateEngine = requireNonNull(templateEngine);
         this.notificationService = requireNonNull(notificationService);
         this.nodeId = requireNonNull(nodeId);
@@ -121,13 +123,15 @@ public class SlackEventNotification implements EventNotification {
      * @throws PermanentEventNotificationException - throws this exception when the custom message template is invalid
      */
     SlackMessage createSlackMessage(EventNotificationContext ctx, SlackEventNotificationConfig config) throws PermanentEventNotificationException {
-        //Note: Link names if notify channel or else the channel tag will be plain text.
-        boolean linkNames = config.linkNames() || config.notifyChannel();
-        String message = buildDefaultMessage(ctx, config);
 
         String customMessage = null;
         String template = config.customMessage();
         if (!isNullOrEmpty(template)) {
+            // If the title is not included but the channel/here still needs to be notified, add a @channel tag to the custom message
+            if (!config.includeTitle() && (config.notifyChannel() || config.notifyHere())) {
+                String tag = config.notifyChannel() ? "channel" : "here";
+                template = StringUtils.f("@%s\n%s", tag, template);
+            }
             customMessage = buildCustomMessage(ctx, config, template);
         }
 
@@ -136,16 +140,18 @@ public class SlackEventNotification implements EventNotification {
                 .text(customMessage)
                 .build();
 
+        //Note: Link names if notify channel or else the channel tag will be plain text.
+        boolean linkNames = config.linkNames() || config.notifyChannel() || config.notifyHere();
         String templatedChannel = buildTemplatedChannel(ctx, config, config.channel());
         String emoji = config.iconEmoji() != null ? ensureEmojiSyntax(config.iconEmoji()) : "";
         return SlackMessage.builder()
                 .iconEmoji(emoji)
                 .iconUrl(config.iconUrl())
                 .username(config.userName())
-                .text(message)
+                .text(config.includeTitle() ? buildDefaultMessage(ctx, config) : null)
                 .channel(templatedChannel)
                 .linkNames(linkNames)
-                .attachments(Collections.singleton(attachment))
+                .attachments(isNullOrEmpty(template) ? Collections.emptySet() : Collections.singleton(attachment))
                 .build();
     }
 
@@ -167,7 +173,10 @@ public class SlackEventNotification implements EventNotification {
         String title = buildMessageTitle(ctx);
 
         // Build custom message
-        String audience = config.notifyChannel() ? "@channel " : "";
+        String audience = "";
+        if (config.notifyChannel() || config.notifyHere()) {
+            audience = config.notifyChannel() ? "@channel " : "@here ";
+        }
         String description = ctx.eventDefinition().map(EventDefinitionDto::description).orElse("");
         return String.format(Locale.ROOT, "%s*Alert %s* triggered:\n> %s \n", audience, title, description);
     }
@@ -179,27 +188,27 @@ public class SlackEventNotification implements EventNotification {
 
     String buildTemplatedChannel(EventNotificationContext ctx, SlackEventNotificationConfig config, String template) throws PermanentEventNotificationException {
         final List<MessageSummary> backlog = getMessageBacklog(ctx, config);
-        Map<String, Object> model = getCustomMessageModel(ctx, config.type(), backlog);
+        Map<String, Object> model = getCustomMessageModel(ctx, config.type(), backlog, config.timeZone());
         try {
             LOG.debug("channel: template = {} model = {}", template, model);
             return templateEngine.transform(template, model);
         } catch (Exception e) {
             String error = "Invalid channel template.";
             LOG.error(error + "[{}]", e.toString());
-            throw new PermanentEventNotificationException(error + e.toString(), e.getCause());
+            throw new PermanentEventNotificationException(error + e, e.getCause());
         }
     }
 
     String buildCustomMessage(EventNotificationContext ctx, SlackEventNotificationConfig config, String template) throws PermanentEventNotificationException {
         final List<MessageSummary> backlog = getMessageBacklog(ctx, config);
-        Map<String, Object> model = getCustomMessageModel(ctx, config.type(), backlog);
+        Map<String, Object> model = getCustomMessageModel(ctx, config.type(), backlog, config.timeZone());
         try {
             LOG.debug("customMessage: template = {} model = {}", template, model);
             return templateEngine.transform(template, model);
         } catch (Exception e) {
             String error = "Invalid Custom Message template.";
             LOG.error(error + "[{}]", e.toString());
-            throw new PermanentEventNotificationException(error + e.toString(), e.getCause());
+            throw new PermanentEventNotificationException(error + e, e.getCause());
         }
     }
 
@@ -214,11 +223,11 @@ public class SlackEventNotification implements EventNotification {
 
 
     @VisibleForTesting
-    Map<String, Object> getCustomMessageModel(EventNotificationContext ctx, String type, List<MessageSummary> backlog) {
+    Map<String, Object> getCustomMessageModel(EventNotificationContext ctx, String type, List<MessageSummary> backlog, DateTimeZone timeZone) {
         EventNotificationModelData modelData = EventNotificationModelData.of(ctx, backlog);
 
         LOG.debug("the custom message model data is {}", modelData.toString());
-        Map<String, Object> objectMap = objectMapper.convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
+        Map<String, Object> objectMap = objectMapperProvider.getForTimeZone(timeZone).convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
         objectMap.put("type", type);
         return objectMap;
     }

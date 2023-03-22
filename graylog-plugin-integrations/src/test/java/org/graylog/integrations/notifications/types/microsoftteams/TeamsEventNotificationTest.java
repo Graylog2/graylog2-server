@@ -90,7 +90,8 @@ public class TeamsEventNotificationTest {
         final ImmutableList<MessageSummary> messageSummaries = generateMessageSummaries(50);
         when(notificationCallbackService.getBacklogForEvent(eventNotificationContext)).thenReturn(messageSummaries);
 
-        teamsEventNotification = new TeamsEventNotification(notificationCallbackService, new ObjectMapperProvider().get(),
+        teamsEventNotification = new TeamsEventNotification(notificationCallbackService,
+                new ObjectMapperProvider(),
                 Engine.createEngine(),
                 mockNotificationService,
                 nodeId, mockrequestClient);
@@ -161,7 +162,7 @@ public class TeamsEventNotificationTest {
     @Test
     public void getCustomMessageModel() {
         List<MessageSummary> messageSummaries = generateMessageSummaries(50);
-        Map<String, Object> customMessageModel = teamsEventNotification.getCustomMessageModel(eventNotificationContext, teamsEventNotificationConfig.type(), messageSummaries);
+        Map<String, Object> customMessageModel = teamsEventNotification.getCustomMessageModel(eventNotificationContext, teamsEventNotificationConfig.type(), messageSummaries, DateTimeZone.UTC);
         //there are 9 keys and two asserts needs to be implemented (backlog,event)
         assertThat(customMessageModel).isNotNull();
         assertThat(customMessageModel.get("event_definition_description")).isEqualTo("Event Definition Test Description");
