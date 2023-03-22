@@ -35,31 +35,22 @@ const _collectionsByAttributeId = (attributesMetaData: Attributes) => attributes
     };
   }, {});
 
-const categorizeFilters = (filters: UrlQueryFilters, collectionsByAttributeId: CollectionsByAttributeId) => (
+const _urlQueryFiltersWithoutTitle = (filters: UrlQueryFilters, collectionsByAttributeId: CollectionsByAttributeId) => (
   Object.entries(filters).reduce((col, [attributeId, filterValues]) => {
     const relatedCollection = collectionsByAttributeId?.[attributeId];
 
     if (!relatedCollection) {
-      return {
-        ...col,
-        filtersWithTitle: {
-          ...col.filtersWithTitle,
-          [attributeId]: filterValues,
-        },
-      };
+      return col;
     }
 
     return {
       ...col,
-      filtersWithoutTitle: {
-        ...col.filtersWithoutTitle,
-        [attributeId]: filterValues,
-      },
+      [attributeId]: filterValues,
     };
-  }, { filtersWithTitle: {}, filtersWithoutTitle: {} })
+  }, {})
 );
 
-const _payload = (filtersWithoutTitle: UrlQueryFilters, collectionsByAttributeId: CollectionsByAttributeId) => ({
+const filtersWithoutTitlePayload = (filtersWithoutTitle: UrlQueryFilters, collectionsByAttributeId: CollectionsByAttributeId) => ({
   entities: Object.entries(filtersWithoutTitle).reduce((col, [attributeId, filterValues]) => {
     const relatedCollection = collectionsByAttributeId[attributeId];
 
@@ -82,7 +73,10 @@ const filterTitle = (
   if (attribute?.type === 'DATE') {
     const [from, until] = extractRangeFromString(filterValue);
 
-    return timeRangeTitle(formatTime(from), formatTime(until));
+    const fromDate = from ? formatTime(from) : undefined;
+    const untilDate = until ? formatTime(until) : undefined;
+
+    return timeRangeTitle(fromDate, untilDate);
   }
 
   if (attribute?.filter_options) {
@@ -100,7 +94,7 @@ const filterTitle = (
   return filterValue;
 };
 
-const _allFiltersWithTitle = (
+const allfiltersWithTitle = (
   urlQueryFilters: UrlQueryFilters,
   requestedFilterTitles: RequestedFilterTitles,
   attributesMetaData: Attributes,
@@ -125,6 +119,20 @@ const _allFiltersWithTitle = (
   }, {});
 };
 
+const filtersWithTitleToResponse = (filtersWithTitle: Filters, attributesMetaData: Attributes) => Object.entries(filtersWithTitle).reduce(
+  (col, [_attributeId, filters]) => {
+    const relatedCollection = attributesMetaData?.find(({ id }) => id === _attributeId)?.related_collection;
+
+    if (!relatedCollection) {
+      return col;
+    }
+
+    return [
+      ...col,
+      ...filters.map(({ value, title }) => ({ id: value, type: relatedCollection, title })),
+    ];
+  }, []);
+
 const fetchFilterTitles = (payload: { entities: Array<{ id: string, type: string }> }) => (
   fetch('POST', URLUtils.qualifyUrl('/system/catalog/entity_titles'), payload)
 );
@@ -133,11 +141,11 @@ const useFiltersWithTitle = (urlQueryFilters: UrlQueryFilters, attributesMetaDat
   const queryClient = useQueryClient();
   const { formatTime } = useUserDateTime();
   const collectionsByAttributeId = _collectionsByAttributeId(attributesMetaData);
-  const categorizedFilters = categorizeFilters(urlQueryFilters, collectionsByAttributeId);
-  const payload = _payload(categorizedFilters.filtersWithoutTitle, collectionsByAttributeId);
+  const urlQueryFiltersWithoutTitle = _urlQueryFiltersWithoutTitle(urlQueryFilters, collectionsByAttributeId);
+  const payload = filtersWithoutTitlePayload(urlQueryFiltersWithoutTitle, collectionsByAttributeId);
 
   const { data, refetch, isInitialLoading } = useQuery(
-    ['entity_titles', urlQueryFilters],
+    ['entity_titles', payload],
     () => fetchFilterTitles(payload),
     {
       onError: (errorThrown) => {
@@ -149,28 +157,17 @@ const useFiltersWithTitle = (urlQueryFilters: UrlQueryFilters, attributesMetaDat
     },
   );
 
-  const cachedResponse = queryClient.getQueryData(['entity_titles', urlQueryFilters]);
+  const cachedResponse = queryClient.getQueryData(['entity_titles', payload]);
   const requestedFilterTitles = (cachedResponse ?? data)?.entities;
-  const allFiltersWithTitle = _allFiltersWithTitle(urlQueryFilters, requestedFilterTitles, attributesMetaData, formatTime);
+  const allFiltersWithTitle = allfiltersWithTitle(urlQueryFilters, requestedFilterTitles, attributesMetaData, formatTime);
 
-  const onChange = useCallback((newFilters: Filters, newUrlQueryFilters: UrlQueryFilters) => {
-    const result = Object.entries(newFilters).reduce((col, [_attributeId, filters]) => {
-      const relatedCollection = attributesMetaData?.find(({ id }) => id === _attributeId)?.related_collection;
+  const onChange = useCallback((newFiltersWithTitle: Filters, newUrlQueryFilters: UrlQueryFilters) => {
+    const newURLQueryFiltersWithoutTitle = _urlQueryFiltersWithoutTitle(newUrlQueryFilters, collectionsByAttributeId);
+    const newPayload = filtersWithoutTitlePayload(newURLQueryFiltersWithoutTitle, collectionsByAttributeId);
+    const newResponse = filtersWithTitleToResponse(newFiltersWithTitle, attributesMetaData);
 
-      if (!relatedCollection) {
-        return col;
-      }
-
-      return [
-        ...col,
-        ...filters.map(({ value, title }) => ({ id: value, type: relatedCollection, title })),
-      ];
-    }, []);
-
-    queryClient.setQueryData(['entity_titles', newUrlQueryFilters], {
-      entities: result,
-    });
-  }, [attributesMetaData, queryClient]);
+    queryClient.setQueryData(['entity_titles', newPayload], { entities: newResponse });
+  }, [attributesMetaData, collectionsByAttributeId, queryClient]);
 
   return ({
     data: allFiltersWithTitle,
