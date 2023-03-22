@@ -15,26 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { Col, Nav, NavItem, Row } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { useStore } from 'stores/connect';
+import AppConfig from 'util/AppConfig';
+import { Col, Nav, NavItem } from 'components/bootstrap';
+import { DocumentTitle, PageHeader } from 'components/common';
 import { isPermitted } from 'util/PermissionsMixin';
-// import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
 import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
 import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
-import HideOnCloud from 'util/conditional/HideOnCloud';
 import IndexSetsDefaultsConfig from 'components/configurations/IndexSetsDefaultsConfig';
 import PermissionsConfig from 'components/configurations/PermissionsConfig';
+import PluginsConfig from 'components/configurations/PluginsConfig';
 import 'components/maps/configurations';
-import type { Store } from 'stores/StoreTypes';
-import usePluginEntities from 'hooks/usePluginEntities';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
-import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import useCurrentUser from 'hooks/useCurrentUser';
 
 import ConfigletContainer from './configurations/ConfigletContainer';
@@ -42,191 +38,111 @@ import ConfigletContainer from './configurations/ConfigletContainer';
 import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
 import UserConfig from '../components/configurations/UserConfig';
 
+type ConfigurationSectionProps = {
+  ConfigurationComponent: React.ComponentType,
+  title: string
+}
 
-const getConfig = (configType, configuration) => configuration?.[configType] ?? null;
-
-const onUpdate = (configType: string) => {
-  return (config) => {
-    switch (configType) {
-      default:
-        return ConfigurationsActions.update(configType, config);
-    }
-  };
-};
+const ConfigurationSection = ({ ConfigurationComponent, title } : ConfigurationSectionProps) => (
+  <ConfigletContainer title={title}>
+    <ConfigurationComponent />
+  </ConfigletContainer>
+);
 
 const ConfigurationsPage = () => {
-  const [loaded, setLoaded] = useState(false);
-  const pluginSystemConfigs = usePluginEntities('systemConfigurations');
-  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
   const currentUser = useCurrentUser();
   const [activeSectionKey, setActiveSectionKey] = useState(1);
-  const [activeSubSectionKey, setActiveSubSectionKey] = useState(1);
-
-  useEffect(() => {
-    // if (isPermitted(currentUser.permissions, ['urlwhitelist:read'])) {
-    //   promises.push(ConfigurationsActions.listWhiteListConfig(ConfigurationType.URL_WHITELIST_CONFIG));
-    // }
-    const pluginPromises = pluginSystemConfigs
-      .map((systemConfig) => ConfigurationsActions.list(systemConfig.configType));
-
-    Promise.allSettled(pluginPromises).then(() => setLoaded(true));
-  }, [currentUser.permissions, pluginSystemConfigs]);
+  const isCloud = AppConfig.isCloud();
 
   const handleNavSelect = (itemKey) => {
     setActiveSectionKey(itemKey);
-    setActiveSubSectionKey(1);
   };
 
-  const handleSubNavSelect = (itemKey) => {
-    setActiveSubSectionKey(itemKey);
-  };
-
-
-  const pluginDisplayNames = [
-    {
-      configType: 'org.graylog.plugins.collector.system.CollectorSystemConfiguration',
-      displayName: 'Collectors System',
-    },
-    {
-      configType: 'org.graylog.aws.config.AWSPluginConfiguration',
-      displayName: 'AWS',
-    },
-    {
-      configType: 'org.graylog.plugins.threatintel.ThreatIntelPluginConfiguration',
-      displayName: 'Threat Intelligence Lookup',
-    },
-    {
-      configType: 'org.graylog.plugins.failure.config.EnterpriseFailureHandlingConfiguration',
-      displayName: 'Failure Processing',
-    },
-    {
-      configType: 'org.graylog.plugins.license.violations.TrafficLimitViolationSettings',
-      displayName: 'Traffic Limit Violation',
-    },
-    {
-      configType: 'org.graylog.plugins.map.config.GeoIpResolverConfig',
-      displayName: 'Geo-Location Processor',
-    },
-  ];
-
-  const configurationSections = [
+  const configurationSections: Array<{
+    name: string,
+    hide?: boolean,
+    SectionComponent: React.ComponentType<ConfigurationSectionProps | {}>,
+    props: ConfigurationSectionProps | {}
+  }> = [
     {
       name: 'Search',
-      shouldRender: true,
-      render: (key) => (
-        <ConfigletContainer title="Search Configuration" key={key}>
-          <SearchesConfig />
-        </ConfigletContainer>
-      ),
+      SectionComponent: ConfigurationSection,
+      props: {
+        ConfigurationComponent: SearchesConfig,
+        title: 'Search',
+      },
     },
     {
       name: 'Message Processor',
-      shouldRender: true,
-      render: (key) => (
-        <ConfigletContainer title="Message Processor Configuration" key={key}>
-          <MessageProcessorsConfig />
-        </ConfigletContainer>
-      ),
+      SectionComponent: ConfigurationSection,
+      props: {
+        ConfigurationComponent: MessageProcessorsConfig,
+        title: 'Message Processor',
+      },
     },
     {
       name: 'Sidecar',
-      shouldRender: true,
-      render: (key) => (
-        <ConfigletContainer title="Sidecar Configuration" key={key}>
-          <SidecarConfig  />
-        </ConfigletContainer>
-      ),
+      SectionComponent: ConfigurationSection,
+      props: {
+        ConfigurationComponent: SidecarConfig,
+        title: 'Sidecar',
+      },
     },
     {
       name: 'Events',
-      shouldRender: true,
-      render: (key) => (
-        <ConfigletContainer title="Events Configuration" key={key}>
-          <EventsConfig />
-        </ConfigletContainer>
-      ),
+      SectionComponent: ConfigurationSection,
+      props: {
+        ConfigurationComponent: EventsConfig,
+        title: 'Events',
+      },
+
     },
     {
       name: 'URL Whitelist',
-      shouldRender: true,
-      render: (key) => (
-        isPermitted(currentUser.permissions, ['urlwhitelist:read']) && (
-        <ConfigletContainer title="URL Whitelist Configuration" key={key}>
-          <UrlWhiteListConfig />
-        </ConfigletContainer>
-        )
-      ),
+      hide: !isPermitted(currentUser.permissions, ['urlwhitelist:read']),
+      SectionComponent: ConfigurationSection,
+      props: {
+        ConfigurationComponent: UrlWhiteListConfig,
+        title: 'URL Whitelist',
+      },
     },
     {
       name: 'Decorators',
-      shouldRender: true,
-      render: (key) => (
-        <ConfigletContainer title="Decorators Configuration" key={key}>
-          <DecoratorsConfig />
-        </ConfigletContainer>
-      ),
+      SectionComponent: ConfigurationSection,
+      props: {
+        ConfigurationComponent: DecoratorsConfig,
+        title: 'Decorators',
+      },
     },
     {
       name: 'Permissions',
-      shouldRender: true,
-      render: (key) => (
-        <ConfigletContainer title="Permissions Configuration" key={key}>
-          <PermissionsConfig />
-        </ConfigletContainer>
-      ),
+      SectionComponent: ConfigurationSection,
+      props: {
+        ConfigurationComponent: PermissionsConfig,
+        title: 'Permissions',
+      },
     },
     {
       name: 'Index Set Defaults',
-      shouldRender: true,
-      render: (key) => (
-        <HideOnCloud key={key}>
-          <ConfigletContainer title="Index Set Default Configuration">
-            <IndexSetsDefaultsConfig  />
-          </ConfigletContainer>
-        </HideOnCloud>
-      ),
+      hide: isCloud,
+      SectionComponent: ConfigurationSection,
+      props: {
+        ConfigurationComponent: IndexSetsDefaultsConfig,
+        title: 'Index Set Defaults',
+      },
     },
     {
       name: 'Users',
-      shouldRender: true,
-      render: (key) => (
-        <ConfigletContainer title="User Configuration" key={key}>
-          <UserConfig />
-        </ConfigletContainer>
-      ),
+      SectionComponent: ConfigurationSection,
+      props: {
+        ConfigurationComponent: UserConfig,
+        title: 'Index Set Defaults',
+      },
     },
     {
       name: 'Plugins',
-      shouldRender: pluginSystemConfigs.length > 0,
-      render: (key) => (
-        <Row key={key}>
-          <Col md={3}>
-            <Nav bsStyle="pills" stacked activeKey={activeSubSectionKey} onSelect={handleSubNavSelect}>
-              {pluginSystemConfigs.map(({ configType }, index) => {
-                const { displayName } = pluginDisplayNames.find((entry) => entry.configType === configType);
-
-                return (
-                  <NavItem key={`plugin-nav-${configType}`} eventKey={index + 1} title={displayName}>
-                    {displayName}
-                  </NavItem>
-                );
-              })}
-            </Nav>
-          </Col>
-          <Col md={9}>
-            {pluginSystemConfigs
-              .map(({ component: SystemConfigComponent, configType }, index) => (
-                (index + 1 === activeSubSectionKey) && (
-                <ConfigletContainer title={configType} key={`plugin-section-${configType}`}>
-                  <SystemConfigComponent key={`system-configuration-${configType}`}
-                                         config={getConfig(configType, configuration) ?? undefined}
-                                         updateConfig={onUpdate(configType)} />
-                </ConfigletContainer>
-                )
-              ))}
-          </Col>
-        </Row>
-      ),
+      SectionComponent: PluginsConfig,
+      props: {},
     },
   ];
 
@@ -243,32 +159,26 @@ const ConfigurationsPage = () => {
       </PageHeader>
 
       <ConfigletRow className="content">
-        {loaded ? (
-          <>
-            <Col md={2}>
-              <Nav bsStyle="pills" stacked activeKey={activeSectionKey} onSelect={handleNavSelect}>
-                {configurationSections.map((section, index) => (
-                  section.shouldRender && (
-                  <NavItem key={`nav-${section.name}`} eventKey={index + 1} title={section.name}>
-                    {section.name}
+        <>
+          <Col md={2}>
+            <Nav bsStyle="pills" stacked activeKey={activeSectionKey} onSelect={handleNavSelect}>
+              {configurationSections.map(({ hide, name }, index) => (
+                !hide && (
+                  <NavItem key={`nav-${name}`} eventKey={index + 1} title={name}>
+                    {name}
                   </NavItem>
-                  )
-                ))}
-              </Nav>
-            </Col>
-
-            <Col md={10}>
-              {configurationSections.map((section) => (
-                isSectionActive(section.name) && section.shouldRender && section.render(`section-${section.name}`)
+                )
               ))}
-            </Col>
-
-          </>
-        ) : (
-          <Col md={12}>
-            <Spinner text="Loading Configuration Panel..." />
+            </Nav>
           </Col>
-        )}
+
+          <Col md={10}>
+            {configurationSections.map(({ name, hide, props, SectionComponent }) => (
+              isSectionActive(name) && !hide && (
+              <SectionComponent {...props} key={name} />
+              )))}
+          </Col>
+        </>
       </ConfigletRow>
     </DocumentTitle>
   );
