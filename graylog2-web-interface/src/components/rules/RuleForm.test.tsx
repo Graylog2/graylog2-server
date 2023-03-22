@@ -78,9 +78,9 @@ describe('RuleForm', () => {
     const setRawMessageToSimulate = jest.fn();
     const ruleInput = 'new_test';
 
-    const { getByRole, getByPlaceholderText } = render(
+    const { getByRole, getByPlaceholderText } = renderWithDataRouter(
       <PipelineRulesContext.Provider value={{
-        rule_source: ruleToUpdate.source,
+        ruleSource: ruleToUpdate.source,
         ruleSourceRef: {},
         usedInPipelines: [],
         rawMessageToSimulate: '',
