@@ -90,8 +90,7 @@ public class NodePingPeriodical extends Periodical {
         final boolean isLeader = managedOpenSearch.isLeaderNode();
         final URI httpPublishUri = configuration.getHttpPublishUri();
         try {
-            final Node node = nodeService.byNodeId(nodeId);
-            nodeService.markAsAlive(node, isLeader, httpPublishUri);
+            nodeService.markAsAlive(nodeId, isLeader, httpPublishUri);
         } catch (NodeNotFoundException e) {
             LOG.warn("Did not find meta info of this node. Re-registering.");
             nodeService.registerServer(nodeId.getNodeId(),
