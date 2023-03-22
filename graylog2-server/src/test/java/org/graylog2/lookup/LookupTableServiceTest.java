@@ -130,4 +130,14 @@ public class LookupTableServiceTest {
         verify(table, times(1)).clearKey("key");
         verify(table, never()).clearKey(null);
     }
+
+    @Test
+    public void functionAssignTtl() {
+        function.assignTtl("key", 500L);
+
+        assertThatThrownBy(() -> function.assignTtl(null, 500L)).isInstanceOf(NullPointerException.class);
+
+        verify(table, times(1)).assignTtl("key", 500L);
+        verify(table, never()).clearKey(null);
+    }
 }

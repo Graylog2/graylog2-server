@@ -111,8 +111,8 @@ public abstract class LookupTable {
         cache().purge(LookupCacheKey.create(dataAdapter(), key));
     }
 
-    public LookupResult assignTtl(@Nonnull Object key, @Nonnull Long ttl) {
-        final LookupResult result = dataAdapter().assignTtl(key, ttl);
+    public LookupResult assignTtl(@Nonnull Object key, @Nonnull Long ttlMs) {
+        final LookupResult result = dataAdapter().assignTtl(key, ttlMs);
         cache().purge(LookupCacheKey.create(dataAdapter(), key));
         return result;
     }

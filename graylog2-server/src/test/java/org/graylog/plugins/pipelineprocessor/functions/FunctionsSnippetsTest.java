@@ -87,6 +87,7 @@ import org.graylog.plugins.pipelineprocessor.functions.json.JsonFlatten;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAddStringList;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAssignTtl;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupClearKey;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupRemoveStringList;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetStringList;
@@ -373,6 +374,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(LookupSetStringList.NAME, new LookupSetStringList(lookupTableService));
         functions.put(LookupAddStringList.NAME, new LookupAddStringList(lookupTableService));
         functions.put(LookupRemoveStringList.NAME, new LookupRemoveStringList(lookupTableService));
+        functions.put(LookupAssignTtl.NAME, new LookupAssignTtl(lookupTableService));
 
         functionRegistry = new FunctionRegistry(functions);
     }
@@ -1249,6 +1251,19 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         verifyNoMoreInteractions(lookupTable);
 
         assertThat(message.getField("new_value")).isEqualTo(result);
+    }
+
+    @Test
+    public void lookupAssignTtl() {
+        doReturn(LookupResult.single(123L)).when(lookupTable).assignTtl(any(), any());
+
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        verify(lookupTable).assignTtl("key", 123L);
+        verifyNoMoreInteractions(lookupTable);
+
+        assertThat(message.getField("new_value")).isEqualTo(123L);
     }
 
     @Test
