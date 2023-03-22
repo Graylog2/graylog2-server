@@ -17,28 +17,36 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
-import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
-import { Button, Table } from 'components/bootstrap';
+import { useStore } from 'stores/connect';
+import type { Store } from 'stores/StoreTypes';
+import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
+import { getConfig } from 'components/configurations/helpers';
+import { ConfigurationType } from 'components/configurations/ConfigurationTypes'; import { Button, Table } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
+import Spinner from 'components/common/Spinner';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
-import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import type { WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
 
 const UrlWhiteListConfig = () => {
   const [showConfigModal, setShowConfigModal] = useState(false);
-  const [config, setConfig] = useState<WhiteListConfig | undefined>(undefined);
+  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
+  const [viewConfig, setViewConfig] = useState<WhiteListConfig | undefined>(undefined);
+  const [formConfig, setFormConfig] = useState<WhiteListConfig | undefined>(undefined);
   const [isValid, setIsValid] = useState(false);
 
   useEffect(() => {
-    ConfigurationsActions.list(ConfigurationType.URL_WHITELIST_CONFIG).then((configData) => {
-      setConfig(configData as WhiteListConfig);
+    ConfigurationsActions.list(ConfigurationType.URL_WHITELIST_CONFIG).then(() => {
+      const config = getConfig(ConfigurationType.URL_WHITELIST_CONFIG, configuration);
+
+      setViewConfig(config);
+      setFormConfig(config);
     });
-  }, []);
+  }, [configuration]);
 
   const summary = (): React.ReactElement<'tr'>[] => {
     const literal = 'literal';
-    const { entries } = config;
+    const { entries } = viewConfig;
 
     return entries.map((urlConfig, idx) => {
       return (
@@ -58,22 +66,23 @@ const UrlWhiteListConfig = () => {
 
   const closeModal = () => {
     setShowConfigModal(false);
+    setFormConfig(viewConfig);
   };
 
   const saveConfig = () => {
-    ConfigurationsActions.updateWhitelist(ConfigurationType.URL_WHITELIST_CONFIG, config).then(() => {
+    ConfigurationsActions.updateWhitelist(ConfigurationType.URL_WHITELIST_CONFIG, formConfig).then(() => {
       closeModal();
     });
   };
 
   const update = (newConfig: WhiteListConfig, newIsValid: boolean) => {
-    setConfig(newConfig);
+    setFormConfig(newConfig);
     setIsValid(newIsValid);
   };
 
-  if (!config) { return null; }
+  if (!viewConfig || !formConfig) { return <Spinner />; }
 
-  const { entries, disabled } = config;
+  const { entries, disabled } = formConfig;
 
   return (
     <div>
