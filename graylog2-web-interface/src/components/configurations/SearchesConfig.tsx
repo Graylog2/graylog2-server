@@ -68,8 +68,10 @@ const SearchesConfig = () => {
 
   useEffect(() => {
     ConfigurationsActions.list(ConfigurationType.SEARCHES_CLUSTER_CONFIG).then(() => {
-      setViewConfig(getConfig(ConfigurationType.SEARCHES_CLUSTER_CONFIG, configuration));
-      setFormConfig(getConfig(ConfigurationType.SEARCHES_CLUSTER_CONFIG, configuration));
+      const config = getConfig(ConfigurationType.SEARCHES_CLUSTER_CONFIG, configuration);
+
+      setViewConfig(config);
+      setFormConfig(config);
     });
   }, [configuration]);
 

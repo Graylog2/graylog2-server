@@ -15,14 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 
+import { useStore } from 'stores/connect';
+import type { Store } from 'stores/StoreTypes';
+import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
+import { getConfig } from 'components/configurations/helpers';
+import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Button, Alert, Table } from 'components/bootstrap';
 import { IfPermitted, SortableList } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
-import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 
 type Config = {
   disabled_processors: Array<any>,
@@ -31,16 +34,17 @@ type Config = {
 
 const MessageProcessorsConfig = () => {
   const [showConfigModal, setShowConfigModal] = useState(false);
-  const [config, setConfig] = useState<Config | undefined>(undefined);
-
-  const inputsRef = useRef({});
+  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
+  const [viewConfig, setViewConfig] = useState<Config | undefined>(undefined);
+  const [formConfig, setFormConfig] = useState<Config | undefined>(undefined);
 
   useEffect(() => {
-    ConfigurationsActions.listMessageProcessorsConfig(ConfigurationType.MESSAGE_PROCESSORS_CONFIG)
-      .then((configData) => {
-        setConfig(configData as Config);
-      });
-  }, []);
+    ConfigurationsActions.listMessageProcessorsConfig(ConfigurationType.MESSAGE_PROCESSORS_CONFIG).then(() => {
+      const config = getConfig(ConfigurationType.MESSAGE_PROCESSORS_CONFIG, configuration);
+      setViewConfig(config);
+      setFormConfig(config);
+    });
+  }, [configuration]);
 
   const openModal = () => {
     setShowConfigModal(true);
@@ -51,12 +55,12 @@ const MessageProcessorsConfig = () => {
   };
 
   const hasNoActiveProcessor = () => {
-    return config.disabled_processors.length >= config.processor_order.length;
+    return formConfig.disabled_processors.length >= formConfig.processor_order.length;
   };
 
   const saveConfig = () => {
     if (!hasNoActiveProcessor()) {
-      ConfigurationsActions.updateMessageProcessorsConfig(ConfigurationType.MESSAGE_PROCESSORS_CONFIG, config).then(() => {
+      ConfigurationsActions.updateMessageProcessorsConfig(ConfigurationType.MESSAGE_PROCESSORS_CONFIG, formConfig).then(() => {
         closeModal();
       });
     }
@@ -67,27 +71,26 @@ const MessageProcessorsConfig = () => {
       return { class_name: item.id, name: item.title };
     });
 
-    setConfig({ ...config, processor_order: processorOrder });
+    setFormConfig({ ...formConfig, processor_order: processorOrder });
   };
 
-  const toggleStatus = (className) => {
-    return () => {
-      let newDisabledProcessors = config.disabled_processors;
-      const { checked } = inputsRef.current[className];
+  const toggleStatus = (className, enabled) => {
+    const disabledProcessors = formConfig.disabled_processors;
 
-      if (checked) {
-        newDisabledProcessors = config.disabled_processors.filter((p) => p !== className);
-      } else if (config.disabled_processors.indexOf(className) === -1) {
-        newDisabledProcessors.push(className);
-      }
-
-      setConfig({ ...config, disabled_processors: newDisabledProcessors });
-    };
+    if (enabled) {
+      setFormConfig({ ...formConfig, disabled_processors: [...disabledProcessors, className] });
+    } else {
+      setFormConfig({ ...formConfig, disabled_processors: disabledProcessors.filter((processorName) => processorName !== className) });
+    }
   };
+
+  const isProcessorEnabled = (processor, config) => (
+    config.disabled_processors.filter((p) => p === processor.class_name).length < 1
+  );
 
   const summary = () => {
-    return config.processor_order.map((processor, idx) => {
-      const status = config.disabled_processors.filter((p) => p === processor.class_name).length > 0 ? 'disabled' : 'active';
+    return viewConfig.processor_order.map((processor, idx) => {
+      const status = isProcessorEnabled(processor, viewConfig) ? 'active' : 'disabled';
 
       return (
         // eslint-disable-next-line react/no-array-index-key
@@ -101,33 +104,32 @@ const MessageProcessorsConfig = () => {
   };
 
   const sortableItems = () => {
-    return config.processor_order.map((processor) => {
+    return formConfig.processor_order.map((processor) => {
       return { id: processor.class_name, title: processor.name };
     });
   };
 
   const statusForm = () => {
-    const sortedProcessorOrder = [...config.processor_order].sort((a, b) => naturalSort(a.name, b.name));
+    const sortedProcessorOrder = [...formConfig.processor_order].sort((a, b) => naturalSort(a.name, b.name));
 
     return sortedProcessorOrder.map((processor, idx) => {
-      const enabled = config.disabled_processors.filter((p) => p === processor.class_name).length < 1;
+      const enabled = isProcessorEnabled(processor, formConfig);
 
       return (
         // eslint-disable-next-line react/no-array-index-key
         <tr key={idx}>
           <td>{processor.name}</td>
           <td>
-            <input ref={(elem) => { inputsRef.current = ({ ...inputsRef.current, [processor.class_name]: elem }); }}
-                   type="checkbox"
+            <input type="checkbox"
                    checked={enabled}
-                   onChange={toggleStatus(processor.class_name)} />
+                   onChange={() => toggleStatus(processor.class_name, enabled)} />
           </td>
         </tr>
       );
     });
   };
 
-  if (!config) { return null; }
+  if (!viewConfig) { return null; }
 
   return (
     <div>
@@ -151,7 +153,7 @@ const MessageProcessorsConfig = () => {
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>Edit configuration</Button>
       </IfPermitted>
 
-      {showConfigModal && (
+      {showConfigModal && formConfig && (
       <BootstrapModalForm show
                           title="Update Message Processors Configuration"
                           onSubmitForm={saveConfig}
