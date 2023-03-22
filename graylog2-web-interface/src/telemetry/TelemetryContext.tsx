@@ -20,8 +20,9 @@ import { singleton } from 'logic/singleton';
 
 export type TelemetryEvent = {
   appSection?: string,
-  data?: {
-    [key: string]: string
+  eventElement?: string
+  eventInfo?: {
+    [key: string]: string | boolean,
   }
 }
 export type TelemetryEventType = '$pageview' | 'view' | 'click' | 'open' | 'close' | 'toggle';
