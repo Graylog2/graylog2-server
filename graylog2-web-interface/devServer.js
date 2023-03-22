@@ -66,13 +66,14 @@ app.use('/config.js', proxy(apiUrl, {
 
 app.use(compress()); // Enables compression middleware
 app.use(history()); // Enables HTML5 History API middleware
+
 app.use(expressCspHeader({
   directives: {
     'default-src': [SELF],
     'script-src': [SELF, EVAL],
     'style-src': [SELF, INLINE],
     'img-src': [SELF, 'data:'],
-  }
+  },
 }));
 
 app.use(webpackDevMiddleware(vendorCompiler, {
