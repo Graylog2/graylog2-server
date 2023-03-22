@@ -127,7 +127,8 @@ public class SyslogCodec extends AbstractCodec {
          */
         String timeZoneConfig = configuration.getString(CK_TIMEZONE);
         final SyslogServerEventIF e;
-        DateTimeZone defaultTimeZone = StringUtils.isNotBlank(timeZoneConfig) ? DateTimeZone.forID(timeZoneConfig) : null;
+        boolean isDefaultTimeZoneSet = StringUtils.isNotBlank(timeZoneConfig) && !DropdownField.NOT_CONFIGURED.equals(timeZoneConfig);
+        DateTimeZone defaultTimeZone = isDefaultTimeZoneSet ? DateTimeZone.forID(timeZoneConfig) : null;
         if (STRUCTURED_SYSLOG_PATTERN.matcher(msg).matches()) {
             e = new StructuredSyslogServerEvent(msg, remoteAddress, defaultTimeZone);
         } else if (CISCO_WITH_SEQUENCE_NUMBERS_PATTERN.matcher(msg).matches()) {
@@ -291,8 +292,8 @@ public class SyslogCodec extends AbstractCodec {
             r.addField(new DropdownField(
                     CK_TIMEZONE,
                     "Time Zone",
-                    DateTimeZone.UTC.getID(),
-                    DropdownField.ValueTemplates.timeZones(),
+                    DropdownField.NOT_CONFIGURED,
+                    DropdownField.ValueTemplates.timeZones(true),
                     "Default time zone used when no timezone detected",
                     ConfigurationField.Optional.OPTIONAL));
 

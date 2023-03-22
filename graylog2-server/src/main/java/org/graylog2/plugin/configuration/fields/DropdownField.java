@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 public class DropdownField extends AbstractConfigurationField {
 
     public static final String FIELD_TYPE = "dropdown";
+    public static final String NOT_CONFIGURED = "NotSet";
 
     private String defaultValue;
     private final Map<String, String> values;
@@ -95,7 +96,7 @@ public class DropdownField extends AbstractConfigurationField {
          *
          * @return map of sorted timezones
          */
-        public static Map<String, String> timeZones() {
+        public static Map<String, String> timeZones(boolean addNotConfiguredOption) {
             Map<Integer, List<DateTimeZone>> offsetsAndTimezones = buildSortedTimeZoneMap();
             Map<String, String> timezones = new LinkedHashMap<>();
             for (List<DateTimeZone> dtzList : offsetsAndTimezones.values()) {
@@ -103,6 +104,11 @@ public class DropdownField extends AbstractConfigurationField {
                     timezones.put(dtz.getID(), buildTimeZoneDisplayName(dtz));
                 }
             }
+
+            if (addNotConfiguredOption) {
+                timezones.put(NOT_CONFIGURED, "Not configured");
+            }
+
             return timezones;
         }
 

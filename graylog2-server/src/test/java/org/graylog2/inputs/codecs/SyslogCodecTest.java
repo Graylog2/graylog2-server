@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.fields.DropdownField;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTime;
@@ -448,6 +449,20 @@ public class SyslogCodecTest {
 
         assertEquals(new DateTime(YEAR + "-10-21T12:09:37", DateTimeZone.forID("MST")).toDate(), ((DateTime) msgWithoutTimezone.getField("timestamp")).toDate());
         assertEquals(new DateTime("2012-12-25T22:14:15.003Z", DateTimeZone.UTC), ((DateTime) msgWithUTCTimezone.getField("timestamp")).withZone(DateTimeZone.UTC));
+        assertEquals(new DateTime("2015-01-11T16:35:21.335797", DateTimeZone.forOffsetHours(1)).toDate(), ((DateTime) msgWithTimezoneOffset.getField("timestamp")).toDate());
+    }
+
+    @Test
+    public void testDefaultTimezoneConfigNotConfiguredStillUsesSystemTime() {
+        when(configuration.getString("timezone")).thenReturn(DropdownField.NOT_CONFIGURED);
+
+        SyslogCodec codec = new SyslogCodec(configuration, metricRegistry);
+        final Message msgWithoutTimezone = codec.decode(buildRawMessage(UNSTRUCTURED));
+        final Message msgWithUTCTimezone = codec.decode(buildRawMessage(STRUCTURED));
+        final Message msgWithTimezoneOffset = codec.decode(buildRawMessage(STRUCTURED_ISSUE_845_EMPTY));
+
+        assertEquals(new DateTime(YEAR + "-10-21T12:09:37").toDate(), ((DateTime) msgWithoutTimezone.getField("timestamp")).toDate());
+        assertEquals(new DateTime("2012-12-25T22:14:15.003Z"), ((DateTime) msgWithUTCTimezone.getField("timestamp")));
         assertEquals(new DateTime("2015-01-11T16:35:21.335797", DateTimeZone.forOffsetHours(1)).toDate(), ((DateTime) msgWithTimezoneOffset.getField("timestamp")).toDate());
     }
 
