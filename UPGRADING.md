@@ -155,6 +155,10 @@ will be returned like this if the `secret` attribute contains a sensitive value:
 }
 ```
 
+### Added Optional Default Timezone configuration for Syslog inputs
+When creating or editing a new syslog input, it is now possible to configure a default timezone in case logs ingested are not
+sending dates in UTC. When left as "Not configured", system behaves as before. 
+
 The following REST API endpoints were changed:
 
 | Endpoint                                                                                                   | Description                                   |
@@ -165,6 +169,7 @@ The following REST API endpoints were changed:
 
 - The `JSON path value from HTTP API` input will now only run on the leader node, if the `Global` option has been selected in the input configuration. Previously, the input was started on all nodes in the cluster.
 - The default connection and read timeouts for email sending have been reduced from 60 seconds to 10 seconds.
+- We are now parsing the time zone information send by Fortigate syslog messages. Any workarounds to transform the date into the right timezone because the forwared timezone information was not honored, should be removed.
 
 ## Configuration File Changes
 
