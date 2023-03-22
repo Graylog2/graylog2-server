@@ -31,6 +31,11 @@ class CSVFileAdapterDocumentation extends React.Component {
 '10.0.0.1';'e4:b2:12:d1:48:28';'server1'
 '10.0.0.2';'e4:b2:11:d1:58:34';'server2'`;
 
+    const csvFile3 = `"cidr","subnet"
+"192.168.100.0/24","Finance Department subnet"
+"192.168.101.0/24","IT Department subnet"
+"192.168.102.0/24","HR Department subnet"`;
+
     return (
       <div>
         <p>The CSV data adapter can read key value pairs from a CSV file.</p>
@@ -72,6 +77,26 @@ class CSVFileAdapterDocumentation extends React.Component {
 
         <h5 style={{ marginBottom: 10 }}>CSV File</h5>
         <pre>{csvFile2}</pre>
+
+        <h3 style={{ marginBottom: 10 }}>CIDR Lookups</h3>
+        <p style={{ marginBottom: 10, padding: 0 }}>
+          If this data adapter will be used to lookup IP address keys against CIDR addresses<br />
+          then it should be marked as a CIDR lookup. For example:<br />
+        </p>
+
+        <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+        <p style={{ marginBottom: 10, padding: 0 }}>
+          Separator: <code>,</code><br />
+          Quote character: <code>"</code><br />
+          Key column: <code>cidr</code><br />
+          Value column: <code>subnet</code><br />
+          CIDR lookup: <code>true</code>
+        </p>
+
+        <h5 style={{ marginBottom: 10 }}>CSV File</h5>
+        <pre>{csvFile3}</pre>
+
+        <p>Given this CSV file and configuration looking up the key 192.168.101.64 would return 'IT Department subnet'.</p>
       </div>
     );
   }

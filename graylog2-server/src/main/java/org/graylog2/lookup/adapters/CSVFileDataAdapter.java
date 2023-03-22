@@ -37,10 +37,13 @@ import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.plugin.utilities.FileInfo;
+import org.graylog2.utilities.IpSubnet;
+import org.graylog2.utilities.ReservedIpChecker;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
@@ -48,6 +51,7 @@ import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -235,6 +239,9 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
     @Override
     public LookupResult doGet(Object key) {
+        if (Boolean.TRUE.equals(config.cidrLookup())) {
+            return getResultForCIDRRange(key);
+        }
         final String stringKey = config.isCaseInsensitiveLookup() ? String.valueOf(key).toLowerCase(Locale.ENGLISH) : String.valueOf(key);
         final String value = lookupRef.get().get(stringKey);
 
@@ -243,6 +250,27 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         }
 
         return LookupResult.single(value);
+    }
+
+    public LookupResult getResultForCIDRRange(Object ip) {
+        for (Map.Entry<String, String> entry : lookupRef.get().entrySet()) {
+            String range = entry.getKey();
+            Optional<IpSubnet> subnet = ReservedIpChecker.stringToSubnet(range);
+            if (subnet.isEmpty()) {
+                LOG.warn("CIDR range '{}' in data adapter '{}' is not a valid subnet, skipping this key in lookup.", entry, name);
+            } else {
+                try {
+                    if (subnet.get().contains(String.valueOf(ip))) {
+                        return LookupResult.single(entry.getValue());
+                    }
+                } catch (UnknownHostException e) {
+                    LOG.warn("Attempted to do a CIDR range lookup on invalid IP '{}'", ip);
+                    return getErrorResult();
+                }
+            }
+        }
+
+        return getEmptyResult();
     }
 
     @Override
@@ -276,6 +304,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                     .valueColumn("value")
                     .checkInterval(60)
                     .caseInsensitiveLookup(false)
+                    .cidrLookup(false)
                     .build();
         }
     }
@@ -333,6 +362,10 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
         @JsonProperty("case_insensitive_lookup")
         public abstract Optional<Boolean> caseInsensitiveLookup();
+
+        @JsonProperty("cidr_lookup")
+        @Nullable
+        public abstract Boolean cidrLookup();
 
         public boolean isCaseInsensitiveLookup() {
             return caseInsensitiveLookup().isPresent() && caseInsensitiveLookup().get();
@@ -394,6 +427,9 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
             @JsonProperty("case_insensitive_lookup")
             public abstract Builder caseInsensitiveLookup(Boolean caseInsensitiveLookup);
+
+            @JsonProperty("cidr_lookup")
+            public abstract Builder cidrLookup(Boolean cidrLookup);
 
             public abstract Config build();
         }

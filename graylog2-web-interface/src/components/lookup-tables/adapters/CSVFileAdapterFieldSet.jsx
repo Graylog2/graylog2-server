@@ -104,6 +104,14 @@ class CSVFileAdapterFieldSet extends React.Component {
                onChange={this.props.handleFormEvent}
                help="Enable if the key lookup should be case-insensitive."
                wrapperClassName="col-md-offset-3 col-md-9" />
+        <Input type="checkbox"
+               id="cidr_lookup"
+               name="cidr_lookup"
+               label="CIDR lookup"
+               checked={config.cidr_lookup}
+               onChange={this.props.handleFormEvent}
+               help="Enable if the keys in the lookup table are in CIDR notation and lookups will be done with IPs"
+               wrapperClassName="col-md-offset-3 col-md-9" />
       </fieldset>
     );
   }

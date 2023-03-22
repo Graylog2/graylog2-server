@@ -41,6 +41,8 @@ class CSVFileAdapterSummary extends React.Component {
         <dd>{config.check_interval} seconds</dd>
         <dt>Case-insensitive lookup</dt>
         <dd>{config.case_insensitive_lookup ? 'yes' : 'no'}</dd>
+        <dt>CIDR lookup</dt>
+        <dd>{config.cidr_lookup ? 'yes' : 'no'}</dd>
       </dl>
     );
   }
