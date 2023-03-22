@@ -34,5 +34,5 @@ public @interface DbEntity {
     String NO_TITLE = "";
 
     String ALL_ALOWED = "";
-    String NOBODY_ALOWED = "youshall:notpass";
+    String NOBODY_ALOWED = "__no_access__";
 }
