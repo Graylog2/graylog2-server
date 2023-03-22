@@ -156,7 +156,8 @@ const EventsConfig = () => {
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>Edit configuration</Button>
       </IfPermitted>
 
-      <BootstrapModalForm show={showConfigModal}
+      {showConfigModal && (
+      <BootstrapModalForm show
                           title="Update Events System Configuration"
                           onSubmitForm={saveConfig}
                           onCancel={closeModal}
@@ -215,6 +216,7 @@ const EventsConfig = () => {
           </FormGroup>
         </fieldset>
       </BootstrapModalForm>
+      )}
     </div>
   );
 };

@@ -48,8 +48,6 @@ const getConfig = (configType, configuration) => configuration?.[configType] ?? 
 const onUpdate = (configType: string) => {
   return (config) => {
     switch (configType) {
-      case ConfigurationType.URL_WHITELIST_CONFIG:
-        return ConfigurationsActions.updateWhitelist(configType, config);
       case ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG:
         return ConfigurationsActions.updateIndexSetDefaults(configType, config);
       default:
@@ -92,7 +90,6 @@ const ConfigurationsPage = () => {
     setActiveSubSectionKey(itemKey);
   };
 
-  const urlWhiteListConfig = getConfig(ConfigurationType.URL_WHITELIST_CONFIG, configuration);
   const indexSetsDefaultsConfig = getConfig(ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG, configuration);
   const permissionsConfig = getConfig(ConfigurationType.PERMISSIONS_CONFIG, configuration);
   const userConfig = getConfig(ConfigurationType.USER_CONFIG, configuration);
@@ -163,12 +160,11 @@ const ConfigurationsPage = () => {
     },
     {
       name: 'URL Whitelist',
-      shouldRender: urlWhiteListConfig,
+      shouldRender: true,
       render: (key) => (
         isPermitted(currentUser.permissions, ['urlwhitelist:read']) && (
         <ConfigletContainer title="URL Whitelist Configuration" key={key}>
-          <UrlWhiteListConfig config={urlWhiteListConfig}
-                              updateConfig={onUpdate(ConfigurationType.URL_WHITELIST_CONFIG)} />
+          <UrlWhiteListConfig />
         </ConfigletContainer>
         )
       ),
