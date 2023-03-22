@@ -21,7 +21,7 @@ import { Col, Nav, NavItem, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { useStore } from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
-import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
+// import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
 import SidecarConfig from 'components/configurations/SidecarConfig';
@@ -63,18 +63,13 @@ const ConfigurationsPage = () => {
   const [activeSubSectionKey, setActiveSubSectionKey] = useState(1);
 
   useEffect(() => {
-    const promises = [
-      ConfigurationsActions.listUserConfig(ConfigurationType.USER_CONFIG),
-    ];
-
-    if (isPermitted(currentUser.permissions, ['urlwhitelist:read'])) {
-      promises.push(ConfigurationsActions.listWhiteListConfig(ConfigurationType.URL_WHITELIST_CONFIG));
-    }
-
+    // if (isPermitted(currentUser.permissions, ['urlwhitelist:read'])) {
+    //   promises.push(ConfigurationsActions.listWhiteListConfig(ConfigurationType.URL_WHITELIST_CONFIG));
+    // }
     const pluginPromises = pluginSystemConfigs
       .map((systemConfig) => ConfigurationsActions.list(systemConfig.configType));
 
-    Promise.allSettled([...promises, ...pluginPromises]).then(() => setLoaded(true));
+    Promise.allSettled(pluginPromises).then(() => setLoaded(true));
   }, [currentUser.permissions, pluginSystemConfigs]);
 
   const handleNavSelect = (itemKey) => {
@@ -86,7 +81,6 @@ const ConfigurationsPage = () => {
     setActiveSubSectionKey(itemKey);
   };
 
-  const userConfig = getConfig(ConfigurationType.USER_CONFIG, configuration);
 
   const pluginDisplayNames = [
     {
@@ -194,11 +188,10 @@ const ConfigurationsPage = () => {
     },
     {
       name: 'Users',
-      shouldRender: userConfig,
+      shouldRender: true,
       render: (key) => (
         <ConfigletContainer title="User Configuration" key={key}>
-          <UserConfig config={userConfig}
-                      updateConfig={onUpdate(ConfigurationType.USER_CONFIG)} />
+          <UserConfig />
         </ConfigletContainer>
       ),
     },
