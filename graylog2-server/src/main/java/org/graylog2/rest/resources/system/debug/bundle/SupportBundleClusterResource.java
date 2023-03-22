@@ -78,6 +78,7 @@ public class SupportBundleClusterResource extends ProxiedResource {
     @POST
     @Path("/bundle/build")
     @RequiresPermissions(SUPPORTBUNDLE_CREATE)
+    @ApiOperation(value = "Build a new Support Bundle")
     @Timed
     @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
     public Response buildBundle() throws IOException {
