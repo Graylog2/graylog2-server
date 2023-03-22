@@ -92,7 +92,7 @@ public class CatalogResource extends RestResource {
     @ApiOperation(value = "Get titles of provided entities")
     @NoAuditEvent("This endpoint does not change any data")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/entity_titles")
+    @Path("/entities/titles")
     public EntitiesTitleResponse getTitles(@ApiParam(name = "JSON body", required = true) final EntityTitleRequest request) {
         return entityTitleService.getTitles(getSubject(), request);
     }
