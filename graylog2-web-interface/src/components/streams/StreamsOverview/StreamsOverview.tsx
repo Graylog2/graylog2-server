@@ -16,10 +16,9 @@
  */
 import PropTypes from 'prop-types';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useQueryParam, ArrayParam } from 'use-query-params';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
+import invert from 'lodash/invert';
 
-import UserNotification from 'util/UserNotification';
 import { PaginatedList, SearchForm, NoSearchResult } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';
@@ -29,9 +28,6 @@ import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import EntityDataTable from 'components/common/EntityDataTable';
-import StreamActions from 'components/streams/StreamsOverview/StreamActions';
-import BulkActions from 'components/streams/StreamsOverview/BulkActions/BulkActions';
-import type { Sort } from 'stores/PaginationTypes';
 import useStreams from 'components/streams/hooks/useStreams';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
@@ -41,18 +37,20 @@ import {
   ADDITIONAL_ATTRIBUTES,
 } from 'components/streams/StreamsOverview/Constants';
 import EntityFilters from 'components/common/EntityFilters';
-import type { Filters, UrlQueryFilters } from 'components/common/EntityFilters/types';
+import type { Filters } from 'components/common/EntityFilters/types';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
-import ExpandedRulesActions from 'components/streams/StreamsOverview/ExpandedRulesActions';
-import fetch from 'logic/rest/FetchProvider';
-import URLUtils from 'util/URLUtils';
+import useTableElements from 'components/streams/StreamsOverview/hooks/useTableComponents';
+import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
+import useFiltersWithTitle from 'components/common/EntityFilters/hooks/useFiltersWithTitle';
 
-import ExpandedRulesSection from './ExpandedRulesSection';
 import CustomColumnRenderers from './ColumnRenderers';
+import useTableEventHandlers from './hooks/useTableEventHandlers';
 
 const ATTRIBUTE_COLLECTIONS = {
   index_set_id: 'index_sets',
 };
+
+const COLLECTION_ATTRIBUTE_ID = invert(ATTRIBUTE_COLLECTIONS);
 
 const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
   useEffect(() => {
@@ -64,82 +62,6 @@ const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
       StreamRulesStore.unregister(() => refetchStreams());
     };
   }, [refetchStreams]);
-};
-
-const fetchFilterTitles = (filterParams: Array<{ id: string, type: string }>) => fetch('POST', URLUtils.qualifyUrl('/system/catalog/entity_titles'), { entities: filterParams });
-
-const useFiltersWithTitle = (filters: { [attributeId: string]: Array<string> }, paginatedStreams) => {
-  const queryClient = useQueryClient();
-
-  const filterParams = Object.entries(filters).reduce((col, [attributeId, values]) => {
-    const relatedAttribute = paginatedStreams?.attributes.find((attribute) => attribute.id === attributeId);
-
-    if (!relatedAttribute?.related_collection) {
-      return col;
-    }
-
-    return [
-      ...col,
-      ...values.map((value) => ({
-        id: value,
-        type: relatedAttribute.related_collection,
-      })),
-    ];
-  }, []);
-
-  const cachedData = queryClient.getQueryData(['entity_titles', filters]);
-  const { data, refetch, isInitialLoading } = useQuery(
-    ['entity_titles', filters],
-    () => fetchFilterTitles(filterParams),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading filter titles failed with status: ${errorThrown}`,
-          'Could not load streams');
-      },
-      keepPreviousData: true,
-      enabled: !!paginatedStreams,
-    },
-  );
-
-  return ({
-    data: (cachedData ?? data)?.entities?.reduce((col, { id, title, type }) => {
-      const relatedAttribute = paginatedStreams?.attributes.find((attribute) => attribute.related_collection === type);
-
-      if (!relatedAttribute) {
-        return col;
-      }
-
-      return {
-        ...col,
-        [relatedAttribute.id]: [...col[relatedAttribute.id] ?? [], { id, title }],
-      };
-    }, {}),
-    refetch,
-    isInitialLoading,
-  });
-};
-
-const useUrlQueryFilters = () => {
-  const [urlQueryFilters, setUrlQueryFilters] = useQueryParam('filters', ArrayParam);
-
-  const filtersFromQuery = useMemo(() => (urlQueryFilters ?? []).reduce((col, filter) => {
-    const [filterKey, filterValue] = filter.split(/=(.*)/);
-
-    return {
-      ...col,
-      [filterKey]: [...(col[filterKey] ?? []), filterValue],
-    };
-  }, {}), [urlQueryFilters]); // use immutable ordered map
-
-  const setFilterValues = (newFilters: UrlQueryFilters) => {
-    const newUrlQueryFilters = Object.entries(newFilters).reduce((col, [attributeId, filters]) => {
-      return [...col, ...filters.map((value) => `${attributeId}=${value}`)];
-    }, []);
-
-    setUrlQueryFilters(newUrlQueryFilters);
-  };
-
-  return [filtersFromQuery, setFilterValues]; // make sure data has same order as urlQueryFilters
 };
 
 type Props = {
@@ -166,7 +88,20 @@ const StreamsOverview = ({ indexSets }: Props) => {
     filters: urlQueryFilters,
   }, { enabled: !isLoadingLayoutPreferences });
 
-  const { data: filtersWithTitle } = useFiltersWithTitle(urlQueryFilters, paginatedStreams);
+  const { data: filtersWithTitle } = useFiltersWithTitle(urlQueryFilters, paginatedStreams?.attributes, !!paginatedStreams);
+
+  const { entityActions, expandedSections, bulkActions } = useTableElements({ indexSets });
+  const {
+    onPageSizeChange,
+    onSearch,
+    onSearchReset,
+    onColumnsChange,
+    onSortChange,
+  } = useTableEventHandlers({
+    paginationQueryParameter,
+    updateTableLayout,
+    setQuery,
+  });
 
   useRefetchStreamsOnStoreChange(refetchStreams);
 
@@ -176,79 +111,33 @@ const StreamsOverview = ({ indexSets }: Props) => {
     [paginatedStreams?.attributes],
   );
 
-  const onPageSizeChange = useCallback((newPageSize: number) => {
-    paginationQueryParameter.setPagination({ page: 1, pageSize: newPageSize });
-    updateTableLayout({ perPage: newPageSize });
-  }, [paginationQueryParameter, updateTableLayout]);
-
-  const onSearch = useCallback((newQuery: string) => {
-    paginationQueryParameter.resetPage();
-    setQuery(newQuery);
-  }, [paginationQueryParameter]);
-
-  const onReset = useCallback(() => {
-    onSearch('');
-  }, [onSearch]);
-
   const onChangeFilters = useCallback((newFilters: Filters) => {
-    const newUrlQueryFilters = Object.entries(newFilters).reduce((col, [attributeId, filterCol]) => {
-      return {
-        ...col,
-        [attributeId]: [...col[attributeId] ?? [], ...filterCol.map(({ value }) => value)],
-      };
-    }, {});
+    const newUrlQueryFilters = Object.entries(newFilters).reduce((col, [attributeId, filterCol]) => ({
+      ...col,
+      [attributeId]: [...col[attributeId] ?? [], ...filterCol.map(({ value }) => value)],
+    }), {});
 
-    const result = Object.entries(newFilters).reduce((col, [attributeId, filters]) => {
-      return [
-        ...col,
-        ...filters.map(({ value, title }) => ({ id: value, type: 'index_sets', title })),
-      ];
-    }, []);
+    queryClient.setQueryData(['entity_titles', newUrlQueryFilters], (cur: {
+      entities: Array<Object>,
+      not_permitted_to_view: Array<string>
+    }) => ({
+      ...cur,
+      entities: Object.entries(newFilters).reduce((col, [attributeId, filters]) => {
+        const relatedCollection = ATTRIBUTE_COLLECTIONS[attributeId];
 
-    queryClient.setQueryData(['entity_titles', newUrlQueryFilters], {
-      entities: result,
-    });
+        if (!relatedCollection) {
+          return col;
+        }
+
+        return [
+          ...col,
+          ...filters.map(({ value, title }) => ({ id: value, type: '', title })),
+        ];
+      }, []),
+    }));
 
     setUrlQueryFilters(newUrlQueryFilters);
   }, [queryClient, setUrlQueryFilters]);
-
-  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
-    updateTableLayout({ displayedAttributes });
-  }, [updateTableLayout]);
-
-  const onSortChange = useCallback((newSort: Sort) => {
-    paginationQueryParameter.resetPage();
-    updateTableLayout({ sort: newSort });
-  }, [paginationQueryParameter, updateTableLayout]);
-
-  const renderStreamActions = useCallback((listItem: Stream) => (
-    <StreamActions stream={listItem}
-                   indexSets={indexSets} />
-  ), [indexSets]);
-
-  const renderBulkActions = useCallback((
-    selectedStreamIds: Array<string>,
-    setSelectedStreamIds: (streamIds: Array<string>) => void,
-  ) => (
-    <BulkActions selectedStreamIds={selectedStreamIds}
-                 setSelectedStreamIds={setSelectedStreamIds}
-                 indexSets={indexSets} />
-  ), [indexSets]);
-
-  const renderExpandedRules = useCallback((stream: Stream) => (
-    <ExpandedRulesSection stream={stream} />
-  ), []);
-  const renderExpandedRulesActions = useCallback((stream: Stream) => (
-    <ExpandedRulesActions stream={stream} />
-  ), []);
-
-  const expandedSectionsRenderer = useMemo(() => ({
-    rules: {
-      title: 'Rules',
-      content: renderExpandedRules,
-      actions: renderExpandedRulesActions,
-    },
-  }), [renderExpandedRules, renderExpandedRulesActions]);
 
   if (isLoadingLayoutPreferences || isLoadingStreams) {
     return <Spinner />;
@@ -262,7 +151,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
                    totalItems={total}>
       <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
-                    onReset={onReset}
+                    onReset={onSearchReset}
                     queryHelpComponent={<QueryHelper entityName="stream" />}>
           <EntityFilters attributes={attributes}
                          onChangeFilters={onChangeFilters}
@@ -281,10 +170,10 @@ const StreamsOverview = ({ indexSets }: Props) => {
                                    onSortChange={onSortChange}
                                    onPageSizeChange={onPageSizeChange}
                                    pageSize={layoutConfig.pageSize}
-                                   bulkActions={renderBulkActions}
-                                   expandedSectionsRenderer={expandedSectionsRenderer}
+                                   bulkActions={bulkActions}
+                                   expandedSectionsRenderer={expandedSections}
                                    activeSort={layoutConfig.sort}
-                                   rowActions={renderStreamActions}
+                                   rowActions={entityActions}
                                    columnRenderers={columnRenderers}
                                    columnDefinitions={columnDefinitions}
                                    entityAttributesAreCamelCase={false} />
