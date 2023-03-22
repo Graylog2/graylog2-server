@@ -1,0 +1,5 @@
+type = "c"
+message = "Make sure all bindings which use createIndex are threadsafe and make them singletons."
+
+pulls = ["14965"]
+issues = ["Graylog2/graylog-plugin-enterprise#4862"]

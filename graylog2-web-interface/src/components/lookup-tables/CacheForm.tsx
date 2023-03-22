@@ -24,8 +24,8 @@ import { Col, Row } from 'components/bootstrap';
 import { FormikFormGroup, FormSubmit } from 'components/common';
 import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
 import useScopePermissions from 'hooks/useScopePermissions';
-import history from 'util/History';
 import Routes from 'routing/Routes';
+import useHistory from 'routing/useHistory';
 
 type TitleProps = {
   title: string,
@@ -124,6 +124,7 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
     return promise.then(() => saved());
   };
 
+  const history = useHistory();
   const onCancel = () => history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
   const updatable = !create && !loadingScopePermissions && scopePermissions?.is_mutable;
 

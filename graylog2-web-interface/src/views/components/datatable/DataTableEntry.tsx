@@ -122,17 +122,18 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
   return (
     (
       <tr className={`fields-row ${classes}`}>
-        {columns.map(({ field, value, path, source }, idx) => (
+        {columns.map(({ field, value, path, source }, idx) => {
+          const key = `${activeQuery}-${field}=${value}-${idx}`;
 
-          (
-            <Column key={`${activeQuery}-${field}=${value}-${idx}`}
+          return (
+            <Column key={key}
                     field={field}
                     value={value}
                     type={fieldTypeFor(columnNameToField(field, series), types)}
                     valuePath={path.slice()}
                     source={source} />
-          )
-        ))}
+          );
+        })}
       </tr>
     )
   );

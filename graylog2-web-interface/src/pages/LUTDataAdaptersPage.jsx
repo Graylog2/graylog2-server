@@ -20,7 +20,6 @@ import React from 'react';
 import { LinkContainer } from 'components/common/router';
 import connect from 'stores/connect';
 import Routes from 'routing/Routes';
-import history from 'util/History';
 import { Col, Row, Button } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { DataAdapter, DataAdapterCreate, DataAdapterForm, DataAdaptersOverview } from 'components/lookup-tables';
@@ -30,8 +29,9 @@ import withLocation from 'routing/withLocation';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
 import { LookupTableDataAdaptersActions, LookupTableDataAdaptersStore } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import LUTPageNavigation from 'components/lookup-tables/LUTPageNavigation';
+import withHistory from 'routing/withHistory';
 
-const _saved = () => {
+const _saved = (history) => {
   // reset detail state
   history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
 };
@@ -118,6 +118,7 @@ class LUTDataAdaptersPage extends React.Component {
       types,
       dataAdapters,
       pagination,
+      history,
     } = this.props;
     let content;
     const isShowing = action === 'show';
@@ -134,7 +135,7 @@ class LUTDataAdaptersPage extends React.Component {
                                type={dataAdapter.config.type}
                                create={false}
                                title="Data Adapter"
-                               saved={_saved}
+                               saved={() => _saved(history)}
                                validate={_validateAdapter}
                                validationErrors={validationErrors} />
             </Col>
@@ -192,6 +193,7 @@ LUTDataAdaptersPage.propTypes = {
   location: PropTypes.object.isRequired,
   action: PropTypes.string,
   paginationQueryParameter: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired,
 };
 
 LUTDataAdaptersPage.defaultProps = {
@@ -204,7 +206,10 @@ LUTDataAdaptersPage.defaultProps = {
   action: undefined,
 };
 
-export default connect(withParams(withLocation(withPaginationQueryParameter(LUTDataAdaptersPage))), { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore }, ({ dataAdaptersStore, lookupTableStore, ...otherProps }) => ({
+export default connect(
+  withHistory(withParams(withLocation(withPaginationQueryParameter(LUTDataAdaptersPage)))),
+    { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore },
+    ({ dataAdaptersStore, lookupTableStore, ...otherProps }) => ({
   ...otherProps,
   ...dataAdaptersStore,
   errorStates: lookupTableStore.errorStates,

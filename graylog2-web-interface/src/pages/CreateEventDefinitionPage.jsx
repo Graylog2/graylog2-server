@@ -25,13 +25,14 @@ import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import connect from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
-import history from 'util/History';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
+import withHistory from 'routing/withHistory';
 
 class CreateEventDefinitionPage extends React.Component {
   static propTypes = {
     currentUser: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -54,7 +55,7 @@ class CreateEventDefinitionPage extends React.Component {
     const { eventDefinitionTitle } = this.state;
     const pageTitle = eventDefinitionTitle ? `New Event Definition "${eventDefinitionTitle}"` : 'New Event Definition';
 
-    const { currentUser } = this.props;
+    const { currentUser, history } = this.props;
 
     if (!isPermitted(currentUser.permissions, 'eventdefinitions:create')) {
       history.push(Routes.NOTFOUND);
@@ -86,6 +87,6 @@ class CreateEventDefinitionPage extends React.Component {
   }
 }
 
-export default connect(CreateEventDefinitionPage, {
+export default connect(withHistory(CreateEventDefinitionPage), {
   currentUser: CurrentUserStore,
 }, ({ currentUser }) => ({ currentUser: currentUser.currentUser }));

@@ -21,7 +21,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
 import upperFirst from 'lodash/upperFirst';
 
-import history from 'util/History';
 import { ColorPickerPopover, FormSubmit, Select, SourceCodeEditor } from 'components/common';
 import { Button, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
@@ -29,6 +28,7 @@ import ColorLabel from 'components/sidecars/common/ColorLabel';
 import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
 import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
 import ConfigurationHelper from 'components/sidecars/configuration-forms/ConfigurationHelper';
+import useHistory from 'routing/useHistory';
 
 import SourceViewModal from './SourceViewModal';
 import ImportsViewModal from './ImportsViewModal';
@@ -63,6 +63,7 @@ const ConfigurationForm = ({
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showUploadsModal, setShowUploadsModal] = useState(false);
   const defaultTemplates = useRef({});
+  const history = useHistory();
 
   useEffect(() => {
     CollectorsActions.all().then((response) => setCollectors(response.collectors));

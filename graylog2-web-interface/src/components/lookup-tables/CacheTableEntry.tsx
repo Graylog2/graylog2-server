@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 
+import useHistory from 'routing/useHistory';
 import { Link } from 'components/common/router';
 import { Spinner } from 'components/common';
 import { Button } from 'components/bootstrap';

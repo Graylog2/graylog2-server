@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useEffect, useMemo } from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import URI from 'urijs';
 
 import useQuery from 'routing/useQuery';
@@ -26,13 +26,9 @@ import { selectViewStates } from 'views/logic/slices/viewSelectors';
 import useAppDispatch from 'stores/useAppDispatch';
 import { selectQuery } from 'views/logic/slices/viewSlice';
 
-const _clearURI = (query) => new URI(query)
-  .removeSearch('page');
+const _clearURI = (query: string) => new URI(query).removeSearch('page');
 
-const _updateQueryParams = (
-  newPage: string | undefined,
-  query: string,
-) => {
+const _updateQueryParams = (newPage: string | undefined, query: string) => {
   const baseUri = _clearURI(query);
 
   if (newPage) {
@@ -58,20 +54,20 @@ const useSyncStateWithQueryParams = ({ dashboardPage, uriParams, setDashboardPag
   }, [uriParams.page, dashboardPage, setDashboardPage, states, dispatch]);
 };
 
-const useCleanupQueryParams = ({ uriParams, query, history }) => {
+const useCleanupQueryParams = ({ uriParams, query, navigate }) => {
   useEffect(() => {
     if (uriParams?.page === undefined) {
       const baseURI = _clearURI(query);
 
-      history.replace(baseURI.toString());
+      navigate(baseURI.toString(), { replace: true });
     }
-  }, [query, history, uriParams?.page]);
+  }, [query, navigate, uriParams?.page]);
 };
 
 const DashboardPageContextProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
   const { search, pathname } = useLocation();
   const query = pathname + search;
-  const history = useHistory();
+  const navigate = useNavigate();
   const [dashboardPage, setDashboardPage] = useState<string | undefined>();
   const params = useQuery();
   const uriParams = useMemo(() => ({
@@ -79,13 +75,13 @@ const DashboardPageContextProvider = ({ children }: { children: React.ReactNode 
   }), [params]);
 
   useSyncStateWithQueryParams({ dashboardPage, uriParams, setDashboardPage });
-  useCleanupQueryParams({ uriParams, query, history });
+  useCleanupQueryParams({ uriParams, query, navigate });
 
   const dashboardPageContextValue = useMemo(() => {
     const updatePageParams = (newPage: string | undefined) => {
       const newUri = _updateQueryParams(newPage, query);
 
-      history.replace(newUri);
+      navigate(newUri, { replace: true });
     };
 
     const setDashboardPageParam = (nextPage: string) => updatePageParams(nextPage);
@@ -96,7 +92,7 @@ const DashboardPageContextProvider = ({ children }: { children: React.ReactNode 
       unsetDashboardPage: unSetDashboardPageParam,
       dashboardPage: dashboardPage,
     });
-  }, [dashboardPage, history, query]);
+  }, [dashboardPage, navigate, query]);
 
   return (
     <DashboardPageContext.Provider value={dashboardPageContextValue}>
