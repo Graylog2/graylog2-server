@@ -19,10 +19,14 @@ import { useEffect, useState } from 'react';//
 import lodash from 'lodash';
 import moment from 'moment';
 
-import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
+import { useStore } from 'stores/connect';
+import type { Store } from 'stores/StoreTypes';
+import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
+import { getConfig } from 'components/configurations/helpers';
+import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { Button, FormGroup, HelpBlock, BootstrapModalForm } from 'components/bootstrap';
 import { IfPermitted, TimeUnitInput } from 'components/common';
-import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
+import Spinner from 'components/common/Spinner';
 import { getValueFromInput } from 'util/FormsUtils';
 import Input from 'components/bootstrap/Input';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
@@ -48,15 +52,20 @@ const DEFAULT_CONFIG = {
 
 const EventsConfig = () => {
   const [showConfigModal, setShowConfigModal] = useState(false);
-  const [config, setConfig] = useState<Config>(DEFAULT_CONFIG);
+  const [viewConfig, setViewConfig] = useState<Config>(DEFAULT_CONFIG);
+  const [formConfig, setFormConfig] = useState<Config>(DEFAULT_CONFIG);
+  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    ConfigurationsActions.list(ConfigurationType.EVENTS_CONFIG).then((configData) => {
-      setConfig(configData as Config);
+    ConfigurationsActions.list(ConfigurationType.EVENTS_CONFIG).then(() => {
+      const config = getConfig(ConfigurationType.EVENTS_CONFIG, configuration);
+
+      setViewConfig(config);
+      setFormConfig(config);
       setLoaded(true);
     });
-  }, []);
+  }, [configuration]);
 
   const openModal = () => {
     setShowConfigModal(true);
@@ -64,16 +73,17 @@ const EventsConfig = () => {
 
   const closeModal = () => {
     setShowConfigModal(false);
+    setFormConfig(viewConfig);
   };
 
   const saveConfig = () => {
-    ConfigurationsActions.update(ConfigurationType.EVENTS_CONFIG, config).then(() => {
+    ConfigurationsActions.update(ConfigurationType.EVENTS_CONFIG, formConfig).then(() => {
       closeModal();
     });
   };
 
   const propagateChanges = (key, value) => {
-    setConfig({ ...config, [key]: value });
+    setFormConfig({ ...formConfig, [key]: value });
   };
 
   const searchTimeoutValidator = (milliseconds) => {
@@ -107,7 +117,7 @@ const EventsConfig = () => {
   };
 
   const onCatchUpWindowUpdate = (nextValue, nextUnit, nextEnabled) => {
-    if (config.events_catchup_window === 0 && nextEnabled) {
+    if (formConfig.events_catchup_window === 0 && nextEnabled) {
       propagateChanges('events_catchup_window', DEFAULT_CATCH_UP_WINDOW);
 
       return;
@@ -127,13 +137,13 @@ const EventsConfig = () => {
     return lodash.capitalize(str);
   };
 
-  if (!loaded) { return null; }
+  if (!loaded || !viewConfig) { return <Spinner />; }
 
-  const eventsSearchTimeout = extractDurationAndUnit(config.events_search_timeout, TIME_UNITS);
-  const eventsNotificationRetryPeriod = extractDurationAndUnit(config.events_notification_retry_period, TIME_UNITS);
-  const eventsCatchupWindow = extractDurationAndUnit(config.events_catchup_window, TIME_UNITS);
-  const eventsNotificationDefaultBacklog = config.events_notification_default_backlog;
-  const eventsNotificationTcpKeepalive = config.events_notification_tcp_keepalive;
+  const eventsSearchTimeout = (config) => extractDurationAndUnit(config.events_search_timeout, TIME_UNITS);
+  const eventsNotificationRetryPeriod = (config) => extractDurationAndUnit(config.events_notification_retry_period, TIME_UNITS);
+  const eventsCatchupWindow = (config) => extractDurationAndUnit(config.events_catchup_window, TIME_UNITS);
+  const eventsNotificationDefaultBacklog = (config) => config.events_notification_default_backlog;
+  const eventsNotificationTcpKeepalive = (config) => config.events_notification_tcp_keepalive;
 
   return (
     <div>
@@ -141,22 +151,22 @@ const EventsConfig = () => {
 
       <dl className="deflist">
         <dt>Search Timeout:</dt>
-        <dd>{eventsSearchTimeout.duration} {titleCase(eventsSearchTimeout.unit)}</dd>
+        <dd>{eventsSearchTimeout(viewConfig).duration} {titleCase(eventsSearchTimeout(viewConfig).unit)}</dd>
         <dt>Notification Retry:</dt>
-        <dd>{eventsNotificationRetryPeriod.duration} {titleCase(eventsNotificationRetryPeriod.unit)}</dd>
+        <dd>{eventsNotificationRetryPeriod(viewConfig).duration} {titleCase(eventsNotificationRetryPeriod(viewConfig).unit)}</dd>
         <dt>Notification Backlog:</dt>
-        <dd>{eventsNotificationDefaultBacklog}</dd>
+        <dd>{eventsNotificationDefaultBacklog(viewConfig)}</dd>
         <dt>Catch Up Window:</dt>
-        <dd>{eventsCatchupWindow.duration > 0 ? eventsCatchupWindow.duration : 'disabled'} {eventsCatchupWindow.duration > 0 ? titleCase(eventsCatchupWindow.unit) : ''}</dd>
+        <dd>{eventsCatchupWindow(viewConfig).duration > 0 ? eventsCatchupWindow(viewConfig).duration : 'disabled'} {eventsCatchupWindow(viewConfig).duration > 0 ? titleCase(eventsCatchupWindow(viewConfig).unit) : ''}</dd>
         <dt>TCP keep-alive probes:</dt>
-        <dd>{eventsNotificationTcpKeepalive ? 'enabled' : 'disabled'}</dd>
+        <dd>{eventsNotificationTcpKeepalive(viewConfig) ? 'enabled' : 'disabled'}</dd>
       </dl>
 
       <IfPermitted permissions="clusterconfigentry:edit">
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>Edit configuration</Button>
       </IfPermitted>
 
-      {showConfigModal && (
+      {showConfigModal && formConfig && (
       <BootstrapModalForm show
                           title="Update Events System Configuration"
                           onSubmitForm={saveConfig}
@@ -166,8 +176,8 @@ const EventsConfig = () => {
           <FormGroup controlId="search-timeout-field">
             <TimeUnitInput label="Search Timeout"
                            update={onSearchTimeoutUpdate}
-                           value={eventsSearchTimeout.duration}
-                           unit={eventsSearchTimeout.unit}
+                           value={eventsSearchTimeout(formConfig).duration}
+                           unit={eventsSearchTimeout(formConfig).unit}
                            units={TIME_UNITS}
                            required />
             <HelpBlock>
@@ -177,8 +187,8 @@ const EventsConfig = () => {
           <FormGroup controlId="notifications-retry-field">
             <TimeUnitInput label="Notifications retry period"
                            update={onRetryPeriodUpdate}
-                           value={eventsNotificationRetryPeriod.duration}
-                           unit={eventsNotificationRetryPeriod.unit}
+                           value={eventsNotificationRetryPeriod(formConfig).duration}
+                           unit={eventsNotificationRetryPeriod(formConfig).unit}
                            units={TIME_UNITS}
                            required />
             <HelpBlock>
@@ -190,15 +200,15 @@ const EventsConfig = () => {
                  onChange={onBacklogUpdate}
                  label="Default notifications backlog size"
                  help="Amount of log messages included in a notification by default."
-                 value={eventsNotificationDefaultBacklog}
+                 value={eventsNotificationDefaultBacklog(formConfig)}
                  min="0"
                  required />
           <FormGroup controlId="catch-up-window">
             <TimeUnitInput label="Catch up window size"
                            update={onCatchUpWindowUpdate}
-                           value={eventsCatchupWindow.duration}
-                           unit={eventsCatchupWindow.unit}
-                           enabled={eventsCatchupWindow.duration > 0}
+                           value={eventsCatchupWindow(formConfig).duration}
+                           unit={eventsCatchupWindow(formConfig).unit}
+                           enabled={eventsCatchupWindow(formConfig).duration > 0}
                            units={TIME_UNITS} />
             <HelpBlock>If Event processor execution is behind schedule, queries on older data will be run with this window size to speed up processing.
               (If the &quot;search within the last&quot; setting of an event definition is greater, this setting will be ignored)
@@ -209,7 +219,7 @@ const EventsConfig = () => {
                    label="Send TCP keep-alive probes for notification connections"
                    type="checkbox"
                    onChange={onNotificationTcpKeepAliveUpdate}
-                   checked={eventsNotificationTcpKeepalive} />
+                   checked={eventsNotificationTcpKeepalive(formConfig)} />
             <HelpBlock>
               If enabled, http connections for notifications will send TCP keep-alive probes
             </HelpBlock>

@@ -25,6 +25,7 @@ import { getConfig } from 'components/configurations/helpers';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { Button, Row, Col, BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted, ISODurationInput } from 'components/common';
+import Spinner from 'components/common/Spinner';
 
 import 'moment-duration-format';
 
@@ -176,7 +177,7 @@ const SearchesConfig = () => {
   };
 
   if (!viewConfig) {
-    return null;
+    return <Spinner />;
   }
 
   const duration = (config) => moment.duration(config.query_time_range_limit);
