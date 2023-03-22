@@ -66,7 +66,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 @Codec(name = "syslog", displayName = "Syslog")
 public class SyslogCodec extends AbstractCodec {
     private static final Logger LOG = LoggerFactory.getLogger(SyslogCodec.class);
-    private static final Pattern STRUCTURED_SYSLOG_PATTERN = Pattern.compile("<\\d{1,3}>[0-9]\\d{0,2}\\s.*", Pattern.DOTALL);
+    public static final Pattern STRUCTURED_SYSLOG_PATTERN = Pattern.compile("<\\d{1,3}>[0-9]\\d{0,2}\\s.*", Pattern.DOTALL);
     private static final Pattern CISCO_WITH_SEQUENCE_NUMBERS_PATTERN = Pattern.compile("<\\d{1,3}>\\d*:\\s.*", Pattern.DOTALL);
     private static final Pattern FORTIGATE_PATTERN = Pattern.compile("<\\d{1,3}>date=.*", Pattern.DOTALL);
 
