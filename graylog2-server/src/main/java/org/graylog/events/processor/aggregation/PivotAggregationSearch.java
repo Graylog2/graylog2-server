@@ -71,6 +71,7 @@ import java.util.stream.Collectors;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.stream.Collectors.toSet;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class PivotAggregationSearch implements AggregationSearch {
     private static final Logger LOG = LoggerFactory.getLogger(PivotAggregationSearch.class);
@@ -153,13 +154,16 @@ public class PivotAggregationSearch implements AggregationSearch {
                 return AggregationResult.empty();
             }
 
+            final String description = f("Event definition %s (%s) failed: %s",
+                    eventDefinition.title(), eventDefinition.id(),
+                    errors.stream().map(SearchError::description).collect(Collectors.joining("\n")));
             Notification systemNotification = notificationService.buildNow()
                     .addType(Notification.Type.SEARCH_ERROR)
                     .addSeverity(Notification.Severity.NORMAL)
                     .addTimestamp(DateTime.now(DateTimeZone.UTC))
-                    .addKey(searchJob.getId())
+                    .addKey(eventDefinition.id())
                     .addDetail("title", "Aggregation search failed")
-                    .addDetail("description", errors.stream().map(SearchError::description).collect(Collectors.joining("\n")));
+                    .addDetail("description", description);
             notificationService.publishIfFirst(systemNotification);
 
             if (errors.size() > 1) {
