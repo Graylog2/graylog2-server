@@ -17,7 +17,7 @@
 import PropTypes from 'prop-types';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQueryParam, ArrayParam } from 'use-query-params';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import UserNotification from 'util/UserNotification';
 import { PaginatedList, SearchForm, NoSearchResult } from 'components/common';
@@ -41,7 +41,7 @@ import {
   ADDITIONAL_ATTRIBUTES,
 } from 'components/streams/StreamsOverview/Constants';
 import EntityFilters from 'components/common/EntityFilters';
-import type { Filters } from 'components/common/EntityFilters/types';
+import type { Filters, UrlQueryFilters } from 'components/common/EntityFilters/types';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
 import ExpandedRulesActions from 'components/streams/StreamsOverview/ExpandedRulesActions';
 import fetch from 'logic/rest/FetchProvider';
@@ -49,6 +49,10 @@ import URLUtils from 'util/URLUtils';
 
 import ExpandedRulesSection from './ExpandedRulesSection';
 import CustomColumnRenderers from './ColumnRenderers';
+
+const ATTRIBUTE_COLLECTIONS = {
+  index_set_id: 'index_sets',
+};
 
 const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
   useEffect(() => {
@@ -62,9 +66,11 @@ const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
   }, [refetchStreams]);
 };
 
-const fetchFilterTitles = (filterParams: [ { id: string, type: string } ]) => fetch('POST', URLUtils.qualifyUrl('/system/catalog/entity_titles'), { entities: filterParams });
+const fetchFilterTitles = (filterParams: Array<{ id: string, type: string }>) => fetch('POST', URLUtils.qualifyUrl('/system/catalog/entity_titles'), { entities: filterParams });
 
 const useFiltersWithTitle = (filters: { [attributeId: string]: Array<string> }, paginatedStreams) => {
+  const queryClient = useQueryClient();
+
   const filterParams = Object.entries(filters).reduce((col, [attributeId, values]) => {
     const relatedAttribute = paginatedStreams?.attributes.find((attribute) => attribute.id === attributeId);
 
@@ -81,8 +87,9 @@ const useFiltersWithTitle = (filters: { [attributeId: string]: Array<string> }, 
     ];
   }, []);
 
+  const cachedData = queryClient.getQueryData(['entity_titles', filters]);
   const { data, refetch, isInitialLoading } = useQuery(
-    ['entity_suggestions', filters],
+    ['entity_titles', filters],
     () => fetchFilterTitles(filterParams),
     {
       onError: (errorThrown) => {
@@ -95,7 +102,7 @@ const useFiltersWithTitle = (filters: { [attributeId: string]: Array<string> }, 
   );
 
   return ({
-    data: data?.entities?.reduce((col, { id, title, type }) => {
+    data: (cachedData ?? data)?.entities?.reduce((col, { id, title, type }) => {
       const relatedAttribute = paginatedStreams?.attributes.find((attribute) => attribute.related_collection === type);
 
       if (!relatedAttribute) {
@@ -124,8 +131,12 @@ const useUrlQueryFilters = () => {
     };
   }, {}), [urlQueryFilters]); // use immutable ordered map
 
-  const setFilterValues = (newFilters) => {
-    setUrlQueryFilters(newFilters);
+  const setFilterValues = (newFilters: UrlQueryFilters) => {
+    const newUrlQueryFilters = Object.entries(newFilters).reduce((col, [attributeId, filters]) => {
+      return [...col, ...filters.map((value) => `${attributeId}=${value}`)];
+    }, []);
+
+    setUrlQueryFilters(newUrlQueryFilters);
   };
 
   return [filtersFromQuery, setFilterValues]; // make sure data has same order as urlQueryFilters
@@ -136,8 +147,8 @@ type Props = {
 }
 
 const StreamsOverview = ({ indexSets }: Props) => {
-  const [urlQueryFilters] = useUrlQueryFilters();
-
+  const queryClient = useQueryClient();
+  const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useState('');
   const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
@@ -180,9 +191,26 @@ const StreamsOverview = ({ indexSets }: Props) => {
   }, [onSearch]);
 
   const onChangeFilters = useCallback((newFilters: Filters) => {
-    // setFilters(newFilters);
-    paginationQueryParameter.resetPage();
-  }, [paginationQueryParameter]);
+    const newUrlQueryFilters = Object.entries(newFilters).reduce((col, [attributeId, filterCol]) => {
+      return {
+        ...col,
+        [attributeId]: [...col[attributeId] ?? [], ...filterCol.map(({ value }) => value)],
+      };
+    }, {});
+
+    const result = Object.entries(newFilters).reduce((col, [attributeId, filters]) => {
+      return [
+        ...col,
+        ...filters.map(({ value, title }) => ({ id: value, type: 'index_sets', title })),
+      ];
+    }, []);
+
+    queryClient.setQueryData(['entity_titles', newUrlQueryFilters], {
+      entities: result,
+    });
+
+    setUrlQueryFilters(newUrlQueryFilters);
+  }, [queryClient, setUrlQueryFilters]);
 
   const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
     updateTableLayout({ displayedAttributes });
