@@ -17,7 +17,6 @@
 import PropTypes from 'prop-types';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import invert from 'lodash/invert';
 
 import { PaginatedList, SearchForm, NoSearchResult } from 'components/common';
 import Spinner from 'components/common/Spinner';
@@ -45,12 +44,6 @@ import useFiltersWithTitle from 'components/common/EntityFilters/hooks/useFilter
 
 import CustomColumnRenderers from './ColumnRenderers';
 import useTableEventHandlers from './hooks/useTableEventHandlers';
-
-const ATTRIBUTE_COLLECTIONS = {
-  index_set_id: 'index_sets',
-};
-
-const COLLECTION_ATTRIBUTE_ID = invert(ATTRIBUTE_COLLECTIONS);
 
 const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
   useEffect(() => {
@@ -110,34 +103,35 @@ const StreamsOverview = ({ indexSets }: Props) => {
     () => ([...(paginatedStreams?.attributes ?? []), ...ADDITIONAL_ATTRIBUTES]),
     [paginatedStreams?.attributes],
   );
-
   const onChangeFilters = useCallback((newFilters: Filters) => {
+    console.log({ newFilters });
     const newUrlQueryFilters = Object.entries(newFilters).reduce((col, [attributeId, filterCol]) => ({
       ...col,
       [attributeId]: [...col[attributeId] ?? [], ...filterCol.map(({ value }) => value)],
     }), {});
+    console.log({ newUrlQueryFilters });
 
-    queryClient.setQueryData(['entity_titles', newUrlQueryFilters], (cur: {
-      entities: Array<Object>,
-      not_permitted_to_view: Array<string>
-    }) => ({
-      ...cur,
-      entities: Object.entries(newFilters).reduce((col, [attributeId, filters]) => {
-        const relatedCollection = ATTRIBUTE_COLLECTIONS[attributeId];
+    const result = Object.entries(newFilters).reduce((col, [_attributeId, filters]) => {
+      const relatedAttribute = paginatedStreams?.attributes?.find(({ id }) => id === _attributeId);
 
-        if (!relatedCollection) {
-          return col;
-        }
+      if (!relatedAttribute.related_collection) {
+        return col;
+      }
 
-        return [
-          ...col,
-          ...filters.map(({ value, title }) => ({ id: value, type: '', title })),
-        ];
-      }, []),
-    }));
+      return [
+        ...col,
+        ...filters.map(({ value, title }) => ({ id: value, type: relatedAttribute.related_collection, title })),
+      ];
+    }, []);
+
+    console.log({ result });
+
+    queryClient.setQueryData(['entity_titles', newUrlQueryFilters], {
+      entities: result,
+    });
 
     setUrlQueryFilters(newUrlQueryFilters);
-  }, [queryClient, setUrlQueryFilters]);
+  }, [paginatedStreams?.attributes, queryClient, setUrlQueryFilters]);
 
   if (isLoadingLayoutPreferences || isLoadingStreams) {
     return <Spinner />;
