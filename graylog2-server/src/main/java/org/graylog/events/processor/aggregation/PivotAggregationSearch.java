@@ -144,7 +144,7 @@ public class PivotAggregationSearch implements AggregationSearch {
             });
 
             // If we have only EmptyParameterErrors, just return an empty Result
-            if (! (errors.stream().filter(e -> !(e instanceof EmptyParameterError)).count() > 1)) {
+            if (errors.stream().allMatch(e -> e instanceof EmptyParameterError)) {
                 return AggregationResult.empty();
             }
             if (errors.size() > 1) {
