@@ -39,6 +39,7 @@ import useHasUndeclaredParameters from 'views/logic/parameters/useHasUndeclaredP
 import useAppDispatch from 'stores/useAppDispatch';
 import { updateView } from 'views/logic/slices/viewSlice';
 import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
+import useHistory from 'routing/useHistory';
 
 import DashboardPropertiesModal from './dashboard/DashboardPropertiesModal';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
@@ -80,6 +81,7 @@ const DashboardActionsMenu = () => {
     </>
   );
   const dispatch = useAppDispatch();
+  const history = useHistory();
 
   const _onSaveNewDashboard = useCallback(async (newDashboard: View) => {
     const isViewDuplication = !!view.id;
@@ -87,11 +89,11 @@ const DashboardActionsMenu = () => {
     if (isViewDuplication) {
       const dashboardWithPluginData = await executePluggableDuplicationHandler(newDashboard, currentUser.permissions, pluggableSaveViewControls);
 
-      return dispatch(onSaveNewDashboard(dashboardWithPluginData));
+      return dispatch(onSaveNewDashboard(dashboardWithPluginData, history));
     }
 
-    return dispatch(onSaveNewDashboard(newDashboard));
-  }, [currentUser.permissions, dispatch, pluggableSaveViewControls, view.id]);
+    return dispatch(onSaveNewDashboard(newDashboard, history));
+  }, [currentUser.permissions, dispatch, history, pluggableSaveViewControls, view.id]);
   const _onSaveView = useCallback(() => dispatch(OnSaveViewAction(view)), [dispatch, view]);
   const _onUpdateView = useCallback((updatedView) => dispatch(updateView(updatedView)), [dispatch]);
 

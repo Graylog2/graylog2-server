@@ -22,7 +22,7 @@ import { Button, Col, ControlLabel, FormControl, FormGroup, Row, Input } from 'c
 import { ConfirmLeaveDialog, SourceCodeEditor, FormSubmit } from 'components/common';
 import MessageShow from 'components/search/MessageShow';
 import Routes from 'routing/Routes';
-import history from 'util/History';
+import useHistory from 'routing/useHistory';
 
 import { PipelineRulesContext } from './RuleContext';
 import PipelinesUsingRule from './PipelinesUsingRule';
@@ -61,6 +61,7 @@ const RuleForm = ({ create }: Props) => {
 
   const [isDirty, setIsDirty] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const history = useHistory();
 
   const handleError = (error) => {
     if (error.responseMessage.includes('duplicate key error')) {

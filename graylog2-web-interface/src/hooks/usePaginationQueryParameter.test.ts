@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { renderHook, act } from 'wrappedTestingLibrary/hooks';
-import { useLocation } from 'react-router-dom';
+import { useLocation, MemoryRouter as Router } from 'react-router-dom';
 import type { Location } from 'history';
 
 import { asMock } from 'helpers/mocking';
@@ -23,22 +23,22 @@ import { asMock } from 'helpers/mocking';
 import usePaginationQueryParameter, { DEFAULT_PAGE } from './usePaginationQueryParameter';
 
 const DEFAULT_PAGE_SIZES = [10, 50, 100];
-const mockHistoryReplace = jest.fn();
+const mockNavigate = jest.fn();
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useHistory: () => ({
-    replace: mockHistoryReplace,
-  }),
+  useNavigate: () => mockNavigate,
   useLocation: jest.fn(() => ({
     pathname: '',
     search: '',
   })),
 }));
 
+const options = { wrapper: Router };
+
 describe('usePaginationQueryParameter custom hook', () => {
   it('should use default pagination if there is no <page> query parameter', () => {
-    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
+    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES), options);
 
     const { page } = result.current;
 
@@ -46,7 +46,7 @@ describe('usePaginationQueryParameter custom hook', () => {
   });
 
   it('should use default pageSize if there is no <pageSize> query parameter', () => {
-    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
+    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES), options);
 
     const { pageSize } = result.current;
 
@@ -54,7 +54,7 @@ describe('usePaginationQueryParameter custom hook', () => {
   });
 
   it('should set <page> query parameter with the value sent in setPagination', () => {
-    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
+    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES), options);
 
     const { page, setPagination } = result.current;
 
@@ -64,11 +64,11 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     act(() => setPagination({ page: nextPage }));
 
-    expect(mockHistoryReplace).toHaveBeenCalledWith(`?page=${nextPage}&pageSize=10`);
+    expect(mockNavigate).toHaveBeenCalledWith(`?page=${nextPage}&pageSize=10`);
   });
 
   it('should set <pageSize> query parameter with the value sent in setPagination and initialize the <page> query parameter', () => {
-    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
+    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES), options);
 
     const { pageSize, setPagination } = result.current;
 
@@ -78,7 +78,7 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     act(() => setPagination({ pageSize: nextPageSize }));
 
-    expect(mockHistoryReplace).toHaveBeenCalledWith(`?page=${DEFAULT_PAGE}&pageSize=${nextPageSize}`);
+    expect(mockNavigate).toHaveBeenCalledWith(`?page=${DEFAULT_PAGE}&pageSize=${nextPageSize}`);
   });
 
   it('should get the page value from <page> query parameter', () => {
@@ -86,9 +86,9 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     asMock(useLocation).mockReturnValue({
       search: `?page=${currentPage}`,
-    } as Location<{ search: string }>);
+    } as Location);
 
-    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
+    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES), options);
 
     const { page } = result.current;
 
@@ -100,9 +100,9 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     asMock(useLocation).mockReturnValue({
       search: `?pageSize=${currentPageSize}`,
-    } as Location<{ search: string }>);
+    } as Location);
 
-    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
+    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES), options);
 
     const { pageSize } = result.current;
 
@@ -114,9 +114,9 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     asMock(useLocation).mockReturnValue({
       search: `?pageSize=${currentPageSize}`,
-    } as Location<{ search: string }>);
+    } as Location);
 
-    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES));
+    const { result } = renderHook(() => usePaginationQueryParameter(DEFAULT_PAGE_SIZES), options);
 
     const { pageSize } = result.current;
 
@@ -131,7 +131,7 @@ describe('usePaginationQueryParameter custom hook', () => {
     asMock(useLocation).mockReturnValue({
       search: `?page=${currentPage}&pageSize=${currentPageSize}`,
       pathname: 'example.org',
-    } as Location<{ search: string }>);
+    } as Location);
 
     const { result } = renderHook(() => usePaginationQueryParameter());
 
@@ -140,7 +140,7 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     result.current.resetPage();
 
-    expect(mockHistoryReplace).toHaveBeenCalledWith(`example.org?page=1&pageSize=${currentPageSize}`);
+    expect(mockNavigate).toHaveBeenCalledWith(`example.org?page=1&pageSize=${currentPageSize}`);
   });
 
   it('should always use provided page size and not update pageSize query param, when syncPageSizeFromQuery is false', () => {
@@ -150,7 +150,7 @@ describe('usePaginationQueryParameter custom hook', () => {
     asMock(useLocation).mockReturnValue({
       search: `?page=${queryParamsPage}&pageSize=50`,
       pathname: 'example.org',
-    } as Location<{ search: string }>);
+    } as Location);
 
     const { result } = renderHook(() => usePaginationQueryParameter(undefined, providedPageSize, false));
 
@@ -159,6 +159,6 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     result.current.setPagination({ page: 4, pageSize: 100 });
 
-    expect(mockHistoryReplace).toHaveBeenCalledWith('example.org?page=4');
+    expect(mockNavigate).toHaveBeenCalledWith('example.org?page=4');
   });
 });
