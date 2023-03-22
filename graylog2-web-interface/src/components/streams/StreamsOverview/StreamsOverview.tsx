@@ -81,7 +81,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
     filters: urlQueryFilters,
   }, { enabled: !isLoadingLayoutPreferences });
 
-  const { data: filtersWithTitle } = useFiltersWithTitle(urlQueryFilters, paginatedStreams?.attributes, !!paginatedStreams);
+  const { data: filtersWithTitle, onChange: onChangeFiltersWithTitle } = useFiltersWithTitle(urlQueryFilters, paginatedStreams?.attributes, !!paginatedStreams);
 
   const { entityActions, expandedSections, bulkActions } = useTableElements({ indexSets });
   const {
@@ -104,31 +104,12 @@ const StreamsOverview = ({ indexSets }: Props) => {
     [paginatedStreams?.attributes],
   );
   const onChangeFilters = useCallback((newFilters: Filters) => {
-    console.log({ newFilters });
     const newUrlQueryFilters = Object.entries(newFilters).reduce((col, [attributeId, filterCol]) => ({
       ...col,
       [attributeId]: [...col[attributeId] ?? [], ...filterCol.map(({ value }) => value)],
     }), {});
-    console.log({ newUrlQueryFilters });
 
-    const result = Object.entries(newFilters).reduce((col, [_attributeId, filters]) => {
-      const relatedAttribute = paginatedStreams?.attributes?.find(({ id }) => id === _attributeId);
-
-      if (!relatedAttribute.related_collection) {
-        return col;
-      }
-
-      return [
-        ...col,
-        ...filters.map(({ value, title }) => ({ id: value, type: relatedAttribute.related_collection, title })),
-      ];
-    }, []);
-
-    console.log({ result });
-
-    queryClient.setQueryData(['entity_titles', newUrlQueryFilters], {
-      entities: result,
-    });
+    onChangeFiltersWithTitle(newFilters, newUrlQueryFilters);
 
     setUrlQueryFilters(newUrlQueryFilters);
   }, [paginatedStreams?.attributes, queryClient, setUrlQueryFilters]);
