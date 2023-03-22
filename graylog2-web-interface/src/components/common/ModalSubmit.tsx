@@ -59,7 +59,7 @@ type Props = {
   isAsyncSubmit?: boolean,
   isSubmitting?: boolean,
   leftCol?: React.ReactNode,
-  onSubmit?: () => void,
+  onSubmit?: (prop?: any) => void,
   submitButtonText: string,
   submitButtonType?: 'submit' | 'button',
   submitIcon?: IconName,

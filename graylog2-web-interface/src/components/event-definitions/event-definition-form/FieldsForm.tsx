@@ -40,7 +40,7 @@ type Props = {
   eventDefinition: EventDefinition,
   validation: {
     errors: {
-      title: string,
+      title?: string,
     }
   },
   onChange: (name: string, value: any) => void,
