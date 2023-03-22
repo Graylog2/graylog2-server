@@ -1,0 +1,4 @@
+type = "f"
+message = "Fixes an off-by-one error that could result in an aggregation search failing silently."
+
+pulls = ["15009"]
