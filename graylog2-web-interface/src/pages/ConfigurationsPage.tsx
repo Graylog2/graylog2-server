@@ -69,7 +69,6 @@ const ConfigurationsPage = () => {
   useEffect(() => {
     const promises = [
       ConfigurationsActions.list(ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG),
-      ConfigurationsActions.list(ConfigurationType.EVENTS_CONFIG),
       ConfigurationsActions.listPermissionsConfig(ConfigurationType.PERMISSIONS_CONFIG),
       ConfigurationsActions.listUserConfig(ConfigurationType.USER_CONFIG),
     ];
@@ -93,7 +92,6 @@ const ConfigurationsPage = () => {
     setActiveSubSectionKey(itemKey);
   };
 
-  const eventsConfig = getConfig(ConfigurationType.EVENTS_CONFIG, configuration);
   const urlWhiteListConfig = getConfig(ConfigurationType.URL_WHITELIST_CONFIG, configuration);
   const indexSetsDefaultsConfig = getConfig(ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG, configuration);
   const permissionsConfig = getConfig(ConfigurationType.PERMISSIONS_CONFIG, configuration);
@@ -156,11 +154,10 @@ const ConfigurationsPage = () => {
     },
     {
       name: 'Events',
-      shouldRender: eventsConfig,
+      shouldRender: true,
       render: (key) => (
         <ConfigletContainer title="Events Configuration" key={key}>
-          <EventsConfig config={eventsConfig}
-                        updateConfig={onUpdate(ConfigurationType.EVENTS_CONFIG)} />
+          <EventsConfig />
         </ConfigletContainer>
       ),
     },

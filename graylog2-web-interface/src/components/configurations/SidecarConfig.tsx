@@ -33,21 +33,23 @@ type Config = {
   sidecar_configuration_override: boolean,
 }
 
-const SidecarConfig = () => {
-  const defaultConfig = {
-    sidecar_expiration_threshold: 'P14D',
-    sidecar_inactive_threshold: 'PT1M',
-    sidecar_update_interval: 'PT30S',
-    sidecar_send_status: true,
-    sidecar_configuration_override: false,
-  };
+const DEFAULT_CONFIG = {
+  sidecar_expiration_threshold: 'P14D',
+  sidecar_inactive_threshold: 'PT1M',
+  sidecar_update_interval: 'PT30S',
+  sidecar_send_status: true,
+  sidecar_configuration_override: false,
+};
 
+const SidecarConfig = () => {
   const [showConfigModal, setShowConfigModal] = useState(false);
-  const [config, setConfig] = useState<Config | undefined>(defaultConfig);
+  const [config, setConfig] = useState<Config>(DEFAULT_CONFIG);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     ConfigurationsActions.list(ConfigurationType.SIDECAR_CONFIG).then((configData) => {
       setConfig(configData as Config);
+      setLoaded(true);
     });
   }, []);
 
@@ -92,7 +94,7 @@ const SidecarConfig = () => {
     return milliseconds >= 1000 && milliseconds < inactiveMilliseconds && milliseconds < expirationMilliseconds;
   };
 
-  if (!config) { return null; }
+  if (!loaded) { return null; }
 
   return (
     <div>
