@@ -202,6 +202,17 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
         // This cannot be abstract due to backwards compatibility with version < 3.2.0
     }
 
+    /**
+     * Update /add a time to live for the given key in a DataAdapter.
+     * This is a method stub that can be implemented in DataAdapters that support TTLs.
+     * @param key             The key that should be updated.
+     * @param ttl             The time to live that should be added to the entry.
+     * @return A LookupResult containing the updated value or an error
+     */
+    public LookupResult assignTtl(Object key, Long ttl) {
+        return resultWithError;
+    }
+
     public LookupDataAdapterConfiguration getConfig() {
         return config;
     }

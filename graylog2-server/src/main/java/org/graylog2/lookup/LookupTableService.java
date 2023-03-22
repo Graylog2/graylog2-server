@@ -700,5 +700,13 @@ public class LookupTableService extends AbstractIdleService {
         public LookupTable getTable() {
             return lookupTableService.getTable(lookupTableName);
         }
+
+        public LookupResult assignTtl(Object key, Long ttl) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return LookupResult.withError();
+            }
+            return lookupTable.assignTtl(requireValidKey(key), ttl);
+        }
     }
 }

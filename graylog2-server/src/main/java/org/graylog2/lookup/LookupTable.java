@@ -111,6 +111,12 @@ public abstract class LookupTable {
         cache().purge(LookupCacheKey.create(dataAdapter(), key));
     }
 
+    public LookupResult assignTtl(@Nonnull Object key, @Nonnull Long ttl) {
+        final LookupResult result = dataAdapter().assignTtl(key, ttl);
+        cache().purge(LookupCacheKey.create(dataAdapter(), key));
+        return result;
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder id(String id);
