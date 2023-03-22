@@ -17,7 +17,10 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
-import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
+import { useStore } from 'stores/connect';
+import type { Store } from 'stores/StoreTypes';
+import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
+import { getConfig } from 'components/configurations/helpers';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { Button, BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted, ISODurationInput } from 'components/common';
@@ -43,15 +46,20 @@ const DEFAULT_CONFIG = {
 
 const SidecarConfig = () => {
   const [showConfigModal, setShowConfigModal] = useState(false);
-  const [config, setConfig] = useState<Config>(DEFAULT_CONFIG);
+  const [viewConfig, setViewConfig] = useState<Config>(DEFAULT_CONFIG);
+  const [formConfig, setFormConfig] = useState<Config>(DEFAULT_CONFIG);
+  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    ConfigurationsActions.list(ConfigurationType.SIDECAR_CONFIG).then((configData) => {
-      setConfig(configData as Config);
+    ConfigurationsActions.list(ConfigurationType.SIDECAR_CONFIG).then(() => {
+      const config = getConfig(ConfigurationType.SIDECAR_CONFIG, configuration);
+
+      setViewConfig(config);
+      setFormConfig(config);
       setLoaded(true);
     });
-  }, []);
+  }, [configuration]);
 
   const openModal = () => {
     setShowConfigModal(true);
@@ -59,10 +67,11 @@ const SidecarConfig = () => {
 
   const closeModal = () => {
     setShowConfigModal(false);
+    setFormConfig(viewConfig);
   };
 
   const saveConfig = () => {
-    ConfigurationsActions.update(ConfigurationType.SIDECAR_CONFIG, config).then(() => {
+    ConfigurationsActions.update(ConfigurationType.SIDECAR_CONFIG, formConfig).then(() => {
       closeModal();
     });
   };
@@ -71,7 +80,7 @@ const SidecarConfig = () => {
     return (value) => {
       const newValue = typeof value === 'object' ? getValueFromInput(value.target) : value;
 
-      setConfig({ ...config, [field]: newValue });
+      setFormConfig({ ...formConfig, [field]: newValue });
     };
   };
 
@@ -88,13 +97,13 @@ const SidecarConfig = () => {
   };
 
   const updateIntervalValidator = (milliseconds) => {
-    const inactiveMilliseconds = durationMilliseconds(config.sidecar_inactive_threshold);
-    const expirationMilliseconds = durationMilliseconds(config.sidecar_expiration_threshold);
+    const inactiveMilliseconds = durationMilliseconds(formConfig.sidecar_inactive_threshold);
+    const expirationMilliseconds = durationMilliseconds(formConfig.sidecar_expiration_threshold);
 
     return milliseconds >= 1000 && milliseconds < inactiveMilliseconds && milliseconds < expirationMilliseconds;
   };
 
-  if (!loaded) { return null; }
+  if (!loaded || !viewConfig) { return null; }
 
   return (
     <div>
@@ -102,22 +111,22 @@ const SidecarConfig = () => {
 
       <dl className="deflist">
         <dt>Inactive threshold:</dt>
-        <dd>{config.sidecar_inactive_threshold}</dd>
+        <dd>{viewConfig.sidecar_inactive_threshold}</dd>
         <dt>Expiration threshold:</dt>
-        <dd>{config.sidecar_expiration_threshold}</dd>
+        <dd>{viewConfig.sidecar_expiration_threshold}</dd>
         <dt>Update interval:</dt>
-        <dd>{config.sidecar_update_interval}</dd>
+        <dd>{viewConfig.sidecar_update_interval}</dd>
         <dt>Send status:</dt>
-        <dd>{StringUtils.capitalizeFirstLetter(config.sidecar_send_status.toString())}</dd>
+        <dd>{StringUtils.capitalizeFirstLetter(viewConfig.sidecar_send_status.toString())}</dd>
         <dt>Override configuration:</dt>
-        <dd>{StringUtils.capitalizeFirstLetter(config.sidecar_configuration_override.toString())}</dd>
+        <dd>{StringUtils.capitalizeFirstLetter(viewConfig.sidecar_configuration_override.toString())}</dd>
       </dl>
 
       <IfPermitted permissions="clusterconfigentry:edit">
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>Edit configuration</Button>
       </IfPermitted>
 
-      {showConfigModal && (
+      {showConfigModal && formConfig && (
       <BootstrapModalForm show
                           title="Update Sidecars System Configuration"
                           onSubmitForm={saveConfig}
@@ -125,7 +134,7 @@ const SidecarConfig = () => {
                           submitButtonText="Update configuration">
         <fieldset>
           <ISODurationInput id="inactive-threshold-field"
-                            duration={config.sidecar_inactive_threshold}
+                            duration={formConfig.sidecar_inactive_threshold}
                             update={onUpdate('sidecar_inactive_threshold')}
                             label="Inactive threshold (as ISO8601 Duration)"
                             help="Amount of time of inactivity after which Sidecars are flagged as inactive."
@@ -134,7 +143,7 @@ const SidecarConfig = () => {
                             required />
 
           <ISODurationInput id="sidecar-expiration-field"
-                            duration={config.sidecar_expiration_threshold}
+                            duration={formConfig.sidecar_expiration_threshold}
                             update={onUpdate('sidecar_expiration_threshold')}
                             label="Expiration threshold (as ISO8601 Duration)"
                             help="Amount of time after which inactive Sidecars are purged from the database."
@@ -142,7 +151,7 @@ const SidecarConfig = () => {
                             errorText="invalid (min: 1 minute)"
                             required />
           <ISODurationInput id="sidecar-update-field"
-                            duration={config.sidecar_update_interval}
+                            duration={formConfig.sidecar_update_interval}
                             update={onUpdate('sidecar_update_interval')}
                             label="Update interval (as ISO8601 Duration)"
                             help="Time between Sidecar update requests."
@@ -153,13 +162,13 @@ const SidecarConfig = () => {
         <Input type="checkbox"
                id="send-status-updates-checkbox"
                label="Send status updates"
-               checked={config.sidecar_send_status}
+               checked={formConfig.sidecar_send_status}
                onChange={onUpdate('sidecar_send_status')}
                help="Send Sidecar status and host metrics from each client" />
         <Input type="checkbox"
                id="override-sidecar-config-checkbox"
                label="Override Sidecar configuration"
-               checked={config.sidecar_configuration_override}
+               checked={formConfig.sidecar_configuration_override}
                onChange={onUpdate('sidecar_configuration_override')}
                help="Override configuration file settings for all Sidecars" />
       </BootstrapModalForm>
