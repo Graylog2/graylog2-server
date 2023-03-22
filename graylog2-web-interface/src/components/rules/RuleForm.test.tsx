@@ -80,7 +80,7 @@ describe('RuleForm', () => {
 
     const { getByRole, getByPlaceholderText } = render(
       <PipelineRulesContext.Provider value={{
-        ruleSource: ruleToUpdate.source,
+        rule_source: ruleToUpdate.source,
         ruleSourceRef: {},
         usedInPipelines: [],
         rawMessageToSimulate: '',
