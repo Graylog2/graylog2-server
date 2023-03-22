@@ -29,6 +29,10 @@ import type { ValueFilter } from '../types';
 
 const DATE_SEPARATOR = '><';
 
+export const extractRangeFromString = (timeRange: string) => timeRange.split(DATE_SEPARATOR);
+// from and until need to be in the user time zone.
+export const timeRangeTitle = (from: string, until: string) => `${from || 'All time'} - ${until || 'Now'}`;
+
 type FormValues = {
   from: string | undefined,
   until: string | undefined,
@@ -118,7 +122,7 @@ const useInitialValues = (filter: ValueFilter | undefined) => {
   const { formatTime } = useUserDateTime();
 
   if (filter) {
-    const [from, until] = filter.value.split(DATE_SEPARATOR);
+    const [from, until] = extractRangeFromString(filter.value);
 
     return ({
       from: from ? formatTime(from, 'complete') : undefined,
@@ -175,7 +179,7 @@ const DateRangeForm = ({ filter, onSubmit }: Props) => {
     const utcUntil = formValues.until ? toInternalTime(formValues.until) : '';
 
     onSubmit({
-      title: `${formValues.from || 'All time'} - ${formValues.until || 'Now'}`,
+      title: timeRangeTitle(formValues.from, formValues.until),
       value: `${utcFrom}${DATE_SEPARATOR}${utcUntil}`,
     });
   };
