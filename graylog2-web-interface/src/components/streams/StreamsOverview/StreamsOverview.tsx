@@ -15,8 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import { PaginatedList, SearchForm, NoSearchResult } from 'components/common';
 import Spinner from 'components/common/Spinner';
@@ -36,11 +35,9 @@ import {
   ADDITIONAL_ATTRIBUTES,
 } from 'components/streams/StreamsOverview/Constants';
 import EntityFilters from 'components/common/EntityFilters';
-import type { Filters } from 'components/common/EntityFilters/types';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
 import useTableElements from 'components/streams/StreamsOverview/hooks/useTableComponents';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
-import useFiltersWithTitle from 'components/common/EntityFilters/hooks/useFiltersWithTitle';
 
 import CustomColumnRenderers from './ColumnRenderers';
 import useTableEventHandlers from './hooks/useTableEventHandlers';
@@ -62,7 +59,6 @@ type Props = {
 }
 
 const StreamsOverview = ({ indexSets }: Props) => {
-  const queryClient = useQueryClient();
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useState('');
   const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
@@ -80,9 +76,6 @@ const StreamsOverview = ({ indexSets }: Props) => {
     sort: layoutConfig.sort,
     filters: urlQueryFilters,
   }, { enabled: !isLoadingLayoutPreferences });
-
-  const { data: filtersWithTitle, onChange: onChangeFiltersWithTitle } = useFiltersWithTitle(urlQueryFilters, paginatedStreams?.attributes, !!paginatedStreams);
-
   const { entityActions, expandedSections, bulkActions } = useTableElements({ indexSets });
   const {
     onPageSizeChange,
@@ -103,16 +96,6 @@ const StreamsOverview = ({ indexSets }: Props) => {
     () => ([...(paginatedStreams?.attributes ?? []), ...ADDITIONAL_ATTRIBUTES]),
     [paginatedStreams?.attributes],
   );
-  const onChangeFilters = useCallback((newFilters: Filters) => {
-    const newUrlQueryFilters = Object.entries(newFilters).reduce((col, [attributeId, filterCol]) => ({
-      ...col,
-      [attributeId]: [...col[attributeId] ?? [], ...filterCol.map(({ value }) => value)],
-    }), {});
-
-    onChangeFiltersWithTitle(newFilters, newUrlQueryFilters);
-
-    setUrlQueryFilters(newUrlQueryFilters);
-  }, [paginatedStreams?.attributes, queryClient, setUrlQueryFilters]);
 
   if (isLoadingLayoutPreferences || isLoadingStreams) {
     return <Spinner />;
@@ -129,8 +112,8 @@ const StreamsOverview = ({ indexSets }: Props) => {
                     onReset={onSearchReset}
                     queryHelpComponent={<QueryHelper entityName="stream" />}>
           <EntityFilters attributes={attributes}
-                         onChangeFilters={onChangeFilters}
-                         activeFilters={filtersWithTitle}
+                         urlQueryFilters={urlQueryFilters}
+                         setUrlQueryFilters={setUrlQueryFilters}
                          filterValueRenderers={FilterValueRenderers} />
         </SearchForm>
       </div>

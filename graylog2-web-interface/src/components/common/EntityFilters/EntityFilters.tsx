@@ -14,13 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useCallback } from 'react';
 import styled from 'styled-components';
 
 import CreateFilterDropdown from 'components/common/EntityFilters/CreateFilterDropdown';
 import type { Attributes } from 'stores/PaginationTypes';
-import type { Filters, Filter } from 'components/common/EntityFilters/types';
+import type { Filters, Filter, UrlQueryFilters } from 'components/common/EntityFilters/types';
 import ActiveFilters from 'components/common/EntityFilters/ActiveFilters';
+import useFiltersWithTitle from 'components/common/EntityFilters/hooks/useFiltersWithTitle';
 
 import { ROW_MIN_HEIGHT } from './Constants';
 
@@ -39,12 +40,33 @@ const FilterCreation = styled.div`
 
 type Props = {
   attributes: Attributes,
-  onChangeFilters: (filters: Filters) => void,
-  activeFilters: Filters | undefined,
+
+  urlQueryFilters: UrlQueryFilters,
+  setUrlQueryFilters: (urlQueryFilters: UrlQueryFilters) => void,
   filterValueRenderers?: { [attributeId: string]: (value: Filter['value'], title: string) => React.ReactNode };
 }
 
-const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRenderers, onChangeFilters }: Props) => {
+const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters, setUrlQueryFilters }: Props) => {
+  const {
+    data: activeFilters,
+    onChange: onChangeFiltersWithTitle,
+  } = useFiltersWithTitle(
+    urlQueryFilters,
+    attributes,
+    !!attributes,
+  );
+
+  const onChangeFilters = useCallback((newFilters: Filters) => {
+    const newUrlQueryFilters = Object.entries(newFilters).reduce((col, [attributeId, filterCol]) => ({
+      ...col,
+      [attributeId]: [...col[attributeId] ?? [], ...filterCol.map(({ value }) => value)],
+    }), {});
+
+    onChangeFiltersWithTitle(newFilters, newUrlQueryFilters);
+
+    setUrlQueryFilters(newUrlQueryFilters);
+  }, [onChangeFiltersWithTitle, setUrlQueryFilters]);
+
   const filterableAttributes = attributes.filter(({ filterable, type }) => filterable && SUPPORTED_ATTRIBUTE_TYPES.includes(type));
 
   if (!filterableAttributes.length) {
