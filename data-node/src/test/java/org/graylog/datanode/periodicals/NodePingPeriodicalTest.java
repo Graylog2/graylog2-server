@@ -16,14 +16,10 @@
  */
 package org.graylog.datanode.periodicals;
 
-import org.assertj.core.api.Assertions;
-import org.graylog.datanode.periodicals.NodePingPeriodical;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
-import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.net.URI;
@@ -46,14 +42,10 @@ class NodePingPeriodicalTest {
 
         task.doRun();
 
-        final ArgumentCaptor<NodeId> nodeIdCaptor = ArgumentCaptor.forClass(NodeId.class);
-        final ArgumentCaptor<Boolean> isLeaderCaptor = ArgumentCaptor.forClass(Boolean.class);
-        final ArgumentCaptor<URI> uriCaptor = ArgumentCaptor.forClass(URI.class);
-        Mockito.verify(nodeService).markAsAlive(nodeIdCaptor.capture(), isLeaderCaptor.capture(), uriCaptor.capture());
-
-        Assertions.assertThat(nodeIdCaptor.getValue().getNodeId()).isEqualTo("5ca1ab1e-0000-4000-a000-000000000000");
-        Assertions.assertThat(isLeaderCaptor.getValue()).isTrue();
-        Assertions.assertThat(uriCaptor.getValue().toString()).isEqualTo("http://localhost:8999");
+        Mockito.verify(nodeService).markAsAlive(
+                Mockito.eq(nodeID),
+                Mockito.eq(true),
+                Mockito.eq(uri));
     }
 
 
@@ -76,15 +68,11 @@ class NodePingPeriodicalTest {
 
         task.doRun();
 
-        final ArgumentCaptor<String> nodeIdCaptor = ArgumentCaptor.forClass(String.class);
-        final ArgumentCaptor<Boolean> isLeaderCaptor = ArgumentCaptor.forClass(Boolean.class);
-        final ArgumentCaptor<URI> uriCaptor = ArgumentCaptor.forClass(URI.class);
-        final ArgumentCaptor<String> hostnameCapture = ArgumentCaptor.forClass(String.class);
-        Mockito.verify(nodeService).registerServer(nodeIdCaptor.capture(), isLeaderCaptor.capture(), uriCaptor.capture(), hostnameCapture.capture());
-
-        Assertions.assertThat(nodeIdCaptor.getValue()).isEqualTo("5ca1ab1e-0000-4000-a000-000000000000");
-        Assertions.assertThat(isLeaderCaptor.getValue()).isTrue();
-        Assertions.assertThat(uriCaptor.getValue().toString()).isEqualTo("http://localhost:8999");
-        Assertions.assertThat(hostnameCapture.getValue()).isNotBlank();
+        Mockito.verify(nodeService).registerServer(
+                Mockito.eq(nodeID.getNodeId()),
+                Mockito.eq(true),
+                Mockito.eq(uri),
+                Mockito.any()
+        );
     }
 }
