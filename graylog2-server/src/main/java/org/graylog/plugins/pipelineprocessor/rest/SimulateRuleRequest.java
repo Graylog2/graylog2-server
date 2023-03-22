@@ -32,7 +32,7 @@ public abstract class SimulateRuleRequest {
 
     @JsonCreator
     public static SimulateRuleRequest create (@JsonProperty("message") String message,
-                                              @JsonProperty("ruleSource") RuleSource ruleSource) {
+                                              @JsonProperty("rule_source") RuleSource ruleSource) {
         return new AutoValue_SimulateRuleRequest(message, ruleSource);
     }
 }

@@ -291,7 +291,7 @@ export const RulesStore = singletonStore(
     simulate(message, ruleSource, callback) {
       const url = qualifyUrl(ApiRoutes.RulesController.simulate().url);
       const rule = {
-        ruleSource: {
+        rule_source: {
           title: ruleSource.title,
           description: ruleSource.description,
           source: ruleSource.source,
