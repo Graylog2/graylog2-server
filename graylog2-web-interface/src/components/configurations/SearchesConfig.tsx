@@ -18,10 +18,13 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import moment from 'moment';
 
+import { useStore } from 'stores/connect';
+import type { Store } from 'stores/StoreTypes';
+import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
+import { getConfig } from 'components/configurations/helpers';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { Button, Row, Col, BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted, ISODurationInput } from 'components/common';
-import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 
 import 'moment-duration-format';
 
@@ -53,23 +56,26 @@ type Config = {
 }
 
 const SearchesConfig = () => {
+  const isLimitEnabled = (config) => moment.duration(config?.query_time_range_limit).asMilliseconds() > 0;
   const [showConfigModal, setShowConfigModal] = useState(false);
-  const [config, setConfig] = useState<Config | undefined>(undefined);
-  const [limitEnabled, setLimitEnabled] = useState(moment.duration(config?.query_time_range_limit).asMilliseconds() > 0);
+  const [viewConfig, setViewConfig] = useState<Config | undefined>(undefined);
+  const [formConfig, setFormConfig] = useState<Config | undefined>(undefined);
+  const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
   const [relativeTimeRangeOptionsUpdate, setRelativeTimeRangeOptionsUpdate] = useState(undefined);
   const [surroundingTimeRangeOptionsUpdate, setSurroundingTimeRangeOptionsUpdate] = useState(undefined);
-  const [surroundingFilterFields, setSurroundingFilterFields] = useState(undefined);
-  const [analysisDisabledFields, setAnalysisDisabledFields] = useState(undefined);
+  const [surroundingFilterFieldsUpdate, setSurroundingFilterFieldsUpdate] = useState(undefined);
+  const [analysisDisabledFieldsUpdate, setAnalysisDisabledFieldsUpdate] = useState(undefined);
 
   useEffect(() => {
-    ConfigurationsActions.list(ConfigurationType.SEARCHES_CLUSTER_CONFIG).then((configData) => {
-      setConfig(configData as Config);
+    ConfigurationsActions.list(ConfigurationType.SEARCHES_CLUSTER_CONFIG).then(() => {
+      setViewConfig(getConfig(ConfigurationType.SEARCHES_CLUSTER_CONFIG, configuration));
+      setFormConfig(getConfig(ConfigurationType.SEARCHES_CLUSTER_CONFIG, configuration));
     });
-  }, []);
+  }, [configuration]);
 
   const onUpdate = (field) => {
     return (newOptions) => {
-      setConfig({ ...config, [field]: newOptions });
+      setFormConfig({ ...formConfig, [field]: newOptions });
     };
   };
 
@@ -82,17 +88,17 @@ const SearchesConfig = () => {
   };
 
   const onFilterFieldsUpdate = (e) => {
-    setSurroundingFilterFields(e.target.value);
+    setSurroundingFilterFieldsUpdate(e.target.value);
   };
 
   const onAnalysisDisabledFieldsUpdate = (e) => {
-    setAnalysisDisabledFields(e.target.value);
+    setAnalysisDisabledFieldsUpdate(e.target.value);
   };
 
   const onChecked = () => {
     let queryTimeRangeLimit;
 
-    if (limitEnabled) {
+    if (isLimitEnabled(formConfig)) {
       // If currently enabled, disable by setting the limit to 0 seconds.
       queryTimeRangeLimit = 'PT0S';
     } else {
@@ -100,20 +106,28 @@ const SearchesConfig = () => {
       queryTimeRangeLimit = 'P30D';
     }
 
-    setConfig({ ...config, query_time_range_limit: queryTimeRangeLimit });
-    setLimitEnabled(!limitEnabled);
+    setFormConfig({ ...formConfig, query_time_range_limit: queryTimeRangeLimit });
   };
 
   const openModal = () => {
     setShowConfigModal(true);
   };
 
-  const closeModal = () => {
+  const resetFormUpdates = () => {
+    setRelativeTimeRangeOptionsUpdate(undefined);
+    setSurroundingTimeRangeOptionsUpdate(undefined);
+    setSurroundingFilterFieldsUpdate(undefined);
+    setAnalysisDisabledFieldsUpdate(undefined);
+  };
+
+  const handleModalCancel = () => {
     setShowConfigModal(false);
+    setFormConfig(viewConfig);
+    resetFormUpdates();
   };
 
   const saveConfig = () => {
-    const update = { ...config };
+    const update = { ...formConfig };
 
     if (relativeTimeRangeOptionsUpdate) {
       update.relative_timerange_options = {};
@@ -135,19 +149,21 @@ const SearchesConfig = () => {
       setSurroundingTimeRangeOptionsUpdate(undefined);
     }
 
-    // Make sure to update filter fields
-    if (surroundingFilterFields) {
-      update.surrounding_filter_fields = splitStringList(surroundingFilterFields);
-      setSurroundingFilterFields(undefined);
+    if (surroundingFilterFieldsUpdate) {
+      update.surrounding_filter_fields = splitStringList(surroundingFilterFieldsUpdate);
+      setSurroundingFilterFieldsUpdate(undefined);
     }
 
-    if (analysisDisabledFields) {
-      update.analysis_disabled_fields = splitStringList(analysisDisabledFields);
-      setAnalysisDisabledFields(undefined);
+    if (analysisDisabledFieldsUpdate) {
+      update.analysis_disabled_fields = splitStringList(analysisDisabledFieldsUpdate);
+      setAnalysisDisabledFieldsUpdate(undefined);
     }
 
-    ConfigurationsActions.update(ConfigurationType.SEARCHES_CLUSTER_CONFIG, config).then(() => {
-      closeModal();
+    const newFormConfig = { ...formConfig, ...update };
+
+    ConfigurationsActions.update(ConfigurationType.SEARCHES_CLUSTER_CONFIG, newFormConfig).then(() => {
+      setShowConfigModal(false);
+      resetFormUpdates();
     });
   };
 
@@ -157,12 +173,12 @@ const SearchesConfig = () => {
     });
   };
 
-  if (!config) {
+  if (!viewConfig) {
     return null;
   }
 
-  const duration = moment.duration(config.query_time_range_limit);
-  const limit = limitEnabled ? `${config.query_time_range_limit} (${duration.humanize()})` : 'disabled';
+  const duration = (config) => moment.duration(config.query_time_range_limit);
+  const limit = (config) => (isLimitEnabled(config) ? `${config.query_time_range_limit} (${duration(config).humanize()})` : 'disabled');
 
   return (
     <div>
@@ -170,7 +186,7 @@ const SearchesConfig = () => {
 
       <dl className="deflist">
         <dt>Query time range limit</dt>
-        <dd>{limit}</dd>
+        <dd>{limit(viewConfig)}</dd>
         <dd>The maximum time users can query data in the past. This prevents users from accidentally creating queries which
           span a lot of data and would need a long time and many resources to complete (if at all).
         </dd>
@@ -179,22 +195,22 @@ const SearchesConfig = () => {
       <Row>
         <Col md={6}>
           <strong>Relative time range options</strong>
-          <TimeRangeOptionsSummary options={config.relative_timerange_options} />
+          <TimeRangeOptionsSummary options={viewConfig.relative_timerange_options} />
         </Col>
         <Col md={6}>
           <strong>Surrounding time range options</strong>
-          <TimeRangeOptionsSummary options={config.surrounding_timerange_options} />
+          <TimeRangeOptionsSummary options={viewConfig.surrounding_timerange_options} />
         </Col>
         <Col md={6}>
 
           <strong>Surrounding search filter fields</strong>
           <ul>
-            {config.surrounding_filter_fields && config.surrounding_filter_fields.map((f: string) => <li key={f}>{f}</li>)}
+            {viewConfig.surrounding_filter_fields && viewConfig.surrounding_filter_fields.map((f: string) => <li key={f}>{f}</li>)}
           </ul>
 
           <strong>UI analysis disabled for fields</strong>
           <ul>
-            {config.analysis_disabled_fields && (config.analysis_disabled_fields.map((f: string) => <li key={f}>{f}</li>))}
+            {viewConfig.analysis_disabled_fields && (viewConfig.analysis_disabled_fields.map((f: string) => <li key={f}>{f}</li>))}
           </ul>
 
         </Col>
@@ -204,11 +220,11 @@ const SearchesConfig = () => {
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>Edit configuration</Button>
       </IfPermitted>
 
-      {showConfigModal && (
+      {showConfigModal && formConfig && (
       <BootstrapModalForm show
                           title="Update Search Configuration"
                           onSubmitForm={saveConfig}
-                          onCancel={closeModal}
+                          onCancel={handleModalCancel}
                           submitButtonText="Update configuration">
         <fieldset>
           <label htmlFor="query-limit-checkbox">Relative Timerange Options</label>
@@ -216,23 +232,23 @@ const SearchesConfig = () => {
                  type="checkbox"
                  label="Enable query limit"
                  name="enabled"
-                 checked={limitEnabled}
+                 checked={isLimitEnabled(formConfig)}
                  onChange={onChecked} />
-          {limitEnabled && (
+          {isLimitEnabled(formConfig) && (
           <ISODurationInput id="query-timerange-limit-field"
-                            duration={config.query_time_range_limit}
+                            duration={formConfig.query_time_range_limit}
                             update={onUpdate('query_time_range_limit')}
                             label="Query time range limit (ISO8601 Duration)"
                             help={'The maximum time range for searches. (i.e. "P30D" for 30 days, "PT24H" for 24 hours)'}
                             validator={queryTimeRangeLimitValidator}
                             required />
           )}
-          <TimeRangeOptionsForm options={relativeTimeRangeOptionsUpdate || buildTimeRangeOptions(config.relative_timerange_options)}
+          <TimeRangeOptionsForm options={relativeTimeRangeOptionsUpdate || buildTimeRangeOptions(formConfig.relative_timerange_options)}
                                 update={onRelativeTimeRangeOptionsUpdate}
                                 validator={relativeTimeRangeValidator}
                                 title="Relative Timerange Options"
                                 help={<span>Configure the available options for the <strong>relative</strong> time range selector as <strong>ISO8601 duration</strong></span>} />
-          <TimeRangeOptionsForm options={surroundingTimeRangeOptionsUpdate || buildTimeRangeOptions(config.surrounding_timerange_options)}
+          <TimeRangeOptionsForm options={surroundingTimeRangeOptionsUpdate || buildTimeRangeOptions(formConfig.surrounding_timerange_options)}
                                 update={onSurroundingTimeRangeOptionsUpdate}
                                 validator={surroundingTimeRangeValidator}
                                 title="Surrounding Timerange Options"
@@ -242,7 +258,7 @@ const SearchesConfig = () => {
                  type="text"
                  label="Surrounding search filter fields"
                  onChange={onFilterFieldsUpdate}
-                 value={surroundingFilterFields || (config.surrounding_filter_fields && config.surrounding_filter_fields.join(', '))}
+                 value={surroundingFilterFieldsUpdate || (formConfig.surrounding_filter_fields && formConfig.surrounding_filter_fields.join(', '))}
                  help="A ',' separated list of message fields that will be used as filter for the surrounding messages query."
                  required />
 
@@ -250,7 +266,7 @@ const SearchesConfig = () => {
                  type="text"
                  label="Disabled analysis fields"
                  onChange={onAnalysisDisabledFieldsUpdate}
-                 value={analysisDisabledFields || (config.analysis_disabled_fields && config.analysis_disabled_fields.join(', '))}
+                 value={analysisDisabledFieldsUpdate || (formConfig.analysis_disabled_fields && formConfig.analysis_disabled_fields.join(', '))}
                  help="A ',' separated list of message fields for which analysis features like QuickValues will be disabled in the web UI."
                  required />
         </fieldset>

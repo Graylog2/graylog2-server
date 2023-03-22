@@ -67,7 +67,6 @@ const ConfigurationsPage = () => {
   useEffect(() => {
     const promises = [
       ConfigurationsActions.list(ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG),
-      ConfigurationsActions.listPermissionsConfig(ConfigurationType.PERMISSIONS_CONFIG),
       ConfigurationsActions.listUserConfig(ConfigurationType.USER_CONFIG),
     ];
 
@@ -91,7 +90,6 @@ const ConfigurationsPage = () => {
   };
 
   const indexSetsDefaultsConfig = getConfig(ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG, configuration);
-  const permissionsConfig = getConfig(ConfigurationType.PERMISSIONS_CONFIG, configuration);
   const userConfig = getConfig(ConfigurationType.USER_CONFIG, configuration);
 
   const pluginDisplayNames = [
@@ -180,11 +178,10 @@ const ConfigurationsPage = () => {
     },
     {
       name: 'Permissions',
-      shouldRender: permissionsConfig,
+      shouldRender: true,
       render: (key) => (
         <ConfigletContainer title="Permissions Configuration" key={key}>
-          <PermissionsConfig config={permissionsConfig}
-                             updateConfig={onUpdate(ConfigurationType.PERMISSIONS_CONFIG)} />
+          <PermissionsConfig />
         </ConfigletContainer>
       ),
     },
