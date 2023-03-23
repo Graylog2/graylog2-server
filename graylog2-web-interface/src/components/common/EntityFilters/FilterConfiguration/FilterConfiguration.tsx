@@ -19,9 +19,10 @@ import * as React from 'react';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { Filters, Filter } from 'components/common/EntityFilters/types';
 import MenuItem from 'components/bootstrap/MenuItem';
-import StaticOptionsList from 'components/common/EntityFilters/FilterConfiguration/StaticOptionsList';
-import SuggestionsList from 'components/common/EntityFilters/FilterConfiguration/SuggestionsList';
-import DateRangeForm from 'components/common/EntityFilters/FilterConfiguration/DateRangeForm';
+
+import StaticOptionsList from './StaticOptionsList';
+import SuggestionsList from './SuggestionsList';
+import DateRangeForm from './DateRangeForm';
 
 type Props = {
   attribute: Attribute,

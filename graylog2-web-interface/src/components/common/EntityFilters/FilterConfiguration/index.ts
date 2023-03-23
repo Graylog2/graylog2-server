@@ -14,16 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import FilterConfiguration from './FilterConfiguration';
 
-type FilterBase = {
-  id: string,
-  title: string
-}
-
-export type BooleanFilter = FilterBase & { value: 'true' | 'false' }
-export type ValueFilter = FilterBase & { value: string };
-export type Filter = BooleanFilter | ValueFilter;
-
-export type Filters = {
-  [attributeId: string]: Array<Filter>
-};
+export default FilterConfiguration;

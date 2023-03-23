@@ -23,6 +23,7 @@ import { HoverForHelp, Icon } from 'components/common';
 import type { Attributes } from 'stores/PaginationTypes';
 import type { Filters, Filter } from 'components/common/EntityFilters/types';
 import FilterConfiguration from 'components/common/EntityFilters/FilterConfiguration';
+import generateId from 'logic/generateId';
 
 const Container = styled.div`
   margin-left: 5px;
@@ -82,12 +83,12 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderers, onCr
                              dropdownMinWidth={120}
                              dropdownZIndex={1000}>
         {({ toggleDropdown }) => {
-          const _onCreateFilter = (filter: Filter, closeDropdown = true) => {
+          const _onCreateFilter = (filter: { title: string, value: string }, closeDropdown = true) => {
             if (closeDropdown) {
               toggleDropdown();
             }
 
-            onCreateFilter(selectedAttributeId, filter);
+            onCreateFilter(selectedAttributeId, { value: filter.value, title: filter.title, id: generateId() });
           };
 
           if (!selectedAttributeId) {
@@ -102,7 +103,6 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderers, onCr
             <FilterConfiguration onSubmit={_onCreateFilter}
                                  allActiveFilters={activeFilters}
                                  attribute={selectedAttribute}
-                                 scenario="create"
                                  filterValueRenderer={filterValueRenderers?.[selectedAttributeId]} />
           );
         }}
