@@ -77,7 +77,6 @@ public abstract class ExecutionState {
             return this;
         }
 
-
         public abstract ImmutableMap.Builder<String, Object> additionalParametersBuilder();
 
         @JsonProperty("additional_parameters")

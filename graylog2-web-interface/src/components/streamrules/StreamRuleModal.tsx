@@ -193,7 +193,7 @@ const StreamRuleModal = ({
                     <p>
                       <strong>Result:</strong>
                       {' '}
-                      <HumanReadableStreamRule streamRule={values} streamRuleTypes={streamRuleTypes} inputs={inputs} />
+                      <HumanReadableStreamRule streamRule={values} inputs={inputs} />
                     </p>
                   </Col>
                   <Col md={4}>

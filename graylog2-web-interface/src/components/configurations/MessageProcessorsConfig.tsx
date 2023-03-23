@@ -93,13 +93,13 @@ const MessageProcessorsConfig = () => {
       const status = isProcessorEnabled(processor, viewConfig) ? 'active' : 'disabled';
 
       return (
-        // eslint-disable-next-line react/no-array-index-key
-        <tr key={idx}>
-          <td>{idx + 1}</td>
-          <td>{processor.name}</td>
-          <td>{status}</td>
-        </tr>
-      );
+        (
+          <tr key={idx}>
+            <td>{idx + 1}</td>
+            <td>{processor.name}</td>
+            <td>{status}</td>
+          </tr>
+        ));
     });
   };
 
@@ -116,15 +116,17 @@ const MessageProcessorsConfig = () => {
       const enabled = isProcessorEnabled(processor, formConfig);
 
       return (
-        // eslint-disable-next-line react/no-array-index-key
-        <tr key={idx}>
-          <td>{processor.name}</td>
-          <td>
-            <input type="checkbox"
-                   checked={enabled}
-                   onChange={() => toggleStatus(processor.class_name, enabled)} />
-          </td>
-        </tr>
+
+        (
+          <tr key={idx}>
+            <td>{processor.name}</td>
+            <td>
+              <input type="checkbox"
+                     checked={enabled}
+                     onChange={() => toggleStatus(processor.class_name, enabled)} />
+            </td>
+          </tr>
+        )
       );
     });
   };

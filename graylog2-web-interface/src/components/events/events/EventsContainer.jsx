@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { isObject } from 'lodash';
+import isObject from 'lodash/isObject';
 
 import { Spinner } from 'components/common';
 import connect from 'stores/connect';

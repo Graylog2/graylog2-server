@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useContext, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
-import { chunk } from 'lodash';
+import chunk from 'lodash/chunk';
 
 import ColorPicker from 'components/common/ColorPicker';
 import Value from 'views/components/Value';
@@ -162,10 +162,12 @@ const PlotLegend = ({ children, config, chartData, labelMapper = defaultLabelMap
   });
 
   const result = chunk(tableCells, 5).map((cells, index) => (
-    // eslint-disable-next-line react/no-array-index-key
-    <LegendRow key={index}>
-      {cells}
-    </LegendRow>
+
+    (
+      <LegendRow key={index}>
+        {cells}
+      </LegendRow>
+    )
   ));
 
   return (

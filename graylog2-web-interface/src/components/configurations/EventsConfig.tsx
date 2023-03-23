@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';//
-import lodash from 'lodash';
+import capitalize from 'lodash/capitalize';
 import moment from 'moment';
 
 import { useStore } from 'stores/connect';
@@ -134,7 +134,7 @@ const EventsConfig = () => {
   };
 
   const titleCase = (str) => {
-    return lodash.capitalize(str);
+    return capitalize(str);
   };
 
   if (!loaded || !viewConfig) { return <Spinner />; }

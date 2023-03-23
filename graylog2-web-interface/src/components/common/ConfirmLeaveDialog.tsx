@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Prompt, useLocation } from 'react-router-dom';
+import type { Location } from 'react-router-dom';
+import { unstable_useBlocker as useBlocker } from 'react-router-dom';
 import { useCallback, useEffect } from 'react';
 
 import AppConfig from 'util/AppConfig';
@@ -28,10 +28,12 @@ type Props = {
   question: string,
 };
 
-const ConfirmLeaveDialog = ({ question }: Props) => {
-  const location = useLocation();
-  const isLeavingPage = useCallback((newLocation) => (newLocation.pathname !== location.pathname ? question : true), [location.pathname, question]);
+const locationHasChanged = (currentLocation: Location, newLocation: Location, question: string) => ((newLocation.pathname !== currentLocation.pathname)
+  // eslint-disable-next-line no-alert
+  ? !window.confirm(question)
+  : false);
 
+const ConfirmLeaveDialog = ({ question }: Props) => {
   const handleLeavePage = useCallback((e) => {
     if (AppConfig.gl2DevMode()) {
       return null;
@@ -50,9 +52,9 @@ const ConfirmLeaveDialog = ({ question }: Props) => {
     };
   }, [handleLeavePage]);
 
-  return (
-    <Prompt when={!AppConfig.gl2DevMode()} message={isLeavingPage} />
-  );
+  useBlocker((history) => !AppConfig.gl2DevMode() && locationHasChanged(history.currentLocation, history.nextLocation, question));
+
+  return null;
 };
 
 ConfirmLeaveDialog.propTypes = {

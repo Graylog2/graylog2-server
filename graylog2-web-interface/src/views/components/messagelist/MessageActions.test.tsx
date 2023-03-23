@@ -34,6 +34,11 @@ const searchConfig: SearchesConfig = {
     PT1S: '1 second',
     PT1M: 'Only a minute',
   },
+  auto_refresh_timerange_options: {
+    PT1S: '1 second',
+    PT1M: 'Only a minute',
+  },
+  default_auto_refresh_option: 'PT1M',
 };
 
 describe('MessageActions', () => {

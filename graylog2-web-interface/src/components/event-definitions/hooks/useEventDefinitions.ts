@@ -32,9 +32,9 @@ const useEventDefinitions = (searchParams: SearchParams, { enabled }: Options = 
     attributes: Array<{ id: string, title: string, sortable: boolean }>
   } | undefined,
   refetch: () => void,
-  isFetching: boolean,
+  isInitialLoading: boolean,
 } => {
-  const { data, refetch, isFetching } = useQuery(
+  const { data, refetch, isInitialLoading } = useQuery(
     ['eventDefinition', 'overview', searchParams],
     () => EventDefinitionsStore.searchPaginated(
       searchParams.page,
@@ -55,7 +55,7 @@ const useEventDefinitions = (searchParams: SearchParams, { enabled }: Options = 
   return ({
     data,
     refetch,
-    isFetching,
+    isInitialLoading,
   });
 };
 

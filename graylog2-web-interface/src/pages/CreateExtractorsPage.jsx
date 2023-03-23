@@ -24,13 +24,13 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import EditExtractor from 'components/extractors/EditExtractor';
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
-import history from 'util/History';
 import Routes from 'routing/Routes';
 import withParams from 'routing/withParams';
 import withLocation from 'routing/withLocation';
 import { ExtractorsStore } from 'stores/extractors/ExtractorsStore';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
 import { MessagesActions } from 'stores/messages/MessagesStore';
+import withHistory from 'routing/withHistory';
 
 const CreateExtractorsPage = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
@@ -38,6 +38,7 @@ const CreateExtractorsPage = createReactClass({
 
   // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
+    history: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,
   },
@@ -75,7 +76,7 @@ const CreateExtractorsPage = createReactClass({
 
   _extractorSaved() {
     let url;
-    const { params } = this.props;
+    const { params, history } = this.props;
     const { input } = this.state;
 
     if (input.global) {
@@ -119,4 +120,4 @@ const CreateExtractorsPage = createReactClass({
   },
 });
 
-export default withParams(withLocation(CreateExtractorsPage));
+export default withHistory(withParams(withLocation(CreateExtractorsPage)));

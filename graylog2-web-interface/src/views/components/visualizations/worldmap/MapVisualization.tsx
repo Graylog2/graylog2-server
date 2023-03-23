@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { CircleMarker, MapContainer, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import chroma from 'chroma-js';
-import { flatten } from 'lodash';
+import flatten from 'lodash/flatten';
 import leafletStyles from 'leaflet/dist/leaflet.css';
 
 import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';

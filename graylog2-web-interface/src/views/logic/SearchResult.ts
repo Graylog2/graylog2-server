@@ -16,7 +16,8 @@
  */
 import type { List, Map } from 'immutable';
 import { fromJS } from 'immutable';
-import { mapValues, compact } from 'lodash';
+import mapValues from 'lodash/mapValues';
+import compact from 'lodash/compact';
 
 import type { QueryId } from 'views/logic/queries/Query';
 import type { SearchTypeId } from 'views/logic/SearchType';

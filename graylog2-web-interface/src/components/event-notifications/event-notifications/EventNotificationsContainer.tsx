@@ -19,12 +19,16 @@ import { useState, useMemo, useCallback } from 'react';
 
 import { EntityDataTable, NoSearchResult, PaginatedList, QueryHelper, SearchForm, Spinner } from 'components/common';
 import type { EventNotification, TestResults } from 'stores/event-notifications/EventNotificationsStore';
-import type { SearchParams, Sort } from 'stores/PaginationTypes';
+import type { Sort } from 'stores/PaginationTypes';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 
 // Import built-in Event Notification Types
 import '../event-notification-types';
+
+import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
+import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
+import { ENTITY_TABLE_ID, DEFAULT_LAYOUT } from 'components/event-notifications/event-notifications/Constants';
 
 import NotificationConfigTypeCell from './NotificationConfigTypeCell';
 import NotificationTitle from './NotificationTitle';
@@ -34,34 +38,41 @@ import BulkActions from './BulkActions';
 import useEventNotifications from '../hooks/useEventNotifications';
 import useNotificationTest from '../hooks/useNotificationTest';
 
-const INITIAL_COLUMNS = ['title', 'description', 'type', 'created_at'];
-const COLUMNS_ORDER = ['title', 'description', 'type', 'created_at'];
 const customColumnRenderers = (testResults: TestResults): ColumnRenderers<EventNotification> => ({
-  title: {
-    renderCell: (notification) => {
-      return <NotificationTitle notification={notification} testResults={testResults} />;
+  attributes: {
+    title: {
+      renderCell: (_title: string, notification) => {
+        return <NotificationTitle notification={notification} testResults={testResults} />;
+      },
     },
-  },
-  type: {
-    renderCell: (notification) => (
-      <NotificationConfigTypeCell notification={notification} />
-    ),
+    type: {
+      renderCell: (_type: string, notification) => (
+        <NotificationConfigTypeCell notification={notification} />
+      ),
+    },
   },
 });
 
 const EventNotificationsContainer = () => {
-  const [visibleColumns, setVisibleColumns] = useState(INITIAL_COLUMNS);
-  const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
-  const [searchParams, setSearchParams] = useState<SearchParams>({
-    page: paginationQueryParameter.page,
-    pageSize: paginationQueryParameter.pageSize,
-    query: '',
-    sort: {
-      attributeId: 'title',
-      direction: 'asc',
-    },
+  const [query, setQuery] = useState('');
+  const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
+    entityTableId: ENTITY_TABLE_ID,
+    defaultPageSize: DEFAULT_LAYOUT.pageSize,
+    defaultDisplayedAttributes: DEFAULT_LAYOUT.displayedColumns,
+    defaultSort: DEFAULT_LAYOUT.sort,
   });
-  const { data: paginatedEventNotifications, refetch: refetchEventNotifications } = useEventNotifications(searchParams);
+  const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
+  const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
+  const {
+    data: paginatedEventNotifications,
+    refetch: refetchEventNotifications,
+    isInitialLoading: isLoadingEventNotifications,
+  } = useEventNotifications({
+    query,
+    page: paginationQueryParameter.page,
+    pageSize: layoutConfig.pageSize,
+    sort: layoutConfig.sort,
+  });
   const { isLoadingTest, testResults, getNotificationTest } = useNotificationTest();
   const columnRenderers = useMemo(() => customColumnRenderers(testResults), [testResults]);
   const columnDefinitions = useMemo(
@@ -69,27 +80,28 @@ const EventNotificationsContainer = () => {
     [paginatedEventNotifications?.attributes],
   );
 
-  const onPageChange = useCallback(
-    (newPage: number, newPageSize: number) => setSearchParams((cur) => ({ ...cur, page: newPage, pageSize: newPageSize })),
-    [],
-  );
+  const onPageSizeChange = useCallback((newPageSize: number) => {
+    paginationQueryParameter.setPagination({ page: 1, pageSize: newPageSize });
+    updateTableLayout({ perPage: newPageSize });
+  }, [paginationQueryParameter, updateTableLayout]);
 
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
-    setSearchParams((cur) => ({ ...cur, query: newQuery }));
+    setQuery(newQuery);
   }, [paginationQueryParameter]);
 
   const onReset = useCallback(() => {
     onSearch('');
   }, [onSearch]);
 
-  const onColumnsChange = useCallback((newVisibleColumns: Array<string>) => {
-    setVisibleColumns(newVisibleColumns);
-  }, []);
+  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
+    updateTableLayout({ displayedAttributes });
+  }, [updateTableLayout]);
 
   const onSortChange = useCallback((newSort: Sort) => {
-    setSearchParams((cur) => ({ ...cur, sort: newSort, page: 1 }));
-  }, []);
+    paginationQueryParameter.resetPage();
+    updateTableLayout({ sort: newSort });
+  }, [paginationQueryParameter, updateTableLayout]);
 
   const handleTest = useCallback((notification: EventNotification) => {
     getNotificationTest(notification);
@@ -112,15 +124,15 @@ const EventNotificationsContainer = () => {
                  refetchEventNotifications={refetchEventNotifications} />
   );
 
-  if (!paginatedEventNotifications) {
-    return <Spinner text="Loading Notifications information..." />;
+  if (isLoadingLayoutPreferences || isLoadingEventNotifications) {
+    return <Spinner />;
   }
 
   const { elements, pagination: { total } } = paginatedEventNotifications;
 
   return (
-    <PaginatedList onChange={onPageChange}
-                   pageSize={searchParams.pageSize}
+    <PaginatedList pageSize={layoutConfig.pageSize}
+                   showPageSizeSelect={false}
                    totalItems={total}>
       <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
@@ -132,12 +144,14 @@ const EventNotificationsContainer = () => {
           <NoSearchResult>No notification has been found</NoSearchResult>
         ) : (
           <EntityDataTable<EventNotification> data={elements}
-                                              visibleColumns={visibleColumns}
-                                              columnsOrder={COLUMNS_ORDER}
+                                              visibleColumns={layoutConfig.displayedAttributes}
+                                              columnsOrder={DEFAULT_LAYOUT.columnsOrder}
                                               onColumnsChange={onColumnsChange}
                                               onSortChange={onSortChange}
                                               bulkActions={renderBulkActions}
-                                              activeSort={searchParams.sort}
+                                              activeSort={layoutConfig.sort}
+                                              onPageSizeChange={onPageSizeChange}
+                                              pageSize={layoutConfig.pageSize}
                                               rowActions={renderEventDefinitionActions}
                                               columnRenderers={columnRenderers}
                                               columnDefinitions={columnDefinitions} />

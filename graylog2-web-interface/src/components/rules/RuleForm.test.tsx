@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { renderWithDataRouter } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import RuleForm from './RuleForm';
@@ -39,7 +39,7 @@ describe('RuleForm', () => {
 
     const handleDescription = jest.fn();
 
-    const { getByLabelText, getByRole } = render(
+    const { getByLabelText, getByRole } = renderWithDataRouter((
       <PipelineRulesContext.Provider value={{
         description: '',
         handleDescription: handleDescription,
@@ -51,8 +51,8 @@ describe('RuleForm', () => {
         onChangeSource: () => {},
       }}>
         <RuleForm create={false} />
-      </PipelineRulesContext.Provider>,
-    );
+      </PipelineRulesContext.Provider>
+    ));
 
     const descriptionInput = getByLabelText('Description');
 

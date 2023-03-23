@@ -51,7 +51,9 @@ interface ExtraConfigSettings {
 interface ExtraConfigWidget extends VisualizationConfig, ExtraConfigSettings {}
 
 const fromConfig = (config: ExtraConfigWidget): ExtraConfigSettings => ({ ...config });
-const createVisualizationConfig = (config: ExtraConfigSettings) => ({ ...config }) as ExtraConfigWidget;
+const createVisualizationConfig = (config: ExtraConfigSettings) => (({
+  ...config,
+}) as ExtraConfigWidget);
 const toConfig = (config: ExtraConfigSettings): ExtraConfigWidget => createVisualizationConfig(config);
 
 const visualizationPlugin: PluginRegistration = {

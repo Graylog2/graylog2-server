@@ -27,38 +27,53 @@ import { Button, Row, Col, BootstrapModalForm, Input } from 'components/bootstra
 import { IfPermitted, ISODurationInput } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import type { SearchConfig } from 'components/search';
+import Select from 'components/common/Select/Select';
 
 import 'moment-duration-format';
 
 import TimeRangeOptionsForm from './TimeRangeOptionsForm';
 import TimeRangeOptionsSummary from './TimeRangeOptionsSummary';
 
-const queryTimeRangeLimitValidator = (milliseconds) => {
+const queryTimeRangeLimitValidator = (milliseconds: number) => {
   return milliseconds >= 1;
 };
 
-const relativeTimeRangeValidator = (milliseconds, duration) => {
+const relativeTimeRangeValidator = (milliseconds: number, duration: string) => {
   return milliseconds >= 1 || duration === 'PT0S';
 };
 
-const surroundingTimeRangeValidator = (milliseconds) => {
+const surroundingTimeRangeValidator = (milliseconds: number) => {
   return milliseconds >= 1;
 };
 
-const splitStringList = (stringList) => {
+function autoRefreshTimeRangeValidator(milliseconds: number) {
+  return milliseconds >= 1000;
+}
+
+const splitStringList = (stringList: string) => {
   return stringList.split(',').map((f) => f.trim()).filter((f) => f.length > 0);
 };
 
+const buildTimeRangeOptions = (options: { [x: string]: string; }) => {
+  return Object.keys(options).map((key) => {
+    return { period: key, description: options[key] };
+  });
+};
+
+type Option = { period: string, description: string };
+
 const SearchesConfig = () => {
   const isLimitEnabled = (config) => moment.duration(config?.query_time_range_limit).asMilliseconds() > 0;
-  const [showConfigModal, setShowConfigModal] = useState(false);
+  const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
   const [viewConfig, setViewConfig] = useState<SearchConfig | undefined>(undefined);
   const [formConfig, setFormConfig] = useState<SearchConfig | undefined>(undefined);
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
-  const [relativeTimeRangeOptionsUpdate, setRelativeTimeRangeOptionsUpdate] = useState(undefined);
-  const [surroundingTimeRangeOptionsUpdate, setSurroundingTimeRangeOptionsUpdate] = useState(undefined);
-  const [surroundingFilterFieldsUpdate, setSurroundingFilterFieldsUpdate] = useState(undefined);
-  const [analysisDisabledFieldsUpdate, setAnalysisDisabledFieldsUpdate] = useState(undefined);
+  const [relativeTimeRangeOptionsUpdate, setRelativeTimeRangeOptionsUpdate] = useState<Array<Option> | undefined>(undefined);
+  const [surroundingTimeRangeOptionsUpdate, setSurroundingTimeRangeOptionsUpdate] = useState<Array<Option> | undefined>(undefined);
+  const [autoRefreshTimeRangeOptionsUpdate, setAutoRefreshTimeRangeOptionsUpdate] = useState<Array<Option> | undefined>(undefined);
+  const [surroundingFilterFieldsUpdate, setSurroundingFilterFieldsUpdate] = useState<string | undefined>(undefined);
+  const [analysisDisabledFieldsUpdate, setAnalysisDisabledFieldsUpdate] = useState<string | undefined>(undefined);
+  const [defaultAutoRefreshOptionUpdate, setDefaultAutoRefreshOptionUpdate] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     ConfigurationsActions.list(ConfigurationType.SEARCHES_CLUSTER_CONFIG).then(() => {
@@ -69,26 +84,34 @@ const SearchesConfig = () => {
     });
   }, [configuration]);
 
-  const onUpdate = (field) => {
+  const onUpdate = (field: keyof SearchConfig) => {
     return (newOptions) => {
       setFormConfig({ ...formConfig, [field]: newOptions });
     };
   };
 
-  const onRelativeTimeRangeOptionsUpdate = (data) => {
+  const onRelativeTimeRangeOptionsUpdate = (data: Array<Option>) => {
     setRelativeTimeRangeOptionsUpdate(data);
   };
 
-  const onSurroundingTimeRangeOptionsUpdate = (data) => {
+  const onSurroundingTimeRangeOptionsUpdate = (data: Array<Option>) => {
     setSurroundingTimeRangeOptionsUpdate(data);
   };
 
-  const onFilterFieldsUpdate = (e) => {
+  const onAutoRefreshTimeRangeOptionsUpdate = (data: Array<Option>) => {
+    setAutoRefreshTimeRangeOptionsUpdate(data);
+  };
+
+  const onFilterFieldsUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSurroundingFilterFieldsUpdate(e.target.value);
   };
 
-  const onAnalysisDisabledFieldsUpdate = (e) => {
+  const onAnalysisDisabledFieldsUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAnalysisDisabledFieldsUpdate(e.target.value);
+  };
+
+  const onAutoRefreshDefaultOptionsUpdate = (data: string) => {
+    setDefaultAutoRefreshOptionUpdate(data);
   };
 
   const onChecked = () => {
@@ -114,6 +137,8 @@ const SearchesConfig = () => {
     setSurroundingTimeRangeOptionsUpdate(undefined);
     setSurroundingFilterFieldsUpdate(undefined);
     setAnalysisDisabledFieldsUpdate(undefined);
+    setAutoRefreshTimeRangeOptionsUpdate(undefined);
+    setDefaultAutoRefreshOptionUpdate(undefined);
   };
 
   const handleModalCancel = () => {
@@ -155,17 +180,25 @@ const SearchesConfig = () => {
       setAnalysisDisabledFieldsUpdate(undefined);
     }
 
+    if (autoRefreshTimeRangeOptionsUpdate) {
+      update.auto_refresh_timerange_options = Object.fromEntries(autoRefreshTimeRangeOptionsUpdate.map((entry) => [entry.period, entry.description]));
+      setAutoRefreshTimeRangeOptionsUpdate(undefined);
+    }
+
+    const defaultAutoRefreshOption = defaultAutoRefreshOptionUpdate
+      ? update.auto_refresh_timerange_options[defaultAutoRefreshOptionUpdate] ?? Object.keys(update.auto_refresh_timerange_options)[0]
+      : update.auto_refresh_timerange_options[update.default_auto_refresh_option] ?? Object.keys(update.auto_refresh_timerange_options)[0];
+
+    if (update.default_auto_refresh_option !== defaultAutoRefreshOption) {
+      update.default_auto_refresh_option = defaultAutoRefreshOptionUpdate;
+      setDefaultAutoRefreshOptionUpdate(undefined);
+    }
+
     const newFormConfig = { ...formConfig, ...update };
 
     ConfigurationsActions.update(ConfigurationType.SEARCHES_CLUSTER_CONFIG, newFormConfig).then(() => {
       setShowConfigModal(false);
       resetFormUpdates();
-    });
-  };
-
-  const buildTimeRangeOptions = (options) => {
-    return Object.keys(options).map((key) => {
-      return { period: key, description: options[key] };
     });
   };
 
@@ -175,6 +208,11 @@ const SearchesConfig = () => {
 
   const duration = (config) => moment.duration(config.query_time_range_limit);
   const limit = (config) => (isLimitEnabled(config) ? `${config.query_time_range_limit} (${duration(config).humanize()})` : 'disabled');
+  const autoRefreshOptions = autoRefreshTimeRangeOptionsUpdate ?? buildTimeRangeOptions(formConfig.auto_refresh_timerange_options);
+  const formDefaultAutoRefreshOptionUpdate = defaultAutoRefreshOptionUpdate ?? formConfig.default_auto_refresh_option;
+  const defaultAutoRefreshOption = autoRefreshOptions.find((option) => option.period === formDefaultAutoRefreshOptionUpdate)
+    ? formDefaultAutoRefreshOptionUpdate
+    : autoRefreshOptions[0]?.period;
 
   return (
     <div>
@@ -195,7 +233,17 @@ const SearchesConfig = () => {
           <strong>Surrounding time range options</strong>
           <TimeRangeOptionsSummary options={viewConfig.surrounding_timerange_options} />
         </Col>
+        <Col md={6} />
         <Col md={6}>
+          <Row style={{ marginBottom: 20 }}>
+            <Col>
+              <strong>Auto-refresh interval options</strong>
+              <TimeRangeOptionsSummary options={viewConfig.auto_refresh_timerange_options} />
+
+              <strong>Default auto-refresh interval</strong>
+              <TimeRangeOptionsSummary options={{ [viewConfig.default_auto_refresh_option]: viewConfig.auto_refresh_timerange_options[viewConfig.default_auto_refresh_option] }} />
+            </Col>
+          </Row>
           <Row style={{ marginBottom: 20 }}>
             <Col>
               <strong>Surrounding search filter fields</strong>
@@ -267,6 +315,25 @@ const SearchesConfig = () => {
                  value={analysisDisabledFieldsUpdate || (formConfig.analysis_disabled_fields && formConfig.analysis_disabled_fields.join(', '))}
                  help="A ',' separated list of message fields for which analysis features like QuickValues will be disabled in the web UI."
                  required />
+
+          <TimeRangeOptionsForm options={autoRefreshOptions}
+                                update={onAutoRefreshTimeRangeOptionsUpdate}
+                                validator={autoRefreshTimeRangeValidator}
+                                title="Auto-Refresh Interval Options"
+                                help={<span>Configure the available options for the <strong>auto-refresh</strong> interval selector as <strong>ISO8601 duration</strong></span>} />
+          <Input label="Default Auto-Refresh Option"
+                 id="default-auto-refresh-option"
+                 required
+                 help="Select the interval which is used when auto-refresh is started without explicitly selecting one">
+            <Select placeholder="Select the default interval"
+                    clearable={false}
+                    options={autoRefreshOptions}
+                    displayKey="description"
+                    valueKey="period"
+                    matchProp="label"
+                    onChange={onAutoRefreshDefaultOptionsUpdate}
+                    value={defaultAutoRefreshOption} />
+          </Input>
         </fieldset>
       </BootstrapModalForm>
       )}

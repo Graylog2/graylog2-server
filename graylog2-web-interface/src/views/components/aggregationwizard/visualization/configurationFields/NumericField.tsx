@@ -26,7 +26,9 @@ type Props = FieldComponentProps & {
   field: NumericFieldType,
 };
 
-const createEvent = (name: string, value: number) => ({ target: { name, value } }) as React.ChangeEvent<any>;
+const createEvent = (name: string, value: number) => (({
+  target: { name, value },
+}) as React.ChangeEvent<any>);
 
 const NumericField = ({ onChange, value, error, name, title, field }: Props) => {
   const _onChange = useCallback((e: React.ChangeEvent<any>) => {

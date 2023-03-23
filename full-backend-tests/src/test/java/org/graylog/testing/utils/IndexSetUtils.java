@@ -17,6 +17,7 @@
 package org.graylog.testing.utils;
 
 import io.restassured.specification.RequestSpecification;
+import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
@@ -25,6 +26,7 @@ import org.joda.time.Period;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.function.Supplier;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.notNullValue;
@@ -32,9 +34,9 @@ import static org.hamcrest.Matchers.notNullValue;
 public class IndexSetUtils {
     private IndexSetUtils() {}
 
-    public static String defaultIndexSetId(RequestSpecification requestSpec) {
+    public static String defaultIndexSetId(Supplier<RequestSpecification> spec) {
         return given()
-                .spec(requestSpec)
+                .spec(spec.get())
                 .when()
                 .get("/system/indices/index_sets")
                 .then()
@@ -43,9 +45,9 @@ public class IndexSetUtils {
                 .extract().body().jsonPath().getString("index_sets.find { it.default == true }.id");
     }
 
-    public static String createIndexSet(RequestSpecification requestSpec, IndexSetSummary indexSetSummary) {
+    public static String createIndexSet(Supplier<RequestSpecification> spec, IndexSetSummary indexSetSummary) {
         return given()
-                .spec(requestSpec)
+                .spec(spec.get())
                 .log().ifValidationFails()
                 .when()
                 .body(indexSetSummary)
@@ -58,7 +60,7 @@ public class IndexSetUtils {
                 .extract().body().jsonPath().getString("id");
     }
 
-    public static String createIndexSet(RequestSpecification requestSpec, String title, String description, String prefix) {
+    public static String createIndexSet(Supplier<RequestSpecification> spec, String title, String description, String prefix) {
         var indexSetSummary = IndexSetSummary.create(null,
                 title,
                 description,
@@ -83,6 +85,6 @@ public class IndexSetUtils {
                 null
         );
 
-        return createIndexSet(requestSpec, indexSetSummary);
+        return createIndexSet(spec, indexSetSummary);
     }
 }

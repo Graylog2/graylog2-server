@@ -59,7 +59,7 @@ const DashboardsOverview = () => {
     query,
   ]);
   const customColumnRenderers = useColumnRenderers({ searchParams });
-  const { data: paginatedDashboards, refetch } = useDashboards(searchParams, { enabled: !isLoadingLayoutPreferences });
+  const { data: paginatedDashboards, isInitialLoading: isLoadingDashboards, refetch } = useDashboards(searchParams, { enabled: !isLoadingLayoutPreferences });
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
@@ -88,7 +88,7 @@ const DashboardsOverview = () => {
     paginationQueryParameter.resetPage();
   }, [paginationQueryParameter, updateTableLayout]);
 
-  if (!paginatedDashboards) {
+  if (isLoadingDashboards || isLoadingLayoutPreferences) {
     return <Spinner />;
   }
 
@@ -113,18 +113,18 @@ const DashboardsOverview = () => {
         <NoSearchResult>No dashboards have been found.</NoSearchResult>
       )}
       {!!dashboards?.length && (
-        <EntityDataTable activeSort={layoutConfig.sort}
-                         bulkActions={renderBulkActions}
-                         columnDefinitions={attributes}
-                         columnRenderers={customColumnRenderers}
-                         columnsOrder={DEFAULT_LAYOUT.columnsOrder}
-                         data={dashboards}
-                         onColumnsChange={onColumnsChange}
-                         onPageSizeChange={onPageSizeChange}
-                         onSortChange={onSortChange}
-                         pageSize={layoutConfig.pageSize}
-                         rowActions={renderDashboardActions}
-                         visibleColumns={layoutConfig.displayedAttributes} />
+        <EntityDataTable<View> activeSort={layoutConfig.sort}
+                               bulkActions={renderBulkActions}
+                               columnDefinitions={attributes}
+                               columnRenderers={customColumnRenderers}
+                               columnsOrder={DEFAULT_LAYOUT.columnsOrder}
+                               data={dashboards}
+                               onColumnsChange={onColumnsChange}
+                               onPageSizeChange={onPageSizeChange}
+                               onSortChange={onSortChange}
+                               pageSize={layoutConfig.pageSize}
+                               rowActions={renderDashboardActions}
+                               visibleColumns={layoutConfig.displayedAttributes} />
       )}
     </PaginatedList>
   );

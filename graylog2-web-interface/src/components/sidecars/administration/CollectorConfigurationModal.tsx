@@ -16,7 +16,7 @@
  */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import isEqual from 'lodash/isEqual';
 import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';
@@ -164,7 +164,7 @@ const CollectorConfigurationModal = ({
     setSearchQuery('');
   };
 
-  const isNotDirty = lodash.isEqual(selectedConfigurations, initialAssignedConfigs) && lodash.isEqual(partiallySelectedConfigurations, initialPartiallyAssignedConfigs);
+  const isNotDirty = isEqual(selectedConfigurations, initialAssignedConfigs) && isEqual(partiallySelectedConfigurations, initialPartiallyAssignedConfigs);
 
   const filteredOptions = [...initialAssignedConfigs, ...initialPartiallyAssignedConfigs, ...unassignedConfigs].filter((configuration) => configuration.match(getFilterQuery(searchQuery)));
 

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
-import { groupBy } from 'lodash';
+import groupBy from 'lodash/groupBy';
 
 import { Button } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';

@@ -108,7 +108,7 @@ const Routes = {
         OVERVIEW: '/system/authentication/services',
         ACTIVE: '/system/authentication/services/active',
         CREATE: '/system/authentication/services/create',
-        createBackend: (name) => `/system/authentication/services/create/${name}`,
+        createBackend: (name: string) => `/system/authentication/services/create/${name}`,
         show: (id: string) => `/system/authentication/services/${id}`,
         edit: (id: string, initialStepKey?: string) => {
           const editUrl = `/system/authentication/services/edit/${id}`;
@@ -245,6 +245,8 @@ const Routes = {
   legacy_stream_search: (streamId: string) => `/streams/${streamId}/messages`,
 
   dashboard_show: (dashboardId: string) => `/dashboards/${dashboardId}`,
+
+  show_saved_search: (searchId: string) => `/search/${searchId}`,
 
   node: (nodeId: string) => `/system/nodes/${nodeId}`,
 

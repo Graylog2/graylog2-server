@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as ts from 'typescript';
-import { chunk, uniq } from 'lodash';
+import chunk from 'lodash/chunk';
+import uniq from 'lodash/uniq';
 
 import type { Api, Route, Operation, Parameter, Type, EnumType, TypeLiteral, Model } from 'generator/Api';
 

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 const ObjectUtils = {
-  clone(object) {
+  clone<T>(object: T): T {
     return JSON.parse(JSON.stringify(object));
   },
 
