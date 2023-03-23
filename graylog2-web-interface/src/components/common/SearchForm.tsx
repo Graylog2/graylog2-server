@@ -16,7 +16,6 @@
  */
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import Promise from 'bluebird';
 import styled, { css } from 'styled-components';
 import { useState, useEffect, useRef } from 'react';
 import debounce from 'lodash/debounce';

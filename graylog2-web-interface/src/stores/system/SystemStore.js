@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
-import Promise from 'bluebird';
 
 import * as URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
