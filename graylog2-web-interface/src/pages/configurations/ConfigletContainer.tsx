@@ -40,6 +40,7 @@ type BoundaryProps = {
 }
 
 const Boundary = ({ children, title }: BoundaryProps) => (
+  // eslint-disable-next-line react/no-unstable-nested-components
   <ErrorBoundary FallbackComponent={(props) => <ErrorFallback title={title} {...props} />}>
     {children}
   </ErrorBoundary>
