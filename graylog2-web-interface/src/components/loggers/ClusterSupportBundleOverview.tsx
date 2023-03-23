@@ -27,8 +27,16 @@ const Header = styled.div`
   justify-content: space-between;
 `;
 
-const ActionCell = styled.td`
+const AlignRightCell = styled.td`
   text-align: right;
+`;
+
+const AlignRightHeadCell = styled.th`
+  text-align: right;
+`;
+
+const FilenameCol = styled.col`
+  width: 33%;
 `;
 
 const DownloadButton = styled(Button)`
@@ -60,10 +68,13 @@ const ClusterSupportBundleOverview = () => {
           </p>
           {(list.length > 0) ? (
             <Table className="table-striped table-condensed table-hover">
+              <colgroup>
+                <FilenameCol />
+              </colgroup>
               <thead>
                 <tr>
                   <th>Filename</th>
-                  <th>Size</th>
+                  <AlignRightHeadCell>Size</AlignRightHeadCell>
                 </tr>
               </thead>
               <tbody>
@@ -72,13 +83,13 @@ const ClusterSupportBundleOverview = () => {
                     <td>
                       {bundle.file_name}
                     </td>
-                    <td>
+                    <AlignRightCell>
                       {bundle.size}
-                    </td>
-                    <ActionCell>
+                    </AlignRightCell>
+                    <AlignRightCell>
                       <DownloadButton bsSize="xsmall" bsStyle="info" onClick={() => onDownload(bundle.file_name)}>Download</DownloadButton>
                       <Button bsSize="xsmall" bsStyle="default" onClick={() => setBundleNameToDelete(bundle.file_name)}>Delete</Button>
-                    </ActionCell>
+                    </AlignRightCell>
                   </tr>
                 ))}
               </tbody>
