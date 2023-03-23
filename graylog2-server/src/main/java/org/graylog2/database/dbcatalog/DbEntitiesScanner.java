@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DbEntitiesScanner implements Provider<DbEntitiesCatalog> {
 
@@ -52,12 +53,16 @@ public class DbEntitiesScanner implements Provider<DbEntitiesCatalog> {
 
     @Override
     public DbEntitiesCatalog get() {
-        final ConfigurationBuilder configuration = new ConfigurationBuilder()
-                .forPackages(packagesToScan)
-                .setScanners(Scanners.TypesAnnotated);
+        final ConfigurationBuilder configuration = new ConfigurationBuilder();
         if (chainingClassLoader != null) {
             configuration.setClassLoaders(new ClassLoader[]{chainingClassLoader});
+            Stream.of(packagesToScan).forEach(pkg -> {
+                configuration.forPackage(pkg, chainingClassLoader);
+            });
+        } else {
+            configuration.forPackages(packagesToScan);
         }
+        configuration.setScanners(Scanners.TypesAnnotated);
 
         final Reflections reflections = new Reflections(configuration);
 
