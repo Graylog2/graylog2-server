@@ -144,7 +144,7 @@ const SearchForm = ({
    * @private
    */
   const setLoadingState = () => {
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
       if (useLoadingState) {
         setIsLoading(true);
         resolve();
