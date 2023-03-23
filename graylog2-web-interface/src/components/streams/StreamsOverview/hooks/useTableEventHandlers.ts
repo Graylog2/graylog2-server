@@ -11,7 +11,7 @@ const useTableEventHandlers = ({ updateTableLayout, paginationQueryParameter, se
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
     setQuery(newQuery);
-  }, [paginationQueryParameter]);
+  }, [paginationQueryParameter, setQuery]);
 
   const onSearchReset = useCallback(() => {
     onSearch('');

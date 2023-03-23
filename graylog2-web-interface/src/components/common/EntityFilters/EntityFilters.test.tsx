@@ -133,9 +133,7 @@ describe('<EntityFilters />', () => {
       userEvent.click(toggleFilterButton);
 
       await waitFor(() => expect(onChangeFiltersWithTitle).toHaveBeenCalledWith(
-        {
-          disabled: [{ id: 'filter-id', title: 'Paused', value: 'true' }],
-        },
+        { disabled: [{ id: 'filter-id', title: 'Paused', value: 'true' }] },
         { disabled: ['true'] },
       ));
 
