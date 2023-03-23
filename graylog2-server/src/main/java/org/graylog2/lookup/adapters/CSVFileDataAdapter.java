@@ -257,14 +257,14 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             String range = entry.getKey();
             Optional<IpSubnet> subnet = ReservedIpChecker.stringToSubnet(range);
             if (subnet.isEmpty()) {
-                LOG.warn("CIDR range '{}' in data adapter '{}' is not a valid subnet, skipping this key in lookup.", entry, name);
+                LOG.debug("CIDR range '{}' in data adapter '{}' is not a valid subnet, skipping this key in lookup.", entry, name);
             } else {
                 try {
                     if (subnet.get().contains(String.valueOf(ip))) {
                         return LookupResult.single(entry.getValue());
                     }
                 } catch (UnknownHostException e) {
-                    LOG.warn("Attempted to do a CIDR range lookup on invalid IP '{}'", ip);
+                    LOG.debug("Attempted to do a CIDR range lookup on invalid IP '{}'", ip);
                     return getErrorResult();
                 }
             }
