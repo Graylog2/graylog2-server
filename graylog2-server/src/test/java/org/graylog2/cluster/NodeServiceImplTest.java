@@ -22,6 +22,7 @@ import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.joda.time.DateTime;
@@ -29,16 +30,20 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.net.URI;
+import java.time.Duration;
 import java.util.AbstractMap;
+import java.util.Calendar;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class NodeServiceImplTest {
+    public static final int STALE_LEADER_TIMEOUT_MS = 2000;
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
@@ -57,6 +62,7 @@ public class NodeServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
+        Mockito.when(configuration.getStaleLeaderTimeout()).thenReturn(STALE_LEADER_TIMEOUT_MS);
         this.nodeService = new NodeServiceImpl(mongodb.mongoConnection(), configuration);
     }
 
@@ -127,5 +133,33 @@ public class NodeServiceImplTest {
 
         nodeService.markAsAlive(nodeId, false, TRANSPORT_URI);
         assertThat(nodeService.allActive().keySet()).containsExactly(nodeId.getNodeId());
+    }
+
+    @Test
+    public void testLastSeenBackwardsCompatibility() throws NodeNotFoundException, ValidationException {
+        nodeService.registerServer(nodeId.getNodeId(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME);
+        final Node node = nodeService.byNodeId(nodeId);
+        final Calendar cal = Calendar.getInstance();
+
+        cal.add(Calendar.MILLISECOND, -2 * STALE_LEADER_TIMEOUT_MS);
+        final int ts = (int) (cal.getTime().getTime() / 1000);
+        node.getFields().put("last_seen", ts);
+        nodeService.save(node);
+
+        final Node nodeAfterUpdate = nodeService.byNodeId(nodeId);
+        final DateTime lastSeen = nodeAfterUpdate.getLastSeen();
+        final long timeDiff = cal.getTime().getTime() - lastSeen.toDate().getTime();
+        Assertions.assertThat(timeDiff).isLessThan(1000); // make sure that our lastSeen from int is the same valid date
+
+        final Map<String, Node> activeNodes = nodeService.allActive();
+
+        // the node is stale, should not be present here
+        Assertions.assertThat(activeNodes).isEmpty();
+
+        // this should drop the node with the int timestamp, as it's at least 2xstale_delay outdated.
+        nodeService.dropOutdated();
+
+        Assertions.assertThatThrownBy(() -> nodeService.byNodeId(nodeId))
+                .isInstanceOf(NodeNotFoundException.class);
     }
 }
