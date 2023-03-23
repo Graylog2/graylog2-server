@@ -24,9 +24,9 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.tls.HandshakeCertificates;
 import okhttp3.tls.HeldCertificate;
-import org.junit.Ignore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import javax.net.ssl.SSLHandshakeException;
@@ -40,7 +40,7 @@ import java.security.NoSuchAlgorithmException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Ignore("This test is flaky. Maybe a race within MockWebServer")
+@Disabled("This test is flaky. Maybe a race within MockWebServer")
 public class ParameterizedHttpClientProviderTest {
 
     private final MockWebServer server = new MockWebServer();
@@ -119,7 +119,7 @@ public class ParameterizedHttpClientProviderTest {
     }
 
     @Test
-    @Ignore("Not enabled by default")
+    @Disabled("Not enabled by default")
     public void testWithSystemDefaultTruststore() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
         final ParameterizedHttpClientProvider provider = new ParameterizedHttpClientProvider(client(null));
         final OkHttpClient okHttpClient = provider.get(false, false);
@@ -130,7 +130,7 @@ public class ParameterizedHttpClientProviderTest {
     }
 
     @Test
-    @Ignore("Not enabled by default")
+    @Disabled("Not enabled by default")
     public void testWithSystemDefaultTruststoreBadHostname() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
         final ParameterizedHttpClientProvider provider = new ParameterizedHttpClientProvider(client(null));
         final OkHttpClient okHttpClient = provider.get(true, true);
