@@ -17,7 +17,7 @@
 import React from 'react';
 
 import { DocumentTitle, PageHeader } from 'components/common';
-import { LoggerOverview } from 'components/loggers';
+import { LoggerOverview, ClusterSupportBundleOverview } from 'components/loggers';
 
 class LoggersPage extends React.Component {
   render() {
@@ -32,6 +32,7 @@ class LoggersPage extends React.Component {
             </span>
           </PageHeader>
           <LoggerOverview />
+          <ClusterSupportBundleOverview />
         </span>
       </DocumentTitle>
     );

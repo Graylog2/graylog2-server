@@ -1,0 +1,106 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import React, { useState } from 'react';
+import styled from 'styled-components';
+
+import { Spinner, ConfirmDialog, NoSearchResult } from 'components/common';
+import { Col, Row, Table, Button } from 'components/bootstrap';
+import useClusterSupportBundle from 'hooks/useClusterSupportBundle';
+
+const Header = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const ActionCell = styled.td`
+  text-align: right;
+`;
+
+const DownloadButton = styled(Button)`
+  margin-right: 6px;
+`;
+
+const LoadingSpinner = styled(Spinner)(({ theme }) => `
+  margin-left: 6px;
+  font-size: ${theme.fonts.size.h5};
+`);
+
+const ClusterSupportBundleOverview = () => {
+  const { list, isCreating, onCreate, onDelete, onDownload } = useClusterSupportBundle();
+  const [bundleNameToDelete, setBundleNameToDelete] = useState<string|null>(null);
+
+  return (
+    <div>
+      <Row className="content">
+        <Col xs={12}>
+          <Header>
+            <h2>Cluster Support Bundle</h2>
+            <Button bsStyle="success" onClick={onCreate} disabled={isCreating}>
+              Create Support Bundle
+              {isCreating && <LoadingSpinner text="" delay={0} />}
+            </Button>
+          </Header>
+          <p className="description">
+            Export zip file which contains useful debugging information from your Graylog cluster.
+          </p>
+          {(list.length > 0) ? (
+            <Table className="table-striped table-condensed table-hover">
+              <thead>
+                <tr>
+                  <th>Filename</th>
+                  <th>Size</th>
+                </tr>
+              </thead>
+              <tbody>
+                {list.map((bundle) => (
+                  <tr key={bundle.file_name}>
+                    <td>
+                      {bundle.file_name}
+                    </td>
+                    <td>
+                      {bundle.size}
+                    </td>
+                    <ActionCell>
+                      <DownloadButton bsSize="xsmall" bsStyle="info" onClick={() => onDownload(bundle.file_name)}>Download</DownloadButton>
+                      <Button bsSize="xsmall" bsStyle="default" onClick={() => setBundleNameToDelete(bundle.file_name)}>Delete</Button>
+                    </ActionCell>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          ) : (
+            <NoSearchResult>
+              No Support Bundles have been found.
+            </NoSearchResult>
+          )}
+        </Col>
+      </Row>
+      <ConfirmDialog title="Delete Support Bundle"
+                     show={Boolean(bundleNameToDelete)}
+                     onConfirm={() => {
+                       onDelete(bundleNameToDelete);
+                       setBundleNameToDelete(null);
+                     }}
+                     onCancel={() => setBundleNameToDelete(null)}>
+        <>Are you sure you want to delete <strong>{bundleNameToDelete}</strong>?</>
+      </ConfirmDialog>
+    </div>
+  );
+};
+
+export default ClusterSupportBundleOverview;

@@ -20,3 +20,4 @@ export { default as LogLevelDropdown } from './LogLevelDropdown';
 export { default as LogLevelMetrics } from './LogLevelMetrics';
 export { default as LogLevelMetricsOverview } from './LogLevelMetricsOverview';
 export { default as NodeLoggers } from './NodeLoggers';
+export { default as ClusterSupportBundleOverview } from './ClusterSupportBundleOverview';
