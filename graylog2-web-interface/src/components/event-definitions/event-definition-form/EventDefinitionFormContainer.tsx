@@ -61,15 +61,12 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
   }, []);
 
   const handleChange = useCallback((key, value) => {
-    setEventDefinition((curState) => {
-      const nextEventDefinition = cloneDeep(curState);
-      nextEventDefinition[key] = value;
-      onEventDefinitionChange(nextEventDefinition);
-      setIsDirty(true);
-
-      return nextEventDefinition;
-    });
-  }, [onEventDefinitionChange]);
+    const nextEventDefinition = cloneDeep(eventDefinition);
+    nextEventDefinition[key] = value;
+    setEventDefinition(nextEventDefinition);
+    onEventDefinitionChange(eventDefinition);
+    setIsDirty(true);
+  }, [eventDefinition, onEventDefinitionChange]);
 
   useEffect(() => {
     fetchClusterConfig();
