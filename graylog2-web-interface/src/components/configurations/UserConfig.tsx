@@ -79,7 +79,7 @@ const UserConfig = () => {
 
   return (
     <div>
-      <h2>User Configuration</h2>
+      <h2>Users Configuration</h2>
       <p>These settings can be used to set a global session timeout value.</p>
 
       {!viewConfig ? <Spinner /> : (

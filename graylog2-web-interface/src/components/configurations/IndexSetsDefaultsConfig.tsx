@@ -149,7 +149,7 @@ const IndexSetsDefaultsConfig = () => {
 
   return (
     <div>
-      <h2>Index Defaults</h2>
+      <h2>Index Set Defaults Configuration</h2>
       <p>Defaults for newly created index sets.</p>
       {!viewConfig || !formConfig ? <Spinner /> : (
         <>

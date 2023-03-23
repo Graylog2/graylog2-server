@@ -70,7 +70,7 @@ const PermissionsConfig = () => {
 
   return (
     <div>
-      <h2>Permissions Config</h2>
+      <h2>Permissions Configuration</h2>
       <p>These settings can be used to control which entity sharing options are available.</p>
 
       {!config ? <Spinner /> : (

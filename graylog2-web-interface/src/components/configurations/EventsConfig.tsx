@@ -147,7 +147,7 @@ const EventsConfig = () => {
 
   return (
     <div>
-      <h2>Events System</h2>
+      <h2>Events Configuration</h2>
 
       <dl className="deflist">
         <dt>Search Timeout:</dt>

@@ -63,19 +63,19 @@ const ConfigurationsPage = () => {
       },
     },
     {
-      name: 'Message Processor',
+      name: 'Message Processors',
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: MessageProcessorsConfig,
-        title: 'Message Processor',
+        title: 'Message Processors',
       },
     },
     {
-      name: 'Sidecar',
+      name: 'Sidecars',
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: SidecarConfig,
-        title: 'Sidecar',
+        title: 'Sidecars',
       },
     },
     {

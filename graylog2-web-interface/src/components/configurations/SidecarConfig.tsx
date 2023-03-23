@@ -108,7 +108,7 @@ const SidecarConfig = () => {
 
   return (
     <div>
-      <h2>Sidecars System</h2>
+      <h2>Sidecars Configuration</h2>
 
       <dl className="deflist">
         <dt>Inactive threshold:</dt>

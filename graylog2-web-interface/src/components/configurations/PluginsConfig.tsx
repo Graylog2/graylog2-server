@@ -95,7 +95,7 @@ const PluginsConfig = () => {
           })}
         </Nav>
       </Col>
-      <Col md={6}>
+      <Col md={9} lg={6}>
         {pluginSystemConfigs
           .map(({ component: SystemConfigComponent, configType }, index) => (
             (index + 1 === activeSectionKey) && (
