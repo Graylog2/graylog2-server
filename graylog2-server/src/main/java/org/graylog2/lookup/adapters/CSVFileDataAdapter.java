@@ -27,6 +27,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
+import com.google.common.net.InetAddresses;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
 import org.apache.commons.lang3.StringUtils;
@@ -51,7 +52,7 @@ import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.UnknownHostException;
+import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -253,21 +254,23 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     }
 
     public LookupResult getResultForCIDRRange(Object ip) {
-        for (Map.Entry<String, String> entry : lookupRef.get().entrySet()) {
-            String range = entry.getKey();
-            Optional<IpSubnet> subnet = ReservedIpChecker.stringToSubnet(range);
-            if (subnet.isEmpty()) {
-                LOG.debug("CIDR range '{}' in data adapter '{}' is not a valid subnet, skipping this key in lookup.", entry, name);
-            } else {
-                try {
-                    if (subnet.get().contains(String.valueOf(ip))) {
+        try {
+            // Convert directly to InetAddress to avoid long timeouts when using name service lookups for bad IPs
+            InetAddress address = InetAddresses.forString(String.valueOf(ip));
+            for (Map.Entry<String, String> entry : lookupRef.get().entrySet()) {
+                String range = entry.getKey();
+                Optional<IpSubnet> subnet = ReservedIpChecker.stringToSubnet(range);
+                if (subnet.isEmpty()) {
+                    LOG.debug("CIDR range '{}' in data adapter '{}' is not a valid subnet, skipping this key in lookup.", entry, name);
+                } else {
+                    if (subnet.get().contains(address)) {
                         return LookupResult.single(entry.getValue());
                     }
-                } catch (UnknownHostException e) {
-                    LOG.debug("Attempted to do a CIDR range lookup on invalid IP '{}'", ip);
-                    return getErrorResult();
                 }
             }
+        } catch (IllegalArgumentException e) {
+            LOG.debug("Attempted to do a CIDR range lookup on invalid IP '{}'", ip);
+            return getErrorResult();
         }
 
         return getEmptyResult();
