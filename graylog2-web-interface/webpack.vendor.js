@@ -92,6 +92,27 @@ const webpackConfig = {
   recordsPath: path.resolve(ROOT_PATH, 'webpack/vendor-module-ids.json'),
 };
 
+module.exports = webpackConfig;
+
+if (TARGET === 'start') {
+  module.exports = merge(webpackConfig, {
+    devServer: {
+      hot: false,
+      liveReload: true,
+      compress: true,
+      historyApiFallback: true,
+      proxy: {
+        '/api': {
+          target: 'http://localhost:9000',
+        },
+        '/config.js': {
+          target: 'http://localhost:9000/config.js',
+        },
+      },
+    },
+  });
+}
+
 if (TARGET.startsWith('build')) {
   module.exports = merge(webpackConfig, {
     mode: 'production',
@@ -115,6 +136,4 @@ if (TARGET.startsWith('build')) {
       filename: '[name].[chunkhash].js',
     },
   });
-} else {
-  module.exports = webpackConfig;
 }

@@ -17,4 +17,9 @@
 const webpackConfig = require('./webpack.combined.config');
 const vendorConfig = require('./webpack.vendor');
 
-module.exports = [vendorConfig, ...webpackConfig];
+const webpackConfigs = [vendorConfig, ...webpackConfig];
+const pluginNames = webpackConfigs.map((config) => config.name).filter((name) => !['vendor', 'app'].includes(name));
+// @ts-ignore
+global.pluginNames = pluginNames;
+
+export default webpackConfigs;

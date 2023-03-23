@@ -70,21 +70,4 @@ const pluginConfigs = pluginConfigFiles.map((file) => require(file));
 
 const allConfigs = [webpackConfig, ...pluginConfigs];
 
-// We need to inject webpack-hot-middleware to all entries, ensuring the app is able to reload on changes.
-if (TARGET === 'start') {
-  const webpackHotMiddlewareEntry = (name) => `webpack-hot-middleware/client?name=${name}&reload=true`;
-
-  allConfigs.forEach((finalConfig) => {
-    const hmrEntries = {};
-
-    Object.keys(finalConfig.entry).forEach((entryKey) => {
-      const entryValue = finalConfig.entry[entryKey];
-      hmrEntries[entryKey] = [webpackHotMiddlewareEntry(entryKey)].concat(Array.isArray(entryValue) ? entryValue : [entryValue]);
-    });
-
-    // eslint-disable-next-line no-param-reassign
-    finalConfig.entry = hmrEntries;
-  });
-}
-
 module.exports = allConfigs;
