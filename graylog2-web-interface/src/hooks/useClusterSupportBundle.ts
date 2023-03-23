@@ -49,7 +49,7 @@ const deleteSupportBundle = async (filename: string, refetchList: () => Promise<
 
 const downloadSupportBundle = async (filename: string) => {
   try {
-    window.open(qualifyUrl(ApiRoutes.ClusterSupportBundleController.download(filename).url), '_blank');
+    window.open(qualifyUrl(ApiRoutes.ClusterSupportBundleController.download(filename).url), '_self');
   } catch (errorThrown) {
     UserNotification.error(`Downloading the Support Bundle failed with status: ${errorThrown}`, 'Could not download the Support Bundle.');
   }
