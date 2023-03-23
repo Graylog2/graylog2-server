@@ -13,7 +13,7 @@ const useUrlQueryFilters = (): [UrlQueryFilters, (filters: UrlQueryFilters) => v
       ...col,
       [filterKey]: [...(col[filterKey] ?? []), filterValue],
     };
-  }, {}), [urlQueryFilters]); // use immutable ordered map
+  }, {}), [urlQueryFilters]);
 
   const setFilterValues = (newFilters: UrlQueryFilters) => {
     const newUrlQueryFilters = Object.entries(newFilters).reduce((col, [attributeId, filters]) => (
@@ -23,7 +23,7 @@ const useUrlQueryFilters = (): [UrlQueryFilters, (filters: UrlQueryFilters) => v
     setUrlQueryFilters(newUrlQueryFilters);
   };
 
-  return [filtersFromQuery, setFilterValues]; // make sure data has same order as urlQueryFilters
+  return [filtersFromQuery, setFilterValues];
 };
 
 export default useUrlQueryFilters;
