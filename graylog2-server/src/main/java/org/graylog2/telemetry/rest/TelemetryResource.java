@@ -1,11 +1,13 @@
 package org.graylog2.telemetry.rest;
 
+import com.google.common.hash.HashCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.shared.rest.resources.ProxiedResource;
@@ -23,6 +25,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +36,7 @@ import java.util.concurrent.ExecutorService;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.telemetry.rest.TelemetryResponse.ClusterInfo;
 import static org.graylog2.telemetry.rest.TelemetryResponse.LicenseInfo;
+import static org.graylog2.telemetry.rest.TelemetryResponse.UserInfo;
 
 @RequiresAuthentication
 @Api(value = "Telemetry", description = "Message inputs", tags = {CLOUD_VISIBLE})
@@ -65,20 +70,42 @@ public class TelemetryResource extends ProxiedResource {
     @GET
     @ApiOperation(value = "Get telemetry information.")
     public TelemetryResponse get() {
-        ClusterInfo clusterInfo = createClusterInfo();
+        User currentUser = getCurrentUser();
+        String clusterId = getClusterId();
+
         List<TelemetryLicenseStatus> licenses = telemetryLicenseStatusProvider.status();
         LicenseInfo licenseInfo = new LicenseInfo(licenses);
-        return new TelemetryResponse(clusterInfo, licenseInfo);
+        return new TelemetryResponse(
+                createUserInfo(currentUser, clusterId),
+                createClusterInfo(clusterId),
+                licenseInfo);
     }
 
-    private ClusterInfo createClusterInfo() {
+    private UserInfo createUserInfo(User currentUser, String clusterId) {
+        try {
+            if (currentUser == null) {
+                // TODO log
+                return null;
+            }
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+            messageDigest.update("%s%s".formatted(currentUser.getId(), clusterId).getBytes());
+            String hash = HashCode.fromBytes(messageDigest.digest()).toString();
+
+            return new UserInfo(hash, currentUser.isLocalAdmin(), currentUser.getRoleIds().size(), 0);
+        } catch (NoSuchAlgorithmException e) {
+            // TODO log
+            return null;
+        }
+    }
+
+    private ClusterInfo createClusterInfo(String clusterId) {
         Map<String, SystemOverviewResponse> results = new HashMap<>();
         requestOnAllNodes(
                 createRemoteInterfaceProvider(RemoteSystemResource.class),
                 RemoteSystemResource::system)
                 .forEach((s, r) -> results.put(s, toSystemOverviewResponse(r)));
 
-        return new ClusterInfo(getClusterId(), results, getAverageLastMonthTraffic());
+        return new ClusterInfo(clusterId, results, getAverageLastMonthTraffic());
     }
 
     private String getClusterId() {
