@@ -20,9 +20,8 @@ import styled, { css } from 'styled-components';
 
 import { Input, ListGroupItem } from 'components/bootstrap';
 import type { Attribute } from 'stores/PaginationTypes';
-import type { Filter, Filters } from 'components/common/EntityFilters/types';
+import type { Filters, ValueFilter } from 'components/common/EntityFilters/types';
 import { PaginatedList, NoSearchResult } from 'components/common';
-import generateId from 'logic/generateId';
 import useIsKeyHeld from 'hooks/useIsKeyHeld';
 import useFilterValueSuggestions from 'components/common/EntityFilters/hooks/useFilterValueSuggestions';
 import Spinner from 'components/common/Spinner';
@@ -52,14 +51,14 @@ const Hint = styled.div(({ theme }) => css`
 `);
 
 type Props = {
-  attribute: Attribute,
-  filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined,
-  onSubmit: (filter: Filter, closeDropdown: boolean) => void,
   allActiveFilters: Filters | undefined,
-  scenario: 'create' | 'edit'
+  attribute: Attribute,
+  filter: ValueFilter | undefined
+  filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined,
+  onSubmit: (filter: { title: string, value: string }, closeDropdown: boolean) => void,
 }
 
-const SuggestionsList = ({ attribute, filterValueRenderer, onSubmit, allActiveFilters, scenario }: Props) => {
+const SuggestionsList = ({ attribute, filterValueRenderer, onSubmit, allActiveFilters, filter }: Props) => {
   const isShiftHeld = useIsKeyHeld('Shift');
   const [searchParams, setSearchParams] = useState(DEFAULT_SEARCH_PARAMS);
   const { data: { pagination, suggestions }, isInitialLoading } = useFilterValueSuggestions(attribute.id, attribute.related_collection, searchParams);
@@ -103,7 +102,6 @@ const SuggestionsList = ({ attribute, filterValueRenderer, onSubmit, allActiveFi
                 onSubmit({
                   value: suggestion.id,
                   title: suggestion.value,
-                  id: generateId(),
                 }, !isShiftHeld);
               };
 
@@ -121,7 +119,7 @@ const SuggestionsList = ({ attribute, filterValueRenderer, onSubmit, allActiveFi
 
       {!suggestions?.length && <NoSearchResult>No entities found</NoSearchResult>}
 
-      {scenario === 'create' && (
+      {!filter && (
         <Hint>
           <i>
             Hold Shift to select multiple
