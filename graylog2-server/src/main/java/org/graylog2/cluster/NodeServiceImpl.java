@@ -118,7 +118,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
 
     @Override
     public void dropOutdated() {
-        final BasicDBObject query = new BasicDBObject("$not", recentHeartbeat());
+        final BasicDBObject query = new BasicDBObject("$nor", List.of(recentHeartbeat()));
 
         destroyAll(NodeImpl.class, query);
     }
