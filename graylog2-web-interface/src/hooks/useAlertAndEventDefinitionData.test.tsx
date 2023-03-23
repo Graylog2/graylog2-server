@@ -18,6 +18,7 @@ import React from 'react';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { QueryClientProvider, QueryClient, useQueryClient } from '@tanstack/react-query';
 import { useLocation, useParams } from 'react-router-dom';
+import type { Location } from 'react-router-dom';
 
 import {
   mockedMappedAggregation,
@@ -97,15 +98,13 @@ const mockGetQueryData = ({ eventId = undefined, alert, showEventData = true }) 
   }),
 }));
 
-// @ts-ignore
 const mockUseRouterForEvent = (id) => asMock(useLocation).mockImplementation(() => ({
   pathname: `/alerts/${id}/replay-search`,
-}));
+} as Location));
 
-// @ts-ignore
 const mockUseRouterForEventDefinition = (id) => asMock(useLocation).mockImplementation(() => ({
   pathname: `/alerts/definitions/${id}/replay-search`,
-}));
+} as Location));
 
 describe('useAlertAndEventDefinitionData', () => {
   afterEach(() => {

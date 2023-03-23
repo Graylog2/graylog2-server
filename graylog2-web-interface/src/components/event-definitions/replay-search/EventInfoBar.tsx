@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import type { SyntheticEvent } from 'react';
 import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
@@ -50,12 +51,16 @@ const Row = styled.div`
   flex-wrap: wrap;
 `;
 
+const Value = styled.div`
+  display: flex;
+`;
+
 const EventInfoBar = () => {
   useHighlightValuesForEventDefinition();
   const { isEventDefinition, isEvent, isAlert } = useAlertAndEventDefinitionData();
   const [open, setOpen] = useState<boolean>(true);
 
-  const toggleOpen = useCallback((e) => {
+  const toggleOpen = useCallback((e: SyntheticEvent) => {
     e.stopPropagation();
     setOpen((cur) => !cur);
   }, []);
@@ -84,7 +89,7 @@ const EventInfoBar = () => {
           {infoAttributes.map(({ title, content, show }) => (show !== false) && (
             <Item key={title}>
               <b>{title}: </b>
-              <span title={title}>{content || <NoAttributeProvided name={title} />}</span>
+              <Value title={title}>{content || <NoAttributeProvided name={title} />}</Value>
             </Item>
           ))}
         </Row>

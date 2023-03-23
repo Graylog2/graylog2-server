@@ -32,8 +32,10 @@ const counter = () => {
   let index = 0;
 
   return () => {
-    // eslint-disable-next-line no-plusplus
-    return index++;
+    const oldIndex = index;
+    index += 1;
+
+    return oldIndex;
   };
 };
 

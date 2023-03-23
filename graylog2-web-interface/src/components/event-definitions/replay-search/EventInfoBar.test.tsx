@@ -199,13 +199,13 @@ describe('<EventInfoBar />', () => {
     const hideButton = await screen.findByText('Hide event definition details');
     const detailsContainer = await screen.findByTestId('info-container');
 
-    await fireEvent.click(hideButton);
+    fireEvent.click(hideButton);
 
     expect(detailsContainer).not.toBeInTheDocument();
 
     const showButton = await screen.findByText('Show event definition details');
 
-    await fireEvent.click(showButton);
+    fireEvent.click(showButton);
 
     await screen.findByTestId('info-container');
   });
