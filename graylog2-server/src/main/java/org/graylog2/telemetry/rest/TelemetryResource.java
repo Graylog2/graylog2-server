@@ -25,6 +25,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.telemetry.rest.TelemetryResponse.ClusterInfo;
 import static org.graylog2.telemetry.rest.TelemetryResponse.LicenseInfo;
 import static org.graylog2.telemetry.rest.TelemetryResponse.UserInfo;
@@ -88,7 +90,7 @@ public class TelemetryResource extends ProxiedResource {
                 return null;
             }
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-            messageDigest.update("%s%s".formatted(currentUser.getId(), clusterId).getBytes());
+            messageDigest.update(f("%s%s", currentUser.getId(), clusterId).getBytes(StandardCharsets.UTF_8));
             String hash = HashCode.fromBytes(messageDigest.digest()).toString();
 
             return new UserInfo(hash, currentUser.isLocalAdmin(), currentUser.getRoleIds().size(), 0);
