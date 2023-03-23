@@ -372,6 +372,8 @@ public class SupportBundleService {
                         }
                     })
                     .collect(Collectors.toList());
+        } catch (NoSuchFileException ignored) {
+            return List.of();
         } catch (IOException e) {
             LOG.warn("Exception while trying to list support bundles", e);
             throw new BadRequestException(e);
