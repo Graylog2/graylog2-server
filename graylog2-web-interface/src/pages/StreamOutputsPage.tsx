@@ -29,7 +29,7 @@ import useStream from 'components/streams/hooks/useStream';
 const StreamOutputsPage = () => {
   const currentUser = useCurrentUser();
   const { streamId } = useParams();
-  const { stream } = useStream(streamId);
+  const { data: stream } = useStream(streamId);
 
   if (!stream) {
     return <Spinner />;
