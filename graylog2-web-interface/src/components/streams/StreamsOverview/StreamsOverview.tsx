@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 
 import { PaginatedList, SearchForm, NoSearchResult } from 'components/common';
 import Spinner from 'components/common/Spinner';
@@ -38,6 +38,7 @@ import EntityFilters from 'components/common/EntityFilters';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
 import useTableElements from 'components/streams/StreamsOverview/hooks/useTableComponents';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 import CustomColumnRenderers from './ColumnRenderers';
 import useTableEventHandlers from './hooks/useTableEventHandlers';
@@ -89,6 +90,11 @@ const StreamsOverview = ({ indexSets }: Props) => {
     setQuery,
   });
 
+  const onChangeFilters = useCallback((newUrlQueryFilters: UrlQueryFilters) => {
+    paginationQueryParameter.resetPage();
+    setUrlQueryFilters(newUrlQueryFilters);
+  }, [paginationQueryParameter, setUrlQueryFilters]);
+
   useRefetchStreamsOnStoreChange(refetchStreams);
 
   const columnRenderers = useMemo(() => CustomColumnRenderers(indexSets), [indexSets]);
@@ -113,7 +119,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
                     queryHelpComponent={<QueryHelper entityName="stream" />}>
           <EntityFilters attributes={attributes}
                          urlQueryFilters={urlQueryFilters}
-                         setUrlQueryFilters={setUrlQueryFilters}
+                         setUrlQueryFilters={onChangeFilters}
                          filterValueRenderers={FilterValueRenderers} />
         </SearchForm>
       </div>
