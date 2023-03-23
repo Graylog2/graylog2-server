@@ -213,6 +213,12 @@ const ApiRoutes = {
     subsystems: () => { return { url: '/cluster/system/loggers/subsystems' }; },
     setSubsystemLoggerLevel: (nodeId: string, subsystem: string, loglevel: string) => { return { url: `/cluster/system/loggers/${nodeId}/subsystems/${subsystem}/level/${loglevel}` }; },
   },
+  ClusterSupportBundleController: {
+    delete: (filename: string) => { return { url: `/cluster/debug/support/bundle/delete/${filename}` }; },
+    download: (filename: string) => { return { url: `/cluster/debug/support/bundle/download/${filename}` }; },
+    list: () => { return { url: '/cluster/debug/support/bundle/list' }; },
+    create: () => { return { url: '/cluster/debug/support/bundle/build' }; },
+  },
   MessageFieldsApiController: {
     list: () => { return { url: '/system/fields' }; },
     types: () => ({ url: 'views/fields' }),
