@@ -22,7 +22,7 @@ import MenuItem from 'components/bootstrap/MenuItem';
 import {
   isAttributeWithFilterOptions,
   isAttributeWithRelatedCollection, isDateAttribute,
-} from 'components/common/EntityFilters/AttributeIdentification';
+} from 'components/common/EntityFilters/helpers/AttributeIdentification';
 
 import StaticOptionsList from './StaticOptionsList';
 import SuggestionsList from './SuggestionsList';

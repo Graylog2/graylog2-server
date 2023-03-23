@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { Attribute } from 'src/stores/PaginationTypes';
+import type { Attribute } from 'stores/PaginationTypes';
 
 export const isDateAttribute = ({ type }: Attribute) => type === 'DATE';
 export const isAttributeWithFilterOptions = ({ filter_options }: Attribute) => !!filter_options?.length;
