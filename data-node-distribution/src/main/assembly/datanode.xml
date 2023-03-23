@@ -44,6 +44,12 @@
     </fileSets>
     <files>
         <file>
+            <source>${project.basedir}/../data-node/bin/graylog-datanode.sh</source>
+            <destName>graylog-datanode</destName>
+            <outputDirectory>bin</outputDirectory>
+            <fileMode>0755</fileMode>
+        </file>
+        <file>
             <source>${project.basedir}/../data-node/target/graylog-datanode-${project.version}.jar</source>
             <destName>graylog-datanode.jar</destName>
             <outputDirectory>.</outputDirectory>
