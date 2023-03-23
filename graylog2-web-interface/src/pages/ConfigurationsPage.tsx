@@ -33,23 +33,11 @@ import 'components/maps/configurations';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
 import useCurrentUser from 'hooks/useCurrentUser';
 
-import ConfigletContainer from './configurations/ConfigletContainer';
+import ConfigurationSection from './configurations/ConfigurationSection';
+import type { ConfigurationSectionProps } from './configurations/ConfigurationSection';
 
 import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
 import UserConfig from '../components/configurations/UserConfig';
-
-type ConfigurationSectionProps = {
-  ConfigurationComponent: React.ComponentType,
-  title: string
-}
-
-const ConfigurationSection = ({ ConfigurationComponent, title } : ConfigurationSectionProps) => (
-  <ConfigletContainer title={title}>
-    <Col md={6}>
-      <ConfigurationComponent />
-    </Col>
-  </ConfigletContainer>
-);
 
 const ConfigurationsPage = () => {
   const currentUser = useCurrentUser();

@@ -208,11 +208,11 @@ const SearchesConfig = () => {
 
   const duration = (config) => moment.duration(config.query_time_range_limit);
   const limit = (config) => (isLimitEnabled(config) ? `${config.query_time_range_limit} (${duration(config).humanize()})` : 'disabled');
-  const autoRefreshOptions = autoRefreshTimeRangeOptionsUpdate ?? buildTimeRangeOptions(formConfig.auto_refresh_timerange_options);
-  const formDefaultAutoRefreshOptionUpdate = defaultAutoRefreshOptionUpdate ?? formConfig.default_auto_refresh_option;
-  const defaultAutoRefreshOption = autoRefreshOptions.find((option) => option.period === formDefaultAutoRefreshOptionUpdate)
-    ? formDefaultAutoRefreshOptionUpdate
-    : autoRefreshOptions[0]?.period;
+  const autoRefreshOptions = (config) => autoRefreshTimeRangeOptionsUpdate ?? buildTimeRangeOptions(config.auto_refresh_timerange_options);
+  const formDefaultAutoRefreshOptionUpdate = (config) => defaultAutoRefreshOptionUpdate ?? config.default_auto_refresh_option;
+  const defaultAutoRefreshOption = (config) => (autoRefreshOptions(config).find((option) => option.period === formDefaultAutoRefreshOptionUpdate(config))
+    ? formDefaultAutoRefreshOptionUpdate(config)
+    : autoRefreshOptions[0]?.period);
 
   return (
     <div>
@@ -227,23 +227,13 @@ const SearchesConfig = () => {
       </dl>
 
       <Row>
-        <Col md={6}>
+        <Col md={4}>
           <strong>Relative time range options</strong>
           <TimeRangeOptionsSummary options={viewConfig.relative_timerange_options} />
           <strong>Surrounding time range options</strong>
           <TimeRangeOptionsSummary options={viewConfig.surrounding_timerange_options} />
         </Col>
-        <Col md={6} />
-        <Col md={6}>
-          <Row style={{ marginBottom: 20 }}>
-            <Col>
-              <strong>Auto-refresh interval options</strong>
-              <TimeRangeOptionsSummary options={viewConfig.auto_refresh_timerange_options} />
-
-              <strong>Default auto-refresh interval</strong>
-              <TimeRangeOptionsSummary options={{ [viewConfig.default_auto_refresh_option]: viewConfig.auto_refresh_timerange_options[viewConfig.default_auto_refresh_option] }} />
-            </Col>
-          </Row>
+        <Col md={4}>
           <Row style={{ marginBottom: 20 }}>
             <Col>
               <strong>Surrounding search filter fields</strong>
@@ -260,6 +250,13 @@ const SearchesConfig = () => {
               </ul>
             </Col>
           </Row>
+        </Col>
+        <Col md={4}>
+          <strong>Auto-refresh interval options</strong>
+          <TimeRangeOptionsSummary options={viewConfig.auto_refresh_timerange_options} />
+
+          <strong>Default auto-refresh interval</strong>
+          <TimeRangeOptionsSummary options={{ [viewConfig.default_auto_refresh_option]: viewConfig.auto_refresh_timerange_options[viewConfig.default_auto_refresh_option] }} />
         </Col>
       </Row>
       <IfPermitted permissions="clusterconfigentry:edit">
@@ -315,8 +312,7 @@ const SearchesConfig = () => {
                  value={analysisDisabledFieldsUpdate || (formConfig.analysis_disabled_fields && formConfig.analysis_disabled_fields.join(', '))}
                  help="A ',' separated list of message fields for which analysis features like QuickValues will be disabled in the web UI."
                  required />
-
-          <TimeRangeOptionsForm options={autoRefreshOptions}
+          <TimeRangeOptionsForm options={autoRefreshOptions(formConfig)}
                                 update={onAutoRefreshTimeRangeOptionsUpdate}
                                 validator={autoRefreshTimeRangeValidator}
                                 title="Auto-Refresh Interval Options"
@@ -327,12 +323,12 @@ const SearchesConfig = () => {
                  help="Select the interval which is used when auto-refresh is started without explicitly selecting one">
             <Select placeholder="Select the default interval"
                     clearable={false}
-                    options={autoRefreshOptions}
+                    options={autoRefreshOptions(formConfig)}
                     displayKey="description"
                     valueKey="period"
                     matchProp="label"
                     onChange={onAutoRefreshDefaultOptionsUpdate}
-                    value={defaultAutoRefreshOption} />
+                    value={defaultAutoRefreshOption(formConfig)} />
           </Input>
         </fieldset>
       </BootstrapModalForm>

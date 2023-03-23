@@ -15,26 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 
-import ConfigletContainer from './configurations/ConfigletContainer';
+import { Col } from 'components/bootstrap';
+import ConfigletContainer from 'pages/configurations/ConfigletContainer';
 
-const ConfigurationSection = ({ configKey, configPromise, title, children, hideOnCloud } : Props) => {
-  const [config, setConfig] = useState(undefined);
-  const getConfig = (configType, configuration) => configuration?.[configType] ?? null;
+type ConfigurationSectionProps = {
+  ConfigurationComponent: React.ComponentType,
+  title: string
+}
 
-  useEffect(() => {
-    configPromise.then((configResult) => {
-      setConfig(getConfig(configKey, configResult));
-    });
-  });
+const ConfigurationSection = ({ ConfigurationComponent, title } : ConfigurationSectionProps) => (
+  <ConfigletContainer title={title}>
+    <Col md={6}>
+      <ConfigurationComponent />
+    </Col>
+  </ConfigletContainer>
+);
 
-  return (
-    <ConfigletContainer title={title}>
-      <Fallback>
-    </ConfigletContainer>
-  );
-};
+export type { ConfigurationSectionProps };
 
 export default ConfigurationSection;

@@ -24,16 +24,21 @@ import { getConfig } from 'components/configurations/helpers';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Button, Alert, Table } from 'components/bootstrap';
-import { IfPermitted, SortableList } from 'components/common';
+import { IfPermitted, SortableList, Spinner } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
+type Processor = {
+  name: string,
+  class_name: string
+}
+
 type Config = {
-  disabled_processors: Array<any>,
-  processor_order: Array<any>,
+  disabled_processors: Array<string>,
+  processor_order: Array<Processor>,
 }
 
 const MessageProcessorsConfig = () => {
-  const [showConfigModal, setShowConfigModal] = useState(false);
+  const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
   const [viewConfig, setViewConfig] = useState<Config | undefined>(undefined);
   const [formConfig, setFormConfig] = useState<Config | undefined>(undefined);
@@ -52,6 +57,7 @@ const MessageProcessorsConfig = () => {
 
   const closeModal = () => {
     setShowConfigModal(false);
+    setFormConfig(viewConfig);
   };
 
   const hasNoActiveProcessor = () => {
@@ -66,7 +72,7 @@ const MessageProcessorsConfig = () => {
     }
   };
 
-  const updateSorting = (newSorting) => {
+  const updateSorting = (newSorting: Array<{id: string, title: string}>) => {
     const processorOrder = newSorting.map((item) => {
       return { class_name: item.id, name: item.title };
     });
@@ -74,7 +80,7 @@ const MessageProcessorsConfig = () => {
     setFormConfig({ ...formConfig, processor_order: processorOrder });
   };
 
-  const toggleStatus = (className, enabled) => {
+  const toggleStatus = (className: string, enabled: boolean) => {
     const disabledProcessors = formConfig.disabled_processors;
 
     if (enabled) {
@@ -84,7 +90,7 @@ const MessageProcessorsConfig = () => {
     }
   };
 
-  const isProcessorEnabled = (processor, config) => (
+  const isProcessorEnabled = (processor: Processor, config: Config) => (
     config.disabled_processors.filter((p) => p === processor.class_name).length < 1
   );
 
@@ -93,13 +99,12 @@ const MessageProcessorsConfig = () => {
       const status = isProcessorEnabled(processor, viewConfig) ? 'active' : 'disabled';
 
       return (
-        (
-          <tr key={idx}>
-            <td>{idx + 1}</td>
-            <td>{processor.name}</td>
-            <td>{status}</td>
-          </tr>
-        ));
+        <tr key={processor.name}>
+          <td>{idx + 1}</td>
+          <td>{processor.name}</td>
+          <td>{status}</td>
+        </tr>
+      );
     });
   };
 
@@ -112,26 +117,23 @@ const MessageProcessorsConfig = () => {
   const statusForm = () => {
     const sortedProcessorOrder = [...formConfig.processor_order].sort((a, b) => naturalSort(a.name, b.name));
 
-    return sortedProcessorOrder.map((processor, idx) => {
+    return sortedProcessorOrder.map((processor) => {
       const enabled = isProcessorEnabled(processor, formConfig);
 
       return (
-
-        (
-          <tr key={idx}>
-            <td>{processor.name}</td>
-            <td>
-              <input type="checkbox"
-                     checked={enabled}
-                     onChange={() => toggleStatus(processor.class_name, enabled)} />
-            </td>
-          </tr>
-        )
+        <tr key={processor.name}>
+          <td>{processor.name}</td>
+          <td>
+            <input type="checkbox"
+                   checked={enabled}
+                   onChange={() => toggleStatus(processor.class_name, enabled)} />
+          </td>
+        </tr>
       );
     });
   };
 
-  if (!viewConfig) { return null; }
+  if (!viewConfig) { return <Spinner />; }
 
   return (
     <div>
