@@ -23,7 +23,7 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 const UniqueChunkIdPlugin = require('./UniqueChunkIdPlugin');
 
-const getCssLoaderOptions = (target: string) => {
+const getCssLoaderOptions = (target) => {
   // Development
   if (target === 'start') {
     return {
@@ -41,7 +41,7 @@ const getCssLoaderOptions = (target: string) => {
   };
 };
 
-export const sortChunks = (c1: string, c2: string) => {
+const sortChunks = (c1, c2) => {
   // Render the polyfill chunk first
   if (c1 === 'polyfill') {
     return -1;
@@ -62,7 +62,7 @@ export const sortChunks = (c1: string, c2: string) => {
   return 0;
 };
 
-export const rules = (target: string, supportedBrowsers: Array<string>) => [
+const rules = (target, supportedBrowsers) => [
   {
     test: /\.[jt]s(x)?$/,
     use: {
@@ -108,7 +108,7 @@ export const rules = (target: string, supportedBrowsers: Array<string>) => [
   },
 ];
 
-export const config = (target: string, appPath: string, rootPath: string, webInterfaceRoot: string, supportedBrowsers: Array<string>) => {
+const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) => {
   const MANIFESTS_PATH = path.resolve(webInterfaceRoot, 'manifests');
   const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json');
   const BUILD_PATH = path.resolve(rootPath, 'target/web/build');
@@ -203,4 +203,8 @@ export const config = (target: string, appPath: string, rootPath: string, webInt
       ],
     });
   }
+
+  return baseConfig;
 };
+
+module.exports = { rules, config, sortChunks };
