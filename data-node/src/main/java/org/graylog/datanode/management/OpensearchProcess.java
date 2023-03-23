@@ -29,6 +29,7 @@ public interface OpensearchProcess extends ManagableProcess {
 
     Object nodeName();
 
+    boolean isLeaderNode();
     void setLeaderNode(boolean isManagerNode);
 
     String opensearchVersion();

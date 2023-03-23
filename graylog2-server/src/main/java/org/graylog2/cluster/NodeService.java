@@ -37,9 +37,7 @@ public interface NodeService extends PersistedService {
 
     void dropOutdated();
 
-    void markAsAlive(Node node, boolean isLeader, String restTransportAddress);
-
-    void markAsAlive(Node node, boolean isLeader, URI restTransportAddress);
+    void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress) throws NodeNotFoundException;
 
     boolean isOnlyLeader(NodeId nodeIde);
 
