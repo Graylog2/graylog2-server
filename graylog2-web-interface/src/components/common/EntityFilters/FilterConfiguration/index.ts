@@ -14,26 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.management;
+import FilterConfiguration from './FilterConfiguration';
 
-import org.graylog.datanode.process.ProcessInfo;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
-
-import java.util.List;
-
-public interface OpensearchProcess extends ManagableProcess {
-
-    ProcessInfo processInfo();
-
-    RestHighLevelClient restClient();
-
-    Object nodeName();
-
-    boolean isLeaderNode();
-    void setLeaderNode(boolean isManagerNode);
-
-    String opensearchVersion();
-
-    List<String> stdOutLogs();
-    List<String> stdErrLogs();
-}
+export default FilterConfiguration;
