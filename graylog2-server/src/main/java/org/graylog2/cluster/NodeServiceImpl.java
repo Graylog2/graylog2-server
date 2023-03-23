@@ -94,8 +94,6 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
 
     @Override
     public Map<String, Node> allActive(Node.Type type) {
-        Map<String, Node> nodes = Maps.newHashMap();
-
         final BasicDBObject query = new BasicDBObject(Map.of(
                 "$and", List.of(
                         Map.of("type", type.toString()),
