@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// webpack.vendor.js
 const path = require('path');
 
 const webpack = require('webpack');
@@ -92,10 +91,11 @@ const webpackConfig = {
   recordsPath: path.resolve(ROOT_PATH, 'webpack/vendor-module-ids.json'),
 };
 
-module.exports = webpackConfig;
+// eslint-disable-next-line import/no-mutable-exports
+let defaultExport = webpackConfig;
 
 if (TARGET === 'start') {
-  module.exports = merge(webpackConfig, {
+  defaultExport = merge(webpackConfig, {
     devServer: {
       hot: false,
       liveReload: true,
@@ -114,7 +114,7 @@ if (TARGET === 'start') {
 }
 
 if (TARGET.startsWith('build')) {
-  module.exports = merge(webpackConfig, {
+  defaultExport = merge(webpackConfig, {
     mode: 'production',
     optimization: {
       concatenateModules: false,
@@ -137,3 +137,5 @@ if (TARGET.startsWith('build')) {
     },
   });
 }
+
+export default defaultExport;

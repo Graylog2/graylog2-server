@@ -19,7 +19,6 @@ const path = require('path');
 
 const { globSync } = require('glob');
 
-const TARGET = process.env.npm_lifecycle_event;
 const WEB_MODULES = path.resolve(__dirname, './web-modules.json');
 
 const configsFromWebModule = (webModulesFile) => {
@@ -58,6 +57,7 @@ const pluginConfigFiles = process.env.disable_plugins === 'true'
     : configsFromGlob();
 
 if (pluginConfigFiles.some((config) => config.includes('graylog-plugin-cloud/server-plugin'))) {
+  // @ts-ignore
   process.env.IS_CLOUD = true;
 }
 
@@ -70,4 +70,4 @@ const pluginConfigs = pluginConfigFiles.map((file) => require(file));
 
 const allConfigs = [webpackConfig, ...pluginConfigs];
 
-module.exports = allConfigs;
+export default allConfigs;
