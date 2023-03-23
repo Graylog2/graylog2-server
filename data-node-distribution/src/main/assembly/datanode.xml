@@ -56,6 +56,12 @@
             <fileMode>0644</fileMode>
         </file>
         <file>
+            <source>${project.basedir}/../data-node/config/log4j2.xml</source>
+            <destName>log4j2.xml</destName>
+            <outputDirectory>config</outputDirectory>
+            <fileMode>0644</fileMode>
+        </file>
+        <file>
             <source>${project.basedir}/../data-node/target/graylog-datanode-${project.version}.jar</source>
             <destName>graylog-datanode.jar</destName>
             <outputDirectory>.</outputDirectory>
