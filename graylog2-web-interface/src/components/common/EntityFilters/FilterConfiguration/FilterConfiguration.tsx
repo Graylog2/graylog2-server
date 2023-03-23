@@ -19,6 +19,10 @@ import * as React from 'react';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { Filters, Filter } from 'components/common/EntityFilters/types';
 import MenuItem from 'components/bootstrap/MenuItem';
+import {
+  isAttributeWithFilterOptions,
+  isAttributeWithRelatedCollection, isDateAttribute,
+} from 'components/common/EntityFilters/AttributeIdentification';
 
 import StaticOptionsList from './StaticOptionsList';
 import SuggestionsList from './SuggestionsList';
@@ -41,19 +45,19 @@ export const FilterConfiguration = ({
 }: Props) => (
   <>
     <MenuItem header>{filter ? 'Edit' : 'Create'} {attribute.title.toLowerCase()} filter</MenuItem>
-    {attribute.filter_options && (
+    {isAttributeWithFilterOptions(attribute) && (
       <StaticOptionsList attribute={attribute}
                          filterValueRenderer={filterValueRenderer}
                          onSubmit={onSubmit} />
     )}
-    {(!attribute.filter_options?.length && attribute.type !== 'DATE') && (
+    {isAttributeWithRelatedCollection(attribute) && (
       <SuggestionsList attribute={attribute}
                        filterValueRenderer={filterValueRenderer}
                        onSubmit={onSubmit}
                        allActiveFilters={allActiveFilters}
                        filter={filter} />
     )}
-    {attribute.type === 'DATE' && (
+    {isDateAttribute(attribute) && (
       <DateRangeForm onSubmit={onSubmit}
                      filter={filter} />
     )}

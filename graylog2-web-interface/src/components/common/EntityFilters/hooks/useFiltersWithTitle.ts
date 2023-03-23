@@ -12,6 +12,11 @@ import {
 import type { UrlQueryFilters, Filters } from 'components/common/EntityFilters/types';
 import type { Attributes, Attribute } from 'stores/PaginationTypes';
 import type { DateTime } from 'util/DateTime';
+import {
+  isDateAttribute,
+  isAttributeWithFilterOptions,
+  isAttributeWithRelatedCollection,
+} from 'components/common/EntityFilters/AttributeIdentification';
 
 type CollectionsByAttributeId = {
   [attributeId: string]: string | undefined
@@ -70,7 +75,7 @@ const filterTitle = (
   filterValue: string,
   formatTime: (dateTime: DateTime) => string,
 ) => {
-  if (attribute?.type === 'DATE') {
+  if (isDateAttribute(attribute)) {
     const [from, until] = extractRangeFromString(filterValue);
 
     const fromDate = from ? formatTime(from) : undefined;
@@ -79,13 +84,13 @@ const filterTitle = (
     return timeRangeTitle(fromDate, untilDate);
   }
 
-  if (attribute?.filter_options) {
+  if (isAttributeWithFilterOptions(attribute)) {
     const relatedOption = attribute.filter_options.find(({ value }) => value === filterValue);
 
     return relatedOption?.title ?? filterValue;
   }
 
-  if (attribute?.related_collection) {
+  if (isAttributeWithRelatedCollection(attribute)) {
     const fetchedTitle = requestedFilterTitles?.find(({ id, type }) => (type === attribute.related_collection && id === filterValue))?.title;
 
     return fetchedTitle ?? 'Loading...';
