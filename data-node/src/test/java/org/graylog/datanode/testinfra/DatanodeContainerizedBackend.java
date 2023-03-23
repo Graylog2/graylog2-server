@@ -97,7 +97,7 @@ public class DatanodeContainerizedBackend {
                 .waitingFor(new LogMessageWaitStrategy()
                         .withRegEx(".*Graylog DataNode datanode up and running.\n")
                         .withStartupTimeout(Duration.ofSeconds(60)));
-        container.withFileSystemBind("target/datanode-" + datanodeVersion + ".jar", IMAGE_WORKING_DIR + "/datanode.jar")
+        container.withFileSystemBind("target/datanode-" + datanodeVersion + ".jar", IMAGE_WORKING_DIR + "/graylog-datanode.jar")
                 .withFileSystemBind("target/lib", IMAGE_WORKING_DIR + "/lib/");
         customizer.onContainer(container);
         return container;
@@ -121,7 +121,7 @@ public class DatanodeContainerizedBackend {
                                 .run("chown -R opensearch:opensearch " + IMAGE_WORKING_DIR)
                                 .user("opensearch")
                                 .expose(DATANODE_REST_PORT, DATANODE_OPENSEARCH_PORT)
-                                .entryPoint("java", "-jar", "datanode.jar", "datanode", "-f", "datanode.conf")
+                                .entryPoint("java", "-jar", "graylog-datanode.jar", "datanode", "-f", "datanode.conf")
                                 .build());
     }
 

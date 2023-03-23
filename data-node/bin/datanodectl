@@ -17,7 +17,7 @@ if [ -n "$JAVA_HOME" ]; then
 	if [ -x "$java_cmd" ]; then
 		JAVA_CMD="$java_cmd"
 	else
-		echo "$java_bin not executable or doesn't exist"
+		echo "$java_cmd not executable or doesn't exist"
 		exit 1
 	fi
 fi
@@ -35,8 +35,8 @@ while [ -h "$DATANODE_BIN" ]; do
     fi
 done
 
-DATANODE_ROOT="$(dirname $(dirname $DATANODE_BIN))"
-DATANODE_DEFAULT_JAR="${DATANODE_ROOT}/datanode.jar"
+DATANODE_ROOT="$(dirname "$(dirname "$DATANODE_BIN")")"
+DATANODE_DEFAULT_JAR="${DATANODE_ROOT}/graylog-datanode.jar"
 DATANODE_JVM_OPTIONS_FILE="${DATANODE_JVM_OPTIONS_FILE:-$DATANODE_ROOT/config/jvm.options}"
 
 DATANODE_PARSED_JAVA_OPTS=""

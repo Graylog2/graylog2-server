@@ -44,8 +44,8 @@
     </fileSets>
     <files>
         <file>
-            <source>${project.basedir}/../data-node/target/datanode-${project.version}.jar</source>
-            <destName>datanode.jar</destName>
+            <source>${project.basedir}/../data-node/target/graylog-datanode-${project.version}.jar</source>
+            <destName>graylog-datanode.jar</destName>
             <outputDirectory>.</outputDirectory>
         </file>
         <file>
