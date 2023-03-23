@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useParams } from 'react-router-dom';
 
 import { Link } from 'components/common/router';
 import { Col } from 'components/bootstrap';
@@ -22,14 +23,13 @@ import { ContentHeadRow, DocumentTitle, Spinner } from 'components/common';
 import OutputsComponent from 'components/outputs/OutputsComponent';
 import SupportLink from 'components/support/SupportLink';
 import Routes from 'routing/Routes';
-import useQuery from 'routing/useQuery';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useStream from 'components/streams/hooks/useStream';
 
 const StreamOutputsPage = () => {
   const currentUser = useCurrentUser();
-  const { streamsId } = useQuery();
-  const { stream } = useStream(streamsId);
+  const { streamId } = useParams();
+  const { data: stream } = useStream(streamId);
 
   if (!stream) {
     return <Spinner />;
