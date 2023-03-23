@@ -99,13 +99,13 @@ const filterTitle = (
   return filterValue;
 };
 
-const allfiltersWithTitle = (
+const _allFiltersWithTitle = (
   urlQueryFilters: UrlQueryFilters,
   requestedFilterTitles: RequestedFilterTitles,
   attributesMetaData: Attributes,
   formatTime: (dateTime: DateTime) => string,
-) => {
-  return Object.entries(urlQueryFilters).reduce((col, [attributeId, filterValues]) => {
+): Filters => (
+  Object.entries(urlQueryFilters).reduce((col, [attributeId, filterValues]) => {
     const relatedAttribute = attributesMetaData?.find(({ id }) => id === attributeId);
     const filtersWithTitle = filterValues.map((value) => {
       const title = filterTitle(relatedAttribute, requestedFilterTitles, value, formatTime);
@@ -121,8 +121,8 @@ const allfiltersWithTitle = (
       ...col,
       [attributeId]: filtersWithTitle,
     };
-  }, {});
-};
+  }, {})
+);
 
 const filtersWithTitleToResponse = (filtersWithTitle: Filters, attributesMetaData: Attributes) => Object.entries(filtersWithTitle).reduce(
   (col, [_attributeId, filters]) => {
@@ -142,14 +142,21 @@ const fetchFilterTitles = (payload: { entities: Array<{ id: string, type: string
   fetch('POST', URLUtils.qualifyUrl('/system/catalog/entity_titles'), payload)
 );
 
-const useFiltersWithTitle = (urlQueryFilters: UrlQueryFilters, attributesMetaData: Attributes, enabled: boolean) => {
+const useFiltersWithTitle = (
+  urlQueryFilters: UrlQueryFilters,
+  attributesMetaData: Attributes,
+  enabled: boolean,
+): {
+  data: Filters
+  onChange: (newFiltersWithTitle: Filters, newUrlQueryFilters: UrlQueryFilters) => void
+} => {
   const queryClient = useQueryClient();
   const { formatTime } = useUserDateTime();
   const collectionsByAttributeId = _collectionsByAttributeId(attributesMetaData);
   const urlQueryFiltersWithoutTitle = _urlQueryFiltersWithoutTitle(urlQueryFilters, collectionsByAttributeId);
   const payload = filtersWithoutTitlePayload(urlQueryFiltersWithoutTitle, collectionsByAttributeId);
 
-  const { data, refetch, isInitialLoading } = useQuery(
+  const { data } = useQuery(
     ['entity_titles', payload],
     () => fetchFilterTitles(payload),
     {
@@ -164,7 +171,7 @@ const useFiltersWithTitle = (urlQueryFilters: UrlQueryFilters, attributesMetaDat
 
   const cachedResponse = queryClient.getQueryData(['entity_titles', payload]);
   const requestedFilterTitles = (cachedResponse ?? data)?.entities;
-  const allFiltersWithTitle = allfiltersWithTitle(urlQueryFilters, requestedFilterTitles, attributesMetaData, formatTime);
+  const allFiltersWithTitle = _allFiltersWithTitle(urlQueryFilters, requestedFilterTitles, attributesMetaData, formatTime);
 
   const onChange = useCallback((newFiltersWithTitle: Filters, newUrlQueryFilters: UrlQueryFilters) => {
     const newURLQueryFiltersWithoutTitle = _urlQueryFiltersWithoutTitle(newUrlQueryFilters, collectionsByAttributeId);
@@ -176,8 +183,6 @@ const useFiltersWithTitle = (urlQueryFilters: UrlQueryFilters, attributesMetaDat
 
   return ({
     data: allFiltersWithTitle,
-    refetch,
-    isInitialLoading,
     onChange,
   });
 };
