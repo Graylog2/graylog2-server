@@ -164,7 +164,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
                 )
         ));
 
-        return query(NodeImpl.class, query).isEmpty();
+        return count(NodeImpl.class, query) == 0;
     }
 
     @Override
@@ -179,6 +179,6 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
                 )
         ));
 
-        return !query(NodeImpl.class, query).isEmpty();
+        return count(NodeImpl.class, query) > 0;
     }
 }
