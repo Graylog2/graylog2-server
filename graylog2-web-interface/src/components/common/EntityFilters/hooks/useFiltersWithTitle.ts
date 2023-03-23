@@ -5,10 +5,6 @@ import fetch from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import useUserDateTime from 'hooks/useUserDateTime';
-import {
-  extractRangeFromString,
-  timeRangeTitle,
-} from 'components/common/EntityFilters/FilterConfiguration/DateRangeForm';
 import type { UrlQueryFilters, Filters } from 'components/common/EntityFilters/types';
 import type { Attributes, Attribute } from 'stores/PaginationTypes';
 import type { DateTime } from 'util/DateTime';
@@ -16,7 +12,8 @@ import {
   isDateAttribute,
   isAttributeWithFilterOptions,
   isAttributeWithRelatedCollection,
-} from 'components/common/EntityFilters/AttributeIdentification';
+} from 'components/common/EntityFilters/helpers/AttributeIdentification';
+import { timeRangeTitle, extractRangeFromString } from 'components/common/EntityFilters/helpers/timeRange';
 
 type CollectionsByAttributeId = {
   [attributeId: string]: string | undefined
@@ -145,7 +142,7 @@ const fetchFilterTitles = (payload: { entities: Array<{ id: string, type: string
 const useFiltersWithTitle = (
   urlQueryFilters: UrlQueryFilters,
   attributesMetaData: Attributes,
-  enabled: boolean,
+  enabled: boolean = true,
 ): {
   data: Filters
   onChange: (newFiltersWithTitle: Filters, newUrlQueryFilters: UrlQueryFilters) => void
@@ -155,7 +152,6 @@ const useFiltersWithTitle = (
   const collectionsByAttributeId = _collectionsByAttributeId(attributesMetaData);
   const urlQueryFiltersWithoutTitle = _urlQueryFiltersWithoutTitle(urlQueryFilters, collectionsByAttributeId);
   const payload = filtersWithoutTitlePayload(urlQueryFiltersWithoutTitle, collectionsByAttributeId);
-
   const { data } = useQuery(
     ['entity_titles', payload],
     () => fetchFilterTitles(payload),
@@ -165,7 +161,7 @@ const useFiltersWithTitle = (
           'Could not load streams');
       },
       keepPreviousData: true,
-      enabled,
+      enabled: enabled && !!payload.entities.length,
     },
   );
 
