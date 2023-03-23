@@ -41,7 +41,7 @@ const FilterCreation = styled.div`
 type Props = {
   attributes: Attributes,
 
-  urlQueryFilters: UrlQueryFilters,
+  urlQueryFilters: UrlQueryFilters | undefined,
   setUrlQueryFilters: (urlQueryFilters: UrlQueryFilters) => void,
   filterValueRenderers?: { [attributeId: string]: (value: Filter['value'], title: string) => React.ReactNode };
 }
@@ -75,9 +75,9 @@ const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters,
 
   const onCreateFilter = (attributeId, filter: Filter) => {
     onChangeFilters({
-      ...activeFilters,
+      ...(activeFilters ?? {}),
       [attributeId]: [
-        ...(activeFilters[attributeId] ?? []),
+        ...(activeFilters?.[attributeId] ?? []),
         filter,
       ],
     });

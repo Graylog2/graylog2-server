@@ -35,13 +35,13 @@ const AttributeSelect = ({
   activeFilters,
 }: {
   attributes: Attributes,
-  activeFilters: Filters,
+  activeFilters: Filters | undefined,
   setSelectedAttributeId: React.Dispatch<React.SetStateAction<string>>
 }) => (
   <>
     <MenuItem header>Create Filter</MenuItem>
     {attributes.map(({ id, title, type }) => {
-      const hasActiveFilter = !!activeFilters[id]?.length;
+      const hasActiveFilter = !!activeFilters?.[id]?.length;
       const disabled = type === 'BOOLEAN' ? hasActiveFilter : false;
 
       return (
@@ -63,7 +63,7 @@ const AttributeSelect = ({
 
 type Props = {
   filterableAttributes: Attributes,
-  activeFilters: Filters,
+  activeFilters: Filters | undefined,
   onCreateFilter: (attributeId: string, filter: Filter) => void,
   filterValueRenderers: { [attributeId: string]: (value: Filter['value'], title: string) => React.ReactNode } | undefined;
 }
