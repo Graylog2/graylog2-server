@@ -33,6 +33,8 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.net.URI;
+import java.util.AbstractMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -112,9 +114,18 @@ public class NodeServiceImplTest {
 
         final Node node = nodeService.byNodeId(nodeId);
 
-        Assertions.assertThat(node.isLeader()).isFalse();
-        Assertions.assertThat(node.getTransportAddress()).isEqualTo("http://10.0.0.1:12901");
-        Assertions.assertThat(node.getLastSeen()).isNotNull().isInstanceOf(DateTime.class);
+        assertThat(node.isLeader()).isFalse();
+        assertThat(node.getTransportAddress()).isEqualTo("http://10.0.0.1:12901");
+        assertThat(node.getLastSeen()).isNotNull().isInstanceOf(DateTime.class);
+    }
 
+    @Test
+    public void testAllActive() throws NodeNotFoundException {
+        assertThat(nodeService.allActive().keySet()).isEmpty();
+        nodeService.registerServer(nodeId.getNodeId(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME);
+        assertThat(nodeService.allActive().keySet()).containsExactly(nodeId.getNodeId());
+
+        nodeService.markAsAlive(nodeId, false, TRANSPORT_URI);
+        assertThat(nodeService.allActive().keySet()).containsExactly(nodeId.getNodeId());
     }
 }
