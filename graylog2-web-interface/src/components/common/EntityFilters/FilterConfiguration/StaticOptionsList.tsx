@@ -18,25 +18,21 @@ import React from 'react';
 
 import type { Attribute } from 'stores/PaginationTypes';
 import MenuItem from 'components/bootstrap/MenuItem';
-import generateId from 'logic/generateId';
-import type { Filter } from 'components/common/EntityFilters/types';
 
 type Props = {
   attribute: Attribute,
   filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined,
-  onSubmit: (filter: Filter) => void,
+  onSubmit: (filter: { title: string, value: string }) => void,
 }
 
-const StaticOptionsList = ({ attribute, filterValueRenderer, onSubmit }: Props) => {
-  return (
-    <>
-      {attribute.filter_options.map(({ title, value }) => (
-        <MenuItem onSelect={() => onSubmit({ value, title, id: generateId() })} key={`filter-value-${title}`}>
-          {filterValueRenderer ? filterValueRenderer(value, title) : title}
-        </MenuItem>
-      ))}
-    </>
-  );
-};
+const StaticOptionsList = ({ attribute, filterValueRenderer, onSubmit }: Props) => (
+  <>
+    {attribute.filter_options.map(({ title, value }) => (
+      <MenuItem onSelect={() => onSubmit({ value, title })} key={`filter-value-${title}`}>
+        {filterValueRenderer ? filterValueRenderer(value, title) : title}
+      </MenuItem>
+    ))}
+  </>
+);
 
 export default StaticOptionsList;
