@@ -45,7 +45,9 @@ type ConfigurationSectionProps = {
 
 const ConfigurationSection = ({ ConfigurationComponent, title } : ConfigurationSectionProps) => (
   <ConfigletContainer title={title}>
-    <ConfigurationComponent />
+    <Col md={6}>
+      <ConfigurationComponent />
+    </Col>
   </ConfigletContainer>
 );
 
@@ -159,26 +161,24 @@ const ConfigurationsPage = () => {
       </PageHeader>
 
       <ConfigletRow className="content">
-        <>
-          <Col md={2}>
-            <Nav bsStyle="pills" stacked activeKey={activeSectionKey} onSelect={handleNavSelect}>
-              {configurationSections.map(({ hide, name }, index) => (
-                !hide && (
-                  <NavItem key={`nav-${name}`} eventKey={index + 1} title={name}>
-                    {name}
-                  </NavItem>
-                )
-              ))}
-            </Nav>
-          </Col>
+        <Col md={2}>
+          <Nav bsStyle="pills" stacked activeKey={activeSectionKey} onSelect={handleNavSelect}>
+            {configurationSections.map(({ hide, name }, index) => (
+              !hide && (
+              <NavItem key={`nav-${name}`} eventKey={index + 1} title={name}>
+                {name}
+              </NavItem>
+              )
+            ))}
+          </Nav>
+        </Col>
 
-          <Col md={10}>
-            {configurationSections.map(({ name, hide, props, SectionComponent }) => (
-              isSectionActive(name) && !hide && (
+        <Col md={10}>
+          {configurationSections.map(({ name, hide, props, SectionComponent }) => (
+            isSectionActive(name) && !hide && (
               <SectionComponent {...props} key={name} />
-              )))}
-          </Col>
-        </>
+            )))}
+        </Col>
       </ConfigletRow>
     </DocumentTitle>
   );

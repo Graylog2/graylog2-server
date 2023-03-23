@@ -78,7 +78,6 @@ const PluginsConfig = () => {
   if (!isLoaded || !pluginSystemConfigs) { return <Spinner />; }
 
   return (
-
     <Row>
       <Col md={3}>
         <Nav bsStyle="pills"
@@ -96,7 +95,7 @@ const PluginsConfig = () => {
           })}
         </Nav>
       </Col>
-      <Col md={9}>
+      <Col md={6}>
         {pluginSystemConfigs
           .map(({ component: SystemConfigComponent, configType }, index) => (
             (index + 1 === activeSectionKey) && (

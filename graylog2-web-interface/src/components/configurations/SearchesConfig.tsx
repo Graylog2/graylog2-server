@@ -26,6 +26,7 @@ import { ConfigurationType } from 'components/configurations/ConfigurationTypes'
 import { Button, Row, Col, BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted, ISODurationInput } from 'components/common';
 import Spinner from 'components/common/Spinner';
+import type { SearchConfig } from 'components/search';
 
 import 'moment-duration-format';
 
@@ -48,19 +49,11 @@ const splitStringList = (stringList) => {
   return stringList.split(',').map((f) => f.trim()).filter((f) => f.length > 0);
 };
 
-type Config = {
-  query_time_range_limit: string,
-  relative_timerange_options: object,
-  surrounding_timerange_options: object,
-  surrounding_filter_fields: Array<String>,
-  analysis_disabled_fields: Array<String>,
-}
-
 const SearchesConfig = () => {
   const isLimitEnabled = (config) => moment.duration(config?.query_time_range_limit).asMilliseconds() > 0;
   const [showConfigModal, setShowConfigModal] = useState(false);
-  const [viewConfig, setViewConfig] = useState<Config | undefined>(undefined);
-  const [formConfig, setFormConfig] = useState<Config | undefined>(undefined);
+  const [viewConfig, setViewConfig] = useState<SearchConfig | undefined>(undefined);
+  const [formConfig, setFormConfig] = useState<SearchConfig | undefined>(undefined);
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
   const [relativeTimeRangeOptionsUpdate, setRelativeTimeRangeOptionsUpdate] = useState(undefined);
   const [surroundingTimeRangeOptionsUpdate, setSurroundingTimeRangeOptionsUpdate] = useState(undefined);
@@ -199,25 +192,27 @@ const SearchesConfig = () => {
         <Col md={6}>
           <strong>Relative time range options</strong>
           <TimeRangeOptionsSummary options={viewConfig.relative_timerange_options} />
-        </Col>
-        <Col md={6}>
           <strong>Surrounding time range options</strong>
           <TimeRangeOptionsSummary options={viewConfig.surrounding_timerange_options} />
         </Col>
         <Col md={6}>
-
-          <strong>Surrounding search filter fields</strong>
-          <ul>
-            {viewConfig.surrounding_filter_fields && viewConfig.surrounding_filter_fields.map((f: string) => <li key={f}>{f}</li>)}
-          </ul>
-
-          <strong>UI analysis disabled for fields</strong>
-          <ul>
-            {viewConfig.analysis_disabled_fields && (viewConfig.analysis_disabled_fields.map((f: string) => <li key={f}>{f}</li>))}
-          </ul>
-
+          <Row style={{ marginBottom: 20 }}>
+            <Col>
+              <strong>Surrounding search filter fields</strong>
+              <ul>
+                {viewConfig.surrounding_filter_fields && viewConfig.surrounding_filter_fields.map((f: string) => <li key={f}>{f}</li>)}
+              </ul>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <strong>UI analysis disabled for fields</strong>
+              <ul>
+                {viewConfig.analysis_disabled_fields && (viewConfig.analysis_disabled_fields.map((f: string) => <li key={f}>{f}</li>))}
+              </ul>
+            </Col>
+          </Row>
         </Col>
-
       </Row>
       <IfPermitted permissions="clusterconfigentry:edit">
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>Edit configuration</Button>
