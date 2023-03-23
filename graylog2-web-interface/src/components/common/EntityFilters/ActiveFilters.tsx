@@ -20,15 +20,12 @@ import styled from 'styled-components';
 import type { Filters, Filter } from 'components/common/EntityFilters/types';
 import type { Attributes } from 'stores/PaginationTypes';
 import ActiveFilter from 'components/common/EntityFilters/ActiveFilter';
-
-const Container = styled.div`
-  display: flex;
-  margin-left: 10px;
-  align-items: center;
-`;
+import { ROW_MIN_HEIGHT } from 'components/common/EntityFilters/Constants';
 
 const FilterGroup = styled.div`
-  display: flex;
+  display: inline-flex;
+  align-items: center;
+  min-height: ${ROW_MIN_HEIGHT}px;
 `;
 
 const FilterGroupTitle = styled.div`
@@ -44,7 +41,7 @@ type Props = {
 }
 
 const ActiveFilters = ({ attributes = [], filters, filterValueRenderers, onDeleteFilter, onChangeFilter }: Props) => (
-  <Container>
+  <>
     {Object.entries(filters).map(([attributeId, filterValues]) => {
       const attribute = attributes.find(({ id }) => id === attributeId);
 
@@ -55,6 +52,7 @@ const ActiveFilters = ({ attributes = [], filters, filterValueRenderers, onDelet
           </FilterGroupTitle>
           {filterValues.map((filter) => (
             <ActiveFilter filter={filter}
+                          allActiveFilters={filters}
                           key={filter.id}
                           attribute={attribute}
                           filterValueRenderer={filterValueRenderers?.[attributeId]}
@@ -65,7 +63,7 @@ const ActiveFilters = ({ attributes = [], filters, filterValueRenderers, onDelet
       );
     })}
 
-  </Container>
+  </>
 );
 
 export default ActiveFilters;

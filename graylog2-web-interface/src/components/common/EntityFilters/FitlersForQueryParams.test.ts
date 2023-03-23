@@ -14,14 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { createBrowserHistory } from 'history';
+import FiltersForQueryParams from './FiltersForQueryParams';
 
-declare global {
-  interface Window { graylogHistory: ReturnType<typeof createBrowserHistory>; }
-}
+const exampleFilters = {
+  index_set_id: [
+    {
+      value: 'index-set-1',
+      title: 'Default index set',
+      id: 'filter-id-1',
+    },
+    {
+      value: 'index-set-2',
+      title: 'Example index set',
+      id: 'filter-id-2',
+    },
+  ],
+};
 
-if (!window.graylogHistory) {
-  window.graylogHistory = createBrowserHistory();
-}
+describe('FiltersForQueryParams', () => {
+  it('should transform multiple filters', () => {
+    const result = FiltersForQueryParams(exampleFilters);
 
-export default window.graylogHistory;
+    expect(result).toEqual(['index_set_id:index-set-1', 'index_set_id:index-set-2']);
+  });
+});

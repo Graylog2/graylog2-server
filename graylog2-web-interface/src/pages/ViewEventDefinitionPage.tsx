@@ -26,17 +26,18 @@ import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/common';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
-import history from 'util/History';
 import EventDefinitionSummary from 'components/event-definitions/event-definition-form/EventDefinitionSummary';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
+import useHistory from 'routing/useHistory';
 
 const ViewEventDefinitionPage = () => {
   const params = useParams<{definitionId?: string}>();
   const currentUser = useCurrentUser();
   const [eventDefinition, setEventDefinition] = useState<{ title: string } | undefined>();
   const { all: notifications } = useStore(EventNotificationsStore);
+  const history = useHistory();
 
   useEffect(() => {
     if (currentUser && isPermitted(currentUser.permissions, `eventdefinitions:read:${params.definitionId}`)) {
@@ -60,7 +61,7 @@ const ViewEventDefinitionPage = () => {
 
       EventNotificationsActions.listAll();
     }
-  }, [currentUser, params]);
+  }, [currentUser, history, params]);
 
   if (!eventDefinition || !notifications) {
     return (

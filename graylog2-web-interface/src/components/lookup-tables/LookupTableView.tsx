@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import Routes from 'routing/Routes';
 import { ButtonToolbar, Row, Col, Button, Input } from 'components/bootstrap';
@@ -34,14 +34,14 @@ type InputType = { value: string, valid: boolean };
 const INIT_INPUT = { value: '', valid: false };
 
 const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
   const [purgeKey, setPurgeKey] = React.useState<InputType>(INIT_INPUT);
   const [lookupKey, setLookupKey] = React.useState<InputType>(INIT_INPUT);
   const [lookupResult, setLookupResult] = React.useState<any>(null);
 
   const handleEdit = (tableName: string) => () => {
-    history.push(Routes.SYSTEM.LOOKUPTABLES.edit(tableName));
+    navigate(Routes.SYSTEM.LOOKUPTABLES.edit(tableName));
   };
 
   const handleInputOnChange = (event: React.BaseSyntheticEvent) => {

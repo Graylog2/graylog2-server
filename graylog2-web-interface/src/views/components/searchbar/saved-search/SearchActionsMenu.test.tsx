@@ -30,7 +30,6 @@ import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type { NewViewLoaderContextType } from 'views/logic/NewViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import * as ViewsPermissions from 'views/Permissions';
-import history from 'util/History';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
@@ -40,11 +39,13 @@ import useIsDirty from 'views/hooks/useIsDirty';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import useIsNew from 'views/hooks/useIsNew';
+import useHistory from 'routing/useHistory';
+import mockHistory from 'helpers/mocking/mockHistory';
 
 import SearchActionsMenu from './SearchActionsMenu';
 
 jest.mock('views/hooks/useSaveViewFormControls');
-jest.mock('util/History');
+jest.mock('routing/useHistory');
 jest.mock('hooks/useCurrentUser');
 
 jest.mock('bson-objectid', () => jest.fn(() => ({
@@ -122,6 +123,13 @@ describe('SearchActionsMenu', () => {
   afterAll(unloadViewsPlugin);
 
   describe('Button handling', () => {
+    let history;
+
+    beforeEach(() => {
+      history = mockHistory();
+      asMock(useHistory).mockReturnValue(history);
+    });
+
     const findTitleInput = () => screen.getByRole('textbox', { name: /title/i });
 
     it('should export current search as dashboard', async () => {
@@ -134,12 +142,9 @@ describe('SearchActionsMenu', () => {
       render(<SimpleSearchActionsMenu />);
       const exportAsDashboardMenuItem = await screen.findByText('Export to dashboard');
       userEvent.click(exportAsDashboardMenuItem);
-      await waitFor(() => expect(history.push).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(history.pushWithState).toHaveBeenCalledTimes(1));
 
-      expect(history.push).toHaveBeenCalledWith({
-        pathname: '/dashboards/new',
-        state: { view: defaultView },
-      });
+      expect(history.pushWithState).toHaveBeenCalledWith('/dashboards/new', { view: defaultView });
     });
 
     it('should not allow exporting search as dashboard if user does not have required permissions', async () => {

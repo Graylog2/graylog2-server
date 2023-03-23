@@ -62,7 +62,9 @@ class BackendStartupIT {
 
         assertThat(pluginNames).containsAnyOf(
                 "Elasticsearch 6 Support",
-                "Elasticsearch 7 Support");
+                "Elasticsearch 7 Support",
+                "Threat Intelligence Plugin"
+        );
     }
 
     @ContainerMatrixTest

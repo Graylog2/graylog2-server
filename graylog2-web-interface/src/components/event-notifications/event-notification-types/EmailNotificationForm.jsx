@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 
-import { MultiSelect, SourceCodeEditor, TimezoneSelect } from 'components/common';
+import { IfPermitted, MultiSelect, SourceCodeEditor, TimezoneSelect } from 'components/common';
 import UsersSelectField from 'components/users/UsersSelectField';
 import { ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
@@ -163,16 +163,19 @@ class EmailNotificationForm extends React.Component {
                  value={config.sender || ''}
                  onChange={this.handleChange} />
         </HideOnCloud>
-        <FormGroup controlId="notification-user-recipients"
-                   validationState={validation.errors.recipients ? 'error' : null}>
-          <ControlLabel>User recipient(s) <small className="text-muted">(Optional)</small></ControlLabel>
-          <UsersSelectField id="notification-user-recipients"
-                            value={Array.isArray(config.user_recipients) ? config.user_recipients.join(',') : ''}
-                            onChange={this.handleRecipientsChange('user_recipients')} />
-          <HelpBlock>
-            {get(validation, 'errors.recipients[0]', 'Select Graylog users that will receive this Notification.')}
-          </HelpBlock>
-        </FormGroup>
+
+        <IfPermitted permissions="users:list">
+          <FormGroup controlId="notification-user-recipients"
+                     validationState={validation.errors.recipients ? 'error' : null}>
+            <ControlLabel>User recipient(s) <small className="text-muted">(Optional)</small></ControlLabel>
+            <UsersSelectField id="notification-user-recipients"
+                              value={Array.isArray(config.user_recipients) ? config.user_recipients.join(',') : ''}
+                              onChange={this.handleRecipientsChange('user_recipients')} />
+            <HelpBlock>
+              {get(validation, 'errors.recipients[0]', 'Select Graylog users that will receive this Notification.')}
+            </HelpBlock>
+          </FormGroup>
+        </IfPermitted>
 
         <FormGroup controlId="notification-email-recipients"
                    validationState={validation.errors.recipients ? 'error' : null}>
