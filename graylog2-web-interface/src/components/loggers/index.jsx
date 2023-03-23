@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+/* eslint-disable import/no-cycle */
 export { default as LoggerOverview } from './LoggerOverview';
 export { default as LoggingSubsystem } from './LoggingSubsystem';
 export { default as LogLevelDropdown } from './LogLevelDropdown';
