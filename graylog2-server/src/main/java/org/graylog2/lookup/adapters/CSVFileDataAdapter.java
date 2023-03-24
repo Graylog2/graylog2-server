@@ -255,7 +255,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
     public LookupResult getResultForCIDRRange(Object ip) {
         try {
-            // Convert directly to InetAddress to avoid long timeouts when using name service lookups for bad IPs
+            // Convert directly to InetAddress to avoid long timeouts using name service lookups
             InetAddress address = InetAddresses.forString(String.valueOf(ip));
             for (Map.Entry<String, String> entry : lookupRef.get().entrySet()) {
                 String range = entry.getKey();
