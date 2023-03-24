@@ -85,6 +85,7 @@ const filterTitle = (
   requestedFilterTitles,
   filterValue: string,
   formatTime: (dateTime: DateTime) => string,
+  notPermittedEntities: Array<string> | undefined,
 ) => {
   if (isDateAttribute(attribute)) {
     const [from, until] = extractRangeFromString(filterValue);
@@ -102,6 +103,10 @@ const filterTitle = (
   }
 
   if (isAttributeWithRelatedCollection(attribute)) {
+    if (notPermittedEntities?.includes(filterValue)) {
+      return filterValue;
+    }
+
     const fetchedTitle = requestedFilterTitles?.find(({ id, type }) => (type === attribute.related_collection && id === filterValue))?.title;
 
     return fetchedTitle ?? 'Loading...';
@@ -115,14 +120,14 @@ const _allFiltersWithTitle = (
   requestedFilterTitles: RequestedFilterTitles,
   attributesMetaData: Attributes,
   formatTime: (dateTime: DateTime) => string,
+  notPermittedEntities: Array<string> | undefined,
 ): Filters => (
   urlQueryFilters.entrySeq().reduce((col, [attributeId, filterValues]) => {
     const relatedAttribute = attributesMetaData?.find(({ id }) => id === attributeId);
-    const filtersWithTitle = filterValues.map((value) => {
-      const title = filterTitle(relatedAttribute, requestedFilterTitles, value, formatTime);
+    const filtersWithTitle: Array<Filter> = filterValues.map((value) => {
+      const title = filterTitle(relatedAttribute, requestedFilterTitles, value, formatTime, notPermittedEntities);
 
       return ({
-        id: value,
         title,
         value,
       });
@@ -178,7 +183,7 @@ const useFiltersWithTitle = (
 
   const cachedResponse = queryClient.getQueryData(['entity_titles', payload]);
   const requestedFilterTitles = (cachedResponse ?? data)?.entities;
-  const allFiltersWithTitle = _allFiltersWithTitle(urlQueryFilters, requestedFilterTitles, attributesMetaData, formatTime);
+  const allFiltersWithTitle = _allFiltersWithTitle(urlQueryFilters, requestedFilterTitles, attributesMetaData, formatTime, data?.not_permitted_to_view);
 
   const onChange = useCallback((newFiltersWithTitle: Filters, newUrlQueryFilters: UrlQueryFilters) => {
     const newURLQueryFiltersWithoutTitle = _urlQueryFiltersWithoutTitle(newUrlQueryFilters, collectionsByAttributeId);

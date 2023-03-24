@@ -33,7 +33,7 @@ jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve({
 
 describe('useFiltersWithTitle', () => {
   const urlQueryFilters = OrderedMap({
-    index_set_id: ['index_set_id_1'],
+    index_set_id: ['index_set_id_1', 'index_set_id_2'],
     created_at: ['2023-03-23T13:42:50.733+00:00><'],
     disabled: ['false'],
   });
@@ -45,35 +45,33 @@ describe('useFiltersWithTitle', () => {
   );
 
   it('fetches titles only for filters related to attributes which have a related collection', async () => {
-    const { waitFor } = renderHook(() => useFiltersWithTitle(urlQueryFilters, attributes), { wrapper });
+    const { waitFor, result } = renderHook(() => useFiltersWithTitle(urlQueryFilters, attributes), { wrapper });
 
     await waitFor(() => expect(fetch).toHaveBeenCalledWith(
       'POST',
       'http://localhost/system/catalog/entity_titles',
-      { entities: [{ id: 'index_set_id_1', type: 'index_sets' }] },
+      { entities: [{ id: 'index_set_id_1', type: 'index_sets' }, { id: 'index_set_id_2', type: 'index_sets' }] },
     ));
+
+    await waitFor(() => expect(result.current.data).not.toBe(null));
   });
 
   it('generates correct filter names for all attribute types', async () => {
-    asMock(fetch).mockReturnValue(Promise.resolve({ entities: [{ id: 'index_set_id_1', type: 'index_sets' }] }));
+    asMock(fetch).mockReturnValue(Promise.resolve({ entities: [{ id: 'index_set_id_1', type: 'index_sets', title: 'Index set 1' }], not_permitted_to_view: ['index_set_id_2'] }));
     const { waitFor, result } = renderHook(() => useFiltersWithTitle(urlQueryFilters, attributes), { wrapper });
 
     await waitFor(() => expect(result.current.data).toEqual(OrderedMap({
       index_set_id: [
-        {
-          id: 'index_set_id_1',
-          title: 'Loading...',
-          value: 'index_set_id_1',
-        },
+        { title: 'Index set 1', value: 'index_set_id_1' },
+        { title: 'index_set_id_2', value: 'index_set_id_2' },
       ],
       created_at: [
         {
-          id: '2023-03-23T13:42:50.733+00:00><',
           title: '2023-03-23 14:42:50 - Now',
           value: '2023-03-23T13:42:50.733+00:00><',
         },
       ],
-      disabled: [{ id: 'false', title: 'Running', value: 'false' }],
+      disabled: [{ title: 'Running', value: 'false' }],
     })));
   });
 });
