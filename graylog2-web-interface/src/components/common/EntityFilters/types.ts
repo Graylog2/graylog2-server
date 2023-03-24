@@ -15,14 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-type FilterBase = {
-  id: string,
-  title: string
-}
+export type Filter = {
+  value: string,
+  title: string,
 
-export type BooleanFilter = FilterBase & { value: 'true' | 'false' }
-export type ValueFilter = FilterBase & { value: string };
-export type Filter = BooleanFilter | ValueFilter;
+}
 
 export type Filters = {
   [attributeId: string]: Array<Filter>

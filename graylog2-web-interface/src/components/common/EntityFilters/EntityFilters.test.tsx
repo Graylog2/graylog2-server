@@ -38,10 +38,9 @@ jest.mock('components/common/EntityFilters/hooks/useFiltersWithTitle');
 describe('<EntityFilters />', () => {
   const onChangeFiltersWithTitle = jest.fn();
   const attributes = [
-    { id: 'title', title: 'Title', sortable: true },
-    { id: 'description', title: 'Description', sortable: true },
+    { title: 'Title', sortable: true },
+    { title: 'Description', sortable: true },
     {
-      id: 'disabled',
       title: 'Status',
       type: 'BOOLEAN',
       filterable: true,
@@ -52,14 +51,12 @@ describe('<EntityFilters />', () => {
     },
     {
       filterable: true,
-      id: 'index_set_id',
       related_collection: 'index_sets',
       title: 'Index set',
       type: 'STRING',
     },
     {
       filterable: true,
-      id: 'created_at',
       title: 'Created at',
       type: 'DATE',
     },
@@ -114,7 +111,7 @@ describe('<EntityFilters />', () => {
       const setUrlQueryFilters = jest.fn();
 
       asMock(useFiltersWithTitle).mockReturnValue({
-        data: { disabled: [{ id: 'filter-id', title: 'Running', value: 'false' }] },
+        data: { disabled: [{ title: 'Running', value: 'false' }] },
         onChange: onChangeFiltersWithTitle,
       });
 
@@ -177,7 +174,7 @@ describe('<EntityFilters />', () => {
       }));
 
       await waitFor(() => expect(onChangeFiltersWithTitle).toHaveBeenCalledWith(
-        { index_set_id: [{ id: 'filter-id', title: 'Default index set', value: 'index-set-1' }] },
+        { index_set_id: [{ title: 'Default index set', value: 'index-set-1' }] },
         { index_set_id: ['index-set-1'] },
       ));
 
@@ -190,7 +187,7 @@ describe('<EntityFilters />', () => {
       asMock(useFiltersWithTitle).mockReturnValue({
         data: {
           index_set_id: [
-            { id: 'filter-id', title: 'Default index set', value: 'index-set-1' },
+            { title: 'Default index set', value: 'index-set-1' },
           ],
         },
         onChange: onChangeFiltersWithTitle,
@@ -215,7 +212,7 @@ describe('<EntityFilters />', () => {
       }));
 
       await waitFor(() => expect(onChangeFiltersWithTitle).toHaveBeenCalledWith(
-        { index_set_id: [{ id: 'filter-id', title: 'Example index set', value: 'index-set-2' }] },
+        { index_set_id: [{ title: 'Example index set', value: 'index-set-2' }] },
         { index_set_id: ['index-set-2'] },
       ));
 
@@ -250,7 +247,6 @@ describe('<EntityFilters />', () => {
       await waitFor(() => expect(onChangeFiltersWithTitle).toHaveBeenCalledWith(
         {
           created_at: [{
-            id: 'filter-id',
             title: '2020-01-01 00:55:00.000 - Now',
             value: '2019-12-31T23:55:00.000+00:00><',
           }],
@@ -267,7 +263,6 @@ describe('<EntityFilters />', () => {
       asMock(useFiltersWithTitle).mockReturnValue({
         data: {
           created_at: [{
-            id: 'filter-id',
             title: '2020-01-01 00:55:00 - Now',
             value: '2019-12-31T23:55:00.001+00:00',
           }],
@@ -316,7 +311,7 @@ describe('<EntityFilters />', () => {
 
     asMock(useFiltersWithTitle).mockReturnValue({
       data: {
-        disabled: [{ id: 'filter-id', title: 'Running', value: 'false' }],
+        disabled: [{ title: 'Running', value: 'false' }],
       },
       onChange: onChangeFiltersWithTitle,
     });

@@ -26,7 +26,7 @@ import { Checkbox } from 'components/bootstrap';
 import { isValidDate, toUTCFromTz, adjustFormat } from 'util/DateTime';
 import { DATE_SEPARATOR, extractRangeFromString, timeRangeTitle } from 'components/common/EntityFilters/helpers/timeRange';
 
-import type { ValueFilter } from '../types';
+import type { Filter } from '../types';
 
 type FormValues = {
   from: string | undefined,
@@ -113,7 +113,7 @@ const DateConfiguration = ({ name: fieldName, label, checkboxLabel }: {
   );
 };
 
-const useInitialValues = (filter: ValueFilter | undefined) => {
+const useInitialValues = (filter: Filter | undefined) => {
   const { formatTime } = useUserDateTime();
 
   if (filter) {
@@ -161,7 +161,7 @@ const validate = (values: FormValues) => {
 
 type Props = {
   onSubmit: (filter: { title: string, value: string }) => void,
-  filter: ValueFilter | undefined,
+  filter: Filter | undefined,
 }
 
 const DateRangeForm = ({ filter, onSubmit }: Props) => {
