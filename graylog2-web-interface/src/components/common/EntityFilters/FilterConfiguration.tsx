@@ -19,39 +19,48 @@ import * as React from 'react';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { Filters, Filter } from 'components/common/EntityFilters/types';
 import MenuItem from 'components/bootstrap/MenuItem';
-import StaticOptionsList from 'components/common/EntityFilters/configuration/StaticOptionsList';
-import SuggestionsList from 'components/common/EntityFilters/configuration/SuggestionsList';
+import StaticOptionsList from 'components/common/EntityFilters/FilterConfiguration/StaticOptionsList';
+import SuggestionsList from 'components/common/EntityFilters/FilterConfiguration/SuggestionsList';
+import DateRangeForm from 'components/common/EntityFilters/FilterConfiguration/DateRangeForm';
 
 type Props = {
   attribute: Attribute,
+  filter?: Filter,
   filterValueRenderer: (value: Filter['value'], title: string) => React.ReactNode | undefined,
-  onSubmit: (filter: Filter, closeDropdown?: boolean) => void,
+  onSubmit: (filter: { title: string, value: string }, closeDropdown?: boolean) => void,
   allActiveFilters: Filters | undefined,
-  scenario: 'create' | 'edit'
 }
 
 export const FilterConfiguration = ({
-  attribute,
-  onSubmit,
-  filterValueRenderer,
   allActiveFilters,
-  scenario,
+  attribute,
+  filter,
+  filterValueRenderer,
+  onSubmit,
 }: Props) => (
   <>
-    <MenuItem header>{scenario === 'create' ? 'Create' : 'Edit'} {attribute.title.toLowerCase()} filter</MenuItem>
+    <MenuItem header>{filter ? 'Edit' : 'Create'} {attribute.title.toLowerCase()} filter</MenuItem>
     {attribute.filter_options && (
       <StaticOptionsList attribute={attribute}
                          filterValueRenderer={filterValueRenderer}
                          onSubmit={onSubmit} />
     )}
-    {!attribute.filter_options?.length && (
+    {(!attribute.filter_options?.length && attribute.type !== 'DATE') && (
       <SuggestionsList attribute={attribute}
                        filterValueRenderer={filterValueRenderer}
                        onSubmit={onSubmit}
                        allActiveFilters={allActiveFilters}
-                       scenario={scenario} />
+                       filter={filter} />
+    )}
+    {attribute.type === 'DATE' && (
+      <DateRangeForm onSubmit={onSubmit}
+                     filter={filter} />
     )}
   </>
 );
+
+FilterConfiguration.defaultProps = {
+  filter: undefined,
+};
 
 export default FilterConfiguration;
