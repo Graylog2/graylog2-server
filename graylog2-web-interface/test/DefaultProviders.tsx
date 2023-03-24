@@ -17,8 +17,6 @@
 import * as React from 'react';
 import { ThemeProvider } from 'styled-components';
 import { defaultTimezone, defaultUser } from 'defaultMockValues';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
-import { QueryParamProvider } from 'use-query-params';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import UserDateTimeProvider from 'contexts/UserDateTimeProvider';
