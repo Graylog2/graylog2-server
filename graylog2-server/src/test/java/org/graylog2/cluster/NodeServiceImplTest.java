@@ -38,6 +38,7 @@ import java.net.URI;
 import java.time.Duration;
 import java.util.AbstractMap;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -139,7 +140,7 @@ public class NodeServiceImplTest {
     public void testLastSeenBackwardsCompatibility() throws NodeNotFoundException, ValidationException {
         nodeService.registerServer(nodeId.getNodeId(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME);
         final Node node = nodeService.byNodeId(nodeId);
-        final Calendar cal = Calendar.getInstance();
+        final Calendar cal = Calendar.getInstance(Locale.ROOT);
 
         cal.add(Calendar.MILLISECOND, -2 * STALE_LEADER_TIMEOUT_MS);
         final int ts = (int) (cal.getTime().getTime() / 1000);
