@@ -62,7 +62,7 @@ type Props = {
 
 const StreamsOverview = ({ indexSets }: Props) => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
-  const [urlQuerySearch, setUrlQuerySearch] = useQueryParam('query', StringParam);
+  const [query, setQuery] = useQueryParam('query', StringParam);
   const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
     defaultPageSize: DEFAULT_LAYOUT.pageSize,
@@ -72,7 +72,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
   const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
   const { data: paginatedStreams, isInitialLoading: isLoadingStreams, refetch: refetchStreams } = useStreams({
-    query: urlQuerySearch,
+    query: query,
     page: paginationQueryParameter.page,
     pageSize: layoutConfig.pageSize,
     sort: layoutConfig.sort,
@@ -88,7 +88,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
   } = useTableEventHandlers({
     paginationQueryParameter,
     updateTableLayout,
-    setQuery: setUrlQuerySearch,
+    setQuery,
   });
 
   const onChangeFilters = useCallback((newUrlQueryFilters: UrlQueryFilters) => {
@@ -117,7 +117,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
       <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
                     onReset={onSearchReset}
-                    query={urlQuerySearch}
+                    query={query}
                     queryHelpComponent={<QueryHelper entityName="stream" />}>
           <EntityFilters attributes={attributes}
                          urlQueryFilters={urlQueryFilters}
