@@ -16,13 +16,19 @@
  */
 import * as React from 'react';
 import { useContext } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import IconButton from 'components/common/IconButton';
 import { ButtonToolbar } from 'components/bootstrap';
 
 import type { EntityBase, ExpandedSectionRenderer } from './types';
 import ExpandedEntitiesSectionsContext from './contexts/ExpandedSectionsContext';
+
+const Container = styled.tr(({ theme }) => css`
+  &&&& {
+    background-color: ${theme.colors.global.contentBackground};
+  }
+`);
 
 const Header = styled.div`
   display: flex;
@@ -56,7 +62,7 @@ const ExpandedSections = <Entity extends EntityBase>({
   }
 
   return (
-    <tr>
+    <Container>
       <td colSpan={1000}>
         {Object.entries(expandedSectionsRenderer ?? {}).map(([sectionName, section]) => {
           if (!expandedEntitySections.includes(sectionName)) {
@@ -80,7 +86,7 @@ const ExpandedSections = <Entity extends EntityBase>({
           );
         })}
       </td>
-    </tr>
+    </Container>
   );
 };
 
