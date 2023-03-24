@@ -17,8 +17,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { MemoryRouter } from 'react-router-dom';
-import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
-import { QueryParamProvider } from 'use-query-params';
 
 import DefaultQueryClientProvider from './DefaultQueryClientProvider';
 import DefaultProviders from './DefaultProviders';
@@ -30,11 +28,9 @@ type Props = {
 const WrappingContainer = ({ children }: Props) => (
   <DefaultQueryClientProvider>
     <MemoryRouter>
-      <QueryParamProvider adapter={ReactRouter6Adapter}>
-        <DefaultProviders>
-          {children}
-        </DefaultProviders>
-      </QueryParamProvider>
+      <DefaultProviders>
+        {children}
+      </DefaultProviders>
     </MemoryRouter>
   </DefaultQueryClientProvider>
 );
