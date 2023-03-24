@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import FieldType from 'views/logic/fieldtypes/FieldType';
+import { createSearch } from 'fixtures/searches';
+import type { RootState } from 'views/types';
 
 import AddToTableActionHandler from './AddToTableActionHandler';
 
@@ -27,6 +29,9 @@ const actionArgs = {
   queryId: 'deadbeef',
   type: FieldType.create('string'),
 } as const;
+const view = createSearch({ queryId: 'query1' });
+const rootState = { view: { view } } as RootState;
+const getState = jest.fn(() => rootState);
 
 describe('AddToTableActionHandler.condition', () => {
   it('disables action if field is not present in message table', () => {
@@ -35,7 +40,7 @@ describe('AddToTableActionHandler.condition', () => {
       .build();
     const contexts = { widget };
 
-    const result = AddToTableActionHandler.isEnabled({ ...actionArgs, contexts });
+    const result = AddToTableActionHandler.isEnabled({ ...actionArgs, contexts }, getState);
 
     expect(result).toEqual(false);
   });
@@ -46,7 +51,7 @@ describe('AddToTableActionHandler.condition', () => {
       .build();
     const contexts = { widget };
 
-    const result = AddToTableActionHandler.isEnabled({ ...actionArgs, contexts });
+    const result = AddToTableActionHandler.isEnabled({ ...actionArgs, contexts }, getState);
 
     expect(result).toEqual(true);
   });
@@ -55,7 +60,7 @@ describe('AddToTableActionHandler.condition', () => {
     const widget = AggregationWidget.builder().build();
     const contexts = { widget };
 
-    const result = AddToTableActionHandler.isEnabled({ ...actionArgs, contexts });
+    const result = AddToTableActionHandler.isEnabled({ ...actionArgs, contexts }, getState);
 
     expect(result).toEqual(false);
   });

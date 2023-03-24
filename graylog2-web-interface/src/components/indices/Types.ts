@@ -41,13 +41,18 @@ export type MessageCountRotationStrategyConfig = {
 }
 export type TimeBasedRotationStrategyConfig = {
   type: string,
-  rotation_period: string,
-  max_rotation_period: string,
-  rotate_empty_index_set: boolean,
+  rotation_period?: string,
+  max_rotation_period?: string,
+  rotate_empty_index_set?: boolean,
+}
+export type TimeBasedSizeOptimizingRotationStrategyConfig = {
+  type: string,
+  index_lifetime_max?: string,
+  index_lifetime_min?: string,
 }
 export type RotationStrategyConfig = SizeBasedRotationStrategyConfig | MessageCountRotationStrategyConfig | TimeBasedRotationStrategyConfig;
 export type RetentionStrategyConfig = {
-  type: string,
+  type?: string,
   max_number_of_indices?: number,
   index_action?: string,
 }
@@ -66,7 +71,9 @@ export interface RotationProperties {
   max_rotation_period?: JsonSchemaStringPropertyType,
   type: JsonSchemaStringPropertyType,
   max_size?: JsonSchemaStringPropertyType,
-  rotate_empty_index_set: JsonSchemaBooleanPropertyType,
+  rotate_empty_index_set?: JsonSchemaBooleanPropertyType,
+  index_lifetime_max?: JsonSchemaBooleanPropertyType,
+  index_lifetime_min?: JsonSchemaBooleanPropertyType,
 }
 export interface RotationJsonSchema {
   type: string,
@@ -89,9 +96,9 @@ export interface RotationStrategy {
   json_schema: RotationJsonSchema,
 }
 export interface RetentionStrategy {
-  type: string,
-  default_config: RetentionStrategyConfig,
-  json_schema: RetentionJsonSchema,
+  type?: string,
+  default_config?: RetentionStrategyConfig,
+  json_schema?: RetentionJsonSchema,
 }
 export interface RetentionStrategyContext {
   max_index_retention_period?: string,
@@ -105,32 +112,38 @@ export interface RetentionStrategyResponse {
   strategies: Array<RetentionStrategy>,
   context: RetentionStrategyContext,
 }
-export const RetentionStrategiesContextPropType = PropTypes.shape({
+export const RetentionStrategiesContextPropType = PropTypes.exact({
   max_index_retention_period: PropTypes.string,
 });
 export const SizeBasedRotationStrategyConfigPropType = PropTypes.exact({
-  type: PropTypes.string.isRequired,
-  max_size: PropTypes.number.isRequired,
+  type: PropTypes.string,
+  max_size: PropTypes.number,
 });
 export const MessageCountRotationStrategyConfigPropType = PropTypes.exact({
-  type: PropTypes.string.isRequired,
-  max_docs_per_index: PropTypes.number.isRequired,
+  type: PropTypes.string,
+  max_docs_per_index: PropTypes.number,
 });
 export const TimeBasedRotationStrategyConfigPropType = PropTypes.exact({
-  type: PropTypes.string.isRequired,
-  rotation_period: PropTypes.string.isRequired,
+  type: PropTypes.string,
+  rotation_period: PropTypes.string,
   max_rotation_period: PropTypes.string,
   rotate_empty_index_set: PropTypes.bool,
 });
 
+export const TimeBasedSizePtimizingRotationStrategyConfigPropType = PropTypes.exact({
+  type: PropTypes.string,
+  index_lifetime_max: PropTypes.string,
+  index_lifetime_min: PropTypes.string,
+});
 export const RotationStrategyConfigPropType = PropTypes.oneOfType([
   SizeBasedRotationStrategyConfigPropType,
   MessageCountRotationStrategyConfigPropType,
   TimeBasedRotationStrategyConfigPropType,
+  TimeBasedSizePtimizingRotationStrategyConfigPropType,
 ]);
 
 export const IndexActionPropType = PropTypes.string;
-export const RetentionStrategyConfigPropType = PropTypes.exact({
+export const RetentionStrategyConfigPropType = PropTypes.shape({
   type: PropTypes.string.isRequired,
   max_number_of_indices: PropTypes.number,
   index_action: PropTypes.string,
@@ -150,9 +163,11 @@ export const RotationPropertiesPropType = PropTypes.exact({
   max_size: JsonSchemaStringPropertyTypePropType,
   max_docs_per_index: JsonSchemaStringPropertyTypePropType,
   rotate_empty_index_set: JsonSchemaStringPropertyTypePropType,
+  index_lifetime_max: JsonSchemaStringPropertyTypePropType,
+  index_lifetime_min: JsonSchemaStringPropertyTypePropType,
 });
 export const RotationJsonSchemaPropType = PropTypes.exact({
-  type: PropTypes.string,
+  type: PropTypes.string.isRequired,
   id: PropTypes.string,
   properties: RotationPropertiesPropType.isRequired,
 });
@@ -162,7 +177,7 @@ export const RetentionPropertiesPropType = PropTypes.exact({
   index_action: JsonSchemaIndexActionPropertyTypePropType,
 });
 export const RetentionJsonSchemaPropType = PropTypes.exact({
-  type: PropTypes.string,
+  type: PropTypes.string.isRequired,
   id: PropTypes.string,
   properties: RetentionPropertiesPropType,
 });

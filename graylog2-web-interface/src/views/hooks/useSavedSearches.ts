@@ -29,6 +29,9 @@ type PaginatedSearchesResponse = PaginatedListJSON & {
   attributes: Array<Attribute>
 };
 
+type Options = {
+  enabled: boolean,
+}
 const savedSearchesUrl = qualifyUrl('/search/saved');
 
 const fetchSavedSearches = (searchParams: SearchParams) => {
@@ -48,16 +51,16 @@ const fetchSavedSearches = (searchParams: SearchParams) => {
   );
 };
 
-const useSavedSearches = (searchParams: SearchParams): {
+const useSavedSearches = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
   data: {
     list: Readonly<Array<View>>,
     pagination: { total: number },
     attributes: Array<Attribute>,
   } | undefined,
   refetch: () => void,
-  isLoading: boolean,
+  isInitialLoading: boolean,
 } => {
-  const { data, refetch, isLoading } = useQuery(
+  const { data, refetch, isInitialLoading } = useQuery(
     ['saved-searches', 'overview', searchParams],
     () => fetchSavedSearches(searchParams),
     {
@@ -66,13 +69,14 @@ const useSavedSearches = (searchParams: SearchParams): {
           'Could not load saved searches');
       },
       keepPreviousData: true,
+      enabled,
     },
   );
 
   return ({
     data,
     refetch,
-    isLoading,
+    isInitialLoading,
   });
 };
 

@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import get from 'lodash/get';
 
 import { Input, Col } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
@@ -24,7 +25,7 @@ import { numberExpressionNodePropType } from 'logic/alerts/AggregationExpression
 
 const NumberExpression = ({ expression, onChange, renderLabel, validation }) => {
   const handleChange = (event) => {
-    const nextExpression = lodash.cloneDeep(expression);
+    const nextExpression = cloneDeep(expression);
 
     nextExpression.value = event.target.value === '' ? '' : FormsUtils.getValueFromInput(event.target);
     onChange({ conditions: nextExpression });
@@ -36,7 +37,7 @@ const NumberExpression = ({ expression, onChange, renderLabel, validation }) => 
              name="threshold"
              label={renderLabel ? 'Threshold' : ''}
              type="number"
-             value={lodash.get(expression, 'value')}
+             value={get(expression, 'value')}
              bsStyle={validation.message ? 'error' : null}
              help={validation.message}
              onChange={handleChange} />

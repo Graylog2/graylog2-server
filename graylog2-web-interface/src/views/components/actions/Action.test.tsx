@@ -17,19 +17,29 @@
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import { noop } from 'lodash';
+import noop from 'lodash/noop';
 
 import { createSimpleExternalValueAction } from 'fixtures/externalValueActions';
-import type { ActionContexts } from 'views/types';
+import type { ActionContexts, RootState } from 'views/types';
 import asMock from 'helpers/mocking/AsMock';
 import usePluginEntities from 'hooks/usePluginEntities';
 import FieldType from 'views/logic/fieldtypes/FieldType';
+import useAppDispatch from 'stores/useAppDispatch';
+import mockDispatch from 'views/test/mockDispatch';
+import { createSearch } from 'fixtures/searches';
 
 import Action from './Action';
 
 jest.mock('hooks/usePluginEntities', () => jest.fn(() => []));
+jest.mock('stores/useAppDispatch');
 
 describe('Action', () => {
+  beforeEach(() => {
+    const view = createSearch();
+    const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
+    asMock(useAppDispatch).mockReturnValue(dispatch);
+  });
+
   afterEach(() => {
     jest.resetAllMocks();
   });

@@ -16,7 +16,7 @@
  */
 const browserslist = require('browserslist');
 
-const targets = browserslist('defaults, not ie 11');
+const targets = browserslist('defaults, not ie 11, chrome 68');
 
 const supportedProducts = ['chrome', 'edge', 'firefox', 'ios_saf', 'opera', 'safari'];
 

@@ -1,0 +1,5 @@
+type = "f"
+message = "Avoid excessive index creation for AccessToken."
+
+pulls = ["14926"]
+issues = ["Graylog2/graylog-plugin-enterprise#4850"]

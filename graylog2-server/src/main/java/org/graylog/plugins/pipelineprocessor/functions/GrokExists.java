@@ -16,22 +16,22 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions;
 
+import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog2.grok.GrokPatternRegistry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static com.google.common.collect.ImmutableList.of;
 
 import javax.inject.Inject;
 
-public class GrokExists extends AbstractFunction<Boolean> {
+import static com.google.common.collect.ImmutableList.of;
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 
-    private static final Logger log = LoggerFactory.getLogger(GrokExists.class);
+public class GrokExists extends AbstractFunction<Boolean> {
+    private static final RateLimitedLog log = getRateLimitedLog(GrokExists.class);
+
     public static final String NAME = "grok_exists";
 
     private final ParameterDescriptor<String, String> patternParam;
@@ -44,7 +44,7 @@ public class GrokExists extends AbstractFunction<Boolean> {
         this.grokPatternRegistry = grokPatternRegistry;
 
         patternParam = ParameterDescriptor.string("pattern")
-                .description("The Grok Pattern which is to be tested for existance.").build();
+                .description("The Grok Pattern which is to be tested for existence.").build();
         doLog = ParameterDescriptor.bool("log_missing").optional()
                 .description("Log if the Grok Pattern is missing. Warning: Switching on this flag can lead" +
                         " to a high volume of logs.").build();
@@ -61,7 +61,7 @@ public class GrokExists extends AbstractFunction<Boolean> {
 
         final boolean patternExists = grokPatternRegistry.grokPatternExists(pattern);
         if (!patternExists && logWhenNotFound) {
-           log.info("Grok Pattern " + pattern + " does not exists.");
+           log.info(context.pipelineErrorMessage("Grok Pattern " + pattern + " does not exist."));
         }
 
         return patternExists;

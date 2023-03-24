@@ -17,12 +17,14 @@
 import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
-import { sortBy, isEmpty } from 'lodash';
+import sortBy from 'lodash/sortBy';
 
 import { Button } from 'components/bootstrap';
-import { ViewStore } from 'views/stores/ViewStore';
 import type View from 'views/logic/views/View';
 import generateId from 'logic/generateId';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import useAppDispatch from 'stores/useAppDispatch';
+import type { GetState } from 'views/types';
 
 import SectionInfo from '../SectionInfo';
 import SectionSubheadline from '../SectionSubheadline';
@@ -53,7 +55,7 @@ export type CreatorProps = {
   view: View,
 };
 type CreatorType = 'preset' | 'generic';
-type CreatorFunction = (creatorProps: CreatorProps) => React.ReactNode | undefined | null | void;
+type CreatorFunction = () => (dispatch: AppDispatch, getState: GetState) => unknown;
 
 type FunctionalCreator = {
   func: CreatorFunction,
@@ -77,6 +79,12 @@ export type Creator = ComponentCreator | FunctionalCreator;
 
 export const isCreatorFunc = (creator: Creator): creator is FunctionalCreator => ('func' in creator);
 
+const WithDispatch = ({ children }: { children: (dispatch: AppDispatch) => JSX.Element }) => {
+  const dispatch = useAppDispatch();
+
+  return children(dispatch);
+};
+
 class AddWidgetButton extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -86,15 +94,14 @@ class AddWidgetButton extends React.Component<Props, State> {
     };
   }
 
-  _createHandlerFor = (creator: Creator): CreatorFunction => {
+  _createHandlerFor = (dispatch: AppDispatch, creator: Creator): () => void => {
     const { onClick } = this.props;
-    const { view } = ViewStore.getInitialState();
 
     if (isCreatorFunc(creator)) {
       return () => {
         onClick();
 
-        creator.func({ view });
+        dispatch(creator.func());
       };
     }
 
@@ -127,13 +134,21 @@ class AddWidgetButton extends React.Component<Props, State> {
     throw new Error(`Invalid binding for creator: ${JSON.stringify(creator)} - has neither 'func' nor 'component'.`);
   };
 
-  _createMenuItem = (creator: Creator): React.ReactNode => (
-    <CreateButton key={creator.title}
-                  onClick={this._createHandlerFor(creator)}
-                  disabled={creator.condition ? !creator.condition() : false}>
-      {creator.title}
-    </CreateButton>
-  );
+  _createMenuItem = (creator: Creator): React.ReactNode => {
+    const disabled = creator.condition?.() === false;
+
+    return (
+      <WithDispatch key={creator.title}>
+        {(dispatch) => (
+          <CreateButton key={creator.title}
+                        onClick={this._createHandlerFor(dispatch, creator)}
+                        disabled={disabled}>
+            {creator.title}
+          </CreateButton>
+        )}
+      </WithDispatch>
+    );
+  };
 
   _createGroup = (creators: Array<Creator>, type: 'preset' | 'generic'): React.ReactNode => {
     const typeCreators = creators.filter((c) => (c.type === type));
@@ -162,12 +177,7 @@ class AddWidgetButton extends React.Component<Props, State> {
           <SectionSubheadline>Predefined Aggregation</SectionSubheadline>
           {presets}
         </Group>
-        {!isEmpty(components) && (
-          <Group>
-            <SectionSubheadline>Other</SectionSubheadline>
-            {components}
-          </Group>
-        )}
+        {components}
       </>
     );
   }

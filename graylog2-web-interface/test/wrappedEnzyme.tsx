@@ -38,4 +38,5 @@ export * from 'enzyme';
 export {
   mountWithWrapper as mount,
   shallowWithWrapper as shallow,
+  mount as mountUnwrapped,
 };

@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useStore } from 'stores/connect';
-import { ViewStore } from 'views/stores/ViewStore';
+import useAppSelector from 'stores/useAppSelector';
+import { selectView } from 'views/logic/slices/viewSelectors';
 
-const useView = () => useStore(ViewStore, (state) => state?.view);
+const useView = () => useAppSelector(selectView);
+
 export default useView;

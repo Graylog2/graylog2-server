@@ -20,17 +20,18 @@ import { DATE_TIME_FORMATS } from 'util/DateTime';
 import { MISSING_BUCKET_NAME } from 'views/Constants';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
-import type { ActionHandler } from 'views/components/actions/ActionHandler';
+import { updateQueryString } from 'views/logic/slices/viewSlice';
+import { selectCurrentQueryString } from 'views/logic/slices/viewSelectors';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import type { RootState } from 'views/types';
 
-import QueryManipulationHandler from './QueryManipulationHandler';
-
-const formatTimestampForES = (value: string) => {
+const formatTimestampForES = (value: string | number) => {
   const utc = moment(value).tz('UTC');
 
   return `"${utc.format(DATE_TIME_FORMATS.internalIndexer)}"`;
 };
 
-const formatNewQuery = (oldQuery: string, field: string, value: string, type: FieldType) => {
+const formatNewQuery = (oldQuery: string, field: string, value: string | number, type: FieldType) => {
   const predicateValue = type.type === 'date'
     ? formatTimestampForES(value)
     : escape(value);
@@ -41,11 +42,18 @@ const formatNewQuery = (oldQuery: string, field: string, value: string, type: Fi
   return addToQuery(oldQuery, fieldPredicate);
 };
 
-export default class AddToQueryHandler extends QueryManipulationHandler {
-  handle: ActionHandler<{}> = ({ queryId, field, value = '', type }) => {
-    const oldQuery = this.currentQueryString(queryId);
-    const newQuery = formatNewQuery(oldQuery, field, value, type);
+type Arguments = {
+  queryId: string,
+  field: string,
+  value?: string | number,
+  type: FieldType,
+};
 
-    return this.updateQueryString(queryId, newQuery);
-  };
-}
+const AddToQueryHandler = ({ queryId, field, value = '', type }: Arguments) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  const oldQuery = selectCurrentQueryString(queryId)(getState());
+  const newQuery = formatNewQuery(oldQuery, field, value, type);
+
+  return dispatch(updateQueryString(queryId, newQuery));
+};
+
+export default AddToQueryHandler;

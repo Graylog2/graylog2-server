@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { max } from 'lodash';
+import max from 'lodash/max';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 
@@ -23,7 +23,6 @@ export default class ContentPackRevisions {
     this._value = Object.keys(contentPackRevision).reduce((acc, rev) => {
       const contentPack = contentPackRevision[rev];
 
-      /* eslint-disable-next-line no-return-assign */
       acc[parseInt(rev, 10)] = ContentPack.fromJSON(contentPack);
 
       return acc;

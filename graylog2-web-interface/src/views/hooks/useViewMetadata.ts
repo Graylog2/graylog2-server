@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useStore } from 'stores/connect';
-import type { ViewStoreState } from 'views/stores/ViewStore';
-import { ViewStore } from 'views/stores/ViewStore';
+import useAppSelector from 'stores/useAppSelector';
 
-const mapViewMetadata = ({ activeQuery, view }: ViewStoreState) => {
+const useViewMetadata = () => useAppSelector((state) => {
+  const { view, activeQuery } = state?.view ?? {};
+
   if (view) {
     const { id, title, description, summary } = view;
 
@@ -26,8 +26,6 @@ const mapViewMetadata = ({ activeQuery, view }: ViewStoreState) => {
   }
 
   return {};
-};
-
-const useViewMetadata = () => useStore(ViewStore, mapViewMetadata);
+});
 
 export default useViewMetadata;

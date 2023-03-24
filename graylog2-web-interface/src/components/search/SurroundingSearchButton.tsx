@@ -26,16 +26,17 @@ import DrilldownContext from 'views/components/contexts/DrilldownContext';
 import type { SearchesConfig } from './SearchConfig';
 import SearchLink from './SearchLink';
 
-const buildTimeRangeOptions = ({ surrounding_timerange_options: surroundingTimerangeOptions = {} }) => Object.entries(surroundingTimerangeOptions)
-  .reduce((prev, [key, value]) => ({ ...prev, [moment.duration(key).asSeconds()]: value }), {});
+const buildTimeRangeOptions = ({ surrounding_timerange_options: surroundingTimerangeOptions = {} }: Pick<SearchesConfig, 'surrounding_timerange_options'>) => Object.fromEntries(
+  Object.entries(surroundingTimerangeOptions).map(([key, value]) => [moment.duration(key).asSeconds(), value]),
+);
 
-const buildFilterFields = (messageFields, searchConfig) => {
+const buildFilterFields = (messageFields: { [x: string]: unknown; }, searchConfig: Pick<SearchesConfig, 'surrounding_filter_fields'>) => {
   const { surrounding_filter_fields: surroundingFilterFields = [] } = searchConfig;
 
-  return surroundingFilterFields.reduce((prev, cur) => ({ ...prev, [cur]: messageFields[cur] }), {});
+  return Object.fromEntries(surroundingFilterFields.map((fieldName) => [fieldName, messageFields[fieldName]]));
 };
 
-const buildSearchLink = (id, from, to, filterFields, streams) => SearchLink.builder()
+const buildSearchLink = (id: string, from: string, to: string, filterFields: { [key: string]: unknown; }, streams: string[]) => SearchLink.builder()
   .timerange({ type: 'absolute', from, to })
   .streams(streams)
   .filterFields(filterFields)
@@ -43,7 +44,7 @@ const buildSearchLink = (id, from, to, filterFields, streams) => SearchLink.buil
   .build()
   .toURL();
 
-const searchLink = (range, timestamp, id, messageFields, searchConfig, streams) => {
+const searchLink = (range: string, timestamp: moment.MomentInput, id: string, messageFields: { [key: string]: unknown; }, searchConfig: Pick<SearchesConfig, 'surrounding_filter_fields'>, streams: string[]) => {
   const fromTime = moment(timestamp).subtract(Number(range), 'seconds').toISOString();
   const toTime = moment(timestamp).add(Number(range), 'seconds').toISOString();
   const filterFields = buildFilterFields(messageFields, searchConfig);
@@ -52,7 +53,7 @@ const searchLink = (range, timestamp, id, messageFields, searchConfig, streams) 
 };
 
 type Props = {
-  searchConfig: SearchesConfig,
+  searchConfig: Pick<SearchesConfig, 'surrounding_timerange_options' | 'surrounding_filter_fields'>,
   timestamp: string,
   id: string,
   messageFields: { [key: string]: unknown },

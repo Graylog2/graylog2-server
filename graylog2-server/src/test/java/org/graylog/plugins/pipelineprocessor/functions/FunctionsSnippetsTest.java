@@ -95,6 +95,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.CloneMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.NormalizeFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveFromStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RenameField;
@@ -217,6 +218,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(SetFields.NAME, new SetFields());
         functions.put(RenameField.NAME, new RenameField());
         functions.put(RemoveField.NAME, new RemoveField());
+        functions.put(NormalizeFields.NAME, new NormalizeFields());
 
         functions.put(DropMessage.NAME, new DropMessage());
         functions.put(CreateMessage.NAME, new CreateMessage());
@@ -868,6 +870,28 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.hasField("field_1")).isFalse();
         assertThat(message.hasField("field_2")).isTrue();
         assertThat(message.hasField("field_b")).isTrue();
+    }
+
+    @Test
+    public void normalizeFields() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+
+        final Message in = new Message("some message", "somehost.graylog.org", Tools.nowUTC());
+        final String lcVal = "lcVal";
+        final Integer mcVal = 2;
+        final boolean ucVal = true;
+        in.addField("lower_case", lcVal);
+        in.addField("mIxEd_CaSe", mcVal);
+        in.addField("UPPER_CASE", ucVal);
+
+        final Message message = evaluateRule(rule, in);
+
+        assertThat(message.getField("lower_case")).isEqualTo(lcVal);
+        assertThat(message.getField("mixed_case")).isEqualTo(mcVal);
+        assertThat(message.getField("upper_case")).isEqualTo(ucVal);
+        assertThat(message.getField("mIxEd_CaSe")).isNull();
+        assertThat(message.getField("UPPER_CASE")).isNull();
+
     }
 
     @Test

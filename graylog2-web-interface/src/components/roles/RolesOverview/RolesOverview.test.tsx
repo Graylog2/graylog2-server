@@ -78,18 +78,14 @@ describe('RolesOverview', () => {
     render(<RolesOverview />);
 
     await screen.findByText(mockRoles.first().name);
-
-    expect(screen.queryByText(mockRoles.first().description)).toBeInTheDocument();
+    await screen.findByText(mockRoles.first().description);
   });
 
   it('should allow searching for roles', async () => {
     render(<RolesOverview />);
 
     const searchInput = await screen.findByPlaceholderText('Enter search query...');
-    const searchSubmitButton = screen.getByRole('button', { name: 'Search' });
-
     fireEvent.change(searchInput, { target: { value: 'name:manager' } });
-    fireEvent.click(searchSubmitButton);
 
     await waitFor(() => expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: 'name:manager' }));
   });
@@ -97,15 +93,12 @@ describe('RolesOverview', () => {
   it('should reset search', async () => {
     render(<RolesOverview />);
 
-    const searchSubmitButton = await screen.findByRole('button', { name: 'Search' });
-    const resetSearchButton = screen.getByRole('button', { name: 'Reset' });
-    const searchInput = screen.getByPlaceholderText('Enter search query...');
-
+    const searchInput = await screen.findByPlaceholderText('Enter search query...');
     fireEvent.change(searchInput, { target: { value: 'name:manager' } });
-    fireEvent.click(searchSubmitButton);
 
     await waitFor(() => expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: 'name:manager' }));
 
+    const resetSearchButton = await screen.findByRole('button', { name: 'Reset search' });
     fireEvent.click(resetSearchButton);
 
     await waitFor(() => expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: '' }));

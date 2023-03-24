@@ -19,16 +19,13 @@ import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import type Query from 'views/logic/queries/Query';
-import type { ViewType } from 'views/logic/views/View';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import PlotLegend from 'views/components/visualizations/PlotLegend';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import { axisTypes, DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import assertUnreachable from 'logic/assertUnreachable';
-import useViewType from 'views/hooks/useViewType';
-import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
+import useAppDispatch from 'stores/useAppDispatch';
 
 import GenericPlot from './GenericPlot';
 import type { ChartColor, ChartConfig } from './GenericPlot';
@@ -48,7 +45,7 @@ export type Props = {
   height?: number;
   setChartColor?: (config: ChartConfig, color: ColorMapper) => ChartColor,
   plotLayout?: any,
-  onZoom?: (query: Query, from: string, to: string, viewType: ViewType | undefined | null, userTimezone: string) => boolean,
+  onZoom?: (from: string, to: string, userTimezone: string) => boolean,
 };
 
 const yLegendPosition = (containerHeight: number) => {
@@ -87,10 +84,9 @@ const XYPlot = ({
   setChartColor,
   height,
   plotLayout = {},
-  onZoom = OnZoom,
+  onZoom,
 }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
-  const currentQuery = useCurrentQuery();
   const yaxis = { fixedrange: true, rangemode: 'tozero', tickformat: ',~r', type: mapAxisType(axisType) };
   const defaultLayout: Layout = {
     yaxis,
@@ -103,10 +99,10 @@ const XYPlot = ({
   }
 
   const layout = { ...defaultLayout, ...plotLayout };
-  const viewType = useViewType();
+  const dispatch = useAppDispatch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(config.isTimeline
-    ? (from: string, to: string) => onZoom(currentQuery, from, to, viewType, userTimezone)
+    ? (from: string, to: string) => (onZoom ? onZoom(from, to, userTimezone) : dispatch(OnZoom(from, to, userTimezone)))
     : () => true, [config.isTimeline, onZoom]);
 
   if (config.isTimeline && effectiveTimerange) {
@@ -141,7 +137,7 @@ XYPlot.propTypes = {
   chartData: PropTypes.array.isRequired,
   config: CustomPropTypes.instanceOf(AggregationWidgetConfig).isRequired,
   effectiveTimerange: PropTypes.exact({
-    // eslint-disable-next-line react/no-unused-prop-types
+
     type: PropTypes.string.isRequired,
     from: PropTypes.string.isRequired,
     to: PropTypes.string.isRequired,
@@ -158,7 +154,7 @@ XYPlot.defaultProps = {
   getChartColor: undefined,
   setChartColor: undefined,
   effectiveTimerange: undefined,
-  onZoom: OnZoom,
+  onZoom: undefined,
   height: undefined,
 };
 

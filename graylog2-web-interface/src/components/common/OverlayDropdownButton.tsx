@@ -21,27 +21,52 @@ import Button from 'components/bootstrap/Button';
 import OverlayDropdown from 'components/common/OverlayDropdown';
 
 type Props = {
-  bsSize?: string
-  children: React.ReactNode,
+  bsSize?: string,
+  buttonTitle?: string,
+  children: React.ReactNode | ((payload: { toggleDropdown: () => void }) => React.ReactNode),
+  closeOnSelect?: boolean,
   disabled?: boolean
+  dropdownMinWidth?: number
   dropdownZIndex?: number,
-  title: string,
+  onToggle?: () => void,
+  title: React.ReactNode,
 };
 
 /**
  * This component is an alternative to the `DropdownButton` component and displays the dropdown in a portal.
  */
-const OverlayDropdownButton = ({ children, title, bsSize, disabled, dropdownZIndex }: Props) => {
+const OverlayDropdownButton = ({
+  bsSize,
+  buttonTitle,
+  children,
+  closeOnSelect,
+  disabled,
+  dropdownMinWidth,
+  dropdownZIndex,
+  onToggle: onToggleProp,
+  title,
+}: Props) => {
   const [show, setShowDropdown] = useState(false);
+
+  const _onToggle = () => {
+    if (typeof onToggleProp === 'function') {
+      onToggleProp();
+    }
+
+    setShowDropdown((cur) => !cur);
+  };
 
   return (
     <OverlayDropdown show={show}
+                     closeOnSelect={closeOnSelect}
                      dropdownZIndex={dropdownZIndex}
+                     dropdownMinWidth={dropdownMinWidth}
                      renderToggle={({ onToggle, toggleTarget }) => (
                        <div className={`dropdown btn-group ${show ? 'open' : ''}`}>
                          <Button bsSize={bsSize}
                                  className="dropdown-toggle"
                                  ref={toggleTarget}
+                                 title={buttonTitle}
                                  disabled={disabled}
                                  onClick={onToggle}>
                            {title} <span className="caret" />
@@ -49,16 +74,20 @@ const OverlayDropdownButton = ({ children, title, bsSize, disabled, dropdownZInd
                        </div>
                      )}
                      placement="bottom"
-                     onToggle={() => setShowDropdown((cur) => !cur)}>
-      {children}
+                     onToggle={_onToggle}>
+      {typeof children === 'function' ? children({ toggleDropdown: _onToggle }) : children}
     </OverlayDropdown>
   );
 };
 
 OverlayDropdownButton.defaultProps = {
   bsSize: undefined,
+  buttonTitle: undefined,
+  closeOnSelect: true,
   disabled: false,
+  dropdownMinWidth: undefined,
   dropdownZIndex: undefined,
+  onToggle: undefined,
 };
 
 export default OverlayDropdownButton;

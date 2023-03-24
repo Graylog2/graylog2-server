@@ -16,19 +16,14 @@
  */
 import * as React from 'react';
 import { useCallback, useEffect, useContext, useMemo } from 'react';
-import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
 
 import PageContentLayout from 'components/layout/PageContentLayout';
 import { useStore } from 'stores/connect';
 import Sidebar from 'views/components/sidebar/Sidebar';
 import SearchResult from 'views/components/SearchResult';
-import { SearchStore, SearchActions } from 'views/stores/SearchStore';
-import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchConfigActions, SearchConfigStore } from 'views/stores/SearchConfigStore';
-import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import { StreamsActions } from 'views/stores/StreamsStore';
-import { ViewActions, ViewStore } from 'views/stores/ViewStore';
 import HeaderElements from 'views/components/HeaderElements';
 import QueryBarElements from 'views/components/QueryBarElements';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
@@ -37,7 +32,6 @@ import QueryBar from 'views/components/QueryBar';
 import { FieldsOverview } from 'views/components/sidebar';
 import DashboardSearchBar from 'views/components/DashboardSearchBar';
 import SearchBar from 'views/components/SearchBar';
-import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
 import IfSearch from 'views/components/search/IfSearch';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 import HighlightMessageInQuery from 'views/components/messagelist/HighlightMessageInQuery';
@@ -49,11 +43,14 @@ import HighlightingRulesProvider from 'views/components/contexts/HighlightingRul
 import SearchPagePreferencesProvider from 'views/components/contexts/SearchPagePreferencesProvider';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import type { RefluxActions } from 'stores/StoreTypes';
 import useCurrentUser from 'hooks/useCurrentUser';
 import SynchronizeUrl from 'views/components/SynchronizeUrl';
-import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import useView from 'views/hooks/useView';
+import useAppDispatch from 'stores/useAppDispatch';
+import { execute } from 'views/logic/slices/searchExecutionSlice';
+import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
+import useAppSelector from 'stores/useAppSelector';
+import { RefreshActions } from 'views/stores/RefreshStore';
 
 const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => {
   return interactive ? css`
@@ -64,9 +61,9 @@ const GridContainer = styled.div<{ interactive: boolean }>(({ interactive }) => 
     > *:nth-child(2) {
       flex-grow: 1;
     }
-  ` : css`
+` : css`
     flex: 1;
-  `;
+`;
 });
 
 const SearchArea = styled(PageContentLayout)(() => {
@@ -84,26 +81,17 @@ const SearchArea = styled(PageContentLayout)(() => {
         overflow: ${focusedWidget?.id ? 'auto' : 'visible'};
       }
     `}
-  `;
+`;
 });
 
 const ConnectedSidebar = (props: Omit<React.ComponentProps<typeof Sidebar>, 'results'>) => {
-  const activeQuery = useActiveQueryId();
-  const results = useStore(SearchStore, (searches) => searches?.result?.forId(activeQuery));
+  const results = useAppSelector(selectCurrentQueryResults);
 
   return <Sidebar results={results} {...props} />;
 };
 
-const _refreshSearch = (executionState: SearchExecutionState) => {
-  const { view } = ViewStore.getInitialState();
-
-  return SearchMetadataActions.parseSearch(view.search).then(() => {
-    return SearchActions.execute(executionState).then(() => {});
-  });
-};
-
 const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const { view } = useStore(ViewStore);
+  const view = useView();
   const { searchesClusterConfig } = useStore(SearchConfigStore) ?? {};
   const currentUser = useCurrentUser();
   const contextValue = useMemo(() => ({
@@ -121,26 +109,22 @@ const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
-const useRefreshSearchOn = (_actions: Array<RefluxActions<any>>, refresh: () => Promise<any>) => {
-  useEffect(() => {
-    let storeListenersUnsubscribes = Immutable.List<() => void>();
-
-    refresh().finally(() => {
-      storeListenersUnsubscribes = storeListenersUnsubscribes
-        .push(SearchActions.refresh.listen(refresh))
-        .push(ViewActions.search.completed.listen(refresh));
-    });
-
-    // Returning cleanup function used when unmounting
-    return () => { storeListenersUnsubscribes.forEach((unsubscribeFunc) => unsubscribeFunc()); };
-  }, [refresh]);
+const useAutoRefresh = (refresh: () => Promise<unknown>) => {
+  useEffect(() => RefreshActions.refresh.listen(() => {
+    RefreshActions.refresh.promise(refresh());
+  }), [refresh]);
 };
 
 const Search = () => {
-  const refreshSearch = useCallback(() => _refreshSearch(SearchExecutionStateStore.getInitialState()), []);
+  const dispatch = useAppDispatch();
+  const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
   const { sidebar: { isShown: showSidebar } } = useSearchPageLayout();
 
-  useRefreshSearchOn([SearchActions.refresh, ViewActions.search], refreshSearch);
+  useEffect(() => {
+    refreshSearch();
+  }, [refreshSearch]);
+
+  useAutoRefresh(refreshSearch);
 
   useEffect(() => {
     SearchConfigActions.refresh();
@@ -159,7 +143,7 @@ const Search = () => {
               editing: false,
             },
           }) => (
-            <CurrentViewTypeProvider>
+            <>
               <IfInteractive>
                 <IfDashboard>
                   <WindowLeaveMessage />
@@ -206,7 +190,7 @@ const Search = () => {
                   </SearchPagePreferencesProvider>
                 )}
               </InteractiveContext.Consumer>
-            </CurrentViewTypeProvider>
+            </>
           )}
         </WidgetFocusContext.Consumer>
       </WidgetFocusProvider>

@@ -16,12 +16,11 @@
  */
 import React from 'react';
 
-import { useStore } from 'stores/connect';
 import ConfirmLeaveDialog from 'components/common/ConfirmLeaveDialog';
-import { ViewStore } from 'views/stores/ViewStore';
+import useIsDirty from 'views/hooks/useIsDirty';
 
 const WindowLeaveMessage = () => {
-  const dirty = useStore(ViewStore, (state) => state.dirty);
+  const dirty = useIsDirty();
 
   return dirty
     ? <ConfirmLeaveDialog question="Are you sure you want to leave the page? Any unsaved changes will be lost." />

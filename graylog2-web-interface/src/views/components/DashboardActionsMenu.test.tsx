@@ -19,16 +19,17 @@ import * as mockImmutable from 'immutable';
 import { render, screen, within, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import { asMock, MockStore } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import { adminUser } from 'fixtures/users';
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import SearchPageLayoutContext, { SAVE_COPY, BLANK } from 'views/components/contexts/SearchPageLayoutContext';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import { ViewStore } from 'views/stores/ViewStore';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useCurrentUser from 'hooks/useCurrentUser';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
 import DashboardActionsMenu from './DashboardActionsMenu';
 
@@ -42,37 +43,6 @@ jest.mock('bson-objectid', () => jest.fn(() => ({
 jest.mock('views/stores/ViewManagementStore', () => ({
   ViewManagementActions: {
     create: jest.fn((v) => Promise.resolve(v)).mockName('create'),
-  },
-}));
-
-jest.mock('views/stores/ViewStore', () => ({ ViewStore: MockStore() }));
-
-jest.mock('views/stores/SearchMetadataStore', () => ({
-  SearchMetadataStore: {
-    getInitialState: () => ({ undeclared: mockImmutable.Set() }),
-    listen: () => jest.fn(),
-  },
-}));
-
-jest.mock('views/stores/SearchStore', () => ({
-  SearchActions: {
-    execute: jest.fn(() => Promise.resolve()),
-  },
-  SearchStore: {
-    listen: () => jest.fn(),
-    getInitialState: () => ({
-      result: {
-        forId: jest.fn(() => ({})),
-      },
-      widgetMapping: {},
-    }),
-  },
-}));
-
-jest.mock('views/stores/SearchExecutionStateStore', () => ({
-  SearchExecutionStateStore: {
-    getInitialState: jest.fn(),
-    listen: () => jest.fn(),
   },
 }));
 
@@ -94,15 +64,22 @@ describe('DashboardActionsMenu', () => {
     .createdAt(new Date('2019-10-16T14:38:44.681Z'))
     .build();
 
-  const SUT = ({ providerOverrides, ...props }: {providerOverrides?: LayoutState}) => (
-    <SearchPageLayoutContext.Provider value={providerOverrides}>
-      <DashboardActionsMenu {...props} />
-    </SearchPageLayoutContext.Provider>
+  const SUT = ({ providerOverrides, view }: { providerOverrides?: LayoutState, view?: View }) => (
+    <TestStoreProvider view={view}>
+      <SearchPageLayoutContext.Provider value={providerOverrides}>
+        <DashboardActionsMenu />
+      </SearchPageLayoutContext.Provider>
+    </TestStoreProvider>
   );
 
   SUT.defaultProps = {
     providerOverrides: undefined,
+    view: mockView,
   };
+
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
 
   const submitDashboardSaveForm = async () => {
     const saveDashboardModal = await screen.findByTestId('modal-form');
@@ -127,13 +104,11 @@ describe('DashboardActionsMenu', () => {
       .permissions(mockImmutable.List(['dashboards:edit:view-id', 'view:edit:view-id']))
       .build());
 
-    asMock(ViewStore.getInitialState).mockReturnValue({ isNew: false, view: mockView, activeQuery: undefined, dirty: false });
     asMock(useSaveViewFormControls).mockReturnValue([]);
   });
 
   it('should save a new dashboard', async () => {
-    asMock(ViewStore.getInitialState).mockReturnValue({ isNew: false, view: mockView.toBuilder().id(undefined).build(), activeQuery: undefined, dirty: false });
-    render(<SUT />);
+    render(<SUT view={mockView.toBuilder().id(undefined).build()} />);
 
     await openDashboardSaveForm();
     await submitDashboardSaveForm();
@@ -151,7 +126,7 @@ describe('DashboardActionsMenu', () => {
     }],
     );
 
-    render(<SUT />);
+    render(<SUT view={mockView} />);
 
     await openDashboardSaveForm();
     await submitDashboardSaveForm();

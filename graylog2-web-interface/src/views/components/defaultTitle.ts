@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { capitalize } from 'lodash';
+import capitalize from 'lodash/capitalize';
 
 import { widgetDefinition } from 'views/logic/Widgets';
 import type Widget from 'views/logic/widgets/Widget';

@@ -22,7 +22,10 @@ import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackSelection from 'components/content-packs/ContentPackSelection';
 import Entity from 'logic/content-packs/Entity';
 
+import { SEARCH_DEBOUNCE_THRESHOLD } from '../common/SearchForm';
+
 jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
+jest.useFakeTimers('modern');
 
 describe('<ContentPackSelection />', () => {
   it('should render with empty content pack', () => {
@@ -171,14 +174,15 @@ describe('<ContentPackSelection />', () => {
       expect(wrapper.find('input[type="checkbox"]').length).toEqual(3);
 
       wrapper.find('input#common-search-form-query-input').simulate('change', { target: { value: 'falcon' } });
-      wrapper.find('form').at(1).simulate('submit');
+      jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD);
+      wrapper.update();
 
       expect(wrapper.find('input[type="checkbox"]').length).toEqual(2);
 
       /*
        * reset the search
        */
-      wrapper.find('button[children=\'Reset\']').simulate('click');
+      wrapper.find('button[title=\'Reset search\']').simulate('click');
       /* Open menu to show all checkboxes */
       wrapper.find('div.fa-stack').simulate('click');
 

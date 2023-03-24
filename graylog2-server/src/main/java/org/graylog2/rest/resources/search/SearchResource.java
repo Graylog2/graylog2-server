@@ -90,8 +90,8 @@ public abstract class SearchResource extends RestResource {
         this.searchExecutor = searchExecutor;
     }
 
-    protected SearchResponse search(String query, int limit, String filter, boolean decorate, SearchUser searchUser, List<String> fieldList, Sort sorting, TimeRange timeRange) {
-        final Search search = createSearch(query, limit, filter, fieldList, sorting, timeRange);
+    protected SearchResponse search(String query, int limit, int offset, String filter, boolean decorate, SearchUser searchUser, List<String> fieldList, Sort sorting, TimeRange timeRange) {
+        final Search search = createSearch(query, limit, offset, filter, fieldList, sorting, timeRange);
 
         final Optional<String> streamId = Searches.extractStreamId(filter);
 
@@ -207,8 +207,8 @@ public abstract class SearchResource extends RestResource {
         return Sort.create(parts[0], Sort.Order.valueOf(parts[1].toUpperCase(Locale.ENGLISH)));
     }
 
-    protected Search createSearch(String queryString, int limit, String filter, List<String> fieldList, Sort sorting, TimeRange timeRange) {
-        final SearchType searchType = createMessageList(sorting, limit, fieldList);
+    protected Search createSearch(String queryString, int limit, int offset, String filter, List<String> fieldList, Sort sorting, TimeRange timeRange) {
+        final SearchType searchType = createMessageList(sorting, limit, offset, fieldList);
 
         final Query query = Query.builder()
                 .query(ElasticsearchQueryString.of(queryString))
@@ -223,10 +223,11 @@ public abstract class SearchResource extends RestResource {
                 .build();
     }
 
-    private SearchType createMessageList(Sort sorting, int limit, List<String> fieldList) {
+    private SearchType createMessageList(Sort sorting, int limit, int offset, List<String> fieldList) {
         MessageList.Builder messageListBuilder = MessageList.builder()
                 .sort(Collections.singletonList(sorting));
         messageListBuilder = limit > 0 ? messageListBuilder.limit(limit) : messageListBuilder;
+        messageListBuilder = offset > 0 ? messageListBuilder.offset(offset) : messageListBuilder;
         messageListBuilder = fieldList != null && !fieldList.isEmpty() ? messageListBuilder.fields(fieldList) : messageListBuilder;
         return messageListBuilder.build();
     }

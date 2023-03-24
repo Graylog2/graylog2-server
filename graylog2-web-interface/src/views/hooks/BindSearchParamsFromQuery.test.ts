@@ -17,23 +17,19 @@
 import * as Immutable from 'immutable';
 
 import View from 'views/logic/views/View';
-import Query from 'views/logic/queries/Query';
+import Query, { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
-import { QueriesActions } from 'views/stores/QueriesStore';
+import mockDispatch from 'views/test/mockDispatch';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import bindSearchParamsFromQuery from './BindSearchParamsFromQuery';
 
 const MOCK_VIEW_QUERY_ID = 'query-id';
 
-jest.mock('views/stores/QueriesStore', () => ({
-  QueriesActions: {
-    update: jest.fn(() => Promise.resolve()),
-  },
-}));
-
 describe('BindSearchParamsFromQuery should', () => {
   const query = Query.builder()
     .id(MOCK_VIEW_QUERY_ID)
+    .query(createElasticsearchQueryString(''))
     .build();
   const search = Search.create()
     .toBuilder()
@@ -44,15 +40,20 @@ describe('BindSearchParamsFromQuery should', () => {
     .type(View.Type.Search)
     .search(search)
     .build();
+  const dispatch = mockDispatch();
   const defaultInput = {
     query: {},
     view,
+    executionState: SearchExecutionState.empty(),
     retry: () => Promise.resolve(),
+    dispatch,
   };
 
   afterEach(() => {
     jest.clearAllMocks();
   });
+
+  const findMockQuery = (v: View) => v.search.queries.find((q) => q.id === MOCK_VIEW_QUERY_ID);
 
   it('not update query when provided view is not a search', async () => {
     const input = {
@@ -60,15 +61,15 @@ describe('BindSearchParamsFromQuery should', () => {
       view: view.toBuilder().type(View.Type.Dashboard).build(),
     };
 
-    await bindSearchParamsFromQuery(input);
+    const [newView] = await bindSearchParamsFromQuery(input);
 
-    expect(QueriesActions.update).not.toHaveBeenCalled();
+    expect(findMockQuery(newView).query.query_string).toBe('');
   });
 
   it('not update query when query is already up to date', async () => {
-    await bindSearchParamsFromQuery(defaultInput);
+    const [newView] = await bindSearchParamsFromQuery(defaultInput);
 
-    expect(QueriesActions.update).not.toHaveBeenCalled();
+    expect(findMockQuery(newView).query.query_string).toBe('');
   });
 
   it('update query string with provided query param', async () => {
@@ -77,19 +78,15 @@ describe('BindSearchParamsFromQuery should', () => {
       query: { q: 'gl2_source_input:source-input-id' },
     };
 
-    await bindSearchParamsFromQuery(input);
+    const [newView] = await bindSearchParamsFromQuery(input);
 
-    expect(QueriesActions.update)
-      .toHaveBeenCalledWith(
-        MOCK_VIEW_QUERY_ID,
-        expect.objectContaining({ query: { query_string: 'gl2_source_input:source-input-id', type: 'elasticsearch' } }),
-      );
+    expect(findMockQuery(newView).query.query_string).toBe('gl2_source_input:source-input-id');
   });
 
   it('not update query string when no query param is provided', async () => {
-    await bindSearchParamsFromQuery(defaultInput);
+    const [newView] = await bindSearchParamsFromQuery(defaultInput);
 
-    expect(QueriesActions.update).not.toHaveBeenCalled();
+    expect(findMockQuery(newView).query.query_string).toBe('');
   });
 
   it('update query timerange when relative range value param is povided', async () => {
@@ -102,13 +99,9 @@ describe('BindSearchParamsFromQuery should', () => {
       range: 0,
     };
 
-    await bindSearchParamsFromQuery(input);
+    const [newView] = await bindSearchParamsFromQuery(input);
 
-    expect(QueriesActions.update)
-      .toHaveBeenCalledWith(
-        MOCK_VIEW_QUERY_ID,
-        expect.objectContaining({ timerange: expectedTimerange }),
-      );
+    expect(findMockQuery(newView).timerange).toEqual(expectedTimerange);
   });
 
   it('update query timerange when provided query range param is absolute', async () => {
@@ -122,13 +115,9 @@ describe('BindSearchParamsFromQuery should', () => {
       to: input.query.to,
     };
 
-    await bindSearchParamsFromQuery(input);
+    const [newView] = await bindSearchParamsFromQuery(input);
 
-    expect(QueriesActions.update)
-      .toHaveBeenCalledWith(
-        MOCK_VIEW_QUERY_ID,
-        expect.objectContaining({ timerange: expectedTimerange }),
-      );
+    expect(findMockQuery(newView).timerange).toEqual(expectedTimerange);
   });
 
   it('update query timerange when provided query range is keyword', async () => {
@@ -140,13 +129,9 @@ describe('BindSearchParamsFromQuery should', () => {
       type: input.query.rangetype, keyword: input.query.keyword,
     };
 
-    await bindSearchParamsFromQuery(input);
+    const [newView] = await bindSearchParamsFromQuery(input);
 
-    expect(QueriesActions.update)
-      .toHaveBeenCalledWith(
-        MOCK_VIEW_QUERY_ID,
-        expect.objectContaining({ timerange: expectedTimerange }),
-      );
+    expect(findMockQuery(newView).timerange).toEqual(expectedTimerange);
   });
 
   it('update streams of new search when comma-separated streams parameter was supplied', async () => {
@@ -155,7 +140,7 @@ describe('BindSearchParamsFromQuery should', () => {
       query: { streams: 'stream1, stream2,  stream3 ' },
     };
 
-    await bindSearchParamsFromQuery(input);
+    const [newView] = await bindSearchParamsFromQuery(input);
 
     const expectedFilter = Immutable.Map({
       type: 'or',
@@ -166,11 +151,7 @@ describe('BindSearchParamsFromQuery should', () => {
       ]),
     });
 
-    expect(QueriesActions.update)
-      .toHaveBeenCalledWith(
-        MOCK_VIEW_QUERY_ID,
-        expect.objectContaining({ filter: expectedFilter }),
-      );
+    expect(findMockQuery(newView).filter).toEqual(expectedFilter);
   });
 
   it('do not update streams of new search when streams parameter was supplied but is empty', async () => {
@@ -179,9 +160,8 @@ describe('BindSearchParamsFromQuery should', () => {
       query: { streams: '' },
     };
 
-    await bindSearchParamsFromQuery(input);
+    const [newView] = await bindSearchParamsFromQuery(input);
 
-    expect(QueriesActions.update)
-      .not.toHaveBeenCalled();
+    expect(newView).toEqual(view);
   });
 });

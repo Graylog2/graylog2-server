@@ -43,7 +43,6 @@ const isNullish = (o: any) => (o === null || o === undefined);
 class Widget {
   _value: WidgetState;
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   static Builder: typeof Builder;
 
   constructor(id: string, type: string, config: any, filter?: string, timerange?: TimeRange, query?: QueryString, streams?: Array<string>, filters?: FiltersType | Array<SearchFilter>) {
@@ -109,7 +108,6 @@ class Widget {
     return this.toBuilder().id(newId).build();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
     const {
       id,

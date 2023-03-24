@@ -48,6 +48,8 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRange;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.DateRangeBucket;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
@@ -69,6 +71,7 @@ import java.util.stream.Collectors;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.stream.Collectors.toSet;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class PivotAggregationSearch implements AggregationSearch {
     private static final Logger LOG = LoggerFactory.getLogger(PivotAggregationSearch.class);
@@ -88,6 +91,7 @@ public class PivotAggregationSearch implements AggregationSearch {
     private final EventDefinition eventDefinition;
     private final MoreSearch moreSearch;
     private final PermittedStreams permittedStreams;
+    private final NotificationService notificationService;
 
     @Inject
     public PivotAggregationSearch(@Assisted AggregationEventProcessorConfig config,
@@ -98,7 +102,8 @@ public class PivotAggregationSearch implements AggregationSearch {
                                   QueryEngine queryEngine,
                                   EventsConfigurationProvider configProvider,
                                   MoreSearch moreSearch,
-                                  PermittedStreams permittedStreams) {
+                                  PermittedStreams permittedStreams,
+                                  NotificationService notificationService) {
         this.config = config;
         this.parameters = parameters;
         this.searchOwner = searchOwner;
@@ -108,6 +113,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         this.configurationProvider = configProvider;
         this.moreSearch = moreSearch;
         this.permittedStreams = permittedStreams;
+        this.notificationService = notificationService;
     }
 
     private String metricName(AggregationSeries series) {
@@ -144,9 +150,22 @@ public class PivotAggregationSearch implements AggregationSearch {
             });
 
             // If we have only EmptyParameterErrors, just return an empty Result
-            if (! (errors.stream().filter(e -> !(e instanceof EmptyParameterError)).count() > 1)) {
+            if (errors.stream().allMatch(e -> e instanceof EmptyParameterError)) {
                 return AggregationResult.empty();
             }
+
+            final String description = f("Event definition %s (%s) failed: %s",
+                    eventDefinition.title(), eventDefinition.id(),
+                    errors.stream().map(SearchError::description).collect(Collectors.joining("\n")));
+            Notification systemNotification = notificationService.buildNow()
+                    .addType(Notification.Type.SEARCH_ERROR)
+                    .addSeverity(Notification.Severity.NORMAL)
+                    .addTimestamp(DateTime.now(DateTimeZone.UTC))
+                    .addKey(eventDefinition.id())
+                    .addDetail("title", "Aggregation search failed")
+                    .addDetail("description", description);
+            notificationService.publishIfFirst(systemNotification);
+
             if (errors.size() > 1) {
                 throw new EventProcessorException("Pivot search failed with multiple errors.", false, eventDefinition);
             } else {
@@ -158,7 +177,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         final PivotResult streamsResult = (PivotResult) streamQueryResult.searchTypes().get(STREAMS_PIVOT_ID);
 
         return AggregationResult.builder()
-                .keyResults(extractValues(pivotResult))
+                .keyResults( extractValues(pivotResult))
                 .effectiveTimerange(pivotResult.effectiveTimerange())
                 .totalAggregatedMessages(pivotResult.total())
                 .sourceStreams(extractSourceStreams(streamsResult))
@@ -319,7 +338,12 @@ public class PivotAggregationSearch implements AggregationSearch {
                 }
             }
 
-            DateTime resultTimestamp = DateTime.parse(timeKey).withZone(DateTimeZone.UTC);
+            DateTime resultTimestamp;
+            try{
+                resultTimestamp = DateTime.parse(timeKey).withZone(DateTimeZone.UTC);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalStateException("Failed to create event for: " + eventDefinition.title() + " (possibly due to non-existing grouping fields)", e);
+            }
             results.add(AggregationKeyResult.builder()
                     .key(groupKey)
                     .timestamp(resultTimestamp)

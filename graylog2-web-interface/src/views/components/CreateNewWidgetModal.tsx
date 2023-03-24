@@ -21,11 +21,10 @@ import styled, { css } from 'styled-components';
 import { Modal, Button } from 'components/bootstrap';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import usePluginEntities from 'hooks/usePluginEntities';
-import { WidgetActions } from 'views/stores/WidgetStore';
 import generateId from 'logic/generateId';
-import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
-import { useStore } from 'stores/connect';
-import { ViewStore } from 'views/stores/ViewStore';
+import useView from 'views/hooks/useView';
+import useAppDispatch from 'stores/useAppDispatch';
+import { addWidget } from 'views/logic/slices/widgetActions';
 
 const modalTitle = 'Create new widget';
 
@@ -40,11 +39,12 @@ const CreateWidgetButton = styled(Button)`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;  
+  align-items: center;
   text-align: center;
   padding: 10px;
   width: 8rem;
   white-space: normal;
+
   && {
     background: transparent;
     border-radius: 4px;
@@ -62,15 +62,15 @@ type Props = {
 
 const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
   const creators = usePluginEntities('widgetCreators');
-  const view = useStore(ViewStore, (store) => store?.view);
+  const view = useView();
+  const dispatch = useAppDispatch();
 
   const widgetButtons = useMemo(() => creators.map(({ title, func, icon: WidgetIcon }) => {
     const onClick = async () => {
       const newId = generateId();
-      await CurrentViewStateActions.updateWidgetPosition(newId, position);
       const newWidget = func({ view }).toBuilder().id(newId).build();
 
-      return WidgetActions.create(newWidget);
+      return dispatch(addWidget(newWidget, position));
     };
 
     return (
@@ -78,7 +78,7 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
         <HugeIcon><WidgetIcon /></HugeIcon>{title}
       </CreateWidgetButton>
     );
-  }), [creators, position, view]);
+  }), [creators, dispatch, position, view]);
 
   return (
     <Modal onHide={onCancel}

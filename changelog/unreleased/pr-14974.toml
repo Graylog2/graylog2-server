@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix error on missing permission when creating email event notifications. Adds `users:list` permission to role User Inspector"
+
+pulls = ["14974"]
+issues = ["Graylog2/graylog-plugin-enterprise#4886"]

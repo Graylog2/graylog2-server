@@ -19,7 +19,6 @@ import PropTypes from 'prop-types';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
-import type { TitlesMap } from 'views/stores/TitleTypes';
 
 /**
  * Component that allows the user to update a QueryTab title.
@@ -28,7 +27,7 @@ import type { TitlesMap } from 'views/stores/TitleTypes';
  */
 
 type Props = {
-  onTitleChange: (newTitle: string) => Promise<TitlesMap>,
+  onTitleChange: (newTitle: string) => void,
 };
 
 type State = {

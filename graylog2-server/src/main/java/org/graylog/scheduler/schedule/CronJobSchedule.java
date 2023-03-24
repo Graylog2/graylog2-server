@@ -25,15 +25,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
 import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Null;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -79,7 +76,7 @@ public abstract class CronJobSchedule implements JobSchedule {
     private ZonedDateTime getZonedDateTime(JobSchedulerClock clock) {
         final DateTime now = clock.nowUTC();
         Instant instant = Instant.ofEpochMilli(now.getMillis());
-        ZoneId zoneId = ZoneId.of(timezone().orElse(DEFAULT_TIMEZONE));
+        ZoneId zoneId = ZoneId.of(timezone().orElse(DEFAULT_TIMEZONE), ZoneId.SHORT_IDS);
         return ZonedDateTime.ofInstant(instant, zoneId);
     }
 
@@ -90,7 +87,7 @@ public abstract class CronJobSchedule implements JobSchedule {
 
     @Override
     public Optional<Map<String, Object>> toDBUpdate(String fieldPrefix) {
-        return Optional.of(ImmutableMap.of(
+        return Optional.of(java.util.Map.of(
                 fieldPrefix + JobSchedule.TYPE_FIELD, type(),
                 fieldPrefix + FIELD_CRON_EXPRESSION, cronExpression(),
                 fieldPrefix + FIELD_TIMEZONE, timezone().orElse(DEFAULT_TIMEZONE) // always store a TZ together with the cron expression
@@ -103,7 +100,7 @@ public abstract class CronJobSchedule implements JobSchedule {
     public abstract CronJobSchedule.Builder toBuilder();
 
     @AutoValue.Builder
-    public static abstract class Builder implements JobSchedule.Builder<Builder> {
+    public abstract static class Builder implements JobSchedule.Builder<Builder> {
 
         @JsonCreator
         public static Builder create() {

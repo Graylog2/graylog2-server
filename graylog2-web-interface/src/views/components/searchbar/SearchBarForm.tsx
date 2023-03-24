@@ -19,7 +19,7 @@ import { useCallback, useContext, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import type { FormikProps } from 'formik';
 import { Form, Formik } from 'formik';
-import { isFunction } from 'lodash';
+import isFunction from 'lodash/isFunction';
 
 import { onInitializingTimerange, onSubmittingTimerange } from 'views/components/TimerangeForForm';
 import type { SearchBarFormValues } from 'views/Constants';
@@ -28,6 +28,7 @@ import type { QueryValidationState } from 'views/components/searchbar/queryvalid
 import validate from 'views/components/searchbar/validate';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
+import useHandlerContext from 'views/components/useHandlerContext';
 
 type Props = {
   children: ((props: FormikProps<SearchBarFormValues>) => React.ReactNode) | React.ReactNode,
@@ -62,8 +63,9 @@ const SearchBarForm = ({ initialValues, limitDuration, onSubmit, children, valid
     });
   }, [formatTime, initialValues]);
 
-  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime),
-    [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime]);
+  const handlerContext = useHandlerContext();
+  const _validate = useCallback((values: SearchBarFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime, handlerContext),
+    [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime, handlerContext]);
 
   return (
     <Formik<SearchBarFormValues> initialValues={_initialValues}

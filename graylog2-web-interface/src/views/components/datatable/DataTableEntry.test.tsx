@@ -62,6 +62,8 @@ const seriesWithName = (fn, name) => Series.forFunction(fn)
     .build())
   .build();
 
+jest.mock('views/hooks/useActiveQueryId', () => () => 'foobar');
+
 describe('DataTableEntry', () => {
   const SUT = (props) => (
     <table>

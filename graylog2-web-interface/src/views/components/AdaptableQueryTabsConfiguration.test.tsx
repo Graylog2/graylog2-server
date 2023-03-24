@@ -17,27 +17,19 @@
 
 import { render, screen } from 'wrappedTestingLibrary';
 import React from 'react';
-import Immutable, { OrderedSet, Map as MockMap } from 'immutable';
+import Immutable, { OrderedSet } from 'immutable';
 import userEvent from '@testing-library/user-event';
 
-import { MockStore } from 'helpers/mocking';
 import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabsConfiguration';
-import mockAction from 'helpers/mocking/MockAction';
-import { QueriesActions } from 'views/actions/QueriesActions';
-import { ViewStatesActions } from 'views/stores/ViewStatesStore';
-import ViewState from 'views/logic/views/ViewState';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import { setQueriesOrder, mergeQueryTitles } from 'views/logic/slices/viewSlice';
 
-jest.mock('views/stores/QueriesStore', () => ({ QueriesActions: {} }));
-jest.mock('views/stores/ViewStatesStore', () => ({ ViewStatesActions: {} }));
-
-jest.mock('views/stores/ViewStatesStore', () => ({
-  ViewStatesActions: {
-    patchQueriesTitle: jest.fn(() => Promise.resolve()),
-  },
-  ViewStatesStore: MockStore(['getInitialState', () => MockMap()]),
+jest.mock('views/logic/slices/viewSlice', () => ({
+  ...jest.requireActual('views/logic/slices/viewSlice'),
+  setQueriesOrder: jest.fn(() => async () => {}),
+  mergeQueryTitles: jest.fn(() => async () => {}),
 }));
-
-const setShow = jest.fn();
 
 describe('AdaptableQueryTabsConfiguration', () => {
   let oldConfirm;
@@ -52,21 +44,23 @@ describe('AdaptableQueryTabsConfiguration', () => {
     window.confirm = oldConfirm;
   });
 
-  const renderConfiguration = () => render(
-    <AdaptableQueryTabsConfiguration show
-                                     setShow={setShow}
-                                     activeQueryId="queryId-1"
-                                     dashboardId="dashboard-id"
-                                     queriesList={OrderedSet(
-                                       [
-                                         { id: 'queryId-1', title: 'Query Title 1' },
-                                         { id: 'queryId-2', title: 'Query Title 2' },
-                                       ])} />);
+  beforeAll(loadViewsPlugin);
 
-  beforeEach(() => {
-    QueriesActions.setOrder = mockAction(jest.fn(() => Promise.resolve(Immutable.OrderedMap())));
-    ViewStatesActions.patchQueriesTitle = mockAction(jest.fn(() => Promise.resolve(ViewState.create())));
-  });
+  afterAll(unloadViewsPlugin);
+
+  const renderConfiguration = () => render((
+    <TestStoreProvider>
+      <AdaptableQueryTabsConfiguration show
+                                       setShow={() => {}}
+                                       activeQueryId="queryId-1"
+                                       dashboardId="dashboard-id"
+                                       queriesList={OrderedSet(
+                                         [
+                                           { id: 'queryId-1', title: 'Query Title 1' },
+                                           { id: 'queryId-2', title: 'Query Title 2' },
+                                         ])} />
+    </TestStoreProvider>
+  ));
 
   it('should display modal window', async () => {
     renderConfiguration();
@@ -86,12 +80,12 @@ describe('AdaptableQueryTabsConfiguration', () => {
     const submitButton = await screen.findByTitle('Update configuration');
     userEvent.click(submitButton);
 
-    await expect(QueriesActions.setOrder).toHaveBeenCalledWith(Immutable.OrderedSet(['queryId-1', 'queryId-2']));
+    await expect(setQueriesOrder).toHaveBeenCalledWith(Immutable.OrderedSet(['queryId-1', 'queryId-2']));
 
-    await expect(ViewStatesActions.patchQueriesTitle).toHaveBeenCalledWith(Immutable.OrderedSet([
+    await expect(mergeQueryTitles).toHaveBeenCalledWith([
       { queryId: 'queryId-1', titlesMap: Immutable.Map({ tab: Immutable.Map({ title: 'Query Title 1' }) }) },
       { queryId: 'queryId-2', titlesMap: Immutable.Map({ tab: Immutable.Map({ title: 'Query Title 2' }) }) },
-    ]));
+    ]);
   });
 
   it('should remove dashboard page', async () => {
@@ -106,10 +100,10 @@ describe('AdaptableQueryTabsConfiguration', () => {
     const submitButton = await screen.findByTitle('Update configuration');
     userEvent.click(submitButton);
 
-    await expect(QueriesActions.setOrder).toHaveBeenCalledWith(Immutable.OrderedSet(['queryId-1']));
+    await expect(setQueriesOrder).toHaveBeenCalledWith(Immutable.OrderedSet(['queryId-1']));
 
-    await expect(ViewStatesActions.patchQueriesTitle).toHaveBeenCalledWith(Immutable.OrderedSet([
+    await expect(mergeQueryTitles).toHaveBeenCalledWith([
       { queryId: 'queryId-1', titlesMap: Immutable.Map({ tab: Immutable.Map({ title: 'Query Title 1' }) }) },
-    ]));
+    ]);
   });
 });

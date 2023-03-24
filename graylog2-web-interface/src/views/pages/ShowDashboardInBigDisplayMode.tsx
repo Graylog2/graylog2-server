@@ -17,13 +17,9 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
-import connect from 'stores/connect';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
-import { ViewStore } from 'views/stores/ViewStore';
 import BigDisplayModeHeader from 'views/components/dashboard/BigDisplayModeHeader';
 import CycleQueryTab from 'views/components/dashboard/bigdisplay/CycleQueryTab';
-import type { QueryId } from 'views/logic/queries/Query';
-import type View from 'views/logic/views/View';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import type { UntypedBigDisplayModeQuery } from 'views/components/dashboard/BigDisplayModeConfiguration';
 import type { Location } from 'routing/withLocation';
@@ -39,10 +35,6 @@ type BigDisplayModeQuery = {
 
 type Props = {
   location: Location,
-  view: {
-    view?: View,
-    activeQuery?: QueryId,
-  },
 };
 
 const castQueryWithDefaults = ({ tabs, interval, refresh }: UntypedBigDisplayModeQuery): BigDisplayModeQuery => ({
@@ -58,7 +50,7 @@ const BodyPositioningWrapper = styled.div`
   padding: 10px;
 `;
 
-const ShowDashboardInBigDisplayMode = ({ location, view: { view, activeQuery } = {} }: Props) => {
+const ShowDashboardInBigDisplayMode = ({ location }: Props) => {
   const { query } = location;
   const configuration = castQueryWithDefaults(query);
 
@@ -74,12 +66,13 @@ const ShowDashboardInBigDisplayMode = ({ location, view: { view, activeQuery } =
   return (
     <InteractiveContext.Provider value={false}>
       <BodyPositioningWrapper>
-        {view && activeQuery ? <CycleQueryTab interval={configuration.interval} view={view} activeQuery={activeQuery} tabs={configuration.tabs} /> : null}
-        <BigDisplayModeHeader />
-        <ShowViewPage />
+        <ShowViewPage>
+          <CycleQueryTab interval={configuration.interval} tabs={configuration.tabs} />
+          <BigDisplayModeHeader />
+        </ShowViewPage>
       </BodyPositioningWrapper>
     </InteractiveContext.Provider>
   );
 };
 
-export default withLocation(connect(ShowDashboardInBigDisplayMode, { view: ViewStore }));
+export default withLocation(ShowDashboardInBigDisplayMode);

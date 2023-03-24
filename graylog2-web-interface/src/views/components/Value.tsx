@@ -20,6 +20,7 @@ import styled from 'styled-components';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { ValueRenderer, ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import ValueActions from './actions/ValueActions';
 import TypeSpecificValue from './TypeSpecificValue';
@@ -30,7 +31,6 @@ type Props = {
   field: string,
   value: any,
   render?: ValueRenderer,
-  queryId: string | null | undefined,
   type: FieldType,
 };
 
@@ -40,21 +40,31 @@ const ValueActionTitle = styled.span`
 
 const defaultRenderer: ValueRenderer = ({ value }: ValueRendererProps) => value;
 
-const Value = ({ children, field, value, queryId, render = defaultRenderer, type = FieldType.Unknown }: Props) => {
+const InteractiveValue = ({ children, field, value, render, type }: Props) => {
+  const queryId = useActiveQueryId();
   const RenderComponent: ValueRenderer = useMemo(() => render ?? ((props: ValueRendererProps) => props.value), [render]);
   const Component = useCallback(({ value: componentValue }) => <RenderComponent field={field} value={componentValue} />, [RenderComponent, field]);
   const element = <TypeSpecificValue field={field} value={value} type={type} render={Component} />;
 
   return (
+    <ValueActions element={children || element} field={field} queryId={queryId} type={type} value={value}>
+      <ValueActionTitle data-testid="value-actions-title">
+        {field} = <TypeSpecificValue field={field} value={value} type={type} truncate />
+      </ValueActionTitle>
+    </ValueActions>
+  );
+};
+
+InteractiveValue.defaultProps = {
+  children: null,
+  render: defaultRenderer,
+};
+
+const Value = ({ children, field, value, render = defaultRenderer, type = FieldType.Unknown }: Props) => {
+  return (
     <InteractiveContext.Consumer>
-      {(interactive) => ((interactive && queryId)
-        ? (
-          <ValueActions element={children || element} field={field} queryId={queryId} type={type} value={value}>
-            <ValueActionTitle data-testid="value-actions-title">
-              {field} = <TypeSpecificValue field={field} value={value} type={type} truncate />
-            </ValueActionTitle>
-          </ValueActions>
-        )
+      {(interactive) => ((interactive)
+        ? <InteractiveValue field={field} value={value} render={render} type={type}>{children}</InteractiveValue>
         : <span><TypeSpecificValue field={field} value={value} type={type} /></span>)}
     </InteractiveContext.Consumer>
   );

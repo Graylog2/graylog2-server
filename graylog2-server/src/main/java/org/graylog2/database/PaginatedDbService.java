@@ -284,14 +284,40 @@ public abstract class PaginatedDbService<DTO> {
         return sortBuilder;
     }
 
+    protected DBSort.SortBuilder getMultiFieldSortBuilder(String order, List<String> fields) {
+        if (fields == null || fields.isEmpty()) {
+            return DBSort.asc("_id");
+        }
+        final List<String> distinctFields = fields.stream().distinct().toList();
+        DBSort.SortBuilder sortBuilder = null;
+        if ("desc".equalsIgnoreCase(order)) {
+            for (String field : distinctFields) {
+                if (sortBuilder == null) {
+                    sortBuilder = DBSort.desc(field);
+                } else {
+                    sortBuilder = sortBuilder.desc(field);
+                }
+            }
+        } else {
+            for (String field : distinctFields) {
+                if (sortBuilder == null) {
+                    sortBuilder = DBSort.asc(field);
+                } else {
+                    sortBuilder = sortBuilder.asc(field);
+                }
+            }
+        }
+        return sortBuilder;
+    }
+
     /**
      * Utility method to use, if you can't page it inside of MongoDB
      *
      * @param sourceList
      * @param page
      * @param pageSize
-     * @return
      * @param <T>
+     * @return
      */
     public static <T> List<T> getPage(List<T> sourceList, int page, int pageSize) {
         if(pageSize <= 0 || page <= 0) {

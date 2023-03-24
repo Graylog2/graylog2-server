@@ -17,29 +17,34 @@
 import * as React from 'react';
 import { useCallback, useContext, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { createSelector } from '@reduxjs/toolkit';
+import type * as Immutable from 'immutable';
 
-import type { WidgetPositions, BackendWidgetPosition } from 'views/types';
+import type { WidgetPositions, BackendWidgetPosition, GetState } from 'views/types';
 import ReactGridContainer from 'components/common/ReactGridContainer';
 import { widgetDefinition } from 'views/logic/Widgets';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import { useStore } from 'stores/connect';
-import { WidgetStore } from 'views/stores/WidgetStore';
-import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
-import type { StoreState } from 'stores/StoreTypes';
-import { ViewStatesStore } from 'views/stores/ViewStatesStore';
 import ElementDimensions from 'components/common/ElementDimensions';
+import useAppSelector from 'stores/useAppSelector';
+import { selectViewStates, selectIsDirty } from 'views/logic/slices/viewSelectors';
+import type Widget from 'views/logic/widgets/Widget';
 import findGaps from 'views/components/GridGaps';
 import generateId from 'logic/generateId';
 import NewWidgetPlaceholder from 'views/components/NewWidgetPlaceholder';
 import CreateNewWidgetModal from 'views/components/CreateNewWidgetModal';
 import isDeepEqual from 'stores/isDeepEqual';
-import { ViewActions, ViewStore } from 'views/stores/ViewStore';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import useAppDispatch from 'stores/useAppDispatch';
+import { updateWidgetPositions, updateWidgetPosition } from 'views/logic/slices/widgetActions';
+import { setIsDirty } from 'views/logic/slices/viewSlice';
 
 import WidgetContainer from './WidgetContainer';
 import WidgetComponent from './WidgetComponent';
+
+import useWidgets from '../hooks/useWidgets';
 
 const COLUMNS = {
   xxl: 12,
@@ -94,18 +99,19 @@ const WidgetGridItem = ({
   );
 };
 
-const generatePositions = (widgets: Array<{ id: string, type: string }>, positions: { [widgetId: string]: WidgetPosition }) => Object.fromEntries(
-  widgets.map<[string, WidgetPosition]>(({ id, type }) => [id, positions[id] ?? _defaultDimensions(type)]),
-);
+const generatePositions = (widgets: Immutable.List<Widget>, positions: { [widgetId: string]: WidgetPosition }) => Object.fromEntries(widgets
+  .toArray()
+  .map<[string, WidgetPosition]>(({ id, type }) => [id, positions[id] ?? _defaultDimensions(type)]));
 
-const mapWidgetPositions = (states: StoreState<typeof ViewStatesStore>) => Object.fromEntries(states.toArray().flatMap((state) => Object.entries(state.widgetPositions)));
-const mapWidgets = (state: StoreState<typeof WidgetStore>) => state.map(({ id, type }) => ({ id, type })).toArray();
+const selectWidgetPositions = createSelector(selectViewStates, (viewStates) => Object.fromEntries(viewStates.toArray().flatMap(({ widgetPositions }) => Object.entries(widgetPositions))));
 
-const useWidgetPositions = (): WidgetPositions => {
-  const initialPositions = useStore(ViewStatesStore, mapWidgetPositions);
-  const widgets = useStore(WidgetStore, mapWidgets);
+const useWidgetsAndPositions = (): [ReturnType<typeof useWidgets>, WidgetPositions] => {
+  const initialPositions = useAppSelector(selectWidgetPositions);
+  const widgets = useWidgets();
 
-  return useMemo(() => generatePositions(widgets, initialPositions), [widgets, initialPositions]);
+  const positions = useMemo(() => generatePositions(widgets, initialPositions), [widgets, initialPositions]);
+
+  return [widgets, positions];
 };
 
 type GridProps = {
@@ -144,29 +150,30 @@ const MAXIMUM_GRID_SIZE = 12;
 
 const convertPosition = ({ col, row, height, width }: BackendWidgetPosition) => new WidgetPosition(col, row, height, width >= MAXIMUM_GRID_SIZE ? Infinity : width);
 
-const onPositionChange = (newPosition: BackendWidgetPosition) => {
+const onPositionChange = (dispatch: AppDispatch, newPosition: BackendWidgetPosition) => {
   const { id } = newPosition;
   const widgetPosition = convertPosition(newPosition);
-  CurrentViewStateActions.updateWidgetPosition(id, widgetPosition);
+
+  return dispatch(updateWidgetPosition(id, widgetPosition));
 };
 
-const _onPositionsChange = (newPositions: Array<BackendWidgetPosition>, setLastUpdate: (newValue: string) => void) => {
+const _onPositionsChange = (dispatch: AppDispatch, newPositions: Array<BackendWidgetPosition>, setLastUpdate: (newValue: string) => void) => {
   const widgetPositions = Object.fromEntries(newPositions.map((newPosition) => [newPosition.id, convertPosition(newPosition)]));
-  CurrentViewStateActions.widgetPositions(widgetPositions);
   setLastUpdate(generateId());
+
+  return dispatch(updateWidgetPositions(widgetPositions));
 };
 
-const _onSyncLayout = (positions: WidgetPositions, newPositions: Array<BackendWidgetPosition>) => {
-  const { dirty: isDirty } = ViewStore.getInitialState();
+const _onSyncLayout = (positions: WidgetPositions, newPositions: Array<BackendWidgetPosition>) => (dispatch: AppDispatch, getState: GetState) => {
+  const isDirty = selectIsDirty(getState());
   const widgetPositions = Object.fromEntries(newPositions.map((newPosition) => [newPosition.id, convertPosition(newPosition)]));
 
   if (!isDeepEqual(positions, widgetPositions)) {
-    CurrentViewStateActions.widgetPositions(widgetPositions)
-      .then(() => ViewActions.setDirty(isDirty));
+    dispatch(updateWidgetPositions(widgetPositions)).then(() => dispatch(setIsDirty(isDirty)));
   }
 };
 
-const renderGaps = (widgets: { id: string, type: string}[], positions: WidgetPositions) => {
+const renderGaps = (widgets: Widget[], positions: WidgetPositions) => {
   const items = widgets.map((widget) => positions[widget.id])
     .filter((position) => !!position)
     .map((p) => ({ start: { x: p.col, y: p.row }, end: { x: p.col + p.width, y: p.row + p.height } }));
@@ -198,35 +205,40 @@ const WidgetGrid = () => {
   const { focusedWidget } = useContext(WidgetFocusContext);
   const [lastUpdate, setLastUpdate] = useState<string>(undefined);
   const preventDoubleUpdate = useRef<BackendWidgetPosition[]>();
+  const dispatch = useAppDispatch();
 
-  const widgets = useStore(WidgetStore, (state) => state.map(({ id, type }) => ({ id, type })).toArray().reverse());
-  const positions = useWidgetPositions();
+  const [widgets, positions] = useWidgetsAndPositions();
 
   const onPositionsChange = useCallback((newPositions: Array<BackendWidgetPosition>) => {
     preventDoubleUpdate.current = newPositions;
 
-    return _onPositionsChange(newPositions, setLastUpdate);
-  }, []);
+    return _onPositionsChange(dispatch, newPositions, setLastUpdate);
+  }, [dispatch]);
+  const _onPositionChange = useCallback((newPosition: BackendWidgetPosition) => onPositionChange(dispatch, newPosition), [dispatch]);
   const onSyncLayout = useCallback((newPositions: Array<BackendWidgetPosition>) => {
     if (!isDeepEqual(preventDoubleUpdate.current, newPositions)) {
-      _onSyncLayout(positions, newPositions);
+      dispatch(_onSyncLayout(positions, newPositions));
     }
-  }, [positions]);
+  }, [dispatch, positions]);
 
   const [children, newPositions] = useMemo(() => {
     const widgetItems = widgets
+      .toArray()
       .filter((widget) => !!positions[widget.id])
       .map(({ id: widgetId }) => (
-        <WidgetContainer key={widgetId} isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
+        <WidgetContainer key={widgetId}
+                         className="widgetFrame"
+                         data-widget-id={widgetId}
+                         isFocused={focusedWidget?.id === widgetId && focusedWidget?.focusing}>
           <WidgetGridItem positions={positions}
                           widgetId={widgetId}
                           focusedWidget={focusedWidget}
-                          onPositionsChange={onPositionChange} />
+                          onPositionsChange={_onPositionChange} />
         </WidgetContainer>
       ));
 
     if (isInteractive) {
-      const [gapItems, _positions] = renderGaps(widgets, positions);
+      const [gapItems, _positions] = renderGaps(widgets.toArray(), positions);
 
       return [[...widgetItems, ...gapItems], _positions];
     }

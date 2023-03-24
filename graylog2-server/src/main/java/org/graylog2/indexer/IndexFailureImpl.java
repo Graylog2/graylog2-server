@@ -18,7 +18,7 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableMap;
 import org.bson.types.ObjectId;
-import org.graylog2.database.CollectionName;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.validators.Validator;
@@ -27,7 +27,11 @@ import org.joda.time.DateTime;
 import java.util.Collections;
 import java.util.Map;
 
-@CollectionName("index_failures")
+import static org.graylog2.shared.security.RestPermissions.INDICES_FAILURES;
+
+@DbEntity(collection = "index_failures",
+          titleField = "message",
+          readPermission = INDICES_FAILURES)
 public class IndexFailureImpl extends PersistedImpl implements IndexFailure {
 
     public IndexFailureImpl(Map<String, Object> fields) {

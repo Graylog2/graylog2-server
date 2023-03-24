@@ -107,3 +107,5 @@ export const availableTimeRangeTypes = [
   { type: 'absolute' as const, name: 'Absolute' },
   { type: 'keyword' as const, name: 'Keyword' },
 ];
+
+export const VISUALIZATION_TABLE_HEADER_HEIGHT = 28;

@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import { Field, useFormikContext } from 'formik';
 import styled from 'styled-components';
-import { isFunction } from 'lodash';
+import isFunction from 'lodash/isFunction';
 
 import { Input, Checkbox } from 'components/bootstrap';
 import Select from 'components/common/Select';
@@ -34,7 +34,7 @@ import VisualizationElement from './VisualizationElement';
 import ElementConfigurationContainer from '../ElementConfigurationContainer';
 
 const EventAnnotationCheckbox = styled(Checkbox)`
-  input[type="checkbox"] {
+  input[type='checkbox'] {
     margin-right: 0;
     right: 0;
   }

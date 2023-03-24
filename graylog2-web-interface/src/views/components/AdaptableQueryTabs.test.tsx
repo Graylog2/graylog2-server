@@ -21,8 +21,10 @@ import Immutable, { Map } from 'immutable';
 import userEvent from '@testing-library/user-event';
 
 import type { TitlesMap } from 'views/stores/TitleTypes';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
-import AdaptableQueryTabs from './AdaptableQueryTabs';
+import OriginalAdaptableQueryTabs from './AdaptableQueryTabs';
 import type QueryTitleEditModal from './queries/QueryTitleEditModal';
 
 jest.mock('views/components/dashboard/hooks/useDashboards', () => () => ({
@@ -58,6 +60,12 @@ const DEFAULT_PROPS = {
   dashboardId: 'dashboard-id',
 };
 
+const AdaptableQueryTabs = (props: React.ComponentProps<typeof OriginalAdaptableQueryTabs>) => (
+  <TestStoreProvider>
+    <OriginalAdaptableQueryTabs {...props} />
+  </TestStoreProvider>
+);
+
 describe('AdaptableQueryTabs', () => {
   const mainTabRole = 'button';
   const dropdownTabRole = 'menuitem';
@@ -68,6 +76,10 @@ describe('AdaptableQueryTabs', () => {
       hidden: true,
     });
   };
+
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
 
   describe('renders main tabs and more tabs dropdown based on container width', () => {
     // Defaults widths: Container width = 500px, create tab button + more tabs dropdown button with = 215px, width of one main tab = 100px

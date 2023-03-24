@@ -15,9 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { renderHook, act } from '@testing-library/react-hooks';
 import { fireEvent, render } from 'wrappedTestingLibrary';
-/* eslint-disable testing-library/no-unnecessary-act */
+import { renderHook, act } from 'wrappedTestingLibrary/hooks';
 
 import useIsKeyHeld from 'hooks/useIsKeyHeld';
 
@@ -26,12 +25,14 @@ describe('useIsKeyHeld custom hook', () => {
     const { container } = render(<input />);
     const { result } = renderHook(() => useIsKeyHeld('Enter'));
 
+    // eslint-disable-next-line testing-library/no-unnecessary-act
     act(() => {
       fireEvent.keyDown(container, { key: 'Enter', code: 13, charCode: 13 });
     });
 
     expect(result.current).toEqual(true);
 
+    // eslint-disable-next-line testing-library/no-unnecessary-act
     act(() => {
       fireEvent.keyUp(container, { key: 'Enter', code: 13, charCode: 13 });
     });
@@ -43,12 +44,14 @@ describe('useIsKeyHeld custom hook', () => {
     const { result } = renderHook(() => useIsKeyHeld('Enter'));
     const { container } = render(<input />);
 
+    // eslint-disable-next-line testing-library/no-unnecessary-act
     act(() => {
       fireEvent.keyDown(container, { key: 'Enter', code: 13, charCode: 13 });
     });
 
     expect(result.current).toEqual(true);
 
+    // eslint-disable-next-line testing-library/no-unnecessary-act
     act(() => {
       fireEvent.keyDown(container, { key: 'Shift', code: 16, charCode: 16 });
     });

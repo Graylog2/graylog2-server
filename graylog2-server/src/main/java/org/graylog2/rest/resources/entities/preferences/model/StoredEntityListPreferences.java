@@ -16,8 +16,45 @@
  */
 package org.graylog2.rest.resources.entities.preferences.model;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.google.auto.value.AutoValue;
+import org.mongojack.Id;
 
-public record StoredEntityListPreferences(@JsonUnwrapped StoredEntityListPreferencesId preferencesId,
-                                          @JsonUnwrapped EntityListPreferences preferences) {
+@AutoValue
+@JsonAutoDetect
+@JsonDeserialize(builder = StoredEntityListPreferences.Builder.class)
+public abstract class StoredEntityListPreferences {
+    @Id
+    public abstract StoredEntityListPreferencesId preferencesId();
+
+    @JsonUnwrapped
+    public abstract EntityListPreferences preferences();
+
+    @JsonCreator
+    public static StoredEntityListPreferences.Builder builder() {
+        return new AutoValue_StoredEntityListPreferences.Builder();
+    }
+
+    @AutoValue.Builder
+    @JsonPOJOBuilder(withPrefix = "")
+    public abstract static class Builder {
+
+        @Id
+        public abstract Builder preferencesId(final StoredEntityListPreferencesId preferencesId);
+
+        @JsonUnwrapped
+        public abstract Builder preferences(final EntityListPreferences preferences);
+
+        public abstract StoredEntityListPreferences build();
+
+        @JsonCreator
+        public static Builder create() {
+            return builder();
+        }
+    }
+
 }

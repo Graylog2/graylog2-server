@@ -19,11 +19,11 @@ package org.graylog2.filters;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import org.graylog.failure.ProcessingFailureCause;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.inputs.Extractor;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
@@ -54,7 +54,7 @@ class ExtractorFilterTest {
     }
 
     @Test
-    void testFailureHandling() throws NotFoundException {
+    void testFailureHandling() {
 
         final Input input = mock(Input.class);
         when(input.getId()).thenReturn("123");
@@ -65,8 +65,8 @@ class ExtractorFilterTest {
         when(extractor.getId()).thenReturn("888");
         when(inputService.getExtractors(any())).thenReturn(ImmutableList.of(extractor));
 
-        // extractors are initialized within constructor
         dut = new ExtractorFilter(inputService, eventBus, executorService);
+        dut.lifecycleChanged(Lifecycle.STARTING);
 
         final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
         message.setSourceInputId("123");

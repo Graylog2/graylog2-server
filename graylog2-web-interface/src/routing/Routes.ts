@@ -108,7 +108,7 @@ const Routes = {
         OVERVIEW: '/system/authentication/services',
         ACTIVE: '/system/authentication/services/active',
         CREATE: '/system/authentication/services/create',
-        createBackend: (name) => `/system/authentication/services/create/${name}`,
+        createBackend: (name: string) => `/system/authentication/services/create/${name}`,
         show: (id: string) => `/system/authentication/services/${id}`,
         edit: (id: string, initialStepKey?: string) => {
           const editUrl = `/system/authentication/services/edit/${id}`;
@@ -168,6 +168,7 @@ const Routes = {
       STATUS: (sidecarId: string) => `/system/sidecars/${sidecarId}/status`,
       ADMINISTRATION: '/system/sidecars/administration',
       CONFIGURATION: '/system/sidecars/configuration',
+      FAILURE_TRACKING: '/system/sidecars/failuretracking',
       NEW_CONFIGURATION: '/system/sidecars/configuration/new',
       EDIT_CONFIGURATION: (configurationId: string) => `/system/sidecars/configuration/edit/${configurationId}`,
       NEW_COLLECTOR: '/system/sidecars/collector/new',
@@ -244,6 +245,8 @@ const Routes = {
   legacy_stream_search: (streamId: string) => `/streams/${streamId}/messages`,
 
   dashboard_show: (dashboardId: string) => `/dashboards/${dashboardId}`,
+
+  show_saved_search: (searchId: string) => `/search/${searchId}`,
 
   node: (nodeId: string) => `/system/nodes/${nodeId}`,
 

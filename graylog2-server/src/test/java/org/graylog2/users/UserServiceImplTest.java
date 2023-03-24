@@ -196,10 +196,18 @@ public class UserServiceImplTest {
 
     @Test
     @MongoDBFixtures("UserServiceImplTest.json")
-    public void testDelete() throws Exception {
+    public void testDeleteByName() throws Exception {
         assertThat(userService.delete("user1")).isEqualTo(1);
         assertThat(userService.delete("user-duplicate")).isEqualTo(2);
         assertThat(userService.delete("user-does-not-exist")).isEqualTo(0);
+    }
+
+    @Test
+    @MongoDBFixtures("UserServiceImplTest.json")
+    public void testDeleteById() throws Exception {
+        assertThat(userService.deleteById("54e3deadbeefdeadbeef0001")).isEqualTo(1);
+        assertThat(userService.deleteById("54e3deadbeefdeadbeef0003")).isEqualTo(1);
+        assertThat(userService.deleteById("00000eadbeefdeadbee00000")).isEqualTo(0);
     }
 
     @Test

@@ -18,6 +18,8 @@ import MockStore from 'helpers/mocking/StoreMock';
 import MockAction from 'helpers/mocking/MockAction';
 import FieldType, { FieldTypes, Properties } from 'views/logic/fieldtypes/FieldType';
 import type { ActionDefinition } from 'views/components/actions/ActionHandler';
+import { createSearch } from 'fixtures/searches';
+import type { RootState } from 'views/types';
 
 import bindings from './bindings';
 
@@ -43,6 +45,9 @@ describe('Views bindings value actions', () => {
     type: FieldType.Unknown,
   };
   const findAction = (type): ActionDefinition<{}> => valueActions.find((binding) => binding.type === type);
+  const view = createSearch({ queryId: 'query1' });
+  const rootState = { view: { view } } as RootState;
+  const getState = jest.fn(() => rootState);
 
   describe('CreateExtractor', () => {
     const action = findAction('create-extractor');
@@ -57,22 +62,22 @@ describe('Views bindings value actions', () => {
     });
 
     it('should be enabled for fields with a message context', () => {
-      expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }))
+      expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }, getState))
         .toEqual(true);
     });
 
     it('should be disabled for fields without a message context', () => {
-      expect(isEnabled({ ...defaultArguments, contexts: {}, field: 'something', type: FieldTypes.STRING() }))
+      expect(isEnabled({ ...defaultArguments, contexts: {}, field: 'something', type: FieldTypes.STRING() }, getState))
         .toEqual(false);
     });
 
     it('should be enabled for fields with type string', () => {
-      expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }))
+      expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }, getState))
         .toEqual(true);
     });
 
     it('should be enabled for fields with type number', () => {
-      expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.INT() }))
+      expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.INT() }, getState))
         .toEqual(true);
     });
 
@@ -81,7 +86,7 @@ describe('Views bindings value actions', () => {
         ...defaultArguments,
         field: 'something',
         type: FieldType.create('string', [Properties.Compound]),
-      }))
+      }, getState))
         .toEqual(true);
     });
 
@@ -90,7 +95,7 @@ describe('Views bindings value actions', () => {
         ...defaultArguments,
         field: 'something',
         type: FieldType.create('string', [Properties.Decorated]),
-      }))
+      }, getState))
         .toEqual(false);
     });
   });

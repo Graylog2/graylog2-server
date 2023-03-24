@@ -96,6 +96,7 @@ import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.storage.VersionAwareStorageModule;
+import org.graylog2.streams.StreamsModule;
 import org.graylog2.system.processing.ProcessingStatusConfig;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.slf4j.Logger;
@@ -165,10 +166,10 @@ public class Server extends ServerBootstrap {
                 new MessageInputBindings(),
                 new MessageOutputBindings(configuration, chainingClassLoader),
                 new RotationStrategyBindings(elasticsearchConfiguration),
-                new RetentionStrategyBindings(),
+                new RetentionStrategyBindings(elasticsearchConfiguration),
                 new PeriodicalBindings(),
                 new ObjectMapperModule(chainingClassLoader),
-                new RestApiBindings(),
+                new RestApiBindings(configuration),
                 new PasswordAlgorithmBindings(),
                 new DecoratorBindings(),
                 new AuditBindings(),
@@ -191,6 +192,7 @@ public class Server extends ServerBootstrap {
                 new SearchFiltersModule(),
                 new ScopedEntitiesModule(),
                 new ScriptingApiModule(featureFlags),
+                new StreamsModule(),
                 new TracingModule()
         );
         return modules.build();

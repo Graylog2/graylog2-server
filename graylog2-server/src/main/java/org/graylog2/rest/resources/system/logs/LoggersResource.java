@@ -47,6 +47,7 @@ import org.graylog2.rest.models.system.loggers.responses.LoggersSummary;
 import org.graylog2.rest.models.system.loggers.responses.SingleLoggerSummary;
 import org.graylog2.rest.models.system.loggers.responses.SingleSubsystemSummary;
 import org.graylog2.rest.models.system.loggers.responses.SubsystemSummary;
+import org.graylog2.shared.rest.HideOnCloud;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
@@ -220,6 +221,7 @@ public class LoggersResource extends RestResource {
     @Path("/messages/recent")
     @Produces(MediaType.APPLICATION_JSON)
     @RequiresPermissions(RestPermissions.LOGGERSMESSAGES_READ)
+    @HideOnCloud
     public LogMessagesSummary messages(@ApiParam(name = "limit", value = "How many log messages should be returned", defaultValue = "500", allowableValues = "range[0, infinity]")
                                        @QueryParam("limit") @DefaultValue("500") @Min(0L) int limit,
                                        @ApiParam(name = "level", value = "Which log level (or higher) should the messages have", defaultValue = "ALL", allowableValues = "[OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL]")

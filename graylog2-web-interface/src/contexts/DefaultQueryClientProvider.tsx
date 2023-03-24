@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import type { QueryClientConfig } from '@tanstack/react-query';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 
 type Props = {
   children: React.ReactNode,

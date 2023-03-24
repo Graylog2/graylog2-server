@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.entities;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.search.SearchQueryField;
 
 import javax.annotation.Nullable;
 import java.util.Set;
@@ -33,8 +34,7 @@ public abstract class EntityAttribute {
     public abstract String title();
 
     @JsonProperty("type")
-    @Nullable
-    public abstract String type();
+    public abstract SearchQueryField.Type type();
 
     @JsonProperty("sortable")
     @Nullable
@@ -43,6 +43,18 @@ public abstract class EntityAttribute {
     @JsonProperty("filterable")
     @Nullable
     public abstract Boolean filterable();
+
+    @JsonProperty("searchable")
+    @Nullable
+    public abstract Boolean searchable();
+
+    @JsonProperty("hidden")
+    @Nullable
+    public abstract Boolean hidden();
+
+    @JsonProperty("related_collection")
+    @Nullable
+    public abstract String relatedCollection();
 
     @JsonProperty("filter_options")
     @Nullable
@@ -55,15 +67,28 @@ public abstract class EntityAttribute {
     @AutoValue.Builder
     public static abstract class Builder {
         public abstract Builder id(String id);
+
         public abstract Builder title(String title);
-        public abstract Builder type(String type);
+
+        public abstract Builder type(SearchQueryField.Type type);
+
         public abstract Builder sortable(Boolean sortable);
+
         public abstract Builder filterable(Boolean filterable);
+
+        public abstract Builder searchable(Boolean searchable);
+
+        public abstract Builder hidden(Boolean hidden);
+
+        public abstract Builder relatedCollection(String relatedCollection);
+
         public abstract Builder filterOptions(Set<FilterOption> filterOptions);
+
         public abstract EntityAttribute build();
 
         public static Builder builder() {
             return new AutoValue_EntityAttribute.Builder()
+                    .type(SearchQueryField.Type.STRING)
                     .sortable(true);
         }
     }

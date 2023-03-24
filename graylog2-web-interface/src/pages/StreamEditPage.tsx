@@ -15,52 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 
 import { Alert } from 'components/bootstrap';
 import StreamRulesEditor from 'components/streamrules/StreamRulesEditor';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import StreamsStore from 'stores/streams/StreamsStore';
-import useCurrentUser from 'hooks/useCurrentUser';
 import useQuery from 'routing/useQuery';
 import DocsHelper from 'util/DocsHelper';
+import useStream from 'components/streams/hooks/useStream';
 
 const StreamEditPage = () => {
   const params = useParams<{ streamId: string }>();
-  const query = useQuery();
-  const currentUser = useCurrentUser();
-  const [stream, setStream] = useState<{ is_default: boolean, title: string } | undefined>();
+  const query = useQuery() as { index: string, message_id: string };
+  const { data: stream } = useStream(params.streamId);
 
-  useEffect(() => {
-    StreamsStore.get(params.streamId, (newStream: { is_default: boolean, title: string }) => {
-      setStream(newStream);
-    });
-  }, [params.streamId]);
-
-  const isLoading = !currentUser || !stream;
-
-  if (isLoading) {
+  if (!stream) {
     return <Spinner />;
-  }
-
-  let content = (
-    <StreamRulesEditor currentUser={currentUser}
-                       streamId={params.streamId}
-                       messageId={query.message_id}
-                       index={query.index} />
-  );
-
-  if (stream.is_default) {
-    content = (
-      <div className="row content">
-        <div className="col-md-12">
-          <Alert bsStyle="danger">
-            The default stream cannot be edited.
-          </Alert>
-        </div>
-      </div>
-    );
   }
 
   return (
@@ -77,7 +48,21 @@ const StreamEditPage = () => {
           </span>
         </PageHeader>
 
-        {content}
+        {!stream.is_default && (
+          <StreamRulesEditor streamId={params.streamId}
+                             messageId={query.message_id}
+                             index={query.index} />
+        )}
+
+        {stream.is_default && (
+          <div className="row content">
+            <div className="col-md-12">
+              <Alert bsStyle="danger">
+                The default stream cannot be edited.
+              </Alert>
+            </div>
+          </div>
+        )}
       </div>
     </DocumentTitle>
   );

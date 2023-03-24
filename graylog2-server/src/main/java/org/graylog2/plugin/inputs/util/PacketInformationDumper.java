@@ -35,7 +35,7 @@ public class PacketInformationDumper extends SimpleChannelInboundHandler<ByteBuf
         sourceInputId = sourceInput.getId();
         sourceInputLog = LoggerFactory.getLogger(PacketInformationDumper.class.getCanonicalName() + "." + sourceInputId);
         LOG.debug("Set {} to TRACE for network packet metadata dumps of input {}", sourceInputLog.getName(),
-                sourceInput.getUniqueReadableId());
+                sourceInput.toIdentifier());
     }
 
     @Override

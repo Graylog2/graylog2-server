@@ -19,16 +19,19 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 
-import { MockStore } from 'helpers/mocking';
+import { MockStore, asMock } from 'helpers/mocking';
+import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 import { streamRuleTypes } from 'fixtures/streamRuleTypes';
 
 import StreamRuleModal from './StreamRuleModal';
 
-jest.mock('stores/inputs/InputsStore', () => ({
-  InputsActions: {
+jest.mock('components/streams/hooks/useStreamRuleTypes');
+
+jest.mock('stores/inputs/StreamRulesInputsStore', () => ({
+  StreamRulesInputsActions: {
     list: jest.fn(),
   },
-  InputsStore: MockStore(['getInitialState', () => ({
+  StreamRulesInputsStore: MockStore(['getInitialState', () => ({
     inputs: [
       { id: 'my-id', title: 'input title', name: 'name' },
     ],
@@ -39,7 +42,6 @@ describe('StreamRuleModal', () => {
   const SUT = (props: Partial<React.ComponentProps<typeof StreamRuleModal>>) => (
     <StreamRuleModal onSubmit={() => Promise.resolve()}
                      onClose={() => {}}
-                     streamRuleTypes={streamRuleTypes}
                      submitButtonText="Update rule"
                      submitLoadingText="Updating rule..."
                      title="Bach"
@@ -56,6 +58,10 @@ describe('StreamRuleModal', () => {
       description: 'description',
     };
   };
+
+  beforeEach(() => {
+    asMock(useStreamRuleTypes).mockReturnValue({ data: streamRuleTypes });
+  });
 
   it('should render without provided stream rule', async () => {
     render(<SUT />);

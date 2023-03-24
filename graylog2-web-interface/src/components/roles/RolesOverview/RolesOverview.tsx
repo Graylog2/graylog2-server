@@ -54,7 +54,6 @@ const StyledPaginatedList = styled(PaginatedList)`
 `;
 
 const _headerCellFormatter = (header) => {
-  // eslint-disable-next-line react/destructuring-assignment
   switch (header.toLowerCase()) {
     case 'actions':
       return <th className="actions text-right">{header}</th>;

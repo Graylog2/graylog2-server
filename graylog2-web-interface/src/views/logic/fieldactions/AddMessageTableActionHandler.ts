@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { WidgetActions } from 'views/stores/WidgetStore';
 import { DEFAULT_MESSAGE_FIELDS } from 'views/Constants';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import { addWidget } from 'views/logic/slices/widgetActions';
 
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
@@ -30,4 +31,4 @@ export const CreateMessagesWidget = () => MessagesWidget.builder()
       .build(),
   ).build();
 
-export default () => WidgetActions.create(CreateMessagesWidget());
+export default () => (dispatch: AppDispatch) => dispatch(addWidget(CreateMessagesWidget()));

@@ -17,8 +17,16 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
+import {
+  OverlayTrigger,
+  PaginatedList,
+  SearchForm,
+  Icon,
+  Spinner,
+  NoSearchResult,
+  NoEntitiesExist,
+} from 'components/common';
 import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
-import { OverlayTrigger, PaginatedList, SearchForm, Icon, NoEntitiesExist, NoSearchResult } from 'components/common';
 import LUTTableEntry from 'components/lookup-tables/LUTTableEntry';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
@@ -31,50 +39,54 @@ const ScrollContainer = styled.div`
   overflow-x: auto;
 `;
 
-const buildHelpPopover = () => {
-  return (
-    <Popover id="search-query-help" className={Styles.popoverWide} title="Search Syntax Help">
-      <p><strong>Available search fields</strong></p>
-      <Table condensed>
-        <thead>
-          <tr>
-            <th>Field</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>id</td>
-            <td>Lookup Table ID</td>
-          </tr>
-          <tr>
-            <td>title</td>
-            <td>The title of the lookup table</td>
-          </tr>
-          <tr>
-            <td>name</td>
-            <td>The reference name of the lookup table</td>
-          </tr>
-          <tr>
-            <td>description</td>
-            <td>The description of lookup table</td>
-          </tr>
-        </tbody>
-      </Table>
-      <p><strong>Examples</strong></p>
-      <p>
-        Find lookup tables by parts of their names:<br />
-        <kbd>name:geoip</kbd><br />
-        <kbd>name:geo</kbd>
-      </p>
-      <p>
-        Searching without a field name matches against the <code>title</code> field:<br />
-        <kbd>geoip</kbd> <br />is the same as<br />
-        <kbd>title:geoip</kbd>
-      </p>
-    </Popover>
-  );
-};
+const buildHelpPopover = () => (
+  <Popover id="search-query-help" className={Styles.popoverWide} title="Search Syntax Help">
+    <p><strong>Available search fields</strong></p>
+    <Table condensed>
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>id</td>
+          <td>Lookup Table ID</td>
+        </tr>
+        <tr>
+          <td>title</td>
+          <td>The title of the lookup table</td>
+        </tr>
+        <tr>
+          <td>name</td>
+          <td>The reference name of the lookup table</td>
+        </tr>
+        <tr>
+          <td>description</td>
+          <td>The description of lookup table</td>
+        </tr>
+      </tbody>
+    </Table>
+    <p><strong>Examples</strong></p>
+    <p>
+      Find lookup tables by parts of their names:<br />
+      <kbd>name:geoip</kbd><br />
+      <kbd>name:geo</kbd>
+    </p>
+    <p>
+      Searching without a field name matches against the <code>title</code> field:<br />
+      <kbd>geoip</kbd> <br />is the same as<br />
+      <kbd>title:geoip</kbd>
+    </p>
+  </Popover>
+);
+
+const queryHelpComponent = (
+  <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover()}>
+    <Button bsStyle="link" className={Styles.searchHelpButton}><Icon name="question-circle" fixedWidth /></Button>
+  </OverlayTrigger>
+);
 
 type ItemProps = {
   table: LookupTable,
@@ -120,6 +132,49 @@ const LUTItem = ({ table, caches, dataAdapters, errorStates }: ItemProps) => {
   );
 };
 
+const NoResults = ({ query }: { query: string }) => {
+  return (
+    <tbody>
+      <tr>
+        <td colSpan={6}>
+          {query
+            ? <NoSearchResult>No tables found with title &quot;{query}&quot;</NoSearchResult>
+            : <NoEntitiesExist>There are no data adapters to list</NoEntitiesExist>}
+        </td>
+      </tr>
+    </tbody>
+  );
+};
+
+const DataRow = ({
+  tables,
+  caches,
+  dataAdapters,
+  query,
+  errorStates,
+}: {
+  tables: LookupTable[],
+  caches: LookupTableCache[],
+  dataAdapters: LookupTableAdapter[],
+  query: string,
+  errorStates: { [key: string]: { [key: string]: string } },
+}) => {
+  return tables.length > 0
+    ? (
+      <>
+        {tables.map((table: LookupTable) => (
+          <LUTItem key={`table-item-${table.id}`}
+                   table={table}
+                   caches={caches}
+                   dataAdapters={dataAdapters}
+                   errorStates={errorStates} />
+        ))}
+      </>
+    ) : (
+      <NoResults query={query} />
+    );
+};
+
 type Props = {
   tables: LookupTable[],
   caches: LookupTableCache[],
@@ -137,29 +192,37 @@ const LookupTablesOverview = ({
   errorStates,
   paginationQueryParameter,
 }: Props) => {
-  const { currentPage, currentPageSize, resetPage } = React.useMemo(() => ({
+  const [loading, setLoading] = React.useState(false);
+  const [localPagination, setLocalPagination] = React.useState({
     currentPage: paginationQueryParameter.page || 1,
     currentPageSize: paginationQueryParameter.pageSize || 10,
+    currentQuery: pagination.query ? decodeURI(pagination.query) : '',
     resetPage: paginationQueryParameter.resetPage,
-  }), [paginationQueryParameter]);
+    setPagination: paginationQueryParameter.setPagination,
+  });
+
+  React.useEffect(() => {
+    const { currentPage, currentPageSize, currentQuery } = localPagination;
+
+    LookupTablesActions.searchPaginated(currentPage, currentPageSize, currentQuery)
+      .then(() => setLoading(false));
+  }, [localPagination]);
 
   const onPageChange = React.useCallback((newPage: number, newPerPage: number) => {
-    LookupTablesActions.searchPaginated(newPage, newPerPage, pagination.query);
-  }, [pagination.query]);
+    setLocalPagination({ ...localPagination, currentPage: newPage, currentPageSize: newPerPage });
+  }, [localPagination]);
 
-  const onSearch = React.useCallback((query: string, resetLoadingStateCb: () => void) => {
-    resetPage();
-    LookupTablesActions.searchPaginated(currentPage, currentPageSize, query).then(resetLoadingStateCb);
-  }, [resetPage, currentPage, currentPageSize]);
+  const onSearch = React.useCallback((query: string) => {
+    localPagination.resetPage();
+    localPagination.setPagination({ page: 1, pageSize: localPagination.currentPageSize });
+    setLocalPagination({ ...localPagination, currentPage: 1, currentQuery: query });
+  }, [localPagination]);
 
   const onReset = React.useCallback(() => {
-    resetPage();
-    LookupTablesActions.searchPaginated(currentPage, currentPageSize);
-  }, [resetPage, currentPage, currentPageSize]);
-
-  const emptyListComponent = pagination.query === ''
-    ? (<NoEntitiesExist>No lookup table exist.</NoEntitiesExist>)
-    : (<NoSearchResult>No Lookup table found.</NoSearchResult>);
+    localPagination.resetPage();
+    localPagination.setPagination({ page: 1, pageSize: localPagination.currentPageSize });
+    setLocalPagination({ ...localPagination, currentPage: 1, currentQuery: '' });
+  }, [localPagination]);
 
   return (
     <Row className="content">
@@ -167,39 +230,31 @@ const LookupTablesOverview = ({
         <h2 style={{ marginBottom: 16 }}>
           Configured lookup tables <small>{pagination.total} total</small>
         </h2>
-        <PaginatedList activePage={currentPage}
-                       pageSize={currentPageSize}
+        <PaginatedList activePage={localPagination.currentPage}
+                       pageSize={localPagination.currentPageSize}
                        onChange={onPageChange}
                        totalItems={pagination.total}>
-          <SearchForm onSearch={onSearch} onReset={onReset}>
-            <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover()}>
-              <Button bsStyle="link" className={Styles.searchHelpButton}><Icon name="question-circle" fixedWidth /></Button>
-            </OverlayTrigger>
-          </SearchForm>
+          <SearchForm onSearch={onSearch} onReset={onReset} queryHelpComponent={queryHelpComponent} />
           <ScrollContainer>
-            {tables.length === 0
-              ? (emptyListComponent)
-              : (
-                <Table condensed hover className={Styles.overviewTable}>
-                  <thead>
-                    <tr>
-                      <th className={Styles.rowTitle}>Title</th>
-                      <th className={Styles.rowDescription}>Description</th>
-                      <th className={Styles.rowName}>Name</th>
-                      <th className={Styles.rowCache}>Cache</th>
-                      <th className={Styles.rowAdapter}>Data Adapter</th>
-                      <th className={Styles.rowActions}>Actions</th>
-                    </tr>
-                  </thead>
-                  {tables.map((table: LookupTable) => (
-                    <LUTItem key={`table-item-${table.id}`}
-                             table={table}
-                             caches={caches}
-                             dataAdapters={dataAdapters}
-                             errorStates={errorStates} />
-                  ))}
-                </Table>
+            <Table condensed hover className={Styles.overviewTable}>
+              <thead>
+                <tr>
+                  <th className={Styles.rowTitle}>Title</th>
+                  <th className={Styles.rowDescription}>Description</th>
+                  <th className={Styles.rowName}>Name</th>
+                  <th className={Styles.rowCache}>Cache</th>
+                  <th className={Styles.rowAdapter}>Data Adapter</th>
+                  <th className={Styles.rowActions}>Actions</th>
+                </tr>
+              </thead>
+              {loading ? <Spinner text="Loading data adapters" /> : (
+                <DataRow tables={tables}
+                         caches={caches}
+                         dataAdapters={dataAdapters}
+                         query={localPagination.currentQuery}
+                         errorStates={errorStates} />
               )}
+            </Table>
           </ScrollContainer>
         </PaginatedList>
       </Col>

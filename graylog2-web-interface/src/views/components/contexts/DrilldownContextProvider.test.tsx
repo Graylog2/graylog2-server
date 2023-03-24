@@ -18,28 +18,24 @@ import * as React from 'react';
 import { useContext } from 'react';
 import { mount } from 'wrappedEnzyme';
 
-import { StoreMock as mockStore, asMock } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import View from 'views/logic/views/View';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import type { TimeRange, ElasticsearchQueryString } from 'views/logic/queries/Query';
 import Query, { createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
-import { GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import useViewType from 'views/hooks/useViewType';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
+import useGlobalOverride from 'views/hooks/useGlobalOverride';
 
 import DrilldownContextProvider from './DrilldownContextProvider';
 import DrilldownContext from './DrilldownContext';
 
-jest.mock('views/stores/GlobalOverrideStore', () => ({
-  GlobalOverrideStore: mockStore(),
-}));
-
 jest.mock('views/hooks/useViewType');
 jest.mock('views/logic/queries/useCurrentQuery');
+jest.mock('views/hooks/useGlobalOverride');
 
 describe('DrilldownContextProvider', () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const Consumer = (_props: { streams: Array<string>, timerange: TimeRange, query: ElasticsearchQueryString }) => null;
 
   const TestComponent = () => {
@@ -83,7 +79,7 @@ describe('DrilldownContextProvider', () => {
     it('passes query & timerange of global override, streams of widget', () => {
       asMock(useViewType).mockReturnValue(View.Type.Dashboard);
 
-      asMock(GlobalOverrideStore.getInitialState)
+      asMock(useGlobalOverride)
         .mockReturnValue(GlobalOverride.create(
           { type: 'absolute', from: '2020-01-10T13:23:42.000Z', to: '2020-01-10T14:23:42.000Z' },
           createElasticsearchQueryString('something:"else"'),

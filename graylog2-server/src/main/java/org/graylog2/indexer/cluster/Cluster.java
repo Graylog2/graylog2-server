@@ -67,7 +67,7 @@ public class Cluster {
      * @return the cluster health response
      */
     public Optional<HealthStatus> health() {
-        return clusterAdapter.health(allIndexWildcards());
+        return clusterAdapter.health();
     }
 
     private List<String> allIndexWildcards() {
@@ -83,7 +83,7 @@ public class Cluster {
      * @return the cluster health response
      */
     public Optional<HealthStatus> deflectorHealth() {
-        return clusterAdapter.health(Arrays.asList(indexSetRegistry.getWriteIndexAliases()));
+        return clusterAdapter.deflectorHealth(Arrays.asList(indexSetRegistry.getWriteIndexAliases()));
     }
 
     public Set<NodeFileDescriptorStats> getFileDescriptorStats() {
@@ -119,7 +119,7 @@ public class Cluster {
      * Check if the cluster health status is not {@literal RED} and that the
      * {@link IndexSetRegistry#isUp() deflector is up}.
      *
-     * @return {@code true} if the the cluster is healthy and the deflector is up, {@code false} otherwise
+     * @return {@code true} if the cluster is healthy and the deflector is up, {@code false} otherwise
      */
     public boolean isHealthy() {
         return health()
@@ -180,25 +180,24 @@ public class Cluster {
     }
 
     public Optional<String> clusterName() {
-        return clusterAdapter.clusterName(allIndexWildcards());
+        return clusterAdapter.clusterName();
     }
 
     public Optional<ClusterHealth> clusterHealthStats() {
-        return clusterAdapter.clusterHealthStats(allIndexWildcards());
+        return clusterAdapter.clusterHealthStats();
     }
 
     public ElasticsearchStats elasticsearchStats() {
-        final List<String> indices = Arrays.asList(indexSetRegistry.getIndexWildcards());
         final org.graylog2.system.stats.elasticsearch.ClusterStats clusterStats = clusterAdapter.clusterStats();
 
         final PendingTasksStats pendingTasksStats = clusterAdapter.pendingTasks();
 
-        final ShardStats shardStats = clusterAdapter.shardStats(indices);
+        final ShardStats shardStats = clusterAdapter.shardStats();
         final org.graylog2.system.stats.elasticsearch.ClusterHealth clusterHealth = org.graylog2.system.stats.elasticsearch.ClusterHealth.from(
                 shardStats,
                 pendingTasksStats
         );
-        final HealthStatus healthStatus = clusterAdapter.health(indices).orElseThrow(() -> new IllegalStateException("Unable to retrieve cluster health."));
+        final HealthStatus healthStatus = clusterAdapter.health().orElseThrow(() -> new IllegalStateException("Unable to retrieve cluster health."));
 
         return ElasticsearchStats.create(
                 clusterStats.clusterName(),

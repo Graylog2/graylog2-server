@@ -21,40 +21,12 @@ import { render } from 'wrappedTestingLibrary';
 
 import { simpleFields, simpleQueryFields } from 'fixtures/fields';
 import asMock from 'helpers/mocking/AsMock';
-import MockStore from 'helpers/mocking/StoreMock';
-import MockAction from 'helpers/mocking/MockAction';
-import { SearchLoadingStateStore } from 'views/stores/SearchLoadingStateStore';
 import SearchResult from 'views/components/SearchResult';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import useIsLoading from 'views/hooks/useIsLoading';
 
-jest.mock('views/stores/SearchStore', () => ({
-  SearchActions: {
-    execute: jest.fn(() => Promise.resolve()),
-  },
-  SearchStore: {
-    listen: () => jest.fn(),
-    getInitialState: () => ({
-      result: {
-        forId: jest.fn(() => ({})),
-      },
-      widgetMapping: {},
-    }),
-  },
-}));
-
-jest.mock('views/stores/SearchLoadingStateStore', () => ({
-  SearchLoadingStateStore: {
-    getInitialState: jest.fn(() => ({ isLoading: false })),
-    listen: () => jest.fn(),
-  },
-}));
-
-jest.mock('stores/configurations/ConfigurationsStore', () => ({
-  ConfigurationsStore: MockStore(),
-  ConfigurationsActions: {
-    listSearchesClusterConfig: MockAction(),
-  },
-}));
+jest.mock('views/hooks/useIsLoading');
+jest.mock('views/components/Query', () => () => <span>Query Results</span>);
 
 describe('SearchResult', () => {
   beforeAll(() => {
@@ -91,7 +63,7 @@ describe('SearchResult', () => {
   });
 
   it('should display loading indicator, when search is loading', () => {
-    asMock(SearchLoadingStateStore.getInitialState).mockImplementation(() => ({ isLoading: true }));
+    asMock(useIsLoading).mockReturnValue(true);
     const { getByText } = render(<SimpleSearchResult />);
 
     act(() => { jest.advanceTimersByTime(500); });
@@ -100,15 +72,16 @@ describe('SearchResult', () => {
   });
 
   it('should hide loading indicator, when search is not loading', () => {
-    asMock(SearchLoadingStateStore.getInitialState).mockReturnValueOnce({ isLoading: false });
+    asMock(useIsLoading).mockReturnValue(false);
+
     const { queryByText } = render(<SimpleSearchResult />);
 
     expect(queryByText('Updating search results...')).toBeNull();
   });
 
-  it('should display info message when field types and search results exists, but no widgets are defined', () => {
+  it('renders query results', () => {
     const { getByText } = render(<SimpleSearchResult />);
 
-    expect(getByText('Create a new widget by selecting a widget type in the left sidebar section "Create".')).not.toBeNull();
+    expect(getByText('Query Results')).not.toBeNull();
   });
 });

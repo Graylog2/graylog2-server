@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useStore } from 'stores/connect';
-import type { ViewStoreState } from 'views/stores/ViewStore';
-import { ViewStore } from 'views/stores/ViewStore';
+import { createSelector } from '@reduxjs/toolkit';
 
-const queryIdsMapper = (view: ViewStoreState) => view?.view?.search?.queries?.map((q) => q.id).toOrderedSet();
-const useQueryIds = () => useStore(ViewStore, queryIdsMapper);
+import useAppSelector from 'stores/useAppSelector';
+import { selectSearchQueries } from 'views/logic/slices/viewSelectors';
+
+const selectQueryIds = createSelector(selectSearchQueries, (queries) => queries.map((q) => q.id).toOrderedSet());
+const useQueryIds = () => useAppSelector(selectQueryIds);
 
 export default useQueryIds;

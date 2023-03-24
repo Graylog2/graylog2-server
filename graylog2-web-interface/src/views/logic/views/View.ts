@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import { flatten } from 'lodash';
+import flatten from 'lodash/flatten';
 import ObjectID from 'bson-objectid';
 
 import type Widget from 'views/logic/widgets/Widget';

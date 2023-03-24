@@ -14,12 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useViewMetadata from 'views/hooks/useViewMetadata';
+import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
 
-const useActiveQueryId = () => {
-  const { activeQuery } = useViewMetadata();
-
-  return activeQuery;
-};
+const useActiveQueryId = () => useCurrentQueryId();
 
 export default useActiveQueryId;

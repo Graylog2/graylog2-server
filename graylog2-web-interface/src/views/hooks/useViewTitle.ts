@@ -14,12 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useStore } from 'stores/connect';
-import type { ViewStoreState } from 'views/stores/ViewStore';
-import { ViewStore } from 'views/stores/ViewStore';
-import viewTitle from 'views/logic/views/ViewTitle';
+import { createSelector } from '@reduxjs/toolkit';
 
-const viewTitleMapper = (storeState: ViewStoreState) => viewTitle(storeState?.view?.title, storeState?.view?.type);
-const useViewTitle = () => useStore(ViewStore, viewTitleMapper);
+import viewTitle from 'views/logic/views/ViewTitle';
+import useAppSelector from 'stores/useAppSelector';
+import { selectView, selectViewType } from 'views/logic/slices/viewSelectors';
+
+const selectViewTitle = createSelector(
+  selectView,
+  selectViewType,
+  (view, viewType) => viewTitle(view?.title, viewType),
+);
+const useViewTitle = () => useAppSelector(selectViewTitle);
 
 export default useViewTitle;

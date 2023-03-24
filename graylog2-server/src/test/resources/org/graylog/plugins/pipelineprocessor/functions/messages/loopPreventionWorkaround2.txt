@@ -1,0 +1,9 @@
+rule "test rule"
+when
+    not has_field("cloned")
+then
+    let newmsg = clone_message();
+    set_field(field: "cloned", value: "true", message: newmsg);
+    let newmsg2 = clone_message();
+    set_field(field: "cloned", value: "true", message: newmsg2);
+end

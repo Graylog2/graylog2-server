@@ -37,7 +37,7 @@ const GroupingConfiguration = React.memo(({ index }: Props) => {
   const fieldType = groupBy.groupings[index].type;
 
   return (
-    <Wrapper>
+    <Wrapper data-testid={`grouping-${index}`}>
       <Direction groupingIndex={index} />
       <FieldComponent groupingIndex={index} />
       {fieldType === DateType && (<Time index={index} />)}

@@ -100,7 +100,7 @@ public class RelativeSearchResource extends SearchResource {
 
         final TimeRange timeRange = buildRelativeTimeRange(range);
 
-        return search(query, limit, filter, decorate, searchUser, fieldList, sorting, timeRange);
+        return search(query, limit, offset, filter, decorate, searchUser, fieldList, sorting, timeRange);
     }
 
     @GET

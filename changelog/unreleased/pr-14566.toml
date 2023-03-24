@@ -1,0 +1,4 @@
+type = "a"
+message = "Add option to bulk delete dashboards in dashboards overview."
+
+pulls = ["14566"]

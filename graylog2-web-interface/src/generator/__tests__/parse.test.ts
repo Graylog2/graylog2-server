@@ -14,14 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as fs from 'fs';
-import * as path from 'path';
-
 import { parseApi } from 'generator/parse';
+import readJsonFixture from 'helpers/readJsonFixture';
 
 describe('parse', () => {
   it('parses an api properly', () => {
-    const rawApi = JSON.parse(fs.readFileSync(path.resolve(__dirname, './sample-api.json')).toString());
+    const rawApi = readJsonFixture(__dirname, './sample-api.json');
 
     const result = parseApi('sample', rawApi);
 

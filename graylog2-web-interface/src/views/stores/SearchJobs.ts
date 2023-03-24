@@ -18,9 +18,10 @@ import fetch from 'logic/rest/FetchProvider';
 import * as URLUtils from 'util/URLUtils';
 import type Search from 'views/logic/search/Search';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type { SearchErrorResponse } from 'views/logic/SearchError';
 
-const executeQueryUrl = (id) => URLUtils.qualifyUrl(`/views/search/${id}/execute`);
-const jobStatusUrl = (jobId) => URLUtils.qualifyUrl(`/views/search/status/${jobId}`);
+const executeQueryUrl = (id: string) => URLUtils.qualifyUrl(`/views/search/${id}/execute`);
+const jobStatusUrl = (jobId: string) => URLUtils.qualifyUrl(`/views/search/status/${jobId}`);
 
 type SearchJobId = string;
 type SearchId = string;
@@ -31,12 +32,14 @@ type ExecutionInfoType = {
   completed_exceptionally: boolean,
 };
 
-type SearchJobType = {
+export type SearchJobType = {
   id: SearchJobId,
   search: Search,
   search_id: SearchId,
-  results: Map<string, any>,
+  results: { [id: string]: any },
   execution: ExecutionInfoType,
+  owner: string,
+  errors: Array<SearchErrorResponse>,
 };
 
 export function runSearchJob(search: Search, executionState: SearchExecutionState): Promise<SearchJobType> {

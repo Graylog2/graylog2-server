@@ -1,0 +1,5 @@
+type = "a"
+message = "Persist selected sorting, displayed columns and page size in saved searches overview for each user."
+
+issues = ["14293"]
+pulls = ["14600"]

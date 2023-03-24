@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix possible HTTP API thread pool exhaustion by processing proxied cluster metrics requests asynchronously."
+
+pulls = ["14462"]

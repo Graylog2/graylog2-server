@@ -14,10 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext } from 'react';
+import useAppSelector from 'stores/useAppSelector';
+import { selectViewType } from 'views/logic/slices/viewSelectors';
 
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
-
-const useViewType = () => useContext(ViewTypeContext);
+const useViewType = () => useAppSelector(selectViewType);
 
 export default useViewType;

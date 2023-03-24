@@ -15,17 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import styled from 'styled-components';
-import { get } from 'lodash';
 import { useContext, useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 
 import type { WidgetComponentProps, MessageResult } from 'views/types';
-import { useStore } from 'stores/connect';
 import { Messages } from 'views/Constants';
-import { ViewStore } from 'views/stores/ViewStore';
-import { SearchActions, SearchStore } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { SearchTypeOptions } from 'views/logic/search/GlobalOverride';
@@ -34,9 +29,13 @@ import MessageTable from 'views/components/widgets/MessageTable';
 import ErrorWidget from 'views/components/widgets/ErrorWidget';
 import type SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type { BackendMessage } from 'views/components/messagelist/Types';
-import type Widget from 'views/logic/widgets/Widget';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
 import { InputsActions } from 'stores/inputs/InputsStore';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import useCurrentSearchTypesResults from 'views/components/widgets/useCurrentSearchTypesResults';
+import useAppDispatch from 'stores/useAppDispatch';
+import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
+import useOnSearchExecution from 'views/hooks/useOnSearchExecution';
 
 import RenderCompletionCallback from './RenderCompletionCallback';
 
@@ -67,26 +66,13 @@ type Props = WidgetComponentProps<MessagesWidgetConfig, MessageListResult> & {
   pageSize?: number,
 };
 
-const useSearchTypes = (activeQueryId: string) => {
-  const searches = useStore(SearchStore);
-
-  return get(searches, ['result', 'results', activeQueryId, 'searchTypes']);
-};
-
 const useResetPaginationOnSearchExecution = (setPagination: (pagination: Pagination) => void, currentPage) => {
-  useEffect(() => {
-    const resetPagination = () => {
-      if (currentPage !== 1) {
-        setPagination({ currentPage: 1, pageErrors: [] });
-      }
-    };
-
-    const unlistenSearchExecute = SearchActions.execute.completed.listen(resetPagination);
-
-    return () => {
-      unlistenSearchExecute();
-    };
+  const resetPagination = useCallback(() => {
+    if (currentPage !== 1) {
+      setPagination({ currentPage: 1, pageErrors: [] });
+    }
   }, [currentPage, setPagination]);
+  useOnSearchExecution(resetPagination);
 };
 
 const useResetScrollPositionOnPageChange = (currentPage: number) => {
@@ -94,7 +80,6 @@ const useResetScrollPositionOnPageChange = (currentPage: number) => {
 
   useEffect(() => {
     if (scrollContainerRef.current) {
-      // eslint-disable-next-line no-param-reassign
       scrollContainerRef.current.scrollTop = 0;
     }
   }, [currentPage, scrollContainerRef]);
@@ -118,13 +103,14 @@ const MessageList = ({
   pageSize,
   setLoadingState,
 }: Props) => {
-  const { activeQuery: activeQueryId } = useStore(ViewStore);
   const [{ currentPage, pageErrors }, setPagination] = useState<Pagination>({
     pageErrors: [],
     currentPage: 1,
   });
-  const searchTypes = useSearchTypes(activeQueryId);
+  const activeQueryId = useActiveQueryId();
+  const searchTypes = useCurrentSearchTypesResults();
   const scrollContainerRef = useResetScrollPositionOnPageChange(currentPage);
+  const dispatch = useAppDispatch();
   useResetPaginationOnSearchExecution(setPagination, currentPage);
   useRenderCompletionCallback();
 
@@ -144,20 +130,21 @@ const MessageList = ({
     RefreshActions.disable();
     setLoadingState(true);
 
-    SearchActions.reexecuteSearchTypes(searchTypePayload, effectiveTimerange).then((response) => {
+    dispatch(reexecuteSearchTypes(searchTypePayload, effectiveTimerange)).then((response) => {
+      const { result } = response.payload;
       setLoadingState(false);
 
       setPagination({
-        pageErrors: response.result.errors,
+        pageErrors: result.errors,
         currentPage: pageNo,
       });
     });
-  }, [pageSize, searchTypeId, searchTypes, setLoadingState]);
+  }, [dispatch, pageSize, searchTypeId, searchTypes, setLoadingState]);
 
   const onSortChange = useCallback((newSort: SortConfig[]) => {
     const newConfig = config.toBuilder().sort(newSort).build();
 
-    return onConfigChange(newConfig).then(() => {});
+    return onConfigChange(newConfig);
   }, [config, onConfigChange]);
 
   return (
@@ -190,7 +177,7 @@ MessageList.propTypes = {
 };
 
 MessageList.defaultProps = {
-  onConfigChange: () => Promise.resolve(Immutable.OrderedMap<string, Widget>()),
+  onConfigChange: () => Promise.resolve(),
   pageSize: Messages.DEFAULT_LIMIT,
 };
 

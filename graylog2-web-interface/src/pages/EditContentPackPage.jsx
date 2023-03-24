@@ -19,12 +19,12 @@ import PropTypes from 'prop-types';
 import Reflux from 'reflux';
 // eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
-import { cloneDeep, groupBy } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import groupBy from 'lodash/groupBy';
 
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
-import history from 'util/History';
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ValueReferenceData from 'util/ValueReferenceData';
@@ -40,6 +40,7 @@ const EditContentPackPage = createReactClass({
 
   // eslint-disable-next-line react/no-unused-class-component-methods
   propTypes: {
+    history: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
   },
 
@@ -151,6 +152,7 @@ const EditContentPackPage = createReactClass({
 
   _onSave() {
     const { contentPack } = this.state;
+    const { history } = this.props;
 
     ContentPacksActions.create.triggerPromise(contentPack.toJSON())
       .then(

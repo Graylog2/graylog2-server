@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
-import { chunk } from 'lodash';
+import chunk from 'lodash/chunk';
 
 import type { SystemConfiguration } from 'views/types';
 import ConfigletContainer from 'pages/configurations/ConfigletContainer';
@@ -47,11 +47,13 @@ const PluginConfigRows = ({ configuration, systemConfigs }: PluginConfigRowsProp
   // Put two plugin config components per row.
   const configRows = chunk(pluginConfigs, 2)
     .map((configChunk, idx) => (
-      // eslint-disable-next-line react/no-array-index-key
-      <ConfigletRow key={`plugin-config-row-${idx}`}>
-        {configChunk[0]}
-        {configChunk[1]}
-      </ConfigletRow>
+
+      (
+        <ConfigletRow key={`plugin-config-row-${idx}`}>
+          {configChunk[0]}
+          {configChunk[1]}
+        </ConfigletRow>
+      )
     ));
 
   return <>{configRows}</>;

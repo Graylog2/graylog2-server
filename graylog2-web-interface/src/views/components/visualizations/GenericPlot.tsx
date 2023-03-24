@@ -18,7 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import type { DefaultTheme } from 'styled-components';
 import { withTheme } from 'styled-components';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
 
 import { Popover } from 'components/bootstrap';
@@ -152,7 +152,6 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
   _onColorSelect = (setColor: (name: string, color: string) => Promise<unknown>, name: string, newColor: string) => setColor(name, newColor)
     .then(this._onCloseColorPopup);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _onCloseColorPopup = () => this.setState({ legendConfig: undefined });
 
   render() {

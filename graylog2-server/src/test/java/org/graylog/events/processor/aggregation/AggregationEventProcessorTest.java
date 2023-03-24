@@ -104,7 +104,7 @@ public class AggregationEventProcessorTest {
     }
 
     @Test
-    public void testEventsFromAggregationResult() {
+    public void testEventsFromAggregationResult() throws EventProcessorException {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
 
@@ -195,7 +195,7 @@ public class AggregationEventProcessorTest {
     }
 
     @Test
-    public void testEventsFromAggregationResultWithConditions() {
+    public void testEventsFromAggregationResultWithConditions() throws EventProcessorException {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
 
@@ -403,7 +403,7 @@ public class AggregationEventProcessorTest {
     }
 
     @Test
-    public void testEventsFromAggregationResultWithEmptyResultUsesEventDefinitionStreamAsSourceStreams() {
+    public void testEventsFromAggregationResultWithEmptyResultUsesEventDefinitionStreamAsSourceStreams() throws EventProcessorException {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
 
@@ -447,7 +447,7 @@ public class AggregationEventProcessorTest {
     }
 
     @Test
-    public void testEventsFromAggregationResultWithEmptyResultAndNoConfiguredStreamsUsesAllStreamsAsSourceStreams() {
+    public void testEventsFromAggregationResultWithEmptyResultAndNoConfiguredStreamsUsesAllStreamsAsSourceStreams() throws EventProcessorException {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
 

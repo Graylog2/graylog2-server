@@ -14,14 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useStore } from 'stores/connect';
-import type { ViewStoreState } from 'views/stores/ViewStore';
-import { ViewStore } from 'views/stores/ViewStore';
+import useAppSelector from 'stores/useAppSelector';
+import { selectCurrentQuery } from 'views/logic/slices/viewSelectors';
 
-const currentQueryMapper = (viewStore: ViewStoreState) => (viewStore?.activeQuery
-  ? viewStore?.view?.search?.queries?.find((query) => query.id === viewStore?.activeQuery)
-  : undefined);
-
-const useCurrentQuery = () => useStore(ViewStore, currentQueryMapper);
+const useCurrentQuery = () => useAppSelector(selectCurrentQuery);
 
 export default useCurrentQuery;

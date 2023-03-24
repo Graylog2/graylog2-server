@@ -22,10 +22,12 @@ import mockComponent from 'helpers/mocking/MockComponent';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
 import { effectiveTimerange, simpleChartData } from './AreaVisualization.fixtures';
 
-import AreaVisualization from '../AreaVisualization';
+import OriginalAreaVisualization from '../AreaVisualization';
 
 jest.mock('../../GenericPlot', () => mockComponent('GenericPlot'));
 
@@ -33,9 +35,20 @@ jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
   rootTimeZone: jest.fn(() => 'America/Chicago'),
   gl2ServerUrl: jest.fn(() => undefined),
+  isCloud: jest.fn(() => false),
 }));
 
+const AreaVisualization = (props: React.ComponentProps<typeof OriginalAreaVisualization>) => (
+  <TestStoreProvider>
+    <OriginalAreaVisualization {...props} />
+  </TestStoreProvider>
+);
+
 describe('AreaVisualization', () => {
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   it('generates correct props for plot component', () => {
     const config = AggregationWidgetConfig.builder()
       .visualization('area')

@@ -1,0 +1,5 @@
+type = "f"
+message = "Preventing accidental hiding of columns in reporting widgets."
+
+pulls = ["14805"]
+issues = ["Graylog2/graylog-plugin-enterprise#4761"]

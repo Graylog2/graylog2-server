@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 
@@ -23,7 +23,7 @@ import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import { filtersToStreamSet } from 'views/logic/queries/Query';
 import type { RelativeTimeRange } from 'views/logic/queries/Query';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
-import SearchActions from 'views/actions/SearchActions';
+import useOnSearchExecution from 'views/hooks/useOnSearchExecution';
 
 import FieldTypesContext from './FieldTypesContext';
 
@@ -39,12 +39,10 @@ const DefaultFieldTypesProvider = ({ children }: { children: React.ReactElement 
   const all = useMemo(() => Immutable.List(allFieldTypes ?? []), [allFieldTypes]);
   const fieldTypes = useMemo(() => ({ all, queryFields }), [all, queryFields]);
 
-  useEffect(() => {
-    return SearchActions.refresh.listen(() => {
-      refreshCurrentTypes();
-      refreshAllTypes();
-    });
-  }, [refreshAllTypes, refreshCurrentTypes]);
+  useOnSearchExecution(() => {
+    refreshCurrentTypes();
+    refreshAllTypes();
+  });
 
   return (
     <FieldTypesContext.Provider value={fieldTypes}>

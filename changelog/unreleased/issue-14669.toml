@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Adds the default search page as an option to the start pages in the user's profile."
+
+issues = ["14669"]
+pulls = ["14739"]

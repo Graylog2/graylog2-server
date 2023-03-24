@@ -31,7 +31,6 @@ jest.mock('views/hooks/useSaveViewFormControls');
 describe('SavedSearchForm', () => {
   const props = {
     value: 'new Title',
-    onChangeTitle: () => {},
     saveAsSearch: () => {},
     disableCreateNew: false,
     toggleModal: () => {},
@@ -60,14 +59,15 @@ describe('SavedSearchForm', () => {
     });
 
     it('should render disabled create new', async () => {
-      render(<SavedSearchForm {...props}
-                              disableCreateNew />);
+      render(<SavedSearchForm {...props} />);
 
       await findByHeadline();
     });
   });
 
   describe('callbacks', () => {
+    const findTitleInput = () => screen.getByRole('textbox', { name: /title/i });
+
     it('should handle toggleModal', async () => {
       const onToggleModal = jest.fn();
 
@@ -98,17 +98,17 @@ describe('SavedSearchForm', () => {
       render(<SavedSearchForm {...props}
                               saveAsSearch={onSaveAs} />);
 
+      userEvent.type(await findTitleInput(), ' and further title');
       const saveAsButton = await screen.findByRole('button', { name: 'Save as' });
       userEvent.click(saveAsButton);
 
-      expect(onSaveAs).toHaveBeenCalledTimes(1);
+      expect(onSaveAs).toHaveBeenCalledWith('new Title and further title');
     });
 
     it('should not handle saveAsSearch if disabled', async () => {
       const onSaveAs = jest.fn();
 
       render(<SavedSearchForm {...props}
-                              disableCreateNew
                               saveAsSearch={onSaveAs} />);
 
       const saveAsButton = await screen.findByRole('button', { name: 'Save as' });
@@ -124,10 +124,11 @@ describe('SavedSearchForm', () => {
                               saveAsSearch={onSaveAs}
                               isCreateNew />);
 
+      userEvent.type(await findTitleInput(), ' and further title');
       const createNewButton = await screen.findByRole('button', { name: /create new/i });
       userEvent.click(createNewButton);
 
-      expect(onSaveAs).toHaveBeenCalledTimes(1);
+      expect(onSaveAs).toHaveBeenCalledWith('new Title and further title');
     });
   });
 

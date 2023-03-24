@@ -30,7 +30,13 @@ export type WidgetEditingState = {
   focusing: true,
 }
 
-export type FocusContextState = WidgetFocusingState | WidgetEditingState;
+type InitialState = {
+  id: undefined,
+  editing: false,
+  focusing: false,
+}
+
+export type FocusContextState = WidgetFocusingState | WidgetEditingState | InitialState;
 
 export type WidgetFocusContextType = {
   focusedWidget: FocusContextState | undefined,

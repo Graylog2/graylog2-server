@@ -67,10 +67,8 @@ describe('UsersOverview', () => {
   it('should search users', async () => {
     render(<UsersOverview />);
     const searchInput = await screen.findByPlaceholderText('Enter search query...');
-    const searchSubmitButton = screen.getByRole('button', { name: 'Search' });
 
     fireEvent.change(searchInput, { target: { value: 'username:bob' } });
-    fireEvent.click(searchSubmitButton);
 
     await waitFor(() => expect(UsersActions.loadUsersPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: 'username:bob' }));
   });

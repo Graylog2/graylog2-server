@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 
 import { Modal, ListGroup, ListGroupItem } from 'components/bootstrap';
-import { PaginatedList, SearchForm, ModalSubmit } from 'components/common';
+import { PaginatedList, SearchForm, ModalSubmit, Spinner } from 'components/common';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import type { SearchParams } from 'stores/PaginationTypes';
 
@@ -32,6 +32,14 @@ type Props = {
 const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submitLoadingText, activeDashboardId }: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDashboard, setSelectedDashboard] = useState<string | null>(null);
+  const isMounted = useRef<boolean>();
+
+  useEffect(() => {
+    isMounted.current = true;
+
+    return () => { isMounted.current = false; };
+  }, []);
+
   const [searchParams, setSearchParams] = useState<SearchParams>({
     page: 1,
     pageSize: 5,
@@ -41,7 +49,7 @@ const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submitLoadi
       direction: 'asc',
     },
   });
-  const { data: paginatedDashboards } = useDashboards(searchParams);
+  const { data: paginatedDashboards, isInitialLoading: isLoadingDashboards } = useDashboards(searchParams);
 
   useEffect(() => {
     setSelectedDashboard(null);
@@ -61,41 +69,47 @@ const CopyToDashboardForm = ({ onCancel, onSubmit, submitButtonText, submitLoadi
     setIsSubmitting(true);
 
     onSubmit(selectedDashboard).then(() => {
-      setIsSubmitting(false);
+      if (isMounted.current) {
+        setIsSubmitting(false);
+      }
     });
   };
 
   return (
     <Modal show>
       <Modal.Body>
-        <PaginatedList onChange={handlePageChange}
-                       activePage={searchParams.page}
-                       totalItems={paginatedDashboards?.pagination?.total ?? 0}
-                       pageSize={searchParams.pageSize}
-                       pageSizes={[5, 10, 15]}
-                       useQueryParameter={false}>
-          <div style={{ marginBottom: '5px' }}>
-            <SearchForm onSearch={handleSearch}
-                        onReset={handleSearchReset} />
-          </div>
-          {paginatedDashboards?.list && paginatedDashboards.list.length > 0 ? (
-            <ListGroup>
-              {paginatedDashboards.list.map((dashboard) => {
-                const isActiveDashboard = activeDashboardId === dashboard.id;
+        {isLoadingDashboards && <Spinner />}
+        {!isLoadingDashboards && (
+          <PaginatedList onChange={handlePageChange}
+                         activePage={searchParams.page}
+                         totalItems={paginatedDashboards.pagination.total}
+                         pageSize={searchParams.pageSize}
+                         pageSizes={[5, 10, 15]}
+                         useQueryParameter={false}>
+            <div style={{ marginBottom: '5px' }}>
+              <SearchForm onSearch={handleSearch}
+                          onReset={handleSearchReset} />
+            </div>
+            {paginatedDashboards.list.length ? (
+              <ListGroup>
+                {paginatedDashboards.list.map((dashboard) => {
+                  const isActiveDashboard = activeDashboardId === dashboard.id;
 
-                return (
-                  <ListGroupItem active={selectedDashboard === dashboard.id}
-                                 onClick={isActiveDashboard ? undefined : () => setSelectedDashboard(dashboard.id)}
-                                 header={dashboard.title}
-                                 disabled={isActiveDashboard}
-                                 key={dashboard.id}>
-                    {dashboard.summary}
-                  </ListGroupItem>
-                );
-              })}
-            </ListGroup>
-          ) : <span>No dashboards found</span>}
-        </PaginatedList>
+                  return (
+                    <ListGroupItem active={selectedDashboard === dashboard.id}
+                                   onClick={isActiveDashboard ? undefined : () => setSelectedDashboard(dashboard.id)}
+                                   header={dashboard.title}
+                                   disabled={isActiveDashboard}
+                                   key={dashboard.id}>
+                      {dashboard.summary}
+                    </ListGroupItem>
+                  );
+                })}
+              </ListGroup>
+            ) : <span>No dashboards found</span>}
+          </PaginatedList>
+        )}
+
       </Modal.Body>
       <Modal.Footer>
         <ModalSubmit submitButtonText={submitButtonText}

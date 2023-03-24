@@ -27,6 +27,7 @@ const StyledSortIcon = styled.button(({ theme }) => css`
   cursor: pointer;
   position: relative;
   color: ${theme.colors.gray[70]};
+
   &.active {
     color: ${theme.colors.gray[20]};
   }

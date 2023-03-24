@@ -20,11 +20,11 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { MenuItem } from 'components/bootstrap';
-import { QueriesActions } from 'views/stores/QueriesStore';
 import type { QueryId } from 'views/logic/queries/Query';
-import type { QueriesList } from 'views/actions/QueriesActions';
 import DashboardPageContext from 'views/components/contexts/DashboardPageContext';
 import type ViewState from 'views/logic/views/ViewState';
+import useAppDispatch from 'stores/useAppDispatch';
+import { duplicateQuery } from 'views/logic/slices/viewSlice';
 
 import QueryActionDropdown from './QueryActionDropdown';
 
@@ -45,25 +45,25 @@ type Props = {
 const QueryTitle = ({ active, allowsClosing, id, onClose, openEditModal, openCopyToDashboardModal, title }: Props) => {
   const [titleValue, setTitleValue] = useState(title);
   const { setDashboardPage } = useContext(DashboardPageContext);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     setTitleValue(title);
   }, [title]);
 
-  const _onDuplicate = useCallback(() => QueriesActions.duplicate(id).then(
-    (queryList: QueriesList) => setDashboardPage(queryList.keySeq().last()),
-  ), [id, setDashboardPage]);
+  const _onDuplicate = useCallback(() => dispatch(duplicateQuery(id))
+    .then((queryId) => setDashboardPage(queryId)), [dispatch, id, setDashboardPage]);
 
   return (
     <>
-      <TitleWrap aria-label={titleValue} active={active}>
+      <TitleWrap aria-label={titleValue} active={active} data-testid="query-tab" data-active-query-tab={active}>
         {titleValue}
       </TitleWrap>
 
       {active && (
         <QueryActionDropdown>
           <MenuItem onSelect={() => openEditModal(titleValue)}>Edit Title</MenuItem>
-          <MenuItem onSelect={() => _onDuplicate()}>Duplicate</MenuItem>
+          <MenuItem onSelect={_onDuplicate}>Duplicate</MenuItem>
           <MenuItem onSelect={() => openCopyToDashboardModal(true)}>
             Copy to Dashboard
           </MenuItem>

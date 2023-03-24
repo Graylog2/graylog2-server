@@ -37,7 +37,9 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.ScopedContentPackEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.entities.DefaultEntityScope;
+import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -56,12 +58,17 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
     private static final String FIELD_NOTIFICATIONS = "notifications";
     private static final String FIELD_STORAGE = "storage";
     private static final String FIELD_IS_SCHEDULED = "is_scheduled";
+    private static final String UPDATED_AT = "updated_at";
 
     @JsonProperty(FIELD_TITLE)
     public abstract ValueReference title();
 
     @JsonProperty(FIELD_DESCRIPTION)
     public abstract ValueReference description();
+
+    @Nullable
+    @JsonProperty(UPDATED_AT)
+    public abstract DateTime updatedAt();
 
     @JsonProperty(FIELD_PRIORITY)
     public abstract ValueReference priority();
@@ -109,6 +116,9 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
         @JsonProperty(FIELD_DESCRIPTION)
         public abstract Builder description(ValueReference description);
 
+        @JsonProperty(UPDATED_AT)
+        public abstract Builder updatedAt(DateTime updatedAt);
+
         @JsonProperty(FIELD_PRIORITY)
         public abstract Builder priority(ValueReference priority);
 
@@ -149,6 +159,7 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
         return EventDefinitionDto.builder()
                 .scope(scope() != null ? scope().asString(parameters) : DefaultEntityScope.NAME)
                 .title(title().asString(parameters))
+                .updatedAt(updatedAt())
                 .description(description().asString(parameters))
                 .priority(priority().asInteger(parameters))
                 .alert(alert().asBoolean(parameters))

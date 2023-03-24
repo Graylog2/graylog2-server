@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import type Widget from 'views/logic/widgets/Widget';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
-import type { Widgets } from 'views/stores/WidgetStore';
+import type { Widgets } from 'views/types';
 import { singleton } from 'logic/singleton';
 
 type ApplySearchControlsChanges = (widget: Widget) => Widget | undefined;

@@ -16,7 +16,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
-import lodash from 'lodash';
+import capitalize from 'lodash/capitalize';
 import styled from 'styled-components';
 
 import { CounterDetails, GaugeDetails, HistogramDetails, MeterDetails, TimerDetails } from 'components/metrics';
@@ -92,7 +92,7 @@ class MetricDetails extends React.Component {
   render() {
     const { nodeId, metric, metric: { full_name: metricName }, metrics } = this.props;
     const currentMetric = metrics?.[nodeId]?.[metricName] ?? metric;
-    const type = lodash.capitalize(currentMetric.type);
+    const type = capitalize(currentMetric.type);
     const details = this._formatDetailsForType(type, currentMetric);
 
     return (

@@ -28,6 +28,8 @@ import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy;
+import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
@@ -73,6 +75,13 @@ public class MaintenanceStrategiesHelper {
             case MessageCountRotationStrategy.NAME -> {
                 return ImmutablePair.of(MessageCountRotationStrategy.class.getCanonicalName(),
                         MessageCountRotationStrategyConfig.create(elasticsearchConfiguration.getMaxDocsPerIndex()));
+            }
+            case TimeBasedSizeOptimizingStrategy.NAME -> {
+                return ImmutablePair.of(TimeBasedSizeOptimizingStrategy.class.getCanonicalName(),
+                        TimeBasedSizeOptimizingStrategyConfig.builder()
+                                .indexLifetimeMin(elasticsearchConfiguration.getTimeSizeOptimizingRotationMinLifeTime())
+                                .indexLifetimeMax(elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxLifeTime())
+                                .build());
             }
             default -> {
                 LOG.warn("Unknown retention strategy [{}]. Defaulting to [{}]",

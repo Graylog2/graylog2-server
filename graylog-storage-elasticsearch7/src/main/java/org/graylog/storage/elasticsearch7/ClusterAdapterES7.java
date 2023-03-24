@@ -27,12 +27,11 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.indices.GetIndexRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
+import org.graylog.storage.elasticsearch7.cat.IndexSummaryResponse;
 import org.graylog.storage.elasticsearch7.cat.NodeResponse;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.cluster.ClusterAdapter;
@@ -55,6 +54,7 @@ import javax.inject.Named;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -78,8 +78,8 @@ public class ClusterAdapterES7 implements ClusterAdapter {
     }
 
     @Override
-    public Optional<HealthStatus> health(Collection<String> indices) {
-        return clusterHealth(indices).map(response -> healthStatusFrom(response.getStatus()));
+    public Optional<HealthStatus> health() {
+        return clusterHealth().map(response -> healthStatusFrom(response.getStatus()));
     }
 
     private HealthStatus healthStatusFrom(ClusterHealthStatus status) {
@@ -177,13 +177,13 @@ public class ClusterAdapterES7 implements ClusterAdapter {
     }
 
     @Override
-    public Optional<String> clusterName(Collection<String> indices) {
-        return clusterHealth(indices).map(ClusterHealthResponse::getClusterName);
+    public Optional<String> clusterName() {
+        return clusterHealth().map(ClusterHealthResponse::getClusterName);
     }
 
     @Override
-    public Optional<ClusterHealth> clusterHealthStats(Collection<String> indices) {
-        return clusterHealth(indices)
+    public Optional<ClusterHealth> clusterHealthStats() {
+        return clusterHealth()
                 .map(this::clusterHealthFrom);
     }
 
@@ -256,8 +256,8 @@ public class ClusterAdapterES7 implements ClusterAdapter {
     }
 
     @Override
-    public ShardStats shardStats(Collection<String> indices) {
-        return clusterHealth(indices)
+    public ShardStats shardStats() {
+        return clusterHealth()
                 .map(response -> ShardStats.create(
                         response.getNumberOfNodes(),
                         response.getNumberOfDataNodes(),
@@ -271,15 +271,10 @@ public class ClusterAdapterES7 implements ClusterAdapter {
                 .orElseThrow(() -> new ElasticsearchException("Unable to retrieve shard stats."));
     }
 
-    private Optional<ClusterHealthResponse> clusterHealth(Collection<String> indices) {
-        final String[] indicesAry = indices.toArray(new String[0]);
+    private Optional<ClusterHealthResponse> clusterHealth() {
         try {
-            if (!indices.isEmpty() && !indicesExist(indicesAry)) {
-                return Optional.empty();
-            }
-            final ClusterHealthRequest request = new ClusterHealthRequest(indicesAry)
-                    .timeout(TimeValue.timeValueSeconds(Ints.saturatedCast(requestTimeout.toSeconds())))
-                    .indicesOptions(IndicesOptions.lenientExpand());
+            final ClusterHealthRequest request = new ClusterHealthRequest()
+                    .timeout(TimeValue.timeValueSeconds(Ints.saturatedCast(requestTimeout.toSeconds())));
             return Optional.of(client.execute((c, requestOptions) -> c.cluster().health(request, requestOptions)));
         } catch (org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException e) {
             if (LOG.isDebugEnabled()) {
@@ -291,10 +286,30 @@ public class ClusterAdapterES7 implements ClusterAdapter {
         }
     }
 
-    private boolean indicesExist(String... indices) {
-        final GetIndexRequest getIndexRequest = new GetIndexRequest(indices);
-        return client.execute((c, requestOptions) -> c.indices().exists(getIndexRequest, requestOptions));
+    @Override
+    public Optional<HealthStatus> deflectorHealth(Collection<String> indices) {
+        if (indices.isEmpty()) {
+            return Optional.of(HealthStatus.Green);
+        }
+
+        final Map<String, String> aliasMapping = catApi.aliases();
+        final Set<String> mappedIndices = indices
+                .stream()
+                .map(index -> aliasMapping.getOrDefault(index, index))
+                .collect(Collectors.toSet());
+
+        final Set<IndexSummaryResponse> indexSummaries = catApi.indices()
+                .stream()
+                .filter(indexSummary -> mappedIndices.contains(indexSummary.index()))
+                .collect(Collectors.toSet());
+
+        if (indexSummaries.size() < mappedIndices.size()) {
+            return Optional.empty();
+        }
+
+        return indexSummaries.stream()
+                .map(IndexSummaryResponse::health)
+                .map(HealthStatus::fromString)
+                .min(HealthStatus::compareTo);
     }
-
-
 }

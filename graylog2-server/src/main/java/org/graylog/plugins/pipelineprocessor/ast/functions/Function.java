@@ -17,17 +17,18 @@
 package org.graylog.plugins.pipelineprocessor.ast.functions;
 
 import com.google.common.collect.ImmutableList;
+import com.swrve.ratelimitedlogger.RateLimitedLog;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.exceptions.PrecomputeFailure;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+
 public interface Function<T> {
 
-    Logger log = LoggerFactory.getLogger(Function.class);
+    RateLimitedLog log = getRateLimitedLog(Function.class);
 
     Function ERROR_FUNCTION = new AbstractFunction<Void>() {
         @Override

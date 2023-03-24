@@ -17,13 +17,15 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import { useStore } from 'stores/connect';
-import { HighlightingRulesStore } from 'views/stores/HighlightingRulesStore';
+import useAppSelector from 'stores/useAppSelector';
+import { selectHighlightingRules } from 'views/logic/slices/highlightSelectors';
 
 import HighlightingRulesContext from './HighlightingRulesContext';
 
+const useHighlightingRules = () => useAppSelector(selectHighlightingRules);
+
 const HighlightingRulesProvider = ({ children }: { children: React.ReactElement }): React.ReactElement => {
-  const highlightingRules = useStore(HighlightingRulesStore);
+  const highlightingRules = useHighlightingRules();
 
   return highlightingRules
     ? (

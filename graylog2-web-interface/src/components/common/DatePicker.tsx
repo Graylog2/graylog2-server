@@ -32,7 +32,7 @@ const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
     min-height: 34px;
     max-height: 34px;
     
-    &--selected:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside) {
+    &--selected:not(.DayPicker-Day--disabled, .DayPicker-Day--outside) {
       background-color: ${theme.colors.variant.lighter.primary};
       color: ${theme.colors.variant.darkest.primary};
     }
@@ -46,7 +46,7 @@ const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
     }
   }
   
-  &:not(.DayPicker--interactionDisabled) .DayPicker-Day:not(.DayPicker-Day--disabled):not(.DayPicker-Day--selected):not(.DayPicker-Day--outside) {
+  &:not(.DayPicker--interactionDisabled) .DayPicker-Day:not(.DayPicker-Day--disabled, .DayPicker-Day--selected, .DayPicker-Day--outside) {
     &:focus {
       outline-color: ${theme.colors.variant.primary};
     }

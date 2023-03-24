@@ -16,40 +16,42 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import Immutable, { Map as MockMap } from 'immutable';
 
-import { MockStore, asMock } from 'helpers/mocking';
 import View from 'views/logic/views/View';
-import { WidgetStore } from 'views/stores/WidgetStore';
-import useViewType from 'views/hooks/useViewType';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import { createViewWithWidgets, createSearch } from 'fixtures/searches';
 
-import Query from './Query';
+import OriginalQuery from './Query';
 
 import AggregationWidget from '../logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from '../logic/aggregationbuilder/AggregationWidgetConfig';
 
 jest.mock('views/components/WidgetGrid', () => () => <span>This is the widget grid</span>);
 
-jest.mock('views/stores/WidgetStore', () => ({
-  WidgetStore: MockStore(['getInitialState', jest.fn(() => MockMap())]),
-}));
-
-jest.mock('views/hooks/useViewType');
+const Query = (props: Partial<React.ComponentProps<typeof TestStoreProvider>>) => (
+  <TestStoreProvider {...props}>
+    <OriginalQuery />
+  </TestStoreProvider>
+);
 
 describe('Query', () => {
-  beforeEach(() => {
-    asMock(useViewType).mockReturnValue(View.Type.Search);
-  });
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
 
   it('renders dashboard widget creation explanation on the dashboard page, if no widget is defined', async () => {
-    asMock(useViewType).mockReturnValue(View.Type.Dashboard);
-    render(<Query />);
+    const dashboard = createSearch().toBuilder().type(View.Type.Dashboard).build();
+
+    render(<Query view={dashboard} />);
 
     await screen.findByText('This dashboard has no widgets yet');
   });
 
   it('renders search widget creation explanation on the search page, if no widget is defined', async () => {
-    render(<Query />);
+    const search = createSearch().toBuilder().type(View.Type.Search).build();
+
+    render(<Query view={search} />);
 
     await screen.findByText('There are no widgets defined to visualize the search result');
   });
@@ -63,10 +65,9 @@ describe('Query', () => {
       .id('widget2')
       .config(AggregationWidgetConfig.builder().build())
       .build();
-    const widgets = Immutable.Map({ widget1, widget2 });
-    asMock(WidgetStore.getInitialState).mockReturnValue(widgets);
+    const viewWithWidgets = createViewWithWidgets([widget1, widget2], {});
 
-    render(<Query />);
+    render(<Query view={viewWithWidgets} />);
 
     await screen.findByText('This is the widget grid');
   });

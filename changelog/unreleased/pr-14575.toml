@@ -1,0 +1,4 @@
+type = "f"
+message = "Fixing missing offset handling in Legacy Searches."
+
+pulls = ["14575"]

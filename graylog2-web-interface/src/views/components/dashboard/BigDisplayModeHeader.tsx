@@ -15,28 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import connect from 'stores/connect';
 import Spinner from 'components/common/Spinner';
-import { ViewStore } from 'views/stores/ViewStore';
 import queryTitle from 'views/logic/queries/QueryTitle';
-import type { QueryId } from 'views/logic/queries/Query';
-import View from 'views/logic/views/View';
-
-type Props = {
-  view: {
-    activeQuery?: QueryId,
-    view?: View,
-  },
-};
+import useView from 'views/hooks/useView';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 const PositioningWrapper = styled.div`
   padding-left: 20px;
 `;
 
-const BigDisplayModeHeader = ({ view: { activeQuery, view } = { activeQuery: undefined, view: undefined } }: Props) => {
+const BigDisplayModeHeader = () => {
+  const view = useView();
+  const activeQuery = useActiveQueryId();
+
   if (!view || !activeQuery) {
     return <Spinner />;
   }
@@ -51,15 +44,4 @@ const BigDisplayModeHeader = ({ view: { activeQuery, view } = { activeQuery: und
   );
 };
 
-BigDisplayModeHeader.propTypes = {
-  view: PropTypes.shape({
-    view: PropTypes.instanceOf(View),
-    activeQuery: PropTypes.string,
-  }),
-};
-
-BigDisplayModeHeader.defaultProps = {
-  view: undefined,
-};
-
-export default connect(BigDisplayModeHeader, { view: ViewStore });
+export default BigDisplayModeHeader;

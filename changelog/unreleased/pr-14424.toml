@@ -1,0 +1,24 @@
+type = "added"
+message = "Introduces a new index rotation strategy combining features of size-based and time-based strategies."
+
+issues = ["graylog-plugin-enterprise#4447"]
+pulls = ["14424", "graylog-plugin-enterprise#4572"]
+
+details.user = """
+The new index rotation strategy aims to make it easier to achieve good resource usage,
+i.e. shards that are neither too small nor too big, while avoiding excessive number
+of shards. This has been difficult to date, especially when faced with variable ingest
+rate.
+"""
+
+details.ops = """
+`time_size_optimizing` is the new default rotation strategy, as it provides the best results
+with a minimum of user input. The default settings are based on ES/OS sharding recommendations and generally
+do not need to be changed.
+The following configuration file settings are available, if you wish to modify the behavior
+for your requirements:
+`time_size_optimizing_rotation_min_shard_size=20g`: Shard should be at least this big before rotating.
+`time_size_optimizing_rotation_max_shard_size=50g`: Rotate if shard exceeds this size limit.
+`time_size_optimizing_retention_min_lifetime=30d`: The minimum / maximum number of days the data in the index is kept before it is retained.
+`time_size_optimizing_retention_max_lifetime=40d`: The minimum / maximum number of days the data in the index is kept before it is retained.
+"""

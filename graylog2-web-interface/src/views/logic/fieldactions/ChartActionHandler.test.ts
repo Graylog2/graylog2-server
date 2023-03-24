@@ -14,32 +14,34 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import asMock from 'helpers/mocking/AsMock';
 import Widget from 'views/logic/widgets/Widget';
-import { WidgetActions } from 'views/stores/WidgetStore';
 import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
 import Series from 'views/logic/aggregationbuilder/Series';
+import { createSearch } from 'fixtures/searches';
+import mockDispatch from 'views/test/mockDispatch';
+import type { RootState } from 'views/types';
+import { addWidget } from 'views/logic/slices/widgetActions';
 
 import ChartActionHandler from './ChartActionHandler';
 
 import FieldType, { FieldTypes } from '../fieldtypes/FieldType';
 import { createElasticsearchQueryString } from '../queries/Query';
 
-jest.mock('views/stores/WidgetStore', () => ({
-  WidgetActions: {
-    create: jest.fn((widget: Widget) => Promise.resolve(widget)),
-  },
-}));
-
 jest.mock('views/logic/searchtypes/aggregation/PivotGenerator', () => jest.fn());
+
+jest.mock('views/logic/slices/widgetActions', () => ({
+  addWidget: jest.fn(),
+}));
 
 describe('ChartActionHandler', () => {
   const emptyFieldType = new FieldType('empty', [], []);
+  const view = createSearch();
+  const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
 
   it('uses average function if triggered on field', async () => {
-    await ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: {} });
+    await dispatch(ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: {} }));
 
-    expect(WidgetActions.create).toHaveBeenCalledWith(expect.objectContaining({
+    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
       config: expect.objectContaining({
         series: [Series.forFunction('avg(somefield)')],
       }),
@@ -47,9 +49,9 @@ describe('ChartActionHandler', () => {
   });
 
   it('uses the function itself if it was triggered on one', async () => {
-    await ChartActionHandler({ queryId: 'queryId', field: 'max(somefield)', type: emptyFieldType, contexts: {} });
+    await dispatch(ChartActionHandler({ queryId: 'queryId', field: 'max(somefield)', type: emptyFieldType, contexts: {} }));
 
-    expect(WidgetActions.create).toHaveBeenCalledWith(expect.objectContaining({
+    expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
       config: expect.objectContaining({
         series: [Series.forFunction('max(somefield)')],
       }),
@@ -57,24 +59,21 @@ describe('ChartActionHandler', () => {
   });
 
   describe('Widget creation', () => {
-    beforeEach(() => {
-      jest.clearAllMocks();
-    });
-
-    it('should create widget with filter of original widget', () => {
+    it('should create widget with filter of original widget', async () => {
       const filter = "author: 'Vanth'";
       const origWidget = Widget.builder().filter(filter).build();
       const timestampFieldType = FieldTypes.DATE();
 
-      ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: { widget: origWidget } });
+      await dispatch(ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: { widget: origWidget } }));
 
-      const widget = asMock(WidgetActions.create).mock.calls[0][0];
+      expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
+        filter,
+      }));
 
-      expect(widget.filter).toEqual(filter);
       expect(pivotForField).toHaveBeenCalledWith('timestamp', timestampFieldType);
     });
 
-    it('duplicates query/timerange/streams/filter of original widget', () => {
+    it('duplicates query/timerange/streams/filter of original widget', async () => {
       const origWidget = Widget.builder()
         .filter('author: "Vanth"')
         .query(createElasticsearchQueryString('foo:42'))
@@ -82,21 +81,19 @@ describe('ChartActionHandler', () => {
         .timerange({ type: 'relative', range: 3600 })
         .build();
 
-      ChartActionHandler({
+      await dispatch(ChartActionHandler({
         queryId: 'queryId',
         field: 'foo',
         type: new FieldType('keyword', [], []),
         contexts: { widget: origWidget },
-      });
+      }));
 
-      expect(WidgetActions.create).toHaveBeenCalled();
-
-      const { filter, query, streams, timerange } = asMock(WidgetActions.create).mock.calls[0][0];
-
-      expect(filter).toEqual('author: "Vanth"');
-      expect(query).toEqual(createElasticsearchQueryString('foo:42'));
-      expect(streams).toEqual(['stream1', 'stream23']);
-      expect(timerange).toEqual({ type: 'relative', range: 3600 });
+      expect(addWidget).toHaveBeenCalledWith(expect.objectContaining({
+        filter: 'author: "Vanth"',
+        query: createElasticsearchQueryString('foo:42'),
+        streams: ['stream1', 'stream23'],
+        timerange: { type: 'relative', range: 3600 },
+      }));
     });
   });
 });

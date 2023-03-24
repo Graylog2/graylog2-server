@@ -19,6 +19,7 @@ package org.graylog2.cluster;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.WriteResult;
 import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
@@ -36,9 +37,17 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     private final long pingTimeout;
 
     @Inject
-    public NodeServiceImpl(final MongoConnection mongoConnection, final Configuration configuration) {
+    public NodeServiceImpl(final MongoConnection mongoConnection, Configuration configuration) {
+        this(mongoConnection, configuration.getStaleLeaderTimeout());
+    }
+
+    public NodeServiceImpl(final MongoConnection mongoConnection, final int staleLeaderTimeout) {
         super(mongoConnection);
-        this.pingTimeout = TimeUnit.MILLISECONDS.toSeconds(configuration.getStaleLeaderTimeout());
+        this.pingTimeout = TimeUnit.MILLISECONDS.toSeconds(staleLeaderTimeout);
+    }
+
+    public Node.Type type() {
+        return Node.Type.SERVER;
     }
 
     @Override
@@ -46,7 +55,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
         Map<String, Object> fields = Maps.newHashMap();
         fields.put("last_seen", Tools.getUTCTimestamp());
         fields.put("node_id", nodeId);
-        fields.put("type", Node.Type.SERVER.toString());
+        fields.put("type", type().toString());
         fields.put("is_leader", isLeader);
         fields.put("transport_address", httpPublishUri.toString());
         fields.put("hostname", hostname);
@@ -124,21 +133,24 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     /**
      * Mark this node as alive and probably update some settings that may have changed since last server boot.
      */
-    @Override
-    public void markAsAlive(Node node, boolean isLeader, String restTransportAddress) {
-        node.getFields().put("last_seen", Tools.getUTCTimestamp());
-        node.getFields().put("is_leader", isLeader);
-        node.getFields().put("transport_address", restTransportAddress);
-        try {
-            save(node);
-        } catch (ValidationException e) {
-            throw new RuntimeException("Validation failed.", e);
-        }
-    }
+    public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress) throws NodeNotFoundException {
+        BasicDBObject query = new BasicDBObject("node_id", node.getNodeId());
 
-    @Override
-    public void markAsAlive(Node node, boolean isLeader, URI restTransportAddress) {
-        markAsAlive(node, isLeader, restTransportAddress.toString());
+        final BasicDBObject fields = new BasicDBObject();
+        fields.put("is_leader", isLeader);
+        fields.put("transport_address", restTransportAddress.toString());
+        fields.put("last_seen", Tools.getUTCTimestamp()); // TODO: deprecate and remove in later releases and use last_seen_date only!
+        final BasicDBObject update = new BasicDBObject("$set", fields);
+
+        // using $currentDate will persist the database date, avoiding time sync problems across different nodes
+        //update.put("$currentDate", new BasicDBObject("last_seen_date", new BasicDBObject("$type", "date")));
+
+        final WriteResult result = super.collection(NodeImpl.class).update(query, update);
+
+        final int updatedDocumentsCount = result.getN();
+        if (updatedDocumentsCount != 1) {
+            throw new NodeNotFoundException("Unable to find node " + node.getNodeId());
+        }
     }
 
     @Override

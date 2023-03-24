@@ -34,7 +34,7 @@ public interface BulkExecutor<T, C extends HasUser> {
                 return userName;
             }
         }
-        return "<UNKNOWN>"; //matches UNKNOWN_USERNAME constant from enterprise module -> AuditLogFilter
+        return AuditActor.UNKNOWN_USERNAME;
     }
 
     default AuditActor getAuditActor(final C userContext) {

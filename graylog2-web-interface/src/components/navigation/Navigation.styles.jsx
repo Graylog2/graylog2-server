@@ -45,7 +45,6 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
 
     &.active {
       ${activeIndicatorStyles(theme)}
-
       :hover, :focus {
         ${activeIndicatorStyles(theme)}
       }
@@ -93,7 +92,7 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
           content: attr(aria-label);
         }
 
-        [class*="fa-"] {
+        [class*='fa-'] {
           display: none;
         }
       }
@@ -112,7 +111,7 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
     .navbar-collapse {
       width: auto;
       border-top: 1px solid transparent;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 1px 0 rgb(255 255 255 / 10%);
 
       &.collapse {
         height: auto !important;

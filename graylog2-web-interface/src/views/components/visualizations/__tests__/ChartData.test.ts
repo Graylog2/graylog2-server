@@ -14,21 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { readFileSync } from 'fs';
-import { dirname } from 'path';
-
 import md5 from 'md5';
-import { flow, merge, fill } from 'lodash';
+import flow from 'lodash/flow';
+import merge from 'lodash/merge';
+import fill from 'lodash/fill';
 
+import readJsonFixture from 'helpers/readJsonFixture';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 import type { ExtractedSeries, ValuesBySeries, Generator } from '../ChartData';
 import { chartData, extractSeries, formatSeries, generateChart } from '../ChartData';
 import transformKeys from '../TransformKeys';
 
-const cwd = dirname(__filename);
-const readFixture = (filename: string) => JSON.parse(readFileSync(`${cwd}/${filename}`, 'utf-8'));
 const formatTime = (timestamp: string) => timestamp;
+const readFixture = (fixtureName: string) => readJsonFixture(__dirname, fixtureName);
 
 describe('Chart helper functions', () => {
   const config = AggregationWidgetConfig.builder().build();

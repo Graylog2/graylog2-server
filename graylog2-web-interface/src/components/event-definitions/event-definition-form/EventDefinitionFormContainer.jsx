@@ -16,9 +16,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
-import history from 'util/History';
 import Routes from 'routing/Routes';
 import connect from 'stores/connect';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
@@ -40,7 +39,7 @@ const fetchNotifications = () => {
   EventNotificationsActions.listAll();
 };
 
-const handleCancel = () => {
+const handleCancel = (history) => {
   history.push(Routes.ALERTS.DEFINITIONS.LIST);
 };
 
@@ -69,7 +68,7 @@ class EventDefinitionFormContainer extends React.Component {
 
   handleChange = (key, value) => {
     this.setState((state) => {
-      const nextEventDefinition = lodash.cloneDeep(state.eventDefinition);
+      const nextEventDefinition = cloneDeep(state.eventDefinition);
 
       nextEventDefinition[key] = value;
       const { onEventDefinitionChange } = this.props;
@@ -81,6 +80,7 @@ class EventDefinitionFormContainer extends React.Component {
   };
 
   handleSubmitSuccessResponse = () => {
+    const { history } = this.props;
     this.setState({ isDirty: false }, () => history.push(Routes.ALERTS.DEFINITIONS.LIST));
   };
 
@@ -169,6 +169,7 @@ EventDefinitionFormContainer.propTypes = {
   entityTypes: PropTypes.object,
   notifications: PropTypes.object.isRequired,
   onEventDefinitionChange: PropTypes.func,
+  history: PropTypes.object.isRequired,
 };
 
 EventDefinitionFormContainer.defaultProps = {

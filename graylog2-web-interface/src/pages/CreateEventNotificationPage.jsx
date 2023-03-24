@@ -23,12 +23,15 @@ import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import connect from 'stores/connect';
 import { isPermitted } from 'util/PermissionsMixin';
-import history from 'util/History';
 import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 
+import useHistory from '../routing/useHistory';
+
 const CreateEventDefinitionPage = ({ currentUser }) => {
+  const history = useHistory();
+
   if (!isPermitted(currentUser.permissions, 'eventnotifications:create')) {
     history.push(Routes.NOTFOUND);
   }

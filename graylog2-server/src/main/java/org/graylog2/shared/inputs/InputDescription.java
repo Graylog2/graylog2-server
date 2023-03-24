@@ -42,11 +42,23 @@ public class InputDescription {
         return descriptor.getLinkToDocs();
     }
 
+    public boolean isCloudCompatible() {
+        return descriptor.isCloudCompatible();
+    }
+
+    public boolean isForwarderCompatible() {
+        return descriptor.isForwarderCompatible();
+    }
+
     public Map<String, Map<String, Object>> getRequestedConfiguration() {
         return config.combinedRequestedConfiguration().asList();
     }
 
     public ConfigurationRequest getConfigurationRequest() {
         return config.combinedRequestedConfiguration();
+    }
+
+    public static String getInputDescriptionName(InputDescription description, String inputTypeFallback) {
+        return description != null ? description.getName() : "Unknown Input (" + inputTypeFallback + ")";
     }
 }

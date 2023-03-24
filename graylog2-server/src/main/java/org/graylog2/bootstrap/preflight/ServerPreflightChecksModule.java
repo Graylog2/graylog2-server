@@ -16,11 +16,12 @@
  */
 package org.graylog2.bootstrap.preflight;
 
+import com.google.inject.Scopes;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.bindings.providers.NodeIdProvider;
 import org.graylog2.storage.providers.ElasticsearchVersionProvider;
 
 public class ServerPreflightChecksModule extends Graylog2Module {
@@ -28,7 +29,7 @@ public class ServerPreflightChecksModule extends Graylog2Module {
     @Override
     protected void configure() {
         bind(ElasticsearchVersionProvider.class).asEagerSingleton();
-        bind(NodeId.class).toProvider(NodeIdProvider.class);
+        bind(NodeId.class).toProvider(FilePersistedNodeIdProvider.class).asEagerSingleton();
         bind(AuditEventSender.class).to(NullAuditEventSender.class);
 
         // The MongoDBPreflightCheck is not registered here, because it is called separately from ServerBootstrap

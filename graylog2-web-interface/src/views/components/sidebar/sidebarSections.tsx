@@ -22,7 +22,6 @@ import ViewDescription from './description/ViewDescription';
 import AddWidgetButton from './create/AddWidgetButton';
 import HighlightingRules from './highlighting/HighlightingRules';
 
-/* eslint-disable react/no-unused-prop-types */
 export type SidebarSectionProps = {
   sidebarChildren: React.ReactElement,
   sidebarIsPinned: boolean,

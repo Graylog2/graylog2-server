@@ -75,7 +75,7 @@ public abstract class ScopedDbService<E extends ScopedEntity> extends PaginatedD
     }
 
     @Override
-    public final E save(E entity) {
+    public E save(E entity) {
 
         ensureValidScope(entity);
         if (entity.id() != null) {

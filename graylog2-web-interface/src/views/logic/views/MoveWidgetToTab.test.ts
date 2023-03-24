@@ -14,10 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { readFileSync } from 'fs';
-import { dirname } from 'path';
-
 import * as Immutable from 'immutable';
+
+import readJsonFixture from 'helpers/readJsonFixture';
 
 import MoveWidgetToTab from './MoveWidgetToTab';
 import View from './View';
@@ -51,9 +50,7 @@ jest.mock('views/logic/Widgets', () => ({
   })),
 }));
 
-const cwd = dirname(__filename);
-const readFixture = (filename) => JSON.parse(readFileSync(`${cwd}/${filename}`).toString());
-
+const readFixture = (fixtureName: string) => readJsonFixture(__dirname, fixtureName);
 const dashboardFixture = View.fromJSON(readFixture('./MoveWidgetToTab.Dashboard.fixture.json'));
 const searchFixture = Search.fromJSON(readFixture('./MoveWidgetToTab.Search.fixture.json'));
 const dashboard = dashboardFixture.toBuilder()

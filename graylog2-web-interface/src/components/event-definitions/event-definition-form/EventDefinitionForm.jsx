@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import defaultTo from 'lodash/defaultTo';
+import last from 'lodash/last';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 
@@ -81,7 +82,7 @@ class EventDefinitionForm extends React.Component {
       event.preventDefault();
     }
 
-    if (activeStep === lodash.last(STEP_KEYS)) {
+    if (activeStep === last(STEP_KEYS)) {
       const { onSubmit } = this.props;
 
       onSubmit();
@@ -89,7 +90,7 @@ class EventDefinitionForm extends React.Component {
   };
 
   renderButtons = (activeStep, eventDefinitionId) => {
-    if (activeStep === lodash.last(STEP_KEYS)) {
+    if (activeStep === last(STEP_KEYS)) {
       const { onCancel } = this.props;
 
       return (
@@ -153,7 +154,7 @@ class EventDefinitionForm extends React.Component {
       },
       {
         key: STEP_KEYS[1],
-        title: lodash.defaultTo(eventDefinitionType.displayName, 'Condition'),
+        title: defaultTo(eventDefinitionType.displayName, 'Condition'),
         component: <EventConditionForm {...defaultStepProps} />,
       },
       {

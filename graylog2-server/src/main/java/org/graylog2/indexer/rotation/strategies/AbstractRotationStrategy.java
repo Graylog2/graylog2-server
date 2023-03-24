@@ -22,6 +22,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.NoTargetIndexException;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
@@ -44,12 +45,14 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
     private final AuditEventSender auditEventSender;
     private final NodeId nodeId;
     protected final ElasticsearchConfiguration elasticsearchConfiguration;
+    protected final Indices indices;
 
     public AbstractRotationStrategy(
-            AuditEventSender auditEventSender, NodeId nodeId, ElasticsearchConfiguration elasticsearchConfiguration) {
+            AuditEventSender auditEventSender, NodeId nodeId, ElasticsearchConfiguration elasticsearchConfiguration, Indices indices) {
         this.auditEventSender = requireNonNull(auditEventSender);
         this.nodeId = nodeId;
         this.elasticsearchConfiguration = elasticsearchConfiguration;
+        this.indices = indices;
     }
 
     @Nullable
@@ -68,6 +71,9 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
             return;
         }
 
+        // Refresh so we have current stats on idle indices
+        indices.refresh(indexName);
+
         final Result rotate = shouldRotate(indexName, indexSet);
         if (rotate == null) {
             LOG.error("Cannot perform rotation of index <{}> in index set <{}> with strategy <{}> at this moment", indexName, indexSetTitle, strategyName);
@@ -75,7 +81,7 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
         }
         LOG.debug("Rotation strategy result: {}", rotate.getDescription());
         if (rotate.shouldRotate()) {
-            LOG.info("Deflector index <{}> (index set <{}>) should be rotated, Pointing deflector to new index now!", indexSetTitle, indexName);
+            LOG.info("Deflector index <{}> (index set <{}>) should be rotated ({}), Pointing deflector to new index now!", indexSetTitle, indexName, rotate.getDescription());
             indexSet.cycle();
             auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_ROTATION_COMPLETE, ImmutableMap.of(
                     "index_name", indexName,
@@ -83,6 +89,31 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
             ));
         } else {
             LOG.debug("Deflector index <{}> should not be rotated. Not doing anything.", indexName);
+        }
+    }
+
+    public Result createResult(boolean shouldRotate, String message) {
+        return new ResultImpl(shouldRotate, message);
+    }
+
+    static class ResultImpl implements Result {
+        private final boolean shouldRotate;
+        private final String message;
+
+        private ResultImpl(boolean shouldRotate, String message) {
+            this.shouldRotate = shouldRotate;
+            this.message = message;
+            LOG.debug("{} because of: {}", shouldRotate ? "Rotating" : "Not rotating", message);
+        }
+
+        @Override
+        public String getDescription() {
+            return message;
+        }
+
+        @Override
+        public boolean shouldRotate() {
+            return shouldRotate;
         }
     }
 }

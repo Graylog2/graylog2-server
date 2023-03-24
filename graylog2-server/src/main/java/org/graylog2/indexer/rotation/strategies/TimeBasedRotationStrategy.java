@@ -63,16 +63,14 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
     public static final String NAME = "time";
     public static final String OVERRIDE_HINT = "(elasticsearch_max_write_index_age overrides configured period)";
 
-    private final Indices indices;
     private Map<String, DateTime> anchor;
 
     @Inject
     public TimeBasedRotationStrategy(Indices indices, NodeId nodeId,
                                      AuditEventSender auditEventSender,
                                      ElasticsearchConfiguration elasticsearchConfiguration) {
-        super(auditEventSender, nodeId, elasticsearchConfiguration);
+        super(auditEventSender, nodeId, elasticsearchConfiguration, indices);
         this.anchor = new ConcurrentHashMap<>();
-        this.indices = requireNonNull(indices, "indices must not be null");
     }
 
     @Override
@@ -208,7 +206,7 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
 
             // still not able to figure out the last rotation time, we'll rotate forcibly
             if (!anchor.containsKey(indexSetId)) {
-                return new SimpleResult(true, "No known previous rotation time, forcing index rotation now.");
+                return createResult(true, "No known previous rotation time, forcing index rotation now.");
             }
         }
 
@@ -219,7 +217,7 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
             final String message = new MessageFormat("Next rotation at {0} {1}", Locale.ENGLISH)
                     .format(new Object[]{nextRotation,
                             overriding ? OVERRIDE_HINT : ""});
-            return new SimpleResult(false, message);
+            return createResult(false, message);
         }
 
         // determine new anchor (push it to within less then one period before now) in case we missed one or more periods
@@ -232,14 +230,14 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
                     .format(new Object[]{
                             nextAnchor,
                             overriding ? OVERRIDE_HINT : ""});
-            return new SimpleResult(false, message);
+            return createResult(false, message);
         }
 
         final String message = new MessageFormat("Rotation period {0} elapsed, next rotation at {1} {2}", Locale.ENGLISH)
                 .format(new Object[]{now,
                         nextAnchor,
                         overriding ? OVERRIDE_HINT : ""});
-        return new SimpleResult(true, message);
+        return createResult(true, message);
     }
 
     private boolean isEmptyIndexSet(IndexSet indexSet) {
@@ -273,27 +271,6 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         } while (tmpAnchor.isBefore(now));
 
         return currentAnchor.withPeriodAdded(normalizedPeriod, multiplicator - 1);
-    }
-
-    static class SimpleResult implements AbstractRotationStrategy.Result {
-        private final String message;
-        private final boolean rotate;
-
-        SimpleResult(boolean rotate, String message) {
-            this.message = message;
-            this.rotate = rotate;
-            log.debug("{} because of: {}", rotate ? "Rotating" : "Not rotating", message);
-        }
-
-        @Override
-        public String getDescription() {
-            return message;
-        }
-
-        @Override
-        public boolean shouldRotate() {
-            return rotate;
-        }
     }
 
     @Override

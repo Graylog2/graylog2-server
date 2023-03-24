@@ -39,7 +39,7 @@ const exceedsDuration = (timeRange: TimeRange, limitDuration, formatTime: (dateT
 
   switch (timeRange?.type) {
     case 'absolute':
-    case 'keyword': { // eslint-disable-line no-fallthrough, padding-line-between-statements
+    case 'keyword': { // eslint-disable-line padding-line-between-statements
       const durationFrom = timeRange.from;
 
       const durationLimit = formatTime(toDateObject(new Date()).subtract(Number(limitDuration), 'seconds'), 'complete');

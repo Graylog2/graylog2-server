@@ -17,29 +17,25 @@
 import React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent, screen, within } from 'wrappedTestingLibrary';
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import MockStore from 'helpers/mocking/StoreMock';
-import mockAction from 'helpers/mocking/MockAction';
-import { createSearch } from 'fixtures/searches';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import WidgetModel from 'views/logic/widgets/Widget';
-import { WidgetActions } from 'views/stores/WidgetStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import View from 'views/logic/views/View';
-import { ViewStore } from 'views/stores/ViewStore';
-import type { ViewStoreState } from 'views/stores/ViewStore';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
-import viewsBindings from 'views/bindings';
 import DataTable from 'views/components/datatable/DataTable';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import { asMock } from 'helpers/mocking';
 import useViewType from 'views/hooks/useViewType';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import { updateWidget } from 'views/logic/slices/widgetActions';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -48,28 +44,14 @@ import WidgetContext from '../contexts/WidgetContext';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
 import FieldTypesContext from '../contexts/FieldTypesContext';
 
-const testTimeout = applyTimeoutMultiplier(30000);
+const testTimeout = applyTimeoutMultiplier(60000);
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 
-const MockWidgetStoreState = Immutable.Map();
-
-jest.mock('views/stores/WidgetStore', () => ({
-  WidgetStore: MockStore(['getInitialState', () => MockWidgetStoreState]),
-  WidgetActions: {
-    update: mockAction(),
-  },
-}));
-
-jest.mock('views/stores/AggregationFunctionsStore', () => ({
-  getInitialState: jest.fn(() => ({
-    count: { type: 'count', description: 'Count' },
-  })),
-  listen: jest.fn(),
-}));
+jest.mock('views/hooks/useAggregationFunctions');
 
 jest.mock('views/stores/StreamsStore', () => ({
   StreamsStore: MockStore(['getInitialState', () => ({
@@ -79,27 +61,19 @@ jest.mock('views/stores/StreamsStore', () => ({
   })]),
 }));
 
-jest.mock('views/stores/SearchStore', () => ({
-  SearchStore: MockStore(['getInitialState', () => ({ search: { parameters: [] } })]),
-  SearchActions: {
-    execute: mockAction(),
-  },
-}));
-
 jest.mock('views/hooks/useViewType');
 
-const viewsPlugin = new PluginManifest({}, viewsBindings);
+jest.mock('views/logic/slices/widgetActions', () => ({
+  ...jest.requireActual('views/logic/slices/widgetActions'),
+  updateWidget: jest.fn(() => async () => {}),
+}));
 
 const selectEventConfig = { container: document.body };
 
 describe('Aggregation Widget', () => {
-  beforeAll(() => {
-    PluginStore.register(viewsPlugin);
-  });
+  beforeAll(loadViewsPlugin);
 
-  afterAll(() => {
-    PluginStore.unregister(viewsPlugin);
-  });
+  afterAll(unloadViewsPlugin);
 
   const dataTableWidget = WidgetModel.builder().newId()
     .type('AGGREGATION')
@@ -108,19 +82,10 @@ describe('Aggregation Widget', () => {
     .timerange({ type: 'relative', from: 300 })
     .build();
 
-  const viewStoreState: ViewStoreState = {
-    activeQuery: 'query-id-1',
-    view: createSearch({ queryId: 'query-id-1' }),
-    isNew: false,
-    dirty: false,
-  };
-
   beforeEach(() => {
     jest.useFakeTimers()
       // @ts-expect-error
       .setSystemTime(mockedUnixTime);
-
-    ViewStore.getInitialState = jest.fn(() => viewStoreState);
   });
 
   afterEach(() => {
@@ -142,8 +107,7 @@ describe('Aggregation Widget', () => {
     widget: propsWidget = dataTableWidget,
     ...props
   }: AggregationWidgetProps) => (
-    <>
-      {/* eslint-disable-next-line react/jsx-no-constructed-context-values */}
+    <TestStoreProvider>
       <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
         <WidgetFocusContext.Provider value={widgetFocusContextState}>
           <WidgetContext.Provider value={propsWidget}>
@@ -156,7 +120,7 @@ describe('Aggregation Widget', () => {
           </WidgetContext.Provider>
         </WidgetFocusContext.Provider>
       </FieldTypesContext.Provider>
-    </>
+    </TestStoreProvider>
   );
 
   const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: /update preview/i });
@@ -208,9 +172,7 @@ describe('Aggregation Widget', () => {
 
       submitWidgetChanges();
 
-      await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledTimes(1));
-
-      expect(WidgetActions.update).toHaveBeenCalledWith(expect.any(String), updatedWidget);
+      await waitFor(() => expect(updateWidget).toHaveBeenCalledWith(expect.any(String), updatedWidget));
     }, testTimeout);
 
     it('should apply not submitted widget time range changes in correct format when clicking on "Update widget"', async () => {
@@ -245,9 +207,7 @@ describe('Aggregation Widget', () => {
       // Submit all changes
       submitWidgetChanges();
 
-      await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledTimes(1));
-
-      expect(WidgetActions.update).toHaveBeenCalledWith(expect.any(String), updatedWidget);
+      await waitFor(() => expect(updateWidget).toHaveBeenCalledWith(expect.any(String), updatedWidget));
     }, testTimeout);
   });
 
@@ -279,9 +239,7 @@ describe('Aggregation Widget', () => {
 
       submitWidgetChanges();
 
-      await waitFor(() => expect(WidgetActions.update).toHaveBeenCalledTimes(1));
-
-      expect(WidgetActions.update).toHaveBeenCalledWith(expect.any(String), updatedWidget);
+      await waitFor(() => expect(updateWidget).toHaveBeenCalledWith(expect.any(String), updatedWidget));
     }, testTimeout);
   });
 });

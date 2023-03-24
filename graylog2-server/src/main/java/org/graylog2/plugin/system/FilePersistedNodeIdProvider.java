@@ -21,7 +21,10 @@ import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -31,11 +34,13 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.List;
 
+@Singleton
 public class FilePersistedNodeIdProvider implements Provider<NodeId> {
     private static final Logger LOG = LoggerFactory.getLogger(FilePersistedNodeIdProvider.class);
     private final String filename;
 
-    public FilePersistedNodeIdProvider(final String filename) {
+    @Inject
+    public FilePersistedNodeIdProvider(@Named("node_id_file") final String filename) {
         this.filename = filename;
     }
 

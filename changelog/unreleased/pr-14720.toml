@@ -1,0 +1,5 @@
+type = "f"
+message = "Changing default refresh interval to five seconds."
+
+pulls = ["14720"]
+isses = ["Graylog2/graylog-plugin-enterprise#4567"]

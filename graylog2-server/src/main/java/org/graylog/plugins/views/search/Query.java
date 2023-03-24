@@ -125,7 +125,7 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
             return this;
         }
 
-        if (state.timerange().isPresent() || state.query().isPresent() || !state.searchTypes().isEmpty() || !state.keepSearchTypes().isEmpty()) {
+        if (state.timerange().isPresent() || state.query().isPresent() || !state.searchTypes().isEmpty() || !state.keepSearchTypes().isEmpty() || !state.keepQueries().isEmpty()) {
             final Builder builder = toBuilder();
 
             if (state.timerange().isPresent() || state.query().isPresent()) {

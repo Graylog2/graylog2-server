@@ -26,10 +26,9 @@ import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
 
 jest.mock('components/welcome/hooks/useLastOpened', () => jest.fn(() => ({
   data: {
-    lastOpened: [{ id: '1', title: 'Title 1', type: 'dashboard' }, {
-      id: '2',
+    lastOpened: [{ grn: 'grn::::dashboard:1', title: 'Title 1' }, {
+      grn: 'grn::::search:2',
       title: 'Title 2',
-      type: 'search',
     }],
     per_page: 5,
     page: 1,
@@ -41,10 +40,9 @@ jest.mock('components/welcome/hooks/useLastOpened', () => jest.fn(() => ({
 
 jest.mock('components/welcome/hooks/useFavoriteItems', () => jest.fn(() => ({
   data: {
-    favorites: [{ id: '4', title: 'Title 4', type: 'dashboard' }, {
-      id: '3',
+    favorites: [{ grn: 'grn::::dashboard:4', title: 'Title 4' }, {
+      grn: 'grn::::dashboard:3',
       title: 'Title 3',
-      type: 'dashboard',
     }],
     per_page: 5,
     page: 1,
@@ -60,16 +58,14 @@ jest.mock('components/welcome/hooks/useRecentActivity', () => jest.fn(() => ({
       {
         id: '5',
         activityType: 'share',
-        itemType: 'dashboard',
-        itemId: '5',
+        itemGrn: 'grn::::dashboard:5',
         itemTitle: 'Title 5',
         timestamp: '2022-01-01',
       },
       {
         id: '6',
         activityType: 'deleted',
-        itemType: 'search',
-        itemId: '6',
+        itemGrn: 'grn::::search:6',
         itemTitle: 'Title 6',
         timestamp: '2022-01-03',
       },

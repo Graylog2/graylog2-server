@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.favorites;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog.grn.GRN;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -34,7 +35,7 @@ public record FavoritesForUserDTO(
         String userId,
         @Nullable
         @JsonProperty(FIELD_ITEMS)
-        List<FavoriteDTO> items
+        List<GRN> items
 ) {
     public static final String FIELD_ID = "id";
     public static final String FIELD_USER_ID = "user_id";
@@ -51,7 +52,7 @@ public record FavoritesForUserDTO(
     }
 
     public FavoritesForUserDTO(@JsonProperty(FIELD_USER_ID) String userId,
-                               @Nullable @JsonProperty(FIELD_ITEMS) List<FavoriteDTO> items) {
+                               @Nullable @JsonProperty(FIELD_ITEMS) List<GRN> items) {
         this(null, userId, items);
     }
 }

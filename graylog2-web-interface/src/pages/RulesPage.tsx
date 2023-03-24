@@ -124,7 +124,6 @@ const RulesPage = () => {
     <Flex>
       <SearchForm query={query}
                   onSearch={handleSearch}
-                  queryWidth={400}
                   queryHelpComponent={<QueryHelper entityName="Pipeline Rule" />}
                   wrapperClass="has-bm"
                   onReset={() => handleSearch('')}

@@ -43,7 +43,6 @@ export default (widgets: (Array<Widget> | Immutable.List<Widget>)): ResultType =
     .map((widget) => widgetDefinition(widget.type)
       .searchTypes(widget)
       .map((searchType) => ({
-
         id: generateId(),
         timerange: widget.timerange,
         query: widget.query,

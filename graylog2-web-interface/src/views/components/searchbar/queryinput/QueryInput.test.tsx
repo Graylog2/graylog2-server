@@ -20,6 +20,8 @@ import userEvent from '@testing-library/user-event';
 
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import { validationError } from 'fixtures/queryValidationState';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
 import QueryInput from './QueryInput';
 
@@ -42,15 +44,21 @@ describe('QueryInput', () => {
   const getQueryInput = () => screen.getByRole('textbox');
 
   const SimpleQueryInput = (props: Partial<React.ComponentProps<typeof QueryInput>>) => (
-    <QueryInput value=""
-                name="search-query"
-                onChange={() => Promise.resolve('')}
-                validate={() => Promise.resolve({})}
-                isValidating={false}
-                onExecute={() => {}}
-                completerFactory={() => new Completer()}
-                {...props} />
+    <TestStoreProvider>
+      <QueryInput value=""
+                  name="search-query"
+                  onChange={() => Promise.resolve('')}
+                  validate={() => Promise.resolve({})}
+                  isValidating={false}
+                  onExecute={() => {}}
+                  completerFactory={() => new Completer()}
+                  {...props} />
+    </TestStoreProvider>
   );
+
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
 
   afterEach(() => {
     jest.clearAllMocks();

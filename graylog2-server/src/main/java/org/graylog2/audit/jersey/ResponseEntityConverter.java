@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-//TODO: remove this class from enterprise module
 public class ResponseEntityConverter {
     private final ObjectMapper objectMapper;
 

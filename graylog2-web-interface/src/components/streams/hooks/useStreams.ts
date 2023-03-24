@@ -20,6 +20,7 @@ import UserNotification from 'util/UserNotification';
 import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import type { Stream } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
+import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 
 type Options = {
   enabled: boolean,
@@ -32,15 +33,19 @@ const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled
     attributes: Array<Attribute>
   } | undefined,
   refetch: () => void,
-  isFetching: boolean,
+  isInitialLoading: boolean,
 } => {
-  const { data, refetch, isFetching } = useQuery(
+  const { data, refetch, isInitialLoading } = useQuery(
     ['streams', 'overview', searchParams],
     () => StreamsStore.searchPaginated(
       searchParams.page,
       searchParams.pageSize,
       searchParams.query,
-      { sort: searchParams?.sort.attributeId, order: searchParams?.sort.direction },
+      {
+        sort: searchParams?.sort.attributeId,
+        order: searchParams?.sort.direction,
+        filters: FiltersForQueryParams(searchParams.filters),
+      },
     ),
     {
       onError: (errorThrown) => {
@@ -55,7 +60,7 @@ const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled
   return ({
     data,
     refetch,
-    isFetching,
+    isInitialLoading,
   });
 };
 

@@ -14,13 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 
 import UserNotification from 'util/UserNotification';
-import type { SearchBarControl, CombinedSearchBarFormValues } from 'views/types';
+import type { SearchBarControl, CombinedSearchBarFormValues, HandlerContext } from 'views/types';
 import usePluginEntities from 'hooks/usePluginEntities';
 import type Widget from 'views/logic/widgets/Widget';
 import type Query from 'views/logic/queries/Query';
+import type { AppDispatch } from 'stores/useAppDispatch';
 
 const executeSafely = <T extends () => ReturnType<T>>(fn: T, errorMessage: string, fallbackResult?: ReturnType<T>): ReturnType<T> => {
   try {
@@ -36,7 +37,7 @@ const executeSafely = <T extends () => ReturnType<T>>(fn: T, errorMessage: strin
 
 const initialValues = <T>(currentQuery: T, initialValuesHandler: Array<(entity: T) => ({ [key: string]: any })>) => {
   const _initialValues = initialValuesHandler.map((useInitialValues) => executeSafely(
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+
     () => useInitialValues(currentQuery),
     'An error occurred when collecting initial search bar form values from a plugin',
     {},
@@ -59,13 +60,13 @@ export const useInitialDashboardWidgetValues = (currentWidget: Widget) => {
   return initialValues(currentWidget, initialValuesHandler);
 };
 
-const executeSubmitHandler = async <T>(values: CombinedSearchBarFormValues, submitHandlers: Array<(values: CombinedSearchBarFormValues, entity?: T) => Promise<T>>, currentEntity?: T): Promise<T> => {
+const executeSubmitHandler = async <T>(dispatch: AppDispatch, values: CombinedSearchBarFormValues, submitHandlers: Array<(values: CombinedSearchBarFormValues, dispatch: AppDispatch, entity?: T) => Promise<T>>, currentEntity?: T): Promise<T> => {
   let updatedEntity = currentEntity;
 
   // eslint-disable-next-line no-restricted-syntax
   for (const submitHandler of submitHandlers) {
     // eslint-disable-next-line no-await-in-loop,no-loop-func
-    const entityWithPluginData = await submitHandler(values, updatedEntity).catch((e) => {
+    const entityWithPluginData = await submitHandler(values, dispatch, updatedEntity).catch((e) => {
       const errorMessage = `An error occurred when executing a submit handler from a plugin: ${e}`;
       // eslint-disable-next-line no-console
       console.error(errorMessage);
@@ -82,22 +83,22 @@ const executeSubmitHandler = async <T>(values: CombinedSearchBarFormValues, subm
   return updatedEntity;
 };
 
-export const executeSearchSubmitHandler = (values: CombinedSearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, currentQuery?: Query) => {
+export const executeSearchSubmitHandler = (dispatch: AppDispatch, values: CombinedSearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, currentQuery?: Query) => {
   const pluginSubmitHandlers = pluggableSearchBarControls?.map((pluginFn) => pluginFn()?.onSearchSubmit).filter((pluginData) => !!pluginData);
 
-  return executeSubmitHandler(values, pluginSubmitHandlers, currentQuery);
+  return executeSubmitHandler(dispatch, values, pluginSubmitHandlers, currentQuery);
 };
 
-export const executeDashboardWidgetSubmitHandler = (values: CombinedSearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, currentWidget: Widget) => {
+export const executeDashboardWidgetSubmitHandler = (dispatch: AppDispatch, values: CombinedSearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, currentWidget: Widget) => {
   const pluginSubmitHandlers = pluggableSearchBarControls?.map((pluginFn) => pluginFn()?.onDashboardWidgetSubmit).filter((pluginData) => !!pluginData);
 
-  return executeSubmitHandler(values, pluginSubmitHandlers, currentWidget);
+  return executeSubmitHandler(dispatch, values, pluginSubmitHandlers, currentWidget);
 };
 
-export const pluggableValidationPayload = (values: CombinedSearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl> = []) => {
+export const pluggableValidationPayload = (values: CombinedSearchBarFormValues, context: HandlerContext, pluggableSearchBarControls: Array<() => SearchBarControl> = []) => {
   const validationPayloadHandler = pluggableSearchBarControls.map((pluginFn) => pluginFn()?.validationPayload).filter((validationPayloadFn) => !!validationPayloadFn);
   const validationPayload: Array<{ [key: string ]: any }> = validationPayloadHandler.map((validationPayloadFn) => executeSafely(
-    () => validationPayloadFn(values),
+    () => validationPayloadFn(values, context),
     'An error occurred when preparing search bar validation for a plugin',
     {},
   ));
@@ -105,11 +106,11 @@ export const pluggableValidationPayload = (values: CombinedSearchBarFormValues, 
   return merge({}, ...validationPayload);
 };
 
-export const validatePluggableValues = (values: CombinedSearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl> = []) => {
+export const validatePluggableValues = (values: CombinedSearchBarFormValues, context: HandlerContext, pluggableSearchBarControls: Array<() => SearchBarControl> = []) => {
   const validationHandler = pluggableSearchBarControls.map((pluginFn) => pluginFn()?.onValidate).filter((onValidate) => !!onValidate);
 
   const errors = validationHandler.map((onValidate) => executeSafely(
-    () => onValidate(values),
+    () => onValidate(values, context),
     'An error occurred when validating search bar values from a plugin',
     {},
   ));

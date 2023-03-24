@@ -30,6 +30,7 @@ const useStreamRuleTypes = (): { data: Array<StreamRuleType> | undefined } => {
           'Could not load stream rule types');
       },
       keepPreviousData: true,
+      staleTime: 60 * (60 * 1000), // 1 hour
     },
   );
 

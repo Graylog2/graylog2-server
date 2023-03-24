@@ -27,11 +27,14 @@ import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ScopedDbService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.mongojack.DBQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Predicate;
@@ -56,16 +59,26 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
     }
 
     public PaginatedList<EventDefinitionDto> searchPaginated(SearchQuery query, Predicate<EventDefinitionDto> filter,
-                                                             String sortByField, int page, int perPage) {
+                                                             String sortByField, String sortOrder, int page, int perPage) {
         return findPaginatedWithQueryFilterAndSort(query.toDBQuery(), filter,
-                getSortBuilder("asc", sortByField), page, perPage);
+                getSortBuilder(sortOrder, sortByField), page, perPage);
     }
 
     public EventDefinitionDto saveWithOwnership(EventDefinitionDto eventDefinitionDto, User user) {
-        final EventDefinitionDto dto = super.save(eventDefinitionDto);
+        final EventDefinitionDto dto = save(eventDefinitionDto);
         entityOwnerShipService.registerNewEventDefinition(dto.id(), user);
         return dto;
     }
+
+    @Override
+    public EventDefinitionDto save(final EventDefinitionDto entity) {
+        EventDefinitionDto enrichedWithUpdateDate = entity
+                .toBuilder()
+                .updatedAt(DateTime.now(DateTimeZone.UTC))
+                .build();
+        return super.save(enrichedWithUpdateDate);
+    }
+
 
     public int deleteUnregister(String id) {
         // Must ensure deletability and mutability before deleting, so that de-registration is only performed if entity exists
@@ -111,5 +124,13 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
      */
     public List<EventDefinitionDto> getSystemEventDefinitions() {
         return ImmutableList.copyOf((db.find(DBQuery.is(EventDefinitionDto.FIELD_SCOPE, SystemNotificationEventEntityScope.NAME)).iterator()));
+    }
+
+    /**
+     * Returns the list of event definitions that contain the given value in the specified array field
+     */
+    @NotNull
+    public List<EventDefinitionDto> getByArrayValue(String arrayField, String field, String value) {
+        return ImmutableList.copyOf((db.find(DBQuery.elemMatch(arrayField, DBQuery.is(field, value))).iterator()));
     }
 }

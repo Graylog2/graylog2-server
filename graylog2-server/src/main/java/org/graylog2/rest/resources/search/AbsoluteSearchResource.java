@@ -100,7 +100,7 @@ public class AbsoluteSearchResource extends SearchResource {
 
         final TimeRange timeRange = buildAbsoluteTimeRange(from, to);
 
-        return search(query, limit, filter, decorate, searchUser, fieldList, sorting, timeRange);
+        return search(query, limit, offset, filter, decorate, searchUser, fieldList, sorting, timeRange);
     }
 
     @GET

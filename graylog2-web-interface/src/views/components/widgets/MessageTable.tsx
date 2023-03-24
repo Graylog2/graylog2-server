@@ -32,6 +32,7 @@ import type { BackendMessage, Message } from 'views/components/messagelist/Types
 import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 import Field from 'views/components/Field';
 import MessageTableProviders from 'views/components/messagelist/MessageTableProviders';
+import { VISUALIZATION_TABLE_HEADER_HEIGHT } from 'views/Constants';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 
@@ -51,14 +52,17 @@ const Table = styled.table(({ theme }) => css`
     th {
       font-weight: bold !important;
       font-size: inherit !important;
+      white-space: break-spaces !important;
+      word-break: break-all !important;
     }
 
     th,
     td {
       border: 1px ${theme.colors.gray[80]} solid !important;
       left: 0;
-      padding: 5px;
+      padding: 5px !important;
       position: static;
+      min-width: 0 !important;
     }
   }
 `);
@@ -87,8 +91,9 @@ const TableHead = styled.thead(({ theme }) => css`
   
   && > tr > th {
     min-width: 50px;
-    min-height: 28px;
+    height: ${VISUALIZATION_TABLE_HEADER_HEIGHT}px;
     padding: 0 5px;
+    vertical-align: center;
     border: 0;
     font-size: ${theme.fonts.size.small};
     font-weight: normal;

@@ -14,21 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { WidgetActions } from 'views/stores/WidgetStore';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import type Widget from 'views/logic/widgets/Widget';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
+import type { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 
-import type { FieldActionHandlerCondition, FieldActionHandler } from './FieldActionHandler';
+import type { FieldActionHandlerCondition } from './FieldActionHandler';
 
 type Contexts = { widget: Widget };
 
-const RemoveFromTableActionHandler: FieldActionHandler<Contexts> = ({ field, contexts: { widget } }) => {
+const RemoveFromTableActionHandler = ({
+  field,
+  contexts: { widget },
+}: ActionHandlerArguments<Contexts>) => (dispatch: AppDispatch) => {
   const newFields = widget.config.fields.filter((f) => (f !== field));
   const newConfig = widget.config.toBuilder()
     .fields(newFields)
     .build();
 
-  return WidgetActions.updateConfig(widget.id, newConfig);
+  return dispatch(updateWidgetConfig(widget.id, newConfig));
 };
 
 const isEnabled: FieldActionHandlerCondition<Contexts> = ({ contexts: { widget }, field }) => {

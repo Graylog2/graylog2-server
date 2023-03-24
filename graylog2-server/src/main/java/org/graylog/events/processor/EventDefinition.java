@@ -18,10 +18,12 @@ package org.graylog.events.processor;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.graylog.events.context.EventDefinitionContextService;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.storage.EventStorageHandler;
+import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 import java.util.Set;
@@ -33,6 +35,9 @@ public interface EventDefinition {
     String title();
 
     String description();
+
+    @Nullable
+    DateTime updatedAt();
 
     int priority();
 
@@ -49,6 +54,8 @@ public interface EventDefinition {
     ImmutableList<EventNotificationHandler.Config> notifications();
 
     ImmutableList<EventStorageHandler.Config> storage();
+
+    EventDefinitionContextService.SchedulerCtx schedulerCtx();
 
     default Set<String> requiredPermissions() {
         return config().requiredPermissions();

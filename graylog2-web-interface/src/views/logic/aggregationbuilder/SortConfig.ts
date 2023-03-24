@@ -94,7 +94,6 @@ export default class SortConfig {
       .build();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   toBuilder(): Builder {
     const { type, field, direction } = this._value;
 

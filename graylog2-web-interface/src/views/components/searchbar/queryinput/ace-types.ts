@@ -50,7 +50,7 @@ export type Command = {
     win: string,
     mac: string,
   },
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+
   exec: (editor: Editor) => void,
 };
 
@@ -71,7 +71,7 @@ export type Completer = {
 export type Editor = {
   commands: Commands,
   completer: Completer,
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+
   completers: Array<AutoCompleter>,
   execCommand: (command: string) => void,
   session: Session,

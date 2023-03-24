@@ -18,31 +18,36 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useMemo, useState, useCallback, useRef } from 'react';
 import type * as Immutable from 'immutable';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 
-import { Button, Table, ButtonToolbar } from 'components/bootstrap';
+import { Table, ButtonGroup } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
-import StringUtils from 'util/StringUtils';
 import ColumnsVisibilitySelect from 'components/common/EntityDataTable/ColumnsVisibilitySelect';
 import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
 import { CELL_PADDING, BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import useColumnsWidths from 'components/common/EntityDataTable/hooks/useColumnsWidths';
 import useElementDimensions from 'hooks/useElementDimensions';
 import type { Sort } from 'stores/PaginationTypes';
+import { PageSizeSelect } from 'components/common';
+import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
 
+import BulkActionsRow from './BulkActionsRow';
 import TableHead from './TableHead';
 import TableRow from './TableRow';
-import type { ColumnRenderers, Column, EntityBase } from './types';
+import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
+import type { ColumnRenderers, Column, EntityBase, ColumnRenderersByAttribute, ExpandedSectionRenderer } from './types';
 
 const ScrollContainer = styled.div`
+  width: 100%;
   overflow-x: auto;
 `;
 
 const StyledTable = styled(Table)`
   table-layout: fixed;
 
-  thead > tr > th, tbody > tr > td {
+  thead > tr > th,
+  tbody > tr > td {
     padding: ${CELL_PADDING}px;
   }
 `;
@@ -55,19 +60,20 @@ const ActionsRow = styled.div`
   min-height: 22px;
 `;
 
-const BulkActionsWrapper = styled.div`
+const LayoutConfigRow = styled.div`
   display: flex;
   align-items: center;
-`;
-
-const BulkActions = styled(ButtonToolbar)`
-  margin-left: 5px;
+  gap: 5px;
 `;
 
 const filterAccessibleColumns = (
   columns: Array<Column>,
   userPermissions: Immutable.List<string>,
-) => columns.filter(({ permissions, anyPermissions }) => {
+) => columns.filter(({ permissions, anyPermissions, hidden }) => {
+  if (hidden) {
+    return false;
+  }
+
   if (permissions?.length) {
     return anyPermissions
       ? isAnyPermitted(userPermissions, permissions)
@@ -86,12 +92,13 @@ const filterVisibleColumns = (
 
 const useElementsWidths = <Entity extends EntityBase>({
   columns,
-  columnRenderers,
+  columnRenderersByAttribute,
   displayBulkSelectCol,
 }: {
   columns: Array<Column>,
-  columnRenderers: ColumnRenderers<Entity>,
+  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>,
   displayBulkSelectCol: boolean
+  entityAttributesAreCamelCase: boolean
 }) => {
   const tableRef = useRef<HTMLTableElement>();
   const actionsRef = useRef<HTMLDivElement>();
@@ -102,7 +109,7 @@ const useElementsWidths = <Entity extends EntityBase>({
   const columnsWidths = useColumnsWidths<Entity>({
     actionsColWidth,
     bulkSelectColWidth: displayBulkSelectCol ? BULK_SELECT_COLUMN_WIDTH : 0,
-    columnRenderers,
+    columnRenderersByAttribute,
     columnsIds,
     tableWidth,
   });
@@ -110,27 +117,55 @@ const useElementsWidths = <Entity extends EntityBase>({
   return { tableRef, actionsRef, columnsWidths, actionsColWidth };
 };
 
+const mergeColumnsRenderers = <Entity extends EntityBase>(columns: Array<Column>, customColumnRenderers: ColumnRenderers<Entity>) => {
+  const renderers = merge({}, DefaultColumnRenderers, customColumnRenderers);
+  const renderersByAttribute = Object.fromEntries(columns.map(({ id, type }) => {
+    const typeRenderer = renderers.types?.[type];
+    const attributeRenderer = renderers.attributes?.[id];
+
+    const columnRenderer = merge({}, typeRenderer, attributeRenderer);
+
+    return [id, columnRenderer];
+  }));
+
+  return renderersByAttribute;
+};
+
 type Props<Entity extends EntityBase> = {
   /** Currently active sort */
   activeSort?: Sort,
-  /** Supported batch operations */
-  bulkActions?: (selectedEntities: Array<string>, setSelectedEntities: (streamIds: Array<string>) => void) => React.ReactNode
-  /** List of all available columns. */
+  /**
+   * The column ids are always snake case. By default, entity attributes are camel case.
+   * This prop controls if the column ids need to be transformed to camel case to connect them with the entity attributes.
+   */
+  entityAttributesAreCamelCase?: boolean,
+  /** Supported bulk actions */
+  bulkActions?: (selectedEntities: Array<string>, setSelectedEntities: (streamIds: Array<string>) => void) => React.ReactNode,
+  /** List of all available columns. Column ids need to be snake case. */
   columnDefinitions: Array<Column>,
-  /** Custom cell and header renderer for a column */
+  /** Custom cell and header renderer for a column. Column ids need to be snake case. */
   columnRenderers?: ColumnRenderers<Entity>,
-  /** Define default columns order */
+  /** Define default columns order. Column ids need to be snake case. */
   columnsOrder?: Array<string>,
   /** The table data. */
   data: Readonly<Array<Entity>>,
+  /** Allows you to extend a row with additional information * */
+  expandedSectionsRenderer?: {
+    [sectionName: string]: ExpandedSectionRenderer<Entity>
+  },
   /** Function to handle changes of columns visibility */
   onColumnsChange: (columnIds: Array<string>) => void,
   /** Function to handle sort changes */
   onSortChange: (newSort: Sort) => void,
+  /** Function to handle page size changes */
+  onPageSizeChange?: (newPageSize: number) => void,
+  /** Active page size */
+  pageSize?: number
   /** Actions for each row. */
   rowActions?: (entity: Entity) => React.ReactNode,
   /** Which columns should be displayed. */
   visibleColumns: Array<string>,
+
 };
 
 /**
@@ -138,21 +173,25 @@ type Props<Entity extends EntityBase> = {
  */
 const EntityDataTable = <Entity extends EntityBase>({
   activeSort,
+  entityAttributesAreCamelCase,
   bulkActions,
-  columnRenderers: customColumnRenderers,
   columnDefinitions,
+  columnRenderers: customColumnRenderers,
   columnsOrder,
   data,
-  onSortChange,
-  rowActions,
+  expandedSectionsRenderer,
   onColumnsChange,
+  onPageSizeChange,
+  onSortChange,
+  pageSize,
+  rowActions,
   visibleColumns,
 }: Props<Entity>) => {
   const currentUser = useCurrentUser();
   const [selectedEntities, setSelectedEntities] = useState<Array<string>>([]);
-  const columnRenderers = merge(DefaultColumnRenderers, customColumnRenderers);
   const displayActionsCol = typeof rowActions === 'function';
   const displayBulkSelectCol = typeof bulkActions === 'function';
+  const displayPageSizeSelect = typeof onPageSizeChange === 'function';
 
   const accessibleColumns = useMemo(
     () => filterAccessibleColumns(columnDefinitions, currentUser.permissions),
@@ -164,10 +203,13 @@ const EntityDataTable = <Entity extends EntityBase>({
     [accessibleColumns, visibleColumns],
   );
 
-  const { tableRef, actionsRef, actionsColWidth, columnsWidths } = useElementsWidths({
+  const columnRenderersByAttribute = useMemo(() => mergeColumnsRenderers<Entity>(columns, customColumnRenderers), [columns, customColumnRenderers]);
+
+  const { tableRef, actionsRef, actionsColWidth, columnsWidths } = useElementsWidths<Entity>({
     columns,
-    columnRenderers,
+    columnRenderersByAttribute,
     displayBulkSelectCol,
+    entityAttributesAreCamelCase,
   });
 
   const onToggleEntitySelect = useCallback((itemId: string) => {
@@ -180,29 +222,29 @@ const EntityDataTable = <Entity extends EntityBase>({
     }));
   }, []);
 
-  const unselectAllItems = useCallback(() => setSelectedEntities([]), []);
-
   return (
-    <>
+    <ExpandedSectionsProvider>
       <ActionsRow>
         <div>
-          {(displayBulkSelectCol && !!selectedEntities?.length) && (
-            <BulkActionsWrapper>
-              {selectedEntities.length} {StringUtils.pluralize(selectedEntities.length, 'item', 'items')} selected
-              <BulkActions>
-                {bulkActions(selectedEntities, setSelectedEntities)}
-                <Button bsSize="xsmall" onClick={unselectAllItems}>Cancel</Button>
-              </BulkActions>
-            </BulkActionsWrapper>
+          {displayBulkSelectCol && (
+            <BulkActionsRow bulkActions={bulkActions}
+                            selectedEntities={selectedEntities}
+                            setSelectedEntities={setSelectedEntities} />
           )}
         </div>
-        <div>
-          <ColumnsVisibilitySelect allColumns={accessibleColumns}
-                                   selectedColumns={visibleColumns}
-                                   onChange={onColumnsChange} />
-        </div>
+        <LayoutConfigRow>
+          Show
+          <ButtonGroup>
+            {displayPageSizeSelect && (
+              <PageSizeSelect pageSize={pageSize} showLabel={false} onChange={onPageSizeChange} />
+            )}
+            <ColumnsVisibilitySelect allColumns={accessibleColumns}
+                                     selectedColumns={visibleColumns}
+                                     onChange={onColumnsChange} />
+          </ButtonGroup>
+        </LayoutConfigRow>
       </ActionsRow>
-      <ScrollContainer ref={tableRef}>
+      <ScrollContainer id="scroll-container" ref={tableRef}>
         <StyledTable striped condensed hover>
           <TableHead columns={columns}
                      columnsOrder={columnsOrder}
@@ -211,29 +253,32 @@ const EntityDataTable = <Entity extends EntityBase>({
                      selectedEntities={selectedEntities}
                      setSelectedEntities={setSelectedEntities}
                      data={data}
-                     columnRenderers={columnRenderers}
+                     columnRenderersByAttribute={columnRenderersByAttribute}
                      onSortChange={onSortChange}
                      displayBulkSelectCol={displayBulkSelectCol}
                      activeSort={activeSort}
                      displayActionsCol={displayActionsCol} />
-          <tbody>
-            {data.map((entity, index) => (
+          {data.map((entity, index) => (
+            <tbody key={`table-row-${entity.id}`} data-testid={`table-row-${entity.id}`}>
               <TableRow entity={entity}
-                        key={entity.id}
                         index={index}
+                        entityAttributesAreCamelCase={entityAttributesAreCamelCase}
                         actionsRef={actionsRef}
                         onToggleEntitySelect={onToggleEntitySelect}
-                        columnRenderers={columnRenderers}
+                        columnRenderersByAttribute={columnRenderersByAttribute}
                         isSelected={!!selectedEntities?.includes(entity.id)}
                         rowActions={rowActions}
                         displaySelect={displayBulkSelectCol}
                         displayActions={displayActionsCol}
                         columns={columns} />
-            ))}
-          </tbody>
+              <ExpandedSections key={`expanded-sections-${entity.id}`}
+                                expandedSectionsRenderer={expandedSectionsRenderer}
+                                entity={entity} />
+            </tbody>
+          ))}
         </StyledTable>
       </ScrollContainer>
-    </>
+    </ExpandedSectionsProvider>
   );
 };
 
@@ -241,8 +286,12 @@ EntityDataTable.defaultProps = {
   activeSort: undefined,
   bulkActions: undefined,
   columnRenderers: undefined,
-  rowActions: undefined,
   columnsOrder: [],
+  expandedSectionsRenderer: undefined,
+  onPageSizeChange: undefined,
+  pageSize: undefined,
+  rowActions: undefined,
+  entityAttributesAreCamelCase: true,
 };
 
 export default EntityDataTable;

@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.tuple.Pair;
+import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,8 @@ import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.search.SearchQueryParser.DEFAULT_OPERATOR;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SearchQueryParserTest {
 
@@ -195,7 +198,7 @@ public class SearchQueryParserTest {
     }
 
     private void checkQuery(SearchQueryParser parser, String query, SearchQueryField.Type type, String expectedQuery, SearchQueryOperator expectedOp) {
-        final SearchQueryOperator defaultOperator = type == SearchQueryField.Type.STRING ? SearchQueryParser.DEFAULT_STRING_OPERATOR : SearchQueryParser.DEFAULT_OPERATOR;
+        final SearchQueryOperator defaultOperator = type == SearchQueryField.Type.STRING ? SearchQueryParser.DEFAULT_STRING_OPERATOR : DEFAULT_OPERATOR;
         final Pair<String, SearchQueryOperator> pair = parser.extractOperator(query, defaultOperator);
         assertThat(pair.getLeft()).isEqualTo(expectedQuery);
         assertThat(pair.getRight()).isEqualTo(expectedOp);
@@ -294,5 +297,55 @@ public class SearchQueryParserTest {
         assertThat(queryMap.get("name")).containsOnly(new SearchQueryParser.FieldValue("Bobby", false));
         assertThat(queryMap.get("breed")).containsOnly(new SearchQueryParser.FieldValue("terrier", false));
         assertThat(searchQuery.hasDisallowedKeys()).isFalse();
+    }
+
+    @Test
+    void booleanValuesSupported() {
+        final SearchQueryParser parser = new SearchQueryParser("name",
+                Map.of(
+                        "name", SearchQueryField.create("title", SearchQueryField.Type.STRING),
+                        "gone", SearchQueryField.create("disabled", SearchQueryField.Type.BOOLEAN)
+                )
+        );
+
+        final SearchQuery searchQuery = parser.parse("gone:true");
+
+        assertEquals("gone:true", searchQuery.getQueryString());
+        final Multimap<String, SearchQueryParser.FieldValue> queryMap = searchQuery.getQueryMap();
+
+        assertThat(queryMap.keySet().size()).isEqualTo(1);
+        assertThat(queryMap.keySet()).containsOnly("disabled"); //properly renamed
+        assertThat(queryMap.get("disabled"))
+                .containsOnly(new SearchQueryParser.FieldValue(
+                        true, //boolean true instead of "true" string!
+                        SearchQueryOperators.EQUALS, //equals instead of reqexp!
+                        false)
+                );
+
+    }
+
+    @Test
+    void objectIdValuesSupported() {
+        final SearchQueryParser parser = new SearchQueryParser("name",
+                Map.of(
+                        "name", SearchQueryField.create("title", SearchQueryField.Type.STRING),
+                        "id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID)
+                )
+        );
+
+        final SearchQuery searchQuery = parser.parse("id:5f4dfb9c69be46153b9a9a7b");
+
+        assertEquals("id:5f4dfb9c69be46153b9a9a7b", searchQuery.getQueryString());
+        final Multimap<String, SearchQueryParser.FieldValue> queryMap = searchQuery.getQueryMap();
+
+        assertThat(queryMap.keySet().size()).isEqualTo(1);
+        assertThat(queryMap.keySet()).containsOnly("_id"); //properly renamed
+        assertThat(queryMap.get("_id"))
+                .containsOnly(new SearchQueryParser.FieldValue(
+                        new ObjectId("5f4dfb9c69be46153b9a9a7b"), //ObjectID instead of String
+                        SearchQueryOperators.EQUALS, //equals instead of reqexp!
+                        false)
+                );
+
     }
 }

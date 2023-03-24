@@ -100,6 +100,7 @@ interface ProviderType {
     setLoginFormState: (loginFormState: string) => void;
   }>;
 }
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;

@@ -18,17 +18,37 @@ import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import mockAction from 'helpers/mocking/MockAction';
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import { HighlightingRulesActions } from 'views/stores/HighlightingRulesStore';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import { asMock } from 'helpers/mocking';
+import useAppDispatch from 'stores/useAppDispatch';
+import mockDispatch from 'views/test/mockDispatch';
+import { createSearch } from 'fixtures/searches';
+import type { RootState } from 'views/types';
+import { updateHighlightingRule, removeHighlightingRule } from 'views/logic/slices/highlightActions';
 
 import HighlightingRule from './HighlightingRule';
 
-jest.mock('views/stores/HighlightingRulesStore', () => ({ HighlightingRulesActions: {} }));
+jest.mock('stores/useAppDispatch');
+
+jest.mock('views/logic/slices/highlightActions', () => ({
+  updateHighlightingRule: jest.fn(() => Promise.resolve()),
+  removeHighlightingRule: jest.fn(() => Promise.resolve()),
+}));
 
 describe('HighlightingRule', () => {
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   const rule = Rule.create('response_time', '250', undefined, StaticColor.create('#f44242'));
+  const view = createSearch();
+  const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
+
+  beforeEach(() => {
+    asMock(useAppDispatch).mockReturnValue(dispatch);
+  });
 
   it('should display field and value of rule', async () => {
     render(<HighlightingRule rule={rule} />);
@@ -38,8 +58,6 @@ describe('HighlightingRule', () => {
   });
 
   it('should update rule if color was changed', async () => {
-    HighlightingRulesActions.update = mockAction(jest.fn((updatedRule) => Promise.resolve([updatedRule])));
-
     render(<HighlightingRule rule={rule} />);
 
     const staticColorPicker = await screen.findByTestId('static-color-preview');
@@ -48,13 +66,11 @@ describe('HighlightingRule', () => {
     userEvent.click(await screen.findByTitle(/#fbfdd8/i));
 
     await waitFor(() => {
-      expect(HighlightingRulesActions.update).toHaveBeenCalledWith(expect.anything(), { color: StaticColor.create('#fbfdd8') });
+      expect(updateHighlightingRule).toHaveBeenCalledWith(rule, { color: StaticColor.create('#fbfdd8') });
     });
   });
 
   it('should close popover when color was changed', async () => {
-    HighlightingRulesActions.update = mockAction(jest.fn((updatedRule) => Promise.resolve([updatedRule])));
-
     render(<HighlightingRule rule={rule} />);
 
     const staticColorPicker = await screen.findByTestId('static-color-preview');
@@ -88,7 +104,7 @@ describe('HighlightingRule', () => {
       oldConfirm = window.confirm;
       window.confirm = jest.fn(() => false);
 
-      HighlightingRulesActions.remove = mockAction(jest.fn(() => Promise.resolve([])));
+      // eslint-disable-next-line testing-library/no-render-in-setup
       render(<HighlightingRule rule={rule} />);
 
       deleteIcon = await screen.findByTitle('Remove this Highlighting Rule');
@@ -104,17 +120,19 @@ describe('HighlightingRule', () => {
       expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove this highlighting?');
     });
 
-    it('does not remove rule if confirmation was cancelled', () => {
+    it('does not remove rule if confirmation was cancelled', async () => {
       userEvent.click(deleteIcon);
 
-      expect(HighlightingRulesActions.remove).not.toHaveBeenCalled();
+      await screen.findByText('response_time');
     });
 
-    it('removes rule rule if confirmation was acknowledged', () => {
+    it('removes rule rule if confirmation was acknowledged', async () => {
       window.confirm = jest.fn(() => true);
       userEvent.click(deleteIcon);
 
-      expect(HighlightingRulesActions.remove).toHaveBeenCalledWith(rule);
+      await waitFor(() => {
+        expect(removeHighlightingRule).toHaveBeenCalledWith(rule);
+      });
     });
   });
 });

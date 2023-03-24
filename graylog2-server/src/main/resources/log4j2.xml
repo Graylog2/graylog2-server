@@ -25,6 +25,8 @@
         <Logger name="org.apache.kafka.clients.producer.ProducerConfig" level="warn"/>
         <!-- Silence useless session validation messages -->
         <Logger name="org.apache.shiro.session.mgt.AbstractValidatingSessionManager" level="warn"/>
+        <!-- Silence Azure SDK messages -->
+        <Logger name="com.azure" level="warn"/>
         <Root level="warn">
             <AppenderRef ref="STDOUT"/>
             <AppenderRef ref="graylog-internal-logs"/>

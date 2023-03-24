@@ -25,13 +25,13 @@ const itemStateIndicatorSelector = `.${indicatorClassName}${indicatorPseudoEleme
 
 export const hoverIndicatorStyles = (theme: DefaultTheme) => css`
   ${itemStateIndicatorSelector} {
-    border-color: ${theme.colors.gray[70]}; 
+    border-color: ${theme.colors.gray[70]};
   }
 `;
 
 export const activeIndicatorStyles = (theme: DefaultTheme) => css`
   ${itemStateIndicatorSelector} {
-    border-color: ${theme.colors.gray[50]}; 
+    border-color: ${theme.colors.gray[50]};
   }
 `;
 

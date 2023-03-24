@@ -1,0 +1,8 @@
+rule "test rule"
+when
+    to_long($message.cycle) > 0
+then
+    let cycle = to_long($message.cycle) - 1;
+    let newmsg = clone_message(preventLoops: false);
+    set_field(field: "cycle", value: cycle, message: newmsg);
+end

@@ -15,17 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { DEFAULT_MESSAGE_FIELDS, MISSING_BUCKET_NAME } from 'views/Constants';
-import { WidgetActions } from 'views/stores/WidgetStore';
 import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
 import TitleTypes from 'views/stores/TitleTypes';
+import type { AppDispatch } from 'stores/useAppDispatch';
+import type { GetState } from 'views/types';
+import { addWidget } from 'views/logic/slices/widgetActions';
+import { setTitle } from 'views/logic/slices/titlesActions';
+import { selectActiveQuery } from 'views/logic/slices/viewSelectors';
 
-import type { ValueActionHandler, ValuePath } from './ValueActionHandler';
+import type { ValuePath } from './ValueActionHandler';
 
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
 import type Widget from '../widgets/Widget';
 import { createElasticsearchQueryString } from '../queries/Query';
-import { TitlesActions } from '../../stores/TitlesStore';
 import duplicateCommonWidgetSettings from '../fieldactions/DuplicateCommonWidgetSettings';
 
 type Contexts = {
@@ -45,11 +48,11 @@ const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> => {
     .reduce((prev, cur) => (prev.includes(cur) ? prev : [...prev, cur]), []);
 };
 
-const ShowDocumentsHandler: ValueActionHandler<Contexts> = ({ contexts: { valuePath, widget } }: Arguments) => {
-  const mergedObject = valuePath.reduce((elem, acc) => ({
-    ...acc,
-    ...elem,
-  }), {});
+const ShowDocumentsHandler = ({
+  contexts: { valuePath, widget },
+}: Arguments) => (dispatch: AppDispatch, getState: GetState) => {
+  const activeQuery = selectActiveQuery(getState());
+  const mergedObject = Object.fromEntries(valuePath.flatMap(Object.entries));
   const widgetQuery = widget && widget.query ? widget.query.query_string : '';
   const valuePathQuery = Object.entries(mergedObject)
     .map(([k, v]) => (v === MISSING_BUCKET_NAME ? `NOT _exists_:${k}` : `${k}:${escape(String(v))}`))
@@ -68,7 +71,8 @@ const ShowDocumentsHandler: ValueActionHandler<Contexts> = ({ contexts: { valueP
 
   const title = `Messages for ${valuePathQuery}`;
 
-  return WidgetActions.create(newWidget).then(() => TitlesActions.set(TitleTypes.Widget, newWidget.id, title));
+  return dispatch(addWidget(newWidget))
+    .then(() => dispatch(setTitle(activeQuery, TitleTypes.Widget, newWidget.id, title)));
 };
 
 ShowDocumentsHandler.isEnabled = ({ contexts: { valuePath, widget } }) => (valuePath !== undefined && widget !== undefined);

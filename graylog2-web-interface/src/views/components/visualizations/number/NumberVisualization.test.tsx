@@ -25,11 +25,12 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import Series from 'views/logic/aggregationbuilder/Series';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { CurrentViewType } from 'views/components/CustomPropTypes';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
 import NumberVisualization from './NumberVisualization';
 
 jest.mock('./AutoFontSizer', () => ({ children }) => children);
-jest.mock('stores/connect', () => (x) => x);
 
 jest.mock('views/components/messagelist/CustomHighlighting', () => {
   /* eslint-disable-next-line react/prop-types */
@@ -71,24 +72,30 @@ describe('NumberVisualization', () => {
   const fields = List([FieldTypeMapping.create('lines_add', FieldTypes.INT())]);
 
   const SimplifiedNumberVisualization = (props: SUTProps = {}) => (
-    <NumberVisualization data={data}
-                         width={200}
-                         height={200}
-                         fields={fields}
+    <TestStoreProvider>
+      <NumberVisualization data={data}
+                           width={200}
+                           height={200}
+                           fields={fields}
                          // @ts-ignore
-                         currentView={currentView}
-                         onChange={() => {}}
-                         toggleEdit={() => {}}
-                         effectiveTimerange={{
-                           from: '2020-01-10T13:23:42.000Z',
-                           to: '2020-01-10T14:23:42.000Z',
-                           type: 'absolute',
-                         }}
-                         config={AggregationWidgetConfig.builder()
-                           .series([Series.forFunction('count()')])
-                           .build()}
-                         {...props} />
+                           currentView={currentView}
+                           onChange={() => {}}
+                           toggleEdit={() => {}}
+                           effectiveTimerange={{
+                             from: '2020-01-10T13:23:42.000Z',
+                             to: '2020-01-10T14:23:42.000Z',
+                             type: 'absolute',
+                           }}
+                           config={AggregationWidgetConfig.builder()
+                             .series([Series.forFunction('count()')])
+                             .build()}
+                           {...props} />
+    </TestStoreProvider>
   );
+
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
 
   it('should render a number visualization', () => {
     const wrapper = mount(<SimplifiedNumberVisualization />);

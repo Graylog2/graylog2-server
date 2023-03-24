@@ -22,8 +22,6 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import { Col, Row } from 'components/bootstrap';
 import type { QueryId } from 'views/logic/queries/Query';
-import type Query from 'views/logic/queries/Query';
-import type { TitlesMap } from 'views/stores/TitleTypes';
 import ElementDimensions from 'components/common/ElementDimensions';
 import type ViewState from 'views/logic/views/ViewState';
 
@@ -32,8 +30,8 @@ import AdaptableQueryTabs from './AdaptableQueryTabs';
 
 export interface QueryTabsProps {
   onRemove: (queryId: string) => Promise<void | ViewState>,
-  onSelect: (queryId: string) => Promise<Query> | Promise<string>,
-  onTitleChange: (queryId: string, newTitle: string) => Promise<TitlesMap>,
+  onSelect: (queryId: string) => void,
+  onTitleChange: (queryId: string, newTitle: string) => void,
   queries: Immutable.OrderedSet<QueryId>,
   activeQueryId: string,
   titles: Immutable.Map<string, string>,

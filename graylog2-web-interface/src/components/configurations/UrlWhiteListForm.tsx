@@ -16,7 +16,9 @@
  */
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { cloneDeep, debounce, map } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import debounce from 'lodash/debounce';
+import map from 'lodash/map';
 import styled from 'styled-components';
 
 import Input from 'components/bootstrap/Input';

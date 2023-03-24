@@ -47,7 +47,7 @@ const StyledListItem = styled.li(({ theme }) => css`
   }
 
   &:not(:last-child) {
-    border-bottom: 1px solid ${theme.colors.gray[90]}
+    border-bottom: 1px solid ${theme.colors.gray[90]};
   }
 `);
 

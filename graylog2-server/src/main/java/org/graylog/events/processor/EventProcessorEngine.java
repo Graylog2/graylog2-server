@@ -99,7 +99,7 @@ public class EventProcessorEngine {
             throw e;
         } catch (Exception e) {
             metrics.recordException(eventProcessor, definitionId);
-            LOG.error("Caught an unhandled exception while executing event processor <{}/{}/{}> - Make sure to modify the event processor to throw only EventProcessorExecutionException so we get more context!",
+            LOG.error("Caught an unhandled exception while executing event processor <{}/{}/{}> - Make sure to modify the event processor to throw only EventProcessorException so we get more context!",
                     definition.config().type(), definition.title(), definition.id(), e);
             // Since we don't know what kind of error this is, we play safe and make this a temporary error.
             throw new EventProcessorException("Couldn't create events for: " + definition.toString(), false, definition, e);

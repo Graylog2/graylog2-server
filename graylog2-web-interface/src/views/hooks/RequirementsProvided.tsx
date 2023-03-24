@@ -18,14 +18,14 @@ import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import MissingRequirements from 'views/components/views/MissingRequirements';
-import type { ViewHook } from 'views/logic/hooks/ViewHook';
+import type { ViewHook, ViewHookArguments } from 'views/logic/hooks/ViewHook';
 import type { Requirements } from 'views/logic/views/View';
 
-const _missingRequirements = (requirements, requirementsProvided): Requirements => Object.entries(requirements)
+const _missingRequirements = (requirements: Requirements, requirementsProvided: string | string[]): Requirements => Object.entries(requirements)
   .filter(([require]) => !requirementsProvided.includes(require))
   .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
 
-const RequirementsProvided: ViewHook = async ({ view }) => {
+const RequirementsProvided: ViewHook = async ({ view, executionState }: ViewHookArguments) => {
   const providedRequirements = PluginStore.exports('views.requires.provided');
   const missingRequirements = _missingRequirements(view.requires, providedRequirements);
 
@@ -35,7 +35,7 @@ const RequirementsProvided: ViewHook = async ({ view }) => {
     throw Component;
   }
 
-  return true;
+  return [view, executionState];
 };
 
 export default RequirementsProvided;

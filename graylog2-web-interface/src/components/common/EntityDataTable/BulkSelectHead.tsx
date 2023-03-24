@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo, useEffect, useRef } from 'react';
-import { uniq } from 'lodash';
+import uniq from 'lodash/uniq';
 
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';

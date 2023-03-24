@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 const WidgetWrap = styled.div(({ theme }) => css`
   height: inherit;
   margin: 0;
-  padding: 7px 9px 6px 9px;
+  padding: 7px 9px 6px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -95,7 +95,7 @@ const WidgetWrap = styled.div(({ theme }) => css`
     }
 
     button {
-      padding: 0 5px 0 5px;
+      padding: 0 5px;
     }
   }
 `);

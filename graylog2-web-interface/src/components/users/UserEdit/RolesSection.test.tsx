@@ -50,7 +50,6 @@ describe('<RolesSection />', () => {
   });
 
   it('should assigning a role', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const onSubmitStub = jest.fn((_data: { roles: string[] }) => Promise.resolve());
     render(<RolesSection user={exampleUser} onSubmit={(data) => onSubmitStub(data)} />);
     await act(() => mockRolesForUserPromise.then());
@@ -68,17 +67,13 @@ describe('<RolesSection />', () => {
   });
 
   it('should filter assigned roles', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const onSubmitStub = jest.fn((_data: { roles: string[] }) => Promise.resolve());
     render(<RolesSection user={exampleUser} onSubmit={(data) => onSubmitStub(data)} />);
     await act(() => mockRolesForUserPromise.then());
     await act(() => mockLoadRolesPromise.then());
 
     const filterInput = screen.getByPlaceholderText('Enter query to filter');
-    const filterSubmitButton = screen.getByRole('button', { name: 'Filter' });
-
     fireEvent.change(filterInput, { target: { value: 'name of an assigned role' } });
-    fireEvent.click(filterSubmitButton);
 
     await waitFor(() => expect(AuthzRolesActions.loadRolesForUser).toHaveBeenCalledTimes(2));
 
@@ -93,7 +88,7 @@ describe('<RolesSection />', () => {
     const newExampleUser = alice.toBuilder()
       .roles(Immutable.Set([assignedRole1.name, assignedRole2.name]))
       .build();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const onSubmitStub = jest.fn((_data: { roles: string[] }) => Promise.resolve());
     render(<RolesSection user={newExampleUser} onSubmit={(data) => onSubmitStub(data)} />);
     await act(() => mockRolesForUserPromise.then());

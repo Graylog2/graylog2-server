@@ -68,7 +68,7 @@ const StyledAlert = styled(BootstrapAlert).attrs(({ bsStyle }: { bsStyle: ColorV
         top: -9px;
       }
     }
-  `;
+`;
 });
 
 const Alert = ({ bsStyle, ...rest }: Props) => {

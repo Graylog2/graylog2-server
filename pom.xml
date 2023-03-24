@@ -183,12 +183,12 @@
         <equalsverifier.version>3.10</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.1</junit.version>
-        <junit-jupiter.version>5.8.2</junit-jupiter.version>
+        <junit-jupiter.version>5.9.1</junit-jupiter.version>
         <mockito.version>3.4.4</mockito.version>
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
         <restassured.version>4.3.2</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.17.2</testcontainers.version>
+        <testcontainers.version>1.17.6</testcontainers.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v16.13.0</nodejs.version>
@@ -196,8 +196,7 @@
 
         <!-- Plugin versions -->
         <license-maven.version>4.0.rc2</license-maven.version>
-        <!-- Downgraded to 1.3.0 because of this issue: https://github.com/maven-download-plugin/maven-download-plugin/issues/80 -->
-        <download-maven-plugin.version>1.3.0</download-maven-plugin.version>
+        <download-maven-plugin.version>1.6.8</download-maven-plugin.version>
     </properties>
 
     <repositories>
@@ -254,6 +253,26 @@
                 <artifactId>httpcore-nio</artifactId>
                 <version>${apache-httpcore.version}</version>
             </dependency>
+            <!-- Ensure consistent Netty versions across dependencies and transitive dependencies -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>${netty.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-tcnative-boringssl-static</artifactId>
+                <version>${netty-tcnative-boringssl-static.version}</version>
+                <classifier>osx-x86_64</classifier>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-tcnative-boringssl-static</artifactId>
+                <version>${netty-tcnative-boringssl-static.version}</version>
+                <classifier>linux-x86_64</classifier>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -273,7 +292,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -489,6 +508,17 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>com.googlecode.maven-download-plugin</groupId>
+                <artifactId>download-maven-plugin</artifactId>
+                <version>${download-maven-plugin.version}</version>
+                <configuration>
+                    <!-- Avoid metadata problems with the cache directory of older plugin versions. Bump the rev when updating the download-maven-plugin. -->
+                    <cacheDirectory>${settings.localRepository}/.cache/download-maven-plugin-rev1</cacheDirectory>
+                    <followRedirects>true</followRedirects>
+                    <retries>5</retries>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <configuration>
@@ -556,6 +586,18 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>datanode</id>
+            <activation>
+                <property>
+                    <name>!skip.datanode</name>
+                </property>
+            </activation>
+            <modules>
+                <module>data-node</module>
+                <module>data-node-distribution</module>
+            </modules>
+        </profile>
         <profile>
             <id>release</id>
             <build>

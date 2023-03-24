@@ -15,45 +15,63 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 
-import HighlightingRuleContext from 'views/components/contexts/HighlightingRulesContext';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import { createSearch } from 'fixtures/searches';
+import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
+import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
 
-import HighlightingRules from './HighlightingRules';
+import OriginalHighlightingRules from './HighlightingRules';
 
-jest.mock('stores/connect', () => (x) => x);
+const HighlightingRules = ({ rules }: { rules?: Array<HighlightingRule> }) => {
+  const formatting = FormattingSettings.create(rules);
+  const defaultView = createSearch();
+  const view = defaultView
+    .toBuilder()
+    .state(defaultView.state.update('query-id-1', (viewState) => viewState.toBuilder().formatting(formatting).build()))
+    .build();
+
+  return (
+    <TestStoreProvider view={view}>
+      <HighlightingRulesProvider>
+        <OriginalHighlightingRules />
+      </HighlightingRulesProvider>
+    </TestStoreProvider>
+  );
+};
+
+HighlightingRules.defaultProps = {
+  rules: [],
+};
 
 describe('HighlightingRules', () => {
-  it('renders search term legend even when HighlightingRulesContext is not provided', () => {
-    const wrapper = mount(<HighlightingRules />);
+  beforeAll(loadViewsPlugin);
 
-    expect(wrapper.text()).toMatch(/Search terms/);
+  afterAll(unloadViewsPlugin);
+
+  it('renders search term legend even when rules are empty', async () => {
+    render(<HighlightingRules />);
+
+    await screen.findByText('Search terms');
+    const colorPreview = await screen.findByTestId('static-color-preview');
+
+    expect(colorPreview).toHaveStyleRule('background-color', '#ffec3d');
   });
 
-  it('renders search term legend even when rules are empty', () => {
-    const wrapper = mount(
-      <HighlightingRuleContext.Provider value={[]}>
-        <HighlightingRules />
-      </HighlightingRuleContext.Provider>,
-    );
-
-    expect(wrapper.text()).toMatch(/Search terms/);
-  });
-
-  it('renders element for each HighlightingRule', () => {
+  it('renders element for each HighlightingRule', async () => {
     const rules = [
       HighlightingRule.create('foo', 'bar', undefined, StaticColor.create('#f4f141')),
       HighlightingRule.create('response_time', '250', undefined, StaticColor.create('#f44242')),
     ];
-    const wrapper = mount(
-      <HighlightingRuleContext.Provider value={rules}>
-        <HighlightingRules />
-      </HighlightingRuleContext.Provider>,
-    );
+    render(<HighlightingRules rules={rules} />);
 
-    expect(wrapper.text()).toMatch(/foo == "bar"/);
-    expect(wrapper.text()).toMatch(/response_time == "250"/);
+    const highlightingRules = await screen.findAllByTestId('highlighting-rule');
+
+    expect(highlightingRules[0].textContent).toMatch(/foo == "bar"/);
+    expect(highlightingRules[1].textContent).toMatch(/response_time == "250"/);
   });
 });

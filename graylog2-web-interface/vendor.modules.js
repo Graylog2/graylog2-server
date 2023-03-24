@@ -32,4 +32,6 @@ module.exports = [
   'reflux-core',
   'reflux',
   'styled-components',
+  'redux',
+  'react-redux',
 ];

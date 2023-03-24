@@ -30,9 +30,9 @@ const legacyWriteText = (str: string) => {
 };
 
 // Compatibility is sufficient. We not support IE or outdated iOS.
-// eslint-disable-next-line compat/compat
+
 const copyToClipboard = (text: string) => (navigator.clipboard && window.isSecureContext
-  // eslint-disable-next-line compat/compat
+
   ? navigator.clipboard.writeText(text)
   : legacyWriteText(text));
 

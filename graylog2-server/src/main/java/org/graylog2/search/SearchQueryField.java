@@ -16,9 +16,36 @@
  */
 package org.graylog2.search;
 
+import org.bson.types.ObjectId;
+import org.graylog2.utilities.date.MultiFormatDateParser;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
+
 public class SearchQueryField {
+
+    private static final MultiFormatDateParser dateParser = new MultiFormatDateParser();
+
     public enum Type {
-        STRING, DATE, INT, LONG, OBJECT_ID;
+        STRING(value -> value),
+        DATE(value -> dateParser.parseDate(value)),
+        INT(value -> Integer.parseInt(value)),
+        LONG(value -> Long.parseLong(value)),
+        OBJECT_ID(value -> new ObjectId(value)),
+        BOOLEAN(value -> Boolean.parseBoolean(value));
+
+        public static final Collection<Type> NUMERIC_TYPES = List.of(DATE, LONG, INT);
+
+        private final Function<String, Object> mongoValueConverter;
+
+        Type(final Function<String, Object> mongoValueConverter) {
+            this.mongoValueConverter = mongoValueConverter;
+        }
+
+        public Function<String, Object> getMongoValueConverter() {
+            return mongoValueConverter;
+        }
     }
 
     private final String dbField;
@@ -29,10 +56,10 @@ public class SearchQueryField {
     }
 
     public static SearchQueryField create(String dbField, Type fieldType) {
-        return new SearchQueryField(dbField, fieldType);
+        return new SearchQueryField(dbField, fieldType != null ? fieldType : Type.STRING);
     }
 
-    public SearchQueryField(String dbField, Type fieldType) {
+    SearchQueryField(String dbField, Type fieldType) {
         this.dbField = dbField;
         this.fieldType = fieldType;
     }

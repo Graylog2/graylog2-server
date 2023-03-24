@@ -19,18 +19,26 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
-import ExtraWidgetActions from 'views/components/widgets/ExtraWidgetActions';
+import OriginalExtraWidgetActions from 'views/components/widgets/ExtraWidgetActions';
 import Widget from 'views/logic/widgets/Widget';
-import usePluginEntities from 'hooks/usePluginEntities';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useWidgetActions from 'views/components/widgets/useWidgetActions';
 
-jest.mock('hooks/usePluginEntities', () => jest.fn(() => []));
+jest.mock('views/components/widgets/useWidgetActions');
+
+const ExtraWidgetActions = (props: React.ComponentProps<typeof OriginalExtraWidgetActions>) => (
+  <TestStoreProvider>
+    <OriginalExtraWidgetActions {...props} />
+  </TestStoreProvider>
+);
 
 describe('ExtraWidgetActions', () => {
   const widget = Widget.empty();
   const dummyActionWithoutIsHidden = {
     type: 'dummy-action',
     title: () => 'Dummy Action',
-    action: jest.fn(),
+    action: jest.fn(() => async () => {}),
   };
   const dummyActionWhichIsHidden = {
     ...dummyActionWithoutIsHidden,
@@ -45,14 +53,20 @@ describe('ExtraWidgetActions', () => {
     disabled: jest.fn(() => true),
   };
 
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
+
   it('returns `null` if no action is configured', () => {
+    asMock(useWidgetActions).mockReturnValue([]);
+
     const { container } = render(<ExtraWidgetActions onSelect={() => {}} widget={widget} />);
 
     expect(container).toBeEmptyDOMElement();
   });
 
   it('returns `null` if no action is not hidden', () => {
-    asMock(usePluginEntities).mockReturnValue([dummyActionWhichIsHidden]);
+    asMock(useWidgetActions).mockReturnValue([dummyActionWhichIsHidden]);
 
     const { container } = render(<ExtraWidgetActions onSelect={() => {}} widget={widget} />);
 
@@ -60,7 +74,7 @@ describe('ExtraWidgetActions', () => {
   });
 
   it('renders action which has no `isHidden`', async () => {
-    asMock(usePluginEntities).mockReturnValue([dummyActionWithoutIsHidden]);
+    asMock(useWidgetActions).mockReturnValue([dummyActionWithoutIsHidden]);
 
     render(<ExtraWidgetActions onSelect={() => {}} widget={widget} />);
 
@@ -68,7 +82,7 @@ describe('ExtraWidgetActions', () => {
   });
 
   it('renders action where `isHidden` returns `false`', async () => {
-    asMock(usePluginEntities).mockReturnValue([dummyActionWhichIsNotHidden]);
+    asMock(useWidgetActions).mockReturnValue([dummyActionWhichIsNotHidden]);
 
     render(<ExtraWidgetActions onSelect={() => {}} widget={widget} />);
 
@@ -76,7 +90,7 @@ describe('ExtraWidgetActions', () => {
   });
 
   it('clicking menu item triggers action', async () => {
-    asMock(usePluginEntities).mockReturnValue([dummyActionWhichIsNotHidden]);
+    asMock(useWidgetActions).mockReturnValue([dummyActionWhichIsNotHidden]);
 
     render(<ExtraWidgetActions onSelect={() => {}} widget={widget} />);
 
@@ -95,7 +109,7 @@ describe('ExtraWidgetActions', () => {
   });
 
   it('clicking menu item triggers `onSelect` to close menu', async () => {
-    asMock(usePluginEntities).mockReturnValue([dummyActionWhichIsNotHidden]);
+    asMock(useWidgetActions).mockReturnValue([dummyActionWhichIsNotHidden]);
     const onSelect = jest.fn();
 
     render(<ExtraWidgetActions onSelect={onSelect} widget={widget} />);
@@ -108,7 +122,7 @@ describe('ExtraWidgetActions', () => {
   });
 
   it('renders divider if at least one action is present', async () => {
-    asMock(usePluginEntities).mockReturnValue([dummyActionWithoutIsHidden]);
+    asMock(useWidgetActions).mockReturnValue([dummyActionWithoutIsHidden]);
 
     render(<ExtraWidgetActions onSelect={() => {}} widget={widget} />);
 
@@ -116,7 +130,7 @@ describe('ExtraWidgetActions', () => {
   });
 
   it('renders a disabled action disabled', async () => {
-    asMock(usePluginEntities).mockReturnValue([dummyActionWhichIsDisabled]);
+    asMock(useWidgetActions).mockReturnValue([dummyActionWhichIsDisabled]);
 
     render(<ExtraWidgetActions onSelect={() => {}} widget={widget} />);
 

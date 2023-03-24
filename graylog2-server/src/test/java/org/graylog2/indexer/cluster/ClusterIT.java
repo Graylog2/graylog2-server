@@ -97,15 +97,7 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void health_returns_empty_with_missing_index() {
-        when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{"does_not_exist"});
-        final Optional<HealthStatus> health = cluster.health();
-        assertThat(health).isEmpty();
-    }
-
-    @Test
     public void health_returns_green_with_no_indices() {
-        when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{});
         final Optional<HealthStatus> health = cluster.health();
         assertThat(health).contains(HealthStatus.Green);
     }
@@ -176,15 +168,7 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void isHealthy_returns_false_with_missing_index() {
-        when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{"does-not-exist"});
-        when(indexSetRegistry.isUp()).thenReturn(true);
-        assertThat(cluster.isHealthy()).isFalse();
-    }
-
-    @Test
     public void isHealthy_returns_true_with_no_indices() {
-        when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{});
         when(indexSetRegistry.isUp()).thenReturn(true);
         assertThat(cluster.isHealthy()).isTrue();
     }

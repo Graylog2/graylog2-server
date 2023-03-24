@@ -17,18 +17,16 @@
 package org.graylog.plugins.views.search.views;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.search.SearchQuery;
 import org.mongojack.DBQuery;
-import org.mongojack.DBSort;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -51,27 +49,28 @@ public class ViewSummaryService extends PaginatedDbService<ViewSummaryDTO> imple
     }
 
     public PaginatedList<ViewSummaryDTO> searchPaginatedByType(SearchUser searchUser,
-                                                                        ViewDTO.Type type,
-                                                                        SearchQuery dbQuery,
-                                                   Predicate<ViewSummaryDTO> filter,
-                                                   String order,
-                                                   String sortField,
-                                                   int page,
-                                                   int perPage) {
-
+                                                               ViewDTO.Type type,
+                                                               Bson dbQuery, //query executed on DB level
+                                                               Predicate<ViewSummaryDTO> predicate, //predicate executed on code level, AFTER data is fetched
+                                                               String order,
+                                                               String sortField,
+                                                               int page,
+                                                               int perPage) {
         checkNotNull(sortField);
 
-        var sort = getSortBuilder(order, sortField);
+        var sort = getMultiFieldSortBuilder(order, List.of(sortField, ViewDTO.SECONDARY_SORT));
 
         var query = Filters.and(
-                // negation for Filters.exists() not found, so reverting to BasicDBObject for now
-                Filters.or(Filters.eq(ViewDTO.FIELD_TYPE, type), new BasicDBObject(ViewDTO.FIELD_TYPE, new BasicDBObject("$exists", false))),
-                dbQuery.toBson()
+                Filters.or(
+                        Filters.eq(ViewDTO.FIELD_TYPE, type),
+                        Filters.exists(ViewDTO.FIELD_TYPE, false)
+                ),
+                dbQuery
         );
 
         final List<ViewSummaryDTO> views = findViews(searchUser, query, sort)
                 .map(this::deserialize)
-                .filter(filter)
+                .filter(predicate)
                 .toList();
 
         final List<ViewSummaryDTO> paginatedStreams = perPage > 0

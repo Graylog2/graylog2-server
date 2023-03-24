@@ -35,10 +35,14 @@ import dataTable from 'views/components/datatable/bindings';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
+import viewsReducers from 'views/viewsReducers';
+import TestStoreProvider from 'views/test/TestStoreProvider';
 
 import AggregationWizard from '../AggregationWizard';
 
-const extendedTimeout = applyTimeoutMultiplier(15000);
+jest.mock('views/hooks/useAggregationFunctions');
+
+const extendedTimeout = applyTimeoutMultiplier(30000);
 
 const fieldType = new FieldType('field_type', ['numeric'], []);
 const fieldTypeMapping1 = new FieldTypeMapping('took_ms', fieldType);
@@ -58,7 +62,7 @@ const widgetConfig = AggregationWidgetConfig
 
 const selectEventConfig = { container: document.body };
 
-const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
+const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable], 'views.reducers': viewsReducers } };
 
 const addSortElement = async () => {
   await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
@@ -85,8 +89,8 @@ const sortByTookMsDesc = async (sortElementContainerId: Matcher, option: string 
   });
 };
 
-describe('AggregationWizard', () => {
-  const renderSUT = (props = {}) => render(
+const renderSUT = (props = {}) => render((
+  <TestStoreProvider>
     <FieldTypesContext.Provider value={fieldTypes}>
       <AggregationWizard onChange={() => {}}
                          onSubmit={() => {}}
@@ -99,9 +103,11 @@ describe('AggregationWizard', () => {
                          {...props}>
         <span>The Visualization</span>
       </AggregationWizard>
-    </FieldTypesContext.Provider>,
-  );
+    </FieldTypesContext.Provider>
+  </TestStoreProvider>
+));
 
+describe('AggregationWizard', () => {
   beforeAll(() => PluginStore.register(plugin));
 
   afterAll(() => PluginStore.unregister(plugin));
@@ -165,7 +171,7 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  });
+  }, extendedTimeout);
 
   it('should configure another sort element', async () => {
     const onChangeMock = jest.fn();

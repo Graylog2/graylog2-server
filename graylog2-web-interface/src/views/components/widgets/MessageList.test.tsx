@@ -25,28 +25,29 @@ import { TIMESTAMP_FIELD, Messages } from 'views/Constants';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import { SearchActions } from 'views/stores/SearchStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
-import type { SearchExecutionResult } from 'views/actions/SearchActions';
-import CancellablePromise from 'logic/rest/CancellablePromise';
+import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import useCurrentSearchTypesResults from 'views/components/widgets/useCurrentSearchTypesResults';
+import useAppDispatch from 'stores/useAppDispatch';
+import { finishedLoading } from 'views/logic/slices/searchExecutionSlice';
+import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
+import SearchResult from 'views/logic/SearchResult';
+import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
+import type { SearchErrorResponse } from 'views/logic/SearchError';
+import TestStoreProvider from 'views/test/TestStoreProvider';
+import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
 import type { MessageListResult } from './MessageList';
 import MessageList from './MessageList';
 import type { TRenderCompletionCallback } from './RenderCompletionCallback';
 import RenderCompletionCallback from './RenderCompletionCallback';
 
-const mockEffectiveTimeRange = {
+const mockEffectiveTimeRange: AbsoluteTimeRange = {
   from: '2019-11-15T14:40:48.666Z',
   to: '2019-11-29T14:40:48.666Z',
   type: 'absolute',
 };
-
-jest.mock('views/stores/ViewStore', () => ({
-  ViewStore: MockStore(
-    ['getInitialState', () => ({ activeQuery: 'somequery', view: { id: 'someview' } })],
-  ),
-}));
 
 jest.mock('stores/inputs/InputsStore', () => ({
   InputsStore: MockStore(),
@@ -57,33 +58,33 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: MockStore('listSearchesClusterConfig', 'configurations'),
 }));
 
-jest.mock('views/stores/SearchStore', () => ({
-  SearchStore: MockStore(
-    ['getInitialState', () => ({
-      result: {
-        results: {
-          somequery: {
-            searchTypes: {
-              'search-type-id': {
-                effectiveTimerange: mockEffectiveTimeRange,
-              },
-            },
-          },
-        },
-      },
-    })],
-  ),
-  SearchActions: {
-    reexecuteSearchTypes: jest.fn(),
-    execute: { completed: { listen: jest.fn(() => () => {}) } },
+const searchTypeResults = {
+  'search-type-id': {
+    effectiveTimerange: mockEffectiveTimeRange,
+    type: '',
+    total: 0,
   },
-}));
+};
+
+const dummySearchJobResults = {
+  errors: [],
+  execution: { cancelled: false, completed_exceptionally: false, done: true },
+  id: 'foo',
+  owner: 'me',
+  search_id: 'bar',
+  results: {},
+};
 
 jest.mock('views/stores/RefreshStore', () => ({
   RefreshActions: {
     disable: jest.fn(),
   },
 }));
+
+jest.mock('views/hooks/useActiveQueryId');
+jest.mock('views/components/widgets/useCurrentSearchTypesResults');
+jest.mock('views/components/widgets/reexecuteSearchTypes');
+jest.mock('stores/useAppDispatch');
 
 describe('MessageList', () => {
   const config = MessagesWidgetConfig.builder().fields([]).build();
@@ -105,10 +106,14 @@ describe('MessageList', () => {
     total: 1,
   };
 
-  const mockReexecuteResult = CancellablePromise.of(Promise.resolve({ result: { errors: [] }, widgetMapping: {} } as SearchExecutionResult));
+  beforeAll(loadViewsPlugin);
+
+  afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
-    asMock(SearchActions.reexecuteSearchTypes).mockReturnValue(CancellablePromise.of(Promise.resolve(mockReexecuteResult)));
+    asMock(useActiveQueryId).mockReturnValue('somequery');
+    // @ts-expect-error
+    asMock(useCurrentSearchTypesResults).mockReturnValue(searchTypeResults);
     asMock(InputsStore.getInitialState).mockReturnValue({ inputs: [] });
   });
 
@@ -126,18 +131,20 @@ describe('MessageList', () => {
   };
 
   const SimpleMessageList = (props: Partial<React.ComponentProps<typeof MessageList>>) => (
-    <MessageList title="Message List"
-                 editing={false}
-                 filter=""
-                 type="messages"
-                 id="message-list"
-                 queryId="deadbeef"
-                 toggleEdit={() => {}}
-                 setLoadingState={() => {}}
-                 data={props.data}
-                 config={props.config}
-                 fields={props.fields}
-                 {...props} />
+    <TestStoreProvider>
+      <MessageList title="Message List"
+                   editing={false}
+                   filter=""
+                   type="messages"
+                   id="message-list"
+                   queryId="deadbeef"
+                   toggleEdit={() => {}}
+                   setLoadingState={() => {}}
+                   data={props.data}
+                   config={props.config}
+                   fields={props.fields}
+                   {...props} />
+    </TestStoreProvider>
   );
 
   SimpleMessageList.defaultProps = {
@@ -190,6 +197,11 @@ describe('MessageList', () => {
   });
 
   it('reexecute query for search type, when using pagination', async () => {
+    const dispatch = jest.fn().mockResolvedValue(finishedLoading({
+      result: new SearchResult(dummySearchJobResults),
+      widgetMapping: Immutable.Map(),
+    }));
+    asMock(useAppDispatch).mockReturnValue(dispatch);
     const searchTypePayload = { [data.id]: { limit: Messages.DEFAULT_LIMIT, offset: Messages.DEFAULT_LIMIT } };
     const secondPageSize = 10;
 
@@ -197,10 +209,15 @@ describe('MessageList', () => {
 
     clickNextPageButton();
 
-    await waitFor(() => expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith(searchTypePayload, mockEffectiveTimeRange));
+    await waitFor(() => expect(reexecuteSearchTypes).toHaveBeenCalledWith(searchTypePayload, mockEffectiveTimeRange));
   });
 
   it('disables refresh actions, when using pagination', async () => {
+    const dispatch = jest.fn().mockResolvedValue(finishedLoading({
+      result: new SearchResult(dummySearchJobResults),
+      widgetMapping: Immutable.Map(),
+    }));
+    asMock(useAppDispatch).mockReturnValue(dispatch);
     const secondPageSize = 10;
 
     render(<SimpleMessageList data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }} />);
@@ -211,9 +228,16 @@ describe('MessageList', () => {
   });
 
   it('displays error description, when using pagination throws an error', async () => {
-    asMock(SearchActions.reexecuteSearchTypes).mockReturnValue(CancellablePromise.of(Promise.resolve({
-      result: { errors: [{ description: 'Error description' }] },
-    } as SearchExecutionResult)));
+    const dispatch = jest.fn().mockResolvedValue(finishedLoading({
+      result: new SearchResult({
+        ...dummySearchJobResults,
+        errors: [{
+          description: 'Error description',
+        } as SearchErrorResponse],
+      }),
+      widgetMapping: Immutable.Map(),
+    }));
+    asMock(useAppDispatch).mockReturnValue(dispatch);
 
     const secondPageSize = 10;
 

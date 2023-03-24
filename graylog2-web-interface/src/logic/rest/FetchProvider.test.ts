@@ -53,7 +53,7 @@ const setUpServer = () => {
   const app = express();
 
   app.use(formidableMiddleware());
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars,no-console
+  // eslint-disable-next-line no-console
   app.use((err, _req, _res, _next) => console.error(err));
 
   app.get('/test1', (_req, res) => {
@@ -115,7 +115,7 @@ describe('FetchProvider', () => {
 
   beforeAll(() => {
     server = setUpServer();
-    // eslint-disable-next-line global-require
+
     window.fetch = nodeFetch;
 
     // @ts-ignore Types do not match actual result for some reason

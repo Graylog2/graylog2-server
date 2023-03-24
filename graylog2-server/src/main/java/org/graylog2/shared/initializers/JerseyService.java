@@ -48,9 +48,11 @@ import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.filter.WebAppNotFoundResponseFilter;
 import org.graylog2.shared.rest.CORSFilter;
+import org.graylog2.shared.rest.ContentTypeOptionFilter;
 import org.graylog2.shared.rest.EmbeddingControlFilter;
 import org.graylog2.shared.rest.NodeIdResponseFilter;
 import org.graylog2.shared.rest.NotAuthorizedResponseFilter;
+import org.graylog2.shared.rest.OptionalResponseFilter;
 import org.graylog2.shared.rest.PrintModelProcessor;
 import org.graylog2.shared.rest.RequestIdFilter;
 import org.graylog2.shared.rest.RestAccessLogFilter;
@@ -243,7 +245,7 @@ public class JerseyService extends AbstractIdleService {
                 .property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true)
                 .property(ServerProperties.WADL_FEATURE_DISABLE, true)
                 .property(ServerProperties.MEDIA_TYPE_MAPPINGS, mediaTypeMappings())
-                .register(new PrefixAddingModelProcessor(packagePrefixes, graylogConfiguration))
+                .register(new PrefixAddingModelProcessor(packagePrefixes))
                 .register(new AuditEventModelProcessor(pluginAuditEventTypes))
                 .registerClasses(
                         ShiroSecurityContextFilter.class,
@@ -263,7 +265,9 @@ public class JerseyService extends AbstractIdleService {
                         XHRFilter.class,
                         NotAuthorizedResponseFilter.class,
                         WebAppNotFoundResponseFilter.class,
-                        EmbeddingControlFilter.class)
+                        EmbeddingControlFilter.class,
+                        OptionalResponseFilter.class,
+                        ContentTypeOptionFilter.class)
                 // Replacing this with a lambda leads to missing subtypes - https://github.com/Graylog2/graylog2-server/pull/10617#discussion_r630236360
                 .register(new ContextResolver<ObjectMapper>() {
                     @Override

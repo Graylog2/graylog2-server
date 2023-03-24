@@ -16,7 +16,8 @@
  */
 package org.graylog.plugins.views.startpage.recentActivities;
 
+import org.graylog.grn.GRN;
 import org.joda.time.DateTime;
 
-public record RecentActivity(String id, ActivityType activityType, String itemType, String itemId, String itemTitle, String userName, DateTime timestamp) {
+public record RecentActivity(String id, ActivityType activityType, GRN itemGrn, String itemTitle, String userName, DateTime timestamp) {
 }

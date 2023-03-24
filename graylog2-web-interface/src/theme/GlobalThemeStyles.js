@@ -51,7 +51,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     border-top: 1px solid ${theme.colors.global.background};
   }
 
-  h1, h2 {
+  h1,
+  h2 {
     font-family: ${theme.fonts.family.navigation};
   }
 
@@ -104,9 +105,9 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   /* Remove boostrap outline */
   a:active,
   select:active,
-  input[type="file"]:active,
-  input[type="radio"]:active,
-  input[type="checkbox"]:active,
+  input[type='file']:active,
+  input[type='radio']:active,
+  input[type='checkbox']:active,
   .btn:active {
     outline: none;
     outline-offset: 0;
@@ -479,7 +480,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     display: inline-block;
   }
 
-  .configuration-bundles input[type="file"] {
+  .configuration-bundles input[type='file'] {
     line-height: inherit !important;
   }
 
@@ -628,7 +629,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   .tag-remove::before,
   .pill-remove::before {
-    content: "×";
+    content: '×';
   }
 
   .save-button-margin {
@@ -648,7 +649,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   }
 
   .ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {
-    background-color: ${theme.utils.opacify(theme.colors.variant.info, 0.70)};
+    background-color: ${theme.utils.opacify(theme.colors.variant.info, 0.7)};
     color: ${theme.colors.input.colorDisabled};
   }
 
@@ -667,8 +668,8 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
     border-color: ${theme.colors.variant.lighter.default};
   }
 
-  input[type="range"],
-  input[type="range"]:focus {
+  input[type='range'],
+  input[type='range']:focus {
     box-shadow: none;
     height: auto;
   }
