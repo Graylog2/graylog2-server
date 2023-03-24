@@ -16,6 +16,7 @@
  */
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
+import { OrderedMap } from 'immutable';
 
 import CreateFilterDropdown from 'components/common/EntityFilters/CreateFilterDropdown';
 import type { Attributes } from 'stores/PaginationTypes';
@@ -57,13 +58,11 @@ const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters,
   );
 
   const onChangeFilters = useCallback((newFilters: Filters) => {
-    const newUrlQueryFilters = Object.entries(newFilters).reduce((col, [attributeId, filterCol]) => ({
-      ...col,
-      [attributeId]: [...col[attributeId] ?? [], ...filterCol.map(({ value }) => value)],
-    }), {});
+    const newUrlQueryFilters = newFilters.entrySeq().reduce((col, [attributeId, filterCol]) => (
+      col.set(attributeId, [...col[attributeId] ?? [], ...filterCol.map(({ value }) => value)])
+    ), OrderedMap<string, Array<string>>());
 
     onChangeFiltersWithTitle(newFilters, newUrlQueryFilters);
-
     setUrlQueryFilters(newUrlQueryFilters);
   }, [onChangeFiltersWithTitle, setUrlQueryFilters]);
 
@@ -73,44 +72,33 @@ const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters,
     return null;
   }
 
-  const onCreateFilter = (attributeId, filter: Filter) => {
-    onChangeFilters({
-      ...(activeFilters ?? {}),
-      [attributeId]: [
-        ...(activeFilters?.[attributeId] ?? []),
-        filter,
-      ],
-    });
+  const onCreateFilter = (attributeId: string, filter: Filter) => {
+    onChangeFilters(OrderedMap(activeFilters).set(
+      attributeId,
+      [...(activeFilters?.get(attributeId) ?? []), filter],
+    ));
   };
 
   const onDeleteFilter = (attributeId: string, filterId: string) => {
-    const filterGroup = activeFilters[attributeId];
+    const filterGroup = activeFilters.get(attributeId);
     const updatedFilterGroup = filterGroup.filter(({ value }) => value !== filterId);
-    let updatedFilters = { ...activeFilters };
+    const updatedFilters = { ...activeFilters };
 
     if (updatedFilterGroup.length) {
-      updatedFilters = {
-        ...activeFilters,
-        [attributeId]: updatedFilterGroup,
-      };
-    } else {
-      delete updatedFilters[attributeId];
+      return onChangeFilters(updatedFilters.set(attributeId, updatedFilterGroup));
     }
 
-    onChangeFilters(updatedFilters);
+    return onChangeFilters(updatedFilters.delete(attributeId));
   };
 
   const onChangeFilter = (attributeId: string, prevValue: string, newFilter: Filter) => {
-    const filterGroup = activeFilters[attributeId];
+    const filterGroup = activeFilters.get(attributeId);
     const targetFilterIndex = filterGroup.findIndex(({ value }) => value === prevValue);
 
     const updatedFilterGroup = [...filterGroup];
     updatedFilterGroup[targetFilterIndex] = newFilter;
 
-    onChangeFilters({
-      ...activeFilters,
-      [attributeId]: updatedFilterGroup,
-    });
+    onChangeFilters(activeFilters.set(attributeId, updatedFilterGroup));
   };
 
   return (

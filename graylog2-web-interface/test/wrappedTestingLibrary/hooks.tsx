@@ -21,7 +21,6 @@ import 'jest-styled-components';
 import type { RenderHookResult, RenderHookOptions } from '@testing-library/react-hooks';
 import { renderHook } from '@testing-library/react-hooks';
 import type { QueryClientConfig } from '@tanstack/react-query';
-import DefaultProviders from 'DefaultProviders';
 
 import DefaultQueryClientProvider from '../DefaultQueryClientProvider';
 
@@ -37,11 +36,9 @@ const renderHookWithWrapper = <TProps, TResult>(
 
         return (
           <DefaultQueryClientProvider options={options.queryClientOptions}>
-            <DefaultProviders>
-              <CustomWrapper>
-                {children}
-              </CustomWrapper>
-            </DefaultProviders>
+            <CustomWrapper>
+              {children}
+            </CustomWrapper>
           </DefaultQueryClientProvider>
         );
       },

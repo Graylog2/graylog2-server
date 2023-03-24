@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { OrderedMap } from 'immutable';
 
 export type Filter = {
   value: string,
@@ -21,10 +22,5 @@ export type Filter = {
 
 }
 
-export type Filters = {
-  [attributeId: string]: Array<Filter>
-};
-
-export type UrlQueryFilters = {
-  [attributeId: string]: Array<string>
-}
+export type Filters = OrderedMap<string, Array<Filter>>;
+export type UrlQueryFilters = OrderedMap<string, Array<string>>
