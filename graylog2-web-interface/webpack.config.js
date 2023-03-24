@@ -118,7 +118,6 @@ if (TARGET === 'start') {
       new webpack.DefinePlugin({
         IS_CLOUD: process.env.IS_CLOUD,
       }),
-      new CopyWebpackPlugin({ patterns: [{ from: 'config.js' }] }),
     ],
   });
 }

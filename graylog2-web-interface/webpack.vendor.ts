@@ -106,7 +106,7 @@ if (TARGET === 'start') {
           target: 'http://localhost:9000',
         },
         '/config.js': {
-          target: 'http://localhost:9000/config.js',
+          target: 'http://localhost:9000',
         },
       },
     },
