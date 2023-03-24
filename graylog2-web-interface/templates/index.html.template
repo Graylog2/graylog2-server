@@ -14,5 +14,6 @@
   </head>
   <body>
     <%= htmlWebpackPlugin.tags.bodyTags %>
+    <div id="app-root" />
   </body>
 </html>
