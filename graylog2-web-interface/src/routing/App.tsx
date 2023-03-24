@@ -48,6 +48,7 @@ const ScrollToHint = styled.div(({ theme }) => css`
   left: 50%;
   margin-left: -125px;
   top: 50px;
+  /* stylelint-disable function-no-unknown */
   color: ${theme.utils.readableColor(chroma(theme.colors.brand.tertiary).alpha(0.8).css())};
   font-size: 80px;
   padding: 25px;
