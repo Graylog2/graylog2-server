@@ -96,6 +96,10 @@ public class DropdownField extends AbstractConfigurationField {
          *
          * @return map of sorted timezones
          */
+        public static Map<String, String> timeZones() {
+            return timeZones(false);
+        }
+
         public static Map<String, String> timeZones(boolean addNotConfiguredOption) {
             Map<Integer, List<DateTimeZone>> offsetsAndTimezones = buildSortedTimeZoneMap();
             Map<String, String> timezones = new LinkedHashMap<>();
