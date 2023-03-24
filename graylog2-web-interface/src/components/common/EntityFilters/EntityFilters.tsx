@@ -22,11 +22,19 @@ import type { Attributes } from 'stores/PaginationTypes';
 import type { Filters, Filter } from 'components/common/EntityFilters/types';
 import ActiveFilters from 'components/common/EntityFilters/ActiveFilters';
 
-const Container = styled.div`
+import { ROW_MIN_HEIGHT } from './Constants';
+
+const SUPPORTED_TYPES = ['STRING', 'BOOLEAN'];
+
+const FilterCreation = styled.div`
   display: inline-flex;
-  height: 34px;
+  height: ${ROW_MIN_HEIGHT}px;
   align-items: center;
   margin-left: 5px;
+  
+  && {
+    margin-right: 10px;
+  }
 `;
 
 type Props = {
@@ -37,7 +45,7 @@ type Props = {
 }
 
 const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRenderers, onChangeFilters }: Props) => {
-  const filterableAttributes = attributes.filter(({ filterable, type }) => filterable && type === 'BOOLEAN');
+  const filterableAttributes = attributes.filter(({ filterable, type }) => filterable && SUPPORTED_TYPES.includes(type));
 
   if (!filterableAttributes.length) {
     return null;
@@ -47,7 +55,7 @@ const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRendere
     onChangeFilters({
       ...activeFilters,
       [attributeId]: [
-        ...activeFilters[attributeId] ?? [],
+        ...(activeFilters[attributeId] ?? []),
         filter,
       ],
     });
@@ -84,12 +92,15 @@ const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRendere
   };
 
   return (
-    <Container>
-      Filters
-      <CreateFilterDropdown filterableAttributes={filterableAttributes}
-                            onCreateFilter={onCreateFilter}
-                            activeFilters={activeFilters}
-                            filterValueRenderers={filterValueRenderers} />
+    <>
+      <FilterCreation>
+        Filters
+        <CreateFilterDropdown filterableAttributes={filterableAttributes}
+                              onCreateFilter={onCreateFilter}
+                              activeFilters={activeFilters}
+                              filterValueRenderers={filterValueRenderers} />
+
+      </FilterCreation>
       {activeFilters && (
         <ActiveFilters filters={activeFilters}
                        attributes={attributes}
@@ -97,7 +108,7 @@ const EntityFilters = ({ attributes = [], activeFilters = {}, filterValueRendere
                        onDeleteFilter={onDeleteFilter}
                        filterValueRenderers={filterValueRenderers} />
       )}
-    </Container>
+    </>
   );
 };
 

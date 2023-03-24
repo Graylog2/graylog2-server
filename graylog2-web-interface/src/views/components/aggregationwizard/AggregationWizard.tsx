@@ -95,7 +95,7 @@ const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfi
 };
 
 const validateForm = (formValues: WidgetConfigFormValues) => {
-  const elementValidations = aggregationElements.map((element) => element.validate ?? (() => ({}) as WidgetConfigValidationErrors));
+  const elementValidations = aggregationElements.map((element) => element.validate ?? (() => (({}) as WidgetConfigValidationErrors)));
 
   const elementValidationResults = elementValidations.map((validate) => validate(formValues));
 

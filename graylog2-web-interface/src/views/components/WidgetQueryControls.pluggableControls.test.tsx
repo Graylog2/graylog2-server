@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
-import WrappingContainer from 'WrappingContainer';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
@@ -137,13 +136,11 @@ describe('WidgetQueryControls pluggable controls', () => {
   });
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    <WrappingContainer>
-      <TestStoreProvider>
-        <WidgetContext.Provider value={widget}>
-          {children}
-        </WidgetContext.Provider>
-      </TestStoreProvider>
-    </WrappingContainer>
+    <TestStoreProvider>
+      <WidgetContext.Provider value={widget}>
+        {children}
+      </WidgetContext.Provider>
+    </TestStoreProvider>
   );
 
   const renderSUT = (props = {}) => render(

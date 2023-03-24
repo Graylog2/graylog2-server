@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useEffect, useState, useCallback } from 'react';
 import { Formik, Form, Field } from 'formik';
 import styled, { css } from 'styled-components';
-import { compact } from 'lodash';
+import compact from 'lodash/compact';
 import * as Immutable from 'immutable';
 
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';

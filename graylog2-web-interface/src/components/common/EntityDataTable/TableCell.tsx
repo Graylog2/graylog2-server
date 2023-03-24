@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { camelCase } from 'lodash';
+import camelCase from 'lodash/camelCase';
 
 import type { Column, ColumnRenderer, EntityBase } from './types';
 

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { max } from 'lodash';
+import max from 'lodash/max';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 

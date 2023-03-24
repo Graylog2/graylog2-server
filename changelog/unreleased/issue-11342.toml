@@ -1,0 +1,5 @@
+type = "c"
+message = "Improved validation of grok pattern definition."
+
+issues = ["11342"]
+pulls = ["14853"]

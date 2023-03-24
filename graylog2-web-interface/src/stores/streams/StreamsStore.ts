@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Reflux from 'reflux';
-import lodash from 'lodash';
+import pull from 'lodash/pull';
 
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -347,7 +347,7 @@ const StreamsStore = singletonStore('Streams', () => Reflux.createStore({
     this.callbacks.forEach((callback) => callback());
   },
   unregister(callback: Callback) {
-    lodash.pull(this.callbacks, callback);
+    pull(this.callbacks, callback);
   },
 }));
 
