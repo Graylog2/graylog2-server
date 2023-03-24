@@ -52,15 +52,13 @@ type Props = {
   children: React.ReactNode,
 }
 const DefaultProviders = ({ children }: Props) => (
-  <QueryParamProvider adapter={ReactRouter6Adapter}>
-    <CurrentUserContext.Provider value={defaultUser}>
-      <ThemeProvider theme={theme}>
-        <UserDateTimeProvider tz={defaultTimezone}>
-          {children}
-        </UserDateTimeProvider>
-      </ThemeProvider>
-    </CurrentUserContext.Provider>
-  </QueryParamProvider>
+  <CurrentUserContext.Provider value={defaultUser}>
+    <ThemeProvider theme={theme}>
+      <UserDateTimeProvider tz={defaultTimezone}>
+        {children}
+      </UserDateTimeProvider>
+    </ThemeProvider>
+  </CurrentUserContext.Provider>
 );
 
 export default DefaultProviders;

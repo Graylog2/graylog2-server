@@ -57,6 +57,8 @@ const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters,
     !!attributes,
   );
 
+  const filterableAttributes = attributes.filter(({ filterable, type }) => filterable && SUPPORTED_ATTRIBUTE_TYPES.includes(type));
+
   const onChangeFilters = useCallback((newFilters: Filters) => {
     const newUrlQueryFilters = newFilters.entrySeq().reduce((col, [attributeId, filterCol]) => (
       col.set(attributeId, [...col[attributeId] ?? [], ...filterCol.map(({ value }) => value)])
@@ -66,20 +68,14 @@ const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters,
     setUrlQueryFilters(newUrlQueryFilters);
   }, [onChangeFiltersWithTitle, setUrlQueryFilters]);
 
-  const filterableAttributes = attributes.filter(({ filterable, type }) => filterable && SUPPORTED_ATTRIBUTE_TYPES.includes(type));
-
-  if (!filterableAttributes.length) {
-    return null;
-  }
-
-  const onCreateFilter = (attributeId: string, filter: Filter) => {
+  const onCreateFilter = useCallback((attributeId: string, filter: Filter) => {
     onChangeFilters(OrderedMap(activeFilters).set(
       attributeId,
       [...(activeFilters?.get(attributeId) ?? []), filter],
     ));
-  };
+  }, [activeFilters, onChangeFilters]);
 
-  const onDeleteFilter = (attributeId: string, filterId: string) => {
+  const onDeleteFilter = useCallback((attributeId: string, filterId: string) => {
     const filterGroup = activeFilters.get(attributeId);
     const updatedFilterGroup = filterGroup.filter(({ value }) => value !== filterId);
 
@@ -88,16 +84,20 @@ const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters,
     }
 
     return onChangeFilters(activeFilters.remove(attributeId));
-  };
+  }, [activeFilters, onChangeFilters]);
 
-  const onChangeFilter = (attributeId: string, prevValue: string, newFilter: Filter) => {
+  const onChangeFilter = useCallback((attributeId: string, prevValue: string, newFilter: Filter) => {
     const filterGroup = activeFilters.get(attributeId);
     const targetFilterIndex = filterGroup.findIndex(({ value }) => value === prevValue);
     const updatedFilterGroup = [...filterGroup];
     updatedFilterGroup[targetFilterIndex] = newFilter;
 
     onChangeFilters(activeFilters.set(attributeId, updatedFilterGroup));
-  };
+  }, [activeFilters, onChangeFilters]);
+
+  if (!filterableAttributes.length) {
+    return null;
+  }
 
   return (
     <>
