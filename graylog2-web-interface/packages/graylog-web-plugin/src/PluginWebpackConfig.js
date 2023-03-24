@@ -19,6 +19,7 @@ const path = require('path');
 const webpack = require('webpack');
 const merge = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+
 const TARGET = process.env.npm_lifecycle_event || 'build';
 
 function getPluginFullName(fqcn) {
@@ -34,11 +35,11 @@ function PluginWebpackConfig(defaultRootPath, fqcn, _options, additionalConfig) 
   };
 
   const options = merge(defaultOptions, _options);
-  // eslint-disable-next-line global-require,import/no-dynamic-require
+  /* eslint-disable global-require,import/no-dynamic-require */
   const VENDOR_MANIFEST = require(path.resolve(options.web_src_path, 'manifests', 'vendor-manifest.json'));
   const core = require(path.resolve(options.web_src_path, 'webpack/core'));
   const supportedBrowsers = require(path.resolve(options.web_src_path, 'supportedBrowsers'));
-
+  /* eslint-enable global-require,import/no-dynamic-require */
 
   const plugins = [
     new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: options.root_path }),
@@ -47,20 +48,20 @@ function PluginWebpackConfig(defaultRootPath, fqcn, _options, additionalConfig) 
   const fullPluginName = getPluginFullName(fqcn);
 
   const config = merge.smart({
-      name: fullPluginName,
-      dependencies: ['vendor'],
-      entry: {
-        [fullPluginName]: options.entry_path,
-      },
-      output: {
-        path: options.build_path,
-      },
-      plugins: plugins,
-      resolve: {
-        modules: [path.resolve(options.web_src_path, 'src'), path.resolve(options.web_src_path, 'node_modules')],
-      },
+    name: fullPluginName,
+    dependencies: ['vendor'],
+    entry: {
+      [fullPluginName]: options.entry_path,
     },
-    core.config(TARGET, options.src_path, options.root_path, options.web_src_path, supportedBrowsers),
+    output: {
+      path: options.build_path,
+    },
+    plugins: plugins,
+    resolve: {
+      modules: [path.resolve(options.web_src_path, 'src'), path.resolve(options.web_src_path, 'node_modules')],
+    },
+  },
+  core.config(TARGET, options.src_path, options.root_path, options.web_src_path, supportedBrowsers),
   );
 
   if (additionalConfig) {
