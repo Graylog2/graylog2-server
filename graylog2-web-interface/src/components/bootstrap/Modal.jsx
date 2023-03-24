@@ -17,6 +17,9 @@
 // eslint-disable-next-line no-restricted-imports
 import { Modal as BootstrapModal } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
+import React, { useEffect } from 'react';
+
+import useSendTelemetry from 'telemetry/useSendTelemetry';
 
 const Dialog = css`
   margin-top: 55px;
@@ -50,7 +53,30 @@ const Body = css`
   }
 `;
 
-const Modal = styled(BootstrapModal)`
+const Modal = styled((props) => {
+  const { show, name } = props;
+  const sendTelemetry = useSendTelemetry();
+
+  useEffect(() => {
+    const telemetryEvent = {
+      appSection: name,
+      eventElement: name,
+      eventInfo: {},
+    };
+
+    if (show) {
+      sendTelemetry('open', telemetryEvent);
+    }
+
+    return () => {
+      if (show) {
+        sendTelemetry('close', telemetryEvent);
+      }
+    };
+  }, [show, name, sendTelemetry]);
+
+  return <BootstrapModal {...(props || {})} />;
+})`
   .modal-backdrop {
     height: 100000%;  /* yes, really. this fixes the backdrop being cut off when the page is scrolled. */
     z-index: 1030;
