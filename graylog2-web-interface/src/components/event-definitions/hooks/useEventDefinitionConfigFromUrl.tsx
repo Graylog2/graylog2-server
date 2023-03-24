@@ -20,7 +20,7 @@ import { useMemo } from 'react';
 import useQuery from 'routing/useQuery';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
 
-type EventDefinitionURLConfig = {
+export type EventDefinitionURLConfig = {
   type,
   query?: string,
   streams?: Array<string>,
