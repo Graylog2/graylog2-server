@@ -35,11 +35,17 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.net.URI;
+import java.sql.Timestamp;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.AbstractMap;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -140,16 +146,14 @@ public class NodeServiceImplTest {
     public void testLastSeenBackwardsCompatibility() throws NodeNotFoundException, ValidationException {
         nodeService.registerServer(nodeId.getNodeId(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME);
         final Node node = nodeService.byNodeId(nodeId);
-        final Calendar cal = Calendar.getInstance(Locale.ROOT);
-
-        cal.add(Calendar.MILLISECOND, -2 * STALE_LEADER_TIMEOUT_MS);
-        final int ts = (int) (cal.getTime().getTime() / 1000);
+        final LocalDateTime lastSeenDate = LocalDateTime.now().minus(-2 * STALE_LEADER_TIMEOUT_MS, ChronoUnit.MILLIS);
+        final int ts = (int) lastSeenDate.toEpochSecond(ZoneOffset.UTC);
         node.getFields().put("last_seen", ts);
         nodeService.save(node);
 
         final Node nodeAfterUpdate = nodeService.byNodeId(nodeId);
         final DateTime lastSeen = nodeAfterUpdate.getLastSeen();
-        final long timeDiff = cal.getTime().getTime() - lastSeen.toDate().getTime();
+        final long timeDiff = Math.abs(ts - (lastSeen.getMillis() / 1000));
         Assertions.assertThat(timeDiff).isLessThan(1000); // make sure that our lastSeen from int is the same valid date
 
         final Map<String, Node> activeNodes = nodeService.allActive();
