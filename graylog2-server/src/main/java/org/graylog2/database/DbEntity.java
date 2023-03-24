@@ -14,18 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bindings;
+package org.graylog2.database;
 
-import com.google.inject.AbstractModule;
-import org.graylog2.bindings.providers.MongoConnectionProvider;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
-import org.graylog2.database.dbcatalog.DbEntitiesScanner;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class MongoDBModule extends AbstractModule {
-    @Override
-    protected void configure() {
-        bind(DbEntitiesCatalog.class).toProvider(DbEntitiesScanner.class).asEagerSingleton();
-        bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface DbEntity {
+    String collection();
+
+    String titleField() default "title";
+
+    String readPermission() default NOBODY_ALOWED;
+
+    //use for DBEntities that do not have string representations/ titles at all
+    String NO_TITLE = "";
+
+    String ALL_ALOWED = "";
+    String NOBODY_ALOWED = "__no_access__";
 }

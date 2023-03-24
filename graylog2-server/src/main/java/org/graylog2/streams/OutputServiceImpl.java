@@ -23,7 +23,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.CollectionName;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
@@ -55,7 +55,7 @@ public class OutputServiceImpl implements OutputService {
                              StreamService streamService,
                              ClusterEventBus clusterEventBus) {
         this.streamService = streamService;
-        final String collectionName = OutputImpl.class.getAnnotation(CollectionName.class).value();
+        final String collectionName = OutputImpl.class.getAnnotation(DbEntity.class).collection();
         this.dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
         this.coll = JacksonDBCollection.wrap(dbCollection, OutputImpl.class, String.class, mapperProvider.get());
         this.clusterEventBus = clusterEventBus;
