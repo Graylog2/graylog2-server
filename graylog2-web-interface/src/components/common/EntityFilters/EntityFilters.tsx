@@ -82,19 +82,17 @@ const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters,
   const onDeleteFilter = (attributeId: string, filterId: string) => {
     const filterGroup = activeFilters.get(attributeId);
     const updatedFilterGroup = filterGroup.filter(({ value }) => value !== filterId);
-    const updatedFilters = { ...activeFilters };
 
     if (updatedFilterGroup.length) {
-      return onChangeFilters(updatedFilters.set(attributeId, updatedFilterGroup));
+      return onChangeFilters(activeFilters.set(attributeId, updatedFilterGroup));
     }
 
-    return onChangeFilters(updatedFilters.delete(attributeId));
+    return onChangeFilters(activeFilters.remove(attributeId));
   };
 
   const onChangeFilter = (attributeId: string, prevValue: string, newFilter: Filter) => {
     const filterGroup = activeFilters.get(attributeId);
     const targetFilterIndex = filterGroup.findIndex(({ value }) => value === prevValue);
-
     const updatedFilterGroup = [...filterGroup];
     updatedFilterGroup[targetFilterIndex] = newFilter;
 
