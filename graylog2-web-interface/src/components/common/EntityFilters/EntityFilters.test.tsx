@@ -326,4 +326,31 @@ describe('<EntityFilters />', () => {
 
     await screen.findByTestId('disabled-filter-false');
   });
+
+  it('should delete an active filter', async () => {
+    const setUrlQueryFilters = jest.fn();
+
+    asMock(useFiltersWithTitle).mockReturnValue({
+      data: OrderedMap({
+        disabled: [{ title: 'Running', value: 'false' }],
+      }),
+      onChange: onChangeFiltersWithTitle,
+    });
+
+    render(
+      <EntityFilters attributes={attributes}
+                     setUrlQueryFilters={setUrlQueryFilters}
+                     urlQueryFilters={OrderedMap({ disabled: ['false'] })} />,
+    );
+
+    const activeFilter = await screen.findByTestId('disabled-filter-false');
+    const deleteButton = within(activeFilter).getByRole('button', {
+      name: /delete filter/i,
+    });
+
+    userEvent.click(deleteButton);
+
+    await waitFor(() => expect(onChangeFiltersWithTitle).toHaveBeenCalledWith(OrderedMap(), OrderedMap()));
+    await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap()));
+  });
 });

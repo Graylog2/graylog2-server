@@ -43,7 +43,6 @@ type Props = {
 const ActiveFilters = ({ attributes = [], filters, filterValueRenderers, onDeleteFilter, onChangeFilter }: Props) => (
   <>
     {filters.entrySeq().map(([attributeId, filterValues]) => {
-      console.log(attributeId, attributes);
       const attribute = attributes.find(({ id }) => id === attributeId);
 
       return (
