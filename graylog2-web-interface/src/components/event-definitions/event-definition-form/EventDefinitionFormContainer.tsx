@@ -60,7 +60,7 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
     ConfigurationsActions.listEventsClusterConfig().then((config) => setEventsClusterConfig(config));
   }, []);
 
-  const handleChange = useCallback((key: string, value: any) => {
+  const handleChange = useCallback((key: string, value: unknown) => {
     const nextEventDefinition = cloneDeep(eventDefinition);
     nextEventDefinition[key] = value;
     setEventDefinition(nextEventDefinition);

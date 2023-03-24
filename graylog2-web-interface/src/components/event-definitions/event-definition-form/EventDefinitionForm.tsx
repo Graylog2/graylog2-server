@@ -54,14 +54,14 @@ type Props = {
   currentUser: User,
   validation: {
     errors: {
-      config?: any,
+      config?: unknown,
       title?: string,
     }
   },
   entityTypes: {},
   notifications: Array<EventNotification>,
-  defaults: { default_backlog_size: any },
-  onChange: (key: any, value: any) => void,
+  defaults: { default_backlog_size: number },
+  onChange: (key: string, value: unknown) => void,
   onCancel: () => void,
   onSubmit: () => void
 }
