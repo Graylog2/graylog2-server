@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import ConfigletContainer from 'pages/configurations/ConfigletContainer';
 
+import ConfigletContainer from 'pages/configurations/ConfigletContainer';
 import { useStore } from 'stores/connect';
 import type { Store } from 'stores/StoreTypes';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';

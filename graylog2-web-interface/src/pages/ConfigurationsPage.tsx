@@ -14,13 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import AppConfig from 'util/AppConfig';
-import { isPermitted } from 'util/PermissionsMixin';
-
 import * as React from 'react';
 import { useState } from 'react';
-import ConfigletRow from 'pages/configurations/ConfigletRow';
 
+import AppConfig from 'util/AppConfig';
+import { isPermitted } from 'util/PermissionsMixin';
+import ConfigletRow from 'pages/configurations/ConfigletRow';
 import { Col, Nav, NavItem } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Icon } from 'components/common';
 import SearchesConfig from 'components/configurations/SearchesConfig';
