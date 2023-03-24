@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import PropTypes from 'prop-types';
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useEffect, useMemo, useCallback } from 'react';
+import { useQueryParam, StringParam } from 'use-query-params';
 
 import { PaginatedList, SearchForm, NoSearchResult } from 'components/common';
 import Spinner from 'components/common/Spinner';
@@ -61,7 +62,8 @@ type Props = {
 
 const StreamsOverview = ({ indexSets }: Props) => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
-  const [query, setQuery] = useState('');
+  const [urlQuerySearch, setUrlQuerySearch] = useQueryParam('query', StringParam);
+  console.log({ urlQuerySearch });
   const { layoutConfig, isLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
     defaultPageSize: DEFAULT_LAYOUT.pageSize,
@@ -71,7 +73,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
   const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
   const { data: paginatedStreams, isInitialLoading: isLoadingStreams, refetch: refetchStreams } = useStreams({
-    query,
+    query: urlQuerySearch,
     page: paginationQueryParameter.page,
     pageSize: layoutConfig.pageSize,
     sort: layoutConfig.sort,
@@ -87,7 +89,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
   } = useTableEventHandlers({
     paginationQueryParameter,
     updateTableLayout,
-    setQuery,
+    setQuery: setUrlQuerySearch,
   });
 
   const onChangeFilters = useCallback((newUrlQueryFilters: UrlQueryFilters) => {
@@ -116,6 +118,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
       <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
                     onReset={onSearchReset}
+                    query={urlQuerySearch}
                     queryHelpComponent={<QueryHelper entityName="stream" />}>
           <EntityFilters attributes={attributes}
                          urlQueryFilters={urlQueryFilters}
