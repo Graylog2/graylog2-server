@@ -26,6 +26,7 @@ import org.apache.shiro.subject.Subject;
 import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
@@ -92,21 +93,16 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
 
     }
 
-    public boolean hasAllPermission(final Subject subject) {
+    boolean hasAllPermission(final Subject subject) {
         return subject.isPermitted(new AllPermission());
     }
 
-    public boolean hasReadPermissionForWholeCollection(final Subject subject,
-                                                       final String collection) {
-        final DbEntityCatalogEntry dbEntityCatalogEntry = catalog.getByCollectionName(collection).orElse(null);
-        if (dbEntityCatalogEntry == null) {
-            return false;
-        }
-        final String readPermission = dbEntityCatalogEntry.readPermission();
-        if (readPermission == null || readPermission.isEmpty()) {
-            return false;
-        }
-        return subject.isPermitted(readPermission + ":*");
+    boolean hasReadPermissionForWholeCollection(final Subject subject,
+                                                final String collection) {
+        return catalog.getByCollectionName(collection)
+                .map(DbEntityCatalogEntry::readPermission)
+                .map(rp -> rp.equals(DbEntity.ALL_ALOWED) || subject.isPermitted(rp + ":*"))
+                .orElse(false);
     }
 
 
