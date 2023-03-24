@@ -159,7 +159,6 @@ const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) 
         new webpack.DefinePlugin({
           DEVELOPMENT: true,
         }),
-        new webpack.HotModuleReplacementPlugin(),
         new ForkTsCheckerWebpackPlugin(),
       ],
     });
