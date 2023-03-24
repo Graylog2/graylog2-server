@@ -8,7 +8,6 @@ import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.rest.resources.system.RemoteSystemResource;
-import org.graylog2.telemetry.TelemetryService;
 
 import javax.inject.Named;
 import javax.ws.rs.Consumes;

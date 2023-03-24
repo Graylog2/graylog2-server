@@ -6,7 +6,10 @@ import org.graylog2.telemetry.enterprise.TelemetryLicenseStatus;
 import java.util.List;
 import java.util.Map;
 
-public record TelemetryResponse(UserInfo currentUser, ClusterInfo clusterInfo, LicenseInfo licenseInfo) {
+public record TelemetryResponse(UserInfo currentUser,
+                                ClusterInfo clusterInfo,
+                                LicenseInfo licenseInfo,
+                                PluginInfo pluginInfo) {
 
 
     public record UserInfo(String user,
@@ -24,6 +27,9 @@ public record TelemetryResponse(UserInfo currentUser, ClusterInfo clusterInfo, L
 
     public record LicenseInfo(List<TelemetryLicenseStatus> licenses) {
 
+    }
+
+    public record PluginInfo(boolean isEnterprisePluginInstalled, List<String> installedPlugins) {
     }
 
 
